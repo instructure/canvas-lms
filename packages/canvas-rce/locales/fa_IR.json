@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "افزودن"
+  },
+  "all_4321c3a1": {
+    "message": "همه"
+  },
   "announcement_list_da155734": {
     "message": "فهرست اطلاعیه"
   },
@@ -7,9 +13,6 @@
   },
   "assignments_1e02582c": {
     "message": "تکلیف ها"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "رنگ پس زمینه، کلید down را برای انتخاب فشار دهید"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -62,11 +65,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "بستن"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "همکاری ها"
+  },
+  "content_type_2cf90d95": {
+    "message": "نوع محتوا"
   },
   "copyright_holder_66ee111": {
     "message": "دارنده حق نشر:"
@@ -83,9 +92,6 @@
   "discussions_index_6c36ced": {
     "message": "فهرست بحث ها"
   },
-  "embed_image_1080badc": {
-    "message": "درج تصویر"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "وارد کردن عبارت های جستجو"
   },
@@ -100,12 +106,6 @@
   },
   "folder_705fd2d7": {
     "message": "پوشه"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "اندازه قلم، کلید down را برای انتخاب فشار دهید"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "در حال قالب بندی، کلید down را برای انتخاب فشار دهید"
   },
   "grades_a61eba0a": {
     "message": "نمره ها"
@@ -155,8 +155,14 @@
   "loading_25990131": {
     "message": "در حال بارگذاری..."
   },
+  "loading_bde52856": {
+    "message": "در حال بارگذاری"
+  },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
+  },
+  "media_af190855": {
+    "message": "رسانه"
   },
   "modules_c4325335": {
     "message": "ماژول ها"
@@ -173,9 +179,6 @@
   "quizzes_7e598f57": {
     "message": "آزمون ها"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "قسمت دارای متن غنی. ALT+F8 را برای راهنمایی فشار دهید."
-  },
   "search_280d00bd": {
     "message": "جستجو"
   },
@@ -185,11 +188,14 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "sort_by_e75f9e3e": {
+    "message": "مرتب کردن بر اساس"
+  },
+  "submit_a3cc6859": {
+    "message": "ارسال"
+  },
   "syllabus_f191f65b": {
     "message": "سرفصل"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "رنگ متن، کلید down را برای انتخاب فشار دهید"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "مطلب در دامنه عمومی است"
@@ -208,6 +214,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "بارگذاری یک تصویر جدید"
+  },
+  "url_22a5f3b8": {
+    "message": "نشانی اینترنتی"
   },
   "usage_right_ff96f3e2": {
     "message": "حق استفاده:"

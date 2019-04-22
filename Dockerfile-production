@@ -3,7 +3,7 @@
 # task `build/dockerfile_writer.rb`
 
 # See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
-FROM instructure/ruby-passenger:2.4
+FROM instructure/ruby-passenger:2.4-xenial
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"

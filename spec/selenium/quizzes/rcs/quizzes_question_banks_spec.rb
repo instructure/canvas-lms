@@ -26,7 +26,6 @@ describe 'quizzes question banks' do
 
     before(:each) do
       course_with_teacher_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

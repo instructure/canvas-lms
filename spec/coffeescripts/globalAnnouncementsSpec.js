@@ -24,7 +24,6 @@ import serviceRCELoader from 'jsx/shared/rce/serviceRCELoader'
 QUnit.module('GlobalAnnouncements', {
   setup() {
     fakeENV.setup()
-    ENV.RICH_CONTENT_SERVICE_ENABLED = true
     this.loadOnTargetStub = sinon.stub(serviceRCELoader, 'loadOnTarget')
   },
   teardown() {

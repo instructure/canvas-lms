@@ -33,6 +33,7 @@ exports[`does not render end time if the same as start time 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -80,6 +81,7 @@ exports[`does not render end time if the same as start time 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -190,6 +192,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -237,6 +240,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -356,6 +360,7 @@ exports[`renders Announcement correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -403,6 +408,7 @@ exports[`renders Announcement correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -520,6 +526,7 @@ exports[`renders Announcement correctly with just date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -567,6 +574,7 @@ exports[`renders Announcement correctly with just date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -658,6 +666,7 @@ exports[`renders Announcement correctly with just points 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -705,6 +714,7 @@ exports[`renders Announcement correctly with just points 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -822,6 +832,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -869,6 +880,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -960,6 +972,7 @@ exports[`renders Assignment correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1007,6 +1020,7 @@ exports[`renders Assignment correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://www.non_default_url.com"
             iconPlacement="start"
@@ -1124,6 +1138,7 @@ exports[`renders Assignment correctly with just date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1171,6 +1186,7 @@ exports[`renders Assignment correctly with just date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -1262,6 +1278,7 @@ exports[`renders Assignment correctly with just points 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1309,6 +1326,7 @@ exports[`renders Assignment correctly with just points 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -1426,6 +1444,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1473,6 +1492,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -1564,6 +1584,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1611,6 +1632,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -1720,6 +1742,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1767,6 +1790,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -1902,6 +1926,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -1949,6 +1974,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -2058,6 +2084,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2105,6 +2132,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -2215,6 +2243,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2262,6 +2291,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -2371,6 +2401,7 @@ exports[`renders Discussion correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2418,6 +2449,7 @@ exports[`renders Discussion correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -2535,6 +2567,7 @@ exports[`renders Discussion correctly with just date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2582,6 +2615,7 @@ exports[`renders Discussion correctly with just date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -2673,6 +2707,7 @@ exports[`renders Discussion correctly with just points 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2720,6 +2755,7 @@ exports[`renders Discussion correctly with just points 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -2837,6 +2873,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -2884,6 +2921,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -2975,6 +3013,7 @@ exports[`renders Note correctly with Group 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3022,6 +3061,7 @@ exports[`renders Note correctly with Group 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="/groups/9/pages/this-is-an-account-level-group-page"
             iconPlacement="start"
@@ -3113,6 +3153,7 @@ exports[`renders Note correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3167,6 +3208,7 @@ exports[`renders Note correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -3209,7 +3251,7 @@ exports[`renders Note correctly with everything 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__bavIU): Object {
+                  Symbol(Button__eHiXd): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3291,6 +3333,7 @@ exports[`renders Note correctly without Course 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3345,6 +3388,7 @@ exports[`renders Note correctly without Course 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -3387,7 +3431,7 @@ exports[`renders Note correctly without Course 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button__bavIU): Object {
+                  Symbol(Button__eHiXd): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3469,6 +3513,7 @@ exports[`renders Page correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3516,6 +3561,7 @@ exports[`renders Page correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -3633,6 +3679,7 @@ exports[`renders Page correctly with just date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3680,6 +3727,7 @@ exports[`renders Page correctly with just date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -3771,6 +3819,7 @@ exports[`renders Page correctly with just points 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3818,6 +3867,7 @@ exports[`renders Page correctly with just points 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -3935,6 +3985,7 @@ exports[`renders Page correctly without right side content 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -3982,6 +4033,7 @@ exports[`renders Page correctly without right side content 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4073,6 +4125,7 @@ exports[`renders Quiz correctly with everything 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4120,6 +4173,7 @@ exports[`renders Quiz correctly with everything 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4237,6 +4291,7 @@ exports[`renders Quiz correctly with just date 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4284,6 +4339,7 @@ exports[`renders Quiz correctly with just date 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4375,6 +4431,7 @@ exports[`renders Quiz correctly with just points 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4422,6 +4479,7 @@ exports[`renders Quiz correctly with just points 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4539,6 +4597,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4586,6 +4645,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4677,6 +4737,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4724,6 +4785,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4815,6 +4877,7 @@ exports[`renders correctly 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -4862,6 +4925,7 @@ exports[`renders correctly 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -4979,6 +5043,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5026,6 +5091,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -5144,6 +5210,7 @@ exports[`renders feedback if available 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5191,6 +5258,7 @@ exports[`renders feedback if available 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -5310,6 +5378,7 @@ exports[`renders media feedback if available 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5357,6 +5426,7 @@ exports[`renders media feedback if available 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -5476,6 +5546,7 @@ exports[`renders the end time if available 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5523,6 +5594,7 @@ exports[`renders the end time if available 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             iconPlacement="start"
             linkRef={[Function]}
@@ -5633,6 +5705,7 @@ exports[`renders the location if available 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5680,6 +5753,7 @@ exports[`renders the location if available 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"
@@ -5783,6 +5857,7 @@ exports[`renders user-created Todo correctly 1`] = `
           </ScreenReaderContent>
         }
         onChange={[Function]}
+        readOnly={false}
         size="medium"
         variant="simple"
       />
@@ -5837,6 +5912,7 @@ exports[`renders user-created Todo correctly 1`] = `
         >
           <Link
             as="button"
+            disabled={false}
             ellipsis={true}
             href="http://example.com"
             iconPlacement="start"

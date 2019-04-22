@@ -69,6 +69,12 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
     "https://www.googleapis.com/oauth2/v3/userinfo".freeze
   end
 
+  def client_options
+    super.merge(
+      auth_scheme: :basic_auth
+    )
+  end
+
   def authorize_options
     result = { scope: scope_for_options }
     result[:hd] = hosted_domain if hosted_domain

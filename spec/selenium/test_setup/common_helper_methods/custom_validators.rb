@@ -70,10 +70,19 @@ module CustomValidators
     expect(f("#flash_message_holder")).to contain_jqcss(selector)
   end
 
+  def expect_instui_flash_message(message = nil)
+    text = ":contains(#{message.inspect})" if message
+    expect(f("#flashalert_message_holder")).to contain_jqcss(text)
+  end
+
   def expect_no_flash_message(type = :warning, message = nil)
     selector = ".ic-flash-#{type}"
     selector << ":contains(#{message.inspect})" if message
     expect(f("#flash_message_holder")).not_to contain_jqcss(selector)
+  end
+
+  def expect_no_instui_flash_message
+    expect(f('body')).not_to contain_css('#flashalert_message_holder')
   end
 
   def assert_flash_notice_message(okay_message)

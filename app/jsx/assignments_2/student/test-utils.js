@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {CREATE_SUBMISSION_COMMENT, SUBMISSION_COMMENT_QUERY} from './assignmentData'
 
 export function mockAssignment(overrides = {}) {
   return {
@@ -27,6 +28,7 @@ export function mockAssignment(overrides = {}) {
     unlockAt: null,
     gradingType: 'points',
     allowedAttempts: null,
+    allowedExtensions: [],
     assignmentGroup: {
       name: 'Assignments',
       __typename: 'AssignmentGroup'
@@ -34,7 +36,10 @@ export function mockAssignment(overrides = {}) {
     env: {
       assignmentUrl: '/test/assignment',
       moduleUrl: '/test/module',
-      currentUserId: '1',
+      currentUser: {
+        display_name: 'optimistic user',
+        avatar_image_url: 'http://awesome.url.thing'
+      },
       modulePrereq: null,
       __typename: 'env'
     },
@@ -46,6 +51,7 @@ export function mockAssignment(overrides = {}) {
     submissionsConnection: {
       nodes: [
         {
+          _id: '3',
           commentsConnection: {
             __typename: 'CommentsConnection',
             nodes: [
@@ -145,11 +151,11 @@ export function singleAttachment(overrides = {}) {
   }
 }
 
-export function commentGraphqlMock(query, comments) {
+export function commentGraphqlMock(comments) {
   return [
     {
       request: {
-        query,
+        query: SUBMISSION_COMMENT_QUERY,
         variables: {
           submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
         }
@@ -157,6 +163,35 @@ export function commentGraphqlMock(query, comments) {
       result: {
         data: {
           submissionComments: comments
+        }
+      }
+    },
+    {
+      request: {
+        query: CREATE_SUBMISSION_COMMENT,
+        variables: {
+          id: '3',
+          comment: 'lion'
+        }
+      },
+      result: {
+        data: {
+          createSubmissionComment: {
+            submissionComment: {
+              _id: '3',
+              comment: 'lion',
+              updatedAt: new Date().toISOString(),
+              attachments: [],
+              author: {
+                avatarUrl: 'whatever',
+                shortName: 'sent user',
+                __typename: 'User'
+              },
+              mediaObject: null,
+              __typename: 'SubmissionComment'
+            },
+            __typename: 'CreateSubmissionCommentPayload'
+          }
         }
       }
     }

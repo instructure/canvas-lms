@@ -101,11 +101,13 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }).isRequired,
 
     hideGradesAction: shape({
+      hasGradesToHide: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
 
     postGradesAction: shape({
-      enabled: bool.isRequired,
+      featureEnabled: bool.isRequired,
+      hasGradesToPost: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
 
@@ -377,8 +379,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
         </MenuItem>
 
-        {this.props.postGradesAction.enabled ? (
-          <MenuItem onSelect={this.postGrades}>{I18n.t('Post grades')}</MenuItem>
+        {this.props.postGradesAction.featureEnabled ? (
+          <MenuItem
+            disabled={!this.props.postGradesAction.hasGradesToPost}
+            onSelect={this.postGrades}
+          >
+            {this.props.postGradesAction.hasGradesToPost
+              ? I18n.t('Post grades')
+              : I18n.t('All grades posted')}
+          </MenuItem>
         ) : (
           <MenuItem
             disabled={this.props.muteAssignmentAction.disabled}
@@ -392,8 +401,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           </MenuItem>
         )}
 
-        {this.props.postGradesAction.enabled && (
-          <MenuItem onSelect={this.hideGrades}>{I18n.t('Hide grades')}</MenuItem>
+        {this.props.postGradesAction.featureEnabled && (
+          <MenuItem
+            disabled={!this.props.hideGradesAction.hasGradesToHide}
+            onSelect={this.hideGrades}
+          >
+            {this.props.hideGradesAction.hasGradesToHide
+              ? I18n.t('Hide grades')
+              : I18n.t('All grades hidden')}
+          </MenuItem>
         )}
 
         {!this.props.enterGradesAsSetting.hidden && <MenuItemSeparator />}
@@ -432,9 +448,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           </MenuItem>
         )}
 
-        {this.props.postGradesAction.enabled && <MenuItemSeparator />}
+        {this.props.postGradesAction.featureEnabled && <MenuItemSeparator />}
 
-        {this.props.postGradesAction.enabled && (
+        {this.props.postGradesAction.featureEnabled && (
           <MenuItem onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
           </MenuItem>

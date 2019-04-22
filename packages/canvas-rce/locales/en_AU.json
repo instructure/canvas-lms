@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Assignments"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Background Colour, press down to select"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Copyright Holder:"
   },
+  "course_documents_104d76e0": {
+    "message": "Course Documents"
+  },
+  "course_images_f8511d04": {
+    "message": "Course Images"
+  },
+  "course_links_b56959b9": {
+    "message": "Course Links"
+  },
+  "course_media_ec759ad": {
+    "message": "Course Media"
+  },
   "course_navigation_dd035109": {
     "message": "Course Navigation"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Discussions Index"
-  },
-  "embed_image_1080badc": {
-    "message": "Embed Image"
   },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Folder"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Font Size, press down to select"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatting, press down to select"
   },
   "grades_a61eba0a": {
     "message": "Marks"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Loading..."
   },
+  "loading_bde52856": {
+    "message": "Loading"
+  },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Record/Upload Media"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Press ALT+F8 for help."
-  },
   "search_280d00bd": {
     "message": "Search"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Syllabus"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Text Colour, press down to select"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "This upload exceeds the file storage quota. Please speak to your system administrator."
+  },
+  "tray_839df38a": {
+    "message": "Tray"
   },
   "upload_8b403d05": {
     "message": "Upload"

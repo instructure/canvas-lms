@@ -63,7 +63,7 @@ describe "quizzes questions" do
       expect(answers.length).to eq 3
 
       # check that the wiki sidebar is visible
-      expect(f('#editor_tabs .wiki-sidebar-header')).to include_text("Insert Content into the Page")
+      expect(f('#editor_tabs')).to include_text("Link to other content in the course.")
 
       submit_form(question)
       question = f("#question_#{quest1.id}")

@@ -117,8 +117,9 @@ export function mockAssignment(overrides) {
     id: 'assignment-gid',
     gid: 'assignment-gid',
     lid: 'assignment-lid',
-    name: 'assignment name',
+    name: 'Basic Mock Assignment',
     pointsPossible: 5,
+    gradingType: 'points',
     dueAt: '2018-11-28T13:00-05:00',
     lockAt: '2018-11-29T13:00-05:00',
     unlockAt: '2018-11-27T13:00-05:00',
@@ -134,6 +135,7 @@ export function mockAssignment(overrides) {
     submissionTypes: ['online_text_entry'],
     allowedExtensions: [],
     allowedAttempts: null,
+    onlyVisibleToOverrides: false,
     assignmentOverrides: {
       pageInfo: mockPageInfo(),
       nodes: []
@@ -148,6 +150,7 @@ export function mockAssignment(overrides) {
 
 export function mockOverride(overrides = {}) {
   return {
+    __typename: 'AssignmentOverride',
     gid: '1',
     lid: '1',
     title: 'Section A',
@@ -170,6 +173,7 @@ export function mockOverride(overrides = {}) {
 
 export function mockSubmission(overrides) {
   return {
+    __typename: 'Submission',
     gid: '1',
     lid: '1',
     state: 'submitted',
@@ -192,12 +196,14 @@ export function mockSubmission(overrides) {
 
 export function mockUser(overrides) {
   return {
+    __typename: 'User',
     lid: 'user_1',
     gid: 'user_1',
     name: 'Juan User',
     shortName: 'Juan',
     sortableName: 'User, Juan',
     email: 'juan_user1@example.com',
+    avatarUrl: 'http://host.test',
     ...overrides
   }
 }

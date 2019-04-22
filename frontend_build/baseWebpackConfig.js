@@ -20,6 +20,7 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
+const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
 const webpack = require('webpack')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
@@ -33,7 +34,6 @@ const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 const momentLocaleBundles = require('./momentBundles')
-require('babel-polyfill')
 
 const root = path.resolve(__dirname, '..')
 const USE_BABEL_CACHE =
@@ -161,16 +161,6 @@ module.exports = {
       /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
-      // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
-      {
-        test: require.resolve('tinymce/tinymce'),
-        loaders: ['imports-loader?this=>window', 'exports-loader?window.tinymce']
-      },
-      {
-        test: /tinymce\/(themes|plugins)\//,
-        loaders: ['imports-loader?this=>window']
-      },
-
       {
         test: /\.js$/,
         include: [
@@ -254,6 +244,13 @@ module.exports = {
       NODE_ENV: null,
       DEPRECATION_SENTRY_DSN: null,
       GIT_COMMIT: null
+    }),
+
+    // Only include timezone data starting from 2011 (canvaseption) to 15 years from now,
+    // so we don't clutter the vendor bundle with a bunch of old timezone data
+    new MomentTimezoneDataPlugin({
+      startYear: 2011,
+      endYear: new Date().getFullYear() + 15
     }),
 
     new WebpackCleanupPlugin({

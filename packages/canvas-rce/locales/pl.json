@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Zadania"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Kolor tła; naciskaj do dołu, aby wybrać"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Właściciel praw autorskich:"
   },
+  "course_documents_104d76e0": {
+    "message": "Dokumenty kursu"
+  },
+  "course_images_f8511d04": {
+    "message": "Obrazy kursu"
+  },
+  "course_links_b56959b9": {
+    "message": "Łącza kursu"
+  },
+  "course_media_ec759ad": {
+    "message": "Multimedia kursu"
+  },
   "course_navigation_dd035109": {
     "message": "Nawigowanie po kursie"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Spis dyskusji"
-  },
-  "embed_image_1080badc": {
-    "message": "Osadź obraz"
   },
   "enter_search_terms_e397b1f0": {
     "message": "wprowadź szukane terminy"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Folder"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Rozmiar czcionki; naciskaj do dołu, aby wybrać"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatowanie; naciskaj do dołu, aby wybrać"
   },
   "grades_a61eba0a": {
     "message": "Oceny"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Trwa ładowanie..."
   },
+  "loading_bde52856": {
+    "message": "Wczytywanie"
+  },
   "loading_failed_b3524381": {
     "message": "Niepowodzenie wczytywania..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Utwórz/prześlij pliki multimedialne"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Obszar Rich Text. Wciśnij ALT+F8 po pomoc"
-  },
   "search_280d00bd": {
     "message": "Wyszukaj"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Program"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Kolor tekstu; naciskaj do dołu, aby wybrać"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiał znajduje się w domenie publicznej"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Ta przesyłka przekracza przydział magazynowania plików. Skontaktuj się z administratorem systemu."
+  },
+  "tray_839df38a": {
+    "message": "Zasobnik"
   },
   "upload_8b403d05": {
     "message": "Pobierz"

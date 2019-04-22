@@ -24,10 +24,6 @@ describe "root account basic settings" do
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
   include_examples "settings basic tests", :root_account
 
-  before(:once) do
-    enable_all_rcs Account.default
-  end
-
   before(:each) do
     stub_rcs_config
   end

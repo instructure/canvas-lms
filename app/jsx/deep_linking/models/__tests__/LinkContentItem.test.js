@@ -69,7 +69,7 @@ describe('constructor', () => {
 describe('toHtmlString', () => {
   it('correctly creates a link with the thumbnail', () => {
     expect(linkContentItem().toHtmlString()).toEqual(
-      '<a href="https://www.test.com" title="Title"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+      '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
     )
   })
 
@@ -77,7 +77,7 @@ describe('toHtmlString', () => {
     const overrides = {thumbnail: undefined}
     it('creates an anchor tag with the correct values', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="https://www.test.com" title="Title">some text</a>'
+        '<a href="https://www.test.com" title="Title" target="_blank">some text</a>'
       )
     })
   })
@@ -86,7 +86,21 @@ describe('toHtmlString', () => {
     const overrides = {url: 'javascript:alert("hello world!");'}
     it('sanitizes the url', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+      )
+    })
+  })
+
+  describe('when the iframe property is specified', () => {
+    const iframe = {
+      src: 'http://www.instructure.com',
+      width: 500,
+      height: 200
+    }
+
+    it('returns markup for an iframe', () => {
+      expect(linkContentItem({iframe}).toHtmlString()).toEqual(
+        '<iframe src="http://www.instructure.com" title="Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
       )
     })
   })

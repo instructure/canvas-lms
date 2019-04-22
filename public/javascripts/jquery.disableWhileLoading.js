@@ -33,17 +33,22 @@ $('#form').disableWhileLoading(promise, {
 
 */
 import I18n from 'i18n!instructure'
-import objectCollection from 'compiled/util/objectCollection'
 import $ from 'jquery'
 import './jquery.ajaxJSON'
 import 'spin.js/jquery.spin'
+
+function eraseFromArray (array, victim) {
+  array.forEach((prospect, index) => {
+    if (prospect === victim) array.splice(index, 1)
+  })
+}
 
   $.fn.disableWhileLoading = function(deferred, options) {
     return this.each(function() {
       var opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options),
           $this = $(this),
           data = $this.data(),
-          thingsToWaitOn = data.disabledWhileLoadingDeferreds || (data.disabledWhileLoadingDeferreds = objectCollection([])),
+          thingsToWaitOn = data.disabledWhileLoadingDeferreds || (data.disabledWhileLoadingDeferreds = []),
           myDeferred = $.Deferred();
 
       $.when.apply($, thingsToWaitOn).done(function() {
@@ -92,7 +97,7 @@ import 'spin.js/jquery.spin'
               if(typeof selector === 'number') var selector = ''+this; // for arrays
               $disabledArea.find(selector).text(function() { return $(this).data(dataKey) });
             });
-            thingsToWaitOn.erase(myDeferred); //speed up so that $.when doesn't have to look at myDeferred any more
+            eraseFromArray(thingsToWaitOn, myDeferred); //speed up so that $.when doesn't have to look at myDeferred any more
             myDeferred.resolve();
             if (opts.onComplete) {
               opts.onComplete();

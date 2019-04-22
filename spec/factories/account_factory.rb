@@ -38,12 +38,6 @@ module Factories
 
   def account_rcs_model(opts={})
     @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
-    enable_all_rcs(@account)
-    LoadAccount.default_domain_root_account.enable_feature!(:rich_content_service_high_risk)
-  end
-
-  def enable_all_rcs(account)
-    account.enable_feature!(:rich_content_service_high_risk)
   end
 
   def provision_quizzes_next(account)

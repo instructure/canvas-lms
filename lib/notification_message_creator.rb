@@ -281,7 +281,7 @@ class NotificationMessageCreator
     return [] unless user.registered?
 
     active_channel_scope = user.communication_channels.select { |cc| cc.active? && cc.notification_policies.find { |np| np.notification_id == @notification.id } }
-    immediate_channel_scope = active_channel_scope.select { |cc| cc.notification_policies.find { |np| np.frequency == 'immediately' } }
+    immediate_channel_scope = active_channel_scope.select { |cc| cc.notification_policies.find { |np| np.notification_id == @notification.id && np.frequency == 'immediately' } }
 
     user_has_a_policy = active_channel_scope.find { |cc| cc.path_type != 'push' }
     if !user_has_a_policy && @notification.default_frequency(user) == 'immediately'

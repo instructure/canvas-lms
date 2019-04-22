@@ -17,9 +17,6 @@
 #
 
 module Types
-  # TODO: move this into SubmissionFilterInputType when 1.8 lands
-  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded].freeze
-
   class SubmissionFilterInputType < Types::BaseInputObject
     graphql_name "SubmissionFilterInput"
 

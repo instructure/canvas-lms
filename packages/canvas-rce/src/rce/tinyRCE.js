@@ -29,7 +29,7 @@ tinymce.ScriptLoader.add = function(url) {
 };
 
 // load theme
-import "tinymce/themes/modern/theme";
+import "tinymce/themes/silver/theme";
 
 // add tinymc plugins
 import "tinymce/plugins/autolink/plugin";
@@ -37,7 +37,6 @@ import "tinymce/plugins/autoresize/plugin";
 import "tinymce/plugins/link/plugin";
 import "tinymce/plugins/noneditable/plugin";
 import "tinymce/plugins/media/plugin";
-import "tinymce/plugins/textcolor/plugin";
 import "tinymce/plugins/directionality/plugin";
 import "tinymce/plugins/lists/plugin";
 import "tinymce/plugins/wordcount/plugin";

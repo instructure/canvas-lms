@@ -30,6 +30,10 @@
     <% end %>
   </div>
 
+  <% if post_policies_enabled %>
+    <div id="speed_grader_hidden_submission_pill_mount_point"></div>
+  <% end %>
+
   <% case assignment.grading_type %>
   <% when "points", "percent", "letter_grade", "gpa_scale" %>
     <input type="text" id="grading-box-extended" maxlength="254"/>

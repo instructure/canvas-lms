@@ -316,7 +316,7 @@ module Canvas::Migration::Helpers
 
       hash = {type: type, title: title}
       if @migration
-        mig_id = CC::CCHelper.create_key(item)
+        mig_id = (@migration.content_export || CC::CCHelper).create_key(item)
         hash[:migration_id] = mig_id
         hash[:property] = "#{property_prefix}[#{type}][id_#{mig_id}]"
       else

@@ -134,13 +134,13 @@ class ContextModulesApiController < ApplicationController
   #      too numerous to return inline. Callers must be prepared to use the
   #      {api:ContextModuleItemsApiController#index List Module Items API}
   #      if items are not returned.
-  #    - "content_details": Requires include['items']. Returns additional
+  #    - "content_details": Requires 'items'. Returns additional
   #      details with module items specific to their associated content items.
   #      Includes standard lock information for each item.
   #
   # @argument search_term [String]
-  #   The partial name of the modules (and module items, if include['items'] is
-  #   specified) to match and return.
+  #   The partial name of the modules (and module items, if 'items' is
+  #   specified with include[]) to match and return.
   #
   # @argument student_id
   #   Returns module completion information for the student with this id.
@@ -195,7 +195,7 @@ class ContextModulesApiController < ApplicationController
   #      too numerous to return inline. Callers must be prepared to use the
   #      {api:ContextModuleItemsApiController#index List Module Items API}
   #      if items are not returned.
-  #    - "content_details": Requires include['items']. Returns additional
+  #    - "content_details": Requires 'items'. Returns additional
   #      details with module items specific to their associated content items.
   #      Includes standard lock information for each item.
   #

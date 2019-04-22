@@ -78,7 +78,7 @@
   @has_content_notices = load_content_notices
 -%>
 <%= render :partial => "layouts/head" %>
-<body class="<%= (@body_classes).uniq.join(" ") %> lato-font-not-loaded-yet">
+<body class="<%= (@body_classes).uniq.join(" ") %>">
 <%if @current_user && @real_current_user && @real_current_user != @current_user %>
   <div role="alert" class="screenreader-only">
     <% if @current_user.fake_student? %>

@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Додати"
+  },
+  "all_4321c3a1": {
+    "message": "Всі"
+  },
   "alternative_text_a834dcad": {
     "message": "Альтернативний текст:"
   },
@@ -10,9 +16,6 @@
   },
   "assignments_1e02582c": {
     "message": "Завдання"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Колір фону, натисніть, щоб обрати"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -68,11 +71,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Натисніть, щоб вставити посилання на цей елемент."
   },
+  "close_d634289d": {
+    "message": "Закрити"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Закрити форму Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Сумісна робота"
+  },
+  "content_type_2cf90d95": {
+    "message": "Тип вмісту"
   },
   "copyright_holder_66ee111": {
     "message": "Правовласник:"
@@ -92,9 +101,6 @@
   "discussions_index_6c36ced": {
     "message": "Індекс обговорення"
   },
-  "embed_image_1080badc": {
-    "message": "Вставити забраження"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "введіть умови пошуку"
   },
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Папка"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Розмір шрифту, натисніть, щоб обрати"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Форматування, натисніть, щоб вибрати"
   },
   "grades_a61eba0a": {
     "message": "Оцінки"
@@ -173,11 +173,17 @@
   "loading_25990131": {
     "message": "Завантаження..."
   },
+  "loading_bde52856": {
+    "message": "Завантаження"
+  },
   "loading_failed_b3524381": {
     "message": "Невдале завантаження..."
   },
   "loading_folders_8d4d5d5a": {
     "message": "Завантаження папок ..."
+  },
+  "media_af190855": {
+    "message": "Носій інформації"
   },
   "modules_c4325335": {
     "message": "Розділи"
@@ -197,9 +203,6 @@
   "record_upload_media_5fdce166": {
     "message": "Запис/завантаження медіа"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Багатофункціональна область тексту. Натисніть ALT+F8 для довідки"
-  },
   "search_280d00bd": {
     "message": "Пошук"
   },
@@ -212,11 +215,11 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Виберіть теку, до якої завантажити ваш файл"
   },
+  "submit_a3cc6859": {
+    "message": "Підтвердити"
+  },
   "syllabus_f191f65b": {
     "message": "Навчальний план"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Колір тексту, натисніть, щоб обрати"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Матеріал в публічному домені"
@@ -238,6 +241,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Завантажити нове зображення"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Права використання:"

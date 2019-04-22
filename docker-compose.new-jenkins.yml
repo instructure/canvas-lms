@@ -1,0 +1,27 @@
+# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
+version: "2.1"
+services:
+  web:
+    # use master if NAME is unavailable
+    image: "starlord.inscloudgate.net/jenkins/canvas-lms:${NAME:-master}"
+    links:
+      - postgres
+      - redis
+      - selenium-chrome
+    environment:
+      ENCRYPTION_KEY: 598f25a47a708a96be4bd398cc512c71df1b24114e5af4f8f9c4d2ed777c9906519a07f9452e369a6fa27f8b31e8f768da1422fa47bbf9d8fbd46620dc863002
+      RAILS_ENV: test
+      RAILS_DB_NAME_TEST: 'canvas_test'
+      RAILS_DB_HOST: postgres
+      RAILS_DB_PASSWORD: ''
+      remote_url: http://selenium-chrome:4444/wd/hub
+      browser: chrome
+
+  selenium-chrome:
+    build: ./docker-compose/selenium-chrome
+
+  redis:
+    image: redis:alpine
+
+  postgres:
+    build: ./build/docker-compose/postgres/9.5

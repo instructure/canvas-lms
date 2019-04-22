@@ -129,7 +129,11 @@ export default class MessageParticipantsDialog {
       data.bulk_message = true
     }
 
-    if (this.group) data.tags = this.group.context_codes
+    if (this.group) {
+      data.tags = this.group.context_codes
+    } else if (this.opts.timeslot) {
+      data.context_code = this.opts.timeslot.context_code
+    }
 
     const deferred = $.ajaxJSON(
       '/conversations',

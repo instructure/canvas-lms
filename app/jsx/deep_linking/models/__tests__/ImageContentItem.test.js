@@ -57,7 +57,7 @@ describe('toHtmlString', () => {
     })
   })
 
-  describe('when a thumnail is provided', () => {
+  describe('when a thumbnail is provided', () => {
     const contentItem = imageContentItem({
       thumbnail: 'http://www.test.com/thumbnail',
       width: 100,
@@ -66,7 +66,7 @@ describe('toHtmlString', () => {
 
     it('creates a link to the image using the thumbnail', () => {
       expect(contentItem.toHtmlString()).toEqual(
-        '<a href="https://www.test.com/image" title="Title"><img src="http://www.test.com/thumbnail" alt="some text"></a>'
+        '<a href="https://www.test.com/image" title="Title" target="_blank"><img src="http://www.test.com/thumbnail" alt="some text"></a>'
       )
     })
   })

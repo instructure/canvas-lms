@@ -18,6 +18,10 @@
 class Quizzes::QuizSubmissionEventPartitioner
   cattr_accessor :logger
 
+  def self.precreate_tables
+    Setting.get('quiz_events_partitions_precreate_months', 2).to_i
+  end
+
   def self.process(in_migration=false)
     Shackles.activate(:deploy) do
       Quizzes::QuizSubmissionEvent.transaction do
@@ -26,7 +30,7 @@ class Quizzes::QuizSubmissionEventPartitioner
 
         partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
 
-        partman.ensure_partitions(Setting.get('quiz_events_partitions_precreate_months', 2).to_i)
+        partman.ensure_partitions(precreate_tables)
 
         Shard.current.database_server.unshackle {partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)}
 
@@ -39,5 +43,10 @@ class Quizzes::QuizSubmissionEventPartitioner
 
   def self.log(*args)
     logger.info(*args) if logger
+  end
+
+  def self.processed?
+    partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
+    partman.partitions_created?(precreate_tables - 1)
   end
 end

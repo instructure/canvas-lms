@@ -120,10 +120,39 @@ describe Api::V1::PlannerItem do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         assessor_submission = @assignment.find_or_create_submission(@reviewer)
         @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: assessor_submission, assessor: @reviewer)
-        json = api.planner_item_json(@peer_review, @student, session)
+        json = api.planner_item_json(@peer_review, @reviewer, session)
         expect(json[:plannable_type]).to eq "assessment_request"
         expect(json[:plannable][:title]).to eq @assignment.title
         expect(json[:plannable][:todo_date]).to eq @assignment.due_at
+      end
+
+      it "includes the submission url" do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        assessor_submission = @assignment.find_or_create_submission(@reviewer)
+        @peer_review = AssessmentRequest.create!(
+          assessor: @reviewer,
+          assessor_asset: assessor_submission,
+          asset: submission,
+          user: @student
+        )
+        json = api.planner_item_json(@peer_review, @reviewer, session)
+        expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(json[:html_url]).to eq expected_url
+      end
+
+      it "includes the anonymized submission url when anonymous peer reviews" do
+        @assignment.update!(anonymous_peer_reviews: true)
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        assessor_submission = @assignment.find_or_create_submission(@reviewer)
+        @peer_review = AssessmentRequest.create!(
+          assessor: @reviewer,
+          assessor_asset: assessor_submission,
+          asset: submission,
+          user: @student
+        )
+        json = api.planner_item_json(@peer_review, @reviewer, session)
+        expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
+        expect(json[:html_url]).to eq expected_url
       end
     end
 

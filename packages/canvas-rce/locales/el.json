@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Πρόσθεση"
+  },
+  "all_4321c3a1": {
+    "message": "Όλα"
+  },
   "announcement_list_da155734": {
     "message": "Λίστα Ανακοινώσεων"
   },
@@ -7,9 +13,6 @@
   },
   "assignments_1e02582c": {
     "message": "Εργασίες"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Χρώμα Φόντου, πιέστε για επιλογή"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -62,11 +65,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Κάντε κλικ για να εισάγετε σύνδεσμο προς αυτή το αντικείμενο"
   },
+  "close_d634289d": {
+    "message": "Κλείσιμο"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Κλείσιμο φόρμας Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Συνεργασίες"
+  },
+  "content_type_2cf90d95": {
+    "message": "Τύπος Περιεχομένου"
   },
   "copyright_holder_66ee111": {
     "message": "Κάτοχος Πνευματικών Δικαιωμάτων:"
@@ -83,9 +92,6 @@
   "discussions_index_6c36ced": {
     "message": "Ευρετήριο Συζητήσεων"
   },
-  "embed_image_1080badc": {
-    "message": "Ενσωμάτωση εικόνας"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "εισαγωγή όρων αναζήτησης"
   },
@@ -100,12 +106,6 @@
   },
   "folder_705fd2d7": {
     "message": "Φάκελος"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Μέγεθος Γραμματοσειράς, πιέστε για επιλογή"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Μορφοποίηση, πατήστε κάτω για επιλογή"
   },
   "grades_a61eba0a": {
     "message": "Βαθμοί"
@@ -155,8 +155,14 @@
   "loading_25990131": {
     "message": "Φόρτωση..."
   },
+  "loading_bde52856": {
+    "message": "Φόρτωση"
+  },
   "loading_failed_b3524381": {
     "message": "Η Φόρτωση Απέτυχε"
+  },
+  "media_af190855": {
+    "message": "Δεδομένα"
   },
   "modules_c4325335": {
     "message": "Ενότητες"
@@ -173,9 +179,6 @@
   "quizzes_7e598f57": {
     "message": "Κουίζ"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Περιοχή Rich Text. Πατήστε ALT+F8 για βοήθεια"
-  },
   "search_280d00bd": {
     "message": "Αναζήτηση"
   },
@@ -185,11 +188,11 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Επιλέξτε το φάκελο στον οποίο θέλετε να φορτώσετε το αρχείο "
   },
+  "submit_a3cc6859": {
+    "message": "Υποβολή"
+  },
   "syllabus_f191f65b": {
     "message": "Αναλυτικό Πρόγραμμα"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Χρώμα Κειμένου, πιέστε για επιλογή"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Το υλικό βρίσκεται στο δημόσιο domain"
@@ -208,6 +211,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Φόρτωση νέας εικόνας"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Δικαίωμα Χρήσης:"

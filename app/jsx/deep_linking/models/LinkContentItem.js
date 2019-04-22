@@ -32,10 +32,14 @@ export default class LinkContentItem extends ContentItem {
   }
 
   get properties() {
-    return Object.freeze(['url', 'title', 'text', 'icon', 'thumbnail'])
+    return Object.freeze(['url', 'title', 'text', 'icon', 'thumbnail', 'iframe'])
   }
 
   toHtmlString() {
+    if (this.iframe && this.iframe.src) {
+      return this.iframeTag()
+    }
+
     return this.anchorTag(this.linkBody())
   }
 

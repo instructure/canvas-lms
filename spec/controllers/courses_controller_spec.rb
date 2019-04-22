@@ -2227,6 +2227,28 @@ describe CoursesController do
       expect(feed).not_to be_nil
       expect(feed.entries).to be_empty
     end
+
+    it "respects assignment overrides" do
+      @assignment.update_attribute :only_visible_to_overrides, true
+      @a0 = @assignment
+      graded_discussion_topic(context: @course)
+      @topic.assignment.update_attribute :only_visible_to_overrides, true
+
+      get 'public_feed', params: {:feed_code => @enrollment.feed_code}, :format => 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed).not_to be_nil
+      expect(feed.entries.map(&:id).join(" ")).not_to include @a0.asset_string
+      expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
+
+      assignment_override_model :assignment => @a0, :set => @enrollment.course_section
+      assignment_override_model :assignment => @topic.assignment, :set => @enrollment.course_section
+
+      get 'public_feed', params: {:feed_code => @enrollment.feed_code}, :format => 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed).not_to be_nil
+      expect(feed.entries.map(&:id).join(" ")).to include @a0.asset_string
+      expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
+    end
   end
 
   describe "POST 'reset_content'" do
@@ -2591,6 +2613,22 @@ describe CoursesController do
       json = json_parse(response.body)
       expect(json.count).to eq(1)
       expect(json[0]).to include({ "id" => student1.id, "uuid" => student1.uuid })
+    end
+
+    it 'can sort uesrs' do
+      student1.update!(name: 'Student B')
+      student2.update!(name: 'Student A')
+
+      user_session(teacher)
+      get 'users', params: {
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        sort: 'username'
+      }
+      json = json_parse(response.body)
+      expect(json[0]).to include({ 'id' => student2.id })
+      expect(json[1]).to include({ 'id' => student1.id })
     end
   end
 end

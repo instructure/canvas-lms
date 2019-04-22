@@ -758,6 +758,47 @@ describe UserLearningObjectScopes do
     end
   end
 
+  context "#assignments_needing_grading_count" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @sectionb = @course.course_sections.create!(name: 'section B')
+      @student_a = user_with_pseudonym(active_all: true, name: 'StudentA', username: 'studentA@instructure.com')
+      @student_b = user_with_pseudonym(active_all: true, name: 'StudentB', username: 'studentB@instructure.com')
+      @course.enroll_student(@student_a).update_attributes(workflow_state: 'active')
+      @sectionb.enroll_user(@student_b, 'StudentEnrollment', 'active')
+    end
+
+    it 'should show counts for all submissions a grader can see' do
+      assignment_model(course: @course, submission_types: ['online_text_entry'])
+      [@student_a, @student_b].each do |student|
+        @assignment.submit_homework student, body: "submission for #{student.name}"
+      end
+
+      expect(@teacher.assignments_needing_grading_count).to eq 2
+    end
+
+    it 'should not show counts for submissions that a grader can\'t see due to enrollment visibility' do
+      @enrollment.update_attributes(limit_privileges_to_course_section: true) # limit the teacher to only see one of the students
+      assignment_model(course: @course, submission_types: ['online_text_entry'])
+      [@student_a, @student_b].each do |student|
+        @assignment.submit_homework student, body: "submission for #{student.name}"
+      end
+
+      expect(@teacher.assignments_needing_grading_count).to eq 1
+    end
+
+    it 'should not show counts for submissions in a section where the grader is enrolled but is not a grader' do
+      @enrollment.update_attributes(limit_privileges_to_course_section: true)
+      @sectionb.enroll_user(@teacher, 'StudentEnrollment', 'active')
+      assignment_model(course: @course, submission_types: ['online_text_entry'])
+      [@student_a, @student_b].each do |student|
+        @assignment.submit_homework student, body: "submission for #{student.name}"
+      end
+
+      expect(@teacher.assignments_needing_grading_count).to eq 1
+    end
+  end
+
   context "#assignments_needing_moderation" do
     before :once do
       # create courses and sections

@@ -25,7 +25,6 @@ describe 'Grading quizzes' do
   context 'as a teacher' do
     before(:once) do
       course_with_teacher(active_all: 1)
-      enable_all_rcs @course.account
       student_in_course(active_all: 1)
     end
 

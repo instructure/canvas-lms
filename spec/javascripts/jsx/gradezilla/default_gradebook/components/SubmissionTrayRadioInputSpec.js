@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import SubmissionTrayRadioInput from 'jsx/gradezilla/default_gradebook/components/SubmissionTrayRadioInput'
-import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
+import {NumberInput} from '@instructure/ui-number-input'
 
 let wrapper
 let updateSubmission
@@ -184,7 +184,7 @@ QUnit.module('SubmissionTrayRadioInput', function(hooks) {
         checked: true,
         submission: {latePolicyStatus: 'late', secondsLate}
       })
-      strictEqual(numberInput().props().defaultValue, '2')
+      strictEqual(numberInput().props().value, '2')
     })
 
     test('the default value for the input is converted to hours if the late policy interval is "hour"', function() {
@@ -196,7 +196,7 @@ QUnit.module('SubmissionTrayRadioInput', function(hooks) {
         latePolicy: {lateSubmissionInterval: 'hour'},
         submission: {latePolicyStatus: 'late', secondsLate}
       })
-      strictEqual(numberInput().props().defaultValue, '48')
+      strictEqual(numberInput().props().value, '48')
     })
 
     test('the default value for the input is rounded to two digits after the decimal point', function() {
@@ -208,7 +208,7 @@ QUnit.module('SubmissionTrayRadioInput', function(hooks) {
         latePolicy: {lateSubmissionInterval: 'hour'},
         submission: {latePolicyStatus: 'late', secondsLate}
       })
-      strictEqual(numberInput().props().defaultValue, '48.07')
+      strictEqual(numberInput().props().value, '48.07')
     })
 
     QUnit.module('on blur', function() {

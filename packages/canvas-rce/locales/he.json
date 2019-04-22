@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "הוספה"
+  },
+  "all_4321c3a1": {
+    "message": "כל"
+  },
   "alternative_text_a834dcad": {
     "message": "טקסט חלופי:"
   },
@@ -10,9 +16,6 @@
   },
   "assignments_1e02582c": {
     "message": "משימות"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "צבע רקע, יש להקיש כדי לבחור"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -68,11 +71,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "הקלקה להוספת קישור לפריט זה"
   },
+  "close_d634289d": {
+    "message": "סגירה"
+  },
   "close_flickr_form_b32e600a": {
     "message": "סגירת דף פליקר"
   },
   "collaborations_5c56c15f": {
     "message": "שיתופי פעולה"
+  },
+  "content_type_2cf90d95": {
+    "message": "סוג תוכן"
   },
   "copyright_holder_66ee111": {
     "message": "בעלים של זכויות יוצרים:"
@@ -92,9 +101,6 @@
   "discussions_index_6c36ced": {
     "message": "אינדקס דיונים"
   },
-  "embed_image_1080badc": {
-    "message": "הטמעת תמונה"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "הקלדת ערכי חיפוש"
   },
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "תיקיה"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "גודל אות, יש להקיש כדי לבחור"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "עיצוב, יש להקיש כדי לבחור"
   },
   "grades_a61eba0a": {
     "message": "הערכות"
@@ -173,8 +173,14 @@
   "loading_25990131": {
     "message": "בטעינה... "
   },
+  "loading_bde52856": {
+    "message": "טוען"
+  },
   "loading_failed_b3524381": {
     "message": "טעינה נכשלה..."
+  },
+  "media_af190855": {
+    "message": "מדיה"
   },
   "modules_c4325335": {
     "message": "מודולים"
@@ -191,9 +197,6 @@
   "quizzes_7e598f57": {
     "message": "בחנים"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "איזור תוכן עשיר. לעזרה יש להקיש ALT+F8"
-  },
   "search_280d00bd": {
     "message": "חיפוש"
   },
@@ -206,11 +209,11 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "בחירת תיקיה להעלאת הקובץ שלך"
   },
+  "submit_a3cc6859": {
+    "message": "הגשה"
+  },
   "syllabus_f191f65b": {
     "message": "תכנית לימודים"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "צבע טקסט, יש להקיש כדי לבחור"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "החומר הנו ברשות הציבור"
@@ -229,6 +232,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "העלאת תמונה חדשה"
+  },
+  "url_22a5f3b8": {
+    "message": "כתובת דף אינטרנט"
   },
   "usage_right_ff96f3e2": {
     "message": "זכויות שימוש"

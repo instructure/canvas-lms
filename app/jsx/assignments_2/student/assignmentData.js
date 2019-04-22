@@ -21,7 +21,7 @@ import {bool, number, shape, string, arrayOf} from 'prop-types'
 export function GetAssignmentEnvVariables() {
   const defaults = {
     assignmentUrl: '',
-    currentUserId: null,
+    currentUser: null,
     modulePrereq: null,
     moduleUrl: ''
   }
@@ -34,7 +34,7 @@ export function GetAssignmentEnvVariables() {
   }`
   defaults.assignmentUrl = `${baseUrl}/assignments`
   defaults.moduleUrl = `${baseUrl}/modules`
-  defaults.currentUserId = ENV.current_user_id
+  defaults.currentUser = ENV.current_user
 
   if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
     const prereq = ENV.PREREQS.items[0].prev
@@ -50,6 +50,32 @@ export function GetAssignmentEnvVariables() {
   return {...defaults}
 }
 
+function submissionCommentQueryParams() {
+  return `
+    _id
+    comment
+    updatedAt
+    mediaObject {
+      id
+      title
+      mediaType
+      mediaSources {
+        src: url
+        type: contentType
+      }
+    }
+    author {
+      avatarUrl
+      shortName
+    }
+    attachments {
+      _id
+      displayName
+      mimeClass
+      url
+    }`
+}
+
 export const STUDENT_VIEW_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
@@ -63,6 +89,7 @@ export const STUDENT_VIEW_QUERY = gql`
         unlockAt
         gradingType
         allowedAttempts
+        allowedExtensions
         assignmentGroup {
           name
         }
@@ -78,6 +105,7 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
+            _id
             id
             deductedPoints
             enteredGrade
@@ -98,30 +126,19 @@ export const SUBMISSION_COMMENT_QUERY = gql`
       ... on Submission {
         commentsConnection {
           nodes {
-            _id
-            comment
-            updatedAt
-            mediaObject {
-              id
-              title
-              mediaType
-              mediaSources {
-                src: url
-                type: contentType
-              }
-            }
-            author {
-              avatarUrl
-              shortName
-            }
-            attachments {
-              _id
-              displayName
-              mimeClass
-              url
-            }
+            ${submissionCommentQueryParams()}
           }
         }
+      }
+    }
+  }
+`
+
+export const CREATE_SUBMISSION_COMMENT = gql`
+  mutation CreateSubmissionComment($id: ID!, $comment: String!) {
+    createSubmissionComment(input: {submissionId: $id, comment: $comment}) {
+      submissionComment {
+        ${submissionCommentQueryParams()}
       }
     }
   }
@@ -132,6 +149,16 @@ export const AttachmentShape = shape({
   displayName: string,
   mimeClass: string,
   url: string
+})
+
+export const MediaObjectShape = shape({
+  id: string,
+  title: string,
+  mediaType: string,
+  mediaSources: shape({
+    src: string,
+    type: string
+  })
 })
 
 export const CommentShape = shape({
@@ -146,16 +173,6 @@ export const CommentShape = shape({
   updatedAt: string
 })
 
-export const MediaObjectShape = shape({
-  id: string,
-  title: string,
-  mediaType: string,
-  mediaSources: shape({
-    src: string,
-    type: string
-  })
-})
-
 export const StudentAssignmentShape = shape({
   description: string,
   dueAt: string,
@@ -166,13 +183,17 @@ export const StudentAssignmentShape = shape({
   unlockAt: string,
   gradingType: string,
   allowedAttempts: number,
+  allowedExtensions: arrayOf(string),
   assignmentGroup: shape({
     name: string.isRequired
   }).isRequired,
   env: shape({
     assignmentUrl: string.isRequired,
     moduleUrl: string.isRequired,
-    currentUserId: string,
+    currentUser: shape({
+      display_name: string,
+      avatar_image_url: string
+    }),
     modulePrereq: shape({
       title: string.isRequired,
       link: string.isRequired

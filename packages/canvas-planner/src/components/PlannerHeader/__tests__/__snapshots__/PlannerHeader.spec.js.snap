@@ -248,6 +248,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   >
     <View
       as="div"
+      debug={false}
       display="auto"
       overflowX="visible"
       overflowY="visible"
@@ -549,6 +550,7 @@ exports[`new activity button shows when there is new activity 1`] = `
   >
     <View
       as="div"
+      debug={false}
       display="auto"
       overflowX="visible"
       overflowY="visible"
@@ -850,6 +852,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   >
     <View
       as="div"
+      debug={false}
       display="auto"
       overflowX="visible"
       overflowY="visible"

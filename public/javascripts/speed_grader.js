@@ -41,6 +41,7 @@ import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
 import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
 import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
 import View from '@instructure/ui-layout/lib/components/View'
+import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round'
 import _ from 'underscore'
@@ -93,6 +94,8 @@ const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
 const SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT = 'speed_grader_post_grades_menu_mount_point'
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
+const SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT =
+  'speed_grader_hidden_submission_pill_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
@@ -705,6 +708,24 @@ function renderProgressIcon(attachment) {
   }
 
   ReactDOM.render(<Tooltip tip={icon[1]}>{icon[0]}</Tooltip>, mountPoint)
+}
+
+function renderHiddenSubmissionPill({submission, postManually}) {
+  const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
+  // Show the "hidden" pill if:
+  // - Manual posting is enabled and the submission is not posted (graded or not)
+  // - Auto-posting is enabled and the submission is graded but not posted
+  //   (this means it's been manually hidden)
+  const showPill =
+    submission && submission.posted_at == null && (postManually || submission.graded_at != null)
+  if (showPill) {
+    ReactDOM.render(
+      <Pill variant="danger" text={I18n.t('Hidden')} margin="0 0 small" />,
+      mountPoint
+    )
+  } else {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  }
 }
 
 function renderCommentTextArea() {
@@ -3069,6 +3090,9 @@ EG = {
       $score.text('')
     }
 
+    if (ENV.post_policies_enabled) {
+      renderHiddenSubmissionPill({submission, postManually: jsonData.post_manually})
+    }
     EG.updateStatsInHeader()
   },
 

@@ -62,6 +62,7 @@ module SpeedGrader
       )
       res['anonymize_students'] = @assignment.anonymize_students?
       res['anonymize_graders'] = !@assignment.can_view_other_grader_identities?(@current_user)
+      res['post_manually'] = @assignment.post_manually? if @course.feature_enabled?(:post_policies)
 
       # include :provisional here someday if we need to distinguish
       # between provisional and real comments (also in

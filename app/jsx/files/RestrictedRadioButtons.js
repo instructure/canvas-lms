@@ -75,45 +75,30 @@ class RestrictedRadioButtons extends React.Component {
       ref: 'unpublishInput',
       text: I18n.t('Unpublish'),
       selectedOptionKey: 'unpublished',
-      iconClasses: 'icon-unpublish RestrictedRadioButtons__unpublish_icon',
+      iconClasses: 'icon-unpublish RestrictedRadioButtons__icon',
       onChange() {
         this.updateBtnEnable()
         this.setState({selectedOption: 'unpublished'})
       }
     },
     {
-      ref: 'permissionsInput',
-      text: I18n.t('Restricted Access'),
-      selectedOptionKey: ['link_only', 'date_range'],
-      iconClasses: 'icon-cloud-lock RestrictedRadioButtons__icon-cloud-lock',
-      onChange() {
-        const selectedOption = this.state.unlock_at ? 'date_range' : 'link_only'
-        this.updateBtnEnable()
-        this.setState({selectedOption})
-      }
-    }
-  ]
-  restrictedOptions = [
-    {
-      ref: 'link_only',
+      ref: 'linkOnly',
       selectedOptionKey: 'link_only',
-      getText() {
-        if (this.allFolders()) {
-          return I18n.t('Hidden, files inside will be available with links.')
-        } else if (this.props.models.length > 1 && this.anyFolders()) {
-          return I18n.t(
-            'Files and folder contents only available to students with link. Not visible in student files.'
-          )
-        } else {
-          return I18n.t('Only available to students with link. Not visible in student files.')
-        }
+      text: I18n.t('Not visible in student files'),
+      iconClasses: 'icon-line icon-off RestrictedRadioButtons__icon',
+      onChange() {
+        this.updateBtnEnable()
+        this.setState({selectedOption: 'link_only'})
       }
     },
     {
       ref: 'dateRange',
       selectedOptionKey: 'date_range',
-      getText() {
-        return I18n.t('Schedule student availability')
+      text: I18n.t('Schedule student availability'),
+      iconClasses: 'icon-line icon-calendar-month RestrictedRadioButtons__icon',
+      onChange() {
+        this.updateBtnEnable()
+        this.setState({selectedOption: 'date_range'})
       }
     }
   ]
@@ -172,33 +157,6 @@ class RestrictedRadioButtons extends React.Component {
       </div>
     ))
 
-  renderRestrictedAccessOptions = () => {
-    if (this.state.selectedOption !== 'link_only' && this.state.selectedOption !== 'date_range') {
-      return null
-    }
-
-    return (
-      <div style={{marginLeft: '20px'}}>
-        {this.restrictedOptions.map((option, index) => (
-          <div className="radio" key={index}>
-            <label>
-              <input
-                ref={e => (this[option.ref] = e)}
-                type="radio"
-                name="restrict_options"
-                checked={this.state.selectedOption === option.selectedOptionKey}
-                onChange={() => {
-                  this.setState({selectedOption: option.selectedOptionKey})
-                }}
-              />
-              {option.getText.bind(this)()}
-            </label>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   renderDatePickers = () => {
     const styleObj = {}
     if (this.state.selectedOption !== 'date_range') {
@@ -241,7 +199,6 @@ class RestrictedRadioButtons extends React.Component {
   renderRestrictedRadioButtons = () => (
     <div>
       {this.renderPermissionOptions()}
-      {this.renderRestrictedAccessOptions()}
       {this.renderDatePickers()}
     </div>
   )

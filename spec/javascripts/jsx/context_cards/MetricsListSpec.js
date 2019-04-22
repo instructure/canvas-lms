@@ -40,7 +40,47 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
       notOk(subject.grade)
     })
 
-    test('returns current_grade if present', () => {
+    test('returns override_grade if present', () => {
+      const overrideGrade = 'A+'
+      subject = TestUtils.renderIntoDocument(
+        <MetricsList
+          user={{
+            enrollments: [
+              {
+                grades: {
+                  override_grade: overrideGrade
+                },
+                sections: []
+              }
+            ]
+          }}
+        />
+      )
+
+      equal(subject.grade, overrideGrade)
+    })
+
+    test('returns override_score if present and override_grade is not present', () => {
+      const overrideScore = '81.8'
+      subject = TestUtils.renderIntoDocument(
+        <MetricsList
+          user={{
+            enrollments: [
+              {
+                grades: {
+                  override_score: overrideScore
+                },
+                sections: []
+              }
+            ]
+          }}
+        />
+      )
+
+      equal(subject.grade, `${overrideScore}%`)
+    })
+
+    test('returns current_grade if present and override fields are not present', () => {
       const currentGrade = 'A+'
       subject = TestUtils.renderIntoDocument(
         <MetricsList

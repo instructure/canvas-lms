@@ -162,10 +162,12 @@ describe "announcements" do
       _, path = get_file('testfile1.txt')
       f('#discussion_attachment_uploaded_data').send_keys(path)
       expect_new_page_load { submit_form('.form-actions') }
-      expect(Announcement.last.title).to eq("First Announcement")
+      ann = Announcement.last
+      expect(ann.title).to eq("First Announcement")
       # the delayed post at should be far enough in the future to make this
       # not flaky
-      expect(Announcement.last.delayed_post_at > Time.zone.now).to eq true
+      expect(ann.delayed_post_at > Time.zone.now).to eq true
+      expect(ann.attachment).to be_locked
     end
 
     it "displayed delayed post note on page of delayed announcement" do

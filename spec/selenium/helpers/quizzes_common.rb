@@ -270,8 +270,10 @@ module QuizzesCommon
 
   def click_questions_tab
     wait_for_ajaximations
-    dismiss_flash_messages_if_present
-    f("a[href='#questions_tab']").click
+    tab = f("a[href='#questions_tab']")
+    keep_trying_until do
+      tab.click; true
+    end
   end
 
   # Locate an anchor using its text() node value. The anchor is expected to

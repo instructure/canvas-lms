@@ -52,6 +52,14 @@ See CanvasPartman::Concerns::Partitioned.
       raise NotImplementedError
     end
 
+    # Check that the current partition, and n future partitions exist
+    #
+    # @param [Integer] advance
+    #   The number of partitions to check in advance
+    def partitions_created?(_advance = 1)
+      raise NotImplementedError
+    end
+
     # Prune old partitions
     #
     # @param [Integer] number_to_keep

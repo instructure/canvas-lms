@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Opgaver"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Baggrundsfarve, tryk ned for at vælge"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Rettighedshaver:"
   },
+  "course_documents_104d76e0": {
+    "message": "Fagdokumenter"
+  },
+  "course_images_f8511d04": {
+    "message": "Fagbilleder"
+  },
+  "course_links_b56959b9": {
+    "message": "Faglinks"
+  },
+  "course_media_ec759ad": {
+    "message": "Fagmedier"
+  },
   "course_navigation_dd035109": {
     "message": "Fagnavigation"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Diskussionsoversigt"
-  },
-  "embed_image_1080badc": {
-    "message": "Integrer billede"
   },
   "enter_search_terms_e397b1f0": {
     "message": "indtast søgetermer"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "mappe"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Skriftstørrelse, tryk ned for at vælge"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatering, tryk ned for at vælge"
   },
   "grades_a61eba0a": {
     "message": "Vurderinger"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Indlæser ..."
   },
+  "loading_bde52856": {
+    "message": "Indlæser"
+  },
   "loading_failed_b3524381": {
     "message": "Indlæsning mislykkedes ..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Optag/overfør medier"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Område med RTF. Tryk på ALT+F8 for hjælp"
-  },
   "search_280d00bd": {
     "message": "Søg"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Fagplan"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Tekstfarve, tryk ned for at vælge"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialer er på det offentlige domæne"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Denne upload overstiger fillagringskvoten. Kontakt din systemadministrator."
+  },
+  "tray_839df38a": {
+    "message": "Bakke"
   },
   "upload_8b403d05": {
     "message": "Upload"

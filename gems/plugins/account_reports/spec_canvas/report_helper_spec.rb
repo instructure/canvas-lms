@@ -35,10 +35,15 @@ describe "report helper" do
   let(:report) { AccountReports::TestReport.new(account_report) }
 
   it 'should handle basic math' do
+    # default min
     expect(report.number_of_items_per_runner(1)).to eq 25
-    expect(report.number_of_items_per_runner(13001)).to eq 130
+    # divided by 99 to make for 100 jobs except for when exactly divisible by 99
+    expect(report.number_of_items_per_runner(13001)).to eq 131
+    # default max
     expect(report.number_of_items_per_runner(1801308213)).to eq 1000
+    # override min
     expect(report.number_of_items_per_runner(100, min: 10)).to eq 10
+    # override max
     expect(report.number_of_items_per_runner(109213081, max: 100)).to eq 100
   end
 
@@ -57,7 +62,7 @@ describe "report helper" do
     # other runners
     expect(AccountReport).to receive(:bulk_insert_objects).twice.and_call_original
     # also got to pass min so that we get runners with 12 ids instead of 25
-    report.create_report_runners((1..1_200).to_a, 1_200, min: 10)
+    report.create_report_runners((1..1_200).to_a, 1_201, min: 10)
     expect(account_report.account_report_runners.count).to eq 100
   end
 

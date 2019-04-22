@@ -202,7 +202,9 @@ class Wiki < ActiveRecord::Base
     if (match = param.match(/\Apage_id:(\d+)\z/))
       return self.wiki_pages.where(id: match[1].to_i).first
     end
-    scope = include_deleted ? self.wiki_pages : self.wiki_pages.not_deleted
+    scope = include_deleted ?
+      self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END")) :
+      self.wiki_pages.not_deleted
     scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
   end
 

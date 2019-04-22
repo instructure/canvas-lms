@@ -20,65 +20,90 @@ import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
 import EditableHeading from '../EditableHeading'
 
-it('renders the value in view mode', () => {
-  const {getByText} = render(
-    <EditableHeading
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      label="Book title"
-      value="Another Roadside Attraction"
-      level="h3"
-    />
-  )
+describe('EditableHeading', () => {
+  it('renders the value in view mode', () => {
+    const {getByText} = render(
+      <EditableHeading
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        label="Book title"
+        value="Another Roadside Attraction"
+        level="h3"
+      />
+    )
 
-  expect(getByText('Another Roadside Attraction')).toBeInTheDocument()
-  expect(document.querySelector('h3')).toBeInTheDocument()
-})
+    expect(getByText('Another Roadside Attraction')).toBeInTheDocument()
+    expect(document.querySelector('h3')).toBeInTheDocument()
+  })
 
-it('renders the value in edit mode', () => {
-  const {getByDisplayValue} = render(
-    <EditableHeading
-      mode="edit"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      label="Book title"
-      value="Still Life with Woodpecker"
-      level="h3"
-    />
-  )
+  it('renders the value in edit mode', () => {
+    const {getByDisplayValue} = render(
+      <EditableHeading
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        label="Book title"
+        value="Still Life with Woodpecker"
+        level="h3"
+      />
+    )
 
-  expect(getByDisplayValue('Still Life with Woodpecker')).toBeInTheDocument()
-})
+    expect(getByDisplayValue('Still Life with Woodpecker')).toBeInTheDocument()
+  })
 
-it('does not render edit button when readOnly', () => {
-  const {queryByText} = render(
-    <EditableHeading
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      label="Edit title"
-      value="Still Life with Woodpecker"
-      level="h3"
-      readOnly
-    />
-  )
-  expect(queryByText('Edit title')).toBeNull()
-})
+  it('does not render edit button when readOnly', () => {
+    const {queryByText} = render(
+      <EditableHeading
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        label="Edit title"
+        value="Even Cowgirls Get the Blues"
+        level="h3"
+        readOnly
+      />
+    )
+    expect(queryByText('Edit title')).toBeNull()
+  })
 
-it('exits edit mode on <Enter>', () => {
-  const onChangeMode = jest.fn()
-  const {getByDisplayValue} = render(
-    <EditableHeading
-      mode="edit"
-      onChange={() => {}}
-      onChangeMode={onChangeMode}
-      label="Book title"
-      value="Jitterbug Perfume"
-      level="h3"
-    />
-  )
-  const input = getByDisplayValue('Jitterbug Perfume')
-  fireEvent.keyDown(input, {key: 'Enter', code: 13})
-  expect(onChangeMode).toHaveBeenCalledWith('view')
+  it('exits edit mode on <Enter>', () => {
+    const onChangeMode = jest.fn()
+    const {getByDisplayValue} = render(
+      <EditableHeading
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={onChangeMode}
+        label="Book title"
+        value="Jitterbug Perfume"
+        level="h3"
+      />
+    )
+    const input = getByDisplayValue('Jitterbug Perfume')
+    fireEvent.keyDown(input, {key: 'Enter', code: 13})
+    expect(onChangeMode).toHaveBeenCalledWith('view')
+  })
+
+  it('reverts to the old value and exits edit mode on Escape', () => {
+    const onChange = jest.fn()
+    const onChangeMode = jest.fn()
+    const {getByDisplayValue} = render(
+      <EditableHeading
+        mode="edit"
+        onChange={onChange}
+        onChangeMode={onChangeMode}
+        label="Book title"
+        value="Half Asleep in Frog Pajamas"
+        level="h3"
+      />
+    )
+
+    const input = getByDisplayValue('Half Asleep in Frog Pajamas')
+    fireEvent.change(input, {target: {value: 'x'}})
+    expect(onChange).toHaveBeenLastCalledWith('x')
+
+    fireEvent.keyUp(input, {key: 'Escape', code: 27})
+    expect(onChange).toHaveBeenLastCalledWith('Half Asleep in Frog Pajamas')
+    expect(onChangeMode).toHaveBeenLastCalledWith('view')
+  })
 })

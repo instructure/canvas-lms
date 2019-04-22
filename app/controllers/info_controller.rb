@@ -74,6 +74,21 @@ class InfoController < ApplicationController
     end
   end
 
+  def health_prognosis
+    # do some checks on things that aren't a problem yet, but will be if nothing is done to fix them
+    checks = {
+      'messages_partition' => Messages::Partitioner.processed?,
+      'quizzes_submission_events_partition' => Quizzes::QuizSubmissionEventPartitioner.processed?,
+      'versions_partition' => Version::Partitioner.processed?,
+    }
+    failed = checks.reject{|_k, v| v}.map(&:first)
+    if failed.any?
+      render :json => {:status => "failed upcoming health checks - #{failed.join(", ")}"}, :status => :internal_server_error
+    else
+      render :json => {:status => "canvas will be ok, probably"}
+    end
+  end
+
   # for windows live tiles
   def browserconfig
     cancel_cache_buster

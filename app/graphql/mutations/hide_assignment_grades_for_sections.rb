@@ -41,7 +41,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
     unless assignment.grades_published?
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be hidden by section before grades are published"
     end
-    raise GraphQL::ExecutionError, "Anonymous assignments cannot be hidden by section" if assignment.anonymous_grading?
+    raise GraphQL::ExecutionError, "Anonymous assignments cannot be hidden by section" if assignment.anonymize_students?
 
     if sections.empty? || sections.count != input[:section_ids].size
       raise GraphQL::ExecutionError, "Invalid section ids"
@@ -52,7 +52,13 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
     progress = course.progresses.new(tag: "hide_assignment_grades_for_sections")
 
     if progress.save
-      progress.process_job(assignment, :hide_submissions, {preserve_method_args: true}, submission_ids: submission_ids)
+      progress.process_job(
+        assignment,
+        :hide_submissions,
+        {preserve_method_args: true},
+        progress: progress,
+        submission_ids: submission_ids
+      )
       return {assignment: assignment, progress: progress, sections: sections}
     else
       raise GraphQL::ExecutionError, "Error hiding assignment grades for sections"

@@ -20,18 +20,14 @@ import * as GradesApi from 'jsx/assignments/GradeSummary/grades/GradesApi'
 import FakeServer, {jsonBodyFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
 
 QUnit.module('GradeSummary GradesApi', suiteHooks => {
-  let qunitTimeout
   let server
 
   suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // avoid accidental unresolved async
     server = new FakeServer()
   })
 
   suiteHooks.afterEach(() => {
     server.teardown()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   QUnit.module('.bulkSelectProvisionalGrades()', () => {

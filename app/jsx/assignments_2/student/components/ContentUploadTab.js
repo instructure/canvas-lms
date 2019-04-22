@@ -16,19 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
-import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import I18n from 'i18n!assignments_2'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import mimeClass from 'compiled/util/mimeClass'
 import React, {Component} from 'react'
+import {StudentAssignmentShape} from '../assignmentData'
+
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 export default class ContentUploadTab extends Component {
+  static propTypes = {
+    assignment: StudentAssignmentShape
+  }
+
   state = {
     files: [],
     messages: []
@@ -90,7 +98,24 @@ export default class ContentUploadTab extends Component {
         <Billboard
           heading={I18n.t('Upload File')}
           hero={DEFAULT_ICON}
-          message={I18n.t('Drag and drop, or click to browse your computer')}
+          message={
+            <Flex direction="column">
+              {this.props.assignment.allowedExtensions.length ? (
+                <FlexItem>
+                  {I18n.t('File permitted: %{fileTypes}', {
+                    fileTypes: this.props.assignment.allowedExtensions
+                      .map(ext => ext.toUpperCase())
+                      .join(', ')
+                  })}
+                </FlexItem>
+              ) : null}
+              <FlexItem padding="small 0 0">
+                <Text size="small">
+                  {I18n.t('Drag and drop, or click to browse your computer')}
+                </Text>
+              </FlexItem>
+            </Flex>
+          }
         />
       </div>
     )
@@ -152,6 +177,11 @@ export default class ContentUploadTab extends Component {
   render() {
     return (
       <FileDrop
+        accept={
+          this.props.assignment.allowedExtensions.length
+            ? this.props.assignment.allowedExtensions
+            : ''
+        }
         allowMultiple
         enablePreview
         id="inputFileDrop"

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!usage_rights_modal'
 import customPropTypes from '../modules/customPropTypes'

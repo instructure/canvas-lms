@@ -25,7 +25,7 @@ module SIS
       end
 
       def self.identifying_fields
-        %w[observer_id].freeze
+        %w[observer_id student_id].freeze
       end
 
       # possible columns:

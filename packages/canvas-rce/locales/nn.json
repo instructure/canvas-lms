@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Legg til"
+  },
+  "all_4321c3a1": {
+    "message": "Alle"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst: "
   },
@@ -10,9 +16,6 @@
   },
   "assignments_1e02582c": {
     "message": "Oppgåver"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Bakgrunnsfarge, klikk for å velje"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -68,11 +71,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klikk for å setje inn ei lenke til dette elementet. "
   },
+  "close_d634289d": {
+    "message": "Lukk"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Lukk Flickr-dialog"
   },
   "collaborations_5c56c15f": {
     "message": "Samarbeid"
+  },
+  "content_type_2cf90d95": {
+    "message": "Innhaldstype"
   },
   "copyright_holder_66ee111": {
     "message": "Rettshavar:"
@@ -92,9 +101,6 @@
   "discussions_index_6c36ced": {
     "message": "Diskusjonsoversikt"
   },
-  "embed_image_1080badc": {
-    "message": "Sett inn bilde"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "oppgi søkeord"
   },
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Mappe"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Skriftstorleik, klikk for å velje"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatering, klikk for å velje"
   },
   "grades_a61eba0a": {
     "message": "Karakterar"
@@ -173,11 +173,17 @@
   "loading_25990131": {
     "message": "Lastar..."
   },
+  "loading_bde52856": {
+    "message": "Lastar"
+  },
   "loading_failed_b3524381": {
     "message": "Opplasting mislukkast..."
   },
   "loading_folders_8d4d5d5a": {
     "message": "Lastar mapper..."
+  },
+  "media_af190855": {
+    "message": "Media"
   },
   "modules_c4325335": {
     "message": "Modular"
@@ -197,9 +203,6 @@
   "record_upload_media_5fdce166": {
     "message": "Ta opp / last opp media"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Område for rik tekst-format. Trykk ALT+F8 for hjelp"
-  },
   "search_280d00bd": {
     "message": "Søk"
   },
@@ -212,11 +215,11 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vel ei mappe å laste opp fila til"
   },
+  "submit_a3cc6859": {
+    "message": "Send!"
+  },
   "syllabus_f191f65b": {
     "message": "Emneoversikt"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Tekstfarge, klikk for å velje"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet er ikkje opphavsrettbeskytta"
@@ -238,6 +241,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Last opp eit nytt bilde"
+  },
+  "url_22a5f3b8": {
+    "message": "URL-adresse"
   },
   "usage_right_ff96f3e2": {
     "message": "Bruksrett:"

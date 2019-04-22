@@ -29,7 +29,6 @@ describe 'creating a quiz' do
   context 'as a teacher' do
     before(:each) do
       course_with_teacher_logged_in(course_name: 'Test Course', active_all: true)
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

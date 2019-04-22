@@ -196,6 +196,27 @@ describe CourseLinkValidator do
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
+  it "should work more betterer with external_tools/retrieve" do
+    course_factory
+    tool = @course.context_external_tools.create!(name: 'blah',
+      url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456')
+
+    active_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool.url)}"
+    nonsense_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape("https://lolwut.beep")}"
+
+    message = %{
+      <a href='#{active_link}'>link</a>
+      <a href='#{nonsense_link}'>linkk</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to eq([nonsense_link])
+  end
+
   it "should work with absolute links to local objects" do
     course_factory
     deleted = @course.assignments.create!(:title => "blah")
@@ -260,6 +281,26 @@ describe CourseLinkValidator do
 
     links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
     expect(links).to match_array [unpublished_link, deleted_link]
+  end
+
+  it "should ignore links to replaced wiki pages" do
+    course_factory
+    deleted = @course.wiki_pages.create!(:title => "baleeted")
+    deleted.destroy
+    not_really_deleted = @course.wiki_pages.create!(:title => "baleeted")
+    not_really_deleted_link = "/courses/#{@course.id}/pages/#{not_really_deleted.url}"
+
+    message = %{
+      <a href='#{not_really_deleted_link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
   end
 
   it "should identify typo'd canvas links" do

@@ -34,6 +34,7 @@ exports[`renders desert when completely empty 1`] = `
     </div>
     <Link
       as="button"
+      disabled={false}
       iconPlacement="start"
       id="PlannerEmptyState_CardView"
       linkRef={[Function]}

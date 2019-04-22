@@ -17,9 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../lti_spec_helper')
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
+  include LtiSpecHelper
 
   before :once do
     course_with_teacher(:active_all => true)
@@ -127,6 +129,8 @@ describe ExternalToolsController do
     context "form post", type: :request do
       include WebMock::API
 
+      let(:config_response) { double(body: valid_tool_config) }
+
       let(:post_body) do
         {
           custom_fields_string: '',
@@ -173,6 +177,7 @@ describe ExternalToolsController do
 
       before(:each) do
         allow_any_instance_of(AppCenter::AppApi).to receive(:fetch_app_center_response).and_return(app_center_response)
+        allow_any_instance_of(CC::Importer::BLTIConverter).to receive(:fetch).and_return(config_response)
 
         configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
         stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)

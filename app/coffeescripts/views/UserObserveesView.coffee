@@ -48,6 +48,8 @@ define [
         @setLoading(true)
       @collection.on 'fetch', =>
         @setLoading(false)
+      @collection.on 'fetched:last', =>
+        $('<em>').text(I18n.t('No students being observed')).appendTo(@$('.observees-list-container')) if @collection.size() == 0
 
     addObservee: (ev) ->
       ev.preventDefault()
@@ -77,5 +79,9 @@ define [
       field.focus()
 
     setLoading: (loading) ->
-      @$el.toggleClass('loading', loading)
-      @$('.observees-list-container').attr('aria-busy', if loading then 'true' else 'false')
+      if loading
+        @$('.observees-list-container').attr('aria-busy', 'true')
+        @$('.loading-indicator').show()
+      else
+        @$('.observees-list-container').attr('aria-busy', 'false')
+        @$('.loading-indicator').hide()

@@ -18,7 +18,6 @@
 
 import Modal, { ModalBody} from './components/InstuiModal'
 import $ from 'jquery'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import React from 'react'
 import { bool } from 'prop-types'
 import I18n from 'i18n!terms_of_service_modal'

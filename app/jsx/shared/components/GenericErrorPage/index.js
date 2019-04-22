@@ -25,7 +25,6 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import axios from 'axios'
 import {string} from 'prop-types'
 import {Spinner} from '@instructure/ui-elements'
-import {Flex, FlexItem} from '@instructure/ui-layout'
 import ErrorTextInputForm from './ErrorTextInputForm'
 import ErrorPageHeader from './ErrorPageHeader'
 
@@ -110,55 +109,43 @@ class GenericErrorPage extends React.Component {
         textAlign="center"
         display="block"
       >
-        <Flex
-          direction="column"
-          justifyItems="center"
-          alignItems="center"
-          margin="small"
-          display="block"
-        >
-          <FlexItem>
-            <ErrorPageHeader imageUrl={this.props.imageUrl} />
-          </FlexItem>
-          <FlexItem>
-            <View margin="small" display="block">
-              {!this.state.commentPosted && (
-                <Flex alignItems="center" justifyItems="center" margin="small" display="block">
-                  <FlexItem>
-                    <Text margin="0">{I18n.t('If you have a moment,')}</Text>
-                  </FlexItem>
-                  <FlexItem>
-                    <Button margin="0" variant="link" onClick={this.handleOpenCommentBox}>
-                      {I18n.t('click here to tell us what happened')}
-                    </Button>
-                  </FlexItem>
-                </Flex>
-              )}
-              {this.state.showingCommentBox && (
-                <ErrorTextInputForm
-                  handleChangeCommentBox={this.handleChangeCommentBox}
-                  handleChangeOptionalEmail={this.handleChangeOptionalEmail}
-                  handleSubmitErrorReport={this.handleSubmitErrorReport}
-                />
-              )}
-              {this.state.submitLoading && (
-                <Spinner title={I18n.t('Loading')} margin="0 0 0 medium" />
-              )}
-              {this.state.commentPosted && this.state.commentPostError && (
-                <View display="block" data-test-id="generic-error-comments-submitted">
-                  <Text color="error" margin="x-small">
-                    {I18n.t('Comment failed to post! Please try again later.')}
-                  </Text>
-                </View>
-              )}
-              {this.state.commentPosted && !this.state.commentPostError && (
-                <View display="block" data-test-id="generic-error-comments-submitted">
-                  <Text margin="x-small">{I18n.t('Comment submitted!')}</Text>
-                </View>
-              )}
+        <ErrorPageHeader imageUrl={this.props.imageUrl} />
+        <View margin="small" display="block">
+          {!this.state.commentPosted && (
+            <React.Fragment>
+              <View margin="small" display="block">
+                <Text margin="0">{I18n.t('Help us improve by telling us what happened')}</Text>
+              </View>
+              <View margin="small" display="block">
+                <Button margin="0" variant="primary" onClick={this.handleOpenCommentBox}>
+                  {I18n.t('Report Issue')}
+                </Button>
+              </View>
+            </React.Fragment>
+          )}
+          {this.state.showingCommentBox && (
+            <ErrorTextInputForm
+              textAreaComment={this.state.textAreaComment}
+              optionalEmail={this.state.optionalEmail}
+              handleChangeCommentBox={this.handleChangeCommentBox}
+              handleChangeOptionalEmail={this.handleChangeOptionalEmail}
+              handleSubmitErrorReport={this.handleSubmitErrorReport}
+            />
+          )}
+          {this.state.submitLoading && <Spinner title={I18n.t('Loading')} margin="0 0 0 medium" />}
+          {this.state.commentPosted && this.state.commentPostError && (
+            <View display="block" data-test-id="generic-error-comments-submitted">
+              <Text color="error" margin="x-small">
+                {I18n.t('Comment failed to post! Please try again later.')}
+              </Text>
             </View>
-          </FlexItem>
-        </Flex>
+          )}
+          {this.state.commentPosted && !this.state.commentPostError && (
+            <View display="block" data-test-id="generic-error-comments-submitted">
+              <Text margin="x-small">{I18n.t('Comment submitted!')}</Text>
+            </View>
+          )}
+        </View>
       </View>
     )
   }

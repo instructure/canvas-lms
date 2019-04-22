@@ -312,7 +312,7 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_report_row(row:, row_number: nil, report_runner:, account_report: nil)
+  def add_report_row(row:, row_number: nil, report_runner:)
     report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner)
     if report_runner.rows.length == 1_000
       report_runner.write_rows
@@ -330,7 +330,7 @@ module AccountReports::ReportHelper
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)
     # use 100 jobs for the report, but no fewer than 25, and no more than 1000 per job
-    [[item_count/100.to_f.round(0), min].max, max].min
+    [[item_count/99.to_f.round(0), min].max, max].min
   end
 
   def create_report_runners(ids, total, min: 25, max: 1000)

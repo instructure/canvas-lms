@@ -93,7 +93,7 @@ module Canvas::Migration::ExternalContent
         obj = obj_class.where(obj_class.primary_key => canvas_id).first
         obj ? content_export.create_key(obj) : NOT_FOUND
       else
-        CC::CCHelper.create_key("#{obj_class.reflection_type_name}_#{canvas_id}")
+        (content_export || CC::CCHelper).create_key("#{obj_class.reflection_type_name}_#{canvas_id}")
       end
     end
 

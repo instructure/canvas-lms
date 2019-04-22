@@ -75,7 +75,6 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
       make_full_screen
     end

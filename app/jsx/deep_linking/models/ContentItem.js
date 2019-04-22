@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU Affero General Public License along
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
 export default class ContentItem {
   constructor(json) {
@@ -33,6 +34,28 @@ export default class ContentItem {
 
   linkThumbnail() {
     return this.imageTag(this.thumbnail)
+  }
+
+  iframeTag() {
+    const {iframe} = this
+    if (iframe) {
+      const iframeTag = document.createElement('iframe')
+
+      iframeTag.setAttribute('src', iframe.src)
+      iframeTag.setAttribute('title', this.title || "")
+      iframeTag.setAttribute('allowfullscreen', 'true')
+      iframeTag.setAttribute('allow', iframeAllowances())
+
+      if (iframe.width) {
+        iframeTag.style.width = `${iframe.width}px`
+      }
+
+      if (iframe.height) {
+        iframeTag.style.height = `${iframe.height}px`
+      }
+
+      return iframeTag.outerHTML
+    }
   }
 
   imageTag(src, width, height) {
@@ -58,6 +81,7 @@ export default class ContentItem {
     const anchorTag = document.createElement('a')
     anchorTag.setAttribute('href', this.safeUrl())
     anchorTag.setAttribute('title', this.title)
+    anchorTag.setAttribute('target', '_blank')
     anchorTag.innerHTML = innerHTML
     return anchorTag.outerHTML
   }

@@ -141,15 +141,15 @@ class ModeratePage
     end
 
     def grade_input(student)
-      f('input', student_table_row_by_displayed_name(student.name))
+      f('.GradesGrid__FinalGradeCell input', student_table_row_by_displayed_name(student.name))
     end
 
     def grade_input_dropdown_list(student)
-      ff('li', student_table_row_by_displayed_name(student.name))
+      ff("ul##{grade_input(student).attribute('aria-controls')} li")
     end
 
     def grade_input_dropdown(student)
-      f('ul', student_table_row_by_displayed_name(student.name))
+      f("ul##{grade_input(student).attribute('aria-controls')}")
     end
 
     def student_link(student_name)

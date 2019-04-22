@@ -45,32 +45,6 @@ test('can load the original element from the editor id', () => {
   equal(editor.getEditor().data('value'), '42')
 })
 
-test('shipping a new link to the editor instance', function() {
-  const jqueryEditor = {
-    editorBox() {},
-    data(arg) {
-      if (arg === 'remoteEditor') return false
-      if (arg === 'rich_text') return true
-    }
-  }
-  const editor = new LinkableEditor(rawEditor, jqueryEditor)
-  const text = 'Link HREF'
-  const classes = ''
-  const expectedOpts = {
-    classes: '',
-    dataAttributes: undefined,
-    selectedContent: 'Some Content',
-    selectionDetails: {
-      node: undefined,
-      range: undefined
-    },
-    url: 'Link HREF'
-  }
-  const edMock = sandbox.mock(jqueryEditor)
-  edMock.expects('editorBox').withArgs('create_link', expectedOpts)
-  editor.createLink(text, classes)
-})
-
 test('createLink passes data attributes to create_link command', function() {
   sandbox.stub(RceCommandShim, 'send')
   const dataAttrs = {}

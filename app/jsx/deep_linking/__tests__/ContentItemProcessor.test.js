@@ -88,13 +88,13 @@ describe('processContentItemsForEditor', () => {
 
     it('creates content for a link content item', () => {
       expect(send.mock.calls[0][2]).toEqual(
-        '<a href="http://www.test.com" title="link title">link text</a>'
+        '<a href="http://www.test.com" title="link title" target="_blank">link text</a>'
       )
     })
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(send.mock.calls[1][2]).toEqual(
-        '<a href="undefined?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title">link text</a>'
+        '<a href="undefined?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title" target="_blank">link text</a>'
       )
     })
 
@@ -120,13 +120,13 @@ describe('processContentItemsForEditor', () => {
 
     it('creates content for a link content item', () => {
       expect(send.mock.calls[0][2]).toEqual(
-        '<a href="http://www.test.com" title="link title">user selection</a>'
+        '<a href="http://www.test.com" title="link title" target="_blank">user selection</a>'
       )
     })
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(send.mock.calls[1][2]).toEqual(
-        '<a href="undefined?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title">user selection</a>'
+        '<a href="undefined?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title" target="_blank">user selection</a>'
       )
     })
   })

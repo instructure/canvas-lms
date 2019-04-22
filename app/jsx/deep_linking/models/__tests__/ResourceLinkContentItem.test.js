@@ -20,8 +20,10 @@ import ResourceLinkContentItem from '../ResourceLinkContentItem'
 
 const url ='https://www.test.com/launch'
 const endpoint = 'http://test.canvas.com/accounts/1/external_tools/retrieve'
+const title = 'Tool Title'
 const json = {
-  url
+  url,
+  title
 }
 
 const resourceLinkContentItem = (overrides, launchEndpoint) => {
@@ -36,6 +38,20 @@ describe('constructor', () => {
   it('sets the url to the canvas launch endpoint', () => {
     expect(resourceLinkContentItem({}, endpoint).url).toEqual(
       `${endpoint}?display=borderless&url=${encodeURIComponent(url)}`
+    )
+  })
+})
+
+describe('when the iframe property is specified', () => {
+  const iframe = {
+    src: 'http://www.instructure.com',
+    width: 500,
+    height: 200
+  }
+
+  it('returns markup for an iframe', () => {
+    expect(resourceLinkContentItem({iframe}).toHtmlString()).toEqual(
+      '<iframe src="undefined?display=borderless&amp;url=https%3A%2F%2Fwww.test.com%2Flaunch" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
     )
   })
 })

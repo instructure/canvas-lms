@@ -78,14 +78,15 @@ describe('EditableNumber', () => {
     expect(onChangeMode).toHaveBeenCalledWith('view')
   })
 
-  it('reverts to the old value on Escape', () => {
+  it('reverts to the old value and exits edit mode on Escape', () => {
     const onChange = jest.fn()
     const onInputChange = jest.fn()
+    const onChangeMode = jest.fn()
     const {getByDisplayValue} = render(
       <EditableNumber
         mode="edit"
         onChange={onChange}
-        onChangeMode={() => {}}
+        onChangeMode={onChangeMode}
         onInputChange={onInputChange}
         label="Pick a number"
         value="17"
@@ -93,10 +94,12 @@ describe('EditableNumber', () => {
     )
 
     const input = getByDisplayValue('17')
-    fireEvent.input(input, {target: {value: '2'}})
-    fireEvent.keyDown(input, {key: 'Escape', code: 27})
-    expect(onInputChange).toHaveBeenCalledWith('2')
-    expect(onChange).toHaveBeenCalledWith('17')
+    fireEvent.change(input, {target: {value: '2'}})
+    expect(onInputChange).toHaveBeenLastCalledWith('2')
+
+    fireEvent.keyUp(input, {key: 'Escape', code: 27})
+    expect(onChange).toHaveBeenLastCalledWith('17')
+    expect(onChangeMode).toHaveBeenLastCalledWith('view')
   })
 
   // I want to test that the input grows in width as the user

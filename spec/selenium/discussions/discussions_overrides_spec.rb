@@ -92,8 +92,8 @@ describe "discussions overrides" do
       f('#bordered-wrapper .Container__DueDateRow-item:nth-of-type(2) button[title = "Remove These Dates"]').click
       f('.form-actions button[type=submit]').click
       wait_for_ajaximations
-      expect(f('.ui-dialog')).to be_present
-      expect(f('#ui-id-7').text).to include('Not all sections will be assigned this item')
+      expect(fj('.ui-dialog:contains("Warning")')).to be_present
+      expect(fj('.ui-dialog:contains("Warning")').text).to include('Not all sections will be assigned this item')
       wait_for_new_page_load{f('.ui-dialog .ui-dialog-buttonset .btn-primary').click}
       f('.toggle_due_dates').click
       wait_for_ajaximations

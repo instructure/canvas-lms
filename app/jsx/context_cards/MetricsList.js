@@ -39,9 +39,13 @@ import InstUIMetricsList, { MetricsListItem } from '@instructure/ui-elements/lib
       const enrollment = this.props.user.enrollments[0]
       if (enrollment) {
         const grades = enrollment.grades
-        if (grades.current_grade) {
+        if (grades.override_grade != null) {
+          return grades.override_grade
+        } else if (grades.override_score != null) {
+          return `${grades.override_score}%`
+        } else if (grades.current_grade != null) {
           return grades.current_grade
-        } else if (grades.current_score) {
+        } else if (grades.current_score != null) {
           return `${grades.current_score}%`
         }
         return '-'

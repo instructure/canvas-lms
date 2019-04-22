@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Verkefni"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Bakgrunnslitur, ýtið niður til að velja"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(C) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Handhafi höfundarréttar:"
   },
+  "course_documents_104d76e0": {
+    "message": "Skjöl námskeiðs"
+  },
+  "course_images_f8511d04": {
+    "message": "Myndir námskeiðs"
+  },
+  "course_links_b56959b9": {
+    "message": "Tenglar námskeiðs"
+  },
+  "course_media_ec759ad": {
+    "message": "Margmiðlunarefni námskeiðs"
+  },
   "course_navigation_dd035109": {
     "message": "Leiðarnet námskeiðs"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Umræðuvísir"
-  },
-  "embed_image_1080badc": {
-    "message": "Ívefja mynd"
   },
   "enter_search_terms_e397b1f0": {
     "message": "slá inn leitarorð"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Mappa"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Leturstærð, ýtið niður til að velja"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Er að sníða, ýtið niður til að velja"
   },
   "grades_a61eba0a": {
     "message": "Einkunnir"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Hleður..."
   },
+  "loading_bde52856": {
+    "message": "Sæki"
+  },
   "loading_failed_b3524381": {
     "message": "Mistókst að hlaða..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Taka/hlaða upp margmiðlunarefni"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Svæði með miklum texta. Ýtið á ALT+F8 til að fá aðstoð"
-  },
   "search_280d00bd": {
     "message": "Leita"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Námsefni"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Litur texta, ýtið niður til að velja"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Efnið er á opinbera léninu"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Þetta uppflutta efni er stærra en geymsluhluti skráa. Vinsamlegast hafðu samband við kerfisstjórnanda þinn."
+  },
+  "tray_839df38a": {
+    "message": "Bakki"
   },
   "upload_8b403d05": {
     "message": "Hlaða upp"

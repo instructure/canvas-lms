@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Задания"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Цвет фона, нажмите стрелку вниз, чтобы выбрать"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 г. Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Правообладатель:"
   },
+  "course_documents_104d76e0": {
+    "message": "Документы курса"
+  },
+  "course_images_f8511d04": {
+    "message": "Изображения курса"
+  },
+  "course_links_b56959b9": {
+    "message": "Ссылки курса"
+  },
+  "course_media_ec759ad": {
+    "message": "Мультимедиа курса"
+  },
   "course_navigation_dd035109": {
     "message": "Навигация курса"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Индекс обсуждений"
-  },
-  "embed_image_1080badc": {
-    "message": "Вставить изображение"
   },
   "enter_search_terms_e397b1f0": {
     "message": "введите критерии поиска"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Папка"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Размер шрифта, нажмите стрелку вниз, чтобы выбрать"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Форматирование, нажмите стрелку вниз, чтобы выбрать"
   },
   "grades_a61eba0a": {
     "message": "Баллы"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Загрузка..."
   },
+  "loading_bde52856": {
+    "message": "Загрузка"
+  },
   "loading_failed_b3524381": {
     "message": "Загрузка завершилась безрезультатно..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Записать / загрузить мультимедиа"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Область форматированного текста. Нажмите ALT + F8 для справки"
-  },
   "search_280d00bd": {
     "message": "Поиск"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Содержание курса"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Цвет текста, нажмите стрелку вниз, чтобы выбрать"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Материал находится в общедоступном домене"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Эта загрузка превышает квоту на хранение файлов. Обратитесь к своему системному администратору."
+  },
+  "tray_839df38a": {
+    "message": "Лоток"
   },
   "upload_8b403d05": {
     "message": "Загрузить"

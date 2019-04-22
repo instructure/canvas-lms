@@ -27,4 +27,14 @@ export default class ResourceLinkContentItem extends LinkContentItem {
   ltiEndpointParams(url) {
     return `display=borderless&url=${encodeURIComponent(url)}`
   }
+
+  toHtmlString() {
+    if (this.iframe) {
+      // The iframe src must always be the Canvas launch endpoint
+      this.iframe.src = this.safeUrl()
+      return this.iframeTag()
+    }
+
+    return this.anchorTag(this.linkBody())
+  }
 }

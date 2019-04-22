@@ -39,7 +39,7 @@ describe "Account Reports" , type: :request do
     report.save
     @account.save
 
-    get "/accounts/#{@account.id}/settings"
+    get "/accounts/#{@account.id}/reports_tab"
     expect(response).to be_successful
     expect(response.body).to match /someuniquetextstuffgoeshere/
   end

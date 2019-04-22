@@ -47,7 +47,6 @@ describe "groups" do
       @student = User.create!(name: "Student 1")
       @teacher = User.create!(name: "Teacher 1")
       course_with_student({user: @student, :active_course => true, :active_enrollment => true})
-      enable_all_rcs @course.account
       @course.enroll_teacher(@teacher).accept!
       # This line below is terrible
       group_test_setup(4,1,1)

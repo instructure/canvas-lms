@@ -30,14 +30,18 @@
         <table class="detail_list">
           {{#each events}}
           <tr class="syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}" data-workflow-state="{{workflow_state}}">
-            <td class="icon" aria-hidden="true">
+            <td class="icon">
               {{#ifEqual type 'assignment'}}
+                <span class="screenreader-only">{{#t}}Assignment{{/t}}</span>
                 {{addIcon 'assignment'}}
               {{else}}{{#ifEqual type 'wiki_page' }}
+                <span class="screenreader-only">{{#t}}Page{{/t}}</span>
                 {{addIcon 'document'}}
               {{else}}{{#ifEqual type 'discussion_topic' }}
+                <span class="screenreader-only">{{#t}}Discussion Topic{{/t}}</span>
                 {{addIcon 'discussion'}}
               {{else}}
+                <span class="screenreader-only">{{#t}}Calendar Event{{/t}}</span>
                 {{addIcon 'calendar-month'}}
               {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
             </td>

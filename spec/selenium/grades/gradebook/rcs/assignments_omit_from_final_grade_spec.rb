@@ -57,7 +57,6 @@ describe 'omit from final grade assignments' do
   context 'assignment edit and show pages' do
     before(:each) do
       enroll_teacher_and_students
-      enable_all_rcs @course.account
       stub_rcs_config
       assignment_2
       user_session(teacher)

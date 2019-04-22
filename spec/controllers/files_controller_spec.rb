@@ -154,19 +154,6 @@ describe FilesController do
       expect(assigns[:contexts][0]).to eql(@course)
     end
 
-    it "should return a json format for wiki sidebar" do
-      user_session(@teacher)
-      r1 = Folder.root_folders(@course).first
-      f1 = course_folder
-      a1 = folder_file
-      get 'index', params: {:course_id => @course.id}, :format => 'json'
-      expect(response).to be_successful
-      data = json_parse
-      expect(data).not_to be_nil
-      # order expected
-      expect(data["folders"].map{|x| x["folder"]["id"]}).to eql([r1.id, f1.id])
-    end
-
     it "should work for a user context, too" do
       user_session(@student)
       get 'index', params: {:user_id => @student.id}

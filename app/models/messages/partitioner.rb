@@ -26,5 +26,10 @@ module Messages
     def self.log(*args)
       logger.info(*args) if logger
     end
+
+    def self.processed?
+      partman = CanvasPartman::PartitionManager.create(Message)
+      partman.partitions_created?(precreate_tables - 1)
+    end
   end
 end

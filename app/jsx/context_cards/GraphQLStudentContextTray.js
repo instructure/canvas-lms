@@ -72,6 +72,8 @@ const SCC_QUERY = gql`
           grades {
             current_grade: currentGrade
             current_score: currentScore
+            override_grade: overrideGrade
+            override_score: overrideScore
           }
         }
         analytics: summaryAnalytics(courseId: $courseId) {

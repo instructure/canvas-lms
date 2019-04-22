@@ -47,7 +47,6 @@ describe "discussions" do
 
       before(:each) do
         user_session(teacher)
-        enable_all_rcs @course.account
         stub_rcs_config
       end
 
@@ -113,6 +112,7 @@ describe "discussions" do
       end
 
       it "should save and display all changes", priority: "2", test_id: 270923 do
+        skip('Bug ticket created: COMMS-1984')
         course.require_assignment_group
 
         confirm(:off)

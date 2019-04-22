@@ -24,29 +24,84 @@ import {render} from 'react-testing-library'
 import {mockOverride} from '../../../test-utils'
 import OverrideSummary from '../OverrideSummary'
 
-it('renders an OverrideSummary', () => {
-  const dueAt = '2018-11-27T13:00-0500'
-  const unlockAt = '2018-11-26T13:00-0500'
-  const lockAt = '2018-11-28T13:00-0500'
-  const override = mockOverride({
-    title: 'Section A',
-    dueAt,
-    unlockAt,
-    lockAt,
-    submissionTypes: ['online_upload', 'online_url'],
-    allowedAttempts: 1
+describe('OverrideSummary', () => {
+  it('renders with unlock and lock dates', () => {
+    const dueAt = '2018-11-27T13:00-0500'
+    const unlockAt = '2018-11-26T13:00-0500'
+    const lockAt = '2018-11-28T13:00-0500'
+    const override = mockOverride({
+      title: 'Section A',
+      dueAt,
+      unlockAt,
+      lockAt,
+      submissionTypes: ['online_upload', 'online_url'],
+      allowedAttempts: 1
+    })
+    const {getByText, getByTestId} = render(<OverrideSummary override={override} />)
+    expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
+    expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
+
+    const due = `Due: ${tz.format(dueAt, I18n.t('#date.formats.full'))}`
+    expect(getByText(due)).toBeInTheDocument()
+
+    const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
+    const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.full'))}`
+    expect(getByText(unlock)).toBeInTheDocument()
+    expect(getByText(lock)).toBeInTheDocument()
+
+    expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
   })
-  const {getByText, getByTestId} = render(<OverrideSummary override={override} />)
-  expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
-  expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
 
-  const due = `Due: ${tz.format(dueAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(due)).toBeInTheDocument()
+  it('renders with neither unlock or lock dates', () => {
+    const dueAt = '2018-11-27T13:00-0500'
+    const unlockAt = null
+    const lockAt = null
+    const override = mockOverride({
+      title: 'Section A',
+      dueAt,
+      unlockAt,
+      lockAt,
+      submissionTypes: ['online_upload', 'online_url'],
+      allowedAttempts: 1
+    })
+    const {getByText} = render(<OverrideSummary override={override} />)
 
-  const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
-  const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(unlock)).toBeInTheDocument()
-  expect(getByText(lock)).toBeInTheDocument()
+    expect(getByText('Available')).toBeInTheDocument()
+  })
 
-  expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
+  it('renders with only unlock date', () => {
+    const dueAt = '2018-11-27T13:00-0500'
+    const unlockAt = '2018-11-26T13:00-0500'
+    const lockAt = null
+    const override = mockOverride({
+      title: 'Section A',
+      dueAt,
+      unlockAt,
+      lockAt,
+      submissionTypes: ['online_upload', 'online_url'],
+      allowedAttempts: 1
+    })
+    const {getByText} = render(<OverrideSummary override={override} />)
+
+    const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.full'))}`
+    expect(getByText(`Available after ${unlock}`)).toBeInTheDocument()
+  })
+
+  it('renders with only lock date', () => {
+    const dueAt = '2018-11-27T13:00-0500'
+    const unlockAt = null
+    const lockAt = '2018-11-28T13:00-0500'
+    const override = mockOverride({
+      title: 'Section A',
+      dueAt,
+      unlockAt,
+      lockAt,
+      submissionTypes: ['online_upload', 'online_url'],
+      allowedAttempts: 1
+    })
+    const {getByText} = render(<OverrideSummary override={override} />)
+
+    const lock = `${tz.format(lockAt, I18n.t('#date.formats.full'))}`
+    expect(getByText(`Available until ${lock}`)).toBeInTheDocument()
+  })
 })

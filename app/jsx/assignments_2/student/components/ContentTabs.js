@@ -40,7 +40,7 @@ function ContentTabs(props) {
     <div data-testid="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
         <TabPanel title={I18n.t('Upload')}>
-          <ContentUploadTab />
+          <ContentUploadTab assignment={props.assignment} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
           {!props.assignment.muted ? (

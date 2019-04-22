@@ -62,31 +62,11 @@ gulp.task('rev', () => {
     .pipe(rename(path => path.dirname = '/timezone'))
     .pipe(gulpTimezonePlugin())
 
-  const fontfaceObserverStream = gulp
-    .src('node_modules/fontfaceobserver/fontfaceobserver.standalone.js')
-    .pipe(gulpPlugins.rename('lato-fontfaceobserver.js'))
-    .pipe(gulpPlugins.insert.wrap(`
-      // Optimization for Repeat Views
-      if (sessionStorage.latoFontLoaded) {
-        document.documentElement.classList.remove('lato-font-not-loaded-yet')
-      } else {
-      `
-      ,
-      `
-        new FontFaceObserver('LatoWeb').load().then(function () {
-          sessionStorage.latoFontLoaded = true;
-          document.documentElement.classList.remove('lato-font-not-loaded-yet')
-        }, console.log.bind(console, 'Failed to load Lato font'));
-      }
-      `
-    ))
-
   return makeIE11Polyfill().then((IE11PolyfillCode) => {
 
     let stream = merge(
       timezonesStream,
       customTimezoneStream,
-      fontfaceObserverStream,
       gulpPlugins.file('ie11-polyfill.js', IE11PolyfillCode, { src: true }),
       gulp.src(STUFF_TO_REV, {
         base: 'public', // tell it to use the 'public' folder as the base of all paths

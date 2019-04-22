@@ -6,6 +6,7 @@ exports[`renders the item to update if provided 1`] = `
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -36,6 +37,7 @@ exports[`renders the item to update if provided 1`] = `
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -70,7 +72,8 @@ exports[`renders the item to update if provided 1`] = `
         allowCustom={false}
         allowEmpty={true}
         closeOnSelect={true}
-        constrain="scroll-parent"
+        constrain="window"
+        disabled={false}
         editable={false}
         emptyOption="---"
         filter={[Function]}
@@ -79,8 +82,10 @@ exports[`renders the item to update if provided 1`] = `
         inputRef={[Function]}
         label="Course"
         loadingText={null}
+        multiple={false}
         onChange={[Function]}
         optionsMaxWidth={null}
+        readOnly={false}
         selectedOption={
           Object {
             "label": "a course",
@@ -113,6 +118,7 @@ exports[`renders the item to update if provided 1`] = `
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         resize="none"
         size="medium"
         textareaRef={[Function]}
@@ -121,6 +127,7 @@ exports[`renders the item to update if provided 1`] = `
     </FormFieldGroup>
     <View
       as="div"
+      debug={false}
       display="auto"
       margin="small 0 0"
       overflowX="visible"
@@ -165,6 +172,7 @@ exports[`updates state when new note is passed in 1`] = `
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -195,6 +203,7 @@ exports[`updates state when new note is passed in 1`] = `
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -229,7 +238,8 @@ exports[`updates state when new note is passed in 1`] = `
         allowCustom={false}
         allowEmpty={true}
         closeOnSelect={true}
-        constrain="scroll-parent"
+        constrain="window"
+        disabled={false}
         editable={false}
         emptyOption="---"
         filter={[Function]}
@@ -238,8 +248,10 @@ exports[`updates state when new note is passed in 1`] = `
         inputRef={[Function]}
         label="Course"
         loadingText={null}
+        multiple={false}
         onChange={[Function]}
         optionsMaxWidth={null}
+        readOnly={false}
         selectedOption={
           Object {
             "label": "first course",
@@ -278,6 +290,7 @@ exports[`updates state when new note is passed in 1`] = `
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         resize="none"
         size="medium"
         textareaRef={[Function]}
@@ -286,6 +299,7 @@ exports[`updates state when new note is passed in 1`] = `
     </FormFieldGroup>
     <View
       as="div"
+      debug={false}
       display="auto"
       margin="small 0 0"
       overflowX="visible"
@@ -330,6 +344,7 @@ exports[`updates state when new note is passed in 2`] = `
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -360,6 +375,7 @@ exports[`updates state when new note is passed in 2`] = `
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -394,7 +410,8 @@ exports[`updates state when new note is passed in 2`] = `
         allowCustom={false}
         allowEmpty={true}
         closeOnSelect={true}
-        constrain="scroll-parent"
+        constrain="window"
+        disabled={false}
         editable={false}
         emptyOption="---"
         filter={[Function]}
@@ -403,8 +420,10 @@ exports[`updates state when new note is passed in 2`] = `
         inputRef={[Function]}
         label="Course"
         loadingText={null}
+        multiple={false}
         onChange={[Function]}
         optionsMaxWidth={null}
+        readOnly={false}
         selectedOption={
           Object {
             "label": "second course",
@@ -443,6 +462,7 @@ exports[`updates state when new note is passed in 2`] = `
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         resize="none"
         size="medium"
         textareaRef={[Function]}
@@ -451,6 +471,7 @@ exports[`updates state when new note is passed in 2`] = `
     </FormFieldGroup>
     <View
       as="div"
+      debug={false}
       display="auto"
       margin="small 0 0"
       overflowX="visible"

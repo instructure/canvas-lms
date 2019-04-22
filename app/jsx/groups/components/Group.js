@@ -17,7 +17,6 @@
  */
 
 import I18n from 'i18n!student_groups'
-import _ from 'underscore'
 import React from 'react'
 import natcompare from 'compiled/util/natcompare'
 

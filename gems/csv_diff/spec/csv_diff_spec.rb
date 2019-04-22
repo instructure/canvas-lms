@@ -158,4 +158,16 @@ CSV
     expected_output = CSV.open(files+"/1.out.csv", headers: true).read.to_a.sort
     expect(sorted_output).to eq expected_output
   end
+
+  it "returns a hash with a count if requested" do
+    subject = described_class.new(%w[user_id])
+    files = File.dirname(__FILE__)+"/files"
+    previous = CSV.open(files+"/1.prev.csv", headers: true)
+    current  = CSV.open(files+"/1.curr.csv", headers: true)
+    cb = ->(row) { row['state'] = 'deleted' }
+
+    hash = subject.generate(previous, current, deletes: cb, return_count: true)
+    expect(hash[:file_io].is_a?(Tempfile)).to be_truthy
+    expect(hash[:row_count]).to eq 29
+  end
 end

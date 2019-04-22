@@ -21,8 +21,7 @@ module PostGradesTray
   include SeleniumDependencies
 
   def full_content
-    # content finder similar to detail tray
-    # f('#SubmissionTray__Content')
+    fj("h3:contains('Post Grades')")
   end
 
   def unposted_count_indicator
@@ -34,14 +33,18 @@ module PostGradesTray
   end
 
   def post_button
-    # TODO: post button locator
+    fj("label:contains('Post')")
   end
 
   def post_type_radio_button(type)
-    # TODO: locator similar to fj(".SubmissionTray__RadioInput label:contains('#{type}')")
+    fj("label:contains(#{type})")
+  end
+
+  def specific_sections_toggle
+    fj("label:contains('Specific Sections')")
   end
 
   def select_section(section_name)
-    # TODO: locator for showing sections and for section checkbox
+    fj("label:contains(#{section_name})")
   end
 end

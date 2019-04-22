@@ -22,7 +22,6 @@ import pubsub from 'vendor/jquery.ba-tinypubsub'
 import mejs from 'vendor/mediaelement-and-player'
 import MediaElementKeyActionHandler from 'jsx/mediaelement/MediaElementKeyActionHandler'
 import $ from 'jquery'
-import kalturaAnalytics from '../util/kalturaAnalytics'
 import htmlEscape from 'str/htmlEscape'
 import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl';
 
@@ -75,7 +74,9 @@ $.extend(mejs.MediaElementDefaults, {
 })
 
 mejs.MepDefaults.success = function (mediaElement, domObject) {
-  kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
+  import('../util/kalturaAnalytics').then(kalturaAnalytics => {
+    kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
+  })
   return mediaElement.play()
 }
 

@@ -42,7 +42,7 @@ const isStudentDetailsLoading = handleActions({
 }, false)
 
 const errors = handleActions({
-  [actionTypes.SET_ERRORS]: (state, action) => [...action.payload, ...state]
+  [actionTypes.SET_ERRORS]: (state, action) => [...Array.from(action.payload), ...Array.from(state)]
 }, [])
 
 const ranges = handleActions({

@@ -56,7 +56,7 @@ class AnnouncementsApiController < ApplicationController
   #   a string of the name of the resource. Possible values are:
   #   "sections", "sections_user_count"
   #   if "sections" is passed, includes the course sections that are associated
-  #   with the topic, if the topic is specific to sertain sections of the course.
+  #   with the topic, if the topic is specific to certain sections of the course.
   #   If "sections_user_count" is passed, then:
   #     (a) If sections were asked for *and* the topic is specific to certain
   #         course sections sections, includes the number of users in each

@@ -20,7 +20,7 @@ require 'securerandom'
 
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
-  before_action :rich_content_service_config
+  before_action :rce_js_env
   before_action :get_eportfolio
 
   def create
@@ -136,10 +136,6 @@ class EportfolioEntriesController < ApplicationController
   end
 
   protected
-  def rich_content_service_config
-    rce_js_env(:basic)
-  end
-
   def eportfolio_entry_params
     params.require(:eportfolio_entry).permit(:name, :allow_comments, :show_comments)
   end

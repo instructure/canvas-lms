@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Oppgaver"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Bakgrunnsfarge, trykk nedover for å velge"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Opphavsrett Innehaver:"
   },
+  "course_documents_104d76e0": {
+    "message": "Fagdokumenter"
+  },
+  "course_images_f8511d04": {
+    "message": "Fagbilder"
+  },
+  "course_links_b56959b9": {
+    "message": "Faglenker"
+  },
+  "course_media_ec759ad": {
+    "message": "Fagmedia"
+  },
   "course_navigation_dd035109": {
     "message": "Fagnavigering"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Diskusjonsindeks"
-  },
-  "embed_image_1080badc": {
-    "message": "Sett inn bilde"
   },
   "enter_search_terms_e397b1f0": {
     "message": "skriv inn søkeord"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Mappe"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Skriftstørrelse, trykk nedover for å velge"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatering, trykk nedover for å velge"
   },
   "grades_a61eba0a": {
     "message": "Vurderinger"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Laster..."
   },
+  "loading_bde52856": {
+    "message": "Laster"
+  },
   "loading_failed_b3524381": {
     "message": "Lasting mislyktes..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Gjør opptak/last opp media"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rikt tekstområde. Trykk ALT+F8 for hjelp"
-  },
   "search_280d00bd": {
     "message": "Søk"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Fagoversikt"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Tekstfarge, trykk nedover for å velge"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet er i det offentlige domenet"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Opplastingen overskrider kvoten på lagringsplassen. Vennligst kontakt systemadministratoren din."
+  },
+  "tray_839df38a": {
+    "message": "Brett"
   },
   "upload_8b403d05": {
     "message": "Last opp"

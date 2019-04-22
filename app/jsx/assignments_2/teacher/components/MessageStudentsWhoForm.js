@@ -153,6 +153,7 @@ export default class MessageStudentsWhoForm extends React.Component {
           multiple
           selectedOption={this.props.selectedStudents}
           onChange={this.handleStudentsChange}
+          data-testid="student-recipients"
           formatSelectedOption={tag => (
             <AccessibleContent alt={I18n.t('Remove %{studentName}', {studentName: tag.label})}>
               {tag.label}
@@ -170,11 +171,13 @@ export default class MessageStudentsWhoForm extends React.Component {
           label={I18n.t('Subject:')}
           value={this.props.subject}
           onChange={this.handleChangeSubject}
+          data-testid="subject-input"
         />
         <TextArea
           label={I18n.t('Body:')}
           value={this.props.body}
           onChange={this.handleChangeBody}
+          data-testid="body-input"
         />
       </FormFieldGroup>
     )

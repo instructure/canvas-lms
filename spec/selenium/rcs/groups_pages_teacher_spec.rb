@@ -42,7 +42,6 @@ describe "groups" do
   context "as a teacher" do
     before :once do
       @course = course_model.tap(&:offer!)
-      enable_all_rcs @course.account
       @teacher = teacher_in_course(course: @course, name: 'teacher', active_all: true).user
       group_test_setup(4,1,1)
       # adds all students to the group

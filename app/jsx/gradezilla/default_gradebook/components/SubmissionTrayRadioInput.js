@@ -20,7 +20,7 @@ import React from 'react'
 import {func, number, shape, string, bool} from 'prop-types'
 import I18n from 'i18n!gradebook'
 import View from '@instructure/ui-layout/lib/components/View'
-import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
+import {NumberInput} from '@instructure/ui-number-input'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
@@ -39,96 +39,108 @@ function defaultDurationLate(interval, secondsLate) {
   return round(durationLate, 2)
 }
 
-export default function SubmissionTrayRadioInput(props) {
-  const showNumberInput = props.value === 'late' && props.checked
-  const interval = props.latePolicy.lateSubmissionInterval
-  const numberInputDefault = defaultDurationLate(interval, props.submission.secondsLate)
-  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
-  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
-  const styles = {
-    backgroundColor: props.color,
-    height: showNumberInput ? '5rem' : '2rem'
+export default class SubmissionTrayRadioInput extends React.Component {
+  static propTypes = {
+    checked: bool.isRequired,
+    color: string,
+    disabled: bool.isRequired,
+    latePolicy: shape({
+      lateSubmissionInterval: string.isRequired
+    }).isRequired,
+    locale: string.isRequired,
+    onChange: func.isRequired,
+    submission: shape({
+      secondsLate: number.isRequired
+    }).isRequired,
+    text: string.isRequired,
+    updateSubmission: func.isRequired,
+    value: string.isRequired
   }
 
-  const radioInputClasses = classnames('SubmissionTray__RadioInput', {
-    'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent'
-  })
+  static defaultProps = {
+    color: 'transparent'
+  }
 
-  function handleNumberInputBlur({target: {value}}) {
+  constructor(props) {
+    super(props)
+    this.showNumberInput = props.value === 'late' && props.checked
+    const interval = props.latePolicy.lateSubmissionInterval
+    this.numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
+    this.numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
+    this.styles = {
+      backgroundColor: props.color,
+      height: this.showNumberInput ? '5rem' : '2rem'
+    }
+    this.radioInputClasses = classnames('SubmissionTray__RadioInput', {
+      'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent'
+    })
+
+    this.state = {
+      numberInputValue: defaultDurationLate(interval, props.submission.secondsLate)
+    }
+  }
+
+  handleNumberInputBlur = ({target: {value}}) => {
     if (!NumberHelper.validate(value)) {
       return
     }
 
     const parsedValue = NumberHelper.parse(value)
     const roundedValue = round(parsedValue, 2)
-    if (roundedValue === numberInputDefault) {
+    if (roundedValue === this.state.numberInputValue) {
       return
     }
 
     let secondsLateOverride = parsedValue * 3600
-    if (props.latePolicy.lateSubmissionInterval === 'day') {
+    if (this.props.latePolicy.lateSubmissionInterval === 'day') {
       secondsLateOverride *= 24
     }
 
-    props.updateSubmission({
+    this.props.updateSubmission({
       latePolicyStatus: 'late',
       secondsLateOverride: Math.trunc(secondsLateOverride)
     })
   }
 
-  return (
-    <div className={radioInputClasses} style={styles}>
-      <RadioInput
-        checked={props.checked}
-        disabled={props.disabled}
-        name="SubmissionTrayRadioInput"
-        label={props.text}
-        onChange={props.onChange}
-        value={props.value}
-      />
+  handleNumberInputChange = (_event, numberInputValue) => {
+    this.setState({numberInputValue})
+  }
 
-      {showNumberInput && (
-        <span className="NumberInput__Container NumberInput__Container-LeftIndent">
-          <NumberInput
-            defaultValue={numberInputDefault.toString()}
-            disabled={props.disabled}
-            inline
-            label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-            locale={props.locale}
-            min="0"
-            onBlur={handleNumberInputBlur}
-            showArrows={false}
-            width="5rem"
-          />
+  render() {
+    return (
+      <div className={this.radioInputClasses} style={this.styles}>
+        <RadioInput
+          checked={this.props.checked}
+          disabled={this.props.disabled}
+          name="SubmissionTrayRadioInput"
+          label={this.props.text}
+          onChange={this.props.onChange}
+          value={this.props.value}
+        />
 
-          <PresentationContent>
-            <View as="div" margin="0 small">
-              <Text>{numberInputText}</Text>
-            </View>
-          </PresentationContent>
-        </span>
-      )}
-    </div>
-  )
-}
+        {this.showNumberInput && (
+          <span className="NumberInput__Container NumberInput__Container-LeftIndent">
+            <NumberInput
+              value={this.state.numberInputValue.toString()}
+              disabled={this.props.disabled}
+              inline
+              label={<ScreenReaderContent>{this.numberInputLabel}</ScreenReaderContent>}
+              locale={this.props.locale}
+              min="0"
+              onBlur={this.handleNumberInputBlur}
+              onChange={this.handleNumberInputChange}
+              showArrows={false}
+              width="5rem"
+            />
 
-SubmissionTrayRadioInput.propTypes = {
-  checked: bool.isRequired,
-  color: string,
-  disabled: bool.isRequired,
-  latePolicy: shape({
-    lateSubmissionInterval: string.isRequired
-  }).isRequired,
-  locale: string.isRequired,
-  onChange: func.isRequired,
-  submission: shape({
-    secondsLate: number.isRequired
-  }).isRequired,
-  text: string.isRequired,
-  updateSubmission: func.isRequired,
-  value: string.isRequired
-}
-
-SubmissionTrayRadioInput.defaultProps = {
-  color: 'transparent'
+            <PresentationContent>
+              <View as="div" margin="0 small">
+                <Text>{this.numberInputText}</Text>
+              </View>
+            </PresentationContent>
+          </span>
+        )}
+      </div>
+    )
+  }
 }

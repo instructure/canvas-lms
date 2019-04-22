@@ -9,7 +9,8 @@
     "integration-test": "nightwatch --env integration",
     "lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "eslint --fix \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
-    "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
+    "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json && npm run test:jest",
+    "test:jest": "jest",
     "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --watch",
     "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha 'test/**/*.test.js'",
     "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register",
@@ -50,6 +51,11 @@
       "minify-dead-code-elimination"
     ],
     "env": {
+      "test": {
+        "plugins": [
+          "dynamic-import-node"
+        ]
+      },
       "test-node": {
         "plugins": [
           "istanbul"
@@ -83,7 +89,8 @@
       "es6": true,
       "browser": true,
       "node": true,
-      "mocha": true
+      "mocha": true,
+      "jest": true
     },
     "globals": {
       "Promise": false,
@@ -146,8 +153,7 @@
     "redux-batch-middleware": "^0.2.0",
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
-    "tinymce": "^4.5.7",
-    "tinymce-light-skin": "~1.3.0"
+    "tinymce": "^5"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -156,6 +162,7 @@
     "@instructure/babel-preset-pretranslated-format-message": "^1",
     "@instructure/ui-babel-preset": "^5",
     "babel-loader": "^8.0.0",
+    "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-inline-json-import": "^0.2.0",
     "babel-plugin-minify-constant-folding": "^0.5.0",
     "babel-plugin-minify-dead-code-elimination": "^0.5.0",
@@ -170,6 +177,8 @@
     "fetch-mock": "^6",
     "format-message-cli": "^6",
     "format-message-parse": "^6",
+    "jest": "^24",
+    "jest-canvas-mock": "^1",
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",
     "jsdomify": "^3",
@@ -179,6 +188,7 @@
     "nyc": "^13",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
+    "react-testing-library": "^6",
     "sinon": "^7",
     "skin-deep": "^1",
     "webpack": "^4",

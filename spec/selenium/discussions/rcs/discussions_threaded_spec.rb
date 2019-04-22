@@ -23,7 +23,6 @@ describe "threaded discussions" do
 
   before :once do
     course_with_teacher(active_course: true, active_all: true, name: 'teacher')
-    enable_all_rcs @course.account
     @topic_title = 'threaded discussion topic'
     @topic = create_discussion(@topic_title, 'threaded')
     @student = student_in_course(course: @course, name: 'student', active_all: true).user

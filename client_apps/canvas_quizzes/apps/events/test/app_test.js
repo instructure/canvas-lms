@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(function(require) {
-  var App = require('core/delegate');
+// define(function(require) {
+//   var App = require('core/delegate');
 
-  describe('app', function() {
-    it('write me', function() {
-      expect(App).toBeTruthy();
-    });
-  });
-});
+//   describe('app', function() {
+//     it('write me', function() {
+//       expect(App).toBeTruthy();
+//     });
+//   });
+// });

@@ -643,6 +643,30 @@ describe ExternalToolsController do
       tool
     end
 
+    context "LTI 1.3" do
+      let(:developer_key) { DeveloperKey.create! }
+      let(:lti_1_3_tool) do
+        @course.context_external_tools.create!(
+          name: "bob",
+          consumer_key: "key",
+          shared_secret: "secret",
+          developer_key: developer_key,
+          url: "http://www.example.com/basic_lti",
+          settings: { 'use_1_3' => true }
+        )
+      end
+
+      before do
+        lti_1_3_tool.context.root_account.enable_feature!(:lti_1_3)
+        user_session(@teacher)
+      end
+
+      it 'does stuff' do
+        get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti?do_not_use"}
+        expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
+      end
+    end
+
     it "should require authentication" do
       user_model
       user_session(@user)

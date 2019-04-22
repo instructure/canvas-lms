@@ -657,7 +657,14 @@ class ActiveRecord::Base
     return if objects.empty?
     hashed_objects = []
     excluded_columns << objects.first.class.primary_key if excluded_columns.delete('primary_key')
-    objects.each {|object| hashed_objects << object.attributes.except(excluded_columns.join(','))}
+    objects.each do |object|
+      hashed_objects << object.attributes.except(excluded_columns.join(',')).map do |(name, value)|
+        if (type = object.class.attribute_types[name]).is_a?(ActiveRecord::Type::Serialized)
+          value = type.serialize(value)
+        end
+        [name, value]
+      end.to_h
+    end
     objects.first.class.bulk_insert(hashed_objects)
   end
 
@@ -971,10 +978,14 @@ ActiveRecord::Relation.class_eval do
     scope
   end
 
+  def lock_in_order
+    lock(:no_key_update).order(:id).pluck(:id)
+  end
+
   def touch_all
     self.activate do |relation|
       relation.transaction do
-        ids_to_touch = relation.not_recently_touched.lock(:no_key_update).order(:id).pluck(:id)
+        ids_to_touch = relation.not_recently_touched.lock_in_order
         unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc) if ids_to_touch.any?
       end
     end
@@ -1080,7 +1091,14 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    return super if joins_values.empty?
+    db = Shard.current(klass.shard_category).database_server
+    if joins_values.empty?
+      if ::Shackles.environment != db.shackles_environment
+        Shard.current.database_server.unshackle {return super }
+      else
+        return super
+      end
+    end
 
     stmt = Arel::UpdateManager.new
 
@@ -1137,7 +1155,11 @@ module UpdateAndDeleteWithJoins
       where_sql = collector.value
     end
     sql.concat('WHERE ' + where_sql)
-    connection.update(sql, "#{name} Update")
+    if ::Shackles.environment != db.shackles_environment
+      Shard.current.database_server.unshackle {connection.update(sql, "#{name} Update")}
+    else
+      connection.update(sql, "#{name} Update")
+    end
   end
 
   def delete_all

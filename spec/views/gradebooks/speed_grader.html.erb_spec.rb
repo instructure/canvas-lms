@@ -227,4 +227,18 @@ describe "/gradebooks/speed_grader" do
       expect(html.at_css("#hide_student_names")).to be_present
     end
   end
+
+  describe "hidden submission pill" do
+    it "is included when post policies are enabled" do
+      render template: 'gradebooks/speed_grader', locals: locals
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.at_css("#speed_grader_hidden_submission_pill_mount_point")).to be_present
+    end
+
+    it "is not included when post policies are not enabled" do
+      render template: 'gradebooks/speed_grader', locals: locals.merge({post_policies_enabled: false})
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.at_css("#speed_grader_hidden_submission_pill_mount_point")).not_to be_present
+    end
+  end
 end

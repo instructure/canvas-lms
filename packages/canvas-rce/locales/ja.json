@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "課題"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "背景色、押して選択"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "著作権保有者:"
   },
+  "course_documents_104d76e0": {
+    "message": "コースドキュメント"
+  },
+  "course_images_f8511d04": {
+    "message": "コース画像"
+  },
+  "course_links_b56959b9": {
+    "message": "コースリンク"
+  },
+  "course_media_ec759ad": {
+    "message": "コースメディア"
+  },
   "course_navigation_dd035109": {
     "message": "コース ナビゲーション"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "ディスカッションのインデックス"
-  },
-  "embed_image_1080badc": {
-    "message": "画像の埋め込み"
   },
   "enter_search_terms_e397b1f0": {
     "message": "検索語を入力"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "フォルダ"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "フォント サイズ、押して選択"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "書式設定、押して選択"
   },
   "grades_a61eba0a": {
     "message": "成績"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "読み込んでいます..."
   },
+  "loading_bde52856": {
+    "message": "読み込み中"
+  },
   "loading_failed_b3524381": {
     "message": "読み込みに失敗しました..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "メディアの記録/アップロード"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "リッチテキストエリア。ヘルプへは、ALT+F8を押してください"
-  },
   "search_280d00bd": {
     "message": "検索"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "シラバス"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "テキスト色、押して選択"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "この資料はパブリック ドメインです"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "この子芯は、ファイル保存の割り当てを超えています。システムアドミニストレータに報告してください。"
+  },
+  "tray_839df38a": {
+    "message": "トレイ"
   },
   "upload_8b403d05": {
     "message": "アップロード"

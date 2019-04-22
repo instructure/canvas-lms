@@ -237,8 +237,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   .btn-link {
     border-width: 0;
     padding-#{direction(right)}: 15px;
-    &.restricted { color: $ic-color-alert; }
-    &.hiddenState { color: $ic-color-alert; }
+    &.restricted { color: $ic-font-color-dark; }
+    &.hiddenState { color: $ic-font-color-dark; }
   }
 }
 

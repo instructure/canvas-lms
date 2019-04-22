@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(function(require) {
-  var Subject = require('jsx!views/answer_matrix');
+// define(function(require) {
+//   var Subject = require('jsx!views/answer_matrix');
 
-  describe('Views::AnswerMatrix', function() {
-    reactRouterSuite(this, Subject, {
-    });
+//   describe('Views::AnswerMatrix', function() {
+//     reactRouterSuite(this, Subject, {
+//     });
 
-    it('should render', function() {
-      expect(subject.isMounted()).toEqual(true);
-    });
+//     it('should render', function() {
+//       expect(subject.isMounted()).toEqual(true);
+//     });
 
-    describe('inverted', function() {
-      beforeEach(function() {
-        subject.setState({ invert: true });
-      });
+//     describe('inverted', function() {
+//       beforeEach(function() {
+//         subject.setState({ invert: true });
+//       });
 
-      it('should render', function() {
-        expect(subject.isMounted()).toEqual(true);
-      });
-    });
-  });
-});
+//       it('should render', function() {
+//         expect(subject.isMounted()).toEqual(true);
+//       });
+//     });
+//   });
+// });

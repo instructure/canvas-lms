@@ -39,6 +39,7 @@ const submissionsParams = {
     'late_policy_status',
     'missing',
     'points_deducted',
+    'posted_at',
     'score',
     'seconds_late',
     'submission_type',
@@ -105,19 +106,21 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
   const submissionRequests = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
+    let submissions
     const submissionRequest = getSubmissionsForStudents(
       submissionRequestChunkIds,
       options,
       resolveEnqueued,
       dispatch
     )
-      .then(async submissions => {
-        // within the main Gradebook object, students must be received before
-        // their related submissions can be received
-        await studentRequest
+      .then(subs => (submissions = subs))
+      // within the main Gradebook object, students must be received before
+      // their related submissions can be received
+      .then(() => studentRequest)
+      .then(() => {
         // if the student request fails, this callback will not be called
         // the failure will be caught and otherwise ignored
-        options.onSubmissionsChunkLoaded(submissions)
+        return options.onSubmissionsChunkLoaded(submissions)
       })
       .catch(ignoreFailure)
     submissionRequests.push(submissionRequest)
@@ -136,7 +139,7 @@ export default class StudentContentDataLoader {
     this.dispatch = new NaiveRequestDispatch()
   }
 
-  async load(studentIds) {
+  load(studentIds) {
     const loadedStudentIds = this.options.loadedStudentIds || []
     const studentIdsToLoad = _.difference(studentIds, loadedStudentIds)
 
@@ -149,7 +152,7 @@ export default class StudentContentDataLoader {
     const studentIdChunks = _.chunk(studentIdsToLoad, this.options.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
-    await new Promise(resolve => {
+    return new Promise(resolve => {
       const getNextChunk = () => {
         if (studentIdChunks.length) {
           const nextChunkIds = studentIdChunks.shift()
@@ -171,15 +174,15 @@ export default class StudentContentDataLoader {
       }
 
       getNextChunk()
+    }).then(() => {
+      const {courseSettings, finalGradeOverrides} = this.options.gradebook
+      let finalGradeOverridesRequest
+      if (courseSettings.allowFinalGradeOverride) {
+        finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
+      }
+
+      // wait for all student, submission, and final grade override requests to return
+      return Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
     })
-
-    const {courseSettings, finalGradeOverrides} = this.options.gradebook
-    let finalGradeOverridesRequest
-    if (courseSettings.allowFinalGradeOverride) {
-      finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
-    }
-
-    // wait for all student, submission, and final grade override requests to return
-    await Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
   }
 }

@@ -25,7 +25,6 @@ describe "discussion assignments" do
 
   before :once do
     course_with_teacher(:active_all => true)
-    enable_all_rcs @course.account
     @course.assignment_groups.create!(:name => "Assignment Group")
     @category1 = @course.group_categories.create!(:name => "category 1")
     @category1.configure_self_signup(true, false)

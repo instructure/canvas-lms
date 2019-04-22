@@ -27,6 +27,7 @@ it('renders', () => {
       assignment={mockAssignment()}
       onChangeAssignment={() => {}}
       onValidate={() => true}
+      invalidMessage={() => undefined}
     />
   )
   expect(container.querySelectorAll('[role="tab"]')).toHaveLength(4)

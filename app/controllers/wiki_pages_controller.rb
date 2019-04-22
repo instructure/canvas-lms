@@ -26,7 +26,7 @@ class WikiPagesController < ApplicationController
   before_action :set_pandapub_read_token
   before_action :set_js_rights
   before_action :set_js_wiki_data
-  before_action :rich_content_service_config, only: [:edit, :index]
+  before_action :rce_js_env, only: [:edit, :index]
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
@@ -158,10 +158,6 @@ class WikiPagesController < ApplicationController
   end
 
   private
-  def rich_content_service_config
-    rce_js_env(:sidebar)
-  end
-
   def wiki_pages_js_env(context)
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),

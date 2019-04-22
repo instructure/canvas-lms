@@ -19,7 +19,6 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import CoursesListRow from '../CoursesListRow'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 
 const props = {
   id: '1',

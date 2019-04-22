@@ -19,7 +19,7 @@
 const noop = () => {}
 
 export function beforeCheck(editor = {}, done = noop) {
-  const [_skinStylesheet, ...ourCustomStylesheets] = editor.dom.doc.styleSheets
+  const [_skinStylesheet, ...ourCustomStylesheets] = Array.from(editor.dom.doc.styleSheets)
   const hcStyles = window.ENV.url_for_high_contrast_tinymce_editor_css
   ourCustomStylesheets.forEach(s => (s.disabled = true))
 
@@ -45,7 +45,7 @@ export function beforeCheck(editor = {}, done = noop) {
 }
 
 export function afterCheck(editor = {}, done = noop) {
-  ;[...editor.dom.doc.styleSheets].forEach(sheet => {
+  Array.from(editor.dom.doc.styleSheets).forEach(sheet => {
     if (window.ENV.url_for_high_contrast_tinymce_editor_css.includes(sheet.href)) {
       sheet.ownerNode.parentElement.removeChild(sheet.ownerNode)
     } else {

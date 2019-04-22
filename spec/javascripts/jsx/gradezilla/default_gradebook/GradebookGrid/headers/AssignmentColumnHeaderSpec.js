@@ -821,7 +821,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
 
     test('is not present when post policies is enabled', () => {
-      props.postGradesAction.enabled = true
+      props.postGradesAction.featureEnabled = true
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Mute Assignment'))
     })
@@ -883,7 +883,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
 
     test('is not present when post policies is enabled', () => {
-      props.postGradesAction.enabled = true
+      props.postGradesAction.featureEnabled = true
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Unmute Assignment'))
     })
@@ -930,16 +930,39 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Post grades" action', hooks => {
     hooks.beforeEach(() => {
-      props.postGradesAction.enabled = true
+      props.postGradesAction.featureEnabled = true
+      props.postGradesAction.hasGradesToPost = true
     })
 
-    test('is present when post policies is enabled', () => {
-      mountAndOpenOptionsMenu()
-      ok(getMenuItem($menuContent, 'Post grades'))
+    QUnit.module('when post policies is enabled', () => {
+      test('has the default text when submissions can be posted', () => {
+        mountAndOpenOptionsMenu()
+        ok(getMenuItem($menuContent, 'Post grades'))
+      })
+
+      test('is enabled when submissions can be posted', () => {
+        mountAndOpenOptionsMenu()
+        strictEqual(getMenuItem($menuContent, 'Post grades').getAttribute('aria-disabled'), null)
+      })
+
+      test('has the text "All grades posted" when no submissions can be posted', () => {
+        props.postGradesAction.hasGradesToPost = false
+        mountAndOpenOptionsMenu()
+        ok(getMenuItem($menuContent, 'All grades posted'))
+      })
+
+      test('is disabled when no submissions can be posted', () => {
+        props.postGradesAction.hasGradesToPost = false
+        mountAndOpenOptionsMenu()
+        strictEqual(
+          getMenuItem($menuContent, 'All grades posted').getAttribute('aria-disabled'),
+          'true'
+        )
+      })
     })
 
     test('is not present when post policies is not enabled', () => {
-      props.postGradesAction.enabled = false
+      props.postGradesAction.featureEnabled = false
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Post grades'))
     })
@@ -973,7 +996,35 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Hide grades" action', hooks => {
     hooks.beforeEach(() => {
-      props.postGradesAction.enabled = true
+      props.postGradesAction.featureEnabled = true
+      props.hideGradesAction.hasGradesToHide = true
+    })
+
+    QUnit.module('when post policies is enabled', () => {
+      test('has the default text when submissions can be hidden', () => {
+        mountAndOpenOptionsMenu()
+        ok(getMenuItem($menuContent, 'Hide grades'))
+      })
+
+      test('is enabled when submissions can be hidden', () => {
+        mountAndOpenOptionsMenu()
+        strictEqual(getMenuItem($menuContent, 'Hide grades').getAttribute('aria-disabled'), null)
+      })
+
+      test('has the text "All grades posted" when no submissions can be hidden', () => {
+        props.hideGradesAction.hasGradesToHide = false
+        mountAndOpenOptionsMenu()
+        ok(getMenuItem($menuContent, 'All grades posted'))
+      })
+
+      test('is disabled when no submissions can be hidden', () => {
+        props.hideGradesAction.hasGradesToHide = false
+        mountAndOpenOptionsMenu()
+        strictEqual(
+          getMenuItem($menuContent, 'All grades hidden').getAttribute('aria-disabled'),
+          'true'
+        )
+      })
     })
 
     test('is present when post policies is enabled', () => {
@@ -982,7 +1033,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
 
     test('is not present when post policies is not enabled', () => {
-      props.postGradesAction.enabled = false
+      props.postGradesAction.featureEnabled = false
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Hide grades'))
     })
@@ -1016,7 +1067,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Grade Posting Policy" action', hooks => {
     hooks.beforeEach(() => {
-      props.postGradesAction.enabled = true
+      props.postGradesAction.featureEnabled = true
     })
 
     test('is present when post policies is enabled', () => {
@@ -1025,7 +1076,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
 
     test('is not present when post policies is not enabled', () => {
-      props.postGradesAction.enabled = false
+      props.postGradesAction.featureEnabled = false
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Grade Posting Policy'))
     })

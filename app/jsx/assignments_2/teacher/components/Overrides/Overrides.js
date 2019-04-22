@@ -29,6 +29,8 @@ export default class Overrides extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
+    onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     readOnly: bool
   }
 
@@ -37,24 +39,34 @@ export default class Overrides extends React.Component {
   }
 
   handleChangeOverride = (overrideIndex, path, value) => {
-    if (path === 'allowedAttempts' || path === 'submissionTypes') {
+    const hoistToAssignment = ['allowedAttempts', 'submissionTypes']
+    if (hoistToAssignment.includes(path)) {
       this.props.onChangeAssignment(path, value)
     } else {
       this.props.onChangeAssignment(`assignmentOverrides.nodes.${overrideIndex}.${path}`, value)
     }
   }
 
+  handleValidateEveryoneElse = (_ignore, path, value) => this.props.onValidate(path, value)
+
+  handleValidateOverride = (overrideIndex, path, value) =>
+    this.props.onValidate(`assignmentOverrides.nodes.${overrideIndex}.${path}`, value)
+
+  everyoneElseInvalidMessage = (_ignore, path) => this.props.invalidMessage(path)
+
+  invalidMessage = (overrideIndex, path) =>
+    this.props.invalidMessage(`assignmentOverrides.nodes.${overrideIndex}.${path}`)
+
   renderEveryoneElse() {
-    if (this.props.assignment.dueAt !== null) {
-      return (
-        <EveryoneElse
-          assignment={this.props.assignment}
-          onChangeAssignment={this.props.onChangeAssignment}
-          readOnly={this.props.readOnly}
-        />
-      )
-    }
-    return null
+    return (
+      <EveryoneElse
+        assignment={this.props.assignment}
+        onChangeAssignment={this.props.onChangeAssignment}
+        onValidate={this.handleValidateEveryoneElse}
+        invalidMessage={this.everyoneElseInvalidMessage}
+        readOnly={this.props.readOnly}
+      />
+    )
   }
 
   renderOverrides() {
@@ -74,6 +86,8 @@ export default class Overrides extends React.Component {
           }}
           index={index}
           onChangeOverride={this.handleChangeOverride}
+          onValidate={this.handleValidateOverride}
+          invalidMessage={this.invalidMessage}
           readOnly={this.props.readOnly}
         />
       ))
@@ -85,7 +99,7 @@ export default class Overrides extends React.Component {
     return (
       <View as="div">
         {this.renderOverrides()}
-        {this.renderEveryoneElse()}
+        {this.props.assignment.onlyVisibleToOverrides ? null : this.renderEveryoneElse()}
       </View>
     )
   }

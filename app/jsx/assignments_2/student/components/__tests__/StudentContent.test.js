@@ -20,7 +20,7 @@ import React from 'react'
 import {mockAssignment, mockComments} from '../../test-utils'
 import StudentContent from '../StudentContent'
 import {MockedProvider} from 'react-apollo/test-utils'
-import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {SUBMISSION_COMMENT_QUERY, CREATE_SUBMISSION_COMMENT} from '../../assignmentData'
 import {waitForElement, render, fireEvent} from 'react-testing-library'
 
 const mocks = [
@@ -35,6 +35,17 @@ const mocks = [
       data: {
         submissionComments: mockComments()
       }
+    }
+  },
+  {
+    request: {
+      query: CREATE_SUBMISSION_COMMENT,
+      variables: {
+        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+      }
+    },
+    result: {
+      data: null
     }
   }
 ]

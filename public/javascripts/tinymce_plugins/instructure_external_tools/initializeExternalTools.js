@@ -19,13 +19,9 @@
 import I18n from 'i18n!editor'
 import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
-import ExternalToolsHelper from 'tinymce_plugins/instructure_external_tools/ExternalToolsHelper'
+import ExternalToolsHelper from './ExternalToolsHelper'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
-import '../../jquery.instructure_misc_helpers'
-import 'jqueryui/dialog'
-import '../../jquery.instructure_misc_plugins'
-import Links from 'tinymce_plugins/instructure_links/links'
-import ExternalToolDialog from 'jsx/editor/ExternalToolDialog'
+import Links from '../instructure_links/links'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -44,22 +40,24 @@ const ExternalToolsPlugin = {
       // if somehow open gets called early, keep trying until it is ready
       open: (...args) => setTimeout(() => dialog.open(...args), 50)
     }
-    const dialogContainer = document.createElement('div')
-    document.body.appendChild(dialogContainer)
-    ReactDOM.render(
-      <ExternalToolDialog
-        win={window}
-        editor={ed}
-        contextAssetString={ENV.context_asset_string}
-        iframeAllowances={iframeAllowances()}
-        resourceSelectionUrl={$('#context_external_tool_resource_selection_url').attr('href')}
-        deepLinkingOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}
-      />,
-      dialogContainer,
-      function() {
-        dialog = this
-      }
-    )
+    import('jsx/editor/ExternalToolDialog').then(ExternalToolDialog => {
+      const dialogContainer = document.createElement('div')
+      document.body.appendChild(dialogContainer)
+      ReactDOM.render(
+        <ExternalToolDialog
+          win={window}
+          editor={ed}
+          contextAssetString={ENV.context_asset_string}
+          iframeAllowances={iframeAllowances()}
+          resourceSelectionUrl={$('#context_external_tool_resource_selection_url').attr('href')}
+          deepLinkingOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}
+        />,
+        dialogContainer,
+        function() {
+          dialog = this
+        }
+      )
+    })
 
     const clumpedButtons = []
     for (let idx = 0; _INST.editorButtons && idx < _INST.editorButtons.length; idx++) {
@@ -74,9 +72,9 @@ const ExternalToolsPlugin = {
         ed.addCommand(`instructureExternalButton${current_button.id}`, () => {
           dialog.open(current_button)
         })
-        ed.addButton(
+        ;(ENV.use_rce_enhancements ? ed.ui.registry : ed).addButton(
           `instructure_external_button_${current_button.id}`,
-          ExternalToolsHelper.buttonConfig(current_button)
+          ExternalToolsHelper.buttonConfig(current_button, ed)
         )
       }
     }
@@ -88,17 +86,25 @@ const ExternalToolsPlugin = {
         ExternalToolsHelper.attachClumpedDropdown($(`#${this._id}`), items, ed)
       }
 
-      ed.addButton('instructure_external_button_clump', {
-        title: TRANSLATIONS.more_external_tools,
-        image: '/images/downtick.png',
-        onkeyup(event) {
-          if (event.keyCode === 32 || event.keyCode === 13) {
-            event.stopPropagation()
-            handleClick.call(this)
-          }
-        },
-        onclick: handleClick
-      })
+      if (ENV.use_rce_enhancements) {
+        ed.ui.registry.addButton('instructure_external_button_clump', {
+          title: TRANSLATIONS.more_external_tools,
+          image: '/images/downtick.png',
+          onAction: handleClick
+        })
+      } else {
+        ed.addButton('instructure_external_button_clump', {
+          title: TRANSLATIONS.more_external_tools,
+          image: '/images/downtick.png',
+          onkeyup(event) {
+            if (event.keyCode === 32 || event.keyCode === 13) {
+              event.stopPropagation()
+              handleClick.call(this)
+            }
+          },
+          onclick: handleClick
+        })
+      }
     }
   }
 }

@@ -171,7 +171,8 @@ class ContentMigrationsController < ApplicationController
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
       js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
       js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
-      js_env(:SHOW_SELECT => @current_user.manageable_courses.count <= 100)
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses.count }.sum
+      js_env(:SHOW_SELECT => course_count <= 100)
       js_env(:CONTENT_MIGRATIONS_EXPIRE_DAYS => ContentMigration.expire_days)
       js_env(:QUIZZES_NEXT_CONFIGURED_ROOT => @context.root_account.feature_allowed?(:quizzes_next) &&
              @context.root_account.feature_enabled?(:import_to_quizzes_next))
@@ -499,7 +500,8 @@ class ContentMigrationsController < ApplicationController
         params[:do_not_run] = true
       end
     elsif params[:copy]
-      copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h)
+      copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h,
+        global_identifiers: @content_migration.content_export&.global_identifiers?)
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options

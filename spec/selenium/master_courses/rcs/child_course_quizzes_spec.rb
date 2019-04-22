@@ -21,7 +21,6 @@ describe "master courses - child courses - quiz locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-    enable_all_rcs Account.default
 
     qd = { question_type: "text_only_question", id: 1, question_name: 'the hardest question ever'}.with_indifferent_access
     due_date = format_date_for_view(Time.zone.now - 1.month)

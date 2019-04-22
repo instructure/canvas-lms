@@ -37,6 +37,19 @@ export const EnvShape = shape({
   }).isRequired
 })
 
+const userFields = gql`
+  fragment UserFields on User {
+    __typename
+    gid: id
+    lid: _id
+    name
+    shortName
+    sortableName
+    avatarUrl
+    email
+  }
+`
+
 export const TEACHER_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
@@ -52,6 +65,7 @@ export const TEACHER_QUERY = gql`
       pointsPossible
       state
       needsGradingCount
+      onlyVisibleToOverrides
       lockInfo {
         isLocked
       }
@@ -113,7 +127,7 @@ export const TEACHER_QUERY = gql`
         }
       }
       submissions: submissionsConnection(
-        filter: {states: [submitted, unsubmitted, graded, pending_review]}
+        filter: {states: [submitted, unsubmitted, graded, ungraded, pending_review]}
       ) {
         pageInfo {
           startCursor
@@ -133,18 +147,13 @@ export const TEACHER_QUERY = gql`
           latePolicyStatus
           submittedAt
           user {
-            gid: id
-            lid: _id
-            name
-            shortName
-            sortableName
-            avatarUrl
-            email
+            ...UserFields
           }
         }
       }
     }
   }
+  ${userFields}
 `
 
 const assignmentGroup = gql`
@@ -230,6 +239,38 @@ export const COURSE_MODULES_QUERY_LOCAL = gql`
   ${assignmentModule}
 `
 
+export const STUDENT_SEARCH_QUERY = gql`
+  query SearchStudents(
+    $assignmentId: ID!
+    $userSearch: String
+    $orderBy: [SubmissionSearchOrder!]
+  ) {
+    assignment(id: $assignmentId) {
+      id
+      submissions: submissionsConnection(
+        filter: {
+          userSearch: $userSearch
+          enrollmentTypes: StudentEnrollment
+          states: [submitted, unsubmitted, graded, ungraded, pending_review]
+        }
+        orderBy: $orderBy
+      ) {
+        nodes {
+          lid: _id
+          gid: id
+          state
+          score
+          submittedAt
+          user {
+            ...UserFields
+          }
+        }
+      }
+    }
+  }
+  ${userFields}
+`
+
 export const SET_WORKFLOW = gql`
   mutation SetWorkflow($id: ID!, $workflow: AssignmentState!) {
     updateAssignment(input: {id: $id, state: $workflow}) {
@@ -248,6 +289,8 @@ export const SAVE_ASSIGNMENT = gql`
     $name: String
     $description: String
     $dueAt: DateTime
+    $unlockAt: DateTime
+    $lockAt: DateTime
     $pointsPossible: Float
     $state: AssignmentState
   ) {
@@ -257,6 +300,8 @@ export const SAVE_ASSIGNMENT = gql`
         name: $name
         description: $description
         dueAt: $dueAt
+        unlockAt: $unlockAt
+        lockAt: $lockAt
         pointsPossible: $pointsPossible
         state: $state
       }
@@ -267,6 +312,8 @@ export const SAVE_ASSIGNMENT = gql`
         lid: _id
         gid: id
         dueAt
+        unlockAt
+        lockAt
         name
         description
         pointsPossible
@@ -323,7 +370,7 @@ export const UserShape = shape({
   email: string
 })
 
-const SubmissionShape = shape({
+export const SubmissionShape = shape({
   gid: string,
   lid: string,
   submissionStatus: oneOf(['resubmitted', 'missing', 'late', 'submitted', 'unsubmitted']),
@@ -358,6 +405,17 @@ export const TeacherAssignmentShape = shape({
   submissions: shape({
     nodes: arrayOf(SubmissionShape)
   }).isRequired
+})
+
+export const StudentSearchQueryShape = shape({
+  assignmentId: string.isRequired,
+  userSearch: string,
+  orderBy: arrayOf(
+    shape({
+      field: string,
+      direction: oneOf(['ascending', 'descending'])
+    })
+  )
 })
 
 // custom proptype validator

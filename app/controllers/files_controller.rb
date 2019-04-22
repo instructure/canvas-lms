@@ -229,26 +229,7 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
-    # This is only used by the old wiki sidebar, see
-    # public/javascripts/wikiSidebar.js#loadFolders
-    Shackles.activate(:slave) do
-      if request.format == :json
-        if authorized_action(@context.attachments.build, @current_user, :read)
-          root_folder = Folder.root_folders(@context).first
-          if authorized_action(root_folder, @current_user, :read)
-            file_structure = {
-              :folders => @context.active_folders.
-                reorder(Arel.sql("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at")).
-                select(:id, :parent_folder_id, :name)
-            }
-
-            render :json => file_structure
-          end
-        end
-      else
-        return react_files
-      end
-    end
+    return react_files
   end
 
   # @API List files

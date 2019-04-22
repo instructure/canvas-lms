@@ -83,12 +83,12 @@ Rails.application.config.after_initialize do
 
   Switchman::Shard.class_eval do
     self.primary_key = "id"
-    reset_column_information # make sure that the id column object knows it is the primary key
+    reset_column_information if connected? # make sure that the id column object knows it is the primary key
 
     serialize :settings, Hash
 
     # the default shard was already loaded, but didn't deserialize it
-    if default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
+    if connected? && default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
       settings = serialized_attributes['settings'].load(default.read_attribute('settings'))
       default.settings = settings
     end

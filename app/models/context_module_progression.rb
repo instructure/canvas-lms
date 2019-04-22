@@ -235,10 +235,15 @@ class ContextModuleProgression < ActiveRecord::Base
   def evaluate_score_requirement_met(requirement, subs, tag)
     return unless requirement[:type] == "min_score"
     remove_incomplete_requirement(requirement[:id]) # start from a fresh slate so we don't hold onto a max score that doesn't exist anymore
-    return unless subs && subs.any?
+    return if subs.blank?
 
-    if tag.assignment && tag.assignment.muted?
-      if subs.any?{|sub| sub.is_a?(Submission) && !sub.unsubmitted? }
+    if tag.course.feature_enabled?(:post_policies)
+      if subs.any? { |sub| sub.is_a?(Submission) && !sub.posted? }
+        self.update_incomplete_requirement!(requirement, nil)
+        return
+      end
+    elsif tag.assignment&.muted?
+      if subs.any? { |sub| sub.is_a?(Submission) && !sub.unsubmitted? }
         self.update_incomplete_requirement!(requirement, nil)
       end
       return

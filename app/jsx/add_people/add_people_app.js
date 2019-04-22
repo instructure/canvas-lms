@@ -22,7 +22,7 @@ import { bindActionCreators } from 'redux'
 import { connect, Provider } from 'react-redux'
 import natcompare from 'compiled/util/natcompare'
 import { createStore, defaultState } from './store'
-import { actions, actionTypes } from './actions'
+import { actions } from './actions'
 import reducer from './reducer'
 import AddPeople from './components/add_people'
 

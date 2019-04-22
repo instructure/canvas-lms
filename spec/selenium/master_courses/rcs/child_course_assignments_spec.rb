@@ -41,7 +41,6 @@ describe "master courses - child courses - assignment locking" do
   end
 
   before :each do
-    enable_all_rcs Account.default
     stub_rcs_config
     user_session(@teacher)
   end

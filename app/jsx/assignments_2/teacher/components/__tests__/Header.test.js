@@ -32,6 +32,7 @@ describe('assignments 2 teacher view header', () => {
           onChangeAssignment={() => {}}
           onSetWorkstate={() => {}}
           onValidate={() => true}
+          invalidMessage={() => undefined}
         />
       </MockedProvider>
     )

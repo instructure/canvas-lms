@@ -34,7 +34,6 @@ module LtiAdvantage::Serializers
       roles
       tool_platform
       version
-      lti11_legacy_user_id
       target_link_uri
     ).freeze
 

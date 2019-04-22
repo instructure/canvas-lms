@@ -594,6 +594,7 @@ CanvasRails::Application.routes.draw do
   resources :accounts do
     get 'search(/:tab)', action: :course_user_search
     get "settings#{full_path_glob}", action: :settings
+    get :reports_tab
     get :settings
     get :admin_tools
     get 'search' => 'accounts#course_user_search', :as => :course_user_search
@@ -904,6 +905,7 @@ CanvasRails::Application.routes.draw do
   resources :errors, only: [:show, :index, :create], path: :error_reports
 
   get 'health_check' => 'info#health_check'
+  get 'health_prognosis' => 'info#health_prognosis'
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
@@ -1371,6 +1373,8 @@ CanvasRails::Application.routes.draw do
       post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 
       get 'dashboard/dashboard_cards', controller: 'users', action: 'dashboard_cards', as: :dashboard_dashboard_cards
+
+      get 'users/:id/graded_submissions', controller: 'users', action: 'user_graded_submissions', as: :user_submissions
 
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'

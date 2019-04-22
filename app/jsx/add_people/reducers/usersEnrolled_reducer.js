@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import redux from 'redux'
 import { handleActions } from 'redux-actions'
 import {actionTypes} from '../actions'
 import '../store'

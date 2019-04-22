@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "추가"
+  },
+  "all_4321c3a1": {
+    "message": "전부"
+  },
   "announcement_list_da155734": {
     "message": "공지 목록"
   },
@@ -7,9 +13,6 @@
   },
   "assignments_1e02582c": {
     "message": "과제"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "배경색, 선택하려면 누름"
   },
   "cancel_file_upload_9903e7b9": {
     "message": "Cancel file upload"
@@ -56,11 +59,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "닫기"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "협업"
+  },
+  "content_type_2cf90d95": {
+    "message": "내용 유형"
   },
   "course_navigation_dd035109": {
     "message": "과목 탐색"
@@ -70,9 +79,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "토론 색인"
-  },
-  "embed_image_1080badc": {
-    "message": "이미지 포함"
   },
   "enter_search_terms_e397b1f0": {
     "message": "검색 용어 입력"
@@ -88,12 +94,6 @@
   },
   "folder_705fd2d7": {
     "message": "폴더"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "글자 크기, 선택하려면 누름"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "서식, 선택하려면 누름"
   },
   "grades_a61eba0a": {
     "message": "평점"
@@ -137,8 +137,14 @@
   "loading_25990131": {
     "message": "로드하는 중..."
   },
+  "loading_bde52856": {
+    "message": "로드 중"
+  },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
+  },
+  "media_af190855": {
+    "message": "미디어"
   },
   "modules_c4325335": {
     "message": "모듈"
@@ -155,9 +161,6 @@
   "quizzes_7e598f57": {
     "message": "퀴즈"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Press ALT+F8 for help"
-  },
   "search_280d00bd": {
     "message": "검색"
   },
@@ -167,11 +170,14 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "sort_by_e75f9e3e": {
+    "message": "정렬 조건"
+  },
+  "submit_a3cc6859": {
+    "message": "제출"
+  },
   "syllabus_f191f65b": {
     "message": "요강"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "텍스트 색, 선택하려면 누름"
   },
   "upload_8b403d05": {
     "message": "업로드"
@@ -181,6 +187,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "새 이미지 업로드"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "새 페이지의 이름은 무엇입니까?"

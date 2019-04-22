@@ -353,6 +353,13 @@ describe ActiveRecord::Base do
     it "should not raise an error if there are no records" do
       expect { Course.bulk_insert [] }.to change(Course, :count).by(0)
     end
+
+    it 'should work through bulk insert objects' do
+      users = [User.new(name: 'bulk_insert_1', workflow_state: 'registered', preferences: {accepted_terms: Time.zone.now})]
+      User.bulk_insert_objects users
+      names = User.order(:name).pluck(:name, :preferences)
+      expect(names.first.last[:accepted_terms]).not_to be_nil
+    end
   end
 
   context "distinct_values" do

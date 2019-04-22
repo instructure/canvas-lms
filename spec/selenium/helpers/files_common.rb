@@ -104,11 +104,10 @@ module FilesCommon
     elsif permission_type == :unpublish
       driver.find_elements(:name, 'permissions')[1].click
     else
-      driver.find_elements(:name, 'permissions')[2].click
       if restricted_access_option == :available_with_link
-        driver.find_elements(:name, 'restrict_options')[0].click
+        driver.find_elements(:name, 'permissions')[2].click
       else
-        driver.find_elements(:name, 'restrict_options')[1].click
+        driver.find_elements(:name, 'permissions')[3].click
         ff('.ui-datepicker-trigger.btn')[0].click
         fln("15").click
         ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
@@ -181,18 +180,13 @@ module FilesCommon
   end
 
   def insert_file_from_rce(insert_into = nil)
-    if insert_into == :quiz
-      ff(".ui-tabs-anchor")[6].click
-    else
-      file_tab = ff(".ui-tabs-anchor")[1]
-      expect(file_tab).to be_displayed
-      ff(".ui-tabs-anchor")[1].click
-    end
-    ff(".name.text")[0].click
     wait_for_ajaximations
-    ff(".name.text")[1].click
+    skip("CORE-2714 figure out why the files tab shows up as disabled on the rcs sidebar in jenkins")
+    fj('[role=tablist] [role=presentation]:not([aria-disabled]):contains("Files")').click
     wait_for_ajaximations
-    ff(".name.text")[2].click
+    fj('[role=tabpanel] button:contains("unfiled")').click
+    wait_for_ajaximations
+    fj('[role=tabpanel] button:contains("some test file")').click
     wait_for_ajaximations
     if insert_into == :quiz
       ff(".name.text")[3].click
