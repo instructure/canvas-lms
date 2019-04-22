@@ -566,8 +566,9 @@ class GradebookImporter
       return true
     end
 
-    if row.compact.all? { |c| c.strip =~ /^(Muted|)$/i }
-      # this row is muted or empty and should not be processed at all
+    if row.compact.all? { |column| column =~ /^\s*(Muted|Manual Posting)?\s*$/i }
+      # This row indicates muted assignments (or manually posted assignments if
+      # post policies is enabled) and should not be processed at all
       return true
     end
 

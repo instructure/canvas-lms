@@ -190,6 +190,50 @@ describe GradebookExporter do
           expect(header_row_length).to eq muted_row_length
         end
       end
+
+      context "when post policies are enabled" do
+        before(:once) do
+          @course.enable_feature!(:post_policies)
+        end
+
+        let(:csv) do
+          unparsed_csv = GradebookExporter.new(@course, @teacher, {}).to_csv
+          CSV.parse(unparsed_csv, headers: true)
+        end
+
+        context "when at least one assignment is manually-posted" do
+          let_once(:manual_assignment) { @course.assignments.create!(title: "manual") }
+          let_once(:manual_header) { "manual (#{manual_assignment.id})" }
+          let_once(:auto_assignment) { @course.assignments.create!(title: "auto") }
+          let_once(:auto_header) { "auto (#{auto_assignment.id})" }
+
+          before(:once) do
+            manual_assignment.ensure_post_policy(post_manually: true)
+            auto_assignment.ensure_post_policy(post_manually: false)
+          end
+
+          let(:manual_posting_row) { csv[0] }
+
+          it "includes a line consisting entirely of 'Manual Posting' or empty values" do
+            expect(manual_posting_row.fields.uniq).to contain_exactly(nil, "Manual Posting")
+          end
+
+          it "designates manually-posted assignments as 'Manual Posting'" do
+            expect(manual_posting_row[manual_header]).to eq "Manual Posting"
+          end
+
+          it "emits an empty value for auto-posted assignments" do
+            expect(manual_posting_row[auto_header]).to be nil
+          end
+        end
+
+        it "omits the 'Manual Posting' row if no assignments are manually-posted" do
+          auto_assignment = @course.assignments.create!(title: "auto")
+          auto_assignment.ensure_post_policy(post_manually: false)
+
+          expect(csv[0].fields).not_to include("Manual Posting")
+        end
+      end
     end
 
     context "internationalization" do
