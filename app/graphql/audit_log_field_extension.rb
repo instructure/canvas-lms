@@ -42,9 +42,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
           "mutation_name" => mutation.graphql_name,
           "current_user_id" => context[:current_user]&.global_id&.to_s,
           "real_current_user_id" => context[:real_current_user]&.global_id&.to_s,
-          # TODO: may need to support a filter on this at some point to
-          # avoid logging sensitive parameters
-          "params" => arguments[:input].to_h,
+          "params" => ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h),
         },
         return_consumed_capacity: "TOTAL"
       )
