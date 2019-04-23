@@ -819,6 +819,18 @@ hy:
         default: 
           recently_deleted_courses: 
             text: "Այս հաշվետվության մեջ ցույց են տրվում նշված ժամակահատվածի այն բոլոր դասընթացները, որոնք ջնջվել են վերջին 30 օրվա ընթացքում: Վերջնական csv ֆայլում մեկ տող է հատկացվում յուրաքանչյուր դասընթացին և ցույց են տրվում դասընթացի նույնականացուցիչը, sis դասընթացի նույնականացուցիչը, դասընթացի կարճ անվանումը, դասընթացի անվանումը, դասընթացն սկսելու և ավարտելու ամսաթվերը:"
+    reports_tab: 
+      headers: 
+        report_last_run: "Վերջին գործարկումը"
+        report_name: Անուն
+      headings: 
+        sections: Հաշվետվություններ
+      links: 
+        configure_report: Կարգաբերել...
+        run_report: "Պատրաստել հաշվետվություն"
+      open_report_description: "Բացել հաշվետվության նկարագրությունը"
+      report_last_run_never: Երբեք
+      report_running: "Պատրաստվում է հաշվետվություն: *Դրա ավարտին դուք կստանաք էլ.հաղորդագրություն*"
     retry_login: "Կրկին փորձեք մուտք գործել համակարգ"
     root_accounts: 
       labels: 
@@ -2868,6 +2880,7 @@ hy:
     see_file: "Տես %{file_name}"
     see_quiz: "Տես %{quiz_name}"
     see_related_link: "Տես համապատասխան հղումը"
+  calendar_event_89aadc1c: "Օրացուցային միջոցառում"
   calendar_events: 
     crumbs: 
       new: "Նոր օրացուցային միջոցառում"
@@ -7704,6 +7717,9 @@ hy:
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Ներառել այս հանձնարարության գնահատականները Ձեր դպրոցի Ունկնդիրների մասին տեղեկությունների համակարգում:"
   include_unpublished_assignments_83ebbaec: "Ներառել չհրապարակված հանձնարարությունները"
   include_unpublished_courses_7a0e7aab: "Ներառել չհրատարակված դասընթացները"
+  incompleteregistration: 
+    get_started: Սկսենք
+    welcome_to_canvas: "Ձեզ ողջունում է Canvas-ը"
   incorrect_username_and_or_password_2de73abb: "Սխալ օգտատիրոջ անուն և/կամ գաղտնաբառ"
   increase_indent_6af90f7c: "Մեծացնել ներսի տողագլուխը"
   incremental_update_successfully_generated_against__db3f3f06: "Նախկինում SIS ներմուծման հիման վրա հաջողությամբ իրականացվել է լրացուցիչ թարմացում: "
@@ -7886,6 +7902,7 @@ hy:
   k_2521301c: k
   key_name_7311d22: "Հիմնական անվանումը՝ "
   key_settings_44df6a41: "Հիմնական կարգաբերումներ"
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Արգելափակել մինչև"
   last_enrollment_activity_10fe15ba: "Վերջին գրանցման հետ կապված գործողություն"
