@@ -205,6 +205,12 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
+  def self.always_allowed_scopes
+    [
+      "/login/oauth2/token"
+    ].map{ |path| Regexp.new("^#{path}$")}
+  end
+
   def url_scopes_for_method(method)
     re = /^url:#{method}\|/
     scopes.select { |scope| re =~ scope }.map do |scope|

@@ -1417,7 +1417,8 @@ describe CoursesController do
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
         params: {},
-        method: 'GET'
+        method: 'GET',
+        path: '/not_allowed_path'
       }))
       expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
     end
