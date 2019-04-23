@@ -228,6 +228,38 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           )
         end
       end
+
+      context "when nil is present in an attempt history" do
+        let(:url_grades) { [] }
+        let(:submission_version_data) do
+          time_now = Time.zone.now
+          [
+            { score: 50, url: 'http://url1', submitted_at: time_now - 10.days },
+            { score: 25, url: 'http://url2', submitted_at: time_now - 8.days },
+            { score: 55, url: 'http://url1', submitted_at: time_now - 9.days },
+            { score: nil, url: 'http://url1', submitted_at: time_now - 3.days }
+          ]
+        end
+
+        before do
+          s = Submission.find_or_initialize_by(assignment: assignment, user: @user)
+
+          submission_version_data.each do |d|
+            s.score = d[:score]
+            s.submitted_at = d[:submitted_at]
+            s.grader_id = -1
+            s.url = d[:url]
+            s.with_versioning(:explicit => true) { s.save! }
+          end
+          s
+        end
+
+        it "outputs only attempts without being masked by a (score) nil version" do
+          expect(subject.grade_history.count).to be(1)
+          expect(subject.grade_history.first[:url]).to eq('http://url2')
+          expect(subject.grade_history.first[:score]).to eq(25)
+        end
+      end
     end
   end
 
@@ -253,7 +285,10 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     it "sends notification to users" do
       expect(submission).to receive(:without_versioning).and_call_original
-      expect(submission).to receive(:with_versioning).twice.and_call_original
+      # expect 4 :save! calls:
+      # 1 - save an initial unsubmitted version; 2 - create a new data version;
+      # 3 - update status to submitted; 4 - update actual data (score, url, ...)
+      expect(submission).to receive(:save!).exactly(4).times.and_call_original
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
         submission,
         "Assignment Submitted",
