@@ -76,7 +76,9 @@ export function mockAssignment(overrides = {}) {
           enteredGrade: '9',
           grade: '6',
           latePolicyStatus: 'late',
+          state: 'submitted',
           submissionStatus: 'late',
+          submittedAt: '2019-02-20T15:12:33-07:00',
           gradingStatus: 'graded',
           __typename: 'Sumbission'
         }

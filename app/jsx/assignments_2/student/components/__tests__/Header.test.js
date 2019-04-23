@@ -84,3 +84,28 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late status i
 
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
+
+it('will render the unavailable state tracker if an assignment is not available', () => {
+  const assignment = mockAssignment()
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('unavailable-step-container')).toBeInTheDocument()
+})
+
+it('will render the available state tracker if an assignment is available but not submitted', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'unsubmitted'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('available-step-container')).toBeInTheDocument()
+})
+
+it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'submitted'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+})

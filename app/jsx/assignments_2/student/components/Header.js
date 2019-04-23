@@ -25,7 +25,6 @@ import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import Attempt from './Attempt'
 import DateTitle from './DateTitle'
 import GradeDisplay from './GradeDisplay'
-import I18n from 'i18n!assignments_2_student_header'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import {number} from 'prop-types'
 import StepContainer from './StepContainer'
@@ -138,7 +137,6 @@ class Header extends React.Component {
                 assignment={this.props.assignment}
                 forceLockStatus={!this.props.assignment.env.currentUser} // TODO: replace with new 'self' graphql query when ready
                 isCollapsed={this.state.isSticky}
-                collapsedLabel={I18n.t('Submitted')}
               />
             </div>
           </div>

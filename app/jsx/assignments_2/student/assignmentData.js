@@ -115,7 +115,9 @@ export const STUDENT_VIEW_QUERY = gql`
             grade
             gradingStatus
             latePolicyStatus
+            state
             submissionStatus
+            submittedAt
           }
         }
       }
@@ -224,7 +226,9 @@ export const StudentAssignmentShape = shape({
         grade: string,
         gradingStatus: string,
         latePolicyStatus: string,
-        submissionStatus: string
+        state: string,
+        submissionStatus: string,
+        submittedAt: string
       })
     ).isRequired
   })
