@@ -927,6 +927,18 @@ hu:
         default: 
           recently_deleted_courses: 
             text: "Ez a jelentés megmutatja az adott félévhez tartozó összes olyan kurzust, amit az elmúlt 30 napban töröltek. Az eredményt tartalmazó csv fájl kurzusonként egy sort fog tartalmazni, benne a kurzusazonosító, a kurzus sis id, a kurzus rövid neve, a kurzus neve, valamint a kurzus kezdetének és végének a dátuma."
+    reports_tab: 
+      headers: 
+        report_last_run: "Utolsó futtatás"
+        report_name: Név
+      headings: 
+        sections: Riportok
+      links: 
+        configure_report: Beállítás...
+        run_report: "Riport futtatása"
+      open_report_description: "Jelentés leírásának megnyitása"
+      report_last_run_never: Soha
+      report_running: "A jelentés fut.*E-mailben értesítjük Önt, amikor elkészült.*"
     retry_login: "Újbóli belépés"
     root_accounts: 
       labels: 
@@ -7315,6 +7327,7 @@ hu:
       submit: "%{model} mentése"
       update: "%{model} frissítése"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Itt a remek alkalom arra, hogy megismerkedjen a Naptár lehetőségeivel és hozzáadjon egy eseményt a kurzushoz. Ne aggódjon,segítünk! A feladatok határidejét nem kell felvennie, azok automatikusan bekerülnek a naptárba."
+  hidden_14a032a7: Rejtett
   hidden_available_with_a_link_65ef2bda: "Rejtett. Hivatkozással elérhető"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Rejtett, tartalmazott fájlok hivatkozással elérhetőek. "
   hide_all_artifacts_d654fbd5: "Minden alkotás elrejtése"
@@ -7451,6 +7464,9 @@ hu:
   include_unpublished_courses_7a0e7aab: "A nem publikus kurzusokat is beleértve"
   incomplete_95612d72: befejezetlen
   incomplete_da3c2ea2: Befejezetlen
+  incompleteregistration: 
+    get_started: "Vágjon bele!"
+    welcome_to_canvas: "Üdvözöljük a Canvasban!"
   incorrect_answer_7c17e63b: "Helytelen válasz"
   increase_indent_6af90f7c: "Behúzás növelése"
   increase_indent_6d550a4a: "Behúzás növelése"
@@ -7670,6 +7686,7 @@ hu:
     esc_key_notification: "Nyomja meg az escape gombot a billentyűparancsok használata előtt, amikor az osztálynapló rácson navigál."
   keyboard_shortcuts_ed1844bd: Billentyűparancsok
   kind_7f0a88c4: Típus
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Zárolva eddig"
   last_enrollment_activity_10fe15ba: "Legutóbbi beiratkozási tevékenység"
