@@ -1650,6 +1650,9 @@ class ApplicationController < ActionController::Base
                                                         tool: @tool})
 
         adapter = if @tool.use_1_3?
+          # Use the resource URL as the target_link_uri
+          opts[:launch_url] = @resource_url
+
           Lti::LtiAdvantageAdapter.new(
             tool: @tool,
             user: @current_user,
