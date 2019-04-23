@@ -100,6 +100,10 @@ module RCENextPage
     # add selector
   end
 
+  def assignment_due_date
+    # add (selector).text
+  end
+
   def links_toolbar_button
     # put new links toolbar locator here
   end

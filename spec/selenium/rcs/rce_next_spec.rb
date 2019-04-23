@@ -328,5 +328,20 @@ describe "RCE next tests" do
 
       expect(assignment_unpublished_status).to be_displayed
     end
+
+    it "should display assignment due date in links accordion" do
+      skip('Unskip in CORE-2619')
+      title = "Assignment-Title"
+      due_at = 3.days.from_now
+      @assignment = @course.assignments.create!(:name => title, :status => published, due_at: @due_at)
+
+      visit_new_announcement_page
+
+      click_links_toolbar_button
+      click_course_links
+      click_assignments_accordion
+
+      expect(assignment_due_date).to eq date_string(due_at, :no_words)
+    end
   end
 end
