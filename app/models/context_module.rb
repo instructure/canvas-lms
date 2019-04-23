@@ -509,8 +509,10 @@ class ContextModule < ActiveRecord::Base
       end
     end
 
-    tags = DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
-      filter.call(tags, user_ids, self.context_id, opts)
+    tags = self.shard.activate do
+      DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
+        filter.call(tags, user_ids, self.context_id, opts)
+      end
     end
 
     tags
