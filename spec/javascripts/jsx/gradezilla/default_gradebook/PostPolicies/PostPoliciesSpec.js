@@ -178,6 +178,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const assignment = {
         anonymize_students: false,
         course_id: '1201',
+        grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,
