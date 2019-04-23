@@ -104,7 +104,7 @@ gem 'parallel', '1.12.1', require: false
   gem 'ruby-progressbar', '1.9.0', require: false # used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
 gem 'rake', '12.3.1'
-gem 'ratom-nokogiri', '0.10.7', require: false
+gem 'ratom-nokogiri', '0.10.8', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
 
