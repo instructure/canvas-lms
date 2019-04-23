@@ -18,6 +18,7 @@
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
+import FileList from '../../../shared/FileList'
 import I18n from 'i18n!assignments_2'
 import IconAudio from '@instructure/ui-icons/lib/Line/IconAudio'
 import IconMedia from '@instructure/ui-icons/lib/Line/IconMedia'
@@ -155,13 +156,29 @@ export default class CommentTextArea extends Component {
     )
   }
 
-  renderFiles() {
-    // TODO: build file display UI and swap this out for an attachments file display component
-    if (this.state.currentFiles.length && !this.state.uploadingComments) {
-      return this.state.currentFiles.map(file => {
-        return <div key={file.id}>TODO: change this attached file</div>
-      })
-    }
+  handleRemoveFile = refsMap => e => {
+    e.preventDefault()
+
+    const refs = {}
+    Object.entries(refsMap).forEach(([key, value]) => (refs[key] = value))
+
+    const fileId = parseInt(e.currentTarget.id, 10)
+    const fileIndex = this.state.currentFiles.findIndex(file => file.id === fileId)
+
+    this.setState(
+      prevState => ({
+        currentFiles: prevState.currentFiles.filter((_, i) => i !== fileIndex)
+      }),
+      () => {
+        if (this.state.currentFiles.length === 0) {
+          this.attachmentFileButton.focus()
+        } else if (fileIndex === 0) {
+          refs[this.state.currentFiles[fileIndex].id].focus()
+        } else {
+          refs[this.state.currentFiles[fileIndex - 1].id].focus()
+        }
+      }
+    )
   }
 
   render() {
@@ -183,7 +200,15 @@ export default class CommentTextArea extends Component {
                 value={this.state.commentText}
               />
               {this.state.uploadingComments && <LoadingIndicator />}
-              <div data-testid="assignments_2_comment_attachment">{this.renderFiles()}</div>
+              {this.state.currentFiles.length !== 0 && !this.state.uploadingComments && (
+                <div data-testid="assignments_2_comment_attachment">
+                  <FileList
+                    files={this.state.currentFiles}
+                    removeFileHandler={this.handleRemoveFile}
+                    canRemove
+                  />
+                </div>
+              )}
             </div>
             {!this.state.uploadingComments && !this.state.hasError && (
               <div className="textarea-action-button-container">
@@ -200,12 +225,16 @@ export default class CommentTextArea extends Component {
                   type="file"
                 />
                 <Button
+                  id="attachmentFileButton"
                   icon={DEFAULT_ICON}
-                  size="small"
                   margin="0 x-small 0 0"
                   onClick={() => {
                     this.fileInput.click()
                   }}
+                  ref={element => {
+                    this.attachmentFileButton = element
+                  }}
+                  size="small"
                   variant="icon"
                 >
                   <ScreenReaderContent>{I18n.t('Attach a File')}</ScreenReaderContent>

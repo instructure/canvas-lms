@@ -31,6 +31,10 @@ import Comments from '../Comments'
 import * as uploadFileModule from '../../../../shared/upload_file'
 
 describe('CommentTextArea', () => {
+  beforeAll(() => {
+    window.URL.createObjectURL = jest.fn()
+  })
+
   beforeEach(() => {
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
   })
@@ -62,7 +66,7 @@ describe('CommentTextArea', () => {
   })
 
   it('renders the same number of attachments as files', async () => {
-    const {container, getByTestId} = render(
+    const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea assignment={mockAssignment()} />
       </MockedProvider>
@@ -70,18 +74,76 @@ describe('CommentTextArea', () => {
     const fileInput = await waitForElement(() =>
       container.querySelector('input[id="attachmentFile"]')
     )
-    const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
-    const file1 = new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'})
-    const file2 = new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'})
-    const file3 = new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+    const files = [
+      new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+    ]
 
-    uploadFiles(fileInput, [file, file1, file2, file3])
-    const attachmentRenderContainer = getByTestId('assignments_2_comment_attachment')
-    expect(attachmentRenderContainer.children).toHaveLength(4)
+    uploadFiles(fileInput, files)
+    files.forEach(file => expect(getByText(file.name)).toBeInTheDocument())
   })
 
-  it('uploading files concats to previously uploaded files', async () => {
-    const {container, getByTestId} = render(
+  it('concats to previously uploaded files', async () => {
+    const {container, getByText} = render(
+      <MockedProvider>
+        <CommentTextArea assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="attachmentFile"]')
+    )
+    const files = [
+      new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image4.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image5.png', {type: 'image/png'})
+    ]
+
+    uploadFiles(fileInput, files.slice(0, 1))
+    expect(getByText(files[0].name)).toBeInTheDocument()
+
+    uploadFiles(fileInput, files.slice(1, 4))
+    files.slice(1, 4).forEach(file => expect(getByText(file.name)).toBeInTheDocument())
+
+    uploadFiles(fileInput, files.slice(4))
+    files.slice(4).forEach(file => expect(getByText(file.name)).toBeInTheDocument())
+  })
+
+  it('can remove uploaded files', async () => {
+    const {container, getByText, queryByText} = render(
+      <MockedProvider>
+        <CommentTextArea assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="attachmentFile"]')
+    )
+    const files = [
+      new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+    ]
+
+    uploadFiles(fileInput, files)
+    files.forEach(file => expect(getByText(file.name)).toBeInTheDocument())
+
+    files.slice(0, 3).forEach(file => {
+      const button = container.querySelector(`button[id="${file.id}"]`)
+      expect(button).toContainElement(getByText(`Remove ${file.name}`))
+      fireEvent.click(button)
+    })
+
+    files.slice(0, 3).forEach(file => expect(queryByText(file.name)).not.toBeInTheDocument())
+    files.slice(3).forEach(file => expect(getByText(file.name)).toBeInTheDocument())
+  })
+
+  it('sets focus to the attachment file button after removing all attachments', async () => {
+    const {container, getByText} = render(
       <MockedProvider>
         <CommentTextArea assignment={mockAssignment()} />
       </MockedProvider>
@@ -92,23 +154,69 @@ describe('CommentTextArea', () => {
     const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
 
     uploadFiles(fileInput, [file])
-    const attachmentRenderContainer = getByTestId('assignments_2_comment_attachment')
-    expect(attachmentRenderContainer).toBeInTheDocument()
 
-    const file1 = new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'})
-    const file2 = new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'})
-    const file3 = new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+    const uploadButton = container.querySelector('button[id="attachmentFileButton"]')
+    jest.spyOn(uploadButton, 'focus')
 
-    uploadFiles(fileInput, [file1, file2, file3])
-    const attachmentRender2Container = getByTestId('assignments_2_comment_attachment')
-    expect(attachmentRender2Container.children).toHaveLength(4)
+    const button = container.querySelector(`button[id="${file.id}"]`)
+    expect(button).toContainElement(getByText(`Remove ${file.name}`))
+    fireEvent.click(button)
 
-    const file4 = new File(['foo'], 'awesome-test-image4.png', {type: 'image/png'})
-    const file5 = new File(['foo'], 'awesome-test-image5.png', {type: 'image/png'})
+    expect(uploadButton.focus).toHaveBeenCalled()
+  })
 
-    uploadFiles(fileInput, [file4, file5])
-    const attachmentRender3Container = getByTestId('assignments_2_comment_attachment')
-    expect(attachmentRender3Container.children).toHaveLength(6)
+  it('sets focus to the next file in the list if the first file is removed', async () => {
+    const {container, getByText} = render(
+      <MockedProvider>
+        <CommentTextArea assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="attachmentFile"]')
+    )
+    const files = [
+      new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+    ]
+
+    uploadFiles(fileInput, files)
+
+    const nextFile = container.querySelector(`button[id="${files[1].id}"]`)
+    jest.spyOn(nextFile, 'focus')
+
+    const firstFile = container.querySelector(`button[id="${files[0].id}"]`)
+    expect(firstFile).toContainElement(getByText(`Remove ${files[0].name}`))
+    fireEvent.click(firstFile)
+
+    expect(nextFile.focus).toHaveBeenCalled()
+  })
+
+  it('sets focus to the previous file in the list if any other file is removed', async () => {
+    const {container, getByText} = render(
+      <MockedProvider>
+        <CommentTextArea assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="attachmentFile"]')
+    )
+    const files = [
+      new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+    ]
+
+    uploadFiles(fileInput, files)
+
+    const prevFile = container.querySelector(`button[id="${files[0].id}"]`)
+    jest.spyOn(prevFile, 'focus')
+
+    const currFile = container.querySelector(`button[id="${files[1].id}"]`)
+    expect(currFile).toContainElement(getByText(`Remove ${files[1].name}`))
+    fireEvent.click(currFile)
+
+    expect(prevFile.focus).toHaveBeenCalled()
   })
 
   it('notifies users when a submission comments with files is sent', async () => {
