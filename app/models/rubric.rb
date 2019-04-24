@@ -18,6 +18,7 @@
 
 class Rubric < ActiveRecord::Base
   include Workflow
+  include HtmlTextHelper
 
   attr_writer :skip_updating_points_possible
   belongs_to :user
@@ -271,7 +272,11 @@ class Rubric < ActiveRecord::Base
     (params[:criteria] || {}).each do |idx, criterion_data|
       criterion = {}
       criterion[:description] = (criterion_data[:description].presence || t('no_description', "No Description")).strip
-      criterion[:long_description] = (criterion_data[:long_description] || "").strip
+      # Outcomes descriptions are already html sanitized, so use that if an outcome criteria
+      # is present. Otherwise we need to sanitize the input ourselves.
+      unless criterion_data[:learning_outcome_id].present?
+        criterion[:long_description] = format_message((criterion_data[:long_description] || "").strip).first
+      end
       criterion[:points] = criterion_data[:points].to_f || 0
       criterion_data[:id].strip! if criterion_data[:id]
       criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
@@ -280,6 +285,7 @@ class Rubric < ActiveRecord::Base
       ratings = []
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.where(id: criterion_data[:learning_outcome_id]).first
+        criterion[:long_description] = outcome&.description || ''
         if outcome
           criterion[:learning_outcome_id] = outcome.id
           criterion[:mastery_points] = ((criterion_data[:mastery_points] || outcome.data[:rubric_criterion][:mastery_points]).to_f rescue nil)
