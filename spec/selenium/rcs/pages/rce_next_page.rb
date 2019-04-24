@@ -120,6 +120,22 @@ module RCENextPage
     f('button[aria-label="More..."]')
   end
 
+  def list_toggle_button
+    
+  end
+
+  def bullet_list_button
+
+  end
+
+  def numbered_list_button
+
+  end
+
+  def editor_window
+    f("form.edit-form .edit-content")
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -193,5 +209,21 @@ module RCENextPage
 
   def click_more_toolbar_button
     more_toolbar_button.click
+  end
+
+  def click_list_toggle_button
+    list_toggle_button.click
+  end
+
+  def click_bullet_list_button
+    bullet_list_button.click
+  end
+
+  def click_numbered_list_button
+    numbered_list_button.click
+  end
+
+  def click_editor_window
+    editor_window.click
   end
 end
