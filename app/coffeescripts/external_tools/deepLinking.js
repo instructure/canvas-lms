@@ -32,21 +32,23 @@ export function handleDeepLinkingError(e, contentView, reloadTool) {
 
 function legacyContentItem(ltiAdvantageContentItem) {
   const types = {
-    'ltiResourceLink': 'LtiLinkItem',
-    'file': 'FileItem'
+    ltiResourceLink: 'LtiLinkItem',
+    file: 'FileItem'
   }
-  const { type, title, text, icon, url } = ltiAdvantageContentItem
+  const {type, title, text, icon, url} = ltiAdvantageContentItem
   const legacyType = types[type]
 
-  if(!legacyType) { throw `Unknown type: ${type}` }
+  if (!legacyType) {
+    throw `Unknown type: ${type}`
+  }
 
   return {
-    "@type": legacyType,
+    '@type': legacyType,
     title,
     text,
     url,
     thumbnail: {
-      "@id": icon
+      '@id': icon
     }
   }
 }

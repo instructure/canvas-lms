@@ -48,6 +48,7 @@ define [
   'jst/content_migrations/subviews/DaySubstitutionCollection'
   '../../views/content_migrations/subviews/OverwriteAssessmentContentView'
   '../../views/content_migrations/subviews/ImportQuizzesNextView'
+  './processMigrationContentItem'
 ], (I18n, $,
     ProgressingContentMigrationCollection,
     ContentMigrationModel,
@@ -78,7 +79,8 @@ define [
     pubsub,
     daySubCollectionTemplate,
     OverwriteAssessmentContentView,
-    ImportQuizzesNextView) ->
+    ImportQuizzesNextView
+    processMigrationContentItem) ->
   ConverterViewControl.setModel new ContentMigrationModel
                                  course_id: ENV.COURSE_ID
                                  daySubCollection: daySubCollection
@@ -240,8 +242,8 @@ define [
             quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
             quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
 
-
-
+  # Listen for deep linking messages
+  window.addEventListener 'message', processMigrationContentItem
 
   registerExternalTool = (et) ->
     toolModel = new ExternalTool(et)
