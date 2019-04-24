@@ -86,6 +86,7 @@ export default class ToolConfigurationForm extends React.Component {
           label="Method"
           assistiveText={I18n.t('3 options available. Use arrow keys to navigate options.')}
           onChange={this.handleConfigTypeChange}
+          selectedOption={this.props.configurationMethod}
         >
           <option value="manual">{I18n.t('Manual Entry')}</option>
           <option value="json">{I18n.t('Paste JSON')}</option>
