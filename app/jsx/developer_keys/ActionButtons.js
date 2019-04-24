@@ -53,11 +53,12 @@ class DeveloperKeyActionButtons extends React.Component {
   }
 
   editLinkHandler = (event) => {
-    const { dispatch, editDeveloperKey, developerKeysModalOpen, developerKey } = this.props
+    const { dispatch, editDeveloperKey, developerKeysModalOpen, developerKey, ltiKeysSetLtiKey, developerKey: {is_lti_key} } = this.props
 
     event.preventDefault()
+    if (is_lti_key) { dispatch(ltiKeysSetLtiKey(true)) }
     dispatch(editDeveloperKey(developerKey))
-    dispatch(developerKeysModalOpen())
+    dispatch(developerKeysModalOpen(is_lti_key ? 'lti' : 'api'))
   }
 
   focusDeleteLink = () => { this.deleteLink.focus() }
@@ -99,9 +100,7 @@ class DeveloperKeyActionButtons extends React.Component {
   }
 
   renderEditButton () {
-    const { developerName, developerKey: {is_lti_key} } = this.props;
-
-    if(is_lti_key) return
+    const { developerName } = this.props;
 
     return (
       <Tooltip
@@ -153,6 +152,7 @@ DeveloperKeyActionButtons.propTypes = {
   deleteDeveloperKey: PropTypes.func.isRequired,
   editDeveloperKey: PropTypes.func.isRequired,
   developerKeysModalOpen: PropTypes.func.isRequired,
+  ltiKeysSetLtiKey: PropTypes.func.isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     api_key: PropTypes.string,

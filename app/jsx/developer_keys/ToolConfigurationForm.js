@@ -61,7 +61,7 @@ export default class ToolConfigurationForm extends React.Component {
       return (
         <ManualConfigurationForm
           ref={this.setManualConfigRef}
-          toolConfiguration={this.props.manualToolConfiguration}
+          toolConfiguration={this.props.toolConfiguration}
           validScopes={this.props.validScopes}
           validPlacements={this.props.validPlacements}
         />
@@ -76,6 +76,14 @@ export default class ToolConfigurationForm extends React.Component {
     )
   }
 
+  renderOptions () {
+    return [
+      <option key="manual" value="manual">{I18n.t('Manual Entry')}</option>,
+      <option key="json" value="json">{I18n.t('Paste JSON')}</option>,
+      this.props.editing ? null : <option key="url" value="url">{I18n.t('Enter URL')}</option>
+    ].filter(o => !!o)
+  }
+
   render() {
     return (
       <View>
@@ -88,9 +96,7 @@ export default class ToolConfigurationForm extends React.Component {
           onChange={this.handleConfigTypeChange}
           selectedOption={this.props.configurationMethod}
         >
-          <option value="manual">{I18n.t('Manual Entry')}</option>
-          <option value="json">{I18n.t('Paste JSON')}</option>
-          <option value="url">{I18n.t('Enter URL')}</option>
+          {this.renderOptions()}
         </Select>
         <br />
         {this.configurationInput()}
@@ -107,7 +113,7 @@ ToolConfigurationForm.propTypes = {
   validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
   setLtiConfigurationMethod: PropTypes.func.isRequired,
   configurationMethod: PropTypes.string,
-  manualToolConfiguration: PropTypes.object.isRequired
+  editing: PropTypes.bool.isRequired
 }
 
 ToolConfigurationForm.defaultProps = {

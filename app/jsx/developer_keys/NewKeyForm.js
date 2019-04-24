@@ -95,7 +95,7 @@ export default class DeveloperKeyFormFields extends React.Component {
   }
 
   formBody() {
-    const { createLtiKeyState } = this.props
+    const { createLtiKeyState, editing } = this.props
 
     if (!createLtiKeyState.isLtiKey) {
       return <DeveloperKeyScopes
@@ -116,7 +116,8 @@ export default class DeveloperKeyFormFields extends React.Component {
       setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
       setPrivacyLevel={this.props.setPrivacyLevel}
       dispatch={this.props.dispatch}
-      toolConfiguration={this.props.toolConfiguration}
+      toolConfiguration={this.props.tool_configuration}
+      editing={editing}
     />
   }
 
@@ -213,7 +214,10 @@ DeveloperKeyFormFields.propTypes = {
     redirect_uris: PropTypes.string,
     email: PropTypes.string,
     name: PropTypes.string,
-    require_scopes: PropTypes.bool
+    require_scopes: PropTypes.bool,
+    tool_configuration: PropTypes.shape({
+      oidc_initiation_url: PropTypes.string
+    })
   }),
   availableScopes: PropTypes.objectOf(PropTypes.arrayOf(
     PropTypes.shape({
@@ -222,7 +226,8 @@ DeveloperKeyFormFields.propTypes = {
     })
   )).isRequired,
   availableScopesPending: PropTypes.bool.isRequired,
-  toolConfiguration: PropTypes.shape({
+  editing: PropTypes.bool.isRequired,
+  tool_configuration: PropTypes.shape({
     oidc_initiation_url: PropTypes.string
   })
 }

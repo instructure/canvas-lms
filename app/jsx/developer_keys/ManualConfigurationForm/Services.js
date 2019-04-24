@@ -87,10 +87,11 @@ export default class Services extends React.Component {
 }
 
 Services.propTypes = {
-  validScopes: PropTypes.object.isRequired,
+  validScopes: PropTypes.object,
   scopes: PropTypes.arrayOf(PropTypes.string)
 }
 
 Services.defaultProps = {
-  scopes: []
+  scopes: [],
+  validScopes: {}
 }

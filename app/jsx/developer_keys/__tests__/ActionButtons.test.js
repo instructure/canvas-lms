@@ -59,12 +59,12 @@ it('renders edit button for non lti keys', () => {
   expect(wrapper.find(IconEditLine).exists()).toBe(true)
 })
 
-it('does not render edit button for non lti keys', () => {
+it('does render edit button for non lti keys', () => {
   const wrapper = mount(<ActionButtons {...props({developerKey: {
     id: '1',
     api_key: 'test',
     created_at: 'test',
     is_lti_key: true
   }})} />)
-  expect(wrapper.find(IconEditLine).exists()).toBe(false)
+  expect(wrapper.find(IconEditLine).exists()).toBe(true)
 })

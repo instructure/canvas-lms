@@ -43,13 +43,13 @@ export default class ToolConfiguration extends React.Component {
         <ToolConfigurationForm
           ref={this.setConfigurationMethodsRef}
           dispatch={this.props.dispatch}
-          toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
+          toolConfiguration={this.props.toolConfiguration}
           toolConfigurationUrl={this.props.createLtiKeyState.toolConfigurationUrl}
           validScopes={ENV.validLtiScopes}
           validPlacements={ENV.validLtiPlacements}
           setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
           configurationMethod={this.props.createLtiKeyState.configurationMethod}
-          manualToolConfiguration={this.props.toolConfiguration}
+          editing={this.props.editing}
         />
       )
     }
@@ -93,5 +93,6 @@ ToolConfiguration.propTypes = {
   }).isRequired,
   toolConfiguration: PropTypes.shape({
     oidc_initiation_url: PropTypes.string
-  })
+  }),
+  editing: PropTypes.bool.isRequired
 }

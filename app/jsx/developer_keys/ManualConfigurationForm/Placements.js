@@ -126,12 +126,13 @@ export default class Placements extends React.Component {
 }
 
 Placements.propTypes = {
-  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
+  validPlacements: PropTypes.arrayOf(PropTypes.string),
   placements: PropTypes.arrayOf(PropTypes.shape({
     placement: PropTypes.string.isRequired
   }))
 }
 
 Placements.defaultProps = {
-  placements: [{placement: "account_navigation"}, {placement: "link_selection"}]
+  placements: [{placement: "account_navigation"}, {placement: "link_selection"}],
+  validPlacements: []
 }

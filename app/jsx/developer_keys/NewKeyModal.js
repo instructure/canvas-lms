@@ -32,7 +32,7 @@ import LtiKeyFooter from './LtiKeyFooter'
 
 export default class DeveloperKeyModal extends React.Component {
   state = {
-    toolConfiguration: {}
+    toolConfiguration: null // used to save state when saving the key, display what was there if failure
   }
 
   developerKeyUrl() {
@@ -48,6 +48,22 @@ export default class DeveloperKeyModal extends React.Component {
 
   modalTitle() {
     return this.developerKey() ? I18n.t('Create developer key') : I18n.t('Edit developer key')
+  }
+
+  get manualForm () {
+    return this.newForm ? this.newForm : {
+      valid: () => true,
+      generateToolConfiguration: () => {
+        return this.toolConfiguration
+      }
+    }
+  }
+
+  get toolConfiguration () {
+    const {
+      createOrEditDeveloperKeyState: { developerKey }
+    } = this.props;
+    return this.state.toolConfiguration ? this.state.toolConfiguration : (developerKey && developerKey.tool_configuration || {})
   }
 
   get submissionForm () {
@@ -105,7 +121,31 @@ export default class DeveloperKeyModal extends React.Component {
     )
   }
 
+  saveLTIKeyEdit (settings) {
+    const { store: { dispatch }, actions } = this.props
+    dispatch(actions.saveLtiToolConfigurationStart())
+    this.setState({toolConfiguration: settings})
+    return actions.ltiKeysUpdateCustomizations(
+      settings.scopes,
+      [],
+      this.props.createOrEditDeveloperKeyState.developerKey.id,
+      settings,
+      '',
+      null
+    )(dispatch).then((data) => {
+      dispatch(actions.saveLtiToolConfigurationSuccessful())
+      const { developer_key, tool_configuration } = data
+      developer_key.tool_configuration = tool_configuration.settings
+      dispatch(actions.listDeveloperKeysReplace(developer_key))
+      this.closeModal()
+      $.flashMessage(I18n.t('Save successful.'))
+    }).catch(errors => {
+      $.flashError(I18n.t('Failed to save changes: %{errors}%', {errors}))
+    })
+  }
+
   saveLtiToolConfiguration = () => {
+    const { store: { dispatch }, actions } = this.props
     const formData = new FormData(this.submissionForm)
     if (formData.get("developer_key[redirect_uris]").trim().length === 0) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
@@ -122,26 +162,30 @@ export default class DeveloperKeyModal extends React.Component {
         }
       }
     } else if(this.props.createLtiKeyState.configurationMethod === 'manual') {
-      if (!this.newForm.valid()) {
+      if (!this.manualForm.valid()) {
         return
       }
-      settings = this.newForm.generateToolConfiguration();
+      settings = this.manualForm.generateToolConfiguration();
       this.setState({toolConfiguration: settings})
     }
 
-    this.props.store.dispatch(this.props.actions.saveLtiToolConfiguration({
-      account_id: this.props.ctx.params.contextId,
-      developer_key: {
-        name: formData.get("developer_key[name]"),
-        email: formData.get("developer_key[email]"),
-        notes: formData.get("developer_key[notes]"),
-        redirect_uris: formData.get("developer_key[redirect_uris]"),
-        test_cluster_only: this.testClusterOnly,
-        access_token_count: 0
-      },
-      settings,
-      settings_url: formData.get("tool_configuration_url"),
-    }))
+    if (this.props.createOrEditDeveloperKeyState.editing) {
+      this.saveLTIKeyEdit(settings)
+    } else {
+      return actions.saveLtiToolConfiguration({
+        account_id: this.props.ctx.params.contextId,
+        developer_key: {
+          name: formData.get("developer_key[name]"),
+          email: formData.get("developer_key[email]"),
+          notes: formData.get("developer_key[notes]"),
+          redirect_uris: formData.get("developer_key[redirect_uris]"),
+          test_cluster_only: this.testClusterOnly,
+          access_token_count: 0
+        },
+        settings,
+        settings_url: formData.get("tool_configuration_url"),
+      })(dispatch)
+    }
   }
 
   get isLtiKey() {
@@ -199,7 +243,7 @@ export default class DeveloperKeyModal extends React.Component {
       createLtiKeyState,
       availableScopes,
       availableScopesPending,
-      createOrEditDeveloperKeyState: { developerKey },
+      createOrEditDeveloperKeyState: { developerKey, editing },
       actions
     } = this.props;
 
@@ -215,7 +259,8 @@ export default class DeveloperKeyModal extends React.Component {
       setPrivacyLevel={actions.ltiKeysSetPrivacyLevel}
       createLtiKeyState={createLtiKeyState}
       setLtiConfigurationMethod={actions.setLtiConfigurationMethod}
-      toolConfiguration={this.state.toolConfiguration || this.props.toolConfiguration}
+      tool_configuration={this.toolConfiguration}
+      editing={editing}
     />
   }
 
@@ -232,6 +277,7 @@ export default class DeveloperKeyModal extends React.Component {
     store.dispatch(actions.developerKeysModalClose())
     store.dispatch(actions.resetLtiState())
     store.dispatch(actions.editDeveloperKey())
+    this.setState({toolConfiguration: null})
   }
 
   render() {
@@ -275,7 +321,9 @@ DeveloperKeyModal.propTypes = {
     listDeveloperKeyScopesSet: PropTypes.func.isRequired,
     saveLtiToolConfiguration: PropTypes.func.isRequired,
     resetLtiState: PropTypes.func.isRequired,
-    setLtiConfigurationMethod: PropTypes.func.isRequired
+    setLtiConfigurationMethod: PropTypes.func.isRequired,
+    ltiKeysUpdateCustomizations: PropTypes.func.isRequired,
+    saveLtiToolConfigurationStart: PropTypes.func.isRequired
   }).isRequired,
   createLtiKeyState: PropTypes.shape({
     isLtiKey: PropTypes.bool.isRequired,
@@ -290,7 +338,8 @@ DeveloperKeyModal.propTypes = {
     developerKeyCreateOrEditFailed: PropTypes.bool.isRequired,
     developerKeyCreateOrEditPending: PropTypes.bool.isRequired,
     developerKeyModalOpen: PropTypes.bool.isRequired,
-    developerKey: NewKeyForm.propTypes.developerKey
+    developerKey: NewKeyForm.propTypes.developerKey,
+    editing: PropTypes.bool.isRequired
   }).isRequired,
   availableScopesPending: PropTypes.bool.isRequired,
   ctx: PropTypes.shape({
@@ -298,8 +347,5 @@ DeveloperKeyModal.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  toolConfiguration: PropTypes.shape({
-    oidc_initiation_url: PropTypes.string
-  })
+  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
 }
