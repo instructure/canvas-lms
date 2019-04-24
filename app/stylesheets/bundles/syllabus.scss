@@ -98,3 +98,8 @@
 #syllabus_links {
   @include clearfix;
 }
+
+#course_syllabus.user_content iframe[src*="vimeo"] {
+  height: calc(35vw);
+  min-height: 320px;
+}
