@@ -30,7 +30,7 @@ import ManualConfigurationForm from './ManualConfigurationForm'
 export default class ToolConfigurationForm extends React.Component {
   get toolConfiguration() {
     const {toolConfiguration} = this.props
-    return toolConfiguration ? JSON.stringify(toolConfiguration) : ''
+    return toolConfiguration ? JSON.stringify(toolConfiguration, null, 4) : ''
   }
 
   generateToolConfiguration = () => {

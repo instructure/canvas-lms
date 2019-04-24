@@ -49,8 +49,7 @@ describe('when configuration method is by JSON', () => {
 
   it('renders the tool configuration JSON in a text area', () => {
     const textArea = wrapper.find('TextArea')
-    const expectedString = JSON.stringify(newProps().toolConfiguration)
-    expect(textArea.text()).toEqual(expect.stringContaining(expectedString))
+    expect(textArea.text()).toEqual(expect.stringContaining(newProps().toolConfiguration.url))
   })
 
   it('transitions to configuring by URL when the url option is selected', () => {
