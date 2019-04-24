@@ -3650,7 +3650,7 @@ function renderPostGradesMenu() {
       EG.postPolicies.showHideAssignmentGradesTray({onExited: () => {}})
     },
     onPostGrades: () => {
-      EG.postPolicies.showPostAssignmentGradesTray({onExited: () => {}})
+      EG.postPolicies.showPostAssignmentGradesTray({onExited: () => {}, submissions})
     }
   }
 

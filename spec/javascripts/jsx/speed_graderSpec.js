@@ -1791,7 +1791,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
     })
   })
 
-  QUnit.module('"Post Grades/Hide Grades"', hooks => {
+  QUnit.module('"Post Policies"', hooks => {
     function getPostAndHideGradesButton() {
       return document.querySelector('span#speed_grader_post_grades_menu_mount_point button')
     }
@@ -1848,14 +1848,23 @@ QUnit.module('SpeedGrader', suiteHooks => {
       SpeedGrader.teardown()
     })
 
-    test('shows the Post Assignment Grades Tray', () => {
-      getPostGradesMenuItem().click()
-      strictEqual(showPostAssignmentGradesTrayStub.callCount, 1)
+    QUnit.module('Post Grades', () => {
+      test('shows the Post Assignment Grades Tray', () => {
+        getPostGradesMenuItem().click()
+        strictEqual(showPostAssignmentGradesTrayStub.callCount, 1)
+      })
+
+      test('passes the submissions to showPostAssignmentGradesTray', () => {
+        getPostGradesMenuItem().click()
+        deepEqual(showPostAssignmentGradesTrayStub.firstCall.args[0].submissions, window.jsonData.submissions)
+      })
     })
 
-    test('shows the Hide Assignment Grades Tray', () => {
-      getHideGradesMenuItem().click()
-      strictEqual(showHideAssignmentGradesTrayStub.callCount, 1)
+    QUnit.module('Hide Grades', () => {
+      test('shows the Hide Assignment Grades Tray', () => {
+        getHideGradesMenuItem().click()
+        strictEqual(showHideAssignmentGradesTrayStub.callCount, 1)
+      })
     })
   })
 })

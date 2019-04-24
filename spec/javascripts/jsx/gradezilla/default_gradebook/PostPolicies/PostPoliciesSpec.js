@@ -172,6 +172,8 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
   })
 
   QUnit.module('#showPostAssignmentGradesTray()', hooks => {
+    let submission
+
     hooks.beforeEach(() => {
       createPostPolicies()
 
@@ -179,17 +181,20 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         anonymize_students: false,
         course_id: '1201',
         grades_published: true,
-        html_url: 'http://localhost/assignments/2301',
         id: '2301',
-        invalid: false,
-        muted: false,
-        name: 'Math 1.1',
-        omit_from_final_grade: false,
-        points_possible: 10,
-        published: true,
-        submission_types: ['online_text_entry']
+        name: 'Math 1.1'
       }
+      submission = {
+        assignment_id: '2301',
+        posted_at: new Date().toISOString()
+      }
+      const student = {
+        assignment_2301: submission,
+        enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
+      }
+
       gradebook.setAssignments({2301: assignment})
+      gradebook.gotChunkOfStudents([student])
       gradebook.setSections([{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
 
       postPolicies.initialize()
@@ -231,6 +236,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
     })
 
+    test('includes the submissions', () => {
+      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      deepEqual(submissions, [{postedAt: submission.posted_at}])
+    })
+
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
       const callback = sinon.stub()
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
@@ -246,6 +257,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const assignment = {
         anonymize_students: false,
         course_id: '1201',
+        grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,

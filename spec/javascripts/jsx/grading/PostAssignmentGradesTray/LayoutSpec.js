@@ -74,6 +74,18 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     )
   }
 
+  function getUnpostedCount() {
+    return getUnpostedSummary().querySelector('[id^="Badge__"]')
+  }
+
+  function getUnpostedHiddenText() {
+    return [...getUnpostedSummary().querySelectorAll('*')].find($el => $el.textContent === 'Hidden')
+  }
+
+  function getUnpostedSummary() {
+    return document.getElementById('PostAssignmentGradesTray__Layout__UnpostedSummary')
+  }
+
   function getPostText() {
     const postText =
       'Posting grades is not allowed because grades have not been released for this assignment.'
@@ -110,7 +122,8 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
       onPostClick: () => {},
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
       sectionSelectionChanged: () => {},
-      selectedSectionIds: []
+      selectedSectionIds: [],
+      unpostedCount: 0
     }
   })
 
@@ -172,6 +185,10 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
 
     test('"Post types" inputs are enabled', () => {
       strictEqual(getPostTypeInputs().every($input => !$input.disabled), true)
+    })
+
+    test('a summary of unposted submissions is not displayed', () => {
+      notOk(getUnpostedSummary())
     })
   })
 
@@ -238,6 +255,26 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
 
     test('descriptive text is present', () => {
       ok(getPostText())
+    })
+  })
+
+  QUnit.module('when some submissions are unposted', () => {
+    test('a summary of unposted submissions is displayed', () => {
+      context.unpostedCount = 1
+      mountComponent()
+      ok(getUnpostedSummary())
+    })
+
+    test('the number of unposted submissions is displayed', () => {
+      context.unpostedCount = 2
+      mountComponent()
+      strictEqual(getUnpostedCount().textContent, '2')
+    })
+
+    test('text describing the number of unposted submissions is displayed', () => {
+      context.unpostedCount = 1
+      mountComponent()
+      ok(getUnpostedHiddenText())
     })
   })
 

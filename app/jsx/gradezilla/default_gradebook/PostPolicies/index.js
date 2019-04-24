@@ -23,6 +23,11 @@ import AssignmentPostingPolicyTray from '../../../grading/AssignmentPostingPolic
 import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
+function getSubmission(student, assignmentId) {
+  const submission = student[`assignment_${assignmentId}`] || {posted_at: null}
+  return {postedAt: submission.posted_at}
+}
+
 export default class PostPolicies {
   constructor(gradebook) {
     this._gradebook = gradebook
@@ -89,6 +94,10 @@ export default class PostPolicies {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymize_students, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
+    const studentsWithVisibility = Object.values(
+      this._gradebook.studentsThatCanSeeAssignment(assignment.id)
+    )
+    const submissions = studentsWithVisibility.map(student => getSubmission(student, assignment.id))
 
     this._postAssignmentGradesTray.show({
       assignment: {
@@ -98,7 +107,8 @@ export default class PostPolicies {
         name
       },
       onExited,
-      sections
+      sections,
+      submissions
     })
   }
 

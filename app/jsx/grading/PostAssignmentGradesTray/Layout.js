@@ -17,8 +17,9 @@
  */
 
 import React, {Fragment} from 'react'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 
+import Badge from '@instructure/ui-elements/lib/components/Badge'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
@@ -42,7 +43,8 @@ export default function Layout({
   onPostClick,
   sections,
   sectionSelectionChanged,
-  selectedSectionIds
+  selectedSectionIds,
+  unpostedCount
 }) {
   const hasSections = sections.length > 0
   const heading = (
@@ -68,6 +70,23 @@ export default function Layout({
   return (
     <Fragment>
       {heading}
+
+      {unpostedCount > 0 && (
+        <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
+          <Badge
+            count={unpostedCount}
+            countUntil={99}
+            margin="0 0 medium large"
+            placement="start center"
+            type="count"
+            variant="danger"
+          >
+            <View as="div" margin="0 0 0 small">
+              <Text margin="0 0 0 small">{I18n.t('Hidden')}</Text>
+            </View>
+          </Badge>
+        </div>
+      )}
 
       <View as="div" margin="small 0" padding="0 medium">
         <PostTypes
@@ -148,5 +167,6 @@ Layout.propTypes = {
     })
   ).isRequired,
   sectionSelectionChanged: SpecificSections.propTypes.sectionSelectionChanged,
-  selectedSectionIds: SpecificSections.propTypes.selectedSectionIds
+  selectedSectionIds: SpecificSections.propTypes.selectedSectionIds,
+  unpostedCount: number.isRequired
 }

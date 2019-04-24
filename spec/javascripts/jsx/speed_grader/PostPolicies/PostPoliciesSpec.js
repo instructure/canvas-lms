@@ -165,6 +165,18 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
     })
 
+    test('includes the submissions', () => {
+      const submission = {
+        id: '93',
+        assignment_id: '2301',
+        posted_at: new Date().toISOString(),
+        user_id: '441'
+      }
+      postPolicies.showPostAssignmentGradesTray({submissions: [submission]})
+      const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      deepEqual(submissions, [submission])
+    })
+
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
       const callback = sinon.stub()
       postPolicies.showPostAssignmentGradesTray({onExited: callback})

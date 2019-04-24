@@ -116,6 +116,14 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     await waitForElement(getTrayElement)
   }
 
+  function getUnpostedCount() {
+    return getUnpostedSummary().querySelector('[id^="Badge__"]')
+  }
+
+  function getUnpostedSummary() {
+    return getTrayElement().querySelector('div#PostAssignmentGradesTray__Layout__UnpostedSummary')
+  }
+
   async function waitForTrayClosed() {
     return wait(() => {
       if (context.onExited.callCount > 0) {
@@ -203,6 +211,35 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       getCloseIconButton().click()
       await waitForTrayClosed()
       notOk(getTrayElement())
+    })
+  })
+
+  QUnit.module('unposted summary', () => {
+    QUnit.module('with unposted submissions', () => {
+      test('the number of unposted submissions is displayed', async () => {
+        context.submissions = [
+          {postedAt: new Date().toISOString()},
+          {postedAt: null},
+          {postedAt: null}
+        ]
+        await show(context)
+        strictEqual(getUnpostedCount().textContent, '2')
+      })
+    })
+
+    QUnit.module('with no unposted submissions', unpostedSubmissionsHooks => {
+      unpostedSubmissionsHooks.beforeEach(async () => {
+        context.submissions = [
+          {postedAt: new Date().toISOString()},
+          {postedAt: new Date().toISOString()}
+        ]
+
+        await show(context)
+      })
+
+      test('a summary of unposted submissions is not displayed', () => {
+        notOk(getUnpostedSummary())
+      })
     })
   })
 

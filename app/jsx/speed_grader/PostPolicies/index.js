@@ -64,11 +64,12 @@ export default class PostPolicies {
     })
   }
 
-  showPostAssignmentGradesTray({onExited}) {
+  showPostAssignmentGradesTray({onExited, submissions}) {
     this._postAssignmentGradesTray.show({
       assignment: this._assignment,
       onExited,
-      sections: this._sections
+      sections: this._sections,
+      submissions
     })
   }
 }
