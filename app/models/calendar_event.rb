@@ -222,9 +222,11 @@ class CalendarEvent < ActiveRecord::Base
 
   def child_event_participants_scope
     self.shard.activate do
-      User.where("id IN (?) OR id IN (?)",
-        child_events.where.not(:user_id => nil).select(:user_id), # user is set directly
-        child_events.where(:user_id => nil, :context_type => "User").select(:context_id)) # or context is user
+      # user is set directly, or context is user
+      User.where("id IN
+        (#{child_events.where.not(:user_id => nil).select(:user_id).to_sql}
+        UNION
+         #{child_events.where(:user_id => nil, :context_type => "User").select(:context_id).to_sql})")
     end
   end
 
