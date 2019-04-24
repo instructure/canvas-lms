@@ -86,6 +86,11 @@ function viewAssignmentWithInlineAnswers(link) {
     var iframe = document.createElement('iframe');
     iframe.src = url;
     content.appendChild(iframe);
+
+    var select = document.getElementById("highlight-changes");
+    if(select)
+      select.value = 0;
+
     return false;
 }
 

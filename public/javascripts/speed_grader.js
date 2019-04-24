@@ -1219,7 +1219,7 @@ define([
       // without anything special. they can select again if needed.
       var select = document.getElementById("highlight-changes");
       if(select)
-        highlightSince(select.value, false); // defined in speed_grader.html.erb
+        select.value = 0;
     },
 
     handleModerationTabs: function(index_to_load) {
