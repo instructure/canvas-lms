@@ -1215,6 +1215,11 @@ define([
       this.refreshFullRubric();
       if(window.onSpeedGraderLoaded)
       	window.onSpeedGraderLoaded();
+      // I need to reset this because the new submission is loaded
+      // without anything special. they can select again if needed.
+      var select = document.getElementById("highlight-changes");
+      if(select)
+        highlightSince(select.value, false); // defined in speed_grader.html.erb
     },
 
     handleModerationTabs: function(index_to_load) {

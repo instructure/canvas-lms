@@ -18,13 +18,16 @@
 
 var currentlyHighlightedForTime = null;
 
-function highlightSince(timestamp) {
+function highlightSince(timestamp, viaUi) {
   var innerDocument = document.querySelector("#iframe_holder iframe");
   if(innerDocument == null) {
-    alert("View the assignment with inline answers first.");
+    if(viaUi)
+      alert("View the assignment with inline answers first.");
     return;
   }
   innerDocument = innerDocument.contentDocument;
+  try { currentlyHighlightedForTime.classList.remove("currently-highlighted-for-time"); } catch(e) {}
+  currentlyHighlightedForTime = null;
   var list = innerDocument.querySelectorAll("[data-time-updated]");
   var firstFound = null;
   for(var i = 0; i < list.length; i++) {
@@ -37,7 +40,6 @@ function highlightSince(timestamp) {
         e.classList.add("highlighted-for-time");
         if(firstFound == null) {
           firstFound = e;
-          try { currentlyHighlightedForTime.classList.remove("currently-highlighted-for-time"); } catch(e) {}
           currentlyHighlightedForTime = e;
           currentlyHighlightedForTime.classList.add("currently-highlighted-for-time");
         }
@@ -57,8 +59,11 @@ function cycleHighlight() {
     alert("View the assignment with inline answers first.");
     return;
   }
+  var select = document.getElementById("highlight-changes");
   innerDocument = innerDocument.contentDocument;
-  var list = innerDocument.querySelectorAll(".highlighted-for-time");
+  // for nothing special highlighted, do any user data, otherwise, just
+  // those specially highlighted for time.
+  var list = innerDocument.querySelectorAll(select.value == 0 ? ".bz-retained-field-replaced:not(:empty)" : ".highlighted-for-time");
   for(var i = 0; i < list.length; i++) {
     if(currentlyHighlightedForTime == null || currentlyHighlightedForTime == list[i]) {
       var n = ((i + 1) < list.length) ? list[i + 1] : list[0];
@@ -295,7 +300,7 @@ function viewAssignmentAudit(link) {
 
             <br />
             Highlight changes since:
-              <select id="highlight-changes" onchange="highlightSince(this.value);">
+              <select id="highlight-changes" onchange="highlightSince(this.value, true);">
                 <option value="0">Nothing special</option>
               </select>
               <button type="button" onclick="cycleHighlight();">show next highlight</button>
