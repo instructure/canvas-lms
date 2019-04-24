@@ -44,7 +44,7 @@ function getProps(textareaId, language = "en", textDirection = "ltr") {
         directionality: textDirection,
         height: "250px",
         plugins:
-          "instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table",
+          "instructure-ui-icons, instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table",
         // todo: add "instructure_embed" when the wiki sidebar work is done
         external_plugins: {},
         menubar: true,
