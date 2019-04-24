@@ -1,1 +1,5 @@
-<span class="label {{statusLabel}}">{{status}}</span>
+{{#if queueSize}}
+  <span>Waiting for {{queueSize}} jobs...</span>
+{{else}}
+  <span class="label {{statusLabel}}">{{status}}</span>
+{{/if}}

@@ -58,7 +58,7 @@ define [
     #
     # @api private
 
-    pollIfRunning: -> @progressModel.poll() if @get('workflow_state') == 'running' || @get('workflow_state') == 'pre_processing'
+    pollIfRunning: -> @progressModel.poll() if @get('workflow_state') == 'running' || @get('workflow_state') == 'pre_processing' || @get('workflow_state') == 'queued'
 
     # Sometimes the progress url for this progressing migration might change or
     # be added after initialization. If this happens, the @progressModel's url needs

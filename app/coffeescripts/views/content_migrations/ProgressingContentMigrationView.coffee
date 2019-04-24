@@ -33,7 +33,7 @@ define [
     tagName: 'li'
     className: 'clearfix migrationProgressItem'
 
-    events: 
+    events:
       'click .showIssues'       : 'toggleIssues'
       'click .selectContentBtn' : 'showSelectContentDialog'
 
@@ -46,7 +46,7 @@ define [
       '[data-bind=migration_issues_count]'  : '$issuesCount'
       '.sourceLink'                         : '$sourceLink'
 
-    initialize: -> 
+    initialize: ->
       super
       @issuesLoaded = false
 
@@ -59,13 +59,13 @@ define [
         @render()
 
       # Render the progress bar if workflow_state changes to running
-      @progress.on 'change:workflow_state', (event) => 
+      @progress.on 'change:workflow_state', (event) =>
         @renderProgressBar() if @progress.get('workflow_state') == "running"
 
       # When progress is complete, update
-      @progress.on 'complete', (event) => @updateMigrationModel()
+      @progress.on 'all', (event) => @updateMigrationModel()
 
-    toJSON: -> 
+    toJSON: ->
       json = super
       json.display_name = @displayName()
       json.created_at = @createdAt()
@@ -86,11 +86,11 @@ define [
     displayName: ->          @model.get('migration_type_title')  ||  I18n.t('content_migration', 'Content Migration')
     createdAt:   ->          @model.get('created_at')            ||  (new Date()).toISOString()
 
-    # Render a collection view that represents issues for this migration. 
+    # Render a collection view that represents issues for this migration.
     #
     # @backbone override
 
-    render: => 
+    render: =>
       super
       issuesCollectionView = new PaginatedCollectionView
                          collection: @issues
@@ -117,41 +117,41 @@ define [
     # @expects void
     # @api backbone override
 
-    afterRender: -> 
+    afterRender: ->
       if @model.get('workflow_state') == "running"
         @renderProgressBar() if @progress.get('workflow_state') == "running"
 
-    # Create a new progress bar with the @progress model. Replace the changable html 
-    # with this progress information. 
+    # Create a new progress bar with the @progress model. Replace the changable html
+    # with this progress information.
     #
-    # @expects void 
+    # @expects void
     # @api private
 
-    renderProgressBar: -> 
-      progressBarView = new ProgressBarView 
+    renderProgressBar: ->
+      progressBarView = new ProgressBarView
                           model: @progress
                           el: @$changable
       progressBarView.render()
 
     # Does a fetch on the migration model. If successful it will re-render the progress
-    # view. 
+    # view.
     #
     # @api private
 
-    updateMigrationModel: -> 
+    updateMigrationModel: ->
       @model.fetch
               error: (model, response, option) => @model.set('status', 'failed')
               success: (model, response, options) => @render()
 
     # When clicking on the issues button for the first time it needs to fetch all of the issues.
-    # This progress view keeps track of if it's fetched issues for this migration with the 
-    # @issueLoaded class variable. If this is false more issues need to be fetched from the 
+    # This progress view keeps track of if it's fetched issues for this migration with the
+    # @issueLoaded class variable. If this is false more issues need to be fetched from the
     # server. Also, when toggled the text should change on the button.
     #
     # @expects event
     # @api private
 
-    toggleIssues: (event) -> 
+    toggleIssues: (event) ->
       event.preventDefault()
 
       if @issuesLoaded
@@ -160,21 +160,21 @@ define [
         @setIssuesButtonText()
       else
         dfd = @fetchIssues()
-        dfd.done => 
+        dfd.done =>
           @issuesLoaded = true
           @toggleIssues(event)
 
     # Fetches issues and adds a loading icon and text to the button.
     # @api private
 
-    fetchIssues: () -> 
+    fetchIssues: () ->
       @model.set('issuesButtonText', I18n.t('loading', 'Loading...'))
       dfd = @issues.fetch()
       @$el.disableWhileLoading dfd
       dfd
 
     # Determines which text to add to the issues button. This is so when you click
-    # the issues button it changes from Show Issues to Hide Issues as well as 
+    # the issues button it changes from Show Issues to Hide Issues as well as
     # handles a case where loading text is still there an needs to be removed.
     #
     # @api private
@@ -188,7 +188,7 @@ define [
         @$showIssues.attr('title', I18n.t('hide_issues', 'Hide Issues'))
         @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
         @hiddenIssues = true
-      else 
+      else
         @$issuesCount.show()
         @$showIssues.attr('aria-label', I18n.t('show_issues', 'Show Issues'))
         @$showIssues.attr('title', I18n.t('show_issues', 'Show Issues'))
@@ -197,14 +197,14 @@ define [
         @hiddenIssues = false
 
     # Render's a new SelectContentDialog which allows someone to select the migration
-    # content to be migrated. 
+    # content to be migrated.
     #
     # @api private
 
-    showSelectContentDialog: (event) => 
+    showSelectContentDialog: (event) =>
       event.preventDefault()
 
-      @selectContentView ||= new SelectContentView 
+      @selectContentView ||= new SelectContentView
                               model: @model
                               el: @$selectContentDialog
                               title: I18n.t('#select_content', 'Select Content')
