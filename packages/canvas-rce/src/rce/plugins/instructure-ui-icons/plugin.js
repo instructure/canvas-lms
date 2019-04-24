@@ -28,6 +28,7 @@ import {
   IconItalicLine,
   IconLinkLine,
   IconNumberedListLine,
+  IconLtiLine,
   IconOutdentLine,
   IconStrikethroughLine,
   IconTextSubscriptLine,
@@ -69,6 +70,7 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     },
 
     'ordered-list': IconNumberedListLine,
+    lti: IconLtiLine,
     outdent: IconOutdentLine,
     'remove-formatting': IconClearTextFormattingLine,
     'strike-through': IconStrikethroughLine,
