@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.FlickrSearch__logo {
-  margin-top: $ic-sp;
-  height: $ic-sp*4;
-  width: $ic-sp*4;
+.Unsplash__logo {
+  width: $ic-sp*10
 }
 
-.FlickrSearch__images {
+.ImageSearch__images {
   margin-top: $ic-sp;
   display: flex;
   flex-direction: row;
@@ -32,43 +30,34 @@
   flex-flow: row wrap;
 }
 
-.FlickrSearch__loading {
+.ImageSearch__loading {
   margin-top: $ic-sp*5;
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
-.FlickrSearch__pageNavigation {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.FlickrSearch__control {
-  margin: $ic-sp;
-}
-
-.FlickrImage {
+.ImageSearch__item {
   height: $ic-sp*10;
   width: $ic-sp*15;
   margin: $ic-sp;
   position: relative;
+  background: transparent;
+  border: none;
 }
 
-.FlickrImage__screenreader {
+.ImageSearch__screenreader {
   opacity: 0;
   width: 100%;
   height: 100%;
   position: absolute;
 }
 
-.FlickrImage__display {
+.ImageSearch__display {
   background-color: $ic-color-neutral;
   background-size: cover;
-  background-position: center center; 
+  background-position: center center;
   background-repeat: no-repeat;
   width: 100%;
   height: 100%;
-  position: absolute;
 }

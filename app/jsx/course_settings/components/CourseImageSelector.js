@@ -23,7 +23,7 @@ import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Modal from '../../shared/components/InstuiModal'
+import Modal, {ModalBody} from '../../shared/components/InstuiModal'
 import I18n from 'i18n!course_images'
 import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
@@ -81,17 +81,21 @@ export default class CourseImageSelector extends React.Component {
           label={I18n.t('Choose Image')}
           onDismiss={this.handleModalClose}
         >
-          <CourseImagePicker
-            courseId={this.props.courseId}
-            handleClose={this.handleModalClose}
-            handleFileUpload={(e, courseId) =>
-              this.props.store.dispatch(Actions.uploadFile(e, courseId))
-            }
-            handleFlickrUrlUpload={flickrUrl =>
-              this.props.store.dispatch(Actions.uploadFlickrUrl(flickrUrl, this.props.courseId))
-            }
-            uploadingImage={this.state.uploadingImage}
-          />
+          <ModalBody>
+            <CourseImagePicker
+              courseId={this.props.courseId}
+              handleClose={this.handleModalClose}
+              handleFileUpload={(e, courseId) =>
+                this.props.store.dispatch(Actions.uploadFile(e, courseId))
+              }
+              handleImageSearchUrlUpload={imageUrl =>
+                this.props.store.dispatch(
+                  Actions.uploadImageSearchUrl(imageUrl, this.props.courseId)
+                )
+              }
+              uploadingImage={this.state.uploadingImage}
+            />
+          </ModalBody>
         </Modal>
       </div>
     )

@@ -84,13 +84,13 @@ const Actions = {
   },
 
   getCourseImage(courseId, ajaxLib = axios) {
-    return (dispatch, getState) => {
+    return dispatch => {
       ajaxLib
         .get(`/api/v1/courses/${courseId}/settings`)
         .then(response => {
           dispatch(this.gotCourseImage(response.data.image, courseId))
         })
-        .catch(response => {
+        .catch(() => {
           $.flashError(I18n.t('There was an error retrieving the course image'))
         })
     }
@@ -118,27 +118,27 @@ const Actions = {
   putImageData(courseId, imageUrl, imageId = null, ajaxLib = axios) {
     const data = imageId ? {'course[image_id]': imageId} : {'course[image_url]': imageUrl}
 
-    return (dispatch, getState) => {
+    return dispatch => {
       this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib)
-        .then(response => {
+        .then(() => {
           dispatch(
             imageId ? this.setCourseImageId(imageUrl, imageId) : this.setCourseImageUrl(imageUrl)
           )
         })
-        .catch(response => {
+        .catch(() => {
           dispatch(this.errorUploadingImage())
         })
     }
   },
 
-  putRemoveImage(courseId, ajaxLib = axios) {
-    return (dispatch, getState) => {
+  putRemoveImage(courseId) {
+    return dispatch => {
       dispatch(this.removingImage())
       this.ajaxPutFormData(`/api/v1/courses/${courseId}`, {'course[remove_image]': true})
-        .then(response => {
+        .then(() => {
           dispatch(this.removedImage())
         })
-        .catch(response => {
+        .catch(() => {
           dispatch(this.errorRemovingImage())
         })
     }
@@ -151,29 +151,29 @@ const Actions = {
       // In this case the url field was blank so we could either
       // recreate it or hit the API to get it.  We hit the api
       // to be safe.
-      return (dispatch, getState) => {
+      return dispatch => {
         ajaxLib
           .get(`/api/v1/files/${imageId}`)
           .then(response => {
             dispatch(this.putImageData(courseId, response.data.url, imageId, ajaxLib))
           })
-          .catch(response => {
+          .catch(() => {
             dispatch(this.errorUploadingImage())
           })
       }
     }
   },
 
-  uploadFlickrUrl(flickrUrl, courseId, ajaxLib = axios) {
-    return (dispatch, getState) => {
+  uploadImageSearchUrl(imageUrl, courseId, ajaxLib = axios) {
+    return dispatch => {
       dispatch(this.uploadingImage())
-      dispatch(this.putImageData(courseId, flickrUrl, null, ajaxLib))
+      dispatch(this.putImageData(courseId, imageUrl, null, ajaxLib))
     }
   },
 
   uploadFile(event, courseId, ajaxLib = axios) {
     event.preventDefault()
-    return (dispatch, getState) => {
+    return dispatch => {
       const {type, file} = Helpers.extractInfoFromEvent(event)
 
       if (Helpers.isValidImageType(type)) {
@@ -206,7 +206,7 @@ const Actions = {
       // TODO: this is a naive implementation,
       // upgrading to axios@0.12.0 will make it unnecessary
       // by using URLSearchParams.
-      transformRequest(data, headers) {
+      transformRequest(data) {
         return Object.keys(data).reduce(
           (prev, key) => `${prev + (prev ? '&' : '')}${key}=${data[key]}`,
           ''
