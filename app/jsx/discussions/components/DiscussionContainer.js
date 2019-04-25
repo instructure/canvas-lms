@@ -23,9 +23,10 @@ import {DropTarget} from 'react-dnd'
 import {string, func, bool} from 'prop-types'
 import I18n from 'i18n!discussions_v2'
 import moment from 'moment'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text, Heading} from '@instructure/ui-elements/lib/components'
 import update from 'immutability-helper'
 
 import select from '../../shared/select'
@@ -160,27 +161,26 @@ export class DiscussionsContainer extends Component {
   }
 
   renderDiscussions() {
-    return this.state.discussions.map(
-      discussion =>
-        this.props.permissions.moderate ? (
-          <ConnectedDraggableDiscussionRow
-            key={discussion.id}
-            discussion={discussion}
-            deleteDiscussion={this.props.deleteDiscussion}
-            getDiscussionPosition={this.getDiscussionPosition}
-            onMoveDiscussion={this.props.onMoveDiscussion}
-            moveCard={this.moveCard}
-            draggable
-          />
-        ) : (
-          <ConnectedDiscussionRow
-            key={discussion.id}
-            discussion={discussion}
-            deleteDiscussion={this.props.deleteDiscussion}
-            onMoveDiscussion={this.props.onMoveDiscussion}
-            draggable={false}
-          />
-        )
+    return this.state.discussions.map(discussion =>
+      this.props.permissions.moderate ? (
+        <ConnectedDraggableDiscussionRow
+          key={discussion.id}
+          discussion={discussion}
+          deleteDiscussion={this.props.deleteDiscussion}
+          getDiscussionPosition={this.getDiscussionPosition}
+          onMoveDiscussion={this.props.onMoveDiscussion}
+          moveCard={this.moveCard}
+          draggable
+        />
+      ) : (
+        <ConnectedDiscussionRow
+          key={discussion.id}
+          discussion={discussion}
+          deleteDiscussion={this.props.deleteDiscussion}
+          onMoveDiscussion={this.props.onMoveDiscussion}
+          draggable={false}
+        />
+      )
     )
   }
 
@@ -196,13 +196,16 @@ export class DiscussionsContainer extends Component {
     return this.props.connectDropTarget(
       <div className="discussions-container__wrapper">
         <span ref={this.wrapperToggleRef}>
+          <ScreenReaderContent>
+            <Heading level="h2">{this.props.title}</Heading>
+          </ScreenReaderContent>
           <ToggleDetails
             expanded={this.state.expanded}
             onToggle={this.toggleExpanded}
             summary={
-              <Text weight="bold" as="h2">
-                {this.props.title}
-              </Text>
+              <div aria-hidden="true">
+                <Text weight="bold">{this.props.title}</Text>
+              </div>
             }
           >
             {!this.props.pinned ? (
