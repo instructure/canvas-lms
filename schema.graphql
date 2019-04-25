@@ -237,6 +237,31 @@ type AssignmentGroup implements AssignmentsConnectionInterface & Node & Timestam
     last: Int
   ): AssignmentConnection
   createdAt: DateTime
+
+  """
+  grades for this assignment group
+  """
+  gradesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): GradesConnection
   groupWeight: Float
   id: ID!
   name: String
@@ -981,12 +1006,14 @@ type File implements ModuleItemInterface & Node & Timestamped {
 Contains grade information for a course or grading period
 """
 type Grades {
+  assignmentGroup: AssignmentGroup
   currentGrade: String
 
   """
   The current score includes all graded assignments, excluding muted submissions.
   """
   currentScore: Float
+  enrollment: Enrollment
   finalGrade: String
 
   """
@@ -1018,6 +1045,41 @@ type Grades {
   (ungraded assignments are counted as 0 points).
   """
   unpostedFinalScore: Float
+}
+
+"""
+The connection type for Grades.
+"""
+type GradesConnection {
+  """
+  A list of edges.
+  """
+  edges: [GradesEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Grades]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type GradesEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Grades
 }
 
 type GradingPeriod implements Node & Timestamped {

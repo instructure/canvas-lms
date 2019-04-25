@@ -58,5 +58,16 @@ module Types
     def grading_period
       load_association :grading_period
     end
+
+    field :assignment_group, AssignmentGroupType, null: true
+    def assignment_group
+      load_association(:assignment_group)
+    end
+
+    field :enrollment, EnrollmentType, null: true
+    def enrollment
+      load_association(:enrollment)
+    end
+
   end
 end
