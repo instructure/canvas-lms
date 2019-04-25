@@ -1209,7 +1209,13 @@ class BzController < ApplicationController
     # I also want to store the per-module, per-course
     # last item, so we can pick up where we left off on
     # the dynamic syllabus there too.
-    url = URI.parse(params[:last_url])
+    begin
+      url = URI.parse(params[:last_url])
+    rescue => e
+      # if the url doesn't parse, just don't store it.
+      # no big deal and we can suppress spurious error logs
+      return
+    end
     if url.query
       urlparams = CGI.parse(url.query)
       if urlparams.key?('module_item_id')
