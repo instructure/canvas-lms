@@ -38,6 +38,7 @@ class CommunicationChannel < ActiveRecord::Base
   validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   after_commit :check_if_bouncing_changed
+  after_save :clear_user_email_cache
 
   acts_as_list :scope => :user
 
@@ -53,6 +54,10 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_PUSH     = 'push'
 
   RETIRE_THRESHOLD = 1
+
+  def clear_user_email_cache
+    self.user.clear_email_cache! if self.path_type == TYPE_EMAIL
+  end
 
   def self.country_codes
     # [country code, name, true if email should be used instead of Twilio]

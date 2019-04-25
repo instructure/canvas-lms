@@ -805,7 +805,7 @@ class User < ActiveRecord::Base
   end
 
   def email_cache_key
-    ['user_email', self].cache_key
+    ['user_email', self.global_id].cache_key
   end
 
   def clear_email_cache!
