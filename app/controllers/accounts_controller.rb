@@ -839,7 +839,7 @@ class AccountsController < ApplicationController
             hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type", "id"]
             hash
           end
-          @account.settings[:custom_help_links] = Account::HelpLinks.process_links_before_save(sorted_help_links)
+          @account.settings[:custom_help_links] = @account.help_links_builder.process_links_before_save(sorted_help_links)
           @account.settings[:new_custom_help_links] = true
         end
 
@@ -1462,7 +1462,7 @@ class AccountsController < ApplicationController
       help_link_name: @account.settings[:help_link_name] || default_help_link_name,
       help_link_icon: @account.settings[:help_link_icon] || 'help',
       CUSTOM_HELP_LINKS: @account.help_links || [],
-      DEFAULT_HELP_LINKS: Account::HelpLinks.instantiate_links(Account::HelpLinks.default_links)
+      DEFAULT_HELP_LINKS: @account.help_links_builder.instantiate_links(@account.help_links_builder.default_links)
     }
   end
 

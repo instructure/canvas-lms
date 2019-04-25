@@ -97,7 +97,7 @@ describe InfoController do
 
     it "should filter the links based on the current user's role" do
       account = Account.create!
-      allow(Account::HelpLinks).to receive(:default_links).and_return([
+      allow(account.help_links_builder).to receive(:default_links).and_return([
         {
           :available_to => ['student'],
           :text => 'Ask Your Instructor a Question',
