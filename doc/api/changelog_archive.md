@@ -6,6 +6,14 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2019-02-16
+### Additions
+| API Responses | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Users API] | Edit a User Endpoint | Added [user]title and [user]bio parameters
+
+[Users API]: users.html
+
 ## 2019-01-26
 
 ### Changes
