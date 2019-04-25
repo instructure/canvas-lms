@@ -20,6 +20,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import TinyMCE from "react-tinymce";
 
+import formatMessage from "../format-message";
 import * as contentInsertion from "./contentInsertion";
 import indicatorRegion from "./indicatorRegion";
 import indicate from "../common/indicate";
@@ -215,13 +216,25 @@ export default class RCEWrapper extends React.Component {
 
   wrapOptions(options = {}) {
     const setupCallback = options.setup;
-    options.setup = editor => {
-      editorWrappers.set(editor, this);
-      if (typeof setupCallback === "function") {
-        setupCallback(editor);
+
+    return {
+      ...options,
+
+      block_formats: [
+        `${formatMessage('Header')}=h2`,
+        `${formatMessage('Subheader')}=h3`,
+        `${formatMessage('Small header')}=h4`,
+        `${formatMessage('Preformatted')}=pre`,
+        `${formatMessage('Paragraph')}=p`
+      ].join('; '),
+
+      setup: editor => {
+        editorWrappers.set(editor, this);
+        if (typeof setupCallback === "function") {
+          setupCallback(editor);
+        }
       }
-    };
-    return options;
+    }
   }
 
   handleTextareaChange = () => {
