@@ -116,6 +116,10 @@ module RCENextPage
     fj('[role="menuitem"]:contains("Course Images")')
   end
 
+  def more_toolbar_button
+    f('button[aria-label="More..."]')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -185,5 +189,9 @@ module RCENextPage
   def click_course_images
     course_images.click
     wait_for_ajaximations
+  end
+
+  def click_more_toolbar_button
+    more_toolbar_button.click
   end
 end

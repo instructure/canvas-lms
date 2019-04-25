@@ -233,7 +233,16 @@ export default class RCEWrapper extends React.Component {
         if (typeof setupCallback === "function") {
           setupCallback(editor);
         }
-      }
+      },
+
+      toolbar: [
+        'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
+        'subscript | align bullist outdent indent | ' +
+        'link unlink | instructure_image instructure_record | ' +
+        'removeformat table instructure_equation instructure_equella'
+      ],
+
+      toolbar_drawer: 'floating'
     }
   }
 

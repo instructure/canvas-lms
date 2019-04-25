@@ -43,17 +43,7 @@ function getProps(textareaId, state) {
           "instructure-ui-icons, instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table, lists, instructure_condensed_buttons",
         // todo: add "instructure_embed" when the wiki sidebar work is done
         external_plugins: {},
-        menubar: true,
-        // todo: the toolbar building and automatic splitting functions should come into the service
-        toolbar: [
-          // basic buttons
-          "bold italic underline forecolor backcolor removeformat align outdent indent superscript subscript bullist fontsizeselect formatselect",
-
-          // plugin buttons ("instructure_links" will be changed to "link", but this is how
-          //   it's currently sent over from canvas.  Once that's no longer true, the test
-          //  page can just use "link" instead)
-          "table instructure_links unlink instructure_equation instructure_image instructure_equella instructure_record"
-        ]
+        menubar: true
       };
     },
 

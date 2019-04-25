@@ -295,6 +295,7 @@ describe "RCE next tests" do
 
       visit_front_page_edit(@course)
 
+      click_more_toolbar_button
       click_images_toolbar_button
       click_course_images
 
