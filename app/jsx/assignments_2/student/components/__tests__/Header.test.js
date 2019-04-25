@@ -109,3 +109,12 @@ it('will render the submitted state tracker if an assignment is submitted but no
 
   expect(getByTestId('submitted-step-container')).toBeInTheDocument()
 })
+
+it('will render the graded state tracker if an assignment is graded', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'graded'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('graded-step-container')).toBeInTheDocument()
+})

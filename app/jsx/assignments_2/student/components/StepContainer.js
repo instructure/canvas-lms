@@ -19,6 +19,7 @@
 import {bool} from 'prop-types'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
+import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import {StudentAssignmentShape} from '../assignmentData'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -103,12 +104,61 @@ submittedStepContainer.propTypes = {
   isCollapsed: bool
 }
 
+function gradedStepContainer(props) {
+  return (
+    <div className="steps-container" data-testid="graded-step-container">
+      {props.isCollapsed && renderCollapsedContainer(I18n.t('Graded'))}
+      <Steps isCollapsed={props.isCollapsed}>
+        <StepItem label={I18n.t('Available')} status="complete" />
+        <StepItem label={I18n.t('Uploaded')} status="complete" />
+        <StepItem
+          label={
+            <Flex direction="column">
+              <FlexItem>{I18n.t('Submitted')}</FlexItem>
+              <FlexItem>
+                <FriendlyDatetime
+                  format={I18n.t('#date.formats.full')}
+                  dateTime={props.assignment.submissionsConnection.nodes[0].submittedAt}
+                />
+              </FlexItem>
+            </Flex>
+          }
+          status="complete"
+        />
+        <StepItem
+          label={
+            <Flex direction="column">
+              <FlexItem>{I18n.t('Grade')}</FlexItem>
+              <FlexItem>
+                <GradeDisplay
+                  displaySize="small"
+                  gradingType={props.assignment.gradingType}
+                  pointsPossible={props.assignment.pointsPossible}
+                  receivedGrade={props.assignment.submissionsConnection.nodes[0].grade}
+                />
+              </FlexItem>
+            </Flex>
+          }
+          status="complete"
+        />
+      </Steps>
+    </div>
+  )
+}
+
+gradedStepContainer.propTypes = {
+  assignment: StudentAssignmentShape,
+  isCollapsed: bool
+}
+
 function StepContainer(props) {
   const {assignment, isCollapsed, forceLockStatus} = props
 
   // TODO: render the step-container based on the actual assignment data.
   if (forceLockStatus || assignment.lockInfo.isLocked) {
     return unavailableStepContainer({isCollapsed})
+  } else if (assignment.submissionsConnection.nodes[0].state === 'graded') {
+    return gradedStepContainer({isCollapsed, assignment})
   } else if (assignment.submissionsConnection.nodes[0].state === 'submitted') {
     return submittedStepContainer({isCollapsed, assignment})
   } else {
