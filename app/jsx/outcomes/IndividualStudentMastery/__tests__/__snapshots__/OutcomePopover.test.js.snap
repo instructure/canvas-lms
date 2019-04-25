@@ -114,6 +114,16 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
               grow={true}
               shrink={true}
             >
+              <div
+                style={
+                  Object {
+                    "overflowWrap": "break-word",
+                    "wordWrap": "break-word",
+                  }
+                }
+              >
+                My outcome
+              </div>
               <div>
                 Last Assessment: 
                 <DatetimeDisplay
@@ -311,6 +321,16 @@ exports[`renders correctly with no results 1`] = `
               grow={true}
               shrink={true}
             >
+              <div
+                style={
+                  Object {
+                    "overflowWrap": "break-word",
+                    "wordWrap": "break-word",
+                  }
+                }
+              >
+                My outcome
+              </div>
               <div>
                 Last Assessment: 
                 No submissions
@@ -505,6 +525,16 @@ exports[`renders the OutcomePopover component 1`] = `
               grow={true}
               shrink={true}
             >
+              <div
+                style={
+                  Object {
+                    "overflowWrap": "break-word",
+                    "wordWrap": "break-word",
+                  }
+                }
+              >
+                My outcome
+              </div>
               <div>
                 Last Assessment: 
                 <DatetimeDisplay
