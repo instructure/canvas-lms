@@ -90,7 +90,7 @@ module UserLearningObjectScopes
   end
 
   def objects_needing(
-    object_type, purpose, participation_type, params_cache_key, expires_in,
+    object_type, purpose, participation_type, params, expires_in,
     limit: ULOS_DEFAULT_LIMIT, scope_only: false,
     course_ids: nil, group_ids: nil, contexts: nil, include_concluded: false,
     include_ignored: false, include_ungraded: false
@@ -126,6 +126,7 @@ module UserLearningObjectScopes
         end
       else
         course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
+        params_cache_key = Digest::MD5.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
         Rails.cache.fetch(cache_key, expires_in: expires_in) do
           result = Shackles.activate(:slave) do
