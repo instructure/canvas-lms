@@ -15,22 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'user_agent'
+require 'browser/browser'
 
-class Browser < Struct.new(:browser, :version)
-  def self.supported?(user_agent)
-    user_agent = UserAgent.parse(user_agent)
-    return false if minimum_browsers.any?{ |browser| user_agent < browser }
-    true # if we don't recognize it (e.g. Android), be nice
-  end
+BrowserSupport = Struct.new(:browser, :version) do
+  class << self
+    def supported?(user_agent)
+      browser = Browser.new(user_agent)
+      return false if minimum_browsers.any?{ |min| browser.send("#{min.browser}?", "<#{min.version}") }
+      true # if we don't recognize it (e.g. Android), be nice
+    end
 
-  def self.configuration
-    @configuration ||= YAML.load_file(File.expand_path('../../config/browsers.yml', __FILE__))
-  end
+    def configuration
+      @configuration ||= YAML.load_file(File.expand_path('../../config/browsers.yml', __FILE__))
+    end
 
-  def self.minimum_browsers
-    @minimum_browsers ||= (configuration['minimums'] || []).
-      map{ |browser, version| new(browser, version.to_s) }
+    def minimum_browsers
+      @minimum_browsers ||= (configuration['minimums'] || []).
+        map{ |browser, version| new(browser, version.to_s) }
+    end
   end
 end
-
