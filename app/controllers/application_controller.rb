@@ -585,7 +585,45 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        render "shared/unauthorized", status: :unauthorized
+        # if it is a content library page or assignment they cannot view, try redirecting them to
+        # a non-CL version they can access
+
+        replacement_url = nil
+
+        if @current_user
+          if request.path.match(/\/courses\/1\/pages/)
+            # handle pages
+            url_name = request.path["/courses/1/pages/".length .. -1]
+            course_id = nil
+            # I want to keep the last one we see as that is likely the most recent course
+            @current_user.enrollments.active.each do |enrollment|
+              course_id = enrollment.course.id if enrollment.course.wiki_pages.where(:url => url_name).any?
+            end
+
+            replacement_url = "/courses/#{course_id}/pages/#{url_name}" if course_id
+          elsif request.path.match(/\/courses\/1\/assignments/)
+            # handle assignments
+            old_assignment_id = request.path["/courses/1/assignments/".length .. -1]
+            old_assignment = Assignment.find(old_assignment_id)
+            assignment_id = nil
+            course_id = nil
+            # I want to keep the last one we see as that is likely the most recent course
+            @current_user.enrollments.active.each do |enrollment|
+              result = enrollment.course.assignments.where(:title => old_assignment.title)
+              if result.any?
+                course_id = enrollment.course.id
+                assignment_id = result.first.id
+              end
+            end
+            replacement_url = "/courses/#{course_id}/assignments/#{assignment_id}" if course_id
+          end
+        end
+
+        if replacement_url.nil?
+          render "shared/unauthorized", status: :unauthorized
+        else
+          redirect_to(replacement_url)
+        end
       }
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }

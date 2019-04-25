@@ -1985,5 +1985,4 @@ CanvasRails::Application.routes.draw do
   get '/openid/:action', :controller => 'openid'
   post '/openid/:action', :controller => 'openid'
 
-
 end

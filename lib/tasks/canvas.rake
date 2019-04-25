@@ -114,7 +114,7 @@ namespace :canvas do
     build_js = truthy_values.include?(args[:build_js])
 
     log_time('Making sure node_modules are up to date') {
-      raise 'error running npm install' unless `npm install`
+      raise 'error running npm install' unless `npm install -dd`
     }
 
     # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
@@ -130,8 +130,12 @@ namespace :canvas do
 
     if compile_css
       tasks["css:styleguide"] = -> {
-        Rake::Task['css:styleguide'].invoke
+        log_time('--> Running compile_css') {
+          Rake::Task['css:styleguide'].invoke
+        }
       }
+    else
+      puts "--> Skipping css:styleguide because compile_css = #{compile_css}"
     end
 
     # TODO: Once webpack is the only way, remove js:build
@@ -139,11 +143,25 @@ namespace :canvas do
       tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
         prereqs = ['js:generate', 'i18n:generate_js']
         prereqs.each do |name|
-          log_time(name) { Rake::Task[name].invoke }
+          log_time(name) { 
+            begin 
+              Rake::Task[name].invoke 
+            rescue => e
+               puts "--> DEBUG: #{e.message}"
+               puts "--> DEBUG: #{e.backtrace.join("\n")}"
+            end
+          }
         end
         # webpack and js:build can run concurrently
         Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
-          log_time(name) { Rake::Task[name].invoke }
+          log_time(name) { 
+            begin
+              Rake::Task[name].invoke 
+            rescue => e
+               puts "--> DEBUG: #{e.message}"
+               puts "--> DEBUG: #{e.backtrace.join("\n")}"
+            end
+          }
         end
       }
     else
@@ -173,7 +191,7 @@ namespace :canvas do
       end
     end
     combined_time = times.reduce(:+)
-    puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
+    puts "Finished compiling assets"
     raise "Error reving files" unless system('node_modules/.bin/gulp rev')
   end
 

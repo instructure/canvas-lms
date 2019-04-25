@@ -25,3 +25,6 @@ require 'capistrano/rails/migrations'
 Dir.glob('lib/capistrano/tasks/*.rake').each { |r| import r }
 
 require 'capistrano/passenger'
+
+# Let's use use nvm to manage the npm and node versions
+require 'capistrano/nvm'

@@ -371,6 +371,8 @@ class BzController < ApplicationController
         result = RetainedData.where(:user_id => student_id, :name => o["data-bz-retained"])
         value = ''
         value = result.first.value unless result.empty?
+        time = 0
+        time = result.first.updated_at.to_i unless result.empty?
 
         if o.name == "TEXTAREA"
           n = doc.create_element 'div'
@@ -396,6 +398,7 @@ class BzController < ApplicationController
         end
 
         n['class'] = "bz-retained-field-replaced"
+        n['data-time-updated'] = time
 
         o.replace n
 
@@ -601,7 +604,14 @@ class BzController < ApplicationController
       params[:names].each do |name|
         next if data[name]
         result = RetainedData.where(:user_id => user.id, :name => name)
-        data[name] = result.empty? ? '' : result.first.value
+        if params[:include_timings]
+          obj = {}
+          obj["value"] = result.empty? ? '' : result.first.value
+          obj["timestamp"] = result.empty? ? 0 : result.first.updated_at.to_i
+          data[name] = obj
+        else
+          data[name] = result.empty? ? '' : result.first.value
+        end
       end
     end
     render :json => data

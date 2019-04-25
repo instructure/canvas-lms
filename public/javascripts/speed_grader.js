@@ -1215,6 +1215,11 @@ define([
       this.refreshFullRubric();
       if(window.onSpeedGraderLoaded)
       	window.onSpeedGraderLoaded();
+      // I need to reset this because the new submission is loaded
+      // without anything special. they can select again if needed.
+      var select = document.getElementById("highlight-changes");
+      if(select)
+        select.value = 0;
     },
 
     handleModerationTabs: function(index_to_load) {
@@ -1651,6 +1656,9 @@ define([
         });
       }
       $multiple_submissions.html($.raw(innerHTML));
+
+
+      bzSpeedGraderSubmissionsCallback(submissionHistory);
     },
 
     showSubmissionDetails: function(){
