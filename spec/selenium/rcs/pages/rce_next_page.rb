@@ -136,6 +136,18 @@ module RCENextPage
     f("form.edit-form .edit-content")
   end
 
+  def indent_toggle_button
+    # put side arrow to switch indent locator here
+  end
+
+  def indent_button
+    # put indent button locator here
+  end
+
+  def outdent_button
+    # put outdent button locator here
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -221,6 +233,18 @@ module RCENextPage
 
   def click_numbered_list_button
     numbered_list_button.click
+  end
+
+  def click_indent_toggle_button
+    # indent_toggle_button.click
+  end
+
+  def click_indent_button
+    # indent_button.click
+  end
+
+  def click_outdent_button
+    # outdent_button.click
   end
 
   def click_editor_window

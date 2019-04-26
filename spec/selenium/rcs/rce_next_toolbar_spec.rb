@@ -85,5 +85,42 @@ describe "RCE Next toolbar features" do
         expect(f("#tinymce")).not_to contain_css('li')
       end
     end
+
+    it "should indent and remove indentation for embedded images" do
+      skip('Unskip in CORE-2637')
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      visit_front_page_edit(@course)
+      click_images_toolbar_button
+      click_course_images
+      click_image_link(title)
+
+      select_all_wiki
+      force_click(indent_button)
+      validate_wiki_style_attrib("padding-left", "40px", "p")
+
+      force_click(indent_toggle_button)
+      force_click(outdent_button)
+
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should indent and remove indentation for text" do
+      skip('Unskip in CORE-2637')
+      wysiwyg_state_setup(@course, "test")
+
+      click_indent_button
+      validate_wiki_style_attrib("padding-left", "40px", "p")
+
+      click_indent_toggle_button
+      click_outdent_button
+      
+      validate_wiki_style_attrib_empty("p")
+    end
   end
 end
