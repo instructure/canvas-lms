@@ -172,5 +172,60 @@ describe "RCE Next toolbar features" do
         expect(f("#tinymce")).not_to contain_css('sub')
       end
     end
+
+    it "should align text to the left" do
+      skip('Unskip in CORE-2635')
+      wysiwyg_state_setup(@course, text = "left")
+
+      click_align_left_button
+      validate_wiki_style_attrib("text-align", text, "p")
+    end
+
+    it "should remove left align from text" do
+      skip('Unskip in CORE-2635')
+      text = "<p style=\"text-align: left;\">1</p>"
+      wysiwyg_state_setup(@course, text, html: true)
+
+      click_align_left_button
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should align text to the center" do
+      skip('Unskip in CORE-2635')
+      wysiwyg_state_setup(@course, text = "center")
+
+      click_align_toggle_button
+      click_align_center_button
+      validate_wiki_style_attrib("text-align", text, "p")
+    end
+
+    it "should remove center align from text" do
+      skip('Unskip in CORE-2635')
+      text = "<p style=\"text-align: center;\">1</p>"
+      wysiwyg_state_setup(@course, text, html: true)
+
+      click_align_toggle_button
+      click_align_center_button
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should align text to the right" do
+      skip('Unskip in CORE-2635')
+      wysiwyg_state_setup(@course, text = "right")
+
+      click_align_toggle_button
+      click_align_right_button
+      validate_wiki_style_attrib("text-align", text, "p")
+    end
+
+    it "should remove right align from text" do
+      skip('Unskip in CORE-2635')
+      text = "<p style=\"text-align: right;\">1</p>"
+      wysiwyg_state_setup(@course, text, html: true)
+
+      click_align_toggle_button
+      click_align_right_button
+      validate_wiki_style_attrib_empty("p")
+    end
   end
 end

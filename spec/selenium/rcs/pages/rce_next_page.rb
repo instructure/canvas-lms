@@ -160,6 +160,22 @@ module RCENextPage
     # put subscript button locator here
   end
 
+  def align_toggle_button
+    # put side arrow to switch align locator here
+  end
+
+  def align_left_button
+    # put align left button locator here
+  end
+
+  def align_center_button
+    # put align center button locator here
+  end
+
+  def align_right_button
+    # put align right button locator here
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -269,6 +285,22 @@ module RCENextPage
 
   def click_subscript_button
     # subscript_button.click
+  end
+
+  def click_align_toggle_button
+    # align_toggle_button.click
+  end
+
+  def click_align_left_button
+    # align_left_button.click
+  end
+
+  def click_align_center_button
+    # align_center_button.click
+  end
+
+  def click_align_right_button
+    # align_right_button.click
   end
 
   def click_editor_window
