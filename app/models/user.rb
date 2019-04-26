@@ -808,8 +808,21 @@ class User < ActiveRecord::Base
     ['user_email', self.global_id].cache_key
   end
 
+  def cached_active_emails
+    self.shard.activate do
+      Rails.cache.fetch(active_emails_cache_key) do
+        self.communication_channels.active.email.pluck(:path)
+      end
+    end
+  end
+
+  def active_emails_cache_key
+    ['active_user_emails', self.global_id].cache_key
+  end
+
   def clear_email_cache!
     Rails.cache.delete(email_cache_key)
+    Rails.cache.delete(active_emails_cache_key)
   end
 
   def email_cached?
@@ -1685,14 +1698,6 @@ class User < ActiveRecord::Base
 
       @courses_with_primary_enrollment[cache_key] =
         res.sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
-    end
-  end
-
-  def cached_active_emails
-    self.shard.activate do
-      Rails.cache.fetch([self, 'active_emails'].cache_key) do
-        self.communication_channels.active.email.map(&:path)
-      end
     end
   end
 

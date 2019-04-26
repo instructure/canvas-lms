@@ -1260,9 +1260,6 @@ describe CommunicationChannelsController do
       enable_cache do
         expect(@user.cached_active_emails).to eq []
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
-        # still cached
-        expect(@user.cached_active_emails).to eq []
-        @user.update_attribute(:updated_at, 5.seconds.ago)
         expect(@user.cached_active_emails).to eq ['jt@instructure.com']
         delete 'destroy', params: {:id => @cc.id}
         @user.reload
