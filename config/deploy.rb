@@ -29,6 +29,13 @@ set :bundle_binstubs, nil
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, '/var/canvas'
 
+# We reinstallled npm using nvm. So use the capistrano-nvm gem
+# We did this under the "deploy" user since that's the user capistrano runs as.
+# We also edited /home/deploy/.bashrc to move the NVM related stuff to the top of 
+# the file so that it would run in non-interactive shells (which capistrano deploys use)
+set :nvm_node, 'v0.12.14'
+set :nvm_map_bins, %w{node npm}
+
 # Default value for :scm is :git
 # set :scm, :git
 
