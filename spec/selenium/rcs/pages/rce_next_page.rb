@@ -21,31 +21,31 @@ module RCENextPage
   # ---------------------- Controls ----------------------
 
   def pages_accordion_button
-    fj('button:contains("Pages")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Pages")')
   end
 
   def assignments_accordion_button
-    fj('button:contains("Assignments")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Assignments")')
   end
 
   def quizzes_accordion_button
-    fj('button:contains("Quizzes")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Quizzes")')
   end
 
   def announcements_accordion_button
-    fj('button:contains("Announcements")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Announcements")')
   end
 
   def discussions_accordion_button
-    fj('button:contains("Discussions")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Discussions")')
   end
 
   def modules_accordion_button
-    fj('button:contains("Modules")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Modules")')
   end
 
   def navigation_accordion_button
-    fj('button:contains("Course Navigation")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Course Navigation")')
   end
 
   def new_page_link
@@ -104,20 +104,34 @@ module RCENextPage
     # add (selector).text
   end
 
+  def possibly_hidden_toolbar_button(selector)
+    button = driver.execute_script("return document.querySelector('#{selector}')")
+    more_toolbar_button.click unless button
+    f(selector)
+  end
+
   def links_toolbar_button
-    # put new links toolbar locator here
+    possibly_hidden_toolbar_button('button[title="Links"]')
   end
 
   def course_links
-    # put course links option in links dropdown here
+    f('[role="menuitem"][title="Course Links"]')
   end
 
   def images_toolbar_button
-    f('button[aria-label="Images"]')
+    possibly_hidden_toolbar_button('button[aria-label="Images"]')
   end
 
   def course_images
-    fj('[role="menuitem"]:contains("Course Images")')
+    f('[role="menuitem"][title="Course Images"]')
+  end
+
+  def rce_page_body_ifr_id
+    f('iframe.tox-edit-area__iframe')['id']
+  end
+
+  def course_item_link(title)
+    fj("[data-testid='instructure_links-Link'] button:contains('#{title}')")
   end
 
   def more_toolbar_button
@@ -208,6 +222,10 @@ module RCENextPage
 
   def click_navigation_accordion
     navigation_accordion_button.click
+  end
+
+  def click_course_item_link(title)
+    course_item_link(title).click
   end
 
   def click_new_page_link
