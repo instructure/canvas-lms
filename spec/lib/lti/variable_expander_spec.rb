@@ -95,6 +95,20 @@ module Lti
       )
     end
 
+    it 'returns sis_id for enrollment' do
+      user.save!
+      course.save!
+      course.offer!
+      managed_pseudonym(user, account: root_account, username: 'login_id', sis_user_id: 'sis id!')
+      login = managed_pseudonym(user, account: root_account, username: 'login_id2', sis_user_id: 'sis id2!')
+      course.enroll_user(user, 'StudentEnrollment', sis_pseudonym_id: login.id, enrollment_state: 'active')
+
+      exp_hash = {test: '$Canvas.user.sisSourceId'}
+      variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+      variable_expander.expand_variables!(exp_hash)
+      expect(exp_hash[:test]).to eq 'sis id2!'
+    end
+
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
       variable_expander.current_user = nil
