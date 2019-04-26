@@ -16,15 +16,83 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from "escape-html";
-import formatMessage from "../../../format-message";
-import clickCallback from "./clickCallback";
+import formatMessage from "../../../format-message"
+import clickCallback from "./clickCallback"
 import bridge from '../../../bridge'
+import $ from 'jquery'
 
 const PLUGIN_KEY = 'links'
 
 tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
   init(ed) {
+    ed.on('keydown',function(e) {
+      // alt + f7
+      if(e.keyCode === 18 && e.keyCode === 118){
+          $('.tox-toolbar-textfield').focus()
+          e.preventDefault();
+      }
+    });
+    const isAnchorElement = function (node) {
+      return node.nodeName.toLowerCase() === 'a' && node.href;
+    };
+
+    const isSelected = function () {
+      return !ed.selection.isCollapsed()
+    };
+
+    const getAnchorElement = function () {
+      const node = ed.selection.getNode();
+      return isAnchorElement(node) ? node : null;
+    };
+
+    ed.ui.registry.addContextForm('link-form', {
+      launch: {
+        type: 'contextformtogglebutton',
+        icon: 'link'
+      },
+      label: formatMessage('Link'),
+      predicate: (node) => {
+        return isAnchorElement(node) || isSelected()
+      },
+      initValue: function () {
+        const elm = getAnchorElement();
+        return elm ? elm.href : '';
+      },
+      commands: [
+        {
+          type: 'contextformtogglebutton',
+          icon: 'link',
+          tooltip: formatMessage('Link'),
+          primary: true,
+          onSetup: function (buttonApi) {
+            buttonApi.setActive(!!getAnchorElement());
+            const nodeChangeHandler = function () {
+              buttonApi.setActive(!ed.readonly && !!getAnchorElement());
+            };
+            ed.on('nodechange', nodeChangeHandler);
+            return function () {
+              ed.off('nodechange', nodeChangeHandler);
+            }
+          },
+          onAction: function (formApi) {
+            const value = formApi.getValue();
+            ed.execCommand('mceInsertLink', false, {href: value});
+            formApi.hide();
+          }
+        },
+        {
+          type: 'contextformtogglebutton',
+          icon: 'unlink',
+          tooltip: formatMessage('Remove link'),
+          active: false,
+          onAction: function (formApi) {
+            ed.execCommand('unlink');
+            formApi.hide();
+          }
+        }
+      ]
+    });
+
     // Register commands
     ed.addCommand(
       "instructureLinks",
@@ -40,7 +108,9 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
           {
             type: 'menuitem',
             text: formatMessage('External Links'),
-            onAction: () => ed.execCommand("instructureLinks")
+            onAction: () => {
+              ed.execCommand('mceLink');
+            }
           },
           {
             type: 'menuitem',
