@@ -53,8 +53,13 @@ function getTrayLabel({contentType, contentSubtype}) {
   }
 }
 
+const thePanels = {
+  links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
+  images: React.lazy(() => import('../instructure_image/Images')),
+  documents: React.lazy(() => import('./FakeComponent')),
+  media: React.lazy(() => import('./FakeComponent'))
+}
 /**
- * Lazy loads and renders the desired panel
  * @param {contentType, contentSubType} filterSettings: key to which panel is desired
  * @param  contentProps: the props from connection to the redux store
  * @returns rendered component
@@ -62,19 +67,11 @@ function getTrayLabel({contentType, contentSubtype}) {
 function renderContentComponent({contentType, contentSubtype}, contentProps) {
   let Component = null
   if (contentType === 'links') {
-    Component = React.lazy(() => import('../instructure_links/components/LinksPanel'))
+    Component = thePanels.links
   } else {
-    switch (contentSubtype) {
-      case 'images':
-        Component = React.lazy(() => import('../instructure_image/Images'))
-        break
-      case 'documents':
-      case 'media':
-      default:
-        Component = React.lazy(() => import('./FakeComponent'))
-    }
+    Component = thePanels[contentSubtype]
   }
-  return <Component {...contentProps} />
+  return Component && <Component {...contentProps} />
 }
 
 const FILTER_SETTINGS_BY_PLUGIN = {
