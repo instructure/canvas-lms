@@ -1249,6 +1249,14 @@ module Lti
     private
 
     def sis_pseudonym
+      if @context.is_a?(Course) && !instance_variable_defined?(:@sis_pseudonym)
+        enrollments = @current_user&.enrollments&.current&.where(course_id: @context)&.where&.not(sis_pseudonym_id: nil)&.preload(:sis_pseudonym)
+        if enrollments&.exists?
+          # in the off chance there is a user that has two sis_ids for the same
+          # course, we will order them to at least be consistent, use the first
+          @sis_pseudonym = enrollments.first.sis_pseudonym
+        end
+      end
       @sis_pseudonym ||= SisPseudonym.for(@current_user, @root_account, type: :trusted, require_sis: false) if @current_user
     end
 

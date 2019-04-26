@@ -2072,6 +2072,7 @@ class Course < ActiveRecord::Base
       e.self_enrolled = self_enrolled
       e.start_at = start_at
       e.end_at = end_at
+      e.sis_pseudonym_id = opts[:sis_pseudonym_id]
       if e.changed?
         e.need_touch_user = true if opts[:skip_touch_user]
         transaction do
@@ -2086,7 +2087,6 @@ class Course < ActiveRecord::Base
           end
         end
       end
-      e.sis_pseudonym_id = opts[:sis_pseudonym_id]
       e.user = user
       self.claim if self.created? && e && e.admin?
       unless opts[:skip_touch_user]
