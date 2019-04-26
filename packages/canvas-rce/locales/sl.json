@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Dodaj"
+  },
+  "all_4321c3a1": {
+    "message": "Vse"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Abecedno"
+  },
   "alternative_text_a834dcad": {
     "message": "Nadomestno besedilo:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Kliknite, da vstavite povezavo k temu elementu."
   },
+  "close_d634289d": {
+    "message": "Zapri"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Zapri obrazec storitve Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Skupinske naloge"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Računalnik"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Podvrsta vsebine"
+  },
+  "content_type_2cf90d95": {
+    "message": "Vrsta vsebine"
   },
   "copyright_holder_66ee111": {
     "message": "Lastnik avtorskih pravic:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Licenca Creative Commons:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Datum dodajanja"
+  },
+  "date_published_371c4ad0": {
+    "message": "Datum objave"
   },
   "decorative_image_fde98579": {
     "message": "Dekorativna slika"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Nalaganje map ..."
   },
+  "media_af190855": {
+    "message": "Mediji"
+  },
   "modules_c4325335": {
     "message": "Moduli"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Izberite mapo za nalaganje datoteke vanjo."
   },
+  "sort_by_e75f9e3e": {
+    "message": "Razvrsti po"
+  },
+  "submit_a3cc6859": {
+    "message": "Pošlji"
+  },
   "syllabus_f191f65b": {
     "message": "Učni načrt"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "Trak"
   },
+  "unsplash_ee049fbf": {
+    "message": "Pozdravna"
+  },
   "upload_8b403d05": {
     "message": "Naloži"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Naloži novo sliko"
+  },
+  "upload_image_6120b609": {
+    "message": "Naloži sliko"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Pravica uporabe:"

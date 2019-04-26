@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Bæta við"
+  },
+  "all_4321c3a1": {
+    "message": "Allt"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Í stafrófsröð"
+  },
   "alternative_text_a834dcad": {
     "message": "Valfrjáls texti:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Smellið til að setja inn tengil á þetta atriði."
   },
+  "close_d634289d": {
+    "message": "Loka"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Loka Flickr-formi"
   },
   "collaborations_5c56c15f": {
     "message": "Samvinnutól"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Tölva"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Undirtegund efnis"
+  },
+  "content_type_2cf90d95": {
+    "message": "Efnistegund"
   },
   "copyright_holder_66ee111": {
     "message": "Handhafi höfundarréttar:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-leyfi:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Dagsetning bætt við"
+  },
+  "date_published_371c4ad0": {
+    "message": "Dagsetning birt"
   },
   "decorative_image_fde98579": {
     "message": "Skreytingarmynd"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Hleð inn skrám..."
   },
+  "media_af190855": {
+    "message": "Miðill"
+  },
   "modules_c4325335": {
     "message": "Einingar"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Velja möppu til að hlaða skránni þinni upp í"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Raða eftir"
+  },
+  "submit_a3cc6859": {
+    "message": "Leggja fram"
+  },
   "syllabus_f191f65b": {
     "message": "Námsefni"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "Bakki"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Hlaða upp"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Hlaða upp nýrri mynd"
+  },
+  "upload_image_6120b609": {
+    "message": "Hleð upp mynd"
+  },
+  "url_22a5f3b8": {
+    "message": "Vefslóð"
   },
   "usage_right_ff96f3e2": {
     "message": "Notkunarréttindi:"

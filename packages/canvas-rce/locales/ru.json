@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Добавить"
+  },
+  "all_4321c3a1": {
+    "message": "Все"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Буквенный"
+  },
   "alternative_text_a834dcad": {
     "message": "Альтернативный текст:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Нажмите, чтобы вставить ссылку на этот элемент."
   },
+  "close_d634289d": {
+    "message": "Закрыть"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Закрыть форму Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Совместные работы"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Компьютер"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Подтип контента"
+  },
+  "content_type_2cf90d95": {
+    "message": "Тип содержимого"
   },
   "copyright_holder_66ee111": {
     "message": "Правообладатель:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Лицензионное соглашение Creative Commons:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Дата добавления"
+  },
+  "date_published_371c4ad0": {
+    "message": "Дата публикации"
   },
   "decorative_image_fde98579": {
     "message": "Декоративное изображение"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Скачивание папок..."
   },
+  "media_af190855": {
+    "message": "Мультимедиа"
+  },
   "modules_c4325335": {
     "message": "Модули"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Выберите папку, в которую будет помещен ваш файл"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Сортировать по"
+  },
+  "submit_a3cc6859": {
+    "message": "Отправить"
+  },
   "syllabus_f191f65b": {
     "message": "Содержание курса"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "Лоток"
   },
+  "unsplash_ee049fbf": {
+    "message": "Без образования брызг"
+  },
   "upload_8b403d05": {
     "message": "Загрузить"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Загрузить новое изображение"
+  },
+  "upload_image_6120b609": {
+    "message": "Загрузить изображение"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Право на использование:"

@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Ajoute"
+  },
+  "all_4321c3a1": {
+    "message": "Tout"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetik"
+  },
   "alternative_text_a834dcad": {
     "message": "Lòt Tèks:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klike pou ensere yon lyen nan eleman sa a."
   },
+  "close_d634289d": {
+    "message": "Fèmen"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Fèmen fòmilè Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Kolaborasyon"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Òdinatè"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Kontni Subtype"
+  },
+  "content_type_2cf90d95": {
+    "message": "Tip Kontni"
   },
   "copyright_holder_66ee111": {
     "message": "Titilè Dwa Otè:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Lisans Creative Commons"
+  },
+  "date_added_ed5ad465": {
+    "message": "Dat Ajoute"
+  },
+  "date_published_371c4ad0": {
+    "message": "Dat Pibliye"
   },
   "decorative_image_fde98579": {
     "message": "Imaj Dekoratif"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Chajman dosye..."
   },
+  "media_af190855": {
+    "message": "Medya"
+  },
   "modules_c4325335": {
     "message": "Modil"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleksyone yon dosye pou transfere fichye ou a ladan li"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Triye Pa"
+  },
+  "submit_a3cc6859": {
+    "message": "Soumèt"
+  },
   "syllabus_f191f65b": {
     "message": "Pwogram"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "Plato"
   },
+  "unsplash_ee049fbf": {
+    "message": "Deklanche"
+  },
   "upload_8b403d05": {
     "message": "Chajman"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Transfere yon nouvo imaj"
+  },
+  "upload_image_6120b609": {
+    "message": "Transfere Imaj"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Dwa Itilizasyon:"

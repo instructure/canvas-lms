@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "追加"
+  },
+  "all_4321c3a1": {
+    "message": "すべて"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "アルファベットで"
+  },
   "alternative_text_a834dcad": {
     "message": "代替テキスト："
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "クリックするとこのアイテムへのリンクが挿入されます。"
   },
+  "close_d634289d": {
+    "message": "閉じる"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Flickr フォームを閉じる"
   },
   "collaborations_5c56c15f": {
     "message": "共同作業"
+  },
+  "computer_1d7dfa6f": {
+    "message": "コンピュータ"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "コンテンツのサブタイプ"
+  },
+  "content_type_2cf90d95": {
+    "message": "コンテンツ タイプ"
   },
   "copyright_holder_66ee111": {
     "message": "著作権保有者:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "クリエイティブ コモンズ ライセンス:"
+  },
+  "date_added_ed5ad465": {
+    "message": "追加された日付"
+  },
+  "date_published_371c4ad0": {
+    "message": "公開日"
   },
   "decorative_image_fde98579": {
     "message": "装飾の画像"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "フォルダを読み込み中..."
   },
+  "media_af190855": {
+    "message": "メディア"
+  },
   "modules_c4325335": {
     "message": "モジュール"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "ファイルをアップロードするフォルダを選択"
   },
+  "sort_by_e75f9e3e": {
+    "message": "分類する"
+  },
+  "submit_a3cc6859": {
+    "message": "提出"
+  },
   "syllabus_f191f65b": {
     "message": "シラバス"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "トレイ"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "アップロード"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "新しい画像をアップロードする"
+  },
+  "upload_image_6120b609": {
+    "message": "イメージのアップロード"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "使用権:"

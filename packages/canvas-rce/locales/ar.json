@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "إضافة"
+  },
+  "all_4321c3a1": {
+    "message": "الكل"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "أبجدي"
+  },
   "alternative_text_a834dcad": {
     "message": "نص بديل:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "انقر لإدراج ارتباط إلى هذا العنصر."
   },
+  "close_d634289d": {
+    "message": "إغلاق"
+  },
   "close_flickr_form_b32e600a": {
     "message": "نموذج إغلاق Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "عمليات التعاون"
+  },
+  "computer_1d7dfa6f": {
+    "message": "الكمبيوتر"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "النوع الفرعي للمحتوى"
+  },
+  "content_type_2cf90d95": {
+    "message": "نوع المحتوى"
   },
   "copyright_holder_66ee111": {
     "message": "مالك حقوق النشر:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "ترخيص المشاع الإبداعي:"
+  },
+  "date_added_ed5ad465": {
+    "message": "تاريخ الإضافة"
+  },
+  "date_published_371c4ad0": {
+    "message": "تاريخ النشر"
   },
   "decorative_image_fde98579": {
     "message": "صورة تزيين"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "جارٍ تحميل المجلدات..."
   },
+  "media_af190855": {
+    "message": "الوسائط"
+  },
   "modules_c4325335": {
     "message": "الوحدات"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "حدد مجلدًا لتحميل ملفك عليه"
   },
+  "sort_by_e75f9e3e": {
+    "message": "الفزر حسب"
+  },
+  "submit_a3cc6859": {
+    "message": "إرسال"
+  },
   "syllabus_f191f65b": {
     "message": "المناهج"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "العلبة"
   },
+  "unsplash_ee049fbf": {
+    "message": "إلغاء تناثر"
+  },
   "upload_8b403d05": {
     "message": "تحميل"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "تحميل صورة جديدة"
+  },
+  "upload_image_6120b609": {
+    "message": "تحميل صورة"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "حق الاستخدام:"

@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Dodaj"
+  },
+  "all_4321c3a1": {
+    "message": "Wszystkie"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetycznie"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternatywny tekst:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Kliknij, aby wstawić łącze do tego elementu."
   },
+  "close_d634289d": {
+    "message": "Zamknij"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Zamknij formularz Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Projekty współpracy"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Komputer"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Podtyp zawartości"
+  },
+  "content_type_2cf90d95": {
+    "message": "Typ zawartości"
   },
   "copyright_holder_66ee111": {
     "message": "Właściciel praw autorskich:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Licencja Creative Commons:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Data dodania"
+  },
+  "date_published_371c4ad0": {
+    "message": "Data publikacji"
   },
   "decorative_image_fde98579": {
     "message": "Obraz dekoracyjny"
@@ -182,6 +209,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Wczytywanie folderów..."
   },
+  "media_af190855": {
+    "message": "Multimedia"
+  },
   "modules_c4325335": {
     "message": "Moduły"
   },
@@ -212,6 +242,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Wybierz folder, aby przesłać do niego plik"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Sortuj wg"
+  },
+  "submit_a3cc6859": {
+    "message": "Prześlij"
+  },
   "syllabus_f191f65b": {
     "message": "Program"
   },
@@ -230,6 +266,9 @@
   "tray_839df38a": {
     "message": "Zasobnik"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Pobierz"
   },
@@ -238,6 +277,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Przekaż nowy obraz"
+  },
+  "upload_image_6120b609": {
+    "message": "Prześlij obraz"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Prawo użytkowania:"
