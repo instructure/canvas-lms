@@ -2086,6 +2086,7 @@ class Course < ActiveRecord::Base
           end
         end
       end
+      e.sis_pseudonym_id = opts[:sis_pseudonym_id]
       e.user = user
       self.claim if self.created? && e && e.admin?
       unless opts[:skip_touch_user]

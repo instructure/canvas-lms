@@ -29,17 +29,15 @@ describe Lti::LtiUserCreator do
     let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
     let(:canvas_user2) { user_factory(name: 'Observer Dude') }
     let(:root_account) { Account.create! }
+    let(:sis_pseudonym) { managed_pseudonym(canvas_user, account: root_account, username: 'login_id', sis_user_id: 'sis id!') }
 
     it 'converts a canvas user to an lti user' do
       canvas_user.email = 'user@email.com'
 
-      sub_account = Account.create!
+      sub_account = Account.new
       sub_account.root_account = root_account
       sub_account.save!
-      pseudonym = pseudonym(canvas_user, account: sub_account.root_account, username: 'login_id')
-
-      pseudonym.sis_user_id = 'sis id!'
-      pseudonym.save!
+      sis_pseudonym
 
       allow(Time.zone.tzinfo).to receive(:name).and_return('my/zone')
 
@@ -105,6 +103,27 @@ describe Lti::LtiUserCreator do
       end
 
       describe "#current_enrollments" do
+        it "returns correct sis_user_id" do
+          second_sis = managed_pseudonym(canvas_user, account: root_account, username: 'second_login_id', sis_user_id: 'wrong_sis')
+          enrollment = student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true, sis_pseudonym_id: sis_pseudonym.id)
+
+          user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool, canvas_course)
+          lti_user = user_factory.convert
+          expect(lti_user.sis_source_id).to eq 'sis id!'
+          enrollment.update_attribute(:sis_pseudonym_id, second_sis.id)
+          user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool, canvas_course)
+          lti_user = user_factory.convert
+          expect(lti_user.sis_source_id).to eq 'wrong_sis'
+        end
+
+        it "returns a sis_user_id when no sis_id tied to enrollment" do
+          student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
+          sis_pseudonym
+          user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool, canvas_course)
+          lti_user = user_factory.convert
+          expect(lti_user.sis_source_id).to eq 'sis id!'
+        end
+
         it "collects current active student enrollments" do
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
 
