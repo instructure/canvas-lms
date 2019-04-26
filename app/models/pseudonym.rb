@@ -396,25 +396,6 @@ class Pseudonym < ActiveRecord::Base
     self.password
   end
 
-  def move_to_user(user, migrate=true)
-    return unless user
-    return true if self.user_id == user.id
-    old_user = self.user
-    old_user_id = self.user_id
-    self.user = user
-    unless self.crypted_password
-      self.generate_temporary_password
-    end
-    self.save
-    if old_user_id
-      CommunicationChannel.by_path(self.unique_id).where(:user_id => old_user_id).update_all(:user_id => user)
-      User.where(:id => [old_user_id, user]).update_all(:update_at => Time.now.utc)
-    end
-    if User.find(old_user_id).pseudonyms.empty? && migrate
-      UserMerge.from(old_user).into(user)
-    end
-  end
-
   def valid_ssha?(plaintext_password)
     return false if plaintext_password.blank? || self.sis_ssha.blank?
     decoded = Base64::decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
