@@ -148,6 +148,18 @@ module RCENextPage
     # put outdent button locator here
   end
 
+  def super_toggle_button
+    # put side arrow to switch super locator here
+  end
+
+  def superscript_button
+    # put superscript button locator here
+  end
+
+  def subscript_button
+    # put subscript button locator here
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -245,6 +257,18 @@ module RCENextPage
 
   def click_outdent_button
     # outdent_button.click
+  end
+
+  def click_super_toggle_button
+    # super_toggle_button.click
+  end
+
+  def click_superscript_button
+    # superscript_button.click
+  end
+
+  def click_subscript_button
+    # subscript_button.click
   end
 
   def click_editor_window

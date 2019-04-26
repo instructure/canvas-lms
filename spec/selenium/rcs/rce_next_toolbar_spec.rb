@@ -119,8 +119,58 @@ describe "RCE Next toolbar features" do
 
       click_indent_toggle_button
       click_outdent_button
-      
+
       validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should make text superscript in rce" do
+      skip('Unskip in CORE-2634')
+      wysiwyg_state_setup(@course)
+
+      click_superscript_button
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce sup')).to be_displayed
+      end
+    end
+
+    it "should remove superscript from text in rce" do
+      skip('Unskip in CORE-2634')
+      skip_if_chrome('fragile in chrome')
+      text = "<p><sup>This is my text</sup></p>"
+
+      wysiwyg_state_setup(@course, text, html: true)
+      shift_click_button(superscript_button)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f("#tinymce")).not_to contain_css('sup')
+      end
+    end
+
+    it "should make text subscript in rce" do
+      skip('Unskip in CORE-2634')
+      wysiwyg_state_setup(@course)
+
+      click_super_toggle_button
+      click_subscript_button
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce sub')).to be_displayed
+      end
+    end
+
+    it "should remove subscript from text in rce" do
+      skip('Unskip in CORE-2634')
+      skip_if_chrome('fragile in chrome')
+      text = "<p><sub>This is my text</sub></p>"
+      wysiwyg_state_setup(@course, text, html: true)
+
+      click_super_toggle_button
+      shift_click_button(subscript_button)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f("#tinymce")).not_to contain_css('sub')
+      end
     end
   end
 end
