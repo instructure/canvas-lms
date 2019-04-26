@@ -124,12 +124,13 @@ export default class PostAssignmentGradesTray extends PureComponent {
 
     try {
       const progress = await postRequest
-      await resolvePostAssignmentGradesStatus(progress)
+      const postedSubmissionInfo = await resolvePostAssignmentGradesStatus(progress)
+      this.dismiss()
+      this.state.onPosted(postedSubmissionInfo)
       showFlashAlert({
         message: successMessage,
         type: 'success'
       })
-      this.dismiss()
     } catch (error) {
       showFlashAlert({
         message: I18n.t('There was a problem posting assignment grades.'),

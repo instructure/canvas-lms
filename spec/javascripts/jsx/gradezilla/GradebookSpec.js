@@ -4073,6 +4073,12 @@ test('uses Grid Support to update the column headers', function() {
   strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
 })
 
+test('takes an optional array of column ids', function() {
+  this.gradebook.updateColumnHeaders(['2301', '2401'])
+  const {args} = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.firstCall
+  deepEqual(args[0], ['2301', '2401'])
+})
+
 QUnit.module('Gradebook#listRowIndicesForStudentIds')
 
 test('returns a row index for each student id', function() {

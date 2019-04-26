@@ -92,6 +92,8 @@ describe Mutations::HideAssignmentGrades do
     end
 
     describe "hiding the grades" do
+      let(:hide_submissions_job) { Delayed::Job.where(tag: "Assignment#hide_submissions").order(:id).last }
+
       before(:each) do
         @student_submission = assignment.submissions.find_by(user: student)
         @student_submission.update!(posted_at: Time.zone.now)
@@ -99,7 +101,6 @@ describe Mutations::HideAssignmentGrades do
 
       it "hides the assignment grades" do
         execute_query(mutation_str(assignment_id: assignment.id), context)
-        hide_submissions_job = Delayed::Job.where(tag: "Assignment#hide_submissions").order(:id).last
         hide_submissions_job.invoke_job
         expect(@student_submission.reload).not_to be_posted
       end
@@ -111,16 +112,29 @@ describe Mutations::HideAssignmentGrades do
 
       it "returns the progress" do
         result = execute_query(mutation_str(assignment_id: assignment.id), context)
-        progress = Progress.where(tag: "hide_assignment_grades").order(:id).last
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
         expect(result.dig("data", "hideAssignmentGrades", "progress", "_id").to_i).to be progress.id
       end
 
-      it "stores the ids of submissions hidden on the Progress object" do
-        execute_query(mutation_str(assignment_id: assignment.id), context)
-        hide_submissions_job = Delayed::Job.where(tag:"Assignment#hide_submissions").order(:id).last
+      it "stores the assignment id of submissions hidden on the Progress object" do
+        result = execute_query(mutation_str(assignment_id: assignment.id), context)
         hide_submissions_job.invoke_job
-        progress = Progress.where(tag: "hide_assignment_grades").order(:id).last
-        expect(progress.results[:submission_ids]).to match_array [@student_submission.id]
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+        expect(progress.results[:assignment_id]).to eq assignment.id
+      end
+
+      it "stores the posted_at of submissions hidden on the Progress object" do
+        result = execute_query(mutation_str(assignment_id: assignment.id), context)
+        hide_submissions_job.invoke_job
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+        expect(progress.results[:posted_at]).to eq @student_submission.reload.posted_at
+      end
+
+      it "stores the user ids of submissions hidden on the Progress object" do
+        result = execute_query(mutation_str(assignment_id: assignment.id), context)
+        hide_submissions_job.invoke_job
+        progress = Progress.find(result.dig("data", "hideAssignmentGrades", "progress", "_id"))
+        expect(progress.results[:user_ids]).to match_array [student.id]
       end
     end
   end

@@ -7160,10 +7160,25 @@ describe Assignment do
         }
       end
 
-      it "when given a Progress, sets the submission ids in the results" do
-        progress = @course.progresses.create!(tag: "post_submissions")
-        assignment.post_submissions(progress: progress, submission_ids: [student1_submission.id])
-        expect(progress.results[:submission_ids]).to match_array [student1_submission.id]
+      context "when given a Progress" do
+        before(:each) do
+          @progress = @course.progresses.create!(tag: "post_submissions")
+        end
+
+        it "sets the assignment id in the results" do
+          assignment.post_submissions(progress: @progress, submission_ids: [student1_submission.id])
+          expect(@progress.results[:assignment_id]).to eq assignment.id
+        end
+
+        it "sets the posted_at in the results" do
+          assignment.post_submissions(progress: @progress, submission_ids: [student1_submission.id])
+          expect(@progress.results[:posted_at]).to eq student1_submission.reload.posted_at
+        end
+
+        it "sets the user ids in the results" do
+          assignment.post_submissions(progress: @progress, submission_ids: [student1_submission.id])
+          expect(@progress.results[:user_ids]).to match_array [student1.id]
+        end
       end
 
       context "when post policies are enabled" do
@@ -7264,10 +7279,25 @@ describe Assignment do
         }
       end
 
-      it "when given a Progress, sets the submission ids in the results" do
-        progress = @course.progresses.create!(tag: "hide_submissions")
-        assignment.hide_submissions(progress: progress, submission_ids: [student1_submission.id])
-        expect(progress.results[:submission_ids]).to match_array [student1_submission.id]
+      context "when given a Progress" do
+        before(:each) do
+          @progress = @course.progresses.create!(tag: "hide_submissions")
+        end
+
+        it "sets the assignment id in the results" do
+          assignment.hide_submissions(progress: @progress, submission_ids: [student1_submission.id])
+          expect(@progress.results[:assignment_id]).to eq assignment.id
+        end
+
+        it "sets the posted_at to nil in the results" do
+          assignment.hide_submissions(progress: @progress, submission_ids: [student1_submission.id])
+          expect(@progress.results[:posted_at]).to be_nil
+        end
+
+        it "sets the user ids in the results" do
+          assignment.hide_submissions(progress: @progress, submission_ids: [student1_submission.id])
+          expect(@progress.results[:user_ids]).to match_array [student1.id]
+        end
       end
 
       context "when post policies are enabled" do

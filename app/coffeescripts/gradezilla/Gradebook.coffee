@@ -2161,8 +2161,8 @@ define [
 
     ## React Grid Component Rendering Methods
 
-    updateColumnHeaders: ->
-      @gradebookGrid.gridSupport?.columns.updateColumnHeaders()
+    updateColumnHeaders: (columnIds = []) =>
+      @gradebookGrid.gridSupport?.columns.updateColumnHeaders(columnIds)
 
     # Column Header Helpers
     handleHeaderKeyDown: (e, columnId) =>

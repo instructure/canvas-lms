@@ -40,6 +40,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
         name: 'Math 1.1'
       },
       onExited: sinon.spy(),
+      onHidden: sinon.spy(),
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}]
     }
 
@@ -267,6 +268,11 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       strictEqual(heading.textContent, 'Math 1.1')
       resolveHideAssignmentGradesStatusPromise.resolve()
       await waitForHiding()
+    })
+
+    test('calls onHidden', async () => {
+      await clickHide()
+      strictEqual(context.onHidden.callCount, 1)
     })
 
     QUnit.module('pending request', pendingRequestHooks => {

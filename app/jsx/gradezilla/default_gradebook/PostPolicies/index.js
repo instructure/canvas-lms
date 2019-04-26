@@ -30,9 +30,10 @@ function getSubmission(student, assignmentId) {
 
 export default class PostPolicies {
   constructor(gradebook) {
+    this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
     this._gradebook = gradebook
 
-    this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
+    this._onGradesPostedOrHidden = this._onGradesPostedOrHidden.bind(this)
   }
 
   initialize() {
@@ -64,6 +65,18 @@ export default class PostPolicies {
     ReactDOM.unmountComponentAtNode(document.getElementById('post-assignment-grades-tray'))
   }
 
+  _onGradesPostedOrHidden({assignmentId, postedAt, userIds}) {
+    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+
+    userIds.forEach(userId => {
+      const submission = this._gradebook.getSubmission(userId, assignmentId)
+      submission.posted_at = postedAt
+      this._gradebook.updateSubmission(submission)
+    })
+
+    this._gradebook.updateColumnHeaders([columnId])
+  }
+
   showAssignmentPostingPolicyTray({assignmentId, onExited}) {
     const {id, name, postManually} = this._gradebook.getAssignment(assignmentId)
 
@@ -86,6 +99,7 @@ export default class PostPolicies {
         name
       },
       onExited,
+      onHidden: this._onGradesPostedOrHidden,
       sections
     })
   }
@@ -108,7 +122,8 @@ export default class PostPolicies {
       },
       onExited,
       sections,
-      submissions
+      submissions,
+      onPosted: this._onGradesPostedOrHidden
     })
   }
 

@@ -40,6 +40,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         name: 'Math 1.1'
       },
       onExited: sinon.spy(),
+      onPosted: sinon.spy(),
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}]
     }
 
@@ -309,6 +310,11 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       strictEqual(heading.textContent, 'Math 1.1')
       resolvePostAssignmentGradesStatusPromise.resolve()
       await waitForPosting()
+    })
+
+    test('calls onPosted', async () => {
+      await clickPost()
+      strictEqual(context.onPosted.callCount, 1)
     })
 
     QUnit.module('pending request', pendingRequestHooks => {
