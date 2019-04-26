@@ -52,6 +52,7 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
   DESC
+  field :create_assignment, mutation: Mutations::CreateAssignment
   field :update_assignment, mutation: Mutations::UpdateAssignment
   field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
   field :create_module, mutation: Mutations::CreateModule
