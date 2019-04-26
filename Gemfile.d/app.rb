@@ -86,6 +86,7 @@ gem 'ims-lti', '2.2.3', require: 'ims'
 gem 'json_schemer', '0.1.7'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'json', '2.2.0'
+gem 'link_header', '0.0.8'
 gem 'oj', '3.3.9'
 gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.9.4', require: false
