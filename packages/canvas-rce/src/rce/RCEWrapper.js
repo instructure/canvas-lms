@@ -26,6 +26,7 @@ import indicatorRegion from "./indicatorRegion";
 import indicate from "../common/indicate";
 import Bridge from "../bridge";
 import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
+import StatusBar from './StatusBar';
 
 const editorWrappers = new WeakMap();
 
@@ -277,6 +278,7 @@ export default class RCEWrapper extends React.Component {
 
   render() {
     const {trayProps, ...mceProps} = this.props
+    mceProps.editorOptions.statusbar = false
 
     return (
       <>
@@ -293,6 +295,7 @@ export default class RCEWrapper extends React.Component {
           config={this.wrapOptions(mceProps.editorOptions)}
         />
 
+        <StatusBar />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
       </>
     );

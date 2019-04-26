@@ -49,6 +49,7 @@ function createdMountedElement(additionalProps = {}) {
       defaultContent: "an example string",
       textareaId: textareaId,
       tinymce: fakeTinyMCE,
+      editorOptions: {},
       ...additionalProps
     })
   );
