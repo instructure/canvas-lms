@@ -95,6 +95,9 @@
   "decorative_image_fde98579": {
     "message": "Декоративне зображення"
   },
+  "decrease_indent_de6343ab": {
+    "message": "Зменшити відступ"
+  },
   "discussions_a5f96392": {
     "message": "Обговорення"
   },
@@ -140,6 +143,9 @@
   "images_7ce26570": {
     "message": "Зображення"
   },
+  "increase_indent_6d550a4a": {
+    "message": "Збільшити відступ"
+  },
   "insert_equella_links_49a8dacd": {
     "message": "Вставити посилання Equella"
   },
@@ -178,6 +184,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Завантаження папок ..."
+  },
+  "loading_more_results_def6df65": {
+    "message": "Завантажити більше результатів..."
   },
   "media_af190855": {
     "message": "Носій інформації"

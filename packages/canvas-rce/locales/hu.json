@@ -86,6 +86,9 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licenc:"
   },
+  "decrease_indent_de6343ab": {
+    "message": "Behúzás csökkentése"
+  },
   "discussions_a5f96392": {
     "message": "Fórumok"
   },
@@ -125,6 +128,9 @@
   "images_7ce26570": {
     "message": "Képek"
   },
+  "increase_indent_6d550a4a": {
+    "message": "Behúzás növelése"
+  },
   "insert_equella_links_49a8dacd": {
     "message": "Insert Equella Links"
   },
@@ -160,6 +166,9 @@
   },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
+  },
+  "loading_more_results_def6df65": {
+    "message": "További találatok betöltése..."
   },
   "media_af190855": {
     "message": "Média"

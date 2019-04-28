@@ -95,6 +95,9 @@
   "decorative_image_fde98579": {
     "message": "תמונת קישוט"
   },
+  "decrease_indent_de6343ab": {
+    "message": "הצרת עימוד"
+  },
   "discussions_a5f96392": {
     "message": "דיונים "
   },
@@ -140,6 +143,9 @@
   "images_7ce26570": {
     "message": "תמונות"
   },
+  "increase_indent_6d550a4a": {
+    "message": "הרחבת עימוד"
+  },
   "insert_equella_links_49a8dacd": {
     "message": "הוספת קישורי Equella "
   },
@@ -175,6 +181,9 @@
   },
   "loading_failed_b3524381": {
     "message": "טעינה נכשלה..."
+  },
+  "loading_more_results_def6df65": {
+    "message": "טוען תוצאות נוספות..."
   },
   "media_af190855": {
     "message": "מדיה"

@@ -86,6 +86,9 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Lisansı:"
   },
+  "decrease_indent_de6343ab": {
+    "message": "İçerden başlatma sınırını azalt"
+  },
   "discussions_a5f96392": {
     "message": "Tartışmalar"
   },
@@ -94,6 +97,9 @@
   },
   "enter_search_terms_e397b1f0": {
     "message": "arama ifadelerini gir"
+  },
+  "external_links_3d9f074e": {
+    "message": "Harici Bağlantılar"
   },
   "file_upload_form_4aaad554": {
     "message": "Dosya Yükleme Formu"
@@ -124,6 +130,9 @@
   },
   "images_7ce26570": {
     "message": "Görseller"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "İçerden başlatma sınırını artır"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Equella Bağlantısı Ekle"
@@ -161,6 +170,9 @@
   "loading_failed_b3524381": {
     "message": "Yükleme Başarısız..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Daha fazla sonuç yükleniyor..."
+  },
   "media_af190855": {
     "message": "Medya"
   },
@@ -187,6 +199,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Bazı sorunlar oluştu."
   },
   "sort_by_e75f9e3e": {
     "message": "Sırala"

@@ -74,6 +74,9 @@
   "course_navigation_dd035109": {
     "message": "과목 탐색"
   },
+  "decrease_indent_de6343ab": {
+    "message": "들여쓰기 축소"
+  },
   "discussions_a5f96392": {
     "message": "토론"
   },
@@ -82,6 +85,9 @@
   },
   "enter_search_terms_e397b1f0": {
     "message": "검색 용어 입력"
+  },
+  "external_links_3d9f074e": {
+    "message": "외부 링크"
   },
   "file_upload_form_4aaad554": {
     "message": "File Upload Form"
@@ -106,6 +112,9 @@
   },
   "images_7ce26570": {
     "message": "이미지"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "들여쓰기 확대"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Insert Equella Links"

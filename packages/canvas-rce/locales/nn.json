@@ -95,6 +95,9 @@
   "decorative_image_fde98579": {
     "message": "Dekorativt bilde"
   },
+  "decrease_indent_de6343ab": {
+    "message": "Reduser innrykk"
+  },
   "discussions_a5f96392": {
     "message": "Diskusjonar"
   },
@@ -140,6 +143,9 @@
   "images_7ce26570": {
     "message": "Bilde"
   },
+  "increase_indent_6d550a4a": {
+    "message": "Auk innrykk"
+  },
   "insert_equella_links_49a8dacd": {
     "message": "Sett inn Equella-lenker"
   },
@@ -178,6 +184,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Lastar mapper..."
+  },
+  "loading_more_results_def6df65": {
+    "message": "Lastar fleire resultat..."
   },
   "media_af190855": {
     "message": "Media"
