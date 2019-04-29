@@ -42,7 +42,11 @@ import './jquery.templateData'
   var SelectContentDialog = {};
 
   SelectContentDialog.deepLinkingListener = (event) => {
-    if (event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN) {
+    if (
+      event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
+      event.data &&
+      event.data.messageType === 'LtiDeepLinkingResponse'
+    ) {
       processSingleContentItem(event)
         .then((result) => {
           if (result.type !== 'ltiResourceLink') { $.flashError(I18n.t('Selected content is not an LTI link.')) }

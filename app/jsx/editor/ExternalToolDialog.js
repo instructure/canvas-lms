@@ -119,7 +119,11 @@ export default class ExternalToolDialog extends React.Component {
   handleDeepLinking = ev => {
     const {editor, deepLinkingOrigin} = this.props
     // Only accept messages from the same origin
-    if (ev.origin === deepLinkingOrigin) {
+    if (
+      ev.origin === deepLinkingOrigin &&
+      ev.data &&
+      ev.data.messageType === 'LtiDeepLinkingResponse'
+    ) {
       processEditorContentItems(ev, editor, this)
     }
   }

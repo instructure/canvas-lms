@@ -390,6 +390,13 @@ describe('handleDeepLinking', () => {
     expect(send).not.toHaveBeenCalled()
   })
 
+  it('ignores non-deep linking responses', async () => {
+    const instance = await getInstance(container)
+    const ev = {origin: 'deepOrigin', data: data({messageType: 'notdeeplinking'})}
+    instance.handleDeepLinking(ev)
+    expect(send).not.toHaveBeenCalled()
+  })
+
   it('processes content items for correct origin', async () => {
     const editor = fakeEditor()
     const instance = await getInstance(container, {editor})

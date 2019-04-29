@@ -53,18 +53,20 @@ export default class HomeworkSubmissionLtiContainer {
     }
   }
 
-  handleDeepLinking = (event) => {
-    if (event.origin !== ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN) { return }
+  handleDeepLinking = event => {
+    if (
+      event.origin !== ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN ||
+      !event.data ||
+      event.data.messageType !== 'LtiDeepLinkingResponse'
+    ) {
+      return
+    }
     processSingleContentItem(event)
-      .then((result) => {
+      .then(result => {
         handleContentItem(result, this.contentReturnView, this.removeDeepLinkingListener)
       })
-      .catch((e) => {
-        handleDeepLinkingError(
-          e,
-          this.contentReturnView,
-          this.embedLtiLaunch.bind(this)
-        )
+      .catch(e => {
+        handleDeepLinkingError(e, this.contentReturnView, this.embedLtiLaunch.bind(this))
       })
   }
 
@@ -118,24 +120,27 @@ export default class HomeworkSubmissionLtiContainer {
       displayAsModal: false
     })
 
-    this.contentReturnView = returnView;
+    this.contentReturnView = returnView
 
-    returnView.on('ready', (function(_this) {
-      return function(data) {
-        var homeworkSubmissionView;
-        tool = this.model; // this will return the model from returnView
-        homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data);
-        homeworkSubmissionView.parentView = _this;
-        this.remove();
-        $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el);
-        _this.cleanupViewsForTool(tool);
-        _this.renderedViews[tool.get('id')].push(homeworkSubmissionView);
-        homeworkSubmissionView.render();
-        return $('input.turnitin_pledge').click(function(e) {
-          return recordEulaAgreement('#eula_agreement_timestamp', e.target.checked);
-        });
-      };
-    })(this));
+    returnView.on(
+      'ready',
+      (function(_this) {
+        return function(data) {
+          var homeworkSubmissionView
+          tool = this.model // this will return the model from returnView
+          homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data)
+          homeworkSubmissionView.parentView = _this
+          this.remove()
+          $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el)
+          _this.cleanupViewsForTool(tool)
+          _this.renderedViews[tool.get('id')].push(homeworkSubmissionView)
+          homeworkSubmissionView.render()
+          return $('input.turnitin_pledge').click(function(e) {
+            return recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
+          })
+        }
+      })(this)
+    )
 
     returnView.on('cancel', data => {})
 
