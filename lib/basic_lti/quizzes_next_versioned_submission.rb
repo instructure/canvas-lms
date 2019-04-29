@@ -124,8 +124,9 @@ module BasicLTI
       @_attempts_hash ||= begin
         attempts = submission.versions.sort_by(&:created_at).each_with_object({}) do |v, a|
           h = YAML.safe_load(v.yaml).with_indifferent_access
-          url = h[:url]
+          url = v.model.url
           next if url.blank?
+          h[:url] = url
           (a[url] = (a[url] || [])) << h.slice(*JSON_FIELDS)
         end
 
