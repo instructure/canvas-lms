@@ -57,6 +57,11 @@ describe DeveloperKeysController do
           end
         end
 
+        it 'Should set LTI_1_3_ENABLED to true' do
+          get 'index', params: { account_id: Account.site_admin.id }
+          expect(assigns.dig(:js_env, :LTI_1_3_ENABLED)).to eq true
+        end
+
         it 'should return the list of developer keys' do
           dk = DeveloperKey.create!
           get 'index', params: { account_id: Account.site_admin.id }
@@ -294,6 +299,11 @@ describe DeveloperKeysController do
         site_admin_key
         root_account_key
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+      end
+
+      it 'Should set LTI_1_3_ENABLED to false' do
+        get 'index', params: {account_id: sub_account.id}
+        expect(assigns.dig(:js_env, :LTI_1_3_ENABLED)).to be_falsey
       end
 
       it 'responds with not found if the account is a sub account' do
