@@ -165,6 +165,12 @@ describe OriginalityReport do
       report_with_score.update_attributes(originality_score: 23.2)
       expect(report_with_score.workflow_state).to eq 'error'
     end
+
+    it "updates state to 'error' if an error message is present" do
+      report_with_score.save
+      report_with_score.update_attributes(error_message: 'An error occured.')
+      expect(report_with_score.workflow_state).to eq 'error'
+    end
   end
 
   describe '#asset_key' do
