@@ -16544,7 +16544,7 @@ nn:
       grading_alt: karaktersetjing
       submission_comment: "Kommentar til innlevering"
     terms_required: 
-      updated_terms_of_use: "Oppdaterte vilkår for bruk\""
+      updated_terms_of_use: "Oppdatert akseptable bruksvilkår"
     unauthorized: 
       headings: 
         needs_cookies: "Informasjonskapslar (cookies) er obligatorisk"
