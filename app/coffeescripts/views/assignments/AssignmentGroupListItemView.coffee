@@ -20,7 +20,6 @@ define [
   'jquery'
   'jsx/move_item'
   '../../class/cache'
-  '../../util/hasLocalStorage'
   '../DraggableCollectionView'
   './AssignmentListItemView'
   './CreateAssignmentView'
@@ -30,7 +29,7 @@ define [
   'jst/assignments/AssignmentGroupListItem'
   './AssignmentKeyBindingsMixin'
 ], (
-  I18n, $, MoveItem, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  I18n, $, MoveItem, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
   CreateGroupView, DeleteGroupView, preventDefault, template, AssignmentKeyBindingsMixin
 ) ->
 
@@ -145,7 +144,7 @@ define [
 
     initCache: ->
       $.extend true, @, Cache
-      @cache.use('localStorage') if hasLocalStorage
+      @cache.use('localStorage')
       key = @cacheKey()
       if !@cache.get(key)?
         @cache.set(key, true)
