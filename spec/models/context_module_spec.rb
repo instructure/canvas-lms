@@ -1370,6 +1370,31 @@ describe ContextModule do
       mod1.unpublish!; mod1.publish!
       expect(mod1.relock_warning?).to be_falsey
     end
+
+    it "should be true when publishing a module that has prerequisites" do
+      # this is necessary because the prerequisites may have changed while the module was unpublished
+      mod1 = @course.context_modules.new(:name => "some module")
+      mod1.workflow_state = "active"
+      mod1.save!
+
+      mod2 = @course.context_modules.new(:name => "some module2")
+      mod2.prerequisites = "module_#{mod1.id}"
+      mod2.workflow_state = "unpublished"
+      mod2.save!
+
+      mod2.publish!
+      expect(mod2.relock_warning?).to eq true
+    end
+
+    it "should be true when publishing a module that has an unlock_at date" do
+      mod1 = @course.context_modules.new(:name => "some module")
+      mod1.workflow_state = "unpublished"
+      mod1.unlock_at = 1.month.from_now
+      mod1.save!
+
+      mod1.publish!
+      expect(mod1.relock_warning?).to eq true
+    end
   end
 
   it "evaluates progressions after save" do

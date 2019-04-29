@@ -52,6 +52,8 @@ class ContextModule < ActiveRecord::Base
       if self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == "unpublished"
         # should trigger when publishing a prerequisite for an already active module
         @relock_warning = true if self.context.context_modules.active.any?{|mod| self.is_prerequisite_for?(mod)}
+        # if any of these changed while we were unpublished, then we also need to trigger
+        @relock_warning = true if self.prerequisites.any? || self.completion_requirements.any? || self.unlock_at.present?
       end
       if self.saved_change_to_completion_requirements?
         # removing a requirement shouldn't trigger
