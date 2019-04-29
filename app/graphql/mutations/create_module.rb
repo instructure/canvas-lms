@@ -29,6 +29,7 @@ class Mutations::CreateModule < Mutations::BaseMutation
     course = Course.find(course_id)
     verify_authorized_action!(course.context_modules.temp_record, :create)
     mod = course.context_modules.build(name: input[:name])
+    mod.require_presence_of_name = true
     if mod.save
       {module: mod}
     else

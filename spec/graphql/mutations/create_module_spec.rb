@@ -53,6 +53,11 @@ describe Mutations::CreateModule do
     expect(result.dig(*%w[data createModule errors])).to be_nil
   end
 
+  it "requires non-empty name" do
+    result = CanvasSchema.execute(mutation_str(name: ''), context: {current_user: @teacher})
+    expect(result.dig('data', 'createModule', 'errors')[0]['message']).to eq "can't be blank"
+  end
+
   it "fails gracefully for invalid course id" do
     invalid_course_id = 0
     result = CanvasSchema.execute(mutation_str(course_id: invalid_course_id), context: {current_user: @teacher})

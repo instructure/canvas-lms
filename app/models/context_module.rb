@@ -40,6 +40,8 @@ class ContextModule < ActiveRecord::Base
   after_save :invalidate_progressions
   after_save :relock_warning_check
   validates_presence_of :workflow_state, :context_id, :context_type
+  validates_presence_of :name, :if => :require_presence_of_name
+  attr_accessor :require_presence_of_name
 
   def relock_warning_check
     # if the course is already active and we're adding more stringent requirements

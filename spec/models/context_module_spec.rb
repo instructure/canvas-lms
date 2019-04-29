@@ -24,6 +24,21 @@ describe ContextModule do
     @module = @course.context_modules.create!(:name => "some module")
   end
 
+  describe "name validation" do
+    before :once do
+      course_factory
+    end
+
+    it "rejects an empty name if required" do
+      mod = @course.context_modules.build
+      expect(mod).to be_valid
+      mod.require_presence_of_name = true
+      expect(mod).not_to be_valid
+      mod.name = 'blah'
+      expect(mod).to be_valid
+    end
+  end
+
   describe "publish_items!" do
     before :once do
       course_module
