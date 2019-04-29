@@ -70,7 +70,7 @@ export default class OutcomeView extends OutcomeContentBase {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:_assertThisInitialized\()*(\w+)\)*;/)[1];
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
       eval(`${thisName} = this;`);
     }
     this.editRating = this.editRating.bind(this)

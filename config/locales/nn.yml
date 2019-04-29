@@ -1046,6 +1046,18 @@ nn:
         default: 
           recently_deleted_courses: 
             text: "Rapporten viser alle emna i eit bestemt semester som er sletta dei siste 30 dagane. Den endelege CSV-fila inneheld ei rad per emne og viser emne-ID-en, emne-SIS-ID-en, forkorting av emnenamnet, emnenamnet og  start- og sluttdato for emnet."
+    reports_tab: 
+      headers: 
+        report_last_run: "Siste køyring"
+        report_name: Namn
+      headings: 
+        sections: Rapportar
+      links: 
+        configure_report: Konfigurerer...
+        run_report: "Køyr rapport"
+      open_report_description: "Opne skildring av rapport"
+      report_last_run_never: Aldri
+      report_running: "Rapporten køyrer.*Du får ein e-post når køyringa er fullført.*"
     retry_login: "Logg på ein gong til"
     root_accounts: 
       labels: 
@@ -9334,6 +9346,9 @@ nn:
   include_unpublished_courses_7a0e7aab: "Inkluder upubliserte emne"
   incomplete_95612d72: "ikkje fullført"
   incomplete_da3c2ea2: "Ikkje fullført"
+  incompleteregistration: 
+    get_started: "Kom i gang"
+    welcome_to_canvas: "Velkomen til Canvas!"
   incorrect_answer_7c17e63b: "Feil svar"
   increase_indent_6af90f7c: "Auk innrykk"
   increase_indent_6d550a4a: "Auk innrykk"
@@ -9587,6 +9602,7 @@ nn:
     esc_key_notification: "Trykk escape-knappen før du brukar tastatursnarveger i karaktermatrisen"
   keyboard_shortcuts_ed1844bd: Hurtigtastar
   kind_7f0a88c4: Type
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Lås til"
   last_download_33ea9bf4: "Siste nedlasting:"
@@ -15050,6 +15066,7 @@ nn:
   quizzes/quiz: 
     submission_action_take_quiz: "Ta %{title}"
   quizzes_7e598f57: Quizar
+  quizzes_next_27c59ce3: Quizzes.Next
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next innleveringshistorikk"
   quizzes_tutorial_tray_6f87cdd3: "Quizar opplæringsmeny"
   radio_button_option_1_a8ec51f9: "Alternativknapp 1"

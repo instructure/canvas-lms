@@ -306,9 +306,7 @@ module AuthenticationMethods
   protected :redirect_back_or_default
 
   def redirect_to_referrer_or_default(default)
-    redirect_to(:back)
-  rescue ActionController::RedirectBackError
-    redirect_to(default)
+    redirect_back(fallback_location: default)
   end
 
   def redirect_to_login

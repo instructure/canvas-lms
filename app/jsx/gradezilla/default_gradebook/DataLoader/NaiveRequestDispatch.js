@@ -20,19 +20,25 @@ import $ from 'jquery'
 import 'jquery.ajaxJSON'
 import cheaterDepaginate from '../../../shared/CheatDepaginator'
 
-const ACTIVE_REQUEST_LIMIT = 8 // naive limit
+const ACTIVE_REQUEST_LIMIT = 12 // naive limit
 
 export default class NaiveRequestDispatch {
-  constructor() {
+  constructor(options = {}) {
+    this.options = {
+      activeRequestLimit: ACTIVE_REQUEST_LIMIT,
+      ...options
+    }
     this.requests = []
   }
 
   get activeRequestCount() {
-    return this.requests.reduce((sum, request) => sum + (request.started ? request.count : 0), 0)
+    // Return the count of active requests currently in the queue.
+    return this.requests.filter(request => request.active).length
   }
 
   get nextPendingRequest() {
-    return this.requests.find(request => !request.started)
+    // Return the first request in the queue which has not been started.
+    return this.requests.find(request => !request.active)
   }
 
   addRequest(request) {
@@ -47,7 +53,7 @@ export default class NaiveRequestDispatch {
 
   fillQueue() {
     let nextRequest = this.nextPendingRequest
-    while (nextRequest != null && this.activeRequestCount < ACTIVE_REQUEST_LIMIT) {
+    while (nextRequest != null && this.activeRequestCount < this.options.activeRequestLimit) {
       nextRequest.start()
       nextRequest = this.nextPendingRequest
     }
@@ -55,32 +61,40 @@ export default class NaiveRequestDispatch {
 
   getDepaginated(url, params, pageCallback = () => {}, pagesEnqueuedCallback = () => {}) {
     const request = {
-      count: 1, // initial request
       deferred: new $.Deferred(),
-      started: false
-    }
-
-    const perPage = (...args) => {
-      request.count--
-      return pageCallback(...args)
+      active: false
     }
 
     const allEnqueued = deferreds => {
-      request.count = request.count + deferreds.length - 1 // -1 for initial request
+      /*
+       * The initial request to get the first page and page link headers has
+       * completed, so the corresponding request object in this queue can be
+       * removed. Any additional page requests will have been added to the queue
+       * and will be responsible for removing themselves upon completion.
+       */
+      this.clearRequest(request)
       return pagesEnqueuedCallback(deferreds)
     }
 
     /* eslint-disable promise/catch-or-return */
     request.start = () => {
-      request.started = true
-      cheaterDepaginate(url, params, perPage, allEnqueued, this)
-        .then((...args) => {
+      /*
+       * Update the request as "active" so that it is counted as an active
+       * request in the queue and is not restarted when filling the queue.
+       */
+      request.active = true
+
+      cheaterDepaginate(url, params, pageCallback, allEnqueued, this)
+        .then(request.deferred.resolve)
+        .fail(request.deferred.reject)
+        .always(() => {
+          /*
+           * If there is ever a problem with the initial request, there is
+           * likely a larger problem with Canvas/Gradebook or the user
+           * attempting to load the page. It will not call the "pages enqueued
+           * callback," and will need to be cleared here.
+           */
           this.clearRequest(request)
-          request.deferred.resolve(...args)
-        })
-        .fail((...args) => {
-          this.clearRequest(request)
-          request.deferred.reject(...args)
         })
     }
     /* eslint-enable promise/catch-or-return */
@@ -92,22 +106,23 @@ export default class NaiveRequestDispatch {
 
   getJSON(url, params, resolve, reject) {
     const request = {
-      count: 1,
       deferred: new $.Deferred(),
-      started: false
+      active: false
     }
 
     /* eslint-disable promise/catch-or-return */
     request.start = () => {
-      request.started = true
+      /*
+       * Update the request as "active" so that it is counted as an active
+       * request in the queue and is not restarted when filling the queue.
+       */
+      request.active = true
+
       $.ajaxJSON(url, 'GET', params, resolve, reject)
-        .then((...args) => {
+        .then(request.deferred.resolve)
+        .fail(request.deferred.reject)
+        .always(() => {
           this.clearRequest(request)
-          request.deferred.resolve(...args)
-        })
-        .fail((...args) => {
-          this.clearRequest(request)
-          request.deferred.reject(...args)
         })
     }
     /* eslint-enable promise/catch-or-return */
