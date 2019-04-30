@@ -24,21 +24,25 @@ import axios from 'axios'
 // fetching. But since they are just raw `fetch` responses, we need to massage them
 // into something that looks like an axios response, since that is what everything
 // here is designed to deal with
-const fetchRequestsTransformedToLookLikeAxiosRequests = window.preloadedDiscussionTopicFetchRequests.map(
-  fetchRequest => {
-    return fetchRequest.then(res => {
-      return res.json().then(json => {
-        return {
-          data: json,
-          headers: {link: res.headers.get('Link')}
-        }
+let axiosResponses
+function getFetchRequests() {
+  return (
+    axiosResponses ||
+    (axiosResponses = (window.preloadedDiscussionTopicFetchRequests || []).map(fetchRequest => {
+      return fetchRequest.then(res => {
+        return res.json().then(json => {
+          return {
+            data: json,
+            headers: {link: res.headers.get('Link')}
+          }
+        })
       })
-    })
-  }
-)
+    }))
+  )
+}
 
 export function getDiscussions({contextType, contextId}, {page}) {
-  return fetchRequestsTransformedToLookLikeAxiosRequests[page - 1]
+  return getFetchRequests()[page - 1]
 }
 
 export function updateDiscussion({contextType, contextId}, discussion, updatedFields) {
