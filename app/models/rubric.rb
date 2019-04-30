@@ -160,14 +160,6 @@ class Rubric < ActiveRecord::Base
     OpenObject.process(self.data)
   end
 
-  def display_name
-    res = ""
-    res += self.user.name + ", " rescue ""
-    res += self.context.name rescue ""
-    res = t('unknown_details', "Unknown Details") if res.empty?
-    res
-  end
-
   def criteria
     self.data
   end
