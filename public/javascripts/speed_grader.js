@@ -2245,7 +2245,7 @@ EG = {
         })
       })
     }
-    $multiple_submissions.html($.raw(innerHTML))
+    $multiple_submissions.html($.raw(innerHTML || ''))
     StatusPill.renderPills()
   },
 

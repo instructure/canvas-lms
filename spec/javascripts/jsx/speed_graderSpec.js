@@ -274,6 +274,15 @@ test('omits submission time for submissions when anonymizing and not an admin', 
   notOk(submissionDropdown.innerHTML.includes('Jan 1, 2010'))
 })
 
+test('sets submission history container content to empty when submission history is blank', () => {
+  SpeedGrader.setup()
+  SpeedGrader.EG.refreshSubmissionsToView()
+  SpeedGrader.EG.currentStudent.submission.submission_history = []
+  SpeedGrader.EG.refreshSubmissionsToView()
+  const submissionDropdown = document.getElementById('multiple_submissions')
+  strictEqual(submissionDropdown.innerHTML, '')
+})
+
 QUnit.module('#showSubmissionDetails', function(hooks) {
   let originalWindowJSONData
   let originalStudent
