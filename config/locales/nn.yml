@@ -1965,6 +1965,7 @@ nn:
       Gir ein brukar løyve til å søke etter brukarar innafor eit emne ved hjelp av primær e-postadresse.
   allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: "Gir ein brukar løyve til å søke etter andre brukarar innafor eit emne ved hjelp av login-ID."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Gir ein brukar løyve til å sjå lenke til SpeedGrader frå ei oppgåve."
+  allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "Gir brukarar løyve til å sjå og endre SIS-ID og integrasjons-ID i innloggingsdetaljane til ein brukar. "
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
       Gir løyve til å sjå emnestatus, velje emneforside og sjekklisteknappene
       for emneoppsett på emneforsida.
@@ -1973,6 +1974,7 @@ nn:
   allows_user_to_view_student_results_and_or_access__60fac9: "Gir ein brukar løyve til å sjå studentvurderingar og/eller tilgang til quiz i SpeedGrader."
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Gir ein brukar løyve til å sjå oppgåvelenker i emnenavigasjon. Gir ein brukar løyve til å sjå emnekunngjeringar."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
+  alumno_88c80e37: Alumn
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
@@ -1985,6 +1987,7 @@ nn:
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Det oppstod eit problem under importeringa av setta med karaktersetjingsperiodar"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Det oppstod eit problem under oppdateringa av setta med karaktersetjingsperiodar"
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "Det oppstod ein feil ved endring av låsestatus for\"%{fileName}\""
+  an_error_occurred_loading_outcomes_data_cfd18b61: "Det oppstod ein feil under innlasting av læringsmåldata."
   an_error_occurred_making_a_network_request_d1bda348: "Det oppstod ein feil ved nettverksførespurnaden "
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod ein feil*, legg inn svaret ditt på nytt seinare"
   an_error_occurred_please_try_again_95361e05: "Det oppstod ein feil. Prøv på nytt seinare."
@@ -1994,6 +1997,7 @@ nn:
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Det oppstod ein feil under bruk av temaet. Prøv på nytt seinare."
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Det oppstod ein feil under generering av temaet. Prøv på nytt seinare."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod ein feil under førebuing av nedlasting. Prøv på nytt seinare."
+  an_error_occurred_updating_this_assignment_21287c7e: "Det oppstod ein feil under oppdateringa av denne oppgåva."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Det oppstod ein feil under innstilling av bruksretten for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ein feil oppstod ved forsøk på å kontakte Turnitin"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Det oppstod ein feil ved sjekk av overføringsstatus"
@@ -5219,6 +5223,7 @@ nn:
   course_collaborations_dadb327e: Emnesamarbeid
   course_conferences_3d914c96: Emnekonferansar
   course_content_a92eca20: Emneinnhald
+  course_content_add_edit_delete_ea877eca: "Emneinnhald - legg til / rediger / slett"
   course_copy_argument_error: "Ein emnekopi skal ha eit kjeldeemne."
   course_copy_description: "Programtillegg for overføring ved kopiering av Canvas-emne"
   course_copy_display: Emnekopi
@@ -5931,6 +5936,7 @@ nn:
     unauthorized: 
       invalid_link: "Påmeldingslenka du brukte er ikkje lenger gyldig. Kontakt faglærar for emnet og kontroller at du framleis er registrert."
   courses_43204aae: Emne
+  courses_account_72e4fca7: "Emne (konto)"
   courses_navigation_menu_b3638384: "Meny for emnenavigasjon"
   create_132b3be1: Opprett
   create_a_new_account_4cf7c0f9: "Opprett ny konto"
@@ -6333,6 +6339,7 @@ nn:
   delete_rating_24876355: "Slett vurdering"
   delete_requirement_bce2d943: "Slett vilkår"
   delete_rubric_9b66412d: "Slett vurderingsskjema"
+  delete_rubric_title_ac3a24e6: "Slett vurderingsskjema: %{title}"
   delete_section_name_a48d9d79: "Slett seksjon \"%{name}\""
   delete_selected_a023ccf8: "Slett Valt"
   delete_survey_56fddbbd: "Slett Undersøking"
@@ -7630,6 +7637,7 @@ nn:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Kan ikkje laste Sync History-komponenten. Er internettkoplinga OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Kan ikkje laste Unsynced Changes-komponenten. Er internettkoplinga OK?"
   failed_to_create_webhook_b766cf5c: "Kan ikkje opprette webkrok."
+  failed_to_delete_discussion_title_986df717: "Kan ikkje slette diskusjon %{title}"
   failed_to_delete_external_feed_36f19d70: "Kunne ikkje slette ekstern straum"
   failed_to_export_some_tool_settings_c992fc56: "Kan ikke eksportere enkelte verktøyinnstillingar"
   failed_to_import_media_objects_4c1fcb4f: "Kan ikkje importere medieobjekt"
@@ -9859,6 +9867,7 @@ nn:
     other: "Ferdig med å laste emne: %{count} emne funne"
   loading_courses_started_6e6d742c: "Lasting av emne er starta"
   loading_data_ecd89ba: "Lastar data.."
+  loading_discussions_8ed5fcd7: "Lastar diskusjonar"
   loading_graders_f6a76142: "Lastar karaktersetjarar"
   loading_mastery_paths_c558a766: "Lastar meistringsstiar..."
   loading_more_gradebook_history_results_810f6d2e: "Lastar fleire resultat frå karakterbokhistorikken"
@@ -12944,6 +12953,7 @@ nn:
     manage_webhooks: "Webhooks - administrer"
     provision_catalog: "Klargjer ein katalog"
   permissions_365c49e: Løyve
+  permissions_manage_9eea4f8f: "Løyve - administrer"
   peru_51_d3d38d1f: "Peru (+51)"
   peru_7dcfdc91: Peru
   philippines_37a6289e: Filippinene
@@ -12953,6 +12963,7 @@ nn:
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "vel eit endepunkt, vi postar feilrapportane der"
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Vel dato og tidspunkt for følgande konferansesetting:"
   pin_cdbc9f8f: Fest
+  pin_of_discussion_title_failed_6c2c32a5: "Feste diskusjon %{title} mislukkast"
   pink_68ad45cb: Rosa
   pinned_discussions_a55c0cea: "Festa diskusjonar"
   place_b128fa94: Plassering
@@ -13432,6 +13443,7 @@ nn:
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Moglege poeng må vere 0 eller meir for valde typar karaktersetjing"
   points_possible_points_fda3b111: "%{points_possible} poeng"
   points_pts_e5596bf7: "%{points} poeng"
+  points_should_be_strictly_decreasing_l_r_18f26f87: "Poengskalaen må vere synkande: %{l} <= %{r}"
   points_total_pts_5b4cbd77: "%{points} / %{total} poeng"
   pointspossible_points_possible_964c8592: "%{pointsPossible} moglege poeng"
   pointspossible_pts_624a6733: "%{pointsPossible} poeng"
@@ -14024,6 +14036,7 @@ nn:
       select_bank: "Vel rett spørsmålsbank for dette spørsmålet:"
       show_details: "Vis spørsmålsdetaljar"
   question_banks_45bdf347: Spørsmålsbankar
+  question_banks_view_and_link_e6d9cde2: "Spørsmålsbankar - sjå og lenk til"
   question_f06476d1: spørsmål
   question_group_837b8014: Spørsmålsgruppe
   question_mark_icon_d2bbd204: Spørsmålsteiknikon
@@ -17575,6 +17588,7 @@ nn:
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Dette er ei førehandsvising av utkastet til quizen"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Dette er ei førehandsvising av den publiserte versjonen av quizen"
   this_is_a_what_if_score_cbdc04f9: "Dette er kva-skjer-dersom-resultat"
+  this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Dette er ein kontoinnstilling som institusjonen sin Canvas-kontakt må aktivere."
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Denne karakteren er valt for denne studenten akkurat no."
   this_is_the_default_email_address_f3c421fb: "Dette er standard e-postadresse"
   this_is_your_course_landing_page_33d445ec: "Dette er heimesida til emnet ditt"
@@ -17943,6 +17957,7 @@ nn:
   total_messages_af025be6: "Meldingar totalt"
   total_options_351e2682: "Alle alternativ"
   total_points_44d76792: Totalpoeng
+  total_points_total_f41b2cff: "Totalresultat: %{total}"
   total_range_45c8549a: "Totalt spenn"
   total_results_outcomedetails_cnt_30ff1f8d: "Totalresultat: %{outcomeDetails.cnt}"
   track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og seksjon"
@@ -18066,6 +18081,7 @@ nn:
   unpublished_click_to_publish_module_name_89f8601c: "Ikkje publisert. Klikk for å publisere %{module_name}."
   unpublished_click_to_publish_name_10104b5c: "Upublisert. Klikk for å publisere %{name}"
   unpublished_click_to_publish_title_7c57293f: "Ikkje publisert. Klikk for å publisere %{title}. "
+  unpublished_content_referenced_in_this_resource_865f8ef6: "Upublisert innhald er referert til i denne ressursen:"
   unpublished_courses_title: "Upubliserte emne"
   unpublished_dfd8801: upublisert
   unread_e9c1b19c: "Ikkje lest"
