@@ -21,7 +21,7 @@ define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
   var K = require('../constants');
-  var I18n = require('i18n!quiz_log_auditing.table_view');
+  var I18n = require('i18n!quiz_log_auditing.table_view').default;
   var Legend = require('jsx!./answer_matrix/legend');
   var Emblem = require('jsx!./answer_matrix/emblem');
   var Option = require('jsx!./answer_matrix/option');

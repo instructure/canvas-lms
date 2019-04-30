@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
-  var I18n = require('i18n!quiz_log_auditing.inverted_table_view');
+  var I18n = require('i18n!quiz_log_auditing.inverted_table_view').default;
   var Cell = require('jsx!./cell');
 
   /**

@@ -27,9 +27,7 @@ import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-const Comments = lazy(() =>
-  import('./Comments').then(result => (result.default ? result : {default: result}))
-)
+const Comments = lazy(() => import('./Comments'))
 
 ContentTabs.propTypes = {
   assignment: StudentAssignmentShape

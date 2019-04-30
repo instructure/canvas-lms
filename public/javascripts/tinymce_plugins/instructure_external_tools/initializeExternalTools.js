@@ -40,7 +40,7 @@ const ExternalToolsPlugin = {
       // if somehow open gets called early, keep trying until it is ready
       open: (...args) => setTimeout(() => dialog.open(...args), 50)
     }
-    import('jsx/editor/ExternalToolDialog').then(ExternalToolDialog => {
+    import('jsx/editor/ExternalToolDialog').then(({default: ExternalToolDialog}) => {
       const dialogContainer = document.createElement('div')
       document.body.appendChild(dialogContainer)
       ReactDOM.render(

@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var Actions = require('../actions');
-  var I18n = require('i18n!quizzes');
+  var I18n = require('i18n!quizzes').default;
   var NotificationRenderers = [];
 
   var Notifications = React.createClass({

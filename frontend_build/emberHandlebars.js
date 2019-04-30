@@ -54,15 +54,18 @@ function resourceName(path) {
 }
 
 function emitTemplate(path, name, result, dependencies) {
-  return `define(${JSON.stringify(dependencies)}, function(Ember){
+  return `
+    import Ember from 'ember';
+    ${dependencies.map(d => `import ${JSON.stringify(d)};`).join('\n')}
+
     Ember.TEMPLATES['${name}'] = Ember.Handlebars.template(${result.template});
-  });`
+  `
 }
 
 module.exports = function(source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
-  const dependencies = ['ember', 'coffeescripts/ember/shared/helpers/common']
+  const dependencies = ['coffeescripts/ember/shared/helpers/common']
 
   const result = compileHandlebars({path: this.resourcePath, source, ember: true})
 

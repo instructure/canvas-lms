@@ -23,7 +23,7 @@ define(function(require) {
   var _ = require('lodash');
   var wrap = require('canvas_quizzes/util/array_wrap');
   var round = require('canvas_quizzes/util/round');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
 
   var findWhere = _.findWhere;
   var parseQuestion;

@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var _ = require('lodash');
-  var I18n = require('i18n!quiz_statistics.answers_tables');
+  var I18n = require('i18n!quiz_statistics.answers_tables').default;
   var UserListDialog = require('jsx!./../user_list_dialog');
 
   var AnswerRow = React.createClass({

@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('../../ext/react');
   var Essay = require('jsx!./essay');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
 
   var FileUpload = React.createClass({
     render: Essay.type.prototype.render,

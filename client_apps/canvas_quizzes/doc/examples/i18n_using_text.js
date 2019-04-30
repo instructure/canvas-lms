@@ -21,7 +21,7 @@ define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var K = require('../../../constants');
   var Text = require('jsx!../../../components/text');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
 
   var Help = React.createClass({
     render: function() {

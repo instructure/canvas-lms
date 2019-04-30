@@ -26,9 +26,7 @@ import MissingPrereqs from './MissingPrereqs'
 import LockedAssignment from './LockedAssignment'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
-const LoggedOutTabs = lazy(() =>
-  import('./LoggedOutTabs').then(result => (result.default ? result : {default: result}))
-)
+const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
 function renderContentBaseOnAvailability(assignment) {
   if (assignment.env.modulePrereq) {

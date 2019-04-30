@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var _ = require('lodash');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
   var Notifications = require('jsx!./notifications');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');

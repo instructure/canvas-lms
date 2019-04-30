@@ -74,7 +74,7 @@ $.extend(mejs.MediaElementDefaults, {
 })
 
 mejs.MepDefaults.success = function (mediaElement, domObject) {
-  import('../util/kalturaAnalytics').then(kalturaAnalytics => {
+  import('../util/kalturaAnalytics').then(({default: kalturaAnalytics}) => {
     kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
   })
   return mediaElement.play()

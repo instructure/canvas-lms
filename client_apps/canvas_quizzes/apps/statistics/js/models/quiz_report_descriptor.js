@@ -17,7 +17,7 @@
  */
 
 define(function(require) {
-  var I18n = require('i18n!quiz_reports');
+  var I18n = require('i18n!quiz_reports').default;
   var DateTimeHelpers = require('canvas_quizzes/util/date_time_helpers');
 
   var STUDENT_ANALYSIS = 'student_analysis';

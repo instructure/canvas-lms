@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
-  var I18n = require('i18n!quiz_log_auditing');
+  var I18n = require('i18n!quiz_log_auditing').default;
   var Button = require('jsx!../components/button');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var Actions = require('../actions');

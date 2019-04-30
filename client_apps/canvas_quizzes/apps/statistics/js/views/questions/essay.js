@@ -22,7 +22,7 @@ define(function(require) {
   var Question = require('jsx!../question');
   // var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut');
   var QuestionHeader = require('jsx!./header');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
   var AnswerTable = require('jsx!./answer_table');
 
   var Essay = React.createClass({

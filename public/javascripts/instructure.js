@@ -780,14 +780,13 @@ function handleYoutubeLink () {
       var sf = $('#sequence_footer')
       if (sf.length) {
         var el = $(sf[0]);
-        require.ensure([], function (require) {
-          require('compiled/jquery/ModuleSequenceFooter')
+        import('compiled/jquery/ModuleSequenceFooter').then(() => {
           el.moduleSequenceFooter({
             courseID: el.attr("data-course-id"),
             assetType: el.attr("data-asset-type"),
             assetID: el.attr("data-asset-id")
           });
-        }, 'ModuleSequenceFooterAsyncChunk');
+        });
       }
     }
 
