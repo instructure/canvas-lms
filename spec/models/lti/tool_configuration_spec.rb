@@ -409,6 +409,15 @@ module Lti
         expect(tool_configuration.settings['custom_fields']).to eq settings['custom_fields']
       end
 
+      context 'when the account is site admin' do
+        let_once(:account) { Account.site_admin }
+
+        it 'does not set the account on the key' do
+          config = described_class.create_tool_and_key! account, params
+          expect(config.developer_key.account).to be_nil
+        end
+      end
+
       context 'when tool_config creation fails' do
         let(:settings) { { tool: 'foo' } }
 

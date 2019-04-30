@@ -54,7 +54,7 @@ module Lti
 
     def self.create_tool_and_key!(account, tool_configuration_params)
       self.transaction do
-        dk = DeveloperKey.create!(account: account)
+        dk = DeveloperKey.create!(account: (account.site_admin? ? nil : account))
         settings = tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
 
         if settings.present?
