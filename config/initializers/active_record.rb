@@ -1703,3 +1703,7 @@ if CANVAS_RAILS5_1
 
   ActiveRecord::Relation.prepend(EnforceRawSqlWhitelist)
 end
+
+ActiveRecord::Base.prepend(Canvas::CacheRegister::ActiveRecord::Base)
+ActiveRecord::Base.singleton_class.prepend(Canvas::CacheRegister::ActiveRecord::Base::ClassMethods)
+ActiveRecord::Relation.prepend(Canvas::CacheRegister::ActiveRecord::Relation)

@@ -40,6 +40,8 @@ module ActiveSupport::Cache
   end
   Store.prepend(RailsCacheShim)
 
+  Store.prepend(Canvas::CacheRegister::ActiveSupport::Cache::Store)
+
   unless CANVAS_RAILS5_1
     module AllowMocksInStore
       def compress!(*args)
