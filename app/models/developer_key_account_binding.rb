@@ -31,12 +31,15 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   before_validation :infer_workflow_state
   after_update :clear_cache_if_site_admin
 
+  scope :active_in_account, -> (account) do
+    where(account_id: account.account_chain_ids).
+      where(workflow_state: ON_STATE)
+  end
+
   # run this once on the local shard and again on site_admin to get all avaiable dev_keys with
   # tool configurations
-  scope :lti_1_3_tools, -> (account) do
-    where(account_id: account.account_chain_ids).
-      where(workflow_state: ON_STATE).
-      joins(developer_key: :tool_configuration).
+  scope :lti_1_3_tools, -> (bindings) do
+    bindings.joins(developer_key: :tool_configuration).
       where(developer_keys: { visible: true, workflow_state: 'active' }).
       eager_load(developer_key: :tool_configuration)
   end

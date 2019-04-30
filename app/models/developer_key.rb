@@ -54,6 +54,19 @@ class DeveloperKey < ActiveRecord::Base
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
+  scope :site_admin_lti, -> (key_ids) do
+    # Select site admin shard developer key ids
+    site_admin_key_ids = key_ids.select do |id|
+      Shard.local_id_for(id).second == Account.site_admin.shard
+    end
+
+    Account.site_admin.shard.activate do
+      lti_key_ids = Lti::ToolConfiguration.joins(:developer_key).
+        where(developer_keys: { id: site_admin_key_ids }).
+        pluck(:developer_key_id)
+      DeveloperKey.where(id: lti_key_ids)
+    end
+  end
 
   workflow do
     state :active do

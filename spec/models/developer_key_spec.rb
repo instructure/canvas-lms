@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe DeveloperKey do
   let(:account) { Account.create! }
@@ -39,6 +40,52 @@ describe DeveloperKey do
       redirect_uri: 'http://test.com',
     )
   end
+
+  describe "site_admin_lti scope" do
+    specs_require_sharding
+    include_context 'lti_1_3_spec_helper'
+
+    context "when root account and site admin keys exist" do
+      subject do
+        DeveloperKey.site_admin_lti(
+          [
+            root_account_key,
+            site_admin_key,
+            lti_site_admin_key
+          ].map(&:global_id)
+        )
+      end
+
+      let(:root_account_key) do
+        @shard1.activate do
+          a = account_model
+          DeveloperKey.create!(
+            account: a,
+            tool_configuration: tool_configuration.dup
+          )
+        end
+      end
+
+      let(:site_admin_key) do
+        Account.site_admin.shard.activate do
+          DeveloperKey.create!
+        end
+      end
+
+      let(:lti_site_admin_key) do
+        Account.site_admin.shard.activate do
+          k = DeveloperKey.create!
+          Lti::ToolConfiguration.create!(
+            developer_key: k,
+            settings: settings.merge(public_jwk: tool_config_public_jwk)
+          )
+          k
+        end
+      end
+
+      it { is_expected.to match_array [lti_site_admin_key] }
+    end
+  end 
 
   describe "sets a default value" do
     it "when visible is not specified" do
