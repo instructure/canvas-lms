@@ -188,6 +188,9 @@
     "message": "Group Navigation",
     "description": "Title of Sidebar accordion tab containing links to group pages."
   },
+  "header_f28f73db": {
+    "message": "Header"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "I have obtained permission to use this file."
   },
@@ -199,6 +202,9 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
+  },
+  "image_url_2aee2734": {
+    "message": "Image URL"
   },
   "images_7ce26570": {
     "message": "Images",
@@ -270,8 +276,14 @@
     "message": "Pages",
     "description": "Title of Sidebar accordion tab containing links to wiki pages."
   },
+  "paragraph_5e5ad8eb": {
+    "message": "Paragraph"
+  },
   "people_b4ebb13c": {
     "message": "People"
+  },
+  "preformatted_d0670862": {
+    "message": "Preformatted"
   },
   "quizzes_7e598f57": {
     "message": "Quizzes",
@@ -293,6 +305,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "small_header_168fb9f9": {
+    "message": "Small header"
+  },
   "something_went_wrong_89195131": {
     "message": "Something went wrong."
   },
@@ -301,6 +316,9 @@
   },
   "square_unordered_list_b15ce93b": {
     "message": "square unordered list"
+  },
+  "subheader_2b87606d": {
+    "message": "Subheader"
   },
   "submit_a3cc6859": {
     "message": "Submit"
