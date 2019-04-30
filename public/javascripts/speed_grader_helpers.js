@@ -204,6 +204,15 @@ const speedGraderHelpers = {
     }
   },
 
+  plagiarismErrorMessage(turnitinAsset) {
+    return (
+      turnitinAsset.error_message ||
+      I18n.t(
+        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+      )
+    )
+  },
+
   reloadPage() {
     window.location.reload()
   },
