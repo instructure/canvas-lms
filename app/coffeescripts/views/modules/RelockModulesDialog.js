@@ -40,7 +40,7 @@ export default class RelockModulesDialog extends DialogBaseView {
         {
           text: I18n.t('continue', 'Continue'),
           class: 'btn-primary',
-          click: () => this.cancel()
+          click: (e) => this.cancel(e)
         }
       ]
     }
