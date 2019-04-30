@@ -62,13 +62,13 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
   test('"Everyone" type includes description"', () => {
     mountComponent()
     const labelText = 'Everyone\nGrades will be made visible to all students'
-    strictEqual(getLabel('Everyone').innerText, labelText)
+    strictEqual(getLabel('Everyone').innerText.trim(), labelText)
   })
 
   test('"Graded" type includes description"', () => {
     mountComponent()
     const labelText = 'Graded\nGrades will be made visible to students with graded submissions'
-    strictEqual(getLabel('Graded').innerText, labelText)
+    strictEqual(getLabel('Graded').innerText.trim(), labelText)
   })
 
   test('the defaultValue is selected', () => {
