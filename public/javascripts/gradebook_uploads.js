@@ -175,8 +175,11 @@ const GradebookUploader = {
         id: this.id
       }
       $.each(this.submissions, function() {
-        const originalGrade = Number.parseInt(this.original_grade, 10)
-        const updatedGrade = Number.parseInt(this.grade, 10)
+        // Even if canvas is operating in a locale that does commas as
+        // the decimal separator, the text that represents the score
+        // is sent period separated.
+        const originalGrade = Number.parseFloat(this.original_grade)
+        const updatedGrade = Number.parseFloat(this.grade)
         const updateWillRemoveGrade = !Number.isNaN(originalGrade) && Number.isNaN(updatedGrade)
 
         if (
