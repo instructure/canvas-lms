@@ -16,6 +16,13 @@ namespace :strongmind_defaults do
     puts "Api throttle HWM set to: #{maximum}"
   end
 
+  desc "set default gradebook many_submissions_chunk_size"
+  task :set_gradebook_submissions_chunk_size => :environment do
+    Setting.set('gradebook2.many_submissions_chunk_size', '5')
+    chunk_size = Setting.get('gradebook2.many_submissions_chunk_size', 0)
+    puts "Gradebook submissions_chunk_size set to: #{chunk_size}"
+  end
+
   desc "create dynamo db tables"
   task :create_dynamo_db_tables => :environment do
     ['assignment', 'user', 'enrollment', 'student_assignment'].each do |obj|
