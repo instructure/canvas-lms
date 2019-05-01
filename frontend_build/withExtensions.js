@@ -36,12 +36,10 @@ module.exports.pitch = function(remainingRequest, precedingRequest, data) {
 
   const fileName = extractFileName(remainingRequest)
   const plugins = this.query.replace('?', '').split(',')
-  const originalRequire = `unextended!coffeescripts/${fileName}`
-  const pluginPaths = [originalRequire]
+  const pluginImports = []
   const pluginArgs = []
   plugins.forEach((plugin, i) => {
-    const pluginExtension = `${plugin}/app/coffeescripts/extensions/${fileName}`
-    pluginPaths.push(pluginExtension)
+    pluginImports.push(`import p${i} from "${plugin}/app/coffeescripts/extensions/${fileName}";`)
     pluginArgs.push(`p${i}`)
   })
 
@@ -55,8 +53,9 @@ module.exports.pitch = function(remainingRequest, precedingRequest, data) {
   }
 
   return `
-    define(${JSON.stringify(pluginPaths)},function(orig, ${pluginArgs.join(',')}){
-      return ${pluginChain}
-    });
+    import orig from "unextended!coffeescripts/${fileName}";
+    ${pluginImports.join('\n')}
+
+    export default ${pluginChain};
   `
 }
