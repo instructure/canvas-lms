@@ -64,6 +64,8 @@ function submissionCommentQueryParams() {
       mediaSources {
         src: url
         type: contentType
+        height
+        width
       }
     }
     author {
