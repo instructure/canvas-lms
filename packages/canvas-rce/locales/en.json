@@ -293,6 +293,9 @@
     "message": "Record/Upload Media",
     "description": "Title for RCE button to insert or record media"
   },
+  "remove_link_71c05bee": {
+    "message": "Remove link"
+  },
   "search_280d00bd": {
     "message": "Search"
   },

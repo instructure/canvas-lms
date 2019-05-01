@@ -116,6 +116,9 @@
   "group_navigation_99f191a": {
     "message": "پیمایش گروه"
   },
+  "header_f28f73db": {
+    "message": "عنوان"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "مجوز استفاده از این فایل را به دست آورده ام."
   },
@@ -124,6 +127,9 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
+  },
+  "image_url_2aee2734": {
+    "message": "نشانی اینترنتی تصویر"
   },
   "images_7ce26570": {
     "message": "تصاویر"

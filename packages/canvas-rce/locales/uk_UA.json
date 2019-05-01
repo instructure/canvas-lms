@@ -128,6 +128,9 @@
   "group_navigation_99f191a": {
     "message": "Навігація групи"
   },
+  "header_f28f73db": {
+    "message": "Заголовок"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Я отримав дозвіл на використання цього файлу."
   },
@@ -139,6 +142,9 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Форма завантаження зображення"
+  },
+  "image_url_2aee2734": {
+    "message": "Адреса зображення"
   },
   "images_7ce26570": {
     "message": "Зображення"

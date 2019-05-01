@@ -116,6 +116,9 @@
   "group_navigation_99f191a": {
     "message": "Πλοήγηση στην Ομάδα"
   },
+  "header_f28f73db": {
+    "message": "Επικεφαλίδα"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Πήρα άδεια για να χρησιμοποιήσω αυτό το αρχείο."
   },
@@ -124,6 +127,9 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Φόρμα Μεταφόρτωσης Εικόνας"
+  },
+  "image_url_2aee2734": {
+    "message": "URL Εικόνας"
   },
   "images_7ce26570": {
     "message": "Εικόνες"
