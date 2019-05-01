@@ -111,7 +111,7 @@ module SpeedGrader
           json[:anonymous_id] = anonymous_ids[student.id.to_s]
         end
         json[:needs_provisional_grade] = @assignment.can_be_moderated_grader?(@current_user) if provisional_grader_or_moderator?
-        json[:rubric_assessments] = rubric_assessements_to_json(current_user_rubric_assessments.select {|assessment| assessment.user_id == student.id})
+        json[:rubric_assessments] = rubric_assessments_to_json(current_user_rubric_assessments.select {|assessment| assessment.user_id == student.id})
         json
       end
 
@@ -277,7 +277,7 @@ module SpeedGrader
             pgs.each do |pg|
               current_pg_json = provisional_grade_to_json(pg).tap do |pg_json|
                 assessments = all_provisional_rubric_assessments.select {|assessment| assessment.artifact_id == pg.id}
-                pg_json[:rubric_assessments] = rubric_assessements_to_json(assessments)
+                pg_json[:rubric_assessments] = rubric_assessments_to_json(assessments)
 
                 pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
                 # this should really be provisional_doc_view_urls :: https://instructure.atlassian.net/browse/CNVS-38202
@@ -330,7 +330,7 @@ module SpeedGrader
 
     private
 
-    def rubric_assessements_to_json(rubric_assessments)
+    def rubric_assessments_to_json(rubric_assessments)
       rubric_assessments.map do |assessment|
         json = assessment.as_json(methods: [:assessor_name], include_root: false)
         assessor_id = json[:assessor_id]
