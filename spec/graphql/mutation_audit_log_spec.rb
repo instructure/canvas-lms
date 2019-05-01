@@ -39,24 +39,12 @@ describe  AuditLogFieldExtension do
   end
 
   it "logs" do
-    expect(AuditLogFieldExtension::Logger).to receive(:log).once
+    expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).once
     CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
   end
 
-  it "logs to dynamo" do
-    CanvasSchema.execute(MUTATION, context: {current_user: @teacher, domain_root_account: Account.default})
-    db = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
-    expect(
-      db.query(
-        table_name: "graphql_mutations",
-        key_condition_expression: "object_id = :id",
-        expression_attribute_values: {":id" => @assignment.global_asset_string}
-      ).items.size
-    ).to eq 1
-  end
-
   it "creates a log for every item" do
-    expect(AuditLogFieldExtension::Logger).to receive(:log).twice
+    expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).twice
     @course.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
 
@@ -70,7 +58,7 @@ describe  AuditLogFieldExtension do
   end
 
   it "doesn't log failed mutations" do
-    expect(AuditLogFieldExtension::Logger).not_to receive(:log)
+    expect_any_instance_of(AuditLogFieldExtension::Logger).not_to receive(:log)
     CanvasSchema.execute(MUTATION, context: {current_user: @student})
   end
 
@@ -84,5 +72,35 @@ describe  AuditLogFieldExtension do
     response = CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
     expect(response.dig("data", "updateAssignment", "assignment", "name")).to eq "asdf"
     expect(response["error"]).to be_nil
+  end
+end
+
+describe AuditLogFieldExtension::Logger do
+  let(:mutation) { double(graphql_name: "asdf") }
+  let(:entry) { double(global_asset_string: "asdf_1234") }
+
+  it "sanitizes arguments" do
+    logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {password: "TOP SECRET"}})
+    expect(logger.instance_variable_get(:@params)).to eq ({password: "[FILTERED]"})
+  end
+
+  context "#log_entry_id" do
+    it "uses #global_asset_string for the object_id" do
+      logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})
+      expect(logger.log_entry_id(entry, "some_field")).to eq "asdf_1234"
+    end
+
+    it "allows overriding the logged object" do
+      expect(mutation).to receive(:whatever_log_entry) { double(global_asset_string: "overridden_5678") }
+      logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})
+      expect(logger.log_entry_id(entry, "whatever")).to eq "overridden_5678"
+    end
+  end
+
+  it "generates a unique mutation_id for each entry" do
+    logger = AuditLogFieldExtension::Logger.new(mutation, {request_id: "REQUEST_ID"}, {input: {}})
+    timestamp = logger.instance_variable_get(:@timestamp)
+    expect(logger.mutation_id).to eq "#{timestamp}-REQUEST_ID-#1"
+    expect(logger.mutation_id).to eq "#{timestamp}-REQUEST_ID-#2"
   end
 end

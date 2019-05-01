@@ -25,6 +25,12 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
 
   field :grades, Types::GradesType, null: true
 
+  # grades is a +Score+ object, but for audit log purposes we want to log these
+  # changes to the enrollment instead (Scores are invisible to users of Canvas)
+  def self.grades_log_entry(score)
+    score.enrollment
+  end
+
   def resolve(input:)
     enrollment_id = input[:enrollment_id]
     grading_period_id = input[:grading_period_id]
