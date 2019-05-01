@@ -283,7 +283,10 @@ export default class OutcomeView extends OutcomeContentBase {
       case 'edit':
       case 'add':
         this.$el.html(
-          outcomeFormTemplate(_.extend(data, {calculationMethods: this.model.calculationMethods()}))
+          outcomeFormTemplate(_.extend(data, {
+            calculationMethods: this.model.calculationMethods(),
+            use_rce_enhancements: ENV.use_rce_enhancements
+        }))
         )
 
         addCriterionInfoButton(this.$el.find("#react-info-link")[0])

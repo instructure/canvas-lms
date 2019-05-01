@@ -42,7 +42,7 @@ import ReactDOM from 'react-dom'
 import FileBrowser from 'jsx/shared/rce/FileBrowser'
 
   var SubmitAssignment = {
-   
+
     beforeUnloadHandler: function(e) {
       return (e.returnValue = I18n.t("Changes you made may not be saved."));
     },
@@ -65,8 +65,10 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
     var homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer('#submit_from_external_tool_form');
 
     // Add the Keyboard shortcuts info button
-    var keyboardShortcutsView = new RCEKeyboardShortcuts();
-    keyboardShortcutsView.render().$el.insertBefore($(".switch_text_entry_submission_views:first"));
+    if (!ENV.use_rce_enhancements) {
+      var keyboardShortcutsView = new RCEKeyboardShortcuts();
+      keyboardShortcutsView.render().$el.insertBefore($(".switch_text_entry_submission_views:first"));
+    }
 
     // grow and shrink the comments box on focus/blur if the user
     // hasn't entered any content.

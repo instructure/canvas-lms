@@ -135,6 +135,7 @@ export default class EditView extends ValidatedFormView
   toJSON: ->
     data = super
     json = _.extend data, @options,
+      use_rce_enhancements: ENV.use_rce_enhancements
       showAssignment: !!@assignmentGroupCollection
       useForGrading: @model.get('assignment')?
       isTopic: @isTopic()
@@ -217,6 +218,7 @@ export default class EditView extends ValidatedFormView
 
 
   attachKeyboardShortcuts: =>
+    if !ENV.use_rce_enhancements
       $('.rte_switch_views_link').first().before((new KeyboardShortcuts()).render().$el)
 
   renderAssignmentGroupOptions: =>

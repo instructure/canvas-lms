@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
+import {func} from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Select from '@instructure/ui-forms/lib/components/Select'
@@ -30,7 +32,11 @@ import IconKeyboardShortcuts from '@instructure/ui-icons/lib/Line/IconKeyboardSh
 
 import formatMessage from '../format-message'
 
-export default function StatusBar() {
+StatusBar.propTypes = {
+  onToggleHtml: func
+}
+
+export default function StatusBar(props) {
   return (
     <div>
       <Flex margin="small 0 0 0">
@@ -51,7 +57,10 @@ export default function StatusBar() {
         </FlexItem>
         <FlexItem>
           <View padding="small" borderWidth="0 small 0 0">
-            <Button variant="link">{'</>'}</Button>
+            <Button variant="link" onClick={props.onToggleHtml}>
+              <PresentationContent>{'</>'}</PresentationContent>
+              <ScreenReaderContent>{formatMessage('Toggle raw html view')}</ScreenReaderContent>
+            </Button>
           </View>
         </FlexItem>
         <FlexItem>

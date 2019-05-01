@@ -220,7 +220,9 @@ const bindToEditSyllabus = function () {
   if (!$edit_syllabus_link.length) return
 
   // Add the backbone view for keyboardshortup help here
-  $('.toggle_views_link').first().before(new KeyboardShortcuts().render().$el)
+  if (!ENV.use_rce_enhancements) {
+    $('.toggle_views_link').first().before(new KeyboardShortcuts().render().$el)
+  }
 
   function resetToggleLinks () {
     $('.toggle_html_editor_link').show()

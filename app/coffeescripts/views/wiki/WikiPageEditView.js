@@ -89,6 +89,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   toJSON() {
     let IS
     const json = super.toJSON(...arguments)
+    json.use_rce_enhancements = ENV.use_rce_enhancements
 
     json.IS = IS = {
       TEACHER_ROLE: false,

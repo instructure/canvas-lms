@@ -124,6 +124,7 @@ class EntryView extends Backbone.View
   toJSON: ->
     json = @model.attributes
     json.edited_at = $.datetimeString(json.updated_at)
+    json.use_rce_enhancements = ENV.use_rce_enhancements
     if json.editor
       json.editor_name = json.editor.display_name
       json.editor_href = json.editor.html_url

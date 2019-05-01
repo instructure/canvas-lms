@@ -100,15 +100,17 @@ class EditorToggle {
     this.textArea.val(this.getContent())
     this.textAreaContainer.insertBefore(this.el)
     this.el.detach()
-    if (this.options.switchViews) {
-      this.switchViews = this.createSwitchViews()
-      this.switchViews.insertBefore(this.textAreaContainer)
+    if (!ENV.use_rce_enhancements) {
+      if (this.options.switchViews) {
+        this.switchViews = this.createSwitchViews()
+        this.switchViews.insertBefore(this.textAreaContainer)
+      }
+      if (!this.infoIcon) {
+        this.infoIcon = new KeyboardShortcuts().render().$el
+      }
+      this.infoIcon.insertBefore($('.switch-views__link'))
+      $('<div/>', {style: 'clear: both'}).insertBefore(this.textAreaContainer)
     }
-    if (!this.infoIcon) {
-      this.infoIcon = new KeyboardShortcuts().render().$el
-    }
-    this.infoIcon.insertBefore($('.switch-views__link'))
-    $('<div/>', {style: 'clear: both'}).insertBefore(this.textAreaContainer)
     this.done.insertAfter(this.textAreaContainer)
     RichContentEditor.initSidebar()
     RichContentEditor.loadNewEditor(this.textArea, this.getRceOptions())

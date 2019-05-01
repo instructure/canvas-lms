@@ -249,6 +249,7 @@ export default class TopicView extends Backbone.View {
       modelData.root = true
       modelData.title = ENV.DISCUSSION.TOPIC.TITLE
       modelData.isForMainDiscussion = true
+      modelData.use_rce_enhancements = ENV.use_rce_enhancements
       const html = replyTemplate(modelData)
       this.$('#discussion_topic').append(html)
     }

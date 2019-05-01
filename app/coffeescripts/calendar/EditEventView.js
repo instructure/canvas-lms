@@ -133,9 +133,11 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   attachKeyboardShortcuts() {
-    return $('.switch_event_description_view')
-      .first()
-      .before(new KeyboardShortcuts().render().$el)
+    if (!ENV.use_rce_enhancements) {
+      return $('.switch_event_description_view')
+        .first()
+        .before(new KeyboardShortcuts().render().$el)
+    }
   }
 
   toggleDuplicateOptions() {
@@ -256,6 +258,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
   toJSON() {
     const result = super.toJSON(...arguments)
+    result.use_rce_enhancements = ENV.use_rce_enhancements
     result.recurringEventLimit = 200
     return result
   }

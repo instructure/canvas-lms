@@ -190,9 +190,12 @@ export default class RCEWrapper extends React.Component {
     return this.getTextarea().value;
   }
 
-  toggle() {
+  toggle = () => {
     if (this.isHidden()) {
       this.setCode(this.textareaValue());
+      this.getTextarea().setAttribute('aria-hidden', true);
+    } else {
+      this.getTextarea().removeAttribute('aria-hidden');
     }
     this.onTinyMCEInstance("mceToggleEditor");
   }
@@ -332,7 +335,7 @@ export default class RCEWrapper extends React.Component {
           config={this.wrapOptions(mceProps.editorOptions)}
         />
 
-        <StatusBar />
+        <StatusBar onToggleHtml={this.toggle} />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
       </div>
     );

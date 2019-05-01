@@ -365,6 +365,7 @@ export default class EditView extends ValidatedFormView
     data = @assignment.toView()
 
     _.extend data,
+      use_rce_enhancements: ENV?.use_rce_enhancements
       kalturaEnabled: ENV?.KALTURA_ENABLED or false
       postToSISEnabled: ENV?.POST_TO_SIS or false
       postToSISName: ENV.SIS_NAME

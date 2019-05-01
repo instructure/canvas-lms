@@ -261,8 +261,10 @@ export default class OutcomeContentBase extends ValidatedFormView {
   }
 
   addTinyMCEKeyboardShortcuts() {
-    const keyboardShortcutsView = new RCEKeyboardShortcuts()
-    return keyboardShortcutsView.render().$el.insertBefore($('.rte_switch_views_link:first'))
+    if (!ENV.use_rce_enhancements) {
+      const keyboardShortcutsView = new RCEKeyboardShortcuts()
+      return keyboardShortcutsView.render().$el.insertBefore($('.rte_switch_views_link:first'))
+    }
   }
 
   // Called from subclasses in render.
