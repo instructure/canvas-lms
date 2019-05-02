@@ -17,11 +17,11 @@
 
 class Canvas::Crocodoc
   def self.config
-    PluginSetting.settings_for_plugin(:crocodoc)
+    Canvas::Plugin.find(:crocodoc).settings
   end
 
   def self.enabled?
-    !!PluginSetting.settings_for_plugin(:crocodoc)
+    Canvas::Plugin.find(:crocodoc).enabled?
   end
 
   class TimeoutError < Exception
