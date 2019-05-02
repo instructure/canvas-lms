@@ -263,7 +263,7 @@ module SIS
       end
 
       def should_stop_import?
-        %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+        !@batch.workflow_state == 'importing'
       end
 
       def run_all_importers
