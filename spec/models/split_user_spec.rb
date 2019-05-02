@@ -496,6 +496,19 @@ describe SplitUsers do
     context 'sharding' do
       specs_require_sharding
 
+      it 'should restore admins to the original state' do
+        admin = account1.account_users.create(user: user1)
+        shard_user2.associate_with_shard(sub_account.shard)
+        admin2 = sub_account.account_users.create(user: shard_user2)
+        UserMerge.from(user1).into(shard_user2)
+        admin.reload.destroy
+        SplitUsers.split_db_users(shard_user2)
+
+        expect(admin.reload.workflow_state).to eq 'active'
+        expect(admin.reload.user).to eq user1
+        expect(admin2.reload.user).to eq shard_user2
+      end
+
       it 'should merge a user across shards' do
         user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
         p1 = @pseudonym

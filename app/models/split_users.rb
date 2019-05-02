@@ -164,7 +164,10 @@ class SplitUsers
     end
     handle_submissions(records)
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
-    AccountUser.where(id: account_users_ids).update_all(user_id: restored_user.id)
+
+    Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
+      AccountUser.where(id: shard_account_user_ids).update_all(user_id: restored_user.id)
+    end
     restore_workflow_states_from_records(records)
   end
 
