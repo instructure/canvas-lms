@@ -675,6 +675,34 @@ describe UserMerge do
   context "sharding" do
     specs_require_sharding
 
+    it 'should move prefs over' do
+      @shard1.activate do
+        @user2 = user_model
+        account = Account.create!
+        @shard_course = course_factory(account: account)
+        @user2.preferences[:custom_colors] = {"course_#{@course.id}"=>"#254284"}
+      end
+      course = course_factory
+      user1 = user_model
+      @user2.preferences[:custom_colors]["course_#{course.global_id}"] = "#346543"
+      @user2.save!
+      UserMerge.from(@user2).into(user1)
+      expect(user1.reload.preferences[:custom_colors].keys).to eq ["course_#{@shard_course.global_id}", "course_#{course.id}"]
+    end
+
+    it 'should handle favorites' do
+      @shard1.activate do
+        @user2 = user_model
+        account = Account.create!
+        @shard_course = course_factory(account: account)
+        @shard_course.enroll_user(@user2)
+        @fav = Favorite.create!(user: @user2, context: @shard_course)
+      end
+      user1 = user_model
+      UserMerge.from(@user2).into(user1)
+      expect(user1.favorites.take.context_id).to eq @shard_course.global_id
+    end
+
     it 'should merge with user_services across shards' do
       user1 = user_model
       @shard1.activate do

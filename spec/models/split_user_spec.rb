@@ -204,16 +204,14 @@ describe SplitUsers do
         expect(poll.reload.user_id).to eq user1.id
       end
 
-
       it 'should handle favorites' do
         course1.enroll_user(user1)
         fav = Favorite.create!(user: user1, context: course1)
         UserMerge.from(user1).into(user2)
-        expect(fav.reload.user_id).to eq user2.id
+        expect(user2.favorites.take.context_id).to eq course1.id
         SplitUsers.split_db_users(user2)
         expect(fav.reload.user_id).to eq user1.id
       end
-
 
       it 'should handle ignores' do
         course1.enroll_user(user1)
