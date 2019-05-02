@@ -179,11 +179,11 @@ class UserMerge
     %i{custom_colors course_nicknames}.each do |pref|
       preferences.delete(pref)
       new_pref = {}
-      from_user.preferences.dig(pref)&.each do |tag, value|
-        id = tag.split('_').last
+      from_user.preferences.dig(pref)&.each do |key, value|
+        id = key.is_a?(String) ? key.split('_').last : key
         new_id = Shard.relative_id_for(id, from_user.shard, target_user.shard)
-        new_tag = [tag.split('_').first, new_id].join('_')
-        new_pref[new_tag] = value
+        new_key = key.is_a?(String) ? [key.split('_').first, new_id].join('_') : new_id
+        new_pref[new_key] = value
       end
       preferences[pref] = new_pref unless new_pref.empty?
     end
