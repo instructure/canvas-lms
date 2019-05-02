@@ -690,6 +690,21 @@ describe UserMerge do
       expect(user1.reload.preferences[:custom_colors].keys).to eq ["course_#{@shard_course.global_id}", "course_#{course.id}"]
     end
 
+    it 'should move nicknames' do
+      @shard1.activate do
+        @user2 = user_model
+        account = Account.create!
+        @shard_course = course_factory(account: account)
+        @user2.preferences[:course_nicknames] = {@shard_course.id=>"Marketing"}
+      end
+      course = course_factory
+      user1 = user_model
+      @user2.preferences[:course_nicknames][course.global_id] = "Math"
+      @user2.save!
+      UserMerge.from(@user2).into(user1)
+      expect(user1.reload.preferences[:course_nicknames].keys).to eq [@shard_course.global_id, course.id]
+    end
+
     it 'should handle favorites' do
       @shard1.activate do
         @user2 = user_model
