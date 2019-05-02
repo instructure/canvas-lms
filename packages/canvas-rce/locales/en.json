@@ -100,6 +100,9 @@
   "collaborations_5c56c15f": {
     "message": "Collaborations"
   },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Collapse to hide { types }"
+  },
   "computer_1d7dfa6f": {
     "message": "Computer"
   },
@@ -159,11 +162,20 @@
   "documents_81393201": {
     "message": "Documents"
   },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Due: Multiple Dates"
+  },
+  "due_when_7eed10c6": {
+    "message": "Due: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Enter the alternative text for this image"
+  },
+  "expand_to_see_types_f5d29352": {
+    "message": "Expand to see { types }"
   },
   "external_links_3d9f074e": {
     "message": "External Links"
@@ -282,8 +294,17 @@
   "people_b4ebb13c": {
     "message": "People"
   },
+  "posted_when_a578f5ab": {
+    "message": "Posted: { when }"
+  },
   "preformatted_d0670862": {
     "message": "Preformatted"
+  },
+  "published_c944a23d": {
+    "message": "published"
+  },
+  "published_when_302d8e23": {
+    "message": "Published: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Quizzes",
@@ -347,8 +368,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "This upload exceeds the file storage quota. Please speak to your system administrator."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "To Be Posted: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "To Do: { when }"
+  },
   "tray_839df38a": {
     "message": "Tray"
+  },
+  "unpublished_dfd8801": {
+    "message": "unpublished"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
