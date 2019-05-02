@@ -58,14 +58,14 @@ class UserMerge
       merge_data.items.create!(user: from_user, item_type: 'user_preferences', item: from_user.preferences)
       merge_data.items.create!(user: target_user, item_type: 'user_preferences', item: target_user.preferences)
 
-      target_user.preferences = target_user.preferences.merge(from_user.preferences)
+      prefs = shard_aware_preferences
+      target_user.preferences = target_user.preferences.merge(prefs)
       target_user.save if target_user.changed?
 
       {'access_token_ids': from_user.access_tokens.shard(from_user).pluck(:id),
        'conversation_messages_ids': ConversationMessage.where(author_id: from_user, conversation_id: nil).shard(from_user).pluck(:id),
        'conversation_ids': from_user.all_conversations.shard(from_user).pluck(:id),
        'ignore_ids': from_user.ignores.shard(from_user).pluck(:id),
-       'favorite_ids': from_user.favorites.shard(from_user).pluck(:id),
        'user_past_lti_id_ids': from_user.past_lti_ids.shard(from_user).pluck(:id),
        'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id)}.each do |k, ids|
         merge_data.items.create!(user: from_user, item_type: k, item: ids) unless ids.empty?
@@ -78,6 +78,7 @@ class UserMerge
       end
     end
 
+    copy_favorites
     populate_past_lti_ids
     handle_communication_channels
     destroy_conflicting_module_progressions
@@ -118,7 +119,7 @@ class UserMerge
 
       updates = {}
       %w(access_tokens asset_user_accesses calendar_events collaborations
-         context_module_progressions favorites group_memberships ignores
+         context_module_progressions group_memberships ignores
          page_comments Polling::Poll rubric_assessments user_services
          web_conference_participants web_conferences wiki_pages).each do |key|
         updates[key] = "user_id"
@@ -160,6 +161,33 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+  end
+
+  def copy_favorites
+    from_user.favorites.find_each do |f|
+      Favorite.unique_constraint_retry do
+        course_id = Shard.relative_id_for(f.context_id, from_user.shard, target_user.shard)
+        fave = target_user.favorites.where(context_type: 'Course', context_id: course_id).take
+        target_user.favorites.create!(context_type: 'Course', context_id: course_id) unless fave
+      end
+    end
+  end
+
+  def shard_aware_preferences
+    return from_user.preferences if from_user.shard == target_user.shard
+    preferences = from_user.preferences.dup
+    %i{custom_colors course_nicknames}.each do |pref|
+      preferences.delete(pref)
+      new_pref = {}
+      from_user.preferences.dig(pref)&.each do |tag, value|
+        id = tag.split('_').last
+        new_id = Shard.relative_id_for(id, from_user.shard, target_user.shard)
+        new_tag = [tag.split('_').first, new_id].join('_')
+        new_pref[new_tag] = value
+      end
+      preferences[pref] = new_pref unless new_pref.empty?
+    end
+    preferences
   end
 
   def populate_past_lti_ids
