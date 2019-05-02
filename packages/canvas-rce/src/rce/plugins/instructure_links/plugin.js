@@ -22,15 +22,19 @@ import bridge from '../../../bridge'
 import $ from 'jquery'
 
 const PLUGIN_KEY = 'links'
-
+var keyMap = {};
 tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
   init(ed) {
     ed.on('keydown',function(e) {
+      keyMap[e.keyCode] = true
       // alt + f7
-      if(e.keyCode === 18 && e.keyCode === 118){
-          $('.tox-toolbar-textfield').focus()
-          e.preventDefault();
+      if(keyMap[18] && keyMap[118]){
+        $('.tox-toolbar-textfield').focus()
+        e.preventDefault();
       }
+    });
+    ed.on('keyup',function(e) {
+      keyMap[e.keyCode] = false;
     });
     const isAnchorElement = function (node) {
       return node.nodeName.toLowerCase() === 'a' && node.href;
