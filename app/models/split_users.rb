@@ -303,10 +303,10 @@ class SplitUsers
     # enrollments that were updated which already excluded conflicts, but we
     # will add the scope to protect against a FK violation.
     source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id))).
-      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).
+      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).shard(source_user).
       update_all(user_id: restored_user.id)
     source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id))).
-      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).
+      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).shard(source_user).
       update_all(user_id: restored_user.id)
   end
 
