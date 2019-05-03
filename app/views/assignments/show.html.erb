@@ -18,6 +18,13 @@
 <%
   content_for :right_side, render(:partial => "assignment_sidebar")
 %>
+<% content_for :stylesheets do %>
+  <style>
+    #right-side-wrapper {
+      height: 100%;
+    }
+  </style>
+<% end %>
 
 <% if @locked && !@locked[:can_view] %>
   <% js_bundle :module_sequence_footer %>
