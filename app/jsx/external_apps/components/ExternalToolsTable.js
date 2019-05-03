@@ -48,9 +48,6 @@ export default class ExternalToolsTable extends React.Component {
     if (!store.getState().isLoaded) {
       store.fetch();
     }
-    if (store.getState().lti13LoadStatus !== 'success') {
-      store.fetch13Tools()
-    }
   }
 
   componentWillUnmount() {

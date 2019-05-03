@@ -93,7 +93,6 @@ export default class AddExternalToolButton extends React.Component {
         $.flashMessage(I18n.t('The app was added'))
         store.reset()
         store.fetch()
-        store.fetch13Tools()
       }
     )
   }
