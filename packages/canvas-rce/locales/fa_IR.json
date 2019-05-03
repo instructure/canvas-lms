@@ -95,6 +95,9 @@
   "discussions_index_6c36ced": {
     "message": "فهرست بحث ها"
   },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "مهلت: چند تاریخ"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "وارد کردن عبارت های جستجو"
   },
@@ -191,6 +194,9 @@
   "people_b4ebb13c": {
     "message": "افراد"
   },
+  "published_c944a23d": {
+    "message": "منتشر شده"
+  },
   "quizzes_7e598f57": {
     "message": "آزمون ها"
   },
@@ -223,6 +229,9 @@
   },
   "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
     "message": "مطلب مشمول استثناء استفاده منصفانه است"
+  },
+  "unpublished_dfd8801": {
+    "message": "منتشر نشده"
   },
   "upload_8b403d05": {
     "message": "بارگذاری"

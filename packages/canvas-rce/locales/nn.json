@@ -104,6 +104,9 @@
   "discussions_index_6c36ced": {
     "message": "Diskusjonsoversikt"
   },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Frist: Fleire datoar"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "oppgi søkeord"
   },
@@ -209,6 +212,9 @@
   "people_b4ebb13c": {
     "message": "Personar"
   },
+  "published_c944a23d": {
+    "message": "publisert"
+  },
   "quizzes_7e598f57": {
     "message": "Quizar"
   },
@@ -244,6 +250,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Opplastinga har ein storleik som overskrid lagringskvoten. Ta kontakt med systemadministrator. "
+  },
+  "unpublished_dfd8801": {
+    "message": "upublisert"
   },
   "upload_8b403d05": {
     "message": "Last opp"

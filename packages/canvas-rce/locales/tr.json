@@ -95,6 +95,9 @@
   "discussions_index_6c36ced": {
     "message": "Tartışma Başlıkları"
   },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Teslim Tarihi: Birden Çok Gün"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "arama ifadelerini gir"
   },
@@ -194,6 +197,9 @@
   "people_b4ebb13c": {
     "message": "Katılımcılar"
   },
+  "published_c944a23d": {
+    "message": "yayınlandı"
+  },
   "quizzes_7e598f57": {
     "message": "Kısa sınavlar"
   },
@@ -226,6 +232,9 @@
   },
   "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
     "message": "Bu malzeme adil kullanım istisnasına tabidir"
+  },
+  "unpublished_dfd8801": {
+    "message": "yayınlanmadı"
   },
   "upload_8b403d05": {
     "message": "Yükle"
