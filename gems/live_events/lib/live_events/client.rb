@@ -67,7 +67,7 @@ module LiveEvents
       ctx ||= {}
       attributes = ctx.merge({
         event_name: event_name,
-        event_time: time.utc.iso8601
+        event_time: time.utc.iso8601(3)
       })
 
       event = {

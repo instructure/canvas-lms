@@ -80,7 +80,7 @@ describe LiveEvents::Client do
         data: {
           "attributes" => {
             "event_name" => 'event',
-            "event_time" => now.utc.iso8601
+            "event_time" => now.utc.iso8601(3)
           },
           "body" => {}
         },
@@ -100,7 +100,7 @@ describe LiveEvents::Client do
         data: {
           "attributes" => {
             "event_name" => 'event',
-            "event_time" => now.utc.iso8601,
+            "event_time" => now.utc.iso8601(3),
             "user_id" => 123,
             "real_user_id" => 321,
             "login" => 'loginname',
@@ -125,7 +125,7 @@ describe LiveEvents::Client do
             data: {
               "attributes" => {
                 "event_name" => 'event',
-                "event_time" => now.utc.iso8601
+                "event_time" => now.utc.iso8601(3)
               },
               "body" => {}
             },
@@ -152,7 +152,7 @@ describe LiveEvents::Client do
         data: {
           "attributes" => {
             "event_name" => 'event',
-            "event_time" => now.utc.iso8601,
+            "event_time" => now.utc.iso8601(3),
             "user_id" => 123
           },
           "body" => {}
@@ -180,7 +180,7 @@ describe LiveEvents::Client do
         data: {
           "attributes" => {
             "event_name" => 'event',
-            "event_time" => now.utc.iso8601
+            "event_time" => now.utc.iso8601(3)
           },
           "body" => {}
         },
@@ -208,7 +208,7 @@ describe LiveEvents::Client do
           data: {
             "attributes" => {
               "event_name" => 'event',
-              "event_time" => now.utc.iso8601
+              "event_time" => now.utc.iso8601(3)
             },
             "body" => {}
           },
