@@ -17,23 +17,24 @@
  */
 
 import {
-  IconBulletListLine,
-  IconTextCenteredLine,
-  IconTextStartLine,
-  IconTextEndLine,
+  IconAttachMediaLine,
   IconBoldLine,
+  IconBulletListLine,
+  IconClearTextFormattingLine,
   IconImageLine,
   IconIndentLine,
-  IconClearTextFormattingLine,
   IconItalicLine,
   IconLinkLine,
-  IconNumberedListLine,
   IconLtiLine,
+  IconNumberedListLine,
   IconOutdentLine,
+  IconRemoveLinkLine,
   IconStrikethroughLine,
+  IconTextCenteredLine,
+  IconTextEndLine,
+  IconTextStartLine,
   IconTextSubscriptLine,
   IconTextSuperscriptLine,
-  IconRemoveLinkLine,
 } from '@instructure/ui-icons/es/svg'
 
 tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
@@ -45,13 +46,14 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     'align-center': IconTextCenteredLine,
     'align-left': IconTextStartLine,
     'align-right': IconTextEndLine,
+    'list-bull-default': IconBulletListLine,
+    'list-num-default': IconNumberedListLine,
     bold: IconBoldLine,
     image: IconImageLine,
     indent: IconIndentLine,
     italic: IconItalicLine,
     link: IconLinkLine,
-    'list-num-default': IconNumberedListLine,
-    'list-bull-default': IconBulletListLine,
+    video: IconAttachMediaLine,
 
     // if @instructure/ui-icons ever gets icons for these, lets use those. But until
     // then these are the same as the stock tinyMCE ones but with the viewbox
