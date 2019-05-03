@@ -6269,6 +6269,61 @@ describe Submission do
     end
   end
 
+  describe '#submission_drafts' do
+    before(:once) do
+      @submission = Submission.find_by(user: @student)
+    end
+
+    it 'is empty by default' do
+      expect(@submission.submission_drafts).to eq []
+    end
+
+    describe 'with drafts for multiple attempts' do
+      before(:once) do
+        @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'foo')
+        @draft1 = SubmissionDraft.new(submission: @submission, submission_attempt: 0)
+        @draft2 = SubmissionDraft.new(submission: @submission, submission_attempt: 1)
+        @submission.submission_drafts << @draft1
+        @submission.submission_drafts << @draft2
+      end
+
+      it 'can have drafts for different submission attempts' do
+        expect(@submission.submission_drafts.sort).to eq [@draft1, @draft2]
+      end
+
+      it 'deletes all drafts for all submission attempts when homework is submitted' do
+        @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'foo')
+        @submission.reload
+        expect(@submission.submission_drafts).to eq []
+        expect(SubmissionDraft.count).to be 0
+      end
+    end
+
+    describe 'with attachments' do
+      before(:once) do
+        @attachment1 = attachment_model
+        @attachment2 = attachment_model
+        @submission_draft = SubmissionDraft.create!(
+          submission: @submission,
+          submission_attempt: 0
+        )
+        @submission_draft.attachments = [@attachment1, @attachment2]
+      end
+
+      it 'can access the attachments' do
+        expect(@submission.submission_drafts.first.attachments.sort).to eq [@attachment1, @attachment2]
+      end
+
+      it 'will cascade deletes to SubmissionDraftAttachments when homework is submitted' do
+        @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'foo')
+        @submission.reload
+        expect(@submission.submission_drafts).to eq []
+        expect(SubmissionDraft.count).to be 0
+        expect(SubmissionDraftAttachment.count).to be 0
+      end
+    end
+  end
+
   describe "posting and unposting" do
     before(:each) do
       @assignment.course.enable_feature!(:post_policies)

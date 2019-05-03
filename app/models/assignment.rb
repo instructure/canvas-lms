@@ -2003,10 +2003,12 @@ class Assignment < ActiveRecord::Base
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
-            if student == original_student
-              homework.broadcast_group_submission
-            else
-              homework.save_without_broadcasting!
+            Submission.suspend_callbacks(:delete_submission_drafts!) do
+              if student == original_student
+                homework.broadcast_group_submission
+              else
+                homework.save_without_broadcasting!
+              end
             end
           else
             homework.save!

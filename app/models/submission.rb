@@ -99,6 +99,7 @@ class Submission < ActiveRecord::Base
   has_many :originality_reports
   has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact, inverse_of: :artifact
   has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result', dependent: :destroy
+  has_many :submission_drafts, inverse_of: :submission, dependent: :destroy
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -313,6 +314,7 @@ class Submission < ActiveRecord::Base
   after_save :reset_regraded
   after_save :create_audit_event!
   after_save :handle_posted_at_changed, if: :saved_change_to_posted_at?
+  after_save :delete_submission_drafts!, if: :saved_change_to_attempt?
 
   def reset_regraded
     @regraded = false
@@ -2361,6 +2363,10 @@ class Submission < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def delete_submission_drafts!
+    self.submission_drafts.destroy_all
   end
 
   def point_data?
