@@ -499,6 +499,29 @@ describe SplitUsers do
         expect(submission.reload.user).to eq restored_user
       end
 
+      it 'should handle conflicting submissions for cross shard users' do
+        course1.enroll_student(restored_user, enrollment_state: 'active')
+        course1.enroll_student(shard1_source_user, enrollment_state: 'active')
+        assignment = course1.assignments.new(title: "some assignment")
+        assignment.workflow_state = "published"
+        assignment.save
+        valid_attributes = {
+          grade: "1.5",
+          grader: @teacher,
+          url: "www.instructure.com"
+        }
+        submission1 = assignment.submissions.find_by!(user: restored_user)
+        submission1.update!(valid_attributes)
+        submission2 = assignment.submissions.find_by!(user: shard1_source_user)
+
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(submission1.reload.user).to eq shard1_source_user
+        expect(submission2.reload.user).to eq restored_user
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(submission1.reload.user).to eq restored_user
+        expect(submission2.reload.user).to eq shard1_source_user
+      end
+
       it 'should restore admins to the original state' do
         admin = account1.account_users.create(user: restored_user)
         shard1_source_user.associate_with_shard(sub_account.shard)
