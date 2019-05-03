@@ -64,12 +64,12 @@
   border: 1px solid #c1c7cf;
   border-radius: 3px;
   .student-group-header {
-    @include clearfix;
     padding: direction-sides(16px 16px 16px 10px);
+    display: flex;
+    align-items: center;
   }
   .icon-mini-arrow-right, .icon-mini-arrow-down {
-    float: direction(left);
-    order: 1;
+    order: -1;
   }
   .icon-mini-arrow-down {
     display: none;
@@ -89,15 +89,14 @@
     }
   }
   .student-group-title {
-    float: direction(left);
     display: inline-flex;
-    h3 {
+    align-items: center;
+    flex-grow: 1;
+    h2 {
       margin: direction-sides(0 7px 0 5px);
       font-weight: bold;
       @include fontSize($ic-font-size--small);
-      float: direction(left);
       line-height: 18px;
-      order: 2;
       small {
         @include fontSize($ic-font-size--xsmall);
       }
@@ -106,27 +105,22 @@
       }
     }
     a {
-      position: relative;
-      top: -1px;
       padding-#{direction(right)}: 5px;
-      order: 2;
     }
   }
   .student-group-students {
     i {
       padding-#{direction(right)}: 5px;
     }
-    position: absolute;
-    #{direction(right)}: 175px;
     color: #555;
     font-weight: normal;
+    flex-basis: 10rem;
   }
   .student-group-join {
-    position: absolute;
     text-transform: uppercase;
     font-weight: bold;
-    #{direction(right)}: 10px;
     text-align: direction(right);
+    flex-basis: 2rem;
   }
   .student-group-body {
     padding: direction-sides(16px 16px 16px 36px);

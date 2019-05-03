@@ -246,6 +246,7 @@ const StudentView = createReactClass({
 
     return (
       <div>
+        <h1 className="screenreader-only">{I18n.t('Groups')}</h1>
         <div
           id="group_categories_tabs"
           className="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all"
