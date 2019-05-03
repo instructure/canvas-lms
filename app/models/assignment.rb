@@ -673,7 +673,7 @@ class Assignment < ActiveRecord::Base
   def needs_to_recompute_grade?
     !id_before_last_save.nil? && (
       saved_change_to_points_possible? ||
-      saved_change_to_muted? ||
+      (saved_change_to_muted? && !course.feature_enabled?(:post_policies)) ||
       saved_change_to_workflow_state? ||
       saved_change_to_assignment_group_id? ||
       saved_change_to_only_visible_to_overrides? ||
@@ -3138,8 +3138,11 @@ class Assignment < ActiveRecord::Base
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
+    if course.feature_enabled?(:post_policies)
+      course.recompute_student_scores(submissions.pluck(:user_id))
+      update_muted_status!
+    end
     self.send_later_if_production(:recalculate_module_progressions, submission_ids)
-    update_muted_status! if course.feature_enabled?(:post_policies)
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
   end
 
@@ -3155,7 +3158,10 @@ class Assignment < ActiveRecord::Base
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
     hide_stream_items(submissions: submissions)
-    update_muted_status! if course.feature_enabled?(:post_policies)
+    if course.feature_enabled?(:post_policies)
+      course.recompute_student_scores(submissions.pluck(:user_id))
+      update_muted_status!
+    end
     progress.set_results(assignment_id: id, posted_at: nil, user_ids: user_ids) if progress.present?
   end
 

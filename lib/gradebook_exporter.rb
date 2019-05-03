@@ -98,9 +98,12 @@ class GradebookExporter
     # TODO: Stop using the grade calculator and instead use the scores table entirely.
     # This cannot be done until we are storing points values in the scores table, which
     # will be implemented as part of GRADE-8.
-    calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course,
-                               ignore_muted: false,
-                               grading_period: grading_period)
+    calc = GradeCalculator.new(
+      student_enrollments.map(&:user_id),
+      @course,
+      ignore_muted: false,
+      grading_period: grading_period
+    )
     grades = calc.compute_scores
 
     submissions = {}

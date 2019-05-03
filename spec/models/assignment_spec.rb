@@ -7199,6 +7199,13 @@ describe Assignment do
           assignment.post_submissions(submission_ids: [student1_submission.id])
           expect(assignment).to be_muted
         end
+
+        it "recomputes grades for the affected students" do
+          assignment.mute!
+
+          expect(@course).to receive(:recompute_student_scores).with([student1.id])
+          assignment.post_submissions(submission_ids: [student1_submission.id])
+        end
       end
 
       it "does not update the assignment's muted status when post policies are not enabled" do
@@ -7313,6 +7320,11 @@ describe Assignment do
         it "leaves the assignment unmuted if all submissions remain posted" do
           assignment.hide_submissions(submission_ids: [])
           expect(assignment).not_to be_muted
+        end
+
+        it "recomputes grades for the affected students" do
+          expect(@course).to receive(:recompute_student_scores).with([student1.id])
+          assignment.hide_submissions(submission_ids: [student1_submission.id])
         end
       end
 

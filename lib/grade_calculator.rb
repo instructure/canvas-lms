@@ -97,7 +97,7 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments).
-        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at")
 
       Rails.logger.debug "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
       submissions
@@ -122,9 +122,9 @@ class GradeCalculator
     invalidate_caches
     create_course_grade_alerts(scores_prior_to_compute)
     # The next line looks weird, but it is intended behaviour.  Its
-    # saying "if we're on the branch not calculating muted scores, run
+    # saying "if we're on the branch not calculating hidden scores, run
     # the branch that does."
-    calculate_muted_scores if @ignore_muted
+    calculate_hidden_scores if @ignore_muted
     calculate_course_score if @update_course_score
   end
 
@@ -298,8 +298,8 @@ class GradeCalculator
     GradeCalculator.new(@user_ids, @course, opts).compute_and_save_scores
   end
 
-  def calculate_muted_scores
-    # re-run this calculator, except include muted assignments
+  def calculate_hidden_scores
+    # re-run this calculator, except include muted assignments/unposted submissions
     compute_branch(ignore_muted: false)
   end
 
@@ -693,8 +693,8 @@ class GradeCalculator
       group_submissions = assignments.map do |a|
         s = submissions_by_assignment_id[a.id]
 
-        # ignore submissions for muted assignments
-        s = nil if @ignore_muted && a.muted?
+        # ignore unposted submissions and all submissions for muted assignments
+        s = nil if ignore_submission?(submission: s, assignment: a)
 
         # ignore pending_review quiz submissions
         s = nil if ignore_ungraded && s.try(:pending_review?)
@@ -756,7 +756,7 @@ class GradeCalculator
     if never_drop_ids.present? || @ignore_muted
       cant_drop, submissions = submissions.partition do |submission|
         assignment = submission[:assignment]
-        (@ignore_muted && assignment.muted?) || never_drop_ids.include?(assignment.id)
+        ignore_submission?(submission: submission, assignment: assignment) || never_drop_ids.include?(assignment.id)
       end
     end
 
@@ -945,5 +945,11 @@ class GradeCalculator
   # If you need to invalidate caches with associated classes, put those calls here.
   def invalidate_caches
     GradeSummaryPresenter.invalidate_cache(@course)
+  end
+
+  def ignore_submission?(submission:, assignment:)
+    return false unless @ignore_muted
+
+    @course.feature_enabled?(:post_policies) ? !submission.posted? : assignment.muted?
   end
 end
