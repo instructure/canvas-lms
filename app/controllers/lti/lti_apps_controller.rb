@@ -22,10 +22,13 @@ module Lti
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)
-        if params.key? :v1p3
-          lti_tools_1_3
-        else
-          lti_tools_1_1_and_2_0
+        collection = app_collator.bookmarked_collection
+
+        respond_to do |format|
+          app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
+
+          mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
+          format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
         end
       end
     end
@@ -110,17 +113,6 @@ module Lti
         (bindings + Account.site_admin.shard.activate { DeveloperKeyAccountBinding.lti_1_3_tools(Account.site_admin) }).
           map(&:developer_key).
           select(&:usable?)
-      end
-    end
-
-    def lti_tools_1_1_and_2_0
-      collection = app_collator.bookmarked_collection
-
-      respond_to do |format|
-        app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
-
-        mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
-        format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
       end
     end
 

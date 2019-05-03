@@ -39,7 +39,6 @@ module Lti
       collection.map do |o|
         case o
         when ContextExternalTool
-          next if o.use_1_3?
           hash = external_tool_definition(o)
           if opts[:master_course_status]
             hash.merge!(o.master_course_api_restriction_data(opts[:master_course_status]))
