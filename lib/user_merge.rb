@@ -518,8 +518,8 @@ class UserMerge
           to_move_ids += scope.having_submission.select(unique_id).where.not(unique_id => already_scope.having_submission.select(unique_id), id: to_move_ids).pluck(:id)
           to_move = scope.where(id: to_move_ids).to_a
           move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          merge_data.build_more_data(to_move, data: data)
-          merge_data.build_more_data(move_back, data: data)
+          merge_data.build_more_data(to_move, data: data) unless to_move.empty?
+          merge_data.build_more_data(move_back, data: data) unless move_back.empty?
           swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
         elsif model.name == "Quizzes::QuizSubmission"
           subscope = already_scope.to_a
@@ -541,6 +541,7 @@ class UserMerge
   end
 
   def swap_submission(model, move_back, table, to_move, to_move_ids, fk)
+    return if to_move_ids.empty?
     model.transaction do
       # there is a unique index on assignment_id and user_id. Unique
       # indexes are checked after every row during an update statement
@@ -548,8 +549,7 @@ class UserMerge
       # user_id to the negative user_id and then the user_id, after the
       # conflicting rows have been updated.
       model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(fk)} DEFERRED")
-      # If the users are on different shards we don't need to dance with the ids
-      model.where(id: move_back).update_all(user_id: -from_user.id) if target_user.shard == from_user.shard
+      model.where(id: move_back).update_all(user_id: -from_user.id)
       model.where(id: to_move_ids).update_all(user_id: target_user.id)
       model.where(id: move_back).update_all(user_id: from_user.id)
       update_versions(model.where(id: to_move), table, :user_id)
