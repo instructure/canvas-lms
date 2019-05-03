@@ -16,4 +16,9 @@
 
 <p><strong><%= html_to_text(asset.title).titleize %></strong></p>
 
-<p><%= html_to_text(asset.body, :base_url => dashboard_url) %></p>
+<% available_for = asset.available_for?(user) %>
+<% if available_for %>
+  <p><%= html_to_text(asset.body, :base_url => dashboard_url) %></p>
+<% else %>
+  <p><%= t("Wiki page content is locked or not yet available") %></p>
+<% end %>

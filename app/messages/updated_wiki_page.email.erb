@@ -10,7 +10,11 @@
 
 <%= asset.title.titleize %>
 
-<%= html_to_text(asset.body, :base_url => dashboard_url) %>
-
+<% available_for = asset.available_for?(user) %>
+<% if available_for %>
+  <%= html_to_text(asset.body, :base_url => dashboard_url) %>
+<% else %>
+  <%= t("Wiki page content is locked or not yet available") %>
+<% end %>
 
 <%= t :link_message, "You can review it here: %{link}", :link => content(:link) %>
