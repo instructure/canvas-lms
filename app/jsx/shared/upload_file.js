@@ -85,7 +85,7 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
 
   return ajaxLib.post(preflightUrl, preflightData)
     .catch(preflightFailed)
-    .then((response) => exports.completeUpload(response.data, file, { ajaxLib }));
+    .then((response) => completeUpload(response.data, file, { ajaxLib }));
 }
 
 /*

@@ -72,7 +72,7 @@ test('shows ending info alert and adds styles to iframe', () => {
 })
 
 test('hides beginning info alert and adds styles to iframe', () => {
-  wrapper = mount(
+  const wrapper = mount(
     <ConfigureExternalToolButton
       tool={tool}
     />
@@ -86,7 +86,7 @@ test('hides beginning info alert and adds styles to iframe', () => {
 })
 
 test('hides ending info alert and adds styles to iframe', () => {
-  wrapper = mount(
+  const wrapper = mount(
     <ConfigureExternalToolButton
       tool={tool}
     />
@@ -99,7 +99,7 @@ test('hides ending info alert and adds styles to iframe', () => {
 })
 
 test("doesn't show alerts or add border to iframe by default", () => {
-  wrapper = mount(
+  const wrapper = mount(
     <ConfigureExternalToolButton
       tool={tool}
     />
