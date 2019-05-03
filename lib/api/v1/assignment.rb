@@ -940,7 +940,10 @@ module Api::V1::Assignment
   def clear_tool_settings_tools?(assignment, assignment_params)
     assignment.assignment_configuration_tool_lookups.present? &&
       assignment_params['submission_types']&.present? &&
-      (!assignment_params['submission_types'].include?(assignment.submission_types) || assignment_params['submission_types'].blank?)
+      (
+        !assignment.submission_types.split(',').any? { |t| assignment_params['submission_types'].include?(t) } ||
+        assignment_params['submission_types'].blank?
+      )
   end
 
   def plagiarism_capable?(assignment_params)
