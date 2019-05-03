@@ -24,8 +24,8 @@ import Placement from '../Placement'
 
 const props = (overrides = {}, placementOverrides = {}) => {
   return {
-    displayName: 'account_navigation',
-    placementName: 'Account Navigation',
+    placementName: 'account_navigation',
+    displayName: 'Account Navigation',
     placement: {
       target_link_uri: 'http://example.com',
       message_type: 'LtiResourceLinkRequest',
@@ -96,4 +96,30 @@ it('cleans up invalid inputs', () => {
 it('is valid when valid', () => {
   const wrapper = mount(<Placement {...props()} />)
   expect(wrapper.instance().valid()).toEqual(true)
+})
+
+const placements = ["editor_button", "migration_selection", "homework_submission"]
+
+placements.forEach((placementName) => {
+  it('displays alert when placement only supports deep linking', () => {
+    const wrapper = mount(<Placement {...props({placementName})} />)
+    wrapper.find('button').simulate('click')
+    expect(wrapper.exists('Alert')).toBeTruthy()
+  })
+})
+
+const couldBeEither = ["assignment_selection", "link_selection"]
+
+couldBeEither.forEach((placementName) => {
+  it('displays alert when placement supports deep linking and resource link and deep linking chosen', () => {
+    const wrapper = mount(<Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />)
+    wrapper.find('button').simulate('click')
+    expect(wrapper.exists('Alert')).toBeTruthy()
+  })
+
+  it('does not display alert when placement supports deep linking and resource link and deep linking chosen', () => {
+    const wrapper = mount(<Placement {...props({placementName})} />)
+    wrapper.find('ToggleDetails').simulate('click')
+    expect(wrapper.exists('Alert')).toBeFalsy()
+  })
 })
