@@ -1,4 +1,7 @@
 {
+  "accessibility_a662153d": {
+    "message": "Accessibility"
+  },
   "add_8523c19b": {
     "message": "Add"
   },
@@ -406,6 +409,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Usage Right:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "View keyboard shortcuts"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "What would you like to call the new page?"
