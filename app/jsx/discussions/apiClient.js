@@ -17,32 +17,14 @@
  */
 
 import axios from 'axios'
-
-// In the the index.html.erb view for this page, we fire of `fetch` requests for all the
-// get requests for all the discusisons we're going to render. We do this so they
-// can start loading then and not have to wait until this JS file is loaded to start
-// fetching. But since they are just raw `fetch` responses, we need to massage them
-// into something that looks like an axios response, since that is what everything
-// here is designed to deal with
-let axiosResponses
-function getFetchRequests() {
-  return (
-    axiosResponses ||
-    (axiosResponses = (window.preloadedDiscussionTopicFetchRequests || []).map(fetchRequest => {
-      return fetchRequest.then(res => {
-        return res.json().then(json => {
-          return {
-            data: json,
-            headers: {link: res.headers.get('Link')}
-          }
-        })
-      })
-    }))
-  )
-}
+import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 
 export function getDiscussions({contextType, contextId}, {page}) {
-  return getFetchRequests()[page - 1]
+  // In the the index.html.erb view for this page, we use prefetch_xhr to fire off
+  // `fetch` requests for all the discusisons we're going to render. We do this
+  // so they can start loading then and not have to wait until this JS file is
+  // loaded to start fetching.
+  return asAxios(getPrefetchedXHR(`prefetched_discussion_topic_page_${page - 1}`))
 }
 
 export function updateDiscussion({contextType, contextId}, discussion, updatedFields) {

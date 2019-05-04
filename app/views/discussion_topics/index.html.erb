@@ -24,19 +24,10 @@
 
   js_bundle :discussion_topics_index_v2
   css_bundle :discussions_index
-
 %>
 <% content_for :stylesheets do # we put this in :stylesheets so it is rendered early, in the <head> %>
-  <script>
-    preloadedDiscussionTopicFetchRequests = <%= raw(@discussion_topics_urls_to_prefetch.to_json) %>
-      .map(function(url) {
-        return fetch(url, {
-          credentials: 'same-origin',
-          headers: {
-            'Accept': 'application/json+canvas-string-ids, application/json'
-          }
-        })
-      });
-  </script>
+  <% @discussion_topics_urls_to_prefetch.each_with_index do |url, i| %>
+    <%= prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}") %>
+  <% end %>
 <% end %>
 

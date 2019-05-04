@@ -61,8 +61,8 @@ docker-compose.local.*
 
 # sub-packages
 /packages/*/node_modules
-/packages/canvas-planner/lib
-/packages/canvas-planner/es
+/packages/*/lib
+/packages/*/es
 /packages/canvas-planner/coverage/
 /packages/canvas-planner/.babel-cache
 

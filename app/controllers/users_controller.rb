@@ -623,7 +623,7 @@ class UsersController < ApplicationController
       end
     end
 
-    render :layout => false
+    render :formats => 'html', :layout => false
   end
 
   def toggle_hide_dashcard_color_overlays

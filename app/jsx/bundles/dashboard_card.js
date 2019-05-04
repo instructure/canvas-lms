@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import getDroppableDashboardCardBox from '../dashboard_card/getDroppableDashboardCardBox'
 import axios from 'axios'
+import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 
 let promiseToGetDashboardCards
 
@@ -45,7 +46,9 @@ export default function loadCardDashboard() {
   if (cachedCards) render(JSON.parse(cachedCards))
 
   if (!promiseToGetDashboardCards) {
-    promiseToGetDashboardCards = axios.get('/api/v1/dashboard/dashboard_cards').then(({data}) => data)
+    const url = '/api/v1/dashboard/dashboard_cards'
+    promiseToGetDashboardCards = asJson(getPrefetchedXHR(url)) || axios.get(url).then(({data}) => data)
+
     promiseToGetDashboardCards.then(dashboardCards =>
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )

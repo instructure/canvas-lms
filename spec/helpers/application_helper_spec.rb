@@ -1032,6 +1032,18 @@ describe ApplicationHelper do
     end
   end
 
+  describe "#prefetch_xhr" do
+    it "inserts a script tag that will have a `fetch` call with the right id, url, and options" do
+      expect(prefetch_xhr('some_url', id: 'some_id', options: {headers: {"x-some-header": "some-value"}})).to eq(
+"<script>
+//<![CDATA[
+(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[\"some_id\"] = fetch(\"some_url\", {\"credentials\":\"same-origin\",\"headers\":{\"Accept\":\"application/json+canvas-string-ids, application/json\",\"x-some-header\":\"some-value\"}})
+//]]>
+</script>"
+      )
+    end
+  end
+
   describe "#alt_text_for_login_logo" do
     before :each do
       @domain_root_account = Account.default

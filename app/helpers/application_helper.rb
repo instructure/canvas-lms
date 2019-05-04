@@ -1209,4 +1209,14 @@ module ApplicationHelper
     # stub
   end
 
+  def prefetch_xhr(url, id: nil, options: {})
+    id ||= url
+    opts = {
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json+canvas-string-ids, application/json'
+      }
+    }.deep_merge(options)
+    javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"
+  end
 end
