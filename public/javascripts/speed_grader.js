@@ -1956,7 +1956,8 @@ EG = {
       submission.turnitin_data && submission.turnitin_data.provider === 'vericite'
 
     SpeedgraderHelpers.plagiarismResubmitButton(
-      submission.has_originality_score,
+      submission.has_originality_score &&
+        Object.values(submission.turnitin_data).every(tiid => tiid.status !== 'error'),
       $('#plagiarism_platform_info_container')
     )
 
