@@ -1404,7 +1404,7 @@ class Assignment < ActiveRecord::Base
 
   def low_level_locked_for?(user, opts={})
     return false if opts[:check_policies] && context.grants_right?(user, :read_as_admin)
-    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
       assignment_for_user = self.overridden_for(user)
       if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now)
@@ -1426,13 +1426,6 @@ class Assignment < ActiveRecord::Base
       end
       assignment_for_user.touch_on_unlock_if_necessary
       locked
-    end
-  end
-
-  def clear_locked_cache(user)
-    super
-    each_submission_type do |submission, _, short_type|
-      Rails.cache.delete(submission.locked_cache_key(user)) if self.send("#{short_type}?")
     end
   end
 
@@ -2729,6 +2722,7 @@ class Assignment < ActiveRecord::Base
 
   def update_cached_due_dates
     return unless update_cached_due_dates?
+    self.clear_cache_key(:availability)
 
     unless self.saved_by == :migration
       relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
@@ -2864,7 +2858,7 @@ class Assignment < ActiveRecord::Base
   # simply versioned models are always marked new_record, but for our purposes
   # they are not new. this ensures that assignment override caching works as
   # intended for versioned assignments
-  def cache_key
+  def cache_key(*)
     new_record = @new_record
     @new_record = false if @simply_versioned_version_model
     super
@@ -2921,6 +2915,7 @@ class Assignment < ActiveRecord::Base
 
   def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
     return if self.class.suspended_callback?(:update_cached_due_dates, :save)
+    self.clear_cache_key(:availability)
 
     enqueuing_args = if student_ids
       { strand: "assignment_overrides_changed_for_students_#{self.global_id}" }

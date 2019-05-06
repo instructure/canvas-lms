@@ -237,9 +237,6 @@ class ContextModulesController < ApplicationController
       locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
         @context.context_modules.active.each { |m| m.evaluate_for(@current_user) }
-        if tag.content.respond_to?(:clear_locked_cache)
-          tag.content.clear_locked_cache(@current_user)
-        end
       end
     end
   end
@@ -299,11 +296,28 @@ class ContextModulesController < ApplicationController
 
       preload_assignments_and_quizzes(all_tags, user_is_admin)
 
+      assignment_ids = []
+      quiz_ids = []
+      all_tags.each do |tag|
+        if tag.can_have_assignment? && tag.assignment
+          assignment_ids << tag.assignment.id
+        elsif tag.content_type_quiz?
+          quiz_ids << tag.content.id
+        end
+      end
+
+      submitted_assignment_ids = @current_user.submissions.shard(@context.shard).
+        having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id) if assignment_ids.any?
+      submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard).
+        completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if quiz_ids.any?
+
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
-          tag.assignment.context_module_tag_info(@current_user, @context, user_is_admin: user_is_admin)
+          tag.assignment.context_module_tag_info(@current_user, @context,
+            user_is_admin: user_is_admin, has_submission: submitted_assignment_ids.include?(tag.assignment.id))
         elsif tag.content_type_quiz?
-          tag.content.context_module_tag_info(@current_user, @context, user_is_admin: user_is_admin)
+          tag.content.context_module_tag_info(@current_user, @context,
+            user_is_admin: user_is_admin, has_submission: submitted_quiz_ids.include?(tag.content.id))
         else
           {:points_possible => nil, :due_date => nil}
         end
@@ -658,7 +672,7 @@ class ContextModulesController < ApplicationController
   end
 
   def should_preload_override_data?
-    key = ['preloaded_module_override_data', @context.global_asset_string, @current_user].cache_key
+    key = ['preloaded_module_override_data2', @context.global_asset_string, @current_user.cache_key(:enrollments), @current_user.cache_key(:groups)].cache_key
     # if the user has been touched we should preload all of the overrides because it's almost certain we'll need them all
     if Rails.cache.read(key)
       false

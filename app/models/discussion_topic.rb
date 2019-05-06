@@ -1369,7 +1369,7 @@ class DiscussionTopic < ActiveRecord::Base
   def low_level_locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, :read_as_admin)
 
-    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
         locked = {object: self, unlock_at: delayed_post_at}
@@ -1407,12 +1407,6 @@ class DiscussionTopic < ActiveRecord::Base
         user_context_module_progressions: progressions,
       })
     end
-  end
-
-  def clear_locked_cache(user)
-    super
-    Rails.cache.delete(assignment.locked_cache_key(user)) if assignment
-    Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
   end
 
   def entries_for_feed(user, podcast_feed=false)

@@ -504,6 +504,7 @@ module Api::V1::Assignment
     end
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
+      assignment.clear_cache_key(:availability)
       DueDateCacher.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 

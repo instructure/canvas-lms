@@ -6539,26 +6539,26 @@ describe Assignment do
     end
 
     it "returns past_due if an assignment is due in the past and no submission exists" do
-      info = @assignment.context_module_tag_info(@student, @course)
+      info = @assignment.context_module_tag_info(@student, @course, has_submission: false)
       expect(info[:past_due]).to be_truthy
     end
 
     it "does not return past_due for assignments that don't expect submissions" do
       @assignment.submission_types = ''
       @assignment.save!
-      info = @assignment.context_module_tag_info(@student, @course)
+      info = @assignment.context_module_tag_info(@student, @course, has_submission: false)
       expect(info[:past_due]).to be_falsey
     end
 
     it "does not return past_due for assignments that were turned in on time" do
       Timecop.freeze(2.weeks.ago) { @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'blah') }
-      info = @assignment.context_module_tag_info(@student, @course)
+      info = @assignment.context_module_tag_info(@student, @course, has_submission: true)
       expect(info[:past_due]).to be_falsey
     end
 
     it "does not return past_due for assignments that were turned in late" do
       @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'blah')
-      info = @assignment.context_module_tag_info(@student, @course)
+      info = @assignment.context_module_tag_info(@student, @course, has_submission: true)
       expect(info[:past_due]).to be_falsey
     end
   end

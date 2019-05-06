@@ -137,7 +137,10 @@ class AssignmentOverride < ActiveRecord::Base
   private :update_cached_due_dates?
 
   def update_cached_due_dates
-    DueDateCacher.recompute(assignment) if update_cached_due_dates?
+    if update_cached_due_dates?
+      assignment.clear_cache_key(:availability)
+      DueDateCacher.recompute(assignment)
+    end
   end
 
   def touch_assignment

@@ -27,7 +27,9 @@ module Canvas
     # (which is far less often than the many times per day users are currently being touched)
 
     ALLOWED_TYPES = {
-      'User' => %w{enrollments groups account_users}
+      'User' => %w{enrollments groups account_users},
+      'Assignment' => %w{availability},
+      'Quizzes::Quiz' => %w{availability}
     }.freeze
 
     MIGRATED_TYPES = {}.freeze # for someday when we're reasonably sure we've moved all the cache keys for a type over
