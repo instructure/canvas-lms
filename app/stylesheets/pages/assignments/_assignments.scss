@@ -192,7 +192,7 @@
   .details {
     border: none;
     padding: 0;
-    h3 {
+    h2 {
       margin: 0;
     }
     .header {
@@ -202,7 +202,7 @@
     }
     .content {
       padding-#{direction(left)}: 5px;
-      h4 {
+      h3 {
         @include fontSize(11px);
         font-weight: bold;
         margin-bottom: 0;

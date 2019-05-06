@@ -25,7 +25,7 @@
   @assigned_assessments.count(&:incomplete?)
 ].cache_key) do %>
 <div class="details">
-  <h3><%= t 'titles.submission', "Submission" %></h3>
+  <h2><%= t 'titles.submission', "Submission" %></h2>
   <% if @current_user_submission.excused? %>
     <div class="header">
       <%= t "Excused!" %>
@@ -108,7 +108,7 @@
     </div>
 
     <% if @assignment.has_peer_reviews? && @current_user_submission.user == @current_user %>
-      <h4><%= t 'titles.assigned_peer_reviews', "Assigned Peer Reviews" %></h4>
+      <h3><%= t 'titles.assigned_peer_reviews', "Assigned Peer Reviews" %></h3>
 
       <ul class="unstyled_list Submission__List">
         <li style="<%= hidden unless @assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
@@ -122,7 +122,7 @@
       <% if @assignment.muted? %>
         <p><%= t 'You may not see all comments right now because the assignment is currently being graded.' %></p>
       <% else %>
-        <h4><%= t 'titles.comments', "Comments:" %> </h4>
+        <h3><%= t 'titles.comments', "Comments:" %> </h3>
 
         <% visible_comments = @current_user_submission.visible_submission_comments -%>
         <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
