@@ -137,10 +137,10 @@ class SplitUsers
     end
     source_user.shard.activate do
       ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each {|c| c.move_to_user(restored_user)}
-      MERGE_ITEM_TYPES.each do |klass, user_attr|
-        ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
-        klass.to_s.classify.constantize.where(id: ids).update_all(user_attr => restored_user.id) if ids
-      end
+    end
+    MERGE_ITEM_TYPES.each do |klass, user_attr|
+      ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
+      Shard.partition_by_shard(ids) { |shard_ids| klass.to_s.classify.constantize.where(id: shard_ids).update_all(user_attr => restored_user.id) } if ids
     end
   end
 
