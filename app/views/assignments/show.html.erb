@@ -207,6 +207,8 @@
 
     </table>
 
+    <%= render :partial => "excused_students" %>
+
     <% if can_do(@assignment, @current_user, :update) %>
       <div class="content-box">
         <a

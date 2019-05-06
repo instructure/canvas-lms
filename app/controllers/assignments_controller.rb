@@ -461,6 +461,8 @@ class AssignmentsController < ApplicationController
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
           @current_user
         ),
+        ALL_STUDENTS: students_in_course,
+        EXCLUDED_STUDENTS: excused_students,
         COURSE_ID: @context.id,
         GROUP_CATEGORIES: group_categories,
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,

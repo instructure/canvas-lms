@@ -152,6 +152,8 @@ define [
       @assignment = @model
       @setDefaultsIfNew()
       @dueDateOverrideView = options.views['js-assignment-overrides']
+      @excludeStudentsView = options.views['js-exclude-students']
+      
       @on 'success', @redirectAfterSave
       @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -371,6 +373,7 @@ define [
       data.due_at = defaultDates?.get('due_at') or null
       data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
+      data.excluded_students = @excludeStudentsView.getExcludedStudents()
       data.published = true if @shouldPublish
       data.points_possible = round(numberHelper.parse(data.points_possible), 2)
       data.peer_review_count = numberHelper.parse(data.peer_review_count) if data.peer_review_count

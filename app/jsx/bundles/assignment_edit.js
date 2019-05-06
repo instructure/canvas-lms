@@ -22,7 +22,11 @@ import EditHeaderView from 'compiled/views/assignments/EditHeaderView'
 import EditView from 'compiled/views/assignments/EditView'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import DueDateList from 'compiled/models/DueDateList'
+
 import DueDateOverride from 'compiled/views/assignments/DueDateOverride'
+import ExcludeStudents from 'compiled/views/assignments/ExcludeStudents'
+import ExcludeStudentList from 'compiled/models/ExcludeStudentList'
+
 import AssignmentGroupSelector from 'compiled/views/assignments/AssignmentGroupSelector'
 import GradingTypeSelector from 'compiled/views/assignments/GradingTypeSelector'
 import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
@@ -42,6 +46,7 @@ assignment.urlRoot = ENV.URL_ROOT
 
 const sectionList = new SectionCollection(ENV.SECTION_LIST)
 const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sectionList, assignment)
+const excludeStudentList = new ExcludeStudentList([])
 
 const assignmentGroupSelector = new AssignmentGroupSelector({
   parentModel: assignment,
@@ -72,13 +77,16 @@ const editView = new EditView({
   groupCategorySelector,
   peerReviewsSelector,
   views: {
+    'js-exclude-students': new ExcludeStudents(
+      {model: excludeStudentList}
+    ),
     'js-assignment-overrides': new DueDateOverride({
       model: dueDateList,
       views: {},
       postToSIS: assignment.postToSIS(),
       dueDatesReadonly: !!lockedItems.due_dates,
       availabilityDatesReadonly: !!lockedItems.availability_dates
-    })
+    }),
   },
   lockedItems: assignment.id ? lockedItems : {} // if no id, creating a new assignment
 })
