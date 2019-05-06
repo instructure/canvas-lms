@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -21,11 +21,12 @@ const sharedConfig = require('./webpack.shared.config')
 
 module.exports = {
   ...sharedConfig,
+  mode: 'development',
   entry: {
-    demo: [path.join(__dirname, 'demo', 'app.js')]
+    testcafe: [path.join(__dirname, 'testcafe', 'entry.js')]
   },
   output: {
-    path: path.join(__dirname, 'github-pages'),
+    path: path.join(__dirname, 'testcafe/build'),
     filename: '[name].js'
   }
 }

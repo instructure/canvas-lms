@@ -6,3 +6,4 @@ npm-debug*
 doc/*.js
 github-pages/*.js
 canvas
+testcafe/build

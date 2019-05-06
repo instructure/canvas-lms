@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require('path')
-const sharedConfig = require('./webpack.shared.config')
+const webpack = require('webpack')
 
 module.exports = {
-  ...sharedConfig,
-  entry: {
-    demo: [path.join(__dirname, 'demo', 'app.js')]
+  module: {
+    rules: [
+      {
+        test: /\.js?$/,
+        use: ['babel-loader'],
+        exclude: /node_modules/
+      }
+    ]
   },
-  output: {
-    path: path.join(__dirname, 'github-pages'),
-    filename: '[name].js'
-  }
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
+      }
+    })
+  ]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require('path')
-const sharedConfig = require('./webpack.shared.config')
+// import React from 'react'
+// import ReactDOM from 'react-dom'
 
-module.exports = {
-  ...sharedConfig,
-  entry: {
-    demo: [path.join(__dirname, 'demo', 'app.js')]
-  },
-  output: {
-    path: path.join(__dirname, 'github-pages'),
-    filename: '[name].js'
+import '@instructure/ui-themes/lib/canvas'
+
+import {renderIntoDiv} from '../src'
+
+renderIntoDiv(document.getElementById('content'), {
+  textareaId: 'textarea',
+  editorOptions: () => {
+    return {
+      plugins:
+        'instructure-ui-icons, instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table, lists, instructure_condensed_buttons',
+      menubar: true
+    }
   }
-}
+})
