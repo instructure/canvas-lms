@@ -42,7 +42,56 @@ import ReactDOM from 'react-dom'
 import FileBrowser from 'jsx/shared/rce/FileBrowser'
 
   var SubmitAssignment = {
-   
+    // This ensures that the tool links in the "More" tab (which only appears with 4
+    // or more tools) behave properly when clicked
+    moreToolsListClickHandler(event) {
+      event.preventDefault()
+
+      const tool = $(this).data('tool')
+      const url = `/courses/${ENV.COURSE_ID}/external_tools/${tool.id}/resource_selection?homework=1&assignment_id=${ENV.SUBMIT_ASSIGNMENT.ID}`
+
+      const width = tool.get('homework_submission').selection_width || tool.get('selection_width')
+      const height = tool.get('homework_submission').selection_height || tool.get('selection_height')
+      const title = tool.get('display_text')
+      const $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"))
+
+      $div.append($("<iframe/>", {
+        frameborder: 0,
+        src: url,
+        id: "homework_selection_iframe",
+        tabindex: '0'
+      }).css({width, height}))
+        .bind('selection', function(selectionEvent, _data) {
+          submitContentItem(selectionEvent.contentItems[0])
+          $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
+          $div.dialog('close')
+        })
+        .on('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
+        .dialog({
+          width: 'auto',
+          height: 'auto',
+          title,
+          close() {
+            $div.remove()
+          }
+        })
+
+      const tabHelperHeight = 35
+      $div.append(
+        $('<div/>',
+          {id: 'tab-helper', style: 'height:0px;padding:5px', tabindex: '0'}
+        ).focus(function () {
+          $(this).height(`${tabHelperHeight}px`)
+          const joke = document.createTextNode(I18n.t('Q: What goes black, white, black, white?  A: A panda rolling down a hill.'))
+          this.appendChild(joke)
+        }).blur(function () {
+          $(this).html('').height('0px')
+        })
+      )
+
+      return $div
+    },
+
     beforeUnloadHandler: function(e) {
       return (e.returnValue = I18n.t("Changes you made may not be saved."));
     },
@@ -466,5 +515,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
     $tools.disableWhileLoading(uploadPromise, {buttons: {'.submit': I18n.t('getting_file', 'Retrieving File...')}});
     return uploadPromise;
   };
+
+  $("#submit_from_external_tool_form .tools li").live('click', SubmitAssignment.moreToolsListClickHandler);
 
 export default SubmitAssignment;
