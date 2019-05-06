@@ -457,9 +457,9 @@ class GradeCalculator
   def update_values_for(column, updates: {}, key: :grade)
     return unless column
 
-    actual_updates = user_specific_updates(updates: updates, default_value: column, key: key)
+    actual_updates = user_specific_updates(updates: updates, default_value: "excluded.#{column}", key: key)
 
-    "#{column} = CASE enrollment_id #{actual_updates} END"
+    "#{column} = CASE excluded.enrollment_id #{actual_updates} END"
   end
 
   def insert_values_for(column, updates: {}, key: :grade)
@@ -500,19 +500,17 @@ class GradeCalculator
   def save_course_and_grading_period_scores
     return if @only_update_course_gp_metadata
 
-    # Construct upsert statement to update existing Scores or create them if needed,
-    # for course and grading period Scores.
+    # Depending on whether we're updating course scores or grading period
+    # scores, we need to check our inserted values against different uniqueness
+    # constraints
+    conflict_target = if @grading_period.present?
+      "(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL"
+    else
+      "(enrollment_id) WHERE course_score"
+    end
+
+    # Update existing course and grading period Scores or create them if needed.
     Score.connection.execute("
-      UPDATE #{Score.quoted_table_name}
-          SET
-            #{columns_to_insert_or_update[:update_values].join(', ')},
-            updated_at = #{updated_at},
-            -- if workflow_state was previously deleted for some reason, update it to active
-            workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
-          WHERE
-            enrollment_id IN (#{joined_enrollment_ids}) AND
-            assignment_group_id IS NULL AND
-            #{@grading_period ? "grading_period_id = #{@grading_period.id}" : 'course_score IS TRUE'};
       INSERT INTO #{Score.quoted_table_name}
           (
             enrollment_id, grading_period_id,
@@ -527,13 +525,14 @@ class GradeCalculator
             #{updated_at} as created_at,
             #{updated_at} as updated_at
           FROM #{Enrollment.quoted_table_name} enrollments
-          LEFT OUTER JOIN #{Score.quoted_table_name} scores on
-            scores.enrollment_id = enrollments.id AND
-            scores.assignment_group_id IS NULL AND
-            #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'}
           WHERE
-            enrollments.id IN (#{joined_enrollment_ids}) AND
-            scores.id IS NULL;
+            enrollments.id IN (#{joined_enrollment_ids})
+      ON CONFLICT #{conflict_target}
+      DO UPDATE SET
+          #{columns_to_insert_or_update[:update_values].join(', ')},
+          updated_at = excluded.updated_at,
+          -- if workflow_state was previously deleted for some reason, update it to active
+          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
     ")
   end
 
@@ -545,23 +544,6 @@ class GradeCalculator
     return unless @ignore_muted
 
     ScoreMetadata.connection.execute("
-      UPDATE #{ScoreMetadata.quoted_table_name} metadata
-        SET
-          calculation_details = CASE enrollments.user_id
-            #{@dropped_updates.map do |user_id, dropped|
-              "WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)"
-            end.join(' ')}
-            ELSE calculation_details
-          END,
-          updated_at = #{updated_at}
-        FROM #{Score.quoted_table_name} scores
-        INNER JOIN #{Enrollment.quoted_table_name} enrollments ON
-          enrollments.id = scores.enrollment_id
-        WHERE
-          scores.enrollment_id IN (#{joined_enrollment_ids}) AND
-          scores.assignment_group_id IS NULL AND
-          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'} AND
-          metadata.score_id = scores.id;
       INSERT INTO #{ScoreMetadata.quoted_table_name}
         (score_id, calculation_details, created_at, updated_at)
         SELECT
@@ -582,77 +564,73 @@ class GradeCalculator
         WHERE
           scores.enrollment_id IN (#{joined_enrollment_ids}) AND
           scores.assignment_group_id IS NULL AND
-          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'} AND
-          metadata.id IS NULL;
+          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'}
+      ON CONFLICT (score_id)
+      DO UPDATE SET
+        calculation_details = excluded.calculation_details,
+        updated_at = excluded.updated_at
+      ;
     ")
   end
 
   def assignment_group_columns_to_insert_or_update
     return @assignment_group_columns_to_insert_or_update if defined? @assignment_group_columns_to_insert_or_update
 
-    column_list = { value_names: [], update_columns: [], update_values: [], insert_columns: [], insert_values: [] }
+    column_list = {
+      insert_columns: [],
+      insert_values: [],
+      update_columns: [],
+      update_values: [],
+      value_names: []
+    }
 
     unless @only_update_points
       column_list[:value_names] << 'current_score'
-      column_list[:update_columns] << "#{current_score_column} = val.current_score"
+      column_list[:update_columns] << "#{current_score_column} = excluded.current_score"
       column_list[:insert_columns] << "val.current_score AS #{current_score_column}"
 
       column_list[:value_names] << 'final_score'
-      column_list[:update_columns] << "#{final_score_column} = val.final_score"
+      column_list[:update_columns] << "#{final_score_column} = excluded.final_score"
       column_list[:insert_columns] << "val.final_score AS #{final_score_column}"
     end
 
     column_list[:value_names] << 'current_points'
-    column_list[:update_columns] << "#{points_column(:current)} = val.current_points"
+    column_list[:update_columns] << "#{points_column(:current)} = excluded.current_points"
     column_list[:insert_columns] << "val.current_points AS #{points_column(:current)}"
 
     column_list[:value_names] << 'final_points'
-    column_list[:update_columns] << "#{points_column(:final)} = val.final_points"
+    column_list[:update_columns] << "#{points_column(:final)} = excluded.final_points"
     column_list[:insert_columns] << "val.final_points AS #{points_column(:final)}"
 
     @assignment_group_columns_to_insert_or_update = column_list
   end
 
   def save_assignment_group_scores(score_values, dropped_values)
-    # Construct upsert statement to update existing Scores or create them if needed,
-    # for assignment group Scores.
+    # Update existing assignment group Scores or create them if needed.
     Score.connection.execute("
-      UPDATE #{Score.quoted_table_name} scores
-          SET
-            #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
-            updated_at = #{updated_at},
-            workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
-          FROM (VALUES #{score_values}) val
-            (
-              enrollment_id,
-              assignment_group_id,
-              #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
-            )
-          WHERE val.enrollment_id = scores.enrollment_id AND
-            val.assignment_group_id = scores.assignment_group_id;
       INSERT INTO #{Score.quoted_table_name} (
-          enrollment_id, assignment_group_id,
-          #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')},
-          course_score, created_at, updated_at
+        enrollment_id, assignment_group_id,
+        #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')},
+        course_score, created_at, updated_at
+      )
+        SELECT
+          val.enrollment_id AS enrollment_id,
+          val.assignment_group_id as assignment_group_id,
+          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(', ')},
+          FALSE AS course_score,
+          #{updated_at} AS created_at,
+          #{updated_at} AS updated_at
+        FROM (VALUES #{score_values}) val
+          (
+            enrollment_id,
+            assignment_group_id,
+            #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
           )
-          SELECT
-            val.enrollment_id AS enrollment_id,
-            val.assignment_group_id as assignment_group_id,
-            #{assignment_group_columns_to_insert_or_update[:insert_columns].join(', ')},
-            FALSE AS course_score,
-            #{updated_at} AS created_at,
-            #{updated_at} AS updated_at
-          FROM (VALUES #{score_values}) val
-            (
-              enrollment_id,
-              assignment_group_id,
-              #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
-            )
-          LEFT OUTER JOIN #{Score.quoted_table_name} sc ON
-            sc.enrollment_id = val.enrollment_id AND
-            sc.assignment_group_id = val.assignment_group_id
-          WHERE
-            sc.id IS NULL;
+      ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
+      DO UPDATE SET
+        #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
+        updated_at = excluded.updated_at,
+        workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
     ")
 
     # We only save score metadata for posted grades. This means, if we're
@@ -661,17 +639,6 @@ class GradeCalculator
     # score metadata for unposted grades.
     if @ignore_muted
       ScoreMetadata.connection.execute("
-        UPDATE #{ScoreMetadata.quoted_table_name} md
-          SET
-            calculation_details = CAST(val.calculation_details as json),
-            updated_at = #{updated_at}
-          FROM (VALUES #{dropped_values}) val
-            (enrollment_id, assignment_group_id, calculation_details)
-          INNER JOIN #{Score.quoted_table_name} scores ON
-            scores.enrollment_id = val.enrollment_id AND
-            scores.assignment_group_id = val.assignment_group_id
-          WHERE
-            scores.id = md.score_id;
         INSERT INTO #{ScoreMetadata.quoted_table_name}
           (score_id, calculation_details, created_at, updated_at)
           SELECT
@@ -684,10 +651,11 @@ class GradeCalculator
           LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
             scores.enrollment_id = val.enrollment_id AND
             scores.assignment_group_id = val.assignment_group_id
-          LEFT OUTER JOIN #{ScoreMetadata.quoted_table_name} metadata ON
-            metadata.score_id = scores.id
-          WHERE
-            metadata.id IS NULL;
+        ON CONFLICT (score_id)
+        DO UPDATE SET
+          calculation_details = excluded.calculation_details,
+          updated_at = excluded.updated_at
+        ;
       ")
     end
   end
