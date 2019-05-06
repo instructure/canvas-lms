@@ -4,7 +4,7 @@ A javascript based uploader for kaltura.
 
 ## Installation
 
-`bower install k5uploader`
+`npm install k5uploader`
 
 ## Considerations
 
