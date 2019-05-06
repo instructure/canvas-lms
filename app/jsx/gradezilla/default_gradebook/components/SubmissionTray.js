@@ -68,6 +68,7 @@ export default class SubmissionTray extends React.Component {
       name: string.isRequired,
       htmlUrl: string.isRequired,
       muted: bool.isRequired,
+      postManually: bool.isRequired,
       published: bool.isRequired,
       anonymizeStudents: bool.isRequired,
       moderatedGrading: bool.isRequired
@@ -93,6 +94,7 @@ export default class SubmissionTray extends React.Component {
       grade: string,
       valid: bool.isRequired
     }),
+    postPoliciesEnabled: bool.isRequired,
     student: shape({
       id: string.isRequired,
       avatarUrl: string,
@@ -104,9 +106,11 @@ export default class SubmissionTray extends React.Component {
       drop: bool,
       excused: bool.isRequired,
       grade: string,
+      gradedAt: string.isRequired,
       late: bool.isRequired,
       missing: bool.isRequired,
       pointsDeducted: number,
+      postedAt: string.isRequired,
       secondsLate: number.isRequired,
       assignmentId: string.isRequired
     }),
@@ -317,6 +321,7 @@ export default class SubmissionTray extends React.Component {
                 isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
                 isInNoGradingPeriod={this.props.isInNoGradingPeriod}
                 isNotCountedForScore={this.props.isNotCountedForScore}
+                postPoliciesEnabled={this.props.postPoliciesEnabled}
                 submission={this.props.submission}
               />
 

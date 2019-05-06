@@ -6535,6 +6535,20 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     notOk(props.pendingGradeInfo)
   })
+
+  test('sets postPoliciesEnabled to false when post_policies_enabled is false', () => {
+    gradebook.options.post_policies_enabled = false
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.postPoliciesEnabled, false)
+  })
+
+  test('sets postPoliciesEnabled to true when post_policies_enabled is true', () => {
+    gradebook.options.post_policies_enabled = true
+    gradebook.setSubmissionTrayState(true, '1101', '2301')
+    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+    strictEqual(props.postPoliciesEnabled, true)
+  })
 })
 
 QUnit.module('Gradebook#renderSubmissionTray', {
