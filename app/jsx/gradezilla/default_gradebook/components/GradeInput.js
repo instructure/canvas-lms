@@ -281,7 +281,6 @@ export default class GradeInput extends React.Component {
         onBlur={this.handleTextBlur}
         placeholder="–"
         value={this.state.formattedGrade}
-        width="6em"
       />
     )
   }
