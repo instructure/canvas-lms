@@ -30,6 +30,35 @@ import StatusBar from './StatusBar';
 
 const editorWrappers = new WeakMap();
 
+function showMenubar(el, show) {
+  const $menubar = el.querySelector('.tox-menubar')
+  $menubar && ($menubar.style.display = show ? '' : 'none')
+  if (show) {
+    focusFirstMenuButton(el)
+  }
+}
+
+function focusFirstMenuButton(el) {
+  const $firstMenu = el.querySelector('.tox-mbtn')
+  $firstMenu && $firstMenu.focus()
+}
+
+function accessiblizeMenubar(el, editor) {
+  // hide the menubar
+  showMenubar(el, false)
+
+  // when typed w/in the editor's edit area
+  editor.addShortcut('Alt+F9', '', () => {
+    showMenubar(el, true)
+  })
+  // when typed somewhere else w/in RCEWrapper
+  el.addEventListener('keyup', (e) => {
+    if (e.altKey && e.code === 'F9') {
+      showMenubar(el, true)
+    }
+  })
+}
+
 export default class RCEWrapper extends React.Component {
   static getByEditor(editor) {
     return editorWrappers.get(editor);
@@ -45,6 +74,8 @@ export default class RCEWrapper extends React.Component {
 
     // test override points
     this.indicator = false;
+
+    this._elementRef = null;
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -209,6 +240,10 @@ export default class RCEWrapper extends React.Component {
     editor.rceWrapper = this;
   }
 
+  onInit(_e, editor) {
+    accessiblizeMenubar(this._elementRef, editor)
+  }
+
   componentWillUnmount() {
     if (!this._destroyCalled) {
       this.destroy();
@@ -282,12 +317,13 @@ export default class RCEWrapper extends React.Component {
     mceProps.editorOptions.statusbar = false
 
     return (
-      <>
+      <div ref={el => this._elementRef = el}>
         <TinyMCE
           id={mceProps.textareaId}
           tinymce={mceProps.tinymce}
           className={mceProps.textareaClassName}
           onPreInit={this.annotateEditor.bind(this)}
+          onInit={this.onInit.bind(this)}
           onClick={this.onFocus.bind(this)}
           onKeypress={this.onFocus.bind(this)}
           onActivate={this.onFocus.bind(this)}
@@ -298,7 +334,7 @@ export default class RCEWrapper extends React.Component {
 
         <StatusBar />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
-      </>
+      </div>
     );
   }
 }
