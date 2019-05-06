@@ -102,14 +102,12 @@ class EnrollmentState < ActiveRecord::Base
       self.access_is_current = false
     end
 
-    if self.state_changed? && (self.state == "active" || self.state_was == "active")
-      # we could make this happen on every state change, to expire cached authorization right away but
-      # the permissions cache expires within an hour anyway
-      # this will at least prevent cached unauthorization
+    if self.state_changed?
       self.user_needs_touch = true
       unless self.skip_touch_user
         self.class.connection.after_transaction_commit do
-          self.enrollment.user.touch
+          self.enrollment.user.touch unless User.skip_touch_for_type?(:enrollments)
+          self.enrollment.user.clear_cache_key(:enrollments)
         end
       end
     end
@@ -215,9 +213,7 @@ class EnrollmentState < ActiveRecord::Base
 
     user_ids_to_touch = enrollments.select{|e| e.enrollment_state.user_needs_touch}.map(&:user_id)
     if user_ids_to_touch.any?
-      Shard.partition_by_shard(user_ids_to_touch) do |sliced_user_ids|
-        User.where(:id => sliced_user_ids).touch_all
-      end
+      User.touch_and_clear_cache_keys(user_ids_to_touch, :enrollments)
     end
   end
 

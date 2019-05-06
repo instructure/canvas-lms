@@ -360,6 +360,7 @@ class Group < ActiveRecord::Base
     new_group_memberships = all_group_memberships - old_group_memberships
     new_group_memberships.sort_by!(&:user_id)
     users.sort_by!(&:id)
+    User.clear_cache_keys(user_ids, :groups)
     users.each {|user| clear_permissions_cache(user) }
 
     if self.context_available?

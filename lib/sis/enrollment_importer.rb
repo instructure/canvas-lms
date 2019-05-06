@@ -62,7 +62,10 @@ module SIS
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
-        User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
+               User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
+
+        ids_to_touch = (batch + UserObserver.where(user_id: batch).pluck(:observer_id)).uniq
+        User.touch_and_clear_cache_keys(ids_to_touch, :enrollments) if ids_to_touch.any?
       end
       i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
         Enrollment.send_later_enqueue_args(:batch_add_to_favorites,

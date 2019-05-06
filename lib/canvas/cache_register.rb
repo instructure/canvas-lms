@@ -69,6 +69,15 @@ module Canvas
               Setting.get("revert_cache_register_migration_#{self.name.downcase}_#{key_type}", "false") != "true"
           end
 
+          def touch_and_clear_cache_keys(ids_or_records, *key_types)
+            unless key_types.all?{|type| self.skip_touch_for_type?(type)}
+              Array(ids_or_records).sort.each_slice(1000) do |slice|
+                self.where(id: slice).touch_all
+              end
+            end
+            self.clear_cache_keys(ids, *key_types)
+          end
+
           def clear_cache_keys(ids_or_records, *key_types)
             return unless key_types.all?{|type| valid_cache_key_type?(type)} && CacheRegister.enabled?
 
@@ -106,6 +115,10 @@ module Canvas
         def clear_cache_keys(*key_types)
           klass.clear_cache_keys(self.pluck(klass.primary_key), *key_types)
         end
+
+        def touch_and_clear_cache_keys(*key_types)
+          klass.touch_and_clear_cache_keys(self.pluck(klass.primary_key), *key_types)
+        end
       end
     end
 
@@ -128,7 +141,8 @@ module Canvas
           # so you should just use clear_cache_key
           def fetch_with_batched_keys(key, batch_object:, batched_keys:, **opts, &block)
             batched_keys = Array(batched_keys)
-            if batch_object && !opts[:force] && self.is_a?(::ActiveSupport::Cache::RedisStore) && CacheRegister.enabled? &&
+            if batch_object && !opts[:force] &&
+                defined?(::ActiveSupport::Cache::RedisStore) && self.is_a?(::ActiveSupport::Cache::RedisStore) && CacheRegister.enabled? &&
                 batched_keys.all?{|type| batch_object.class.valid_cache_key_type?(type)}
               fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
             else

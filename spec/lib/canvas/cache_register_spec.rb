@@ -160,6 +160,32 @@ describe Canvas::CacheRegister do
         end
       end
 
+      it "should be able to touch the users as well (unless skipped)" do
+        users = (0..2).map{ User.create! }
+        Timecop.freeze(time1) do
+          users.each {|u| u.cache_key(:enrollments) }
+        end
+
+        Timecop.freeze(time2) do
+          User.touch_and_clear_cache_keys(users.map(&:id), :enrollments)
+          users.each do |u|
+            expect(u.cache_key(:enrollments)).to include(to_stamp(time2))
+            expect(u.reload.updated_at.to_i).to eq time2.to_i
+          end
+        end
+
+        time3 = 3.minutes.from_now
+        expect(User).to receive(:skip_touch_for_type?).with(:enrollments).and_return(true)
+
+        Timecop.freeze(time3) do
+          User.touch_and_clear_cache_keys(users.map(&:id), :enrollments)
+          users.each do |u|
+            expect(u.cache_key(:enrollments)).to include(to_stamp(time3))
+            expect(u.reload.updated_at.to_i).to eq time2.to_i # don't touch
+          end
+        end
+      end
+
       context "with sharding" do
         specs_require_sharding
 
