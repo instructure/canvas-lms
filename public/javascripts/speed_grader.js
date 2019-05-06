@@ -2114,7 +2114,8 @@ EG = {
     $submission_attachment_viewed_at.html($.raw(studentViewedAtHTML))
 
     $submission_files_container.showIf(
-      submission.versioned_attachments && submission.versioned_attachments.length
+      submission.submission_type === 'online_text_entry' ||
+        (submission.versioned_attachments && submission.versioned_attachments.length)
     )
 
     let preview_attachment = null
