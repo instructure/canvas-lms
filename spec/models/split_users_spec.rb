@@ -480,6 +480,14 @@ describe SplitUsers do
       let!(:shard1_account) { @shard1.activate { Account.create! } }
       let!(:shard1_course) { shard1_account.courses.create! }
 
+      it 'should handle access tokens' do
+        at = AccessToken.create!(user: restored_user, :developer_key => DeveloperKey.default)
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(at.reload.user_id).to eq shard1_source_user.id
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(at.reload.user_id).to eq restored_user.id
+      end
+
       it 'should move submissions from new courses post merge when appropriate' do
         pseudonym1 = restored_user.pseudonyms.create!(unique_id: 'sam1@example.com')
         UserMerge.from(restored_user).into(shard1_source_user)
