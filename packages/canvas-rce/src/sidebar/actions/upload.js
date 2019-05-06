@@ -166,6 +166,18 @@ export function fetchFolders(bookmark) {
   };
 }
 
+export function createMediaServerSession() {
+  return (dispatch, getState) => {
+    const { source } = getState();
+    if(!Bridge.mediaServerSession) {
+      return source.mediaServerSession()
+      .then((data) => {
+        Bridge.setMediaServerSession(data)
+      })
+    }
+  }
+}
+
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     dispatch(activateMediaUpload(fileMetaProps))

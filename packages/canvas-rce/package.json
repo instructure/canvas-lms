@@ -107,6 +107,7 @@
     "@instructure/ui-forms": "6",
     "@instructure/ui-icons": "6",
     "@instructure/ui-layout": "6",
+    "@instructure/media-capture": "^5",
     "@instructure/ui-overlays": "6",
     "@instructure/ui-react-utils": "6",
     "@instructure/ui-svg-images": "6",

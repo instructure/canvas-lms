@@ -145,6 +145,10 @@ class RceApiSource {
     return this.fetchPage(this.uriFor('folders', props), this.jwt)
   }
 
+  mediaServerSession() {
+    return this.apiPost(this.baseUri("v1/services/kaltura_session"), headerFor(this.jwt), {})
+  }
+
   // fetches folders for the given context to upload files to
   fetchFolders(props, bookmark) {
     let headers = headerFor(this.jwt)

@@ -49,6 +49,14 @@ export default class Bridge {
     this.focusedEditor = editor;
   }
 
+  get mediaServerSession() {
+    return this._mediaServerSession;
+  }
+
+  setMediaServerSession(session) {
+    this._mediaServerSession = session;
+  }
+
   detachEditor(editor) {
     if (editor === this.focusedEditor) {
       this.focusedEditor = null;

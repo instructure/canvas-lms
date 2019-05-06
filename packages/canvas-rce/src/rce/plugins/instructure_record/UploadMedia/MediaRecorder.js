@@ -17,19 +17,30 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { object } from 'prop-types'
+import { MediaCapture, canUseMediaCapture } from '@instructure/media-capture'
+import {MediaCaptureStrings} from './MediaCaptureStrings'
 
-export default function(ed, document) {
-  return import('./UploadMedia').then(({UploadMedia}) => {
-    let container = document.querySelector('.canvas-rce-media-upload')
-    if (!container) {
-      container = document.createElement('div')
-      container.className = 'canvas-rce-media-upload'
-      document.body.appendChild(container)
-    }
+export default class MediaRecorder extends React.Component {
+  componentWillMount() {
+    this.props.contentProps.createMediaServerSession()
+  }
 
-    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
+  render() {
+    return (
+      <div>
+        {canUseMediaCapture() && (
+          <MediaCapture
+            translations={MediaCaptureStrings}
+            onCompleted={this.saveFile}
+          />
+        )}
+      </div>
+    )
+  }
+}
 
-    ReactDOM.render(<UploadMedia onDismiss={handleDismiss} editor={ed} />, container)
-  })
+MediaRecorder.propTypes = {
+    editor: object.isRequired,
+    contentProps: object.isRequired
 }

@@ -17,19 +17,16 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render, fireEvent} from 'react-testing-library'
+import {UploadMedia} from '../index'
 
-export default function(ed, document) {
-  return import('./UploadMedia').then(({UploadMedia}) => {
-    let container = document.querySelector('.canvas-rce-media-upload')
-    if (!container) {
-      container = document.createElement('div')
-      container.className = 'canvas-rce-media-upload'
-      document.body.appendChild(container)
-    }
+describe('UploadMedia', () => {
+  it('calls onDismiss prop when closing', () => {
+    const handleDismiss = jest.fn()
+    const {getByText} = render(<UploadMedia onDismiss={handleDismiss} />)
 
-    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
-
-    ReactDOM.render(<UploadMedia onDismiss={handleDismiss} editor={ed} />, container)
+    const closeBtn = getByText('Close')
+    fireEvent.click(closeBtn)
+    expect(handleDismiss).toHaveBeenCalled()
   })
-}
+})

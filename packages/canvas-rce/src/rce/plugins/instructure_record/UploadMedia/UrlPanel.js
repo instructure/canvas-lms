@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React, {useState} from 'react'
+import { string, func } from 'prop-types'
+import { TextInput } from '@instructure/ui-text-input'
+import formatMessage from '../../../../format-message'
 
-export default function(ed, document) {
-  return import('./UploadMedia').then(({UploadMedia}) => {
-    let container = document.querySelector('.canvas-rce-media-upload')
-    if (!container) {
-      container = document.createElement('div')
-      container.className = 'canvas-rce-media-upload'
-      document.body.appendChild(container)
-    }
+export default function UrlPanel ({imageUrl, setImageUrl}) {
+  return (
+    <>
+      <TextInput label={formatMessage('Image URL')} type="url" value={imageUrl} onChange={(e, val) => setImageUrl(val)} />
+    </>
+  )
+}
 
-    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
-
-    ReactDOM.render(<UploadMedia onDismiss={handleDismiss} editor={ed} />, container)
-  })
+UrlPanel.propTypes = {
+  imageUrl: string.isRequired,
+  setImageUrl: func.isRequired
 }

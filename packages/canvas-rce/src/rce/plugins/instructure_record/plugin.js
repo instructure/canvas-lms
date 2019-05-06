@@ -23,15 +23,32 @@ import formatMessage from "../../../format-message";
 tinymce.create("tinymce.plugins.InstructureRecord", {
   init: function(ed) {
     ed.addCommand("instructureRecord", clickCallback.bind(this, ed, document));
-    ed.ui.registry.addButton("instructure_record", {
-      title: htmlEscape(
+    ed.ui.registry.addMenuButton("instructure_record", {
+      tooltip: htmlEscape(
         formatMessage({
           default: "Record/Upload Media",
           description: "Title for RCE button to insert or record media"
         })
       ),
-      onAction: () => ed.execCommand("instructureRecord"),
-      icon: "video"
+      icon: "video",
+      fetch(callback) {
+        const items = [
+          {
+            type: 'menuitem',
+            text: formatMessage('Upload/Record Media'),
+            onAction: () => ed.execCommand("instructureRecord"),
+          },
+
+          {
+            type: 'menuitem',
+            text: formatMessage('Course Media'), // This item needs to be adjusted to be user/context aware, i.e. Use Media
+            onAction() {
+              ed.focus(true) // activate the editor without changing focus
+            }
+          }
+        ]
+        callback(items);
+      }
     });
   }
 });

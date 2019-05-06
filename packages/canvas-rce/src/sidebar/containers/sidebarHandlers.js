@@ -20,9 +20,10 @@ import { changeTab, changeAccordion } from "../actions/ui";
 import { fetchInitialPage, fetchNextPage } from "../actions/data";
 import { fetchImages } from "../actions/images";
 import {
+  createMediaServerSession,
   fetchFolders,
-  uploadPreflight,
   openOrCloseUploadForm,
+  uploadPreflight,
   uploadToMediaFolder
 } from "../actions/upload";
 import { searchFlickr, openOrCloseFlickrForm } from "../actions/flickr";
@@ -46,5 +47,6 @@ export default function propsFromDispatch(dispatch) {
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
     startMediaUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
+    createMediaServerSession: (props) => dispatch(createMediaServerSession(props))
   };
 }
