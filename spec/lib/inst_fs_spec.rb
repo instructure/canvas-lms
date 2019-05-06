@@ -107,11 +107,43 @@ describe InstFS do
         end
       end
 
+      it "generates the same url within a cache window of time so it's not unique every time" do
+        url1 = InstFS.authenticated_url(@attachment)
+        url2 = InstFS.authenticated_url(@attachment)
+        expect(url1).to eq(url2)
+
+        Timecop.freeze(1.day.from_now) do
+          url3 = InstFS.authenticated_url(@attachment)
+          expect(url1).to_not eq(url3)
+
+          first_token = url1.split(/token=/).last
+          expect(->{
+            Canvas::Security.decode_jwt(first_token, [ @secret ])
+          }).to raise_error(Canvas::Security::TokenExpired)
+        end
+      end
+
       describe "jwt claims" do
         def claims_for(options={})
           url = InstFS.authenticated_url(@attachment, options)
           token = url.split(/token=/).last
           Canvas::Security.decode_jwt(token, [ @secret ])
+        end
+
+        it "no matter what time it is, the token has no less than 12 hours of validity left and never more than 24" do
+          24.times do |i|
+            Timecop.freeze(i.hours.from_now) do
+              claims = claims_for()
+              now = Time.zone.now
+              exp = Time.zone.at(claims['exp'])
+              expect(exp).to be > now + 12.hours
+              expect(exp).to be < now + 24.hours
+
+              iat = Time.zone.at(claims['iat'])
+              expect(iat).to be <= now
+              expect(iat).to be > now - 12.hours
+            end
+          end
         end
 
         it "includes global user_id claim in the token if user provided" do
