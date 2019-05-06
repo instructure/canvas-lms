@@ -63,7 +63,7 @@ module Lti
       def validate_client_id!
         binding_context = context.respond_to?(:account) ? context.account : context
 
-        unless developer_key.usable? && developer_key.account_binding_for(binding_context).workflow_state == 'on'
+        unless developer_key.usable? && developer_key.account_binding_for(binding_context)&.workflow_state == 'on'
           set_oidc_error!('unauthorized_client', 'Client not authorized in requested context')
         end
       end
