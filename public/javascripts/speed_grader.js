@@ -20,6 +20,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
@@ -717,21 +718,34 @@ function unmountCommentTextArea() {
 
 function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
-  let icon = []
-  switch (attachment.upload_status) {
-    case 'pending':
-      icon = [<IconUpload />, I18n.t('Uploading Submission')]
-      break
-    case 'failed':
-      icon = [<IconWarning />, I18n.t('Submission Failed to Submit')]
-      break
-    case 'success':
-      break
-    default:
-      icon = [<IconCheckMarkIndeterminate />, I18n.t('No File Submitted')]
+  const iconAndTipMap = {
+    pending: {
+      icon: <IconUpload />,
+      tip: I18n.t('Uploading Submission')
+    },
+    failed: {
+      icon: <IconWarning />,
+      tip: I18n.t('Submission Failed to Submit')
+    },
+    default: {
+      icon: <IconCheckMarkIndeterminate />,
+      tip: I18n.t('No File Submitted')
+    }
   }
 
-  ReactDOM.render(<Tooltip tip={icon[1]}>{icon[0]}</Tooltip>, mountPoint)
+  if (attachment.upload_status === 'success') {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  } else {
+    const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
+    const tooltip = (
+      <Tooltip tip={tip} on={['click', 'hover', 'focus']}>
+        <Button variant="icon" icon={icon}>
+          <ScreenReaderContent>toggle tooltip</ScreenReaderContent>
+        </Button>
+      </Tooltip>
+    )
+    ReactDOM.render(tooltip, mountPoint)
+  }
 }
 
 function renderHiddenSubmissionPill({submission, postManually}) {
