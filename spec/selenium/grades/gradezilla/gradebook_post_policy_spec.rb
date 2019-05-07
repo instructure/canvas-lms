@@ -120,7 +120,8 @@ describe 'Gradezilla Post Policy' do
         @section_one_students.each do |student|
           user_session(student)
           StudentGradesPage.visit_as_student(@course_with_manual_post)
-          expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+          assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+          expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
         end
       end
 
@@ -152,11 +153,13 @@ describe 'Gradezilla Post Policy' do
       it 'student can see hidden icon', priority: '1', test_id: 3756682 do
         user_session(@section_one_students.second)
         StudentGradesPage.visit_as_student(@course_with_manual_post)
-        expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+        assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+        expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
 
         user_session(@section_two_students.second)
         StudentGradesPage.visit_as_student(@course_with_manual_post)
-        expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+        assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+        expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
       end
 
       it 'hidden pill displayed in submission tray', priority: '1', test_id: 3756682 do
@@ -180,7 +183,8 @@ describe 'Gradezilla Post Policy' do
         @section_two_students.each do |student|
           user_session(student)
           StudentGradesPage.visit_as_student(@course_with_manual_post)
-          expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+          assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+          expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
         end
       end
 
@@ -213,7 +217,8 @@ describe 'Gradezilla Post Policy' do
     it 'does not post for ungraded', priority: '1', test_id: 3756680 do
       user_session(@students[3])
       StudentGradesPage.visit_as_student(@course_with_manual_post)
-      expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+      assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+      expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
     end
   end
 
@@ -236,14 +241,16 @@ describe 'Gradezilla Post Policy' do
     it 'does not post ungraded for section', priority: '1', test_id: 3756681 do
       user_session(@section_two_students.second)
       StudentGradesPage.visit_as_student(@course_with_manual_post)
-      expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+      assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+      expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
     end
 
     it 'does not post graded for other section', priority: '1', test_id: 3756681 do
       @section_one_students.each do |student|
         user_session(student)
         StudentGradesPage.visit_as_student(@course_with_manual_post)
-        expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+        assignment_row = StudentGradesPage.assignment_row(@manual_assignment)
+        expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_displayed
       end
     end
   end

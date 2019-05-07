@@ -14,14 +14,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../pages/post_grades_tray_page'
-require_relative '../pages/hide_grades_tray_page'
+
+require_relative 'post_grades_tray_page'
+require_relative 'hide_grades_tray_page'
 
 class Speedgrader
   class << self
     include SeleniumDependencies
-    include PostGradesTray
-    include HideGradesTray
+
+    def tray
+      f('[role=dialog][aria-label="Hide grades tray"]')
+    end
 
     # components/elements
     def right_inner_panel
@@ -48,12 +51,12 @@ class Speedgrader
       f('#grading-box-extended')
     end
 
-    def red_dot_grade_not_posted
-      # TODO: add locator for red dot
+    def hidden_pill
+      fxpath('//span[text() = "Hidden"]', hidden_pill_container)
     end
 
-    def hidden_pill
-      # TODO: add locator for hidden pill
+    def hidden_pill_container
+      f('#speed_grader_hidden_submission_pill_mount_point')
     end
 
     def grading_enabled?
@@ -80,21 +83,32 @@ class Speedgrader
       fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
     end
 
-    # TODO: This (mute/unmute) probably needs to go away as post policy gets implemented per invisions
     def mute_button
       f('button#mute_link')
     end
 
+    def post_or_hide_grades_button
+      fj('button:contains("Post or Hide Grades"):visible')
+    end
+
+    def all_grades_hidden_link
+      fj('button:contains("All Grades Hidden"):visible')
+    end
+
     def post_grades_link
-      # TODO: post button locator
+      fj("[role=menuitem]:contains('Post Grades'):visible")
+    end
+
+    def all_grades_posted_link
+      fj("[role=menuitem]:contains('All Grades Posted'):visible")
     end
 
     def hide_grades_link
-      # TODO: hide button locator
+      fj("[role=menuitem]:contains('Hide Grades'):visible")
     end
 
-    def grades_not_posted_icon
-      # TODO: grades not posted (crossed eyeball?) locator
+    def grades_hidden_icon
+      f('svg[name=IconOff]', f('#speed_grader_post_grades_menu_mount_point'))
     end
 
     def hide_students_chkbox
@@ -344,6 +358,10 @@ class Speedgrader
       end
     end
 
+    def click_post_or_hide_grades_button
+      post_or_hide_grades_button.click
+    end
+
     def click_post_link
       post_grades_link.click
     end
@@ -556,7 +574,7 @@ class Speedgrader
     end
 
     def comment_button_for_row(row_text)
-      row =fj("tr:contains('#{row_text}')")
+      row = fj("tr:contains('#{row_text}')")
       fj('button:contains("Additional Comments")', row)
     end
 
@@ -567,6 +585,21 @@ class Speedgrader
     def rubric_comment_for_row(row_text)
       row = fj("tr:contains('#{row_text}'):visible")
       f(".react-rubric-break-words", row)
+    end
+
+    def manually_post_grades(type:, sections: [])
+      click_post_or_hide_grades_button
+      click_post_link
+      PostGradesTray.post_type_radio_button(type).click
+      PostGradesTray.select_sections(sections: sections)
+      PostGradesTray.post_grades
+    end
+
+    def manually_hide_grades(sections: [])
+      click_post_or_hide_grades_button
+      click_hide_link
+      HideGradesTray.select_sections(sections: sections)
+      HideGradesTray.hide_grades
     end
   end
 end

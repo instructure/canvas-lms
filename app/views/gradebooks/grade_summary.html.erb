@@ -494,7 +494,7 @@
           </tr>
       <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
         <td colspan="6">
-          <% if assignment_presenter.has_comments? %>
+          <% if assignment_presenter.posted_to_student? && assignment_presenter.has_comments? %>
               <table class="score_details_table ic-Table ic-Table--condensed">
                 <thead>
                   <tr>
