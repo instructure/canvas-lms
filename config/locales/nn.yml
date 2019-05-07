@@ -14017,7 +14017,7 @@ nn:
         already_bookmarked: "Allereie laga bokmerke"
         bookmark: "Bokmerk denne banken"
         delete: "Slett bank"
-        edit: "Slett bankdetaljar"
+        edit: "Rediger bankdetaljar"
         move_questions: "Flytt fleire spørsmål"
       edit_warning: "Hugs at endringar i spørsmålsmalar ikkje automatisk oppdaterer quizar som allereie har teke desse spørsmåla i bruk."
       headings: 
