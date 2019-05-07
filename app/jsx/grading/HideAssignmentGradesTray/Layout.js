@@ -32,7 +32,7 @@ import Description from './Description'
 import SpecificSections from '../SpecificSections'
 
 export default function Layout({
-  assignment: {anonymizeStudents, gradesPublished},
+  assignment: {anonymousGrading, gradesPublished},
   dismiss,
   hideBySections,
   hideBySectionsChanged,
@@ -77,16 +77,18 @@ export default function Layout({
         </View>
       )}
 
-      {hasSections && anonymizeStudents && (
+      {hasSections && anonymousGrading && (
         <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>{I18n.t('Anonymous assignments cannot be hidden by section.')}</Text>
+          <Text>
+            {I18n.t('You can only hide grades for everyone when the assignment is anonymous.')}
+          </Text>
         </View>
       )}
 
       {hasSections && (
         <SpecificSections
           checked={hideBySections}
-          disabled={!gradesPublished || anonymizeStudents}
+          disabled={!gradesPublished || anonymousGrading}
           onCheck={event => {
             hideBySectionsChanged(event.target.checked)
           }}
@@ -125,7 +127,7 @@ export default function Layout({
 
 Layout.propTypes = {
   assignment: shape({
-    anonymizeStudents: bool.isRequired,
+    anonymousGrading: bool.isRequired,
     gradesPublished: bool.isRequired
   }).isRequired,
   dismiss: func.isRequired,

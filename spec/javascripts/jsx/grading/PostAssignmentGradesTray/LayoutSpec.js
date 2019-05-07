@@ -33,7 +33,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   }
 
   function getAnonymousText() {
-    const postText = 'Anonymous assignments cannot be posted by section.'
+    const postText = 'You can only post grades for everyone when the assignment is anonymous.'
     return [...$container.querySelectorAll('p')].find($p => $p.textContent === postText)
   }
 
@@ -110,7 +110,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     context = {
       assignment: {
-        anonymizeStudents: false,
+        anonymousGrading: false,
         gradesPublished: true
       },
       dismiss: () => {},
@@ -293,12 +293,6 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
       notOk(getAnonymousText())
     })
 
-    test('anonymous descriptive text is hidden when assignment is anonymous', () => {
-      context.assignment.anonymizeStudents = true
-      mountComponent()
-      notOk(getAnonymousText())
-    })
-
     test('sections are not shown when postBySections is false', () => {
       context.postBySections = false
       mountComponent()
@@ -308,7 +302,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
 
   QUnit.module('Anonymous assignments', anonymousAssignmentsHooks => {
     anonymousAssignmentsHooks.beforeEach(() => {
-      context.assignment.anonymizeStudents = true
+      context.assignment.anonymousGrading = true
       mountComponent()
     })
 

@@ -29,17 +29,17 @@ import I18n from 'i18n!hide_assignment_grades_tray'
 export const EVERYONE = 'everyone'
 export const GRADED = 'graded'
 
-export default function PostTypes(props) {
+export default function PostTypes({anonymousGrading, defaultValue, disabled, postTypeChanged}) {
   return (
     <RadioInputGroup
-      defaultValue={props.defaultValue}
+      defaultValue={anonymousGrading ? EVERYONE : defaultValue}
       description={
         <ScreenReaderContent>
           {I18n.t('Select whether to post for all submissions, or only graded ones.')}
         </ScreenReaderContent>
       }
-      disabled={props.disabled}
-      onChange={props.postTypeChanged}
+      disabled={disabled}
+      onChange={postTypeChanged}
       name={I18n.t('Post types')}
     >
       <RadioInput
@@ -53,6 +53,7 @@ export default function PostTypes(props) {
         value={EVERYONE}
       />
       <RadioInput
+        disabled={anonymousGrading}
         label={
           <Fragment>
             <Text>{I18n.t('Graded')}</Text>
@@ -69,6 +70,7 @@ export default function PostTypes(props) {
 }
 
 PostTypes.propTypes = {
+  anonymousGrading: bool.isRequired,
   defaultValue: oneOf([EVERYONE, GRADED]).isRequired,
   disabled: bool.isRequired,
   postTypeChanged: func.isRequired

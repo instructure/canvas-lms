@@ -33,7 +33,7 @@ import PostTypes from './PostTypes'
 import SpecificSections from '../SpecificSections'
 
 export default function Layout({
-  assignment: {anonymizeStudents, gradesPublished},
+  assignment: {anonymousGrading, gradesPublished},
   dismiss,
   postBySections,
   postBySectionsChanged,
@@ -69,8 +69,6 @@ export default function Layout({
 
   return (
     <Fragment>
-      {heading}
-
       {unpostedCount > 0 && (
         <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
           <Badge
@@ -88,26 +86,23 @@ export default function Layout({
         </div>
       )}
 
+      {heading}
+
       <View as="div" margin="small 0" padding="0 medium">
         <PostTypes
-          disabled={!gradesPublished}
+          anonymousGrading={anonymousGrading}
           defaultValue={postType}
+          disabled={!gradesPublished}
           postTypeChanged={postTypeChanged}
         />
       </View>
 
       <View as="div" margin="0 medium" className="hr" />
 
-      {hasSections && anonymizeStudents && (
-        <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>{I18n.t('Anonymous assignments cannot be posted by section.')}</Text>
-        </View>
-      )}
-
       {hasSections && (
         <SpecificSections
           checked={postBySections}
-          disabled={!gradesPublished || anonymizeStudents}
+          disabled={!gradesPublished || anonymousGrading}
           onCheck={event => {
             postBySectionsChanged(event.target.checked)
           }}
@@ -118,6 +113,14 @@ export default function Layout({
       )}
 
       <View as="div" margin="0 medium" className="hr" />
+
+      {anonymousGrading && (
+        <View as="p" margin="small 0 small" padding="0 medium">
+          <Text>
+            {I18n.t('You can only post grades for everyone when the assignment is anonymous.')}
+          </Text>
+        </View>
+      )}
 
       {!gradesPublished && (
         <View as="p" margin="small 0 small" padding="0 medium">
@@ -150,7 +153,7 @@ export default function Layout({
 
 Layout.propTypes = {
   assignment: shape({
-    anonymizeStudents: bool.isRequired,
+    anonymousGrading: bool.isRequired,
     gradesPublished: bool.isRequired
   }).isRequired,
   dismiss: func.isRequired,

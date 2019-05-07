@@ -32,7 +32,7 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
   }
 
   function getAnonymousText() {
-    const hideText = 'Anonymous assignments cannot be hidden by section.'
+    const hideText = 'You can only hide grades for everyone when the assignment is anonymous.'
     return [...$container.querySelectorAll('p')].find($p => $p.textContent === hideText)
   }
 
@@ -82,7 +82,7 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     context = {
       assignment: {
-        anonymizeStudents: false,
+        anonymousGrading: false,
         gradesPublished: true
       },
       dismiss: () => {},
@@ -218,13 +218,8 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
       notOk(getLabel('Specific Sections'))
     })
 
-    test('anonymous descriptive text is shown', () => {
-      mountComponent()
-      notOk(getAnonymousText())
-    })
-
     test('anonymous descriptive text is not shown', () => {
-      context.assignment.anonymizeStudents = true
+      context.assignment.anonymousGrading = true
       mountComponent()
       notOk(getAnonymousText())
     })
@@ -238,7 +233,7 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
 
   QUnit.module('Anonymous assignments', anonymousAssignmentsHooks => {
     anonymousAssignmentsHooks.beforeEach(() => {
-      context.assignment.anonymizeStudents = true
+      context.assignment.anonymousGrading = true
       mountComponent()
     })
 

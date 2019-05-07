@@ -108,7 +108,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymize_students: false,
+        anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
         html_url: 'http://localhost/assignments/2301',
@@ -145,10 +145,10 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.name, 'Math 1.1')
     })
 
-    test('includes the assignment anonymize_students', () => {
+    test('includes the assignment anonymous_grading', () => {
       postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.anonymizeStudents, false)
+      strictEqual(assignment.anonymousGrading, false)
     })
 
     test('includes the assignment grades_published', () => {
@@ -226,7 +226,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymize_students: false,
+        anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
         id: '2301',
@@ -266,10 +266,10 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.name, 'Math 1.1')
     })
 
-    test('includes the assignment anonymize_students', () => {
+    test('includes the assignment anonymous_grading', () => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.anonymizeStudents, false)
+      strictEqual(assignment.anonymousGrading, false)
     })
 
     test('includes the assignment grades_published', () => {
@@ -351,7 +351,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymize_students: false,
+        anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
         html_url: 'http://localhost/assignments/2301',

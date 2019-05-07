@@ -40,6 +40,10 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be posted before grades are published"
     end
 
+    if input[:graded_only] && assignment.anonymous_grading
+      raise GraphQL::ExecutionError, "Anonymous assignments cannot be posted by graded only"
+    end
+
     submissions_scope = input[:graded_only] ? assignment.submissions.graded : assignment.submissions
     submission_ids = submissions_scope.pluck(:id)
     progress = course.progresses.new(tag: "post_assignment_grades")
