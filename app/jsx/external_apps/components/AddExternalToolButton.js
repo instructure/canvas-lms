@@ -22,6 +22,7 @@ import React from 'react'
 import Modal from '../../shared/components/InstuiModal'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
 import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
+import ConfirmationForm from './ConfirmationForm'
 import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
 import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
 import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateConfirmationForm'
@@ -37,6 +38,8 @@ export default class AddExternalToolButton extends React.Component {
       modalIsOpen: props.modalIsOpen,
       tool: {},
       isLti2: props.isLti2,
+      type: '',
+      toolConfiguration: null,
       lti2RegistrationUrl: 'about:blank',
       configurationType: props.configurationType || '',
       duplicateTool: props.duplicateTool,
@@ -53,7 +56,7 @@ export default class AddExternalToolButton extends React.Component {
       modalIsOpen: true,
       tool: {},
       isLti2: false,
-      lti2RegistrationUrl: null
+      lti2RegistrationUrl: null,
     })
   }
 
@@ -63,7 +66,8 @@ export default class AddExternalToolButton extends React.Component {
       tool: {},
       duplicateTool: false,
       attemptedToolSaveData: {},
-      attemptedToolConfigurationType: ''
+      attemptedToolConfigurationType: '',
+      type: ''
     })
   }
 
@@ -141,6 +145,13 @@ export default class AddExternalToolButton extends React.Component {
         tool: {}
       })
       e.currentTarget.closest('form').submit()
+    } else if (configurationType === 'byClientId') {
+      this.setState({
+        type: 'byClientId',
+        // TODO: fetch the tool config for the
+        // specified client id
+        toolConfiguration: {}
+      })
     } else if (!this.throttleCreation) {
       this.setState({
         configurationType,
@@ -178,6 +189,14 @@ export default class AddExternalToolButton extends React.Component {
           handleActivateLti2={this.handleActivateLti2}
         />
       )
+    } else if (this.state.type === 'byClientId' && this.state.toolConfiguration) {
+      return(
+        <ConfirmationForm
+          onCancel={() => { this.closeModal() }}
+          onConfirm={() => { this.closeModal() }}
+          message={I18n.t('Install tool_name ?')}
+        />
+      )
     } else {
       return (
         <div>
@@ -188,6 +207,7 @@ export default class AddExternalToolButton extends React.Component {
             handleSubmit={this.createTool}
             hideComponent={this.state.isLti2}
             membershipServiceFeatureFlagEnabled={window.ENV.MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED}
+            lti13Enabled={ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED}
           >
             <button type="button" className="Button" onClick={this.closeModal}>
               {I18n.t('Cancel')}

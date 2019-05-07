@@ -106,6 +106,18 @@ test('renders lti2 form with new tool', () => {
   ok(nodes.configurationFormLti2)
 })
 
+test('renders correct form when "Lti 1.3" is chosen', () => {
+  const data = {
+    configurationType: 'byClientId',
+    handleSubmit,
+    tool: {},
+    showConfigurationSelector: true
+  }
+  const nodes = getDOMNodes(data)
+  ok(nodes.configurationTypeSelector)
+  ok(nodes.component.lti13Form)
+})
+
 test('renders manual form with existing tool and no selector', () => {
   const data = {
     configurationType: 'manual',
