@@ -65,7 +65,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.15.5'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.2.2'
+gem 'switchman-inst-jobs', '1.3.3'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
@@ -86,7 +86,7 @@ gem 'icalendar', '2.5.1', require: false
 gem 'ims-lti', '2.2.3', require: 'ims'
 gem 'json_schemer', '0.1.7'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'json', '2.1.0'
+gem 'json', '2.2.0'
 gem 'oj', '3.3.9'
 gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.9.4', require: false
@@ -105,7 +105,7 @@ gem 'parallel', '1.12.1', require: false
   gem 'ruby-progressbar', '1.9.0', require: false # used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
 gem 'rake', '12.3.1'
-gem 'ratom-nokogiri', '0.10.7', require: false
+gem 'ratom-nokogiri', '0.10.8', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
 

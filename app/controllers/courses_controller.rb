@@ -777,6 +777,7 @@ class CoursesController < ApplicationController
           @course.require_assignment_group rescue nil
           # offer updates the workflow state, saving the record without doing validation callbacks
           if api_request? and value_to_boolean(params[:offer])
+            return unless verified_user_check
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
@@ -2335,7 +2336,7 @@ class CoursesController < ApplicationController
     params[:course][:event] = :offer if params[:offer].present?
 
     if params[:course][:event] && params[:course].keys.size == 1
-      if authorized_action(@course, @current_user, :change_course_state)
+      if authorized_action(@course, @current_user, :change_course_state) && verified_user_check
         if process_course_event
           render_update_success
         else
@@ -2439,6 +2440,7 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+        return unless verified_user_check
         unless process_course_event
           render_update_failure
           return
