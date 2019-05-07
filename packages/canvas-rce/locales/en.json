@@ -73,6 +73,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "circle unordered list"
   },
+  "clear_upload_34efa419": {
+    "message": "Clear Upload"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Click any file to insert a download link for that file."
   },
@@ -165,6 +168,9 @@
   "documents_81393201": {
     "message": "Documents"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Drag and drop, or click to browse your computer"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Due: Multiple Dates"
   },
@@ -185,6 +191,9 @@
   },
   "file_upload_form_4aaad554": {
     "message": "File Upload Form"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename } preview"
   },
   "files_c300e900": {
     "message": "Files",
@@ -238,6 +247,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Insert Math Equation",
     "description": "Title for RCE button to insert a math equation"
+  },
+  "invalid_file_type_881cc9b2": {
+    "message": "Invalid file type"
   },
   "link_7262adec": {
     "message": "Link",
@@ -394,6 +406,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Upload a new image"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Upload File"
   },
   "upload_image_6120b609": {
     "message": "Upload Image"
