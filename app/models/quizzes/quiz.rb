@@ -384,9 +384,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     return false unless course.root_account.settings[:restrict_quiz_questions]
 
     if user.present?
-      quiz_eligibility = Quizzes::QuizEligibility.new(course: course, user: user)
-      user_in_active_section = quiz_eligibility.section_dates_currently_apply?
-      return false if user_in_active_section
+      user_sections = course.sections_visible_to(user).select(&:restrict_enrollments_to_section_dates)
+      return false if user_sections.present?
     end
 
     !!course.concluded?
@@ -635,15 +634,9 @@ class Quizzes::Quiz < ActiveRecord::Base
     # Admins can take the full quiz whenever they want
     return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
 
-    can_take = Quizzes::QuizEligibility.new(course: self.context, quiz: self, user: submission.user)
-
-    fallback_end_at = if can_take.section_dates_currently_apply?
-      can_take.active_sections_max_end_at
-    elsif course.restrict_enrollments_to_course_dates
-      course.end_at || course.enrollment_term.end_at
-    else
-      course.enrollment_term.end_at
-    end
+    # We no longer use enrollment_term but get this info from enrollment_state
+    fallback_end_at = course.enrollments.for_user(user).active_by_date.
+      maximum('enrollment_states.state_valid_until')
 
     # set to lock date
     if lock_at && !submission.manually_unlocked
