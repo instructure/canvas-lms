@@ -28,6 +28,29 @@ import Bridge from "../bridge";
 import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar';
 
+import themeable from '@instructure/ui-themeable/lib'
+import styles from '../skins/skin-delta.css'
+import theme from '../skins/theme'
+
+// Get oxide the default skin injected into the DOM before the overrides loaded by themeable
+import {template} from '../../node_modules/tinymce/skins/ui/oxide/skin.min.css'
+let inserted = false
+function injectTinySkin() {
+  if (inserted) return
+  inserted = true
+  const style = document.createElement("style");
+  style.setAttribute('data-skin', 'tiny oxide skin')
+  style.appendChild(
+    // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
+    document.createTextNode(template().replace(/tinymce__oxide--/g, ""))
+  );
+  const beforeMe =
+    document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
+    document.head.querySelector('style') || // find any stylesheet
+    document.head.firstElementChild
+  document.head.insertBefore(style, beforeMe);
+}
+
 const editorWrappers = new WeakMap();
 
 function showMenubar(el, show) {
@@ -71,10 +94,30 @@ function initKeyboardShortcuts(el, editor) {
   })
 }
 
-export default class RCEWrapper extends React.Component {
+@themeable(theme, styles)
+class RCEWrapper extends React.Component {
   static getByEditor(editor) {
     return editorWrappers.get(editor);
   }
+
+  static propTypes = {
+    defaultContent: PropTypes.string,
+    editorOptions: PropTypes.object,
+    handleUnmount: PropTypes.func,
+    language: PropTypes.string,
+    onFocus: PropTypes.func,
+    onRemove: PropTypes.func,
+    textareaClassName: PropTypes.string,
+    textareaId: PropTypes.string,
+    tinymce: PropTypes.object,
+    trayProps
+  };
+
+  static defaultProps = {
+    trayProps: null
+  }
+
+  static skinCssInjected = false
 
   constructor(props) {
     super(props);
@@ -88,6 +131,8 @@ export default class RCEWrapper extends React.Component {
     this.indicator = false;
 
     this._elementRef = null;
+
+    injectTinySkin()
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -237,9 +282,25 @@ export default class RCEWrapper extends React.Component {
     return this.mceInstance().isHidden();
   }
 
+  get iframe() {
+    return document.getElementById(`${this.props.textareaId}_ifr`)
+  }
+
   onFocus() {
     Bridge.focusEditor(this);
+
+    // use .active to put a focus ring around the content area
+    // then the editor has focus. This isn't prefect, but it's
+    // what we've got for now.
+    const ifr = this.iframe
+    ifr && ifr.parentElement.classList.add('active')
+
     this.props.onFocus && this.props.onFocus(this);
+  }
+
+  onBlur() {
+    const ifr = this.iframe
+    ifr && ifr.parentElement.classList.remove('active')
   }
 
   call(methodName, ...args) {
@@ -333,7 +394,7 @@ export default class RCEWrapper extends React.Component {
     mceProps.editorOptions.statusbar = false
 
     return (
-      <div ref={el => this._elementRef = el}>
+      <div ref={el => this._elementRef = el} className={styles.root}>
         <TinyMCE
           id={mceProps.textareaId}
           tinymce={mceProps.tinymce}
@@ -344,6 +405,7 @@ export default class RCEWrapper extends React.Component {
           onKeypress={this.onFocus.bind(this)}
           onActivate={this.onFocus.bind(this)}
           onRemove={this.onRemove.bind(this)}
+          onBlur={this.onBlur.bind(this)}
           content={mceProps.defaultContent}
           config={this.wrapOptions(mceProps.editorOptions)}
         />
@@ -355,19 +417,4 @@ export default class RCEWrapper extends React.Component {
   }
 }
 
-RCEWrapper.propTypes = {
-  defaultContent: PropTypes.string,
-  editorOptions: PropTypes.object,
-  handleUnmount: PropTypes.func,
-  language: PropTypes.string,
-  onFocus: PropTypes.func,
-  onRemove: PropTypes.func,
-  textareaClassName: PropTypes.string,
-  textareaId: PropTypes.string,
-  tinymce: PropTypes.object,
-  trayProps
-};
-
-RCEWrapper.defaultProps = {
-  trayProps: null
-}
+export default RCEWrapper

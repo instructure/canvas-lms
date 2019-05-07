@@ -137,6 +137,7 @@
   "dependencies": {
     "@instructure/ui-a11y": "^5",
     "@instructure/ui-buttons": "^5",
+    "@instructure/ui-color-utils": "^6",
     "@instructure/ui-elements": "^5",
     "@instructure/ui-forms": "^5",
     "@instructure/ui-icons": "^5",

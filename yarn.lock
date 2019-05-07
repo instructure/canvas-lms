@@ -1099,6 +1099,14 @@
     keycode "^2"
     prop-types "^15"
 
+"@instructure/ui-color-utils@^6":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-color-utils/-/ui-color-utils-6.1.0.tgz#a2cafde6ea53cd89cb5fd4310609e770a6448538"
+  integrity sha512-4/19ghW2dk5Gr4eY1n/motp42AGc9iznm0Y87B9WkramX1KJ/RlRaKpogzhKsv8X8BOxNXJ3P9iLxvDAasqqyg==
+  dependencies:
+    "@babel/runtime" "^7"
+    tinycolor2 "^1.4.1"
+
 "@instructure/ui-container@^5.52.3":
   version "5.52.3"
   resolved "https://registry.yarnpkg.com/@instructure/ui-container/-/ui-container-5.52.3.tgz#0c60a0c16ada533d20f119673c949094aab9c427"

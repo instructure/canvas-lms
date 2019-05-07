@@ -23,7 +23,6 @@ import tinyRCE from "./tinyRCE";
 import normalizeProps from "./normalizeProps";
 import formatMessage from "../format-message";
 import Bridge from "../bridge";
-import { use as useSkin } from "./skin";
 
 if (!process.env.BUILD_LOCALE) {
   formatMessage.setup({
@@ -34,8 +33,6 @@ if (!process.env.BUILD_LOCALE) {
 }
 
 export function renderIntoDiv(target, props, renderCallback) {
-  if (!props.skin) useSkin();
-
   // normalize props
   props = normalizeProps(props, tinyRCE);
 
