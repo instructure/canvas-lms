@@ -177,6 +177,13 @@ describe Context do
       quiz_model(course: @course)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq @quiz
     end
+
+    it 'finds module items' do
+      page = @course.wiki_pages.create! title: 'blah'
+      mod = @course.context_modules.create! name: 'bleh'
+      tag = mod.add_item type: 'wiki_page', id: page.id
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/modules/items/#{tag.id}")).to eq tag
+    end
   end
 
   context "self.names_by_context_types_and_ids" do
