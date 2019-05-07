@@ -164,7 +164,10 @@ class SplitUsers
     end
     handle_submissions(records)
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
-    AccountUser.where(id: account_users_ids).update_all(user_id: restored_user.id)
+
+    Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
+      AccountUser.where(id: shard_account_user_ids).update_all(user_id: restored_user.id)
+    end
     restore_workflow_states_from_records(records)
   end
 
@@ -300,10 +303,10 @@ class SplitUsers
     # enrollments that were updated which already excluded conflicts, but we
     # will add the scope to protect against a FK violation.
     source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id))).
-      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).
+      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).shard(source_user).
       update_all(user_id: restored_user.id)
     source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id))).
-      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).
+      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).shard(source_user).
       update_all(user_id: restored_user.id)
   end
 

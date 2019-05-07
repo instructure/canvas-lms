@@ -9749,7 +9749,7 @@ ko:
       quiz_score_too_short: "점수는 0보다 커야 합니다."
       retrieving_filters_failed: "필터 검색 실패"
     ? "false"
-    : 오답
+    : 틀림
     file_uploaded_or_removed: 
       quizzes: 
         file_successfully_uploaded: "파일을 성공적으로 업로드했습니다."
@@ -10082,7 +10082,7 @@ ko:
           numerical: "숫자로 된 답변"
           short_answer: "공란 채우기"
           text_only: "내용(문제 없음)"
-          true_false: 참/거짓
+          true_false: 맞음/틀림
         show_possible_answers: "%{question}에 대한 가능한 답변 표시"
         show_possible_answers_no_question: "다음에 대한 가능한 답변을 표시"
         titles: 
@@ -10600,7 +10600,7 @@ ko:
     toggle_message: "퀴즈 표시 토\x1d글"
     top_level: ""
     ? "true"
-    : 참
+    : 맞음
   quizzes_7e598f57: 퀴즈
   ratings_2433172b: 등급
   re_upload_submissions_form: 

@@ -825,7 +825,8 @@ module ApplicationHelper
   end
 
   def custom_dashboard_url
-    url = @domain_root_account.settings[:dashboard_url]
+    url = @domain_root_account.settings["#{ApplicationController.test_cluster_name}_dashboard_url".to_sym] if ApplicationController.test_cluster_name
+    url ||= @domain_root_account.settings[:dashboard_url]
     if url.present?
       url += "?current_user_id=#{@current_user.id}" if @current_user
       url
