@@ -16,13 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
+import {unmountComponentAtNode} from 'react-dom'
 import PostPolicies from '../../../../../app/jsx/speed_grader/PostPolicies'
 
 QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
   let $hideTrayMountPoint
   let $postTrayMountPoint
+  let afterUpdateSubmission
   let postPolicies
+  let updateSubmission
+
+  function expectedAssignment() {
+    return {
+      anonymizeStudents: false,
+      gradesPublished: true,
+      id: '2301',
+      name: 'Math 1.1'
+    }
+  }
 
   suiteHooks.beforeEach(() => {
     $hideTrayMountPoint = document.createElement('div')
@@ -33,14 +44,15 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     document.body.appendChild($hideTrayMountPoint)
     document.body.appendChild($postTrayMountPoint)
 
-    const assignment = {
-      anonymizeStudents: false,
-      gradesPublished: true,
-      id: '2301',
-      name: 'Math 1.1'
-    }
     const sections = [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}]
-    postPolicies = new PostPolicies({assignment, sections})
+    afterUpdateSubmission = sinon.stub()
+    updateSubmission = sinon.stub()
+    postPolicies = new PostPolicies({
+      afterUpdateSubmission,
+      assignment: expectedAssignment(),
+      sections,
+      updateSubmission
+    })
   })
 
   suiteHooks.afterEach(() => {
@@ -51,121 +63,116 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
   test('renders the "Hide Assignment Grades" tray', () => {
     const $trayContainer = document.getElementById('hide-assignment-grades-tray')
-    const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+    const unmounted = unmountComponentAtNode($trayContainer)
     strictEqual(unmounted, true)
   })
 
   test('renders the "Post Assignment Grades" tray', () => {
     const $trayContainer = document.getElementById('post-assignment-grades-tray')
-    const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+    const unmounted = unmountComponentAtNode($trayContainer)
     strictEqual(unmounted, true)
   })
 
-  QUnit.module('#destroy()', () => {
+  QUnit.module('#destroy', () => {
     test('unmounts the "Hide Assignment Grades" tray', () => {
       postPolicies.destroy()
       const $trayContainer = document.getElementById('hide-assignment-grades-tray')
-      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      const unmounted = unmountComponentAtNode($trayContainer)
       strictEqual(unmounted, false)
     })
 
     test('unmounts the "Post Assignment Grades" tray', () => {
       postPolicies.destroy()
       const $trayContainer = document.getElementById('post-assignment-grades-tray')
-      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      const unmounted = unmountComponentAtNode($trayContainer)
       strictEqual(unmounted, false)
     })
   })
 
-  QUnit.module('#showHideAssignmentGradesTray()', hooks => {
+  QUnit.module('#showHideAssignmentGradesTray', hooks => {
+    function hideGradesShowArgs() {
+      return postPolicies._hideAssignmentGradesTray.show.firstCall.args[0]
+    }
+
     hooks.beforeEach(() => {
       sinon.stub(postPolicies._hideAssignmentGradesTray, 'show')
     })
 
-    test('shows the "Hide Assignment Grades" tray', () => {
+    test('calls "show" for the "Hide Assignment Grades" tray', () => {
       postPolicies.showHideAssignmentGradesTray({})
       strictEqual(postPolicies._hideAssignmentGradesTray.show.callCount, 1)
     })
 
-    test('includes the assignment id when showing the "Hide Assignment Grades" tray', () => {
+    test('passes the assignment to "show"', () => {
       postPolicies.showHideAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.id, '2301')
+      const {assignment} = hideGradesShowArgs()
+      deepEqual(assignment, expectedAssignment())
     })
 
-    test('includes the assignment name when showing the "Hide Assignment Grades" tray', () => {
+    test('passes the sections to "show"', () => {
       postPolicies.showHideAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.name, 'Math 1.1')
-    })
-
-    test('includes the assignment anonymizeStudents', () => {
-      postPolicies.showHideAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.anonymizeStudents, false)
-    })
-
-    test('includes the assignment gradesPublished', () => {
-      postPolicies.showHideAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.gradesPublished, true)
-    })
-
-    test('includes the sections', () => {
-      postPolicies.showHideAssignmentGradesTray({})
-      const [{sections}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+      const {sections} = hideGradesShowArgs()
       deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
     })
 
-    test('includes the `onExited` callback when showing the "Hide Assignment Grades" tray', () => {
-      const callback = sinon.stub()
-      postPolicies.showHideAssignmentGradesTray({onExited: callback})
-      const [{onExited}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(onExited, callback)
+    test('passes updateSubmission to "show"', () => {
+      postPolicies.showHideAssignmentGradesTray({
+        submissionsMap: {
+          '1': {posted_at: new Date().toISOString()}
+        }
+      })
+      const {onHidden} = hideGradesShowArgs()
+      onHidden({userIds: ['1']})
+      strictEqual(updateSubmission.callCount, 1)
+    })
+
+    test('passes afterUpdateSubmission to "show"', () => {
+      postPolicies.showHideAssignmentGradesTray({
+        submissionsMap: {'1': {posted_at: new Date().toISOString()}}
+      })
+      const {onHidden} = hideGradesShowArgs()
+      onHidden({userIds: ['1']})
+      strictEqual(afterUpdateSubmission.callCount, 1)
+    })
+
+    test('onHidden updates posted_at', () => {
+      const submissionsMap = {
+        '1': {posted_at: new Date().toISOString()}
+      }
+      postPolicies.showHideAssignmentGradesTray({submissionsMap})
+      const {onHidden} = hideGradesShowArgs()
+      onHidden({postedAt: null, userIds: ['1']})
+      strictEqual(submissionsMap['1'].posted_at, null)
     })
   })
 
-  QUnit.module('#showPostAssignmentGradesTray()', hooks => {
+  QUnit.module('#showPostAssignmentGradesTray', hooks => {
+    function postGradesShowArgs() {
+      return postPolicies._postAssignmentGradesTray.show.firstCall.args[0]
+    }
+
     hooks.beforeEach(() => {
       sinon.stub(postPolicies._postAssignmentGradesTray, 'show')
     })
 
-    test('shows the "Post Assignment Grades" tray', () => {
+    test('calls "show" for the "Post Assignment Grades" tray', () => {
       postPolicies.showPostAssignmentGradesTray({})
       strictEqual(postPolicies._postAssignmentGradesTray.show.callCount, 1)
     })
 
-    test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
+    test('passes the assignment to "show"', () => {
       postPolicies.showPostAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.id, '2301')
+      const {assignment} = postGradesShowArgs()
+      deepEqual(assignment, expectedAssignment())
     })
 
-    test('includes the assignment name when showing the "Post Assignment Grades" tray', () => {
+    test('passes sections to "show"', () => {
       postPolicies.showPostAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.name, 'Math 1.1')
-    })
-
-    test('includes the assignment anonymizeStudents', () => {
-      postPolicies.showPostAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.anonymizeStudents, false)
-    })
-
-    test('includes the assignment gradesPublished', () => {
-      postPolicies.showPostAssignmentGradesTray({})
-      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.gradesPublished, true)
-    })
-
-    test('includes the sections', () => {
-      postPolicies.showPostAssignmentGradesTray({})
-      const [{sections}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      const {sections} = postGradesShowArgs()
       deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
     })
 
-    test('includes the submissions', () => {
+    test('passes submissions to "show"', () => {
       const submission = {
         id: '93',
         assignment_id: '2301',
@@ -173,15 +180,33 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
         user_id: '441'
       }
       postPolicies.showPostAssignmentGradesTray({submissions: [submission]})
-      const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      const {submissions} = postGradesShowArgs()
       deepEqual(submissions, [submission])
     })
 
-    test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
-      const callback = sinon.stub()
-      postPolicies.showPostAssignmentGradesTray({onExited: callback})
-      const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(onExited, callback)
+    test('passes updateSubmission to "show"', () => {
+      postPolicies.showPostAssignmentGradesTray({submissionsMap: {'1': {posted_at: null}}})
+      const {onPosted} = postGradesShowArgs()
+      onPosted({userIds: ['1']})
+      strictEqual(updateSubmission.callCount, 1)
+    })
+
+    test('passes afterUpdateSubmission to "show"', () => {
+      postPolicies.showPostAssignmentGradesTray({submissionsMap: {'1': {posted_at: null}}})
+      const {onPosted} = postGradesShowArgs()
+      onPosted({userIds: ['1']})
+      strictEqual(afterUpdateSubmission.callCount, 1)
+    })
+
+    test('onPosted updates posted_at', () => {
+      const submissionsMap = {
+        '1': {posted_at: null}
+      }
+      postPolicies.showPostAssignmentGradesTray({submissionsMap})
+      const postedAt = new Date().toISOString()
+      const {onPosted} = postGradesShowArgs()
+      onPosted({postedAt, userIds: ['1']})
+      strictEqual(submissionsMap['1'].posted_at, postedAt)
     })
   })
 })

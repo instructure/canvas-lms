@@ -22,8 +22,9 @@ require_relative '../pages/student_grades_page'
 describe 'SpeedGrader Post Policy' do
   include_context "in-process server selenium tests"
 
+  before(:all) { skip('GRADE-2192') }
+
   before :once do
-    skip('Unskip in GRADE-1943')
     # course
     course_with_teacher(
       course_name: "Post Policy Course",
@@ -70,13 +71,12 @@ describe 'SpeedGrader Post Policy' do
 
     context 'when post everyone' do
       before :each do
-        skip('Unskip in GRADE-1943')
         manually_post_grades('Everyone')
       end
 
       it 'post grades option disabled' do
-        skip('Unskip in GRADE-1943')
         # TODO: expect post option to be disabled for Speedgrader.post_grades
+        expect(Speedgrader.post_grades).to be_disabled
       end
 
       it 'students see grade', priority: '1', test_id: 3757534 do
@@ -88,7 +88,6 @@ describe 'SpeedGrader Post Policy' do
 
     context 'when post everyone for section' do
       before :each do
-        skip('Unskip in GRADE-1943')
         manually_post_grades('Everyone', @section2)
       end
 
@@ -99,7 +98,6 @@ describe 'SpeedGrader Post Policy' do
       end
 
       it 'does not post for other section', priority: '1', test_id: 3757535 do
-        skip('Unskip in GRADE-1943')
         expect(Speedgrader.hidden_pill).to be_displayed
 
         # TODO: verify students not in section have eyeball icon
@@ -110,7 +108,6 @@ describe 'SpeedGrader Post Policy' do
       end
 
       it 'Post tray shows unposted count', priority: '1', test_id: 3757535 do
-        skip('Unskip in GRADE-1943')
         expect(Speedgrader.PostGradesTray.unposted_count).to eq '2'
         # TODO: expect unposted indicator to be displayed and show count 2
       end
@@ -118,7 +115,6 @@ describe 'SpeedGrader Post Policy' do
 
     context 'when hide posted grades for everyone' do
       before :each do
-        skip('Unskip in GRADE-1943')
         manually_post_grades('Everyone')
         wait_for_ajaximations
         Speedgrader.visit(@course.id, @assignment.id)
@@ -127,7 +123,6 @@ describe 'SpeedGrader Post Policy' do
       end
 
       it 'header has HIDDEN icon', priority: '1', test_id: 3757537 do
-        skip('Unskip in GRADE-1943')
         # TODO: expect header to have HIDDEN icon Speedgrader.grades_not_posted_icon
       end
 
@@ -139,14 +134,12 @@ describe 'SpeedGrader Post Policy' do
       end
 
       it 'hidden pill displayed in side panel', priority: '1', test_id: 3757537 do
-        skip('Unskip in GRADE-1943')
         expect(Speedgrader.hidden_pill).to be_displayed
       end
     end
 
     context 'when hide posted grades for section' do
       before :each do
-        skip('Unskip in GRADE-1943')
         manually_post_grades('Everyone')
         wait_for_ajaximations
         manually_hide_grades(@section2)
@@ -154,7 +147,6 @@ describe 'SpeedGrader Post Policy' do
       end
 
       it 'students in section have hidden grades', priority: '1', test_id: 3756683 do
-        skip('Unskip in GRADE-1943')
         @students1.each do |student|
           verify_student_grade_comments_displayed(student, '')
           # TODO: expect hidden icon to be displayed
@@ -178,7 +170,6 @@ describe 'SpeedGrader Post Policy' do
     end
 
     before :each do
-      skip('Unskip in GRADE-1943')
       manually_post_grades('Graded')
     end
 
@@ -189,7 +180,6 @@ describe 'SpeedGrader Post Policy' do
     end
 
     it 'does not post for ungraded', priority: '1', test_id: 3756680 do
-      skip('Unskip in GRADE-1943')
       # TODO: verify ungraded students still have eyeball icon
       verify_student_grade_comments_displayed(@students[3], '')
       # TODO: expect icon to be displayed
@@ -205,7 +195,6 @@ describe 'SpeedGrader Post Policy' do
     end
 
     before :each do
-      skip('Unskip in GRADE-1943')
       manually_post_grades('Graded', @section2)
     end
 
@@ -214,7 +203,6 @@ describe 'SpeedGrader Post Policy' do
     end
 
     it 'does not post ungraded for section', priority: '1', test_id: 3757539 do
-      skip('Unskip in GRADE-1943')
       # TODO: verify students in section without grades have eyeball icon
       verify_student_grade_comments_displayed(@students2.second, '')
       # TODO: expect eyeball icon to be displayed

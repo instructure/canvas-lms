@@ -177,6 +177,15 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       await waitForTrayClosed()
       notOk(getTrayElement())
     })
+
+    test('calls optional onExited', async () => {
+      await show()
+      await waitForElement(getTrayElement)
+      getCloseIconButton().click()
+      await waitForTrayClosed()
+      const {callCount} = context.onExited
+      strictEqual(callCount, 1)
+    })
   })
 
   QUnit.module('"Specific Sections" toggle', hooks => {
@@ -212,6 +221,15 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       getCloseIconButton().click()
       await waitForTrayClosed()
       notOk(getTrayElement())
+    })
+
+    test('calls optional onExited', async () => {
+      await show()
+      await waitForElement(getTrayElement)
+      getCloseIconButton().click()
+      await waitForTrayClosed()
+      const {callCount} = context.onExited
+      strictEqual(callCount, 1)
     })
   })
 

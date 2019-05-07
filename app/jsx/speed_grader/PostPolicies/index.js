@@ -22,14 +22,24 @@ import ReactDOM from 'react-dom'
 import HideAssignmentGradesTray from '../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../grading/PostAssignmentGradesTray'
 
+function submissionsPostedAtUpdater({submissionsMap, updateSubmission, afterUpdateSubmission}) {
+  return function({postedAt, userIds}) {
+    userIds.forEach(userId => {
+      const submission = submissionsMap[userId]
+      submission.posted_at = postedAt
+      updateSubmission(submission)
+    })
+    afterUpdateSubmission()
+  }
+}
+
 export default class PostPolicies {
-  constructor({assignment, sections}) {
+  constructor({assignment, sections, updateSubmission, afterUpdateSubmission}) {
     this._assignment = assignment
     this._sections = sections
-    this.initialize()
-  }
+    this._updateSubmission = updateSubmission
+    this._afterUpdateSubmission = afterUpdateSubmission
 
-  initialize() {
     const $hideContainer = document.getElementById('hide-assignment-grades-tray')
     const bindHideTray = ref => {
       this._hideAssignmentGradesTray = ref
@@ -56,18 +66,28 @@ export default class PostPolicies {
     }
   }
 
-  showHideAssignmentGradesTray({onExited}) {
+  showHideAssignmentGradesTray({submissionsMap}) {
+    const onHidden = submissionsPostedAtUpdater({
+      afterUpdateSubmission: this._afterUpdateSubmission,
+      submissionsMap,
+      updateSubmission: this._updateSubmission
+    })
     this._hideAssignmentGradesTray.show({
       assignment: this._assignment,
-      onExited,
+      onHidden,
       sections: this._sections
     })
   }
 
-  showPostAssignmentGradesTray({onExited, submissions}) {
+  showPostAssignmentGradesTray({submissionsMap, submissions}) {
+    const onPosted = submissionsPostedAtUpdater({
+      afterUpdateSubmission: this._afterUpdateSubmission,
+      submissionsMap,
+      updateSubmission: this._updateSubmission
+    })
     this._postAssignmentGradesTray.show({
       assignment: this._assignment,
-      onExited,
+      onPosted,
       sections: this._sections,
       submissions
     })
