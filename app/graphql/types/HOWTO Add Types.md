@@ -47,11 +47,13 @@ query {
 3. Add the type name to `app/graphql/types/legacy_node_type.rb` (more on
    `LegacyNode` below)
 
-4. If the newly added type is not linked into the graph anywhere (other than
+4. Tell graphql how to resolve your new type in `CanvasSchema#resolve_type`
+
+5. If the newly added type is not linked into the graph anywhere (other than
    being a return value for a interface/union), you must specify that it is an
    [orphan type](https://graphql-ruby.org/type_definitions/interfaces.html#orphan-types)
 
-5. (Optional) add a new type-specific getter to `QueryType`:
+6. (Optional) add a new type-specific getter to `QueryType`:
 
           query {
             assignment(id: "99") {  # id could also have been "ZXCVASDF"
