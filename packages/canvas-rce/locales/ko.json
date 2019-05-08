@@ -128,6 +128,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Insert Math Equation"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "유효하지 않은 파일 유형"
+  },
   "link_7262adec": {
     "message": "Link"
   },
@@ -199,6 +202,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "새 이미지 업로드"
+  },
+  "upload_file_fd2361b8": {
+    "message": "파일 업로드"
   },
   "url_22a5f3b8": {
     "message": "URL"

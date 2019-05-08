@@ -164,6 +164,9 @@
   "insert_math_equation_57c6e767": {
     "message": "הוספת נוסחה מתימטית"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "סוג קובץ לא חוקי"
+  },
   "link_7262adec": {
     "message": "קישור"
   },
@@ -253,6 +256,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "העלאת תמונה חדשה"
+  },
+  "upload_file_fd2361b8": {
+    "message": "העלאת קובץ"
   },
   "url_22a5f3b8": {
     "message": "כתובת דף אינטרנט"
