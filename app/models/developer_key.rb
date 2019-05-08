@@ -43,6 +43,7 @@ class DeveloperKey < ActiveRecord::Base
   before_save :set_require_scopes
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
+  after_update :destroy_external_tools!, if: :destroy_external_tools?
   after_create :create_default_account_binding
 
   validates_as_url :redirect_uri, :oidc_initiation_url, allowed_schemes: nil
@@ -258,6 +259,38 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def destroy_external_tools?
+    saved_change_to_workflow_state? && workflow_state == 'deleted' && tool_configuration.present?
+  end
+
+  def destroy_external_tools!
+    enqueue_args = {
+      n_strand: ['destroy_dev_key_external_tools', account&.global_id || 'site_admin'],
+      priority: Delayed::HIGH_PRIORITY
+    }
+
+    if site_admin?
+      # Cleanup tools across all shards
+      Shard.with_each_shard do
+        send_later_if_production_enqueue_args(
+          :destroy_tools_from_active_shard!,
+          enqueue_args
+        )
+      end
+    else
+      send_later_if_production_enqueue_args(
+        :destroy_tools_from_active_shard!,
+        enqueue_args
+      )
+    end
+  end
+
+  def destroy_tools_from_active_shard!
+    ContextExternalTool.active.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).destroy_all
+    end
+  end
 
   def validate_public_jwk
     return true if public_jwk.blank?
