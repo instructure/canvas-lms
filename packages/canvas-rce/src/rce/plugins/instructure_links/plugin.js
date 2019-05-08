@@ -23,19 +23,11 @@ import $ from 'jquery'
 
 const PLUGIN_KEY = 'links'
 var keyMap = {};
+
+import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
+
 tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
   init(ed) {
-    ed.on('keydown',function(e) {
-      keyMap[e.keyCode] = true
-      // alt + f7
-      if(keyMap[18] && keyMap[118]){
-        $('.tox-toolbar-textfield').focus()
-        e.preventDefault();
-      }
-    });
-    ed.on('keyup',function(e) {
-      keyMap[e.keyCode] = false;
-    });
     const isAnchorElement = function (node) {
       return node.nodeName.toLowerCase() === 'a' && node.href;
     };
@@ -49,7 +41,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
       return isAnchorElement(node) ? node : null;
     };
 
-    ed.ui.registry.addContextForm('link-form', {
+    globalRegistry.addContextForm(ed, 'link-form', {
       launch: {
         type: 'contextformtogglebutton',
         icon: 'link'
@@ -62,6 +54,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
         const elm = getAnchorElement();
         return elm ? elm.href : '';
       },
+
       commands: [
         {
           type: 'contextformtogglebutton',
@@ -81,9 +74,12 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
           onAction: function (formApi) {
             const value = formApi.getValue();
             ed.execCommand('mceInsertLink', false, {href: value});
+            // Collapse the selection to return the user to editing text.
+            ed.selection.collapse()
             formApi.hide();
           }
         },
+
         {
           type: 'contextformtogglebutton',
           icon: 'unlink',
@@ -91,6 +87,8 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
           active: false,
           onAction: function (formApi) {
             ed.execCommand('unlink');
+            // Collapse the selection to return the user to editing text.
+            ed.selection.collapse()
             formApi.hide();
           }
         }
