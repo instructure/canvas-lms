@@ -45,9 +45,9 @@ class UserObservationLink < ActiveRecord::Base
   MISSING_ROOT_ACCOUNT_ID = -1
 
   # shadow_record param is private
-  def self.create_or_restore(student: , observer: , root_account: , shadow_record: false)
+  def self.create_or_restore(student: , observer: , root_account: , cross_shard_record: false)
     raise ArgumentError, 'student, observer and root_account are required' unless student && observer && root_account
-    shard = shadow_record ? observer.shard : student.shard
+    shard = cross_shard_record ? observer.shard : student.shard
     result = shard.activate do
       self.unique_constraint_retry do
         if (uo = self.where(student: student, observer: observer).for_root_accounts(root_account).take)
@@ -64,8 +64,8 @@ class UserObservationLink < ActiveRecord::Base
     end
 
     if result.primary_record?
-      # create the shadow record
-      create_or_restore(student: student, observer: observer, root_account: root_account, shadow_record: true) if result.cross_shard?
+      # create the cross_shard_record
+      create_or_restore(student: student, observer: observer, root_account: root_account, cross_shard_record: true) if result.cross_shard?
 
       result.create_linked_enrollments
       result.student.touch

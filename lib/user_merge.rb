@@ -83,6 +83,7 @@ class UserMerge
     handle_communication_channels
     destroy_conflicting_module_progressions
     move_enrollments
+    move_observees
 
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       max_position = Pseudonym.where(user_id: target_user).order(:position).last.try(:position) || 0
@@ -152,8 +153,8 @@ class UserMerge
           update_all(context_id: target_user.id, context_code: target_user.asset_string)
       end
 
-      move_observees
-
+      merge_data.bulk_insert_merge_data(data) unless data.empty?
+      @data = []
       Enrollment.send_later(:recompute_due_dates_and_scores, target_user.id)
       target_user.update_account_associations
     end
@@ -270,7 +271,7 @@ class UserMerge
         scope.update_all(["user_id=?, position=position+?", target_user, max_position])
       end
     end
-    merge_data.bulk_insert_merge_data(data)
+    merge_data.bulk_insert_merge_data(data) unless data.empty?
     @data = []
   end
 
@@ -344,6 +345,8 @@ class UserMerge
   end
 
   def move_observees
+    merge_data.bulk_insert_merge_data(data) unless data.empty?
+    @data = []
     # record all the records before destroying them
     # pass the from_user since user_id will be the observer
     merge_data.build_more_data(from_user.as_observer_observation_links, user: from_user, data: data)
@@ -351,17 +354,27 @@ class UserMerge
     # delete duplicate or invalid observers/observees, move the rest
     from_user.as_observer_observation_links.where(user_id: target_user.as_observer_observation_links.map(&:user_id)).destroy_all
     from_user.as_observer_observation_links.where(user_id: target_user).destroy_all
-    merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user, data: data)
-    @data = []
     target_user.as_observer_observation_links.where(user_id: from_user).destroy_all
-    target_user.associate_with_shard(from_user.shard) if from_user.as_observer_observation_links.exists?
     from_user.as_observer_observation_links.update_all(observer_id: target_user.id)
     xor_observer_ids = UserObservationLink.where(student: [from_user, target_user]).distinct.pluck(:observer_id)
     from_user.as_student_observation_links.where(observer_id: target_user.as_student_observation_links.map(&:observer_id)).destroy_all
-    target_user.associate_with_shard(from_user.shard) if from_user.as_observer_observation_links.exists?
     from_user.as_student_observation_links.update_all(user_id: target_user.id)
     # for any observers not already watching both users, make sure they have
     # any missing observer enrollments added
+    if from_user.shard != target_user.shard
+      from_user.shard.activate do
+        UserObservationLink.where("user_id=?", target_user.id).where(id: data.map(&:context_id)).preload(:observer, :root_account).find_each do |link|
+          # if the target_user is the same as the observer we already have a record
+          next if Shard.shard_for(link.observer_id) == target_user.shard
+          next if target_user.as_student_observation_links.active.where(observer_id: link.observer).for_root_accounts(link.root_account).exists?
+          # create the record on the target users shard.
+          new_link = UserObservationLink.create_or_restore(student: target_user, observer: link.observer, root_account: link.root_account)
+          merge_data.build_more_data([new_link], user: target_user, workflow_state: 'non_existent', data: data)
+        end
+      end
+    end
+    merge_data.bulk_insert_merge_data(data) unless data.empty?
+    @data = []
     target_user.as_student_observation_links.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
   end
 
@@ -490,7 +503,7 @@ class UserMerge
         end
       end
     end
-    merge_data.bulk_insert_merge_data(data)
+    merge_data.bulk_insert_merge_data(data) unless data.empty?
     @data = []
   end
 
@@ -536,7 +549,7 @@ class UserMerge
         Rails.logger.error "migrating #{table} column user_id failed: #{e}"
       end
     end
-    merge_data.bulk_insert_merge_data(data)
+    merge_data.bulk_insert_merge_data(data) unless data.empty?
     @data = []
   end
 
