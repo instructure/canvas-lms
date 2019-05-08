@@ -38,12 +38,17 @@ function showMenubar(el, show) {
   }
 }
 
+function focusToolbar(el) {
+  const $firstToolbarButton = el.querySelector('.tox-tbtn')
+  $firstToolbarButton  && $firstToolbarButton.focus()
+}
+
 function focusFirstMenuButton(el) {
   const $firstMenu = el.querySelector('.tox-mbtn')
   $firstMenu && $firstMenu.focus()
 }
 
-function accessiblizeMenubar(el, editor) {
+function initKeyboardShortcuts(el, editor) {
   // hide the menubar
   showMenubar(el, false)
 
@@ -52,9 +57,16 @@ function accessiblizeMenubar(el, editor) {
     showMenubar(el, true)
   })
   // when typed somewhere else w/in RCEWrapper
-  el.addEventListener('keyup', (e) => {
+  el.addEventListener('keyup', e => {
     if (e.altKey && e.code === 'F9') {
       showMenubar(el, true)
+    }
+  })
+
+  // toolbar help
+  el.addEventListener('keyup', e => {
+    if (e.altKey && e.code === 'F10') {
+      focusToolbar(el)
     }
   })
 }
@@ -244,7 +256,7 @@ export default class RCEWrapper extends React.Component {
   }
 
   onInit(_e, editor) {
-    accessiblizeMenubar(this._elementRef, editor)
+    initKeyboardShortcuts(this._elementRef, editor)
   }
 
   componentWillUnmount() {
