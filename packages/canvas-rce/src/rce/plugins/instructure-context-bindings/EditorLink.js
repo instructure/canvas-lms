@@ -116,9 +116,16 @@ export default class EditorLink {
 
   bindContext(contextLabel, $contextContainer) {
     const keydownListener = event => {
-      // 'Esc' to exit the context view
+      // 'Esc' to dismiss the context view
       if (event.keyCode === 27) {
         this.editor.selection.collapse()
+        event.preventDefault()
+      }
+
+      // Alt+F7 to return focus to the editor
+      if (event.keyCode === 118 && event.altKey) {
+        this.editor.focus()
+        event.preventDefault()
       }
     }
 

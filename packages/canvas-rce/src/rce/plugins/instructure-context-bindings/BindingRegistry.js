@@ -82,17 +82,24 @@ export default class BindingRegistry {
    * after its creation and to emulate a lifecycle for it.
    */
   addContextForm(editor, name, config) {
-    const amendedConfig = {...config}
     const contextLabel = config.label
-    const [command] = amendedConfig.commands
-
+    const [command, ...commands] = config.commands
     const onSetup = command.onSetup || (() => {})
-    command.onSetup = (...args) => {
-      this.addToolbar(editor, contextLabel)
+
+    const amendedCommand = {...command}
+    amendedCommand.onSetup = (...args) => {
+      this.bindToolbarToEditor(editor, contextLabel)
       return onSetup(...args)
     }
-    editor.ui.registry.addContextForm(name, config)
 
+    const amendedConfig = {...config, commands: [amendedCommand, ...commands]}
+    editor.ui.registry.addContextForm(name, amendedConfig)
+
+    const defaultFocusSelector = `.tox-toolbar-textfield[aria-label="${contextLabel}"]`
+    this.addContextKeydownListener(editor, defaultFocusSelector)
+  }
+
+  addContextKeydownListener(editor, defaultFocusSelector) {
     editor.on('keydown', event => {
       // Alt+F7 is used to "enter into" the context's popover.
       if (event.keyCode === 118 && event.altKey) {
@@ -108,21 +115,20 @@ export default class BindingRegistry {
         }
 
         /*
-         * Attempt to find the text field for this context using the
+         * Attempt to find the default focus element for this context using the
          * EditorLink's "aux container." If found, focus on it.
          */
-        const $formInput = editorLink.$auxContainer.querySelector(
-          `.tox-toolbar-textfield[aria-label="${contextLabel}"]`
-        )
-        if ($formInput) {
-          $formInput.focus()
+        const $focusable = editorLink.$auxContainer.querySelector(defaultFocusSelector)
+
+        if ($focusable) {
+          $focusable.focus()
           event.preventDefault()
         }
       }
     })
   }
 
-  addToolbar(editor, toolbarLabel) {
+  bindToolbarToEditor(editor, toolbarLabel) {
     const editorLink = this.getEditorLink(editor)
     if (editorLink != null) {
       let $auxContainers

@@ -71,6 +71,11 @@ describe('RCE Plugins > Instructure Context Bindings > EditorLink', () => {
     return $contextContainer
   }
 
+  function altF7InContext($contextContainer, selector) {
+    const $element = $contextContainer.querySelector(selector)
+    fireEvent.keyDown($element, {altKey: true, keyCode: 118})
+  }
+
   function escapeFromContext($contextContainer, selector) {
     const $element = $contextContainer.querySelector(selector)
     fireEvent.keyDown($element, {keyCode: 27})
@@ -125,6 +130,18 @@ describe('RCE Plugins > Instructure Context Bindings > EditorLink', () => {
         const $contextContainer = showLinkContext('b')
         escapeFromContext($contextContainer, 'button')
         expect(fakeEditors.b.selection.collapse).toHaveBeenCalledTimes(1)
+      })
+
+      it('focuses on the editor when "Alt+F7" is pressed from a form input', () => {
+        const $contextContainer = showLinkContext('b')
+        altF7InContext($contextContainer, 'input')
+        expect(fakeEditors.b.focus).toHaveBeenCalledTimes(1)
+      })
+
+      it('focuses on the editor when "Alt+F7" is pressed from a form button', () => {
+        const $contextContainer = showLinkContext('b')
+        altF7InContext($contextContainer, 'button')
+        expect(fakeEditors.b.focus).toHaveBeenCalledTimes(1)
       })
 
       it('is removed when the binding is removed', () => {

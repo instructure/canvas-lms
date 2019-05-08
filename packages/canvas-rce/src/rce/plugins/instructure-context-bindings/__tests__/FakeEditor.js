@@ -35,6 +35,8 @@ export default class FakeEditor {
       }
     }
 
+    this.focus = jest.fn()
+
     this.selection = {
       collapse: jest.fn(),
 
