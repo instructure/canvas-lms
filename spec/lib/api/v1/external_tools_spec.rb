@@ -50,6 +50,14 @@ describe Api::V1::ExternalTools do
       expect(json['updated_at']).to eq tool.updated_at
       expect(json['privacy_level']).to eq tool.privacy_level
       expect(json['custom_fields']).to eq tool.custom_fields
+      expect(json['version']).to eq "1.1"
+    end
+
+    it "generates json with 1.3 version" do
+      tool.use_1_3 = true
+      tool.save!
+      json = controller.external_tool_json(tool, @course, @student, nil)
+      expect(json['version']).to eq "1.3"
     end
 
     it "gets default extension settings" do

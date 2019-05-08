@@ -39,6 +39,7 @@ module Api::V1::ExternalTools
     json['selection_height'] = tool.settings[:selection_height] if tool.settings.key? :selection_height
     json['icon_url'] = tool.settings[:icon_url] if tool.settings.key? :icon_url
     json['not_selectable'] = tool.not_selectable
+    json['version'] = tool.use_1_3? ? '1.3' : '1.1'
     extension_types.each do |type|
       if json[type]
         json[type]['label'] = tool.label_for(type, I18n.locale)

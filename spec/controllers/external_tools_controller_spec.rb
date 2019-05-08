@@ -954,6 +954,49 @@ describe ExternalToolsController do
     end
     let(:xml_response) { OpenStruct.new({body: xml}) }
 
+    context 'with client id' do
+      include_context 'lti_1_3_spec_helper'
+      subject { ContextExternalTool.find_by(id: JSON.parse(response.body)['id']) }
+      let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
+      let(:developer_key) { DeveloperKey.create!(account: account) }
+      let_once(:user) { account_admin_user(account: account) }
+      let_once(:account) { account_model }
+      let(:params) do
+        {
+          client_id: developer_key.id,
+          account_id: account
+        }
+      end
+
+      before do
+        user_session(user)
+        tool_configuration
+        post 'create', params: params, format: 'json'
+      end
+
+      it { is_expected.to_not be_nil }
+
+      context 'with invalid client id' do
+        let(:params) { super().merge(client_id: "bad client id") }
+
+        it 'return 404' do
+          expect(response).to have_http_status :not_found
+        end
+      end
+
+      context 'with inactive developer key' do
+        let(:developer_key) do
+          dev_key = super()
+          dev_key.deactivate!
+          dev_key
+        end
+
+        it 'return 422' do
+          expect(response).to have_http_status :unprocessable_entity
+        end
+      end
+    end
+
     context 'tool duplication' do
       shared_examples_for 'detects duplication in context' do
         let(:params) { raise "Override in specs" }
@@ -1652,79 +1695,6 @@ describe ExternalToolsController do
         before { developer_key.destroy! }
 
         it { is_expected.to be_not_found }
-      end
-    end
-
-    describe '#create_tool_from_tool_config' do
-      subject {  post :create_tool_from_tool_config, params: params }
-
-      shared_examples_for 'tool configuration does not exist' do
-        let(:tool_configuration) { nil }
-
-        it { is_expected.to be_not_found }
-      end
-
-      shared_examples_for 'reuses an exisiting ContextExternalTool' do
-        let(:tool_context) { raise 'Override in spec' }
-        let(:cet) do
-          cet = tool_configuration.new_external_tool(tool_context)
-          cet.save!
-          cet
-        end
-
-        before do
-          cet
-          subject
-        end
-
-        it 'returns the existing tool' do
-          expect(json_parse['id']).to eq cet.id
-        end
-      end
-
-      shared_examples_for 'a context that can create a tool' do
-        let(:create_tool_context) { raise 'Override in spec' }
-
-        it 'creates a ContextExternalTool' do
-          expect { subject }.to change { ContextExternalTool.count }.by(1)
-          expect(ContextExternalTool.first.context_id).to eq create_tool_context.id
-        end
-
-        it_behaves_like 'reuses an exisiting ContextExternalTool' do
-          let(:tool_context) { create_tool_context }
-        end
-      end
-
-      context 'when an account' do
-        let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'basic devkey behavior'
-
-        it_behaves_like 'tool configuration does not exist'
-
-        it_behaves_like 'a context that can create a tool' do
-          let(:create_tool_context) { sub_account }
-        end
-      end
-
-      context 'when a course' do
-        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'basic devkey behavior'
-
-        it_behaves_like 'tool configuration does not exist'
-
-        it_behaves_like 'a context that can create a tool' do
-          let(:create_tool_context) { course }
-        end
-
-        it_behaves_like 'reuses an exisiting ContextExternalTool' do
-          let(:tool_context) { sub_account }
-        end
-
-        it_behaves_like 'reuses an exisiting ContextExternalTool' do
-          let(:tool_context) { account }
-        end
       end
     end
   end
