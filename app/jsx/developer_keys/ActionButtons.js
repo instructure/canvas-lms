@@ -44,7 +44,7 @@ class DeveloperKeyActionButtons extends React.Component {
   deleteLinkHandler = (event) => {
     const { dispatch, deleteDeveloperKey, developerKey, onDelete } = this.props
     event.preventDefault()
-    const confirmResult = confirm(I18n.t('Are you sure you want to delete this developer key?'))
+    const confirmResult = confirm(this.confirmationMessage(developerKey))
     if (confirmResult) {
       const callBack = onDelete()
       deleteDeveloperKey(developerKey)(dispatch)
@@ -64,6 +64,15 @@ class DeveloperKeyActionButtons extends React.Component {
   focusDeleteLink = () => { this.deleteLink.focus() }
 
   refDeleteLink = (link) => { this.deleteLink = link; }
+
+  confirmationMessage(developerKey) {
+    if (developerKey.is_lti_key) {
+      return I18n.t(
+        "Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context."
+      )
+    }
+    return I18n.t('Are you sure you want to delete this developer key?')
+  }
 
   renderVisibilityIcon () {
     const { developerName, visible, showVisibilityToggle } = this.props
