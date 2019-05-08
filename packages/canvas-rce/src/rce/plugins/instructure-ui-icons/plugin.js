@@ -19,7 +19,11 @@
 import {
   IconAttachMediaLine,
   IconBoldLine,
+  IconBulletListAlphaLine,
+  IconBulletListCircleOutlineLine,
   IconBulletListLine,
+  IconBulletListRomanLine,
+  IconBulletListSquareLine,
   IconClearTextFormattingLine,
   IconImageLine,
   IconIndentLine,
@@ -58,18 +62,10 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     // if @instructure/ui-icons ever gets icons for these, lets use those. But until
     // then these are the same as the stock tinyMCE ones but with the viewbox
     // adjusted so they look right next to our icons
-    'list-bull-circle': {
-      src: `<svg viewBox="7 7 32 32"><g fill-rule="evenodd"><path d="M11 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM11 26a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM11 36a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill-rule="nonzero"></path><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"></path></g></svg>`
-    },
-    'list-bull-square': {
-      src: `<svg viewBox="7 7 32 32"><g fill-rule="evenodd"><path d="M8 11h6v6H8zM8 21h6v6H8zM8 31h6v6H8z"></path><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"></path></g></svg>`
-    },
-    'list-num-upper-alpha': {
-      src: `<svg viewBox="7 7 32 32"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"></path><path d="M12.6 17l-.5-1.4h-2L9.5 17H8.3l2-6H12l2 6h-1.3zM11 12.3l-.7 2.3h1.6l-.8-2.3zm4.7 4.8c-.4 0-.7-.3-.7-.7 0-.4.3-.7.7-.7.5 0 .7.3.7.7 0 .4-.2.7-.7.7zM11.4 27H8.7v-6h2.6c1.2 0 1.9.6 1.9 1.5 0 .6-.5 1.2-1 1.3.7.1 1.3.7 1.3 1.5 0 1-.8 1.7-2 1.7zM10 22v1.5h1c.6 0 1-.3 1-.8 0-.4-.4-.7-1-.7h-1zm0 4H11c.7 0 1.1-.3 1.1-.8 0-.6-.4-.9-1.1-.9H10V26zm5.4 1.1c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7zm-4.1 10c-1.8 0-2.8-1.1-2.8-3.1s1-3.1 2.8-3.1c1.4 0 2.5.9 2.6 2.2h-1.3c0-.7-.6-1.1-1.3-1.1-1 0-1.6.7-1.6 2s.6 2 1.6 2c.7 0 1.2-.4 1.4-1h1.2c-.1 1.3-1.2 2.2-2.6 2.2zm4.5 0c-.5 0-.8-.3-.8-.7 0-.4.3-.7.8-.7.4 0 .7.3.7.7 0 .4-.3.7-.7.7z"></path></g></svg>`
-    },
-    'list-num-upper-roman': {
-      src: `<svg viewBox="7 7 32 32"><g fill-rule="evenodd"><path opacity=".2" d="M18 12h22v4H18zM18 22h22v4H18zM18 32h22v4H18z"></path><path d="M15.1 17v-1.2h1.3V17H15zm0 10v-1.2h1.3V27H15zm0 10v-1.2h1.3V37H15z"></path><path fill-rule="nonzero" d="M12 20h1.5v7H12zM12 30h1.5v7H12zM9 20h1.5v7H9zM9 30h1.5v7H9zM6 30h1.5v7H6zM12 10h1.5v7H12z"></path></g></svg>`
-    },
+    'list-bull-circle': IconBulletListCircleOutlineLine,
+    'list-bull-square': IconBulletListSquareLine,
+    'list-num-upper-alpha': IconBulletListAlphaLine,
+    'list-num-upper-roman': IconBulletListRomanLine,
 
     'ordered-list': IconNumberedListLine,
     lti: IconLtiLine,
@@ -84,9 +80,18 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     // those too, it probably makes sense to just use TinyMCE's for everything table related.
     // table: IconTableLine,
 
-    //if we use the instUI one here we won't get the functionality where it
-    // updates the icon fill with the color they select
-    // 'text-color': IconTextColorLine,
+    // The `tox-icon-text-color__color` path id here is important. It is what tinyMCE looks for to
+    // update the color when you select a new one
+    'text-color': {
+      src: `<svg viewBox="7 7 1773 1920">
+      <g fill="none" fill-rule="evenodd">
+        <g fill="#2B3B46" fill-rule="nonzero">
+          <path id="tox-icon-text-color__color" d="M0 1920v-443.07692h1772.30769V1920z"/>
+          <path d="M736.526769.05907692h299.224611L1545.14215 1227.08677l-136.46769 56.56615-164.97231-397.587689H528.576L363.603692 1283.65292 227.136 1227.08677 736.526769.05907692zM835.332923 147.751385L589.868308 738.372923h592.541542L937.09292 147.751385H835.332923z" id="A"/>
+        </g>
+      </g>
+    </svg>`
+    },
 
     unlink: IconRemoveLinkLine,
     'unordered-list': IconBulletListLine
@@ -94,19 +99,4 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
   Object.keys(icons).forEach(key => {
     editor.ui.registry.addIcon(key, icons[key].src)
   })
-
-  // TODO: find a better place to put this
-  editor.$(`<style>
-    /* this is because instUI icons don't have a "height" attribute like tinymce ones do, so this will make them consistent */
-    .tox .tox-icon svg:not([height]) { height: 16px }
-
-    /* this is for instUI icons that that dropdown from a SplitButton like in our advlist plugin */
-    .tox .tox-collection__item-icon svg:not([height]) {
-      height: 16px;
-    }
-    .tox .tox-collection--toolbar-lg .tox-collection__item-icon {
-      height: 30px;
-      width: 30px;
-    }
-  </style>`).appendTo(editor.targetElm.ownerDocument.body)
 })

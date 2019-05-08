@@ -19,11 +19,10 @@
 import PropTypes from "prop-types";
 
 import React, { Component } from "react";
-import Checkbox from "@instructure/ui-forms/lib/components/Checkbox";
+import { Checkbox, TextInput } from '@instructure/ui-forms'
 import {View} from "@instructure/ui-layout";
-import TextInput from "@instructure/ui-forms/lib/components/TextInput";
 import formatMessage from "../../format-message";
-import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
+import { ScreenReaderContent } from '@instructure/ui-a11y'
 
 export default class AltTextForm extends Component {
   static propTypes = {

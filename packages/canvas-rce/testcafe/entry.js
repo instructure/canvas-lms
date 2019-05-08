@@ -19,7 +19,7 @@
 // import React from 'react'
 // import ReactDOM from 'react-dom'
 
-import '@instructure/ui-themes/lib/canvas'
+import '@instructure/canvas-theme'
 
 import {renderIntoDiv} from '../src'
 

@@ -25,7 +25,7 @@ import NavigationPanel from './NavigationPanel';
 import CollectionPanel from './CollectionPanel'
 
 import {View} from '@instructure/ui-layout'
-import {pickProps} from '@instructure/ui-utils/lib/react/passthroughProps'
+import {pickProps} from '@instructure/ui-react-utils'
 
 function LinksPanel(props) {
   const isCourse = props.contextType === "course";

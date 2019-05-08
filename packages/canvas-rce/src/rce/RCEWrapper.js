@@ -27,13 +27,14 @@ import indicate from "../common/indicate";
 import Bridge from "../bridge";
 import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar';
-
-import themeable from '@instructure/ui-themeable/lib'
-import styles from '../skins/skin-delta.css'
+import themeable from '@instructure/ui-themeable'
 import theme from '../skins/theme'
 
+// we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
+const styles = require('../skins/skin-delta.css')
+const {template} = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
+
 // Get oxide the default skin injected into the DOM before the overrides loaded by themeable
-import {template} from '../../node_modules/tinymce/skins/ui/oxide/skin.min.css'
 let inserted = false
 function injectTinySkin() {
   if (inserted) return

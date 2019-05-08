@@ -20,10 +20,9 @@ import React, {useState} from 'react'
 import RocketSVG from './RocketSVG'
 import {FileDrop} from '@instructure/ui-forms'
 import {Billboard} from '@instructure/ui-billboard'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import { ScreenReaderContent } from '@instructure/ui-a11y'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
+import { IconTrashLine } from '@instructure/ui-icons'
 import {bool, func, instanceOf} from 'prop-types'
 import formatMessage from '../../../../format-message'
 import { StyleSheet, css } from "aphrodite";
@@ -44,7 +43,7 @@ export default function ComputerPanel({
               setImageFile(null)
               setHasUploadedImage(false)
             }}
-            icon={IconTrash}
+            icon={IconTrashLine}
           >
             <ScreenReaderContent>{formatMessage('Clear Upload')}</ScreenReaderContent>
           </Button></div>

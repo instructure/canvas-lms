@@ -3,7 +3,7 @@
   "version": "4.1.0",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
-  "module": "lib/modules/index.js",
+  "module": "lib/index.js",
   "scripts": {
     "extract": "format-message extract \"src*/**/*.js\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",
@@ -12,9 +12,9 @@
     "test": "npm run test:mocha && npm run test:jest && npm run test:cafe",
     "test:mocha": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
     "test:jest": "jest",
-    "test:cafe": "npm run build:cafe && npm run test:cafe:only",
+    "test:cafe": "yarn build:cafe && yarn test:cafe:only",
     "test:cafe:only": "testcafe chrome testcafe/**/*.test.js",
-    "test:cafe:all": "npm run build:cafe && testcafe chrome,firefox,safari testcafe/**/*.test.js",
+    "test:cafe:all": "yarn build:cafe && testcafe chrome,firefox,safari testcafe/**/*.test.js",
     "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --watch",
     "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha 'test/**/*.test.js'",
     "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register",
@@ -30,44 +30,6 @@
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
-  "babel": {
-    "presets": [
-      "@instructure/ui-babel-preset",
-      [
-        "@instructure/babel-preset-pretranslated-format-message",
-        {
-          "translationsDir": "locales",
-          "extractDefaultTranslations": false
-        }
-      ]
-    ],
-    "plugins": [
-      "inline-json-import",
-      [
-        "transform-inline-environment-variables",
-        {
-          "include": [
-            "BUILD_LOCALE"
-          ]
-        }
-      ],
-      "minify-constant-folding",
-      "minify-guarded-expressions",
-      "minify-dead-code-elimination"
-    ],
-    "env": {
-      "test": {
-        "plugins": [
-          "dynamic-import-node"
-        ]
-      },
-      "test-node": {
-        "plugins": [
-          "istanbul"
-        ]
-      }
-    }
-  },
   "nyc": {
     "include": [
       "shared/**/*.js",
@@ -135,18 +97,25 @@
     }
   },
   "dependencies": {
-    "@instructure/ui-a11y": "^5",
-    "@instructure/ui-buttons": "^5",
-    "@instructure/ui-color-utils": "^6",
-    "@instructure/ui-elements": "^5",
-    "@instructure/ui-forms": "^5",
-    "@instructure/ui-icons": "^5",
-    "@instructure/ui-layout": "^5",
-    "@instructure/ui-tabs": "^5",
-    "@instructure/ui-text-input": "^5",
-    "@instructure/ui-themeable": "^5",
-    "@instructure/ui-themes": "^5",
-    "@instructure/ui-toggle-details": "^5",
+    "@instructure/canvas-theme": "6",
+    "@instructure/ui-a11y": "6",
+    "@instructure/ui-alerts": "6",
+    "@instructure/ui-billboard": "6",
+    "@instructure/ui-buttons": "6",
+    "@instructure/ui-color-utils": "6",
+    "@instructure/ui-elements": "6",
+    "@instructure/ui-forms": "6",
+    "@instructure/ui-icons": "6",
+    "@instructure/ui-layout": "6",
+    "@instructure/ui-overlays": "6",
+    "@instructure/ui-react-utils": "6",
+    "@instructure/ui-svg-images": "6",
+    "@instructure/ui-tabs": "6",
+    "@instructure/ui-text-input": "6",
+    "@instructure/ui-themeable": "6",
+    "@instructure/ui-themes": "6",
+    "@instructure/ui-toggle-details": "6",
+    "@instructure/uid": "6",
     "aphrodite": "^2",
     "bloody-offset": "0.0.0",
     "format-message": "^6",
@@ -169,7 +138,7 @@
     "@babel/core": "^7",
     "@babel/register": "7",
     "@instructure/babel-preset-pretranslated-format-message": "^1",
-    "@instructure/ui-babel-preset": "^5",
+    "@instructure/ui-babel-preset": "6",
     "axe-testcafe": "^1.1.0",
     "babel-loader": "^8.0.0",
     "babel-plugin-dynamic-import-node": "^2.2.0",

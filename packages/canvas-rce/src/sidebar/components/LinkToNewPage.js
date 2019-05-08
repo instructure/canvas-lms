@@ -21,9 +21,9 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import ReactCSSTransitionGroup from "react-transition-group/CSSTransitionGroup";
 import formatMessage from "../../format-message";
-import Button from "@instructure/ui-buttons/lib/components/Button";
-import TextInput from "@instructure/ui-forms/lib/components/TextInput";
-import IconAddSolid from "@instructure/ui-icons/lib/Solid/IconAdd";
+import { Button } from '@instructure/ui-buttons'
+import { TextInput } from '@instructure/ui-forms'
+import { IconAddSolid } from '@instructure/ui-icons'
 import scroll from "../../common/scroll";
 import { StyleSheet, css } from "aphrodite";
 

@@ -20,16 +20,14 @@ import React from 'react'
 import {func} from 'prop-types'
 import {StyleSheet, css} from "aphrodite";
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import View from '@instructure/ui-layout/lib/components/View'
-import {SVGIcon} from '@instructure/ui-svg-images';
+import { Button } from '@instructure/ui-buttons'
+import { Flex, View } from '@instructure/ui-layout'
+import { ScreenReaderContent } from '@instructure/ui-a11y'
+import { Text } from '@instructure/ui-elements'
+import { Select } from '@instructure/ui-forms'
 
-import IconA11y from '@instructure/ui-icons/lib/Line/IconA11y'
-import IconKeyboardShortcuts from '@instructure/ui-icons/lib/Line/IconKeyboardShortcuts'
+import { IconA11yLine, IconKeyboardShortcutsLine } from '@instructure/ui-icons'
+import {SVGIcon} from '@instructure/ui-svg-images';
 
 import formatMessage from '../format-message'
 
@@ -50,31 +48,31 @@ export default function StatusBar(props) {
   return (
     <div>
       <Flex margin="x-small">
-        <FlexItem grow>
+        <Flex.Item grow>
           <View>
             <Text>p</Text>
           </View>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <View display="inline-block" padding="0 x-small">
-            <Button variant="link" icon={IconKeyboardShortcuts}>
+            <Button variant="link" icon={IconKeyboardShortcutsLine}>
               <ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>
             </Button>
-            <Button variant="link" icon={IconA11y}>
+            <Button variant="link" icon={IconA11yLine}>
               <ScreenReaderContent>{formatMessage('Accessibility')}</ScreenReaderContent>
             </Button>
           </View>
           <div className={css(styles.separator)}/>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <View display="inline-block" padding="0 x-small">
             <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml}>
               <ScreenReaderContent>{formatMessage('Toggle raw html view')}</ScreenReaderContent>
             </Button>
           </View>
           <div className={css(styles.separator)}/>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <View display="inline-block" padding="0 x-small xxx-small x-small">
             <Select
               inline
@@ -87,12 +85,12 @@ export default function StatusBar(props) {
             </Select>
           </View>
           <div className={css(styles.separator)}/>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <View display="inline-block" padding="0 0 0 small">
             <Text size="small">42 words</Text>
           </View>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </div>
   )

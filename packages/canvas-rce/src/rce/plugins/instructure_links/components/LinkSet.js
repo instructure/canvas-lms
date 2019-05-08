@@ -22,8 +22,8 @@ import {bool, func} from "prop-types";
 import {linksShape, linkType} from './propTypes'
 import formatMessage from "../../../../format-message";
 import LoadMoreButton from '../../../../common/components/LoadMoreButton'
-import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
-import {List, ListItem, Spinner} from '@instructure/ui-elements'
+import { ScreenReaderContent } from '@instructure/ui-a11y'
+import {List, Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import uid from '@instructure/uid'
 
@@ -78,7 +78,7 @@ class LinkSet extends Component {
     const linkRef = index === allLinks.length-1 ? el => this.lastLinkRef = el : null
 
     return (
-      <ListItem key={link.href} spacing="none" padding="0">
+      <List.Item key={link.href} spacing="none" padding="0">
         <Link
           link={link}
           type={this.props.type}
@@ -86,7 +86,7 @@ class LinkSet extends Component {
           describedByID={this.describedByID}
           elementRef={linkRef}
         />
-      </ListItem>
+      </List.Item>
     );
   }
 

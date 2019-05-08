@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef} from 'react'
 import {arrayOf, bool, func, shape} from 'prop-types'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Spinner} from '@instructure/ui-elements'
 
 import formatMessage from '../../../../format-message'
@@ -55,27 +55,27 @@ export default function Images(props) {
   return (
     <Flex alignItems="center" direction="column" justifyItems="space-between" height="100%">
       {showLoadingIndicator && (
-        <FlexItem display="block" padding="medium">
+        <Flex.Item display="block" padding="medium">
           <Spinner title={formatMessage('Loading...')} />
-        </FlexItem>
+        </Flex.Item>
       )}
 
-      <FlexItem overflowY="visible" width="100%">
+      <Flex.Item overflowY="visible" width="100%">
         <ImageList
           images={records}
           lastItemRef={lastItemRef}
           onImageClick={props.onImageEmbed}
         />
-      </FlexItem>
+      </Flex.Item>
 
       {showLoadMoreButton && (
-        <FlexItem display="block" padding="x-small medium medium medium">
+        <Flex.Item display="block" padding="x-small medium medium medium">
           <LoadMoreButton
             buttonRef={loadMoreButtonRef}
             isLoading={isLoading}
             onLoadMore={props.fetchImages}
           />
-        </FlexItem>
+        </Flex.Item>
       )}
     </Flex>
   )

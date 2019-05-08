@@ -19,8 +19,8 @@
 import PropTypes from "prop-types";
 
 import React, { Component } from "react";
-import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
-import View from "@instructure/ui-layout/lib/components/View";
+import { ToggleDetails } from '@instructure/ui-toggle-details'
+import { View } from '@instructure/ui-layout'
 import LinkSet from "./LinkSet";
 import NavigationPanel from "./NavigationPanel";
 import LinkToNewPage from "./LinkToNewPage";

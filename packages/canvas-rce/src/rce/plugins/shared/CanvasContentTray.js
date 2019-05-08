@@ -21,7 +21,7 @@ import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 
 import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
@@ -117,23 +117,23 @@ export default function CanvasContentTray(props) {
       onDismiss={() => setIsOpen(false)}
     >
       <Flex direction="column" display="block" height="100vh" overflowY="hidden">
-        <FlexItem padding="medium" shadow="above">
+        <Flex.Item padding="medium" shadow="above">
           <Flex margin="none none medium none">
-            <FlexItem>
+            <Flex.Item>
               <CloseButton placement="static" variant="icon" onClick={() => setIsOpen(false)}>
                 {formatMessage('Close')}
               </CloseButton>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem grow shrink>
+            <Flex.Item grow shrink>
               <Heading level="h2" margin="none none none medium">{formatMessage('Add')}</Heading>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
 
           <Filter {...filterSettings} onChange={setFilterSettings} />
-        </FlexItem>
+        </Flex.Item>
 
-        <FlexItem grow shrink>
+        <Flex.Item grow shrink>
           <ErrorBoundary>
             <StoreProvider {...props}>
               {contentProps => (
@@ -143,7 +143,7 @@ export default function CanvasContentTray(props) {
               )}
             </StoreProvider>
           </ErrorBoundary>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </Tray>
   )

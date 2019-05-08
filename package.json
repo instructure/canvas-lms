@@ -39,6 +39,7 @@
     "@instructure/ui-number-input": "^5",
     "@instructure/ui-overlays": "^5",
     "@instructure/ui-pagination": "^5",
+    "@instructure/ui-svg-images": "^5",
     "@instructure/ui-table": "^5",
     "@instructure/ui-tabs": "^5",
     "@instructure/ui-themeable": "^5",

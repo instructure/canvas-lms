@@ -630,4 +630,10 @@
   .tox-toolbar-overlord .tox-toolbar__primary .tox-toolbar__group:last-child button {
     width: auto; /* to make the vertical kabob a bit narrower */
   }
+
+  /* MAKE INSTUI ICONS THE SAME SIZE AS THE DEFAULT TINYMCE ONES */
+  /* this is because instUI icons don't have a "height" attribute like tinymce ones do, so this will make them consistent */
+  .tox .tox-icon svg:not([height]) { height: 16px }
+  /* this is for instUI icons that that dropdown from a SplitButton like in our advlist plugin */
+  .tox .tox-collection__item-icon svg:not([height]) { height: 30px;}
 }

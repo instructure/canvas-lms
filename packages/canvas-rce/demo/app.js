@@ -18,13 +18,10 @@
 
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import Button from "@instructure/ui-buttons/lib/components/Button";
-import RadioInput from "@instructure/ui-forms/lib/components/RadioInput";
-import RadioInputGroup from "@instructure/ui-forms/lib/components/RadioInputGroup";
-import Select from "@instructure/ui-forms/lib/components/Select";
-import TextInput from "@instructure/ui-forms/lib/components/TextInput";
-import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
-import "@instructure/ui-themes/lib/canvas";
+import { Button } from '@instructure/ui-buttons'
+import { RadioInput, RadioInputGroup, Select, TextInput } from '@instructure/ui-forms'
+import { ToggleDetails } from '@instructure/ui-toggle-details'
+import '@instructure/canvas-theme';
 
 import { renderIntoDiv, renderSidebarIntoDiv } from "../src/async";
 import locales from "../src/locales";
