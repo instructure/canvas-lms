@@ -805,6 +805,26 @@ describe SisImportsApiController, type: :request do
     expect(atts_json.first["url"]).to be_present
   end
 
+  it "should return downloadable attachments from the diff if available" do
+    batch = @account.sis_batches.create
+    att1 = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new('blah'), :context => batch)
+    att2 = Attachment.create!(:filename => 'blah2.txt', :uploaded_data => StringIO.new('blah2'), :context => batch)
+    batch.data = {:downloadable_attachment_ids => [att1.id, att2.id], :diffed_attachment_ids => [att2.id]}
+    batch.save!
+
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      { :controller => 'sis_imports_api', :action => 'index',
+        :format => 'json', :account_id => @account.id.to_s })
+
+    atts_json = json["sis_imports"].first["csv_attachments"]
+    expect(atts_json.count).to eq 1
+    expect(atts_json.first["id"]).to eq att1.id
+
+    diff_atts_json = json["sis_imports"].first["diffed_csv_attachments"]
+    expect(diff_atts_json.count).to eq 1
+    expect(diff_atts_json.first["id"]).to eq att2.id
+  end
+
   it "should filter sis imports by date if requested" do
     batch = @account.sis_batches.create
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",

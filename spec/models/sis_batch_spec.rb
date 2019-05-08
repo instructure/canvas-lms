@@ -877,6 +877,26 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b4.generated_diff_id).to_not be_nil
     end
 
+    it "should mark files separately when created for diffing" do
+      f1 = %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active}
+      b1 = process_csv_data([f1], diffing_data_set_identifier: 'default')
+
+      f2 = %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104,,term1,active}
+      b2 = process_csv_data([f2], diffing_data_set_identifier: 'default')
+
+      uploaded = b2.downloadable_attachments(:uploaded)
+      expect(uploaded.count).to eq 1
+      expect(uploaded.first.open.read).to match_ignoring_whitespace(f2)
+      diffed = b2.downloadable_attachments(:diffed)
+      expect(diffed.count).to eq 1
+      expected_diff = %{course_id,short_name,long_name,account_id,term_id,status
+        test_4,TC 104,Test Course 104,,term1,active}
+      expect(diffed.first.open.read).to match_ignoring_whitespace(expected_diff)
+    end
+
     it 'should compare files for diffing correctly' do
       expect(SisBatch.new.file_diff_percent(25, 100)).to eq 75
       expect(SisBatch.new.file_diff_percent(175, 100)).to eq 75

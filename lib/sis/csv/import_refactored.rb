@@ -57,6 +57,7 @@ module SIS
         @override_sis_stickiness = opts[:override_sis_stickiness]
         @add_sis_stickiness = opts[:add_sis_stickiness]
         @clear_sis_stickiness = opts[:clear_sis_stickiness]
+        @previous_diff_import = opts[:previous_diff_import]
 
         @total_rows = 1
         @current_row = 0
@@ -345,11 +346,14 @@ module SIS
               row.each {|header| header&.downcase!}
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
-                  if type == :user && (row & HEADERS_TO_EXCLUDE_FOR_DOWNLOAD).any?
-                    filtered_att = create_filtered_csv(csv, row)
-                    @batch.data[:downloadable_attachment_ids] << filtered_att.id if filtered_att
-                  else
-                    @batch.data[:downloadable_attachment_ids] << att.id
+                  unless @previous_diff_import
+                    downloadable_att = (type == :user && (row & HEADERS_TO_EXCLUDE_FOR_DOWNLOAD).any?) ? create_filtered_csv(csv, row) : att
+                    if downloadable_att
+                      @batch.data[:downloadable_attachment_ids] << downloadable_att.id
+                      if @batch.data[:diffed_against_sis_batch_id]
+                        (@batch.data[:diffed_attachment_ids] ||= []) << downloadable_att.id
+                      end
+                    end
                   end
                   @csvs[type] << csv
                   @headers[type].merge(row)
