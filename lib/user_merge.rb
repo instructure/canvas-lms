@@ -238,7 +238,7 @@ class UserMerge
       end
 
       next unless target_cc
-      to_retire = handle_conflicting_ccs(cc, target_cc, max_position)
+      to_retire = identify_to_retire(cc, target_cc, max_position)
       if to_retire
         keeper = ([target_cc, cc] - [to_retire]).first
         copy_notificaion_policies(to_retire, keeper)
@@ -291,7 +291,7 @@ class UserMerge
     from_user.user_services.delete_all
   end
 
-  def handle_conflicting_ccs(source_cc, target_cc, max_position)
+  def identify_to_retire(source_cc, target_cc, max_position)
     # we prefer keeping the "most" active one, preferring the target user if they're equal
     # the comments inline show all the different cases, with the source cc on the left,
     # target cc on the right.  The * indicates the CC that will be retired in order
@@ -328,8 +328,6 @@ class UserMerge
   end
 
   def copy_notificaion_policies(to_retire, keeper)
-    # cross shard channels get cloned and so do notification_policies
-    return unless to_retire.shard == keeper.shard
     # if the communication_channel is already retired, don't bother.
     return if to_retire.workflow_state == 'retired'
     time = Time.zone.now
@@ -341,7 +339,7 @@ class UserMerge
                                         created_at: time,
                                         updated_at: time)
     end
-    NotificationPolicy.bulk_insert_objects(new_nps)
+    keeper.shard.activate { NotificationPolicy.bulk_insert_objects(new_nps) }
   end
 
   def move_observees

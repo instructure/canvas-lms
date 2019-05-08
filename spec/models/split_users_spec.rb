@@ -574,12 +574,13 @@ describe SplitUsers do
       end
 
       it "should split a user across shards with ccs" do
+        restored_user.communication_channels.create!(:path => 'a@example.com') { |cc| cc.workflow_state = 'active' }
         restored_user_ccs = restored_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
         source_user_ccs = shard1_source_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
 
         @shard1.activate do
           UserMerge.from(restored_user).into(shard1_source_user)
-          cc = shard1_source_user.reload.communication_channels.where(path: 'restored_user@example.com').take
+          cc = shard1_source_user.reload.communication_channels.where(path: 'a@example.com').take
           n = Notification.create!(name: 'Assignment Createds', subject: 'Tests', category: 'TestNevers')
           NotificationPolicy.create(notification: n, communication_channel: cc, frequency: 'immediately')
           SplitUsers.split_db_users(shard1_source_user)
@@ -612,6 +613,21 @@ describe SplitUsers do
         SplitUsers.split_db_users(source_user)
         expect(submission.reload.user).to eq restored_user
       end
+
+      it "should copy notification policies" do
+        og_cc = restored_user.communication_channels.create!(:path => 'a@example.com') { |cc| cc.workflow_state = 'active' }
+
+        n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
+        NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: 'immediately')
+
+        UserMerge.from(restored_user).into(shard1_source_user)
+        cc = shard1_source_user.communication_channels.where(path: 'a@example.com').take!
+        expect(cc.notification_policies.count).to eq 1
+
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(shard1_source_user.communication_channels.count).to eq 0
+      end
+
     end
   end
 end
