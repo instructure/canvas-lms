@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!rubrics'
+import I18n from 'i18n!assignmentRubricDialog'
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
 import 'jqueryui/dialog'

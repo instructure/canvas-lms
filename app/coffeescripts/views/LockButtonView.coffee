@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!lock_btn_module'
+import I18n from 'i18n!LockButton'
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import htmlEscape from 'str/htmlEscape'

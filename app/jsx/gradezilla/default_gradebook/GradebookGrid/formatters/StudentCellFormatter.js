@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import 'jquery.instructure_misc_helpers' // $.toSentence
 
 function getSecondaryDisplayInfo(student, secondaryInfo, options) {

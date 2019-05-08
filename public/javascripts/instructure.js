@@ -18,7 +18,7 @@
 
 import KeyboardNavDialog from 'compiled/views/KeyboardNavDialog'
 import INST from './INST'
-import I18n from 'i18n!instructure'
+import I18n from 'i18n!instructure_js'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'

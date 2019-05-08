@@ -33,7 +33,7 @@ import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid
 import NumberHelper from '../../../shared/helpers/numberHelper'
 
 import Round from 'compiled/util/round'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 function isNumeric(input) {
   return NumberHelper.validate(input)

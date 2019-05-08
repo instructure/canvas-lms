@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!blueprint_courses'
+import I18n from 'i18n!blueprint_coursesLockManageer'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!media_comments'
+import I18n from 'i18n!media_comments_publicjs'
 import _ from 'underscore'
 import pubsub from 'vendor/jquery.ba-tinypubsub'
 import $ from 'jquery'

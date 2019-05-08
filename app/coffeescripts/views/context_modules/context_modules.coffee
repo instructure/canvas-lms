@@ -17,7 +17,7 @@
 
 import Backbone from 'Backbone'
 import $ from 'jquery'
-import I18n from 'i18n!context_modules'
+import I18n from 'i18n!viewsContextModules'
 import 'jquery.loadingImg'
 
 ###

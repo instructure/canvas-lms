@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!gradezilla'
+import I18n from 'i18n!gradezillaHeaderFilterView'
 import {View} from 'Backbone'
 import Grid from '../../gradezilla/OutcomeGradebookGrid'
 import template from 'jst/gradezilla/header_filter'

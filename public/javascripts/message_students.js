@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!message_students'
+import I18n from 'i18n!public_message_students'
 import $ from 'jquery'
 import natcompare from 'compiled/util/natcompare'
 import numberHelper from 'jsx/shared/helpers/numberHelper'

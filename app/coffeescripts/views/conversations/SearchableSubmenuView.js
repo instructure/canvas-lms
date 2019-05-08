@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import htmlEscape from 'str/htmlEscape'
-import I18n from 'i18n!conversations'
+import I18n from 'i18n!SearchableSubmenuView'
 import $ from 'jquery'
 import _ from 'underscore'
 import {View} from 'Backbone'

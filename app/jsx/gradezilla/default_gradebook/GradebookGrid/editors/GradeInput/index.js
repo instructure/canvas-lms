@@ -22,7 +22,7 @@ import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 import {gradeEntry, gradeInfo} from './PropTypes'
 import TextGradeInput from './TextGradeInput'

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Link from '@instructure/ui-elements/lib/components/Link'

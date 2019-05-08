@@ -20,7 +20,7 @@
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
 import regradeTemplate from 'jst/quiz/regrade'
-import I18n from 'i18n!quizzes'
+import I18n from 'i18n!quizzes_public'
 import _ from 'underscore'
 import $ from 'jquery'
 import calcCmd from './calcCmd'

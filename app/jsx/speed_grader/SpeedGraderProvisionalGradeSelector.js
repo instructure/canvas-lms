@@ -30,7 +30,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 
 import natcompare from 'compiled/util/natcompare'
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!SpeedGraderProvisionalGradeSelector'
 
 const NEW_CUSTOM_GRADE = 'custom'
 

@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!assignmentsToggleShowByView'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'

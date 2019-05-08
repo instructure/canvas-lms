@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import i18nObj from 'i18nObj'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradebookOutcomeGradebookGrid'
 import $ from 'jquery'
 import _ from 'underscore'
 import natcompare from '../util/natcompare'

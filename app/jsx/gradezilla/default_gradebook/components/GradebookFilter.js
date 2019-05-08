@@ -20,7 +20,7 @@ import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import Select from '@instructure/ui-core/lib/components/Select'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 class GradebookFilter extends React.Component {
   static propTypes = {

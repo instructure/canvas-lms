@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import I18n from 'i18n!rubrics'
+import I18n from 'i18n!ProficiencyRating'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!instructure'
+import I18n from 'i18n!KeyboardNavDialog'
 import {View} from 'Backbone'
 import $ from 'jquery'
 import 'jqueryui/dialog'

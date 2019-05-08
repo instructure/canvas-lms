@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!message_students'
+import I18n from 'i18n!shared_message_students'
 import axios from 'axios'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'

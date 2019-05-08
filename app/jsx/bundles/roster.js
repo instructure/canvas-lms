@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!roster'
+import I18n from 'i18n!roster_publicjs'
 import { Model } from 'Backbone'
 import CreateUserList from 'compiled/models/CreateUserList'
 import Role from 'compiled/models/Role'

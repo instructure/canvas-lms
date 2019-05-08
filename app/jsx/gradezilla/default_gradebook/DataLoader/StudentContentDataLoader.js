@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
 import NaiveRequestDispatch from './NaiveRequestDispatch'

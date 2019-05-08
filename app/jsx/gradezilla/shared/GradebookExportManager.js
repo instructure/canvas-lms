@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezillaSharedGradebookexportManager'
 
 class GradebookExportManager {
   static DEFAULT_POLLING_INTERVAL = 2000

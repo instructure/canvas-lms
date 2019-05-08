@@ -17,7 +17,7 @@
  */
 
 import Section from 'compiled/models/Section'
-import I18n from 'i18n!overrides'
+import I18n from 'i18n!modelsSection'
 
 QUnit.module('Section')
 

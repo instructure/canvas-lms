@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import I18n from 'i18n!editor'
+import I18n from 'i18n!EditorToggle'
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import preventDefault from '../fn/preventDefault'

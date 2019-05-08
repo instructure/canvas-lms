@@ -18,7 +18,7 @@
 import Backbone from 'Backbone'
 import _ from 'underscore'
 import Section from './Section'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!assignmentOverride'
 
 export default class AssignmentOverride extends Backbone.Model
 

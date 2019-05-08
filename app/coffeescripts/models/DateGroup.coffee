@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from 'Backbone'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!models_DateGroup'
 import tz from 'timezone'
 
 export default class DateGroup extends Backbone.Model

@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import axios from 'axios'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!ExternalContentFileSubmissionView'
 import template from 'jst/assignments/ExternalContentHomeworkFileSubmissionView'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
 

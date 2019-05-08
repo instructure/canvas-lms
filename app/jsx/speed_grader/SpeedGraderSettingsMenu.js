@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, string} from 'prop-types'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!SpeedGraderSettingsMenu'
 
 // We're foregoing the use of InstUI buttons or instructure-icons icons here to be consistent
 // with the look/styling of this button's siblings. When those siblings have been updated to

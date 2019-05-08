@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import GradingStandardCollection from './gradingStandardCollection'
 import GradingPeriodCollection from './gradingPeriodCollection'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!gradingCourseTabContainer'
 import 'jquery.instructure_misc_plugins'
 
 class CourseTabContainer extends React.Component {

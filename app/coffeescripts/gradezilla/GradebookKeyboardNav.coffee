@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import I18n from 'i18n!gradezilla'
+import I18n from 'i18n!gradezillaGradebookKeyboardNav'
 import GRADEBOOK_TRANSLATIONS from './GradebookTranslations'
 import $ from 'jquery'
 import 'jquery.keycodes'

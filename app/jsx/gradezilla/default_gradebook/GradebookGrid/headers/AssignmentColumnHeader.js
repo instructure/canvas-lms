@@ -29,7 +29,7 @@ import Menu, {
 } from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import 'message_students'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
 import ColumnHeader from './ColumnHeader'

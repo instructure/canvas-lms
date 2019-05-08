@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!editor'
+import I18n from 'i18n!ExternalToolsPlugin'
 import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import ExternalToolsHelper from './ExternalToolsHelper'

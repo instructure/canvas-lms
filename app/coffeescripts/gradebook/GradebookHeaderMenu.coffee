@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradebookHeaderMenu'
 import $ from 'jquery'
 import messageStudents from 'message_students'
 import AssignmentDetailsDialog from '../AssignmentDetailsDialog'

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!assignmentsEditHeaderView'
 import Backbone from 'Backbone'
 import $ from 'jquery'
 import template from 'jst/assignments/EditHeaderView'

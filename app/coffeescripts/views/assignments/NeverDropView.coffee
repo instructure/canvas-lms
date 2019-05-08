@@ -17,7 +17,7 @@
 
 import Backbone from 'Backbone'
 import _ from 'underscore'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!assignmentsNeverDrop'
 import neverDropTemplate from 'jst/assignments/NeverDrop'
 
 export default class NeverDrop extends Backbone.View

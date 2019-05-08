@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradebookHelpers'
 import GradebookConstants from 'jsx/gradebook/shared/constants'
 
 export default {

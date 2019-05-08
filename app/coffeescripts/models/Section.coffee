@@ -17,7 +17,7 @@
 #
 
 import {Model} from 'Backbone'
-import I18n from 'i18n!overrides'
+import I18n from 'i18n!modelsSection'
 
 export default class Section extends Model
   @defaultDueDateSection: ->

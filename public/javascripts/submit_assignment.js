@@ -17,7 +17,7 @@
  */
 
 
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!submit_assignment'
 import $ from 'jquery'
 import _ from 'underscore'
 import GoogleDocsTreeView from 'compiled/views/GoogleDocsTreeView'

@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!ModeratedGradingFormFieldGroup'
 import FinalGraderSelectMenu from './FinalGraderSelectMenu'
 import GraderCommentVisibilityCheckbox from './GraderCommentVisibilityCheckbox'
 import GraderCountNumberInput from './GraderCountNumberInput'

@@ -22,7 +22,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
 import {hasGradeChanged, parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
 

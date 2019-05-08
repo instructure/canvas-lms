@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!AssignmentSyncSettingsView'
 import _ from 'underscore'
 import DialogFormView from '../DialogFormView'
 import wrapper from 'jst/EmptyDialogFormWrapper'

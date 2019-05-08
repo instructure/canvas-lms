@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!AssignmentSettingsView'
 import round from '../../util/round'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import _ from 'underscore'

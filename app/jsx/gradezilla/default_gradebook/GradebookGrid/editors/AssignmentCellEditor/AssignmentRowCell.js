@@ -23,7 +23,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 import AssignmentGradeInput from '../AssignmentGradeInput'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
