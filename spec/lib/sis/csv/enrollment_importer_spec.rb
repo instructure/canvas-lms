@@ -380,6 +380,29 @@ describe SIS::CSV::EnrollmentImporter do
     expect(importer.batch.data[:counts][:enrollments]).to eq 1
   end
 
+  it "should always update sis_batch_id" do
+    # because people get confused otherwise
+    course = course_model(account: @account, sis_source_id: 'C001')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,active"
+    )
+    enrollment = Enrollment.where(course_id: course.id, user_id: user.id).take
+    expect(enrollment.sis_batch_id).to eq importer.batch.id
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,deleted"
+    )
+    expect(enrollment.reload.sis_batch_id).to eq importer.batch.id
+    importer = process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "C001,U001,student,deleted"
+    )
+    expect(enrollment.reload.sis_batch_id).to eq importer.batch.id
+  end
+
   it "should allow one user multiple enrollment types in the same section" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",

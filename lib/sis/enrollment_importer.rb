@@ -39,7 +39,7 @@ module SIS
         end
       end
       @logger.debug("Raw enrollments took #{Time.zone.now - start} seconds")
-      i.enrollments_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
+      i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
         Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
@@ -406,6 +406,7 @@ module SIS
           if enrollment.workflow_state != 'deleted'
             @enrollments_to_delete << enrollment
           else
+            @enrollments_to_update_sis_batch_ids << enrollment.id
             @success_count += 1
           end
           # we are done and we con go to the next enrollment
