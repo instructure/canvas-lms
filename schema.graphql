@@ -753,6 +753,41 @@ type Course implements AssignmentsConnectionInterface & Node & Timestamped {
 }
 
 """
+The connection type for Course.
+"""
+type CourseConnection {
+  """
+  A list of edges.
+  """
+  edges: [CourseEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Course]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type CourseEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Course
+}
+
+"""
 Users in a course can be returned based on these enrollment states
 """
 enum CourseFilterableEnrollmentState {
@@ -1002,6 +1037,11 @@ type File implements ModuleItemInterface & Node & Timestamped {
   url: URL
 }
 
+enum GradeState {
+  active
+  deleted
+}
+
 """
 Contains grade information for a course or grading period
 """
@@ -1032,6 +1072,7 @@ type Grades {
   The override score. Supersedes the computed final score if set.
   """
   overrideScore: Float
+  state: GradeState!
   unpostedCurrentGrade: String
 
   """
@@ -2466,6 +2507,31 @@ type Term implements Node {
   legacy canvas id
   """
   _id: ID!
+
+  """
+  courses for this term
+  """
+  coursesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): CourseConnection
   endAt: DateTime
   id: ID!
   name: String

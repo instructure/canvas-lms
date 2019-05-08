@@ -25,14 +25,23 @@ describe Types::TermType do
     course_with_student(active_all: true)
     @term = @course.enrollment_term
     @term_type = GraphQLTypeTester.new(@term, current_user: @teacher)
+    @admin = account_admin_user
   end
 
   it "works" do
-    expect(@term_type.resolve("_id")).to eq @term.id.to_s
-    expect(@term_type.resolve("name")).to eq @term.name
+    expect(@term_type.resolve("_id", current_user: @teacher)).to eq @term.id.to_s
+    expect(@term_type.resolve("name", current_user: @teacher)).to eq @term.name
   end
 
   it "requires read permission" do
     expect(@term_type.resolve("_id", current_user: @student)).to be_nil
+  end
+
+  it 'should have coursesConnection' do
+    expect(@term_type.resolve("coursesConnection { nodes { _id } }", current_user: @admin)).to eq [@course.id.to_s]
+  end
+
+  it 'should require admin privilege' do
+    expect(@term_type.resolve("coursesConnection { nodes { _id } }", current_user: @student)).to be_nil
   end
 end

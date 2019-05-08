@@ -107,5 +107,9 @@ describe Types::GradesType do
     it "resolves the gradingPeriod field to the score's associated grading period" do
       expect(resolve_grades_field("gradingPeriod { title }")).to eq 'Pleistocene'
     end
+
+    it "resolves the state field to the Score's workflow_state" do
+      expect(resolve_grades_field("state")).to eq 'active'
+    end
   end
 end
