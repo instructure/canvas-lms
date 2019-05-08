@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,16 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  class TermType < ApplicationObjectType
-    implements GraphQL::Types::Relay::Node
-    graphql_name "Term"
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require_relative "../graphql_spec_helper"
 
-    global_id_field :id
-    field :_id, ID, "legacy canvas id", method: :id, null: false
+describe Types::TermType do
 
-    field :name, String, null: true
-    field :start_at, DateTimeType, null: true
-    field :end_at, DateTimeType, null: true
+  before(:once) do
+    course_with_student(active_all: true)
+    @term = @course.enrollment_term
+    @term_type = GraphQLTypeTester.new(@term, current_user: @teacher)
+  end
+
+  it "works" do
+    expect(@term_type.resolve("_id")).to eq @term.id.to_s
+    expect(@term_type.resolve("name")).to eq @term.name
+  end
+
+  it "requires read permission" do
+    expect(@term_type.resolve("_id", current_user: @student)).to be_nil
   end
 end

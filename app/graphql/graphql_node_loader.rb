@@ -126,6 +126,13 @@ module GraphQLNodeLoader
           progress
         end
       end
+    when "Term"
+      Loaders::IDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
+        Loaders::AssociationLoader.for(EnrollmentTerm, :root_account).load(enrollment_term).then do
+          next nil unless enrollment_term.root_account.grants_right?(ctx[:current_user], :read)
+          enrollment_term
+        end
+      end
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end

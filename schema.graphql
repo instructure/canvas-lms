@@ -1604,6 +1604,7 @@ enum NodeType {
   PostPolicy
   Progress
   Section
+  Term
   User
 }
 
@@ -1881,6 +1882,12 @@ type Query {
     """
     id: ID!
   ): Node
+  term(
+    """
+    a graphql or legacy id
+    """
+    id: ID!
+  ): Term
 }
 
 type Quiz implements ModuleItemInterface & Node & Timestamped {
@@ -2454,12 +2461,13 @@ type TardinessBreakdown {
   total: Int
 }
 
-type Term {
+type Term implements Node {
   """
   legacy canvas id
   """
   _id: ID!
   endAt: DateTime
+  id: ID!
   name: String
   startAt: DateTime
 }

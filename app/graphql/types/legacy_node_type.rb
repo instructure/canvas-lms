@@ -36,6 +36,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Group"
   value "GroupSet"
   value "File"
+  value "Term"
 
 =begin
   # TODO: seems like we should be able to dynamically generate the types that
