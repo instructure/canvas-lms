@@ -221,11 +221,17 @@ class SplitUsers
   end
 
   def move_user_observers(records)
-    # skip when the user observer is between the two users. Just undlete the record
+    # skip when the user observer is between the two users. Just undelete the record
     not_obs = UserObservationLink.where(user_id: [source_user, restored_user], observer_id: [source_user, restored_user])
     obs = UserObservationLink.where(id: records.pluck(:context_id)).where.not(id: not_obs)
 
-    source_user.as_student_observation_links.where(id: obs).update_all(user_id: restored_user.id)
+    if source_user.shard != restored_user.shard
+      delete_ids = merge_data.records.where(context_type: 'UserObservationLink', previous_workflow_state: 'non_existent', previous_user_id: source_user).pluck(:context_id)
+      restored_user.shard.activate { UserObservationLink.where("user_id=?", source_user.id).where(id: obs).update_all(user_id: restored_user.id) }
+      source_user.shard.activate { UserObservationLink.where(user_id: source_user.id).where(id: delete_ids).delete_all }
+    else
+      source_user.as_student_observation_links.where(id: obs).update_all(user_id: restored_user.id)
+    end
     source_user.as_observer_observation_links.where(id: obs).update_all(observer_id: restored_user.id)
   end
 
