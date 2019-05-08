@@ -938,67 +938,21 @@ describe ExternalToolsController do
 
   describe "POST 'create'" do
     let(:launch_url) { 'https://www.tool.com/launch' }
-      let(:consumer_key) { 'key' }
-      let(:shared_secret) { 'seekret' }
-      let(:xml) do
-        <<-XML
-          <?xml version="1.0" encoding="UTF-8"?>
-          <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
-            <blti:title>Example Tool Provider</blti:title>
-            <blti:description>This is a Sample Tool Provider.</blti:description>
-            <blti:launch_url>https://www.tool.com/launch</blti:launch_url>
-            <blti:extensions platform="canvas.instructure.com">
-            </blti:extensions>
-          </cartridge_basiclti_link>
-        XML
-      end
-      let(:xml_response) { OpenStruct.new({body: xml}) }
-
-    describe 'developer key id' do
-      subject { ContextExternalTool.find(JSON.parse(response.body)['id']).developer_key_id }
-
-      let_once(:user) { account_admin_user(account: account) }
-      let_once(:account) { account_model }
-      let(:params) do
-        {
-          account_id: account.id,
-          external_tool: {
-            name: 'tool name',
-            consumer_key: consumer_key,
-            shared_secret: shared_secret,
-            config_type: 'by_xml',
-            config_xml: xml,
-            developer_key_id: developer_key.id
-          }
-        }
-      end
-
-      before do
-        user_session(user)
-        post 'create', params: params, format: 'json'
-      end
-
-      context 'when the current user has rights' do
-        let(:developer_key) { DeveloperKey.create!(account: account) }
-
-        it { is_expected.to eq developer_key.id }
-      end
-
-      context 'when the current user does not have rights' do
-        let(:developer_key) { DeveloperKey.create!(account: account) }
-        let(:user) { account_admin_user(account: account_model) }
-
-        it 'sets the develoepr key id' do
-          expect(response).to be_unauthorized
-        end
-      end
-
-      context 'when the developer key account does not match' do
-        let(:developer_key) { DeveloperKey.create! }
-
-        it { is_expected.to be_nil }
-      end
+    let(:consumer_key) { 'key' }
+    let(:shared_secret) { 'seekret' }
+    let(:xml) do
+      <<-XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+          <blti:title>Example Tool Provider</blti:title>
+          <blti:description>This is a Sample Tool Provider.</blti:description>
+          <blti:launch_url>https://www.tool.com/launch</blti:launch_url>
+          <blti:extensions platform="canvas.instructure.com">
+          </blti:extensions>
+        </cartridge_basiclti_link>
+      XML
     end
+    let(:xml_response) { OpenStruct.new({body: xml}) }
 
     context 'tool duplication' do
       shared_examples_for 'detects duplication in context' do
