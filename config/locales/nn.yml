@@ -3559,11 +3559,13 @@ nn:
     edit_planner_note: 
       calendar: "Kalender:"
       date: "Dato:"
+      time: "Tidspunkt:"
       title: "Tittel:"
     edit_to_do_item: 
       date: "Dato:"
       links: 
         more_options: "Fleire alternativ"
+      time: "Tidspunkt:"
       title: "Tittel:"
     end_before_start_error: "Starttidspunkt må setjast før sluttidspunkt"
     ends_in_past_error: "Du kan ikkje opprette ein avtale som sluttar i fortida"
@@ -15142,6 +15144,7 @@ nn:
     this_folder_is_empty: "Mappa er tom"
     updated_at: "Dato endra"
     updated_at_short: Endra
+  read_7cabda44: les
   read_comments_3fcc7590: "Les kommentarar"
   ready_to_enroll_panel_46f45abb: "Klar til å melde på brukarpanel"
   recaptcha_not_configured_3a6ef9ee: "reCAPTCHA er ikkje konfigurert"
@@ -17578,6 +17581,7 @@ nn:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappa er låst og kan ikkje visast."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne karakteren er ulik den karakteren som er synleg for studentane fordi nokre oppgåver er skjulte"
   this_grade_is_invalid_8ab192c7: "Denne vurderinga er ugyldig"
+  this_grade_is_unusually_high_60533c20: "Denne vurderinga er unormalt høg"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet er synleg som eit vassmerke i bakgrunnen på sida di. Godkjende format: .png, .svg, .gif og .jpeg"
   this_is_a_blueprint_course_5e7b47fe: Blåkopiemne
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er ei kommadelt liste med klarerte URL-adresser. URL-adresser frå denne lista omgår CSRF-token ved pålogging i Canvas."
