@@ -89,28 +89,6 @@ class Enrollment < ActiveRecord::Base
   scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
 
-  def self.not_yet_started(course)
-    collection = self.where(course_id: course).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
-    collection.select do |enrollment|
-      enrollment.effective_start_at > Time.zone.now
-    end
-  end
-
-  def self.section_ended(course_id)
-    collection = self.where(course_id: course_id).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
-    courses = Course.where(id: course_id)
-    unless courses[0].nil?
-      collection.select do |enrollment|
-        (!enrollment.course_section.end_at.nil? &&
-         enrollment.course_section.end_at < courses[0].time_zone.now) ||
-          (!enrollment.course_section.start_at.nil? &&
-           enrollment.course_section.start_at >  courses[0].time_zone.now)
-      end
-    end
-  end
-
   def ensure_role_id
     self.role_id ||= self.role.id
   end

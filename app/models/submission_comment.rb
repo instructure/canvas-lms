@@ -159,11 +159,9 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment
     p.to do
       course_id = /\d+/.match(submission.context_code).to_s.to_i
-      section_ended =
-        Enrollment.where({
-                           user_id: submission.user.id
-                         }).section_ended(course_id).length > 0
-      unless section_ended
+      active_participant =
+        Enrollment.where(user_id: submission.user.id, :course_id => course_id).active_by_date.exists?
+      if active_participant
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end
     end
