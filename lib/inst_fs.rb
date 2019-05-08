@@ -133,7 +133,8 @@ module InstFS
 
         raise InstFS::DirectUploadError, "upload succeeded, but response did not containe an \"instfs_uuid\" key"
       end
-      raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service"
+
+      raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
     end
 
     private
