@@ -214,6 +214,7 @@ class Course < ActiveRecord::Base
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
+  after_save :clear_caches_if_necessary
   after_commit :update_cached_due_dates
 
   after_update :clear_cached_short_name, :if => :saved_change_to_course_code?
@@ -556,7 +557,6 @@ class Course < ActiveRecord::Base
         user_ids_to_update_account_associations += update_account_associations(courses_or_course_ids_slice, opts)
       end
     else
-
       if courses_or_course_ids.first.is_a? Course
         courses = courses_or_course_ids
         ActiveRecord::Associations::Preloader.new.preload(courses, :course_sections => :nonxlist_course)
@@ -638,6 +638,7 @@ class Course < ActiveRecord::Base
           CourseAccountAssociation.where(:id => to_delete).delete_all
         end
       end
+      Course.clear_cache_keys(course_ids_to_update_user_account_associations, :account_associations)
 
       user_ids_to_update_account_associations = Enrollment.
           where("course_id IN (?) AND workflow_state<>'deleted'", course_ids_to_update_user_account_associations).
@@ -654,7 +655,7 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    Rails.cache.fetch(["associated_accounts", self]) do
+    Rails.cache.fetch_with_batched_keys("associated_accounts", batch_object: self, batched_keys: :account_associations) do
       Shackles.activate(:slave) do
         if association(:course_account_associations).loaded? && !association(:non_unique_associated_accounts).loaded?
           accounts = course_account_associations.map(&:account).uniq
@@ -1629,26 +1630,33 @@ class Course < ActiveRecord::Base
   end
 
   def account_users_for(user)
-    return [] unless user
     @associated_account_ids ||= (self.associated_accounts + root_account.account_chain(include_site_admin: true)).
         uniq.map { |a| a.active? ? a.id : nil }.compact
-    @account_users ||= {}
-    @account_users[user.global_id] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
+    Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
         AccountUser.active.where(:account_id => account_chain_ids, :user_id => user).to_a
       end
     end
-    @account_users[user.global_id] ||= []
-    @account_users[user.global_id]
+  end
+
+  def cached_account_users_for(user)
+    return [] unless user
+    @account_users ||= {}
+    @account_users[user.global_id] ||= begin
+      key = ['account_users_for_course_and_user', user.cache_key(:account_users), Account.cache_key_for_id(account_id, :account_chain)].cache_key
+      Rails.cache.fetch_with_batched_keys(key, batch_object: self, batched_keys: :account_associations, skip_cache_if_disabled: true) do
+        account_users_for(user)
+      end
+    end
   end
 
   def account_membership_allows(user, permission = nil)
     return false unless user
 
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }
+    @membership_allows[[user.id, permission]] ||= self.cached_account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }
   end
 
   def teacherless?
@@ -3237,6 +3245,10 @@ class Course < ActiveRecord::Base
 
   def touch_admins # TODO remove after existing jobs run
     clear_todo_list_cache(:admins)
+  end
+
+  def clear_caches_if_necessary
+    self.clear_cache_key(:account_associations) if saved_change_to_root_account_id? || saved_change_to_account_id?
   end
 
   def list_students_by_sortable_name?

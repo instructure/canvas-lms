@@ -328,4 +328,32 @@ describe Canvas::CacheRegister do
       end
     end
   end
+
+  context "without an object" do
+    it "should try to find the cache key by the id alone" do
+      @user2 = User.create!
+      Timecop.freeze(time1) do
+        @user.cache_key(:enrollments)
+      end
+
+      Timecop.freeze(time2) do
+        expect(User.cache_key_for_id(@user.id, :enrollments)).to include(to_stamp(time1))
+        expect(User.cache_key_for_id(@user2.id, :enrollments)).to include(to_stamp(time2))
+      end
+    end
+
+    it "should return nil if cache register is disabled" do
+      set_revert!
+      Timecop.freeze(time1) do
+        @user.cache_key(:enrollments)
+      end
+      Timecop.freeze(time2) do
+        expect(User.cache_key_for_id(@user.id, :enrollments)).to eq nil
+      end
+    end
+
+    it "should check the types in dev/test" do
+      expect { User.cache_key_for_id(@user.id, :blah) }.to raise_error("invalid cache_key type 'blah' for User")
+    end
+  end
 end

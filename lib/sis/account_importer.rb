@@ -107,7 +107,10 @@ module SIS
         if account.save
           data = SisBatchRollBackData.build_data(sis_batch: @batch, context: account)
           @roll_back_data << data if data
-          account.update_account_associations if update_account_associations
+          if update_account_associations
+            account.update_account_associations
+            account.clear_downstream_caches(:account_chain)
+          end
 
           @success_count += 1
         else

@@ -1159,7 +1159,7 @@ class User < ActiveRecord::Base
     return false unless account.root_account?
 
     Rails.cache.fetch(['has_subset_of_account_permissions', self, user, account].cache_key, :expires_in => 60.minutes) do
-      account_users = account.all_account_users_for(self)
+      account_users = account.cached_all_account_users_for(self)
       account_users.all? do |account_user|
         account_user.is_subset_of?(user)
       end
@@ -2570,7 +2570,7 @@ class User < ActiveRecord::Base
     if pseudonym_hint
       mfa_settings = pseudonym_hint.account.mfa_settings
       return :required if mfa_settings == :required ||
-          mfa_settings == :required_for_admins && !pseudonym_hint.account.all_account_users_for(self).empty?
+          mfa_settings == :required_for_admins && !pseudonym_hint.account.cached_all_account_users_for(self).empty?
     end
 
     result = self.pseudonyms.shard(self).preload(:account).map(&:account).uniq.map do |account|
@@ -2583,7 +2583,7 @@ class User < ActiveRecord::Base
           # if pseudonym_hint is given, and we got to here, we don't need
           # to redo the expensive all_account_users_for check
           if (pseudonym_hint && pseudonym_hint.account == account) ||
-              account.all_account_users_for(self).empty?
+              account.cached_all_account_users_for(self).empty?
             1
           else
             # short circuit the entire method
@@ -2802,7 +2802,7 @@ class User < ActiveRecord::Base
     roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
     roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-    account_users = root_account.all_account_users_for(self)
+    account_users = root_account.cached_all_account_users_for(self)
 
     if exclude_deleted_accounts
       account_users = account_users.select { |a| a.account.workflow_state == 'active' }

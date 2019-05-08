@@ -826,17 +826,17 @@ describe User do
     end
 
     it 'is true if there are no account users for this root account' do
-      account = double(:root_account? => true, :all_account_users_for => [])
+      account = double(:root_account? => true, :cached_all_account_users_for => [])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is true when all account_users for current user are subsets of target user' do
-      account = double(:root_account? => true, :all_account_users_for => [double(:is_subset_of? => true)])
+      account = double(:root_account? => true, :cached_all_account_users_for => [double(:is_subset_of? => true)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is false when any account_user for current user is not a subset of target user' do
-      account = double(:root_account? => true, :all_account_users_for => [double(:is_subset_of? => false)])
+      account = double(:root_account? => true, :cached_all_account_users_for => [double(:is_subset_of? => false)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
   end

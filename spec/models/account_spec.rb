@@ -1720,4 +1720,84 @@ describe Account do
     au = Account.default.account_users.create!(:user => @user)
     expect(au.messages_sent[n.name].map(&:user)).to match_array [active_admin, @user]
   end
+
+  context "fancy redis caching" do
+    before :each do
+      skip "redis required" unless Canvas.redis_enabled?
+    end
+
+    describe "cached_account_users_for" do
+      before :each do
+        @account = Account.create!
+        @user = User.create!
+      end
+
+      def cached_account_users
+        [:@account_users_cache, :@account_chain_ids, :@account_chain].each do |iv|
+          @account.instance_variable_set(iv, nil)
+        end
+        @account.cached_account_users_for(@user)
+      end
+
+      it "should cache" do
+        enable_cache(:redis_store) do
+          expect_any_instantiation_of(@account).to receive(:account_users_for).once.and_call_original
+          2.times { cached_account_users }
+        end
+      end
+
+      it "should skip cache if disabled" do
+        enable_cache(:redis_store) do
+          allow(Canvas::CacheRegister).to receive(:enabled?).and_return(false)
+          expect_any_instantiation_of(@account).to receive(:account_users_for).exactly(2).times.and_call_original
+          2.times { cached_account_users }
+        end
+      end
+
+      it "should update if the account chain changes" do
+        enable_cache(:redis_store) do
+          other_account = Account.create!
+          au = AccountUser.create!(:account => other_account, :user => @user)
+          expect(cached_account_users).to eq []
+          @account.update_attribute(:parent_account, other_account)
+          expect(cached_account_users).to eq [au]
+        end
+      end
+
+      it "should update if the user has an account user added" do
+        enable_cache(:redis_store) do
+          expect(cached_account_users).to eq []
+          au = AccountUser.create!(:account => @account, :user => @user)
+          expect(cached_account_users).to eq [au]
+        end
+      end
+    end
+
+    describe "account_chain_ids" do
+      it "should cache" do
+        enable_cache(:redis_store) do
+          expect(Account.connection).to receive(:select_values).once.and_call_original
+          2.times { Account.account_chain_ids(Account.default.id) }
+        end
+      end
+
+      it "should skip cache if disabled" do
+        enable_cache(:redis_store) do
+          allow(Canvas::CacheRegister).to receive(:enabled?).and_return(false)
+          expect(Account.connection).to receive(:select_values).exactly(2).times.and_call_original
+          2.times { Account.account_chain_ids(Account.default.id) }
+        end
+      end
+
+      it "should update if the account chain changes" do
+        enable_cache(:redis_store) do
+          account1 = Account.default.sub_accounts.create!
+          account2 = Account.default.sub_accounts.create!
+          expect(Account.account_chain_ids(account2.id)).to eq [account2.id, Account.default.id]
+          account2.update_attribute(:parent_account, account1)
+          expect(Account.account_chain_ids(account2.id)).to eq [account2.id, account1.id, Account.default.id]
+        end
+      end
+    end
+  end
 end
