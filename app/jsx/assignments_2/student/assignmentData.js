@@ -52,6 +52,21 @@ export function GetAssignmentEnvVariables() {
   return {...defaults}
 }
 
+function submissionFields() {
+  return `
+    _id
+    id
+    deductedPoints
+    enteredGrade
+    grade
+    gradingStatus
+    latePolicyStatus
+    state
+    submissionStatus
+    submittedAt
+  `
+}
+
 function submissionCommentQueryParams() {
   return `
     _id
@@ -110,16 +125,7 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
-            _id
-            id
-            deductedPoints
-            enteredGrade
-            grade
-            gradingStatus
-            latePolicyStatus
-            state
-            submissionStatus
-            submittedAt
+            ${submissionFields()}
           }
         }
       }
@@ -146,6 +152,20 @@ export const CREATE_SUBMISSION_COMMENT = gql`
     createSubmissionComment(input: {submissionId: $id, comment: $comment, fileIds: $fileIds}) {
       submissionComment {
         ${submissionCommentQueryParams()}
+      }
+    }
+  }
+`
+
+export const CREATE_SUBMISSION = gql`
+  mutation CreateSubmission($id: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
+    createSubmission(input: {assignmentId: $id, submissionType: $type, fileIds: $fileIds}) {
+      submission {
+        ${submissionFields()}
+      }
+      errors {
+        attribute
+        message
       }
     }
   }
@@ -200,7 +220,8 @@ export const StudentAssignmentShape = shape({
     moduleUrl: string.isRequired,
     currentUser: shape({
       display_name: string,
-      avatar_image_url: string
+      avatar_image_url: string,
+      id: string
     }),
     modulePrereq: shape({
       title: string.isRequired,

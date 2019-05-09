@@ -53,7 +53,11 @@ const mocks = [
 describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is unlocked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByTestId} = render(<StudentContent assignment={assignment} />)
+    const {getByTestId} = render(
+      <MockedProvider>
+        <StudentContent assignment={assignment} />
+      </MockedProvider>
+    )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
 
@@ -65,7 +69,11 @@ describe('Assignment Student Content View', () => {
 
   it('renders the assignment details and student content tab if the assignment is unlocked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
+    const {getByRole, getByText, queryByText} = render(
+      <MockedProvider>
+        <StudentContent assignment={assignment} />
+      </MockedProvider>
+    )
 
     expect(getByRole('tablist')).toHaveTextContent('Upload')
     expect(getByText('Details')).toBeInTheDocument()

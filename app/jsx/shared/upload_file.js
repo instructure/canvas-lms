@@ -204,3 +204,33 @@ export async function submissionCommentAttachmentsUpload(files, courseId, assign
   return Promise.all(uploadPromises)
 }
 
+/*
+ * This is a helper function for uploading multiple files to a given
+ * upload url
+ *
+ * @returns an array of attachment objects.
+ */
+export async function uploadFiles(files, uploadUrl) {
+  const uploadPromises = files.map(currentFile => {
+    const preflightFileData = {
+      name: currentFile.name,
+      content_type: currentFile.type
+    }
+    return uploadFile(uploadUrl, preflightFileData, currentFile)
+  })
+  return Promise.all(uploadPromises)
+}
+
+/*
+ * Creats a url for the files submission endpoint in the files api from
+ * an assignment
+ *
+ * @returns a url for uploading files to an assignment
+ */
+export function submissionFileUploadUrl(assignment) {
+  return `/api/v1/courses/${
+    assignment.env.courseId
+  }/assignments/${assignment._id}/submissions/${
+    assignment.env.currentUser.id
+  }/files`
+}

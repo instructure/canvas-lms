@@ -15,7 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {CREATE_SUBMISSION_COMMENT, SUBMISSION_COMMENT_QUERY} from './assignmentData'
+import {
+  CREATE_SUBMISSION,
+  CREATE_SUBMISSION_COMMENT,
+  STUDENT_VIEW_QUERY,
+  SUBMISSION_COMMENT_QUERY
+} from './assignmentData'
 
 export function mockAssignment(overrides = {}) {
   return {
@@ -52,36 +57,17 @@ export function mockAssignment(overrides = {}) {
     modules: [],
     submissionsConnection: {
       nodes: [
-        {
+        submissionFields({
           _id: '3',
-          commentsConnection: {
-            __typename: 'CommentsConnection',
-            nodes: [
-              {
-                __typename: 'Comment',
-                _id: '1',
-                attachments: [],
-                comment: 'comment comment',
-                updatedAt: '2019-03-05T23:09:36-07:00',
-                author: {
-                  __typename: 'Author',
-                  avatarUrl: 'example.com',
-                  shortName: 'bob builder'
-                }
-              }
-            ]
-          },
           id: '3',
           deductedPoints: 3,
           enteredGrade: '9',
           grade: '6',
           latePolicyStatus: 'late',
-          state: 'submitted',
           submissionStatus: 'late',
           submittedAt: '2019-02-20T15:12:33-07:00',
-          gradingStatus: 'graded',
-          __typename: 'Sumbission'
-        }
+          gradingStatus: 'graded'
+        })
       ],
       __typename: 'SubmissionConnection'
     },
@@ -258,4 +244,80 @@ export function commentGraphqlMock(comments) {
       }
     }
   ]
+}
+
+export function submissionGraphqlMock() {
+  return [
+    {
+      request: {
+        query: CREATE_SUBMISSION,
+        variables: {
+          id: '22',
+          type: 'online_upload',
+          fileIds: ['1']
+        }
+      },
+      result: {
+        data: {
+          createSubmission: {
+            submission: submissionFields(),
+            errors: {
+              attribute: null,
+              message: null,
+              __typename: 'Errors'
+            },
+            __typename: 'CreateSubmissionPayload'
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: STUDENT_VIEW_QUERY,
+        variables: {
+          assignmentLid: '22'
+        }
+      },
+      result: {
+        data: {
+          assignment: mockAssignment({lockInfo: {isLocked: false, __typename: 'LockInfo'}}),
+          __typename: 'Assignment'
+        }
+      }
+    }
+  ]
+}
+
+export function submissionFields(overrides = {}) {
+  return {
+    _id: '22',
+    id: 'lookAtMe',
+    commentsConnection: {
+      __typename: 'CommentsConnection',
+      nodes: [
+        {
+          __typename: 'Comment',
+          _id: '1',
+          attachments: [],
+          comment: 'comment comment',
+          updatedAt: '2019-03-05T23:09:36-07:00',
+          author: {
+            __typename: 'Author',
+            avatarUrl: 'example.com',
+            shortName: 'bob builder'
+          }
+        }
+      ]
+    },
+    deductedPoints: null,
+    enteredGrade: null,
+    grade: null,
+    gradingStatus: 'needs_grading',
+    latePolicyStatus: null,
+    state: 'submitted',
+    submissionStatus: 'submitted',
+    submittedAt: '2019-05-08T10:02:42-06:00',
+    __typename: 'Submission',
+    ...overrides
+  }
 }
