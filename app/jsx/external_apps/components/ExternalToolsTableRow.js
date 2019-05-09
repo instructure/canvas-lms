@@ -45,6 +45,10 @@ export default class ExternalToolsTableRow extends React.Component {
     }).isRequired
   }
 
+  get is13Tool () {
+    return this.props.tool.lti_version === '1.3'
+  }
+
   onModalClose = () => {
     this.button.focus()
   }
@@ -164,7 +168,7 @@ export default class ExternalToolsTableRow extends React.Component {
               <EditExternalToolButton
                 ref="editExternalToolButton"
                 tool={tool}
-                canAddEdit={this.props.canAddEdit}
+                canAddEdit={this.props.canAddEdit && !this.is13Tool}
                 returnFocus={this.returnFocus}
               />
               <ExternalToolPlacementButton

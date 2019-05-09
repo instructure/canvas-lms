@@ -124,7 +124,9 @@ export default class ExternalToolsTable extends React.Component {
                 </th>
               </tr>
             </thead>
-            <tbody className="collectionViewItems">{this.trs()}</tbody>
+            <tbody className="collectionViewItems">
+              {this.trs()}
+            </tbody>
           </table>
         </InfiniteScroll>
       </div>
