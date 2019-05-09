@@ -32,7 +32,6 @@ import 'jquery.instructure_forms'
 import 'ajax_errors'
 import 'compiled/behaviors/activate'
 import 'compiled/behaviors/tooltip'
-import 'media_comments'
 
 
 import('../runOnEveryPageButDontBlockAnythingElse')
