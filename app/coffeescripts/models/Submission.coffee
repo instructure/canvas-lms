@@ -25,6 +25,9 @@ define [
     isGraded: =>
       @get('grade')?
 
+    excused: =>
+      @get('excused')
+
     hasSubmission: =>
       !!@get('submission_type')
 

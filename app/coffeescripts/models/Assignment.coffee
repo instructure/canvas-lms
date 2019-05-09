@@ -139,6 +139,10 @@ define [
       return false if isAdmin()
       @get('in_closed_grading_period')
 
+    isExcused: =>
+      sub = @get('submission')
+      return sub.excused if sub
+
     gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType
       @set 'grading_type', gradingType
@@ -408,7 +412,7 @@ define [
         'turnitinAvailable', 'turnitinEnabled', 'vericiteAvailable',
         'vericiteEnabled', 'gradeGroupStudentsIndividually', 'groupCategoryId',
         'frozen', 'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
-        'gradingStandardId', 'isLetterGraded', 'isGpaScaled',
+        'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'isExcused',
         'assignmentGroupId', 'iconType', 'published', 'htmlUrl', 'htmlEditUrl',
         'labelId', 'position', 'postToSIS', 'multipleDueDates', 'nonBaseDates',
         'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',

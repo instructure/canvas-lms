@@ -17,6 +17,9 @@
     <div class="ig-info">
       <a href="{{htmlUrl}}" class="ig-title">
         {{name}}
+        {{#if isExcused}}
+          (Excused)
+        {{/if}}
       </a>
       <div class="ig-details">
         {{#if canManage}}
