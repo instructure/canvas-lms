@@ -373,6 +373,7 @@ class Submission < ActiveRecord::Base
   def new_version_needed?
     turnitin_data_changed? || vericite_data_changed? || (changes.keys - [
       "updated_at",
+      "posted_at",
       "processed",
       "process_attempts",
       "grade_matches_current_submission",
