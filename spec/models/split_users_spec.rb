@@ -480,6 +480,14 @@ describe SplitUsers do
       let!(:shard1_account) { @shard1.activate { Account.create! } }
       let!(:shard1_course) { shard1_account.courses.create! }
 
+      it 'should handle access tokens' do
+        at = AccessToken.create!(user: restored_user, :developer_key => DeveloperKey.default)
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(at.reload.user_id).to eq shard1_source_user.id
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(at.reload.user_id).to eq restored_user.id
+      end
+
       it 'should move submissions from new courses post merge when appropriate' do
         pseudonym1 = restored_user.pseudonyms.create!(unique_id: 'sam1@example.com')
         UserMerge.from(restored_user).into(shard1_source_user)
@@ -497,6 +505,19 @@ describe SplitUsers do
         submission.update!(valid_attributes)
         SplitUsers.split_db_users(shard1_source_user)
         expect(submission.reload.user).to eq restored_user
+      end
+
+      it 'should handle user_observers cross shard' do
+        observer1 = user_model
+        observer2 = user_model
+        add_linked_observer(restored_user, observer1)
+        add_linked_observer(shard1_source_user, observer2)
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(restored_user.linked_observers).to eq []
+        expect(shard1_source_user.linked_observers.pluck(:id).sort).to eq [observer1.id, observer2.id].sort
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(restored_user.reload.linked_observers).to eq [observer1]
+        expect(shard1_source_user.reload.linked_observers).to eq [observer2]
       end
 
       it 'should handle conflicting submissions for cross shard users' do
@@ -553,12 +574,13 @@ describe SplitUsers do
       end
 
       it "should split a user across shards with ccs" do
+        restored_user.communication_channels.create!(:path => 'a@example.com') { |cc| cc.workflow_state = 'active' }
         restored_user_ccs = restored_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
         source_user_ccs = shard1_source_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
 
         @shard1.activate do
           UserMerge.from(restored_user).into(shard1_source_user)
-          cc = shard1_source_user.reload.communication_channels.where(path: 'restored_user@example.com').take
+          cc = shard1_source_user.reload.communication_channels.where(path: 'a@example.com').take
           n = Notification.create!(name: 'Assignment Createds', subject: 'Tests', category: 'TestNevers')
           NotificationPolicy.create(notification: n, communication_channel: cc, frequency: 'immediately')
           SplitUsers.split_db_users(shard1_source_user)
@@ -591,6 +613,21 @@ describe SplitUsers do
         SplitUsers.split_db_users(source_user)
         expect(submission.reload.user).to eq restored_user
       end
+
+      it "should copy notification policies" do
+        og_cc = restored_user.communication_channels.create!(:path => 'a@example.com') { |cc| cc.workflow_state = 'active' }
+
+        n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
+        NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: 'immediately')
+
+        UserMerge.from(restored_user).into(shard1_source_user)
+        cc = shard1_source_user.communication_channels.where(path: 'a@example.com').take!
+        expect(cc.notification_policies.count).to eq 1
+
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(shard1_source_user.communication_channels.count).to eq 0
+      end
+
     end
   end
 end
