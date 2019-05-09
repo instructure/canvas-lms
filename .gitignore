@@ -90,3 +90,6 @@ docker-compose.override.yml
 
 # ignore JetBrains IDEs files
 .idea/*
+
+# ignore tmp files from emacs
+*~
