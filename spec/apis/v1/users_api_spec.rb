@@ -234,7 +234,7 @@ describe Api::V1::User do
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2)
       @pseudonym = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default)
-      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false).and_return(@pseudonym)
+      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false, root_account: Account.default).and_return(@pseudonym)
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',

@@ -443,7 +443,7 @@ module Canvas::LiveEvents
       grader_id = submission.global_grader_id
     end
 
-    sis_pseudonym = SisPseudonym.for(submission.user, submission.assignment.root_account, type: :trusted, require_sis: false)
+    sis_pseudonym = SisPseudonym.for(submission.user, submission.assignment.context, type: :trusted, require_sis: false)
 
     post_event_stringified('grade_change', {
       submission_id: submission.global_id,
