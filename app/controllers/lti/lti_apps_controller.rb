@@ -60,52 +60,6 @@ module Lti
 
     private
 
-    def lti_tools_1_3
-      collection = tool_configs.each_with_object([]) do |tool, memo|
-        config = {}
-        dk_id = tool.developer_key_id
-        config[:config] = tool
-        config[:installed_for_context] = active_tools_for_key_context_combos.key?(dk_id)
-        config[:installed_tool_id] = active_tools_for_key_context_combos[dk_id]&.first&.last #get the cet id if present
-        # TODO: fix the issue where it shows installed at account when installed at course
-        config[:installed_at_context_level] = active_tools_for_key_context_combos.dig(dk_id, "#{@context.id}#{@context.class.name}").present?
-        memo << config
-      end
-
-      respond_to do |format|
-        format.json {render json: app_collator.app_definitions(collection)}
-      end
-    end
-
-    def active_tools_for_key_context_combos
-      @active_tools ||= begin
-        q = if @context.class.name == 'Course'
-              ContextExternalTool.
-                active.
-                where(developer_key: dev_keys, context_id: @context.id, context_type: @context.class.name).
-                or(
-                  ContextExternalTool.
-                  active.
-                  where(developer_key: dev_keys, context_id: @context.account_chain_ids, context_type: 'Account')
-                )
-            else
-              ContextExternalTool.
-                active.
-                where(
-                  developer_key: dev_keys, context_id: [@context.id] + @context.account_chain_ids, context_type: @context.class.name
-                )
-            end
-        q.pluck(:developer_key_id, :context_id, :context_type, :id).each_with_object({}) do |key, memo|
-          memo[key.first] ||= {}
-          memo[key.first]["#{key.second}#{key.third}"] = key.fourth
-        end
-      end
-    end
-
-    def tool_configs
-      @tool_configs ||= dev_keys.map(&:tool_configuration)
-    end
-
     def dev_keys
       @dev_keys ||= begin
         context = @context.is_a?(Account) ? @context : @context.account
