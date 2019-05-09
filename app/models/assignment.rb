@@ -488,6 +488,8 @@ class Assignment < ActiveRecord::Base
               :mute_if_changed_to_anonymous,
               :mute_if_changed_to_moderated
 
+  before_create :set_muted_if_post_policies_enabled
+
   after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,
               :touch_assignment_group,
@@ -3194,6 +3196,12 @@ class Assignment < ActiveRecord::Base
 
     self.muted = true if moderated_grading?
   end
+
+  def set_muted_if_post_policies_enabled
+    return unless course.feature_enabled?(:post_policies)
+    self.muted = true
+  end
+  private :set_muted_if_post_policies_enabled
 
   def ensure_manual_posting_if_anonymous
     return unless course.feature_enabled?(:post_policies) && saved_change_to_anonymous_grading?(from: false, to: true)

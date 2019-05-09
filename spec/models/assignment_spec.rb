@@ -2873,6 +2873,10 @@ describe Assignment do
     context "when post policies are enabled" do
       before(:once) { @course.enable_feature!(:post_policies) }
 
+      it "should default to muted" do
+        expect(@course.assignments.create!).to be_muted
+      end
+
       it "ensures an assignment with no previous post policy posts manually when it is muted" do
         @assignment.mute!
         expect(@assignment).to be_post_manually
