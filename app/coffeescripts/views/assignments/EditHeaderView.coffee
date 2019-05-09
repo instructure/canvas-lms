@@ -20,6 +20,7 @@ import Backbone from 'Backbone'
 import $ from 'jquery'
 import template from 'jst/assignments/EditHeaderView'
 import 'jquery.disableWhileLoading'
+import 'jqueryui/tabs'
 
 export default class EditHeaderView extends Backbone.View
   @optionProperty 'userIsAdmin'
