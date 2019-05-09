@@ -956,7 +956,11 @@ describe ExternalToolsController do
 
     context 'with client id' do
       include_context 'lti_1_3_spec_helper'
-      subject { ContextExternalTool.find_by(id: JSON.parse(response.body)['id']) }
+      subject do
+        post 'create', params: params, format: 'json'
+        ContextExternalTool.find_by(id: tool_id)
+      end
+      let(:tool_id) { response.status == 200 ? JSON.parse(response.body)['id'] : -1 }
       let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
       let(:developer_key) { DeveloperKey.create!(account: account) }
       let_once(:user) { account_admin_user(account: account) }
@@ -971,7 +975,7 @@ describe ExternalToolsController do
       before do
         user_session(user)
         tool_configuration
-        post 'create', params: params, format: 'json'
+        enable_developer_key_account_binding!(developer_key)
       end
 
       it { is_expected.to_not be_nil }
@@ -980,6 +984,7 @@ describe ExternalToolsController do
         let(:params) { super().merge(client_id: "bad client id") }
 
         it 'return 404' do
+          subject
           expect(response).to have_http_status :not_found
         end
       end
@@ -992,6 +997,18 @@ describe ExternalToolsController do
         end
 
         it 'return 422' do
+          subject
+          expect(response).to have_http_status :unprocessable_entity
+        end
+      end
+
+      context 'with no account binding' do
+        before do
+          developer_key.developer_key_account_bindings.destroy_all
+        end
+
+        it 'return 422' do
+          subject
           expect(response).to have_http_status :unprocessable_entity
         end
       end

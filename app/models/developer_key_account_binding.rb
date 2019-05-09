@@ -104,6 +104,10 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     "accounts/site_admin/developer_key_account_bindings/#{developer_key.global_id}"
   end
 
+  def on?
+    self.workflow_state == ON_STATE
+  end
+
   private
 
   def clear_cache_if_site_admin
