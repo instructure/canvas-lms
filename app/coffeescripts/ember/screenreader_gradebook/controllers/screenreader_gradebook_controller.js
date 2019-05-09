@@ -43,6 +43,7 @@ import GradingPeriodSetsApi from '../../../api/gradingPeriodSetsApi'
 import GradebookSelector from 'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
 import {updateFinalGradeOverride} from '../../../../jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import 'jquery.instructure_date_and_time'
+import 'vendor/jquery.ba-tinypubsub'
 
 const {get, set, setProperties} = Ember
 

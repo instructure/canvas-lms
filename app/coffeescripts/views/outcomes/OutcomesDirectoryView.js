@@ -26,6 +26,7 @@ import OutcomeCollection from '../../collections/OutcomeCollection'
 import OutcomeGroupCollection from '../../collections/OutcomeGroupCollection'
 import OutcomeGroupIconView from './OutcomeGroupIconView'
 import OutcomeIconView from './OutcomeIconView'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.disableWhileLoading'
 import 'jqueryui/droppable'
 import '../../jquery.rails_flash_notifications'
@@ -302,9 +303,9 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
       _.isEmpty(this.outcomes.models) &&
       _.isEmpty(this.views())
     ) {
-      return $.publish('renderNoOutcomeWarning')
+      return publish('renderNoOutcomeWarning')
     } else {
-      return $.publish('clearNoOutcomeWarning')
+      return publish('clearNoOutcomeWarning')
     }
   }
 

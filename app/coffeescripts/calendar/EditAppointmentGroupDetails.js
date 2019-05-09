@@ -27,6 +27,7 @@ import editAppointmentGroupTemplate from 'jst/calendar/editAppointmentGroup'
 import genericSelectTemplate from 'jst/calendar/genericSelect'
 import ContextSelector from '../calendar/ContextSelector'
 import preventDefault from '../fn/preventDefault'
+import {publish as jqueryPublish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.ajaxJSON'
 import 'jquery.disableWhileLoading'
 import 'jquery.instructure_forms'
@@ -339,7 +340,7 @@ export default class EditAppointmentGroupDetails {
     const onSuccess = data => {
       (data.new_appointments || []).forEach(eventData => {
         const event = commonEventFactory(eventData, this.contexts)
-        $.publish('CommonEvent/eventSaved', event)
+        jqueryPublish('CommonEvent/eventSaved', event)
       })
       this.closeCB(true)
     }

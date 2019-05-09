@@ -48,6 +48,7 @@ import ExternalTool from '../../models/ExternalTool'
 import OverwriteAssessmentContentView from '../../views/content_migrations/subviews/OverwriteAssessmentContentView'
 import ImportQuizzesNextView from '../../views/content_migrations/subviews/ImportQuizzesNextView'
 import processMigrationContentItem from './processMigrationContentItem'
+import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 ConverterViewControl.setModel new ContentMigrationModel
                                 course_id: ENV.COURSE_ID
@@ -89,7 +90,7 @@ dfd = progressingMigCollection.fetch()
 progressingCollectionView.$el.disableWhileLoading dfd
 
 # Migration has now started and is being processed at this point.
-$.subscribe 'migrationCreated', (migrationModelData) ->
+subscribe 'migrationCreated', (migrationModelData) ->
   progressingMigCollection.add migrationModelData
   $.screenReaderFlashMessageExclusive(I18n.t('Content migration queued'))
 

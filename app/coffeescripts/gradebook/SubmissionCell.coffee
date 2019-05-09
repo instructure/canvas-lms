@@ -25,6 +25,7 @@ import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from './Turnitin'
 import round from '../util/round'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'
 
@@ -83,7 +84,7 @@ class SubmissionCell
     $.ajaxJSON url, "PUT", data, @onUpdateSuccess, @onUpdateError
 
   onUpdateSuccess: (submission) ->
-    $.publish('submissions_updated', [submission.all_submissions])
+    publish('submissions_updated', [submission.all_submissions])
 
   onUpdateError: ->
     $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)

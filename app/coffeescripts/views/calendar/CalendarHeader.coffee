@@ -19,6 +19,7 @@ import $ from 'jquery'
 import Backbone from 'Backbone'
 import template from 'jst/calendar/calendarHeader'
 import CalendarNavigator from './CalendarNavigator'
+import {publish, subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 export default class CalendarHeader extends Backbone.View
   template: template
@@ -61,7 +62,7 @@ export default class CalendarHeader extends Backbone.View
     @navigator.on('navigateNext', => @trigger('navigateNext'))
     @navigator.on('navigateDate', (selectedDate) => @trigger('navigateDate', selectedDate))
     @$calendarViewButtons.on('click', 'button', @toggleView)
-    $.subscribe('Calendar/loadStatus', @animateLoading)
+    subscribe('Calendar/loadStatus', @animateLoading)
 
   toggleView: (e) ->
     e.preventDefault()
@@ -156,7 +157,7 @@ export default class CalendarHeader extends Backbone.View
   _triggerCreateNewEvent: (event) ->
     event.preventDefault()
     @trigger('createNewEvent')
-    $.publish("CalendarHeader/createNewEvent")
+    publish("CalendarHeader/createNewEvent")
 
   _triggerRefreshCalendar: (event) ->
     event.preventDefault()

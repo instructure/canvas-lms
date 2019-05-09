@@ -29,6 +29,7 @@ import RootOutcomesFinder from '../RootOutcomesFinder'
 import dialogTemplate from 'jst/MoveOutcomeDialog'
 import noOutcomesWarning from 'jst/outcomes/noOutcomesWarning'
 import DefaultUrlMixin from '../../backbone-ext/DefaultUrlMixin'
+import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 // This view is a wrapper for showing details for outcomes and groups.
 // It uses OutcomeView and OutcomeGroupView to render
@@ -57,8 +58,8 @@ export default class ContentView extends Backbone.View {
     this.instructionsTemplate = instructionsTemplate
     this.renderInstructions = renderInstructions
     super.initialize(...arguments)
-    $.subscribe('renderNoOutcomeWarning', this.renderNoOutcomeWarning)
-    $.subscribe('clearNoOutcomeWarning', this.clearNoOutcomeWarning)
+    subscribe('renderNoOutcomeWarning', this.renderNoOutcomeWarning)
+    subscribe('clearNoOutcomeWarning', this.clearNoOutcomeWarning)
     return this.render()
   }
 
