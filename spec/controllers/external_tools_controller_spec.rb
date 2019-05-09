@@ -1727,63 +1727,6 @@ describe ExternalToolsController do
         end
       end
     end
-
-    context '#delete_tool_from_tool_config' do
-      subject {  delete :delete_tool_from_tool_config, params: params, format: 'json' }
-
-      let(:cet) do
-        tool = tool_configuration.new_external_tool(create_tool_context)
-        tool.save!
-        tool
-      end
-
-      shared_examples_for 'deletes a tool from dev key' do
-        context 'with existing cet' do
-          before do
-            cet
-          end
-
-          it_behaves_like 'basic devkey behavior'
-
-          it 'removes a ContextExternalTool' do
-            expect { subject }.to change { ContextExternalTool.active.count }.by(-1)
-          end
-
-          context 'on double deletion' do
-            before do
-              delete :delete_tool_from_tool_config, params: params
-            end
-
-            it { is_expected.to have_http_status :not_found }
-          end
-        end
-
-        context 'with no cet' do
-          it { is_expected.to have_http_status :not_found }
-        end
-      end
-
-      context 'when an account' do
-        let(:create_tool_context) { account }
-        let(:params) { { account_id: account.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'deletes a tool from dev key'
-      end
-
-      context 'when a subaccount' do
-        let(:create_tool_context) { sub_account }
-        let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'deletes a tool from dev key'
-      end
-
-      context 'when a course' do
-        let(:create_tool_context) { course }
-        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
-
-        it_behaves_like 'deletes a tool from dev key'
-      end
-    end
   end
 
   def opaque_id(asset)

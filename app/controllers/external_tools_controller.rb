@@ -955,26 +955,6 @@ class ExternalToolsController < ApplicationController
     render json: external_tool_json(cet, @context, @current_user, session)
   end
 
-  # @API Delete Tool from ToolConfiguration
-  # @internal
-  #
-  # Deletes the tool given the context and the developer_key_id.
-  #
-  # @argument account_id [String]
-  #    if account
-  #
-  # @argument course_id [String]
-  #    if course
-  #
-  # @argument developer_key_id [String]
-  #
-  # @returns ContextExternalTool
-  def delete_tool_from_tool_config
-    cet = @context.context_external_tools.active.where(developer_key: developer_key).take
-    raise ActiveRecord::RecordNotFound if cet.nil?
-    delete_tool(cet)
-  end
-
   # @API Edit an external tool
   # Update the specified external tool. Uses same parameters as create
   #
