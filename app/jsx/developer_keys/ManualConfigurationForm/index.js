@@ -30,6 +30,10 @@ import AdditionalSettings from './AdditionalSettings';
 import Placements from './Placements';
 
 export default class ManualConfigurationForm extends React.Component {
+  state = {
+    showMessages: false
+  }
+
   generateToolConfiguration = () => {
     const toolConfig = {
       ...this.requiredRef.generateToolConfigurationPart(),
@@ -41,6 +45,7 @@ export default class ManualConfigurationForm extends React.Component {
   }
 
   valid = () => {
+    this.setState({showMessages: true})
     return this.requiredRef.valid()
       && this.servicesRef.valid()
       && this.additionalRef.valid()
@@ -79,7 +84,7 @@ export default class ManualConfigurationForm extends React.Component {
           description={<ScreenReaderContent>{I18n.t('Manual Configuration')}</ScreenReaderContent>}
           layout="stacked"
         >
-          <RequiredValues ref={this.setRequiredRef} toolConfiguration={toolConfiguration} />
+          <RequiredValues ref={this.setRequiredRef} toolConfiguration={toolConfiguration} showMessages={this.state.showMessages} />
           <Services ref={this.setServicesRef} validScopes={validScopes} scopes={toolConfiguration.scopes} />
           <AdditionalSettings ref={this.setAdditionalRef}  additionalSettings={this.additionalSettings()} custom_fields={this.customFields()} />
           <Placements ref={this.setPlacementsRef}  validPlacements={validPlacements} placements={this.placements()} />

@@ -145,7 +145,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   disabled={this.props.createLtiKeyState.customizing}
                 />
                 <TextArea
-                  label={I18n.t('Redirect URIs:')}
+                  label={this.props.createLtiKeyState.isLtiKey ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
                   name="developer_key[redirect_uris]"
                   required={this.props.createLtiKeyState.isLtiKey}
                   defaultValue={this.fieldValue('redirect_uris')}

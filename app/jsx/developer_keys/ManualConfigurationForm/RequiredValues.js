@@ -25,6 +25,8 @@ import TextInput from '@instructure/ui-forms/lib/components/TextInput';
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 
+const validationMessage = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
+
 export default class RequiredValues extends React.Component {
   constructor (props) {
     super(props);
@@ -88,6 +90,7 @@ export default class RequiredValues extends React.Component {
 
   render() {
     const { toolConfiguration } = this.state;
+    const { showMessages } = this.props
 
     return (
       <FormFieldGroup
@@ -101,47 +104,52 @@ export default class RequiredValues extends React.Component {
           <TextInput
             name="title"
             value={toolConfiguration.title}
-            label={I18n.t("Title")}
+            label={I18n.t("* Title")}
             required
             onChange={this.handleTitleChange}
+            messages={showMessages && !toolConfiguration.title ? validationMessage : []}
           />
           <TextArea
             name="description"
             value={toolConfiguration.description}
-            label={I18n.t("Description")}
+            label={I18n.t("* Description")}
             maxHeight="5rem"
             required
             onChange={this.handleDescriptionChange}
+            messages={showMessages && !toolConfiguration.description ? validationMessage : []}
           />
         </FormFieldGroup>
         <FormFieldGroup
-          description={<ScreenReaderContent>{I18n.t("Open Id Connect Values")}</ScreenReaderContent>}
+          description={<ScreenReaderContent>{I18n.t("* Open Id Connect Values")}</ScreenReaderContent>}
           layout="columns"
         >
           <TextInput
             name="target_link_uri"
             value={toolConfiguration.target_link_uri}
-            label={I18n.t("Target Link URI")}
+            label={I18n.t("* Target Link URI")}
             required
             onChange={this.handleTargetLinkUriChange}
+            messages={showMessages && !toolConfiguration.target_link_uri ? validationMessage : []}
           />
           <TextInput
             name="oidc_initiation_url"
             value={toolConfiguration.oidc_initiation_url}
-            label={I18n.t("OpenID Connect Initiation Url")}
+            label={I18n.t("* OpenID Connect Initiation Url")}
             required
             onChange={this.handleOidcInitiationUrlChange}
+            messages={showMessages && !toolConfiguration.oidc_initiation_url ? validationMessage : []}
           />
         </FormFieldGroup>
         <TextArea
           name="public_jwk"
           value={toolConfiguration.public_jwk}
-          label={I18n.t("Public JWK")}
+          label={I18n.t("* Public JWK")}
           maxHeight="10rem"
           required
           resize="vertical"
           autoGrow
           onChange={this.handlePublicJwkChange}
+          messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
         />
         <hr />
       </FormFieldGroup>
@@ -157,7 +165,8 @@ RequiredValues.propTypes = {
     oidc_initiation_url: PropTypes.string,
     public_jwk: PropTypes.string
   }),
-  flashError: PropTypes.func
+  flashError: PropTypes.func,
+  showMessages: PropTypes.bool
 }
 
 RequiredValues.defaultProps = {
