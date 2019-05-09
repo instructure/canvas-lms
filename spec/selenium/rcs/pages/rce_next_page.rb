@@ -193,7 +193,7 @@ module RCENextPage
   def align_right_button
     # put align right button locator here
   end
-  
+
   def rce_next_toolbar
     f(".tox-toolbar__primary")
   end
@@ -204,6 +204,10 @@ module RCENextPage
 
   def a11y_checker_tray
     f("div[aria-label='Accessibility Checker'")
+  end
+
+  def tray_container
+    f('[data-cid="Tray Portal"]')
   end
 
   # ---------------------- Actions ----------------------

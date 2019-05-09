@@ -317,5 +317,31 @@ describe "RCE next tests" do
 
       expect(a11y_checker_tray).to be_displayed
     end
+
+    it "should close the course links tray when pressing esc", ignore_js_errors: true do
+      skip('Unskip in CORE-2878')
+      visit_front_page_edit(@course)
+
+      click_links_toolbar_button
+      click_course_links
+      wait_for_tiny(edit_wiki_css)
+
+      driver.action.send_keys(:escape).perform # Press esc key
+
+      expect(tray_container).not_to be_displayed
+    end
+
+    it "should close the course images tray when pressing esc", ignore_js_errors: true do
+      skip('Unskip in CORE-2878')
+      visit_front_page_edit(@course)
+
+      click_images_toolbar_button
+      click_course_images
+      wait_for_tiny(edit_wiki_css)
+
+      driver.action.send_keys(:escape).perform # Press esc key
+
+      expect(tray_container).not_to be_displayed
+    end
   end
 end
