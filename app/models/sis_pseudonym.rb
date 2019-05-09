@@ -17,24 +17,27 @@
 
 class SisPseudonym
   # type: :exact, :trusted, or :implicit
-  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false)
+  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
-    raise ArgumentError("context must respond to .root_account") unless context.respond_to?(:root_account)
-    self.new(user, context, type, require_sis, include_deleted).pseudonym
+    raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
+    raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
+    self.new(user, context, type, require_sis, include_deleted, root_account).pseudonym
   end
 
   attr_reader :user, :context, :type, :require_sis, :include_deleted
 
-  def initialize(user, context, type, require_sis, include_deleted)
+  def initialize(user, context, type, require_sis, include_deleted, root_account)
     @user = user
     @context = context
     @type = type
     @require_sis = require_sis
     @include_deleted = include_deleted
+    @root_account = root_account
   end
 
   def pseudonym
     result = @context.sis_pseudonym if @context.class <= Enrollment
+    result ||= find_on_enrollment_for_context
     result ||= find_in_home_account
     result ||= find_in_other_accounts
     if result
@@ -44,6 +47,12 @@ class SisPseudonym
   end
 
   private
+  def find_on_enrollment_for_context
+    if @context.is_a?(Course) || @context.is_a?(CourseSection)
+      @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+    end
+  end
+
   def find_in_other_accounts
     return nil if type == :exact
     if include_deleted

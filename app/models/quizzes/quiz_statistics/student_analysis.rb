@@ -234,7 +234,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             row << submission.user.name
             row << submission.user_id
             if includes_sis_ids?
-              pseudonym = SisPseudonym.for(submission.user, quiz.context.account, type: :trusted)
+              pseudonym = SisPseudonym.for(submission.user, quiz.context, type: :trusted)
               row << pseudonym.try(:sis_user_id)
             end
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
