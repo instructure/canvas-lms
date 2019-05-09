@@ -18686,6 +18686,7 @@ nn:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke listevisinga."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Åtvaring: Dersom du vil ha betre tilgang til å omorganisere oppgåver og grupper, må du velje alternativet Flytt til dialog, i menyen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Åtvaring: Dersom du vil ha betre tilgang, kan du klikke her og bruke karakterbok med individuell vising. "
+  warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Åtvaring! Du er i ferd med å endre på medlemsamansettinga i gruppa. *Endringa vil påverke eksisterande gruppeinnleveringar, merknader, kommentarar og vurderingar og føre til tap av data frå BÅDE denne gruppa og frå gruppa du har flytta studenten frå.*** For å hindre uønska konsekvensar for eksisterande gruppeinnleveringar må du opprette eit nytt gruppesett for for framtidige innleveringar.**"
   warnings: 
     test_install: 
       periodic_message: "Denne Canvas-installasjonen er berre for testing og blir tilbakestilt med jamne mellomrom."
