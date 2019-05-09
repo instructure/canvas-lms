@@ -24,7 +24,7 @@ import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 import IconStudentViewLine from '@instructure/ui-icons/lib/Line/IconStudentView'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import {GridCol} from '@instructure/ui-layout/lib/components/Grid'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 

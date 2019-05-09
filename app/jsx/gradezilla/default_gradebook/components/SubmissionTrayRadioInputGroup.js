@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
 import I18n from 'i18n!gradebook'

@@ -17,7 +17,7 @@
  */
 
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import I18n from 'i18n!react_developer_keys'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'

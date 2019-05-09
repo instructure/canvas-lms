@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import LatePoliciesTabPanel from 'jsx/gradezilla/default_gradebook/components/LatePoliciesTabPanel'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 

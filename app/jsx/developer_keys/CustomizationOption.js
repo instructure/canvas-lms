@@ -21,7 +21,7 @@ import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import IconLink from '@instructure/ui-icons/lib/Line/IconLink'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'

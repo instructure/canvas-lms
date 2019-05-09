@@ -26,7 +26,7 @@ import I18n from 'i18n!assignments_2'
 import FormField from '@instructure/ui-form-field/lib/components/FormField'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
-import generateElementId from '@instructure/ui-utils/lib/dom/generateElementId'
+import generateElementId from '@instructure/uid/lib/uid'
 import {OverrideShape} from '../../assignmentData'
 
 OverrideAssignTo.propTypes = {
