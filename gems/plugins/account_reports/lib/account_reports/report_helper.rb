@@ -203,7 +203,7 @@ module AccountReports::ReportHelper
       enrollment_pseudonym = user_pseudonyms.index_by(&:id)[enrollment.sis_pseudonym_id]
       return enrollment_pseudonym if enrollment_pseudonym
     end
-    SisPseudonym.for(user, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
+    SisPseudonym.for(user, context, type: :trusted, require_sis: false, include_deleted: include_deleted, root_account: root_account)
   end
 
   def preload_logins_for_users(users, include_deleted: false)
