@@ -3672,6 +3672,7 @@ el:
     titles: 
       add: "Προσθήκη Λειτουργικής Μονάδας"
       add_item: "Πρόσθεση Στοιχείου στο %{module}"
+      add_prerequisite: "Προσθήκη Προαπαιτούμενου στην ενότητα *%{module}*"
       edit: "Τροποποίηση Ρυθμίσεων Ενότητας"
       edit_item: "Επεξεργασία Λεπτομερειών Αντικειμένου"
     url_show: 
@@ -6048,6 +6049,7 @@ el:
     show_notes: "Εμφάνιση Στήλης Σημειώσεων"
     show_student_names: "Εμφάνιση των Ονομάτων των Μαθητών"
     student: "Μαθητής "
+    student_index: "%{Index} Σπουδαστή"
     students_who: 
       havent_been_graded: "Δεν έχει/έχουν βαθμολογηθεί"
       havent_submitted_yet: "Δεν έχει γίνει ακόμη υποβολή"
