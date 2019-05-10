@@ -940,9 +940,6 @@ describe UsersController do
           course.root_account.role_overrides.create!(
             permission: 'view_all_grades', role: teacher_role, enabled: false
           )
-          RoleOverride.create!(
-            permission: 'manage_grades', role: teacher_role, enabled: true
-          )
         end
 
         it "allows access" do

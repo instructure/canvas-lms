@@ -491,7 +491,6 @@ class RoleOverridesController < ApplicationController
     unless result
       return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
     end
-    RoleOverride.clear_cached_contexts
     render :json => role_json(@context, @role, @current_user, session)
   end
 

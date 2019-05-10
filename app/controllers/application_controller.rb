@@ -54,8 +54,6 @@ class ApplicationController < ActionController::Base
   include Canvas::RequestForgeryProtection
   protect_from_forgery with: :exception
 
-  # load_user checks masquerading permissions, so this needs to be cleared first
-  before_action :clear_cached_contexts
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
   skip_before_action :activate_authlogic
@@ -1151,10 +1149,6 @@ class ApplicationController < ActionController::Base
   def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store"
-  end
-
-  def clear_cached_contexts
-    RoleOverride.clear_cached_contexts
   end
 
   def set_page_view

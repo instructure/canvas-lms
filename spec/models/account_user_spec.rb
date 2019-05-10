@@ -33,7 +33,6 @@ describe AccountUser do
         expect(@account.grants_right?(@user, :read)).to be_falsey
         @account.account_users.create!(user: @user)
         @user.reload
-        RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
         expect(@account.grants_right?(@user, :read)).to be_truthy
       end
@@ -47,7 +46,6 @@ describe AccountUser do
         expect(@account.grants_right?(@user, :read)).to be_truthy
         au.destroy
         @user.reload
-        RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
         expect(@account.grants_right?(@user, :read)).to be_falsey
         expect(au.reload.workflow_state).to eq 'deleted'

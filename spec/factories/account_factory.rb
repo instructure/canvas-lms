@@ -91,6 +91,5 @@ module Factories
         end
       end
     end
-    RoleOverride.clear_cached_contexts
   end
 end
