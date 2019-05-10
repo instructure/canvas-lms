@@ -565,7 +565,7 @@ describe("RCEWrapper", () => {
     it("registers editor to allow getting wrapper by editor", () => {
       const editor = {};
       const tree = createdMountedElement({ editorOptions });
-      tree.subTree("TinyMCE").props.config.setup(editor);
+      tree.subTree("Editor").props.init.setup(editor);
       assert.equal(RCEWrapper.getByEditor(editor), tree.getMountedInstance());
     });
 
@@ -573,7 +573,7 @@ describe("RCEWrapper", () => {
       const editor = {};
       const spy = editorOptions.setup;
       const tree = createdMountedElement({ editorOptions });
-      tree.subTree("TinyMCE").props.config.setup(editor);
+      tree.subTree("Editor").props.init.setup(editor);
       sinon.assert.calledWithExactly(spy, editor);
     });
 
@@ -584,9 +584,9 @@ describe("RCEWrapper", () => {
 
     it("passes other options through unchanged", () => {
       const tree = createdMountedElement({ editorOptions });
-      tree.subTree("TinyMCE").props.config.setup(editor);
+      tree.subTree("Editor").props.init.setup(editor);
       assert.equal(
-        tree.subTree("TinyMCE").props.config.other,
+        tree.subTree("Editor").props.init.other,
         editorOptions.other
       );
     });

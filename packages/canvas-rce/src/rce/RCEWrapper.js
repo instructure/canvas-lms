@@ -18,7 +18,7 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import TinyMCE from "react-tinymce";
+import {Editor} from "@tinymce/tinymce-react";
 
 import formatMessage from "../format-message";
 import * as contentInsertion from "./contentInsertion";
@@ -135,6 +135,11 @@ class RCEWrapper extends React.Component {
     this._elementRef = null;
 
     injectTinySkin()
+
+    this.state = {
+      path: [],
+      wordCount: 0
+    }
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -349,15 +354,35 @@ class RCEWrapper extends React.Component {
     return this[methodName](...args);
   }
 
-  annotateEditor(_e, editor) {
-    editor.rceWrapper = this;
-  }
-
   onInit(_e, editor) {
+    editor.rceWrapper = this;
     initKeyboardShortcuts(this._elementRef, editor)
     if(document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
+    editor.on('wordCountUpdate', this.onWordCountUpdate)
+  }
+
+  onWordCountUpdate = e => {
+    this.setState(state => {
+      if (e.wordCount.words !== state.wordCount) {
+        return {wordCount: e.wordCount.words}
+      } else return null
+    })
+  }
+
+  onNodeChange = e => {
+    // This is basically copied out of the tinymce silver theme code for the status bar
+    const path = e.parents
+      .filter(
+        p =>
+          p.nodeName !== 'BR' &&
+          !p.getAttribute('data-mce-bogus') &&
+          p.getAttribute('data-mce-type') !== 'bookmark'
+      )
+      .map(p => p.nodeName.toLowerCase())
+      .reverse()
+    this.setState({path})
   }
 
   componentWillUnmount() {
@@ -417,6 +442,9 @@ class RCEWrapper extends React.Component {
     if (this._textareaEl !== el) {
       this.unhandleTextareaChange();
       el.addEventListener("change", this.handleTextareaChange);
+      if (this.props.textareaClassName) {
+        el.classList.add(this.props.textareaClassName)
+      }
       this._textareaEl = el;
     }
   }
@@ -435,11 +463,11 @@ class RCEWrapper extends React.Component {
 
     return (
       <div ref={el => this._elementRef = el} className={styles.root}>
-        <TinyMCE
+        <Editor
           id={mceProps.textareaId}
-          tinymce={mceProps.tinymce}
-          className={mceProps.textareaClassName}
-          onPreInit={this.annotateEditor.bind(this)}
+          textareaName={mceProps.name}
+          init={this.wrapOptions(mceProps.editorOptions)}
+          initialValue={mceProps.defaultContent}
           onInit={this.onInit.bind(this)}
           onClick={this.onFocus.bind(this)}
           onKeypress={this.onFocus.bind(this)}
@@ -447,11 +475,13 @@ class RCEWrapper extends React.Component {
           onRemove={this.onRemove.bind(this)}
           onFocus={this.reallyOnFocus.bind(this)}
           onBlur={this.onBlur.bind(this)}
-          content={mceProps.defaultContent}
-          config={this.wrapOptions(mceProps.editorOptions)}
+          onNodeChange={this.onNodeChange}
         />
-
-        <StatusBar onToggleHtml={this.toggle} />
+        <StatusBar
+          onToggleHtml={this.toggle}
+          path={this.state.path}
+          wordCount={this.state.wordCount}
+        />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
       </div>
     );

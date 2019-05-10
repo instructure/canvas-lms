@@ -17,29 +17,43 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
-import {StyleSheet, css} from "aphrodite";
-
+import {arrayOf, func, number, string} from 'prop-types'
+import {StyleSheet, css} from 'aphrodite'
 import { Button } from '@instructure/ui-buttons'
 import { Flex, View } from '@instructure/ui-layout'
 import { ScreenReaderContent } from '@instructure/ui-a11y'
 import { Text } from '@instructure/ui-elements'
 import { Select } from '@instructure/ui-forms'
-
-import { IconA11yLine, IconKeyboardShortcutsLine } from '@instructure/ui-icons'
-import {SVGIcon} from '@instructure/ui-svg-images';
-
+import {SVGIcon} from '@instructure/ui-svg-images'
+import { IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 
 StatusBar.propTypes = {
-  onToggleHtml: func
+  onToggleHtml: func,
+  path: arrayOf(string),
+  wordCount: number
+}
+
+function renderPath({path}) {
+  return path.reduce((result, pathName, index) => {
+    return result.concat(
+      <span key={`${pathName}-${index}`}>
+        <Text>
+          {index > 0 ? <IconMiniArrowEndLine /> : null}
+          {pathName}
+        </Text>
+      </span>
+    )
+  }, [])
 }
 
 function emptyTagIcon() {
   return (
     <SVGIcon viewBox="0 0 24 24" fontSize="24px">
       <g role="presentation">
-        <text textAnchor="start" x="0" y="18px" fontSize="16">&lt;/&gt;</text>
+        <text textAnchor="start" x="0" y="18px" fontSize="16">
+          &lt;/&gt;
+        </text>
       </g>
     </SVGIcon>
   )
@@ -49,9 +63,7 @@ export default function StatusBar(props) {
     <div>
       <Flex margin="x-small">
         <Flex.Item grow>
-          <View>
-            <Text>p</Text>
-          </View>
+          <View>{renderPath(props)}</View>
         </Flex.Item>
         <Flex.Item>
           <View display="inline-block" padding="0 x-small">
@@ -88,14 +100,13 @@ export default function StatusBar(props) {
         </Flex.Item>
         <Flex.Item>
           <View display="inline-block" padding="0 0 0 small">
-            <Text size="small">42 words</Text>
+            <Text>{formatMessage('{count} words', {count: props.wordCount})}</Text>
           </View>
         </Flex.Item>
       </Flex>
     </div>
   )
 }
-
 
 const styles = StyleSheet.create({
   separator: {

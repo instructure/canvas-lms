@@ -198,7 +198,7 @@ module.exports = {
     noParse: [
       /node_modules\/jquery\//,
       /vendor\/md5/,
-      /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
+      /tinymce\/tinymce$/, // has 'require' and 'define' but they are from it's own internal closure
       /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
