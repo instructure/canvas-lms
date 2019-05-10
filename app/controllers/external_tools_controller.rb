@@ -612,6 +612,12 @@ class ExternalToolsController < ApplicationController
   # @API Create an external tool
   # Create an external tool in the specified course/account.
   # The created tool will be returned, see the "show" endpoint for an example.
+  # If a client ID is supplied canvas will attempt to create a context external
+  # tool using the LTI 1.3 standard.
+  #
+  # @argument client_id [Required, String]
+  #   The client id is attached to the developer key.
+  #   If supplied all other parameters are unnecessary and will be ignored
   #
   # @argument name [Required, String]
   #   The name of the tool
@@ -873,8 +879,8 @@ class ExternalToolsController < ApplicationController
         external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
       end
       set_tool_attributes(@tool, external_tool_params)
-      check_for_duplication(@tool)
     end
+    check_for_duplication(@tool)
     if @tool.errors.blank? && @tool.save
       invalidate_nav_tabs_cache(@tool)
       if api_request?

@@ -1095,6 +1095,28 @@ describe ExternalToolsController do
           end
         end
       end
+
+      context 'create via client id' do
+        include_context 'lti_1_3_spec_helper'
+        let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
+        let(:developer_key) { DeveloperKey.create!(account: @course.account) }
+        before do
+          tool = tool_configuration.new_external_tool(@course)
+          tool.save!
+          enable_developer_key_account_binding!(developer_key)
+        end
+        it_behaves_like 'detects duplication in context' do
+          let(:params) do
+            {
+              client_id: developer_key.id,
+              course_id: @course.id,
+              external_tool: {
+                verify_uniqueness: 'true'
+              }
+            }
+          end
+        end
+      end
     end
 
     it "should require authentication" do
