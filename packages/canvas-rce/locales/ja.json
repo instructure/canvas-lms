@@ -2,6 +2,18 @@
   "add_8523c19b": {
     "message": "追加"
   },
+  "align_11050992": {
+    "message": "位置調整"
+  },
+  "align_center_ca078feb": {
+    "message": "中央揃え"
+  },
+  "align_left_e9f1f93b": {
+    "message": "左揃え"
+  },
+  "align_right_9bad3ac1": {
+    "message": "右揃え"
+  },
   "all_4321c3a1": {
     "message": "すべて"
   },
@@ -52,6 +64,9 @@
   },
   "choose_usage_rights_33683854": {
     "message": "使用権を選択..."
+  },
+  "circle_unordered_list_9e3a0763": {
+    "message": "丸い番号無しリスト"
   },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "ファイルをクリックして、そのファイルにダウンロード リンクを挿入します。"
@@ -122,17 +137,32 @@
   "decorative_image_fde98579": {
     "message": "装飾の画像"
   },
+  "decrease_indent_de6343ab": {
+    "message": "インデントを戻す"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "デフォルトの箇条書きの番号無しリスト"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "デフォルトの番号順リスト"
+  },
   "discussions_a5f96392": {
     "message": "ディスカッション"
   },
   "discussions_index_6c36ced": {
     "message": "ディスカッションのインデックス"
   },
+  "documents_81393201": {
+    "message": "ドキュメント"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "検索語を入力"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "この画像の代替テキストを入力する"
+  },
+  "external_links_3d9f074e": {
+    "message": "外部リンク"
   },
   "file_upload_form_4aaad554": {
     "message": "ファイルアップロードフォーム"
@@ -152,6 +182,9 @@
   "group_navigation_99f191a": {
     "message": "グループ ナビゲーション"
   },
+  "header_f28f73db": {
+    "message": "ヘッダー"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "このファイルを使用する権限を取得しています。"
   },
@@ -164,8 +197,14 @@
   "image_upload_form_7b74079a": {
     "message": "画像アップロードフォーム"
   },
+  "image_url_2aee2734": {
+    "message": "画像 URL"
+  },
   "images_7ce26570": {
     "message": "画像"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "インデント"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Equella リンクを挿入してください"
@@ -206,6 +245,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "フォルダを読み込み中..."
   },
+  "loading_more_results_def6df65": {
+    "message": "より多くの結果を読み込んでいます..."
+  },
   "media_af190855": {
     "message": "メディア"
   },
@@ -215,11 +257,20 @@
   "no_results_940393cf": {
     "message": "結果がありません。"
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "番号付きリストと番号無しリスト"
+  },
   "pages_e5414c2c": {
     "message": "ページ"
   },
+  "paragraph_5e5ad8eb": {
+    "message": "段落"
+  },
   "people_b4ebb13c": {
     "message": "メンバー"
+  },
+  "preformatted_d0670862": {
+    "message": "フォーマット済み"
   },
   "quizzes_7e598f57": {
     "message": "クイズ"
@@ -239,11 +290,29 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "ファイルをアップロードするフォルダを選択"
   },
+  "small_header_168fb9f9": {
+    "message": "小さいヘッダー"
+  },
+  "something_went_wrong_89195131": {
+    "message": "なにかが失敗しました。"
+  },
   "sort_by_e75f9e3e": {
     "message": "分類する"
   },
+  "square_unordered_list_b15ce93b": {
+    "message": "四角い番号無しリスト"
+  },
+  "subheader_2b87606d": {
+    "message": "サブヘッダー"
+  },
   "submit_a3cc6859": {
     "message": "提出"
+  },
+  "subscript_59744f96": {
+    "message": "下付き"
+  },
+  "superscript_8cb349a2": {
+    "message": "上付き"
   },
   "syllabus_f191f65b": {
     "message": "シラバス"
@@ -277,6 +346,12 @@
   },
   "upload_image_6120b609": {
     "message": "イメージのアップロード"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "大文字のアルファベット順リスト"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "大文字のローマ数字順リスト"
   },
   "url_22a5f3b8": {
     "message": "URL"
