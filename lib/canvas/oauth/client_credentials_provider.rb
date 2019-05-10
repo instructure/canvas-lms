@@ -18,14 +18,12 @@
 
 module Canvas::Oauth
   class ClientCredentialsProvider < Provider
-    AUD_PROTOCOL = 'https://'.freeze
-
-    def initialize(jwt, host, scopes = nil)
+    def initialize(jwt, host, scopes = nil, protocol = 'http://')
       @client_id = JSON::JWT.decode(jwt, :skip_verification)[:sub]
       @scopes = scopes || []
       @expected_aud = Rails.application.routes.url_helpers.oauth2_token_url(
         host: host,
-        protocol: AUD_PROTOCOL
+        protocol: protocol
       )
       if key.nil? || key.public_jwk.nil?
         @invalid_key = true
