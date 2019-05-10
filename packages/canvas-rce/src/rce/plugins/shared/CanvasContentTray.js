@@ -114,6 +114,7 @@ export default function CanvasContentTray(props) {
       open={isOpen}
       placement="end"
       size="regular"
+      onDismiss={() => setIsOpen(false)}
     >
       <Flex direction="column" display="block" height="100vh" overflowY="hidden">
         <FlexItem padding="medium" shadow="above">
