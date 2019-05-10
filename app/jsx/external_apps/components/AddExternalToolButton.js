@@ -30,6 +30,7 @@ import 'compiled/jquery.rails_flash_notifications'
 import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
 import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
+import install13Tool from '../lib/install13Tool'
 
 export default class AddExternalToolButton extends React.Component {
   static propTypes = {}
@@ -178,6 +179,19 @@ export default class AddExternalToolButton extends React.Component {
     }
   }
 
+  create13Tool = () => {
+    install13Tool(
+      this.state.clientId,
+      ENV.EXTERNAL_TOOLS_CREATE_URL
+    ).then(() => {
+      this._successHandler()
+    }).catch(() => {
+      $.flashError(I18n.t('We were unable to add the app.'))
+    }).finally(() => {
+      this.closeModal()
+    })
+  }
+
   renderForm = () => {
     if (this.state.duplicateTool) {
       return (
@@ -205,10 +219,15 @@ export default class AddExternalToolButton extends React.Component {
 
       return(
         <ConfirmationForm
-          onCancel={() => { this.closeModal() }}
-          onConfirm={() => { this.closeModal() }}
-          message={I18n.t('Tool "%{toolName}" found for client ID %{clientId}. Would you like to install it?', { toolName, clientId })}
-          confirmLabel={I18n.t('Install')}
+          onCancel={() => {
+            this.closeModal();
+          }}
+          onConfirm={this.create13Tool}
+          message={I18n.t(
+            'Tool "%{toolName}" found for client ID %{clientId}. Would you like to install it?',
+            { toolName, clientId }
+          )}
+          confirmLabel={I18n.t("Install")}
         />
       )
     } else {
