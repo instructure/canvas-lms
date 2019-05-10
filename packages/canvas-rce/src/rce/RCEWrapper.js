@@ -293,6 +293,7 @@ export default class RCEWrapper extends React.Component {
         'instructure_links instructure_image instructure_record | ' +
         'removeformat table instructure_equation instructure_equella'
       ],
+      contextmenu: '',  // show the browser's native context menu
 
       toolbar_drawer: 'floating'
     }
