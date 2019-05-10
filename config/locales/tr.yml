@@ -8020,6 +8020,7 @@ tr:
     keyboard_close_menu: "Güncel etkin ödev menüsünü kapat"
     keyboard_comment_desc: "Etkin gönderiye yorum yap"
     keyboard_sort_desc: "Güncel etkin sütundaki ızgara üzerinde sıralayın"
+    mic_blocked_message: "Mikrofonu kullanma izni engellenmiş. Değiştirmek için chrome://settings/contentExceptions\\#media-stream"
     mute_assignment: "Ödevi Beklet"
     no_assignments_have_points_warning: "Bir ödevde olası puanlar olmadıkça not hesaplanamaz"
     no_submission_time: "ödev gönderme zamanı yok"

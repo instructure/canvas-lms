@@ -2401,6 +2401,9 @@ fa:
       speed_grader: "برنامه نمره گذاری سریع™"
       titles: 
         related_items: "موردهای مرتبط"
+    grade_gpa_scale_screenreader: "نمره: {grade}%"
+    grade_letter_grade_screenreader: "نمره: {grade}%"
+    grade_pass_fail_screenreader: "نمره: {grade}%"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "نمره: %{grade}%"
     grading_type_selector: 
@@ -8004,7 +8007,7 @@ fa:
       no_students_in_groups_close: "متأسفانه موردهای ارسالی این تکلیف را نمی توان در برنامه نمره گذاری سریع نمره گذاری کرد، زیرا کاربری به آن تخصیص داده نشده است. لطفا کاربران را به این مجموعه گروه تخصیص دهید و دوباره سعی کنید. روی دکمه 'تایید' کلیک کنید تا این پنجره بسته شود."
       no_students_in_section: "هیچ دانشجویی در این بخش یافت نشد، در حال بازگشت برای نشان دادن همه بخش ها."
       scores_updated: 
-        one: "%{count} نمره دانشجو به روز شد."
+        one: "%{count} نمره دانشجو به روز شد"
         other: "%{count} نمره دانشجو به روز شد"
     all_sections: "همه بخش‌ها"
     allow_message: "برای آغاز ثبت، روی دکمه \"اجازه دادن» کلیک کنید."
