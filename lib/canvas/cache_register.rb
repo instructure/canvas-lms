@@ -178,7 +178,7 @@ module Canvas
               # get the entry (if it exists) as well as the full frd cache_key used (after batching in the register keys)
               # in case we need to write to it
               frd_key, cached_entry = CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
-              cached_entry = cached_entry.presence && Marshal.load(cached_entry)
+              cached_entry = Marshal.load(cached_entry) if cached_entry
 
               entry = handle_expired_entry(cached_entry, frd_key, options)
               if payload
