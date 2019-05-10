@@ -193,9 +193,17 @@ module RCENextPage
   def align_right_button
     # put align right button locator here
   end
-
+  
   def rce_next_toolbar
     f(".tox-toolbar__primary")
+  end
+
+  def a11y_checker_button
+    fj('button:has([name="IconA11y"])')
+  end
+
+  def a11y_checker_tray
+    f("div[aria-label='Accessibility Checker'")
   end
 
   # ---------------------- Actions ----------------------
@@ -331,5 +339,9 @@ module RCENextPage
 
   def click_editor_window
     editor_window.click
+  end
+
+  def click_a11y_checker_button
+    a11y_checker_button.click
   end
 end

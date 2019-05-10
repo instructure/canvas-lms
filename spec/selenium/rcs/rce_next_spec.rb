@@ -308,5 +308,14 @@ describe "RCE next tests" do
 
       expect(assignment_due_date).to eq date_string(due_at, :no_words)
     end
+
+    it "should open a11y checker when clicking button in status bar" do
+      skip('Unskip in CORE-2638')
+      visit_front_page_edit(@course)
+
+      click_a11y_checker_button
+
+      expect(a11y_checker_tray).to be_displayed
+    end
   end
 end
