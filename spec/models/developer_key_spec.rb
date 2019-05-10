@@ -41,6 +41,47 @@ describe DeveloperKey do
     )
   end
 
+  describe 'usable_in_context?' do
+    let(:account) { account_model }
+    let(:developer_key) { DeveloperKey.create!(account: account) }
+
+    shared_examples_for 'a boolean indicating the key is usable in context' do
+      subject { developer_key.usable_in_context?(context) }
+
+      let(:context) { raise 'set in examples' }
+
+      context 'when the key is usable and the binding is on' do
+        before do
+          developer_key.account_binding_for(account).update!(workflow_state: 'on')
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when the key is not usable' do
+        before { developer_key.update!(workflow_state: 'deleted') }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'when the binding is not on' do
+        it { is_expected.to eq false }
+      end
+    end
+
+    context 'when the context is an account' do
+      it_behaves_like 'a boolean indicating the key is usable in context' do
+        let(:context) { account }
+      end
+    end
+
+    context 'when the context is a course' do
+      it_behaves_like 'a boolean indicating the key is usable in context' do
+        let(:context) { course_model(account: account) }
+      end
+    end
+  end
+
   describe "site_admin_lti scope" do
     specs_require_sharding
     include_context 'lti_1_3_spec_helper'

@@ -93,6 +93,10 @@ class DeveloperKey < ActiveRecord::Base
     active?
   end
 
+  def usable_in_context?(context)
+    account_binding_for(context.try(:account) || context)&.on? && usable?
+  end
+
   def redirect_uri=(value)
     super(value.presence)
   end

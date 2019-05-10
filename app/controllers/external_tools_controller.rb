@@ -863,8 +863,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if params.key?(:client_id)
-      raise ActiveRecord::RecordInvalid unless developer_key.usable?
-      raise ActiveRecord::RecordInvalid unless developer_key_in_context?
+      raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
       @tool = developer_key.tool_configuration.new_external_tool(@context)
     else
       external_tool_params = (params[:external_tool] || params).to_unsafe_h
@@ -997,10 +996,6 @@ class ExternalToolsController < ApplicationController
   end
 
   private
-
-  def developer_key_in_context?
-    developer_key.account_binding_for(@context.is_a?(Account) ? @context : @context.account)&.on?
-  end
 
   def check_for_duplication(tool)
     if tool.duplicated_in_context? && params.dig(:external_tool, :verify_uniqueness).present?

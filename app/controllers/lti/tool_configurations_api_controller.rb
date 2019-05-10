@@ -38,9 +38,11 @@
 class Lti::ToolConfigurationsApiController < ApplicationController
   include Api::V1::ExternalTools
 
-  before_action :require_context, only: [:create]
+  before_action :require_context, only: [:create, :show]
   before_action :require_user
-  before_action :require_manage_developer_keys
+  before_action :require_manage_developer_keys, except: :show
+  before_action :require_key_in_context, only: :show
+  before_action :require_lti_add_edit, only: :show
   before_action :require_tool_configuration, only: [:show, :update, :destroy]
 
   # @API Create Tool configuration
@@ -145,6 +147,14 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   private
+
+  def require_key_in_context
+    head :unauthorized unless developer_key.usable_in_context?(@context)
+  end
+
+  def require_lti_add_edit
+    head :unauthorized unless @context.grants_right?(@current_user, :lti_add_edit)
+  end
 
   def manual_custom_fields
     {

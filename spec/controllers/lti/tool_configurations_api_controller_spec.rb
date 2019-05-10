@@ -405,16 +405,37 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     before do
       tool_configuration
+      account.developer_key_account_bindings.
+        find_by(developer_key: developer_key).
+        update!(workflow_state: 'on')
     end
 
-    it_behaves_like 'an action that requires manage developer keys'
-
-    context do
+    context 'when tool configuration does not exist' do
       let(:tool_configuration) { nil }
       it_behaves_like 'an endpoint that requires an existing tool configuration'
     end
 
-    context 'when the tool configuration exists' do
+    context 'when the requested key is not enable in the context' do
+      let(:disabled_key) { DeveloperKey.create!(account: sub_account) }
+      let(:dev_key_id) { disabled_key.id }
+
+      it 'responds with "unauthorized"' do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context 'when the current user does not have "lti_add_edit"' do
+      let(:student) { student_in_course(active_all: true).user }
+      before { user_session(student) }
+
+      it 'responds with "unauthorized"' do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context 'when the tool configuration exists and key is enabled' do
       it 'renders the tool configuration' do
         subject
         expect(config_from_response).to eq tool_configuration

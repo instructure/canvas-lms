@@ -2218,8 +2218,11 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/tool_configurations_api') do
       put 'developer_keys/:developer_key_id/tool_configuration', action: :update
       post 'accounts/:account_id/developer_keys/tool_configuration', action: :create
-      get 'developer_keys/:developer_key_id/tool_configuration', action: :show
       delete 'developer_keys/:developer_key_id/tool_configuration', action: :destroy
+
+      %w(account course).each do |context|
+        get "#{context}s/:#{context}_id/developer_keys/:developer_key_id/tool_configuration", action: :show
+      end
     end
 
     scope(controller: 'lti/subscriptions_api') do
