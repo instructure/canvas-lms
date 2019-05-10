@@ -2225,7 +2225,7 @@ CanvasRails::Application.routes.draw do
       delete 'developer_keys/:developer_key_id/tool_configuration', action: :destroy
 
       %w(account course).each do |context|
-        get "#{context}s/:#{context}_id/developer_keys/:developer_key_id/tool_configuration", action: :show
+        get "#{context}s/:#{context}_id/developer_keys/:developer_key_id/tool_configuration", action: :show, as: "#{context}_show_tool_configuration"
       end
     end
 

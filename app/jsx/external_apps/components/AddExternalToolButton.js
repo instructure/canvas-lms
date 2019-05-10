@@ -28,6 +28,8 @@ import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
 import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateConfirmationForm'
 import 'compiled/jquery.rails_flash_notifications'
 import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
+import fetchToolConfiguration from '../lib/fetchToolConfiguration'
+import toolConfigurationError from '../lib/toolConfigurationError'
 
 export default class AddExternalToolButton extends React.Component {
   static propTypes = {}
@@ -40,6 +42,7 @@ export default class AddExternalToolButton extends React.Component {
       isLti2: props.isLti2,
       type: '',
       toolConfiguration: null,
+      clientId: null,
       lti2RegistrationUrl: 'about:blank',
       configurationType: props.configurationType || '',
       duplicateTool: props.duplicateTool,
@@ -67,6 +70,8 @@ export default class AddExternalToolButton extends React.Component {
       duplicateTool: false,
       attemptedToolSaveData: {},
       attemptedToolConfigurationType: '',
+      clientId: null,
+      toolConfiguration: null,
       type: ''
     })
   }
@@ -146,11 +151,16 @@ export default class AddExternalToolButton extends React.Component {
       })
       e.currentTarget.closest('form').submit()
     } else if (configurationType === 'byClientId') {
-      this.setState({
-        type: 'byClientId',
-        // TODO: fetch the tool config for the
-        // specified client id
-        toolConfiguration: {}
+      fetchToolConfiguration(
+        data.client_id,
+        ENV.TOOL_CONFIGURATION_SHOW_URL,
+        toolConfigurationError
+      ).then((toolConfiguration) => {
+        this.setState({
+          type: 'byClientId',
+          toolConfiguration,
+          clientId: data.client_id
+        })
       })
     } else if (!this.throttleCreation) {
       this.setState({
@@ -190,11 +200,15 @@ export default class AddExternalToolButton extends React.Component {
         />
       )
     } else if (this.state.type === 'byClientId' && this.state.toolConfiguration) {
+      const {clientId} = this.state
+      const toolName = this.state.toolConfiguration.settings.title
+
       return(
         <ConfirmationForm
           onCancel={() => { this.closeModal() }}
           onConfirm={() => { this.closeModal() }}
-          message={I18n.t('Install tool_name ?')}
+          message={I18n.t('Tool "%{toolName}" found for client ID %{clientId}. Would you like to install it?', { toolName, clientId })}
+          confirmLabel={I18n.t('Install')}
         />
       )
     } else {

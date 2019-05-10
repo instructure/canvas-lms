@@ -46,12 +46,6 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
     strictEqual(document.querySelectorAll('#duplicate-confirmation-form').length, 1)
   })
 
-  test('renders the 1.3 confirmation modal if type is 1.3', () => {
-    mountComponent({modalIsOpen: true})
-    wrapper.setState({type: 'byClientId', toolConfiguration: {}})
-    notEqual($("span:contains(Install tool_name)").length, 0)
-  })
-
   QUnit.module('#handleLti2ToolInstalled()', () => {
     test('displays a flash message from the tool when there is an error', () => {
       mountComponent()
