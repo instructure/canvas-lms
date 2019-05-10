@@ -46,7 +46,7 @@ module Canvas
       end
 
       def supports_brotli?(request)
-        request && request.headers['Accept-Encoding'].include?('br')
+        request && request.headers['Accept-Encoding']&.include?('br')
       end
 
       def push_to_s3!(*args, &block)
