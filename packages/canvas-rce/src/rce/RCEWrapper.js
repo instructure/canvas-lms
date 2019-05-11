@@ -289,13 +289,17 @@ class RCEWrapper extends React.Component {
   onFocus() {
     Bridge.focusEditor(this);
 
+    this.props.onFocus && this.props.onFocus(this);
+  }
+
+  reallyOnFocus() {
     // use .active to put a focus ring around the content area
-    // then the editor has focus. This isn't prefect, but it's
+    // when the editor has focus. This isn't perfect, but it's
     // what we've got for now.
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
-    this.props.onFocus && this.props.onFocus(this);
+    this.onFocus()
   }
 
   onBlur() {
@@ -408,6 +412,7 @@ class RCEWrapper extends React.Component {
           onKeypress={this.onFocus.bind(this)}
           onActivate={this.onFocus.bind(this)}
           onRemove={this.onRemove.bind(this)}
+          onFocus={this.reallyOnFocus.bind(this)}
           onBlur={this.onBlur.bind(this)}
           content={mceProps.defaultContent}
           config={this.wrapOptions(mceProps.editorOptions)}
