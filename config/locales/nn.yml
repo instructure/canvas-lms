@@ -1970,6 +1970,8 @@ nn:
       Gir løyve til å sjå emnestatus, velje emneforside og sjekklisteknappene
       for emneoppsett på emneforsida.
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Gir ein brukar løyve til å sjå påmeldingar under seksjonsfana."
+  allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Gir brukaren løyve til å sjå oppføringar frå faglærarprotokollen i studentsamhandlingsrapporten."
+  allows_user_to_view_student_context_cards_in_annou_dadef934: "Gir ein brukar løyve til å sjå studentinformasjonskortet i svar på kunngjeringar og diskusjonar."
   allows_user_to_view_student_quiz_logs_e1c4491: "Gir ein brukar løyve til å sjå quizhistorikken til studentar."
   allows_user_to_view_student_results_and_or_access__60fac9: "Gir ein brukar løyve til å sjå studentvurderingar og/eller tilgang til quiz i SpeedGrader."
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Gir ein brukar løyve til å sjå oppgåvelenker i emnenavigasjon. Gir ein brukar løyve til å sjå emnekunngjeringar."
@@ -16837,6 +16839,7 @@ nn:
   someone: Nokon
   someone_bbbc538b: Nokon
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Det er noko som ikkje fungerer, men eg kan bruke alternative løysingar for ei stund"
+  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Noko gjekk gale med tilgangen til mikrofonen eller webkameraet ditt. "
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noko gjekk gale. Prøv å laste sida på nytt. Dersom problemet held fram, kan det vere at det er for mange innleveringar knytta til \"%{assignmentTitle}\" som skal lastast inn i SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noko gjekk gale under aktiveringa av brukaren. Prøv på nytt seinare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noko gjekk gale under oppdateringa av brukaren si rolle. Prøv på nytt seinare."
@@ -17651,6 +17654,7 @@ nn:
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Brukaren har ikkje tilgang til emnet\""
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette gjer at du kan godkjenne Canvas for posting av karakterar til SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Temaet vil bli brukt for heile kontoen. Vil du halde fram?"
+  this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dette oppdaterer alle vurderingskriterier knytta til dette læringsmålet som enno ikkje er vurdert."
   ticket_successfully_submitted_f6254460: "Førespurnaden din er levert."
   ticketing_system_52205bff: Ticketing-system
   ticketing_system_configurations_c4fecd96: "Konfigurasjonar i Ticketing-system"
@@ -17931,6 +17935,9 @@ nn:
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Dersom du vil sjå alle varslingane som er sende til ein Canvas-brukar, må du markere brukaren og datointervallet for søket."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "For å sjå sida Personar under konto, må 'Personar - sjå liste' vere slått på. Dersom denne løyva er slått av, men 'Personar - sjå login-ID-ar' er slått på, vil brukarar framleis sjå e-postadressa som login-ID. "
   to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "For å sjå personoversikta i ein konto må 'Personar - sjå liste' vere slått på."
+  to_view_the_list_of_users_in_the_course_users_view_63e7f0c3: |-
+      For å sjå deltakarlista for emnet må 'Personar - sjå liste' òg vere slått på.
+      For å legge til brukarar via SIS-ID må 'Personar - legg til / fjern studentar frå emnet' og/eller 'Personar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar frå emna' òg vere slått på.
   today_76e10f9c: "I dag"
   toggle_course_card_color_overlays_b5b8137a: "Slå av/på fargelag på emnekort"
   toggle_editing_answer_text_as_html_9a93fe6: "Bytt tekst for redigeringssvar til HTML"
@@ -18612,6 +18619,7 @@ nn:
           og i navigasjonsmenyen til venstre. I mellomtida kan du melde deg på
           andre emne eller sette opp brukarprofilen din.
       welcome_to_happiness: "Velkomen til Canvas!"
+  users_can_access_the_manage_question_banks_link_on_e411d01: "Brukarar har tilgang til lenka Administrer spørsmålsbankar frå quizoversikta når 'Emneinnhald - sjå' og 'Oppgåver og Quizar - legg til / endre / slett' er slått på. "
   users_d1b60cb0: Brukarar
   users_matching_search_term_c604db9e: "Brukarar som samsvarar med \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukarar med skjermlesar bør skru av musepeikar for å nytte desse tastatursnarvegane"
