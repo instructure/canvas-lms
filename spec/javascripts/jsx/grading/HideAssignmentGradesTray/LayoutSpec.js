@@ -27,10 +27,16 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
 
   function assignmentFixture() {
     return {
+      anonymizeStudents: false,
       gradesPublished: true,
       id: '2301',
       name: 'Math 1.1'
     }
+  }
+
+  function getAnonymousText() {
+    const hideText = 'Anonymous assignments cannot be hidden by section.'
+    return [...$container.querySelectorAll('p')].find($p => $p.textContent === hideText)
   }
 
   function getCloseButton() {
@@ -47,8 +53,12 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
 
   function getHideText() {
     const hideText =
-      'Hiding grades is not allowed because no grades have been posted for this assignment.'
+      'Hiding grades is not allowed because grades have not been released for this assignment.'
     return [...$container.querySelectorAll('p')].find($p => $p.textContent === hideText)
+  }
+
+  function getLabel(text) {
+    return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
   }
 
   function mountComponent() {
@@ -60,8 +70,13 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     context = {
       assignment: assignmentFixture(),
       dismiss: () => {},
+      hideBySections: true,
+      hideBySectionsChanged: () => {},
       hidingGrades: false,
-      onHideClick: () => {}
+      onHideClick: () => {},
+      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sectionSelectionChanged: () => {},
+      selectedSectionIds: []
     }
   })
 
@@ -109,5 +124,28 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     mountComponent()
     getHideButton().click()
     strictEqual(onHideClickSpy.callCount, 1)
+  })
+
+  QUnit.module('when no sections exist', contextHooks => {
+    contextHooks.beforeEach(() => {
+      context.sections = []
+    })
+
+    test('anonymous descriptive text is not shown', () => {
+      context.assignment = {...assignmentFixture(), anonymizeStudents: true}
+      mountComponent()
+      notOk(getAnonymousText())
+    })
+
+    test('section toggle is not shown', () => {
+      mountComponent()
+      notOk(getLabel('Specific Sections'))
+    })
+
+    test('sections are not shown', () => {
+      context.hideBySections = false
+      mountComponent()
+      notOk(getLabel('Sophomores'))
+    })
   })
 })

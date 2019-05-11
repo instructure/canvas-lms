@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import Backbone from 'Backbone'
   var BackboneState = {
     _forceUpdate() {this.forceUpdate()}, // strips off args that backbone sends and react incorrectly believes is a callback

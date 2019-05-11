@@ -16,32 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(function(require) {
-  var Subject = require('jsx!views/session');
+// define(function(require) {
+//   var Subject = require('jsx!views/session');
 
-  describe('Views::Session', function() {
-    var suite = reactRouterSuite(this, Subject, {});
+//   describe('Views::Session', function() {
+//     var suite = reactRouterSuite(this, Subject, {});
 
-    suite.stubRoutes([
-      { name: "answer_matrix", path: "/doesnt_matter" }
-    ]);
+//     suite.stubRoutes([
+//       { name: "answer_matrix", path: "/doesnt_matter" }
+//     ]);
 
-    it('should render', function() {
-      expect(subject.isMounted()).toEqual(true);
-    });
+//     it('should render', function() {
+//       expect(subject.isMounted()).toEqual(true);
+//     });
 
-    it('should show nothing when unfocused', function() {
-      subject.setProps(
-        {
-          accessibilityWarningFocused: false
-        }
-      );
-      expect(
-        subject
-          .getDOMNode()
-          .getElementsByClassName('ic-QuizInspector__accessibility-warning screenreader-only')
-          .length
-      ).toEqual(1);
-    });
-  });
-});
+//     it('should show nothing when unfocused', function() {
+//       subject.setProps(
+//         {
+//           accessibilityWarningFocused: false
+//         }
+//       );
+//       expect(
+//         subject
+//           .getDOMNode()
+//           .getElementsByClassName('ic-QuizInspector__accessibility-warning screenreader-only')
+//           .length
+//       ).toEqual(1);
+//     });
+//   });
+// });

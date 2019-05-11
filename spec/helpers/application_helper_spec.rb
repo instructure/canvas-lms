@@ -1108,16 +1108,17 @@ describe ApplicationHelper do
 
   context "content security policy enabled" do
 
-    let(:sub_account) { Account.default.sub_accounts.create! }
+    let(:account) { Account.create!(name: 'csp_account')}
+    let(:sub_account) { account.sub_accounts.create! }
     let(:sub_2_account) { sub_account.sub_accounts.create! }
     let(:headers) {{}}
     let(:js_env) {{}}
 
     before do
-      Account.default.enable_feature!(:javascript_csp)
+      account.enable_feature!(:javascript_csp)
 
-      Account.default.add_domain!("root_account.test")
-      Account.default.add_domain!("root_account2.test")
+      account.add_domain!("root_account.test")
+      account.add_domain!("root_account2.test")
       sub_account.add_domain!("sub_account.test")
       sub_2_account.add_domain!("sub_2_account.test")
 
@@ -1127,7 +1128,7 @@ describe ApplicationHelper do
 
     context "on root account" do
       before do
-        allow(helper).to receive(:csp_context).and_return(Account.default)
+        allow(helper).to receive(:csp_context).and_return(account)
       end
 
       it "doesn't set the CSP report only header if not configured" do
@@ -1138,7 +1139,7 @@ describe ApplicationHelper do
       end
 
       it "sets the CSP full header when active" do
-        Account.default.enable_csp!
+        account.enable_csp!
 
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test"
@@ -1154,7 +1155,7 @@ describe ApplicationHelper do
 
       it "includes the report URI when active" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-        Account.default.enable_csp!
+        account.enable_csp!
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/"
       end

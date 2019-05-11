@@ -30,6 +30,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
       begin
         source = cm.source_course || Course.find(cm.migration_settings[:source_course_id])
         ce = ContentExport.new
+        ce.shard = source.shard
         ce.context = source
         ce.content_migration = cm
         ce.selected_content = cm.copy_options
@@ -38,7 +39,9 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         ce.save!
         cm.content_export = ce
 
-        ce.export_without_send_later
+        source.shard.activate do
+          ce.export_without_send_later
+        end
 
         if ce.workflow_state == 'exported_for_course_copy'
           # use the exported attachment as the import archive

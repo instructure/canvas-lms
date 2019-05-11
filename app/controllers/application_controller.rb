@@ -79,6 +79,8 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
+  # multiple actions might be called on a single controller instance in specs
+  before_action :clear_js_env if Rails.env.test?
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
@@ -91,6 +93,10 @@ class ApplicationController < ActionController::Base
 
     crumb.html_safe
   }, :root_path, class: 'home')
+
+  def clear_js_env
+    @js_env = nil
+  end
 
   ##
   # Sends data from rails to JavaScript
@@ -130,7 +136,7 @@ class ApplicationController < ActionController::Base
       ]
 
       @js_env = {
-        ASSET_HOST: Canvas::Cdn.config.host,
+        ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
         active_brand_config_json_url: active_brand_config_url('json'),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         url_for_high_contrast_tinymce_editor_css: editor_hc_css,
@@ -188,9 +194,8 @@ class ApplicationController < ActionController::Base
   helper_method :js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
-  def rce_js_env(risk_level, root_account: @domain_root_account, domain: request.env['HTTP_HOST'])
-    rce_env_hash = Services::RichContent.env_for(root_account,
-                                            risk_level: risk_level,
+  def rce_js_env(domain: request.env['HTTP_HOST'])
+    rce_env_hash = Services::RichContent.env_for(
                                             user: @current_user,
                                             domain: domain,
                                             real_user: @real_current_user,
@@ -834,6 +839,7 @@ class ApplicationController < ActionController::Base
         .for_user(@context)
         .current
         .active_by_date
+      enrollment_scope = enrollment_scope.where(:course_id => @observed_course_ids) if @observed_course_ids
       include_groups = !!opts[:include_groups]
       group_ids = nil
 
@@ -863,12 +869,14 @@ class ApplicationController < ActionController::Base
 
       groups = []
       if include_groups
+        group_scope = @context.current_groups
+        group_scope = group_scope.where(:context_type => "Course", :context_id => @observed_course_ids) if @observed_course_ids
         if group_ids
           Shard.partition_by_shard(group_ids) do |shard_group_ids|
-            groups += @context.current_groups.shard(Shard.current).where(:id => shard_group_ids).to_a
+            groups += group_scope.shard(Shard.current).where(:id => shard_group_ids).to_a
           end
         else
-          groups = @context.current_groups.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
+          groups = group_scope.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
         end
       end
       groups = @context.filter_visible_groups_for_user(groups)

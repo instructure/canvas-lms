@@ -20,13 +20,19 @@ import React from 'react'
 import {mount} from 'enzyme'
 import ToolConfigurationForm from '../ToolConfigurationForm'
 
-function newProps() {
-  return {
-    toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
-    toolConfigurationUrl: 'https://www.test.com/config.json',
-    validScopes: {},
-    validPlacements: []
-  }
+function newProps(overrides = {}) {
+  return Object.assign({},
+    {
+      toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
+      toolConfigurationUrl: 'https://www.test.com/config.json',
+      validScopes: {},
+      validPlacements: [],
+      dispatch: jest.fn(),
+      setLtiConfigurationMethod: jest.fn(),
+      configurationMethod: 'json'
+    },
+    overrides
+  )
 }
 
 let wrapper = 'empty wrapper'
@@ -50,14 +56,14 @@ describe('when configuration method is by JSON', () => {
   it('transitions to configuring by URL when the url option is selected', () => {
     const select = wrapper.find('Select')
     select.instance().props.onChange({}, {value: 'url'})
-    expect(wrapper.state().configurationType).toEqual('url')
+    expect(wrapper.instance().props.dispatch).toHaveBeenCalled()
+    expect(wrapper.instance().props.setLtiConfigurationMethod).toHaveBeenCalled()
   })
 })
 
 describe('when configuration method is by URL', () => {
   beforeEach(() => {
-    wrapper = mount(<ToolConfigurationForm {...newProps()} />)
-    wrapper.setState({configurationType: 'url'})
+    wrapper = mount(<ToolConfigurationForm {...newProps({configurationMethod: 'url'})} />)
   })
 
   it('renders the tool configuration URL in a text input', () => {
@@ -69,14 +75,14 @@ describe('when configuration method is by URL', () => {
   it('transitions to configuring by JSON when the json option is selected', () => {
     const select = wrapper.find('Select')
     select.instance().props.onChange({}, {value: 'json'})
-    expect(wrapper.state().configurationType).toEqual('json')
+    expect(wrapper.instance().props.dispatch).toHaveBeenCalled()
+    expect(wrapper.instance().props.setLtiConfigurationMethod).toHaveBeenCalled()
   })
 })
 
 describe('when configuration method is manual', () => {
   beforeEach(() => {
-    wrapper = mount(<ToolConfigurationForm {...newProps()} />)
-    wrapper.setState({configurationType: 'manual'})
+    wrapper = mount(<ToolConfigurationForm {...newProps({configurationMethod: 'manual'})} />)
   })
 
   it('renders the manual configuration form', () => {

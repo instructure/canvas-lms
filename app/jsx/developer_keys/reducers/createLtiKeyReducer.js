@@ -31,10 +31,15 @@ const initialState = {
   privacyLevel: 'anonymous',
   updateCustomizationsPending: false,
   updateCustomizationsSuccessful: false,
-  updateCustomizationsError: null
+  updateCustomizationsError: null,
+  configurationMethod: 'manual'
 }
 
 const ltiKeysHandlers = {
+  [ACTION_NAMES.LTI_CONFIGURATION_METHOD]: (state, action) => ({
+    ...state,
+    configurationMethod: action.payload
+  }),
   [ACTION_NAMES.LTI_KEYS_SET_LTI_KEY]: (state, action) => ({
     ...state,
     isLtiKey: action.payload

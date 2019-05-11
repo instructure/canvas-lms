@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import tinymce from 'compiled/editor/stocktiny'
 import EditorAccessibility from 'compiled/editor/editorAccessibility'
 
 const fixtures = $('#fixtures')

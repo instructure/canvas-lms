@@ -808,6 +808,18 @@ el:
         default: 
           recently_deleted_courses: 
             text: "<mrk mid=\"7386\" mtype=\"seg\">Αυτή η αναφορά δείχνει όλα τα μαθήματα για κάποιο  εξάμηνο που έχουν διαγραφεί κατά τις τελευταίες 30 ημέρες.</mrk> <mrk mid=\"7387\" mtype=\"seg\">Το παραγόμενο αρχείο csv θα περιέχει μία σειρά ανά μάθημα και θα δείχνει το id του μαθήματος, το sis id του μαθήματος, το βραχύ όνομα του μαθήματος, το όνομα του μαθήματος, καθώς και τις ημερομηνίες έναρξης και λήξης του μαθήματος.</mrk>"
+    reports_tab: 
+      headers: 
+        report_last_run: "Τελευταία Εκτέλεση"
+        report_name: Όνομα
+      headings: 
+        sections: Αναφορές
+      links: 
+        configure_report: Ρύθμιση...
+        run_report: "Εκτέλεση Αναφοράς"
+      open_report_description: "Άνοιγμα της Περιγραφής Αναφοράς"
+      report_last_run_never: Ποτέ
+      report_running: "H αναφορά επεξεργάζεται.*Θα λάβετε ένα ηλεκτρονικό μήνυμα όταν ολοκληρωθεί*"
     retry_login: "Δοκιμάστε ξανά να συνδεθείτε"
     root_accounts: 
       labels: 
@@ -2746,6 +2758,7 @@ el:
     feed_item_title: "Εκδήλωση στο Ημερολόγιο: %{event_title}"
     feed_item_title_with_context: "Εκδήλωση στο Ημερολόγιο, %{course_or_account_name}: %{event_title}"
     see_related_link: "Δες Σχετικό Σύνδεσμο"
+  calendar_event_89aadc1c: "Γεγονός στο Ημερολόγιο"
   calendar_events: 
     crumbs: 
       new: "Νέα Εκδήλωση στο Ημερολόγιο"
@@ -3659,6 +3672,7 @@ el:
     titles: 
       add: "Προσθήκη Λειτουργικής Μονάδας"
       add_item: "Πρόσθεση Στοιχείου στο %{module}"
+      add_prerequisite: "Προσθήκη Προαπαιτούμενου στην ενότητα *%{module}*"
       edit: "Τροποποίηση Ρυθμίσεων Ενότητας"
       edit_item: "Επεξεργασία Λεπτομερειών Αντικειμένου"
     url_show: 
@@ -6035,6 +6049,7 @@ el:
     show_notes: "Εμφάνιση Στήλης Σημειώσεων"
     show_student_names: "Εμφάνιση των Ονομάτων των Μαθητών"
     student: "Μαθητής "
+    student_index: "%{Index} Σπουδαστή"
     students_who: 
       havent_been_graded: "Δεν έχει/έχουν βαθμολογηθεί"
       havent_submitted_yet: "Δεν έχει γίνει ακόμη υποβολή"
@@ -6612,6 +6627,7 @@ el:
       submit: "Αποθήκευση %{model}"
       update: "Ενημέρωση %{model}"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "<mrk mid=\"4305\" mtype=\"seg\">Αυτή είναι μια καταπληκτική ευκαιρία να γνωρίσετε το ημερολόγιο και να προσθέσετε σε αυτό γεγονότα που δεν έχουν να κάνουν με εργασίες αλλά αφορούν το μάθημα.</mrk> <mrk mid=\"4306\" mtype=\"seg\">Μην ανησυχείτε, θα σας βοηθήσουμε.</mrk>"
+  hidden_14a032a7: Κρυφό
   hidden_available_with_a_link_65ef2bda: "<mrk mid=\"7575\" mtype=\"seg\">Κρυφό.</mrk> <mrk mid=\"7576\" mtype=\"seg\">Διατίθεται με σύνδεσμο</mrk>"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Κρυφό, τα αρχεία που περιλαμβάνονται θα είναι διαθέσιμα μέσω συνδέσμων."
   hide_all_details_61d7ebb: "Απόκρυψη Όλων των Λεπτομερειών"
@@ -6715,6 +6731,9 @@ el:
   include_unpublished_assignments_83ebbaec: "Περιλάβετε Μη-κοινοποιημένες Εργασίες"
   include_unpublished_courses_7a0e7aab: "Περιλάβετε Μη-κοινοποιημένα Μαθήματα"
   incomplete_da3c2ea2: "Μη ολοκληρωμένο"
+  incompleteregistration: 
+    get_started: Ξεκινήστε
+    welcome_to_canvas: "Καλώς ορίσατε στο Canvas!"
   incorrect_answer_7c17e63b: "Λάθος Απάντηση"
   increase_indent_6af90f7c: "Αύξηση Εσοχής Κειμένου"
   increase_indent_6d550a4a: "Αύξηση Εσοχής Κειμένου"
@@ -6907,6 +6926,7 @@ el:
     esc_key_notification: "Πατήστε το escape πριν χρησιμοποιήσετε συντομεύσεις πληκτρολογίου κατά την πλοήγησή σας στο δίκτυο του βιβλίου βαθμών."
   keyboard_shortcuts_ed1844bd: "Συντομεύσεις πληκτρολογίου"
   kind_7f0a88c4: Είδος
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Κλειδωμένο έως"
   last_enrollment_activity_10fe15ba: "Δραστηριότητα Τελευταίας Εγγραφής"

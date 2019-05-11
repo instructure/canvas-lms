@@ -1331,7 +1331,19 @@ class CalendarEventsApiController < ApplicationController
   def require_user_or_observer
     return render_unauthorized_action unless @current_user.present?
     @observee = api_find(User, params[:user_id])
-    authorized_action(@observee, @current_user, :read)
+
+    if @observee.grants_right?(@current_user, session, :read)
+      true # parent or admin
+    else
+      # possibly an observer without a full link
+      shards = @current_user.in_region_associated_shards & @observee.in_region_associated_shards
+      @observed_course_ids = @current_user.observer_enrollments.shard(shards).active_or_pending.where(associated_user_id: @observee).pluck(:course_id)
+      if @observed_course_ids.any?
+        true
+      else
+        render_unauthorized_action
+      end
+    end
   end
 
   def require_authorization

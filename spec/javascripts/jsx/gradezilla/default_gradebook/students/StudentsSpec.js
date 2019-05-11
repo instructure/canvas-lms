@@ -226,4 +226,111 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       strictEqual(gradebook.isStudentGradeable('1101'), false)
     })
   })
+
+  QUnit.module('#studentCanReceiveGradeOverride()', hooks => {
+    let submissionData
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+
+      const studentData = [
+        {
+          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
+          id: '1101',
+          name: 'Adam Jones'
+        }
+      ]
+      gradebook.gotChunkOfStudents(studentData)
+
+      gradebook.setAssignmentGroups({
+        2201: {group_weight: 100}
+      })
+
+      gradebook.setAssignments({
+        2301: {
+          assignment_group_id: '2201',
+          id: '2301',
+          name: 'Math Assignment',
+          published: true
+        },
+
+        2302: {
+          assignment_group_id: '2201',
+          id: '2302',
+          name: 'English Assignment',
+          published: false
+        }
+      })
+
+      submissionData = [
+        {
+          submissions: [
+            {
+              assignment_id: '2301',
+              assignment_visible: true,
+              cached_due_date: '2015-10-15T12:00:00Z',
+              id: '2501',
+              score: 10,
+              user_id: '1101',
+              workflow_state: 'graded'
+            },
+
+            {
+              assignment_id: '2302',
+              assignment_visible: true,
+              cached_due_date: '2015-12-15T12:00:00Z',
+              id: '2502',
+              score: 9,
+              user_id: '1101',
+              workflow_state: 'graded'
+            }
+          ],
+
+          user_id: '1101'
+        }
+      ]
+    })
+
+    test('returns true when the student has been graded on one assignment', () => {
+      gradebook.gotSubmissionsChunk(submissionData)
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), true)
+    })
+
+    test('returns false when the student has not been graded on any assignments', () => {
+      submissionData[0].submissions[0].workflow_state = 'submitted'
+      submissionData[0].submissions[1].workflow_state = 'unsubmitted'
+      gradebook.gotSubmissionsChunk(submissionData)
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+    })
+
+    test('considers a submission with a cleared grade to be not yet graded', () => {
+      submissionData[0].submissions[0].score = null
+      submissionData[0].submissions[1].score = null
+      gradebook.gotSubmissionsChunk(submissionData)
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+    })
+
+    test('considers an excused submission to be graded', () => {
+      submissionData[0].submissions[0].excused = true
+      submissionData[0].submissions[1].workflow_state = 'submitted'
+      gradebook.gotSubmissionsChunk(submissionData)
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), true)
+    })
+
+    test('returns false when the student is not assigned to any assignments', () => {
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+    })
+
+    test('returns false when the student enrollment is concluded', () => {
+      gradebook.gotSubmissionsChunk(submissionData)
+      gradebook.students[1101].isConcluded = true
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+    })
+
+    test('returns false when the student is not loaded', () => {
+      gradebook.gotSubmissionsChunk(submissionData)
+      delete gradebook.students[1101]
+      strictEqual(gradebook.studentCanReceiveGradeOverride('1101'), false)
+    })
+  })
 })

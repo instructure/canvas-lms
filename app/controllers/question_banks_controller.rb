@@ -63,7 +63,7 @@ class QuestionBanksController < ApplicationController
       :CONTEXT_URL_ROOT => polymorphic_path([@context]),
       :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
     })
-    rce_js_env(:highrisk)
+    rce_js_env
 
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)

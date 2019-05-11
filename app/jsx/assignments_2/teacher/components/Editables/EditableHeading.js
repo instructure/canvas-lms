@@ -60,11 +60,11 @@ export default class EditableHeading extends React.Component {
     this._hiddenTextRef = null
   }
 
-  getSnapshotBeforeUpdate(prevProps, _prevState) {
-    if (prevProps.mode === 'view' && this._headingRef) {
-      const fontSize = this.getFontSize(this._headingRef)
-      // we'll set the width of the <input> to the width of the text + 1 char
-      return {width: this._headingRef.clientWidth + fontSize}
+  static getDerivedStateFromProps(props, _state) {
+    if (props.mode === 'view') {
+      return {
+        initialValue: props.value
+      }
     }
     return null
   }
@@ -175,6 +175,7 @@ export default class EditableHeading extends React.Component {
           value={this.props.value}
           onChange={this.handleInputChange}
           onKeyDown={this.handleKey}
+          onKeyUp={this.handleKey}
           aria-label={this.props.label}
           onBlur={onBlur}
           elementRef={createChainedFunction(this.getInputRef, editorRef)}
@@ -194,13 +195,13 @@ export default class EditableHeading extends React.Component {
   // don't have to check what mode is, because
   // this is the editor's key handler
   handleKey = event => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && event.type === 'keydown') {
       event.preventDefault()
       event.stopPropagation()
       if (!this.props.readOnly) {
         this.props.onChangeMode('view')
       }
-    } else if (event.key === 'Escape') {
+    } else if (event.key === 'Escape' && event.type === 'keyup') {
       // reset to initial value
       this.props.onChange(this.state.initialValue)
     }
@@ -210,17 +211,8 @@ export default class EditableHeading extends React.Component {
     this.props.onChange(event.target.value)
   }
 
-  // InPlaceEdit.onChange is fired when changing from edit to view
-  // mode. Reset the initialValue now.
   handleChange = newValue => {
-    this.setState(
-      {
-        initialValue: newValue
-      },
-      () => {
-        this.props.onChange(newValue)
-      }
-    )
+    this.props.onChange(newValue)
   }
 
   handleModeChange = mode => {

@@ -60,7 +60,6 @@ describe "discussions" do
 
       before(:each) do
         user_session(student)
-        enable_all_rcs @course.account
       end
 
       context "teacher topic" do
@@ -130,7 +129,6 @@ describe "discussions" do
       before(:each) do
         resize_screen_to_normal
         user_session(teacher)
-        enable_all_rcs @course.account
       end
 
       it "should create a group discussion", priority: "1", test_id: 150473 do

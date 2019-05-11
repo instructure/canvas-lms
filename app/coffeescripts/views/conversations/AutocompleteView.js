@@ -39,7 +39,7 @@ export default class AutocompleteView extends Backbone.View {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
       eval(`${thisName} = this;`);
     }
     this._addToModelCache = this._addToModelCache.bind(this)

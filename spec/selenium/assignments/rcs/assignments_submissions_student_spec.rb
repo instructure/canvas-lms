@@ -31,7 +31,6 @@ describe "submissions" do
     before(:once) do
       @due_date = Time.now.utc + 2.days
       course_with_student(active_all: true)
-      enable_all_rcs @course.account
       @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
       @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)

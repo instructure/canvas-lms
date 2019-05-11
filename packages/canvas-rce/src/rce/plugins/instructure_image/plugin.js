@@ -17,11 +17,15 @@
  */
 
 import htmlEscape from "escape-html";
+
 import formatMessage from "../../../format-message";
 import clickCallback from "./clickCallback";
+import bridge from '../../../bridge'
+
+const PLUGIN_KEY = 'images'
 
 tinymce.create("tinymce.plugins.InstructureImagePlugin", {
-  init: function(ed) {
+  init(ed) {
     // Register commands
     ed.addCommand(
       "mceInstructureImage",
@@ -29,35 +33,48 @@ tinymce.create("tinymce.plugins.InstructureImagePlugin", {
     );
 
     // Register buttons
-    ed.addButton("instructure_image", {
-      title: htmlEscape(
+    ed.ui.registry.addMenuButton("instructure_image", {
+      tooltip: htmlEscape(
         formatMessage({
-          default: "Embed Image",
+          default: "Images",
           description: "Title for RCE button to embed an image"
         })
       ),
-      cmd: "mceInstructureImage",
+
       icon: "image",
-      onPostRender: function() {
+
+      fetch(callback) {
+        const items = [
+          {
+            type: 'menuitem',
+            text: formatMessage('Upload Image'),
+            onAction: () => ed.execCommand("mceInstructureImage"),
+          },
+
+          {
+            type: 'menuitem',
+            text: formatMessage('Course Images'), // This item needs to be adjusted to be user/context aware, i.e. User Images
+            onAction() {
+              ed.focus(true) // activate the editor without changing focus
+              bridge.showTrayForPlugin(PLUGIN_KEY)
+            }
+          }
+        ]
+        callback(items);
+      },
+
+      onSetup(buttonApi) {
         // highlight our button when an image is selected
-        var btn = this;
-        ed.on("NodeChange", function(event) {
-          btn.active(
-            event.nodeName == "IMG" && event.className != "equation_image"
+        const toggleActive = eventApi => {
+          buttonApi.setActive(
+            eventApi.element.nodeName.toLowerCase() === "IMG" &&
+              eventApi.element.className !== "equation_image"
           );
-        });
+        };
+        ed.on("NodeChange", toggleActive);
+        return () => ed.off("NodeChange", toggleActive);
       }
     });
-  },
-
-  getInfo: function() {
-    return {
-      longname: "Instructure image",
-      author: "Instructure",
-      authorurl: "http://instructure.com",
-      infourl: "http://instructure.com",
-      version: "1"
-    };
   }
 });
 

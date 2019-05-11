@@ -192,7 +192,7 @@ class NotificationMessageCreator
   end
 
   def unretired_policies_for(user)
-    user.notification_policies.where("communication_channels.workflow_state<>'retired'")
+    user.communication_channels.select { |cc| !cc.retired? }.map(&:notification_policies).flatten
   end
 
   def delayed_policies_for(user, channel=user.email_channel)
@@ -203,10 +203,9 @@ class NotificationMessageCreator
 
     # If any channel has a policy, even policy-less channels don't get the notification based on the
     # notification default frequency. Is that right?
-    policies= []
-    user_has_policy = unretired_policies_for(user).for(@notification).exists?
-    if user_has_policy
-      policies += unretired_policies_for(user).for(@notification).by(['daily', 'weekly']).where("communication_channels.path_type='email'")
+    policies = unretired_policies_for(user).select { |np| np.notification_id == @notification.id }
+    if !policies.empty?
+      policies = policies.select { |np| ['daily', 'weekly'].include?(np.frequency) && np.communication_channel.path_type == 'email' }
     elsif channel &&
           channel.active? &&
           channel.path_type == 'email'
@@ -235,7 +234,7 @@ class NotificationMessageCreator
   end
 
   def asset_filtered_by_user(user)
-    if asset.respond_to?(:filter_asset_by_recipient) # Does this ever happen?
+    if asset.respond_to?(:filter_asset_by_recipient)
       asset.filter_asset_by_recipient(@notification, user)
     else
       asset
@@ -281,12 +280,12 @@ class NotificationMessageCreator
   def immediate_channels_for(user)
     return [] unless user.registered?
 
-    active_channel_scope = user.communication_channels.active.for(@notification)
-    immediate_channel_scope = user.communication_channels.active.for_notification_frequency(@notification, 'immediately')
+    active_channel_scope = user.communication_channels.select { |cc| cc.active? && cc.notification_policies.find { |np| np.notification_id == @notification.id } }
+    immediate_channel_scope = active_channel_scope.select { |cc| cc.notification_policies.find { |np| np.notification_id == @notification.id && np.frequency == 'immediately' } }
 
-    user_has_a_policy = active_channel_scope.where.not(path_type: 'push').exists?
+    user_has_a_policy = active_channel_scope.find { |cc| cc.path_type != 'push' }
     if !user_has_a_policy && @notification.default_frequency(user) == 'immediately'
-      return [user.email_channel, *immediate_channel_scope.where(path_type: 'push')].compact
+      return [user.email_channel, *immediate_channel_scope.select { |cc| cc.path_type == 'push' }].compact
     end
     immediate_channel_scope
   end

@@ -1028,6 +1028,18 @@ he:
         default: 
           recently_deleted_courses: 
             text: "דוח זה מציג את כל הקורסים בתקופת לימודים נתונה אשר בוטלו ב 30 הימים האחרונים. קובץ ה CSV שמתקבל יציג שורה אחת עם הפרטים הבאים לכל קורס: מזהה, מזהה SIS, שם קצר, שם, ותאריכי התחלה וסיום."
+    reports_tab: 
+      headers: 
+        report_last_run: "הרצה אחרונה"
+        report_name: שם
+      headings: 
+        sections: דוחות
+      links: 
+        configure_report: הגדרות...
+        run_report: "הרצת דו\"ח"
+      open_report_description: "תיאור דוח גמיש"
+      report_last_run_never: "אף פעם"
+      report_running: "הדו\"ח רץ. *תקבלו הודעת דוא\"ל כאשר הוא יסיים.*"
     retry_login: "נסו שוב להתחבר"
     root_accounts: 
       labels: 
@@ -9430,6 +9442,9 @@ he:
   include_unpublished_courses_7a0e7aab: "הכללת קורסים שלא פורסמו"
   incomplete_95612d72: "לא הושלם"
   incomplete_da3c2ea2: "לא הושלם"
+  incompleteregistration: 
+    get_started: "ניתן להתחיל"
+    welcome_to_canvas: "ברוך בואך לקנבס!"
   incorrect_answer_7c17e63b: "תשובה שגויה"
   incorrect_username_and_or_password_2de73abb: "שם משתמש או סיסמה שגויים"
   increase_indent_6af90f7c: "הרחבת עימוד"
@@ -9678,6 +9693,7 @@ he:
     esc_key_notification: "יש להקיש על מקש ה Esc טרם השימוש בקיצורי המקלדת כאשר מנווטים ברשת ספר הציונים"
   keyboard_shortcuts_ed1844bd: "קיצורי מקלדת"
   kind_7f0a88c4: סוג
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "נעילה עד"
   last_enrollment_activity_10fe15ba: "פעילות הרשמה אחרונה"
@@ -10187,6 +10203,7 @@ he:
     cancel: ביטול
     click_to_view: "הקלק/י כדי להציג"
     errors: 
+      file_too_large: "* קובץ זה גדול מדי.* הגודל המרבי הוא %{size} מגה בייט."
       load_failed: "טעינת אפליקצית ההערות למדיה נכשלה. יש לנסות שוב"
       media_comment_installation_broken: "העלאת הערות מדיה לא הוגדרה כהלכה. יש ליצור קשר עם מנהל המערכת שלך."
       must_be_logged_in: "יש צורך להתחבר כדי להקליט מדיה"

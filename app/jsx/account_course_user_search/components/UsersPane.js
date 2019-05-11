@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shape, func, arrayOf, string} from 'prop-types'
+import {shape, func, string} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import _ from 'underscore'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'

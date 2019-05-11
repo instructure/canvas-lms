@@ -68,12 +68,6 @@
   "select_a_file_53ba40ac": {
     "message": "Select a file"
   },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatting. Press down to select"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Background colour. Press down to select"
-  },
   "files_index_af7c662b": {
     "message": "Files index"
   },
@@ -97,9 +91,6 @@
   },
   "copyright_holder_66ee111": {
     "message": "Copyright holder:"
-  },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Press ALT+F8 for help"
   },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
@@ -212,9 +203,6 @@
   "link_to_other_content_in_the_course_879163b5": {
     "message": "Link to other content in the programme."
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Font size. Press down to select"
-  },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
@@ -223,12 +211,6 @@
   },
   "choose_usage_rights_33683854": {
     "message": "Choose usage rights..."
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Text colour. Press down to select"
-  },
-  "embed_image_1080badc": {
-    "message": "Embed image"
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Licence:"

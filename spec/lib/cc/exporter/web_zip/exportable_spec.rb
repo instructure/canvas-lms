@@ -76,6 +76,10 @@ describe "Exportable" do
     def create_zip(exporter, progress_key)
       ZipPackageTest.new(exporter, @course, @user, progress_key)
     end
+
+    def content_export
+      @export ||= @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+    end
   end
 
   context "#convert_to_web_zip" do

@@ -4,6 +4,7 @@ exports[`renders correctly expanded 1`] = `
 <View
   as="div"
   className="outcomeGroup"
+  debug={false}
   display="auto"
   overflowX="visible"
   overflowY="visible"
@@ -115,6 +116,7 @@ exports[`renders the OutcomeGroup component 1`] = `
 <View
   as="div"
   className="outcomeGroup"
+  debug={false}
   display="auto"
   overflowX="visible"
   overflowY="visible"

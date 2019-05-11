@@ -140,12 +140,10 @@ window.Jobs = class Jobs extends FlavorGrid {
   constructor(options, type_name = 'jobs', grid_name = '#jobs-grid') {
     {
       // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) {
-        super()
-      }
-      const thisFn = (() => this).toString()
-      const thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim()
-      eval(`${thisName} = this;`)
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      eval(`${thisName} = this;`);
     }
     this.show_search = this.show_search.bind(this)
     this.change_flavor = this.change_flavor.bind(this)
@@ -380,12 +378,10 @@ class Workers extends Jobs {
   constructor(options) {
     {
       // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) {
-        super()
-      }
-      const thisFn = (() => this).toString()
-      const thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim()
-      eval(`${thisName} = this;`)
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      eval(`${thisName} = this;`);
     }
     this.runtime_formatter = this.runtime_formatter.bind(this)
     super(options, 'running', '#running-grid')

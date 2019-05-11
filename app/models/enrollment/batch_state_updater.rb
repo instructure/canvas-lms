@@ -136,7 +136,7 @@ class Enrollment::BatchStateUpdater
     courses_to_touch_admins = students.map(&:course_id).uniq
     admin_ids = Enrollment.where(course_id: courses_to_touch_admins,
       type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).
-      active.distinct.pluck(:user_id).sort
+      active.distinct.order(:user_id).pluck(:user_id)
     admin_ids.each_slice(1000) do |sliced_admin_ids|
       User.where(id: sliced_admin_ids).touch_all
     end
@@ -191,19 +191,6 @@ class Enrollment::BatchStateUpdater
   def self.run_call_backs_for(batch, root_account=nil)
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
     return if batch.empty?
-    Enrollment.transaction do
-      students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
-      user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
-      courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
-      root_account ||= courses.first.root_account
-      return unless root_account
-      touch_and_update_associations(user_ids)
-      update_linked_enrollments(students)
-      needs_grading_count_updated(courses)
-      recache_all_course_grade_distribution(courses)
-      update_cached_due_dates(students, root_account)
-      touch_all_graders_if_needed(students)
-    end
     root_account ||= Enrollment.where(id: batch).take&.root_account
     return unless root_account
     EnrollmentState.send_later_if_production_enqueue_args(
@@ -213,5 +200,16 @@ class Enrollment::BatchStateUpdater
        max_attempts: 2},
       batch
     )
+    students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
+    user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
+    courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
+    root_account ||= courses.first.root_account
+    return unless root_account
+    touch_and_update_associations(user_ids)
+    update_linked_enrollments(students)
+    needs_grading_count_updated(courses)
+    recache_all_course_grade_distribution(courses)
+    update_cached_due_dates(students, root_account)
+    touch_all_graders_if_needed(students)
   end
 end

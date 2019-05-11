@@ -41,7 +41,6 @@ describe "announcements" do
     end
 
     it "should show replies if user has posted", priority: "1", test_id: 3293301 do
-      enable_all_rcs @course.account
       stub_rcs_config
       get "/courses/#{@course.id}/announcements/#{@announcement.id}"
       f('.discussion-reply-action').click
@@ -56,7 +55,6 @@ describe "announcements" do
   context "announcements as a student" do
     before :each do
       course_with_student_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

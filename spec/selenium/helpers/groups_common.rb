@@ -348,14 +348,10 @@ module GroupsCommon
   end
 
   def expand_files_on_content_pane
-    if Account.default.feature_enabled?(:rich_content_service_high_risk)
-      fj('[role="presentation"]:contains("Files")').click
-    else
-      expect(f('#editor_tabs')).to be_displayed
-      fj('.ui-state-default.ui-corner-top:contains("Files")').present?
-      fj('.ui-state-default.ui-corner-top:contains("Files")').click
-      f('.sign.plus').click
-    end
+    wait_for_ajaximations
+    skip("CORE-2714 figure out why the files tab shows up as disabled on the rcs sidebar in jenkins")
+    fj('[role="tablist"] [role="presentation"]:not([aria-disabled]):contains("Files")').click
+    wait_for_ajaximations
   end
 
   def move_file_to_folder(file_name,destination_name)

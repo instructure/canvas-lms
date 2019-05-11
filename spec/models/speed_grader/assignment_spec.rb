@@ -2767,4 +2767,29 @@ describe SpeedGrader::Assignment do
       end
     end
   end
+
+  describe "post policies" do
+    let_once(:assignment) { @course.assignments.create!(title: "hi") }
+    let(:json) { SpeedGrader::Assignment.new(assignment, @teacher).json }
+
+    context "when post policies are enabled" do
+      before(:once) do
+        @course.enable_feature!(:post_policies)
+      end
+
+      it "sets post_manually to true in the response if the assignment is manually-posted" do
+        assignment.ensure_post_policy(post_manually: true)
+        expect(json['post_manually']).to be true
+      end
+
+      it "sets post_manually to false in the response if the assignment is not manually-posted" do
+        assignment.ensure_post_policy(post_manually: false)
+        expect(json['post_manually']).to be false
+      end
+    end
+
+    it "does not set post_manually in the response when post policies are not enabled" do
+      expect(json).not_to have_key('post_manually')
+    end
+  end
 end

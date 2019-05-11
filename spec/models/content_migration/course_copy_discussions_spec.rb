@@ -21,15 +21,6 @@ describe ContentMigration do
   context "course copy discussions" do
     include_examples "course copy"
 
-    def graded_discussion_topic
-      @topic = @copy_from.discussion_topics.build(:title => "topic")
-      @assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-      @assignment.infer_times
-      @assignment.saved_by = :discussion_topic
-      @topic.assignment = @assignment
-      @topic.save
-    end
-
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
         :pinned => true, :discussion_type => "threaded",
@@ -108,7 +99,7 @@ describe ContentMigration do
     end
 
     it "should copy a discussion topic when assignment is selected" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
 
       # Should not fail if the destination has a group
       @copy_to.groups.create!(:name => 'some random group of people')
@@ -225,7 +216,7 @@ describe ContentMigration do
     end
 
     it "should not copy deleted assignment attached to topic" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
       @assignment.workflow_state = 'deleted'
       @assignment.save!
 
@@ -239,7 +230,7 @@ describe ContentMigration do
     end
 
     it "should copy the assignment group and grading standard in complete copy" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
       @assignment.assignment_group = group
@@ -253,7 +244,7 @@ describe ContentMigration do
     end
 
     it "should copy the grading standard (but not assignment group) in selective copy" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
       @assignment.assignment_group = group
@@ -268,7 +259,7 @@ describe ContentMigration do
     end
 
     it "should not copy the assignment group and grading standard in selective export" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
       @assignment.assignment_group = group
@@ -314,7 +305,7 @@ describe ContentMigration do
     end
 
     it "should not copy lock_at directly when on assignment" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
       @assignment.update_attribute(:lock_at, 3.days.from_now)
 
       run_course_copy
@@ -325,7 +316,7 @@ describe ContentMigration do
     end
 
     it "should not apply the late policy right away if shifting dates to the future" do
-      graded_discussion_topic
+      graded_discussion_topic(context: @copy_from)
       @assignment.update_attributes(:due_at => 3.days.ago, :points_possible => 4)
 
       [@copy_from, @copy_to].each do |course|

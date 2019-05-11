@@ -14,9 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
 
-<%
   @body_classes << 'hide-content-while-scripts-not-loaded'
 
   content_for :page_title, join_title(t('#titles.discussions', "Discussions"), @context.name)
@@ -28,3 +26,17 @@
   css_bundle :discussions_index
 
 %>
+<% content_for :stylesheets do # we put this in :stylesheets so it is rendered early, in the <head> %>
+  <script>
+    preloadedDiscussionTopicFetchRequests = <%= raw(@discussion_topics_urls_to_prefetch.to_json) %>
+      .map(function(url) {
+        return fetch(url, {
+          credentials: 'same-origin',
+          headers: {
+            'Accept': 'application/json+canvas-string-ids, application/json'
+          }
+        })
+      });
+  </script>
+<% end %>
+

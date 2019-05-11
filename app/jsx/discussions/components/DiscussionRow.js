@@ -224,7 +224,7 @@ export class DiscussionRow extends Component {
     }
   }
 
-  getAccessibleTitle = () => {
+  getAccessibleTitle() {
     let result = `${this.props.discussion.title} `
     const availability = this.getAvailabilityString()
     if (availability) result += `${availability} `
@@ -773,10 +773,6 @@ export class DiscussionRow extends Component {
   }
 
   render() {
-    // necessary because discussions return html from RCE
-    const contentWrapper = document.createElement('span')
-    contentWrapper.innerHTML = this.props.discussion.message
-
     return (
       <div>
         <Grid startAt="medium" vAlign="middle" colSpacing="none">
@@ -834,7 +830,6 @@ const mapState = (state, ownProps) => {
   return Object.assign({}, ownProps, propsFromState)
 }
 
-/* eslint-disable new-cap */
 export const DraggableDiscussionRow = compose(
   DropTarget('Discussion', dropTarget, dConnect => ({
     connectDropTarget: dConnect.dropTarget()

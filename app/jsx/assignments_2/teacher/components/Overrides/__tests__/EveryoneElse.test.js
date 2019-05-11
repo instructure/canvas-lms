@@ -41,7 +41,14 @@ it("pulls everyone else's dates from the assignment", () => {
     }
   })
 
-  const {getByText} = render(<EveryoneElse assignment={assignment} onChangeAssignment={() => {}} />)
+  const {getByText} = render(
+    <EveryoneElse
+      assignment={assignment}
+      onChangeAssignment={() => {}}
+      onValidate={() => true}
+      invalidMessage={() => undefined}
+    />
+  )
   expect(getByText('Everyone else')).toBeInTheDocument()
 
   const due = `Due: ${tz.format(aDueAt, I18n.t('#date.formats.full'))}`

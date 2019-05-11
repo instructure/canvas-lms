@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from "jquery";
-
 import Backbone from "Backbone";
 import ModuleCollection from "../../collections/ModuleCollection";
 import template from "jst/modules/ProgressionStudentView";
@@ -33,7 +31,7 @@ export default ProgressionStudentView = (function() {
         // Hack: trick Babel/TypeScript into allowing this before super.
         if (false) { super(); }
         let thisFn = (() => { return this; }).toString();
-        let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+        let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
         eval(`${thisName} = this;`);
       }
       this.syncHeight = this.syncHeight.bind(this);

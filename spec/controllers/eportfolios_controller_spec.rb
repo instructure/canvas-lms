@@ -74,14 +74,12 @@ describe EportfoliosController do
       end
 
       it "exposes the feature state for rich content service to js_env" do
-        @user.account.root_account.enable_feature!(:rich_content_service_high_risk)
         allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return({
           'app-host' => 'rce.docker',
           'cdn-host' => 'rce.docker'
         })
         get 'user_index'
         expect(response).to be_successful
-        expect(assigns[:js_env][:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
       end
     end
   end
@@ -148,12 +146,6 @@ describe EportfoliosController do
         get 'show', params: {:id => @portfolio.id}
         expect(response).to be_successful
         expect(assigns[:page]).not_to be_nil
-      end
-
-      it "exposes the feature state for rich content service to js_env" do
-        @user.account.root_account.disable_feature!(:rich_content_service_high_risk)
-        get 'user_index'
-        expect(assigns[:js_env][:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
       end
     end
 

@@ -81,7 +81,7 @@ class AssignmentsController < ApplicationController
 
   def show
     Shackles.activate(:slave) do
-      rce_js_env(:highrisk)
+      rce_js_env
       @assignment ||= @context.assignments.find(params[:id])
       @assignment_presenter = AssignmentPresenter.new(@assignment)
       if @assignment.deleted?
@@ -198,7 +198,6 @@ class AssignmentsController < ApplicationController
               show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
             }
           end
-          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
         end
       end
     end
@@ -352,7 +351,7 @@ class AssignmentsController < ApplicationController
   end
 
   def syllabus
-    rce_js_env(:sidebar)
+    rce_js_env
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
@@ -452,7 +451,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    rce_js_env(:highrisk)
+    rce_js_env
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]

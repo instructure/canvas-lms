@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, string, func, number, oneOf, oneOfType} from 'prop-types'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
-import NumberInput from '@instructure/ui-number-input/lib/components/NumberInput'
+import {NumberInput} from '@instructure/ui-number-input'
 import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -64,6 +64,17 @@ export default class EditableNumber extends React.Component {
 
     this._inputRef = null
     this._hiddenTextRef = null
+  }
+
+  // if a new value comes in while we're in view mode,
+  // reset our initial value
+  static getDerivedStateFromProps(props, _state) {
+    if (props.mode === 'view') {
+      return {
+        initialValue: props.value
+      }
+    }
+    return null
   }
 
   componentDidUpdate(prevProps, _prevState, _snapshot) {
@@ -212,14 +223,7 @@ export default class EditableNumber extends React.Component {
   // InPlaceEdit.onChange is fired when changing from edit to view
   // mode. Reset the initialValue now.
   handleChange = newValue => {
-    this.setState(
-      {
-        initialValue: newValue
-      },
-      () => {
-        this.props.onChange(newValue)
-      }
-    )
+    this.props.onChange(newValue)
   }
 
   handleModeChange = mode => {

@@ -23,7 +23,7 @@ describe 'quizzes question creation' do
   include QuizzesCommon
 
   before(:once) do
-    course_with_teacher
+    course_with_teacher(active_all: true)
   end
 
   before(:each) do
@@ -46,7 +46,6 @@ describe 'quizzes question creation' do
 
       quiz.reload
       refresh_page # make sure the quizzes load up from the database
-      dismiss_flash_messages # clears success flash message if exists
       click_questions_tab
       3.times do |i|
         expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy
@@ -163,7 +162,6 @@ describe 'quizzes question creation' do
 
     it 'should show errors for graded quizzes', priority: "1", test_id: 197491 do
       open_quiz_edit_form
-      dismiss_flash_messages
       click_questions_tab
       edit_first_question
       delete_first_multiple_choice_answer
@@ -174,7 +172,6 @@ describe 'quizzes question creation' do
     it 'should not show errors for surveys', priority: "1", test_id: 197491 do
       @quiz.update_attribute :quiz_type, "graded_survey"
       open_quiz_edit_form
-      dismiss_flash_messages
       click_questions_tab
       edit_and_save_first_multiple_choice_answer 'instructure!'
       expect(error_displayed?).to be_falsey

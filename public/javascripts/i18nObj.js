@@ -317,16 +317,39 @@ I18n.scoped = (scope, callback) => {
 class Scope {
   constructor(scope) {
     this.scope = scope
+    this.cache = new Map()
   }
 
-  translate() {
-    const args = [].slice.call(arguments)
-    let options = args[args.length - 1]
-    if (!(options instanceof Object)) {
-      options = {}
-      args.push(options)
+  translate(...args) {
+    let cacheKey
+    try {
+      cacheKey = I18n.locale + JSON.stringify(args)
+    } catch (e) {
+      // if there is something in the arguments we can't stringify, just do it without cache
     }
-    options.scope = this.scope
+    if (cacheKey) {
+      const cached = this.cache.get(cacheKey)
+      if (cached) {
+        return cached
+      } else {
+        const valToCache = this.translateWithoutCache(...args)
+        this.cache.set(cacheKey, valToCache)
+        return valToCache
+      }
+    }
+    else {
+      return this.translateWithoutCache(...args)
+    }
+  }
+
+  translateWithoutCache() {
+    let args = arguments
+    const options = args[args.length - 1]
+    if (options instanceof Object) {
+      options.scope = this.scope
+    } else {
+      args = [...args, {scope: this.scope}]
+    }
     return I18n.translate(...args)
   }
 

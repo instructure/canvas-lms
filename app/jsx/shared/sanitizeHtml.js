@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tinymce from 'compiled/editor/stocktiny'
-
 export default function sanitizeHtml(html) {
+  // Note: it is expected that tinymce be loaded and available globally at `window.tinymce` by the 
+  // time this function runs. To do that you can just make sure to call 
+  // RichContentEditor.preloadRemoteModule first
   return new tinymce.html.Serializer().serialize(new tinymce.html.DomParser().parse(html));
 }

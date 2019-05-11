@@ -36,6 +36,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
         >
           <View
             as="div"
+            debug={false}
             display="auto"
             overflowX="visible"
             overflowY="visible"
@@ -43,6 +44,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
           >
             <View
               as="div"
+              debug={false}
               display="auto"
               overflowX="visible"
               overflowY="visible"
@@ -60,6 +62,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
+              debug={false}
               display="auto"
               overflowX="visible"
               overflowY="visible"
@@ -76,6 +79,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
+              debug={false}
               display="auto"
               overflowX="visible"
               overflowY="visible"
@@ -93,6 +97,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
+              debug={false}
               display="auto"
               overflowX="visible"
               overflowY="visible"
@@ -142,6 +147,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -171,6 +177,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -200,6 +207,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -229,6 +237,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -250,6 +259,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
+              debug={false}
               display="auto"
               key="qux"
               margin="large 0 0 0"
@@ -301,6 +311,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -330,6 +341,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -359,6 +371,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -380,6 +393,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
+              debug={false}
               display="auto"
               key="tic"
               margin="large 0 0 0"
@@ -431,6 +445,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -460,6 +475,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -489,6 +505,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                     <td>
                       <View
                         as="div"
+                        debug={false}
                         display="auto"
                         overflowX="visible"
                         overflowY="visible"
@@ -510,6 +527,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
             </View>
             <View
               as="div"
+              debug={false}
               display="auto"
               overflowX="visible"
               overflowY="visible"

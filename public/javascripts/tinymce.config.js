@@ -65,10 +65,10 @@ export default class EditorConfig {
     return {
       selector: `#${this.idAttribute}`,
       toolbar: this.toolbar(),
-      theme: 'modern',
-      skin: false,
+      [!window.ENV.use_rce_enhancements && 'theme']: 'modern',
+      [!window.ENV.use_rce_enhancements && 'skin']: false,
       directionality: getDirection(),
-      plugins: 'autolink,media,paste,table,textcolor,link,directionality,lists,a11y_checker,wordcount',
+      plugins: `autolink,media,paste,table,${window.ENV.use_rce_enhancements ? '' : 'textcolor'},link,directionality,lists,a11y_checker,wordcount`,
       external_plugins: {
         instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
         instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
@@ -113,9 +113,9 @@ export default class EditorConfig {
     let externals = ''
     for (let idx = 0; this.extraButtons && (idx < this.extraButtons.length); idx++) {
       if (this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
-        externals = `${externals},instructure_external_button_${this.extraButtons[idx].id}`
+        externals = `${externals} instructure_external_button_${this.extraButtons[idx].id}`
       } else if (!externals.match(/instructure_external_button_clump/)) {
-        externals += ',instructure_external_button_clump'
+        externals += ' instructure_external_button_clump'
       }
     }
     return externals
@@ -130,12 +130,12 @@ export default class EditorConfig {
    * @return {String} comma delimited set of non-core buttons
    */
   buildInstructureButtons () {
-    let instructure_buttons = ',instructure_image,instructure_equation'
+    let instructure_buttons = ' instructure_image instructure_equation'
     instructure_buttons += this.external_buttons()
     if (this.instConfig && this.instConfig.allowMediaComments && (this.instConfig.kalturaSettings && !this.instConfig.kalturaSettings.hide_rte_button)) {
-      instructure_buttons += ',instructure_record'
+      instructure_buttons += ' instructure_record'
     }
-    const equella_button = this.instConfig && this.instConfig.equellaEnabled ? ',instructure_equella' : ''
+    const equella_button = this.instConfig && this.instConfig.equellaEnabled ? ' instructure_equella' : ''
     instructure_buttons += equella_button
     return instructure_buttons
   }
@@ -145,9 +145,9 @@ export default class EditorConfig {
    * name doesn't need to happen 3 places or not work.
    * @private
    */
-  formatBtnGroup = 'bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright';
-  positionBtnGroup = 'outdent,indent,superscript,subscript,bullist,numlist';
-  fontBtnGroup = 'ltr,rtl,fontsizeselect,formatselect,check_a11y';
+  formatBtnGroup = 'bold italic underline forecolor backcolor removeformat alignleft aligncenter alignright';
+  positionBtnGroup = 'outdent indent superscript subscript bullist numlist';
+  fontBtnGroup = 'ltr rtl fontsizeselect formatselect check_a11y';
 
 
   /**
@@ -159,22 +159,26 @@ export default class EditorConfig {
    *   representing the buttons to appear on the n-th line of the toolbar
    */
   balanceButtons (instructure_buttons) {
-    const instBtnGroup = `table,media,instructure_links,unlink${instructure_buttons}`
+    const instBtnGroup = `table media instructure_links unlink${instructure_buttons}`
     let buttons1 = ''
     let buttons2 = ''
     let buttons3 = ''
 
     if (this.viewportWidth < 359 && this.viewportWidth > 0) {
       buttons1 = this.formatBtnGroup
-      buttons2 = `${this.positionBtnGroup},${instBtnGroup}`
+      buttons2 = `${this.positionBtnGroup} ${instBtnGroup}`
       buttons3 = this.fontBtnGroup
     } else if (this.viewportWidth < 1200) {
-      buttons1 = `${this.formatBtnGroup},${this.positionBtnGroup}`
-      buttons2 = `${instBtnGroup},${this.fontBtnGroup}`
+      buttons1 = `${this.formatBtnGroup} ${this.positionBtnGroup}`
+      buttons2 = `${instBtnGroup} ${this.fontBtnGroup}`
     } else {
-      buttons1 = `${this.formatBtnGroup},${this.positionBtnGroup},${instBtnGroup},${this.fontBtnGroup}`
+      buttons1 = `${this.formatBtnGroup} ${this.positionBtnGroup} ${instBtnGroup} ${this.fontBtnGroup}`
     }
-    return [buttons1, buttons2, buttons3]
+    if (window.ENV.use_rce_enhancements) {
+      return [buttons1, buttons2, buttons3]
+    } else {
+      return [buttons1, buttons2, buttons3].map(b => b.split(' ').join(','))
+    }
   }
 
 

@@ -50,7 +50,7 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
 
         isFilteringColumnsByGradingPeriod: sinon.stub().returns(false),
 
-        isStudentGradeable(id) {
+        studentCanReceiveGradeOverride(id) {
           return {1101: true, 1102: false}[id]
         }
       }

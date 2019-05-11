@@ -23,11 +23,7 @@ import 'Backbone'
 import DialogBaseView from '../DialogBaseView'
 import template from 'jst/conversations/SubmissionCommentFormDialog'
 import composeTitleBarTemplate from 'jst/conversations/composeTitleBar'
-import composeButtonBarTemplate from 'jst/conversations/composeButtonBar'
 import Message from '../../models/Message'
-import AutocompleteView from './AutocompleteView'
-import CourseSelectionView from './CourseSelectionView'
-import ContextMessagesView from './ContextMessagesView'
 import 'jquery.elastic'
 
 // #
@@ -39,7 +35,7 @@ export default class SubmissionCommentFormDialog extends DialogBaseView {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
       eval(`${thisName} = this;`);
     }
     this.resizeBody = this.resizeBody.bind(this)

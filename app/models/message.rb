@@ -315,7 +315,7 @@ class Message < ActiveRecord::Base
       context = context.context if context.respond_to?(:context)
       context = context.account if context.respond_to?(:account)
       context = context.root_account if context.respond_to?(:root_account)
-      if context
+      if context && context.respond_to?(:root_account)
         p = SisPseudonym.for(user, context, type: :implicit, require_sis: false)
         context = p.account if p
       else

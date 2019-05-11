@@ -224,43 +224,62 @@ describe UsersController do
     end
   end
 
-  it "should not include deleted courses in manageable courses" do
-    course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
-    course1 = @course
-    course1.destroy
-    course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
-    course2 = @course
+  context "manageable_courses" do
+    it "should not include deleted courses in manageable courses" do
+      course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+      course1 = @course
+      course1.destroy
+      course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
+      course2 = @course
 
-    get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
-    expect(response).to be_successful
+      get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
+      expect(response).to be_successful
 
-    courses = json_parse
-    expect(courses.map { |c| c['id'] }).to eq [course2.id]
-  end
-
-  it "should not include future teacher term courses in manageable courses" do
-    course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
-    @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment",
-      :start_at => 1.week.from_now, :end_at => 2.weeks.from_now)
-
-    get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
-    expect(response).to be_successful
-
-    courses = json_parse
-    expect(courses).to be_empty
-  end
-
-  it "should sort the results of manageable_courses by name" do
-    course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
-    %w(c d a).each do |name|
-      course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1)
+      courses = json_parse
+      expect(courses.map { |c| c['id'] }).to eq [course2.id]
     end
 
-    get 'manageable_courses', params: {:user_id => @teacher.id}
-    expect(response).to be_successful
+    it "should not include future teacher term courses in manageable courses" do
+      course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment",
+        :start_at => 1.week.from_now, :end_at => 2.weeks.from_now)
 
-    courses = json_parse
-    expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
+      get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
+      expect(response).to be_successful
+
+      courses = json_parse
+      expect(courses).to be_empty
+    end
+
+    it "should sort the results of manageable_courses by name" do
+      course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
+      %w(c d a).each do |name|
+        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1)
+      end
+
+      get 'manageable_courses', params: {:user_id => @teacher.id}
+      expect(response).to be_successful
+
+      courses = json_parse
+      expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should be able to find courses on other shards" do
+        course_with_teacher_logged_in(:course_name => "Blah", :active_all => 1)
+        @shard1.activate do
+          @other_account = Account.create
+          @cs_course = @other_account.courses.create!(:name => "A cross shard course", :workflow_state => "available")
+          @cs_course.enroll_user(@teacher, "TeacherEnrollment", :enrollment_state => "active")
+        end
+
+        get 'manageable_courses', params: {:user_id => @teacher.id}
+        # should sort the cross-shard course before the current shard one
+        expect(json_parse.map{|c| c['label']}).to eq [@cs_course.name, @course.name]
+      end
+    end
   end
 
   describe "POST 'create'" do
@@ -1619,6 +1638,26 @@ describe UsersController do
       get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.size).to eq 0
+    end
+
+    it "respects overrides" do
+      @other_section = @course.course_sections.create! :name => 'other section'
+      @as2 = assignment_model(:title => 'not for you', :course => @course, :only_visible_to_overrides => true)
+      create_section_override_for_assignment(@as2, {course_section: @other_section})
+      graded_discussion_topic(context: @course)
+      create_section_override_for_assignment(@topic.assignment, {course_section: @other_section})
+      @topic.assignment.update_attribute :only_visible_to_overrides, true
+
+      get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.map(&:id).join(" ")).not_to include @as2.asset_string
+      expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
+
+      @course.enroll_student(@student, section: @other_section, enrollment_state: 'active', allow_multiple_enrollments: true)
+      get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.map(&:id).join(" ")).to include @as2.asset_string
+      expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
     end
   end
 

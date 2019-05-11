@@ -27,7 +27,6 @@ import {Text} from '@instructure/ui-elements'
 
 import EditableNumber from './EditableNumber'
 
-const invalidMessage = I18n.t('Points must be a number >= 0')
 const editLabel = I18n.t('Edit Points')
 const label = I18n.t('Points')
 
@@ -38,6 +37,7 @@ export default class AssignmentPoints extends React.Component {
     onChange: func.isRequired,
     onChangeMode: func.isRequired,
     onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     readOnly: bool
   }
 
@@ -79,7 +79,7 @@ export default class AssignmentPoints extends React.Component {
     this.setState({isValid}, () => {
       if (!isValid) {
         showFlashAlert({
-          message: invalidMessage,
+          message: this.props.invalidMessage('pointsPossible') || I18n.t('Error'),
           type: 'error',
           srOnly: true
         })
@@ -93,7 +93,7 @@ export default class AssignmentPoints extends React.Component {
     const msg = this.state.isValid ? null : (
       <View as="div" textAlign="end" margin="xx-small 0 0 0">
         <span style={{whiteSpace: 'nowrap'}}>
-          <Text color="error">{invalidMessage}</Text>
+          <Text color="error">{this.props.invalidMessage('pointsPossible')}</Text>
         </span>
       </View>
     )

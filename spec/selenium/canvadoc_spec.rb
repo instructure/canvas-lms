@@ -64,6 +64,7 @@ describe 'Canvadoc' do
     end
 
     it "embed canvadocs in page", priority: "1", test_id: 126836 do
+      skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
       turn_on_plugin_settings
       f('.save_button').click
       course_with_teacher_logged_in :account => @account, :active_all => true

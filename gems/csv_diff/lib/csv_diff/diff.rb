@@ -24,6 +24,7 @@ module CsvDiff
       @key_fields = Array(key_fields).map(&:to_s)
       @db_file = Tempfile.new(['csv_diff', '.sqlite3'])
       @db = SQLite3::Database.new(@db_file.path)
+      @row_count = 0
       setup_database
     end
 
@@ -46,7 +47,12 @@ module CsvDiff
       end
 
       @output.close
-      @output_file.tap(&:rewind)
+      io = @output_file.tap(&:rewind)
+      if options[:return_count]
+        {:file_io => io, :row_count => @row_count}
+      else
+        io
+      end
     end
 
     protected
@@ -77,6 +83,7 @@ module CsvDiff
             where current.data <> previous.data or previous.key is null
             SQL
         row = Marshal.load(data)
+        @row_count += 1
         @output << row
       end
     end
@@ -90,6 +97,7 @@ module CsvDiff
         row = CSV::Row.new(headers, Marshal.load(data))
         # Allow the caller to munge the row to indicate deletion.
         cb.(row)
+        @row_count += 1
         @output << row
       end
     end

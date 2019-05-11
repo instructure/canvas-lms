@@ -28,11 +28,17 @@ export default class OverrideDetail extends React.Component {
   static propTypes = {
     override: OverrideShape.isRequired,
     onChangeOverride: func.isRequired,
+    onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     readOnly: bool
   }
 
   static defaultProps = {
     readOnly: false
+  }
+
+  handleChangeDate = (which, value) => {
+    this.props.onChangeOverride(which, value)
   }
 
   renderAssignedTo() {
@@ -45,6 +51,10 @@ export default class OverrideDetail extends React.Component {
         dueAt={this.props.override.dueAt}
         unlockAt={this.props.override.unlockAt}
         lockAt={this.props.override.lockAt}
+        onChange={this.handleChangeDate}
+        onValidate={this.props.onValidate}
+        invalidMessage={this.props.invalidMessage}
+        readOnly={this.props.readOnly}
       />
     )
   }

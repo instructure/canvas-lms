@@ -17,6 +17,8 @@
 #
 
 module Types
+  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded].freeze
+
   class SubmissionStateType < BaseEnum
     graphql_name "SubmissionState"
 
@@ -24,6 +26,7 @@ module Types
     value "unsubmitted"
     value "pending_review"
     value "graded"
+    value "ungraded"
     value "deleted"
   end
 end

@@ -26,6 +26,9 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
+import ErrorBoundary from 'jsx/shared/components/ErrorBoundary'
+import GenericErrorPage from 'jsx/shared/components/GenericErrorPage/index'
+import errorShipUrl from '../../student/SVG/ErrorShip.svg'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Mask} from '@instructure/ui-overlays'
@@ -41,7 +44,9 @@ import TeacherFooter from './TeacherFooter'
 import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
-import {validate} from '../Validators'
+import AssignmentFieldValidator from '../AssignentFieldValidator'
+
+const pathToOverrides = /assignmentOverrides\.nodes\.\d+/
 
 export default class TeacherView extends React.Component {
   static propTypes = {
@@ -50,8 +55,7 @@ export default class TeacherView extends React.Component {
   }
 
   static defaultProps = {
-    // for now, put "#edit" in the URL and it will turn off readOnly
-    readOnly: window.location.hash.indexOf('edit') < 0
+    readOnly: window.location.hash.indexOf('readOnly') >= 0
   }
 
   constructor(props) {
@@ -74,15 +78,26 @@ export default class TeacherView extends React.Component {
       locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
       timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
     }
+
+    this.fieldValidator = new AssignmentFieldValidator()
+  }
+
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+  }
+
+  handleBeforeUnload = event => {
+    if (this.state.isDirty) {
+      event.preventDefault()
+      event.returnValue = ''
+    }
   }
 
   // @param value: the new value. may be a scalar, an array, or an object.
-  // @param path: where w/in the assignment it should go. May be a string representing
-  //     the dot-separated path (e.g. 'assignmentOverrides.nodes.0`) or an array
-  //     of steps (e.g. ['assignmentOverrides', 'nodes', 0] (which could also be '0'))
+  // @param path: where w/in the assignment it should go as a string representing
+  //     the dot-separated path (e.g. 'assignmentOverrides.nodes.0`) to the value
   updateWorkingAssignment(path, value) {
-    const dottedpath = Array.isArray(path) ? path.join('.') : path
-    const old = get(this.state.workingAssignment, dottedpath)
+    const old = get(this.state.workingAssignment, path)
     if (old === value) {
       return this.state.workingAssignment
     }
@@ -95,19 +110,8 @@ export default class TeacherView extends React.Component {
   // add or remove path from the set of invalid fields based on the new value
   // returns the updated set
   updateInvalids(path, value) {
-    const isValid = this.validate(path, value)
-    if (isValid) {
-      if (this.state.invalids[path]) {
-        const invalids = {...this.state.invalids}
-        delete invalids[path]
-        return invalids
-      }
-    } else if (!this.state.invalids[path]) {
-      const invalids = {...this.state.invalids}
-      invalids[path] = true
-      return invalids
-    }
-    return this.state.invalids
+    this.validate(path, value)
+    return this.fieldValidator.invalidFields()
   }
 
   // if the new value is different from the existing value, update TeacherView's react state
@@ -125,10 +129,20 @@ export default class TeacherView extends React.Component {
   }
 
   // validate the value at the path
+  // if path points into an override, extract the override from the assignment
+  // and pass it as the context in which to validate the value
   validate = (path, value) => {
-    const isValid = validate(path, value)
+    let context = this.state.workingAssignment
+    const match = pathToOverrides.exec(path)
+    if (match) {
+      // extract the override
+      context = get(this.state.workingAssignment, match[0])
+    }
+    const isValid = this.fieldValidator.validate(path, value, context)
     return isValid
   }
+
+  invalidMessage = path => this.fieldValidator.errorMessage(path)
 
   isAssignmentValid = () => Object.keys(this.state.invalids).length === 0
 
@@ -175,7 +189,15 @@ export default class TeacherView extends React.Component {
   }
 
   handleCancel = () => {
-    this.setState({workingAssignment: this.props.assignment, isDirty: false, invalids: {}})
+    this.setState((state, props) => {
+      // revalidate the current invalid fields with the original values
+      Object.keys(state.invalids).forEach(path => this.validate(path, get(props.assignment, path)))
+      return {
+        workingAssignment: this.props.assignment,
+        isDirty: false,
+        invalids: this.fieldValidator.invalidFields()
+      }
+    })
   }
 
   handleSave(saveAssignment) {
@@ -188,8 +210,10 @@ export default class TeacherView extends React.Component {
             name: assignment.name,
             description: assignment.description,
             state: assignment.state,
-            // ,dueAt: assignment.due_at,
-            pointsPossible: parseFloat(assignment.pointsPossible)
+            pointsPossible: parseFloat(assignment.pointsPossible),
+            dueAt: assignment.dueAt,
+            unlockAt: assignment.unlockAt,
+            lockAt: assignment.lockAt
           }
         })
       })
@@ -327,52 +351,63 @@ export default class TeacherView extends React.Component {
     const assignment = this.state.workingAssignment
     const clazz = classnames('assignments-teacher', {dirty})
     return (
-      <TeacherViewContext.Provider value={this.contextValue}>
-        <div className={clazz}>
-          {this.renderDeleteDialog()}
-          <ScreenReaderContent>
-            <h1>{assignment.name}</h1>
-          </ScreenReaderContent>
-          <Mutation
-            mutation={SAVE_ASSIGNMENT}
-            onCompleted={this.handleSaveSuccess}
-            onError={this.handleSaveError}
-          >
-            {saveAssignment => (
-              <React.Fragment>
-                <Header
-                  assignment={assignment}
-                  onChangeAssignment={this.handleChangeAssignment}
-                  onValidate={this.validate}
-                  onSetWorkstate={newState => this.handleSetWorkstate(saveAssignment, newState)}
-                  onUnsubmittedClick={this.handleUnsubmittedClick}
-                  onDelete={this.handleDeleteButtonPressed}
-                  readOnly={this.props.readOnly}
-                />
-                <ContentTabs
-                  assignment={assignment}
-                  onChangeAssignment={this.handleChangeAssignment}
-                  onValidate={this.validate}
-                  readOnly={this.props.readOnly}
-                />
-                {this.renderMessageStudentsWhoDialog()}
-                {dirty || !this.isAssignmentValid() ? (
-                  <TeacherFooter
-                    onCancel={this.handleCancel}
-                    onSave={() => this.handleSave(saveAssignment)}
-                    onPublish={() => this.handlePublish(saveAssignment)}
+      <ErrorBoundary
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorCategory={I18n.t('Assignments 2 Teacher View Error Page')}
+          />
+        }
+      >
+        <TeacherViewContext.Provider value={this.contextValue}>
+          <div className={clazz}>
+            {this.renderDeleteDialog()}
+            <ScreenReaderContent>
+              <h1>{assignment.name}</h1>
+            </ScreenReaderContent>
+            <Mutation
+              mutation={SAVE_ASSIGNMENT}
+              onCompleted={this.handleSaveSuccess}
+              onError={this.handleSaveError}
+            >
+              {saveAssignment => (
+                <React.Fragment>
+                  <Header
+                    assignment={assignment}
+                    onChangeAssignment={this.handleChangeAssignment}
+                    onValidate={this.validate}
+                    invalidMessage={this.invalidMessage}
+                    onSetWorkstate={newState => this.handleSetWorkstate(saveAssignment, newState)}
+                    onUnsubmittedClick={this.handleUnsubmittedClick}
+                    onDelete={this.handleDeleteButtonPressed}
+                    readOnly={this.props.readOnly}
                   />
-                ) : null}
-              </React.Fragment>
-            )}
-          </Mutation>
-          <Portal open={this.state.isSaving}>
-            <Mask fullscreen>
-              <Spinner size="large" title={I18n.t('Saving assignment')} />
-            </Mask>
-          </Portal>
-        </div>
-      </TeacherViewContext.Provider>
+                  <ContentTabs
+                    assignment={assignment}
+                    onChangeAssignment={this.handleChangeAssignment}
+                    onValidate={this.validate}
+                    invalidMessage={this.invalidMessage}
+                    readOnly={this.props.readOnly}
+                  />
+                  {this.renderMessageStudentsWhoDialog()}
+                  {dirty || !this.isAssignmentValid() ? (
+                    <TeacherFooter
+                      onCancel={this.handleCancel}
+                      onSave={() => this.handleSave(saveAssignment)}
+                      onPublish={() => this.handlePublish(saveAssignment)}
+                    />
+                  ) : null}
+                </React.Fragment>
+              )}
+            </Mutation>
+            <Portal open={this.state.isSaving}>
+              <Mask fullscreen>
+                <Spinner size="large" title={I18n.t('Saving assignment')} />
+              </Mask>
+            </Portal>
+          </div>
+        </TeacherViewContext.Provider>
+      </ErrorBoundary>
     )
   }
 }

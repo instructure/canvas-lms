@@ -34,6 +34,8 @@ import './jquery.loadingImg'
 import './vendor/date' // Date.parse
 import './vendor/jquery.scrollTo'
 
+let reportsTabHasLoaded = false
+
   export function openReportDescriptionLink (event) {
     event.preventDefault();
     var title = $(this).parents('.title').find('span.title').text();
@@ -122,7 +124,57 @@ import './vendor/jquery.scrollTo'
     $('#account_settings_tabs')
     .tabs({
       beforeActivate: (event, ui) => {
-        if (ui.newTab.context.id === 'tab-security-link') {
+        if (ui.newTab.context.id === 'tab-reports-link' && !reportsTabHasLoaded) {
+          reportsTabHasLoaded = true
+          const splitContext = window.ENV.context_asset_string.split('_')
+          fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`).then(req => req.text()).then(html => {
+            $('#tab-reports').html(html)
+
+            $(".open_report_description_link").click(openReportDescriptionLink);
+
+            $(".run_report_link").click(function(event) {
+              event.preventDefault();
+              $(this).parent("form").submit();
+            });
+
+            $(".run_report_form").formSubmit({
+              resetForm: true,
+              beforeSubmit: function(data) {
+                $(this).loadingImage();
+                return true;
+              },
+              success: function(data) {
+                $(this).loadingImage('remove');
+                var report = $(this).attr('id').replace('_form', '');
+                $("#" + report).find('.run_report_link').hide()
+                  .end().find('.configure_report_link').hide()
+                  .end().find('.running_report_message').show();
+                $(this).parent(".report_dialog").dialog('close');
+              },
+              error: function(data) {
+                $(this).loadingImage('remove');
+                $(this).parent(".report_dialog").dialog('close');
+              }
+            });
+
+            $(".configure_report_link").click(function(event) {
+              event.preventDefault();
+              var data = $(this).data(),
+                $dialog = data.$report_dialog;
+              if (!$dialog) {
+                $dialog = data.$report_dialog = $(this).parent("td").find(".report_dialog").dialog({
+                  autoOpen: false,
+                  width: 400,
+                  title: I18n.t('titles.configure_report', 'Configure Report')
+                });
+              }
+              $dialog.dialog('open');
+            })
+
+          }).catch(() => {
+            $('#tab-reports').text(I18n.t('There are no reports for you to view.'))
+          })
+        } else if (ui.newTab.context.id === 'tab-security-link') {
           // Set up axios and send a prefetch request to get the data we need,
           // this should make things appear to be much quicker once the bundle
           // loads in.
@@ -291,46 +343,7 @@ import './vendor/jquery.scrollTo'
     // Admins tab
     $(".add_users_link").click(addUsersLink);
 
-    $(".open_report_description_link").click(openReportDescriptionLink);
 
-    $(".run_report_link").click(function(event) {
-      event.preventDefault();
-      $(this).parent("form").submit();
-    });
-
-    $(".run_report_form").formSubmit({
-      resetForm: true,
-      beforeSubmit: function(data) {
-        $(this).loadingImage();
-        return true;
-      },
-      success: function(data) {
-        $(this).loadingImage('remove');
-        var report = $(this).attr('id').replace('_form', '');
-        $("#" + report).find('.run_report_link').hide()
-          .end().find('.configure_report_link').hide()
-          .end().find('.running_report_message').show();
-        $(this).parent(".report_dialog").dialog('close');
-      },
-      error: function(data) {
-        $(this).loadingImage('remove');
-        $(this).parent(".report_dialog").dialog('close');
-      }
-    });
-
-    $(".configure_report_link").click(function(event) {
-      event.preventDefault();
-      var data = $(this).data(),
-        $dialog = data.$report_dialog;
-      if (!$dialog) {
-        $dialog = data.$report_dialog = $(this).parent("td").find(".report_dialog").dialog({
-          autoOpen: false,
-          width: 400,
-          title: I18n.t('titles.configure_report', 'Configure Report')
-        });
-      }
-      $dialog.dialog('open');
-    })
 
     $('.service_help_dialog').each(function(index) {
       var $dialog = $(this),

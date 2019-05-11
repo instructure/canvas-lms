@@ -57,7 +57,6 @@ module.exports = [
   'jquery.instructure_misc_helpers',
   'jquery.loadingImg',
   'compiled/str/i18nLolcalize',
-  'instructure',
 
   // 'jsx/shared/rce/RichContentEditor'
   'lodash',

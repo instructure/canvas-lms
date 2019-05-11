@@ -158,6 +158,60 @@ describe ContextModuleProgression do
         expect(module_progression.workflow_state).not_to eq 'bogus'
       end
     end
+
+    context "when post policies enabled" do
+      let(:assignment) { @course.assignments.create! }
+      let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
+
+      before(:each) do
+        @course.enable_feature!(:post_policies)
+        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
+        @submission = assignment.submit_homework(@user, body: "my homework")
+      end
+
+      it "does not evaluate requirements when grade has not posted" do
+        @submission.update!(score: 100, posted_at: nil)
+        progression = @module.context_module_progressions.find_by(user: @user)
+        requirement = {id: tag.id, type: "min_score", min_score: 90.0, score: nil}
+        expect(progression.incomplete_requirements).to include requirement
+      end
+
+      it "evaluates requirements when grade has posted" do
+        @submission.update!(score: 100, posted_at: 1.second.ago)
+        progression = @module.context_module_progressions.find_by(user: @user)
+        requirement = {id: tag.id, type: "min_score", min_score: 90.0}
+        expect(progression.requirements_met).to include requirement
+      end
+    end
+
+    context "when post policies not enabled" do
+      let(:assignment) { @course.assignments.create! }
+      let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
+
+      before(:each) do
+        @course.disable_feature!(:post_policies)
+        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
+        @submission = assignment.submit_homework(@user, body: "my homework")
+      end
+
+      it "does not evaluate requirements when assignment is muted" do
+        assignment.mute!
+        assignment.reload
+        @submission.update!(score: 100)
+        progression = @module.context_module_progressions.find_by(user: @user)
+        requirement = {id: tag.id, type: "min_score", min_score: 90.0, score: nil}
+        expect(progression.incomplete_requirements).to include requirement
+      end
+
+      it "evaluates requirements when assignment is not muted" do
+        assignment.unmute!
+        assignment.reload
+        @submission.update!(score: 100)
+        progression = @module.context_module_progressions.find_by(user: @user)
+        requirement = {id: tag.id, type: "min_score", min_score: 90.0}
+        expect(progression.requirements_met).to include requirement
+      end
+    end
   end
 
   context "optimistic locking" do

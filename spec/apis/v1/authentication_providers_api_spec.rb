@@ -190,6 +190,36 @@ describe "AuthenticationProviders API", type: :request do
     end
   end
 
+  describe "/update" do
+    before :once do
+      @aac = @account.authentication_providers.create!(@saml_hash)
+    end
+
+    it "should allow updating without auth type" do
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
+                      {controller: 'authentication_providers',
+                       action: 'update',
+                       account_id: @account.id.to_s,
+                       id: @aac.to_param,
+                       format: 'json'},
+                      { authentication_provider: { log_in_url: 'http://example.com/updated_cool_log_in' } })
+      expect(json['log_in_url']).to eq 'http://example.com/updated_cool_log_in'
+    end
+
+    it "should error when changing the type" do
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
+                      {controller: 'authentication_providers',
+                       action: 'update',
+                       account_id: @account.id.to_s,
+                       id: @aac.to_param,
+                       format: 'json'},
+                      { authentication_provider: { log_in_url: 'http://example.com/updated_cool_log_in', auth_type: 'facebook' } },
+                      {},
+                      expected_status: 400)
+      expect(json['message']).to eq 'Can not change type of authorization config, please delete and create new config.'
+    end
+  end
+
   context "/show" do
     def call_show(id, status = 200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",

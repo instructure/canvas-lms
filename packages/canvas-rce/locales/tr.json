@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Ekle"
+  },
+  "all_4321c3a1": {
+    "message": "Tümü"
+  },
   "announcement_list_da155734": {
     "message": "Duyuru Listesi"
   },
@@ -7,9 +13,6 @@
   },
   "assignments_1e02582c": {
     "message": "Ödevler"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Arkaplan rengi, aşağı tuşa basın ve seçin"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -62,11 +65,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Bu öğeye bağlantı eklemek için tıklayınız"
   },
+  "close_d634289d": {
+    "message": "Kapat"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Flickr formunu kapat"
   },
   "collaborations_5c56c15f": {
     "message": "İşbirliğine Yönelik Çalışmalar"
+  },
+  "content_type_2cf90d95": {
+    "message": "İçerik Tipi"
   },
   "copyright_holder_66ee111": {
     "message": "Telif Sahibi:"
@@ -83,9 +92,6 @@
   "discussions_index_6c36ced": {
     "message": "Tartışma Başlıkları"
   },
-  "embed_image_1080badc": {
-    "message": "Görsel Ekle"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "arama ifadelerini gir"
   },
@@ -100,12 +106,6 @@
   },
   "folder_705fd2d7": {
     "message": "Klasör"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Biçimlendirme, aşağı tuşa basın ve seçin"
   },
   "grades_a61eba0a": {
     "message": "Notlar"
@@ -155,8 +155,14 @@
   "loading_25990131": {
     "message": "Yükleniyor..."
   },
+  "loading_bde52856": {
+    "message": "Yükleniyor"
+  },
   "loading_failed_b3524381": {
     "message": "Yükleme Başarısız..."
+  },
+  "media_af190855": {
+    "message": "Medya"
   },
   "modules_c4325335": {
     "message": "Modüller"
@@ -173,9 +179,6 @@
   "quizzes_7e598f57": {
     "message": "Kısa sınavlar"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
-  },
   "search_280d00bd": {
     "message": "Ara"
   },
@@ -185,11 +188,14 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Sırala"
+  },
+  "submit_a3cc6859": {
+    "message": "Gönder"
+  },
   "syllabus_f191f65b": {
     "message": "Ders Programı"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Yazı rengi, aşağı tuşa basın ve seçin"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Bu malzeme genel kullanıma açık"
@@ -208,6 +214,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Yeni bir görsel yükleyin"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Kullanım Şartları:"

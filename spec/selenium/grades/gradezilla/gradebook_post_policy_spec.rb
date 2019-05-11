@@ -119,7 +119,7 @@ describe 'Gradezilla Post Policy' do
 
     context 'when hide posted grades for everyone' do
       before :each do
-        skip('Unskip in GRADE-1938')
+        skip('Unskip in GRADE-2036')
         manually_post_grades('Everyone')
         wait_for_ajaximations
         Gradezilla.click_hide_grades(@assignment.id)
@@ -128,7 +128,7 @@ describe 'Gradezilla Post Policy' do
       end
 
       it 'header has HIDDEN', priority: '1', test_id: 3756682 do
-        skip('Unskip in GRADE-1938')
+        skip('Unskip in GRADE-2036')
         # TODO: expect header to have HIDDEN
       end
 
@@ -140,7 +140,7 @@ describe 'Gradezilla Post Policy' do
       end
 
       it 'hidden pill displayed in submission tray', priority: '1', test_id: 3756682 do
-        skip('Unskip in GRADE-1938')
+        skip('Unskip in GRADE-2036')
         Gradezilla::Cells.open_tray(@students2.first, @assignment)
         expect(Gradezilla::GradeDetailTray.hidden_pill).to be_displayed
       end
@@ -148,7 +148,7 @@ describe 'Gradezilla Post Policy' do
 
     context 'when hide posted grades for section' do
       before :each do
-        skip('Unskip in GRADE-1938')
+        skip('Unskip in GRADE-2036')
         manually_post_grades('Everyone')
         wait_for_ajaximations
         Gradezilla.click_hide_grades(@assignment.id)
@@ -158,7 +158,7 @@ describe 'Gradezilla Post Policy' do
       end
 
       it 'students in section have hidden grades', priority: '1', test_id: 3756683 do
-        skip('Unskip in GRADE-1938')
+        skip('Unskip in GRADE-2036')
         @students1.each do |student|
           verify_student_grade_displayed(student, '')
           # TODO: expect hidden icon to be displayed

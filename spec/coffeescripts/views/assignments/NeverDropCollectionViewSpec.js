@@ -26,14 +26,10 @@ class AssignmentStub extends Backbone.Model {
   constructor(...args) {
     {
       // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) {
-        super()
-      }
-      const thisFn = (() => {
-        this
-      }).toString()
-      const thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.lastIndexOf(';')).trim()
-      eval(`${thisName} = this;`)
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      eval(`${thisName} = this;`);
     }
     this.toView = this.toView.bind(this)
     super(...args)

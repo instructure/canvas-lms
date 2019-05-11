@@ -140,22 +140,32 @@ describe "course settings" do
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
+  end
+
+  describe 'csp settings' do
+    before(:once) do
+      @csp_account = Account.create!(name: 'csp account')
+      @csp_account.enable_feature!(:javascript_csp)
+      @csp_account.enable_csp!
+      @csp_course = @csp_account.courses.create!(name: 'csp course')
+      @csp_user = User.create!(name: 'csp user')
+      @csp_user.accept_terms
+      @csp_user.register!
+      @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: 'csp@example.com')
+      @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
+    end
+
+    before(:each) {create_session(@csp_pseudonym)}
 
     it "should not allow teachers to click CSP check" do
-      Account.default.enable_feature!(:javascript_csp)
-      Account.default.enable_csp!
-      get "/courses/#{@course.id}/settings"
-
+      get "/courses/#{@csp_course.id}/settings"
       f('.course_form_more_options_link').click
-
       expect(f("#csp_options input[type='checkbox']")).not_to be_enabled
     end
 
     it "should save CSP check by admin" do
-      course_with_admin_logged_in
-      Account.default.enable_feature!(:javascript_csp)
-      Account.default.enable_csp!
-      get "/courses/#{@course.id}/settings"
+      @csp_account.account_users.create!(user: @csp_user)
+      get "/courses/#{@csp_course.id}/settings"
 
       f('.course_form_more_options_link').click
       expect(f("#csp_options input[type='checkbox']")).to be_enabled

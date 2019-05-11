@@ -1031,6 +1031,18 @@ tr:
         default: 
           recently_deleted_courses: 
             text: "Bu rapor son 30 gündeki silinen tüm dönem içerisindeki dersleri vermektedir. Oluşturulan CSV dosyasında ders kimliği , ders öbs numarası, dersin kısa ismi, ders ismi ve dersin başlama bitiş tarihleri yer almaktadır."
+    reports_tab: 
+      headers: 
+        report_last_run: "Son Çalıştırılma"
+        report_name: Name
+      headings: 
+        sections: Raporlar
+      links: 
+        configure_report: Yapılandır...
+        run_report: "Raporu Çalıştır"
+      open_report_description: "Açık Rapor Açıklaması"
+      report_last_run_never: Asla
+      report_running: "Rapor oluşturuluyor. *Tamamlandığında bir eposta alacaksınız.*"
     retry_login: "Tekrar Oturum Aç"
     root_accounts: 
       labels: 
@@ -8008,6 +8020,7 @@ tr:
     keyboard_close_menu: "Güncel etkin ödev menüsünü kapat"
     keyboard_comment_desc: "Etkin gönderiye yorum yap"
     keyboard_sort_desc: "Güncel etkin sütundaki ızgara üzerinde sıralayın"
+    mic_blocked_message: "Mikrofonu kullanma izni engellenmiş. Değiştirmek için chrome://settings/contentExceptions\\#media-stream"
     mute_assignment: "Ödevi Beklet"
     no_assignments_have_points_warning: "Bir ödevde olası puanlar olmadıkça not hesaplanamaz"
     no_submission_time: "ödev gönderme zamanı yok"
@@ -9133,6 +9146,9 @@ tr:
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
   include_unpublished_assignments_83ebbaec: "Yayınlanmamış Ödevleri Dahil et"
   include_unpublished_courses_7a0e7aab: "Yayınlanmamış Dersleri Dahil Et"
+  incompleteregistration: 
+    get_started: Başlayın
+    welcome_to_canvas: "Canvas'a Hoşgeldiniz"
   incorrect_answer_7c17e63b: "Yanlış Cevap"
   incorrect_username_and_or_password_2de73abb: "Yanlış kullanıcı adı ve/veya şifre"
   increase_indent_6af90f7c: "İçerden başlama sınırını artır"
@@ -9339,6 +9355,7 @@ tr:
   key_settings_44df6a41: "Anahtar Ayarları"
   keyboard_shortcuts_ed1844bd: "Klavye Kısayolları"
   kind_7f0a88c4: Tür
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Bu tarihe kadar kilitle"
   last_enrollment_activity_10fe15ba: "Son Derse Kayıt Etkinliği"
@@ -14737,6 +14754,7 @@ tr:
     ? "true"
     : Doğru
   quizzes_7e598f57: "Kısa sınavlar"
+  quizzes_next_27c59ce3: Quizzes.Next
   range_8760934b: "Aralık: "
   range_name_90614433: "Aralık adı"
   ratings_2433172b: Oranlar

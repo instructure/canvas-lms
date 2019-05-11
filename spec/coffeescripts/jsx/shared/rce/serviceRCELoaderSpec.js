@@ -52,9 +52,12 @@ test('caches the response of get_module when called', assert => {
 
 test('handles callbacks once module is loaded', assert => {
   const done = assert.async()
-  RCELoader.loadRCE(() => {})
-  return RCELoader.loadRCE(module => {
-    ok(module.renderIntoDiv)
+
+  const spy = sinon.spy()
+  RCELoader.loadRCE(spy)
+  return RCELoader.loadRCE(RCE => {
+    equal(RCE, RCELoader.RCE)
+    ok(spy.calledOnceWith(RCELoader.RCE))
     done()
   })
 })

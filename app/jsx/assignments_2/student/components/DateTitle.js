@@ -35,7 +35,11 @@ function DateTitle(props) {
     <React.Fragment>
       <Heading margin="0 small 0 0" level="h1" as="h2" data-test-id="title">
         {/* We put 100 here because using auto maxes out at one line and the input for the assignment name never exeeds 100 */}
-        <TruncateText maxLines={isSticky ? 1 : 100} truncate="word" ellipsis="...">
+        <TruncateText
+          maxLines={isSticky ? 1 : 100}
+          truncate={isSticky ? 'character' : 'word'}
+          ellipsis="..."
+        >
           {assignment.name}
         </TruncateText>
       </Heading>

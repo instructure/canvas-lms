@@ -246,6 +246,7 @@ shared_context "in-process server selenium tests" do
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",
         "Failed prop type",
+        "Please either add a 'report-uri' directive, or deliver the policy via the 'Content-Security-Policy' header.",
         "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
         "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
         "In webpack, loading timezones on-demand is not",
@@ -256,6 +257,10 @@ shared_context "in-process server selenium tests" do
         # COMMS-1815: Meeseeks should fix this one on the permissions page
         "Warning: [Select] The option 'All Roles' doesn't correspond to an option.",
         "Warning: [Focusable] Exactly one tabbable child is required (0 found).",
+        "[View] display style is set to 'inline'",
+        "Uncaught TypeError: Failed to fetch",
+        "Uncaught Error: Not Found", # for canvas-rce when no backend is set up
+        "Uncaught Error: Minified React error #200", # this is coming from canvas-rce, but we should fix it
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/"
       ].freeze
 

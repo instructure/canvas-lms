@@ -17,7 +17,6 @@ module LtiAdvantage::Messages
       sub
       version
       target_link_uri
-      lti11_legacy_user_id
     ].freeze
 
     TYPED_ATTRIBUTES = {

@@ -31,18 +31,13 @@ const workingExport = {
   attachmentId: 'attachmentId'
 }
 
-let qunitTimeout
-
 QUnit.module('GradebookExportManager - constructor', {
   setup() {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1500
     moxios.install()
   },
 
   teardown() {
     moxios.uninstall()
-    QUnit.config.testTimeout = qunitTimeout
   }
 })
 
@@ -83,8 +78,6 @@ test('sets the existing export if it is not already completed or failed', functi
 
 QUnit.module('GradebookExportManager - monitoringUrl', {
   setup() {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1500
     moxios.install()
 
     this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
@@ -94,7 +87,6 @@ QUnit.module('GradebookExportManager - monitoringUrl', {
     moxios.uninstall()
 
     this.subject = undefined
-    QUnit.config.testTimeout = qunitTimeout
   }
 })
 
@@ -116,8 +108,6 @@ test('returns undefined if progressId is missing', function() {
 
 QUnit.module('GradebookExportManager - attachmentUrl', {
   setup() {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1500
     moxios.install()
 
     this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
@@ -127,7 +117,6 @@ QUnit.module('GradebookExportManager - attachmentUrl', {
     moxios.uninstall()
 
     this.subject = undefined
-    QUnit.config.testTimeout = qunitTimeout
   }
 })
 
@@ -149,8 +138,6 @@ test('returns undefined if attachmentId is missing', function() {
 
 QUnit.module('GradebookExportManager - startExport', {
   setup() {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1500
     moxios.install()
 
     const expectedExportFromServer = {
@@ -170,7 +157,6 @@ QUnit.module('GradebookExportManager - startExport', {
 
     this.subject.clearMonitor()
     this.subject = undefined
-    QUnit.config.testTimeout = qunitTimeout
   }
 })
 

@@ -24,12 +24,9 @@ import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderPro
 QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   let $container
   let props
-  let qunitTimeout
   let wrapper
 
   hooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // protect against unresolved async mistakes
     props = {
       detailsInitiallyVisible: true,
       gradingType: 'points',
@@ -73,7 +70,6 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   hooks.afterEach(() => {
     $container.remove()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   function getRadioInput({value = null, label = null} = {}) {

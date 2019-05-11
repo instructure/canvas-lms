@@ -42,4 +42,9 @@ class Version::Partitioner
   def self.log(*args)
     logger.info(*args) if logger
   end
+
+  def self.processed?
+    partman = CanvasPartman::PartitionManager.create(Version)
+    partman.partitions_created?(precreate_tables - 1)
+  end
 end

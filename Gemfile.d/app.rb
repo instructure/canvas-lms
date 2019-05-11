@@ -24,9 +24,7 @@ end
 
 gem 'rack', '2.0.6'
 
-# oauth2-1.4.0 caused issues with google oauth login flow, which needs to be
-# investigated as part of a future gem bump.
-gem 'oauth2', '1.2.0', require: false
+gem 'oauth2', '1.4.1', require: false
 
 gem 'rails-observers', '0.1.5'
 
@@ -39,7 +37,7 @@ gem 'active_model_serializers',   '0.9.0alpha1',
 gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.12.16'
+gem 'switchman', '1.13.0'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -59,6 +57,7 @@ gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.10', require: false
 gem 'bcrypt', '3.1.11'
+gem 'brotli', '0.2.0', require: false
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'

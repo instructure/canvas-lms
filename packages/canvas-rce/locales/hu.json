@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Hozzáadás"
+  },
+  "all_4321c3a1": {
+    "message": "Összes"
+  },
   "announcement_list_da155734": {
     "message": "Hirdetménylista"
   },
@@ -7,9 +13,6 @@
   },
   "assignments_1e02582c": {
     "message": "Feladatok"
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Háttérszín, nyomja le a kiválasztáshoz"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -62,11 +65,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "Bezár"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "Együttműködés"
+  },
+  "content_type_2cf90d95": {
+    "message": "Tartalom típusa "
   },
   "copyright_holder_66ee111": {
     "message": "Jog tulajdonosa:"
@@ -83,9 +92,6 @@
   "discussions_index_6c36ced": {
     "message": "Fórumok indexe"
   },
-  "embed_image_1080badc": {
-    "message": "Beágyazott kép"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "keresőszavak megadása"
   },
@@ -100,12 +106,6 @@
   },
   "folder_705fd2d7": {
     "message": "Mappa"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Betűméret, nyomja le a kiválasztáshoz"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formázás, nyomja le a kiválasztáshoz"
   },
   "grades_a61eba0a": {
     "message": "Értékelések"
@@ -155,8 +155,14 @@
   "loading_25990131": {
     "message": "Betöltés..."
   },
+  "loading_bde52856": {
+    "message": "Töltődik"
+  },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
+  },
+  "media_af190855": {
+    "message": "Média"
   },
   "modules_c4325335": {
     "message": "Modulok"
@@ -173,9 +179,6 @@
   "quizzes_7e598f57": {
     "message": "Kvízek"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Vizuális szövegterület, nyomja le az ALT+F8-at a segítséghez"
-  },
   "search_280d00bd": {
     "message": "Keresés"
   },
@@ -185,11 +188,11 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "submit_a3cc6859": {
+    "message": "Beküldés"
+  },
   "syllabus_f191f65b": {
     "message": "Tematika"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Szövegszín, nyomja le a kiválasztáshoz"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Az anyag a közkincs kategóriába tartozik"
@@ -208,6 +211,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Új kép feltöltése"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Felhasználási jog:"

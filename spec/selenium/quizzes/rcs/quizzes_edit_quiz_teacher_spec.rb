@@ -36,7 +36,6 @@ describe 'editing a quiz' do
   context 'as a teacher' do
     before(:once) do
       course_with_teacher(active_all: true)
-      enable_all_rcs @course.account
       create_quiz_with_due_date
     end
 

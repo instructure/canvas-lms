@@ -30,6 +30,7 @@ function renderDetails(assignment, props = {}) {
       assignment={assignment}
       onChangeAssignment={() => {}}
       onValidate={() => true}
+      invalidMessage={() => undefined}
       {...props}
     />
   )
@@ -67,7 +68,7 @@ describe('Assignent Details', () => {
 
     expect(getByText('Section A')).toBeInTheDocument()
     expect(getByText('Section B')).toBeInTheDocument()
-    expect(queryAllByText('Everyone', {exact: false})).toHaveLength(0)
+    expect(queryAllByText('Everyone', {exact: false})).toHaveLength(1)
   })
 
   it('renders the Add Override button if !readOnly', () => {

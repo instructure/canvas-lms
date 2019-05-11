@@ -34,11 +34,13 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
 
     context = {
       assignment: {
+        anonymizeStudents: false,
         gradesPublished: true,
         id: '2301',
         name: 'Math 1.1'
       },
-      onExited: sinon.spy()
+      onExited: sinon.spy(),
+      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}]
     }
 
     const bindRef = ref => {
@@ -80,6 +82,19 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     return [...$tray.querySelectorAll('button')].find($button => $button.textContent === 'Hide')
   }
 
+  function getLabel(text) {
+    const $tray = getTrayElement()
+    return [...$tray.querySelectorAll('label')].find($label => $label.textContent === text)
+  }
+
+  function getSectionToggleInput() {
+    return document.getElementById(getLabel('Specific Sections').htmlFor)
+  }
+
+  function getSectionInput(sectionName) {
+    return document.getElementById(getLabel(sectionName).htmlFor)
+  }
+
   async function show() {
     tray.show(context)
     await waitForElement(getTrayElement)
@@ -107,6 +122,24 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       const heading = getTrayElement().querySelector('h2')
       equal(heading.textContent, 'Math 1.1')
     })
+
+    test('resets the "Specific Sections" toggle', async () => {
+      getSectionToggleInput().click()
+      await show()
+      strictEqual(getSectionToggleInput().checked, false)
+    })
+
+    test('resets the selected sections', async () => {
+      const hideAssignmentGradesForSectionsStub = sinon.stub(Api, 'hideAssignmentGradesForSections')
+      getSectionToggleInput().click()
+      getSectionInput('Sophomores').click()
+      await show()
+      getSectionToggleInput().click()
+      getSectionInput('Freshmen').click()
+      getHideButton().click()
+      deepEqual(hideAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
+      hideAssignmentGradesForSectionsStub.restore()
+    })
   })
 
   QUnit.module('"Close" Icon Button', hooks => {
@@ -118,6 +151,26 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       getCloseIconButton().click()
       await waitForTrayClosed()
       notOk(getTrayElement())
+    })
+  })
+
+  QUnit.module('"Specific Sections" toggle', hooks => {
+    hooks.beforeEach(async () => {
+      await show()
+    })
+
+    test('does not display the sections when unchecked', () => {
+      notOk(getLabel('Freshmen'))
+    })
+
+    test('shows the sections when checked', () => {
+      getSectionToggleInput().click()
+      ok(getSectionInput('Freshmen'))
+    })
+
+    test('is not shown when there are no sections', async () => {
+      await show({sections: []})
+      notOk(getLabel('Freshmen'))
     })
   })
 
@@ -186,7 +239,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     })
 
     test('the rendered success alert contains a message', async () => {
-      const successMessage = 'Assignment grades successfully hidden.'
+      const successMessage = 'Success! Grades have been hidden for Math 1.1.'
       await clickHide()
       strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
     })
@@ -206,11 +259,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     })
 
     test('is disabled when assignment has not yet had grades published', async () => {
-      context.assignment = {
-        gradesPublished: false,
-        id: '2301',
-        name: 'an assignment'
-      }
+      context.assignment.gradesPublished = false
       await show()
       strictEqual(getHideButton().disabled, true)
     })
@@ -242,6 +291,76 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       test('"Hide" button is re-enabled', async () => {
         await clickHide()
         strictEqual(getHideButton().disabled, false)
+      })
+    })
+
+    QUnit.module('when hiding assignment grades for sections', contextHooks => {
+      let hideAssignmentGradesForSectionsStub
+
+      contextHooks.beforeEach(async () => {
+        hideAssignmentGradesForSectionsStub = sinon
+          .stub(Api, 'hideAssignmentGradesForSections')
+          .returns(Promise.resolve({id: PROGRESS_ID, workflowState: 'queued'}))
+
+        await show()
+        getSectionToggleInput().click()
+      })
+
+      contextHooks.afterEach(() => {
+        hideAssignmentGradesForSectionsStub.restore()
+      })
+
+      test('is disabled when assignment is anonymous grading', async () => {
+        context.assignment.anonymizeStudents = true
+        await show()
+        strictEqual(getSectionToggleInput().disabled, true)
+      })
+
+      test('renders an error when no sections are selected', async () => {
+        getHideButton().click()
+        await waitTillFinishedHiding()
+        strictEqual(showFlashAlertStub.callCount, 1)
+      })
+
+      test('the rendered error contains a message when no sections are selected', async () => {
+        const errorMessage = 'At least one section must be selected to hide grades by section.'
+        getHideButton().click()
+        strictEqual(showFlashAlertStub.firstCall.args[0].message, errorMessage)
+      })
+
+      test('render a success message when sections are selected and hiding is successful', async () => {
+        const successMessage =
+          'Success! Grades have been hidden for the selected sections of Math 1.1.'
+        getSectionInput('Sophomores').click()
+        await clickHide()
+        strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
+      })
+
+      test('calls hideAssignmentGradesForSections', async () => {
+        getSectionInput('Sophomores').click()
+        await clickHide()
+        strictEqual(hideAssignmentGradesForSectionsStub.callCount, 1)
+      })
+
+      test('passes the assignment id to hideAssignmentGradesForSections', async () => {
+        getSectionInput('Sophomores').click()
+        await clickHide()
+        strictEqual(hideAssignmentGradesForSectionsStub.firstCall.args[0], '2301')
+      })
+
+      test('passes section ids to hideAssignmentGradesForSections', async () => {
+        getSectionInput('Freshmen').click()
+        getSectionInput('Sophomores').click()
+        await clickHide()
+        deepEqual(hideAssignmentGradesForSectionsStub.firstCall.args[1], ['2001', '2002'])
+      })
+
+      test('deselecting a section excludes it from being hidden', async () => {
+        getSectionInput('Freshmen').click()
+        getSectionInput('Sophomores').click()
+        getSectionInput('Sophomores').click()
+        await clickHide()
+        deepEqual(hideAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
       })
     })
   })

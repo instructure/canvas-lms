@@ -854,6 +854,9 @@ class CoursesController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
   #
+  # @argument sort [String, "username"|"last_login"|"email"|"sis_id"]
+  #   When set, sort the results of the search based on the given field.
+  #
   # @argument enrollment_type[] [String, "teacher"|"student"|"student_view"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
   #   "student_view" implies include[]=test_student.
@@ -915,7 +918,7 @@ class CoursesController < ApplicationController
         #backcompat limit param
         params[:per_page] ||= params[:limit]
 
-        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
+        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort)
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && value_to_boolean(params[:include_inactive])
 
         search_params[:include_inactive_enrollments] = true if include_inactive
@@ -1817,7 +1820,7 @@ class CoursesController < ApplicationController
           add_crumb(t('#crumbs.modules', "Modules"))
           load_modules
         when 'syllabus'
-          rce_js_env(:sidebar)
+          rce_js_env
           add_crumb(t('#crumbs.syllabus', "Syllabus"))
           @groups = @context.assignment_groups.active.order(
             :position,
@@ -2678,18 +2681,17 @@ class CoursesController < ApplicationController
       f.updated = Time.now
       f.id = course_url(@context)
     end
-    unless Setting.get('public_feed_disabled', 'false') == 'true'
-      @entries = []
-      @entries.concat @context.assignments.published
-      @entries.concat @context.calendar_events.active
-      @entries.concat(@context.discussion_topics.published.select{ |dt|
-        !dt.locked_for?(@current_user, :check_policies => true)
-      })
-      @entries.concat @context.wiki_pages.published
-      @entries = @entries.sort_by{|e| e.updated_at}
-      @entries.each do |entry|
-        feed.entries << entry.to_atom(:context => @context)
-      end
+
+    @entries = []
+    @entries.concat Assignments::ScopedToUser.new(@context, @current_user, @context.assignments.published).scope
+    @entries.concat @context.calendar_events.active
+    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select{ |dt|
+      !dt.locked_for?(@current_user, :check_policies => true)
+    }
+    @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
+    @entries = @entries.sort_by{|e| e.updated_at}
+    @entries.each do |entry|
+      feed.entries << entry.to_atom(:context => @context)
     end
     respond_to do |format|
       format.atom { render :plain => feed.to_xml }

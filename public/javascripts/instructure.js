@@ -22,7 +22,6 @@ import I18n from 'i18n!instructure'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'
-import userSettings from 'compiled/userSettings'
 import htmlEscape from './str/htmlEscape'
 import preventDefault from 'compiled/fn/preventDefault'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
@@ -48,7 +47,6 @@ import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import 'compiled/behaviors/trackEvent'
-import 'compiled/badge_counts'
 
 function handleYoutubeLink () {
   const $link = $(this)

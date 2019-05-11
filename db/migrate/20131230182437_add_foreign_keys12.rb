@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AddForeignKeys12 < ActiveRecord::Migration[4.2]
-  tag :postdeploy
+  tag :predeploy
   disable_ddl_transaction!
 
   def self.up

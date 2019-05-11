@@ -1002,6 +1002,18 @@ fa:
         default: 
           recently_deleted_courses: 
             text: "این گزارش همه درس های یک نیمسال خاص را که در 30 روز گذشته حذف شده اند، نشان می دهد. فایل csv به دست آمده برای هر درس یک ردیف دارد و شناسه درس، شناسه درس در سامانه اطلاعات دانشجو، نام کوتاه درس، نام درس و تاریخ های شروع و پایان درس را نشان خواهد داد."
+    reports_tab: 
+      headers: 
+        report_last_run: "آخرین اجرا"
+        report_name: نام
+      headings: 
+        sections: "گزارش ها"
+      links: 
+        configure_report: پیکربندی...
+        run_report: "اجرای گزارش"
+      open_report_description: "باز کردن شرح گزارش"
+      report_last_run_never: هرگز
+      report_running: "این گزارش در حال اجرا است. *در صورت اتمام، یک نامه الکترونیکی دریافت خواهید کرد.*"
     retry_login: "تلاش دوباره برای ورود"
     root_accounts: 
       labels: 
@@ -2389,6 +2401,9 @@ fa:
       speed_grader: "برنامه نمره گذاری سریع™"
       titles: 
         related_items: "موردهای مرتبط"
+    grade_gpa_scale_screenreader: "نمره: {grade}%"
+    grade_letter_grade_screenreader: "نمره: {grade}%"
+    grade_pass_fail_screenreader: "نمره: {grade}%"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "نمره: %{grade}%"
     grading_type_selector: 
@@ -7992,7 +8007,7 @@ fa:
       no_students_in_groups_close: "متأسفانه موردهای ارسالی این تکلیف را نمی توان در برنامه نمره گذاری سریع نمره گذاری کرد، زیرا کاربری به آن تخصیص داده نشده است. لطفا کاربران را به این مجموعه گروه تخصیص دهید و دوباره سعی کنید. روی دکمه 'تایید' کلیک کنید تا این پنجره بسته شود."
       no_students_in_section: "هیچ دانشجویی در این بخش یافت نشد، در حال بازگشت برای نشان دادن همه بخش ها."
       scores_updated: 
-        one: "%{count} نمره دانشجو به روز شد."
+        one: "%{count} نمره دانشجو به روز شد"
         other: "%{count} نمره دانشجو به روز شد"
     all_sections: "همه بخش‌ها"
     allow_message: "برای آغاز ثبت، روی دکمه \"اجازه دادن» کلیک کنید."
@@ -9361,6 +9376,9 @@ fa:
   include_unpublished_courses_7a0e7aab: "شامل سازی درس های منتشر نشده"
   incomplete_95612d72: ناقص
   incomplete_da3c2ea2: ناقص
+  incompleteregistration: 
+    get_started: "شروع به کار"
+    welcome_to_canvas: "به کانواس خوش آمدید!"
   incorrect_answer_7c17e63b: "پاسخ نادرست"
   incorrect_username_and_or_password_2de73abb: "نام کاربری و/یا رمز عبور اشتباه است"
   increase_indent_6af90f7c: "افزایش تورفتگی"
@@ -9606,6 +9624,7 @@ fa:
     esc_key_notification: "قبل از استفاده از میانبرهای صفحه کلید در هنگام پیمایش شبکه دفتر نمره، کلید escape را فشار دهید."
   keyboard_shortcuts_ed1844bd: "میانبرهای صفحه کلید"
   kind_7f0a88c4: نوع
+  label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "قفل کردن تا تاریخ"
   last_e159dbd: آخرین

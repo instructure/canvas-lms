@@ -19,7 +19,15 @@
 import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
 import AssignmentName from '../AssignmentName'
-import {validate} from '../../../Validators'
+import AssignmentFieldValidator from '../../../AssignentFieldValidator'
+
+const afv = new AssignmentFieldValidator()
+function validate() {
+  return afv.validate(...arguments)
+}
+function errorMessage() {
+  return afv.errorMessage(...arguments)
+}
 
 function renderAssignmentName(props) {
   return render(
@@ -28,6 +36,7 @@ function renderAssignmentName(props) {
       onChange={() => {}}
       onChangeMode={() => {}}
       onValidate={validate}
+      invalidMessage={errorMessage}
       name="the name"
       {...props}
     />
@@ -86,6 +95,7 @@ describe('AssignmentName', () => {
           onChange={onChange}
           onChangeMode={onChangeMode}
           onValidate={() => true}
+          invalidMessage={() => undefined}
           name="the name"
         />
         <span id="focus-me" tabIndex="-1">
@@ -100,16 +110,5 @@ describe('AssignmentName', () => {
 
     expect(onChangeMode).toHaveBeenCalledWith('view')
     expect(onChange).toHaveBeenCalledWith('new name')
-  })
-
-  it('reverts to the old value on Escape', () => {
-    const onChange = jest.fn()
-    const {getByDisplayValue} = renderAssignmentName({mode: 'edit', onChange})
-
-    const input = getByDisplayValue('the name')
-    fireEvent.input(input, {target: {value: 'x'}})
-    fireEvent.keyDown(input, {key: 'Escape', code: 27})
-    expect(onChange).toHaveBeenCalledWith('x')
-    expect(onChange).toHaveBeenCalledWith('the name')
   })
 })

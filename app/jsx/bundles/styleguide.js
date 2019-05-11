@@ -18,13 +18,10 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import React from 'react'
-import ReactDOM from 'react-dom'
 import preventDefault from 'compiled/fn/preventDefault'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import PublishIconView from 'compiled/views/PublishIconView'
 import Backbone from 'Backbone'
-import 'jqueryui/accordion'
 import 'jqueryui/tabs'
 import 'jqueryui/button'
 import 'jqueryui/tooltip'

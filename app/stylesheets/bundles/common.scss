@@ -36,11 +36,9 @@
 // Canvas components and area-specific styles
 @import "components/buttons";
 @import "components/ic-code";
-@import "components/deprecated/chevron_crumbs";
 @import "components/deprecated/legacy_buttons";
 @import "components/deprecated/fancy_links";
 @import "components/deprecated/tooltip";
-@import "components/deprecated/ui_listview";
 @import "components/breadcrumbs";
 @import "components/admin_links";
 @import "components/broken-images";
@@ -51,7 +49,6 @@
 @import "components/gutters";
 @import "components/header_bar";
 @import "components/canvas-icons";
-@import "components/inst_tree";
 @import "components/misc";
 @import "components/new-and-total-badge";
 @import "components/react_modal";
@@ -81,7 +78,6 @@
 @import "base/print";
 @import "base/module_sequence_footer";
 @import "components/ic-typography";
-@import "components/accordion";
 @import "components/g_instructure";
 @import "components/tables";
 @import "components/tabs";
@@ -91,11 +87,9 @@
 @import "components/g_media_comments";
 @import "components/g_context_modules";
 @import "components/g_collaborations";
-@import "components/g_files";
 @import "components/g_wiki";
 @import "components/g_conference";
 @import "components/g_rubrics";
-@import "components/g_wiki_sidebar";
 @import "components/g_mini_calendar";
 @import "components/helpDialog";
 @import "components/ic-expand-link";

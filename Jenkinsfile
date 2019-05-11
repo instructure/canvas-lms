@@ -63,11 +63,10 @@ pipeline {
   }
 
   environment {
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-
-    // GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
-    // we want a name in the form '63.181863.8'
+    // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
@@ -86,6 +85,7 @@ pipeline {
       steps {
         timeout(time: 3) {
           script {
+            /* send message to gerrit */
             withGerritCredentials({ ->
               sh '''
                 gerrit_message="Gerrit Builder Started $JOB_BASE_NAME: canvas-lms:$NAME\n$BUILD_URL"
@@ -93,11 +93,16 @@ pipeline {
                   hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
               '''
             })
+
+            /* fetch plugins */
             gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
-            sh 'mv gerrit_builder/canvas-lms/config/* config/'
-            sh 'rmdir -p gerrit_builder/canvas-lms/config'
+            sh '''
+              mv gerrit_builder/canvas-lms/config/* config/
+              rmdir -p gerrit_builder/canvas-lms/config
+              cp docker-compose/config/selenium.yml config/
+            '''
           }
         }
       }
@@ -106,11 +111,18 @@ pipeline {
     stage('Rebase') {
       when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' } }
       steps {
-        sh '''
-          git config user.name $GERRIT_EVENT_ACCOUNT_NAME
-          git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
-          git rebase --preserve-merges origin/$GERRIT_BRANCH
-        '''
+        timeout(time: 2) {
+          sh '''
+            git config user.name $GERRIT_EVENT_ACCOUNT_NAME
+            git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
+            git rebase --preserve-merges origin/$GERRIT_BRANCH
+            rebase_exit_code="$?"
+            if [ $rebase_exit_code != 0 ]; then
+              echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+              git rebase --abort
+            fi
+          '''
+        }
       }
     }
 
@@ -122,14 +134,23 @@ pipeline {
       }
     }
 
+    stage('Smoke Test') {
+      steps {
+        timeout(time: 10) {
+          sh 'build/new-jenkins/smoke-test.sh'
+        }
+      }
+    }
+
     stage('Publish Image') {
       steps {
         timeout(time: 5) {
           script {
-            if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
-              sh 'docker push $PATCHSET_TAG'
-            } else {
-              // change-merged
+            // always push the patchset tag otherwise when a later
+            // patchset is merged this patchset tag is overwritten
+            sh 'docker push $PATCHSET_TAG'
+
+            if (env.GERRIT_EVENT_TYPE == 'change-merged') {
               sh '''
                 docker tag $PATCHSET_TAG $MERGE_TAG
                 docker push $MERGE_TAG
@@ -163,6 +184,12 @@ pipeline {
               hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
           '''
         })
+      }
+    }
+
+    cleanup {
+      script {
+        sh 'docker-compose down --volumes --rmi local'
       }
     }
   }

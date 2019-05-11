@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Opdrachten"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Achtergrondkleur, er op drukken om een optie te selecteren"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Houder van auteursrecht:"
   },
+  "course_documents_104d76e0": {
+    "message": "Cursusdocumenten"
+  },
+  "course_images_f8511d04": {
+    "message": "Cursusafbeeldingen"
+  },
+  "course_links_b56959b9": {
+    "message": "Cursuslinks"
+  },
+  "course_media_ec759ad": {
+    "message": "Cursusmedia"
+  },
   "course_navigation_dd035109": {
     "message": "Cursusnavigatie"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Discussieoverzicht"
-  },
-  "embed_image_1080badc": {
-    "message": "Afbeelding insluiten"
   },
   "enter_search_terms_e397b1f0": {
     "message": "zoektermen invoeren"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Map"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Tekstkleur, er op drukken om een optie te selecteren"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Opmaak, er op drukken om een optie te selecteren"
   },
   "grades_a61eba0a": {
     "message": "Cijfers"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Bezig met laden..."
   },
+  "loading_bde52856": {
+    "message": "Bezig met laden"
+  },
   "loading_failed_b3524381": {
     "message": "Laden mislukt..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Media opnemen/uploaden"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Druk ALT+F8 voor hulp"
-  },
   "search_280d00bd": {
     "message": "Zoeken"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Syllabus"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Tekstkleur, er op drukken om een optie te selecteren"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Het materiaal bevindt zich in het openbaar domein"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Met deze upload wordt het quotum voor bestandsopslag overschreden. Neem contact op met je systeembeheerder."
+  },
+  "tray_839df38a": {
+    "message": "Houder"
   },
   "upload_8b403d05": {
     "message": "Uploaden"

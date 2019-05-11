@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import EditorConfig from 'tinymce.config'
-import tinymce from 'compiled/editor/stocktiny'
 
 let INST = null
 const largeScreenWidth = 1300
@@ -82,7 +81,7 @@ test('calculating an external button clump', () => {
   INST.maxVisibleEditorButtons = 0
   const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
   const btns = config.external_buttons()
-  equal(btns, ',instructure_external_button_clump')
+  equal(btns, ' instructure_external_button_clump')
 })
 
 test('default config has static attributes', () => {
@@ -118,21 +117,4 @@ QUnit.module('Tinymce Config Integration', {
   teardown() {
     $('textarea#a42').remove()
   }
-})
-
-test('configured not to strip spans', assert => {
-  const start = assert.async()
-  assert.expect(1)
-  const $textarea = $('textarea#a42')
-  const config = new EditorConfig(tinymce, INST, 1000, 'a42')
-  const configHash = Object.assign(config.defaultConfig(), {
-    plugins: '',
-    external_plugins: {},
-    init_instance_callback(editor) {
-      const content = editor.setContent('<span></span>')
-      ok(content.match('<span></span>'))
-      start()
-    }
-  })
-  tinymce.init(configHash)
 })

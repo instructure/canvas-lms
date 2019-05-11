@@ -677,6 +677,17 @@ ko:
         default: 
           recently_deleted_courses: 
             text: "이 보고서는 지난 30일 동안 삭제된 해당 학기의 모든 과목을 표시합니다. 결과 csv 파일은 과목 당 하나의 행을 가지며, 과목 ID, 과목 SIS ID, 짧은 과목 이름, 과목 이름, 과목 시작 날짜와 끝 날짜를 표시합니다."
+    reports_tab: 
+      headers: 
+        report_last_run: "마지막 실행"
+        report_name: 이름
+      headings: 
+        sections: 보고서
+      links: 
+        configure_report: 구성...
+        run_report: "보고서 실행"
+      report_last_run_never: 전혀
+      report_running: "보고서를 작성 중입니다.*작업을 마치면 이메일을 발송합니다.*"
     retry_login: "로그인 다시 시도"
     root_accounts: 
       labels: 
@@ -2394,6 +2405,7 @@ ko:
     see_file: "%{file_name} 보기"
     see_quiz: "%{quiz_name} 보기"
     see_related_link: "관련 링크 보기"
+  calendar_event_89aadc1c: 행사
   calendar_events: 
     crumbs: 
       new: "새 행사"
@@ -6238,6 +6250,7 @@ ko:
         other: "토론 *%{count}*개"
     select: 
       prompt: "선택해 주십시오."
+  hidden_14a032a7: 비공개
   hide_e057ff36: 숨기기
   hide_score_total_for_assessment_results_d0ef117f: "평가 결과에 대한 총점 숨기기"
   highest_28ad71e6: 최고
@@ -6292,6 +6305,9 @@ ko:
     title_for_topics_category: "%{category} 주제"
     warnings: 
       truncated_wiki_title: "다음 위키 페이지의 제목이 잘렸습니다: %{title}"
+  incompleteregistration: 
+    get_started: 시작하기
+    welcome_to_canvas: "Canvas에 오신 것을 환영합니다!"
   incorrect_username_and_or_password_2de73abb: "유효하지 않은 사용자 이름이나 암호"
   info: 
     old_styleguide: 
@@ -9733,7 +9749,7 @@ ko:
       quiz_score_too_short: "점수는 0보다 커야 합니다."
       retrieving_filters_failed: "필터 검색 실패"
     ? "false"
-    : 오답
+    : 틀림
     file_uploaded_or_removed: 
       quizzes: 
         file_successfully_uploaded: "파일을 성공적으로 업로드했습니다."
@@ -10066,7 +10082,7 @@ ko:
           numerical: "숫자로 된 답변"
           short_answer: "공란 채우기"
           text_only: "내용(문제 없음)"
-          true_false: 참/거짓
+          true_false: 맞음/틀림
         show_possible_answers: "%{question}에 대한 가능한 답변 표시"
         show_possible_answers_no_question: "다음에 대한 가능한 답변을 표시"
         titles: 
@@ -10584,7 +10600,7 @@ ko:
     toggle_message: "퀴즈 표시 토\x1d글"
     top_level: ""
     ? "true"
-    : 참
+    : 맞음
   quizzes_7e598f57: 퀴즈
   ratings_2433172b: 등급
   re_upload_submissions_form: 

@@ -162,7 +162,7 @@ module Importers
         # be very explicit about draft state courses, but be liberal toward legacy courses
         if course.wiki.has_no_front_page
           if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
-            mig_id = CC::CCHelper.create_key(source.wiki.front_page)
+            mig_id = migration.content_export.create_key(source.wiki.front_page)
             if new_front_page = course.wiki_pages.where(migration_id: mig_id).first
               course.wiki.set_front_page_url!(new_front_page.url)
             end
@@ -335,7 +335,8 @@ module Importers
                 course.context_external_tools.having_setting('course_navigation') :
                 ContextExternalTool.find_all_for(course, :course_navigation)
             if tool = (all_tools.detect{|t| t.migration_id == tool_mig_id} ||
-                all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id})
+                all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id ||
+                  CC::CCHelper.create_key(t, global: true) == tool_mig_id})
               # translate the migration_id to a real id
               tab['id'] = "context_external_tool_#{tool.id}"
               tab_config << tab

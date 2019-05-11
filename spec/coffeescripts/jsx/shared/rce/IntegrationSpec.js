@@ -26,7 +26,6 @@ import editorUtils from 'helpers/editorUtils'
 QUnit.module('Rce Abstraction - integration', {
   setup() {
     fakeENV.setup()
-    ENV.RICH_CONTENT_CDN_HOST = 'fakeCDN.com'
     ENV.RICH_CONTENT_APP_HOST = 'app-host'
     const $textarea = $(`\
 <textarea id="big_rce_text" name="context[big_rce_text]"></textarea>\
@@ -70,18 +69,10 @@ async function loadNewEditor() {
 }
 
 test('instatiating a remote editor', async () => {
-  ENV.RICH_CONTENT_SERVICE_ENABLED = true
   RichContentEditor.preloadRemoteModule()
   const target = $('#big_rce_text')
   loadNewEditor()
   await wait(() => RCELoader.loadRCE.callCount > 0)
   equal(target.parent().attr('id'), 'tinymce-parent-of-big_rce_text')
   equal(target.parent().find('#fake-editor').length, 1)
-})
-
-test('instatiating a local editor', async () => {
-  ENV.RICH_CONTENT_SERVICE_ENABLED = false
-  RichContentEditor.preloadRemoteModule()
-  await loadNewEditor()
-  equal($('#fake-editor').length, 0)
 })

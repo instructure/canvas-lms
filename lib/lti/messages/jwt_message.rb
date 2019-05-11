@@ -73,7 +73,6 @@ module Lti::Messages
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
       @message.sub = old_lti_id || @user.lti_id
-      @message.lti11_legacy_user_id = Lti::Asset.opaque_identifier_for(@user, context: @context)
       @message.target_link_uri = @tool.extension_setting(@opts[:resource_type], :target_link_uri) || @tool.url
     end
 

@@ -32,12 +32,9 @@ QUnit.module('Gradebook', suiteHooks => {
   QUnit.module('#saveSettings()', hooks => {
     let onSuccess
     let onFailure
-    let qunitTimeout
     let server
 
     hooks.beforeEach(() => {
-      qunitTimeout = QUnit.config.testTimeout
-      QUnit.config.testTimeout = 500 // avoid accidental unresolved async
       server = new FakeServer()
 
       onSuccess = sinon.spy()
@@ -50,7 +47,6 @@ QUnit.module('Gradebook', suiteHooks => {
 
     hooks.afterEach(() => {
       server.teardown()
-      QUnit.config.testTimeout = qunitTimeout
     })
 
     async function saveSettings(additionalSettings = {}) {

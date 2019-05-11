@@ -802,11 +802,16 @@ class UsersController < ApplicationController
 
     # include concluded enrollments as well as active ones if requested
     include_concluded = params[:include].try(:include?, 'concluded')
-    @query   = params[:course].try(:[], :name) || params[:term]
-    @courses = @query.present? ?
-      @context.manageable_courses_name_like(@query, include_concluded) :
-      @context.manageable_courses(include_concluded).limit(500)
-    @courses = @courses.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
+    limit = 500
+    @query = params[:course].try(:[], :name) || params[:term]
+    @courses = []
+    Shard.with_each_shard(@context.in_region_associated_shards) do
+      scope = @query.present? ?
+        @context.manageable_courses_name_like(@query, include_concluded) :
+        @context.manageable_courses(include_concluded).limit(limit)
+      @courses += scope.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
+    end
+    @courses = @courses.sort_by(&:sort_key)[0, limit]
 
     cancel_cache_buster
     expires_in 30.minutes
@@ -2063,18 +2068,18 @@ class UsersController < ApplicationController
       f.updated = Time.now
       f.id = user_url(@context)
     end
-    unless Setting.get('public_feed_disabled', 'false') == 'true'
-      @entries = []
-      cutoff = 1.week.ago
-      @context.courses.each do |context|
-        @entries.concat context.assignments.published.where("updated_at>?", cutoff)
-        @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
-        @entries.concat context.discussion_topics.published.where("updated_at>?", cutoff)
-        @entries.concat context.wiki_pages.published.where("updated_at>?", cutoff)
-      end
-      @entries.each do |entry|
-        feed.entries << entry.to_atom(:include_context => true, :context => @context)
-      end
+    @entries = []
+    cutoff = 1.week.ago
+    @context.courses.each do |context|
+      @entries.concat Assignments::ScopedToUser.new(context, @current_user, context.assignments.published.where("assignments.updated_at>?", cutoff)).scope
+      @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
+      @entries.concat DiscussionTopic::ScopedToUser.new(context, @current_user, context.discussion_topics.published.where("discussion_topics.updated_at>?", cutoff)).scope.select { |dt|
+        !dt.locked_for?(@current_user, :check_policies => true)
+      }
+      @entries.concat WikiPages::ScopedToUser.new(context, @current_user, context.wiki_pages.published.where("wiki_pages.updated_at>?", cutoff)).scope
+    end
+    @entries.each do |entry|
+      feed.entries << entry.to_atom(:include_context => true, :context => @context)
     end
     respond_to do |format|
       format.atom { render :plain => feed.to_xml }
@@ -2154,6 +2159,54 @@ class UsersController < ApplicationController
   # should be considered irreversible. This will delete the user and move all
   # the data into the destination user.
   #
+  # User merge details and caveats:
+  # The from_user is the user that was deleted in the user_merge process.
+  # The destination_user is the user that remains, that is being split.
+  #
+  # Avatars:
+  # When both users have avatars, only the destination_users avatar will remain.
+  # When one user has an avatar, will it will end up on the destination_user.
+  #
+  # Terms of Use:
+  # If either user has accepted terms of use, it will be be left as accepted.
+  #
+  # Communication Channels:
+  # All unique communication channels moved to the destination_user.
+  # All notification preferences are moved to the destination_user.
+  #
+  # Enrollments:
+  # All unique enrollments are moved to the destination_user.
+  # When there is an enrollment that would end up making it so that a user would
+  # be observing themselves, the enrollment is not moved over.
+  # Everything that is tied to the from_user at the course level relating to the
+  # enrollment is also moved to the destination_user.
+  #
+  # Submissions:
+  # All submissions are moved to the destination_user. If there are enrollments
+  # for both users in the same course, we prefer submissions that have grades
+  # then submissions that have work in them, and if there are no grades or no
+  # work, they are not moved.
+  #
+  # Other notes:
+  # Access Tokens are moved on merge.
+  # Conversations are moved on merge.
+  # Favorites are moved on merge.
+  # Courses will commonly use LTI tools. LTI tools reference the user with IDs
+  # that are stored on a user object. Merging users deletes one user and moves
+  # all records from the deleted user to the destination_user. These IDs are
+  # kept for all enrollments, group_membership, and account_users for the
+  # from_user at the time of the merge. When the destination_user launches an
+  # LTI tool from a course that used to be the from_user's, it doesn't appear as
+  # a new user to the tool provider. Instead it will send the stored ids. The
+  # destination_user's LTI IDs remain as they were for the courses that they
+  # originally had. Future enrollments for the destination_user will use the IDs
+  # that are on the destination_user object. LTI IDs that are kept and tracked
+  # per context include lti_context_id, lti_id and uuid. APIs that return the
+  # LTI ids will return the one for the context that it is called for, except
+  # for the user uuid. The user UUID will display the destination_users uuid,
+  # and when getting the uuid from an api that is in a context that was
+  # recorded from a merge event, an additional attribute is added as past_uuid.
+  #
   # When finding users by SIS ids in different accounts the
   # destination_account_id is required.
   #
@@ -2208,6 +2261,57 @@ class UsersController < ApplicationController
   # previous user. Some items may have been deleted during a user_merge that
   # cannot be restored, and/or the data has become stale because of other
   # changes to the objects since the time of the user_merge.
+  #
+  # Split users details and caveats:
+  #
+  # The from_user is the user that was deleted in the user_merge process.
+  # The destination_user is the user that remains, that is being split.
+  #
+  # Avatars:
+  # When both users had avatars, both will be remain.
+  # When from_user had an avatar and destination_user did not have an avatar,
+  # the destination_user's avatar will be deleted if it still matches what was
+  # there are the time of the merge.
+  # If the destination_user's avatar was changed at anytime after the merge, it
+  # will remain on the destination user.
+  # If the from_user had an avatar it will be there after split.
+  #
+  # Terms of Use:
+  # If from_user had not accepted terms of use, they will be prompted again
+  # to accept terms of use after the split.
+  # If the destination_user had not accepted terms of use, hey will be prompted
+  # again to accept terms of use after the split.
+  # If neither user had accepted the terms of use, but since the time of the
+  # merge had accepted, both will be prompted to accept terms of use.
+  # If both had accepted terms of use, this will remain.
+  #
+  # Communication Channels:
+  # All communication channels are restored to what they were prior to the
+  # merge. If a communication channel was added after the merge, it will remain
+  # on the destination_user.
+  # Notification preferences remain with the communication channels.
+  #
+  # Enrollments:
+  # All enrollments from the time of the merge will be moved back to where they
+  # were. Enrollments created since the time of the merge that were created by
+  # sis_import will go to the user that owns that sis_id used for the import.
+  # Other new enrollments will remain on the destination_user.
+  # Everything that is tied to the destination_user at the course level relating
+  # to an enrollment is moved to the from_user. When both users are in the same
+  # course prior to merge this can cause some unexpected items to move.
+  #
+  # Submissions:
+  # Unlike other items tied to a course, submissions are explicitly recorded to
+  # avoid problems with grades.
+  # All submissions were moved are restored to the spot prior to merge.
+  # All submission that were created in a course that was moved in enrollments
+  # are moved over to the from_user.
+  #
+  # Other notes:
+  # Access Tokens are moved back on split.
+  # Conversations are moved back on split.
+  # Favorites that existing at the time of merge are moved back on split.
+  # LTI ids are restored to how they were prior to merge.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/users/<user_id>/split \

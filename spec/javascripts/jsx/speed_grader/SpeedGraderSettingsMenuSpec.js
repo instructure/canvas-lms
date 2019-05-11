@@ -24,13 +24,10 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
   let $container
   let $menuContent
   let props
-  let qunitTimeout
   let resolveOpen
   let wrapper
 
   hooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // protect against unresolved async mistakes
     props = {
       assignmentID: '71',
       courseID: '8',
@@ -57,7 +54,6 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
     window.open.restore()
     SpeedGraderSettingsMenu.setURL.restore()
     $container.remove()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   function mountComponent() {

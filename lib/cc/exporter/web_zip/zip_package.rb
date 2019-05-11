@@ -19,6 +19,7 @@ module CC::Exporter::WebZip
   class ZipPackage < CC::Exporter::Epub::FilesDirectory
 
     def initialize(exporter, course, user, progress_key)
+      @global_identifiers = exporter.global_identifiers
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
       @pages = exporter.cartridge_json[:pages]
       @assignments = exporter.cartridge_json[:assignments]
@@ -33,7 +34,7 @@ module CC::Exporter::WebZip
       @user = user
       @current_progress = Rails.cache.fetch(progress_key)
       @current_progress ||= MustViewModuleProgressor.new(user, course).current_progress
-      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user, for_epub_export: true)
+      @html_converter = CC::CCHelper::HtmlContentExporter.new(course, user, for_epub_export: true, key_generator: self)
       @canvas_object_export_hash = map_canvas_objects_to_export_ids
     end
     attr_reader :files, :course, :user, :current_progress
@@ -42,6 +43,10 @@ module CC::Exporter::WebZip
     ASSIGNMENT_TYPES = ['Assignment', 'Quizzes::Quiz', 'DiscussionTopic'].freeze
     CONTENT_TYPES = [*ASSIGNMENT_TYPES, 'WikiPage'].freeze
     CONTENT_TOKENS = [CC::CCHelper::OBJECT_TOKEN, CC::CCHelper::COURSE_TOKEN, CC::CCHelper::WIKI_TOKEN].freeze
+
+    def create_key(obj)
+      CC::CCHelper.create_key(obj, global: @global_identifiers)
+    end
 
     def force_timezone(time)
       time&.in_time_zone(user.time_zone)&.iso8601
@@ -234,7 +239,7 @@ module CC::Exporter::WebZip
           prereqs: mod.prerequisites.map{|pre| pre[:id]}.select{|id| active_module_ids.include?(id)},
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
-          exportId: CC::CCHelper.create_key(mod),
+          exportId: create_key(mod),
           items: parse_module_item_data(mod)
         }
       end
@@ -291,7 +296,7 @@ module CC::Exporter::WebZip
     def find_export_id(item)
       case item.content_type
       when 'Assignment', 'DiscussionTopic', 'Quizzes::Quiz'
-        CC::CCHelper.create_key(item.content)
+        create_key(item.content)
       when 'WikiPage'
         item.content&.url
       end
@@ -303,7 +308,7 @@ module CC::Exporter::WebZip
         item_hash[:submissionTypes] = item_content.readable_submission_types
         item_hash[:graded] = item_content.grading_type != 'not_graded'
       when Quizzes::Quiz
-        item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content.assignment)
+        item_hash[:assignmentExportId] = create_key(item_content.assignment)
         item_hash[:questionCount] = item_content.question_count
         item_hash[:timeLimit] = item_content.time_limit
         item_hash[:attempts] = item_content.allowed_attempts
@@ -312,7 +317,7 @@ module CC::Exporter::WebZip
         item_hash[:lockAt] = force_timezone(item_content.lock_at)
         item_hash[:unlockAt] = force_timezone(item_content.unlock_at)
         item_content = item_content.assignment
-        item_hash[:assignmentExportId] = CC::CCHelper.create_key(item_content) if item_content.present?
+        item_hash[:assignmentExportId] = create_key(item_content) if item_content.present?
         item_hash[:graded] = item_content.present?
       end
       return unless item_content
@@ -375,10 +380,10 @@ module CC::Exporter::WebZip
       type_export_hash = {}
       assignment_export_hash = {}
       course.send(type).each do |item|
-        tag = (type == :wiki_pages ? item.url : CC::CCHelper.create_key(item))
+        tag = (type == :wiki_pages ? item.url : create_key(item))
         type_export_hash[tag] = item
         next unless (type == :discussion_topics || type == :quizzes) && item.assignment
-        assignment_id = CC::CCHelper.create_key(item.assignment)
+        assignment_id = create_key(item.assignment)
         assignment_export_hash[assignment_id] = item
         @discussion_quiz_export_id_map[assignment_id] = tag
       end

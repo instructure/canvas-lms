@@ -33,6 +33,8 @@ class ContentExport < ActiveRecord::Base
 
   has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
 
+  before_create :set_global_identifiers
+
   # export types
   COMMON_CARTRIDGE = 'common_cartridge'.freeze
   COURSE_COPY = 'course_copy'.freeze
@@ -41,6 +43,7 @@ class ContentExport < ActiveRecord::Base
   USER_DATA = 'user_data'.freeze
   ZIP = 'zip'.freeze
   QUIZZES2 = 'quizzes2'.freeze
+  CC_EXPORT_TYPES = [COMMON_CARTRIDGE, COURSE_COPY, MASTER_COURSE_COPY, QTI, QUIZZES2].freeze
 
   workflow do
     state :created
@@ -91,18 +94,31 @@ class ContentExport < ActiveRecord::Base
     can :create
   end
 
+  def set_global_identifiers
+    self.global_identifiers = can_use_global_identifiers? if CC_EXPORT_TYPES.include?(self.export_type)
+  end
+
+  def can_use_global_identifiers?
+    # use global identifiers if no other cc export from this course has used local identifiers
+    # i.e. all exports from now on should try to use global identifiers
+    # unless there's a risk of not matching up with a previous export
+    !self.context.content_exports.where(:export_type => CC_EXPORT_TYPES, :global_identifiers => false).exists?
+  end
+
   def export(opts={})
-    opts = opts.with_indifferent_access
-    case export_type
-    when ZIP
-      export_zip(opts)
-    when USER_DATA
-      export_user_data(opts)
-    when QUIZZES2
-      return unless context.feature_enabled?(:quizzes_next)
-      export_quizzes2
-    else
-      export_course(opts)
+    self.shard.activate do
+      opts = opts.with_indifferent_access
+      case export_type
+      when ZIP
+        export_zip(opts)
+      when USER_DATA
+        export_user_data(opts)
+      when QUIZZES2
+        return unless context.feature_enabled?(:quizzes_next)
+        export_quizzes2
+      else
+        export_course(opts)
+      end
     end
   end
   handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
@@ -293,15 +309,17 @@ class ContentExport < ActiveRecord::Base
     if zip_export?
       obj.asset_string
     else
-      CC::CCHelper.create_key(obj)
+      create_key(obj)
     end
   end
 
   def create_key(obj, prepend="")
-    if for_master_migration? && !is_external_object?(obj)
-      master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
-    else
-      CC::CCHelper.create_key(obj, prepend)
+    self.shard.activate do
+      if for_master_migration? && !is_external_object?(obj)
+        master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
+      else
+        CC::CCHelper.create_key(obj, prepend, global: self.global_identifiers?)
+      end
     end
   end
 

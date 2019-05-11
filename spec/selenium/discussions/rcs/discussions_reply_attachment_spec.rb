@@ -24,7 +24,6 @@ describe "reply attachment" do
   before() do
     @topic_title = 'discussion topic'
     course_with_teacher_logged_in
-    enable_all_rcs @course.account
     stub_rcs_config
     @topic = create_discussion(@topic_title, 'threaded')
     @student = student_in_course.user

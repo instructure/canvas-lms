@@ -35,6 +35,7 @@ exports[`The Points component renders the component when assessing with the expe
         messages={Array []}
         onChange={[Function]}
         readOnly={false}
+        required={false}
         size="medium"
         textAlign="start"
         type="text"

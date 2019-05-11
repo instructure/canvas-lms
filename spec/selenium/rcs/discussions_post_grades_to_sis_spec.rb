@@ -22,7 +22,6 @@ describe "sync grades to sis" do
 
   before :each do
     course_with_admin_logged_in
-    enable_all_rcs @course.account
     stub_rcs_config
     Account.default.set_feature_flag!('post_grades', 'on')
     @course.sis_source_id = 'xyz'

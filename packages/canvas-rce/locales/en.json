@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Add"
+  },
+  "all_4321c3a1": {
+    "message": "All"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alphabetical"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternative text:"
   },
@@ -12,9 +21,6 @@
   "assignments_1e02582c": {
     "message": "Assignments",
     "description": "Title of Sidebar accordion tab containing links to assignments."
-  },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Background Color, press down to select"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -70,14 +76,38 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "Close"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "Collaborations"
   },
+  "computer_1d7dfa6f": {
+    "message": "Computer"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Content Subtype"
+  },
+  "content_type_2cf90d95": {
+    "message": "Content Type"
+  },
   "copyright_holder_66ee111": {
     "message": "Copyright Holder:"
+  },
+  "course_documents_104d76e0": {
+    "message": "Course Documents"
+  },
+  "course_images_f8511d04": {
+    "message": "Course Images"
+  },
+  "course_links_b56959b9": {
+    "message": "Course Links"
+  },
+  "course_media_ec759ad": {
+    "message": "Course Media"
   },
   "course_navigation_dd035109": {
     "message": "Course Navigation",
@@ -85,6 +115,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Date Added"
+  },
+  "date_published_371c4ad0": {
+    "message": "Date Published"
   },
   "decorative_image_fde98579": {
     "message": "Decorative image"
@@ -96,9 +132,8 @@
   "discussions_index_6c36ced": {
     "message": "Discussions Index"
   },
-  "embed_image_1080badc": {
-    "message": "Embed Image",
-    "description": "Title for RCE button to embed an image"
+  "documents_81393201": {
+    "message": "Documents"
   },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
@@ -118,12 +153,6 @@
   },
   "folder_705fd2d7": {
     "message": "Folder"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Font Size, press down to select"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatting, press down to select"
   },
   "grades_a61eba0a": {
     "message": "Grades"
@@ -146,7 +175,7 @@
   },
   "images_7ce26570": {
     "message": "Images",
-    "description": "Title of Sidebar tab containing uploaded images and image services."
+    "description": "Title for RCE button to embed an image"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Insert Equella Links",
@@ -186,11 +215,17 @@
   "loading_25990131": {
     "message": "Loading..."
   },
+  "loading_bde52856": {
+    "message": "Loading"
+  },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
   "loading_folders_8d4d5d5a": {
     "message": "Loading folders..."
+  },
+  "media_af190855": {
+    "message": "Media"
   },
   "modules_c4325335": {
     "message": "Modules",
@@ -214,9 +249,6 @@
     "message": "Record/Upload Media",
     "description": "Title for RCE button to insert or record media"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Press ALT+F8 for help"
-  },
   "search_280d00bd": {
     "message": "Search"
   },
@@ -229,11 +261,14 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Sort By"
+  },
+  "submit_a3cc6859": {
+    "message": "Submit"
+  },
   "syllabus_f191f65b": {
     "message": "Syllabus"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Text Color, press down to select"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"
@@ -247,6 +282,12 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "This upload exceeds the file storage quota. Please speak to your system administrator."
   },
+  "tray_839df38a": {
+    "message": "Tray"
+  },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Upload"
   },
@@ -255,6 +296,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Upload a new image"
+  },
+  "upload_image_6120b609": {
+    "message": "Upload Image"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Usage Right:"

@@ -522,6 +522,7 @@ exports[`renders the base component with required props 1`] = `
   </Heading>
   <div>
     <View
+      debug={false}
       display="block"
       margin="small 0 0 0"
       overflowX="visible"

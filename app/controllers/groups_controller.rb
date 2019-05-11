@@ -760,8 +760,10 @@ class GroupsController < ApplicationController
     end
     @entries = []
     @entries.concat @context.calendar_events.active
-    @entries.concat @context.discussion_topics.published
-    @entries.concat @context.wiki_pages.published
+    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select{ |dt|
+      !dt.locked_for?(@current_user, :check_policies => true)
+    }
+    @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

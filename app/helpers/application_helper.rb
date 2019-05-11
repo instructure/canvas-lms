@@ -147,31 +147,6 @@ module ApplicationHelper
     object.grants_any_right?(user, session, *actions)
   end
 
-  # Loads up the lists of files needed for the wiki_sidebar.  Called from
-  # within the cached code so won't be loaded unless needed.
-  def load_wiki_sidebar
-    return if @wiki_sidebar_data
-    logger.warn "database lookups happening in view code instead of controller code for wiki sidebar (load_wiki_sidebar)"
-    @wiki_sidebar_data = {}
-    includes = [:active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
-    includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).limit(150) if @context.respond_to?(i) }
-    includes.each{|i| @wiki_sidebar_data[i] ||= [] }
-    if @context.respond_to?(:wiki)
-      limit = Setting.get('wiki_sidebar_item_limit', 1000000).to_i
-      @wiki_sidebar_data[:wiki_pages] = @context.wiki_pages.active.order(:title).select('title, url, workflow_state').limit(limit)
-      @wiki_sidebar_data[:wiki] = @context.wiki
-    end
-    @wiki_sidebar_data[:wiki_pages] ||= []
-    if can_do(@context, @current_user, :manage_files, :read_as_admin)
-      @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
-    elsif @context.is_a?(Course) && !@context.tab_hidden?(Course::TAB_FILES)
-      @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context).reject{|folder| folder.locked? || folder.hidden}
-    else
-      @wiki_sidebar_data[:root_folders] = []
-    end
-    @wiki_sidebar_data
-  end
-
   # See `js_base_url`
   def use_optimized_js?
     if params.key?(:optimized_js)
@@ -665,7 +640,7 @@ module ApplicationHelper
   def active_brand_config_url(type, opts={})
     path = active_brand_config(opts).try("public_#{type}_path")
     path ||= BrandableCSS.public_default_path(type, @current_user&.prefers_high_contrast? || opts[:force_high_contrast])
-    "#{Canvas::Cdn.config.host}/#{path}"
+    "#{Canvas::Cdn.add_brotli_to_host_if_supported(request)}/#{path}"
   end
 
   def brand_config_account(opts={})
@@ -850,7 +825,8 @@ module ApplicationHelper
   end
 
   def custom_dashboard_url
-    url = @domain_root_account.settings[:dashboard_url]
+    url = @domain_root_account.settings["#{ApplicationController.test_cluster_name}_dashboard_url".to_sym] if ApplicationController.test_cluster_name
+    url ||= @domain_root_account.settings[:dashboard_url]
     if url.present?
       url += "?current_user_id=#{@current_user.id}" if @current_user
       url

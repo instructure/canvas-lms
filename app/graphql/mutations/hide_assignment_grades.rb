@@ -43,7 +43,13 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
     progress = course.progresses.new(tag: "hide_assignment_grades")
 
     if progress.save
-      progress.process_job(assignment, :hide_submissions, {preserve_method_args: true}, submission_ids: submission_ids)
+      progress.process_job(
+        assignment,
+        :hide_submissions,
+        {preserve_method_args: true},
+        progress: progress,
+        submission_ids: submission_ids
+      )
       return {assignment: assignment, progress: progress}
     else
       raise GraphQL::ExecutionError, "Error hiding assignment grades"

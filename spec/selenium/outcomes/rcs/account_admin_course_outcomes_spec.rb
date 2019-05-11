@@ -31,7 +31,6 @@ describe "account admin outcomes" do
       RoleOverride.create!(:context => account, :permission => 'manage_courses',
         :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

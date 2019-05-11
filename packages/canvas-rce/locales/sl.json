@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Naloge"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Barva ozadja; za izbiro pritisnite navzdol."
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Lastnik avtorskih pravic:"
   },
+  "course_documents_104d76e0": {
+    "message": "Dokumenti predmeta"
+  },
+  "course_images_f8511d04": {
+    "message": "Slike predmeta"
+  },
+  "course_links_b56959b9": {
+    "message": "Povezave predmeta"
+  },
+  "course_media_ec759ad": {
+    "message": "Mediji predmeta"
+  },
   "course_navigation_dd035109": {
     "message": "Navigacija po predmetu"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "Kazalo razprav"
-  },
-  "embed_image_1080badc": {
-    "message": "Vdelaj sliko"
   },
   "enter_search_terms_e397b1f0": {
     "message": "vnos iskalnih besed"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "Mapa"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Velikost pisave; za izbiro pritisnite navzdol."
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Oblikovanje; za izbiro pritisnite navzdol."
   },
   "grades_a61eba0a": {
     "message": "Ocene"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "Nalaganje ..."
   },
+  "loading_bde52856": {
+    "message": "Nalaganje"
+  },
   "loading_failed_b3524381": {
     "message": "Nalaganje ni uspelo ..."
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "Posnemi/naloži medije"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Območje besedila Za pomoč pritisnite ALT+F8."
-  },
   "search_280d00bd": {
     "message": "Iskanje"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "Učni načrt"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Barva besedila; za izbiro pritisnite navzdol."
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Gradivo je dostopno javnosti."
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "To nalaganje presega kvoto prostora za datoteke na disku. Pogovorite se s skrbnikom sistema."
+  },
+  "tray_839df38a": {
+    "message": "Trak"
   },
   "upload_8b403d05": {
     "message": "Naloži"

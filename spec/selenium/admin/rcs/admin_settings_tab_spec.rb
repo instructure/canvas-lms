@@ -21,7 +21,6 @@ describe "admin settings tab" do
   include_context "in-process server selenium tests"
   before :once do
     account_admin_user
-    enable_all_rcs Account.default
   end
 
   before :each do
@@ -552,7 +551,6 @@ describe "admin settings tab" do
 
   it "shows all feature flags that are expected to be visible" do
     course_with_admin_logged_in(:account => Account.site_admin)
-    enable_all_rcs @course.account
     provision_quizzes_next @course
 
     get "/accounts/#{Account.site_admin.id}/settings"

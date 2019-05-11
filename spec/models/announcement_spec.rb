@@ -69,6 +69,21 @@ describe Announcement do
         course.announcements.create!(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
       }.to change(Delayed::Job, :count).by(1)
     end
+
+    it "should unlock the attachment when the job runs" do
+      course_factory(:active_all => true)
+      att = attachment_model(context: @course)
+      announcement = @course.announcements.create!(valid_announcement_attributes.
+        merge(:delayed_post_at => Time.now + 1.week, :workflow_state => 'post_delayed', :attachment => att))
+      att.reload
+      expect(att).to be_locked
+
+      Timecop.freeze(2.weeks.from_now) do
+        run_jobs
+        expect(announcement.reload).to be_active
+        expect(att.reload).to_not be_locked
+      end
+    end
   end
 
   context "section specific announcements" do

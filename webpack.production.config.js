@@ -33,6 +33,7 @@ if (!process.env.JS_BUILD_NO_UGLIFY) {
         },
         ecma: 5,
         output: {
+          ascii_only: true, // for tinymce, see: https://www.tiny.cloud/docs/advanced/usage-with-module-loaders/#minificationwithuglifyjs2
           comments: false,
           semicolons: false, // not because of the holy war but because it prevents everything being on one line and is easer to read in browser
         },

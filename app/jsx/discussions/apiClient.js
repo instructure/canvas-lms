@@ -17,34 +17,28 @@
  */
 
 import axios from 'axios'
-import {encodeQueryString} from '../shared/queryString'
 
-function discussionQueryString(contextType, page) {
-  const params = [
-    {per_page: 50},
-    {plain_messages: true},
-    {include_assignment: true},
-    {exclude_assignment_descriptions: true},
-    {exclude_context_module_locked_topics: true},
-    {page}
-  ]
-
-  if (contextType === 'course') {
-    params.push({'include[]': 'sections_user_count'})
-    params.push({'include[]': 'sections'})
+// In the the index.html.erb view for this page, we fire of `fetch` requests for all the
+// get requests for all the discusisons we're going to render. We do this so they
+// can start loading then and not have to wait until this JS file is loaded to start
+// fetching. But since they are just raw `fetch` responses, we need to massage them
+// into something that looks like an axios response, since that is what everything
+// here is designed to deal with
+const fetchRequestsTransformedToLookLikeAxiosRequests = window.preloadedDiscussionTopicFetchRequests.map(
+  fetchRequest => {
+    return fetchRequest.then(res => {
+      return res.json().then(json => {
+        return {
+          data: json,
+          headers: {link: res.headers.get('Link')}
+        }
+      })
+    })
   }
-  return encodeQueryString(params)
-}
+)
 
 export function getDiscussions({contextType, contextId}, {page}) {
-  const queryString = discussionQueryString(contextType, page)
-  return axios.get(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
-}
-
-export function headDiscussions({contextType, contextId}) {
-  const page = 1
-  const queryString = discussionQueryString(contextType, page)
-  return axios.head(`/api/v1/${contextType}s/${contextId}/discussion_topics?${queryString}`)
+  return fetchRequestsTransformedToLookLikeAxiosRequests[page - 1]
 }
 
 export function updateDiscussion({contextType, contextId}, discussion, updatedFields) {

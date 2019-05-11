@@ -1,0 +1,75 @@
+<h2 class="screenreader-only"><%= t('headings.sections', "Reports") %></h2>
+<table class="reports">
+  <tr class="reports">
+    <th class="reports"><%= t 'headers.report_name', 'Name' %></th>
+    <th class="reports"><%= t 'headers.report_last_run', 'Last Run' %></th>
+    <th class="reports"></th>
+  </tr>
+  <% @available_reports.sort_by {|_, details| details.title}.each do |report, details|
+    title = details.title
+    description_partial = details[:description_partial]
+    description_partial = report + '_description' if description_partial == true
+    parameters_partial = details[:parameters_partial]
+    parameters_partial = report + '_parameters' if parameters_partial == true
+    last_complete = @last_complete_reports[report]
+    last_report = @last_reports[report]
+    in_progress = last_report && last_report.in_progress?
+    #the extra text is added so that you can give more than the date for the last run report
+    extra_text = last_complete.try(:parameters).try(:[], "extra_text")
+%>
+    <tr id="<%= report %>" class="reports">
+      <td class="title reports">
+        <span class="title"><%= title %></span>
+        <% if description_partial %>
+          <a href="#" class="open_report_description_link" role="button" aria-haspopup="true" aria-owns="<%= "#{report}_report_description" %>">
+            <i class="icon-question standalone-icon"></i>
+            <span class="screenreader-only"><%= t(:open_report_description, "Open Report Description") %></span>
+          </a>
+          <div id="<%= "#{report}_report_description" %>" style="display: none" class="report_description">
+            <%= render(:partial => description_partial) %>
+          </div>
+        <% end %>
+      </td>
+      <td class="last-run reports">
+        <% if last_complete %>
+          <%= datetime_string(last_complete.created_at) %>
+          <%#the extra text is added so that you can give more than the date for the last run report %>
+          <% if extra_text %>
+            (<%= extra_text %>)
+          <% end %>
+          <% if last_complete.workflow_state == 'complete' %>
+            <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id, download_frd: 1), 'aria-label' => t('Download Report'), 'title' => t('Download Report') %>
+          <% end %>
+        <% else %>
+          <%= t 'report_last_run_never', 'Never' %>
+        <% end %>
+      </td>
+      <td class="action reports">
+        <% if parameters_partial %>
+          <div style="display: none">
+            <div class="report_dialog">
+              <form id="<%= report %>_form" class="run_report_form" action="<%= api_v1_account_create_report_path(@account, report) %>">
+                <div class="report_parameters">
+                  <%= render :partial => parameters_partial if parameters_partial %>
+                </div>
+                <br />
+                <a href="#" id="run_<%= report %>" class="Button Button--primary Button--small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+              </form>
+            </div>
+          </div>
+          <span class="running_report_message" style="<%= hidden unless in_progress %>">
+                  <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
+                </span>
+          <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="Button Button--small configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
+        <% else %>
+          <form id="<%= report %>_form" class="run_report_form" action="<%= api_v1_account_create_report_path(@account, report) %>">
+                  <span class="running_report_message" style="<%= hidden unless in_progress %>">
+                    <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
+                  </span>
+            <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="Button Button--small Button--primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+          </form>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

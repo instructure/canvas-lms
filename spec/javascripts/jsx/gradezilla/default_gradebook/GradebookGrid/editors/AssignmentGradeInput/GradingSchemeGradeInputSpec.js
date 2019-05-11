@@ -28,13 +28,9 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   let $menuContent
   let resolveClose
   let resolveOpen
-  let qunitTimeout
   let wrapper
 
   suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // protect against unresolved async mistakes
-
     const assignment = {
       pointsPossible: 10
     }
@@ -86,7 +82,6 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   suiteHooks.afterEach(() => {
     wrapper.unmount()
     $container.remove()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   function mountComponent() {

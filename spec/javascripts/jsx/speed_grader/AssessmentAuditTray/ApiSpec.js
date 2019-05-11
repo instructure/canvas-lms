@@ -21,12 +21,9 @@ import FakeServer, {pathFromRequest} from 'jsx/__tests__/FakeServer'
 
 QUnit.module('AssessmentAuditTray Api', suiteHooks => {
   let api
-  let qunitTimeout
   let server
 
   suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // avoid accidental unresolved async
     server = new FakeServer()
 
     api = new Api()
@@ -34,7 +31,6 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
 
   suiteHooks.afterEach(() => {
     server.teardown()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   QUnit.module('#loadAssessmentAuditTrail()', hooks => {

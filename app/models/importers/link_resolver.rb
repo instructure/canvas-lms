@@ -95,6 +95,12 @@ module Importers
           link[:missing_url] = new_url
         end
         link[:new_value] = new_url
+      when :file_ref
+        file_id = context.attachments.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
+        if file_id
+          rest = link[:rest].presence || '/preview'
+          link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"
+        end
       else
         raise "unrecognized link_type in unresolved link"
       end

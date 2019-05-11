@@ -320,17 +320,6 @@ import './vendor/jquery.scrollTo'
     return this;
   };
 
-  $.fn.chevronCrumbs = function(options) {
-    return this.each(function() {
-      $(this).show()
-        .addClass("chevron-crumbs")
-        .children().not("#hide-scratch")
-          .addClass('chevron-crumb')
-          .append('<span class="chevron-outer"><span class="chevron-inner"></span></span>')
-          .filter(".active").prev().addClass("before-active");
-    });
-  };
-
   // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
   $.fn.fillWindowWithMe = function(options){
     var opts               = $.extend({minHeight: 400}, options),

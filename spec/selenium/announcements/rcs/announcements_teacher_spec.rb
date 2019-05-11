@@ -26,7 +26,6 @@ describe "announcements" do
     before :once do
       @teacher = user_with_pseudonym(active_user: true)
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
-      enable_all_rcs @course.account
     end
 
     before :each do

@@ -24,26 +24,16 @@ tinymce.create("tinymce.plugins.InstructureEquella", {
   init: function(ed) {
     ed.addCommand("instructureEquella", clickCallback.bind(this, ed, document));
 
-    ed.addButton("instructure_equella", {
+    ed.ui.registry.addButton("instructure_equella", {
       title: htmlEscape(
         formatMessage({
           default: "Insert Equella Links",
           description: "Title for RCE button to insert links to Equella content"
         })
       ),
-      cmd: "instructureEquella",
+      onAction: _ => ed.execCommand("instructureEquella"),
       icon: "equella icon-equella"
     });
-  },
-
-  getInfo: function() {
-    return {
-      longname: "InstructureEquella",
-      author: "Brian Whitmer",
-      authorurl: "http://www.instructure.com",
-      infourl: "http://www.instructure.com",
-      version: tinymce.majorVersion + "." + tinymce.minorVersion
-    };
   }
 });
 

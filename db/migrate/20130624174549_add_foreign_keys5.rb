@@ -17,7 +17,7 @@
 
 class AddForeignKeys5 < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
-  tag :postdeploy
+  tag :predeploy
 
   def self.up
     add_foreign_key_if_not_exists :favorites, :users, :delay_validation => true

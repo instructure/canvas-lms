@@ -132,7 +132,7 @@ class Header extends React.Component {
             >
               <StepContainer
                 assignment={this.props.assignment}
-                forceLockStatus={!this.props.assignment.env.currentUserId} // TODO: replace with new 'self' graphql query when ready
+                forceLockStatus={!this.props.assignment.env.currentUser} // TODO: replace with new 'self' graphql query when ready
                 isCollapsed={this.state.isSticky}
                 collapsedLabel={I18n.t('Submitted')}
               />

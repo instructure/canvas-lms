@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import CommentContent from './CommentContent'
+import CommentTextArea from './CommentTextArea'
+import ErrorBoundary from '../../../../shared/components/ErrorBoundary'
+import GenericErrorPage from '../../../../shared/components/GenericErrorPage/index'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
 import React from 'react'
-import CommentsContainer from './CommentsContainer'
+import errorShipUrl from '../../SVG/ErrorShip.svg'
 import {Query} from 'react-apollo'
 import {SUBMISSION_COMMENT_QUERY, StudentAssignmentShape} from '../../assignmentData'
-import LoadingIndicator from '../../../shared/LoadingIndicator'
-import GenericErrorPage from '../../../../shared/components/GenericErrorPage/index'
-import ErrorBoundary from '../../../../shared/components/ErrorBoundary'
-import errorShipUrl from '../../SVG/ErrorShip.svg'
 
 function Comments(props) {
   return (
@@ -52,7 +53,8 @@ function Comments(props) {
             }
           >
             <div data-testid="comments-container">
-              <CommentsContainer comments={data.submissionComments.commentsConnection.nodes} />
+              <CommentTextArea assignment={props.assignment} />
+              <CommentContent comments={data.submissionComments.commentsConnection.nodes} />
             </div>
           </ErrorBoundary>
         )

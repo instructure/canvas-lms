@@ -354,8 +354,6 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
 
 QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
   setup() {
-    this.qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 100
     submissions = [
       {assignment_id: 201, score: 100},
       {assignment_id: 202, score: 42},
@@ -371,11 +369,6 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
       {id: 205, points_possible: 1000, omit_from_final_grade: false}
     ]
     assignmentGroup = {id: 301, rules: {drop_lowest: 2}, assignments}
-  },
-
-  teardown() {
-    QUnit.config.testTimeout = this.qunitTimeout
-    this.qunitTimeout = null
   }
 })
 

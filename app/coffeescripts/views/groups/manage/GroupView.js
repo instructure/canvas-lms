@@ -18,8 +18,6 @@
 import $ from 'jquery'
 import {View} from 'Backbone'
 import template from 'jst/groups/manage/group'
-import GroupUsersView from './GroupUsersView'
-import GroupDetailView from './GroupDetailView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
@@ -29,7 +27,7 @@ export default class GroupView extends View {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
       eval(`${thisName} = this;`);
     }
     this.groupsAreDifferent = this.groupsAreDifferent.bind(this)

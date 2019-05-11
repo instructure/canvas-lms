@@ -32,7 +32,6 @@ import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
 import fakeENV from 'helpers/fakeENV'
 import userSettings from 'compiled/userSettings'
 import assertions from 'helpers/assertions'
-import tinymce from 'compiled/editor/stocktiny'
 import 'helpers/jquery.simulate'
 
 const s_params = 'some super secure params'

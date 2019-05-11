@@ -541,7 +541,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       qtext = <<-HTML.strip
         equation: <p>
           <img class="equation_image" title="\\sum" src="/equation_images/%255Csum"
-            alt="LaTeX: \\sum" data-equation-content="\\sum" data-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
+            alt="LaTeX: \\sum" data-equation-content="\\sum" x-canvaslms-safe-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
               &lt;mo&gt;&amp;#x2211;&lt;!-- &sum; --&gt;&lt;/mo&gt;&lt;/math&gt;" />
         </p>
       HTML
@@ -559,7 +559,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
     it "should do more terrible equation stuff" do
       qtext = <<-HTML.strip
-            hmm: <p><img class="equation_image" 
+            hmm: <p><img class="equation_image"
       data-equation-content="h\\left( x \\right) = \\left\\{ {\\begin{array}{*{20}{c}}
       {{x^2} + 4x - 1}&amp;{{\\rm{for}}}&amp;{ - 7 \\le x \\le - 1}\\\\
       { - 3x + p}&amp;{{\\rm{for}}}&amp;{ - 1 &lt; x \\le 6}

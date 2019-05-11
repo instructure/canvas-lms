@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import '../../jquery.dropdownList'
 import '../../jquery.instructure_misc_helpers'
-import {processContentItemsForEditor} from '../../../../app/jsx/deep_linking/ContentItemProcessor'
 
 /**
  * A module for holding helper functions pulled out of the instructure_external_tools/plugin.
@@ -50,11 +48,15 @@ export default {
    * @returns {Hash} appropriate configuration for a tinymce addButton call,
    *   complete with title, cmd, image, and classes
    */
-  buttonConfig(button) {
+  buttonConfig(button, editor) {
     const config = {
       title: button.name,
-      cmd: `instructureExternalButton${button.id}`,
       classes: 'widget btn instructure_external_tool_button'
+    }
+    if (ENV.use_rce_enhancements) {
+      config.onAction = () => editor.execCommand(`instructureExternalButton${button.id}`)
+    } else {
+      config.cmd = `instructureExternalButton${button.id}`
     }
 
     if (button.canvas_icon_class) {

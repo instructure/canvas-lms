@@ -16,15 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
 // for each command, there are three possibilities:
 //
 //   .data('remoteEditor') is set:
 //     feature flag is on and succeeded, just use the remote editor call
-//
-//   .data('rich_text') and .editorBox are set:
-//     feature flag is off, use the legacy editorBox/wikiSidebar interface
 //
 //   neither is set:
 //     probably feature flag is on but failed, or maybe just a poorly set up
@@ -80,8 +75,6 @@ export function send ($target, methodName, ...args) {
       }
     }
     return ret
-  } else if ($target.editorBox && $target.data('rich_text')) {
-    return $target.editorBox(methodName, ...args)
   } else {
     // we're not set up, so tell the caller that `exists?` is false,
     // `get_code` is the textarea value, and ignore anything else.
@@ -100,13 +93,6 @@ export function focus ($target) {
   const remoteEditor = $target.data('remoteEditor')
   if (remoteEditor) {
     remoteEditor.focus()
-  } else if ($target.data('rich_text')) {
-    require.ensure([], require => {
-      const wikiSidebar = require('wikiSidebar')
-      const editor = getTinymce().get($target[0].id)
-      wikiSidebar.attachToEditor($target)
-      editor && editor.focus()
-    }, 'legacyWikiSidebarAsyncChunk')
   } else {
     console.warn("called focus() on an RCE instance that hasn't fully loaded, ignored")
   }
@@ -118,8 +104,6 @@ export function destroy ($target) {
     // detach the remote editor reference after destroying it
     remoteEditor.destroy()
     $target.data('remoteEditor', null)
-  } else if ($target.editorBox && $target.data('rich_text')) {
-    $target.editorBox('destroy')
   } else {
     console.warn("called destroy() on an RCE instance that hasn't fully loaded, ignored")
   }

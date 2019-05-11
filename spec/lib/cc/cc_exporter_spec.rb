@@ -72,7 +72,7 @@ describe "Common Cartridge exporting" do
     end
 
     def mig_id(obj)
-      CC::CCHelper.create_key(obj)
+      CC::CCHelper.create_key(obj, global: true)
     end
 
     def check_resource_node(obj, type, selected=true)
@@ -224,10 +224,10 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
-      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_')
+      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_', global: true)
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
 
-      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_')
+      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_', global: true)
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
     end
 
@@ -571,11 +571,12 @@ describe "Common Cartridge exporting" do
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
       run_export
-      file_node = @manifest_doc.at_css("resource[identifier='id4164d7d594985594573e63f8ca15975'] file[href$='/blah.flv.tlh.subtitles']")
+      key = CC::CCHelper.create_key(track.content, global: true)
+      file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
       expect(file_node).to be_present
       expect(@zip_file.read(file_node['href'])).to eql(track.content)
       track_doc = Nokogiri::XML(@zip_file.read('course_settings/media_tracks.xml'))
-      expect(track_doc.at_css('media_tracks media track[locale=tlh][kind=subtitles][identifierref=id4164d7d594985594573e63f8ca15975]')).to be_present
+      expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
       expect(ccc_schema.validate(track_doc)).to be_empty
     end
 

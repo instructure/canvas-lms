@@ -497,6 +497,26 @@ describe Api::V1::Submission do
         expect(json.fetch(field).count).to be 4
       end
     end
+
+    describe "posted_at" do
+      let(:field) { "posted_at" }
+      let(:submission) { assignment.submissions.build(user: user) }
+      let(:json) do
+        fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
+      end
+
+      it "is included if the owning course has post policies enabled" do
+        posted_at = Time.zone.now
+        submission.update!(posted_at: posted_at)
+
+        assignment.course.enable_feature!(:post_policies)
+        expect(json.fetch('posted_at')).to eq posted_at
+      end
+
+      it "is not included if the owning course does not have post policies enabled" do
+        expect(json).not_to have_key('posted_at')
+      end
+    end
   end
 
   describe '#submission_zip' do

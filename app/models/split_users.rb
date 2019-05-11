@@ -137,10 +137,10 @@ class SplitUsers
     end
     source_user.shard.activate do
       ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each {|c| c.move_to_user(restored_user)}
-      MERGE_ITEM_TYPES.each do |klass, user_attr|
-        ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
-        klass.to_s.classify.constantize.where(id: ids).update_all(user_attr => restored_user.id) if ids
-      end
+    end
+    MERGE_ITEM_TYPES.each do |klass, user_attr|
+      ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
+      Shard.partition_by_shard(ids) { |shard_ids| klass.to_s.classify.constantize.where(id: shard_ids).update_all(user_attr => restored_user.id) } if ids
     end
   end
 
@@ -164,7 +164,10 @@ class SplitUsers
     end
     handle_submissions(records)
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
-    AccountUser.where(id: account_users_ids).update_all(user_id: restored_user.id)
+
+    Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
+      AccountUser.where(id: shard_account_user_ids).update_all(user_id: restored_user.id)
+    end
     restore_workflow_states_from_records(records)
   end
 
@@ -218,11 +221,17 @@ class SplitUsers
   end
 
   def move_user_observers(records)
-    # skip when the user observer is between the two users. Just undlete the record
+    # skip when the user observer is between the two users. Just undelete the record
     not_obs = UserObservationLink.where(user_id: [source_user, restored_user], observer_id: [source_user, restored_user])
     obs = UserObservationLink.where(id: records.pluck(:context_id)).where.not(id: not_obs)
 
-    source_user.as_student_observation_links.where(id: obs).update_all(user_id: restored_user.id)
+    if source_user.shard != restored_user.shard
+      delete_ids = merge_data.records.where(context_type: 'UserObservationLink', previous_workflow_state: 'non_existent', previous_user_id: source_user).pluck(:context_id)
+      restored_user.shard.activate { UserObservationLink.where("user_id=?", source_user.id).where(id: obs).update_all(user_id: restored_user.id) }
+      source_user.shard.activate { UserObservationLink.where(user_id: source_user.id).where(id: delete_ids).delete_all }
+    else
+      source_user.as_student_observation_links.where(id: obs).update_all(user_id: restored_user.id)
+    end
     source_user.as_observer_observation_links.where(id: obs).update_all(observer_id: restored_user.id)
   end
 
@@ -300,10 +309,10 @@ class SplitUsers
     # enrollments that were updated which already excluded conflicts, but we
     # will add the scope to protect against a FK violation.
     source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id))).
-      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).
+      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).shard(source_user).
       update_all(user_id: restored_user.id)
     source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id))).
-      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).
+      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).shard(source_user).
       update_all(user_id: restored_user.id)
   end
 

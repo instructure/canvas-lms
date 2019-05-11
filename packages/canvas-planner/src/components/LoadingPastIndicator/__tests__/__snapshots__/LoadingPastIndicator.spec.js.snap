@@ -4,6 +4,7 @@ exports[`prioritizes loading complete over currently loading 1`] = `
 <div>
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -11,6 +12,7 @@ exports[`prioritizes loading complete over currently loading 1`] = `
     textAlign="center"
   >
     <View
+      debug={false}
       display="block"
       margin="small"
       overflowX="visible"
@@ -48,6 +50,7 @@ exports[`renders TV when all past items loaded 1`] = `
 <div>
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -55,6 +58,7 @@ exports[`renders TV when all past items loaded 1`] = `
     textAlign="center"
   >
     <View
+      debug={false}
       display="block"
       margin="small"
       overflowX="visible"
@@ -92,6 +96,7 @@ exports[`renders spinner while loading 1`] = `
 <div>
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"

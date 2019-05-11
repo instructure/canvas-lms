@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(function(require) {
-  var Subject = require('jsx!views/answer_matrix/legend');
+// define(function(require) {
+//   var Subject = require('jsx!views/answer_matrix/legend');
 
-  describe('Views::AnswerMatrix::Legend', function() {
-    this.reactSuite({
-      type: Subject
-    });
+//   describe('Views::AnswerMatrix::Legend', function() {
+//     this.reactSuite({
+//       type: Subject
+//     });
 
-    it('should render', function() {
-      expect(subject.isMounted()).toEqual(true);
-    });
-  });
-});
+//     it('should render', function() {
+//       expect(subject.isMounted()).toEqual(true);
+//     });
+//   });
+// });

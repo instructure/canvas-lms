@@ -19,7 +19,6 @@
 import serviceRCELoader from '../rce/serviceRCELoader'
 import {RCELOADED_EVENT_NAME, send, destroy, focus} from '../rce/RceCommandShim'
 import Sidebar from '../rce/Sidebar'
-import featureFlag from '../rce/featureFlag'
 import $ from 'jquery'
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
@@ -42,54 +41,6 @@ function loadServiceRCE(target, tinyMCEInitOptions, callback) {
     if (callback) {
       callback()
     }
-  })
-}
-
-let legacyTinyMCELoaded = false
-function loadLegacyTinyMCE(callback) {
-  if (legacyTinyMCELoaded) {
-    callback()
-    return
-  }
-
-  require.ensure(
-    [],
-    require => {
-      legacyTinyMCELoaded = true
-      require('tinymce.editor_box')
-      require('compiled/tinymce')
-      require('./initA11yChecker')
-      callback()
-    },
-    'legacyTinymceAsyncChunk'
-  )
-}
-
-function hideTextareaWhileLoadingLegacyRCE(target, callback) {
-  const $target = node2jquery(target)
-  if (legacyTinyMCELoaded) {
-    callback()
-    return
-  }
-
-  const previousOpacity = $target[0].style.opacity
-  $target.css('opacity', 0)
-  loadLegacyTinyMCE(() => {
-    $target.css('opacity', previousOpacity)
-    callback()
-  })
-}
-
-function loadLegacyRCE(target, tinyMCEInitOptions, callback) {
-  const $target = node2jquery(target)
-  $target.css('display', '')
-  hideTextareaWhileLoadingLegacyRCE($target, () => {
-    tinyMCEInitOptions.defaultContent
-      ? $target
-          .editorBox(tinyMCEInitOptions)
-          .editorBox('set_code', tinyMCEInitOptions.defaultContent)
-      : $target.editorBox(tinyMCEInitOptions)
-    if (callback) callback()
   })
 }
 
@@ -162,10 +113,8 @@ const RichContentEditor = {
    *
    * @public
    */
-  preloadRemoteModule() {
-    if (featureFlag()) {
-      serviceRCELoader.preload()
-    }
+  preloadRemoteModule(cb = () => {}) {
+    return serviceRCELoader.preload(cb)
   },
 
   /**
@@ -235,22 +184,15 @@ const RichContentEditor = {
       }
     }
 
-    if (featureFlag()) {
-      $target = this.freshNode($target)
+    $target = this.freshNode($target)
 
-      if (tinyMCEInitOptions.manageParent) {
-        delete tinyMCEInitOptions.manageParent
-        establishParentNode($target)
-      }
-
-      loadServiceRCE($target, tinyMCEInitOptions, callback)
-    } else {
-      loadLegacyRCE($target, tinyMCEInitOptions, callback)
-
-      // listen for editor_box_focus events on our target, and trigger
-      // activateRCE from them
-      $target.on('editor_box_focus', () => this.activateRCE($target))
+    if (tinyMCEInitOptions.manageParent) {
+      delete tinyMCEInitOptions.manageParent
+      establishParentNode($target)
     }
+
+    loadServiceRCE($target, tinyMCEInitOptions, callback)
+
 
     hideResizeHandleForScreenReaders()
   },
@@ -262,9 +204,7 @@ const RichContentEditor = {
    */
   callOnRCE(target, methodName, ...args) {
     let $target = node2jquery(target)
-    if (featureFlag()) {
-      $target = this.freshNode($target)
-    }
+    $target = this.freshNode($target)
     return send($target, methodName, ...args)
   },
 
@@ -275,9 +215,7 @@ const RichContentEditor = {
    */
   destroyRCE(target) {
     let $target = node2jquery(target)
-    if (featureFlag()) {
-      $target = this.freshNode($target)
-    }
+    $target = this.freshNode($target)
     destroy($target)
     Sidebar.hide()
   },
@@ -290,9 +228,7 @@ const RichContentEditor = {
    */
   activateRCE(target) {
     let $target = node2jquery(target)
-    if (featureFlag()) {
-      $target = this.freshNode($target)
-    }
+    $target = this.freshNode($target)
     focus($target)
     Sidebar.show()
   },

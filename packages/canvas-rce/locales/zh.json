@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "作业"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "背景颜色，按下即可选择"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -77,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "版权持有者："
   },
+  "course_documents_104d76e0": {
+    "message": "课程文件"
+  },
+  "course_images_f8511d04": {
+    "message": "课程图像"
+  },
+  "course_links_b56959b9": {
+    "message": "课程链接"
+  },
+  "course_media_ec759ad": {
+    "message": "课程媒体"
+  },
   "course_navigation_dd035109": {
     "message": "课程导航"
   },
@@ -91,9 +100,6 @@
   },
   "discussions_index_6c36ced": {
     "message": "讨论索引"
-  },
-  "embed_image_1080badc": {
-    "message": "嵌入图片"
   },
   "enter_search_terms_e397b1f0": {
     "message": "搜索搜索条件"
@@ -112,12 +118,6 @@
   },
   "folder_705fd2d7": {
     "message": "文件夹"
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "字体大小，按下即可选择"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "格式，按下即可选择"
   },
   "grades_a61eba0a": {
     "message": "评分"
@@ -173,6 +173,9 @@
   "loading_25990131": {
     "message": "加载中……"
   },
+  "loading_bde52856": {
+    "message": "正在加载"
+  },
   "loading_failed_b3524381": {
     "message": "加载失败……"
   },
@@ -197,9 +200,6 @@
   "record_upload_media_5fdce166": {
     "message": "记录/上传媒体"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "富文本区域。按 ALT+F8 获取帮助"
-  },
   "search_280d00bd": {
     "message": "搜索"
   },
@@ -215,9 +215,6 @@
   "syllabus_f191f65b": {
     "message": "教学大纲"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "文本颜色，按下即可选择"
-  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "材料在公开域中"
   },
@@ -229,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "此上传文件超出了文件存储限额。请与您的系统管理员沟通。"
+  },
+  "tray_839df38a": {
+    "message": "托盘"
   },
   "upload_8b403d05": {
     "message": "上传"

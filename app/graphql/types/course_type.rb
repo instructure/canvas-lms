@@ -23,12 +23,6 @@ module Types
     value :gradedAt, value: :graded_at
   end
 
-  class OrderDirectionType < BaseEnum
-    graphql_name "OrderDirection"
-    value :ascending, value: "ASC"
-    value :descending, value: "DESC NULLS LAST"
-  end
-
   class SubmissionOrderInputType < BaseInputObject
     graphql_name "SubmissionOrderCriteria"
 
@@ -170,7 +164,8 @@ module Types
       )
 
       (order_by || []).each { |order|
-        submissions = submissions.order("#{order[:field]} #{order[:direction]}")
+        direction = order[:direction] == 'descending' ? "DESC NULLS LAST" : "ASC"
+        submissions = submissions.order("#{order[:field]} #{direction}")
       }
 
       submissions

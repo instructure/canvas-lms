@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'parallel'
+require 'brotli'
 
 module Canvas
   module Cdn
@@ -70,32 +71,42 @@ module Canvas
       def upload_file(remote_path)
         local_path = Pathname.new("#{Rails.public_path}/#{remote_path}")
         return if (local_path.extname == '.gz') || local_path.directory?
-        s3_object = mutex.synchronize { bucket.object(remote_path) }
-        return log("skipping already existing #{remote_path}") if s3_object.exists?
         options = options_for(local_path)
-        s3_object.put(options.merge(body: handle_compression(local_path, options)))
+        {'br' => 'br/', 'gzip' => ''}.each do |compression_type, path_prefix|
+          remote_path_with_prefix = path_prefix + remote_path
+          s3_object = mutex.synchronize { bucket.object(remote_path_with_prefix) }
+          if s3_object.exists?
+            log("skipping already existing #{compression_type} file #{remote_path_with_prefix}")
+          else
+            s3_object.put(options.merge(body: handle_compression(local_path, options, compression_type)))
+          end
+        end
       end
 
       def log(msg)
         Rails.logger.debug "#{self.class} - #{msg}"
       end
 
-      def handle_compression(file, options)
-        if file.size > 150 # gzipping small files is not worth it
-          gzipped = ActiveSupport::Gzip.compress(file.read, Zlib::BEST_COMPRESSION)
-          compression = 100 - (100.0 * gzipped.size / file.size).round
-          # if we couldn't compress more than 5%, the gzip decoding cost to the
-          # client makes it is not worth serving gzipped
+      def handle_compression(file, options, compression_algorithm='gzip')
+        contents = file.binread
+        if file.size > 150 # compressing small files is not worth it
+          compressed = if compression_algorithm == 'br'
+            Brotli.deflate(contents, quality: 11)
+          elsif compression_algorithm == 'gzip'
+            ActiveSupport::Gzip.compress(contents, Zlib::BEST_COMPRESSION)
+          end
+          compression = 100 - (100.0 * compressed.size / file.size).round
+          # if we couldn't compress more than 5%, the gzip/brotli decoding cost to the
+          # client makes it not worth serving compressed
           if compression > 5
-            options[:content_encoding] = 'gzip'
-            log "uploading gzipped #{file}. was: #{file.size} now: #{gzipped.size} saved: #{compression}%"
-            return gzipped
+            options[:content_encoding] = compression_algorithm
+            log "uploading #{compression_algorithm}'ed #{file}. was: #{file.size} now: #{compressed.size} saved: #{compression}%"
+            return compressed
           end
         end
-        log "uploading ungzipped #{file}"
-        file.read
+        log "uploading un-#{compression_algorithm}'ed #{file}"
+        contents
       end
-
     end
   end
 end

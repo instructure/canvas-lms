@@ -15,18 +15,17 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if (ENV.badge_counts) {
-  require.ensure([], () => {
-    const $ = require('jquery')
-    $(() =>
-      Object.keys(ENV.badge_counts).forEach((type) => {
-        const unread = ENV.badge_counts[type]
-        if (unread > 0) {
-          if (type === 'submissions') type = 'grades'
-          const $badge = $('<b/>').text(unread).addClass('nav-badge')
-          $(`#section-tabs .${type}`).append($badge)
-        }
-      })
-    )
-  }, 'badgeCountsAsyncChunk')
-}
+import $ from 'jquery'
+
+$(() =>
+  Object.keys(ENV.badge_counts).forEach(type => {
+    const unread = ENV.badge_counts[type]
+    if (unread > 0) {
+      if (type === 'submissions') type = 'grades'
+      const $badge = $('<b/>')
+        .text(unread)
+        .addClass('nav-badge')
+      $(`#section-tabs .${type}`).append($badge)
+    }
+  })
+)

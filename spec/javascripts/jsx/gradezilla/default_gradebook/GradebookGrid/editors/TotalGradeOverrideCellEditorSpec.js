@@ -41,7 +41,8 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
     }
 
     gradebook = createGradebook({final_grade_override_enabled: true})
-    sinon.stub(gradebook, 'isStudentGradeable').callsFake(id => id === '1101')
+    sinon.stub(gradebook, 'isStudentGradeable').returns(true)
+    sinon.stub(gradebook, 'studentHasGradedSubmission').returns(true)
 
     editorOptions = {
       column: {
@@ -75,7 +76,13 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
     })
 
     test('renders a read-only cell when the student is not gradeable', () => {
-      editorOptions.item.id = '1102'
+      gradebook.isStudentGradeable.withArgs('1101').returns(false)
+      createEditor()
+      ok($container.querySelector('.Grid__ReadOnlyCell'))
+    })
+
+    test('renders a read-only cell when the student has no graded submissions', () => {
+      gradebook.studentHasGradedSubmission.withArgs('1101').returns(false)
       createEditor()
       ok($container.querySelector('.Grid__ReadOnlyCell'))
     })

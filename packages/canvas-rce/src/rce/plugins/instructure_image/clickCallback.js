@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function(ed, document) {
-  var selectedNode = ed.selection.getNode();
-  // Internal image object like a flash placeholder
-  if (ed.dom.getAttrib(selectedNode, "class", "").indexOf("mceItem") != -1)
-    return;
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-  // this is deprecated and we should be using new CustomEvent(), but it isn't
-  // supported by IE11
-  var ev = document.createEvent("CustomEvent");
-  ev.initCustomEvent("tinyRCE/initImagePicker", true, true, {
-    ed,
-    selectedNode
-  });
-  document.dispatchEvent(ev);
+export default function(ed, document) {
+  return import('./UploadImage').then(({UploadImage}) => {
+    let container = document.querySelector('.canvas-rce-image-upload')
+    if (!container) {
+      container = document.createElement('div')
+      container.className = 'canvas-rce-image-upload'
+      document.body.appendChild(container)
+    }
+
+    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
+
+    ReactDOM.render(<UploadImage onDismiss={handleDismiss} />, container)
+  })
 }

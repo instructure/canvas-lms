@@ -62,7 +62,8 @@ describe "course syllabus" do
       wait_for_new_page_load { f('.edit_syllabus_link').click }
       # check that the wiki sidebar is visible
       wait_for_ajaximations
-      expect(f('#editor_tabs .wiki-sidebar-header')).to include_text("Insert Content into the Page")
+      expect(f('#editor_tabs')).to include_text("Link to other content in the course.")
+
       edit_form = f('#edit_course_syllabus_form')
       wait_for_tiny(f('#edit_course_syllabus_form'))
       type_in_tiny('#course_syllabus_body', new_description)

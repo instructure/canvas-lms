@@ -23,26 +23,16 @@ import formatMessage from "../../../format-message";
 tinymce.create("tinymce.plugins.InstructureRecord", {
   init: function(ed) {
     ed.addCommand("instructureRecord", clickCallback.bind(this, ed, document));
-    ed.addButton("instructure_record", {
+    ed.ui.registry.addButton("instructure_record", {
       title: htmlEscape(
         formatMessage({
           default: "Record/Upload Media",
           description: "Title for RCE button to insert or record media"
         })
       ),
-      cmd: "instructureRecord",
+      onAction: () => ed.execCommand("instructureRecord"),
       icon: "video icon-video"
     });
-  },
-
-  getInfo: function() {
-    return {
-      longname: "InstructureRecord",
-      author: "Brian Whitmer",
-      authorurl: "http://www.instructure.com",
-      infourl: "http://www.instructure.com",
-      version: tinymce.majorVersion + "." + tinymce.minorVersion
-    };
   }
 });
 

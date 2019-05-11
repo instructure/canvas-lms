@@ -2489,6 +2489,20 @@ define [
       student = @student(studentId)
       not (!student || student.isConcluded)
 
+    studentCanReceiveGradeOverride: (studentId) =>
+      @isStudentGradeable(studentId) && @studentHasGradedSubmission(studentId)
+
+    studentHasGradedSubmission: (studentId) =>
+      student = @student(studentId)
+      submissions = @submissionsForStudent(student)
+      return false unless submissions.length > 0
+
+      submissions.some (submission) ->
+        # A submission is graded if either:
+        # - it has a score and the workflow state is 'graded'
+        # - it is excused
+        submission.excused || (submission.score? && submission.workflow_state == 'graded')
+
     addPendingGradeInfo: (submission, gradeInfo) =>
       { userId, assignmentId } = submission
       pendingGradeInfo = Object.assign({ assignmentId, userId }, gradeInfo)
@@ -2686,6 +2700,9 @@ define [
       @getGradingScheme(assignment.grading_standard_id) || @getDefaultGradingScheme()
 
     ## Gradebook Content Access Methods
+
+    getSections: () =>
+      Object.values(@sections)
 
     setSections: (sections) =>
       @sections = _.indexBy(sections, 'id')

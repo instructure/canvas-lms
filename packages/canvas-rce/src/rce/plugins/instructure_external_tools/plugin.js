@@ -21,16 +21,6 @@ import dispatchInitEvent from "./dispatchInitEvent";
 tinymce.create("tinymce.plugins.InstructureExternalTools", {
   init: function(ed, url) {
     dispatchInitEvent(ed, document, url);
-  },
-
-  getInfo: function() {
-    return {
-      longname: "InstructureExternalTools",
-      author: "Brian Whitmer",
-      authorurl: "http://www.instructure.com",
-      infourl: "http://www.instructure.com",
-      version: tinymce.majorVersion + "." + tinymce.minorVersion
-    };
   }
 });
 

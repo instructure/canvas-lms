@@ -31,6 +31,7 @@ describe "login logout test" do
   end
 
   before do
+    Account.default.enable_canvas_authentication
     @login_error_box_css = ".error_text:last"
   end
 

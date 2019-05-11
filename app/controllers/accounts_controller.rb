@@ -277,7 +277,7 @@ class AccountsController < ApplicationController
   before_action :require_user, :only => [:index, :terms_of_service, :help_links]
   before_action :reject_student_view_student
   before_action :get_context
-  before_action :rich_content_service_config, only: [:settings]
+  before_action :rce_js_env, only: [:settings]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -550,7 +550,7 @@ class AccountsController < ApplicationController
     end
 
     sortable_name_col = User.sortable_name_order_by_clause('users')
-    
+
     order = if params[:sort] == 'course_name'
               "#{Course.best_unicode_collation_key('courses.name')}"
             elsif params[:sort] == 'sis_course_id'
@@ -944,23 +944,28 @@ class AccountsController < ApplicationController
     end
   end
 
+  def reports_tab
+    @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
+    if @available_reports
+      @root_account = @account.root_account
+      @account.shard.activate do
+        scope = @account.account_reports.active.where("report_type=name").most_recent
+        @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+                LATERAL (#{scope.complete.to_sql}) account_reports ").
+          order("report_types.name").
+          preload(:attachment).
+          index_by(&:report_type)
+        @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ").
+          order("report_types.name").
+          index_by(&:report_type)
+      end
+    end
+    render :layout => false
+  end
+
   def settings
     if authorized_action(@account, @current_user, :read)
-      @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
-      if @available_reports
-        @account.shard.activate do
-          scope = @account.account_reports.active.where("report_type=name").most_recent
-          @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-                LATERAL (#{scope.complete.to_sql}) account_reports ").
-              order("report_types.name").
-              preload(:attachment).
-              index_by(&:report_type)
-          @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-                LATERAL (#{scope.to_sql}) account_reports ").
-              order("report_types.name").
-              index_by(&:report_type)
-        end
-      end
       load_course_right_side
       @account_users = @account.account_users.active
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
@@ -1361,11 +1366,6 @@ class AccountsController < ApplicationController
     count > 99 ? "99+" : count
   end
   private :format_avatar_count
-
-  protected
-  def rich_content_service_config
-    rce_js_env(:basic)
-  end
 
   private
 

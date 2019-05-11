@@ -25,7 +25,6 @@ const Handlebars = require('handlebars')
 const {pick} = require('lodash')
 const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
-require('babel-polyfill')
 const {allFingerprintsFor} = require('brandable_css/lib/main')
 const PreProcessor = require('i18nliner-handlebars/dist/lib/pre_processor').default
 require('i18nliner-canvas/js/scoped_hbs_pre_processor')

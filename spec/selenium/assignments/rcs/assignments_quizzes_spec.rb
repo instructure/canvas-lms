@@ -24,8 +24,6 @@ describe "quizzes assignments" do
   before(:each) do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
-    enable_all_rcs @domain_root_account
-    enable_all_rcs @course.account
     stub_rcs_config
   end
 
