@@ -48,7 +48,7 @@ $('.help_dialog_trigger').click((event) => {
 
 
 // Backbone routes
-$('body').on('click', '[data-pushstate]', preventDefault(() => {
+$('body').on('click', '[data-pushstate]', preventDefault(function() {
   Backbone.history.navigate($(this).attr('href'), true)
 }))
 
