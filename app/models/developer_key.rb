@@ -262,37 +262,63 @@ class DeveloperKey < ActiveRecord::Base
     account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
   end
 
+  def disable_external_tools!(is_site_admin)
+    cleanup_external_tools(
+      tool_cleanup_enqueue_args,
+      :disable_tools_on_active_shard!,
+      is_site_admin
+    )
+  end
+
   private
+
+  def cleanup_external_tools(enqueue_args, method, all_shards = false)
+    if all_shards
+      # Cleanup tools across all shards
+      Shard.with_each_shard do
+        send_later_if_production_enqueue_args(
+          method,
+          enqueue_args
+        )
+      end
+    else
+      send_later_if_production_enqueue_args(
+        method,
+        enqueue_args
+      )
+    end
+  end
+
+  def tool_cleanup_enqueue_args
+    {
+      n_strand: ['cleanup_dev_key_external_tools', account&.global_id || 'site_admin'],
+      priority: Delayed::HIGH_PRIORITY
+    }
+  end
 
   def destroy_external_tools?
     saved_change_to_workflow_state? && workflow_state == 'deleted' && tool_configuration.present?
   end
 
   def destroy_external_tools!
-    enqueue_args = {
-      n_strand: ['destroy_dev_key_external_tools', account&.global_id || 'site_admin'],
-      priority: Delayed::HIGH_PRIORITY
-    }
-
-    if site_admin?
-      # Cleanup tools across all shards
-      Shard.with_each_shard do
-        send_later_if_production_enqueue_args(
-          :destroy_tools_from_active_shard!,
-          enqueue_args
-        )
-      end
-    else
-      send_later_if_production_enqueue_args(
-        :destroy_tools_from_active_shard!,
-        enqueue_args
-      )
-    end
+    cleanup_external_tools(
+      tool_cleanup_enqueue_args,
+      :destroy_tools_from_active_shard!,
+      site_admin?
+    )
   end
 
   def destroy_tools_from_active_shard!
     ContextExternalTool.active.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
       ContextExternalTool.where(id: tool_ids).destroy_all
+    end
+  end
+
+  def disable_tools_on_active_shard!
+    ContextExternalTool.active.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).update(
+        workflow_state: ContextExternalTool::DISABLED_STATE
+      )
     end
   end
 

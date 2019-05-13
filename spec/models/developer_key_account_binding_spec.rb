@@ -132,7 +132,10 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
       end
     end
 
-    describe 'after_save' do
+    describe 'after update' do
+      subject { site_admin_binding.update!(update_parameters) }
+
+      let(:update_parameters) { {workflow_state: workflow_state} }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:site_admin_binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
 
@@ -146,6 +149,37 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         allow(MultiCache).to receive(:delete).and_return(true)
         expect(MultiCache).not_to receive(:delete).with(DeveloperKeyAccountBinding.site_admin_cache_key(root_account_key))
         root_account_binding.update!(workflow_state: 'on')
+      end
+
+      describe 'tool cleanup' do
+        before { site_admin_binding.update!(workflow_state: 'on') }
+
+        context 'when the new workflow state is "off"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::OFF_STATE }
+
+          it 'disables associated external tools' do
+            expect(site_admin_key).to receive(:disable_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "on"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ON_STATE }
+
+          it 'does not disable associated external tools' do
+            expect(site_admin_key).not_to receive(:disable_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "allow"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
+
+          it 'does not disable associated external tools' do
+            expect(site_admin_key).not_to receive(:disable_external_tools!)
+            subject
+          end
+        end
       end
     end
   end

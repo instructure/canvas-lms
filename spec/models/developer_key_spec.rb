@@ -41,6 +41,79 @@ describe DeveloperKey do
     )
   end
 
+  describe 'disable_external_tools!' do
+    specs_require_sharding
+
+    subject do
+      @shard1.activate do
+        developer_key.disable_external_tools!(is_site_admin)
+      end
+    end
+
+    let(:developer_key) { DeveloperKey.create! }
+    let(:shard_1_account) { @shard1.activate { account_model } }
+    let(:shard_1_tool) do
+      tool = nil
+      @shard1.activate do
+        tool = ContextExternalTool.create!(
+          name: 'shard 1 tool',
+          workflow_state: 'public',
+          developer_key: developer_key,
+          context: shard_1_account,
+          url: 'https://www.test.com',
+          consumer_key: 'key',
+          shared_secret: 'secret'
+        )
+      end
+    end
+    let(:shard_2_account) { @shard2.activate { account_model } }
+    let(:shard_2_tool) do
+      tool = nil
+      @shard2.activate do
+        tool = ContextExternalTool.create!(
+          name: 'shard 2 tool',
+          workflow_state: 'public',
+          developer_key: developer_key,
+          context: shard_2_account,
+          url: 'https://www.test.com',
+          consumer_key: 'key',
+          shared_secret: 'secret'
+        )
+      end
+    end
+
+    before do
+      @shard1.activate { developer_key }
+      shard_1_tool
+      shard_2_tool
+      subject
+    end
+
+    context 'is_site_admin is true' do
+      let(:is_site_admin) { true }
+
+      it 'disables tools on shard 1' do
+        expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+      end
+
+      it 'disables tools on shard 2' do
+        expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+      end
+    end
+
+    context 'is_site_admin is false' do
+      let(:is_site_admin) { false }
+
+      it 'disables associated tools on the active shard' do
+        expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+      end
+
+      it 'does not disable tools on inactive shards' do
+        expect(shard_2_tool.reload.workflow_state).to eq 'public'
+      end
+    end
+  end
+
   describe 'usable_in_context?' do
     let(:account) { account_model }
     let(:developer_key) { DeveloperKey.create!(account: account) }
