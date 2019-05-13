@@ -34,7 +34,7 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
+  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -2378,47 +2378,6 @@ class User < ActiveRecord::Base
     if self.unread_conversations_count != unread_count
       self.class.where(:id => id).update_all(:unread_conversations_count => unread_count)
     end
-  end
-
-  def set_menu_data(enrollment_uuid)
-    return @menu_data if @menu_data
-    coalesced_enrollments = []
-
-    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_dates => true)
-    cached_enrollments.each do |e|
-
-      next if e.state_based_on_date == :inactive
-
-      if e.state_based_on_date == :completed
-        has_completed_enrollment = true
-        next
-      end
-
-      existing_enrollment_info = coalesced_enrollments.find { |en|
-        # coalesce together enrollments for the same course and the same state
-        en[:enrollment].course == e.course && en[:enrollment].workflow_state == e.workflow_state
-      }
-
-      if existing_enrollment_info
-        existing_enrollment_info[:types] << e.readable_type
-        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || CanvasSort::Last, [e.rank_sortable, e.state_sortable, 0 - e.id]].min
-      else
-        coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
-      end
-    end
-    coalesced_enrollments = coalesced_enrollments.sort_by{|e| e[:sortable] }
-    active_enrollments = coalesced_enrollments.map{ |e| e[:enrollment] }
-
-    cached_group_memberships = self.cached_current_group_memberships
-    coalesced_group_memberships = Canvas::ICU.collate_by(cached_group_memberships.
-      select{ |gm| gm.active_given_enrollments?(active_enrollments) }) { |gm| gm.group.name }
-
-    @menu_data = {
-      :group_memberships => coalesced_group_memberships,
-      :group_memberships_count => cached_group_memberships.length,
-      :accounts => self.adminable_accounts,
-      :accounts_count => self.adminable_accounts.length,
-    }
   end
 
   # Public: Returns a unique list of favorite context type ids relative to the active shard.
