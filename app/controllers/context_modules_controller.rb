@@ -294,6 +294,8 @@ class ContextModulesController < ApplicationController
       all_tags = Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).to_a }
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
 
+      ActiveRecord::Associations::Preloader.new.preload(all_tags, :content)
+
       preload_assignments_and_quizzes(all_tags, user_is_admin)
 
       assignment_ids = []
@@ -650,7 +652,6 @@ class ContextModulesController < ApplicationController
   def preload_assignments_and_quizzes(tags, user_is_admin)
     assignment_tags = tags.select{|ct| ct.can_have_assignment?}
     return unless assignment_tags.any?
-    ActiveRecord::Associations::Preloader.new.preload(assignment_tags, :content)
 
     content_with_assignments = assignment_tags.
       select{|ct| ct.content_type != "Assignment" && ct.content.assignment_id}.map(&:content)
