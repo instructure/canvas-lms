@@ -129,6 +129,7 @@ let reportsTabHasLoaded = false
           const splitContext = window.ENV.context_asset_string.split('_')
           fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`).then(req => req.text()).then(html => {
             $('#tab-reports').html(html)
+            $("#tab-reports .datetime_field").datetime_field();
 
             $(".open_report_description_link").click(openReportDescriptionLink);
 
