@@ -36,9 +36,10 @@ module Canvas::Migration::Helpers
             ['attachments', -> { I18n.t('lib.canvas.migration.attachments', 'Files') }],
     ]
 
-    def initialize(migration=nil, base_url=nil)
+    def initialize(migration=nil, base_url=nil, global_identifiers: )
       @migration = migration
       @base_url = base_url
+      @global_identifiers = global_identifiers
     end
 
     def valid_type?(type=nil)
@@ -184,7 +185,7 @@ module Canvas::Migration::Helpers
             hash[:title] = default_bank.title
           end
           hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title
-          hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank')
+          hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank', global: @global_identifiers)
         end
       when 'context_modules'
         hash[:item_count] = item['item_count']
@@ -316,7 +317,7 @@ module Canvas::Migration::Helpers
 
       hash = {type: type, title: title}
       if @migration
-        mig_id = (@migration.content_export || CC::CCHelper).create_key(item)
+        mig_id = CC::CCHelper.create_key(item, global: @global_identifiers)
         hash[:migration_id] = mig_id
         hash[:property] = "#{property_prefix}[#{type}][id_#{mig_id}]"
       else
