@@ -1632,8 +1632,10 @@ CanvasRails::Application.routes.draw do
       # returned after upload to S3, when that was the create_success URL.
       # that's no longer necessary, but they are still given a Location header
       # pointed at this endpoint which they can GET for the file details (which
-      # create_success would have provided). for those that are still POSTing,
-      # we'll allow this but it's a noop (as far as side effects)
+      # create_success would have provided).
+      #
+      # such behavior is now undocumented, and subject to removal once open
+      # sourcing of inst-fs is complete.
       #
       # to actually change the file metadata (e.g. rename), the PUT route above
       # must be used.

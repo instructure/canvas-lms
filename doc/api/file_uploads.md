@@ -123,18 +123,11 @@ If Step 2 is successful, the response will be either a 3XX redirect or
 
 In the case of a 3XX redirect, the application needs to perform a GET to
 this location in order to complete the upload, otherwise the new file
-may not be marked as available. This request is back against Canvas
-again, and needs to be authenticated using the normal API access token
-authentication.
-
-<p class="note deprecated">
-[DEPRECATED] While a POST would be truer to REST semantics, and was
-previously called for by this documentation, a GET is recommended at
-this point for forwards compatibility with the 201 Created response
-described below. POST requests are currently supported for backwards
-compatibility at all endpoints that may appear in the Location header,
-but are deprecated effective 2019-04-21 (notice given 2018-10-06).
-</p>
+may not be marked as available. (Note: While a POST would be truer to
+REST semantics, a GET is required for forwards compatibility with the
+201 Created response described below.) This request is back against
+Canvas again, and needs to be authenticated using the normal API access
+token authentication.
 
 In the case of a 201 Created, the upload has been complete and the
 Canvas JSON representation of the file can be retrieved with a GET from
