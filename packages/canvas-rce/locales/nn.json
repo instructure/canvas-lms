@@ -2,8 +2,23 @@
   "add_8523c19b": {
     "message": "Legg til"
   },
+  "align_11050992": {
+    "message": "Juster"
+  },
+  "align_center_ca078feb": {
+    "message": "Midtstill"
+  },
+  "align_left_e9f1f93b": {
+    "message": "Venstrejuster"
+  },
+  "align_right_9bad3ac1": {
+    "message": "Høgrejuster"
+  },
   "all_4321c3a1": {
     "message": "Alle"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetisk"
   },
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst: "
@@ -50,6 +65,12 @@
   "choose_usage_rights_33683854": {
     "message": "Vel bruksrett..."
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "sirkulær uordna liste"
+  },
+  "clear_upload_34efa419": {
+    "message": "Fjern opplasting"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klikk på ei fil for å sette inn ei nedlastingslenke for fila. "
   },
@@ -80,11 +101,32 @@
   "collaborations_5c56c15f": {
     "message": "Samarbeid"
   },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Skjul og lukk { types }"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Datamaskin"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Innhald underkategori"
+  },
   "content_type_2cf90d95": {
     "message": "Innhaldstype"
   },
   "copyright_holder_66ee111": {
     "message": "Rettshavar:"
+  },
+  "course_documents_104d76e0": {
+    "message": "Emnedokument"
+  },
+  "course_images_f8511d04": {
+    "message": "Emnebilde"
+  },
+  "course_links_b56959b9": {
+    "message": "Emnelenker"
+  },
+  "course_media_ec759ad": {
+    "message": "Emnemedier"
   },
   "course_navigation_dd035109": {
     "message": "Emnenavigering"
@@ -92,17 +134,35 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-lisens:"
   },
+  "date_added_ed5ad465": {
+    "message": "Dato lagd til"
+  },
+  "date_published_371c4ad0": {
+    "message": "Dato publisert"
+  },
   "decorative_image_fde98579": {
     "message": "Dekorativt bilde"
   },
   "decrease_indent_de6343ab": {
     "message": "Reduser innrykk"
   },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "standard uordna liste med kulepunkt"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "standard numerisk ordna liste"
+  },
   "discussions_a5f96392": {
     "message": "Diskusjonar"
   },
   "discussions_index_6c36ced": {
     "message": "Diskusjonsoversikt"
+  },
+  "documents_81393201": {
+    "message": "Dokument"
+  },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Dra og slipp, eller klikk for å hente fil frå disk"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Frist: Fleire datoar"
