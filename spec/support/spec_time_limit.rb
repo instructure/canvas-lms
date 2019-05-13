@@ -51,7 +51,9 @@ module SpecTimeLimit
 
     # find an appropriate timeout for this spec
     def timeout_for(example)
-      if ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
+      if example.metadata[:custom_timeout]
+        [:target, example.metadata[:custom_timeout].to_i]
+      elsif ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
       elsif example.file_path.match? /\.\/spec\/selenium\/.*rcs/ # files in ./spec/selenium/**/rcs
         [:target, SIDEBAR_LOADING_TIMEOUT]

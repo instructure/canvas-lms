@@ -34,7 +34,7 @@ describe "root account basic settings" do
     f("#account_settings_enable_gravatar").click
 
     submit_form("#account_settings")
-    wait_for_ajax_requests
+    wait_for_ajaximations
     expect(Account.default.reload.settings[:enable_gravatar]).to eq false
   end
 
@@ -47,6 +47,15 @@ describe "root account basic settings" do
     get reports_url
 
     expect(f('#course_storage_csv .last-run a').attribute('href')).to match(/download_frd=1/)
+  end
+
+  it "has date pickers for reports", custom_timeout: 30  do
+    course_with_admin_logged_in
+    get account_settings_url
+    f('#tab-reports-link').click()
+    wait_for_ajax_requests
+    f('#configure_zero_activity_csv').click()
+    expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end
 
   it "should change the default user quota", priority: "1", test_id: 250002 do
