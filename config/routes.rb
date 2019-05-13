@@ -1605,10 +1605,6 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/developer_keys', action: :create
     end
 
-    scope(controller: :internet_image) do
-      get 'image_search', action: :image_search
-    end
-
     scope(controller: :search) do
       get 'search/rubrics', action: 'rubrics', as: 'search_rubrics'
       get 'search/recipients', action: 'recipients', as: 'search_recipients'
