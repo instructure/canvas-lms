@@ -199,7 +199,8 @@ class ContentExportsApiController < ApplicationController
   def content_list
     if authorized_action(@context, @current_user, :read_as_admin)
       base_url = polymorphic_url([:api_v1, @context, :content_list])
-      formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(nil, base_url)
+      formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(nil, base_url,
+        global_identifiers: @context.content_exports.temp_record.can_use_global_identifiers?)
 
       unless formatter.valid_type?(params[:type])
         return render :json => {:message => "unsupported migration type"}, :status => :bad_request
