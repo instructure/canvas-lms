@@ -107,6 +107,8 @@ module CCHelper
   def self.create_key(object, prepend="", global: false)
     if object.is_a? ActiveRecord::Base
       key = global ? object.global_asset_string : object.asset_string
+    elsif global && (md = object.to_s.match(/^(.*)_(\d+)$/))
+      key = "#{md[1]}_#{Shard.global_id_for(md[2])}" # globalize asset strings
     else
       key = object.to_s
     end
