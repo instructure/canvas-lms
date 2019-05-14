@@ -2059,6 +2059,12 @@ describe GradeCalculator do
       check_grades(100.0, 100.0)
     end
 
+    it "should work with drop rules that result in only unpointed assignments going to the drop lowest phase" do
+      set_grades([[9,0],[10,0],[2,2]])
+      @group.update_attribute :rules, "drop_lowest:1\ndrop_highest:1"
+      check_grades(nil, nil)
+    end
+
     it "should support never_drop" do
       set_default_grades
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 3/38

@@ -795,11 +795,11 @@ class GradeCalculator
   end
 
   def keep_highest(submissions, cant_drop, keep, max_total)
-    keep_helper(submissions, cant_drop, keep, max_total) { |*args| big_f_best(*args) }
+    keep_helper(submissions, cant_drop, keep, max_total, keep_mode: :highest) { |*args| big_f_best(*args) }
   end
 
   def keep_lowest(submissions, cant_drop, keep, max_total)
-    keep_helper(submissions, cant_drop, keep, max_total) { |*args| big_f_worst(*args) }
+    keep_helper(submissions, cant_drop, keep, max_total, keep_mode: :lowest) { |*args| big_f_worst(*args) }
   end
 
   # @submissions: set of droppable submissions
@@ -808,30 +808,51 @@ class GradeCalculator
   # @max_total: the highest number of points possible
   # @big_f_blk: sorting block for the big_f function
   # returns +keep+ +submissions+
-  def keep_helper(submissions, cant_drop, keep, max_total, &big_f_blk)
+  def keep_helper(submissions, cant_drop, keep, max_total, keep_mode: nil, &big_f_blk)
     return submissions if submissions.size <= keep
 
     unpointed, pointed = (submissions + cant_drop).partition { |s|
       s[:total].zero?
     }
-    grades = pointed.map { |s| s[:score].to_f / s[:total] }.sort
 
-    q_high = estimate_q_high(pointed, unpointed, grades)
-    q_low  = grades.first
-    q_mid  = (q_low + q_high) / 2
+    kept = nil
+    if pointed.empty? && keep_mode == :lowest
+      # this is a really dumb situation that we saw in the wild.  17
+      # assignments, 2 of them have points possible, the rest have 0
+      # points possible with drop rules of drop 8 lowest and drop 7
+      # highest.
+      #
+      # In drop_pointed above, the call to keep_highest that
+      # goes here ends up eliminating the pointed assignments, so when
+      # keep_lowest is called, we end up here with unpointed
+      # assignments which completely breaks math. estimate_q_high
+      # comes back as NaN and q_low is nil.  "(nil + NaN)/2" means
+      # you're gonna have a bad time.
+      #
+      # What we'll do instead is just sort by score like
+      # drop_unpointed above, and drop the unpointed
+      # ones up to keep.
+      kept = unpointed.sort_by { |s| s[:score].to_f }[-keep,keep]
+    else
+      grades = pointed.map { |s| s[:score].to_f / s[:total] }.sort
 
-    x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
-    threshold = 1 / (2 * keep * max_total**2)
-    until q_high - q_low < threshold
-      x < 0 ?
-        q_high = q_mid :
-        q_low  = q_mid
-      q_mid = (q_low + q_high) / 2
-
-      # bail if we can't can't ever satisfy the threshold (floats!)
-      break if q_mid == q_high || q_mid == q_low
+      q_high = estimate_q_high(pointed, unpointed, grades)
+      q_low  = grades.first
+      q_mid  = (q_low + q_high) / 2
 
       x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
+      threshold = 1 / (2 * keep * max_total**2)
+      until q_high - q_low < threshold
+        x < 0 ?
+          q_high = q_mid :
+          q_low  = q_mid
+        q_mid = (q_low + q_high) / 2
+
+        # bail if we can't can't ever satisfy the threshold (floats!)
+        break if q_mid == q_high || q_mid == q_low
+
+        x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
+      end
     end
 
     kept
