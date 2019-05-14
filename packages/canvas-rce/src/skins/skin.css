@@ -1016,6 +1016,7 @@
   }
   .tox .tox-edit-area {
     border: 1px solid var(--canvasBorderColor);
+    border-radius: 3px;
     display: flex;
     flex: 1;
     -ms-flex-preferred-size: auto;
@@ -1856,7 +1857,7 @@
     overflow: hidden;
     padding: 0;
     text-transform: normal;
-    width: 34px;
+    width: 26px;
   }
   .tox .tox-tbtn svg {
     display: block;
@@ -1968,7 +1969,7 @@
     width: 16px;
   }
   .tox .tox-tbtn__select-chevron svg {
-    fill: rgba(45, 59, 69, 0.6);
+    fill: var(--canvasButtonColor);
   }
   .tox .tox-tbtn--bespoke .tox-tbtn__select-label {
     overflow: hidden;
@@ -2004,7 +2005,7 @@
     width: 16px;
   }
   .tox .tox-split-button__chevron svg {
-    fill: rgba(45, 59, 69, 0.6);
+    fill: var(--canvasButtonColor);
   }
   .tox .tox-pop .tox-split-button__chevron svg {
     transform: rotate(-90deg);
@@ -2212,7 +2213,11 @@
   }
   .tox .tox-tbtn--bespoke .tox-tbtn__select-label {
     width: auto;
-    padding-right: .5rem;
+    padding-right: 0;
+  }
+
+  .tox-pop__dialog .tox-toolbar__group::after {
+    display: none; /* not in a popup, like the link toolbar */
   }
 
   /***************** new rules added to the skin *****************/
@@ -2244,11 +2249,19 @@
   }
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
     border-width: 0;
-    margin-left: 0;
+    margin-left: -6px;
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {
     background: var(--tinySplitButtonChevronHoverBackground);
+  }
+
+  .tox .tox-toolbar__primary {
+    border-width: 0;
+  }
+
+  .tox-tbtn.tox-tbtn--select .tox-icon.tox-tbtn__icon-wrap {
+    margin-right: 4px;
   }
 
   /*

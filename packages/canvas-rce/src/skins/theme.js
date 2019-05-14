@@ -92,5 +92,6 @@ generator['canvas-a11y'] = generator['canvas-high-contrast'] = function ({colors
     canvasButtonBackground: colors.backgroundLight,
     canvasSecondaryButtonBorderColor: colors.borderMedium,
     canvasLinkDecoration: 'underline',
+    canvasFocusBorderColor: colors.brand
   }
 }

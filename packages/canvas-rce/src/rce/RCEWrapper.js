@@ -318,6 +318,9 @@ class RCEWrapper extends React.Component {
 
   onInit(_e, editor) {
     initKeyboardShortcuts(this._elementRef, editor)
+    if(document.body.classList.contains('Underline-All-Links__enabled')) {
+      this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
+    }
   }
 
   componentWillUnmount() {

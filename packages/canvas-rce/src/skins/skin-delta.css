@@ -281,6 +281,7 @@
   }
   .tox .tox-edit-area {
     border: 1px solid var(--canvasBorderColor);
+    border-radius: 3px;
   }
   .tox .tox-edit-area__iframe {
     background-color: var(--canvasBackgroundColor);
@@ -474,7 +475,7 @@
     fill: rgba(45, 59, 69, 0.5);
   }
   .tox .tox-tbtn__select-chevron svg {
-    fill: rgba(45, 59, 69, 0.6);
+    fill: var(--canvasButtonColor);
   }
   .tox .tox-split-button:hover {
     background: var(--toolbarButtonHoverBackground);
@@ -488,7 +489,7 @@
     box-shadow: var(--canvasFocusBoxShadow);
   }
   .tox .tox-split-button__chevron svg {
-    fill: rgba(45, 59, 69, 0.6);
+    fill: var(--canvasButtonColor);
   }
   .tox .tox-split-button.tox-tbtn--disabled:hover,
   .tox .tox-split-button.tox-tbtn--disabled:focus,
@@ -526,7 +527,7 @@
   .tox .tox-custom-editor {
     border-color: var(--canvasBorderColor);
   }
-   .tox a {
+  .tox a {
     color: var(--canvasLinkColor);
   }
   .tox.tox-tinymce {
@@ -564,9 +565,14 @@
     border-right-width: 0;
     padding-left: 0;
   }
+
+  .tox-pop__dialog .tox-toolbar__group::after {
+    display: none; /* not in a popup, like the link toolbar */
+  }
+
   .tox .tox-tbtn--bespoke .tox-tbtn__select-label {
     width: auto;
-    padding-right: .5rem;
+    padding-right: 0;
   }
 
   /***************** new rules added to the skin *****************/
@@ -598,7 +604,7 @@
   }
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
     border-width: 0;
-    margin-left: 0;
+    margin-left: -6px;
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {
@@ -611,5 +617,17 @@
 
   .tox .tox-toolbar__primary {
     border-width: 0;
+  }
+
+  .tox-tbtn.tox-tbtn--select .tox-icon.tox-tbtn__icon-wrap {
+    margin-right: 4px;
+  }
+
+  /* rotate and shrink the kabob button to more closely match the canvas standard */
+  .tox-toolbar-overlord .tox-toolbar__primary .tox-toolbar__group:last-child .tox-tbtn__icon-wrap {
+    transform: rotateZ(90deg) scale(.85, .85);
+  }
+  .tox-toolbar-overlord .tox-toolbar__primary .tox-toolbar__group:last-child button {
+    width: auto; /* to make the vertical kabob a bit narrower */
   }
 }

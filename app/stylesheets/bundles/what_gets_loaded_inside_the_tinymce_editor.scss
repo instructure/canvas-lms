@@ -74,4 +74,8 @@ body#tinyrce {
   height: 100vh;
 }
 
+.Underline-All-Links__enabled a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
+  text-decoration: underline;
+}
+
 @import 'our_custom_tiny_mce_stuff/_tinymce.editor_box.scss';
