@@ -77,7 +77,7 @@ module Canvas
                 self.where(id: slice).touch_all
               end
             end
-            self.clear_cache_keys(ids, *key_types)
+            self.clear_cache_keys(ids_or_records, *key_types)
           end
 
           def clear_cache_keys(ids_or_records, *key_types)
