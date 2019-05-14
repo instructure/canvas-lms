@@ -28,7 +28,6 @@
  * I didn't find any of those elements in the RCE, so I didn't want to guess what it
  * should look like.
  */
- /* stylelint-disable property-blacklist, declaration-property-value-blacklist */
 .root {
   background-color: var(--canvasBackgroundColor)
 }
@@ -38,6 +37,10 @@
     color: inherit;
     font-family: inherit;
   }
+
+  /* fix RTL. tinyMCE tries to do this in its default theme but it's base style is too specific so when it does it, it isn't specific enough to override the base */
+  [dir="rtl"] .tox :not(svg) { direction: rtl }
+
   .tox-tinymce-aux {
     font-family: var(--canvasFontFamily);
   }
@@ -585,14 +588,14 @@
     content: "";
     display: inline-block;
     box-sizing: border-box;
-    border-right: 1px solid var(--canvasBorderColor);
+    border-inline-end: 1px solid var(--canvasBorderColor);
     width: 8px;
     height: 24px;
   }
   .tox-toolbar .tox-toolbar__group:last-child::after,
   .tox-toolbar-overlord .tox-toolbar__group:last-child::after {
-    border-right-width: 0;
-    padding-left: 0;
+    border-inline-end-width: 0;
+    padding-inline-start: 0;
   }
 
   .tox-pop__dialog .tox-toolbar__group::after {
@@ -601,7 +604,7 @@
 
   .tox .tox-tbtn--bespoke .tox-tbtn__select-label {
     width: auto;
-    padding-right: 0;
+    padding-inline-end: 0;
   }
 
   /***************** new rules added to the skin *****************/
@@ -614,12 +617,12 @@
     border: 1px var(--canvasButtonBorderStyle) var(--canvasButtonBorderColor);
   }
   .tox .tox-split-button .tox-tbtn {
-    border-right-width: 0;
-    margin-right: 0;
+    border-inline-end-width: 0;
+    margin-inline-end: 0;
   }
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
-    border-left-width: 0;
-    margin-left: 0;
+    border-inline-start-width: 0;
+    margin-inline-start: 0;
   }
 
   .tox .tox-edit-area.active,
@@ -629,11 +632,11 @@
 
   .tox .tox-split-button .tox-tbtn {
     border-width: 0;
-    margin-right: 0;
+    margin-inline-end: 0;
   }
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
     border-width: 0;
-    margin-left: -6px;
+    margin-inline-start: -6px;
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {
@@ -649,7 +652,7 @@
   }
 
   .tox-tbtn.tox-tbtn--select .tox-icon.tox-tbtn__icon-wrap {
-    margin-right: 4px;
+    margin-inline-end: 4px;
   }
 
   /* MAKE INSTUI ICONS THE SAME SIZE AS THE DEFAULT TINYMCE ONES */
