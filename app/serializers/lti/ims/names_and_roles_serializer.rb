@@ -85,15 +85,16 @@ module Lti::Ims
     end
 
     def member(enrollment, expander)
+      user = enrollment.user
       {
         status: 'Active',
-        name: (enrollment.user.name if page[:tool].include_name?),
-        picture: (enrollment.user.avatar_url if page[:tool].public?),
-        given_name: (enrollment.user.first_name if page[:tool].include_name?),
-        family_name: (enrollment.user.last_name if page[:tool].include_name?),
-        email: (enrollment.user.email if page[:tool].include_email?),
+        name: (user.name if page[:tool].include_name?),
+        picture: (user.avatar_url if page[:tool].public?),
+        given_name: (user.first_name if page[:tool].include_name?),
+        family_name: (user.last_name if page[:tool].include_name?),
+        email: (user.email if page[:tool].include_email?),
         lis_person_sourcedid: (member_sourced_id(expander) if page[:tool].include_name?),
-        user_id: enrollment.user.lti_id,
+        user_id: user.past_lti_ids.first&.user_lti_id || user.lti_id,
         roles: enrollment.lti_roles
       }.compact
     end
