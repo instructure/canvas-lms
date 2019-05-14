@@ -18,6 +18,8 @@
 
 # @API Image Search
 # @beta
+#
+# This API requires a compatible image search service to be configured
 
 class InternetImageController < ApplicationController
 
@@ -26,7 +28,7 @@ class InternetImageController < ApplicationController
 
   def unsplash_config
     @settings ||= Canvas::Plugin.find(:unsplash).try(:settings)
-    return render json: { message: 'Service not configured' }, status: :not_implemented unless @settings&.dig('access_key')&.present?
+    return render json: { message: 'Service not found' }, status: :not_found unless @settings&.dig('access_key')&.present?
   end
 
   def service_url
@@ -34,17 +36,28 @@ class InternetImageController < ApplicationController
   end
 
   # @API Find images
-  # Find public domain images for use in courses and user content.
+  # Find public domain images for use in courses and user content.  If you select an image using this API, please use the {api:InternetImageController#image_selection Confirm image selection API} to indicate photo usage to the server.
   #
-  # @argument query [String]
+  # @argument query [Required, String]
   #   Search terms used for matching images (e.g. "cats").
   #
   # @example_response
-  #   [{"id": "eOLpJytrbsQ", "user": "Jeff Sheldon", "user_url": "http://unsplash.com/@ugmonk", "url": "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&s=92f3e02f63678acc8416d044e189f515"}]
+  #   [{
+  #      "id": "eOLpJytrbsQ",
+  #      "description": "description",
+  #      "alt": "accessible description of image",
+  #      "user": "Jeff Sheldon",
+  #      "user_url": "http://unsplash.com/@ugmonk",
+  #      "large_url": "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&s=92f3e02f63678acc8416d044e189f515",
+  #      "regular_url": "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&s=92f3e02f63678acc8416d044e189f515",
+  #      "small_url": "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=8aae34cf35df31a592f0bef16e6342ef"
+  #   }]
   #
   # @response_field id The unique identifier for the image.
   #
-  # @response_field description Accessible description of the image.
+  # @response_field description Description of the image.
+  #
+  # @response_field alt Accessible alternative text for the image.
   #
   # @response_field user The name of the user who owns the image
   #
@@ -57,8 +70,9 @@ class InternetImageController < ApplicationController
   # @response_field small_url The URL of the image sized small
 
   def image_search
+    return render json: { error: 'query param is required'}, status: :bad_request unless params[:query]
     search_url = "#{service_url}/search/photos"
-    send_params = {per_page: 10, page: 1}.merge(params.permit(:query, :per_page, :page))
+    send_params = {per_page: 10, page: 1}.with_indifferent_access.merge(params.permit(:query, :per_page, :page))
     search_results = HTTParty.get("#{search_url}?#{send_params.to_query}", {
       headers: {"Authorization" => "Client-ID #{@settings[:access_key]}"}
     })
@@ -68,10 +82,11 @@ class InternetImageController < ApplicationController
       ["#{request.protocol}#{request.host_with_port}#{request.path}?#{url.query}", link.attr_pairs]
     end
     response.headers['Link'] = LinkHeader.new(new_links).to_s
-    json = JSON.parse(search_results.body).dig('results').map do |sr|
+    json = search_results.dig('results').map do |sr|
       {
-        id: sr['id'],
+        id: Canvas::Security.url_key_encrypt_data(sr.dig('links', 'download_location')),
         description: sr['description'],
+        alt: sr['alt_description'],
         user: sr.dig('user', 'name'),
         user_url: sr.dig('user', 'links', 'html'),
         large_url: sr.dig('urls', 'regular'),
@@ -80,5 +95,29 @@ class InternetImageController < ApplicationController
       }
     end
     render json: json
+  end
+
+  # @API Confirm image selection
+  # After you have used the search API, you should hit this API to indicate photo usage to the server.
+  #
+  # @argument id [Required, String]
+  #   The ID from the image_search result.
+  #
+  # @response message Confirmation success message or error
+
+  def image_selection
+    return render json: { message: 'id param is required'}, status: :bad_request unless params[:id]
+    url = ''
+    begin
+      url = Canvas::Security.url_key_decrypt_data(params[:id])
+    rescue
+      return render json: {message: 'Could not find image.  Please check the id and try again'}, status: :bad_request
+    end
+    confirm_download = HTTParty.head(url, {headers: {"Authorization" => "Client-ID #{@settings[:access_key]}"}})
+    if confirm_download.code == 404 && confirm_download.dig('errors').present?
+      return render json: {message: confirm_download.dig('errors')&.join(', ')}, status: :not_found
+    end
+    return render json: {message: 'Confirmation success. Thank you.'} if confirm_download.success?
+    raise "Unsplash: #{confirm_download.dig('errors')&.join(', ') || confirm_download}"
   end
 end

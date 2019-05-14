@@ -1607,6 +1607,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :internet_image) do
       get 'image_search', action: :image_search
+      post 'image_selection/:id', action: :image_selection
     end
 
     scope(controller: :search) do
