@@ -1232,6 +1232,24 @@ describe Submission do
     }.not_to change(@submission.versions, :count)
   end
 
+  it "does not create a new version if only the posted_at field is updated" do
+    submission_spec_model
+    expect {
+      @submission.update!(posted_at: Time.zone.now)
+    }.not_to change {
+      @submission.reload.versions.count
+    }
+  end
+
+  it "does not update the most recent version if only the posted_at field is updated" do
+    submission_spec_model
+    expect {
+      @submission.update!(posted_at: Time.zone.now)
+    }.not_to change {
+      @submission.reload.versions.first.model.posted_at
+    }
+  end
+
   describe "version indexing" do
     it "should create a SubmissionVersion when a new submission is created" do
       expect {
