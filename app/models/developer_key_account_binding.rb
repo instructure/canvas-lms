@@ -30,7 +30,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   before_validation :infer_workflow_state
   after_update :clear_cache_if_site_admin
-  after_update :disable_tools!, if: :disable_tools?
+  after_update :update_tools!
 
   scope :active_in_account, -> (account) do
     where(account_id: account.account_chain_ids).
@@ -115,12 +115,20 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   private
 
-  def disable_tools?
-    saved_change_to_workflow_state? && off?
+  def update_tools!
+    if disable_tools?
+      developer_key.disable_external_tools!(site_admin_shard_active?)
+    elsif enable_tools?
+      developer_key.enable_external_tools!(site_admin_shard_active?)
+    end
   end
 
-  def disable_tools!
-    developer_key.disable_external_tools!(Shard.current == Account.site_admin.shard)
+  def enable_tools?
+    saved_change_to_workflow_state? && on?
+  end
+
+  def disable_tools?
+    saved_change_to_workflow_state? && off?
   end
 
   def clear_cache_if_site_admin
@@ -129,5 +137,9 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   def infer_workflow_state
     self.workflow_state ||= DEFAULT_STATE
+  end
+
+  def site_admin_shard_active?
+    Shard.current == Account.site_admin.shard
   end
 end

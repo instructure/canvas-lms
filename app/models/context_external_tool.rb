@@ -44,6 +44,8 @@ class ContextExternalTool < ActiveRecord::Base
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   validate :check_for_xml_error
 
+  scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
+
   CUSTOM_EXTENSION_KEYS = {
     :file_menu => [:accept_media_types].freeze,
     :editor_button => [:use_tray].freeze

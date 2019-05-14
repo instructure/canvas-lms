@@ -263,16 +263,24 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def disable_external_tools!(is_site_admin)
-    cleanup_external_tools(
-      tool_cleanup_enqueue_args,
+    manage_external_tools(
+      tool_management_enqueue_args,
       :disable_tools_on_active_shard!,
+      is_site_admin
+    )
+  end
+
+  def enable_external_tools!(is_site_admin)
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :enable_tools_on_active_shard!,
       is_site_admin
     )
   end
 
   private
 
-  def cleanup_external_tools(enqueue_args, method, all_shards = false)
+  def manage_external_tools(enqueue_args, method, all_shards = false)
     if all_shards
       # Cleanup tools across all shards
       Shard.with_each_shard do
@@ -289,9 +297,9 @@ class DeveloperKey < ActiveRecord::Base
     end
   end
 
-  def tool_cleanup_enqueue_args
+  def tool_management_enqueue_args
     {
-      n_strand: ['cleanup_dev_key_external_tools', account&.global_id || 'site_admin'],
+      n_strand: ['developer_key_tool_management', account&.global_id || 'site_admin'],
       priority: Delayed::HIGH_PRIORITY
     }
   end
@@ -301,8 +309,8 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def destroy_external_tools!
-    cleanup_external_tools(
-      tool_cleanup_enqueue_args,
+    manage_external_tools(
+      tool_management_enqueue_args,
       :destroy_tools_from_active_shard!,
       site_admin?
     )
@@ -314,12 +322,28 @@ class DeveloperKey < ActiveRecord::Base
     end
   end
 
-  def disable_tools_on_active_shard!
-    ContextExternalTool.active.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
+  def set_tool_workflow_state_on_active_shard!(state, scope)
+    scope.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
       ContextExternalTool.where(id: tool_ids).update(
-        workflow_state: ContextExternalTool::DISABLED_STATE
+        workflow_state: state
       )
     end
+  end
+
+  def disable_tools_on_active_shard!
+    return if tool_configuration.blank?
+    set_tool_workflow_state_on_active_shard!(
+      ContextExternalTool::DISABLED_STATE,
+      ContextExternalTool.active
+    )
+  end
+
+  def enable_tools_on_active_shard!
+    return if tool_configuration.blank?
+    set_tool_workflow_state_on_active_shard!(
+      tool_configuration.privacy_level,
+      ContextExternalTool.disabled
+    )
   end
 
   def validate_public_jwk

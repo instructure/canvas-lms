@@ -151,7 +151,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         root_account_binding.update!(workflow_state: 'on')
       end
 
-      describe 'tool cleanup' do
+      context 'when the starting workflow_state is on' do
         before { site_admin_binding.update!(workflow_state: 'on') }
 
         context 'when the new workflow state is "off"' do
@@ -176,6 +176,28 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
           let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
 
           it 'does not disable associated external tools' do
+            expect(site_admin_key).not_to receive(:disable_external_tools!)
+            subject
+          end
+        end
+      end
+
+      context 'when the starting workflow_state is off' do
+        before { site_admin_binding.update!(workflow_state: 'off') }
+
+        context 'when the new workflow state is "on"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ON_STATE }
+
+          it 'enables external tools' do
+            expect(site_admin_key).not_to receive(:disable_external_tools!)
+            subject
+          end
+        end
+
+        context 'when the new workflow state is "allow"' do
+          let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
+
+          it 'does not enable external tools' do
             expect(site_admin_key).not_to receive(:disable_external_tools!)
             subject
           end

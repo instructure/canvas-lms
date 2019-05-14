@@ -43,14 +43,9 @@ describe DeveloperKey do
 
   describe 'disable_external_tools!' do
     specs_require_sharding
+    include_context 'lti_1_3_spec_helper'
 
-    subject do
-      @shard1.activate do
-        developer_key.disable_external_tools!(is_site_admin)
-      end
-    end
-
-    let(:developer_key) { DeveloperKey.create! }
+    let(:developer_key) { @shard1.activate { DeveloperKey.create! } }
     let(:shard_1_account) { @shard1.activate { account_model } }
     let(:shard_1_tool) do
       tool = nil
@@ -82,34 +77,89 @@ describe DeveloperKey do
       end
     end
 
-    before do
-      @shard1.activate { developer_key }
-      shard_1_tool
-      shard_2_tool
-      subject
+    describe 'cleanup external tools' do
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        shard_1_tool
+        shard_2_tool
+        subject
+      end
+
+      context 'is_site_admin is true' do
+        subject do
+          @shard1.activate do
+            developer_key.disable_external_tools!(is_site_admin)
+          end
+        end
+
+        let(:is_site_admin) { true }
+
+        it 'disables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+        end
+
+        it 'disables tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+
+      context 'is_site_admin is false' do
+        subject do
+          @shard1.activate do
+            developer_key.disable_external_tools!(is_site_admin)
+          end
+        end
+
+        let(:is_site_admin) { false }
+
+        it 'disables associated tools on the active shard' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+        end
+
+        it 'does not disable tools on inactive shards' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'public'
+        end
+      end
     end
 
-    context 'is_site_admin is true' do
-      let(:is_site_admin) { true }
-
-      it 'disables tools on shard 1' do
-        expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+    describe 'enable_external_tools!' do
+      subject do
+        @shard1.activate do
+          developer_key.enable_external_tools!(is_site_admin)
+        end
       end
 
-      it 'disables tools on shard 2' do
-        expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
-      end
-    end
-
-    context 'is_site_admin is false' do
-      let(:is_site_admin) { false }
-
-      it 'disables associated tools on the active shard' do
-        expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        shard_1_tool.update!(workflow_state: 'disabled')
+        shard_2_tool.update!(workflow_state: 'disabled')
+        subject
       end
 
-      it 'does not disable tools on inactive shards' do
-        expect(shard_2_tool.reload.workflow_state).to eq 'public'
+      context 'is_site_admin is true' do
+        let(:is_site_admin) { true }
+
+        it 'enables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
+        end
+
+        it 'enables tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'anonymous'
+        end
+      end
+
+      context 'is_site_admin is false' do
+        let(:is_site_admin) { false }
+
+        it 'enables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
+        end
+
+        it 'does not enable tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
       end
     end
   end
