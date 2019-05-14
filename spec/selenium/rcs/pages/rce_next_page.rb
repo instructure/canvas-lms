@@ -194,6 +194,10 @@ module RCENextPage
     # put align right button locator here
   end
 
+  def rce_next_toolbar
+    f(".tox-toolbar__primary")
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
