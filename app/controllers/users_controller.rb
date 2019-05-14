@@ -580,7 +580,7 @@ class UsersController < ApplicationController
 
   def dashboard_cards
     dashboard_courses = map_courses_for_menu(@current_user.menu_courses, tabs: DASHBOARD_CARD_TABS)
-    Rails.cache.write(['last_known_dashboard_cards_count', @current_user].cache_key, dashboard_courses.count)
+    Rails.cache.write(['last_known_dashboard_cards_count', @current_user.global_id].cache_key, dashboard_courses.count)
     render json: dashboard_courses
   end
 

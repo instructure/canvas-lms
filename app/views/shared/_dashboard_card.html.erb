@@ -20,7 +20,7 @@ css_bundle :dashboard_card
 default_number_of_fake_dashcards_to_show = 5
 
 number_of_fake_cards_to_show =
-  Rails.cache.read(['last_known_dashboard_cards_count', @current_user].cache_key) ||
+  Rails.cache.read(['last_known_dashboard_cards_count', @current_user.global_id].cache_key) ||
   default_number_of_fake_dashcards_to_show
 %>
 
