@@ -48,11 +48,11 @@
         <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
         <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
         <% if !learning_outcome_criterion && !assessing %>
-          <div class="long_description small_description"><%= h((criterion.try(:long_description) || '')) %></div>
+          <div class="long_description small_description"><%= (criterion.try(:long_description) || '').html_safe %></div>
         <% end %>
         <div style="<%= "display: none;" if !learning_outcome_criterion && !assessing %>" class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
           <a href="#" class="long_description_link <%= "hidden" if !criterion || criterion.long_description.blank? %>"><%= t "view longer description" %></a>
-          <textarea class="long_description" aria-label="<%= t "Long Description" %>" style="display: none;"><%= h((criterion.try(:long_description) || '')) %></textarea>
+          <textarea class="long_description" aria-label="<%= t "Long Description" %>" style="display: none;"><%= (criterion.try(:long_description) || '').html_safe %></textarea>
         </div>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
           <div class="criterion_use_range_div editing toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">

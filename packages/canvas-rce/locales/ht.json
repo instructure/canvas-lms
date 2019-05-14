@@ -1,4 +1,25 @@
 {
+  "add_8523c19b": {
+    "message": "Ajoute"
+  },
+  "align_11050992": {
+    "message": "Aliyen"
+  },
+  "align_center_ca078feb": {
+    "message": "Aliyen nan mitan"
+  },
+  "align_left_e9f1f93b": {
+    "message": "Aliyen agoch"
+  },
+  "align_right_9bad3ac1": {
+    "message": "Aliyen adwat"
+  },
+  "all_4321c3a1": {
+    "message": "Tout"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetik"
+  },
   "alternative_text_a834dcad": {
     "message": "Lòt Tèks:"
   },
@@ -44,6 +65,9 @@
   "choose_usage_rights_33683854": {
     "message": "Itilizasyon dwa itilizasyon..."
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "Antoure lis ki pa òdone"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klike sou nenpòt fichye pou ensere yon lyen telechajan pou fichye sa a."
   },
@@ -65,11 +89,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klike pou ensere yon lyen nan eleman sa a."
   },
+  "close_d634289d": {
+    "message": "Fèmen"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Fèmen fòmilè Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Kolaborasyon"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Òdinatè"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Kontni Subtype"
+  },
+  "content_type_2cf90d95": {
+    "message": "Tip Kontni"
   },
   "copyright_holder_66ee111": {
     "message": "Titilè Dwa Otè:"
@@ -92,8 +128,23 @@
   "creative_commons_license_725584ae": {
     "message": "Lisans Creative Commons"
   },
+  "date_added_ed5ad465": {
+    "message": "Dat Ajoute"
+  },
+  "date_published_371c4ad0": {
+    "message": "Dat Pibliye"
+  },
   "decorative_image_fde98579": {
     "message": "Imaj Dekoratif"
+  },
+  "decrease_indent_de6343ab": {
+    "message": "Diminye endantasyon"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "lis non òdone a pis pa defo"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "lis nimerik pa defo"
   },
   "discussions_a5f96392": {
     "message": "Diskisyon"
@@ -101,11 +152,17 @@
   "discussions_index_6c36ced": {
     "message": "Endis Diskisyon"
   },
+  "documents_81393201": {
+    "message": "Dokiman"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "antre tèm rechèch"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Antre yon lòt tèks pou imaj sa a"
+  },
+  "external_links_3d9f074e": {
+    "message": "Lyen Ekstèn"
   },
   "file_upload_form_4aaad554": {
     "message": "Fòmilè Transfè Fichye"
@@ -125,6 +182,9 @@
   "group_navigation_99f191a": {
     "message": "Navigasyon Gwoup"
   },
+  "header_f28f73db": {
+    "message": "Antèt"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Mwen gen otorizasyon pou itilize fichye sa a."
   },
@@ -137,8 +197,14 @@
   "image_upload_form_7b74079a": {
     "message": "Fòmilè Transfè Imaj"
   },
+  "image_url_2aee2734": {
+    "message": "URL Imaj"
+  },
   "images_7ce26570": {
     "message": "Imaj"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "Ogmante endantasyon"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Ensere lyen Equella"
@@ -161,9 +227,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Lye a lòt kontni nan gwoup la."
   },
-  "link_to_url_52dd935c": {
-    "message": "Lyen pou ale nan URL"
-  },
   "links_14b70841": {
     "message": "Lyen"
   },
@@ -182,17 +245,32 @@
   "loading_folders_8d4d5d5a": {
     "message": "Chajman dosye..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Chajman plis rezilta..."
+  },
+  "media_af190855": {
+    "message": "Medya"
+  },
   "modules_c4325335": {
     "message": "Modil"
   },
   "no_results_940393cf": {
     "message": "Okenn rezilta."
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Lis Òdone e non Òdone"
+  },
   "pages_e5414c2c": {
     "message": "Paj"
   },
+  "paragraph_5e5ad8eb": {
+    "message": "Paragraf"
+  },
   "people_b4ebb13c": {
     "message": "Moun"
+  },
+  "preformatted_d0670862": {
+    "message": "Prefòmate"
   },
   "quizzes_7e598f57": {
     "message": "Quiz"
@@ -212,6 +290,30 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleksyone yon dosye pou transfere fichye ou a ladan li"
   },
+  "small_header_168fb9f9": {
+    "message": "Ti antèt"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Gen yon bagay ki mal fèt."
+  },
+  "sort_by_e75f9e3e": {
+    "message": "Triye Pa"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "lis kare non òdone"
+  },
+  "subheader_2b87606d": {
+    "message": "Sou antèt"
+  },
+  "submit_a3cc6859": {
+    "message": "Soumèt"
+  },
+  "subscript_59744f96": {
+    "message": "Endis"
+  },
+  "superscript_8cb349a2": {
+    "message": "An Ekspozan"
+  },
   "syllabus_f191f65b": {
     "message": "Pwogram"
   },
@@ -230,6 +332,9 @@
   "tray_839df38a": {
     "message": "Plato"
   },
+  "unsplash_ee049fbf": {
+    "message": "Deklanche"
+  },
   "upload_8b403d05": {
     "message": "Chajman"
   },
@@ -238,6 +343,18 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Transfere yon nouvo imaj"
+  },
+  "upload_image_6120b609": {
+    "message": "Transfere Imaj"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "lis alfabetik an majiskil"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "lis òdone chif Women an majiskil"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Dwa Itilizasyon:"

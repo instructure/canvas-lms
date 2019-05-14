@@ -235,9 +235,13 @@ export default class CourseItemRow extends Component {
             </div>
           )}
           <div className="ic-item-row__content-col">
-            {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
             {this.renderClickableDiv(
-              <Heading level="h3">{this.props.title}</Heading>,
+              <Heading level="h3">
+                {!this.props.isRead && (
+                  <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
+                )}
+                {this.props.title}
+              </Heading>,
               '_titleElement'
             )}
             {this.props.sectionToolTip}

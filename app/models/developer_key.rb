@@ -43,6 +43,7 @@ class DeveloperKey < ActiveRecord::Base
   before_save :set_require_scopes
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
+  after_update :destroy_external_tools!, if: :destroy_external_tools?
   after_create :create_default_account_binding
 
   validates_as_url :redirect_uri, :oidc_initiation_url, allowed_schemes: nil
@@ -54,6 +55,19 @@ class DeveloperKey < ActiveRecord::Base
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
+  scope :site_admin_lti, -> (key_ids) do
+    # Select site admin shard developer key ids
+    site_admin_key_ids = key_ids.select do |id|
+      Shard.local_id_for(id).second == Account.site_admin.shard
+    end
+
+    Account.site_admin.shard.activate do
+      lti_key_ids = Lti::ToolConfiguration.joins(:developer_key).
+        where(developer_keys: { id: site_admin_key_ids }).
+        pluck(:developer_key_id)
+      DeveloperKey.where(id: lti_key_ids)
+    end
+  end
 
   workflow do
     state :active do
@@ -77,6 +91,10 @@ class DeveloperKey < ActiveRecord::Base
     return false if DeveloperKey.test_cluster_checks_enabled? &&
       test_cluster_only? && !ApplicationController.test_cluster?
     active?
+  end
+
+  def usable_in_context?(context)
+    account_binding_for(context.try(:account) || context)&.on? && usable?
   end
 
   def redirect_uri=(value)
@@ -245,6 +263,38 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def destroy_external_tools?
+    saved_change_to_workflow_state? && workflow_state == 'deleted' && tool_configuration.present?
+  end
+
+  def destroy_external_tools!
+    enqueue_args = {
+      n_strand: ['destroy_dev_key_external_tools', account&.global_id || 'site_admin'],
+      priority: Delayed::HIGH_PRIORITY
+    }
+
+    if site_admin?
+      # Cleanup tools across all shards
+      Shard.with_each_shard do
+        send_later_if_production_enqueue_args(
+          :destroy_tools_from_active_shard!,
+          enqueue_args
+        )
+      end
+    else
+      send_later_if_production_enqueue_args(
+        :destroy_tools_from_active_shard!,
+        enqueue_args
+      )
+    end
+  end
+
+  def destroy_tools_from_active_shard!
+    ContextExternalTool.active.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).destroy_all
+    end
+  end
 
   def validate_public_jwk
     return true if public_jwk.blank?

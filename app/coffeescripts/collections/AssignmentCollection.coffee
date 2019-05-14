@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  '../models/Assignment'
-], (Backbone, Assignment) ->
+import Backbone from 'Backbone'
+import Assignment from '../models/Assignment'
 
-  class AssignmentCollection extends Backbone.Collection
+export default class AssignmentCollection extends Backbone.Collection
 
-    model: Assignment
+  model: Assignment
 
-    comparator: 'position'
+  comparator: 'position'

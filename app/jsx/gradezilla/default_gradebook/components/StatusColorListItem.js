@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func, string, bool} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Popover, {
   PopoverTrigger,

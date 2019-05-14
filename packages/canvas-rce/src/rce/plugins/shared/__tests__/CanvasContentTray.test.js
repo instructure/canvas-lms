@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render, waitForElement} from 'react-testing-library'
+import {act, render, wait} from 'react-testing-library'
 
 import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
@@ -28,9 +28,14 @@ describe('RCE Plugins > CanvasContentTray', () => {
   let props
 
   beforeEach(() => {
+    jest.setTimeout(10000)
+
     props = {
       bridge: new Bridge(),
-      source: fakeSource
+      contextId: '1201',
+      contextType: 'Course',
+      source: fakeSource,
+      themeUrl: 'http://localhost/tinymce-theme.swf'
     }
   })
 
@@ -39,30 +44,18 @@ describe('RCE Plugins > CanvasContentTray', () => {
   }
 
   function getTray() {
-    return component.queryByRole('dialog')
+    const $tray = component.queryByRole('dialog')
+    if ($tray) {
+      return $tray
+    }
+    throw new Error('not mounted')
   }
 
   async function showTrayForPlugin(plugin) {
     act(() => {
       props.bridge.controller.showTrayForPlugin(plugin)
     })
-    await waitForElement(getTray)
-  }
-
-  function selectContentType(contentTypeLabel) {
-    const contentTypeField = component.getByLabelText('Content Type')
-    fireEvent.click(contentTypeField)
-    fireEvent.click(component.getByText(contentTypeLabel))
-  }
-
-  function getContentSubtypeField() {
-    return component.queryByLabelText('Content Subtype')
-  }
-
-  function selectContentSubtype(contentSubtypeLabel) {
-    const contentTypeField = getContentSubtypeField()
-    fireEvent.click(contentTypeField)
-    fireEvent.click(component.getByText(contentSubtypeLabel))
+    await wait(getTray, {timeout: 10000})
   }
 
   describe('Tray Label', () => {

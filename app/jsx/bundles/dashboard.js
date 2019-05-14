@@ -43,5 +43,5 @@ if (dashboardHeaderContainer) {
   // stream items and initialize the backbone view in DashboardHeader
   // but on a course dashboard, erb html is there as part of the page load and
   // we can initialize the backbone view immediately
-  import('../views/DashboardView').then(DashboardView => new DashboardView())
+  import('../views/DashboardView').then(({default: DashboardView}) => new DashboardView())
 }

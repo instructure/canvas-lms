@@ -21,7 +21,7 @@ module Submissions
       respond_to do |format|
         format.html do
           flash[:error] = t("The specified user is not a student in this course")
-          redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+          redirect_to named_context_url(@context, :context_assignment_url, @assignment&.id)
         end
         format.json do
           render json: {

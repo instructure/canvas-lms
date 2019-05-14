@@ -19,7 +19,7 @@
 
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
 
   var QuestionHeader = React.createClass({

@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!message_students'
+import I18n from 'i18n!public_message_students'
 import $ from 'jquery'
+import natcompare from 'compiled/util/natcompare'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
@@ -52,13 +53,17 @@ window.messageStudents = function(settings) {
 
   $message_students_dialog.find('ul li:not(.blank)').remove()
 
-  for (let i = 0; i < settings.students.length; i++) {
+  const sortedStudents = settings.students.slice()
+  sortedStudents.sort(natcompare.byKey('sortableName'))
+
+  for (let i = 0; i < sortedStudents.length; i++) {
+    const student = sortedStudents[i]
     const $student = $li.clone(true).removeClass('blank')
 
-    $student.find('.name').text(settings.students[i].name)
-    $student.find('.score').text(settings.students[i].score)
+    $student.find('.name').text(student.name)
+    $student.find('.score').text(student.score)
     const remove_text = I18n.t('Remove %{student} from recipients', {
-      student: settings.students[i].name
+      student: student.name
     })
     const $remove_button = $student.find('.remove-button')
     $remove_button
@@ -78,11 +83,11 @@ window.messageStudents = function(settings) {
       }
     })
 
-    $student.data('id', settings.students[i].id)
-    $student.user_data = settings.students[i]
+    $student.data('id', student.id)
+    $student.user_data = student
 
     $ul.append($student.show())
-    students_hash[settings.students[i].id] = $student
+    students_hash[student.id] = $student
   }
 
   $ul.show()
@@ -169,31 +174,28 @@ $(document).ready(() => {
   })
 
   const showStudentsMessageSentTo = function() {
-    var idx = parseInt($message_students_dialog.find('select').val(), 10) || 0
-    const option = currentSettings.options[idx]
-    const students_hash = $message_students_dialog.data('students_hash')
+    const optionIdx = parseInt($message_students_dialog.find('select').val(), 10) || 0
+    const option = currentSettings.options[optionIdx]
+    const studentsHash = $message_students_dialog.data('students_hash')
     let cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
     if (isNaN(cutoff)) {
       cutoff = null
     }
-    let student_ids = null
-    const students_list = []
-    for (var idx in students_hash) {
-      students_list.push(students_hash[idx])
-    }
-    if (students_hash) {
+
+    const studentElements = Object.values(studentsHash)
+    let selectedStudentIds = []
+    if (studentsHash) {
       if (option && option.callback) {
-        student_ids = option.callback.call(window.messageStudents, cutoff, students_list)
+        selectedStudentIds = option.callback.call(window.messageStudents, cutoff, studentElements)
       } else if (currentSettings.callback) {
-        student_ids = currentSettings.callback.call(
+        selectedStudentIds = currentSettings.callback.call(
           window.messageStudents,
           option.text,
           cutoff,
-          students_list
+          studentElements
         )
       }
     }
-    student_ids = student_ids || []
 
     if (currentSettings.subjectCallback) {
       $message_students_dialog
@@ -205,17 +207,12 @@ $(document).ready(() => {
     $message_students_dialog
       .find('.student_list')
       .toggleClass('show_score', !!(option.cutoff || option.score))
-    disableButtons(student_ids.length === 0)
+    disableButtons(selectedStudentIds.length === 0)
 
-    const student_ids_hash = {}
-    for (var idx in student_ids) {
-      if (student_ids.hasOwnProperty(idx)) {
-        student_ids_hash[parseInt(student_ids[idx], 10) || 0] = true
-      }
-    }
-    for (var idx in students_hash) {
-      students_hash[idx].showIf(student_ids_hash[idx])
-    }
+    const selectedIdSet = new Set(selectedStudentIds)
+    Object.entries(studentsHash).forEach(([studentId, studentElement]) => {
+      studentElement.showIf(selectedIdSet.has(studentId))
+    })
   }
 
   const closeDialog = function() {

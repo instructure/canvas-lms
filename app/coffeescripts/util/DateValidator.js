@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import tz from 'timezone'
-import I18n from 'i18n!overrides'
+import I18n from 'i18n!DateValidator'
 import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
 import DateHelper from 'jsx/shared/helpers/dateHelper'
 

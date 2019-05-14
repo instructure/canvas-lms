@@ -22,7 +22,7 @@ import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArro
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Menu, {MenuItem, MenuItemSeparator} from '@instructure/ui-menu/lib/components/Menu'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 class GradebookMenu extends React.Component {
   static propTypes = {

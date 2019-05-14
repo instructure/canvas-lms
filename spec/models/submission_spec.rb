@@ -1232,6 +1232,24 @@ describe Submission do
     }.not_to change(@submission.versions, :count)
   end
 
+  it "does not create a new version if only the posted_at field is updated" do
+    submission_spec_model
+    expect {
+      @submission.update!(posted_at: Time.zone.now)
+    }.not_to change {
+      @submission.reload.versions.count
+    }
+  end
+
+  it "does not update the most recent version if only the posted_at field is updated" do
+    submission_spec_model
+    expect {
+      @submission.update!(posted_at: Time.zone.now)
+    }.not_to change {
+      @submission.reload.versions.first.model.posted_at
+    }
+  end
+
   describe "version indexing" do
     it "should create a SubmissionVersion when a new submission is created" do
       expect {
@@ -2000,7 +2018,8 @@ describe Submission do
             similarity_score: originality_report.originality_score,
             state: originality_report.state,
             report_url: originality_report.originality_report_url,
-            status: originality_report.workflow_state
+            status: originality_report.workflow_state,
+            error_message: nil
           }
         })
       end
@@ -2051,7 +2070,8 @@ describe Submission do
             similarity_score: originality_report.originality_score,
             state: originality_report.state,
             report_url: originality_report.originality_report_url,
-            status: originality_report.workflow_state
+            status: originality_report.workflow_state,
+            error_message: nil
           }
         })
       end
@@ -2089,9 +2109,22 @@ describe Submission do
             similarity_score: originality_report.originality_score,
             state: originality_report.state,
             report_url: originality_report.originality_report_url,
-            status: originality_report.workflow_state
+            status: originality_report.workflow_state,
+            error_message: nil
           }
         })
+      end
+
+      context 'when originality report has an error message' do
+        subject { submission.originality_data[attachment.asset_string] }
+
+        let(:error_message) { "We can't process that file :(" }
+
+        before { originality_report.update!(error_message: error_message) }
+
+        it 'includes the error message' do
+          expect(subject[:error_message]).to eq error_message
+        end
       end
     end
 

@@ -13,7 +13,6 @@ test_failure_status=99
 
 max_failures=${RERUNS:=200}
 rerun_number=0
-crash_num=0
 runs_remaining=$((1+${RERUNS_RETRY:=3}))
 spec_list=${SPEC_FILES:=spec}
 
@@ -79,13 +78,8 @@ while true; do
   fi
 
   if [[ $last_status == $webdriver_crash_status ]]; then
-    if [[ $crash_num != 0 ]]; then
-      echo "a worker may have crashed during retry, exiting"
-      break
-    fi
-
-    echo "a worker may have crashed, retrying the run once"
-    crash_num=1
+    echo "a webdriver worker crashed; retrigger your build"
+    break
   fi
 
   if [[ $last_status == $test_failure_status ]]; then

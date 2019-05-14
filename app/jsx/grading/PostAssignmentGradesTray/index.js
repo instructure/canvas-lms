@@ -40,7 +40,8 @@ function initialShowState() {
     postType: EVERYONE,
     postingGrades: false,
     open: true,
-    selectedSectionIds: []
+    selectedSectionIds: [],
+    submissions: []
   }
 }
 
@@ -60,7 +61,8 @@ export default class PostAssignmentGradesTray extends PureComponent {
       postType: EVERYONE,
       postingGrades: false,
       open: false,
-      selectedSectionIds: []
+      selectedSectionIds: [],
+      submissions: []
     }
   }
 
@@ -70,8 +72,8 @@ export default class PostAssignmentGradesTray extends PureComponent {
 
   show(context) {
     this.setState({
-      ...context,
-      ...initialShowState()
+      ...initialShowState(),
+      ...context
     })
   }
 
@@ -122,12 +124,13 @@ export default class PostAssignmentGradesTray extends PureComponent {
 
     try {
       const progress = await postRequest
-      await resolvePostAssignmentGradesStatus(progress)
+      const postedSubmissionInfo = await resolvePostAssignmentGradesStatus(progress)
+      this.dismiss()
+      this.state.onPosted(postedSubmissionInfo)
       showFlashAlert({
         message: successMessage,
         type: 'success'
       })
-      this.dismiss()
     } catch (error) {
       showFlashAlert({
         message: I18n.t('There was a problem posting assignment grades.'),
@@ -152,17 +155,28 @@ export default class PostAssignmentGradesTray extends PureComponent {
   }
 
   render() {
-    if (!this.state.assignment) {
+    const {
+      assignment,
+      onExited,
+      open,
+      postBySections,
+      postingGrades,
+      postType,
+      sections,
+      selectedSectionIds,
+      submissions
+    } = this.state
+    const unpostedCount = submissions.filter(submission => submission.postedAt == null).length
+
+    if (!assignment) {
       return null
     }
-
-    const {assignment, onExited, sections} = this.state
 
     return (
       <Tray
         label={I18n.t('Post grades tray')}
         onExited={onExited}
-        open={this.state.open}
+        open={open}
         placement="end"
       >
         <View as="div" padding="small">
@@ -183,14 +197,15 @@ export default class PostAssignmentGradesTray extends PureComponent {
           assignment={assignment}
           dismiss={this.dismiss}
           onPostClick={this.onPostClick}
-          postBySections={this.state.postBySections}
+          postBySections={postBySections}
           postBySectionsChanged={this.postBySectionsChanged}
-          postType={this.state.postType}
+          postType={postType}
           postTypeChanged={this.postTypeChanged}
-          postingGrades={this.state.postingGrades}
+          postingGrades={postingGrades}
           sections={sections}
           sectionSelectionChanged={this.sectionSelectionChanged}
-          selectedSectionIds={this.state.selectedSectionIds}
+          selectedSectionIds={selectedSectionIds}
+          unpostedCount={unpostedCount}
         />
       </Tray>
     )

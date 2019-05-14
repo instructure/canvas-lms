@@ -17,7 +17,7 @@
  */
 
 import { handleActions } from 'redux-actions'
-import I18n from 'i18n!roster'
+import I18n from 'i18n!add_peopleapiState_reducer'
 import { actionTypes } from '../actions'
 import { defaultState } from '../store'
   // helpers -----------------------

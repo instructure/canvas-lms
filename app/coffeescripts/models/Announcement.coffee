@@ -15,19 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../models/DiscussionTopic'
-  'underscore'
-], (DiscussionTopic, _) ->
+import DiscussionTopic from './DiscussionTopic'
+import _ from 'underscore'
 
-  class Announcement extends DiscussionTopic
+export default class Announcement extends DiscussionTopic
 
-    # this is wonky, and admittitedly not the right way to do this, but it is a workaround
-    # to append the query string '?only_announcements=true' to the index action (which tells
-    # discussionTopicsController#index to show announcements instead of discussion topics)
-    # but remove it for create/show/update/delete
-    urlRoot: -> _.result(@collection, 'url').replace(@collection._stringToAppendToURL, '')
+  # this is wonky, and admittitedly not the right way to do this, but it is a workaround
+  # to append the query string '?only_announcements=true' to the index action (which tells
+  # discussionTopicsController#index to show announcements instead of discussion topics)
+  # but remove it for create/show/update/delete
+  urlRoot: -> _.result(@collection, 'url').replace(@collection._stringToAppendToURL, '')
 
-    defaults:
-      is_announcement: true
+  defaults:
+    is_announcement: true
 

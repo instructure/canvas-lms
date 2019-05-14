@@ -25,7 +25,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
 import IconCheckSolid from '@instructure/ui-icons/lib/Solid/IconCheck'
 import IconEndSolid from '@instructure/ui-icons/lib/Solid/IconEnd'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
 import {parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
 

@@ -19,7 +19,7 @@
 import React from 'react'
 import {node} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Select from '@instructure/ui-core/lib/components/Select'
 import InstuiModal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'

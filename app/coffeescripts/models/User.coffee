@@ -16,54 +16,52 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!user'
-  'underscore'
-  'Backbone'
-], (I18n, _, Backbone) ->
+import I18n from 'i18n!user'
+import _ from 'underscore'
+import Backbone from 'Backbone'
 
-  class User extends Backbone.Model
-    modelType: 'user'
-    resourceName: 'users'
+export default class User extends Backbone.Model
+  modelType: 'user'
+  resourceName: 'users'
 
-    errorMap:
-      name:
-        blank:        I18n.t("errors.required", "Required")
-        too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 255})
-      self_enrollment_code:
-        blank:        I18n.t("errors.required", "Required")
-        invalid:      I18n.t("errors.invalid_code", "Invalid code")
-        already_enrolled: I18n.t("errors.already_enrolled", "You are already enrolled in this course")
-        concluded:    I18n.t("This course has concluded")
-        full:         I18n.t("errors.course_full", "This course is full")
-      terms_of_use:
-        accepted:     I18n.t("errors.terms", "You must agree to the terms")
+  errorMap:
+    name:
+      blank:        I18n.t("errors.required", "Required")
+      too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 255})
+    self_enrollment_code:
+      blank:        I18n.t("errors.required", "Required")
+      invalid:      I18n.t("errors.invalid_code", "Invalid code")
+      already_enrolled: I18n.t("errors.already_enrolled", "You are already enrolled in this course")
+      concluded:    I18n.t("This course has concluded")
+      full:         I18n.t("errors.course_full", "This course is full")
+    terms_of_use:
+      accepted:     I18n.t("errors.terms", "You must agree to the terms")
 
-    # first: optional boolean to return only the first match
-    enrollments: (attrs, first) ->
-      _.where @get('enrollments'), attrs, first
+  # first: optional boolean to return only the first match
+  enrollments: (attrs, first) ->
+    _.where @get('enrollments'), attrs, first
 
-    hasEnrollmentType: (type) ->
-      !! @enrollments {type}, true
+  hasEnrollmentType: (type) ->
+    !! @enrollments {type}, true
 
-    hasEnrollmentRole: (role) ->
-      !! @enrollments {role}, true
+  hasEnrollmentRole: (role) ->
+    !! @enrollments {role}, true
 
-    findEnrollmentByRole: (role) ->
-      @enrollments {role}, true
+  findEnrollmentByRole: (role) ->
+    @enrollments {role}, true
 
-    allEnrollmentsByType: (type) ->
-      @enrollments {type}
+  allEnrollmentsByType: (type) ->
+    @enrollments {type}
 
-    allEnrollmentsByRole: (role) ->
-      @enrollments {role}
+  allEnrollmentsByRole: (role) ->
+    @enrollments {role}
 
-    pending: (role) ->
-      _.any @get('enrollments'), (e) -> e.role == role && e.enrollment_state in ['creation_pending', 'invited']
+  pending: (role) ->
+    _.any @get('enrollments'), (e) -> e.role == role && e.enrollment_state in ['creation_pending', 'invited']
 
-    inactive: ->
-      _.all @get('enrollments'), (e) -> e.enrollment_state == 'inactive'
+  inactive: ->
+    _.all @get('enrollments'), (e) -> e.enrollment_state == 'inactive'
 
-    sectionEditableEnrollments: ->
-      _.select @get('enrollments'), (e) -> not _.include(['DesignerEnrollment', 'ObserverEnrollment'], e.type)
+  sectionEditableEnrollments: ->
+    _.select @get('enrollments'), (e) -> not _.include(['DesignerEnrollment', 'ObserverEnrollment'], e.type)
 

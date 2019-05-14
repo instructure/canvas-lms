@@ -26,7 +26,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
@@ -122,7 +122,7 @@ export default class PermissionsIndex extends Component {
   renderHeader() {
     return (
       <div className="permissions-v2__header_contianer">
-        <Container display="block">
+        <View display="block">
           <Grid>
             <GridRow vAlign="middle">
               <GridCol width={3}>
@@ -179,7 +179,7 @@ export default class PermissionsIndex extends Component {
               </GridCol>
             </GridRow>
           </Grid>
-        </Container>
+        </View>
       </div>
     )
   }

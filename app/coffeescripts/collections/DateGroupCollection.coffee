@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-  'jquery'
-  '../models/DateGroup'
-], (Backbone, _, $, DateGroup) ->
+import Backbone from 'Backbone'
+import _ from 'underscore'
+import $ from 'jquery'
+import DateGroup from '../models/DateGroup'
 
-  class DateGroupCollection extends Backbone.Collection
+export default class DateGroupCollection extends Backbone.Collection
 
-    model: DateGroup
+  model: DateGroup

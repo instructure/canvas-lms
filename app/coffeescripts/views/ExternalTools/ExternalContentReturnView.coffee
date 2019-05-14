@@ -15,77 +15,75 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery',
-  'Backbone',
-  'jst/ExternalTools/ExternalContentReturnView',
-  'jsx/external_apps/lib/iframeAllowances'
-], ($, Backbone, template, iframeAllowances) ->
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import template from 'jst/ExternalTools/ExternalContentReturnView'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
-  class ExternalContentReturnView extends Backbone.View
-    template: template
-    @optionProperty 'launchType'
-    @optionProperty 'launchParams'
-    @optionProperty 'displayAsModal'
+export default class ExternalContentReturnView extends Backbone.View
+  template: template
+  @optionProperty 'launchType'
+  @optionProperty 'launchParams'
+  @optionProperty 'displayAsModal'
 
-    defaults:
-      displayAsModal: true
+  defaults:
+    displayAsModal: true
 
-    els:
-      'iframe.tool_launch': "$iframe"
+  els:
+    'iframe.tool_launch': "$iframe"
 
-    events:
-      'focus .before_external_content_info_alert': 'handleAlertFocus'
-      'focus .after_external_content_info_alert': 'handleAlertFocus'
-      'blur .before_external_content_info_alert': 'handleAlertBlur'
-      'blur .after_external_content_info_alert': 'handleAlertBlur'
+  events:
+    'focus .before_external_content_info_alert': 'handleAlertFocus'
+    'focus .after_external_content_info_alert': 'handleAlertFocus'
+    'blur .before_external_content_info_alert': 'handleAlertBlur'
+    'blur .after_external_content_info_alert': 'handleAlertBlur'
 
-    handleAlertFocus: (e) ->
-      $(e.target).removeClass('screenreader-only')
-      @$el.find('iframe').addClass('info_alert_outline')
+  handleAlertFocus: (e) ->
+    $(e.target).removeClass('screenreader-only')
+    @$el.find('iframe').addClass('info_alert_outline')
 
-    handleAlertBlur: (e) =>
-      $(e.target).addClass('screenreader-only')
-      @$el.find('iframe').removeClass('info_alert_outline')
+  handleAlertBlur: (e) =>
+    $(e.target).addClass('screenreader-only')
+    @$el.find('iframe').removeClass('info_alert_outline')
 
-    attach: ->
-      @model.on 'change', => @render()
+  attach: ->
+    @model.on 'change', => @render()
 
-    toJSON: ->
-      json = super
-      json.allowances = iframeAllowances()
-      json.launch_url = @model.launchUrl(@launchType, @launchParams)
-      json
+  toJSON: ->
+    json = super
+    json.allowances = iframeAllowances()
+    json.launch_url = @model.launchUrl(@launchType, @launchParams)
+    json
 
-    afterRender: ->
-      @attachLtiEvents()
-      settings = @model.get(@launchType) || {}
-      @$iframe.width '100%'
-      @$iframe.height settings.selection_height
-      if @displayAsModal
-        @$el.dialog
-          title: @model.get(@launchType)?.label || ''
-          width: settings.selection_width
-          height: settings.selection_height
-          resizable: true
-          close: @removeDialog
+  afterRender: ->
+    @attachLtiEvents()
+    settings = @model.get(@launchType) || {}
+    @$iframe.width '100%'
+    @$iframe.height settings.selection_height
+    if @displayAsModal
+      @$el.dialog
+        title: @model.get(@launchType)?.label || ''
+        width: settings.selection_width
+        height: settings.selection_height
+        resizable: true
+        close: @removeDialog
 
-    attachLtiEvents: ->
-      $(window).on 'externalContentReady', @_contentReady
-      $(window).on 'externalContentCancel', @_contentCancel
+  attachLtiEvents: ->
+    $(window).on 'externalContentReady', @_contentReady
+    $(window).on 'externalContentCancel', @_contentCancel
 
-    detachLtiEvents: ->
-      $(window).off 'externalContentReady', @_contentReady
-      $(window).off 'externalContentCancel', @_contentCancel
+  detachLtiEvents: ->
+    $(window).off 'externalContentReady', @_contentReady
+    $(window).off 'externalContentCancel', @_contentCancel
 
-    removeDialog: =>
-      @detachLtiEvents()
-      @remove()
+  removeDialog: =>
+    @detachLtiEvents()
+    @remove()
 
-    _contentReady: (event, data) =>
-      @trigger 'ready', data
-      @removeDialog()
+  _contentReady: (event, data) =>
+    @trigger 'ready', data
+    @removeDialog()
 
-    _contentCancel: (event, data) =>
-      @trigger 'cancel', data
-      @removeDialog()
+  _contentCancel: (event, data) =>
+    @trigger 'cancel', data
+    @removeDialog()

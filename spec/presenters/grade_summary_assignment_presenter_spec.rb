@@ -236,4 +236,32 @@ describe GradeSummaryAssignmentPresenter do
       expect(presenter.late?).to eq('foo')
     end
   end
+
+  describe "#posted_to_student?" do
+    context "when post policies are enabled" do
+      before(:each) { @course.enable_feature!(:post_policies) }
+
+      it "returns true when the student's submission is posted" do
+        @submission.update!(posted_at: Time.zone.now)
+        expect(presenter).to be_posted_to_student
+      end
+
+      it "returns false when the student's submission is not posted" do
+        @submission.update!(posted_at: nil)
+        expect(presenter).not_to be_posted_to_student
+      end
+    end
+
+    context "when post policies are not enabled" do
+      it "returns true when the assignment is unmuted" do
+        @assignment.unmute!
+        expect(presenter).to be_posted_to_student
+      end
+
+      it "returns false when the assignment is muted" do
+        @assignment.mute!
+        expect(presenter).not_to be_posted_to_student
+      end
+    end
+  end
 end

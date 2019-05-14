@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
-  var I18n = require('i18n!quiz_log_auditing.navigation');
+  var I18n = require('i18n!quiz_log_auditing.navigation').default;
   var Link = ReactRouter.Link;
 
   var QuestionListing = React.createClass({

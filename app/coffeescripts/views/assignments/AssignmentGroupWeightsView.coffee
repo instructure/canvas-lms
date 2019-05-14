@@ -15,36 +15,34 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  '../../util/round'
-  'Backbone'
-  'jst/assignments/AssignmentGroupWeights'
-  'jsx/shared/helpers/numberHelper'
-], ($, round, Backbone, AssignmentGroupWeightsTemplate, numberHelper) ->
+import $ from 'jquery'
+import round from '../../util/round'
+import Backbone from 'Backbone'
+import AssignmentGroupWeightsTemplate from 'jst/assignments/AssignmentGroupWeights'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
 
-  class AssignmentGroupWeightsView extends Backbone.View
-    template: AssignmentGroupWeightsTemplate
-    tagName: 'tr'
-    className: 'ag-weights-tr'
+export default class AssignmentGroupWeightsView extends Backbone.View
+  template: AssignmentGroupWeightsTemplate
+  tagName: 'tr'
+  className: 'ag-weights-tr'
 
-    @optionProperty 'canChangeWeights'
+  @optionProperty 'canChangeWeights'
 
-    events:
-      'blur .group_weight_value' : 'roundWeight'
+  events:
+    'blur .group_weight_value' : 'roundWeight'
 
-    roundWeight: (e) ->
-      value = $(e.target).val()
-      rounded_value = round(numberHelper.parse(value), 2)
-      if isNaN(rounded_value)
-        return
-      else
-        $(e.target).val(I18n.n(rounded_value))
+  roundWeight: (e) ->
+    value = $(e.target).val()
+    rounded_value = round(numberHelper.parse(value), 2)
+    if isNaN(rounded_value)
+      return
+    else
+      $(e.target).val(I18n.n(rounded_value))
 
-    findWeight: ->
-      round(numberHelper.parse(@$el.find('.group_weight_value').val()), 2)
+  findWeight: ->
+    round(numberHelper.parse(@$el.find('.group_weight_value').val()), 2)
 
-    toJSON: ->
-      data = super
-      data.canChangeWeights = @canChangeWeights
-      data
+  toJSON: ->
+    data = super
+    data.canChangeWeights = @canChangeWeights
+    data

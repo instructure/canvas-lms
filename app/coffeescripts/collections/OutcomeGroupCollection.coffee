@@ -16,16 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'underscore'
-  '../collections/PaginatedCollection'
-  '../models/OutcomeGroup'
-], (_, PaginatedCollection, OutcomeGroup) ->
+import _ from 'underscore'
+import PaginatedCollection from './PaginatedCollection'
+import OutcomeGroup from '../models/OutcomeGroup'
 
-  class OutcomeGroupCollection extends PaginatedCollection
-    model: OutcomeGroup
+export default class OutcomeGroupCollection extends PaginatedCollection
+  model: OutcomeGroup
 
-    parse: (response) ->
-      super
-      _.reject response, (groupObj) ->
-        groupObj.id is ENV.COMMON_CORE_GROUP_ID
+  parse: (response) ->
+    super
+    _.reject response, (groupObj) ->
+      groupObj.id is ENV.COMMON_CORE_GROUP_ID

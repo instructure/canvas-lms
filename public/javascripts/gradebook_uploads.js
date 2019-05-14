@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradebook_uploads'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from './str/htmlEscape'
@@ -175,8 +175,11 @@ const GradebookUploader = {
         id: this.id
       }
       $.each(this.submissions, function() {
-        const originalGrade = Number.parseInt(this.original_grade, 10)
-        const updatedGrade = Number.parseInt(this.grade, 10)
+        // Even if canvas is operating in a locale that does commas as
+        // the decimal separator, the text that represents the score
+        // is sent period separated.
+        const originalGrade = Number.parseFloat(this.original_grade)
+        const updatedGrade = Number.parseFloat(this.grade)
         const updateWillRemoveGrade = !Number.isNaN(originalGrade) && Number.isNaN(updatedGrade)
 
         if (

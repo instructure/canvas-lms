@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../models/Progress'
-], (ProgressModel) -> 
-  class ContentMigrationProgress extends ProgressModel
-    defaults: 
-      timeout: 5000
+import ProgressModel from './Progress'
+
+export default class ContentMigrationProgress extends ProgressModel
+  defaults: 
+    timeout: 5000

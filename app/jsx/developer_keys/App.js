@@ -27,7 +27,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import DeveloperKeysTable from './AdminTable'
 import DeveloperKey from './DeveloperKey'
-import DeveloperKeyModal from './NewKeyModal'
+import NewKeyModal from './NewKeyModal'
 import DeveloperKeyModalTrigger from "./NewKeyTrigger"
 
 class DeveloperKeysApp extends React.Component {
@@ -128,7 +128,7 @@ class DeveloperKeysApp extends React.Component {
               actions={actions}
               setAddKeyButtonRef={this.setAddKeyButtonRef}
             />
-            <DeveloperKeyModal
+            <NewKeyModal
               store={store}
               actions={actions}
               createLtiKeyState={createLtiKey}

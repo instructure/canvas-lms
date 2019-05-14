@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const I18n = require('../public/javascripts/i18nObj')
+const I18n = require('../public/javascripts/i18nObj').default
 const core_translations = require('../public/javascripts/translations/_core_en.js')
 
 module.exports = I18n.scoped('fakeScopeUsedForTestingInJest')

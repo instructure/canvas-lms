@@ -16,55 +16,70 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from 'react-testing-library'
+import React, {useRef} from 'react'
+import {fireEvent, render} from 'react-testing-library'
 
+import {buildImage} from '../../../../../sidebar/sources/fake'
 import ImageList from '..'
 
-describe('RCE "Image" Plugin > ImageList', () => {
-  let props
+describe('RCE "Images" Plugin > ImageList', () => {
   let component
+  let props
 
   beforeEach(() => {
     props = {
-      fetchImages: jest.fn(),
-      images: {
-        hasMore: false,
-        isLoading: false,
-        records: []
-      },
-      onImageEmbed: jest.fn()
+      images: [
+        buildImage(0, 'example_1.png', 100, 200),
+        buildImage(1, 'example_2.png', 101, 201),
+        buildImage(2, 'example_3.png', 102, 202)
+      ],
+      onImageClick: jest.fn()
     }
   })
 
-  function renderComponent() {
-    component = render(<ImageList {...props} />)
+  function SpecComponent() {
+    // `useRef()` can only be used within a component render
+    props.lastItemRef = useRef(null)
+
+    return <ImageList {...props} />
   }
 
-  it('calls the .fetchImages prop when mounting', () => {
+  function renderComponent() {
+    component = render(<SpecComponent />)
+  }
+
+  function getImages() {
+    return component.container.querySelectorAll('img')
+  }
+
+  it('includes an `img` element for each image in the list', () => {
     renderComponent()
-    expect(props.fetchImages).toHaveBeenCalledTimes(1)
+    expect(getImages()).toHaveLength(3)
   })
 
-  describe('"Load More"', () => {
-    function getLoadMoreButton() {
-      return component.queryByText(/Load more/)
-    }
-
-    it('is present when more images can be loaded', () => {
-      jest.useFakeTimers()
-      props.images.hasMore = true
+  describe('.lastItemRef prop', () => {
+    it('is used when there are images', () => {
       renderComponent()
-      jest.runAllTimers()
-      expect(getLoadMoreButton()).not.toBeNull()
+      expect(props.lastItemRef.current).toBeInTheDocument()
     })
 
-    it('is not present when no more images can be loaded', () => {
-      jest.useFakeTimers()
-      props.images.hasMore = false
+    it('is forwarded to the last image', () => {
       renderComponent()
-      jest.runAllTimers()
-      expect(getLoadMoreButton()).toBeNull()
+      const $item = props.lastItemRef.current
+      const {src} = $item.querySelector('img')
+      expect(src).toEqual(props.images[2].href)
     })
+
+    it('is not used when the images list is empty', () => {
+      props.images = []
+      renderComponent()
+      expect(props.lastItemRef.current).toBeNull()
+    })
+  })
+
+  it('calls the .onImageClick prop with the related image when clicked', () => {
+    renderComponent()
+    fireEvent.click(getImages()[1])
+    expect(props.onImageClick).toHaveBeenCalledWith(props.images[1])
   })
 })

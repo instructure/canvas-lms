@@ -18,7 +18,7 @@
 
 import KeyboardNavDialog from 'compiled/views/KeyboardNavDialog'
 import INST from './INST'
-import I18n from 'i18n!instructure'
+import I18n from 'i18n!instructure_js'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from 'timezone'
@@ -780,14 +780,13 @@ function handleYoutubeLink () {
       var sf = $('#sequence_footer')
       if (sf.length) {
         var el = $(sf[0]);
-        require.ensure([], function (require) {
-          require('compiled/jquery/ModuleSequenceFooter')
+        import('compiled/jquery/ModuleSequenceFooter').then(() => {
           el.moduleSequenceFooter({
             courseID: el.attr("data-course-id"),
             assetType: el.attr("data-asset-type"),
             assetID: el.attr("data-asset-id")
           });
-        }, 'ModuleSequenceFooterAsyncChunk');
+        });
       }
     }
 

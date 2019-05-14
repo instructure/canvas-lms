@@ -348,7 +348,7 @@ import 'jqueryui/tabs'
           import('react'),
           import('jsx/course_settings/components/CSPSelectionBox')
         ])
-        .then(([axios, ReactDOM, React, CSPSelectionBox]) => {
+        .then(([axios, ReactDOM, React, {default: CSPSelectionBox}]) => {
           ReactDOM.render(
             <CSPSelectionBox
               courseId={ENV.COURSE_ID}

@@ -75,10 +75,12 @@ describe "account admin terms" do
       expect do
         f('.add_term_link').click
         replace_content(f('#enrollment_term_name'), new_term_name)
+        replace_content(f('#enrollment_term_sis_source_id'), '(sis id goes here)')
         f('.submit_button').click
         wait_for_ajax_requests
       end.to change(EnrollmentTerm, :count).by(1)
-      expect(ff('.term .header')[0].text).to eq new_term_name
+      expect(ff('.term .header .name')[0].text).to eq new_term_name
+      expect(ff('.term .header .sis_source_id')[0].text).to eq '(sis id goes here)'
       check_element_has_focus f("#term_#{EnrollmentTerm.last.id} .edit_term_link")
     end
 

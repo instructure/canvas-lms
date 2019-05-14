@@ -16,73 +16,71 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!dialog'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'jqueryui/dialog'
-], (I18n, $, _, Backbone) ->
+import I18n from 'i18n!dialog'
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import 'jqueryui/dialog'
+
+##
+# A Backbone View to extend for creating a jQuery dialog.
+#
+# Define options for the dialog as an object using the dialogOptions key,
+# those options will be merged with the defaultOptions object.
+# Begin with id and title options.
+export default class DialogBaseView extends Backbone.View
+
+  initialize: ->
+    super
+    @initDialog()
+    @setElement @dialog
+
+  defaultOptions: ->
+    # id:
+    # title:
+    autoOpen: false
+    width: 420
+    resizable: false
+    buttons: []
+    destroy: false
+
+  initDialog: () ->
+    opts = _.extend {}, @defaultOptions(),
+      buttons: [
+        text: I18n.t '#buttons.cancel', 'Cancel'
+        'class' : 'cancel_button'
+        click: @cancel
+      ,
+        text: I18n.t '#buttons.update', 'Update'
+        'class' : 'btn-primary'
+        click: @update
+      ],
+      _.result(this, 'dialogOptions')
+    @dialog = $("<div id=\"#{ opts.id }\"></div>").appendTo('body').dialog opts
+    @dialog.parent().attr('id', opts.containerId) if opts.containerId
+    $('.ui-resizable-handle').attr('aria-hidden', true)
+
+    @dialog
 
   ##
-  # A Backbone View to extend for creating a jQuery dialog.
+  # Sample
   #
-  # Define options for the dialog as an object using the dialogOptions key,
-  # those options will be merged with the defaultOptions object.
-  # Begin with id and title options.
-  class DialogBaseView extends Backbone.View
+  # render: ->
+  #   @$el.html someTemplate()
+  #   this
 
-    initialize: ->
-      super
-      @initDialog()
-      @setElement @dialog
+  show: ->
+    @dialog.dialog('open')
 
-    defaultOptions: ->
-      # id:
-      # title:
-      autoOpen: false
-      width: 420
-      resizable: false
-      buttons: []
-      destroy: false
+  close: ->
+    if (@options.destroy)
+      @dialog.dialog('destroy')
+    else
+      @dialog.dialog('close')
 
-    initDialog: () ->
-      opts = _.extend {}, @defaultOptions(),
-        buttons: [
-          text: I18n.t '#buttons.cancel', 'Cancel'
-          'class' : 'cancel_button'
-          click: @cancel
-        ,
-          text: I18n.t '#buttons.update', 'Update'
-          'class' : 'btn-primary'
-          click: @update
-        ],
-        _.result(this, 'dialogOptions')
-      @dialog = $("<div id=\"#{ opts.id }\"></div>").appendTo('body').dialog opts
-      @dialog.parent().attr('id', opts.containerId) if opts.containerId
-      $('.ui-resizable-handle').attr('aria-hidden', true)
+  update: (e) ->
+    throw 'Not yet implemented'
 
-      @dialog
-
-    ##
-    # Sample
-    #
-    # render: ->
-    #   @$el.html someTemplate()
-    #   this
-
-    show: ->
-      @dialog.dialog('open')
-
-    close: ->
-      if (@options.destroy)
-        @dialog.dialog('destroy')
-      else
-        @dialog.dialog('close')
-
-    update: (e) ->
-      throw 'Not yet implemented'
-
-    cancel: (e) =>
-      e.preventDefault()
-      @close()
+  cancel: (e) =>
+    e.preventDefault()
+    @close()

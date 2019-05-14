@@ -59,12 +59,29 @@ it('renders edit button for non lti keys', () => {
   expect(wrapper.find(IconEditLine).exists()).toBe(true)
 })
 
-it('does not render edit button for non lti keys', () => {
+it('does render edit button for non lti keys', () => {
   const wrapper = mount(<ActionButtons {...props({developerKey: {
     id: '1',
     api_key: 'test',
     created_at: 'test',
     is_lti_key: true
   }})} />)
-  expect(wrapper.find(IconEditLine).exists()).toBe(false)
+  expect(wrapper.find(IconEditLine).exists()).toBe(true)
+})
+
+it('warns the user when deleting a LTI key', () => {
+  const oldConfirm = window.confirm
+  const wrapper = mount(<ActionButtons {...props({developerKey: {
+    id: '1',
+    api_key: 'test',
+    created_at: 'test',
+    is_lti_key: true
+  }})} />)
+
+  window.confirm = jest.fn()
+  wrapper.find('Button').at(2).simulate('click')
+  expect(window.confirm).toHaveBeenCalledWith(
+    "Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context."
+  )
+  window.confirm = oldConfirm
 })

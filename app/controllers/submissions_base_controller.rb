@@ -61,16 +61,18 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def update
+    permissions = { user: @current_user, session: session, include_permissions: false }
     provisional = @assignment.moderated_grading? && params[:submission][:provisional]
+    submission_json_exclusions = []
+
+    if @submission.submission_type == "online_quiz" && @assignment.muted? && !@assignment.grants_right?(@current_user, :grade)
+      submission_json_exclusions << :body
+    end
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
 
-      render json: @submission.as_json(permissions: {
-        user: @current_user,
-        session: session,
-        include_permissions: false
-      })
+      render json: @submission.as_json(except: submission_json_exclusions, permissions: permissions)
       return
     end
 
@@ -127,7 +129,7 @@ class SubmissionsBaseController < ApplicationController
 
           json_args = Submission.json_serialization_full_parameters({
             except: [:quiz_submission, :submission_history]
-          }).merge(permissions: { user: @current_user, session: session, include_permissions: false })
+          }).merge(except: submission_json_exclusions, permissions: permissions)
           json_args[:methods] << :provisional_grade_id if provisional
 
           submissions_json = @submissions.map do |submission|

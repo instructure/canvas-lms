@@ -24,6 +24,24 @@ import loadEventListeners from '../rce/loadEventListeners'
 import polyfill from '../rce/polyfill'
 import splitAssetString from 'compiled/str/splitAssetString'
 
+function getTrayProps() {
+  if (!ENV.context_asset_string) {
+    return null
+  }
+
+  const context = splitAssetString(ENV.context_asset_string)
+  return {
+    canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
+    contextId: context[1],
+    contextType: context[0],
+    filesTabDisabled: ENV.RICH_CONTENT_FILES_TAB_DISABLED,
+    host: ENV.RICH_CONTENT_APP_HOST,
+    jwt: ENV.JWT,
+    refreshToken: refreshToken(ENV.JWT),
+    themeUrl: ENV.active_brand_config_json_url
+  }
+}
+
 let loadingPromise
 
   const RCELoader = {
@@ -47,17 +65,9 @@ let loadingPromise
       if (ENV.RICH_CONTENT_SKIP_SIDEBAR) {
         return
       }
-      let context = splitAssetString(ENV.context_asset_string)
-      let props = {
-        jwt: ENV.JWT,
-        refreshToken: refreshToken(ENV.JWT),
-        host: ENV.RICH_CONTENT_APP_HOST,
-        canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
-        filesTabDisabled: ENV.RICH_CONTENT_FILES_TAB_DISABLED,
-        contextType: context[0],
-        contextId: context[1],
-        themeUrl: ENV.active_brand_config_json_url
-      }
+
+      const props = getTrayProps()
+
       this.loadRCE(function (RCE) {
         RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {
           callback(polyfill.wrapSidebar(remoteSidebar))
@@ -173,13 +183,14 @@ let loadingPromise
       }
 
       return {
-        editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),
         defaultContent: textarea.value || tinyMCEInitOptions.defaultContent,
-        textareaId: textarea.id,
-        textareaClassName: textarea.className,
+        editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),
         language: ENV.LOCALE,
         mirroredAttrs: this._attrsToMirror(textarea),
-        onFocus: tinyMCEInitOptions.onFocus
+        onFocus: tinyMCEInitOptions.onFocus,
+        textareaClassName: textarea.className,
+        textareaId: textarea.id,
+        trayProps: getTrayProps()
       }
     }
   }

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!OriginalityReportVisibilityPicker'
 
 export default class OriginalityReportVisibilityPicker extends React.Component {
   static propTypes = {

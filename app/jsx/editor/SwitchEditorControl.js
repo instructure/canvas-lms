@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!editor'
+import I18n from 'i18n!SwitchEditorControl'
 import RichContentEditor from '../shared/rce/RichContentEditor'
 
 class SwitchEditorControl extends React.Component {

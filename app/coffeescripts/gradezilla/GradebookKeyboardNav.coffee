@@ -16,13 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!gradezilla'
-  '../gradezilla/GradebookTranslations'
-  'jquery'
-  'jquery.keycodes'
-], (I18n, GRADEBOOK_TRANSLATIONS, $) ->
-  class GradebookKeyboardNav
+import I18n from 'i18n!gradezillaGradebookKeyboardNav'
+import GRADEBOOK_TRANSLATIONS from './GradebookTranslations'
+import $ from 'jquery'
+import 'jquery.keycodes'
+
+export default class GradebookKeyboardNav
     constructor: (@options) ->
       @gridSupport = @options.gridSupport
       @gradebookElements = [document.querySelector('#gradebook_grid')]

@@ -19,227 +19,225 @@
 # TODO: consolidate this into DiscussionEntry
 #
 
-define [
-  'i18n!discussions'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'str/stripTags'
-  'jquery.ajaxJSON'
-], (I18n, $, _, Backbone, stripTags) ->
+import I18n from 'i18n!discussions'
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import stripTags from 'str/stripTags'
+import 'jquery.ajaxJSON'
+
+##
+# Model representing an entry in discussion topic
+export default class Entry extends Backbone.Model
+
+  defaults: ->
+    ##
+    # Attributes persisted with the server
+    id: null
+    parent_id: null
+    message: I18n.t('no_content', 'No Content')
+    user_id: null
+    read_state: 'read'
+    forced_read_state: false
+    created_at: null
+    updated_at: null
+    deleted: false
+    attachment: null
+
+    ##
+    # Received from API, but not persisted
+    replies: []
+
+    ##
+    # Client side attributes not persisted with the server
+    canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
+
+    # so we can branch for new stuff
+    new: false
+
+    highlight: false
+
+  computedAttributes: [
+    'canModerate'
+    'canReply'
+    'hiddenName'
+    'canRate'
+    'speedgraderUrl'
+    'inlineReplyLink'
+    { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
+    { name: 'allowsThreadedReplies', deps: ['deleted'] }
+    { name: 'showBoxReplyLink', deps: ['allowsSideComments'] }
+    { name: 'collapsable', deps: ['replies', 'allowsSideComments', 'allowsThreadedReplies'] }
+    { name: 'summary', deps: ['message'] }
+  ]
 
   ##
-  # Model representing an entry in discussion topic
-  class Entry extends Backbone.Model
+  # We don't follow backbone's route conventions, a method for each
+  # http method, used in `@sync`
+  read: ->
+    "#{ENV.DISCUSSION.ENTRY_ROOT_URL}?ids[]=#{@get 'id'}"
 
-    defaults: ->
-      ##
-      # Attributes persisted with the server
-      id: null
-      parent_id: null
-      message: I18n.t('no_content', 'No Content')
-      user_id: null
-      read_state: 'read'
-      forced_read_state: false
-      created_at: null
-      updated_at: null
-      deleted: false
-      attachment: null
+  create: ->
+    @set 'author', ENV.DISCUSSION.CURRENT_USER
+    parentId = @get 'parent_id'
+    if parentId is null # i.e. top-level
+      ENV.DISCUSSION.ROOT_REPLY_URL
+    else
+      ENV.DISCUSSION.REPLY_URL.replace /:entry_id/, parentId
 
-      ##
-      # Received from API, but not persisted
-      replies: []
+  delete: ->
+    ENV.DISCUSSION.DELETE_URL.replace /:id/, @get 'id'
 
-      ##
-      # Client side attributes not persisted with the server
-      canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH
+  update: ->
+    ENV.DISCUSSION.DELETE_URL.replace /:id/, @get 'id'
 
-      # so we can branch for new stuff
-      new: false
+  sync: (method, model, options = {}) ->
+    replies = @get('replies')
+    @set('replies', [])
+    options.url = @[method]()
+    oldComplete = options.complete
+    options.complete = =>
+      @set('replies', replies)
+      oldComplete() if oldComplete?
+    Backbone.sync method, this, options
 
-      highlight: false
+  parse: (data) ->
+    if _.isArray data
+      # GET (read) requests send an array O.o
+      data[0]
+    else
+      # POST (create) requests just send the object
+      data
 
-    computedAttributes: [
-      'canModerate'
-      'canReply'
-      'hiddenName'
-      'canRate'
-      'speedgraderUrl'
-      'inlineReplyLink'
-      { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
-      { name: 'allowsThreadedReplies', deps: ['deleted'] }
-      { name: 'showBoxReplyLink', deps: ['allowsSideComments'] }
-      { name: 'collapsable', deps: ['replies', 'allowsSideComments', 'allowsThreadedReplies'] }
-      { name: 'summary', deps: ['message'] }
-    ]
+  toJSON: ->
+    json = super
+    _.pick json,
+      'id'
+      'parent_id'
+      'message'
+      'user_id'
+      'read_state'
+      'forced_read_state'
+      'created_at'
+      'updated_at'
+      'deleted'
+      'attachment'
+      'replies'
+      'author'
 
-    ##
-    # We don't follow backbone's route conventions, a method for each
-    # http method, used in `@sync`
-    read: ->
-     "#{ENV.DISCUSSION.ENTRY_ROOT_URL}?ids[]=#{@get 'id'}"
+  hiddenName: ->
+    if ENV.DISCUSSION.HIDE_STUDENT_NAMES
+      isGradersEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
+      isStudentsEntry = @get('user_id')+'' is ENV.DISCUSSION.STUDENT_ID
 
-    create: ->
-      @set 'author', ENV.DISCUSSION.CURRENT_USER
-      parentId = @get 'parent_id'
-      if parentId is null # i.e. top-level
-        ENV.DISCUSSION.ROOT_REPLY_URL
+      if isGradersEntry
+        @get('author').display_name
+      else if isStudentsEntry
+        I18n.t('this_student', "This Student")
       else
-        ENV.DISCUSSION.REPLY_URL.replace /:entry_id/, parentId
+        I18n.t('discussion_participant', "Discussion Participant")
 
-    delete: ->
-      ENV.DISCUSSION.DELETE_URL.replace /:id/, @get 'id'
+  ratingString: ->
+    return '' unless sum = @get('rating_sum')
+    I18n.t 'like_count', {
+      one: '(%{count} like)'
+      other: '(%{count} likes)'
+    }, count: sum
 
-    update: ->
-      ENV.DISCUSSION.DELETE_URL.replace /:id/, @get 'id'
+  ##
+  # Computed attribute to determine if the entry can be moderated
+  # by the current user
+  canModerate: ->
+    isAuthorsEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
+    isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
 
-    sync: (method, model, options = {}) ->
-      replies = @get('replies')
-      @set('replies', [])
-      options.url = @[method]()
-      oldComplete = options.complete
-      options.complete = =>
-        @set('replies', replies)
-        oldComplete() if oldComplete?
-      Backbone.sync method, this, options
+  ##
+  # Computed attribute to determine if the entry can be replied to
+  # by the current user
+  canReply: ->
+    return no if @get 'deleted'
+    return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+    yes
 
-    parse: (data) ->
-      if _.isArray data
-        # GET (read) requests send an array O.o
-        data[0]
-      else
-        # POST (create) requests just send the object
-        data
+  ##
+  # Computed attribute to determine if the entry can be liked
+  # by the current user
+  canRate: ->
+    ENV.DISCUSSION.PERMISSIONS.CAN_RATE
 
-    toJSON: ->
-      json = super
-      _.pick json,
-        'id'
-        'parent_id'
-        'message'
-        'user_id'
-        'read_state'
-        'forced_read_state'
-        'created_at'
-        'updated_at'
-        'deleted'
-        'attachment'
-        'replies'
-        'author'
+  ##
+  # Computed attribute to determine if an inlineReplyLink should be
+  # displayed for the entry.
+  inlineReplyLink: ->
+    return yes if ENV.DISCUSSION.THREADED && (@allowsThreadedReplies() || @allowsSideComments())
+    no
 
-    hiddenName: ->
-      if ENV.DISCUSSION.HIDE_STUDENT_NAMES
-        isGradersEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
-        isStudentsEntry = @get('user_id')+'' is ENV.DISCUSSION.STUDENT_ID
+  ##
+  # Only threaded discussions get the ability to reply in an EntryView
+  # Directed discussions have the reply form in the EntryCollectionView
+  allowsThreadedReplies: ->
+    return no if @get 'deleted'
+    return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+    return no if not ENV.DISCUSSION.THREADED
+    yes
 
-        if isGradersEntry
-          @get('author').display_name
-        else if isStudentsEntry
-          I18n.t('this_student', "This Student")
-        else
-          I18n.t('discussion_participant', "Discussion Participant")
+  allowsSideComments: ->
+    return no if @get 'deleted'
+    return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
+    return no if ENV.DISCUSSION.THREADED
+    return no if @get 'parent_id'
+    yes
 
-    ratingString: ->
-      return '' unless sum = @get('rating_sum')
-      I18n.t 'like_count', {
-        one: '(%{count} like)'
-        other: '(%{count} likes)'
-      }, count: sum
+  showBoxReplyLink: ->
+    @allowsSideComments()
 
-    ##
-    # Computed attribute to determine if the entry can be moderated
-    # by the current user
-    canModerate: ->
-      isAuthorsEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
-      isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
+  collapsable: ->
+    @hasChildren() or
+    @allowsSideComments() or
+    @allowsThreadedReplies()
 
-    ##
-    # Computed attribute to determine if the entry can be replied to
-    # by the current user
-    canReply: ->
-      return no if @get 'deleted'
-      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
-      yes
+  ##
+  # Computed attribute
+  speedgraderUrl: ->
+    # ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE will only exist if I have permission to grade
+    # and this thing is an assignment
+    if ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE
+      ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE.replace /%3Astudent_id/, @get('user_id')
 
-    ##
-    # Computed attribute to determine if the entry can be liked
-    # by the current user
-    canRate: ->
-      ENV.DISCUSSION.PERMISSIONS.CAN_RATE
+  ##
+  # Computed attribute
+  summary: ->
+    stripTags @get('message')
 
-    ##
-    # Computed attribute to determine if an inlineReplyLink should be
-    # displayed for the entry.
-    inlineReplyLink: ->
-      return yes if ENV.DISCUSSION.THREADED && (@allowsThreadedReplies() || @allowsSideComments())
-      no
+  ##
+  # Not familiar enough with Backbone.sync to do this, using ajaxJSON
+  # Also, we can't just @save() because the mark as read api is a different
+  # resource altogether
+  markAsRead: ->
+    @set 'read_state', 'read'
+    url = ENV.DISCUSSION.MARK_READ_URL.replace /:id/, @get 'id'
+    $.ajaxJSON url, 'PUT'
 
-    ##
-    # Only threaded discussions get the ability to reply in an EntryView
-    # Directed discussions have the reply form in the EntryCollectionView
-    allowsThreadedReplies: ->
-      return no if @get 'deleted'
-      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
-      return no if not ENV.DISCUSSION.THREADED
-      yes
+  markAsUnread: ->
+    @set(read_state: 'unread', forced_read_state: true)
+    url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
+    $.ajaxJSON url, 'DELETE', forced_read_state: true
 
-    allowsSideComments: ->
-      return no if @get 'deleted'
-      return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
-      return no if ENV.DISCUSSION.THREADED
-      return no if @get 'parent_id'
-      yes
+  toggleLike: ->
+    rating = if @get('rating') then 0 else 1
+    @set(rating: rating)
+    sum = (@get('rating_sum') || 0) + (if rating then 1 else -1)
+    @set('rating_sum', sum)
+    url = ENV.DISCUSSION.RATE_URL.replace /:id/, @get 'id'
+    $.ajaxJSON url, 'POST', rating: rating
 
-    showBoxReplyLink: ->
-      @allowsSideComments()
+  _hasActiveReplies: (replies) ->
+    return true if _.some(replies, (reply) -> !reply.deleted)
+    return true if _.some(replies, (reply) => @_hasActiveReplies(reply.replies))
+    false
 
-    collapsable: ->
-      @hasChildren() or
-      @allowsSideComments() or
-      @allowsThreadedReplies()
+  hasActiveReplies: ->
+    @_hasActiveReplies(@get('replies'))
 
-    ##
-    # Computed attribute
-    speedgraderUrl: ->
-      # ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE will only exist if I have permission to grade
-      # and this thing is an assignment
-      if ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE
-        ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE.replace /%3Astudent_id/, @get('user_id')
-
-    ##
-    # Computed attribute
-    summary: ->
-      stripTags @get('message')
-
-    ##
-    # Not familiar enough with Backbone.sync to do this, using ajaxJSON
-    # Also, we can't just @save() because the mark as read api is a different
-    # resource altogether
-    markAsRead: ->
-      @set 'read_state', 'read'
-      url = ENV.DISCUSSION.MARK_READ_URL.replace /:id/, @get 'id'
-      $.ajaxJSON url, 'PUT'
-
-    markAsUnread: ->
-      @set(read_state: 'unread', forced_read_state: true)
-      url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
-      $.ajaxJSON url, 'DELETE', forced_read_state: true
-
-    toggleLike: ->
-      rating = if @get('rating') then 0 else 1
-      @set(rating: rating)
-      sum = (@get('rating_sum') || 0) + (if rating then 1 else -1)
-      @set('rating_sum', sum)
-      url = ENV.DISCUSSION.RATE_URL.replace /:id/, @get 'id'
-      $.ajaxJSON url, 'POST', rating: rating
-
-    _hasActiveReplies: (replies) ->
-      return true if _.some(replies, (reply) -> !reply.deleted)
-      return true if _.some(replies, (reply) => @_hasActiveReplies(reply.replies))
-      false
-
-    hasActiveReplies: ->
-      @_hasActiveReplies(@get('replies'))
-
-    hasChildren: ->
-      @get('replies').length > 0
+  hasChildren: ->
+    @get('replies').length > 0

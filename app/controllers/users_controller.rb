@@ -645,8 +645,8 @@ class UsersController < ApplicationController
         return render(json: { :message => "Invalid Dashboard View Option" }, status: :bad_request)
       end
 
-      @current_user.dashboard_view = params[:dashboard_view]
-      @current_user.save!
+      @current_user&.dashboard_view = params[:dashboard_view]
+      @current_user&.save!
       render json: {}
     end
   end
@@ -2459,6 +2459,9 @@ class UsersController < ApplicationController
   #          -X POST \
   #          -H 'Authorization: Bearer <token>'
   #
+  # @argument include[] [String, "assignment"]
+  #   Associations to include with the group.
+  #
   # @returns [Submission]
   #
   def user_graded_submissions
@@ -2473,7 +2476,9 @@ class UsersController < ApplicationController
 
       scope = BookmarkedCollection.merge(*collections)
       submissions = Api.paginate(scope, self, api_v1_user_submissions_url)
-      render(json: submissions.map{ |s| submission_json(s, s.assignment, @current_user, session) })
+
+      includes = params[:include] || []
+      render(json: submissions.map{ |s| submission_json(s, s.assignment, @current_user, session, nil, includes) })
     end
   end
 

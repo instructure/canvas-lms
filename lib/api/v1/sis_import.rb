@@ -42,8 +42,10 @@ module Api::V1::SisImport
       )
     end
     json[:user] = user_json(batch.user, user, session) if batch.user
-    atts = batch.downloadable_attachments
+    atts = batch.downloadable_attachments(:uploaded)
     json[:csv_attachments] = attachments_json(atts, user, {}, {skip_permission_checks: true}) if atts.any?
+    diff_atts = batch.downloadable_attachments(:diffed)
+    json[:diffed_csv_attachments] = attachments_json(diff_atts, user, {}, {skip_permission_checks: true}) if diff_atts.any?
     json
   end
 end

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import round from 'compiled/util/round'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import {scoreToGrade} from '../../../../gradebook/GradingSchemeHelper'
 import {scoreToPercentage} from '../../../../gradebook/shared/helpers/GradeCalculationHelper'
 import 'jquery.instructure_misc_helpers' // $.toSentence

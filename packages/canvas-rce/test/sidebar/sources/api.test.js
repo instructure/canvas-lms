@@ -217,6 +217,26 @@ describe('sources/api', () => {
     })
   })
 
+  describe('fetchMediaFolder', () => {
+    let files;
+    beforeEach(() => {
+      files = [{id: 24}]
+      const body = {files}
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+    it('calls fetchPage with the proper params', () => {
+      return apiSource.fetchMediaFolder({
+        contextType: 'course', contextId: '22'
+      }).then(() => {
+        sinon.assert.calledWith(apiSource.fetchPage, '/api/folders/media?contextType=course&contextId=22')
+      })
+    })
+  })
+
   describe('preflightUpload', () => {
     const uri = '/api/upload'
     let fileProps = {}

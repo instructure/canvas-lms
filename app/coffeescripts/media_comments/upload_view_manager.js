@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import I18n from 'i18n!media_comments'
+import I18n from 'i18n!media_comments_upload_view_manager'
 import 'jqueryui/progressbar'
 import 'jquery.instructure_misc_helpers'
 

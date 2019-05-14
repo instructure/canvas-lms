@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-  '../../util/natcompare'
-], (_, {Model, Collection}, natcompare) ->
-  class Section extends Model
-    initialize: ->
-      @set('groups', new Collection([], comparator: natcompare.byGet('title')))
+import {Model, Collection} from 'Backbone'
+import natcompare from '../../util/natcompare'
+
+export default class Section extends Model
+  initialize: ->
+    @set('groups', new Collection([], comparator: natcompare.byGet('title')))

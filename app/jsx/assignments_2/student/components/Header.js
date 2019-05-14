@@ -16,20 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
+import React from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import I18n from 'i18n!assignments_2_student_header'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
-import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
-import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
+import Attempt from './Attempt'
 import DateTitle from './DateTitle'
 import GradeDisplay from './GradeDisplay'
-import StepContainer from './StepContainer'
-import Attempt from './Attempt'
+import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import {number} from 'prop-types'
+import StepContainer from './StepContainer'
+import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
@@ -70,7 +69,11 @@ class Header extends React.Component {
     return (
       <React.Fragment>
         <div
-          data-testid="assignments-2-student-header"
+          data-testid={
+            this.state.isSticky
+              ? 'assignment-student-header-sticky'
+              : 'assignment-student-header-normal'
+          }
           id="assignments-2-student-header"
           className={
             this.state.isSticky
@@ -124,17 +127,16 @@ class Header extends React.Component {
           <div className="assignment-pizza-header-outer">
             <div
               className="assignment-pizza-header-inner"
-              data-test-id={
+              data-testid={
                 this.state.isSticky
-                  ? 'assignment-student-header-sticky'
-                  : 'assignment-student-header-normal'
+                  ? 'assignment-student-pizza-header-sticky'
+                  : 'assignment-student-pizza-header-normal'
               }
             >
               <StepContainer
                 assignment={this.props.assignment}
                 forceLockStatus={!this.props.assignment.env.currentUser} // TODO: replace with new 'self' graphql query when ready
                 isCollapsed={this.state.isSticky}
-                collapsedLabel={I18n.t('Submitted')}
               />
             </div>
           </div>
@@ -145,7 +147,7 @@ class Header extends React.Component {
         }
         {this.state.isSticky && (
           <div
-            data-test-id="header-element-filler"
+            data-testid="header-element-filler"
             style={{height: `${this.state.nonStickyHeaderheight - this.props.scrollThreshold}px`}}
           />
         )}

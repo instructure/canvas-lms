@@ -15,19 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!assignments_2'
-import React from 'react'
-import ReactPlayer from 'react-player'
-import {CommentShape} from '../../assignmentData'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
+import I18n from 'i18n!assignments_2'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import React from 'react'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import {CommentShape} from '../../assignmentData'
+import {VideoPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 
 function CommentRow(props) {
   const author = props.comment.author
   const mediaObject = props.comment.mediaObject
+  if (mediaObject) {
+    mediaObject.mediaSources.forEach(function(mediaSource) {
+      mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
+    })
+  }
   return (
     <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
@@ -59,11 +64,24 @@ function CommentRow(props) {
           </Link>
         ))}
         {mediaObject && (
-          <ReactPlayer
-            height={mediaObject.mediaType !== 'audio' ? '360px' : '70px'}
-            url={mediaObject.mediaSources}
-            config={{file: {attributes: {title: mediaObject.title}}}}
-            controls
+          <VideoPlayer
+            tracks={[
+              {
+                src:
+                  'http://localhost:3000/media_objects/m-2bpCURwK6FnmB6kJzeuuF1PuboAraKdc/media_tracks/7',
+                label: 'en',
+                type: 'subtitles',
+                language: 'en'
+              },
+              {
+                src:
+                  'http://localhost:3000/media_objects/m-2bpCURwK6FnmB6kJzeuuF1PuboAraKdc/media_tracks/7',
+                label: 'fr',
+                type: 'subtitles',
+                language: 'fr'
+              }
+            ]}
+            sources={mediaObject.mediaSources}
           />
         )}
       </div>

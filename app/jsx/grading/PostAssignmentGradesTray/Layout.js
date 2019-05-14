@@ -17,44 +17,83 @@
  */
 
 import React, {Fragment} from 'react'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+
+import Badge from '@instructure/ui-elements/lib/components/Badge'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
+
 import I18n from 'i18n!post_assignment_grades_tray'
 
 import PostTypes from './PostTypes'
 import SpecificSections from '../SpecificSections'
 
-export default function Layout(props) {
-  const {
-    assignment,
-    dismiss,
-    postBySections,
-    postBySectionsChanged,
-    postType,
-    postTypeChanged,
-    postingGrades,
-    onPostClick,
-    sections,
-    sectionSelectionChanged,
-    selectedSectionIds
-  } = props
-  const {anonymizeStudents, gradesPublished} = assignment
+export default function Layout({
+  assignment: {anonymizeStudents, gradesPublished},
+  dismiss,
+  postBySections,
+  postBySectionsChanged,
+  postType,
+  postTypeChanged,
+  postingGrades,
+  onPostClick,
+  sections,
+  sectionSelectionChanged,
+  selectedSectionIds,
+  unpostedCount
+}) {
   const hasSections = sections.length > 0
+  const heading = (
+    <View as="div" margin="0 0 small" padding="0 medium">
+      <Heading as="h3" level="h4">
+        {I18n.t('Post Grades')}
+      </Heading>
+    </View>
+  )
+
+  if (postingGrades) {
+    return (
+      <Fragment>
+        {heading}
+
+        <View as="div" textAlign="center" padding="large">
+          <Spinner title={I18n.t('Posting grades')} size="large" />
+        </View>
+      </Fragment>
+    )
+  }
 
   return (
     <Fragment>
-      <View as="div" margin="0 0 small" padding="0 medium">
-        <Heading as="h3" level="h4">
-          {I18n.t('Post Grades')}
-        </Heading>
-      </View>
+      {heading}
+
+      {unpostedCount > 0 && (
+        <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
+          <Badge
+            count={unpostedCount}
+            countUntil={99}
+            margin="0 0 medium large"
+            placement="start center"
+            type="count"
+            variant="danger"
+          >
+            <View as="div" margin="0 0 0 small">
+              <Text margin="0 0 0 small">{I18n.t('Hidden')}</Text>
+            </View>
+          </Badge>
+        </div>
+      )}
 
       <View as="div" margin="small 0" padding="0 medium">
-        <PostTypes defaultValue={postType} postTypeChanged={postTypeChanged} />
+        <PostTypes
+          disabled={!gradesPublished}
+          defaultValue={postType}
+          postTypeChanged={postTypeChanged}
+        />
       </View>
 
       <View as="div" margin="0 medium" className="hr" />
@@ -68,7 +107,7 @@ export default function Layout(props) {
       {hasSections && (
         <SpecificSections
           checked={postBySections}
-          disabled={assignment.anonymizeStudents}
+          disabled={!gradesPublished || anonymizeStudents}
           onCheck={event => {
             postBySectionsChanged(event.target.checked)
           }}
@@ -93,15 +132,13 @@ export default function Layout(props) {
       <View as="div" margin="medium 0 0" padding="0 medium">
         <Flex justifyItems="end">
           <FlexItem margin="0 small 0 0">
-            <Button onClick={dismiss}>{I18n.t('Close')}</Button>
+            <Button disabled={!gradesPublished} onClick={dismiss}>
+              {I18n.t('Close')}
+            </Button>
           </FlexItem>
 
           <FlexItem>
-            <Button
-              disabled={postingGrades || !gradesPublished}
-              onClick={onPostClick}
-              variant="primary"
-            >
+            <Button onClick={onPostClick} disabled={!gradesPublished} variant="primary">
               {I18n.t('Post')}
             </Button>
           </FlexItem>
@@ -121,7 +158,7 @@ Layout.propTypes = {
   postBySectionsChanged: func.isRequired,
   postingGrades: bool.isRequired,
   postType: string.isRequired,
-  postTypeChanged: func.isRequired,
+  postTypeChanged: PostTypes.propTypes.postTypeChanged,
   onPostClick: func.isRequired,
   sections: arrayOf(
     shape({
@@ -129,6 +166,7 @@ Layout.propTypes = {
       name: string.isRequired
     })
   ).isRequired,
-  sectionSelectionChanged: func.isRequired,
-  selectedSectionIds: arrayOf(string).isRequired
+  sectionSelectionChanged: SpecificSections.propTypes.sectionSelectionChanged,
+  selectedSectionIds: SpecificSections.propTypes.selectedSectionIds,
+  unpostedCount: number.isRequired
 }

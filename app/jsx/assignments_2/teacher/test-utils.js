@@ -161,7 +161,7 @@ export function mockOverride(overrides = {}) {
     set: {
       __typename: 'Section',
       lid: '10',
-      name: 'Section A'
+      sectionName: 'Section A'
     },
     // copied from assignment
     allowedAttempts: null,

@@ -805,11 +805,24 @@ class User < ActiveRecord::Base
   end
 
   def email_cache_key
-    ['user_email', self].cache_key
+    ['user_email', self.global_id].cache_key
+  end
+
+  def cached_active_emails
+    self.shard.activate do
+      Rails.cache.fetch(active_emails_cache_key) do
+        self.communication_channels.active.email.pluck(:path)
+      end
+    end
+  end
+
+  def active_emails_cache_key
+    ['active_user_emails', self.global_id].cache_key
   end
 
   def clear_email_cache!
     Rails.cache.delete(email_cache_key)
+    Rails.cache.delete(active_emails_cache_key)
   end
 
   def email_cached?
@@ -1688,14 +1701,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def cached_active_emails
-    self.shard.activate do
-      Rails.cache.fetch([self, 'active_emails'].cache_key) do
-        self.communication_channels.active.email.map(&:path)
-      end
-    end
-  end
-
   def temporary_invitations
     cached_active_emails.map { |email| Enrollment.cached_temporary_invitations(email).dup.reject { |e| e.user_id == self.id } }.flatten
   end
@@ -1707,7 +1712,9 @@ class User < ActiveRecord::Base
   def cached_current_enrollments(opts={})
     RequestCache.cache('cached_current_enrollments', self, opts) do
       enrollments = self.shard.activate do
-        res = Rails.cache.fetch([self, 'current_enrollments3', opts[:include_future], ApplicationController.region ].cache_key) do
+        res = Rails.cache.fetch_with_batched_keys(
+            ['current_enrollments4', opts[:include_future], ApplicationController.region ].cache_key,
+            batch_object: self, batched_keys: :enrollments) do
           scope = (opts[:include_future] ? self.enrollments.current_and_future : self.enrollments.current_and_invited)
           scope.shard(in_region_associated_shards).to_a
         end
@@ -1755,20 +1762,16 @@ class User < ActiveRecord::Base
     end
   end
 
-  def group_membership_key
-    [self, 'current_group_memberships', ApplicationController.region].cache_key
-  end
-
   def cached_current_group_memberships
     @cached_current_group_memberships ||= self.shard.activate do
-      Rails.cache.fetch(group_membership_key) do
+      Rails.cache.fetch_with_batched_keys(['current_group_memberships', ApplicationController.region].cache_key, batch_object: self, batched_keys: :groups) do
         self.current_group_memberships.shard(self.in_region_associated_shards).to_a
       end
     end
   end
 
   def has_student_enrollment?
-    Rails.cache.fetch([self, 'has_student_enrollment', ApplicationController.region ].cache_key) do
+    Rails.cache.fetch_with_batched_keys(['has_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
       self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment}).
         where.not(:workflow_state => %w{rejected inactive deleted}).exists?
     end
@@ -1776,7 +1779,7 @@ class User < ActiveRecord::Base
 
   def non_student_enrollment?
     # We should be able to remove this method when the planner works for teachers/other course roles
-    Rails.cache.fetch([self, 'has_non_student_enrollment', ApplicationController.region ].cache_key) do
+    Rails.cache.fetch_with_batched_keys(['has_non_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
       self.enrollments.shard(in_region_associated_shards).where.not(type: %w{StudentEnrollment StudentViewEnrollment ObserverEnrollment}).
         where.not(workflow_state: %w{rejected inactive deleted}).exists?
     end
@@ -1822,7 +1825,7 @@ class User < ActiveRecord::Base
     @cached_course_ids ||= {}
     @cached_course_ids[type] ||=
       self.shard.activate do
-        Rails.cache.fetch([self, "cached_course_ids", type, ApplicationController.region].cache_key) do
+        Rails.cache.fetch_with_batched_keys(["cached_course_ids", type, ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
           yield(self.enrollments.shard(in_region_associated_shards)).distinct.pluck(:course_id)
         end
       end
@@ -1831,7 +1834,7 @@ class User < ActiveRecord::Base
 
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
-      Rails.cache.fetch([self, 'participating_enrollments', ApplicationController.region].cache_key) do
+      Rails.cache.fetch_with_batched_keys([self, 'participating_enrollments', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
         self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a
       end
     end
@@ -2276,8 +2279,10 @@ class User < ActiveRecord::Base
     return user_roles(root_account, true) if exclude_deleted_accounts
 
     return @roles if @roles
+
     root_account.shard.activate do
-      @roles = Rails.cache.fetch(['user_roles_for_root_account4', self, root_account].cache_key) do
+      base_key = ['user_roles_for_root_account5', root_account.global_id].cache_key
+      @roles = Rails.cache.fetch_with_batched_keys(base_key, batch_object: self, batched_keys: [:enrollments, :account_users]) do
         user_roles(root_account)
       end
     end

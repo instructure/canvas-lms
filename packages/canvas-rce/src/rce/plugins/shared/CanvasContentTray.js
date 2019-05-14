@@ -17,12 +17,13 @@
  */
 
 import React, {Suspense, useEffect, useState} from 'react'
-import {bool, func, instanceOf, oneOf} from 'prop-types'
+import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
 import {Flex, FlexItem} from '@instructure/ui-layout'
 
+import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
@@ -52,21 +53,25 @@ function getTrayLabel({contentType, contentSubtype}) {
   }
 }
 
+const thePanels = {
+  links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
+  images: React.lazy(() => import('../instructure_image/Images')),
+  documents: React.lazy(() => import('./FakeComponent')),
+  media: React.lazy(() => import('./FakeComponent'))
+}
 /**
- * Returns the component lazily for the given filter settings
- * @param {Object} filterSettings
- * @param {string} filterSettings.contentSubtype - The current subtype of
- * content loaded in the tray
+ * @param {contentType, contentSubType} filterSettings: key to which panel is desired
+ * @param  contentProps: the props from connection to the redux store
+ * @returns rendered component
  */
-function loadTrayContent({contentType, contentSubtype}) {
-  switch (contentSubtype) {
-    case 'images':
-      return React.lazy(() => import('../instructure_image/Images'))
-    case 'documents':
-    case 'media':
-    default:
-      return React.lazy(() => import('./FakeComponent'))
+function renderContentComponent({contentType, contentSubtype}, contentProps) {
+  let Component = null
+  if (contentType === 'links') {
+    Component = thePanels.links
+  } else {
+    Component = thePanels[contentSubtype]
   }
+  return Component && <Component {...contentProps} />
 }
 
 const FILTER_SETTINGS_BY_PLUGIN = {
@@ -84,20 +89,22 @@ export default function CanvasContentTray(props) {
   const [isOpen, setIsOpen] = useState(false)
 
   const [filterSettings, setFilterSettings] = useFilterSettings()
-  const ContentComponent = loadTrayContent(filterSettings)
 
   useEffect(() => {
     const controller = {
       showTrayForPlugin(plugin) {
         setFilterSettings(FILTER_SETTINGS_BY_PLUGIN[plugin])
         setIsOpen(true)
+      },
+      hideTray() {
+        setIsOpen(false)
       }
     }
 
     props.bridge.attachController(controller)
 
     return () => {
-      props.bridge.detachController(controller)
+      props.bridge.detachController()
     }
   }, [props.bridge])
 
@@ -107,6 +114,7 @@ export default function CanvasContentTray(props) {
       open={isOpen}
       placement="end"
       size="regular"
+      onDismiss={() => setIsOpen(false)}
     >
       <Flex direction="column" display="block" height="100vh" overflowY="hidden">
         <FlexItem padding="medium" shadow="above">
@@ -126,19 +134,52 @@ export default function CanvasContentTray(props) {
         </FlexItem>
 
         <FlexItem grow shrink>
-          <StoreProvider {...props}>
-            {contentProps => (
-              <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
-                <ContentComponent {...contentProps} />
-              </Suspense>
-            )}
-          </StoreProvider>
+          <ErrorBoundary>
+            <StoreProvider {...props}>
+              {contentProps => (
+                <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+                  {renderContentComponent(filterSettings, contentProps)}
+                </Suspense>
+              )}
+            </StoreProvider>
+          </ErrorBoundary>
         </FlexItem>
       </Flex>
     </Tray>
   )
 }
 
+function requiredWithoutSource(props, propName, componentName) {
+  if (props.source == null && props[propName] == null) {
+    throw new Error(`The prop \`${propName}\` is marked as required in \`${componentName}\`, but its value is \`${props[propName]}\`.`)
+  }
+}
+
+const trayPropsMap = {
+  canUploadFiles: bool.isRequired,
+  contextId: string.isRequired,
+  contextType: string.isRequired,
+  filesTabDisabled: bool,
+  host: requiredWithoutSource,
+  jwt: requiredWithoutSource,
+  refreshToken: func,
+  source: shape({
+    fetchImages: func.isRequired
+  }),
+  themeUrl: string
+}
+
+export const trayProps = shape(trayPropsMap)
+
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
+  ...trayPropsMap
+}
+
+CanvasContentTray.defaultProps = {
+  canUploadFiles: false,
+  filesTabDisabled: false,
+  refreshToken: null,
+  source: null,
+  themeUrl: null
 }

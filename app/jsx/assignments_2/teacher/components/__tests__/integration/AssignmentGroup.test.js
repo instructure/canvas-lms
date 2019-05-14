@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from 'react-testing-library'
 import AssignmentGroup from '../../Editables/AssignmentGroup'
-import {MockedProvider} from 'react-apollo/test-utils'
+import CanvasValidatedMockedProvider from 'jsx/__tests__/CanvasValidatedMockedProvider'
 import {COURSE_ASSIGNMENT_GROUPS_QUERY} from '../../../assignmentData'
 import {waitForNoElement} from '../../../test-utils'
 
@@ -108,9 +108,9 @@ const mocks = [
 describe('AssignmentGroup', () => {
   it('queries group list on edit', async () => {
     const {getByText} = render(
-      <MockedProvider mocks={mocks} addTypename={false}>
+      <CanvasValidatedMockedProvider mocks={mocks} addTypename={false}>
         <AssignmentGroup courseId="55" mode="edit" onChange={() => {}} onChangeMode={() => {}} />
-      </MockedProvider>
+      </CanvasValidatedMockedProvider>
     )
     // The groups are loaded when Select removes its spinner
     await waitForNoElement(() => getByText('Loading...'))

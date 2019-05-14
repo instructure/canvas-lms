@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func, string} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'

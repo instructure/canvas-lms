@@ -157,16 +157,16 @@ module Api::V1::Course
     hash
   end
 
-  def apply_master_course_settings(hash, course, user)
+  def apply_master_course_settings(hash, course, _user)
     is_mc = MasterCourses::MasterTemplate.is_master_course?(course)
     hash['blueprint'] = is_mc
 
     if is_mc
       template = MasterCourses::MasterTemplate.full_template_for(course)
-      if template.use_default_restrictions_by_type
+      if template&.use_default_restrictions_by_type
         hash['blueprint_restrictions_by_object_type'] = template.default_restrictions_by_type_for_api
       else
-        hash['blueprint_restrictions'] = template.default_restrictions
+        hash['blueprint_restrictions'] = template&.default_restrictions
       end
     end
   end
@@ -174,7 +174,8 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      teacher_counts = Course.where(:id => courses).joins(:teacher_enrollments).group("courses.id").count
+      scope = TeacherEnrollment.active_or_pending.where(:course_id => courses).distinct.select(:user_id, :course_id)
+      teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|
         next unless count = teacher_counts[course.id]

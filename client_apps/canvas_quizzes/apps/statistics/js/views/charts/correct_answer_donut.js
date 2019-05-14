@@ -23,7 +23,7 @@ define(function(require) {
   var ChartMixin = require('../../mixins/chart');
   var round = require('canvas_quizzes/util/round');
   // var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
 
   var CIRCLE = 2 * Math.PI;
   var Y_OFFSETS = [-5,15,15];

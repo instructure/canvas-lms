@@ -24,7 +24,12 @@
   css_bundle :grade_summary
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
-<% whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.") %>
+<%
+  whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
+
+  hidden_text = @context.feature_enabled?(:post_policies) ? t("Hidden") : t("Muted")
+  hidden_icon_class = @context.feature_enabled?(:post_policies) ? "icon-off" : "icon-muted"
+%>
 <div id="grade-summary-content" style="display: none;">
   <% content_for :right_side do %>
     <div id="student-grades-right-content" style="display: none;">
@@ -143,7 +148,7 @@
          can_view_distribution = can_do(@context, @current_user, :read_as_admin) || !assignment_presenter.hide_distribution_graphs?
       %>
     <tr class="<%= assignment_presenter.classes %>"
-        data-muted="<%= assignment.muted? %>"
+        data-muted="<%= !assignment_presenter.posted_to_student? %>"
         id="<%= "submission_" + assignment.id.to_s %>"
         <% if assignment_presenter.excused? %>
           <% excused_label = t "This assignment is excused and will not be considered in the total calculation" %>
@@ -197,7 +202,7 @@
                 <span class="tooltip_wrap right" aria-hidden="true">
                   <% if @presenter.editable? || assignment.special_class %>
                     <span class="tooltip_text score_teaser">
-                      <% if assignment.muted? %>
+                      <% if !assignment_presenter.posted_to_student? %>
                         <%= t(:student_mute_notification, "Instructor is working on grades") %>
                       <% elsif submission.try :pending_review? %>
                         <%= t(:grading_in_progress, "Instructor is working on grades") %>
@@ -209,8 +214,8 @@
                     </span>
                   <% end %>
                 </span>
-                <% if assignment.muted? %>
-                  <i class="icon-muted" title="<%= t("#gradebooks.grade.muted", "Muted") %>"></i>
+                <% if !assignment_presenter.posted_to_student? %>
+                  <i class="<%= hidden_icon_class %>" title="<%= hidden_text %>"></i>
                 <% else %>
                   <span class="screenreader-only" role="link">
                     <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
@@ -262,7 +267,7 @@
           <a href="#"
               class="toggle_final_grade_info tooltip"
               aria-label="<%= t('This assignment does not count toward the final grade.') %>"
-            <% if assignment.omit_from_final_grade? && !assignment.muted? %>
+            <% if assignment.omit_from_final_grade? && assignment_presenter.posted_to_student? %>
                 aria-expanded="false"
                 aria-controls="final_grade_info_<%= assignment.id %>"
             <% else %>
@@ -280,7 +285,7 @@
             class="toggle_comments_link tooltip"
             aria-label="<%= t('Read comments') %>"
             aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
-            <% if assignment_presenter.has_comments? && !assignment.muted? %>
+            <% if assignment_presenter.has_comments? && assignment_presenter.posted_to_student? %>
               aria-expanded="false"
               aria-controls="comments_thread_<%= assignment.id %>"
             <% else %>
@@ -564,8 +569,8 @@
     <% end %>
   </table>
   </div>
-  <% if @presenter.has_muted_assignments? %>
-    <small><i class="icon-muted" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+  <% if @presenter.hidden_submissions? %>
+    <small><i class="<%= hidden_icon_class %>" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
   <% end %>
   <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
   <%= render :partial => "shared/rubric_criterion_dialog" %>

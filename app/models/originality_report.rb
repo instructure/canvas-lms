@@ -97,6 +97,7 @@ class OriginalityReport < ActiveRecord::Base
   end
 
   def infer_workflow_state
+    self.workflow_state = 'error' if error_message.present?
     return if self.workflow_state == 'error'
     self.workflow_state = self.originality_score.present? ? 'scored' : 'pending'
   end

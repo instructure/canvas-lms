@@ -25,7 +25,7 @@ Events are delivered with attributes and a body. The attributes are:
 | Name | Type | Description | Example |
 | ---- | ---- | ----------- | ------- |
 | `event_name` | String | The name of the event. | `create_discussion_topic` |
-| `event_time` | String.timestamp | The time, in ISO 8601 format. | `2015-03-18T15:15:54Z` |
+| `event_time` | String.timestamp | The time, in ISO 8601 format with millisecond precision. | `2015-03-18T15:15:54.047Z` |
 
 #### Body (metadata)
 

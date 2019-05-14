@@ -15,67 +15,65 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'i18n!assignments'
-  'underscore'
-  '../DialogFormView'
-  'jst/EmptyDialogFormWrapper'
-  'jst/assignments/AssignmentSyncSettings'
-  "../../jquery.rails_flash_notifications"
-], ($, I18n, _, DialogFormView, wrapper, assignmentSyncSettingsTemplate) ->
+import $ from 'jquery'
+import I18n from 'i18n!AssignmentSyncSettingsView'
+import _ from 'underscore'
+import DialogFormView from '../DialogFormView'
+import wrapper from 'jst/EmptyDialogFormWrapper'
+import assignmentSyncSettingsTemplate from 'jst/assignments/AssignmentSyncSettings'
+import '../../jquery.rails_flash_notifications'
 
-  class AssignmentSyncSettingsView extends DialogFormView
-    template: assignmentSyncSettingsTemplate
-    wrapperTemplate: wrapper
+export default class AssignmentSyncSettingsView extends DialogFormView
+  template: assignmentSyncSettingsTemplate
+  wrapperTemplate: wrapper
 
-    defaults:
-      width: 600
-      height: 300
-      collapsedHeight: 300
+  defaults:
+    width: 600
+    height: 300
+    collapsedHeight: 300
 
-    events: _.extend({}, @::events,
-      'click .dialog_closer': 'cancel'
-    )
+  events: _.extend({}, @::events,
+    'click .dialog_closer': 'cancel'
+  )
 
-    @optionProperty 'viewToggle'
-    @optionProperty 'sisName'
+  @optionProperty 'viewToggle'
+  @optionProperty 'sisName'
 
-    initialize: ->
-      @viewToggle = false
-      super
+  initialize: ->
+    @viewToggle = false
+    super
 
-    openDisableSync: ->
-      if @viewToggle
-        @openAgain()
-      else
-        @viewToggle = true
-        @open()
+  openDisableSync: ->
+    if @viewToggle
+      @openAgain()
+    else
+      @viewToggle = true
+      @open()
 
-    currentGradingPeriod: ->
-      selected_id = $("#grading_period_selector").children(":selected").attr("id")
-      id = if selected_id == undefined then '' else selected_id.split("_").pop()
-      id
+  currentGradingPeriod: ->
+    selected_id = $("#grading_period_selector").children(":selected").attr("id")
+    id = if selected_id == undefined then '' else selected_id.split("_").pop()
+    id
 
-    submit: (event) ->
-      event?.preventDefault()
-      success_message = I18n.t('Sync to %{name} successfully disabled', name: @sisName)
-      error_message = I18n.t('Disabling Sync to %{name} failed', name: @sisName)
-      $.ajaxJSON '/api/sis/courses/' +
-                 @model.id +
-                 '/disable_post_to_sis', 'PUT',
-                 grading_period_id: @currentGradingPeriod(),
-                 ((data) ->
-                   $.flashMessage success_message
-                   setTimeout(window.location.reload(true))
-                 ), ->
-                   $.flashError error_message
+  submit: (event) ->
+    event?.preventDefault()
+    success_message = I18n.t('Sync to %{name} successfully disabled', name: @sisName)
+    error_message = I18n.t('Disabling Sync to %{name} failed', name: @sisName)
+    $.ajaxJSON '/api/sis/courses/' +
+                @model.id +
+                '/disable_post_to_sis', 'PUT',
+                grading_period_id: @currentGradingPeriod(),
+                ((data) ->
+                  $.flashMessage success_message
+                  setTimeout(window.location.reload(true))
+                ), ->
+                  $.flashError error_message
 
-    cancel: ->
-      @close()
+  cancel: ->
+    @close()
 
-    toJSON: ->
-      data = super
-      data.course
-      data.sisName = @sisName
-      data
+  toJSON: ->
+    data = super
+    data.course
+    data.sisName = @sisName
+    data

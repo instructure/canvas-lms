@@ -18,5 +18,5 @@
 
 import renderAssignmentsApp from '../assignments_2/teacherIndex'
 
-const elt = document.querySelector('#assignments_2')
+const elt = document.getElementById('content')
 renderAssignmentsApp(ENV, elt)

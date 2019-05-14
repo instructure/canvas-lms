@@ -16,12 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!gradebook'
-  '../gradebook/GradebookTranslations'
-  'jquery.keycodes'
-], (I18n, GRADEBOOK_TRANSLATIONS) ->
-  class GradebookKeyboardNav
+import I18n from 'i18n!oldgradebookgradebookKeyboardNav'
+import GRADEBOOK_TRANSLATIONS from './GradebookTranslations'
+import 'jquery.keycodes'
+
+export default class GradebookKeyboardNav
     constructor: (@slickGrid, @$grid) ->
 
     init: ->

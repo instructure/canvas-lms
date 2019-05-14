@@ -22,7 +22,7 @@ import Assignment from '../models/Assignment'
 import DateGroup from '../models/DateGroup'
 import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection'
 import DateGroupCollection from '../collections/DateGroupCollection'
-import I18n from 'i18n!quizzes'
+import I18n from 'i18n!modelsQuiz'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'
 

@@ -3033,22 +3033,6 @@ describe Enrollment do
     end
   end
 
-  describe ".not_yet_started" do
-    before :once do
-      course_with_student(active_all: true)
-    end
-
-    it 'includes users for whom the enrollment has not yet started' do
-      allow_any_instance_of(Enrollment).to receive(:effective_start_at).and_return(1.month.from_now)
-      expect(Enrollment.not_yet_started(@course)).to include(@enrollment)
-    end
-
-    it 'excludes users for whom the enrollment has started' do
-      allow(@enrollment).to receive(:effective_start_at).and_return(1.month.ago)
-      expect(Enrollment.not_yet_started(@course)).not_to include(@enrollment)
-    end
-  end
-
   describe "readable_state_based_on_date" do
     before :once do
       course_factory(active_all: true)

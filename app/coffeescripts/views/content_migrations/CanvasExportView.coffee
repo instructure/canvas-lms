@@ -15,14 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/CanvasExport'
-  './MigrationView'
-], (Backbone, template, MigrationView) -> 
-  class CanvasExportView extends MigrationView
-    template: template
+import template from 'jst/content_migrations/CanvasExport'
+import MigrationView from './MigrationView'
 
-    @child 'chooseMigrationFile', '.chooseMigrationFile'
-    @child 'dateShift', '.dateShift'
-    @child 'selectContent', '.selectContent'
+export default class CanvasExportView extends MigrationView
+  template: template
+
+  @child 'chooseMigrationFile', '.chooseMigrationFile'
+  @child 'dateShift', '.dateShift'
+  @child 'selectContent', '.selectContent'

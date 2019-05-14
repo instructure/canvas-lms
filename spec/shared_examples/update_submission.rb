@@ -53,6 +53,106 @@ RSpec.shared_examples 'a submission update action' do |controller|
       expect(assigns[:submission].submission_comments.first.comment).to eql("some comment")
     end
 
+    describe "quiz submissions" do
+      let_once(:assignment) { course.assignments.create!(title: "quiz", submission_types: "online_quiz") }
+      let_once(:course) { Course.create! }
+      let_once(:resource_pair) { controller == :anonymous_submissions ? { anonymous_id: submission.anonymous_id } : { id: student.id } }
+      let_once(:student) { course.enroll_student(User.create!, enrollment_state: :active).user }
+      let_once(:submission) { assignment.submissions.find_by(user: student) }
+      let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: :active).user }
+
+      before(:once) do
+        quiz = assignment.reload.quiz
+        quiz_submission = quiz.generate_submission(student)
+        quiz_submission.update!(workflow_state: "complete")
+        quiz_submission.update_scores(fudge_points: 10.0, grader_id: teacher.id)
+      end
+
+      context "current user is student" do
+        let(:current_user) { student }
+
+        before(:each) do
+          user_session(current_user)
+        end
+
+        it "renders the submission body with quiz submission data" do
+          params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+          put :update, params: params, format: :json
+          submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+          expect(submission_json["submission"]["body"]).to eq submission.reload.body
+        end
+
+        it "renders the submission body with quiz submission data, when updating What-If scores" do
+          params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+          put :update, params: params, format: :json
+          submission_json = JSON.parse(response.body)
+          expect(submission_json["submission"]["body"]).to eq submission.reload.body
+        end
+
+        context "when assignment is muted" do
+          before(:once) do
+            assignment.update!(muted: true)
+          end
+
+          it "does not render the submission body" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_nil
+          end
+
+          it "does not render the submission body, when updating What-If scores" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_nil
+          end
+        end
+      end
+
+      context "current user is teacher" do
+        let(:current_user) { teacher }
+
+        before(:each) do
+          user_session(current_user)
+        end
+
+        it "renders the submission body with quiz submission data" do
+          params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+          put :update, params: params, format: :json
+          submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+          expect(submission_json["submission"]["body"]).to eq submission.reload.body
+        end
+
+        it "renders the submission body with quiz submission data, when updating What-If scores" do
+          params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+          put :update, params: params, format: :json
+          submission_json = JSON.parse(response.body)
+          expect(submission_json["submission"]["body"]).to eq submission.reload.body
+        end
+
+        context "when assignment is muted" do
+          before(:once) do
+            assignment.update!(muted: true)
+          end
+
+          it "renders the submission body with quiz submission data" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to eq submission.reload.body
+          end
+
+          it "renders the submission body with quiz submission data, when updating What-If scores" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to eq submission.reload.body
+          end
+        end
+      end
+    end
+
     it "should allow a non-enrolled admin to add comments" do
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")

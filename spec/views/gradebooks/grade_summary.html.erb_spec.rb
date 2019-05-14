@@ -254,4 +254,60 @@ describe "/gradebooks/grade_summary" do
       end
     end
   end
+
+  describe "hidden indicator" do
+    let_once(:course) { Course.create! }
+    let_once(:student) { course.enroll_student(User.create!(name: "Fred"), active_all: true).user }
+    let_once(:assignment) { course.assignments.create!(title: 'hi') }
+
+    before(:once) do
+      assign(:presenter, GradeSummaryPresenter.new(course, student, student.id))
+      assign(:current_user, student)
+      assign(:context, course)
+    end
+
+    context "when post policies are enabled" do
+      before(:once) { course.enable_feature!(:post_policies) }
+
+      context "when a submission is unposted" do
+        it "displays the 'hidden' icon" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag(".assignment_score i[@class='icon-off']")
+        end
+
+        it "adds the 'Hidden' title to the icon" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag(".assignment_score i[@title='Hidden']")
+        end
+      end
+
+      it "does not display the 'hidden' icon when a submission is posted" do
+        assignment.post_submissions
+
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
+      end
+    end
+
+    context "when post policies are not enabled" do
+      context "when a submission's assignment is muted" do
+        before(:once) { assignment.mute! }
+
+        it "displays the 'muted' icon" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag(".assignment_score i[@class='icon-muted']")
+        end
+
+        it "adds the 'Muted' title to the icon" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag(".assignment_score i[@title='Muted']")
+        end
+      end
+
+      it "does not display the 'muted' icon when a submission's assignment is not muted" do
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag(".assignment_score i[@class='icon-muted']")
+      end
+    end
+  end
 end

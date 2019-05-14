@@ -55,6 +55,7 @@ function getProps(column, gradebook, options) {
     id: student.id,
     isInactive: student.isInactive,
     name: student.name,
+    sortableName: student.sortable_name,
     submission: getSubmission(student, assignmentId)
   }))
 

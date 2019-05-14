@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var Dialog = require('jsx!canvas_quizzes/components/dialog');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
 
   var UserListDialog = React.createClass({
     getDefaultProps: function() {

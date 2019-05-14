@@ -22,7 +22,7 @@
 // on the api input.
 //
 import axios from 'axios'
-import I18n from 'i18n!roster'
+import I18n from 'i18n!add_people_api_client'
 
 export default {
 

@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!roster'
+import I18n from 'i18n!ResendInvitationsView'
 import {View} from 'Backbone'
 import template from 'jst/courses/roster/resendInvitations'
 import 'jquery.ajaxJSON'

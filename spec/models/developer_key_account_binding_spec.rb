@@ -36,8 +36,11 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
   describe '#lti_1_3_tools' do
     subject do
       expect(DeveloperKey.count > 1).to be true
-      described_class.lti_1_3_tools(account)
+      described_class.lti_1_3_tools(
+        described_class.active_in_account(account)
+      )
     end
+
     let(:params) { { visible: true } }
     let(:workflow_state) { described_class::ON_STATE }
 

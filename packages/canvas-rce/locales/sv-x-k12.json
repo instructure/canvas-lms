@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Lägg till"
+  },
+  "all_4321c3a1": {
+    "message": "Alla"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetisk"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativ text:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klicka för att infoga en länk till detta föremål."
   },
+  "close_d634289d": {
+    "message": "Stäng"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Stäng Flickr formuläret"
   },
   "collaborations_5c56c15f": {
     "message": "Samarbeten"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Dator"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Innehållsundertyp"
+  },
+  "content_type_2cf90d95": {
+    "message": "Innehållstyp"
   },
   "copyright_holder_66ee111": {
     "message": "Upphovsrättshavare:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Gemensam kreativitet licens:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Datum tillagt"
+  },
+  "date_published_371c4ad0": {
+    "message": "Publiceringsdatum"
   },
   "decorative_image_fde98579": {
     "message": "Dekorativ-bild"
@@ -161,9 +188,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Länka till annat innehåll i gruppen."
   },
-  "link_to_url_52dd935c": {
-    "message": "Länk till URL"
-  },
   "links_14b70841": {
     "message": "Länkar"
   },
@@ -181,6 +205,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Läser in mappar..."
+  },
+  "media_af190855": {
+    "message": "Media"
   },
   "modules_c4325335": {
     "message": "Moduler"
@@ -212,6 +239,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Välj en mapp att ladda upp din fil till"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Sortera efter"
+  },
+  "submit_a3cc6859": {
+    "message": "Lämna in"
+  },
   "syllabus_f191f65b": {
     "message": "Kursöversikt"
   },
@@ -230,6 +263,9 @@
   "tray_839df38a": {
     "message": "Fack"
   },
+  "unsplash_ee049fbf": {
+    "message": "Ångra stänk"
+  },
   "upload_8b403d05": {
     "message": "Ladda upp"
   },
@@ -238,6 +274,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Ladda upp en ny bild"
+  },
+  "upload_image_6120b609": {
+    "message": "Ladda upp bild"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Användarrättigheter:"

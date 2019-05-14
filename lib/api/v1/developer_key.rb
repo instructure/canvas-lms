@@ -24,11 +24,11 @@ module Api::V1::DeveloperKey
   ).freeze
   INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
 
-  def developer_keys_json(keys, user, session, context, inherited: false)
-    keys.map { |k| developer_key_json(k, user, session, context, inherited: inherited) }
+  def developer_keys_json(keys, user, session, context, inherited: false, include_tool_config: false)
+    keys.map { |k| developer_key_json(k, user, session, context, inherited: inherited, include_tool_config: include_tool_config) }
   end
 
-  def developer_key_json(key, user, session, context, inherited: false)
+  def developer_key_json(key, user, session, context, inherited: false, include_tool_config: false)
     context ||= Account.site_admin
     account_binding = key.account_binding_for(context)
     keys_to_show = if inherited
@@ -58,6 +58,7 @@ module Api::V1::DeveloperKey
         hash['account_name'] = key.account_name
         hash['visible'] = key.visible
       end
+      hash['tool_configuration'] = key.tool_configuration&.configuration if include_tool_config
       hash['is_lti_key'] = key.public_jwk.present?
       hash['id'] = key.global_id
     end

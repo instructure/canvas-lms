@@ -431,7 +431,7 @@ QUnit.module('Gradebook#customColumnDefinitions', {
 })
 
 test('includes the cannot_edit class for read_only columns', function() {
-  columns = this.gradebook.customColumnDefinitions()
+  const columns = this.gradebook.customColumnDefinitions()
   equal(columns[0].cssClass, 'meta-cell custom_column cannot_edit')
   equal(columns[1].cssClass, 'meta-cell custom_column')
 })

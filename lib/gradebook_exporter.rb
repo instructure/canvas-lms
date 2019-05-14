@@ -154,9 +154,8 @@ class GradebookExporter
 
       group_filler_length = groups.size * column_count_per_group
 
-      # Possible muted row
-      if assignments.any?(&:muted)
-        # This is is not translated since we look for this exact string when we upload to gradebook.
+      # Possible "hidden" (muted or manual posting) row
+      if assignments.any? { |assignment| show_as_hidden?(assignment) }
         row = [nil, nil, nil, nil]
         if include_sis_id
           row << nil
@@ -168,7 +167,8 @@ class GradebookExporter
           row << nil
         end
 
-        row.concat(assignments.map { |a| 'Muted' if a.muted? })
+        # This is not translated since we look for this exact string when we upload to gradebook.
+        row.concat(assignments.map { |assignment| show_as_hidden?(assignment) ? hidden_assignment_text : nil })
 
         if should_show_totals
           row.concat([nil] * group_filler_length)
@@ -391,5 +391,17 @@ class GradebookExporter
 
   def include_final_grade_override?
     @course.allow_final_grade_override?
+  end
+
+  def show_as_hidden?(assignment)
+    if @course.feature_enabled?(:post_policies)
+      assignment.post_manually?
+    else
+      assignment.muted?
+    end
+  end
+
+  def hidden_assignment_text
+    @course.feature_enabled?(:post_policies) ? "Manual Posting" : "Muted"
   end
 end

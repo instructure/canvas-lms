@@ -238,8 +238,12 @@ class GradeSummaryPresenter
     end
   end
 
-  def has_muted_assignments?
-    assignments.any?(&:muted?)
+  def hidden_submissions?
+    if @context.feature_enabled?(:post_policies)
+      !submissions.all?(&:posted?)
+    else
+      assignments.any?(&:muted?)
+    end
   end
 
   def courses_with_grades

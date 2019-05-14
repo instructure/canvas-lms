@@ -338,7 +338,12 @@ run `rake canvas:compile_assets` and then try migrations again.
     def initialize
       super <<-END
 
-You have made changes to either app/stylesheets/brandable_variables.json or one of the images it
+If you did not make changes to assets, your node modules are probably out of date.
+
+try running the following ./script/nuke_node.sh
+
+If this does not resolve the issue, you have probably made the changes to
+either app/stylesheets/brandable_variables.json or one of the images it
 references so you need to rename the db migrations that makes sure when this change is deployed it
 makes a new .css file for the css variables for each brand based on these new defaults.
 To do that, run this command and then restart your rails process. (for local dev, if you want the

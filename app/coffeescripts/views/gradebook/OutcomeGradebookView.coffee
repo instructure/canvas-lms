@@ -15,37 +15,35 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!gradebook'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'vendor/slickgrid'
-  '../../gradebook/OutcomeGradebookGrid'
-  '../../userSettings'
-  '../gradebook/CheckboxView'
-  '../gradebook/SectionMenuView'
-  'jst/gradebook/outcome_gradebook'
-  'vendor/jquery.ba-tinypubsub'
-  '../../jquery.rails_flash_notifications'
-  'jquery.instructure_misc_plugins'
-], (I18n, $, _, {View}, Slick, Grid, userSettings, CheckboxView, SectionMenuView, template, cellTemplate) ->
+import I18n from 'i18n!gradebookOutcomeGradebookView'
+import $ from 'jquery'
+import _ from 'underscore'
+import {View} from 'Backbone'
+import Slick from 'vendor/slickgrid'
+import Grid from '../../gradebook/OutcomeGradebookGrid'
+import userSettings from '../../userSettings'
+import CheckboxView from './CheckboxView'
+import SectionMenuView from './SectionMenuView'
+import template from 'jst/gradebook/outcome_gradebook'
+import 'vendor/jquery.ba-tinypubsub'
+import '../../jquery.rails_flash_notifications'
+import 'jquery.instructure_misc_plugins'
 
-  Dictionary =
-    exceedsMastery:
-      color : '#127A1B'
-      label : I18n.t('Exceeds Mastery')
-    mastery:
-      color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
-      label : I18n.t('Meets Mastery')
-    nearMastery:
-      color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
-      label : I18n.t('Near Mastery')
-    remedial:
-      color : '#EE0612'
-      label : I18n.t('Well Below Mastery')
+Dictionary =
+  exceedsMastery:
+    color : '#127A1B'
+    label : I18n.t('Exceeds Mastery')
+  mastery:
+    color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
+    label : I18n.t('Meets Mastery')
+  nearMastery:
+    color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
+    label : I18n.t('Near Mastery')
+  remedial:
+    color : '#EE0612'
+    label : I18n.t('Well Below Mastery')
 
-  class OutcomeGradebookView extends View
+export default class OutcomeGradebookView extends View
 
     tagName: 'div'
 

@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import I18n from 'i18n!grading_periods'
+import I18n from 'i18n!EnrollmentTermsDropdown'
 
 class EnrollmentTermsDropdown extends React.Component {
   static propTypes = {

@@ -95,11 +95,17 @@
   "decorative_image_fde98579": {
     "message": "Декоративне зображення"
   },
+  "decrease_indent_de6343ab": {
+    "message": "Зменшити відступ"
+  },
   "discussions_a5f96392": {
     "message": "Обговорення"
   },
   "discussions_index_6c36ced": {
     "message": "Індекс обговорення"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Очікується: Кілька дат"
   },
   "enter_search_terms_e397b1f0": {
     "message": "введіть умови пошуку"
@@ -125,6 +131,9 @@
   "group_navigation_99f191a": {
     "message": "Навігація групи"
   },
+  "header_f28f73db": {
+    "message": "Заголовок"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Я отримав дозвіл на використання цього файлу."
   },
@@ -137,8 +146,14 @@
   "image_upload_form_7b74079a": {
     "message": "Форма завантаження зображення"
   },
+  "image_url_2aee2734": {
+    "message": "Адреса зображення"
+  },
   "images_7ce26570": {
     "message": "Зображення"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "Збільшити відступ"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Вставити посилання Equella"
@@ -148,6 +163,9 @@
   },
   "insert_math_equation_57c6e767": {
     "message": "Вставити математичну формулу"
+  },
+  "invalid_file_type_881cc9b2": {
+    "message": "Недійсний тип файлу"
   },
   "link_7262adec": {
     "message": "Посилання"
@@ -160,9 +178,6 @@
   },
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Посилання на інший вміст у групі."
-  },
-  "link_to_url_52dd935c": {
-    "message": "Посилання на URL"
   },
   "links_14b70841": {
     "message": "Посилання"
@@ -182,6 +197,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Завантаження папок ..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Завантажити більше результатів..."
+  },
   "media_af190855": {
     "message": "Носій інформації"
   },
@@ -196,6 +214,9 @@
   },
   "people_b4ebb13c": {
     "message": "Люди"
+  },
+  "published_c944a23d": {
+    "message": "опубліковано"
   },
   "quizzes_7e598f57": {
     "message": "Контрольні Роботи"
@@ -232,6 +253,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Це завантаження перевищує квоту для зберігання файлів. Будь ласка, зверніться до свого системного адміністратора."
+  },
+  "unpublished_dfd8801": {
+    "message": "Неопублікований"
   },
   "upload_8b403d05": {
     "message": "Завантажити"

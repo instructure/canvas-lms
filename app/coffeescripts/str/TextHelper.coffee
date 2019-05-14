@@ -16,125 +16,123 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'jquery'
-  'i18n!lib.text_helper'
-  'str/htmlEscape'
-], ($, I18n, htmlEscape) ->
+import $ from 'jquery'
+import I18n from 'i18n!lib.text_helper'
+import htmlEscape from 'str/htmlEscape'
 
-  AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
-  AUTO_LINKIFY_REGEX = ///
-    \b
-    (                                            # Capture 1: entire matched URL
-      (?:
-        https?://                                # http or https protocol
-        |                                        # or
-        www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
-        |                                        # or
-        [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
-      )
-
-      (?:
-        [^\s()<>]+                               # Run of non-space, non-()<>
-        |                                        # or
-        \([^\s()<>]*\)                           # balanced parens, single level
-      )+
-
-      (?:
-        \([^\s()<>]*\)                           # balanced parens, single level
-        |                                        # or
-        [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # End with: not a space or one of these punct chars
-      )
-    ) | (
-      LINK-PLACEHOLDER
+AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
+AUTO_LINKIFY_REGEX = ///
+  \b
+  (                                            # Capture 1: entire matched URL
+    (?:
+      https?://                                # http or https protocol
+      |                                        # or
+      www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
+      |                                        # or
+      [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
     )
-  ///gi
 
-  th =
-    quoteClump: (lines) ->
-      "<div class='quoted_text_holder'>
-        <a href='#' class='show_quoted_text_link'>#{htmlEscape I18n.t("quoted_text_toggle", "show quoted text")}</a>
-        <div class='quoted_text' style='display: none;'>
-          #{$.raw lines.join "\n"}
-        </div>
-      </div>"
+    (?:
+      [^\s()<>]+                               # Run of non-space, non-()<>
+      |                                        # or
+      \([^\s()<>]*\)                           # balanced parens, single level
+    )+
 
-    formatMessage: (message) ->
-      # replace any links with placeholders so we don't escape them
-      links = []
-      placeholderBlocks = []
-      message = message.replace AUTO_LINKIFY_REGEX, (match, i) ->
-        placeholderBlocks.push(if match == AUTO_LINKIFY_PLACEHOLDER
-            AUTO_LINKIFY_PLACEHOLDER
-          else
-            link = match
-            link = "http://" + link unless link[0..6] == 'http://' or link[0..7] == 'https://'
-            links.push link
-            "<a href='#{htmlEscape(link)}'>#{htmlEscape(match)}</a>"
-        )
-        AUTO_LINKIFY_PLACEHOLDER
+    (?:
+      \([^\s()<>]*\)                           # balanced parens, single level
+      |                                        # or
+      [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # End with: not a space or one of these punct chars
+    )
+  ) | (
+    LINK-PLACEHOLDER
+  )
+///gi
 
-      # now escape html
-      message = htmlEscape message
+export default th =
+  quoteClump: (lines) ->
+    "<div class='quoted_text_holder'>
+      <a href='#' class='show_quoted_text_link'>#{htmlEscape I18n.t("quoted_text_toggle", "show quoted text")}</a>
+      <div class='quoted_text' style='display: none;'>
+        #{$.raw lines.join "\n"}
+      </div>
+    </div>"
 
-      # now put the links back in
-      message = message.replace new RegExp(AUTO_LINKIFY_PLACEHOLDER, 'g'), (match, i) ->
-        placeholderBlocks.shift()
-
-      # replace newlines
-      message = message.replace /\n/g, '<br />\n'
-
-      # generate quoting clumps
-      processedLines = []
-      quoteBlock = []
-      for line in message.split("\n")
-        if line.match /^(&gt;|>)/
-          quoteBlock.push line
+  formatMessage: (message) ->
+    # replace any links with placeholders so we don't escape them
+    links = []
+    placeholderBlocks = []
+    message = message.replace AUTO_LINKIFY_REGEX, (match, i) ->
+      placeholderBlocks.push(if match == AUTO_LINKIFY_PLACEHOLDER
+          AUTO_LINKIFY_PLACEHOLDER
         else
-          processedLines.push th.quoteClump(quoteBlock) if quoteBlock.length
-          quoteBlock = []
-          processedLines.push line
-      processedLines.push th.quoteClump(quoteBlock) if quoteBlock.length
-      message = processedLines.join "\n"
+          link = match
+          link = "http://" + link unless link[0..6] == 'http://' or link[0..7] == 'https://'
+          links.push link
+          "<a href='#{htmlEscape(link)}'>#{htmlEscape(match)}</a>"
+      )
+      AUTO_LINKIFY_PLACEHOLDER
 
-    delimit: (number) ->
-      # only process real numbers
-      return String(number) if isNaN number
+    # now escape html
+    message = htmlEscape message
 
-      # capture sign and then start working with the absolute value. don't
-      # process infinities.
-      sign = if number < 0 then '-' else ''
-      abs = Math.abs number
-      return String(number) if abs is Infinity
+    # now put the links back in
+    message = message.replace new RegExp(AUTO_LINKIFY_PLACEHOLDER, 'g'), (match, i) ->
+      placeholderBlocks.shift()
 
-      # break out the integer portion and initialize the result to just the
-      # decimal (if any)
-      integer = Math.floor abs
-      result = if abs == integer then '' else String(abs).replace(/^\d+\./, '.')
+    # replace newlines
+    message = message.replace /\n/g, '<br />\n'
 
-      # for each comma'd chunk, prepend to the result and remove from integer
-      while integer >= 1000
-        mod = String(integer).replace(/\d+(\d\d\d)$/, ',$1')
-        integer = Math.floor integer / 1000
-        result = mod + result
+    # generate quoting clumps
+    processedLines = []
+    quoteBlock = []
+    for line in message.split("\n")
+      if line.match /^(&gt;|>)/
+        quoteBlock.push line
+      else
+        processedLines.push th.quoteClump(quoteBlock) if quoteBlock.length
+        quoteBlock = []
+        processedLines.push line
+    processedLines.push th.quoteClump(quoteBlock) if quoteBlock.length
+    message = processedLines.join "\n"
 
-      # integer is now either in [1, 999], or equal to 0 iff number in (-1, 1).
-      # prepend it with the sign
-      sign + String(integer) + result
+  delimit: (number) ->
+    # only process real numbers
+    return String(number) if isNaN number
 
-    truncateText: (string, options = {}) ->
-      max = options.max ? 30
-      ellipsis = I18n.t('ellipsis', '...')
-      wordSeparator = I18n.t('word_separator', ' ')
+    # capture sign and then start working with the absolute value. don't
+    # process infinities.
+    sign = if number < 0 then '-' else ''
+    abs = Math.abs number
+    return String(number) if abs is Infinity
 
-      string = (string ? "").replace(/\s+/g, wordSeparator).trim()
-      return string if not string or string.length <= max
+    # break out the integer portion and initialize the result to just the
+    # decimal (if any)
+    integer = Math.floor abs
+    result = if abs == integer then '' else String(abs).replace(/^\d+\./, '.')
 
-      truncateAt = 0
-      while true
-        pos = string.indexOf(wordSeparator, truncateAt + 1)
-        break if pos < 0 || pos > max - ellipsis.length
-        truncateAt = pos
-      truncateAt or= max - ellipsis.length # first word > max, so we cut it
+    # for each comma'd chunk, prepend to the result and remove from integer
+    while integer >= 1000
+      mod = String(integer).replace(/\d+(\d\d\d)$/, ',$1')
+      integer = Math.floor integer / 1000
+      result = mod + result
 
-      string.substring(0, truncateAt) + ellipsis
+    # integer is now either in [1, 999], or equal to 0 iff number in (-1, 1).
+    # prepend it with the sign
+    sign + String(integer) + result
+
+  truncateText: (string, options = {}) ->
+    max = options.max ? 30
+    ellipsis = I18n.t('ellipsis', '...')
+    wordSeparator = I18n.t('word_separator', ' ')
+
+    string = (string ? "").replace(/\s+/g, wordSeparator).trim()
+    return string if not string or string.length <= max
+
+    truncateAt = 0
+    while true
+      pos = string.indexOf(wordSeparator, truncateAt + 1)
+      break if pos < 0 || pos > max - ellipsis.length
+      truncateAt = pos
+    truncateAt or= max - ellipsis.length # first word > max, so we cut it
+
+    string.substring(0, truncateAt) + ellipsis

@@ -36,25 +36,32 @@ describe Types::SubmissionCommentType do
 
   let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
 
-  it 'works' do
-    expect(
-      submission_type.resolve('commentsConnection { nodes { comment }}')
-    ).to eq @submission_comments.map(&:comment)
-
+  it 'returns the comments for the current attempt' do
     expect(
       submission_type.resolve('commentsConnection { nodes { _id }}')
+    ).to eq [@comment3.id.to_s]
+  end
+
+  it 'returns all the comments if allComments is true' do
+    expect(
+      submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { _id }}')
     ).to eq @submission_comments.map(&:id).map(&:to_s)
   end
 
   it 'author is only available if you have :read_author permission' do
     expect(
-      submission_type.resolve('commentsConnection { nodes { author { _id }}}', current_user: @student1)
+      submission_type.resolve(
+        'commentsConnection(filter: {allComments: true}) { nodes { author { _id }}}',
+        current_user: @student1
+      )
     ).to eq [@student1.id.to_s, nil, @teacher.id.to_s]
   end
 
   it 'returns an empty list if there are no attachments' do
     expect(
-      submission_type.resolve('commentsConnection { nodes { attachments { _id } }}')
+      submission_type.resolve(
+        'commentsConnection(filter: {allComments: true}) { nodes { attachments { _id } }}'
+      )
     ).to eq [[], [], []]
   end
 
@@ -65,7 +72,9 @@ describe Types::SubmissionCommentType do
     comment.save!
     @submission.reload
     expect(
-      submission_type.resolve('commentsConnection { nodes { attachments { _id } }}')
+      submission_type.resolve(
+        'commentsConnection(filter: {allComments: true}) { nodes { attachments { _id } }}'
+      )
     ).to eq [[], [], []]
   end
 
@@ -79,7 +88,9 @@ describe Types::SubmissionCommentType do
     comment.save!
     @submission.reload
     expect(
-      submission_type.resolve('commentsConnection { nodes { attachments { _id } }}')
+      submission_type.resolve(
+        'commentsConnection(filter: {allComments: true}) { nodes { attachments { _id } }}'
+      )
     ).to eq [[a1.id.to_s, a2.id.to_s], [], []]
   end
 
@@ -100,8 +111,11 @@ describe Types::SubmissionCommentType do
     comment2.save!
 
     @submission.reload
+
     expect(
-      submission_type.resolve('commentsConnection { nodes { attachments { _id } }}')
+      submission_type.resolve(
+        'commentsConnection(filter: {allComments: true}) { nodes { attachments { _id } }}'
+      )
     ).to eq [[a1.id.to_s], [a2.id.to_s, a3.id.to_s], []]
   end
 
@@ -109,7 +123,7 @@ describe Types::SubmissionCommentType do
     context 'with no media object' do
       it 'returns nil' do
         expect(submission_type.resolve(
-          'commentsConnection {
+          'commentsConnection(filter: {allComments: true}) {
             nodes {
               mediaObject {
                 title
@@ -133,7 +147,7 @@ describe Types::SubmissionCommentType do
 
       it 'returns the media object for the comment' do
         expect(submission_type.resolve(
-          'commentsConnection {
+          'commentsConnection(filter: {allComments: true}) {
             nodes {
               mediaObject {
                 title
@@ -148,7 +162,7 @@ describe Types::SubmissionCommentType do
   describe '#attempt' do
     it 'translates nil to zero' do
       expect(
-        submission_type.resolve('commentsConnection { nodes { attempt }}')
+        submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { attempt }}')
       ).to eq [0, 1, 2]
     end
   end

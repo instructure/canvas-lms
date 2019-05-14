@@ -1,4 +1,25 @@
 {
+  "add_8523c19b": {
+    "message": "Bæta við"
+  },
+  "align_11050992": {
+    "message": "Jafna"
+  },
+  "align_center_ca078feb": {
+    "message": "Miðjujafna"
+  },
+  "align_left_e9f1f93b": {
+    "message": "Vinstrijafna"
+  },
+  "align_right_9bad3ac1": {
+    "message": "Hægrijafna"
+  },
+  "all_4321c3a1": {
+    "message": "Allt"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Í stafrófsröð"
+  },
   "alternative_text_a834dcad": {
     "message": "Valfrjáls texti:"
   },
@@ -44,6 +65,9 @@
   "choose_usage_rights_33683854": {
     "message": "Velja notkunarréttindi..."
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "gera hring utan um óraðaðan lista"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Smelltu á hvaða skrá sem er til að setja inn tengil til að sækja skrána."
   },
@@ -65,11 +89,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Smellið til að setja inn tengil á þetta atriði."
   },
+  "close_d634289d": {
+    "message": "Loka"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Loka Flickr-formi"
   },
   "collaborations_5c56c15f": {
     "message": "Samvinnutól"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Tölva"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Undirtegund efnis"
+  },
+  "content_type_2cf90d95": {
+    "message": "Efnistegund"
   },
   "copyright_holder_66ee111": {
     "message": "Handhafi höfundarréttar:"
@@ -92,8 +128,23 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-leyfi:"
   },
+  "date_added_ed5ad465": {
+    "message": "Dagsetning bætt við"
+  },
+  "date_published_371c4ad0": {
+    "message": "Dagsetning birt"
+  },
   "decorative_image_fde98579": {
     "message": "Skreytingarmynd"
+  },
+  "decrease_indent_de6343ab": {
+    "message": "Minnka inndrag"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "sjálfvalið áherslumerktur óraðaður listi"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "sjálfvalið áherslumerktur raðaður listi"
   },
   "discussions_a5f96392": {
     "message": "Umræður"
@@ -101,11 +152,17 @@
   "discussions_index_6c36ced": {
     "message": "Umræðuvísir"
   },
+  "documents_81393201": {
+    "message": "Skjöl"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "slá inn leitarorð"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Settu inn þann texta sem þú kýst við þessa mynd"
+  },
+  "external_links_3d9f074e": {
+    "message": "Ytri tenglar"
   },
   "file_upload_form_4aaad554": {
     "message": "Form fyrir upphleðslu skráar"
@@ -125,6 +182,9 @@
   "group_navigation_99f191a": {
     "message": "Hópleiðarstýring"
   },
+  "header_f28f73db": {
+    "message": "Haus"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ég hef fengð leyfi til að nota þessa skrá."
   },
@@ -137,8 +197,14 @@
   "image_upload_form_7b74079a": {
     "message": "Form myndar í upphleðslu"
   },
+  "image_url_2aee2734": {
+    "message": "Vefslóð myndar"
+  },
   "images_7ce26570": {
     "message": "Myndir"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "Auka inndrag"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Setja inn Equella tengla"
@@ -161,9 +227,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Tengill á annað efni í hópnum."
   },
-  "link_to_url_52dd935c": {
-    "message": "Tengill á vefslóð"
-  },
   "links_14b70841": {
     "message": "Tenglar"
   },
@@ -182,17 +245,32 @@
   "loading_folders_8d4d5d5a": {
     "message": "Hleð inn skrám..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Sæki fleiri niðurstöður..."
+  },
+  "media_af190855": {
+    "message": "Miðill"
+  },
   "modules_c4325335": {
     "message": "Einingar"
   },
   "no_results_940393cf": {
     "message": "Engar niðurstöður."
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Raðaðir og óraðaðir listar"
+  },
   "pages_e5414c2c": {
     "message": "Síður"
   },
+  "paragraph_5e5ad8eb": {
+    "message": "Málsgrein"
+  },
   "people_b4ebb13c": {
     "message": "Fólk"
+  },
+  "preformatted_d0670862": {
+    "message": "Forsniðnir"
   },
   "quizzes_7e598f57": {
     "message": "Próf"
@@ -212,6 +290,30 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Velja möppu til að hlaða skránni þinni upp í"
   },
+  "small_header_168fb9f9": {
+    "message": "Lítill haus"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Eitthvað fór úrskeiðis."
+  },
+  "sort_by_e75f9e3e": {
+    "message": "Raða eftir"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "gera ferning utan um óraðaðan lista"
+  },
+  "subheader_2b87606d": {
+    "message": "Undirhaus"
+  },
+  "submit_a3cc6859": {
+    "message": "Leggja fram"
+  },
+  "subscript_59744f96": {
+    "message": "Undirskrift"
+  },
+  "superscript_8cb349a2": {
+    "message": "Yfirskrift"
+  },
   "syllabus_f191f65b": {
     "message": "Námsefni"
   },
@@ -230,6 +332,9 @@
   "tray_839df38a": {
     "message": "Bakki"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Hlaða upp"
   },
@@ -238,6 +343,18 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Hlaða upp nýrri mynd"
+  },
+  "upload_image_6120b609": {
+    "message": "Hleð upp mynd"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "hástafa bókstafa raðaður listi"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "Hástafa rómverskar tölur raðaður listi"
+  },
+  "url_22a5f3b8": {
+    "message": "Vefslóð"
   },
   "usage_right_ff96f3e2": {
     "message": "Notkunarréttindi:"

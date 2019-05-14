@@ -239,7 +239,8 @@ module CCHelper
                  @course.wiki_pages.where(id: url_or_title.to_i).first
         end
         if page
-          "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{match.query}"
+          query = translate_module_item_query(match.query)
+          "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{query}"
         else
           "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}#{match.query}"
         end
@@ -281,7 +282,7 @@ module CCHelper
       return query unless query&.include?("module_item_id=")
       original_param = query.sub("?", "").split("&").detect{|p| p.include?("module_item_id=")}
       tag_id = original_param.split("=").last
-      new_param = "module_item_id=#{@key_generator.create_key("content_tag_#{tag_id}")}"
+      new_param = "module_item_id=#{@key_generator.create_key(ContentTag.new(:id => tag_id))}"
       query.sub(original_param, new_param)
     end
 

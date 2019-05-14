@@ -15,24 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  './LockButtonView'
-], (LockButtonView) ->
+import LockButtonView from './LockButtonView'
 
-  class LockIconView extends LockButtonView
-    lockClass: 'lock-icon-lock'
-    lockedClass: 'lock-icon-locked'
-    unlockClass: 'lock-icon-unlock'
+export default class LockIconView extends LockButtonView
+  lockClass: 'lock-icon-lock'
+  lockedClass: 'lock-icon-locked'
+  unlockClass: 'lock-icon-unlock'
 
-    tagName: 'span'
-    className: 'lock-icon'
+  tagName: 'span'
+  className: 'lock-icon'
 
-    # These values allow the default text to be overridden if necessary
-    @optionProperty 'lockText'
-    @optionProperty 'unlockText'
+  # These values allow the default text to be overridden if necessary
+  @optionProperty 'lockText'
+  @optionProperty 'unlockText'
 
-    initialize: ->
-      super
-      @events = Object.assign({}, LockButtonView.prototype.events, @events)
+  initialize: ->
+    super
+    @events = Object.assign({}, LockButtonView.prototype.events, @events)
 
-    events: {'keyclick' : 'click'}
+  events: {'keyclick' : 'click'}

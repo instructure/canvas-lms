@@ -15,14 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!gradezilla'
-  'Backbone'
-  '../../gradezilla/OutcomeGradebookGrid'
-  'jst/gradezilla/header_filter'
-], (I18n, {View}, Grid, template) ->
+import I18n from 'i18n!gradezillaHeaderFilterView'
+import {View} from 'Backbone'
+import Grid from '../../gradezilla/OutcomeGradebookGrid'
+import template from 'jst/gradezilla/header_filter'
 
-  class HeaderFilterView extends View
+export default class HeaderFilterView extends View
 
     className: 'text-right'
 

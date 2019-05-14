@@ -15,28 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  './PublishButtonView',
-  'underscore'
-], (PublishButtonView, _) ->
+import PublishButtonView from './PublishButtonView'
+import _ from 'underscore'
 
-  class PublishIconView extends PublishButtonView
-    publishClass: 'publish-icon-publish'
-    publishedClass: 'publish-icon-published'
-    unpublishClass: 'publish-icon-unpublish'
+export default class PublishIconView extends PublishButtonView
+  publishClass: 'publish-icon-publish'
+  publishedClass: 'publish-icon-published'
+  unpublishClass: 'publish-icon-unpublish'
 
-    tagName: 'span'
-    className: 'publish-icon'
+  tagName: 'span'
+  className: 'publish-icon'
 
-    # This value allows the text to include the item title
-    @optionProperty 'title'
+  # This value allows the text to include the item title
+  @optionProperty 'title'
 
-    # These values allow the default text to be overridden if necessary
-    @optionProperty 'publishText'
-    @optionProperty 'unpublishText'
+  # These values allow the default text to be overridden if necessary
+  @optionProperty 'publishText'
+  @optionProperty 'unpublishText'
 
-    initialize: ->
-      super
-      @events = _.extend({}, PublishButtonView.prototype.events, @events)
+  initialize: ->
+    super
+    @events = _.extend({}, PublishButtonView.prototype.events, @events)
 
-    events: {'keyclick' : 'click'}
+  events: {'keyclick' : 'click'}

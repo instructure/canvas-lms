@@ -55,6 +55,14 @@ module Types
       GraphQLNodeLoader.load("AssignmentGroup", id, context)
     end
 
+    field :term, Types::TermType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Term")
+    end
+    def term(id:)
+      GraphQLNodeLoader.load("Term", id, context)
+    end
+
     field :all_courses, [CourseType],
       "All courses viewable by the current user",
       null: true

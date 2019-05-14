@@ -18,7 +18,7 @@
 
 import Backbone from 'Backbone'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!conversations'
+import I18n from 'i18n!ConversationStatusFilter'
 import {decodeQueryString} from 'jsx/shared/queryString'
 import React from 'react'
 import Select from '@instructure/ui-core/lib/components/Select'

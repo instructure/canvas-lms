@@ -48,7 +48,17 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .ui-dialog-titlebar-close {
+    border: none;
 
+    &:hover {
+      border: solid 2px $electric !important;
+      border-radius: 4px;
+    }
+
+    &:focus {
+      border: solid 2px $electric !important;
+      border-radius: 4px;
+    }
   }
 
   .ui-dialog-buttonpane {
@@ -175,7 +185,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment:focus .attachment-icon {
-    box-shadow: 0 0 5px #0088CC;
+    box-shadow: 0 0 5px $electric;
   }
 
   .attachment-icon i:before {
@@ -201,7 +211,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment:focus .attachment-name {
-    background-color: #08c;
+    background-color: $electric;
     color: #fff;
   }
 
@@ -213,7 +223,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment:focus .attachment-name-clip {
-    background: linear-gradient(to bottom, transparent 95%, #08c 99%);
+    background: linear-gradient(to bottom, transparent 95%, $electric 99%);
     border-radius: 10px;
   }
 

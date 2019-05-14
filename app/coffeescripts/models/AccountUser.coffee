@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['../models/User'], (User) ->
+import User from './User'
 
-  class AccountUser extends User
+export default class AccountUser extends User
 
-    defaults:
-      avatar_url: '/images/messages/avatar-50.png'
+  defaults:
+    avatar_url: '/images/messages/avatar-50.png'
 

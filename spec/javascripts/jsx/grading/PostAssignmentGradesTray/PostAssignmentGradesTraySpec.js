@@ -40,6 +40,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         name: 'Math 1.1'
       },
       onExited: sinon.spy(),
+      onPosted: sinon.spy(),
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}]
     }
 
@@ -72,9 +73,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
 
   function getCloseIconButton() {
     const $tray = getTrayElement()
-    return [...$tray.querySelectorAll('button')].filter(
-      $button => $button.textContent === 'Close'
-    )[0]
+    return [...$tray.querySelectorAll('button')].find($button => $button.textContent === 'Close')
   }
 
   function getPostButton() {
@@ -96,17 +95,34 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     return document.getElementById(label.htmlFor)
   }
 
-  function getSectionToggleInput() {
-    return document.getElementById(getLabel('Specific Sections').htmlFor)
+  function getInputByLabel(label) {
+    const $label = getLabel(label)
+    if ($label === undefined) return undefined
+    return document.getElementById($label.htmlFor)
   }
 
-  function getSectionInput(sectionName) {
-    return document.getElementById(getLabel(sectionName).htmlFor)
+  function getSectionToggleInput() {
+    return getInputByLabel('Specific Sections')
+  }
+
+  function getSpinner() {
+    const $tray = getTrayElement()
+    return [...$tray.querySelectorAll('svg')].find(
+      $spinner => $spinner.textContent === 'Posting grades'
+    )
   }
 
   async function show() {
     tray.show(context)
     await waitForElement(getTrayElement)
+  }
+
+  function getUnpostedCount() {
+    return getUnpostedSummary().querySelector('[id^="Badge__"]')
+  }
+
+  function getUnpostedSummary() {
+    return getTrayElement().querySelector('div#PostAssignmentGradesTray__Layout__UnpostedSummary')
   }
 
   async function waitForTrayClosed() {
@@ -123,11 +139,11 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       await show()
     })
 
-    test('opens the tray', async () => {
+    test('opens the tray', () => {
       ok(getTrayElement())
     })
 
-    test('displays the name of the assignment', async () => {
+    test('displays the name of the assignment', () => {
       const heading = getTrayElement().querySelector('h2')
       equal(heading.textContent, 'Math 1.1')
     })
@@ -141,10 +157,10 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     test('resets the selected sections', async () => {
       const postAssignmentGradesForSectionsStub = sinon.stub(Api, 'postAssignmentGradesForSections')
       getSectionToggleInput().click()
-      getSectionInput('Sophomores').click()
+      getInputByLabel('Sophomores').click()
       await show()
       getSectionToggleInput().click()
-      getSectionInput('Freshmen').click()
+      getInputByLabel('Freshmen').click()
       getPostButton().click()
       deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
       postAssignmentGradesForSectionsStub.restore()
@@ -168,13 +184,15 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       await show()
     })
 
+    test('is present', () => ok(getSectionToggleInput()))
+
     test('does not display the sections when unchecked', () => {
       notOk(getLabel('Freshmen'))
     })
 
     test('shows the sections when checked', () => {
       getSectionToggleInput().click()
-      ok(getSectionInput('Freshmen'))
+      ok(getInputByLabel('Freshmen'))
     })
 
     test('is not shown when there are no sections', async () => {
@@ -188,6 +206,8 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       await show()
     })
 
+    test('is present', () => ok(getCloseButton()))
+
     test('closes the tray', async () => {
       getCloseIconButton().click()
       await waitForTrayClosed()
@@ -195,19 +215,56 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     })
   })
 
+  QUnit.module('unposted summary', () => {
+    QUnit.module('with unposted submissions', () => {
+      test('the number of unposted submissions is displayed', async () => {
+        context.submissions = [
+          {postedAt: new Date().toISOString()},
+          {postedAt: null},
+          {postedAt: null}
+        ]
+        await show(context)
+        strictEqual(getUnpostedCount().textContent, '2')
+      })
+    })
+
+    QUnit.module('with no unposted submissions', unpostedSubmissionsHooks => {
+      unpostedSubmissionsHooks.beforeEach(async () => {
+        context.submissions = [
+          {postedAt: new Date().toISOString()},
+          {postedAt: new Date().toISOString()}
+        ]
+
+        await show(context)
+      })
+
+      test('a summary of unposted submissions is not displayed', () => {
+        notOk(getUnpostedSummary())
+      })
+    })
+  })
+
   QUnit.module('"Post" Button', hooks => {
-    const PROGRESS_ID = 23
     let resolvePostAssignmentGradesStatusStub
     let postAssignmentGradesStub
     let showFlashAlertStub
 
-    async function waitTillFinishedPosting() {
+    const PROGRESS_ID = 23
+    const resolvePostAssignmentGradesStatusPromise = {}
+    resolvePostAssignmentGradesStatusPromise.promise = new Promise((resolve, reject) => {
+      resolvePostAssignmentGradesStatusPromise.resolve = val => {
+        resolve(val)
+      }
+      resolvePostAssignmentGradesStatusPromise.reject = reject
+    })
+
+    async function waitForPosting() {
       await wait(() => resolvePostAssignmentGradesStatusStub.callCount > 0)
     }
 
     async function clickPost() {
       getPostButton().click()
-      await waitTillFinishedPosting()
+      await waitForPosting()
     }
 
     hooks.beforeEach(async () => {
@@ -227,6 +284,8 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       resolvePostAssignmentGradesStatusStub.restore()
     })
 
+    test('is present', () => ok(getPostButton()))
+
     test('calls postAssignmentGrades', async () => {
       await clickPost()
       strictEqual(postAssignmentGradesStub.callCount, 1)
@@ -242,35 +301,56 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       strictEqual(resolvePostAssignmentGradesStatusStub.callCount, 1)
     })
 
-    test('renders a success alert', async () => {
-      await clickPost()
-      strictEqual(showFlashAlertStub.callCount, 1)
-    })
-
-    test('the rendered success alert contains a message', async () => {
-      const successMessage = 'Success! Grades have been posted to everyone for Math 1.1.'
-      await clickPost()
-      strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
-    })
-
-    test('tray is closed after posting is finished', async () => {
-      await clickPost()
-      notOk(getTrayElement())
-    })
-
-    test('is disabled while posting grades is in progress', async () => {
-      resolvePostAssignmentGradesStatusStub.returns(new Promise(() => {}))
+    test('displays the name of the assignment while posting grades is in progress', async () => {
+      resolvePostAssignmentGradesStatusStub.returns(
+        resolvePostAssignmentGradesStatusPromise.promise
+      )
       getPostButton().click()
-      strictEqual(getPostButton().disabled, true)
-      const callCount = resolvePostAssignmentGradesStatusStub.callCount
-      resolvePostAssignmentGradesStatusStub.returns(Promise.resolve({}))
-      await wait(() => resolvePostAssignmentGradesStatusStub.callCount > callCount)
+      const heading = getTrayElement().querySelector('h2')
+      strictEqual(heading.textContent, 'Math 1.1')
+      resolvePostAssignmentGradesStatusPromise.resolve()
+      await waitForPosting()
     })
 
-    test('is disabled when assignment has not yet had grades published', async () => {
-      context.assignment.gradesPublished = false
-      await show()
-      strictEqual(getPostButton().disabled, true)
+    test('calls onPosted', async () => {
+      await clickPost()
+      strictEqual(context.onPosted.callCount, 1)
+    })
+
+    QUnit.module('pending request', pendingRequestHooks => {
+      pendingRequestHooks.beforeEach(() => {
+        resolvePostAssignmentGradesStatusStub.returns(
+          resolvePostAssignmentGradesStatusPromise.promise
+        )
+        getPostButton().click()
+      })
+
+      pendingRequestHooks.afterEach(async () => {
+        resolvePostAssignmentGradesStatusPromise.resolve()
+        await waitForPosting()
+      })
+
+      test('displays a spinner', () => {
+        ok(getSpinner)
+      })
+    })
+
+    QUnit.module('on success', () => {
+      test('renders a success alert', async () => {
+        await clickPost()
+        strictEqual(showFlashAlertStub.callCount, 1)
+      })
+
+      test('the rendered success alert contains a message', async () => {
+        const successMessage = 'Success! Grades have been posted to everyone for Math 1.1.'
+        await clickPost()
+        strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
+      })
+
+      test('tray is closed after posting is finished', async () => {
+        await clickPost()
+        notOk(getTrayElement())
+      })
     })
 
     QUnit.module('gradedOnly', contextHooks => {
@@ -297,32 +377,29 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     })
 
     QUnit.module('on failure', contextHooks => {
-      contextHooks.beforeEach(() => {
+      contextHooks.beforeEach(async () => {
         postAssignmentGradesStub.restore()
         postAssignmentGradesStub = sinon
           .stub(Api, 'postAssignmentGrades')
           .returns(Promise.reject(new Error('ERROR')))
+        await clickPost()
       })
 
       test('renders an error alert', async () => {
-        await clickPost()
         strictEqual(showFlashAlertStub.callCount, 1)
       })
 
-      test('the rendered error alert contains a message', async () => {
+      test('the rendered error alert contains a message', () => {
         const message = 'There was a problem posting assignment grades.'
-        await clickPost()
         strictEqual(showFlashAlertStub.firstCall.args[0].message, message)
       })
 
-      test('tray remains open', async () => {
-        await clickPost()
+      test('tray remains open', () => {
         ok(getTrayElement())
       })
 
-      test('"Post" button is re-enabled', async () => {
-        await clickPost()
-        strictEqual(getPostButton().disabled, false)
+      test('spinner is not present', () => {
+        notOk(getSpinner())
       })
     })
 
@@ -333,67 +410,79 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         postAssignmentGradesForSectionsStub = sinon
           .stub(Api, 'postAssignmentGradesForSections')
           .returns(Promise.resolve({id: PROGRESS_ID, workflowState: 'queued'}))
-
-        await show()
-        getSectionToggleInput().click()
       })
 
       contextHooks.afterEach(() => {
         postAssignmentGradesForSectionsStub.restore()
       })
 
-      test('is disabled when assignment is anonymous grading', async () => {
+      test('is not disabled', async () => {
+        await show()
+        strictEqual(getSectionToggleInput().disabled, false)
+      })
+
+      test('is disabled when assignment is anonymous grade', async () => {
         context.assignment.anonymizeStudents = true
         await show()
         strictEqual(getSectionToggleInput().disabled, true)
       })
 
-      test('renders an error when no sections are selected', async () => {
-        getPostButton().click()
-        await waitTillFinishedPosting()
-        strictEqual(showFlashAlertStub.callCount, 1)
-      })
+      QUnit.module(
+        'given the tray is open and section toggle has been clicked',
+        sectionToggleClickedHooks => {
+          sectionToggleClickedHooks.beforeEach(async () => {
+            await show()
+            getSectionToggleInput().click()
+          })
 
-      test('the rendered error contains a message when no sections are selected', async () => {
-        const errorMessage = 'At least one section must be selected to post grades by section.'
-        getPostButton().click()
-        strictEqual(showFlashAlertStub.firstCall.args[0].message, errorMessage)
-      })
+          test('renders an error when no sections are selected', async () => {
+            getPostButton().click()
+            await waitForPosting()
+            strictEqual(showFlashAlertStub.callCount, 1)
+          })
 
-      test('render a success message when sections are selected and posting is successful', async () => {
-        const successMessage =
-          'Success! Grades have been posted for the selected sections of Math 1.1.'
-        getSectionInput('Sophomores').click()
-        await clickPost()
-        strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
-      })
+          test('the rendered error contains a message when no sections are selected', () => {
+            const errorMessage = 'At least one section must be selected to post grades by section.'
+            getPostButton().click()
+            strictEqual(showFlashAlertStub.firstCall.args[0].message, errorMessage)
+          })
 
-      test('calls postAssignmentGradesForSections', async () => {
-        getSectionInput('Sophomores').click()
-        await clickPost()
-        strictEqual(postAssignmentGradesForSectionsStub.callCount, 1)
-      })
+          test('render a success message when sections are selected and posting is successful', async () => {
+            const successMessage =
+              'Success! Grades have been posted for the selected sections of Math 1.1.'
+            getInputByLabel('Sophomores').click()
+            await clickPost()
+            strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
+          })
 
-      test('passes the assignment id to postAssignmentGradesForSections', async () => {
-        getSectionInput('Sophomores').click()
-        await clickPost()
-        strictEqual(postAssignmentGradesForSectionsStub.firstCall.args[0], '2301')
-      })
+          test('calls postAssignmentGradesForSections', async () => {
+            getInputByLabel('Sophomores').click()
+            await clickPost()
+            strictEqual(postAssignmentGradesForSectionsStub.callCount, 1)
+          })
 
-      test('passes section ids to postAssignmentGradesForSections', async () => {
-        getSectionInput('Freshmen').click()
-        getSectionInput('Sophomores').click()
-        await clickPost()
-        deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001', '2002'])
-      })
+          test('passes the assignment id to postAssignmentGradesForSections', async () => {
+            getInputByLabel('Sophomores').click()
+            await clickPost()
+            strictEqual(postAssignmentGradesForSectionsStub.firstCall.args[0], '2301')
+          })
 
-      test('deselecting a section excludes it from being posted', async () => {
-        getSectionInput('Freshmen').click()
-        getSectionInput('Sophomores').click()
-        getSectionInput('Sophomores').click()
-        await clickPost()
-        deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
-      })
+          test('passes section ids to postAssignmentGradesForSections', async () => {
+            getInputByLabel('Freshmen').click()
+            getInputByLabel('Sophomores').click()
+            await clickPost()
+            deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001', '2002'])
+          })
+
+          test('deselecting a section excludes it from being posted', async () => {
+            getInputByLabel('Freshmen').click()
+            getInputByLabel('Sophomores').click()
+            getInputByLabel('Sophomores').click()
+            await clickPost()
+            deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
+          })
+        }
+      )
     })
   })
 })

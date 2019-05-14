@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageContentView from 'compiled/views/wiki/WikiPageContentView'
+import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 QUnit.module('WikiPageContentView')
 
@@ -53,6 +54,6 @@ test('setModel binds to the model change:title trigger', function() {
 
 test('render publishes a "userContent/change" (to enhance user content)', function() {
   const contentView = new WikiPageContentView()
-  $.subscribe('userContent/change', sandbox.mock().atLeast(1))
+  subscribe('userContent/change', sandbox.mock().atLeast(1))
   contentView.render()
 })

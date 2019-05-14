@@ -38,7 +38,11 @@ export default class Services extends React.Component {
     return this.state.scopes
   }
 
-  handleScopesSelectionChange = scopes => this.setState({scopes})
+  valid = () => true
+
+  handleScopesSelectionChange = scopes => {
+    this.setState({scopes})
+  }
 
   render() {
     const { scopes } = this.state;
@@ -83,10 +87,11 @@ export default class Services extends React.Component {
 }
 
 Services.propTypes = {
-  validScopes: PropTypes.object.isRequired,
+  validScopes: PropTypes.object,
   scopes: PropTypes.arrayOf(PropTypes.string)
 }
 
 Services.defaultProps = {
-  scopes: []
+  scopes: [],
+  validScopes: {}
 }

@@ -25,20 +25,27 @@ const assignToSection = {
   set: {
     __typename: 'Section',
     lid: '17',
-    name: 'Section 8'
+    sectionName: 'Section 8'
   }
 }
 const assignToGroup = {
   set: {
     __typename: 'Group',
     lid: '68',
-    name: 'Yo La Tengo'
+    groupName: 'Yo La Tengo'
+  }
+}
+const assignToGroupWithNoName = {
+  set: {
+    __typename: 'Group',
+    lid: '68',
+    groupName: null
   }
 }
 const assignToStudents = {
   set: {
     __typename: 'AdhocStudents',
-    students: [{lid: '2', name: 'Dweezil Zappa'}, {lid: '3', name: 'Moon Zappa'}]
+    students: [{lid: '2', studentName: 'Dweezil Zappa'}, {lid: '3', studentName: 'Moon Zappa'}]
   }
 }
 
@@ -68,11 +75,24 @@ it('renders an OverrideAssignTo group summary', () => {
   expect(getByText('Yo La Tengo')).toBeInTheDocument()
 })
 
+it('renders an OverrideAssignTo group summary with a group with no name', () => {
+  const override = mockOverride(assignToGroupWithNoName)
+  const {getByTestId} = render(<OverrideAssignTo override={override} variant="summary" />)
+  const elem = getByTestId('OverrideAssignTo')
+  expect(elem.innerHTML.includes('unnamed group')).toBeTruthy()
+})
+
 it('renders an OverrideAssignTo group detail', () => {
   const override = mockOverride(assignToGroup)
   const {getByText} = render(<OverrideAssignTo override={override} variant="detail" />)
   expect(getByText('Assign to:')).toBeInTheDocument()
   expect(getByText('Yo La Tengo')).toBeInTheDocument()
+})
+
+it('renders an OverrideAssignTo group detail with a group with no name', () => {
+  const override = mockOverride(assignToGroupWithNoName)
+  const {getByText} = render(<OverrideAssignTo override={override} variant="detail" />)
+  expect(getByText('unnamed group')).toBeInTheDocument()
 })
 
 it('renders an OverrideAssignTo students summary', () => {

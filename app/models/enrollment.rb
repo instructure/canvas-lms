@@ -89,28 +89,6 @@ class Enrollment < ActiveRecord::Base
   scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
 
-  def self.not_yet_started(course)
-    collection = self.where(course_id: course).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
-    collection.select do |enrollment|
-      enrollment.effective_start_at > Time.zone.now
-    end
-  end
-
-  def self.section_ended(course_id)
-    collection = self.where(course_id: course_id).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
-    courses = Course.where(id: course_id)
-    unless courses[0].nil?
-      collection.select do |enrollment|
-        (!enrollment.course_section.end_at.nil? &&
-         enrollment.course_section.end_at < courses[0].time_zone.now) ||
-          (!enrollment.course_section.start_at.nil? &&
-           enrollment.course_section.start_at >  courses[0].time_zone.now)
-      end
-    end
-  end
-
   def ensure_role_id
     self.role_id ||= self.role.id
   end
@@ -522,26 +500,22 @@ class Enrollment < ActiveRecord::Base
   def conclude
     self.workflow_state = "completed"
     self.completed_at = Time.now
-    self.user.touch
     self.save
   end
 
   def unconclude
     self.workflow_state = 'active'
     self.completed_at = nil
-    self.user.touch
     self.save
   end
 
   def deactivate
     self.workflow_state = "inactive"
-    self.user.touch
     self.save
   end
 
   def reactivate
     self.workflow_state = "active"
-    self.user.touch
     self.save
   end
 
@@ -662,11 +636,12 @@ class Enrollment < ActiveRecord::Base
   def accept(force = false)
     Shackles.activate(:master) do
       return false unless force || invited?
-      update_attribute(:workflow_state, 'active')
-      if self.type == 'StudentEnrollment'
-        Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
+      if update_attribute(:workflow_state, 'active')
+        if self.type == 'StudentEnrollment'
+          Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
+        end
+        true
       end
-      touch_user
     end
   end
 
@@ -701,7 +676,7 @@ class Enrollment < ActiveRecord::Base
 
   workflow do
     state :invited do
-      event :reject, :transitions_to => :rejected do self.user.touch; end
+      event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
     end
 
@@ -710,7 +685,7 @@ class Enrollment < ActiveRecord::Base
     end
 
     state :active do
-      event :reject, :transitions_to => :rejected do self.user.touch; end
+      event :reject, :transitions_to => :rejected
       event :complete, :transitions_to => :completed
     end
 
@@ -847,7 +822,6 @@ class Enrollment < ActiveRecord::Base
     result = self.save
     if result
       self.user.try(:update_account_associations)
-      self.user.touch
       scores.update_all(updated_at: Time.zone.now, workflow_state: :deleted)
 
       Assignment.remove_user_as_final_grader(user_id, course_id) if remove_user_as_final_grader?
@@ -1352,7 +1326,7 @@ class Enrollment < ActiveRecord::Base
         enrollment.save!
       end
     end
-    user.touch
+    user.clear_cache_key(:enrollments)
   end
 
   def self.course_user_state(course, uuid)

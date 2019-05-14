@@ -1,0 +1,22 @@
+{
+  "name": "@instructure/k5uploader",
+  "version": "1.0.0",
+  "description": "html 5 kaltura uploader",
+  "main": "k5uploader.js",
+  "scripts": {
+    "test": "echo \"if we want tests, we should go to https://github.com/knomedia/k5uploader/blob/master/package.json#L7 and copy/paste back in the testem stuff\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/instructure/canvas-lms.git"
+  },
+  "author": "Instructure",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/instructure/canvas-lms/issues"
+  },
+  "homepage": "https://github.com/instructure/canvas-lms#readme",
+  "dependencies": {
+    "jquery": "*"
+  }
+}

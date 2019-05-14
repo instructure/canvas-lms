@@ -39,7 +39,7 @@ module SIS
         end
       end
       @logger.debug("Raw enrollments took #{Time.zone.now - start} seconds")
-      i.enrollments_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
+      i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
         Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
@@ -62,7 +62,10 @@ module SIS
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
-        User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
+               User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
+
+        ids_to_touch = (batch + UserObserver.where(user_id: batch).pluck(:observer_id)).uniq
+        User.touch_and_clear_cache_keys(ids_to_touch, :enrollments) if ids_to_touch.any?
       end
       i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
         Enrollment.send_later_enqueue_args(:batch_add_to_favorites,
@@ -403,6 +406,7 @@ module SIS
           if enrollment.workflow_state != 'deleted'
             @enrollments_to_delete << enrollment
           else
+            @enrollments_to_update_sis_batch_ids << enrollment.id
             @success_count += 1
           end
           # we are done and we con go to the next enrollment

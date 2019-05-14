@@ -21,7 +21,7 @@ define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var ChartMixin = require('../../mixins/chart');
   var d3 = require('d3');
-  var I18n = require('i18n!quiz_statistics.summary');
+  var I18n = require('i18n!quiz_statistics.summary').default;
   var max = d3.max;
   var sum = d3.sum;
 

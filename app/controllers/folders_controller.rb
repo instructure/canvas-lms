@@ -624,4 +624,26 @@ class FoldersController < ApplicationController
       end
     end
   end
+
+  # @API Get uploaded media folder for user
+  # @subtopic Folders
+  # Returns the details for a designated upload folder that the user has rights to
+  # upload to, and creates it if it doesn't exist.
+  #
+  # If the current user does not have the permissions to manage files
+  # in the course or group, the folder will belong to the current user directly.
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/media' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns Folder
+  def media_folder
+    require_context
+    if authorized_action(@context, @current_user, :read)
+      folder_context = @context.grants_right?(@current_user, session, :manage_files) ? @context : @current_user
+      @folder = Folder.media_folder(folder_context)
+      render :json => folder_json(@folder, @current_user, session)
+    end
+  end
 end

@@ -334,7 +334,6 @@ student_context_cards:
   description: Enable student context card links
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
 new_user_tutorial:
   state: allowed
   display_name: New User Tutorial

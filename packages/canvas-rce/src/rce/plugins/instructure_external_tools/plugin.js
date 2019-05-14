@@ -17,11 +17,15 @@
  */
 
 import dispatchInitEvent from "./dispatchInitEvent";
+import {IconLtiLine} from '@instructure/ui-icons/es/svg'
+
 
 tinymce.create("tinymce.plugins.InstructureExternalTools", {
   init: function(ed, url) {
+    ed.ui.registry.addIcon('lti', IconLtiLine.src)
     dispatchInitEvent(ed, document, url);
-  }
+  },
+  icon: 'lti'
 });
 
 // Register plugin

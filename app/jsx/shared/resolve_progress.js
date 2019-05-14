@@ -36,8 +36,12 @@ export default function resolveProgress(progress, options={}) {
     // poll again after a delay. default to once a second if not specified, and
     // wait at least 100ms between polls even if asked for less.
     let { interval } = options;
-    if (!interval) { interval = 1000; }
-    if (interval < 100) { interval = 100; }
+    if (process.env.NODE_ENV === 'test' && !interval) {
+      interval = 0 // gotta go fast
+    } else {
+      if (!interval) interval = 1000
+      if (interval < 100) interval = 100
+    }
     return delayAsPromise(interval)
       .then(() => ajaxLib.get(url))
       .then((response) => {

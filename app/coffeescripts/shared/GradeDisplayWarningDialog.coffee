@@ -15,37 +15,35 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!gradezilla'
-  'jquery'
-  'jst/GradeDisplayWarningDialog'
-  'jqueryui/dialog'
-], (I18n, $, gradeDisplayWarningDialogTemplate) ->
+import I18n from 'i18n!gradezillaGradeDisplayWarningDialog'
+import $ from 'jquery'
+import gradeDisplayWarningDialogTemplate from 'jst/GradeDisplayWarningDialog'
+import 'jqueryui/dialog'
 
-  class GradeDisplayWarningDialog
-    constructor: (options) ->
-      @options = options
-      points_warning = I18n.t("grade_display_warning.points_text", "Students will also see their final grade as points. Are you sure you want to continue?")
-      percent_warning = I18n.t("grade_display_warning.percent_text", "Students will also see their final grade as a percentage. Are you sure you want to continue?")
-      locals =
-        warning_text: if @options.showing_points then percent_warning else points_warning
-      @$dialog = $ gradeDisplayWarningDialogTemplate(locals)
-      @$dialog.dialog
-        resizable: false
-        width: 350
-        buttons: [{
-          text: I18n.t("grade_display_warning.cancel", "Cancel"), click: @cancel},
-          {text: I18n.t("grade_display_warning.continue", "Continue"), click: @save}]
-        close: =>
-          @$dialog.remove()
-          options.onClose() if typeof options.onClose == 'function'
+export default class GradeDisplayWarningDialog
+  constructor: (options) ->
+    @options = options
+    points_warning = I18n.t("grade_display_warning.points_text", "Students will also see their final grade as points. Are you sure you want to continue?")
+    percent_warning = I18n.t("grade_display_warning.percent_text", "Students will also see their final grade as a percentage. Are you sure you want to continue?")
+    locals =
+      warning_text: if @options.showing_points then percent_warning else points_warning
+    @$dialog = $ gradeDisplayWarningDialogTemplate(locals)
+    @$dialog.dialog
+      resizable: false
+      width: 350
+      buttons: [{
+        text: I18n.t("grade_display_warning.cancel", "Cancel"), click: @cancel},
+        {text: I18n.t("grade_display_warning.continue", "Continue"), click: @save}]
+      close: =>
+        @$dialog.remove()
+        options.onClose() if typeof options.onClose == 'function'
 
-    save: () =>
-      if @$dialog.find('#hide_warning').prop('checked')
-        @options.save({ dontWarnAgain: true })
-      else
-        @options.save({ dontWarnAgain: false })
-      @$dialog.dialog('close')
+  save: () =>
+    if @$dialog.find('#hide_warning').prop('checked')
+      @options.save({ dontWarnAgain: true })
+    else
+      @options.save({ dontWarnAgain: false })
+    @$dialog.dialog('close')
 
-    cancel: () =>
-      @$dialog.dialog('close')
+  cancel: () =>
+    @$dialog.dialog('close')

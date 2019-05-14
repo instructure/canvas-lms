@@ -27,6 +27,10 @@ export default class Bridge {
     this._editorRendered = new Promise(resolve => {
       this.resolveEditorRendered = resolve
     })
+
+    this.insertLink = this.insertLink.bind(this)
+
+    this.trayProps = new WeakMap();
   }
 
   get editorRendered() {
@@ -66,12 +70,12 @@ export default class Bridge {
     this._controller = controller
   }
 
-  detachController(controller) {
+  detachController() {
     this._controller = null
   }
 
   showTrayForPlugin(plugin) {
-    this._controller.showTrayForPlugin(plugin)
+    this._controller && this._controller.showTrayForPlugin(plugin)
   }
 
   existingContentToLink() {
@@ -98,6 +102,9 @@ export default class Bridge {
         range: selection.getRng()
       };
       this.focusedEditor.insertLink(link);
+      if (this.controller) {
+        this.controller.hideTray()
+      }
     } else {
       console.warn("clicked sidebar link without a focused editor");
     }
@@ -106,6 +113,9 @@ export default class Bridge {
   insertImage(image) {
     if (this.focusedEditor) {
       this.focusedEditor.insertImage(image);
+      if (this.controller) {
+        this.controller.hideTray()
+      }
     } else {
       console.warn("clicked sidebar image without a focused editor");
     }

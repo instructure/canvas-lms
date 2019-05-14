@@ -41,7 +41,7 @@ function defaultValue(gradingType, pointsPossible, options = {}) {
 }
 
 function PointsDisplay(props) {
-  const {gradingType, receivedGrade, pointsPossible} = props
+  const {displaySize, gradingType, pointsPossible, receivedGrade} = props
 
   return (
     <div>
@@ -56,7 +56,7 @@ function PointsDisplay(props) {
       </ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
         <FlexItem>
-          <Text transform="capitalize" size="x-large" data-test-id="grade-display">
+          <Text transform="capitalize" size={displaySize} data-test-id="grade-display">
             {GradeFormatHelper.formatGrade(receivedGrade, {
               gradingType,
               pointsPossible,
@@ -72,12 +72,14 @@ function PointsDisplay(props) {
 }
 
 PointsDisplay.propTypes = {
+  displaySize: PropTypes.string,
   gradingType: PropTypes.string.isRequired,
   receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   pointsPossible: PropTypes.number.isRequired
 }
 
 PointsDisplay.defaultProps = {
+  displaySize: 'x-large',
   gradingType: 'points'
 }
 

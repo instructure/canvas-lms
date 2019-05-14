@@ -17,12 +17,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!assignmentsToggleShowByView'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
 import Cache from '../../class/cache'
-import hasLocalStorage from '../../util/hasLocalStorage'
 import AssignmentGroup from '../../models/AssignmentGroup'
 import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
@@ -42,7 +41,7 @@ export default class ToggleShowByView extends Backbone.View {
   initializeCache() {
     if (this.course.get('id') == null) return
     $.extend(true, this, Cache)
-    if (hasLocalStorage && (ENV.current_user_id != null)) this.cache.use('localStorage')
+    if (ENV.current_user_id != null) this.cache.use('localStorage')
     if (this.cache.get(this.cacheKey()) == null) this.cache.set(this.cacheKey(), true)
     return this.initialized.resolve()
   }

@@ -1,6 +1,11 @@
 <%= t "New Topic for %{course}", :course => asset.context.name %>
 <%= asset.title %>
 
-<%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 50) %>
+<% available_from = asset.available_from_for(user) %>
+<% if available_from && available_from > Time.now.utc %>
+    <%= t("Content not available") %>
+<% else %>
+    <%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 50) %>
+<% end %>
 
 <%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

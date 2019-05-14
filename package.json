@@ -35,6 +35,7 @@
     "@instructure/ui-icons": "^5",
     "@instructure/ui-layout": "^5",
     "@instructure/ui-menu": "^5",
+    "@instructure/ui-media-player": "^5",
     "@instructure/ui-number-input": "^5",
     "@instructure/ui-overlays": "^5",
     "@instructure/ui-pagination": "^5",
@@ -98,7 +99,6 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-lazy-load": "^3.0.13",
     "react-modal": "^3",
-    "react-player": "^1.9.3",
     "react-redux": "^5.1.1",
     "react-tokeninput": "^2.5.0",
     "react-transition-group": "^1",
@@ -125,7 +125,6 @@
     "babel-eslint": "^10",
     "babel-jest": "^24",
     "babel-loader": "^8",
-    "babel-plugin-add-module-exports": "0.2.1",
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-transform-amd-to-commonjs": "^1.4.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4",
@@ -179,6 +178,7 @@
     "jest-junit": "^6",
     "jest-localstorage-mock": "^2",
     "jest-moxios-utils": "^1",
+    "jest-raw-loader": "^1",
     "json-loader": "^0.5.7",
     "jsx-loader": "0.11.2",
     "karma": "^3",
@@ -265,6 +265,8 @@
     "jquery": "https://github.com/ryankshaw/jquery.git#a755a3e9c99d5a70d8ea570836f94ae1ba56046d",
     "canvas-quizzes/grunt-contrib-jasmine/jasmine-core": "2.6.4",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
-    "graphael": "https://github.com/ryankshaw/graphael.git"
+    "graphael": "https://github.com/ryankshaw/graphael.git",
+    "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
+    "node-sass": "4.7.2"
   }
 }

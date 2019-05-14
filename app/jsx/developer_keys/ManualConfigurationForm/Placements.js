@@ -18,6 +18,7 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
+import $ from 'jquery'
 
 import Select from '@instructure/ui-forms/lib/components/Select';
 import { AccessibleContent } from '@instructure/ui-a11y'
@@ -40,6 +41,17 @@ export default class Placements extends React.Component {
     return Object.values(this.placementRefs).map(p => p.generateToolConfigurationPart())
   }
 
+  valid = () => {
+    if (Object.values(this.placementRefs).length === 0) {
+      $.flashError(I18n.t('Must have at least one placement defined.'))
+      return false
+    }
+    if (Object.values(this.placementRefs).some(p => !p.valid())) {
+      return false
+    }
+    return true
+  }
+
   placements(obj) {
     return obj.map(o => o.placement);
   }
@@ -53,13 +65,15 @@ export default class Placements extends React.Component {
     const selected = opts.map(o => o.id)
     const removed = difference(this.placements(placements), selected)
     const added = difference(selected, this.placements(placements));
-    removed.forEach(p => delete this.placementRefs[`${p.placement}Ref`])
+    removed.forEach(p => delete this.placementRefs[`${p}Ref`])
     this.setState({placements: [...filter(placements, p => !removed.includes(p.placement)), ...this.newPlacements(added)]});
   }
 
   setPlacementRef = placement => node => {
     const ref = `${placement}Ref`
-    this.placementRefs[ref] = node
+    if (node) {
+      this.placementRefs[ref] = node
+    }
     this[ref] = node
   }
 
@@ -112,12 +126,13 @@ export default class Placements extends React.Component {
 }
 
 Placements.propTypes = {
-  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
+  validPlacements: PropTypes.arrayOf(PropTypes.string),
   placements: PropTypes.arrayOf(PropTypes.shape({
     placement: PropTypes.string.isRequired
   }))
 }
 
 Placements.defaultProps = {
-  placements: [{placement: "account_navigation"}, {placement: "link_selection"}]
+  placements: [{placement: "account_navigation"}, {placement: "link_selection"}],
+  validPlacements: []
 }

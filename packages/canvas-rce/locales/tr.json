@@ -86,14 +86,23 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Lisansı:"
   },
+  "decrease_indent_de6343ab": {
+    "message": "İçerden başlatma sınırını azalt"
+  },
   "discussions_a5f96392": {
     "message": "Tartışmalar"
   },
   "discussions_index_6c36ced": {
     "message": "Tartışma Başlıkları"
   },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Teslim Tarihi: Birden Çok Gün"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "arama ifadelerini gir"
+  },
+  "external_links_3d9f074e": {
+    "message": "Harici Bağlantılar"
   },
   "file_upload_form_4aaad554": {
     "message": "Dosya Yükleme Formu"
@@ -113,6 +122,9 @@
   "group_navigation_99f191a": {
     "message": "Grup Gezinme Menüsü"
   },
+  "header_f28f73db": {
+    "message": "Başlık"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Bu dosyayı kullanmak için iznim var."
   },
@@ -122,8 +134,14 @@
   "image_upload_form_7b74079a": {
     "message": "Görsel Yükleme Formu"
   },
+  "image_url_2aee2734": {
+    "message": "Görsel URL''si"
+  },
   "images_7ce26570": {
     "message": "Görseller"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "İçerden başlatma sınırını artır"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Equella Bağlantısı Ekle"
@@ -133,6 +151,9 @@
   },
   "insert_math_equation_57c6e767": {
     "message": "Matematik Denklemi Ekle"
+  },
+  "invalid_file_type_881cc9b2": {
+    "message": "Geçersiz dosya türü"
   },
   "link_7262adec": {
     "message": "Bağlantı"
@@ -161,6 +182,9 @@
   "loading_failed_b3524381": {
     "message": "Yükleme Başarısız..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Daha fazla sonuç yükleniyor..."
+  },
   "media_af190855": {
     "message": "Medya"
   },
@@ -176,6 +200,9 @@
   "people_b4ebb13c": {
     "message": "Katılımcılar"
   },
+  "published_c944a23d": {
+    "message": "yayınlandı"
+  },
   "quizzes_7e598f57": {
     "message": "Kısa sınavlar"
   },
@@ -187,6 +214,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Bazı sorunlar oluştu."
   },
   "sort_by_e75f9e3e": {
     "message": "Sırala"
@@ -206,6 +236,9 @@
   "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
     "message": "Bu malzeme adil kullanım istisnasına tabidir"
   },
+  "unpublished_dfd8801": {
+    "message": "yayınlanmadı"
+  },
   "upload_8b403d05": {
     "message": "Yükle"
   },
@@ -214,6 +247,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Yeni bir görsel yükleyin"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Dosya Yükle"
   },
   "url_22a5f3b8": {
     "message": "URL"

@@ -18,26 +18,44 @@
 module Lti::Messages
   class DeepLinkingRequest < JwtMessage
     ACCEPT_TYPES = {
+      'migration_selection' => %w(file).freeze,
       'editor_button' => %w(link file html ltiResourceLink image).freeze,
-      'assignment_selection' => %w(ltiResourceLink).freeze
+      'assignment_selection' => %w(ltiResourceLink).freeze,
+      'homework_submission' => %w(file).freeze,
+      'link_selection' => %w(ltiResourceLink).freeze
     }.freeze
 
     DOCUMENT_TARGETS = {
+      'migration_selection' => %w(iframe).freeze,
       'editor_button' => %w(embed iframe window).freeze,
-      'assignment_selection' => %w(iframe window).freeze
+      'assignment_selection' => %w(iframe window).freeze,
+      'homework_submission' => %w(iframe).freeze,
+      'link_selection' => %w(iframe window).freeze,
     }.freeze
 
     MEDIA_TYPES = {
+      'migration_selection' => %w(
+        application/vnd.ims.imsccv1p1
+        application/vnd.ims.imsccv1p2
+        application/vnd.ims.imsccv1p3
+        application/zip
+        application/xml
+      ).freeze,
       'editor_button' => %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).freeze,
-      'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
+      'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
+      'homework_submission' => %w(*/*).freeze,
+      'link_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
     }.freeze
 
     AUTO_CREATE = {
+      'migration_selection' => false,
       'editor_button' => false,
-      'assignment_selection' => false
+      'assignment_selection' => false,
+      'homework_submission' => false,
+      'link_selection' => false
     }.freeze
 
-    MODAL_PLACEMENTS = %w(editor_button assignment_selection).freeze
+    MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection).freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super

@@ -73,7 +73,7 @@ class Enrollment::BatchStateUpdater
   def self.mark_enrollments_as_deleted(batch, sis_batch: nil, batch_mode: false)
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: 'deleted', batch_mode_delete: batch_mode)
     updates = {workflow_state: 'deleted', updated_at: Time.now.utc}
-    updates[sis_batch_id: sis_batch.id] if sis_batch
+    updates[:sis_batch_id] = sis_batch.id if sis_batch
     Enrollment.where(id: batch).update_all(updates)
     EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil)
     Score.where(enrollment_id: batch).order(:id).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func, number, shape, string, bool} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import View from '@instructure/ui-layout/lib/components/View'
 import {NumberInput} from '@instructure/ui-number-input'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'

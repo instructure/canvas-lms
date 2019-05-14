@@ -23,7 +23,7 @@ import _ from 'underscore'
 import $ from 'jquery'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import I18n from 'i18n!grading_periods'
+import I18n from 'i18n!GradingPeriodSetForm'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import 'compiled/jquery.rails_flash_notifications'
 

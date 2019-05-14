@@ -209,4 +209,24 @@ describe('ContentUploadTab', () => {
     expect(uploadRender).toContainElement(getByText('file1.jpg'))
     expect(queryByText('Invalid file type')).toBeNull()
   })
+
+  it('renders a submit button only when a file has been uploaded', async () => {
+    const {container, getByText, queryByText} = render(
+      <ContentUploadTab assignment={mockAssignment()} />
+    )
+
+    expect(queryByText('Submit')).toBeNull()
+
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
+    uploadFiles(fileInput, [file])
+
+    expect(getByText('Submit')).toBeInTheDocument()
+
+    const button = container.querySelector('button[id="1"]')
+    expect(button).toContainElement(getByText('Remove file1.jpg'))
+    fireEvent.click(button)
+
+    expect(queryByText('Submit')).toBeNull()
+  })
 })

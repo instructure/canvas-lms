@@ -36,7 +36,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      let thisName = thisFn.match(/_this\d*/)[0];
       eval(`${thisName} = this;`);
     }
     this.onUnload = this.onUnload.bind(this)
@@ -89,6 +89,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   toJSON() {
     let IS
     const json = super.toJSON(...arguments)
+    json.use_rce_enhancements = ENV.use_rce_enhancements
 
     json.IS = IS = {
       TEACHER_ROLE: false,

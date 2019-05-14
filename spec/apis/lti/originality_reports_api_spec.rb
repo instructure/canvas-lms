@@ -120,7 +120,8 @@ module Lti
           'updated_at',
           'submission_id',
           'workflow_state',
-          'link_id'
+          'link_id',
+          'error_message'
         ].freeze
 
         get @endpoints[:show], headers: request_headers
@@ -211,7 +212,8 @@ module Lti
             'updated_at',
             'submission_id',
             'workflow_state',
-            'link_id'
+            'link_id',
+            'error_message'
           ].freeze
           get @endpoints[:alt_show], headers: request_headers
           expect(response).to be_successful
@@ -329,6 +331,12 @@ module Lti
         put @endpoints[:update], params: {originality_report: {originality_report_url: "http://www.test.com"}}, headers: request_headers
         expect(response).to be_successful
         expect(OriginalityReport.find(@report.id).originality_report_url).to eq "http://www.test.com"
+      end
+
+      it "updates error_message" do
+        put @endpoints[:update], params: {originality_report: {error_message: "An error occured."}}, headers: request_headers
+        expect(response).to be_successful
+        expect(OriginalityReport.find(@report.id).error_message).to eq "An error occured."
       end
 
       it "updates the associated resource_url" do
@@ -648,7 +656,8 @@ module Lti
           'updated_at',
           'submission_id',
           'workflow_state',
-          'link_id'
+          'link_id',
+          'error_message'
         ].freeze
 
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}, headers: request_headers
@@ -749,6 +758,19 @@ module Lti
              headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['workflow_state']).to eq 'pending'
+      end
+
+      it 'sets the error_message' do
+        post @endpoints[:create],
+             params: {
+                originality_report: {
+                  file_id: @attachment.id,
+                  workflow_state: 'error',
+                  error_message: 'error message'
+                }
+             },
+             headers: request_headers
+        expect(json_parse['error_message']).to eq 'error message'
       end
 
       it 'allows creating reports for any attachment in submission history' do

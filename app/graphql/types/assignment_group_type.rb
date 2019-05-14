@@ -19,6 +19,8 @@ module Types
   class AssignmentGroupType < ApplicationObjectType
     graphql_name "AssignmentGroup"
 
+    alias assignment_group object
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
@@ -42,6 +44,21 @@ module Types
       load_association(:context).then { |course|
         super(course: course, filter: filter)
       }
+    end
+
+    field :grades_connection, GradesType.connection_type, null: true do
+      description "grades for this assignment group"
+    end
+    def grades_connection
+      load_association(:context).then do |course|
+        visible_enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, current_user)
+
+        # slim the scope down further because while students can see other student enrollments, they should not be able to see other student grades
+        unless course.grants_any_right?(current_user, :manage_grades, :read_as_admin, :manage_assignments)
+          visible_enrollments = visible_enrollments.where(enrollments: { user_id: current_user[:id] })
+        end
+        assignment_group.scores.where(enrollment_id: visible_enrollments)
+      end
     end
 
     def assignments_scope(*args)

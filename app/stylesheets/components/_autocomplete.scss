@@ -280,22 +280,43 @@ i[class*=icon-].icon-messageRecipient--cancel {
   }
 
   &.selected, &:hover {
-    background: $ic-bg-light-primary;
-    color: var(--ic-brand-primary);
+    background: $electric;
+    color: $ic-color-light;
+  }
+
+  &:hover .result-name {
+    color: $ic-color-light;
+  }
+
+  &.selected .result-name {
+    color: $ic-color-light;
+  }
+
+  &:hover .icon-mini-arrow-right {
+    color: $ic-color-light;
+  }
+
+  &.selected .icon-mini-arrow-right {
+    color: $ic-color-light;
+  }
+
+  &:hover .icon-mini-arrow-left {
+    color: $ic-color-light;
+  }
+
+  &.selected .icon-mini-arrow-left {
+    color: $ic-color-light;
   }
 }
 
 .ac-result-list {
   .context, .everyone {
-    border-bottom: 1px solid $ic-border-light;
+    border: none;
     color: var(--ic-brand-primary);
   }
 
   .back {
     color: #333;
-  }
-  li:last-child {
-    border-bottom: none;
   }
 
   .no-result {

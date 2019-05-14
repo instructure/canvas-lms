@@ -592,6 +592,9 @@ export class DiscussionRow extends Component {
       <div className="ic-item-row__content-col">
         <Heading level="h3" margin="0">
           <a style={{color: 'inherit'}} className="discussion-title" ref={refFn} href={linkUrl}>
+            {this.props.discussion.read_state !== 'read' && (
+              <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
+            )}
             <span aria-hidden="true">{this.props.discussion.title}</span>
             <ScreenReaderContent>{this.getAccessibleTitle()}</ScreenReaderContent>
           </a>
@@ -755,14 +758,7 @@ export class DiscussionRow extends Component {
 
   renderBlueUnreadBadge() {
     if (this.props.discussion.read_state !== 'read') {
-      return (
-        <Badge
-          margin="0 small x-small 0"
-          standalone
-          type="notification"
-          formatOutput={() => <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-        />
-      )
+      return <Badge margin="0 small x-small 0" standalone type="notification" />
     } else {
       return (
         <View display="block" margin="0 small x-small 0">

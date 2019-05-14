@@ -15,17 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!gradebook'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'jst/gradebook/section_to_show_menu'
-  '../../jquery.kylemenu'
-  'vendor/jquery.ba-tinypubsub'
-], (I18n, $, _, {View}, template) ->
+import I18n from 'i18n!gradebookSectionMenuView'
+import $ from 'jquery'
+import _ from 'underscore'
+import {View} from 'Backbone'
+import template from 'jst/gradebook/section_to_show_menu'
+import '../../jquery.kylemenu'
+import 'vendor/jquery.ba-tinypubsub'
 
-  class SectionMenuView extends View
+export default class SectionMenuView extends View
 
     @optionProperty 'sections'
     @optionProperty 'course'

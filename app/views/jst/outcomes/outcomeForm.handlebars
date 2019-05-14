@@ -8,15 +8,17 @@
 
   <label for="description">{{#t "description"}}Describe this outcome{{/t}}:</label>
 
-  <div class="pull-right">
-    <a href="#" class="rte_switch_views_link">
-      {{t "HTML Editor"}}
-    </a>
-    <a href="#" class="rte_switch_views_link" style="display:none;">
-      {{t "Rich Content Editor"}}
-    </a>
-  </div>
-  <div style="clear:both;"></div>
+  {{#unless use_rce_enhancements}}
+    <div class="pull-right">
+      <a href="#" class="rte_switch_views_link">
+        {{t "HTML Editor"}}
+      </a>
+      <a href="#" class="rte_switch_views_link" style="display:none;">
+        {{t "Rich Content Editor"}}
+      </a>
+    </div>
+    <div style="clear:both;"></div>
+  {{/unless}}
 
   <textarea cols="40" name="description" id=description rows="20" style="display: none; width: 100%; height: 150px;">{{description}}</textarea>
 

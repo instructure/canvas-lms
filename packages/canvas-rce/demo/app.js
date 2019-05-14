@@ -27,57 +27,55 @@ import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleD
 import "@instructure/ui-themes/lib/canvas";
 
 import { renderIntoDiv, renderSidebarIntoDiv } from "../src/async";
-import bridge from '../src/bridge'
 import locales from "../src/locales";
 import CanvasRce from "../src/rce/CanvasRce";
 import * as fakeSource from "../src/sidebar/sources/fake";
 
-// This is temporarily here so we have a place to develop the shared
-// infrastructure until we get real plugins built.
-import CanvasContentTray from '../src/rce/plugins/shared/CanvasContentTray';
-
-function getProps(textareaId, language = "en", textDirection = "ltr") {
+function getProps(textareaId, state) {
   return {
-    language,
+    language: state.lang,
+
     editorOptions: () => {
       return {
-        directionality: textDirection,
+        directionality: state.dir,
         height: "250px",
         plugins:
-          "instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table",
+          "instructure-ui-icons, instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table, lists, instructure_condensed_buttons",
         // todo: add "instructure_embed" when the wiki sidebar work is done
         external_plugins: {},
-        menubar: true,
-        // todo: the toolbar building and automatic splitting functions should come into the service
-        toolbar: [
-          // basic buttons
-          "bold italic underline forecolor backcolor removeformat alignleft aligncenter alignright outdent indent superscript subscript bullist numlist fontsizeselect formatselect",
-
-          // plugin buttons ("instructure_links" will be changed to "link", but this is how
-          //   it's currently sent over from canvas.  Once that's no longer true, the test
-          //  page can just use "link" instead)
-          "table link unlink instructure_equation instructure_image instructure_equella instructure_record"
-        ]
+        menubar: true
       };
     },
+
     textareaClassName: "exampleClassOne exampleClassTwo",
-    textareaId
+    textareaId,
+
+    trayProps: {
+      canUploadFiles: true,
+      contextId: state.contextId,
+      contextType: state.contextType,
+      host: state.host,
+      jwt: state.jwt,
+      source: state.jwt && state.sourceType === 'real' ? undefined : fakeSource
+    }
   };
 }
 
-function renderDemos({ host, jwt, lang, contextType, contextId, dir, sourceType }) {
+function renderDemos(state) {
+  const {host, jwt, contextType, contextId, sourceType} = state
+
   renderIntoDiv(
     document.getElementById("editor1"),
-    getProps("textarea1", lang, dir)
+    getProps("textarea1", state)
   );
 
   renderIntoDiv(
     document.getElementById("editor2"),
-    getProps("textarea2", lang, dir)
+    getProps("textarea2", state)
   );
 
   ReactDOM.render(
-    <CanvasRce rceProps={getProps("textarea3", lang, dir)} />,
+    <CanvasRce rceProps={getProps("textarea3", state)} />,
     document.getElementById("editor3")
   );
 
@@ -132,15 +130,6 @@ class DemoOptions extends Component {
   render() {
     return (
       <ToggleDetails expanded summary="Configuration Options">
-        <CanvasContentTray
-          bridge={bridge}
-          contextId={this.state.contextId}
-          contextType={this.state.contextType}
-          host={this.state.host}
-          jwt={this.state.sourceType === 'real' ? this.state.jwt : ''}
-          source={this.state.jwt && this.state.sourceType === 'real' ? undefined : fakeSource}
-        />
-
         <form
           onSubmit={e => {
             e.preventDefault();

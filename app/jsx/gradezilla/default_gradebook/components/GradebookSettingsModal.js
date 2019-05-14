@@ -23,7 +23,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import Modal, {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import View from '@instructure/ui-layout/lib/components/View'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 import AdvancedTabPanel from './AdvancedTabPanel'
 import {

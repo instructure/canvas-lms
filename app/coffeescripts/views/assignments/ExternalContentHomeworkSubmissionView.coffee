@@ -15,33 +15,31 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone',
-  '../../../../public/javascripts/submit_assignment_helper'
-], ($, Backbone, SubmitAssignmentHepler) ->
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import {verifyPledgeIsChecked} from '../../../../public/javascripts/submit_assignment_helper'
 
-  class ExternalContentHomeworkSubmissionView extends Backbone.View
-    @optionProperty 'externalTool'
+export default class ExternalContentHomeworkSubmissionView extends Backbone.View
+  @optionProperty 'externalTool'
 
-    events:
-      'click .relaunch-tool': '_relaunchTool'
-      'click .submit_button': '_triggerSubmit'
-      'click .cancel_button': '_triggerCancel'
+  events:
+    'click .relaunch-tool': '_relaunchTool'
+    'click .submit_button': '_triggerSubmit'
+    'click .cancel_button': '_triggerCancel'
 
-    _relaunchTool: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
-      @trigger 'relaunchTool', @externalTool, @model
+  _relaunchTool: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
+    @trigger 'relaunchTool', @externalTool, @model
 
-    _triggerCancel: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
-      @trigger 'cancel', @externalTool, @model
+  _triggerCancel: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
+    @trigger 'cancel', @externalTool, @model
 
-    _triggerSubmit: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
-      @model.set('comment', @$el.find('.submission_comment').val())
-      if SubmitAssignmentHepler.verifyPledgeIsChecked($('input.turnitin_pledge.external-tool'))
-        @submitHomework()
+  _triggerSubmit: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
+    @model.set('comment', @$el.find('.submission_comment').val())
+    if verifyPledgeIsChecked($('input.turnitin_pledge.external-tool'))
+      @submitHomework()

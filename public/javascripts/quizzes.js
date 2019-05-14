@@ -20,7 +20,7 @@
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
 import regradeTemplate from 'jst/quiz/regrade'
-import I18n from 'i18n!quizzes'
+import I18n from 'i18n!quizzes_public'
 import _ from 'underscore'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
@@ -3855,8 +3855,6 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
     RichContentEditor.initSidebar();
 
-    var keyboardShortcutsView = new RCEKeyboardShortcuts();
-
     if (!lockedItems.content) {
       RichContentEditor.loadNewEditor($('#quiz_description'), {
         focus: true,
@@ -3866,28 +3864,31 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         }
       })
     }
-    keyboardShortcutsView.render().$el.insertBefore($(".toggle_description_views_link:first"));
+    if (!ENV.use_rce_enhancements) {
+      var keyboardShortcutsView = new RCEKeyboardShortcuts();
+      keyboardShortcutsView.render().$el.insertBefore($(".toggle_description_views_link:first"));
 
-    $(".toggle_description_views_link").click(function(event) {
-      event.preventDefault();
-      RichContentEditor.callOnRCE($("#quiz_description"), 'toggle');
-      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-      $(this).siblings(".toggle_description_views_link").andSelf().toggle().focus();
-    });
+      $(".toggle_description_views_link").click(function(event) {
+        event.preventDefault();
+        RichContentEditor.callOnRCE($("#quiz_description"), 'toggle');
+        //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+        $(this).siblings(".toggle_description_views_link").andSelf().toggle().focus();
+      });
 
-    $(".toggle_question_content_views_link").click(function(event) {
-      event.preventDefault();
-      RichContentEditor.callOnRCE($(this).parents(".question_form").find(".question_content"), 'toggle');
-      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-      $(this).siblings(".toggle_question_content_views_link").andSelf().toggle().focus();
-    });
+      $(".toggle_question_content_views_link").click(function(event) {
+        event.preventDefault();
+        RichContentEditor.callOnRCE($(this).parents(".question_form").find(".question_content"), 'toggle');
+        //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+        $(this).siblings(".toggle_question_content_views_link").andSelf().toggle().focus();
+      });
 
-    $(".toggle_text_after_answers_link").click(function(event) {
-      event.preventDefault();
-      RichContentEditor.callOnRCE($(this).parents(".question_form").find(".text_after_answers"), 'toggle');
-      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-      $(this).siblings(".toggle_text_after_answers_link").andSelf().toggle().focus();
-    });
+      $(".toggle_text_after_answers_link").click(function(event) {
+        event.preventDefault();
+        RichContentEditor.callOnRCE($(this).parents(".question_form").find(".text_after_answers"), 'toggle');
+        //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+        $(this).siblings(".toggle_text_after_answers_link").andSelf().toggle().focus();
+      });
+    }
 
     $("#calc_helper_methods").change(function() {
       var method = $(this).val();

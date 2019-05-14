@@ -21,7 +21,7 @@ define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var K = require('../../../constants');
   var Button = require('jsx!../../../components/button');
-  var I18n = require('i18n!quiz_log_auditing.question_answers.essay');
+  var I18n = require('i18n!quiz_log_auditing.question_answers.essay').default;
 
   var Essay = React.createClass({
     statics: {

@@ -94,13 +94,19 @@ const accountLevelPermissions = generateActionTemplates(
       )
     },
     {
+      title: I18n.t('Feature Options (Account Settings)'),
+      description: I18n.t(
+        'To manage the Feature Options tab, Feature Options - enable / disable must also be enabled.'
+      )
+    },
+    {
       title: I18n.t('Reports (Account Settings)'),
       description: I18n.t(
         'To view the Reports tab, Courses - view usage reports must also be enabled.'
       )
     },
     {
-      title: I18n.t('Account Settings (Subaccount Navigation)'),
+      title: I18n.t('Subaccount Navigation (Account Settings)'),
       description: I18n.t(
         'Not all settings options are available at the subaccount level, including the Notifications tab.'
       )
@@ -1880,7 +1886,8 @@ Allows user to access the Learning Mastery Gradebook (if enabled).`)
       title: I18n.t('Quizzes'),
       description: I18n.t(
         `To moderate a quiz, Assignments and Quizzes - add / edit / delete​ must also be enabled.
-        To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.`
+        To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.
+        To view the submission log, Quizzes - view submission log must also be enabled.`
       )
     },
   ],
@@ -2454,6 +2461,10 @@ const assignmentsAndQuizzes = generateActionTemplates(
     }
   ],
   [
+    {
+      title: I18n.t('Grades'),
+      description: I18n.t('Grades - edit must also be enabled.')
+    },
     {
       title: I18n.t('Quizzes'),
       description: I18n.t('The Quiz Log Auditing feature option must be enabled in Course Settings.')

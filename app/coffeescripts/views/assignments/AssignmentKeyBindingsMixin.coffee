@@ -15,11 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'i18n!assignments'
-], ( _, I18n) ->
+import _ from 'underscore'
+import I18n from 'i18n!AssignmentKeyBindingsMixin'
 
+export default
   keyBindings:
     [
       keyCode: 74

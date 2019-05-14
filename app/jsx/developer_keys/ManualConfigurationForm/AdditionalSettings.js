@@ -33,7 +33,7 @@ export default class AdditionalSettings extends React.Component {
     super(props);
 
     this.state = {
-      additionalSettings: {...props.additionalSettings, ...props.settings},
+      additionalSettings: {...omit(props.additionalSettings, ["settings"]), ...props.additionalSettings.settings},
       custom_fields: Object.keys(props.custom_fields).map(k => `${k}=${props.custom_fields[k]}`).join("\n")
     }
   }
@@ -43,7 +43,7 @@ export default class AdditionalSettings extends React.Component {
     const extension = {
       platform: 'canvas.instructure.com',
       settings: {
-        ...(omitBy(omit(additionalSettings, ['domain', 'tool_id']), s => !!s))
+        ...(omitBy(omit(additionalSettings, ['domain', 'tool_id']), s => !s))
       }
     }
     if (additionalSettings.domain) {
@@ -56,6 +56,10 @@ export default class AdditionalSettings extends React.Component {
       extensions: [extension],
       custom_fields
     }
+  }
+
+  valid = () => {
+    return true
   }
 
   handleDomainChange = e => {
@@ -85,7 +89,7 @@ export default class AdditionalSettings extends React.Component {
 
   handleSelectionWidthChange = e => {
     const value = e.target.value;
-    this.setState(state => ({additionalSettings: {...state.additionalSettings, selection_Width: parseInt(value, 10)}}))
+    this.setState(state => ({additionalSettings: {...state.additionalSettings, selection_width: parseInt(value, 10)}}))
   }
 
   handleCustomFieldsChange = e => {
@@ -140,13 +144,13 @@ export default class AdditionalSettings extends React.Component {
             />
             <TextInput
               name="selection_height"
-              value={additionalSettings.selection_height}
+              value={additionalSettings.selection_height && additionalSettings.selection_height.toString()}
               label={I18n.t("Selection Height")}
               onChange={this.handleSelectionHeightChange}
             />
             <TextInput
               name="selection_width"
-              value={additionalSettings.selection_width}
+              value={additionalSettings.selection_width && additionalSettings.selection_width.toString()}
               label={I18n.t("Selection Width")}
               onChange={this.handleSelectionWidthChange}
             />

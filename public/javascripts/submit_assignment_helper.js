@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!submit_assignment_helper'
 import './jquery.instructure_misc_plugins'
 import 'compiled/jquery.rails_flash_notifications'
 

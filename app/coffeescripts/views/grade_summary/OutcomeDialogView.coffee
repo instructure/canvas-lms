@@ -15,55 +15,54 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  '../DialogBaseView'
-  './OutcomeLineGraphView'
-  'jst/outcomes/outcomePopover'
-], ($, _, DialogBaseView, OutcomeLineGraphView, template) ->
-  class OutcomeResultsDialogView extends DialogBaseView
-    @optionProperty 'model'
-    $target: null
-    template: template
+import $ from 'jquery'
+import _ from 'underscore'
+import DialogBaseView from '../DialogBaseView'
+import OutcomeLineGraphView from './OutcomeLineGraphView'
+import template from 'jst/outcomes/outcomePopover'
 
-    initialize: ->
-      super
-      @outcomeLineGraphView = new OutcomeLineGraphView({
-        model: @model
-      })
+export default class OutcomeResultsDialogView extends DialogBaseView
+  @optionProperty 'model'
+  $target: null
+  template: template
 
-    afterRender: ->
-      @outcomeLineGraphView.setElement(@$("div.line-graph"))
-      @outcomeLineGraphView.render()
+  initialize: ->
+    super
+    @outcomeLineGraphView = new OutcomeLineGraphView({
+      model: @model
+    })
 
-    dialogOptions: ->
-      containerId: "outcome_results_dialog"
-      close: @onClose
-      buttons: []
-      width: 460
+  afterRender: ->
+    @outcomeLineGraphView.setElement(@$("div.line-graph"))
+    @outcomeLineGraphView.render()
 
-    show: (e) ->
-      return unless (e.type == "click" || @_getKey(e.keyCode))
-      @$target = $(e.target)
-      e.preventDefault()
-      @$el.dialog('option', 'title', @model.get('title'))
-      super
-      @render()
+  dialogOptions: ->
+    containerId: "outcome_results_dialog"
+    close: @onClose
+    buttons: []
+    width: 460
 
-    onClose: =>
-      @$target.focus()
-      delete @$target
+  show: (e) ->
+    return unless (e.type == "click" || @_getKey(e.keyCode))
+    @$target = $(e.target)
+    e.preventDefault()
+    @$el.dialog('option', 'title', @model.get('title'))
+    super
+    @render()
 
-    toJSON: ->
-      json = super
-      _.extend json,
-        dialog: true
+  onClose: =>
+    @$target.focus()
+    delete @$target
 
-    # Private
-    _getKey: (keycode) =>
-      keys = {
-        13 : "enter"
-        32 : "spacebar"
-      }
-      keys[keycode]
+  toJSON: ->
+    json = super
+    _.extend json,
+      dialog: true
+
+  # Private
+  _getKey: (keycode) =>
+    keys = {
+      13 : "enter"
+      32 : "spacebar"
+    }
+    keys[keycode]

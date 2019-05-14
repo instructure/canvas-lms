@@ -21,13 +21,25 @@ import ReactDOM from 'react-dom'
 import ExternalToolDialog from '../ExternalToolDialog'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Transition from '@instructure/ui-motion/lib/components/Transition'
-import {processContentItemsForEditor} from '../../deep_linking/ContentItemProcessor'
 import {send} from '../../shared/rce/RceCommandShim'
 
-jest.mock('../../deep_linking/ContentItemProcessor')
+// jest.mock('../../deep_linking/ContentItemProcessor')
 jest.mock('../../shared/rce/RceCommandShim')
 
 const noop = () => {}
+
+const content_items = [
+  {
+    type: 'link',
+    title: 'title',
+    url: 'http://www.tool.com'
+  },
+  {
+    type: 'ltiResourceLink',
+    title: 'LTI Link',
+    url: 'http://www.tool.com/lti'
+  }
+]
 
 let container, submit, originalSubmit, originalScroll
 
@@ -98,6 +110,13 @@ function getInstance(_container, overrides) {
   })
 }
 
+const data = overrides => ({
+  content_items,
+  ltiEndpoint: 'https://www.instructure.com/lti',
+  messageType: 'LtiDeepLinkingResponse',
+  ...overrides
+})
+
 beforeEach(async () => {
   originalSubmit = HTMLFormElement.prototype.submit
   submit = jest.fn()
@@ -106,7 +125,6 @@ beforeEach(async () => {
   window.scroll = noop
   container = document.createElement('div')
   send.mockReset()
-  processContentItemsForEditor.mockReset()
 })
 
 afterEach(() => {
@@ -369,15 +387,24 @@ describe('handleDeepLinking', () => {
     const instance = await getInstance(container)
     const ev = {origin: 'otherOrigin'}
     instance.handleDeepLinking(ev)
-    expect(processContentItemsForEditor).not.toHaveBeenCalled()
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it('ignores non-deep linking responses', async () => {
+    const instance = await getInstance(container)
+    const ev = {origin: 'deepOrigin', data: data({messageType: 'notdeeplinking'})}
+    instance.handleDeepLinking(ev)
+    expect(send).not.toHaveBeenCalled()
   })
 
   it('processes content items for correct origin', async () => {
     const editor = fakeEditor()
     const instance = await getInstance(container, {editor})
-    const ev = {origin: 'deepOrigin'}
+    const ev = {origin: 'deepOrigin', data: data()}
     instance.handleDeepLinking(ev)
-    expect(processContentItemsForEditor).toHaveBeenCalledWith(ev, editor, instance)
+    expect(send.mock.calls[0][2]).toEqual(
+      '<a href="http://www.tool.com" title="title" target="_blank">title</a>'
+    )
   })
 })
 

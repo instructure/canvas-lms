@@ -15,18 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../../userSettings'
-  'i18n!gradebook'
-  'jquery'
-  'underscore'
-  'Backbone'
-  'jst/gradebook/grading_period_to_show_menu'
-   '../../jquery.kylemenu'
-  'vendor/jquery.ba-tinypubsub'
-], (userSettings, I18n, $, _, {View}, template) ->
+import userSettings from '../../userSettings'
+import I18n from 'i18n!gradebookGradingPeriodMenuView'
+import $ from 'jquery'
+import _ from 'underscore'
+import {View} from 'Backbone'
+import template from 'jst/gradebook/grading_period_to_show_menu'
+import '../../jquery.kylemenu'
+import 'vendor/jquery.ba-tinypubsub'
 
-  class GradingPeriodMenuView extends View
+export default class GradingPeriodMenuView extends View
 
     @optionProperty 'periods'
 

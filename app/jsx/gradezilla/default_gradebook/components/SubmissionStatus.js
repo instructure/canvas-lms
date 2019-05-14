@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, shape} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import View from '@instructure/ui-layout/lib/components/View'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Message from './SubmissionStatus/Message'

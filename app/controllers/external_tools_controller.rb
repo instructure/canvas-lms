@@ -518,7 +518,7 @@ class ExternalToolsController < ApplicationController
       )
     end
 
-    lti_launch.params = if selection_type == 'homework_submission' && assignment
+    lti_launch.params = if selection_type == 'homework_submission' && assignment && !tool.use_1_3?
                           adapter.generate_post_payload_for_homework_submission(assignment)
                         else
                           adapter.generate_post_payload
@@ -612,6 +612,12 @@ class ExternalToolsController < ApplicationController
   # @API Create an external tool
   # Create an external tool in the specified course/account.
   # The created tool will be returned, see the "show" endpoint for an example.
+  # If a client ID is supplied canvas will attempt to create a context external
+  # tool using the LTI 1.3 standard.
+  #
+  # @argument client_id [Required, String]
+  #   The client id is attached to the developer key.
+  #   If supplied all other parameters are unnecessary and will be ignored
   #
   # @argument name [Required, String]
   #   The name of the tool
@@ -862,13 +868,18 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_type=by_url' \
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
-    external_tool_params = (params[:external_tool] || params).to_unsafe_h
-    @tool = @context.context_external_tools.new
-    if request.content_type == 'application/x-www-form-urlencoded'
-      custom_fields = Lti::AppUtil.custom_params(request.raw_post)
-      external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+    if params.key?(:client_id)
+      raise ActiveRecord::RecordInvalid unless developer_key.usable_in_context?(@context)
+      @tool = developer_key.tool_configuration.new_external_tool(@context)
+    else
+      external_tool_params = (params[:external_tool] || params).to_unsafe_h
+      @tool = @context.context_external_tools.new
+      if request.content_type == 'application/x-www-form-urlencoded'
+        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+      end
+      set_tool_attributes(@tool, external_tool_params)
     end
-    set_tool_attributes(@tool, external_tool_params)
     check_for_duplication(@tool)
     if @tool.errors.blank? && @tool.save
       invalidate_nav_tabs_cache(@tool)
@@ -927,52 +938,6 @@ class ExternalToolsController < ApplicationController
         end
       end
     end
-  end
-
-  # @API Create Tool from ToolConfiguration
-  # @internal
-  # Creates context_external_tool from attached tool_configuration of
-  # the provided developer_key if not already present in context.
-  # DeveloperKey must have a ToolConfiguration to create tool or 404 will be raised.
-  # Will return an existing ContextExternalTool if one already exists.
-  #
-  # @argument account_id [String]
-  #    if account
-  #
-  # @argument course_id [String]
-  #    if course
-  #
-  # @argument developer_key_id [String]
-  #
-  # @returns ContextExternalTool
-  def create_tool_from_tool_config
-    cet = fetch_existing_tool_in_context_chain
-    if cet.nil?
-      cet = developer_key.tool_configuration.new_external_tool(@context)
-      cet.save!
-      invalidate_nav_tabs_cache(cet)
-    end
-    render json: external_tool_json(cet, @context, @current_user, session)
-  end
-
-  # @API Delete Tool from ToolConfiguration
-  # @internal
-  #
-  # Deletes the tool given the context and the developer_key_id.
-  #
-  # @argument account_id [String]
-  #    if account
-  #
-  # @argument course_id [String]
-  #    if course
-  #
-  # @argument developer_key_id [String]
-  #
-  # @returns ContextExternalTool
-  def delete_tool_from_tool_config
-    cet = @context.context_external_tools.active.where(developer_key: developer_key).take
-    raise ActiveRecord::RecordNotFound if cet.nil?
-    delete_tool(cet)
   end
 
   # @API Edit an external tool
@@ -1182,19 +1147,10 @@ class ExternalToolsController < ApplicationController
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
               :oauth_compliant]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
-    attrs += [:developer_key_id] if set_developer_key?(params)
 
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
-  end
-
-  def set_developer_key?(external_tool_params)
-    developer_key_id = external_tool_params[:developer_key_id]
-    return false if developer_key_id.blank?
-    return false unless DeveloperKey.find(developer_key_id).owner_account == @context
-    return false unless @context.grants_right?(@current_user, session, :manage_developer_keys)
-    true
   end
 
   def invalidate_nav_tabs_cache(tool)
@@ -1228,12 +1184,8 @@ class ExternalToolsController < ApplicationController
     head :not_found
   end
 
-  def fetch_existing_tool_in_context_chain
-    ContextExternalTool.all_tools_for(@context).where(developer_key: developer_key).take
-  end
-
   def developer_key
-    @_developer_key = DeveloperKey.nondeleted.find(params[:developer_key_id])
+    @_developer_key = DeveloperKey.nondeleted.find(params[:client_id])
   end
 
   def delete_tool(tool)

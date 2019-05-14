@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/ZipFiles'
-  './MigrationView'
-],(Backbone, template, MigrationView) -> 
-  class ZipFiles extends MigrationView
-    template: template
+import template from 'jst/content_migrations/ZipFiles'
+import MigrationView from './MigrationView'
 
-    @child 'chooseMigrationFile', '.chooseMigrationFile'
-    @child 'folderPicker', '.folderPicker'
+export default class ZipFiles extends MigrationView
+  template: template
+
+  @child 'chooseMigrationFile', '.chooseMigrationFile'
+  @child 'folderPicker', '.folderPicker'

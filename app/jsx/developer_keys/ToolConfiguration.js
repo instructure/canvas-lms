@@ -31,6 +31,10 @@ export default class ToolConfiguration extends React.Component {
     return this.configMethodsRef.generateToolConfiguration();
   }
 
+  valid = () => {
+    return this.configMethodsRef.valid()
+  }
+
   setConfigurationMethodsRef = node => this.configMethodsRef = node;
 
   body() {
@@ -39,12 +43,13 @@ export default class ToolConfiguration extends React.Component {
         <ToolConfigurationForm
           ref={this.setConfigurationMethodsRef}
           dispatch={this.props.dispatch}
-          toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
+          toolConfiguration={this.props.toolConfiguration}
           toolConfigurationUrl={this.props.createLtiKeyState.toolConfigurationUrl}
           validScopes={ENV.validLtiScopes}
           validPlacements={ENV.validLtiPlacements}
           setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
           configurationMethod={this.props.createLtiKeyState.configurationMethod}
+          editing={this.props.editing}
         />
       )
     }
@@ -85,5 +90,9 @@ ToolConfiguration.propTypes = {
     enabledScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
     disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
     configurationMethod: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  toolConfiguration: PropTypes.shape({
+    oidc_initiation_url: PropTypes.string
+  }),
+  editing: PropTypes.bool.isRequired
 }

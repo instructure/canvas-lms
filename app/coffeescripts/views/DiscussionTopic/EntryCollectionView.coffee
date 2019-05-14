@@ -15,153 +15,151 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!discussions'
-  'jquery'
-  '../../arr/walk'
-  'Backbone'
-  'jsx/shared/helpers/rtlHelper'
-  'jst/discussions/EntryCollectionView'
-  'jst/discussions/entryStats'
-  '../DiscussionTopic/EntryView',
-  '../../jquery/scrollIntoView'
-], (I18n, $, walk, {View}, {isRTL}, template, entryStatsTemplate, EntryView) ->
+import I18n from 'i18n!discussions'
+import $ from 'jquery'
+import walk from '../../arr/walk'
+import {View} from 'Backbone'
+import {isRTL} from 'jsx/shared/helpers/rtlHelper'
+import template from 'jst/discussions/EntryCollectionView'
+import entryStatsTemplate from 'jst/discussions/entryStats'
+import EntryView from './EntryView'
+import '../../jquery/scrollIntoView'
 
-  class EntryCollectionView extends View
+export default class EntryCollectionView extends View
 
-    defaults:
-      descendants: 2
-      showMoreDescendants: 2
-      showReplyButton: false
-      displayShowMore: true
+  defaults:
+    descendants: 2
+    showMoreDescendants: 2
+    showReplyButton: false
+    displayShowMore: true
 
-      # maybe make a sub-class for threaded discussions if the branching gets
-      # out of control. UPDATE: it is out of control
-      threaded: false
+    # maybe make a sub-class for threaded discussions if the branching gets
+    # out of control. UPDATE: it is out of control
+    threaded: false
 
-      # its collection represents the root of the discussion, should probably
-      # be a subclass instead :\
-      root: false
+    # its collection represents the root of the discussion, should probably
+    # be a subclass instead :\
+    root: false
 
-    events:
-      'click .loadNext': 'loadNextFromEvent'
+  events:
+    'click .loadNext': 'loadNextFromEvent'
 
-    template: template
+  template: template
 
-    $window: $ window
+  $window: $ window
 
-    els: '.discussion-entries': 'list'
+  els: '.discussion-entries': 'list'
 
-    initialize: ->
-      super
-      @childViews = []
+  initialize: ->
+    super
+    @childViews = []
 
-    attach: ->
-      @collection.on 'reset', @addAll
-      @collection.on 'add', @add
+  attach: ->
+    @collection.on 'reset', @addAll
+    @collection.on 'add', @add
 
-    toJSON: -> @options
+  toJSON: -> @options
 
-    addAll: =>
-      @teardown()
-      @collection.each @add
+  addAll: =>
+    @teardown()
+    @collection.each @add
 
-    add: (entry) =>
-      view = new EntryView
-        model: entry
-        treeView: @constructor
-        descendants: @options.descendants
-        children: @collection.options.perPage
-        showMoreDescendants: @options.showMoreDescendants
-        threaded: @options.threaded
-        collapsed: @options.collapsed
-      view.render()
-      entry.on('change:editor', @nestEntries)
-      return @addNewView view if entry.get 'new'
-      if @options.descendants
-        view.renderTree()
-      else if entry.hasChildren()
-        view.renderDescendantsLink()
-      if !@options.threaded and !@options.root
-        @list.prepend view.el
-      else
-        @list.append view.el
-      @childViews.push(view)
-      @nestEntries()
-
-    nestEntries: ->
-      $('.entry-content[data-should-position]').each ->
-        $el    = $(this)
-        level = $el.parents('li.entry').length
-        offset = (level - 1) * 30
-        directionToPad = if isRTL(this) then 'right' else 'left'
-        $el.css("padding-#{directionToPad}", offset).removeAttr('data-should-position')
-        $el.find('.discussion-title').attr
-          'role': 'heading'
-          'aria-level': level + 1
-
-    addNewView: (view) ->
-      view.model.set 'new', false
+  add: (entry) =>
+    view = new EntryView
+      model: entry
+      treeView: @constructor
+      descendants: @options.descendants
+      children: @collection.options.perPage
+      showMoreDescendants: @options.showMoreDescendants
+      threaded: @options.threaded
+      collapsed: @options.collapsed
+    view.render()
+    entry.on('change:editor', @nestEntries)
+    return @addNewView view if entry.get 'new'
+    if @options.descendants
+      view.renderTree()
+    else if entry.hasChildren()
+      view.renderDescendantsLink()
+    if !@options.threaded and !@options.root
+      @list.prepend view.el
+    else
       @list.append view.el
-      @nestEntries()
-      if not @options.root
-        @$window.scrollTo view.$el, 200
+    @childViews.push(view)
+    @nestEntries()
 
-        view.$el.hide()
-        setTimeout =>
-          view.$el.fadeIn()
-        , 500
+  nestEntries: ->
+    $('.entry-content[data-should-position]').each ->
+      $el    = $(this)
+      level = $el.parents('li.entry').length
+      offset = (level - 1) * 30
+      directionToPad = if isRTL(this) then 'right' else 'left'
+      $el.css("padding-#{directionToPad}", offset).removeAttr('data-should-position')
+      $el.find('.discussion-title').attr
+        'role': 'heading'
+        'aria-level': level + 1
 
-    teardown: ->
-      @list.empty()
+  addNewView: (view) ->
+    view.model.set 'new', false
+    @list.append view.el
+    @nestEntries()
+    if not @options.root
+      @$window.scrollTo view.$el, 200
 
-    afterRender: ->
-      super
-      @addAll()
-      @renderNextLink()
+      view.$el.hide()
+      setTimeout =>
+        view.$el.fadeIn()
+      , 500
 
-    renderNextLink: ->
-      @nextLink?.remove()
-      return unless @options.displayShowMore and @unShownChildren() > 0
-      stats = @getUnshownStats()
-      @nextLink = $ '<div/>'
-      showMore = true
-      if not @options.threaded
-        moreText = I18n.t 'show_all_n_replies',
-          one: "Show one reply"
-          other: "Show all %{count} replies"
-          {count: stats.total + @collection.options.perPage}
-      @nextLink.html entryStatsTemplate({stats, moreText, showMore: yes})
-      @nextLink.addClass 'showMore loadNext'
-      if @options.threaded
-        @nextLink.insertAfter @list
-      else
-        @nextLink.insertBefore @list
+  teardown: ->
+    @list.empty()
 
-    getUnshownStats: ->
-      start = @collection.length
-      end = @collection.fullCollection.length
-      unshown = @collection.fullCollection.toJSON().slice start, end
-      total = 0
-      unread = 0
-      walk unshown, 'replies', (entry) ->
-        total++
-        unread++ if entry.read_state is 'unread'
-      {total, unread}
+  afterRender: ->
+    super
+    @addAll()
+    @renderNextLink()
 
-    unShownChildren: ->
-      @collection.fullCollection.length - @collection.length
+  renderNextLink: ->
+    @nextLink?.remove()
+    return unless @options.displayShowMore and @unShownChildren() > 0
+    stats = @getUnshownStats()
+    @nextLink = $ '<div/>'
+    showMore = true
+    if not @options.threaded
+      moreText = I18n.t 'show_all_n_replies',
+        one: "Show one reply"
+        other: "Show all %{count} replies"
+        {count: stats.total + @collection.options.perPage}
+    @nextLink.html entryStatsTemplate({stats, moreText, showMore: yes})
+    @nextLink.addClass 'showMore loadNext'
+    if @options.threaded
+      @nextLink.insertAfter @list
+    else
+      @nextLink.insertBefore @list
 
-    loadNextFromEvent: (event) ->
-      event.stopPropagation()
-      event.preventDefault()
-      @loadNext()
+  getUnshownStats: ->
+    start = @collection.length
+    end = @collection.fullCollection.length
+    unshown = @collection.fullCollection.toJSON().slice start, end
+    total = 0
+    unread = 0
+    walk unshown, 'replies', (entry) ->
+      total++
+      unread++ if entry.read_state is 'unread'
+    {total, unread}
 
-    loadNext: ->
-      if @options.threaded
-        @collection.add @collection.fullCollection.getPage 'next'
-      else
-        @collection.reset @collection.fullCollection.toArray()
-      @renderNextLink()
+  unShownChildren: ->
+    @collection.fullCollection.length - @collection.length
 
-    filter: @::afterRender
+  loadNextFromEvent: (event) ->
+    event.stopPropagation()
+    event.preventDefault()
+    @loadNext()
+
+  loadNext: ->
+    if @options.threaded
+      @collection.add @collection.fullCollection.getPage 'next'
+    else
+      @collection.reset @collection.fullCollection.toArray()
+    @renderNextLink()
+
+  filter: @::afterRender

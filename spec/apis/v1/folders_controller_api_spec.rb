@@ -221,6 +221,40 @@ describe "Folders API", type: :request do
     end
   end
 
+  describe "#media_folder" do
+    it "should create a media folder for a course" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.
+        merge(:action => "media_folder", :course_id => @course.id.to_param).except(:id), {})
+      folder = @course.folders.where(:name => "Uploaded Media").first
+      expect(folder.unique_type).to eq Folder::MEDIA_TYPE
+      expect(json['id']).to eq folder.id
+
+      # get the same one twice
+      json2 = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.
+        merge(:action => "media_folder", :course_id => @course.id.to_param).except(:id), {})
+      expect(json2['id']).to eq folder.id
+    end
+
+    it "should create a folder in the user's root if user doesn't have upload rights" do
+      course_with_student(:course => @course, :active_all => true)
+      @me = @student
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.
+        merge(:action => "media_folder", :course_id => @course.id.to_param).except(:id), {})
+      expect(@course.folders.where(:name => "Uploaded Media").first).to be_nil
+      folder = @user.folders.where(:name => "Uploaded Media").first
+      expect(json['id']).to eq folder.id
+      expect(json['can_upload']).to eq true
+    end
+
+    it "should create a media folder for a group" do
+      group_model(:context => @course)
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/media", @folders_path_options.
+        merge(:action => "media_folder", :group_id => @group.id.to_param).except(:id), {})
+      folder = @group.folders.where(:name => "Uploaded Media").first
+      expect(json['id']).to eq folder.id
+    end
+  end
+
   describe "#destroy" do
     it "should delete an empty folder" do
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)

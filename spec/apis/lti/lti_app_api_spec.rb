@@ -217,16 +217,31 @@ module Lti
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
       end
 
-      context 'lti 1.1 and 2.0 tools' do
+      context 'lti 1.1 and 2.0, and 1.3 tools' do
+        let(:dev_key) { DeveloperKey.create! account: account }
+        let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
+        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
+        let(:advantage_tool) do
+          t = new_valid_external_tool(account)
+          t.use_1_3 = true
+          t.developer_key = dev_key
+          t.save!
+          t
+        end
+
         before do
           @tp = create_tool_proxy
           @tp.bindings.create(context: account)
           @external_tool = new_valid_external_tool(account)
+          enable_binding
+          tool_config
+          advantage_tool
         end
 
         it 'returns a list of app definitions for a context' do
           expect(subject.select {|j| j['app_type'] == @tp.class.name && j['app_id'] == @tp.id.to_s}).not_to be_nil
           expect(subject.select {|j| j['app_type'] == @external_tool.class.name && j['app_id'] == @external_tool.id.to_s}).not_to be_nil
+          expect(subject.select {|j| j['app_type'] == @advantage_tool.class.name && j['app_id'] == @advantage_tool.id.to_s}).not_to be_nil
         end
 
         context 'with pagination limit request' do
@@ -247,89 +262,6 @@ module Lti
             expect(subject.count).to eq 3
             expect(json_next.count).to eq 3
             json
-          end
-        end
-      end
-
-      context 'lti 1.3 tools' do
-        let(:params) { super().merge v1p3: true }
-        let(:dev_key) { DeveloperKey.create! account: account }
-        let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
-        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
-
-        before { 2.times { |_| new_valid_external_tool(account) } }
-
-        context 'with no 1.3 tools' do
-          it 'makes successful request' do
-            subject
-            expect(response).to have_http_status :ok
-          end
-
-          it { is_expected.to be_empty }
-        end
-
-        context 'with 1.3 tools' do
-          before do
-            enable_binding
-            tool_config
-          end
-
-          it 'makes successful request' do
-            subject
-            expect(response).to have_http_status :ok
-          end
-
-          it { is_expected.to_not be_empty }
-          it { is_expected.to have(1).items }
-
-          it 'is not installed_for_context' do
-            expect(subject.first['installed_for_context']).to be false
-          end
-
-          it 'is not installed_at_context_level' do
-            expect(subject.first['installed_at_context_level']).to eq false
-          end
-
-          context 'when a tool is installed in a course' do
-            let(:tool) { ContextExternalTool.first }
-            let(:course) { course_model(account: tool.account) }
-
-            before do
-              tool.context = course
-              tool.use_1_3 = true
-              tool.developer_key = dev_key
-              tool.save!
-            end
-
-            it 'is installed_at_context_level' do
-              expect(subject.first['installed_at_context_level']).to eq true
-            end
-
-            it 'is installed_for_context' do
-              expect(subject.first['installed_for_context']).to eq true
-            end
-
-            it 'has installed_tool_id' do
-              expect(subject.first['installed_tool_id']).not_to be_blank
-            end
-          end
-
-          context 'with a deleted tool in context chain' do
-            before do
-              tool = ContextExternalTool.first
-              tool.use_1_3 = true
-              tool.developer_key = dev_key
-              tool.save!
-              tool.destroy!
-            end
-
-            it { is_expected.to_not be_empty }
-            it { is_expected.to have(1).items }
-
-
-            it 'is not installed_for_context' do
-              expect(subject.first['installed_for_context']).to eq false
-            end
           end
         end
       end

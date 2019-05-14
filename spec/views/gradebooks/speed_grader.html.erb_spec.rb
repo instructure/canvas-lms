@@ -74,6 +74,16 @@ describe "/gradebooks/speed_grader" do
     expect(rendered).to include '<span id="speed_grader_settings_mount_point"></span>'
   end
 
+  it "includes a mount point for hide assignment grades tray" do
+    render template: 'gradebooks/speed_grader', locals: locals
+    expect(rendered).to include '<div id="hide-assignment-grades-tray"></div>'
+  end
+
+  it "includes a mount point for post assignment grades tray" do
+    render template: 'gradebooks/speed_grader', locals: locals
+    expect(rendered).to include '<div id="post-assignment-grades-tray"></div>'
+  end
+
   it "includes a link back to the gradebook (gradebook by default)" do
     render template: 'gradebooks/speed_grader', locals: locals
     expect(rendered).to include "a href=\"http://test.host/courses/#{@course.id}/gradebook\""

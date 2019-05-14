@@ -614,6 +614,7 @@ describe ExternalToolsController, type: :request do
      "not_selectable"=> et ? et.not_selectable : nil,
      "workflow_state"=>"public",
      "vendor_help_link"=>nil,
+     "version"=>"1.1",
      "resource_selection"=>
              {"text"=>"",
               "url"=>"http://www.example.com/ims/lti/resource",

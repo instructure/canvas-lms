@@ -50,6 +50,33 @@ describe Lti::Messages::DeepLinkingRequest do
       expect(subject['deep_link_return_url']).to eq deep_linking_return_url
     end
 
+    context 'when resource type is "link_selection"' do
+      let(:opts) {{resource_type: 'link_selection'}}
+
+      it 'sets the correct "accept_types"' do
+        expect(subject['accept_types']).to match_array %w(
+          ltiResourceLink
+        )
+      end
+
+      it 'sets the correct "accept_presentation_document_targets"' do
+        expect(subject['accept_presentation_document_targets']).to match_array %w(
+          iframe
+          window
+        )
+      end
+
+      it 'sets the correct "accept_media_types"' do
+        expect(subject['accept_media_types']).to eq(
+          'application/vnd.ims.lti.v1.ltilink'
+        )
+      end
+
+      it 'sets the correct "auto_create"' do
+        expect(subject['auto_create']).to eq false
+      end
+    end
+
     context 'when resource type is "assignment_selection"' do
       let(:opts) {{resource_type: 'assignment_selection'}}
 
@@ -69,6 +96,48 @@ describe Lti::Messages::DeepLinkingRequest do
       it 'sets the correct "accept_media_types"' do
         expect(subject['accept_media_types']).to eq(
           'application/vnd.ims.lti.v1.ltilink'
+        )
+      end
+
+      it 'sets the correct "auto_create"' do
+        expect(subject['auto_create']).to eq false
+      end
+    end
+
+    context 'when resource type is "homework_submission"' do
+      let(:opts) {{resource_type: 'homework_submission'}}
+
+      it 'sets the correct "accept_types"' do
+        expect(subject['accept_types']).to match_array %w(file)
+      end
+
+      it 'sets the correct "accept_presentation_document_targets"' do
+        expect(subject['accept_presentation_document_targets']).to match_array %w(iframe)
+      end
+
+      it 'sets the correct "accept_media_types"' do
+        expect(subject['accept_media_types']).to eq('*/*')
+      end
+
+      it 'sets the correct "auto_create"' do
+        expect(subject['auto_create']).to eq false
+      end
+    end
+
+    context 'when resource type is "migration_selection"' do
+      let(:opts) {{resource_type: 'migration_selection'}}
+
+      it 'sets the correct "accept_types"' do
+        expect(subject['accept_types']).to match_array %w(file)
+      end
+
+      it 'sets the correct "accept_presentation_document_targets"' do
+        expect(subject['accept_presentation_document_targets']).to match_array %w(iframe)
+      end
+
+      it 'sets the correct "accept_media_types"' do
+        expect(subject['accept_media_types']).to eq(
+          'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
         )
       end
 

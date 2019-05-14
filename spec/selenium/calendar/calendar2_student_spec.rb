@@ -77,6 +77,52 @@ describe "calendar2" do
           expect(f("#reservations li")).to include_text "nobody@example.com"
         end
 
+        it "should allow users to see all attendees on events up to 25 reservations" do
+          create_appointment_group(
+            :contexts => [@course],
+            :title => "eh",
+            :max_appointments_per_participant => 1,
+            :min_appointments_per_participant => 1,
+            :participants_per_appointment => 15,
+            :participant_visibility => "protected"
+          )
+          ag1 = AppointmentGroup.first
+          ag1.appointments.first.reserve_for @student, @student
+          students = create_users_in_course(@course, 12, return_type: :record)
+          students.each do |student_temp|
+            ag1.appointments.first.reserve_for student_temp, student_temp
+          end
+          get "/calendar2"
+          f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
+          fj('.fc-event:visible').click
+          wait_for_ajaximations
+          expected_string = "Attendees\nnobody@example.com\n#{students.map(&:name).join("\n")}"
+          expect(f("#reservations")).to include_text expected_string
+        end
+
+        it "should show dots indicating more users available if more than 25 reservations" do
+          create_appointment_group(
+            :contexts => [@course],
+            :title => "eh",
+            :max_appointments_per_participant => 1,
+            :min_appointments_per_participant => 1,
+            :participants_per_appointment => 27,
+            :participant_visibility => "protected"
+          )
+          ag1 = AppointmentGroup.first
+          ag1.appointments.first.reserve_for @student, @student
+          students = create_users_in_course(@course, 25, return_type: :record)
+          students.each do |student_temp|
+            ag1.appointments.first.reserve_for student_temp, student_temp
+          end
+          get "/calendar2"
+          f('.navigate_next').click unless Time.now.utc.month == (Time.now.utc + 1.day).month
+          fj('.fc-event:visible').click
+          wait_for_ajaximations
+          expected_string = "Attendees\nnobody@example.com\n#{students[0, 24].map(&:name).join("\n")}\n(...)"
+          expect(f("#reservations")).to include_text expected_string
+        end
+
         it "should not display attendees for reservation with no participants" do
           create_appointment_group(
             :contexts => [@course],

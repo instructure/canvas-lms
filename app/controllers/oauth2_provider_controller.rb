@@ -86,7 +86,7 @@ class Oauth2ProviderController < ApplicationController
 
   def deny
     params = { error: "access_denied" }
-    params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
+    params[:state] = session[:oauth2][:state] if session[:oauth2].key? :state
     redirect_to Canvas::Oauth::Provider.final_redirect(self, params)
   end
 

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import axios from 'axios'
-import I18n from 'i18n!grading_periods'
+import I18n from 'i18n!AccountGradingPeriod'
 import DateHelper from '../shared/helpers/dateHelper'
 import 'jquery.instructure_misc_helpers'
 

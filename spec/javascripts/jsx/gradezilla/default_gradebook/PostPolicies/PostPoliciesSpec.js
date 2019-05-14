@@ -169,26 +169,80 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const [{onExited}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
       strictEqual(onExited, callback)
     })
+
+    QUnit.module('onHidden', onHiddenHooks => {
+      let postedOrHiddenInfo
+      let student
+      let updateColumnHeadersStub
+
+      onHiddenHooks.beforeEach(() => {
+        student = {
+          assignment_2301: {assignment_id: '2301', user_id: '1101'},
+          enrollments: [{type: 'StudentEnrollment'}],
+          id: '1101'
+        }
+        postedOrHiddenInfo = {
+          assignmentId: '2301',
+          postedAt: null,
+          userIds: ['1101']
+        }
+
+        gradebook.gotChunkOfStudents([student])
+        updateColumnHeadersStub = sinon.stub(gradebook, 'updateColumnHeaders')
+      })
+
+      onHiddenHooks.afterEach(() => {
+        updateColumnHeadersStub.restore()
+      })
+
+      test('calls updateColumnHeaders', () => {
+        postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+        const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+        onHidden(postedOrHiddenInfo)
+        strictEqual(updateColumnHeadersStub.callCount, 1)
+      })
+
+      test('calls updateColumnHeaders with the column ids', () => {
+        postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+        const columnId = gradebook.getAssignmentColumnId('2301')
+        const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+        onHidden(postedOrHiddenInfo)
+        deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
+      })
+
+      test('updates the posted_at of the submissions', () => {
+        postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+        const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+        onHidden(postedOrHiddenInfo)
+        strictEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
+      })
+    })
   })
 
   QUnit.module('#showPostAssignmentGradesTray()', hooks => {
+    let submission
+
     hooks.beforeEach(() => {
       createPostPolicies()
 
       const assignment = {
         anonymize_students: false,
         course_id: '1201',
-        html_url: 'http://localhost/assignments/2301',
+        grades_published: true,
         id: '2301',
-        invalid: false,
-        muted: false,
-        name: 'Math 1.1',
-        omit_from_final_grade: false,
-        points_possible: 10,
-        published: true,
-        submission_types: ['online_text_entry']
+        name: 'Math 1.1'
       }
+      submission = {
+        assignment_id: '2301',
+        posted_at: new Date().toISOString()
+      }
+      const student = {
+        assignment_2301: submission,
+        enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
+      }
+
       gradebook.setAssignments({2301: assignment})
+      gradebook.gotChunkOfStudents([student])
       gradebook.setSections([{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
 
       postPolicies.initialize()
@@ -230,11 +284,65 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
     })
 
+    test('includes the submissions', () => {
+      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      deepEqual(submissions, [{postedAt: submission.posted_at}])
+    })
+
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
       const callback = sinon.stub()
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
       const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
       strictEqual(onExited, callback)
+    })
+
+    QUnit.module('onPosted', onPostedHooks => {
+      let postedOrHiddenInfo
+      let student
+      let updateColumnHeadersStub
+
+      onPostedHooks.beforeEach(() => {
+        student = {
+          assignment_2301: {assignment_id: '2301', user_id: '1101'},
+          enrollments: [{type: 'StudentEnrollment'}],
+          id: '1101'
+        }
+        postedOrHiddenInfo = {
+          assignmentId: '2301',
+          postedAt: new Date().toISOString(),
+          userIds: ['1101']
+        }
+
+        gradebook.gotChunkOfStudents([student])
+        updateColumnHeadersStub = sinon.stub(gradebook, 'updateColumnHeaders')
+      })
+
+      onPostedHooks.afterEach(() => {
+        updateColumnHeadersStub.restore()
+      })
+
+      test('calls updateColumnHeaders', () => {
+        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        onPosted(postedOrHiddenInfo)
+        strictEqual(updateColumnHeadersStub.callCount, 1)
+      })
+
+      test('calls updateColumnHeaders with the column ids', () => {
+        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const columnId = gradebook.getAssignmentColumnId('2301')
+        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        onPosted(postedOrHiddenInfo)
+        deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
+      })
+
+      test('updates the posted_at of the submissions', () => {
+        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        onPosted(postedOrHiddenInfo)
+        strictEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
+      })
     })
   })
 
@@ -245,6 +353,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const assignment = {
         anonymize_students: false,
         course_id: '1201',
+        grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,

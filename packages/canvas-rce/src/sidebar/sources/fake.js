@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const FAKE_TIMEOUT = process.env.NODE_ENV === 'test' ? 0 : 500
+
 const PAGES = {
   // page of announcements
   announcements: {
     links: [
-      { href: "/courses/1/announcements", title: "Announcements List" },
-      { href: "/courses/1/announcements/2", title: "Announcement 2" },
+      { href: "/courses/1/announcements", title: "Announcements List", date: '2018-04-22T13:00:00Z', date_type: 'posted' },
+      { href: "/courses/1/announcements/2", title: "Announcement 2", date: '2018-04-22T13:00:00Z', date_type: 'delayed_post' },
       { href: "/courses/1/announcements/1", title: "Announcement 1" }
     ],
     bookmark: null
@@ -30,11 +32,11 @@ const PAGES = {
   // first page of assignments
   assignments: {
     links: [
-      { href: "/courses/1/assignments", title: "Assignment List" },
-      { href: "/courses/1/assignments/1", title: "Assignment 1" },
-      { href: "/courses/1/assignments/2", title: "Assignment 2" },
-      { href: "/courses/1/assignments/3", title: "Assignment 3" },
-      { href: "/courses/1/assignments/4", title: "Quiz 1" }
+      { href: "/courses/1/assignments", title: "Assignment List", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/1", title: "Assignment 1", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/2", title: "Assignment 2", published: false, date: null, date_type: null },
+      { href: "/courses/1/assignments/3", title: "Assignment 3", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/4", title: "Quiz 1", published: true }
     ],
     // refers to second page of assignments
     bookmark: "assignments2"
@@ -43,8 +45,8 @@ const PAGES = {
   // second page of assignments
   assignments2: {
     links: [
-      { href: "/courses/1/assignments/5", title: "Quiz 2" },
-      { href: "/courses/1/assignments/6", title: "Quiz 3" }
+      { href: "/courses/1/assignments/5", title: "Quiz 2", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/6", title: "Quiz 3", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' }
     ],
     bookmark: null
   },
@@ -52,11 +54,11 @@ const PAGES = {
   // page of discussions
   discussions: {
     links: [
-      { href: "/courses/1/discussion_topics", title: "Discussion Index" },
-      { href: "/courses/1/discussion_topics/4", title: "Discussion 2" },
-      { href: "/courses/1/discussion_topics/3", title: "Discussion 1" },
-      { href: "/courses/1/discussion_topics/2", title: "Announcement 2" },
-      { href: "/courses/1/discussion_topics/1", title: "Announcement 1" }
+      { href: "/courses/1/discussion_topics", title: "Discussion Index", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/discussion_topics/4", title: "Discussion 2", published: true, date: '2018-04-22T13:00:00Z', date_type: 'todo' },
+      { href: "/courses/1/discussion_topics/3", title: "Discussion 1", published: true , date: '2018-04-22T13:00:00Z', date_type: 'todo'},
+      { href: "/courses/1/discussion_topics/2", title: "Announcement 2", published: false, date: null, date_type: null },
+      { href: "/courses/1/discussion_topics/1", title: "Announcement 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' }
     ],
     // intentionally referring to page that doesn't exist to test failure mode
     bookmark: "discussions2"
@@ -65,9 +67,9 @@ const PAGES = {
   // page of modules
   modules: {
     links: [
-      { href: "/courses/1/modules", title: "Modules List" },
-      { href: "/courses/1/modules/2", title: "Module 2" },
-      { href: "/courses/1/modules/1", title: "Module 1" }
+      { href: "/courses/1/modules", title: "Modules List", published: true, date: '2018-04-22T13:00:00Z', date_type: 'published' },
+      { href: "/courses/1/modules/2", title: "Module 2", published: false, date: null, date_type: 'published' },
+      { href: "/courses/1/modules/1", title: "Module 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'published' }
     ],
     bookmark: null
   },
@@ -81,8 +83,8 @@ const PAGES = {
   // page of wiki pages
   wikiPages: {
     links: [
-      { href: "/courses/1/pages/wiki-page-1", title: "Wiki Page 1" },
-      { href: "/courses/1/pages/wiki-page-2", title: "Wiki Page 2" }
+      { href: "/courses/1/pages/wiki-page-1", title: "Wiki Page 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'todo' },
+      { href: "/courses/1/pages/wiki-page-2", title: "Wiki Page 2", published: false, date: null, date_type: 'todo' }
     ],
     bookmark: null
   },
@@ -199,29 +201,66 @@ const FOLDERS = [
   { id: 3, name: "Folder 3", filesUrl: "filesurl", foldersUrl: "foldersurl" }
 ];
 
-const serializedImage = {
-  id: 12345,
-  display_name: "test_image.jpeg",
-  "content-type": "image/jpeg",
-  preview_url: "http://preview-me.com",
-  url:
-    "http://api.ning.com/files/ZzR9cn0EG4o1Mz1V9B*gENYbkq9DHXt5bMKeFCgDhSzMnV8YhTmlB-yQZv4vgqL3bLno3dPh35L*Dv5gtCOfBrKwxM7DLBG*/412303325.jpeg?xgip=0%3A0%3A1021%3A1021%3B%3B&width=64&height=64&crop=1%3A1",
-  thumbnail_url:
-    "http://api.ning.com/files/ZzR9cn0EG4o1Mz1V9B*gENYbkq9DHXt5bMKeFCgDhSzMnV8YhTmlB-yQZv4vgqL3bLno3dPh35L*Dv5gtCOfBrKwxM7DLBG*/412303325.jpeg?xgip=0%3A0%3A1021%3A1021%3B%3B&width=64&height=64&crop=1%3A1"
-};
+export function buildImage(index, name, height, width) {
+  const id = 123000001 + index
+  const url = `https://www.fillmurray.com/${height}/${width}`
+
+  return {
+    display_name: name,
+    href: url,
+    id,
+    preview_url: url,
+    thumbnail_url: url
+  }
+}
+
+const imageNames = ['bill_murray', 'bill_is_the_best', 'bill_who?', 'love_this_guy!!11!']
+const images = []
+for (let i = 0; i < 30; i++) {
+  const name = imageNames[i % imageNames.length] + i + '.jpeg'
+
+  /*
+   * This is just to get some variety to the example images.
+   * We get some Bills, each with unique dimensions following this pattern:
+   * 100x200, 201x101, 302x202, 203x303, 304x404, 405x305,
+   * 100x206, 201x107, 302x208, 203x309, 304x410, 405x311, etc.
+   */
+  const height = [100, 200, 200, 300, 300, 400][i % 6] + i
+  const width = [200, 100, 300, 200, 400, 300][i % 6] + Math.round(i / 6)
+  images.push(buildImage(i, name, height, width))
+}
 
 const brokenImage = {
-  id: 123456789,
-  display_name: "broken_image.jpeg",
-  "content-type": "image/jpeg",
-  preview_url: "http://preview-me.com",
-  url:
-    "http://api.ning.com/files/ZzR9cn0EG4o1Mz1V9B*-yQZv4vgqL3bLno3dPh35L*Dv5gtCOfBrKwxM7DLBG*/412303325.jpeg?xgip=0%3A0%3A1021%3A1021%3B%3B&width=64&height=64&crop=1%3A1",
-  thumbnail_url:
-    "http://api.ning.com/files/ZzR9cn0EG4o1Mz1V9B*gENYbkq9gDhSzMnV8YhTmlB-yQZv4vgqL3bLno3dPh35L*Dv5gtCOfBrKwxM7DLBG*/412303325.jpeg?xgip=0%3A0%3A1021%3A1021%3B%3B&width=64&height=64&crop=1%3A1"
-};
+  id: 123000000,
+  display_name: 'broken_image.jpeg',
+  filename: 'broken_image.jpeg',
+  href: 'http://canvas/files/123000000/download',
+  preview_url: 'http://canvas/files/123000000/download',
+  thumbnail_url: 'http://does.not/exist.png'
+}
 
-const IMAGES = [serializedImage, brokenImage];
+const IMAGE_RESPONSES = [
+  {
+    bookmark: 'http://canvas/images/2',
+    images: [
+      images[0],
+      brokenImage,
+      ...images.slice(1, 10)
+    ]
+  },
+
+  {
+    bookmark: 'http://canvas/images/3',
+    bookmarkForThis: 'http://canvas/images/2',
+    images: images.slice(10, 20)
+  },
+
+  {
+    bookmark: null,
+    bookmarkForThis: 'http://canvas/images/3',
+    images: images.slice(20)
+  }
+]
 
 const FLICKR_RESULTS = {
   go: [
@@ -319,24 +358,41 @@ export function fetchFiles(uri = "files") {
   return Promise.resolve(PAGES[uri]);
 }
 
-export function fetchImages() {
-  return new Promise(function(resolve) {
-    resolve({ images: IMAGES });
+export function fetchImages(props) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(() => {
+      let response
+      if (props.bookmark) {
+        response = IMAGE_RESPONSES.find(response => response.bookmarkForThis === props.bookmark)
+      } else {
+        response = IMAGE_RESPONSES[0]
+      }
+
+      if (response) {
+        resolve(response)
+      } else {
+        reject(new Error('Invalid bookmark'))
+      }
+    }, FAKE_TIMEOUT)
   });
+}
+
+export function fetchMediaFolder() {
+  return Promise.resolve(PAGES.folders)
 }
 
 export function preflightUpload() {
   return new Promise(function(resolve) {
     setTimeout(() => {
       resolve({});
-    }, 500);
+    }, FAKE_TIMEOUT);
   });
 }
 
 export function uploadFRD() {
   return new Promise(function(resolve) {
     setTimeout(() => {
-      resolve(serializedImage);
+      resolve(images[0]);
     }, 250);
   });
 }

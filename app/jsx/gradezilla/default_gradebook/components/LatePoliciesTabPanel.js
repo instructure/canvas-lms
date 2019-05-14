@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import View from '@instructure/ui-layout/lib/components/View'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
@@ -33,7 +33,7 @@ import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid
 import NumberHelper from '../../../shared/helpers/numberHelper'
 
 import Round from 'compiled/util/round'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 function isNumeric(input) {
   return NumberHelper.validate(input)

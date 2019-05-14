@@ -15,73 +15,70 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-  'jquery'
-  'jsx/shared/helpers/numberHelper'
-  'jst/assignments/PeerReviewsSelector'
-  '../../jquery/toggleAccessibly'
-], (Backbone, _, $, numberHelper, template, toggleAccessibly) ->
+import Backbone from 'Backbone'
+import _ from 'underscore'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import template from 'jst/assignments/PeerReviewsSelector'
+import '../../jquery/toggleAccessibly'
 
-  class PeerReviewsSelector extends Backbone.View
+export default class PeerReviewsSelector extends Backbone.View
 
-    template: template
+  template: template
 
-    PEER_REVIEWS_ASSIGN_AT    = '#assignment_peer_reviews_assign_at'
-    PEER_REVIEWS              = '#assignment_peer_reviews'
-    MANUAL_PEER_REVIEWS       = '#assignment_manual_peer_reviews'
-    AUTO_PEER_REVIEWS         = '#assignment_automatic_peer_reviews'
-    PEER_REVIEWS_DETAILS      = '#peer_reviews_details'
-    AUTO_PEER_REVIEWS_OPTIONS = '#automatic_peer_reviews_options'
-    ANONYMOUS_PEER_REVIEWS    = '#anonymous_peer_reviews'
+  PEER_REVIEWS_ASSIGN_AT    = '#assignment_peer_reviews_assign_at'
+  PEER_REVIEWS              = '#assignment_peer_reviews'
+  MANUAL_PEER_REVIEWS       = '#assignment_manual_peer_reviews'
+  AUTO_PEER_REVIEWS         = '#assignment_automatic_peer_reviews'
+  PEER_REVIEWS_DETAILS      = '#peer_reviews_details'
+  AUTO_PEER_REVIEWS_OPTIONS = '#automatic_peer_reviews_options'
+  ANONYMOUS_PEER_REVIEWS    = '#anonymous_peer_reviews'
 
-    events: do ->
-      events = {}
-      events["change #{PEER_REVIEWS}"] = 'handlePeerReviewsChange'
-      events["change #{MANUAL_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
-      events["change #{AUTO_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
-      events
+  events: do ->
+    events = {}
+    events["change #{PEER_REVIEWS}"] = 'handlePeerReviewsChange'
+    events["change #{MANUAL_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
+    events["change #{AUTO_PEER_REVIEWS}"] = 'handleAutomaticPeerReviewsChange'
+    events
 
-    els: do ->
-      els = {}
-      els["#{PEER_REVIEWS_ASSIGN_AT}"] = '$peerReviewsAssignAt'
-      els["#{PEER_REVIEWS}"] = '$peerReviews'
-      els["#{PEER_REVIEWS_DETAILS}"] = '$peerReviewsDetails'
-      els["#{AUTO_PEER_REVIEWS}"] = '$autoPeerReviews'
-      els["#{AUTO_PEER_REVIEWS_OPTIONS}"] = '$autoPeerReviewsOptions'
-      els
+  els: do ->
+    els = {}
+    els["#{PEER_REVIEWS_ASSIGN_AT}"] = '$peerReviewsAssignAt'
+    els["#{PEER_REVIEWS}"] = '$peerReviews'
+    els["#{PEER_REVIEWS_DETAILS}"] = '$peerReviewsDetails'
+    els["#{AUTO_PEER_REVIEWS}"] = '$autoPeerReviews'
+    els["#{AUTO_PEER_REVIEWS_OPTIONS}"] = '$autoPeerReviewsOptions'
+    els
 
-    @optionProperty 'parentModel'
-    @optionProperty 'nested'
-    @optionProperty 'hideAnonymousPeerReview'
+  @optionProperty 'parentModel'
+  @optionProperty 'nested'
+  @optionProperty 'hideAnonymousPeerReview'
 
-    handlePeerReviewsChange: =>
-      @$peerReviewsDetails.toggleAccessibly @$peerReviews.prop('checked')
+  handlePeerReviewsChange: =>
+    @$peerReviewsDetails.toggleAccessibly @$peerReviews.prop('checked')
 
-    handleAutomaticPeerReviewsChange: =>
-      @$autoPeerReviewsOptions.toggleAccessibly(@$autoPeerReviews.filter(':checked').val() is '1')
+  handleAutomaticPeerReviewsChange: =>
+    @$autoPeerReviewsOptions.toggleAccessibly(@$autoPeerReviews.filter(':checked').val() is '1')
 
-    afterRender: =>
-      @$peerReviewsAssignAt.datetime_field()
+  afterRender: =>
+    @$peerReviewsAssignAt.datetime_field()
 
-    toJSON: =>
-      frozenAttributes = @parentModel.frozenAttributes()
+  toJSON: =>
+    frozenAttributes = @parentModel.frozenAttributes()
 
-      anonymousPeerReviews: @parentModel.anonymousPeerReviews()
-      peerReviews: @parentModel.peerReviews()
-      automaticPeerReviews: @parentModel.automaticPeerReviews()
-      peerReviewCount: @parentModel.peerReviewCount()
-      peerReviewsAssignAt: @parentModel.peerReviewsAssignAt()
-      frozenAttributes: frozenAttributes
-      peerReviewsFrozen: _.include(frozenAttributes, 'peer_reviews')
-      nested: @nested
-      prefix: 'assignment' if @nested
-      hideAnonymousPeerReview: @hideAnonymousPeerReview
-      hasGroupCategory: @parentModel.groupCategoryId()
-      intraGroupPeerReviews: @parentModel.intraGroupPeerReviews()
+    anonymousPeerReviews: @parentModel.anonymousPeerReviews()
+    peerReviews: @parentModel.peerReviews()
+    automaticPeerReviews: @parentModel.automaticPeerReviews()
+    peerReviewCount: @parentModel.peerReviewCount()
+    peerReviewsAssignAt: @parentModel.peerReviewsAssignAt()
+    frozenAttributes: frozenAttributes
+    peerReviewsFrozen: _.include(frozenAttributes, 'peer_reviews')
+    nested: @nested
+    prefix: 'assignment' if @nested
+    hideAnonymousPeerReview: @hideAnonymousPeerReview
+    hasGroupCategory: @parentModel.groupCategoryId()
+    intraGroupPeerReviews: @parentModel.intraGroupPeerReviews()
 
-    getFormData: =>
-      data = super
-      data.peerReviewCount = numberHelper.parse(data.peerReviewCount)
-      data
+  getFormData: =>
+    data = super
+    data.peerReviewCount = numberHelper.parse(data.peerReviewCount)
+    data

@@ -17,7 +17,7 @@
  */
 
 import React, { Component } from 'react'
-import I18n from 'i18n!blueprint_settings'
+import I18n from 'i18n!blueprint_settingsUnsyncedChanges'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from '../../shared/select'

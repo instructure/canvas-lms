@@ -16,64 +16,63 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  './CollaborationView'
-  './CollaborationFormView'
-], ($, {each, reject}, {View}, CollaborationView, CollaborationFormView) ->
-  class CollaborationsPage extends View
-    events:
-      'click .add_collaboration_link': 'addCollaboration'
-      'keyclick .add_collaboration_link': 'addCollaboration'
+import $ from 'jquery'
+import {each, reject} from 'underscore'
+import {View} from 'Backbone'
+import CollaborationView from './CollaborationView'
+import CollaborationFormView from './CollaborationFormView'
 
-    initialize: ->
-      super
-      @cacheElements()
-      @createViews()
-      @attachEvents()
+export default class CollaborationsPage extends View
+  events:
+    'click .add_collaboration_link': 'addCollaboration'
+    'keyclick .add_collaboration_link': 'addCollaboration'
 
-    # Internal: Set up page state on load.
-    #
-    # Returns nothing.
-    initPageState: =>
-      if $('#collaborations .collaboration:visible').length is 0
-        @addFormView.render(false)
-        @$addLink.hide()
+  initialize: ->
+    super
+    @cacheElements()
+    @createViews()
+    @attachEvents()
 
-    cacheElements: ->
-      @$addLink = $('.add_collaboration_link')
-      @$addForm = $('#new_collaboration')
-      @$noCollaborationsMessage = $('#no_collaborations_message')
-
-    createViews: ->
-      @addFormView = new CollaborationFormView(el: @$addForm)
-      @collaborationViews = $('div.collaboration').map ->
-        new CollaborationView(el: $(this))
-
-    attachEvents: ->
-      @addFormView.on('hide', @onFormHide)
-                  .on('error', @onFormError)
-      each @collaborationViews, (view) =>
-        view.on('delete', @onCollaborationDelete)
-
-    addCollaboration: (e) ->
-      e.preventDefault()
+  # Internal: Set up page state on load.
+  #
+  # Returns nothing.
+  initPageState: =>
+    if $('#collaborations .collaboration:visible').length is 0
+      @addFormView.render(false)
       @$addLink.hide()
-      @addFormView.render()
-      @$el.scrollTo(@addFormView.$el)
 
-    onCollaborationDelete: (deletedView) =>
-      @collaborationViews = reject @collaborationViews, (view) ->
-        view is deletedView
-      if @collaborationViews.length is 0
-        @$noCollaborationsMessage.show()
-        @addFormView.render(false)
+  cacheElements: ->
+    @$addLink = $('.add_collaboration_link')
+    @$addForm = $('#new_collaboration')
+    @$noCollaborationsMessage = $('#no_collaborations_message')
 
-    onFormHide: =>
-      @$addLink.show()
-      @$addLink.focus()
+  createViews: ->
+    @addFormView = new CollaborationFormView(el: @$addForm)
+    @collaborationViews = $('div.collaboration').map ->
+      new CollaborationView(el: $(this))
 
-    onFormError: ($input, message) =>
-      $input.focus().errorBox(message)
+  attachEvents: ->
+    @addFormView.on('hide', @onFormHide)
+                .on('error', @onFormError)
+    each @collaborationViews, (view) =>
+      view.on('delete', @onCollaborationDelete)
+
+  addCollaboration: (e) ->
+    e.preventDefault()
+    @$addLink.hide()
+    @addFormView.render()
+    @$el.scrollTo(@addFormView.$el)
+
+  onCollaborationDelete: (deletedView) =>
+    @collaborationViews = reject @collaborationViews, (view) ->
+      view is deletedView
+    if @collaborationViews.length is 0
+      @$noCollaborationsMessage.show()
+      @addFormView.render(false)
+
+  onFormHide: =>
+    @$addLink.show()
+    @$addLink.focus()
+
+  onFormError: ($input, message) =>
+    $input.focus().errorBox(message)

@@ -70,7 +70,7 @@ export default class OutcomeView extends OutcomeContentBase {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      let thisName = thisFn.match(/_this\d*/)[0];
       eval(`${thisName} = this;`);
     }
     this.editRating = this.editRating.bind(this)
@@ -283,7 +283,10 @@ export default class OutcomeView extends OutcomeContentBase {
       case 'edit':
       case 'add':
         this.$el.html(
-          outcomeFormTemplate(_.extend(data, {calculationMethods: this.model.calculationMethods()}))
+          outcomeFormTemplate(_.extend(data, {
+            calculationMethods: this.model.calculationMethods(),
+            use_rce_enhancements: ENV.use_rce_enhancements
+        }))
         )
 
         addCriterionInfoButton(this.$el.find("#react-info-link")[0])

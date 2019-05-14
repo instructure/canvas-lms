@@ -20,7 +20,7 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingStandard from './gradingStandard'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!external_toolsgradingStandardCollection'
 import _ from 'underscore'
 import 'jquery.instructure_misc_plugins'
 

@@ -23,11 +23,17 @@ import AssignmentPostingPolicyTray from '../../../grading/AssignmentPostingPolic
 import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
+function getSubmission(student, assignmentId) {
+  const submission = student[`assignment_${assignmentId}`] || {posted_at: null}
+  return {postedAt: submission.posted_at}
+}
+
 export default class PostPolicies {
   constructor(gradebook) {
+    this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
     this._gradebook = gradebook
 
-    this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
+    this._onGradesPostedOrHidden = this._onGradesPostedOrHidden.bind(this)
   }
 
   initialize() {
@@ -59,6 +65,18 @@ export default class PostPolicies {
     ReactDOM.unmountComponentAtNode(document.getElementById('post-assignment-grades-tray'))
   }
 
+  _onGradesPostedOrHidden({assignmentId, postedAt, userIds}) {
+    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+
+    userIds.forEach(userId => {
+      const submission = this._gradebook.getSubmission(userId, assignmentId)
+      submission.posted_at = postedAt
+      this._gradebook.updateSubmission(submission)
+    })
+
+    this._gradebook.updateColumnHeaders([columnId])
+  }
+
   showAssignmentPostingPolicyTray({assignmentId, onExited}) {
     const {id, name, postManually} = this._gradebook.getAssignment(assignmentId)
 
@@ -81,6 +99,7 @@ export default class PostPolicies {
         name
       },
       onExited,
+      onHidden: this._onGradesPostedOrHidden,
       sections
     })
   }
@@ -89,6 +108,10 @@ export default class PostPolicies {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymize_students, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
+    const studentsWithVisibility = Object.values(
+      this._gradebook.studentsThatCanSeeAssignment(assignment.id)
+    )
+    const submissions = studentsWithVisibility.map(student => getSubmission(student, assignment.id))
 
     this._postAssignmentGradesTray.show({
       assignment: {
@@ -98,7 +121,9 @@ export default class PostPolicies {
         name
       },
       onExited,
-      sections
+      sections,
+      submissions,
+      onPosted: this._onGradesPostedOrHidden
     })
   }
 

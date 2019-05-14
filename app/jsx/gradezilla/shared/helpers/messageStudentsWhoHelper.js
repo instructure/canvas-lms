@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezillasharedMessageStudentsWhoHelper'
 
 export function hasSubmitted(submission) {
   if (submission.excused) {

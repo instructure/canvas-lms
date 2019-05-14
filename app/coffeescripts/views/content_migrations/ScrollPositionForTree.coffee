@@ -15,57 +15,53 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'jquery'
-], (_, $) ->
-  class ScrollPositionForTree
-    # Public Functions
-    
-    # Create the inital object
+export default class ScrollPositionForTree
+  # Public Functions
 
-    constructor: (@$tree, @$container) ->
-      @bindEvents()
+  # Create the inital object
 
-    # Calculates the offset that should be used to keep the treeitems in sync. 
-    # You can overwrite this function to if you need something more custom
+  constructor: (@$tree, @$container) ->
+    @bindEvents()
 
-    fileScrollOffset: ($treeitem) ->
-      return unless $treeitem.length
+  # Calculates the offset that should be used to keep the treeitems in sync.
+  # You can overwrite this function to if you need something more custom
 
-      topLevelMarginOffset = @findTopTreeItemMargins($treeitem, '.top-level-treeitem', 10)
-      treeItemsOffset = @findTreeItemsOffset($treeitem, 32)
-      containerOffset = @$container.height()/2
+  fileScrollOffset: ($treeitem) ->
+    return unless $treeitem.length
 
-      topLevelMarginOffset + treeItemsOffset - containerOffset
+    topLevelMarginOffset = @findTopTreeItemMargins($treeitem, '.top-level-treeitem', 10)
+    treeItemsOffset = @findTreeItemsOffset($treeitem, 32)
+    containerOffset = @$container.height()/2
 
-    # Private Function
+    topLevelMarginOffset + treeItemsOffset - containerOffset
 
-    bindEvents: ->
-      @$tree.on 'keyup', @manageScrollPosition
+  # Private Function
 
-    # Ensure that when you press a key the currently selected
-    # treeitem is always centered.
+  bindEvents: ->
+    @$tree.on 'keyup', @manageScrollPosition
 
-    manageScrollPosition: =>
-      $treeitem = @$tree.find("##{@$tree.attr('aria-activedescendant')}")
-      @$container.scrollTop @fileScrollOffset($treeitem)
-      
-    # Finds the total margins that seperate top level tree items. Expects
-    # a tree item to start from, toplevel selector and margins between each
+  # Ensure that when you press a key the currently selected
+  # treeitem is always centered.
 
-    findTopTreeItemMargins: ($treeitem, selector, margin) ->
-      $topLevelItem = $treeitem.closest(selector)
-      $topLevelItem = $treeitem unless $topLevelItem.length
+  manageScrollPosition: =>
+    $treeitem = @$tree.find("##{@$tree.attr('aria-activedescendant')}")
+    @$container.scrollTop @fileScrollOffset($treeitem)
 
-      topLevelIndex = $topLevelItem.index("#{selector}:visible")
+  # Finds the total margins that seperate top level tree items. Expects
+  # a tree item to start from, toplevel selector and margins between each
 
-      (margin * topLevelIndex) + margin
+  findTopTreeItemMargins: ($treeitem, selector, margin) ->
+    $topLevelItem = $treeitem.closest(selector)
+    $topLevelItem = $treeitem unless $topLevelItem.length
 
-    # Finds the total heights of all tree items up to the passed in tree item. Pass
-    # in an optional height. 
+    topLevelIndex = $topLevelItem.index("#{selector}:visible")
 
-    findTreeItemsOffset: ($treeitem, height) ->
-      treeItemIndex = $treeitem.index("[role=treeitem]:visible")
-      height * (treeItemIndex + 1)
+    (margin * topLevelIndex) + margin
+
+  # Finds the total heights of all tree items up to the passed in tree item. Pass
+  # in an optional height.
+
+  findTreeItemsOffset: ($treeitem, height) ->
+    treeItemIndex = $treeitem.index("[role=treeitem]:visible")
+    height * (treeItemIndex + 1)
 

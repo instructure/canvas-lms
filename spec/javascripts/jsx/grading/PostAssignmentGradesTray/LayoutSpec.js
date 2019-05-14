@@ -26,13 +26,10 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   let $container
   let context
 
-  function assignmentFixture() {
-    return {
-      anonymizeStudents: false,
-      gradesPublished: true,
-      id: '2301',
-      name: 'Math 1.1'
-    }
+  function getHeading() {
+    return [...$container.querySelectorAll('h3')].find($heading =>
+      $heading.textContent.includes('Post Grades')
+    )
   }
 
   function getAnonymousText() {
@@ -52,16 +49,53 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     )
   }
 
+  function getInputByLabel(label) {
+    const $label = getLabel(label)
+    if ($label === undefined) return undefined
+    return document.getElementById($label.htmlFor)
+  }
+
+  function getSpecificSectionToggleInput() {
+    return getInputByLabel('Specific Sections')
+  }
+
+  function getPostTypeInputs() {
+    const postText = 'Select whether to post for all submissions, or only graded ones.'
+    const $postTypeFieldSet = [...$container.querySelectorAll('fieldset')].find(
+      $fieldset => $fieldset.querySelector('legend').textContent === postText
+    )
+    if ($postTypeFieldSet === undefined) return undefined
+    return [...$postTypeFieldSet.querySelectorAll('input[type=radio]')]
+  }
+
   function getPostButton() {
     return [...$container.querySelectorAll('button')].find(
       $button => $button.textContent === 'Post'
     )
   }
 
+  function getUnpostedCount() {
+    return getUnpostedSummary().querySelector('[id^="Badge__"]')
+  }
+
+  function getUnpostedHiddenText() {
+    return [...getUnpostedSummary().querySelectorAll('*')].find($el => $el.textContent === 'Hidden')
+  }
+
+  function getUnpostedSummary() {
+    return document.getElementById('PostAssignmentGradesTray__Layout__UnpostedSummary')
+  }
+
   function getPostText() {
     const postText =
       'Posting grades is not allowed because grades have not been released for this assignment.'
     return [...$container.querySelectorAll('p')].find($p => $p.textContent === postText)
+  }
+
+  function getSpinner() {
+    return [...$container.querySelectorAll('svg')].find(
+      $spinner => $spinner.textContent === 'Posting grades'
+    )
   }
 
   function getPostType(type) {
@@ -75,7 +109,10 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     context = {
-      assignment: assignmentFixture(),
+      assignment: {
+        anonymizeStudents: false,
+        gradesPublished: true
+      },
       dismiss: () => {},
       postBySections: true,
       postBySectionsChanged: () => {},
@@ -85,7 +122,8 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
       onPostClick: () => {},
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
       sectionSelectionChanged: () => {},
-      selectedSectionIds: []
+      selectedSectionIds: [],
+      unpostedCount: 0
     }
   })
 
@@ -95,55 +133,154 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   })
 
   test('clicking "Close" button calls the dismiss prop', () => {
-    const dismissSpy = sinon.spy()
-    context.dismiss = dismissSpy
+    sinon.spy(context, 'dismiss')
     mountComponent()
     getCloseButton().click()
-    strictEqual(dismissSpy.callCount, 1)
-  })
-
-  test('"Post" button is disabled when grades have yet to be published', () => {
-    const unpublishedAssignment = {...assignmentFixture(), gradesPublished: false}
-    context.assignment = unpublishedAssignment
-    mountComponent()
-    strictEqual(getPostButton().disabled, true)
-  })
-
-  test('descriptive text exists when grades have yet to be published', () => {
-    const unpublishedAssignment = {...assignmentFixture(), gradesPublished: false}
-    context.assignment = unpublishedAssignment
-    mountComponent()
-    ok(getPostText())
-  })
-
-  test('"Post" button is disabled when postingGrades is true', () => {
-    context.postingGrades = true
-    mountComponent()
-    strictEqual(getPostButton().disabled, true)
-  })
-
-  test('descriptive text does not exist when grades have been published', () => {
-    mountComponent()
-    notOk(getPostText())
+    const {
+      dismiss: {callCount}
+    } = context
+    strictEqual(callCount, 1)
   })
 
   test('clicking "Post" button calls the onPostClick prop', () => {
-    const onPostClickSpy = sinon.spy()
-    context.onPostClick = onPostClickSpy
+    sinon.spy(context, 'onPostClick')
     mountComponent()
     getPostButton().click()
-    strictEqual(onPostClickSpy.callCount, 1)
+    const {
+      onPostClick: {callCount}
+    } = context
+    strictEqual(callCount, 1)
   })
 
-  QUnit.module('when no sections exist', contextHooks => {
-    contextHooks.beforeEach(() => {
-      context.sections = []
+  QUnit.module('default behavior', mountComponentHooks => {
+    mountComponentHooks.beforeEach(() => mountComponent())
+
+    test('heading is present', () => {
+      ok(getHeading())
     })
 
-    test('anonymous descriptive text is not shown', () => {
-      context.assignment = {...assignmentFixture(), anonymizeStudents: true}
-      mountComponent()
+    test('spinner is hidden', () => {
+      notOk(getSpinner())
+    })
+
+    test('section toggle is present', () => {
+      ok(getSpecificSectionToggleInput())
+    })
+
+    test('"post" button is present', () => {
+      ok(getPostButton())
+    })
+
+    test('close button is present', () => {
+      ok(getCloseButton())
+    })
+
+    test('descriptive text is hidden', () => {
+      notOk(getPostText())
+    })
+
+    test('anonymous descriptive text is hidden', () => {
       notOk(getAnonymousText())
+    })
+
+    test('"Post types" inputs are enabled', () => {
+      strictEqual(getPostTypeInputs().every($input => !$input.disabled), true)
+    })
+
+    test('a summary of unposted submissions is not displayed', () => {
+      notOk(getUnpostedSummary())
+    })
+  })
+
+  QUnit.module('given "postingGrades" prop is true', postingGradesHooks => {
+    postingGradesHooks.beforeEach(() => {
+      context.postingGrades = true
+      mountComponent()
+    })
+
+    test('heading is present', () => {
+      ok(getHeading())
+    })
+
+    test('spinner is present', () => {
+      ok(getSpinner())
+    })
+
+    test('section toggle hidden', () => {
+      notOk(getSpecificSectionToggleInput())
+    })
+
+    test('"post" button is hidden', () => {
+      notOk(getPostButton())
+    })
+
+    test('close button is hidden', () => {
+      notOk(getCloseButton())
+    })
+
+    test('descriptive text is hidden', () => {
+      notOk(getPostText())
+    })
+
+    test('anonymous descriptive text is hidden', () => {
+      notOk(getAnonymousText())
+    })
+
+    test('"Post types" inputs are hidden', () => {
+      notOk(getPostTypeInputs())
+    })
+  })
+
+  QUnit.module('given grades are not published', gradesPublishedHooks => {
+    gradesPublishedHooks.beforeEach(() => {
+      context.assignment.gradesPublished = false
+      mountComponent()
+    })
+
+    test('"Post types" inputs are disabled', () => {
+      strictEqual(getPostTypeInputs().every($input => $input.disabled), true)
+    })
+
+    test('"Specific Section" toggle is disabled', () => {
+      strictEqual(getSpecificSectionToggleInput().disabled, true)
+    })
+
+    test('"Close" button is disabled', () => {
+      strictEqual(getCloseButton().disabled, true)
+    })
+
+    test('"Post" button is disabled', () => {
+      strictEqual(getPostButton().disabled, true)
+    })
+
+    test('descriptive text is present', () => {
+      ok(getPostText())
+    })
+  })
+
+  QUnit.module('when some submissions are unposted', () => {
+    test('a summary of unposted submissions is displayed', () => {
+      context.unpostedCount = 1
+      mountComponent()
+      ok(getUnpostedSummary())
+    })
+
+    test('the number of unposted submissions is displayed', () => {
+      context.unpostedCount = 2
+      mountComponent()
+      strictEqual(getUnpostedCount().textContent, '2')
+    })
+
+    test('text describing the number of unposted submissions is displayed', () => {
+      context.unpostedCount = 1
+      mountComponent()
+      ok(getUnpostedHiddenText())
+    })
+  })
+
+  QUnit.module('when sections are absent', contextHooks => {
+    contextHooks.beforeEach(() => {
+      context.sections = []
     })
 
     test('section toggle is not shown', () => {
@@ -151,10 +288,36 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
       notOk(getLabel('Specific Sections'))
     })
 
-    test('sections are not shown', () => {
+    test('anonymous descriptive text is hidden', () => {
+      mountComponent()
+      notOk(getAnonymousText())
+    })
+
+    test('anonymous descriptive text is hidden when assignment is anonymous', () => {
+      context.assignment.anonymizeStudents = true
+      mountComponent()
+      notOk(getAnonymousText())
+    })
+
+    test('sections are not shown when postBySections is false', () => {
       context.postBySections = false
       mountComponent()
       notOk(getLabel('Sophomores'))
+    })
+  })
+
+  QUnit.module('Anonymous assignments', anonymousAssignmentsHooks => {
+    anonymousAssignmentsHooks.beforeEach(() => {
+      context.assignment.anonymizeStudents = true
+      mountComponent()
+    })
+
+    test('anonymous descriptive text is present', () => {
+      ok(getAnonymousText())
+    })
+
+    test('"Specific Sections" is disabled', () => {
+      strictEqual(getSpecificSectionToggleInput().disabled, true)
     })
   })
 
@@ -165,11 +328,32 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     })
 
     test('clicking another post type calls postTypeChanged', () => {
-      const postTypeChangedSpy = sinon.spy()
-      context.postTypeChanged = postTypeChangedSpy
+      sinon.spy(context, 'postTypeChanged')
       mountComponent()
       getPostType('Graded').click()
-      strictEqual(postTypeChangedSpy.callCount, 1)
+      const {
+        postTypeChanged: {callCount}
+      } = context
+      strictEqual(callCount, 1)
+    })
+  })
+
+  QUnit.module('SpecificSections', () => {
+    test('enabling "Specific Sections" calls the postBySectionsChanged prop', () => {
+      const spy = sinon.spy(context, 'postBySectionsChanged')
+      mountComponent()
+      getSpecificSectionToggleInput().click()
+      const {callCount} = spy
+      strictEqual(callCount, 1)
+    })
+
+    test('selecting "Graded" calls the sectionSelectionChanged prop', () => {
+      const spy = sinon.spy(context, 'sectionSelectionChanged')
+      mountComponent()
+      getSpecificSectionToggleInput().click()
+      getInputByLabel('Freshmen').click()
+      const {callCount} = spy
+      strictEqual(callCount, 1)
     })
   })
 })

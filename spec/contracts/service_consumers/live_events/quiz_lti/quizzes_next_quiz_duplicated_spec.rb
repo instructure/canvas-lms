@@ -42,6 +42,8 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         }
         Account.default.enable_feature!(:lor_for_account)
         Account.default.context_external_tools.create!(params)
+        # Account.default.lti_context_id = 1
+        # Account.default.save!
 
         old_course = course_model(uuid: '100005')
         old_course.root_account.settings[:provision] = {'lti' => 'lti url'}
@@ -55,6 +57,8 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         new_course.root_account.settings[:provision] = {'lti' => 'lti url'}
         new_course.root_account.save!
         new_course.enable_feature!(:quizzes_next)
+        new_course.lti_context_id = 2
+        new_course.save!
 
         # act
 

@@ -42,42 +42,26 @@ export default class ExternalToolsTableRow extends React.Component {
     store: PropTypes.shape({
       getState: PropTypes.func,
       filteredApps: PropTypes.func,
-      installTool: PropTypes.func,
-      removeTool: PropTypes.func
     }).isRequired
   }
 
   get is13Tool () {
-    return this.props.tool.lti_version === "1.3";
+    return this.props.tool.lti_version === '1.3'
   }
 
   onModalClose = () => {
     this.button.focus()
   }
 
-  nameClassNames = () => classMunger('external_tool', {muted: (this.props.tool.enabled === false && !this.is13Tool)})
+  nameClassNames = () => classMunger('external_tool', {muted: this.props.tool.enabled === false})
 
   disabledFlag = () => {
-    if (this.props.tool.enabled === false && !this.is13Tool) {
+    if (this.props.tool.enabled === false) {
       return I18n.t('(disabled)')
     }
   }
 
-  show13 = () => {
-    return <Tooltip
-      tip={I18n.t("Is an LTI 1.3 Tool.")}
-      on={['click', 'hover', 'focus']}
-      >
-        <Button variant="icon" icon={IconLti}>
-          <ScreenReaderContent>{I18n.t("Toggle ToolTip")}</ScreenReaderContent>
-        </Button>
-      </Tooltip>
-  }
-
   locked = () => {
-    if(this.is13Tool) {
-      return;
-    }
     if (!this.props.tool.installed_locally) {
       return (
         <span className="text-muted">
@@ -128,64 +112,12 @@ export default class ExternalToolsTableRow extends React.Component {
     }
   }
 
-  onAppToggle = tool => () => {
-    if (tool.installed_at_context_level) {
-      this.props.store.removeTool(tool.app_id)
-    } else {
-      this.props.store.installTool(tool.app_id)
-    }
-  }
-
   focus () {
     this.button.focus()
   }
 
-  get isDisabled () {
-    const { tool } = this.props
-    return !tool.installed_at_context_level && tool.installed_for_context
-  }
-
-  renderCheckbox () {
-    const { tool } = this.props
-    return <Checkbox
-      label={
-        <ScreenReaderContent>
-          {
-            tool.enabled
-              ? I18n.t('Disable %{toolName}', {toolName: tool.name})
-              : I18n.t('Enable %{toolName}', {toolName: tool.name})
-          }
-        </ScreenReaderContent>
-      }
-      variant="toggle"
-      checked={tool.installed_for_context}
-      onChange={this.onAppToggle(tool)}
-      disabled={this.isDisabled}
-      ref={(node) => this.button = node}
-    />
-  }
-
-  renderCheckboxWithToolTip () {
-    return <Tooltip
-      tip={I18n.t("Inherited tool from parent context.")}
-      on={['click', 'hover', 'focus']}
-    >
-      {this.renderCheckbox()}
-    </Tooltip>
-  }
-
   renderButtons = () => {
     const { tool } = this.props
-    if (tool.lti_version === '1.3') {
-      return <td className="links text-right" nowrap="nowrap">
-        <div style={{float: "right"}}>
-          {this.isDisabled
-            ? this.renderCheckboxWithToolTip()
-            : this.renderCheckbox()
-          }
-        </div>
-      </td>
-    }
     if (tool.installed_locally && !tool.restricted_by_master_course) {
       let configureButton= null
       let updateBadge = null
@@ -236,7 +168,7 @@ export default class ExternalToolsTableRow extends React.Component {
               <EditExternalToolButton
                 ref="editExternalToolButton"
                 tool={tool}
-                canAddEdit={this.props.canAddEdit}
+                canAddEdit={this.props.canAddEdit && !this.is13Tool}
                 returnFocus={this.returnFocus}
               />
               <ExternalToolPlacementButton
@@ -278,10 +210,7 @@ export default class ExternalToolsTableRow extends React.Component {
   render() {
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
-        {this.is13Tool
-          ? <td className="e-tool-table-data center-text">{this.show13()}</td>
-          : <td className="e-tool-table-data center-text">{this.locked()}</td>
-        }
+        <td className="e-tool-table-data center-text">{this.locked()}</td>
         <td
           nowrap="nowrap"
           className={`${this.nameClassNames()} e-tool-table-data`}

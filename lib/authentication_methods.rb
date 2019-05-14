@@ -90,7 +90,8 @@ module AuthenticationMethods
       request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
 
       if developer_key.try(:require_scopes)
-        if @access_token.url_scopes_for_method(request_method).any? { |scope| scope =~ request.path }
+        scope_patterns = @access_token.url_scopes_for_method(request_method).concat(AccessToken.always_allowed_scopes)
+        if scope_patterns.any? { |scope| scope =~ request.path }
           params.delete :include
           params.delete :includes
         else

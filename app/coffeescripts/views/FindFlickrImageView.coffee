@@ -15,54 +15,51 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jquery'
-  'underscore'
-  'str/htmlEscape'
-  'jst/FindFlickrImageView'
-  'jst/FindFlickrImageResult'
-], (Backbone, $, _, h, template, resultTemplate) ->
+import Backbone from 'Backbone'
+import $ from 'jquery'
+import _ from 'underscore'
+import template from 'jst/FindFlickrImageView'
+import resultTemplate from 'jst/FindFlickrImageResult'
 
-  class FindFlickrImageView extends Backbone.View
+export default class FindFlickrImageView extends Backbone.View
 
-    tagName: 'form'
+  tagName: 'form'
 
-    attributes:
-      'class': 'bootstrap-form form-horizontal FindFlickrImageView'
+  attributes:
+    'class': 'bootstrap-form form-horizontal FindFlickrImageView'
 
-    template: template
+  template: template
 
-    events:
-      'submit' : 'searchFlickr'
-      'change .flickrSearchTerm' : 'hideResultsIfEmptySearch'
-      'input .flickrSearchTerm' : 'hideResultsIfEmptySearch'
-      
-    hideResultsIfEmptySearch: ->
-      @renderResults([]) unless @$('.flickrSearchTerm').val()
+  events:
+    'submit' : 'searchFlickr'
+    'change .flickrSearchTerm' : 'hideResultsIfEmptySearch'
+    'input .flickrSearchTerm' : 'hideResultsIfEmptySearch'
 
-    searchFlickr: (event) ->
-      event?.preventDefault()
-      return unless query = @$('.flickrSearchTerm').val()
+  hideResultsIfEmptySearch: ->
+    @renderResults([]) unless @$('.flickrSearchTerm').val()
 
-      flickrUrl = "#{@flickrUrl}/#{query}" if @flickrUrl
-      flickrUrl ||= 'https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json' +
-                  '&api_key=734839aadcaa224c4e043eaf74391e50&sort=relevance&license=1,2,3,4,5,6' +
-                  "&text=#{query}&per_page=150&extras=needs_interstitial&jsoncallback=?"
-      @request?.abort()
-      @$('.flickrResults').show().disableWhileLoading @request = $.getJSON flickrUrl, (data) =>
-        photos = data.photos.photo
-        @renderResults(photos)
+  searchFlickr: (event) ->
+    event?.preventDefault()
+    return unless query = @$('.flickrSearchTerm').val()
 
-    renderResults: (photos) ->
-      html = _.reject(photos, (photo) => photo.needs_interstitial == 1)
-        .map((photo) ->
-          resultTemplate
-            thumb:    "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_s.jpg"
-            fullsize: "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}.jpg"
-            source:   "https://secure.flickr.com/photos/#{photo.owner}/#{photo.id}"
-            title:    photo.title
-        )
-      html = html.join('')
+    flickrUrl = "#{@flickrUrl}/#{query}" if @flickrUrl
+    flickrUrl ||= 'https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json' +
+                '&api_key=734839aadcaa224c4e043eaf74391e50&sort=relevance&license=1,2,3,4,5,6' +
+                "&text=#{query}&per_page=150&extras=needs_interstitial&jsoncallback=?"
+    @request?.abort()
+    @$('.flickrResults').show().disableWhileLoading @request = $.getJSON flickrUrl, (data) =>
+      photos = data.photos.photo
+      @renderResults(photos)
 
-      @$('.flickrResults').showIf(!!photos.length).html html
+  renderResults: (photos) ->
+    html = _.reject(photos, (photo) => photo.needs_interstitial == 1)
+      .map((photo) ->
+        resultTemplate
+          thumb:    "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}_s.jpg"
+          fullsize: "https://farm#{photo.farm}.static.flickr.com/#{photo.server}/#{photo.id}_#{photo.secret}.jpg"
+          source:   "https://secure.flickr.com/photos/#{photo.owner}/#{photo.id}"
+          title:    photo.title
+      )
+    html = html.join('')
+
+    @$('.flickrResults').showIf(!!photos.length).html html

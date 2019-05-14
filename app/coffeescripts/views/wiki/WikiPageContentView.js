@@ -19,6 +19,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
 import template from 'jst/wiki/WikiPageContent'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 
 export default class WikiPageContentView extends Backbone.View {
   static initClass() {
@@ -46,7 +47,7 @@ export default class WikiPageContentView extends Backbone.View {
 
   afterRender() {
     super.afterRender(...arguments)
-    $.publish('userContent/change')
+    publish('userContent/change')
     return this.trigger('render')
   }
 
