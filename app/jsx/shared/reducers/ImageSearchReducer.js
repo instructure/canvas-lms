@@ -16,25 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  import ImageSearchInitialState from '../stores/ImageSearchStore'
+  import ImageSearchInitialState from '../stores/ImageSearchInitialState'
   import _ from 'underscore'
 
   const imageSearchHandlers = {
     START_IMAGE_SEARCH (state, action) {
-      state.page = action.page;
       state.searching = true;
       state.searchTerm = action.term;
+      state.prevUrl = null;
+      state.nextUrl= null;
       return state;
     },
     RECEIVE_IMAGE_SEARCH_RESULTS (state, action) {
-      state.searchResults = action.results;
+      state.searchResults = action.results.data;
+      state.prevUrl = action.results.prevUrl
+      state.nextUrl = action.results.nextUrl
       state.searching = false;
       return state;
     },
     CLEAR_IMAGE_SEARCH (state) {
       state.searchResults = [];
       state.searching = false;
-      state.page = 1;
+      state.prevUrl = null;
+      state.nextUrl= null;
       state.searchTerm = '';
       return state;
     },

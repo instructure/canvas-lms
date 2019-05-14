@@ -16,72 +16,85 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import axios from 'axios';
+import parseLinkHeader from "parse-link-header"
 
-  let request = null;
+let request
 
-  const ImageSearchActions = {
+const once = (config = {}) => {
+  if (request) {
+    request.cancel("Only one request allowed at a time.");
+  }
+  request = axios.CancelToken.source();
 
-    startImageSearch(term, page) {
-      return { type: 'START_IMAGE_SEARCH', term, page };
-    },
+  config.cancelToken = request.token
+  return axios(config);
+}
 
-    receiveImageSearchResults(originalResults) {
-      const photos = Object.assign({}, originalResults.photos)
-      if (photos.photo) {
-        photos.photo = photos.photo.filter(photo => photo.needs_interstitial !== 1)
-      }
-      const results = Object.assign({}, originalResults, { photos })
-      return { type: 'RECEIVE_IMAGE_SEARCH_RESULTS', results }
-    },
+const ImageSearchActions = {
 
-    clearImageSearch() {
-      this.cancelImageSearch();
-      return { type: 'CLEAR_IMAGE_SEARCH' }
-    },
+  startImageSearch(term) {
+    return { type: 'START_IMAGE_SEARCH', term }
+  },
 
-    failImageSearch(error) {
-      return { type: 'FAIL_IMAGE_SEARCH', error };
-    },
+  receiveImageSearchResults(originalResults) {
+    const results = Object.assign({}, originalResults)
+    results.prevUrl = parseLinkHeader(results.headers.link).prev ?
+      parseLinkHeader(results.headers.link).prev.url : null
+    results.nextUrl = parseLinkHeader(results.headers.link).next ?
+      parseLinkHeader(results.headers.link).next.url : null
+    return { type: 'RECEIVE_IMAGE_SEARCH_RESULTS', results }
+  },
 
-    cancelImageSearch() {
-      if (request) {
-        request.abort();
-      }
-    },
+  clearImageSearch() {
+    this.cancelImageSearch();
+    return { type: 'CLEAR_IMAGE_SEARCH' }
+  },
 
-    search(term, page) {
-      return (dispatch) => {
-        dispatch(this.startImageSearch(term, page));
-        this.searchApiGet(term, page, dispatch);
-      }
-    },
+  failImageSearch(error) {
+    return { type: 'FAIL_IMAGE_SEARCH', error }
+  },
 
-    searchApiGet(term, page, dispatch){
-      const url = this.composeSearchUrl(term, page);
-
-      this.cancelImageSearch();
-
-      request = $.getJSON(url)
-        .done( (results) => {
-          dispatch(this.receiveImageSearchResults(results));
-        })
-        .fail( (error) => {
-          dispatch(this.failImageSearch(error));
-        });
-    },
-
-    composeSearchUrl(term, page) {
-      // This API key has been in Canvas forever, so no qualms about putting it here.
-      // Ideally this key should be rotated and stored securely elsewhere.
-      const apiKey = '734839aadcaa224c4e043eaf74391e50';
-      const sort = 'relevance';
-      const licenses = '9';
-      const per_page = '20';
-      const imageSize = 'url_m';
-
-      return `https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=true&api_key=${apiKey}&sort=${sort}&license=${licenses}&text=${term}&per_page=${per_page}&content_type=6&safe_search=1&page=${page}&privacy_filter=1&extras=license,owner_name,${imageSize},needs_interstitial`
+  cancelImageSearch() {
+    if (request) {
+      request.cancel()
     }
-  };
+  },
+
+  search(term) {
+    return (dispatch) => {
+      dispatch(this.startImageSearch(term))
+      this.searchApiGet(this.composeSearchUrl(term), dispatch)
+    }
+  },
+
+  loadMore(term, url) {
+    return (dispatch) => {
+      dispatch(this.startImageSearch(term))
+      this.searchApiGet(url, dispatch)
+    }
+  },
+
+  searchApiGet(url, dispatch){
+    this.cancelImageSearch();
+
+    const config = {
+      method: "get",
+      url: url,
+      timeout: 60000
+    }
+
+    once(config).then(response => {
+      dispatch(this.receiveImageSearchResults(response))
+    }).catch((error) => {
+      dispatch(this.failImageSearch(error))
+    })
+  },
+
+  composeSearchUrl(term) {
+    const per_page = '12';
+    return `/api/v1/image_search/?query=${term}&per_page=${per_page}`
+  }
+}
 
 export default ImageSearchActions

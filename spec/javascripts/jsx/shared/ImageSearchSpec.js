@@ -23,26 +23,24 @@ import ImageSearch from 'jsx/shared/ImageSearch'
 
 QUnit.module('ImageSearch View');
 
-const getDummySearchResults = (pageCount) => {
-  const photo = [{
+const getDummySearchResults = () => {
+  const photos = [{
     id: 1,
-    url_m: "url1"
+    description: "desc for photo 1",
+    small_url: "url1"
   },
-  {
-    id: 2,
-    url_m: "url2"
-  },
-  {
-    id: 3,
-    url_m: "url3"
-  }];
+    {
+      id: 2,
+      description: "desc for photo 2",
+      small_url: "url2"
+    },
+    {
+      id: 3,
+      description: "desc for photo 3",
+      small_url: "url3"
+    }];
 
-  const photos = {
-    pages: pageCount,
-    photo
-  };
-
-  return {photos};
+  return photos;
 }
 
 test('it renders', () => {
@@ -93,100 +91,104 @@ test('it clears search results when input is cleared', () => {
   ok(called, 'clearResults was called');
 });
 
-test('it does not render next or previous page buttons when there is only one page of results', assert => {
+test('it disables previous and next when there is only one page of results', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
   );
 
-  const searchResults = getDummySearchResults(1);
+  const searchResults = getDummySearchResults();
 
-  imageSearch.setState({searchResults}, () => {
+  imageSearch.setState({searchResults, prevUrl: null, nextUrl: null}, () => {
     ok(
-      !imageSearch.refs.imageSearchControlNext && !imageSearch.refs.imageSearchControlPrev,
-      'next and previous did not appear'
+      Boolean(imageSearch.refs.imageSearchControlNext.props.disabled &&
+        imageSearch.refs.imageSearchControlPrev.props.disabled),
+      'next and previous are disabled'
     );
     done();
   });
 });
 
-test('it only renders next when there is more than one page of results and it is not on the last page', assert => {
+test('it only enables next page when there is a next-page', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
   );
 
-  const searchResults = getDummySearchResults(2);
+  const searchResults = getDummySearchResults();
 
-  imageSearch.setState({searchResults}, () => {
+  imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
     ok(
-      imageSearch.refs.imageSearchControlNext && !imageSearch.refs.imageSearchControlPrev,
-      'only next button appeared'
+      Boolean(!imageSearch.refs.imageSearchControlNext.props.disabled &&
+        imageSearch.refs.imageSearchControlPrev.props.disabled),
+      'next button is enabled'
     );
     done();
   });
 });
 
-test('it only renders previous when there is more than one page of results and it is not on the first page', assert => {
+test('it only enables previous when there is a previous-page', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
   );
 
-  const searchResults = getDummySearchResults(2);
+  const searchResults = getDummySearchResults();
 
-  imageSearch.setState({page: 2, searchResults}, () => {
-    ok(!imageSearch.refs.imageSearchControlNext && imageSearch.refs.imageSearchControlPrev,
-      'only previous button appeared');
+  imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
+    ok(
+      Boolean(imageSearch.refs.imageSearchControlNext.props.disabled &&
+        !imageSearch.refs.imageSearchControlPrev.props.disabled),
+      'previous button is enabled');
     done();
   });
 });
 
-test('it renders next and previous when there is more than one page of results and it is on a page in-between', assert => {
+test('it enables next and previous when there are both next and previous pages', assert => {
   const done = assert.async()
   const image = TestUtils.renderIntoDocument(
     <ImageSearch />
   );
 
-  const searchResults = getDummySearchResults(3);
+  const searchResults = getDummySearchResults();
 
-  image.setState({page: 2, searchResults}, () => {
-    ok(image.refs.imageSearchControlNext && image.refs.imageSearchControlPrev,
-    'next and previous both appeared');
+  image.setState({searchResults, prevUrl: "http://prev", nextUrl: "http://next"}, () => {
+    ok(Boolean(!image.refs.imageSearchControlNext.props.disabled && !image.refs.imageSearchControlPrev.props.disabled),
+      'next and previous are both enabled');
     done();
   });
 });
 
-test('it increments the page count when next is clicked', assert => {
+test('it loads next page of results when next is clicked', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
   );
   let called = false;
-  imageSearch.incrementPageCount = () => called = true;
+  imageSearch.loadNextPage = () => called = true;
 
-  const searchResults = getDummySearchResults(2);
+  const searchResults = getDummySearchResults();
 
-  imageSearch.setState({page: 1, searchResults}, () => {
+  imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
     TestUtils.Simulate.click(ReactDOM.findDOMNode(imageSearch.refs.imageSearchControlNext));
-    ok(called, 'clicking next called incrementPageCount');
+    ok(called, 'clicking next triggered next results action');
     done();
   });
 });
 
-test('it decrements the page count when previous is clicked', assert => {
+test('it loads previous page of results when previous is clicked', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
   );
   let called = false;
-  imageSearch.decrementPageCount = () => called = true;
+  imageSearch.loadPreviousPage = () => called = true;
 
-  const searchResults = getDummySearchResults(2);
+  const searchResults = getDummySearchResults();
 
-  imageSearch.setState({page: 2, searchResults}, () => {
+  imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
     TestUtils.Simulate.click(ReactDOM.findDOMNode(imageSearch.refs.imageSearchControlPrev));
-    ok(called, 'clicking previous called decrementPageCount');
+    ok(called, 'clicking previous triggered previous results action');
     done();
   });
 });
@@ -197,7 +199,7 @@ test('it renders search results', assert => {
     <ImageSearch />
   );
 
-  const searchResults = getDummySearchResults(1);
+  const searchResults = getDummySearchResults();
 
   imageSearch.setState({searchResults}, () => {
     strictEqual(

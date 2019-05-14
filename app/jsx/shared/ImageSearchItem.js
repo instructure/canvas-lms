@@ -32,16 +32,15 @@ class ImageSearchItem extends React.Component {
 
   render () {
     return (
-        <button className="ImageSearch__item"
-                type="button"
-           onClick={this.handleClick}
-           ref="searchImageItem"
-        >
-          <img className="ImageSearch__display"
-            alt={this.props.description}
-            src={this.props.src}
-          />
-        </button>
+      <button className="ImageSearch__item"
+              type="button"
+              onClick={this.handleClick}
+      >
+        <img className="ImageSearch__display"
+             alt={this.props.description}
+             src={this.props.src}
+        />
+      </button>
     )
   }
 }

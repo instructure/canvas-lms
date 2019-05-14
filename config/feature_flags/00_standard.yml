@@ -436,11 +436,3 @@ rce_enhancements:
   root_opt_in: true
   beta: true
   development: true
-unsplash_image_search:
-  state: hidden
-  display_name: Unsplash Image Searches
-  description: |-
-    When searching for Course Card Images, Unsplash will be used instead of Flickr
-  applies_to: RootAccount
-  beta: true
-  development: true

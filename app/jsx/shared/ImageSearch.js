@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!image_search'
 import ImageSearchActions from './actions/ImageSearchActions'
 import ImageSearchStore from './stores/ImageSearchStore'
@@ -29,6 +30,10 @@ import { Link } from '@instructure/ui-elements'
 import { View, Flex, FlexItem } from '@instructure/ui-layout'
 
 export default class ImageSearch extends React.Component {
+  static propTypes = {
+    selectImage: PropTypes.func
+  }
+
   state = ImageSearchStore.getState()
 
   componentWillMount() {
@@ -53,60 +58,56 @@ export default class ImageSearch extends React.Component {
     }
   }
 
-  search(value, page) {
-    ImageSearchStore.dispatch(ImageSearchActions.search(value, page))
+  search(value) {
+    ImageSearchStore.dispatch(ImageSearchActions.search(value))
   }
 
   clearResults() {
     ImageSearchStore.dispatch(ImageSearchActions.clearImageSearch())
   }
 
-  incrementPageCount = () => {
-    this.search(this.state.searchTerm, this.state.page + 1)
+  loadNextPage = () => {
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.term, this.state.nextUrl))
   }
 
-  decrementPageCount = () => {
-    this.search(this.state.searchTerm, this.state.page - 1)
+  loadPreviousPage = () => {
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.term, this.state.prevUrl))
   }
 
   renderPagination(photos) {
-    if (!photos) {
+    if (!photos || photos.length === 0) {
       return null
     }
-    const showPrevious = this.state.page > 1 && !this.state.searching
-    const showNext = this.state.page < photos.pages && !this.state.searching
 
     return (
       <Flex as="div" width="100%" justifyItems="center" margin="small 0 small">
-        {showPrevious && (
-          <FlexItem margin="auto small auto small">
-            <Link
-              ref="imageSearchControlPrev"
-              onClick={this.decrementPageCount}
-              icon={IconArrowOpenStartLine}
-            >
-              {I18n.t('Previous Page')}
-            </Link>
-          </FlexItem>
-        )}
-        {showNext && (
-          <FlexItem>
-            <Link
-              ref="imageSearchControlNext"
-              onClick={this.incrementPageCount}
-              icon={IconArrowOpenEndLine}
-              iconPlacement="end"
-            >
-              {I18n.t('Next Page')}
-            </Link>
-          </FlexItem>
-        )}
+        <FlexItem margin="auto small auto small">
+          <Link
+            ref="imageSearchControlPrev"
+            onClick={this.loadPreviousPage}
+            icon={IconArrowOpenStartLine}
+            disabled={!this.state.prevUrl}
+          >
+            {I18n.t('Previous Page')}
+          </Link>
+        </FlexItem>
+        <FlexItem>
+          <Link
+            ref="imageSearchControlNext"
+            onClick={this.loadNextPage}
+            icon={IconArrowOpenEndLine}
+            iconPlacement="end"
+            disabled={!this.state.nextUrl}
+          >
+            {I18n.t('Next Page')}
+          </Link>
+        </FlexItem>
       </Flex>
     )
   }
 
   render() {
-    const photos = this.state.searchResults.photos
+    const photos = this.state.searchResults
 
     return (
       <div>
@@ -127,16 +128,17 @@ export default class ImageSearch extends React.Component {
 
         {this.renderPagination(photos)}
         {!this.state.searching ? (
-          <div className="FlickrSearch__images">
+          <div className="ImageSearch__images">
+
             {photos &&
-              photos.photo.map(photo => (
-                <ImageSearchItem
-                  key={photo.id}
-                  src={photo.url_m}
-                  description={this.state.searchTerm}
-                  selectImage={this.props.selectImage}
-                />
-              ))}
+            photos.map(photo => (
+              <ImageSearchItem
+                key={photo.id}
+                src={photo.small_url}
+                description={photo.description ? photo.description : this.state.searchTerm}
+                selectImage={this.props.selectImage}
+              />
+            ))}
           </div>
         ) : (
           <div className="ImageSearch__loading">

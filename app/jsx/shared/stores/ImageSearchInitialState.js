@@ -17,10 +17,9 @@
  */
 
   const ImageSearchInitialState = {
-        searching: false,
-        searchResults: [],
-        searchTerm: '',
-        page: 1
+    searching: false,
+    searchResults: [],
+    searchTerm: '',
   };
 
 export default ImageSearchInitialState

@@ -148,7 +148,7 @@ class ApplicationController < ActionController::Base
         k12: k12?,
         use_responsive_layout: use_responsive_layout?,
         use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
-        use_unsplash_image_search: @domain_root_account&.feature_enabled?(:unsplash_image_search),
+        use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
