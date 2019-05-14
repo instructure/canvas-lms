@@ -620,12 +620,29 @@ describe SplitUsers do
         n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
         NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: 'immediately')
 
-        UserMerge.from(restored_user).into(shard1_source_user)
-        cc = shard1_source_user.communication_channels.where(path: 'a@example.com').take!
-        expect(cc.notification_policies.count).to eq 1
+        @shard1.activate do
+          UserMerge.from(restored_user).into(shard1_source_user)
+          cc = shard1_source_user.communication_channels.where(path: 'a@example.com').take!
+          expect(cc.notification_policies.count).to eq 1
+        end
 
         SplitUsers.split_db_users(shard1_source_user)
         expect(shard1_source_user.communication_channels.count).to eq 0
+      end
+
+      it "should copy notification policies on conflict" do
+        og_cc = restored_user.communication_channels.create!(:path => 'a@example.com') { |cc| cc.workflow_state = 'active' }
+
+        n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
+        NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: 'immediately')
+        # conflict_cc
+        cc = shard1_source_user.communication_channels.create!(:path => 'a@example.com') { |cc| cc.workflow_state = 'active' }
+
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(cc.notification_policies.count).to eq 1
+
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(shard1_source_user.communication_channels.count).to eq 1
       end
 
     end
