@@ -6,6 +6,21 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2019-03-09
+### Changes
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [SIS Imports API] | Imports SIS Data Endpoint | Added change_threshold parameter
+
+[SIS Imports API]: sis_imports.html
+
+### Removals
+| API Responses | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Users API] | To Do Items Endpoint | Removed mention of user dashboard, as this API call is not used for the dashboard
+
+[Users API]: users.html
+
 ## 2019-02-16
 ### Additions
 | API Responses | Function |      |
