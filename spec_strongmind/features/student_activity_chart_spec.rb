@@ -1,7 +1,7 @@
-
 require_relative '../rails_helper'
 
 RSpec.describe 'Student Access Report', type: :feature, js: true do
+  include_context 'stubbed_network'
   describe 'activity chart' do
     before do
       Chronic.time_class = Time.zone

@@ -1,6 +1,8 @@
 require_relative '../rails_helper'
 
+
 RSpec.describe 'Enrollment', type: :model do
+  include_context 'stubbed_network'
   describe "#after_commit" do
     let(:enrollment) do 
       Enrollment.create(

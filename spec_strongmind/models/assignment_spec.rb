@@ -1,6 +1,7 @@
 require_relative '../rails_helper'
 
 RSpec.describe 'Assignment', type: :model do
+  include_context 'stubbed_network'
   describe 'Callbacks' do
     describe 'after_save' do
       let!(:assign) { assignment_model }

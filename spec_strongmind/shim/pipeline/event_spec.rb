@@ -1,6 +1,7 @@
 require_relative '../../rails_helper'
 
 RSpec.describe 'pipeline service', type: :model do
+  include_context 'stubbed_network'
   let(:course) { create_course }
 
   before :each do
