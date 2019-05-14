@@ -17,7 +17,7 @@
 #
 class UserMergeDataItem < ActiveRecord::Base
   belongs_to :user
-  belongs_to :merge_data, class_name: 'UserMergeData', inverse_of: :items
+  belongs_to :merge_data, class_name: 'UserMergeData', inverse_of: :items, foreign_key: "user_merge_data_id"
 
   serialize :item
 end
