@@ -45,6 +45,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.5.2', require: false
 gem "after_transaction_commit", '2.0.0'
+gem "aws-sdk-dynamodb", "1.5.0"
 gem "aws-sdk-kinesis", '1.6.0', require: false
 gem "aws-sdk-s3", '1.19.0', require: false
 gem "aws-sdk-sns", '1.5.0', require: false
@@ -148,6 +149,7 @@ gem 'broadcast_policy', path: "gems/broadcast_policy"
 gem 'canvas_breach_mitigation', path: 'gems/canvas_breach_mitigation'
 gem 'canvas_color', path: 'gems/canvas_color'
 gem 'canvas_crummy', path: 'gems/canvas_crummy'
+gem "canvas_dynamodb", path: "gems/canvas_dynamodb"
 gem 'canvas_ext', path: 'gems/canvas_ext'
 gem 'canvas_http', path: 'gems/canvas_http'
 gem 'canvas_kaltura', path: 'gems/canvas_kaltura'
@@ -180,8 +182,3 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.3'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
-
-group :dynamodb do
-  gem "canvas_dynamodb", path: "gems/canvas_dynamodb"
-  gem "aws-sdk-dynamodb", "1.5.0"
-end

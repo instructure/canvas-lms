@@ -43,7 +43,6 @@ module Canvas
           }
           opts[:endpoint] = config[:endpoint] if config[:endpoint]
           fingerprint = "#{category}:#{environment}"
-          Bundler.require 'dynamodb'
           begin
             @clients[key] = CanvasDynamoDB::Database.new(
               fingerprint,
