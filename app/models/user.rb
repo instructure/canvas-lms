@@ -2278,12 +2278,12 @@ class User < ActiveRecord::Base
     # the results.
     return user_roles(root_account, true) if exclude_deleted_accounts
 
-    return @roles if @roles
-
-    root_account.shard.activate do
-      base_key = ['user_roles_for_root_account5', root_account.global_id].cache_key
-      @roles = Rails.cache.fetch_with_batched_keys(base_key, batch_object: self, batched_keys: [:enrollments, :account_users]) do
-        user_roles(root_account)
+    RequestCache.cache('user_roles', self, root_account) do
+      root_account.shard.activate do
+        base_key = ['user_roles_for_root_account5', root_account.global_id].cache_key
+        Rails.cache.fetch_with_batched_keys(base_key, batch_object: self, batched_keys: [:enrollments, :account_users]) do
+          user_roles(root_account)
+        end
       end
     end
   end
