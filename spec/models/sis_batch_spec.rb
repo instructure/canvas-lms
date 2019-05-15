@@ -65,6 +65,25 @@ describe SisBatch do
     end
   end
 
+  it 'should restore scores when restoring enrollments' do
+    course = @account.courses.create!(name: 'one', sis_source_id: 'c1')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
+    enrollment = course.enroll_user(user, 'StudentEnrollment', enrollment_state: 'active')
+    assignment = assignment_model(course: course)
+    submission = assignment.find_or_create_submission(user)
+    submission.submission_type = "online_quiz"
+    submission.save!
+    batch = process_csv_data([%{course_id,user_id,role,status,section_id
+                                c1,u1,student,deleted,}])
+    expect(submission.reload.workflow_state).to eq 'deleted'
+    expect(enrollment.reload.workflow_state).to eq 'deleted'
+    expect(enrollment.scores.exists?).to eq false
+    batch.restore_states_for_batch
+    expect(submission.reload.workflow_state).to eq 'submitted'
+    expect(enrollment.reload.workflow_state).to eq 'active'
+    expect(enrollment.scores.exists?).to eq true
+  end
+
   it "should not add attachments to the list" do
     create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
     create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
