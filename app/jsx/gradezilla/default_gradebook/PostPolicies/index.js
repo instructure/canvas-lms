@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import tz from 'timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -70,7 +71,7 @@ export default class PostPolicies {
 
     userIds.forEach(userId => {
       const submission = this._gradebook.getSubmission(userId, assignmentId)
-      submission.posted_at = postedAt
+      submission.posted_at = tz.parse(postedAt)
       this._gradebook.updateSubmission(submission)
     })
 

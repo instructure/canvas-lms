@@ -310,7 +310,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         }
         postedOrHiddenInfo = {
           assignmentId: '2301',
-          postedAt: new Date().toISOString(),
+          postedAt: new Date(),
           userIds: ['1101']
         }
 
@@ -341,7 +341,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
         const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
         onPosted(postedOrHiddenInfo)
-        strictEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
+        deepEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
       })
     })
   })

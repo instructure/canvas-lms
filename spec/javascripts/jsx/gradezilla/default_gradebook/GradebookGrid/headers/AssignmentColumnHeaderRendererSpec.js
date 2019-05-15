@@ -195,6 +195,13 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       deepEqual(component.props.assignment.submissionTypes, ['online_text_entry'])
     })
 
+    test('includes the assignment post manually property', () => {
+      buildGradebook()
+      assignment.post_manually = true
+      render()
+      strictEqual(component.props.assignment.postManually, true)
+    })
+
     test('includes the curve grades action', () => {
       buildGradebook()
       sinon.spy(gradebook, 'getCurveGradesAction')
