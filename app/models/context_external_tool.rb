@@ -817,7 +817,8 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.global_navigation_visibility_for_user(root_account, user)
-    Rails.cache.fetch(['external_tools/global_navigation/visibility', root_account.asset_string, user].cache_key) do
+    Rails.cache.fetch_with_batched_keys(['external_tools/global_navigation/visibility', root_account.asset_string].cache_key,
+        batch_object: user, batched_keys: [:enrollments, :account_users]) do
       # let them see admin level tools if there are any courses they can manage
       if root_account.grants_right?(user, :manage_content) ||
         Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists?
