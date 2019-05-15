@@ -18,9 +18,9 @@
 
 import React from 'react'
 import I18n from 'i18n!external_tools'
-import {View} from '@instructure/ui-layout'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import IconLti from '@instructure/ui-icons/lib/Line/IconLti'
+import { View } from '@instructure/ui-layout/lib/components';
 
 class ConfigurationFormLti13 extends React.Component {
   constructor(props) {
@@ -61,7 +61,7 @@ class ConfigurationFormLti13 extends React.Component {
 
   render() {
     return (
-      <View display="block" margin="0 0 small 0">
+      <View as="div" margin="0 0 small 0">
         <TextInput
           name="client_id"
           value={this.state.clientId}
@@ -69,7 +69,11 @@ class ConfigurationFormLti13 extends React.Component {
           icon={() => <IconLti />}
           ref={this.clientIdInput}
           onChange={this.setClientId}
-          messages={this.state.messages}
+          messages={
+            [
+              { text: I18n.t('To obtain a client ID, an account admin will need to generate an LTI developer key.'), type: 'hint' }
+            ].concat(this.state.messages)
+          }
           required
         />
       </View>
