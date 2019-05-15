@@ -18,7 +18,7 @@
 require "aws-sdk-dynamodb"
 require "benchmark"
 
-module CanvasDyanmoDB
+module CanvasDynamoDB
   require "canvas_dynamodb/database"
   require "canvas_dynamodb/batch_builder_base"
   require "canvas_dynamodb/batch_get_builder"
