@@ -39,7 +39,6 @@
 
 .ImageSearch__item {
   height: $ic-sp*10;
-  width: $ic-sp*15;
   margin: $ic-sp;
   position: relative;
   background: transparent;
@@ -54,10 +53,6 @@
 }
 
 .ImageSearch__display {
-  background-color: $ic-color-neutral;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  width: 100%;
+  width: auto;
   height: 100%;
 }
