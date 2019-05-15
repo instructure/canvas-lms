@@ -91,7 +91,10 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     student_enrollment.send("conclude")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    check_edit_entry(entry)
+    wait_for_ajaximations
+
+    fj("#entry-#{entry.id} .al-trigger").click
+    expect(fj('.al-options:visible').text).to include("Edit (Disabled)")
   end
 
   it "should not allow deletes for a concluded student", priority: "2", test_id: 222526 do
@@ -102,7 +105,10 @@ describe "threaded discussions" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     student_enrollment.send("conclude")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    check_delete_entry(entry)
+    wait_for_ajaximations
+
+    fj("#entry-#{entry.id} .al-trigger").click
+    expect(fj('.al-options:visible').text).to include("Delete (Disabled)")
   end
 
   it "should allow edits to discussion with replies", priority: "1", test_id: 150513 do
@@ -133,7 +139,7 @@ describe "threaded discussions" do
     fj("#entry-#{entry.id} .al-trigger").click
     wait_for_ajaximations
 
-    expect(fj('.al-options:visible').text).to_not include("Edit")
+    expect(fj('.al-options:visible').text).to include("Edit (Disabled)")
   end
 
   it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do

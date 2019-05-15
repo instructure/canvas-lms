@@ -58,6 +58,7 @@ export default class Entry extends Backbone.Model
     highlight: false
 
   computedAttributes: [
+    'isAuthorsEntry'
     'canModerate'
     'canReply'
     'hiddenName'
@@ -125,12 +126,18 @@ export default class Entry extends Backbone.Model
       'replies'
       'author'
 
+  ##
+  # Computed attribute to determine if the entry was created by
+  # the current user
+  isAuthorsEntry: ->
+    return true if @get('user_id') + '' == ENV.DISCUSSION.CURRENT_USER.id + ''
+    false
+
   hiddenName: ->
     if ENV.DISCUSSION.HIDE_STUDENT_NAMES
-      isGradersEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
       isStudentsEntry = @get('user_id')+'' is ENV.DISCUSSION.STUDENT_ID
 
-      if isGradersEntry
+      if @isAuthorsEntry()
         @get('author').display_name
       else if isStudentsEntry
         I18n.t('this_student', "This Student")
@@ -148,8 +155,7 @@ export default class Entry extends Backbone.Model
   # Computed attribute to determine if the entry can be moderated
   # by the current user
   canModerate: ->
-    isAuthorsEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
-    isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
+    @isAuthorsEntry() and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
 
   ##
   # Computed attribute to determine if the entry can be replied to
