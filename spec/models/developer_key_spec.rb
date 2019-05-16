@@ -86,14 +86,14 @@ describe DeveloperKey do
         subject
       end
 
-      context 'is_site_admin is true' do
+      context 'when account is site admin' do
         subject do
           @shard1.activate do
-            developer_key.disable_external_tools!(is_site_admin)
+            developer_key.disable_external_tools!(account)
           end
         end
 
-        let(:is_site_admin) { true }
+        let(:account) { Account.site_admin }
 
         it 'disables tools on shard 1' do
           expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
@@ -104,14 +104,14 @@ describe DeveloperKey do
         end
       end
 
-      context 'is_site_admin is false' do
+      context 'account is not site admin' do
         subject do
           @shard1.activate do
-            developer_key.disable_external_tools!(is_site_admin)
+            developer_key.disable_external_tools!(account)
           end
         end
 
-        let(:is_site_admin) { false }
+        let(:account) { shard_1_tool.root_account }
 
         it 'disables associated tools on the active shard' do
           expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
@@ -126,20 +126,20 @@ describe DeveloperKey do
     describe 'enable_external_tools!' do
       subject do
         @shard1.activate do
-          developer_key.enable_external_tools!(is_site_admin)
+          developer_key.enable_external_tools!(account)
         end
       end
 
       before do
         developer_key
-        @shard1.activate { tool_configuration }
+        @shard1.activate { tool_configuration.update!(privacy_level: 'anonymous') }
         shard_1_tool.update!(workflow_state: 'disabled')
         shard_2_tool.update!(workflow_state: 'disabled')
         subject
       end
 
-      context 'is_site_admin is true' do
-        let(:is_site_admin) { true }
+      context 'account is site admin' do
+        let(:account) { Account.site_admin }
 
         it 'enables tools on shard 1' do
           expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
@@ -151,7 +151,7 @@ describe DeveloperKey do
       end
 
       context 'is_site_admin is false' do
-        let(:is_site_admin) { false }
+        let(:account) { shard_1_tool.root_account }
 
         it 'enables tools on shard 1' do
           expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'

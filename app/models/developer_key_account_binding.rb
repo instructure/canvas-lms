@@ -117,9 +117,9 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   def update_tools!
     if disable_tools?
-      developer_key.disable_external_tools!(site_admin_shard_active?)
+      developer_key.disable_external_tools!(account)
     elsif enable_tools?
-      developer_key.enable_external_tools!(site_admin_shard_active?)
+      developer_key.enable_external_tools!(account)
     end
   end
 
@@ -137,9 +137,5 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   def infer_workflow_state
     self.workflow_state ||= DEFAULT_STATE
-  end
-
-  def site_admin_shard_active?
-    Shard.current == Account.site_admin.shard
   end
 end
