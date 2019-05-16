@@ -76,7 +76,7 @@
     background-color: inherit;
     border-color: var(--canvasSecondaryButtonBorderColor);
     color: inherit;
-    opacity: .5;
+    opacity: 0.5;
   }
   .tox .tox-button--secondary:focus:not(:disabled) {
     background-color: inherit;
@@ -148,7 +148,7 @@
   }
   .tox .tox-collection__item--state-disabled {
     background-color: unset;
-    color: rgba(45, 59, 69, 0.5);
+    opacity: 0.5;
     cursor: default;
   }
   .tox .tox-collection--list .tox-collection__item--enabled {
@@ -339,11 +339,11 @@
     border-color: #cccccc;
   }
   .tox .tox-insert-table-picker .tox-insert-table-picker__selected {
-    background-color: rgba(52, 152, 219, 0.5);
-    border-color: rgba(52, 152, 219, 0.5);
+    background-color: var(--tableSelectorHighlightColor);
+    border-color: var(--tableSelectorHighlightColor);
   }
   .tox .tox-insert-table-picker__label {
-    color: rgba(45, 59, 69, 0.6);
+    color: var(--canvasTextColor);
   }
   .tox .tox-menu {
     background-color: var(--canvasBackgroundColor);
@@ -356,7 +356,7 @@
     color: var(--canvasButtonColor);
   }
   .tox .tox-mbtn[disabled] {
-    color: rgba(45, 59, 69, 0.5);
+    opacity: 0.5;
   }
   .tox .tox-mbtn:hover:not(:disabled) {
     background: var(--toolbarButtonHoverBackground);
@@ -465,14 +465,14 @@
   .tox .tox-tbtn--disabled:hover,
   .tox .tox-tbtn:disabled,
   .tox .tox-tbtn:disabled:hover {
-    color: rgba(45, 59, 69, 0.5);
+    opacity: 0.5;
   }
   .tox .tox-tbtn--disabled svg,
   .tox .tox-tbtn--disabled:hover svg,
   .tox .tox-tbtn:disabled svg,
   .tox .tox-tbtn:disabled:hover svg {
     /* stylelint-disable-line no-descending-specificity */
-    fill: rgba(45, 59, 69, 0.5);
+    opacity: 0.5;
   }
   .tox .tox-tbtn__select-chevron svg {
     fill: var(--canvasButtonColor);
@@ -495,7 +495,7 @@
   .tox .tox-split-button.tox-tbtn--disabled:focus,
   .tox .tox-split-button.tox-tbtn--disabled .tox-tbtn:hover,
   .tox .tox-split-button.tox-tbtn--disabled .tox-tbtn:focus {
-    color: rgba(45, 59, 69, 0.5);
+    opacity: 0.5;
   }
   .tox .tox-toolbar {
     background-color: var(--canvasBackgroundColor);

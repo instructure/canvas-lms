@@ -154,7 +154,7 @@
     background-image: none;
     border-color: #3498db;
     box-shadow: none;
-    color: rgba(255, 255, 255, 0.5);
+    opacity: 0.5;
     cursor: not-allowed;
   }
   .tox .tox-button:focus:not(:disabled) {
@@ -199,7 +199,8 @@
     background-image: none;
     border-color: #f0f0f0;
     box-shadow: none;
-    color: rgba(45, 59, 69, 0.5);
+    color: inherit;
+    opacity: 0.5;
   }
   .tox .tox-button--secondary:focus:not(:disabled) {
     background-color: #e3e3e3;
@@ -1372,11 +1373,11 @@
     margin: -4px 0;
   }
   .tox .tox-insert-table-picker .tox-insert-table-picker__selected {
-    background-color: rgba(52, 152, 219, 0.5);
-    border-color: rgba(52, 152, 219, 0.5);
+    background-color: var(--tableSelectorHighlightColor);
+    border-color: var(--tableSelectorHighlightColor);
   }
   .tox .tox-insert-table-picker__label {
-    color: rgba(45, 59, 69, 0.6);
+    color: var(--canvasTextColor);
     display: block;
     font-size: 14px;
     padding: 4px;
@@ -1452,7 +1453,7 @@
     background-color: none;
     border-color: none;
     box-shadow: none;
-    color: rgba(45, 59, 69, 0.5);
+    opacity: 0.5;
     cursor: not-allowed;
   }
   .tox .tox-mbtn:hover:not(:disabled) {

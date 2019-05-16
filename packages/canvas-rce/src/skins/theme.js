@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { darken } from '@instructure/ui-color-utils'
+import { darken, lighten, alpha } from '@instructure/ui-color-utils'
 
  // pull canvas theme values we need for the rce skin
 export default function generator ({ borders, colors, typography }) {
@@ -29,8 +29,10 @@ export default function generator ({ borders, colors, typography }) {
     canvasSuccessColor: colors.textSuccess,
     canvasBorderColor: colors.borderMedium,
     toolbarButtonHoverBackground: darken(colors.backgroundLightest, 5), // copied from INSTUI "light" Button
+
     activeMenuItemBackground: colors.backgroundBrand,
     activeMenuItemLabelColor: colors.textLightest,
+    tableSelectorHighlightColor: alpha(lighten(colors.brand, 10), 50),
 
     canvasLinkColor: colors.link,
     canvasLinkDecoration: 'none',
@@ -63,7 +65,7 @@ export default function generator ({ borders, colors, typography }) {
 
     canvasFontFamily: typography.fontFamily,
     canvasFontSize: '1rem',
-    canvasFontSizeSmall: typography.fontSizeSmall,
+    canvasFontSizeSmall: typography.fontSizeSmall
   }
   vars.tinySplitButtonChevronHoverBackground = darken(vars.toolbarButtonHoverBackground, 10)
   return vars
@@ -84,6 +86,7 @@ generator['canvas'] = function(variables) {
 
     activeMenuItemBackground: variables['ic-brand-button--primary-bgd'],
     activeMenuItemLabelColor: variables['ic-brand-button--primary-text'],
+    tableSelectorHighlightColor: alpha(lighten(variables['ic-brand-primary'], 10), 50)
   }
 }
 
