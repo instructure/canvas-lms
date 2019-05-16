@@ -16,4 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'compiled/bundles/modules/content_migration_setup'
+import 'compiled/modules/content_migration_setup'

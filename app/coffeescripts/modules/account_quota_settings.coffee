@@ -18,9 +18,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
-import Account from '../../models/Account'
-import QuotasView from '../../views/accounts/settings/QuotasView'
-import ManualQuotasView from '../../views/accounts/settings/ManualQuotasView'
+import Account from '../models/Account'
+import QuotasView from '../views/accounts/settings/QuotasView'
+import ManualQuotasView from '../views/accounts/settings/ManualQuotasView'
 
 if ENV.ACCOUNT
   account = new Account(ENV.ACCOUNT)
