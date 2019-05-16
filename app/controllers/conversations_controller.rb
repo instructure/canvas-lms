@@ -284,7 +284,8 @@ class ConversationsController < ApplicationController
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id.to_s,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
         :CAN_MESSAGE_ACCOUNT_CONTEXT => valid_account_context?(@domain_root_account),
-        :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
+        :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size,
+        :CAN_DELETE_INBOX_MESSAGES => can_do(Account.first, @current_user, :delete_inbox_messages)
       }
 
       notes_enabled_accounts = @current_user.associated_accounts.where(enable_user_notes: true)

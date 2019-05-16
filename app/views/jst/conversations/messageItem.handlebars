@@ -66,9 +66,11 @@
             <li>
               <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
             </li>
-            <li>
-              <a href="#" class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
-            </li>
+            {{#if can_delete}}
+              <li>
+                <a href="#" class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
+              </li>
+            {{/if}}
           </ul>
         </div>
       </li>

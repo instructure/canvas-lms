@@ -51,7 +51,8 @@ define [
         context   = @model.toJSON().conversation
         context.starToggleMessage = if @model.starred() then @messages['unstar'] else @messages['star']
         context.archiveToggleMessage = if @model.get('workflow_state') == 'archived' then @messages['unarchive'] else @messages['archive']
-        $template = $(template(context))
+        context.can_delete = ENV.CONVERSATIONS.CAN_DELETE_INBOX_MESSAGES
+        $template = $(template(context)) 
         @model.messageCollection.each (message) =>
           message.set('conversation_id', context.id) unless message.get('conversation_id')
           message.set('cannot_reply', context.cannot_reply) if context.cannot_reply
