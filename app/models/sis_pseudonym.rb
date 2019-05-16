@@ -38,6 +38,7 @@ class SisPseudonym
   def pseudonym
     result = @context.sis_pseudonym if @context.class <= Enrollment
     result ||= find_on_enrollment_for_context
+    result = nil if exclude_deleted?(result)
     result ||= find_in_home_account
     result ||= find_in_other_accounts
     if result
@@ -47,6 +48,11 @@ class SisPseudonym
   end
 
   private
+
+  def exclude_deleted?(result)
+    result&.workflow_state == 'deleted' && !@include_deleted
+  end
+
   def find_on_enrollment_for_context
     if @context.is_a?(Course) || @context.is_a?(CourseSection)
       @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
