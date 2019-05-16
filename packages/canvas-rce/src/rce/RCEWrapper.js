@@ -403,6 +403,16 @@ class RCEWrapper extends React.Component {
     this.setState({path})
   }
 
+  onResize = (_e, coordinates) => {
+    const container = this.mceInstance().getContainer()
+    const currentContainerHeight = Number.parseInt(container.style.height, 10)
+    if (isNaN(currentContainerHeight)) return
+    const modifiedHeight = currentContainerHeight + coordinates.deltaY
+    container.style.height = `${modifiedHeight}px`
+    // play nice and send the same event that the silver theme would send
+    this.mceInstance().fire('ResizeEditor')
+  }
+
   componentWillUnmount() {
     if (!this._destroyCalled) {
       this.destroy();
@@ -527,6 +537,7 @@ class RCEWrapper extends React.Component {
           path={this.state.path}
           wordCount={this.state.wordCount}
           isHtmlView={this.state.isHtmlView}
+          onResize={this.onResize}
         />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
       </div>

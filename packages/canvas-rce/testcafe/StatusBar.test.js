@@ -23,6 +23,7 @@ import {Selector} from 'testcafe'
 fixture`StatusBar`.page`./testcafe.html`
 
 const tinyIframe = Selector('.tox-edit-area__iframe')
+const dragHandle = Selector('[name="IconDragHandle"]')
 
 test('toggles between rce and html views', async t => {
   const textarea = Selector('#textarea')
@@ -70,4 +71,16 @@ test('displays the current html path', async t => {
     .switchToMainWindow()
     .expect(Selector('span').withText(/p.*strong.*em/).exists)
     .ok()
+})
+
+test('drag handle resizes the editor', async t => {
+  const initialSize = await tinyIframe.boundingClientRect
+  await t.drag(dragHandle, -100, 400)
+  let finalSize = await tinyIframe.boundingClientRect
+  await t.expect(finalSize.height).eql(initialSize.height + 400)
+  await t.expect(finalSize.width).eql(initialSize.width)
+  await t.drag(dragHandle, -100, -300)
+  finalSize = await tinyIframe.boundingClientRect
+  await t.expect(finalSize.height).eql(initialSize.height + 100)
+  await t.expect(finalSize.width).eql(initialSize.width)
 })

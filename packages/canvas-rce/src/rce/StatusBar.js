@@ -26,12 +26,14 @@ import { Text } from '@instructure/ui-elements'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import { IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
+import ResizeHandle from './ResizeHandle'
 
 StatusBar.propTypes = {
   onToggleHtml: func,
   path: arrayOf(string),
   wordCount: number,
-  isHtmlView: bool
+  isHtmlView: bool,
+  onResize: func // react-draggable onDrag handler.
 }
 
 function renderPath({path}) {
@@ -58,6 +60,7 @@ function emptyTagIcon() {
     </SVGIcon>
   )
 }
+
 export default function StatusBar(props) {
   if (props.isHtmlView) {
     const toggleToRich = formatMessage('Switch to rich text editor')
@@ -79,7 +82,7 @@ export default function StatusBar(props) {
     const toggleToHtml = formatMessage('Switch to raw html editor')
 
     return (
-      <Flex margin="x-small" data-testid="RCEStatusBar">
+      <Flex margin="x-small 0 x-small x-small" data-testid="RCEStatusBar">
         <Flex.Item grow>
           <View>{renderPath(props)}</View>
         </Flex.Item>
@@ -109,6 +112,10 @@ export default function StatusBar(props) {
               <ScreenReaderContent>{toggleToHtml}</ScreenReaderContent>
             </Button>
           </View>
+        </Flex.Item>
+
+        <Flex.Item>
+          <ResizeHandle onDrag={props.onResize} />
         </Flex.Item>
       </Flex>
     )
