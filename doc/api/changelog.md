@@ -11,6 +11,30 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 <div class="changelog"></div>
 
+## 2019-06-01
+### Additions
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Files API] | Get uploaded media folder for user Endpoint | Added endpoint |
+| [Originality Report API] | Create an Originality Report<br><br>Edit an Originality Report | Added originality_report[error_message] parameter
+
+[Files API]: files.html
+[Originality Report API]: originality_reports.html
+
+<p></p>
+| API Responses | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Originality Report API] | Originality Report Object | Returns Error_report |
+
+[Originality Report API]: originality_reports.html
+
+### Removals
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Uploading Files API] | Uploading via POST Process | Step 3: Removed mention of POST requests in favor of GET requests for forward compatibility
+
+[Uploading Files API]: file.file_uploads.html
+
 ## 2019-05-11
 ### Additions
 | API Calls | Function |  |
@@ -28,7 +52,7 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 | API Calls | Function |  |
 |----------------------|----------------------|--------------------------|
 | [Submissions API] | Grade or Comment on a Submission Endpoint | Rubric_assessment parameter: Added rubric_assessment[criterion_id][rating_id] sub-parameter<br><br>Added rating IDs to example rubric in description
-|  [Users API]         | Update User Settings Endpoint | Hide_dashcard_color_overlays: Added parameter
+|  [Users API]         | Update User Settings Endpoint | Added hide_dashcard_color_overlays parameter
 
 [Submissions API]: submissions.html
 [Users API]: users.html
@@ -49,19 +73,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 |                          | List Items for Selective Import Endpoint | Added endpoint
 
 [Content Migrations API]: content_migrations.html
-
-
-## 2019-03-09
-### Changes
-| API Calls | Function |  |
-|----------------------|----------------------|--------------------------|
-| [SIS Imports API] | Imports SIS Data Endpoint | Change_threshold parameter: added clarification for diffing percentage calculation
-
-[SIS Imports API]: sis_imports.html
-
-### Removals
-| API Responses | Function |      |
-|----------------------|----------------------|--------------------------|
-| [Users API] | To Do Items Endpoint | Removed mention of user dashboard, as this API call is not used for the dashboard
-
-[Users API]: users.html

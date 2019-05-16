@@ -67,7 +67,7 @@ module Lti
         end
       end
       unless instance_variable_defined?(:@pseudonym)
-        @pseudonym = SisPseudonym.for(@canvas_user, @canvas_root_account, type: :trusted, require_sis: false)
+        @pseudonym = SisPseudonym.for(@canvas_user, @canvas_context, type: :trusted, require_sis: false, root_account: @canvas_root_account)
       end
       @pseudonym
     end

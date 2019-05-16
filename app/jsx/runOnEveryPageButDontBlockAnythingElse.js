@@ -46,7 +46,7 @@ import 'LtiThumbnailLauncher'
 // this will make nested apps that use the hash happy
 $('#skip_navigation_link').on(
   'click',
-  preventDefault(() => {
+  preventDefault(function () {
     $($(this).attr('href'))
       .attr('tabindex', -1)
       .focus()

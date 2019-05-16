@@ -791,11 +791,7 @@ class SisBatch < ActiveRecord::Base
             if retry_count == 0
               # restore the items and return the ids of the items that changed
               ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
-              if type == 'Enrollment'
-                ids.each_slice(1000) do |slice|
-                  Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: ["restore_states_batch_updater", account.global_id]}, slice, self.account)
-                end
-              end
+              finalize_enrollments(ids) if type == 'Enrollment'
               count += update_restore_progress(restore_progress, data, count, total)
             else
               # try to restore each row one at a time
@@ -811,9 +807,7 @@ class SisBatch < ActiveRecord::Base
                   end
                 end
               end
-              successful_ids.each_slice(1000) do |slice|
-                Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: ["restore_states_batch_updater", account.global_id]}, slice, self.account)
-              end
+              finalize_enrollments(successful_ids) if type == 'Enrollment'
               count += update_restore_progress(restore_progress, data - failed_data, count, total)
               roll_back_data.active.where(id: failed_data).update_all(workflow_state: 'failed', updated_at: Time.zone.now)
             end
@@ -822,6 +816,18 @@ class SisBatch < ActiveRecord::Base
       end
     end
     count
+  end
+
+  def finalize_enrollments(ids)
+    ids.each_slice(1000) do |slice|
+      Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, { n_strand: ["restore_states_batch_updater", account.global_id] }, slice, self.account)
+    end
+    # we know enrollments are not deleted, but we don't know what the previous
+    # state was, we will assume deleted and restore the scores and submissions
+    # for students, if it was not deleted, it will not break anything.
+    Enrollment.where(id: ids, type: 'StudentEnrollment').order(:course_id).preload(:course).find_in_batches do |batch|
+      Enrollment.restore_submissions_and_scores_for_enrollments(batch)
+    end
   end
 
   def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)

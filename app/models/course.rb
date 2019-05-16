@@ -1033,9 +1033,11 @@ class Course < ActiveRecord::Base
         Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
       end
 
-      Enrollment.where(:course_id => self).touch_all
-      user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
-      User.touch_and_clear_cache_keys(user_ids, :enrollments)
+      self.class.connection.after_transaction_commit do
+        Enrollment.where(:course_id => self).touch_all
+        user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
+        User.touch_and_clear_cache_keys(user_ids, :enrollments)
+      end
 
       data
     end
@@ -3011,7 +3013,9 @@ class Course < ActiveRecord::Base
       # association
       Enrollment.where(:course_id => self).update_all(:course_id => new_course.id, :updated_at => Time.now.utc)
       user_ids = new_course.all_enrollments.pluck(:user_id)
-      User.touch_and_clear_cache_keys(user_ids, :enrollments)
+      self.class.connection.after_transaction_commit do
+        User.touch_and_clear_cache_keys(user_ids, :enrollments)
+      end
       Shard.partition_by_shard(user_ids) do |sharded_user_ids|
         Favorite.where(:user_id => sharded_user_ids, :context_type => "Course", :context_id => self.id).
           update_all(:context_id => new_course.id, :updated_at => Time.now.utc)

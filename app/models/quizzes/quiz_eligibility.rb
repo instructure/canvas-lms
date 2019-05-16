@@ -36,7 +36,7 @@ class Quizzes::QuizEligibility
     return true if quiz.grants_right?(user, session, :manage)
     return false unless course
     return false if inactive_student_with_private_course?
-    !(course_restrictions_apply? || user_restrictions_apply?)
+    !locked? && !user_restrictions_apply?
   end
 
   def eligible?
@@ -51,17 +51,6 @@ class Quizzes::QuizEligibility
   def locked?
     return false unless quiz_locked?
     !quiz.grants_right?(user, session, :update)
-  end
-
-  def section_dates_currently_apply?
-    active_sections = student_sections.select{|s| restricted?(s) && active?(s)}
-    @active_sections_max_end_at = active_sections.map(&:end_at).compact.max if active_sections.present?
-    active_sections.present?
-  end
-
-  def active_sections_max_end_at
-    section_dates_currently_apply? if @active_sections_max_end_at.nil?
-    @active_sections_max_end_at
   end
 
   private
@@ -84,50 +73,12 @@ class Quizzes::QuizEligibility
     end
   end
 
-  def course_restrictions_apply?
-    locked? || restricted_by_date?
-  end
-
   def user_restrictions_apply?
     inactive_non_admin? || !quiz.grants_right?(user, session, :submit)
   end
 
   def quiz_restrictions_apply?
     need_access_code? || invalid_ip?
-  end
-
-  def restricted_by_date?
-    # First check if any of the assignment overides are active
-    assignment_override_sections.each{|ao| return false if active?(ao)}
-
-    # Term dates override any others unless course date restrictions or
-    # section date restrictions are selected.  Section dates override course
-    # dates if section date restrictions apply
-
-    any_section_restriction = false
-
-    term_active = active?(term)
-
-    course_restricted = restricted?(course)
-    course_active = active?(course)
-
-    student_sections.each do |section|
-      section_restricted = restricted?(section)
-      section_active = active?(section)
-
-      any_section_restriction = true if section_restricted
-
-      # if there is a section restriction and the user is in an active section
-      return false if section_restricted && section_active
-    end
-
-    # he's in a section that's restricted, but not one that's active; it's restricted
-    return true if any_section_restriction
-
-    return !course_active if course_restricted
-
-    # fall back to the term if there aren't any other restrictions
-    !term_active
   end
 
   def store_session_access_code(access_code)
@@ -153,10 +104,6 @@ class Quizzes::QuizEligibility
     false
   end
 
-  def assignment_override_sections
-    AssignmentOverride.where(quiz_id: quiz.id, set_type: 'CourseSection').map(&:set) & student_sections
-  end
-
   def inactive_non_admin?
     return false if user.new_record?
     inactive_enrollment? && user_cannot_not_read_as_admin?
@@ -168,14 +115,6 @@ class Quizzes::QuizEligibility
 
   def inactive_student_with_private_course?
     user && !user_is_active? && !course.is_public
-  end
-
-  def student_sections
-    @student_sections ||= !user.new_record? && user.sections_for_course(course) || []
-  end
-
-  def term
-    @term ||= course.enrollment_term || EnrollmentTerm.new
   end
 
   def user_cannot_not_read_as_admin?
