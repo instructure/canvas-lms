@@ -21,11 +21,14 @@ import htmlEscape from 'escape-html'
 
 import formatMessage from '../../../format-message'
 import bridge from '../../../bridge'
+import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 
 const PLUGIN_KEY = 'images'
 
 import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
+
+const trayController = new TrayController()
 
 tinymce.create('tinymce.plugins.InstructureImagePlugin', {
   init(editor) {
@@ -75,6 +78,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
     editor.ui.registry.addButton('instructure-image-options', {
       onAction(buttonApi) {
         // show the tray
+        trayController.showTrayForEditor(editor)
       },
 
       onSetup(buttonApi) {
@@ -98,6 +102,10 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
       predicate: isImageElement,
       scope: 'node'
     })
+  },
+
+  destroy() {
+    trayController.hideTrayForEditor(editor)
   }
 });
 
