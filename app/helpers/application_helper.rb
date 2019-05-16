@@ -183,7 +183,8 @@ module ApplicationHelper
     # if there is a moment locale besides english set, put a script tag for it
     # so it is loaded and ready before we run any of our app code
     if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != 'en'
-      @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("moment/locale/#{js_env[:MOMENT_LOCALE]}")
+      moment_chunks = Canvas::Cdn::RevManifest.all_webpack_chunks_for("moment/locale/#{js_env[:MOMENT_LOCALE]}")
+      @script_chunks += moment_chunks if moment_chunks
     end
     @script_chunks += Canvas::Cdn::RevManifest.all_webpack_chunks_for("main")
     @script_chunks.uniq!
