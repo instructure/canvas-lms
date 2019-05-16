@@ -35,12 +35,17 @@ describe ContextExternalTool do
         shared_secret: 'secret',
         name: 'test tool',
         url: 'http://www.tool.com/launch',
-        developer_key: developer_key
+        developer_key: developer_key,
+        root_account: @root_account
       )
     end
 
     it 'allows setting the developer key' do
       expect(tool.developer_key).to eq developer_key
+    end
+
+    it 'allows setting the root account' do
+      expect(tool.root_account).to eq @root_account
     end
   end
 
