@@ -838,6 +838,38 @@ describe ContextExternalTool do
       @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret', :domain => "google.com")
     end
 
+    context "setting the root account" do
+      let(:new_tool) do
+        context.context_external_tools.new(
+          name: 'test',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          domain: 'www.test.com'
+        )
+      end
+
+      shared_examples_for 'a tool that infers the root account' do
+        let(:context) { raise 'set "context" in examples' }
+
+        it 'sets the root account' do
+          expect { new_tool.save! }.to change { new_tool.root_account }.from(nil).to context.root_account
+        end
+      end
+
+
+      context 'when the context is a course' do
+        it_behaves_like 'a tool that infers the root account' do
+          let(:context) { course_model }
+        end
+      end
+
+      context 'when the context is an account' do
+        it_behaves_like 'a tool that infers the root account' do
+          let(:context) { account_model }
+        end
+      end
+    end
+
     it "should require valid configuration for user navigation settings" do
       tool = new_external_tool
       tool.settings = {:user_navigation => {:bob => 'asfd'}}

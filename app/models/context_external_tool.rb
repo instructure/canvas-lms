@@ -459,6 +459,7 @@ class ContextExternalTool < ActiveRecord::Base
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
+    self.root_account ||= context.root_account
 
     ContextExternalTool.normalize_sizes!(self.settings)
 
