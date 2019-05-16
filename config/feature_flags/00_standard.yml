@@ -362,7 +362,8 @@ encrypted_sourcedids:
   root_opt_in: true
 quizzes_next:
   state: allowed
-  display_name: Quizzes.Next
+  display_name:
+    features.quizzes.next: Quizzes.Next
   description: Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
