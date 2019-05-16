@@ -296,6 +296,9 @@
   "no_results_940393cf": {
     "message": "No results."
   },
+  "options_3ab0ea65": {
+    "message": "Options"
+  },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordered and Unordered Lists"
   },
@@ -343,6 +346,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Show image options"
   },
   "small_header_168fb9f9": {
     "message": "Small header"
