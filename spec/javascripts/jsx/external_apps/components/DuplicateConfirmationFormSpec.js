@@ -67,6 +67,15 @@ test ('calls the force install function if the "install anyway" button is clicke
   ok(saveSpy.calledOnce)
 });
 
+test ('calls the force install prop if the "install anyway" button is clicked', () => {
+  const saveSpy = sinon.spy();
+  const propsDup = Object.assign({}, { forceSaveTool: saveSpy });
+  renderComponent(propsDup);
+  const button = domNode.querySelector('#continue-install');
+  TestUtils.Simulate.click(button);
+  ok(saveSpy.calledOnce)
+});
+
 test ('sets "verifyUniqueness" to undefined when doing a force install', () => {
   const saveSpy = sinon.spy();
   const propsDup = Object.assign({}, props);
