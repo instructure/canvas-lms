@@ -119,7 +119,6 @@ class GradeCalculator
     scores_prior_to_compute = Score.where(enrollment: @enrollments.map(&:id), assignment_group_id: nil, course_score: true).to_a
     save_scores
     update_score_statistics
-    invalidate_caches
     create_course_grade_alerts(scores_prior_to_compute)
     # The next line looks weird, but it is intended behaviour.  Its
     # saying "if we're on the branch not calculating hidden scores, run
@@ -940,11 +939,6 @@ class GradeCalculator
       score: wrapped_submission[:score],
       total: wrapped_submission[:total],
     }
-  end
-
-  # If you need to invalidate caches with associated classes, put those calls here.
-  def invalidate_caches
-    GradeSummaryPresenter.invalidate_cache(@course)
   end
 
   def ignore_submission?(submission:, assignment:)
