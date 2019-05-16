@@ -79,7 +79,7 @@ module Importers
         end
       end
 
-      context.touch_admins if context.respond_to?(:touch_admins)
+      context.clear_todo_list_cache(:admins) if context.is_a?(Course)
     end
 
     def self.create_tool_settings(tool_setting_hash, tool_proxy, assignment)

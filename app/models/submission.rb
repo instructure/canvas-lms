@@ -1189,7 +1189,7 @@ class Submission < ActiveRecord::Base
   def touch_graders
     self.class.connection.after_transaction_commit do
       if self.assignment && self.user && self.assignment.context.is_a?(Course)
-        self.assignment.context.touch_admins_later
+        self.assignment.context.clear_todo_list_cache_later(:admins)
       end
     end
   end
@@ -2553,7 +2553,7 @@ class Submission < ActiveRecord::Base
       progress.fail
     end
   ensure
-    context.touch_admins_later
+    context.clear_todo_list_cache_later(:admins)
     user_ids = graded_user_ids.to_a
     if user_ids.any?
       Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"

@@ -214,7 +214,6 @@ class Course < ActiveRecord::Base
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
-  after_save :touch_students_if_necessary
   after_commit :update_cached_due_dates
 
   after_update :clear_cached_short_name, :if => :saved_change_to_course_code?
@@ -3226,27 +3225,18 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def touch_admins_later
-    send_later_enqueue_args(:touch_admins, { :run_at => 15.seconds.from_now, :singleton => "course_touch_admins_#{global_id}" })
+  def clear_todo_list_cache_later(association_type)
+    raise "invalid association" unless self.association(association_type).klass == User
+    send_later_enqueue_args(:clear_todo_list_cache, { :run_at => 15.seconds.from_now, :singleton => "course_clear_cache_#{global_id}_#{association_type}" }, association_type)
   end
 
-  def touch_admins
-    User.where(id: self.admins).touch_all
+  def clear_todo_list_cache(association_type)
+    raise "invalid association" unless self.association(association_type).klass == User
+    self.send(association_type).clear_cache_keys(:todo_list)
   end
 
-  def touch_students_if_necessary
-    # to update the cached current enrollments
-    if saved_change_to_workflow_state? && (workflow_state == 'available' || workflow_state_before_last_save == 'available')
-      touch_students_later if self.students.exists?
-    end
-  end
-
-  def touch_students_later
-    send_later_enqueue_args(:touch_students, { :run_at => 15.seconds.from_now, :singleton => "course_touch_students_#{global_id}" })
-  end
-
-  def touch_students
-    User.where(id: self.students).touch_all
+  def touch_admins # TODO remove after existing jobs run
+    clear_todo_list_cache(:admins)
   end
 
   def list_students_by_sortable_name?

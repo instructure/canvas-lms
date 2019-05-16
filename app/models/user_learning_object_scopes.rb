@@ -128,7 +128,8 @@ module UserLearningObjectScopes
         course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
         params_cache_key = Digest::MD5.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
-        Rails.cache.fetch(cache_key, expires_in: expires_in) do
+
+        Rails.cache.fetch_with_batched_keys(cache_key, expires_in: expires_in, batch_object: self, batched_keys: :todo_list) do
           result = Shackles.activate(:slave) do
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do

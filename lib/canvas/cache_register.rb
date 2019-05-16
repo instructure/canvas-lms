@@ -27,7 +27,7 @@ module Canvas
     # (which is far less often than the many times per day users are currently being touched)
 
     ALLOWED_TYPES = {
-      'User' => %w{enrollments groups account_users},
+      'User' => %w{enrollments groups account_users todo_list},
       'Assignment' => %w{availability},
       'Quizzes::Quiz' => %w{availability}
     }.freeze

@@ -1388,7 +1388,7 @@ class Enrollment < ActiveRecord::Base
   def touch_graders_if_needed
     if !active_student? && active_student?(:was) && self.course.submissions.where(:user_id => self.user_id).exists?
       self.class.connection.after_transaction_commit do
-        User.where(id: self.course.admins).touch_all
+        self.course.admins.clear_cache_keys(:todo_list)
       end
     end
   end
