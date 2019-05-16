@@ -194,6 +194,7 @@ module ApplicationHelper
     capture do
       # if we don't also put preload tags for these, the browser will prioritize and
       # download the bundle chunks we preload below before these scripts
+      paths.each { |url| concat preload_link_tag(javascript_path(url)) }
       chunk_urls.each { |url| concat preload_link_tag(url) }
 
       concat javascript_include_tag(*(paths + chunk_urls), defer: true)
