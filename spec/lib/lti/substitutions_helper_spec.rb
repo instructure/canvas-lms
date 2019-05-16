@@ -614,6 +614,19 @@ module Lti
           expect(sub_helper.email).to eq sis_email
         end
 
+        it "only returns active logins" do
+          tool = class_double("Lti::ToolProxy")
+          p = sis_pseudonym
+          # moving account so that if the pseudonym was not tied to enrollment
+          # it would return 'test@foo.com' instead of sis_email if it was active
+          p.account = Account.create!
+          p.workflow_state = 'deleted'
+          p.save!
+          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
+          expect(sub_helper.email).to eq 'test@foo.com'
+        end
+
         context "prefer_sis_email" do
           before(:each) do
             tool.settings[:prefer_sis_email] = "true"
