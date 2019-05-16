@@ -121,6 +121,20 @@ export default class Bridge {
     }
   }
 
+  insertImagePlaceholder(fileMetaProps) {
+    if (this.focusedEditor) {
+      this.focusedEditor.insertImagePlaceholder(fileMetaProps);
+    } else {
+      console.warn("clicked sidebar image without a focused editor");
+    }
+  }
+
+  removePlaceholders(name) {
+    if (this.focusedEditor) {
+      this.focusedEditor.removePlaceholders(name);
+    }
+  }
+
   embedImage(image) {
     if (
       this.existingContentToLink() &&

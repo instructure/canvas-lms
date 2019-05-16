@@ -208,6 +208,14 @@ describe("Upload data actions", () => {
         );
       })
     })
+
+    it('results in a START_MEDIA_UPLOADING action being fired', () => {
+      let baseState = setupState();
+      let store = spiedStore(baseState);
+      return store.dispatch(actions.uploadToMediaFolder('images', fakeFileMetaData)).then(() => {
+        sinon.assert.calledWith(store.spy, { type: 'START_MEDIA_UPLOADING', payload: fakeFileMetaData })
+      })
+    })
   })
 
   describe("generateThumbnailUrl", () => {
@@ -503,4 +511,34 @@ describe("Upload data actions", () => {
       })
     })
   })
+
+  describe('activateMediaUpload', () => {
+    it("inserts the placeholder through the bridge", () => {
+      let bridgeSpy = sinon.spy(Bridge, "insertImagePlaceholder");
+      let store = spiedStore({});
+      store.dispatch(actions.activateMediaUpload({}))
+      sinon.assert.called(bridgeSpy)
+    });
+
+    it('dispatches a START_MEDIA_UPLOADING action', () => {
+      let store = spiedStore({});
+      store.dispatch(actions.activateMediaUpload({}))
+      sinon.assert.calledWith(store.spy, { type: 'START_MEDIA_UPLOADING', payload: {} })
+    })
+  });
+
+  describe('removePlaceholdersFor', () => {
+    it("removes the placeholder through the bridge", () => {
+      let bridgeSpy = sinon.spy(Bridge, "removePlaceholders");
+      let store = spiedStore({});
+      store.dispatch(actions.removePlaceholdersFor('image1'))
+      sinon.assert.calledWith(bridgeSpy, 'image1')
+    });
+
+    it('dispatches a STOP_MEDIA_UPLOADING action', () => {
+      let store = spiedStore({});
+      store.dispatch(actions.removePlaceholdersFor('image1'))
+      sinon.assert.calledWith(store.spy, { type: 'STOP_MEDIA_UPLOADING' })
+    })
+  });
 });

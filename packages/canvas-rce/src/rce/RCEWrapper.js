@@ -102,6 +102,7 @@ class RCEWrapper extends React.Component {
   }
 
   static propTypes = {
+    confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
     editorOptions: PropTypes.object,
     handleUnmount: PropTypes.func,
@@ -142,6 +143,16 @@ class RCEWrapper extends React.Component {
     return this.isHidden()
       ? this.textareaValue()
       : this.mceInstance().getContent();
+  }
+
+  checkReadyToGetCode(promptFunc) {
+    let status = true;
+    // Check for remaining placeholders
+    if (this.mceInstance().dom.doc.querySelector(`[data-placeholder-for]`)) {
+      status = promptFunc(formatMessage('An image is still being uploaded, if you continue the image will not be embedded properly.'))
+    }
+
+    return status;
   }
 
   setCode(newContent) {
@@ -194,6 +205,27 @@ class RCEWrapper extends React.Component {
     } else if (element) {
       element.onload = () => this.contentInserted(element);
       element.onerror = () => this.checkImageLoadError(element);
+    }
+  }
+
+  insertImagePlaceholder(fileMetaProps) {
+    const image = new Image();
+    image.src = fileMetaProps.domObject.preview
+    const markup = `
+    <img
+      alt="${formatMessage('Loading...')}"
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="${fileMetaProps.name}"
+      style="width: ${image.width}px; height: ${image.height}px; border: solid 1px #8B969E;"
+    />`;
+
+    this.insertCode(markup);
+  }
+
+  removePlaceholders(name) {
+    const placeholder = this.mceInstance().dom.doc.querySelector(`[data-placeholder-for="${name}"]`)
+    if (placeholder) {
+      placeholder.remove();
     }
   }
 

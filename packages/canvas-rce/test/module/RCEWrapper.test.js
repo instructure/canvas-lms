@@ -81,7 +81,8 @@ describe("RCEWrapper", () => {
         },
         decode: input => {
           return input;
-        }
+        },
+        doc: document.createElement('div')
       },
       selection: {
         getEnd: () => {
@@ -232,7 +233,6 @@ describe("RCEWrapper", () => {
     it("gets code properly", () => {
       assert.equal(editor.getContent(), instance.getCode());
     });
-
     it("inserts code properly", () => {
       const code = {};
       sinon.stub(contentInsertion, "insertContent");
@@ -248,6 +248,92 @@ describe("RCEWrapper", () => {
       assert.ok(contentInsertion.insertLink.calledWith(editor, link));
       contentInsertion.insertLink.restore();
     });
+
+    describe('checkReadyToGetCode', () => {
+
+      afterEach(() => {
+        editor.dom.doc = document.createElement('div') // reset
+      })
+      it('returns true if there are no elements with data-placeholder-for attributes', () => {
+        assert.ok(instance.checkReadyToGetCode(() => {}))
+      })
+
+      it('calls promptFunc if there is an element with data-placeholder-for attribute', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        const spy = sinon.spy()
+        instance.checkReadyToGetCode(spy)
+        sinon.assert.calledWith(spy, 'An image is still being uploaded, if you continue the image will not be embedded properly.')
+      })
+
+      it('returns true if promptFunc returns true', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        const stub = sinon.stub().returns(true)
+        assert.ok(instance.checkReadyToGetCode(stub))
+      })
+
+      it('returns false if promptFunc returns false', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        const stub = sinon.stub().returns(false)
+        assert.ok(!instance.checkReadyToGetCode(stub))
+      })
+    })
+
+    describe('insertImagePlaceholder', () => {
+      it('inserts a placeholder image with the proper metadata', () => {
+        // This image should be 10x10px but jsdom doesn't return the proper size
+        // so we stub it out to always return 10 here.
+        const heightStub = sinon.stub(HTMLImageElement.prototype, 'height').get(() => 10)
+        const widthStub = sinon.stub(HTMLImageElement.prototype, 'width').get(() => 10)
+        const greenSquare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'green_square',
+          domObject: {
+            preview: greenSquare
+          }
+        }
+
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="green_square"
+      style="width: 10px; height: 10px; border: solid 1px #8B969E;"
+    />`;
+        const stub = sinon.stub(contentInsertion, 'insertContent')
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(stub, editor, imageMarkup)
+        contentInsertion.insertContent.restore()
+        heightStub.restore()
+        widthStub.restore()
+      })
+    })
+
+    describe('removePlaceholders', () => {
+      it('removes placeholders that match the given name', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        editor.dom.doc.appendChild(placeholder)
+        instance.removePlaceholders('image1')
+        assert.ok(!editor.dom.doc.querySelector(`[data-placeholder-for="image1"]`))
+      })
+
+      it('does not remove placeholders that do not match the given name', () => {
+        const placeholder = document.createElement('img')
+        placeholder.setAttribute('data-placeholder-for', 'image1')
+        const placeholder2 = document.createElement('img')
+        placeholder2.setAttribute('data-placeholder-for', 'image2')
+        editor.dom.doc.appendChild(placeholder2)
+        instance.removePlaceholders('image1')
+        assert.ok(!editor.dom.doc.querySelector(`[data-placeholder-for="image1"]`))
+        assert.ok(editor.dom.doc.querySelector(`[data-placeholder-for="image2"]`))
+      })
+    })
 
     describe("insert image", () => {
       it("works when no element is returned from content insertion", () => {

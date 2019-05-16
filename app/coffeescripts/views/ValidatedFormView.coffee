@@ -23,6 +23,7 @@ import I18n from 'i18n!errors'
 import 'jquery.toJSON'
 import 'jquery.disableWhileLoading'
 import 'jquery.instructure_forms'
+import {send} from 'jsx/shared/rce/RceCommandShim'
 
 ##
 # Sets model data from a form, saves it, and displays errors returned in a
@@ -70,9 +71,20 @@ export default class ValidatedFormView extends Backbone.View
   #
   # @api public
   # @returns jqXHR
-  submit: (event) ->
+  submit: (event, sendFunc = send) ->
     event?.preventDefault()
     @hideErrors()
+    
+
+    rceInputs = @$el.find('textarea[data-rich_text]').toArray()
+    
+    okayToContinue = true
+    if rceInputs.length > 0
+      if window.ENV.use_rce_enhancements
+        okayToContinue = rceInputs.map((rce) => sendFunc($(rce), 'checkReadyToGetCode', window.confirm)).every((value) => value)
+    
+    if !okayToContinue
+      return
 
     data = @getFormData()
     errors = @validateBeforeSave data, {}

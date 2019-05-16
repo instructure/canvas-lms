@@ -31,6 +31,8 @@ export const PROCESSED_FOLDER_BATCH = "PROCESSED_FOLDER_BATCH";
 export const QUOTA_EXCEEDED_UPLOAD = "QUOTA_EXCEEDED_UPLOAD";
 export const START_LOADING = "START_LOADING";
 export const STOP_LOADING = "STOP_LOADING";
+export const START_MEDIA_UPLOADING = "START_MEDIA_UPLOADING";
+export const STOP_MEDIA_UPLOADING = "STOP_MEDIA_UPLOADING";
 
 export function startLoading() {
   return { type: START_LOADING };
@@ -70,6 +72,29 @@ export function openOrCloseUploadForm() {
 
 export function processedFolderBatch({ folders }) {
   return { type: PROCESSED_FOLDER_BATCH, folders };
+}
+
+export function startMediaUploading(fileMetaProps) {
+  return { type: START_MEDIA_UPLOADING, payload: fileMetaProps }
+}
+
+export function stopMediaUploading() {
+  return { type: STOP_MEDIA_UPLOADING }
+}
+
+export function activateMediaUpload(fileMetaProps) {
+  return (dispatch) => {
+    dispatch(startMediaUploading(fileMetaProps))
+    Bridge.insertImagePlaceholder(fileMetaProps)
+  }
+}
+
+export function removePlaceholdersFor(name) {
+  return (dispatch) => {
+    dispatch(stopMediaUploading())
+    Bridge.removePlaceholders(name)
+  }
+
 }
 
 export function allUploadCompleteActions(results, fileMetaProps) {
@@ -143,6 +168,7 @@ export function fetchFolders(bookmark) {
 
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
+    dispatch(activateMediaUpload(fileMetaProps))
     const { source, jwt, host, contextId, contextType } = getState();
     return source.fetchMediaFolder({ jwt, host, contextId, contextType })
     .then(({folders}) => {
@@ -242,6 +268,11 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       })
       .then(results => {
         return setAltText(fileMetaProps.altText, results);
+      })
+      .then(results => {
+        // This may or may not be necessary depending on the upload
+        dispatch(removePlaceholdersFor(fileMetaProps.name))
+        return results
       })
       .then(results => {
         return embedUploadResult(results, tabContext);
