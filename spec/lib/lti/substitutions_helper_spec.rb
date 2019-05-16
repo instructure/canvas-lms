@@ -527,6 +527,19 @@ module Lti
       it "should return previous lti context_ids" do
         expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
       end
+
+      it "should invalidate cache on last copied migration" do
+        enable_cache do
+          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
+          @c4 = Course.create!(:root_account => root_account, :account => account, :lti_context_id => 'jkl')
+          @c1.content_migrations.create!(:workflow_state => 'imported', :source_course => @c4)
+          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi} # not copied into subject course yet
+
+          @c5 = Course.create!(:root_account => root_account, :account => account, :lti_context_id => 'mno')
+          course.content_migrations.create!(:workflow_state => 'imported', :source_course => @c5) # direct copy
+          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi jkl mno}
+        end
+      end
     end
 
     describe "section substitutions" do
