@@ -55,6 +55,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :update_assignment, mutation: Mutations::UpdateAssignment
   field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
+  field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
 
   # TODO: Remove the in active development string from here once this is more
