@@ -2373,8 +2373,8 @@ class User < ActiveRecord::Base
   # Public: Reset the user's cached unread conversations count.
   #
   # Returns nothing.
-  def reset_unread_conversations_counter
-    unread_count = conversations.unread.count
+  def reset_unread_conversations_counter(unread_count=nil)
+    unread_count ||= conversations.unread.count
     if self.unread_conversations_count != unread_count
       self.class.where(:id => id).update_all(:unread_conversations_count => unread_count)
     end
