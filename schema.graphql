@@ -2150,6 +2150,7 @@ type Submission implements Node & SubmissionInterface & Timestamped {
   postedAt: DateTime
   score: Float
   state: SubmissionState!
+  submissionDraft: SubmissionDraft
   submissionHistoriesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2248,6 +2249,16 @@ type SubmissionConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+}
+
+type SubmissionDraft {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  attachments: [File!]
+  submission: Submission!
+  submissionAttempt: Int!
 }
 
 """
