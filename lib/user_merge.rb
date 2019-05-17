@@ -333,7 +333,7 @@ class UserMerge
     time = Time.zone.now
     new_nps = []
     keeper.shard.activate do
-      to_retire.notification_policies.where.not(notification_id: keeper.notification_policies.select(:notification_id)).each do |np|
+      to_retire.notification_policies.where.not(notification_id: keeper.notification_policies.pluck(:notification_id)).each do |np|
         new_nps << NotificationPolicy.new(notification_id: np.notification_id,
                                           communication_channel_id: keeper.id,
                                           frequency: np.frequency,
