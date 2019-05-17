@@ -20,6 +20,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import {Editor} from "@tinymce/tinymce-react";
 
+import themeable from '@instructure/ui-themeable'
+import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+
 import formatMessage from "../format-message";
 import * as contentInsertion from "./contentInsertion";
 import indicatorRegion from "./indicatorRegion";
@@ -27,7 +31,7 @@ import indicate from "../common/indicate";
 import Bridge from "../bridge";
 import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar';
-import themeable from '@instructure/ui-themeable'
+import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
@@ -479,6 +483,17 @@ class RCEWrapper extends React.Component {
 
     return (
       <div ref={el => this._elementRef = el} className={styles.root}>
+        <ShowOnFocusButton
+          buttonRef={ref => this.loadPriorButton = ref}
+          buttonProps={{
+            variant: 'link',
+            onClick: () => {alert('thataway')},
+            icon: IconKeyboardShortcutsLine,
+            margin: 'xx-small'
+          }}
+          >
+            {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
+        </ShowOnFocusButton>
         <Editor
           id={mceProps.textareaId}
           textareaName={mceProps.name}
