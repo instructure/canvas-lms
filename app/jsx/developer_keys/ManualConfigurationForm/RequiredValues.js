@@ -25,6 +25,9 @@ import TextInput from '@instructure/ui-forms/lib/components/TextInput';
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import Grid from '@instructure/ui-layout/lib/components/Grid';
+import GridRow from '@instructure/ui-layout/lib/components/Grid/GridRow';
+import GridCol from '@instructure/ui-layout/lib/components/Grid/GridCol';
 
 const validationMessage = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 
@@ -100,49 +103,49 @@ export default class RequiredValues extends React.Component {
         <PresentationContent>
           <hr />
         </PresentationContent>
-        <FormFieldGroup
-          description={<ScreenReaderContent>{I18n.t('Display Values')}</ScreenReaderContent>}
-          layout="columns"
-        >
-          <TextInput
-            name="title"
-            value={toolConfiguration.title}
-            label={I18n.t("* Title")}
-            required
-            onChange={this.handleTitleChange}
-            messages={showMessages && !toolConfiguration.title ? validationMessage : []}
-          />
-          <TextArea
-            name="description"
-            value={toolConfiguration.description}
-            label={I18n.t("* Description")}
-            maxHeight="5rem"
-            required
-            onChange={this.handleDescriptionChange}
-            messages={showMessages && !toolConfiguration.description ? validationMessage : []}
-          />
-        </FormFieldGroup>
-        <FormFieldGroup
-          description={<ScreenReaderContent>{I18n.t("* Open Id Connect Values")}</ScreenReaderContent>}
-          layout="columns"
-        >
-          <TextInput
-            name="target_link_uri"
-            value={toolConfiguration.target_link_uri}
-            label={I18n.t("* Target Link URI")}
-            required
-            onChange={this.handleTargetLinkUriChange}
-            messages={showMessages && !toolConfiguration.target_link_uri ? validationMessage : []}
-          />
-          <TextInput
-            name="oidc_initiation_url"
-            value={toolConfiguration.oidc_initiation_url}
-            label={I18n.t("* OpenID Connect Initiation Url")}
-            required
-            onChange={this.handleOidcInitiationUrlChange}
-            messages={showMessages && !toolConfiguration.oidc_initiation_url ? validationMessage : []}
-          />
-        </FormFieldGroup>
+        <Grid>
+          <GridRow>
+            <GridCol>
+              <TextInput
+                name="title"
+                value={toolConfiguration.title}
+                label={I18n.t("* Title")}
+                onChange={this.handleTitleChange}
+                messages={showMessages && !toolConfiguration.title ? validationMessage : []}
+              />
+            </GridCol>
+            <GridCol>
+              <TextArea
+                name="description"
+                value={toolConfiguration.description}
+                label={I18n.t("* Description")}
+                maxHeight="5rem"
+                onChange={this.handleDescriptionChange}
+                messages={showMessages && !toolConfiguration.description ? validationMessage : []}
+              />
+            </GridCol>
+          </GridRow>
+          <GridRow>
+            <GridCol>
+              <TextInput
+                name="target_link_uri"
+                value={toolConfiguration.target_link_uri}
+                label={I18n.t("* Target Link URI")}
+                onChange={this.handleTargetLinkUriChange}
+                messages={showMessages && !toolConfiguration.target_link_uri ? validationMessage : []}
+              />
+            </GridCol>
+            <GridCol>
+              <TextInput
+                name="oidc_initiation_url"
+                value={toolConfiguration.oidc_initiation_url}
+                label={I18n.t("* OpenID Connect Initiation Url")}
+                onChange={this.handleOidcInitiationUrlChange}
+                messages={showMessages && !toolConfiguration.oidc_initiation_url ? validationMessage : []}
+              />
+            </GridCol>
+          </GridRow>
+        </Grid>
         <TextArea
           name="public_jwk"
           value={toolConfiguration.public_jwk}
