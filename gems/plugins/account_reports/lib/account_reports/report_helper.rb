@@ -196,14 +196,13 @@ module AccountReports::ReportHelper
   end
 
   def loaded_pseudonym(pseudonyms, user, include_deleted: false, enrollment: nil)
-    context = root_account
     user_pseudonyms = pseudonyms[user.id] || []
     user.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
     if enrollment&.sis_pseudonym_id
       enrollment_pseudonym = user_pseudonyms.index_by(&:id)[enrollment.sis_pseudonym_id]
-      return enrollment_pseudonym if enrollment_pseudonym
+      return enrollment_pseudonym if enrollment_pseudonym && (enrollment_pseudonym.workflow_state != 'deleted' || include_deleted)
     end
-    SisPseudonym.for(user, context, type: :trusted, require_sis: false, include_deleted: include_deleted, root_account: root_account)
+    SisPseudonym.for(user, root_account, type: :trusted, require_sis: false, include_deleted: include_deleted, root_account: root_account)
   end
 
   def preload_logins_for_users(users, include_deleted: false)

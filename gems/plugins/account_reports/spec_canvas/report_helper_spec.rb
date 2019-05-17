@@ -72,18 +72,37 @@ describe "report helper" do
   end
 
   describe "load pseudonyms" do
-    it 'should do one query for pseudonyms' do
-      user_with_pseudonym(active_all: true, account: account, user: user)
+    before(:once) do
+      @user = user_with_pseudonym(active_all: true, account: account, user: user)
       course = account.courses.create!(name: 'reports')
       role = Enrollment.get_built_in_role_for_type('StudentEnrollment')
-      e = course.enrollments.create!(user: user,
-                                     workflow_state: 'active',
-                                     sis_pseudonym: user.pseudonym,
-                                     type: 'StudentEnrollment',
-                                     role: role)
-      report.preload_logins_for_users([user])
+      @enrollmnent = course.enrollments.create!(user: @user,
+                                                workflow_state: 'active',
+                                                sis_pseudonym: @pseudonym,
+                                                type: 'StudentEnrollment',
+                                                role: role)
+    end
+
+    it 'should do one query for pseudonyms' do
+      report.preload_logins_for_users([@user])
       expect(SisPseudonym).to receive(:for).never
-      report.loaded_pseudonym({user.id => [user.pseudonym]}, user, enrollment: e)
+      report.loaded_pseudonym({@user.id => [@pseudonym]}, @user, enrollment: @enrollmnent)
+    end
+
+    it 'should ignore deleted pseudonyms' do
+      @pseudonym.destroy
+      report.preload_logins_for_users([@user])
+      expect(SisPseudonym).to receive(:for).once.and_call_original
+      pseudonym = report.loaded_pseudonym({@user.id => [@pseudonym]}, @user, enrollment: @enrollmnent)
+      expect(pseudonym).to be_nil
+    end
+
+    it 'should use deleted pseudonyms when passed' do
+      @pseudonym.destroy
+      report.preload_logins_for_users([@user])
+      expect(SisPseudonym).to receive(:for).never
+      pseudonym = report.loaded_pseudonym({@user.id => [@pseudonym]}, @user, include_deleted: true, enrollment: @enrollmnent)
+      expect(pseudonym).to eq @pseudonym
     end
   end
 
