@@ -19,7 +19,7 @@
 import { darken, lighten, alpha } from '@instructure/ui-color-utils'
 
  // pull canvas theme values we need for the rce skin
-export default function generator ({ borders, colors, typography }) {
+export default function generator ({ borders, colors, forms, shadows, spacing, typography }) {
   const vars = {
     canvasBackgroundColor: colors.white,
     canvasTextColor: colors.textDarkest,
@@ -44,6 +44,10 @@ export default function generator ({ borders, colors, typography }) {
     canvasButtonHoverBackground: colors.backgroundLightest,
     canvasButtonHoverColor: colors.brand,
     canvasButtonActiveBackground: colors.backgroundLightest,
+    canvasButtonFontWeight: typography.fontWeightNormal,
+    canvasButtonFontSize: typography.fontSizeMedium,
+    canvasButtonLineHeight: forms.inputHeightMedium,
+    canvasButtonPadding: `0 ${spacing.small}`,
 
     // the instui primary button
     canvasPrimaryButtonBackground: colors.backgroundBrand,
@@ -51,6 +55,7 @@ export default function generator ({ borders, colors, typography }) {
     canvasPrimaryButtonBorderColor: 'transparent',
     canvasPrimaryButtonHoverBackground: darken(colors.backgroundBrand, 10),
     canvasPrimaryButtonHoverColor: colors.textLightest,
+
 
     // the instui secondary button
     canvasSecondaryButtonBackground: colors.backgroundLight,
@@ -61,11 +66,25 @@ export default function generator ({ borders, colors, typography }) {
 
     canvasFocusBorderColor: borders.brand,
     canvasFocusBorderWidth: borders.widthSmall, // canvas really uses widthMedium
-    canvasFocusBoxShadow: `0 0 0 2px ${colors.brand}`,
+    canvasFocusBoxShadow: `0 0 0 0 2px ${colors.brand}`,
 
     canvasFontFamily: typography.fontFamily,
     canvasFontSize: '1rem',
-    canvasFontSizeSmall: typography.fontSizeSmall
+    canvasFontSizeSmall: typography.fontSizeSmall,
+
+    // modal dialogs
+    canvasModalShadow: shadows.depth3,
+    canvasModalHeadingPadding: spacing.medium,
+    canvasModalHeadingFontSize: typography.fontSizeXLarge,
+    canvasModalHeadingFontWeight: typography.fontWeightNormal,
+    canvasModalBodyPadding: spacing.medium,
+    canvasModalFooterPadding: spacing.small,
+    canvasModalFooterBackground: colors.backgroundLight,
+    canvasFormElementMargin: `0 0 ${spacing.medium} 0`,
+    canvasFormElementLabelColor: colors.textDarkest,
+    canvasFormElementLabelMargin: `0 0 ${spacing.small} 0`,
+    canvasFormElementLabelFontSize: typography.fontSizeMedium,
+    canvasFormElementLabelFontWeight: typography.fontWeightBold
   }
   vars.tinySplitButtonChevronHoverBackground = darken(vars.toolbarButtonHoverBackground, 10)
   return vars

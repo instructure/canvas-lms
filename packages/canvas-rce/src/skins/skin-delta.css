@@ -44,8 +44,12 @@
   .tox .tox-button {
     background-color: var(--canvasPrimaryButtonBackground);
     font-family: var(--canvasFontFamily);
+    font-weight: var(--canvasButtonFontWeight);
+    font-size: var(--canvasButtonFontSize);
     color: var(--canvasPrimaryButtonColor);
     border-color: var(--canvasPrimaryButtonBorderColor);
+    line-height: calc(var(--canvasButtonLineHeight) - 2px);
+    padding: var(--canvasButtonPadding);
   }
   .tox .tox-button[disabled] {
     opacity: 0.5;
@@ -246,17 +250,23 @@
   .tox .tox-dialog {
     background-color: var(--canvasBackgroundColor);
     border-color: var(--canvasBorderColor);
-    box-shadow: 0 16px 16px -10px rgba(45, 59, 69, 0.15), 0 0 40px 1px rgba(45, 59, 69, 0.15);
+    box-shadow: var(--canvasModalShadow);
   }
   .tox .tox-dialog__header {
     background-color: var(--canvasBackgroundColor);
     color: var(--canvasTextColor);
+    border-bottom: 1px solid var(--canvasBorderColor);
+    padding: var(--canvasModalHeadingPadding);
+    margin: 0;
   }
   .tox .tox-dialog__title {
     font-family: var(--canvasFontFamily);
+    font-size: var(--canvasModalHeadingFontSize);
+    font-weight: var(--canvasModalHeadingFontWeight);
   }
   .tox .tox-dialog__body {
     color: var(--canvasTextColor);
+    padding: var(--canvasModalBodyPadding);
   }
   .tox .tox-dialog__body-nav-item {
     color: rgba(45, 59, 69, 0.6);
@@ -266,8 +276,10 @@
     color: #3498db;
   }
   .tox .tox-dialog__footer {
-    background-color: var(--canvasBackgroundColor);
+    background-color: var(--canvasModalFooterBackground);
     border-top: 1px solid var(--canvasBorderColor);
+    padding: var(--canvasModalFooterPadding);
+    margin: 0;
   }
   .tox .tox-dialog__table tbody tr {
     border-bottom-color: var(--canvasBorderColor);
@@ -289,6 +301,9 @@
   }
   .tox.tox-inline-edit-area {
     border-color: var(--canvasBorderColor);
+  }
+  .tox .tox-form__group {
+    padding: 2px;
   }
   .tox .tox-control-wrap .tox-textfield {
     padding-right: 32px;
@@ -312,6 +327,18 @@
   .tox .tox-toolbar-label {
     color: rgba(45, 59, 69, 0.6);
   }
+  .tox .tox-form__group {
+    margin: var(--canvasFormElementMargin);
+  }
+  .tox .tox-form__group:last-child {
+    margin: 0;
+  }
+  .tox .tox-form__group .tox-label {
+    color: var(--canvasFormElementLabelColor);
+    margin: var(--canvasFormElementLabelMargin);
+    font-size: var(--canvasFormElementLabelFontSize);
+    font-weight: var(--canvasFormElementLabelFontWeight);
+  }
   .tox .tox-form__group--error {
     color: var(--canvasErrorColor);
   }
@@ -327,7 +354,9 @@
   .tox .tox-textfield:focus,
   .tox .tox-selectfield select:focus,
   .tox .tox-textarea:focus {
-    border-color: var(--canvasFocusBorderColor);
+    /*border-color: var(--canvasFocusBorderColor);*/
+    border-color: var(--canvasBorderColor);
+    box-shadow: var(--canvasFocusBoxShadow);
   }
   .tox .tox-naked-btn {
     color: var(--canvasButtonColor);

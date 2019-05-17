@@ -19,81 +19,22 @@
 import formatMessage from "../../../format-message"
 import clickCallback from "./clickCallback"
 import bridge from '../../../bridge'
-import $ from 'jquery'
 
 const PLUGIN_KEY = 'links'
-var keyMap = {};
-
-import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
 
 tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
   init(ed) {
+    const getLink = function (editor, elm) {
+      return editor.dom.getParent(elm, 'a[href]');
+    }
+    const isCursorOnAnchorElement = function () {
+      return isAnchorElement(ed.selection.getNode()) || isAnchorElement(ed.selection.getStart())
+    }
+
     const isAnchorElement = function (node) {
-      return node.nodeName.toLowerCase() === 'a' && node.href;
+      const link = node.nodeName.toLowerCase() === 'a' ? node : getLink(ed, node)
+      return link && link.href
     };
-
-    const isSelected = function () {
-      return !ed.selection.isCollapsed()
-    };
-
-    const getAnchorElement = function () {
-      const node = ed.selection.getNode();
-      return isAnchorElement(node) ? node : null;
-    };
-
-    globalRegistry.addContextForm(ed, 'link-form', {
-      launch: {
-        type: 'contextformtogglebutton',
-        icon: 'link'
-      },
-      label: formatMessage('Link'),
-      predicate: (node) => {
-        return isAnchorElement(node) || isSelected()
-      },
-      initValue: function () {
-        const elm = getAnchorElement();
-        return elm ? elm.href : '';
-      },
-
-      commands: [
-        {
-          type: 'contextformtogglebutton',
-          icon: 'link',
-          tooltip: formatMessage('Link'),
-          primary: true,
-          onSetup: function (buttonApi) {
-            buttonApi.setActive(!!getAnchorElement());
-            const nodeChangeHandler = function () {
-              buttonApi.setActive(!ed.readonly && !!getAnchorElement());
-            };
-            ed.on('nodechange', nodeChangeHandler);
-            return function () {
-              ed.off('nodechange', nodeChangeHandler);
-            }
-          },
-          onAction: function (formApi) {
-            const value = formApi.getValue();
-            ed.execCommand('mceInsertLink', false, {href: value});
-            // Collapse the selection to return the user to editing text.
-            ed.selection.collapse()
-            formApi.hide();
-          }
-        },
-
-        {
-          type: 'contextformtogglebutton',
-          icon: 'unlink',
-          tooltip: formatMessage('Remove link'),
-          active: false,
-          onAction: function (formApi) {
-            ed.execCommand('unlink');
-            // Collapse the selection to return the user to editing text.
-            ed.selection.collapse()
-            formApi.hide();
-          }
-        }
-      ]
-    });
 
     // Register commands
     ed.addCommand(
@@ -106,24 +47,55 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
       tooltip: formatMessage('Links'),
       icon: "link",
       fetch(callback) {
-        const items = [
-          {
-            type: 'menuitem',
-            text: formatMessage('External Links'),
-            onAction: () => {
-              ed.execCommand('mceLink');
+        let items
+        if (isCursorOnAnchorElement()) {
+          items = [
+            {
+              type: 'menuitem',
+              text: formatMessage('Edit Link'),
+              onAction: () => {
+                ed.execCommand('mceLink')
+              }
+            },
+            {
+              type: 'menuitem',
+              text: formatMessage('Remove Link'),
+              onAction() {
+                ed.execCommand('unlink')
+              }
             }
-          },
-          {
-            type: 'menuitem',
-            text: formatMessage('Course Links'),
-            onAction() {
-              ed.focus(true) // activate the editor without changing focus
-              bridge.showTrayForPlugin(PLUGIN_KEY)
+          ]
+        } else {
+          items = [
+            {
+              type: 'menuitem',
+              text: formatMessage('External Links'),
+              onAction: () => {
+                ed.execCommand('mceLink');
+              }
+            },
+            {
+              type: 'menuitem',
+              text: formatMessage('Course Links'),
+              onAction() {
+                ed.focus(true) // activate the editor without changing focus
+                bridge.showTrayForPlugin(PLUGIN_KEY)
+              }
             }
-          }
-        ]
+          ]
+        }
         callback(items)
+      },
+      onSetup: function(api) {
+        function handleNodeChange(e) {
+          api.setActive(isAnchorElement(e.element))
+        }
+
+        ed.on('NodeChange', handleNodeChange)
+
+        return () => {
+          ed.off('NodeChange', handleNodeChange)
+        }
       }
     });
   }

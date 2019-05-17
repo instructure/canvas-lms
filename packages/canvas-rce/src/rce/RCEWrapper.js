@@ -420,7 +420,9 @@ class RCEWrapper extends React.Component {
       ],
       contextmenu: '',  // show the browser's native context menu
 
-      toolbar_drawer: 'floating'
+      toolbar_drawer: 'floating',
+      target_list: false, // don't show the target list when creating/editing links
+      link_title: false   // don't show the title input when creating/editing links
     }
   }
 
