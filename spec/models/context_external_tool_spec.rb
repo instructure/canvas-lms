@@ -627,6 +627,34 @@ describe ContextExternalTool do
         expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
       end
     end
+
+    context 'when multiple ContextExternalTools have domain/url conflict' do
+      before do
+        ContextExternalTool.create!(
+          context: @course,
+          consumer_key: 'key1',
+          shared_secret: 'secret1',
+          name: 'test faked tool',
+          url: 'http://nothing',
+          domain: 'www.tool.com',
+          tool_id: 'faked'
+        )
+
+        ContextExternalTool.create!(
+          context: @course,
+          consumer_key: 'key2',
+          shared_secret: 'secret2',
+          name: 'test tool',
+          url: 'http://www.tool.com/launch',
+          tool_id: 'real'
+        )
+      end
+
+      it 'picks up url in higher priority' do
+        tool = ContextExternalTool.find_external_tool('http://www.tool.com/launch?p1=2082', Course.find(@course.id))
+        expect(tool.tool_id).to eq('real')
+      end
+    end
   end
 
   describe "#extension_setting" do

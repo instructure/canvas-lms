@@ -561,12 +561,15 @@ class ContextExternalTool < ActiveRecord::Base
       res.normalize!
       return true if res.to_s == standard_url
     end
-    if domain.present?
-      host = Addressable::URI.parse(url).normalize.host rescue nil
-      d = domain.gsub(/http[s]?\:\/\//, '')
-      !!(host && ('.' + host).match(/\.#{d}\z/))
-    end
   end
+
+  def matches_tool_domain?(url)
+    return false if domain.blank?
+    url = ContextExternalTool.standardize_url(url)
+    host = Addressable::URI.parse(url).normalize.host rescue nil
+    d = domain.gsub(/http[s]?\:\/\//, '')
+    !!(host && ('.' + host).match(/\.#{d}\z/))
+end
 
   def matches_domain?(url)
     url = ContextExternalTool.standardize_url(url)
@@ -678,7 +681,7 @@ class ContextExternalTool < ActiveRecord::Base
     res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url, false) && tool.id != exclude_tool_id }
     return res if res
 
-    res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_url?(url) && tool.id != exclude_tool_id }
+    res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_tool_domain?(url) && tool.id != exclude_tool_id }
     return res if res
 
     nil
