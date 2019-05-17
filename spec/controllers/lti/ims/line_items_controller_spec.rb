@@ -18,6 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/line_items_controller"
 
 module Lti
@@ -95,6 +96,7 @@ module Lti
         let(:http_success_status) { :created }
         let(:content_type) { 'application/vnd.ims.lis.v2.lineitem+json' }
 
+        it_behaves_like 'lti services'
         it_behaves_like 'advantage services'
 
         before do
@@ -259,6 +261,7 @@ module Lti
         end
         let(:action) { :update }
 
+        it_behaves_like 'lti services'
         it_behaves_like 'advantage services'
         it_behaves_like 'assignment with wrong tool'
 
@@ -393,6 +396,7 @@ module Lti
           ]
         end
 
+        it_behaves_like 'lti services'
         it_behaves_like 'advantage services'
         it_behaves_like 'assignment with wrong tool'
 
@@ -483,6 +487,7 @@ module Lti
         end
         let(:expected_mime_type) { described_class::CONTAINER_MIME_TYPE }
 
+        it_behaves_like 'lti services'
         it_behaves_like 'advantage services'
 
         context do

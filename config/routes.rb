@@ -2327,6 +2327,11 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
     end
 
+    # Public Developer Key Update Service
+    scope(controller: 'lti/public_jwk') do
+      put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
+    end
+
     # Names and Roles Provisioning (NRPS) v2 Service
     scope(controller: 'lti/ims/names_and_roles') do
       get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles

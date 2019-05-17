@@ -18,6 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/scores_controller"
 
 module Lti::Ims
@@ -67,6 +68,7 @@ module Lti::Ims
       let(:content_type) { 'application/vnd.ims.lis.v1.score+json' }
 
       it_behaves_like 'advantage services'
+      it_behaves_like 'lti services'
 
       context 'with valid params' do
         context 'when the lti_id userId is used' do
