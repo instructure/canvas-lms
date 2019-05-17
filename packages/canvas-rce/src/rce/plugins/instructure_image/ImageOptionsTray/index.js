@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-elements'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Tray} from '@instructure/ui-overlays'
 
 import formatMessage from '../../../../format-message'
@@ -42,21 +42,21 @@ export default function ImageOptionsTray(props) {
       shouldReturnFocus
     >
       <Flex direction="column" height="100vh">
-        <FlexItem as="header" padding="medium">
+        <Flex.Item as="header" padding="medium">
           <Flex direction="row">
-            <FlexItem grow shrink>
+            <Flex.Item grow shrink>
               <Heading as="h2">Image Stuff</Heading>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem>
+            <Flex.Item>
               <CloseButton onClick={onRequestClose}>{formatMessage('Close')}</CloseButton>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
+        </Flex.Item>
 
-        <FlexItem as="div" padding="medium">
+        <Flex.Item as="div" padding="medium">
           <img alt={imageElement.alt} src={imageElement.src} />
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </Tray>
   )
