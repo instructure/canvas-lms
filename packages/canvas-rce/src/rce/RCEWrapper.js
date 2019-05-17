@@ -138,7 +138,8 @@ class RCEWrapper extends React.Component {
 
     this.state = {
       path: [],
-      wordCount: 0
+      wordCount: 0,
+      isHtmlView: false
     }
   }
 
@@ -287,12 +288,10 @@ class RCEWrapper extends React.Component {
 
   toggle = () => {
     if (this.isHidden()) {
-      this.setCode(this.textareaValue());
-      this.getTextarea().setAttribute('aria-hidden', true);
+      this.setState({isHtmlView: false})
     } else {
-      this.getTextarea().removeAttribute('aria-hidden');
+      this.setState({isHtmlView: true})
     }
-    this.onTinyMCEInstance("mceToggleEditor");
   }
 
   focus() {
@@ -453,8 +452,18 @@ class RCEWrapper extends React.Component {
     this.registerTextareaChange();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(_prevProps, prevState) {
     this.registerTextareaChange();
+    if(prevState.isHtmlView !== this.state.isHtmlView) {
+      if (this.state.isHtmlView) {
+        this.getTextarea().removeAttribute('aria-hidden');
+        this.mceInstance().hide()
+      } else {
+        this.setCode(this.textareaValue());
+        this.getTextarea().setAttribute('aria-hidden', true);
+        this.mceInstance().show()
+      }
+    }
   }
 
   render() {
@@ -481,6 +490,7 @@ class RCEWrapper extends React.Component {
           onToggleHtml={this.toggle}
           path={this.state.path}
           wordCount={this.state.wordCount}
+          isHtmlView={this.state.isHtmlView}
         />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
       </div>

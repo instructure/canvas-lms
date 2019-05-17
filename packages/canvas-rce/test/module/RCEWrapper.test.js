@@ -149,13 +149,6 @@ describe("RCEWrapper", () => {
       element = createBasicElement();
     });
 
-    it("calls toggle on its tinyMCE instance", () => {
-      element.toggle();
-      assert(
-        execCommandSpy.withArgs("mceToggleEditor", false, textareaId).called
-      );
-    });
-
     it("syncs content during toggle if coming back from hidden instance", () => {
       element = createdMountedElement().getMountedInstance();
       editor.hidden = true;

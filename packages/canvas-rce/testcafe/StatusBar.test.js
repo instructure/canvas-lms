@@ -28,19 +28,31 @@ test('toggles between rce and html views', async t => {
   const textarea = Selector('#textarea')
   const rceContainer = Selector('.tox-tinymce')
   const toggleButton = Selector('button').withText('</>')
+  const wordCount = Selector('span').withText('0 words').nth(-1)
   await t.expect(rceContainer.visible).ok('rce should be initially visible')
+  await t.expect(wordCount.count).eql(1)
   await t.expect(textarea.visible).notOk('textarea should be initially invisible')
   await t.click(toggleButton)
   await t.expect(rceContainer.visible).notOk('rce should be invisible after toggle')
+  await t.expect(wordCount.count).eql(0)
   await t.expect(textarea.visible).ok('textarea should be visible after toggle')
   await t.click(toggleButton)
   await t.expect(rceContainer.visible).ok('rce should be visible after toggling again')
+  await t.expect(wordCount.count).eql(1)
   await t.expect(textarea.visible).notOk('textarea should be hidden after toggling again')
 })
 
 test('counts words', async t => {
   // search for the exact text for the selector will wait for it to change to this text
-  await t.switchToIframe(tinyIframe).typeText('body', 'foo bar baz bing')
+  await t.expect(Selector('span').withText('0 words')).exists
+
+  await t.switchToIframe(tinyIframe).typeText('body', 'foo')
+  await t
+    .switchToMainWindow()
+    .expect(Selector('span').withText('1 word').exists)
+    .ok()
+
+  await t.switchToIframe(tinyIframe).typeText('body', ' bar baz bing')
   await t
     .switchToMainWindow()
     .expect(Selector('span').withText('4 words').exists)

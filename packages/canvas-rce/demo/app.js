@@ -44,7 +44,7 @@ function getProps(textareaId, state) {
       };
     },
 
-    textareaClassName: "exampleClassOne exampleClassTwo",
+    textareaClassName: "exampleClassOne",
     textareaId,
 
     trayProps: {

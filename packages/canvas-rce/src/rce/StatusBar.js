@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import {arrayOf, func, number, string} from 'prop-types'
+import {arrayOf, bool, func, number, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import { Button } from '@instructure/ui-buttons'
 import { Flex, View } from '@instructure/ui-layout'
 import { ScreenReaderContent } from '@instructure/ui-a11y'
 import { Text } from '@instructure/ui-elements'
-import { Select } from '@instructure/ui-forms'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import { IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
@@ -31,7 +30,8 @@ import formatMessage from '../format-message'
 StatusBar.propTypes = {
   onToggleHtml: func,
   path: arrayOf(string),
-  wordCount: number
+  wordCount: number,
+  isHtmlView: bool
 }
 
 function renderPath({path}) {
@@ -59,53 +59,60 @@ function emptyTagIcon() {
   )
 }
 export default function StatusBar(props) {
-  return (
-    <div>
-      <Flex margin="x-small">
+  if (props.isHtmlView) {
+    const toggleToRich = formatMessage('Switch to rich text view')
+    return (
+      <View display="block" margin="x-small" textAlign="end" data-testid="RCEStatusBar">
+        <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToRich}>
+          <ScreenReaderContent>{toggleToRich}</ScreenReaderContent>
+        </Button>
+      </View>
+    )
+  } else {
+    const kbshortcut = formatMessage('View keyboard shortcuts')
+    const a11y = formatMessage('Accessibility')
+    const wordCount = formatMessage(`{count, plural,
+         =0 {0 words}
+        one {1 word}
+      other {# words}
+    }`, {count: props.wordCount})
+    const toggleToHtml = formatMessage('Switch to raw html view')
+
+    return (
+      <Flex margin="x-small" data-testid="RCEStatusBar">
         <Flex.Item grow>
           <View>{renderPath(props)}</View>
         </Flex.Item>
+
         <Flex.Item>
           <View display="inline-block" padding="0 x-small">
-            <Button variant="link" icon={IconKeyboardShortcutsLine}>
-              <ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>
+            <Button variant="link" icon={IconKeyboardShortcutsLine} title={kbshortcut}>
+              <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
             </Button>
-            <Button variant="link" icon={IconA11yLine}>
-              <ScreenReaderContent>{formatMessage('Accessibility')}</ScreenReaderContent>
+            <Button variant="link" icon={IconA11yLine} title={a11y}>
+              <ScreenReaderContent>{a11y}</ScreenReaderContent>
             </Button>
           </View>
           <div className={css(styles.separator)}/>
         </Flex.Item>
+
         <Flex.Item>
-          <View display="inline-block" padding="0 x-small">
-            <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml}>
-              <ScreenReaderContent>{formatMessage('Toggle raw html view')}</ScreenReaderContent>
-            </Button>
+          <View display="inline-block" padding="0 small xx-small small">
+            <Text>{wordCount}</Text>
           </View>
           <div className={css(styles.separator)}/>
         </Flex.Item>
-        <Flex.Item>
-          <View display="inline-block" padding="0 x-small xxx-small x-small">
-            <Select
-              inline
-              width="12rem"
-              size="small"
-              label={<ScreenReaderContent>Select a language</ScreenReaderContent>}
-            >
-              <option value="en-us">English (US)</option>
-              <option value="fr">French</option>
-            </Select>
-          </View>
-          <div className={css(styles.separator)}/>
-        </Flex.Item>
+
         <Flex.Item>
           <View display="inline-block" padding="0 0 0 small">
-            <Text>{formatMessage('{count} words', {count: props.wordCount})}</Text>
+            <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToHtml}>
+              <ScreenReaderContent>{toggleToHtml}</ScreenReaderContent>
+            </Button>
           </View>
         </Flex.Item>
       </Flex>
-    </div>
-  )
+    )
+  }
 }
 
 const styles = StyleSheet.create({
