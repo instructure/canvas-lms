@@ -29,6 +29,8 @@ import PropTypes from 'prop-types'
 import DeveloperKeyScopes from './Scopes'
 import ToolConfiguration from './ToolConfiguration'
 
+const validationMessage = [{text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}]
+
 export default class DeveloperKeyFormFields extends React.Component {
   constructor (props) {
     super(props)
@@ -147,9 +149,9 @@ export default class DeveloperKeyFormFields extends React.Component {
                 <TextArea
                   label={this.props.createLtiKeyState.isLtiKey ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
                   name="developer_key[redirect_uris]"
-                  required={this.props.createLtiKeyState.isLtiKey}
                   defaultValue={this.fieldValue('redirect_uris')}
                   resize="both"
+                  messages={this.props.showRequiredMessages ? validationMessage : []}
                   disabled={this.props.createLtiKeyState.customizing}
                 />
                 {!this.props.createLtiKeyState.isLtiKey &&
@@ -229,5 +231,6 @@ DeveloperKeyFormFields.propTypes = {
   editing: PropTypes.bool.isRequired,
   tool_configuration: PropTypes.shape({
     oidc_initiation_url: PropTypes.string
-  })
+  }),
+  showRequiredMessages: PropTypes.bool
 }

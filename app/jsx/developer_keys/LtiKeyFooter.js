@@ -24,6 +24,13 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import {ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 
 export default class LtiKeyFooter extends React.Component {
+  get buttonText () {
+    if (this.props.saveOnly) {
+      return I18n.t('Save')
+    }
+    return this.props.customizing ? I18n.t('Save Customizations') : I18n.t('Save and Customize')
+  }
+
   onAdvanceToCustomization = () => {
     this.props.onAdvanceToCustomization()
   }
@@ -41,11 +48,10 @@ export default class LtiKeyFooter extends React.Component {
   nextOrSaveButton() {
     const {customizing} = this.props
     const clickHandler = customizing ? this.onSave : this.onAdvanceToCustomization
-    const buttonText = customizing ? I18n.t('Save Customizations') : I18n.t('Save and Customize')
 
     return (
       <Button onClick={clickHandler} variant="primary" disabled={this.props.disable}>
-        {buttonText}
+        {this.buttonText}
       </Button>
     )
   }
@@ -67,5 +73,6 @@ LtiKeyFooter.propTypes = {
   onSaveClick: PropTypes.func.isRequired,
   onAdvanceToCustomization: PropTypes.func.isRequired,
   customizing: PropTypes.bool.isRequired,
-  disable: PropTypes.bool
+  disable: PropTypes.bool,
+  saveOnly: PropTypes.bool
 }

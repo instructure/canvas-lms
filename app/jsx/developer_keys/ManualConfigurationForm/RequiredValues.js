@@ -151,7 +151,6 @@ export default class RequiredValues extends React.Component {
           value={toolConfiguration.public_jwk}
           label={I18n.t("* Public JWK")}
           maxHeight="10rem"
-          required
           resize="vertical"
           autoGrow
           onChange={this.handlePublicJwkChange}

@@ -32,7 +32,8 @@ import LtiKeyFooter from './LtiKeyFooter'
 
 export default class DeveloperKeyModal extends React.Component {
   state = {
-    toolConfiguration: null // used to save state when saving the key, display what was there if failure
+    toolConfiguration: null, // used to save state when saving the key, display what was there if failure
+    submitted: false
   }
 
   developerKeyUrl() {
@@ -148,8 +149,9 @@ export default class DeveloperKeyModal extends React.Component {
     const { store: { dispatch }, actions } = this.props
     const formData = new FormData(this.submissionForm)
     const redirectUris = formData.get("developer_key[redirect_uris]")
-    if (redirectUris.trim().length === 0) {
+    if (!this.hasRedirectUris(formData)) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
+      this.setState({submitted: true})
       return
     }
     let settings = {};
@@ -165,6 +167,7 @@ export default class DeveloperKeyModal extends React.Component {
       }
     } else if(this.props.createLtiKeyState.configurationMethod === 'manual') {
       if (!this.manualForm.valid()) {
+        this.setState({submitted: true})
         return
       }
       settings = this.manualForm.generateToolConfiguration();
@@ -194,6 +197,11 @@ export default class DeveloperKeyModal extends React.Component {
     }
   }
 
+  hasRedirectUris(formData) {
+    const redirect_uris = formData.get("developer_key[redirect_uris]")
+    return redirect_uris && redirect_uris.trim().length !== 0
+  }
+
   get isLtiKey() {
     return this.props.createLtiKeyState.isLtiKey
   }
@@ -211,7 +219,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   modalFooter() {
     if (this.isLtiKey) {
-      const { createLtiKeyState, store, actions } = this.props
+      const { createLtiKeyState, store, actions, createOrEditDeveloperKeyState: { editing } } = this.props
       return(
         <LtiKeyFooter
           onCancelClick={this.closeModal}
@@ -221,6 +229,7 @@ export default class DeveloperKeyModal extends React.Component {
           disable={this.isSaving}
           ltiKeysSetCustomizing={actions.ltiKeysSetCustomizing}
           dispatch={store.dispatch}
+          saveOnly={editing || createLtiKeyState.configurationMethod === 'manual'}
         />
       )
     }
@@ -267,6 +276,7 @@ export default class DeveloperKeyModal extends React.Component {
       setLtiConfigurationMethod={actions.setLtiConfigurationMethod}
       tool_configuration={this.toolConfiguration}
       editing={editing}
+      showRequiredMessages={this.state.submitted && !this.hasRedirectUris(new FormData(this.submissionForm))}
     />
   }
 
