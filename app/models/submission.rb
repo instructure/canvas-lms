@@ -1184,7 +1184,7 @@ class Submission < ActiveRecord::Base
   # End Plagiarism functions
 
   def external_tool_url
-    URI.encode(url) if self.submission_type == 'basic_lti_launch'
+    URI.encode(url) if url && self.submission_type == 'basic_lti_launch'
   end
 
   def clear_user_submissions_cache
