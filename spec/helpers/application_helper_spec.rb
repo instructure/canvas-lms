@@ -1098,7 +1098,7 @@ describe ApplicationHelper do
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test"
         expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
-        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test"
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test"
       end
 
       it "includes the report URI" do

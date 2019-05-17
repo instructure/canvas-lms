@@ -960,9 +960,10 @@ module ApplicationHelper
     script_domains = csp_context.csp_whitelisted_domains(request, include_files: include_files_domain_in_csp, include_tools: false)
     if include_files_domain_in_csp
       frame_domains = %w{'self'} + frame_domains
+      object_domains = %w{'self'} + script_domains
       script_domains = %w{'self' 'unsafe-eval' 'unsafe-inline'} + script_domains
     end
-    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}"
+    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}"
   end
 
   # Returns true if the current_path starts with the given value
