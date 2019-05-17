@@ -271,6 +271,26 @@ describe "RCE next tests" do
       end
     end
 
+    it "should open tray when clicking options button on existing image" do
+      page_title = "Page1"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      @page = @course.wiki_pages.create!(title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}")
+      visit_existing_wiki_edit(@course, page_title)
+
+      in_frame tiny_rce_ifr_id do
+        f('img').click
+      end
+
+      click_image_options_button
+
+      expect(image_options_tray).to be_displayed
+    end
+
     it "should display assignment publish status in links accordion" do
       skip('Unskip in CORE-2619')
       title = "Assignment-Title"

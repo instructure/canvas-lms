@@ -126,6 +126,14 @@ module RCENextPage
     f('[role="menuitem"][title="Course Images"]')
   end
 
+  def image_options_button
+    f('button[aria-label="Show image options"]')
+  end
+
+  def image_options_tray
+    f('[role="dialog"][aria-label="Image Options Tray"]')
+  end
+
   def rce_page_body_ifr_id
     f('iframe.tox-edit-area__iframe')['id']
   end
@@ -347,5 +355,13 @@ module RCENextPage
 
   def click_a11y_checker_button
     a11y_checker_button.click
+  end
+
+  def click_image_options_button
+    image_options_button.click
+  end
+
+  def click_in_body_image(title)
+    in_body_image(title).click
   end
 end
