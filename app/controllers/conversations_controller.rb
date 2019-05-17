@@ -284,15 +284,20 @@ class ConversationsController < ApplicationController
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id.to_s,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
         :CAN_MESSAGE_ACCOUNT_CONTEXT => valid_account_context?(@domain_root_account),
-        :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
-      }
+        :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size,
+      } 
+      
+     
+      is_admin = @current_user.roles(Account.site_admin).include? 'admin'
+        
+      hash[:CAN_DELETE_INBOX_MESSAGES] = is_admin || @current_user.enrollments.active.any? { |e| e.has_permission_to?(:delete_inbox_messages) }
 
       notes_enabled_accounts = @current_user.associated_accounts.where(enable_user_notes: true)
 
       hash[:NOTES_ENABLED] = notes_enabled_accounts.any?
       hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = notes_enabled_accounts.any? {|a| a.grants_right?(@current_user, :manage_students) }
 
-      if hash[:NOTES_ENABLED] && !hash[:CAN_ADD_NOTES_FOR_ACCOUNT]
+      if hash[:NOTES_ENABLED] && !hash[:CAN_ADD_NOTES_FOR_ACCOUNT] 
         course_note_permissions = {}
         @current_user.enrollments.active.of_instructor_type.preload(:course).each do |enrollment|
           course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
