@@ -128,6 +128,8 @@ class RoleOverride < ActiveRecord::Base
         :restrict_future_enrollments => true,
         :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
       },
+
+      # StrongMind added
       :delete_inbox_messages => {
         :label => lambda { "Delete inbox messages" },
         :available_to => [
