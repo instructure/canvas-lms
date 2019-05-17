@@ -23,11 +23,19 @@ import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
 
+function imageOptionsFromElement($image) {
+  return {
+    altText: $image.alt || '',
+    isDecorativeImage: $image.getAttribute('data-is-decorative') === 'true'
+  }
+}
+
 export default class TrayController {
   constructor() {
     this._editor = null
     this._isOpen = false
     this._shouldOpen = false
+    this._renderId = 0
   }
 
   get $container() {
@@ -56,6 +64,22 @@ export default class TrayController {
     }
   }
 
+  _applyImageOptions(imageOptions) {
+    const editor = this._editor
+    const $img = editor.selection.getNode()
+
+    if (imageOptions.displayAs === 'embed') {
+      $img.alt = imageOptions.altText
+      $img.setAttribute('data-is-decorative', imageOptions.isDecorativeImage)
+      this._dismissTray()
+    } else {
+      const link = `<a href="${$img.src}" target="_blank">${$img.src}</a>`
+      editor.selection.setContent(link)
+      this._dismissTray()
+      editor.focus()
+    }
+  }
+
   _dismissTray() {
     this._shouldOpen = false
     this._renderTray()
@@ -65,14 +89,27 @@ export default class TrayController {
   _renderTray() {
     const $img = this._editor.selection.getNode()
 
+    if (this._shouldOpen) {
+      /*
+       * When the tray is being opened again, it should be rendered fresh
+       * (clearing the internal state) so that the currently-selected image can
+       * be used for initial image options.
+       */
+      this._renderId++
+    }
+
     const element = (
       <ImageOptionsTray
-        imageElement={$img}
+        key={this._renderId}
+        imageOptions={imageOptionsFromElement($img)}
         onEntered={() => {
           this._isOpen = true
         }}
         onExited={() => {
           this._isOpen = false
+        }}
+        onSave={imageOptions => {
+          this._applyImageOptions(imageOptions)
         }}
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}

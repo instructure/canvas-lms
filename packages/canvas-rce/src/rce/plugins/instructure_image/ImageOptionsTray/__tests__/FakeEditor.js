@@ -18,14 +18,52 @@
 
 export default class FakeEditor {
   constructor() {
+    this._$container = null
+
     this._selectedNode = null
 
     this.selection = {
-      getNode: () => this._selectedNode
+      getNode: () => this._selectedNode,
+
+      getContent: () => (this._selectedNode ? this._selectedNode.outerHTML : ''),
+
+      setContent: contentString => {
+        if (this._selectedNode) {
+          this._selectedNode.remove()
+        }
+        const $temp = document.createElement('div')
+        $temp.innerHTML = contentString
+        this._selectedNode = this.$container.appendChild($temp.firstChild)
+      }
     }
+  }
+
+  get $container() {
+    return this._$container
+  }
+
+  initialize() {
+    this.uninitialize()
+    this._$container = document.body.appendChild(document.createElement('div'))
+    this._$container.tabIndex = '0'
+  }
+
+  uninitialize() {
+    if (this._$container) {
+      this._$container.remove()
+      this._$container = null
+    }
+  }
+
+  appendElement($element) {
+    this._$container.appendChild($element)
   }
 
   setSelectedNode($element) {
     this._selectedNode = $element
+  }
+
+  focus() {
+    this._$container.focus()
   }
 }
