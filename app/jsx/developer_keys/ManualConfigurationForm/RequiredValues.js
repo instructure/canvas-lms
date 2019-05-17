@@ -24,6 +24,7 @@ import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldG
 import TextInput from '@instructure/ui-forms/lib/components/TextInput';
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 
 const validationMessage = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 
@@ -96,7 +97,9 @@ export default class RequiredValues extends React.Component {
       <FormFieldGroup
         description={I18n.t("Required Values")}
       >
-        <hr />
+        <PresentationContent>
+          <hr />
+        </PresentationContent>
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Display Values')}</ScreenReaderContent>}
           layout="columns"
@@ -151,7 +154,9 @@ export default class RequiredValues extends React.Component {
           onChange={this.handlePublicJwkChange}
           messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
         />
-        <hr />
+        <PresentationContent>
+          <hr />
+        </PresentationContent>
       </FormFieldGroup>
     )
   }
