@@ -224,8 +224,17 @@
   "quizzes_7e598f57": {
     "message": "Контрольні Роботи"
   },
+  "record_7c9448b": {
+    "message": "Записати"
+  },
   "record_upload_media_5fdce166": {
     "message": "Запис/завантаження медіа"
+  },
+  "recording_98da6bda": {
+    "message": "Запис"
+  },
+  "save_11a80ec3": {
+    "message": "Зберегти"
   },
   "search_280d00bd": {
     "message": "Пошук"
@@ -238,6 +247,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Виберіть теку, до якої завантажити ваш файл"
+  },
+  "start_over_f7552aa9": {
+    "message": "Почати з початку"
   },
   "submit_a3cc6859": {
     "message": "Підтвердити"
@@ -269,11 +281,17 @@
   "upload_a_new_image_890df275": {
     "message": "Завантажити нове зображення"
   },
+  "upload_media_ce31135a": {
+    "message": "Завантажити медіа контент"
+  },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Права використання:"
+  },
+  "video_player_b371005": {
+    "message": "Відеопрогравач"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Як би ви хотіли назвати нову сторінку?"

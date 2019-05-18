@@ -206,6 +206,15 @@
   "quizzes_7e598f57": {
     "message": "آزمون ها"
   },
+  "record_7c9448b": {
+    "message": "ضبط کردن"
+  },
+  "recording_98da6bda": {
+    "message": "در حال ضبط"
+  },
+  "save_11a80ec3": {
+    "message": "ذخیره سازی"
+  },
   "search_280d00bd": {
     "message": "جستجو"
   },
@@ -220,6 +229,9 @@
   },
   "sort_by_e75f9e3e": {
     "message": "مرتب کردن بر اساس"
+  },
+  "start_over_f7552aa9": {
+    "message": "شروع دوباره"
   },
   "submit_a3cc6859": {
     "message": "ارسال"
@@ -251,11 +263,17 @@
   "upload_file_fd2361b8": {
     "message": "بارگذاری فایل"
   },
+  "upload_media_ce31135a": {
+    "message": "بارگذاری رسانه"
+  },
   "url_22a5f3b8": {
     "message": "نشانی اینترنتی"
   },
   "usage_right_ff96f3e2": {
     "message": "حق استفاده:"
+  },
+  "video_player_b371005": {
+    "message": "پخش کننده فیلم"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "مایلید نام این صفحه جدید چه باشد؟"

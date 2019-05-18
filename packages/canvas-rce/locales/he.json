@@ -221,6 +221,15 @@
   "quizzes_7e598f57": {
     "message": "בחנים"
   },
+  "record_7c9448b": {
+    "message": "הקלטה"
+  },
+  "recording_98da6bda": {
+    "message": "מקליט"
+  },
+  "save_11a80ec3": {
+    "message": "שמירה "
+  },
   "search_280d00bd": {
     "message": "חיפוש"
   },
@@ -232,6 +241,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "בחירת תיקיה להעלאת הקובץ שלך"
+  },
+  "start_over_f7552aa9": {
+    "message": "התחל/י מהתחלה"
   },
   "submit_a3cc6859": {
     "message": "הגשה"
@@ -263,11 +275,17 @@
   "upload_file_fd2361b8": {
     "message": "העלאת קובץ"
   },
+  "upload_media_ce31135a": {
+    "message": "העלאת מדיה"
+  },
   "url_22a5f3b8": {
     "message": "כתובת דף אינטרנט"
   },
   "usage_right_ff96f3e2": {
     "message": "זכויות שימוש"
+  },
+  "video_player_b371005": {
+    "message": "נגן הוידאו"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "איך לקרוא לדף החדש?"

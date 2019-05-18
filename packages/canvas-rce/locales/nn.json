@@ -191,6 +191,9 @@
   "files_index_af7c662b": {
     "message": "Filoversikt"
   },
+  "finish_bc343002": {
+    "message": "Fullfør"
+  },
   "folder_705fd2d7": {
     "message": "Mappe"
   },
@@ -272,6 +275,9 @@
   "media_af190855": {
     "message": "Media"
   },
+  "mic_a7f3d311": {
+    "message": "Mic"
+  },
   "modules_c4325335": {
     "message": "Modular"
   },
@@ -308,11 +314,20 @@
   "quizzes_7e598f57": {
     "message": "Quizar"
   },
+  "record_7c9448b": {
+    "message": "Spel inn"
+  },
   "record_upload_media_5fdce166": {
     "message": "Ta opp / last opp media"
   },
+  "recording_98da6bda": {
+    "message": "Opptak"
+  },
   "remove_link_71c05bee": {
     "message": "Fjern lenke"
+  },
+  "save_11a80ec3": {
+    "message": "Lagre"
   },
   "search_280d00bd": {
     "message": "Søk"
@@ -332,11 +347,17 @@
   "something_went_wrong_89195131": {
     "message": "Noko gjekk gale."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Noko gjekk gale med tilgangen til mikrofonen eller webkameraet ditt. "
+  },
   "sort_by_e75f9e3e": {
     "message": "Sorter etter"
   },
   "square_unordered_list_b15ce93b": {
     "message": "firkanta uordna liste"
+  },
+  "start_over_f7552aa9": {
+    "message": "Start på nytt"
   },
   "subheader_2b87606d": {
     "message": "Underoverskrift"
@@ -365,9 +386,6 @@
   "to_do_when_2783d78f": {
     "message": "Gjeremål: { when }"
   },
-  "toggle_raw_html_view_d1aaea9e": {
-    "message": "Slå på rein HTML-vising"
-  },
   "tray_839df38a": {
     "message": "Sidemeny"
   },
@@ -389,6 +407,9 @@
   "upload_image_6120b609": {
     "message": "Last opp bilde"
   },
+  "upload_media_ce31135a": {
+    "message": "Last opp media"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "alfabetisk ordna liste i store bokstavar"
   },
@@ -397,6 +418,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Bruksrett:"
+  },
+  "video_player_b371005": {
+    "message": "Videoavspelar"
   },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Sjå hurtigtastar"

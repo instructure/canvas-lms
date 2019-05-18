@@ -206,6 +206,15 @@
   "quizzes_7e598f57": {
     "message": "Kvízek"
   },
+  "record_7c9448b": {
+    "message": "Felvétel"
+  },
+  "recording_98da6bda": {
+    "message": "Felvétel"
+  },
+  "save_11a80ec3": {
+    "message": "Mentés"
+  },
   "search_280d00bd": {
     "message": "Keresés"
   },
@@ -214,6 +223,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "start_over_f7552aa9": {
+    "message": "Újrakezdés"
   },
   "submit_a3cc6859": {
     "message": "Beküldés"
@@ -242,11 +254,17 @@
   "upload_a_new_image_890df275": {
     "message": "Új kép feltöltése"
   },
+  "upload_media_ce31135a": {
+    "message": "Médiafájl feltöltése"
+  },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Felhasználási jog:"
+  },
+  "video_player_b371005": {
+    "message": "Videólejátszó"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Mi legyen az új oldal neve?"

@@ -209,6 +209,15 @@
   "quizzes_7e598f57": {
     "message": "Kısa sınavlar"
   },
+  "record_7c9448b": {
+    "message": "Kayıt"
+  },
+  "recording_98da6bda": {
+    "message": "Kaydediliyor"
+  },
+  "save_11a80ec3": {
+    "message": "Kaydet"
+  },
   "search_280d00bd": {
     "message": "Ara"
   },
@@ -223,6 +232,9 @@
   },
   "sort_by_e75f9e3e": {
     "message": "Sırala"
+  },
+  "start_over_f7552aa9": {
+    "message": "Baştan Başla"
   },
   "submit_a3cc6859": {
     "message": "Gönder"
@@ -253,6 +265,9 @@
   },
   "upload_file_fd2361b8": {
     "message": "Dosya Yükle"
+  },
+  "upload_media_ce31135a": {
+    "message": "Ortama Yükle"
   },
   "url_22a5f3b8": {
     "message": "URL"

@@ -206,6 +206,15 @@
   "quizzes_7e598f57": {
     "message": "Թեստեր"
   },
+  "record_7c9448b": {
+    "message": "Գրառում"
+  },
+  "recording_98da6bda": {
+    "message": "Ձայնագրում"
+  },
+  "save_11a80ec3": {
+    "message": "Պահպանել"
+  },
   "search_280d00bd": {
     "message": "Որոնել"
   },
@@ -214,6 +223,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "start_over_f7552aa9": {
+    "message": "Սկսել նորից"
   },
   "submit_a3cc6859": {
     "message": "Ուղարկել"
@@ -250,6 +262,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Օգտագործման իրավունք՝"
+  },
+  "video_player_b371005": {
+    "message": "Տեսաձայնագրության նվագարկիչ"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Ինչպե՞ս կցանկանայիք անվանել նոր էջը:"

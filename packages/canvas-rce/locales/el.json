@@ -206,6 +206,15 @@
   "quizzes_7e598f57": {
     "message": "Κουίζ"
   },
+  "record_7c9448b": {
+    "message": "Ηχογράφηση"
+  },
+  "recording_98da6bda": {
+    "message": "Εγγράφεται"
+  },
+  "save_11a80ec3": {
+    "message": "Αποθήκευση"
+  },
   "search_280d00bd": {
     "message": "Αναζήτηση"
   },
@@ -214,6 +223,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Επιλέξτε το φάκελο στον οποίο θέλετε να φορτώσετε το αρχείο "
+  },
+  "start_over_f7552aa9": {
+    "message": "Ξεκινήστε Ξανά"
   },
   "submit_a3cc6859": {
     "message": "Υποβολή"
@@ -245,11 +257,17 @@
   "upload_file_fd2361b8": {
     "message": "Φόρτωση Αρχείου"
   },
+  "upload_media_ce31135a": {
+    "message": "Μεταφόρτωση Αρχείου Πολυμέσων"
+  },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Δικαίωμα Χρήσης:"
+  },
+  "video_player_b371005": {
+    "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Πως θέλετε να ονομάσετε τη νέα σελίδα;"

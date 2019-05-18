@@ -124,6 +124,9 @@
   "copyright_holder_66ee111": {
     "message": "Copyright Holder:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 words}\n    one {1 word}\n  other {# words}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Course Documents"
   },
@@ -235,6 +238,9 @@
   },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
+  },
+  "image_options_tray_90a46006": {
+    "message": "Image Options Tray"
   },
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
@@ -422,6 +428,12 @@
   "superscript_8cb349a2": {
     "message": "Superscript"
   },
+  "switch_to_raw_html_view_1f016020": {
+    "message": "Switch to raw html view"
+  },
+  "switch_to_rich_text_view_5286f610": {
+    "message": "Switch to rich text view"
+  },
   "syllabus_f191f65b": {
     "message": "Syllabus"
   },
@@ -442,9 +454,6 @@
   },
   "to_do_when_2783d78f": {
     "message": "To Do: { when }"
-  },
-  "toggle_raw_html_view_d1aaea9e": {
-    "message": "Toggle raw html view"
   },
   "tray_839df38a": {
     "message": "Tray"
