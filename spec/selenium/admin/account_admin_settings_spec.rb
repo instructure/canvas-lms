@@ -50,6 +50,7 @@ describe "root account basic settings" do
   end
 
   it "has date pickers for reports", custom_timeout: 30  do
+    skip("until we can make this fast enough, or delete the spec which is probably fine CORE-2980")
     course_with_admin_logged_in
     get account_settings_url
     f('#tab-reports-link').click()
