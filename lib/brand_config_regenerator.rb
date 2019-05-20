@@ -41,7 +41,7 @@ class BrandConfigRegenerator
       if @account.site_admin?
         # note: this is only root accounts on the same shard as site admin
         @account.shard.activate do
-          root_scope = Account.root_accounts.active.where.not(id: @account)
+          root_scope = Account.root_accounts.active.non_shadow.where.not(id: @account)
           result.concat(root_scope.select(&:brand_config_md5))
           result.concat(SharedBrandConfig.where(account_id: root_scope))
 
