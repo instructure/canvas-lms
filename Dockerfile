@@ -61,6 +61,7 @@ COPY packages     ${APP_HOME}packages
 COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
 COPY yarn.lock    ${APP_HOME}
+COPY babel.config.js ${APP_HOME}
 RUN find gems packages -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
