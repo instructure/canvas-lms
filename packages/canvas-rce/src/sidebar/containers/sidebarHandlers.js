@@ -23,6 +23,7 @@ import {
   createMediaServerSession,
   fetchFolders,
   openOrCloseUploadForm,
+  saveMediaRecording,
   uploadPreflight,
   uploadToMediaFolder
 } from "../actions/upload";
@@ -47,6 +48,7 @@ export default function propsFromDispatch(dispatch) {
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
     startMediaUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
-    createMediaServerSession: (props) => dispatch(createMediaServerSession(props))
+    createMediaServerSession: () => dispatch(createMediaServerSession()),
+    saveMediaRecording: (file, editor, dismiss) => dispatch(saveMediaRecording(file, editor, dismiss))
   };
 }

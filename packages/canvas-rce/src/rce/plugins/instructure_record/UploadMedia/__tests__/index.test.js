@@ -23,7 +23,7 @@ import {UploadMedia} from '../index'
 describe('UploadMedia', () => {
   it('calls onDismiss prop when closing', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<UploadMedia onDismiss={handleDismiss} />)
+    const {getByText} = render(<UploadMedia editor={{}} onDismiss={handleDismiss} />)
 
     const closeBtn = getByText('Close')
     fireEvent.click(closeBtn)

@@ -19,10 +19,13 @@
 import * as files from "./files";
 import * as images from "./images";
 import Bridge from "../../bridge";
-import { fileEmbed } from "../../common/mimeClass";
+import {fileEmbed} from "../../common/mimeClass";
+import K5Uploader from '@instructure/k5uploader'
 
 export const RECEIVE_FOLDER = "RECEIVE_FOLDER";
 export const FAIL_FOLDERS_LOAD = "FAIL_FOLDERS_LOAD";
+export const FAIL_MEDIA_UPLOAD = "FAIL_MEDIA_UPLOAD";
+export const MEDIA_UPLOAD_SUCCESS = "MEDIA_UPLOAD_SUCCESS";
 export const START_FILE_UPLOAD = "START_FILE_UPLOAD";
 export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
@@ -48,6 +51,14 @@ export function receiveFolder({ id, name, parentId }) {
 
 export function failFoldersLoad(error) {
   return { type: FAIL_FOLDERS_LOAD, error };
+}
+
+export function failMediaUpload(error) {
+  return { type: FAIL_MEDIA_UPLOAD, error };
+}
+
+export function mediaUploadSuccess() {
+  return { type: MEDIA_UPLOAD_SUCCESS };
 }
 
 export function startUpload(fileMetaProps) {
@@ -164,6 +175,68 @@ export function fetchFolders(bookmark) {
         });
     }
   };
+}
+
+function generateUploadOptions(mediatypes, sessionData) {
+  const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
+  delete sessionDataCopy["kaltura_setting"]
+  return {
+    kaltura_session: sessionDataCopy,
+    allowedMediaTypes: mediatypes,
+    uploadUrl: sessionData.kaltura_setting.uploadUrl,
+    entryUrl: sessionData.kaltura_setting.entryUrl,
+    uiconfUrl: sessionData.kaltura_setting.uiconfUrl,
+    entryDefaults: {
+      partnerData: sessionData.kaltura_setting.partner_data
+    }
+  }
+}
+
+function addUploaderReadyEventListeners(uploader, file) {
+  uploader.addEventListener('K5.ready', () => {
+    uploader.uploadFile(file)
+  })
+}
+
+function addUploaderFileErrorEventListeners(uploader, dispatch) {
+  uploader.addEventListener('K5.fileError', (error) => {
+    dispatch(failMediaUpload(error));
+  })
+}
+
+function addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, context, source) {
+  uploader.addEventListener('K5.complete', (mediaServerMediaObject) => {
+    mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
+    mediaServerMediaObject.type= `${context.contextType}_${context.contextId}`
+    source.uploadMediaToCanvas(mediaServerMediaObject).then(() => {
+      var videoElement = editor.dom.add(editor.getBody(), 'div', { 'class': 'draggableTemplate' }, ' ');
+      editor.dom.add(videoElement, 'video', { 'width': '550', 'height': ' 426', 'controls': 'true','src': 'http://www.google.com'});
+      dispatch(mediaUploadSuccess());
+      dismiss()
+    }).catch((error)=> {
+      dispatch(failMediaUpload(error));
+    })
+  })
+}
+
+export function saveMediaRecording(file, editor, dismiss) {
+  return (dispatch, getState) => {
+    dispatch(startLoading());
+    const { source, contextId, contextType } = getState();
+    return source.mediaServerSession()
+    .then((mediaServerSession) => {
+      Bridge.setMediaServerSession(mediaServerSession)
+      const session = generateUploadOptions(['video', 'audio', 'webm', 'video/webm', 'audio/webm'], mediaServerSession)
+      const uploader = new K5Uploader(session)
+      addUploaderReadyEventListeners(uploader, file)
+      addUploaderFileErrorEventListeners(uploader, dispatch)
+      addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, {contextId, contextType}, source)
+      return uploader
+    })
+    .catch(error => {
+      dispatch(failMediaUpload(error));
+    })
+  }
 }
 
 export function createMediaServerSession() {

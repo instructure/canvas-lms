@@ -16,22 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useState} from 'react'
-import {func, object} from 'prop-types'
-import {Modal} from '@instructure/ui-overlays'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading, Spinner} from '@instructure/ui-elements'
-import {Tabs} from '@instructure/ui-tabs'
+import {CloseButton} from '@instructure/ui-buttons'
 import formatMessage from '../../../../format-message'
+import {func, object} from 'prop-types'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {Modal} from '@instructure/ui-overlays'
+import React, {Suspense, useState} from 'react'
+import {Tabs} from '@instructure/ui-tabs'
+import {View} from '@instructure/ui-layout'
 
-import {StoreProvider} from '../../shared/StoreContext'
 import Bridge from '../../../../bridge'
+import {StoreProvider} from '../../shared/StoreContext'
 
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
-const UrlPanel = React.lazy(() => import('./UrlPanel'))
 
 export function UploadMedia(props) {
-  const [ imageUrl, setImageUrl ] = useState('');
   const [ selectedPanel, setSelectedPanel ] = useState(0)
   const trayProps = Bridge.trayProps.get(props.editor)
 
@@ -42,7 +41,6 @@ export function UploadMedia(props) {
           label={formatMessage('Upload Media')}
           size="large"
           onDismiss={props.onDismiss}
-          onSubmit={() => {}}
           open
           shouldCloseOnDocumentClick
         >
@@ -56,23 +54,18 @@ export function UploadMedia(props) {
             <Tabs selectedIndex={selectedPanel} onChange={(newIndex) => setSelectedPanel(newIndex)}>
               <Tabs.Panel title={formatMessage('Computer')}>Computer Panel Here</Tabs.Panel>
               <Tabs.Panel title={formatMessage('Record')}>
-                <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
-                  <MediaRecorder editor={props.editor} contentProps={contentProps}/>
+                <Suspense fallback={
+                  <View as="div" height="100%" width="100%" textAlign="center">
+                    <Spinner renderTitle={formatMessage('Loading media')} size="large" margin="0 0 0 medium" />
+                  </View>
+                }>
+                  <MediaRecorder editor={props.editor} dismiss={props.onDismiss} contentProps={contentProps}/>
                 </Suspense>
               </Tabs.Panel>
               <Tabs.Panel title={formatMessage('URL')}>
-              <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
-                  <UrlPanel imageUrl={imageUrl} setImageUrl={setImageUrl} />
-                </Suspense>
               </Tabs.Panel>
             </Tabs>
           </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={props.onDismiss}>{formatMessage('Close')}</Button>&nbsp;
-            <Button variant="primary" type="submit">
-              {formatMessage('Submit')}
-            </Button>
-          </Modal.Footer>
         </Modal>
       )}
     </StoreProvider>

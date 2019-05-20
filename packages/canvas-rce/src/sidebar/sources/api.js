@@ -167,6 +167,18 @@ class RceApiSource {
     return this.apiPost(this.baseUri("v1/services/kaltura_session"), headerFor(this.jwt), {})
   }
 
+  uploadMediaToCanvas(mediaObject) {
+    const body = {
+      id: mediaObject.entryId,
+      type: { 2: 'image', 5: 'audio' }[mediaObject.mediaType] || mediaObject.type.includes("audio") ? 'audio' : 'video',
+      context_code: mediaObject.contextCode,
+      title: mediaObject.title,
+      user_entered_title: mediaObject.userTitle
+    }
+
+    return this.apiPost(this.baseUri("media_objects"), headerFor(this.jwt), body)
+  }
+
   // fetches folders for the given context to upload files to
   fetchFolders(props, bookmark) {
     let headers = headerFor(this.jwt)

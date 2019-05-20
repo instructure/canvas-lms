@@ -19,6 +19,8 @@
 import {
   START_FILE_UPLOAD,
   FAIL_FILE_UPLOAD,
+  FAIL_MEDIA_UPLOAD,
+  MEDIA_UPLOAD_SUCCESS,
   TOGGLE_UPLOAD_FORM,
   COMPLETE_FILE_UPLOAD,
   RECEIVE_FOLDER,
@@ -143,6 +145,19 @@ function loadingFolders(state = false, action) {
   }
 }
 
+function uploadingMediaStatus(state = false, action) {
+  switch (action.type) {
+    case START_LOADING:
+      return {loading: true, uploaded: false, error: false};
+    case FAIL_MEDIA_UPLOAD:
+      return {loading: false, uploaded: false, error: true};
+    case MEDIA_UPLOAD_SUCCESS:
+      return {loading: false, uploaded: true, error: false};
+    default:
+      return state;
+  }
+}
+
 export default combineReducers({
   uploading,
   formExpanded,
@@ -150,5 +165,6 @@ export default combineReducers({
   rootFolderId,
   folderTree,
   error,
-  loadingFolders
+  loadingFolders,
+  uploadingMediaStatus
 });
