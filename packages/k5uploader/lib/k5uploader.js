@@ -63,10 +63,7 @@ K5Uploader.prototype.uploadFile = function(file) {
     return
   }
 
-  if (ENV.ARC_RECORDING_FEATURE_ENABLED && this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes) || ["webm", "video/webm", "audio/webm"].includes(file.type)) {
-    this.uploader = new Uploader();
-    this.uploader.send(this.session, file);
-  } else if (this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes)) {
+ if (this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes) || ["webm", "video/webm", "audio/webm"].includes(file.type)) {
     this.uploader = new Uploader();
     this.uploader.send(this.session, file);
   } else {
@@ -81,23 +78,12 @@ K5Uploader.prototype.uploadFile = function(file) {
 
 K5Uploader.prototype.onUploadSuccess = function(result) {
   // combine all needed data and add an entry to kaltura
-  var allParams;
-  if (ENV.ARC_RECORDING_FEATURE_ENABLED) {
-    allParams = [
+  var allParams = [
       this.session.asEntryParams(),
       result.asEntryParams(),
       k5Options.asEntryParams()
     ]
     this.entryService.addEntry(allParams)
-  } else {
-    allParams = [
-      this.uiconfig.asEntryParams(this.file.name),
-      this.session.asEntryParams(),
-      result.asEntryParams(),
-      k5Options.asEntryParams()
-    ]
-    this.entryService.addEntry(allParams)
-  }
 }
 
 // Delegate to publicly available K5 events
