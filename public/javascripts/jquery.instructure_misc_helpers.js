@@ -110,43 +110,6 @@ import './vendor/jquery.scrollTo'
     return $.map(res.split(/\s/), function(word) { return (word[0] || "").toUpperCase() + word.substring(1); }).join(" ");
   };
 
-  $.parseUserAgentString = function(userAgent) {
-    userAgent = (userAgent || "").toLowerCase();
-    var data = {
-      version: (userAgent.match( /.+(?:me|ox|it|ra|ie|er|rv|version)[\/: ]([\d.]+)/ ) || [0,null])[1],
-      chrome: /chrome/.test( userAgent ),
-      safari: /webkit/.test( userAgent ),
-      opera: /opera/.test( userAgent ),
-      msie: (/msie/.test( userAgent ) || (/trident/.test( userAgent ))) && !(/opera/.test( userAgent )),
-      firefox: /firefox/.test( userAgent),
-      mozilla: /mozilla/.test( userAgent ) && !(/(compatible|webkit)/.test( userAgent )),
-      speedgrader: /speedgrader/.test( userAgent )
-    };
-    var browser = null;
-    if(data.chrome) {
-      browser = "Chrome";
-    } else if(data.safari) {
-      browser = "Safari";
-    } else if(data.opera) {
-      browser = "Opera";
-    } else if(data.msie) {
-      browser = "Internet Explorer";
-    } else if(data.firefox) {
-      browser = "Firefox";
-    } else if(data.mozilla) {
-      browser = "Mozilla";
-    } else if(data.speedgrader) {
-      browser = "SpeedGrader for iPad";
-    }
-    if (!browser) {
-      browser = I18n.t('browsers.unrecognized', "Unrecognized Browser");
-    } else if(data.version) {
-      data.version = data.version.split(/\./).slice(0,2).join(".");
-      browser = browser + " " + data.version;
-    }
-    return browser;
-  };
-
   $.fileSize = function(bytes) {
     var factor = 1024;
     if(bytes < factor) {

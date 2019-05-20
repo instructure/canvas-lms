@@ -16,10 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import Backbone from 'Backbone'
+import I18n from 'i18n!modelsPageView'
 import TextHelper from '../str/TextHelper'
-import 'jquery.instructure_misc_helpers' // $.parseUserAgentString
+
+function parseUserAgentString(userAgent) {
+  userAgent = (userAgent || '').toLowerCase()
+  const data = {
+    version: (userAgent.match(/.+(?:me|ox|it|ra|ie|er|rv|version)[\/: ]([\d.]+)/) || [0, null])[1],
+    chrome: /chrome/.test(userAgent),
+    safari: /webkit/.test(userAgent),
+    opera: /opera/.test(userAgent),
+    msie: (/msie/.test(userAgent) || /trident/.test(userAgent)) && !/opera/.test(userAgent),
+    firefox: /firefox/.test(userAgent),
+    mozilla: /mozilla/.test(userAgent) && !/(compatible|webkit)/.test(userAgent),
+    speedgrader: /speedgrader/.test(userAgent)
+  }
+  let browser = null
+  if (data.chrome) {
+    browser = 'Chrome'
+  } else if (data.safari) {
+    browser = 'Safari'
+  } else if (data.opera) {
+    browser = 'Opera'
+  } else if (data.msie) {
+    browser = 'Internet Explorer'
+  } else if (data.firefox) {
+    browser = 'Firefox'
+  } else if (data.mozilla) {
+    browser = 'Mozilla'
+  } else if (data.speedgrader) {
+    browser = 'SpeedGrader for iPad'
+  }
+  if (!browser) {
+    browser = I18n.t('browsers.unrecognized', 'Unrecognized Browser')
+  } else if (data.version) {
+    data.version = data.version.split(/\./).slice(0, 2).join('.')
+    browser = `${browser} ${data.version}`
+  }
+  return browser
+}
 
 export default class PageView extends Backbone.Model {
   isLinkable() {
@@ -29,7 +65,7 @@ export default class PageView extends Backbone.Model {
   }
 
   summarizedUserAgent() {
-    return this.get('app_name') || $.parseUserAgentString(this.get('user_agent'))
+    return this.get('app_name') || parseUserAgentString(this.get('user_agent'))
   }
 
   readableInteractionTime() {
