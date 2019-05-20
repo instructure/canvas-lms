@@ -134,6 +134,7 @@ export default class ImageSearch extends React.Component {
             photos.map(photo => (
               <ImageSearchItem
                 key={photo.id}
+                confirmationId={photo.id}
                 src={photo.small_url}
                 description={photo.description ? photo.description : this.state.searchTerm}
                 selectImage={this.props.selectImage}

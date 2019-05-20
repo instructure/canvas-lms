@@ -23,11 +23,12 @@ class ImageSearchItem extends React.Component {
   static propTypes = {
     description: PropTypes.string,
     src: PropTypes.string,
+    confirmationId: PropTypes.string,
     selectImage: PropTypes.func
   }
 
   handleClick = () => {
-    this.props.selectImage(this.props.src);
+    this.props.selectImage(this.props.src, this.props.confirmationId);
   }
 
   render () {

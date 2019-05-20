@@ -88,9 +88,9 @@ export default class CourseImageSelector extends React.Component {
               handleFileUpload={(e, courseId) =>
                 this.props.store.dispatch(Actions.uploadFile(e, courseId))
               }
-              handleImageSearchUrlUpload={imageUrl =>
+              handleImageSearchUrlUpload={(imageUrl, confirmationId = null) =>
                 this.props.store.dispatch(
-                  Actions.uploadImageSearchUrl(imageUrl, this.props.courseId)
+                  Actions.uploadImageSearchUrl(imageUrl, this.props.courseId, confirmationId)
                 )
               }
               uploadingImage={this.state.uploadingImage}

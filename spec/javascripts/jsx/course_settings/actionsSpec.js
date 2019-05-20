@@ -38,6 +38,8 @@ test('calling setModalVisibility produces the proper object', () => {
       showModal: false
     }
   };
+
+  deepEqual(actual, expected)
 });
 
 test('calling gotCourseImage produces the proper object', () => {
@@ -124,6 +126,20 @@ test('prepareSetImage without a imageUrl calls the API to get the url', assert =
     Actions.putImageData.restore();
     done()
   });
+});
+
+test('uploadImageSearchUrl without a confirmationId should not call confirmImageSelection', () => {
+  sinon.spy(Actions, 'confirmImageSelection');
+  Actions.uploadImageSearchUrl('http://imageUrl', 1)(() => {});
+  notOk(Actions.confirmImageSelection.called);
+  Actions.confirmImageSelection.restore();
+});
+
+test('uploadImageSearchUrl with a confirmationId calls confirmImageSelection', () => {
+  sinon.spy(Actions, 'confirmImageSelection');
+  Actions.uploadImageSearchUrl('http://imageUrl', 1, 'id')(() => {});
+  ok(Actions.confirmImageSelection.called);
+  Actions.confirmImageSelection.restore();
 });
 
 test('uploadFile returns false when image is not valid', assert => {

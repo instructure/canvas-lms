@@ -99,7 +99,9 @@ export default class CourseImagePicker extends React.Component {
           />
           {ENV.use_unsplash_image_search ? (
             <ImageSearch
-              selectImage={imageUrl => this.props.handleImageSearchUrlUpload(imageUrl)}
+              selectImage={(imageUrl, confirmationId) =>
+                this.props.handleImageSearchUrlUpload(imageUrl, confirmationId)
+              }
             />
           ) : (
             <FlickrSearch

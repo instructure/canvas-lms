@@ -18,6 +18,7 @@
 
 import axios from 'axios'
 import $ from 'jquery'
+import qs from 'qs'
 import I18n from 'i18n!actions'
 import Helpers from './helpers'
 import {uploadFile as rawUploadFile} from '../shared/upload_file'
@@ -164,11 +165,19 @@ const Actions = {
     }
   },
 
-  uploadImageSearchUrl(imageUrl, courseId, ajaxLib = axios) {
+  uploadImageSearchUrl(imageUrl, courseId, confirmationId = null, ajaxLib = axios) {
     return dispatch => {
       dispatch(this.uploadingImage())
       dispatch(this.putImageData(courseId, imageUrl, null, ajaxLib))
+      if (confirmationId != null) {
+        this.confirmImageSelection(confirmationId, ajaxLib)
+      }
     }
+  },
+
+  confirmImageSelection(confirmationId, ajaxLib = axios) {
+    // We don't need to wait for this response to come back.  This is best effort for Unsplash's benefit.
+    return ajaxLib.post(`/api/v1/image_selection/${confirmationId}`)
   },
 
   uploadFile(event, courseId, ajaxLib = axios) {
@@ -202,17 +211,7 @@ const Actions = {
   },
 
   ajaxPutFormData(path, data, ajaxLib = axios) {
-    return ajaxLib.put(path, data, {
-      // TODO: this is a naive implementation,
-      // upgrading to axios@0.12.0 will make it unnecessary
-      // by using URLSearchParams.
-      transformRequest(data) {
-        return Object.keys(data).reduce(
-          (prev, key) => `${prev + (prev ? '&' : '')}${key}=${data[key]}`,
-          ''
-        )
-      }
-    })
+    return ajaxLib.put(path, qs.stringify(data))
   }
 }
 
