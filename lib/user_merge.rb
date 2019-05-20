@@ -162,6 +162,12 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+    @merge_data.update_attributes(workflow_state: 'active')
+  rescue => e
+    @merge_data&.update_attribute(:workflow_state, 'failed')
+    @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message))
+    Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id)
+    raise
   end
 
   def copy_favorites

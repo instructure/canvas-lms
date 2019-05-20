@@ -18,8 +18,8 @@
 class UserMergeData < ActiveRecord::Base
   belongs_to :user
   belongs_to :from_user, class_name: 'User'
-  has_many :records, class_name: 'UserMergeDataRecord', inverse_of: :merge_data
-  has_many :items, class_name: 'UserMergeDataItem', inverse_of: :merge_data
+  has_many :records, class_name: 'UserMergeDataRecord', inverse_of: :merge_data, autosave: false
+  has_many :items, class_name: 'UserMergeDataItem', inverse_of: :merge_data, autosave: false
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
   scope :splitable, -> { where('created_at > ?', split_time) }

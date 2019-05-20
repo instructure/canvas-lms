@@ -32,6 +32,15 @@ describe UserMerge do
       expect(user2).to be_deleted
     end
 
+    it 'should require mark as failed on failure users' do
+      mergeme = UserMerge.from(user2)
+      # make any method that gets called raise an error
+      allow(mergeme).to receive(:copy_favorites).and_raise('boom')
+      expect { mergeme.into(user1) }.to raise_error('boom')
+      expect(mergeme.merge_data.workflow_state).to eq 'failed'
+      expect(mergeme.merge_data.items.where(item_type: 'merge_error').take.item.first).to eq 'boom'
+    end
+
     it "should move pseudonyms to the new user" do
       pseudonym = user2.pseudonyms.create!(unique_id: 'sam@yahoo.com')
       pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@yahoo.com')
