@@ -324,6 +324,12 @@ describe("fixIssue", () => {
     instance.fixIssue(ev)
     expect(instance.check).not.toHaveBeenCalled()
   })
+
+  test("focuses the close button", () => {
+    instance._closeButtonRef = {focus: jest.fn()}
+    instance.fixIssue(ev)
+    expect(instance._closeButtonRef.focus).toHaveBeenCalled()
+  })
 })
 
 describe("render", () => {
