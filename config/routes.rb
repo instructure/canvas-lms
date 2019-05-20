@@ -2186,6 +2186,10 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
       get "accounts/:account_id/csp_log", action: :csp_log
     end
+
+    scope(:controller => :context) do
+      post 'media_objects', action: 'create_media_object', as: :create_media_object
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
