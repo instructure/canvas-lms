@@ -224,6 +224,35 @@ module Lti
       end
     end
 
+    describe 'after_update' do
+      subject { tool_configuration.update!(changes) }
+
+      before { tool_configuration.update!(developer_key: developer_key) }
+
+      context 'when a change to the settings hash was made' do
+        let(:changed_settings) do
+          s = settings
+          s['title'] = 'new title!'
+          s
+        end
+        let(:changes) { {settings: changed_settings} }
+
+        it 'calls update_external_tools! on the developer key' do
+          expect(developer_key).to receive(:update_external_tools!)
+          subject
+        end
+      end
+
+      context 'when a change to the settings hash was not made' do
+        let(:changes) { {disabled_placements: []} }
+
+        it 'does not call update_external_tools! on the developer key' do
+          expect(developer_key).not_to receive(:update_external_tools!)
+          subject
+        end
+      end
+    end
+
     describe '#new_external_tool' do
       subject{ tool_configuration.new_external_tool(context) }
 

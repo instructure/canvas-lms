@@ -46,13 +46,14 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   end
   let(:new_url) { 'https://www.new-url.com/test' }
   let(:dev_key_id) { developer_key.id }
+  let(:privacy_level) { 'public' }
   let(:params) do
     {
       developer_key: dev_key_params,
       account_id: sub_account.id,
       developer_key_id: dev_key_id,
       tool_configuration: {
-        privacy_level: 'public',
+        privacy_level: privacy_level,
         settings: settings
       }
     }.compact
@@ -95,6 +96,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       )
     end
     let(:url) { 'https://www.mytool.com/config/json' }
+    let(:privacy_level) { 'public' }
     let(:params) do
       {
         developer_key: dev_key_params,
@@ -104,7 +106,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
           settings_url: url,
           disabled_placements: ['course_navigation', 'account_navigation'],
           custom_fields: "foo=bar\r\nkey=value",
-          privacy_level: 'public'
+          privacy_level: privacy_level
         }
       }
     end
@@ -384,6 +386,40 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       it 'sets the privacy level' do
         subject
         expect(config_from_response.privacy_level).to eq 'public'
+      end
+    end
+
+    context 'when there are associated tools' do
+      shared_examples_for 'an action that updates installed tools' do
+        subject { installed_tool.reload.workflow_state }
+
+        let(:installed_tool) do
+          t = tool_configuration.new_external_tool(context)
+          t.save!
+          t
+        end
+        let(:context) { raise 'set in examples' }
+        let(:privacy_level) { 'anonymous' }
+
+        before do
+          installed_tool
+          put :update, params: params
+          run_jobs
+        end
+
+        it { is_expected.to eq privacy_level }
+      end
+
+      context 'when tool in an account' do
+        it_behaves_like 'an action that updates installed tools' do
+          let(:context) { tool_configuration.developer_key.account }
+        end
+      end
+
+      context 'when tool is in a course' do
+        it_behaves_like 'an action that updates installed tools' do
+          let(:context) { course_model }
+        end
       end
     end
 

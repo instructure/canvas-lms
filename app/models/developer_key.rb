@@ -286,6 +286,14 @@ class DeveloperKey < ActiveRecord::Base
     )
   end
 
+  def update_external_tools!
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :update_tools_on_active_shard!,
+      account
+    )
+  end
+
   private
 
   def manage_external_tools(enqueue_args, method, affected_account)
@@ -329,33 +337,40 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def destroy_tools_from_active_shard!(affected_account)
-    scope = if affected_account.nil? || affected_account.site_admin?
-      ContextExternalTool.where(developer_key: self)
-    else
-      # Don't destroy tools in other root accounts on the same shard
-      ContextExternalTool.where(
-        developer_key: self,
-        root_account: affected_account
-      )
-    end
-
-    scope.where.not(workflow_state: 'deleted').select(:id).find_in_batches do |tool_ids|
+    base_scope = ContextExternalTool.where.not(workflow_state: 'deleted')
+    tool_management_scope(base_scope, affected_account).select(:id).find_in_batches do |tool_ids|
       ContextExternalTool.where(id: tool_ids).destroy_all
     end
   end
 
   def set_tool_workflow_state_on_active_shard!(state, scope, binding_account)
-    tool_scope = if binding_account.site_admin?
-      scope.where(developer_key: self)
-    else
-      # Don't update tools in another root account on the same shard
-      scope.where(developer_key: self, root_account: binding_account)
-    end
-
-    tool_scope.select(:id).find_in_batches do |tool_ids|
+    tool_management_scope(scope, binding_account).select(:id).find_in_batches do |tool_ids|
       ContextExternalTool.where(id: tool_ids).update(
         workflow_state: state
       )
+    end
+  end
+
+  def tool_management_scope(base_scope, affected_account)
+    if affected_account&.site_admin? || affected_account.blank?
+      return base_scope.where(developer_key: self)
+    end
+
+    # Don't update tools in another root account on the same shard
+    base_scope.where(developer_key: self, root_account: affected_account)
+  end
+
+  def update_tools_on_active_shard!(account)
+    return if tool_configuration.blank?
+
+    base_scope = ContextExternalTool.where.not(workflow_state: 'deleted')
+    tool_management_scope(base_scope, account).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
+        tool_configuration.new_external_tool(
+          tool.context,
+          existing_tool: tool
+        ).save
+      end
     end
   end
 

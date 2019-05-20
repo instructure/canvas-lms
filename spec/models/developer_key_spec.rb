@@ -206,6 +206,58 @@ describe DeveloperKey do
         end
       end
     end
+
+    describe '#update_external_tools!' do
+      subject do
+        @shard1.activate do
+          tool_configuration.settings['title'] = new_title
+          tool_configuration.save!
+          developer_key.update_external_tools!
+          run_jobs
+        end
+      end
+
+      let(:new_title) { 'New Title!' }
+
+      before do
+        developer_key
+        @shard1.activate { tool_configuration.update!(privacy_level: 'anonymous') }
+        shard_1_tool.update!(workflow_state: 'disabled')
+        shard_2_tool.update!(workflow_state: 'disabled')
+      end
+
+      context 'when site admin key' do
+        before do
+          developer_key.update!(account: nil)
+          subject
+          run_jobs
+        end
+
+        it 'updates tools on all shard 1' do
+          expect(shard_1_tool.reload.name).to eq new_title
+        end
+
+        it 'updates tools on shard 2' do
+          expect(shard_2_tool.reload.name).to eq new_title
+        end
+      end
+
+      context 'when non-site admin key' do
+        before do
+          developer_key.update!(account: shard_1_account)
+          subject
+          run_jobs
+        end
+
+        it 'updates tools on shard 1' do
+          expect(shard_1_tool.reload.name).to eq new_title
+        end
+
+        it 'does not update tools on shard 2' do
+          expect(shard_2_tool.reload.name).to eq 'shard 2 tool'
+        end
+      end
+    end
   end
 
   describe 'usable_in_context?' do
