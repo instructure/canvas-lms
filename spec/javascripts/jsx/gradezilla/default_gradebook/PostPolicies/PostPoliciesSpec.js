@@ -351,16 +351,18 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymous_grading: false,
+        anonymous_grading: true,
         course_id: '1201',
         grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,
+        moderated_grading: true,
         muted: false,
         name: 'Math 1.1',
         omit_from_final_grade: false,
         points_possible: 10,
+        post_manually: true,
         published: true,
         submission_types: ['online_text_entry']
       }
@@ -385,6 +387,24 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
+    })
+
+    test('passes the assignment anonymous-grading status to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.anonymousGrading, true)
+    })
+
+    test('passes the assignment moderated-grading status to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.moderatedGrading, true)
+    })
+
+    test('passes the current manual-posting status of the assignment to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.postManually, true)
     })
 
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {

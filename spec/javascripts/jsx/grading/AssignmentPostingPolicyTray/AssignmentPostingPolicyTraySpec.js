@@ -33,7 +33,8 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
     context = {
       assignment: {
         id: '2301',
-        name: 'Math 1.1'
+        name: 'Math 1.1',
+        postManually: false
       },
 
       onExited: sinon.spy()
@@ -64,6 +65,22 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
     return [...$tray.querySelectorAll('button')].find($button => $button.textContent === 'Close')
   }
 
+  function getSaveButton() {
+    const $tray = getTrayElement()
+    return [...$tray.querySelectorAll('button')].find($button => $button.textContent === 'Save')
+  }
+
+  function getLabel(text) {
+    const $tray = getTrayElement()
+    return [...$tray.querySelectorAll('label')].find($label => $label.textContent.includes(text))
+  }
+
+  function getInputByLabel(label) {
+    const $label = getLabel(label)
+    if ($label === undefined) return undefined
+    return document.getElementById($label.htmlFor)
+  }
+
   async function show() {
     tray.show(context)
     await waitForElement(getTrayElement)
@@ -88,6 +105,49 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
       await show()
       const heading = getTrayElement().querySelector('h2')
       equal(heading.textContent, 'Grade Posting Policy: Math 1.1')
+    })
+
+    test('disables the "Automatically" input for an anonymous assignment', async () => {
+      context.assignment.anonymousGrading = true
+      await show()
+      strictEqual(getInputByLabel('Automatically').disabled, true)
+    })
+
+    test('disables the "Automatically" input for a moderated assignment', async () => {
+      context.assignment.moderatedGrading = true
+      await show()
+      strictEqual(getInputByLabel('Automatically').disabled, true)
+    })
+
+    test('enables the "Automatically" input if the assignment is not anonymous or moderated', async () => {
+      await show()
+      strictEqual(getInputByLabel('Automatically').disabled, false)
+    })
+
+    test('the "Automatically" input is initally selected if an auto-posted assignment is passed', async () => {
+      await show()
+      strictEqual(getInputByLabel('Automatically').checked, true)
+    })
+
+    test('the "Manually" input is initially selected if a manual-posted assignment is passed', async () => {
+      context.assignment.postManually = true
+      await show()
+      strictEqual(getInputByLabel('Manually').checked, true)
+    })
+
+    test('enables the "Save" button if the postManually value has changed', async () => {
+      await show()
+      getInputByLabel('Manually').click()
+
+      strictEqual(getSaveButton().disabled, false)
+    })
+
+    test('disables the "Save" button if the postManually value has not changed', async () => {
+      await show()
+      getInputByLabel('Manually').click()
+      getInputByLabel('Automatically').click()
+
+      strictEqual(getSaveButton().disabled, true)
     })
   })
 

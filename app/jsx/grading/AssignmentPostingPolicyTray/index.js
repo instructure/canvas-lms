@@ -25,27 +25,41 @@ import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!post_grades_tray'
 
+import Layout from './Layout'
+
 export default class AssignmentPostingPolicyTray extends PureComponent {
   constructor(props) {
     super(props)
 
-    this.dismiss = this.dismiss.bind(this)
+    this.handleDismiss = this.handleDismiss.bind(this)
     this.show = this.show.bind(this)
 
     this.state = {
       open: false
     }
+
+    this.handlePostPolicyChanged = this.handlePostPolicyChanged.bind(this)
+    this.handleSave = this.handleSave.bind(this)
   }
 
-  dismiss() {
+  handleDismiss() {
     this.setState({open: false})
   }
 
   show(context) {
     this.setState({
       ...context,
+      selectedPostManually: context.assignment.postManually,
       open: true
     })
+  }
+
+  handlePostPolicyChanged({postManually}) {
+    this.setState({selectedPostManually: postManually})
+  }
+
+  handleSave() {
+    // TODO (GRADE-2192): write me
   }
 
   render() {
@@ -53,7 +67,8 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
       return null
     }
 
-    const {assignment, onExited} = this.state
+    const {assignment, onExited, selectedPostManually} = this.state
+    const allowAutomaticPosting = !(assignment.anonymousGrading || assignment.moderatedGrading)
 
     return (
       <Tray
@@ -65,7 +80,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 medium 0">
             <FlexItem>
-              <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
+              <CloseButton onClick={this.handleDismiss}>{I18n.t('Close')}</CloseButton>
             </FlexItem>
 
             <FlexItem margin="0 0 0 small" shrink>
@@ -77,6 +92,15 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
             </FlexItem>
           </Flex>
         </View>
+
+        <Layout
+          allowAutomaticPosting={allowAutomaticPosting}
+          allowSaving={assignment.postManually !== selectedPostManually}
+          onPostPolicyChanged={this.handlePostPolicyChanged}
+          onDismiss={this.handleDismiss}
+          onSave={this.handleSave}
+          selectedPostManually={selectedPostManually}
+        />
       </Tray>
     )
   }
