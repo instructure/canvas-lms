@@ -82,7 +82,7 @@ module UserLearningObjectScopes
 
   def group_ids_for_todo_lists(group_ids: nil, contexts: nil)
     shard.activate do
-      group_ids_result = cached_current_group_memberships.map(&:group_id)
+      group_ids_result = cached_current_group_memberships_by_date.map(&:group_id)
       group_ids_result &= group_ids if group_ids
       group_ids_result &= contexts.select{|g| g.is_a? Group}.map(&:id) if contexts
       group_ids_result
