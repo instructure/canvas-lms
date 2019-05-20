@@ -54,8 +54,8 @@ module Types
     field :_id, ID, 'legacy canvas id', method: :id, null: false
     global_id_field :id
 
-    field :submission_histories, SubmissionHistoryConnection, null: true, connection: true
-    def submission_histories
+    field :submission_histories_connection, SubmissionHistoryConnection, null: true, connection: true
+    def submission_histories_connection
       # There is not a version saved for submission attempt zero, so we fake it
       # here. If there are no versions, we are still on attempt zero and can use
       # the current submission, otherwise we fudge it with a model that is not

@@ -2140,7 +2140,7 @@ type Submission implements Node & SubmissionInterface & Timestamped {
   postedAt: DateTime
   score: Float
   state: SubmissionState!
-  submissionHistories(
+  submissionHistoriesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
     """
