@@ -121,12 +121,12 @@ export default class DeveloperKeyModal extends React.Component {
     )
   }
 
-  saveLTIKeyEdit (settings) {
+  saveLTIKeyEdit (settings, developerKey) {
     const { store: { dispatch }, actions } = this.props
     dispatch(actions.saveLtiToolConfigurationStart())
     this.setState({toolConfiguration: settings})
     return actions.ltiKeysUpdateCustomizations(
-      settings.scopes,
+      developerKey,
       [],
       this.props.createOrEditDeveloperKeyState.developerKey.id,
       settings,
@@ -147,11 +147,13 @@ export default class DeveloperKeyModal extends React.Component {
   saveLtiToolConfiguration = () => {
     const { store: { dispatch }, actions } = this.props
     const formData = new FormData(this.submissionForm)
-    if (formData.get("developer_key[redirect_uris]").trim().length === 0) {
+    const redirectUris = formData.get("developer_key[redirect_uris]")
+    if (redirectUris.trim().length === 0) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
       return
     }
     let settings = {};
+    let developerKey = {}
     if (this.props.createLtiKeyState.configurationMethod === 'json') {
       try {
         settings = JSON.parse(formData.get("tool_configuration"))
@@ -166,11 +168,15 @@ export default class DeveloperKeyModal extends React.Component {
         return
       }
       settings = this.manualForm.generateToolConfiguration();
+      developerKey = {
+        scopes: settings.scopes,
+        redirectUris
+      }
       this.setState({toolConfiguration: settings})
     }
 
     if (this.props.createOrEditDeveloperKeyState.editing) {
-      this.saveLTIKeyEdit(settings)
+      this.saveLTIKeyEdit(settings, developerKey)
     } else {
       return actions.saveLtiToolConfiguration({
         account_id: this.props.ctx.params.contextId,
@@ -178,7 +184,7 @@ export default class DeveloperKeyModal extends React.Component {
           name: formData.get("developer_key[name]"),
           email: formData.get("developer_key[email]"),
           notes: formData.get("developer_key[notes]"),
-          redirect_uris: formData.get("developer_key[redirect_uris]"),
+          redirect_uris: redirectUris,
           test_cluster_only: this.testClusterOnly,
           access_token_count: 0
         },
