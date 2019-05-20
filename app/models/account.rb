@@ -1329,7 +1329,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.update_all_update_account_associations
-    Account.root_accounts.active.find_each(&:update_account_associations)
+    Account.root_accounts.active.non_shadow.find_each(&:update_account_associations)
   end
 
   def course_count
