@@ -175,8 +175,8 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         context 'when the new workflow state is "allow"' do
           let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
 
-          it 'does not disable associated external tools' do
-            expect(site_admin_key).not_to receive(:disable_external_tools!)
+          it 'restores associated external tools' do
+            expect(site_admin_key).to receive(:restore_external_tools!)
             subject
           end
         end
@@ -197,8 +197,8 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         context 'when the new workflow state is "allow"' do
           let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
 
-          it 'does not enable external tools' do
-            expect(site_admin_key).not_to receive(:disable_external_tools!)
+          it 'restores associated external tools' do
+            expect(site_admin_key).to receive(:restore_external_tools!)
             subject
           end
         end

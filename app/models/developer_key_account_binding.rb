@@ -113,6 +113,10 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     self.workflow_state == OFF_STATE
   end
 
+  def allowed?
+    self.workflow_state == ALLOW_STATE
+  end
+
   private
 
   def update_tools!
@@ -120,6 +124,8 @@ class DeveloperKeyAccountBinding < ApplicationRecord
       developer_key.disable_external_tools!(account)
     elsif enable_tools?
       developer_key.enable_external_tools!(account)
+    elsif restore_tools?
+      developer_key.restore_external_tools!(account)
     end
   end
 
@@ -129,6 +135,10 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   def disable_tools?
     saved_change_to_workflow_state? && off?
+  end
+
+  def restore_tools?
+    saved_change_to_workflow_state? && allowed?
   end
 
   def clear_cache_if_site_admin

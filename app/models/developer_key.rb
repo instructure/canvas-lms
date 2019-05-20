@@ -278,20 +278,30 @@ class DeveloperKey < ActiveRecord::Base
     )
   end
 
+  def restore_external_tools!(binding_account)
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :restore_tools_on_active_shard!,
+      binding_account
+    )
+  end
+
   private
 
   def manage_external_tools(enqueue_args, method, affected_account)
+    return if tool_configuration.blank?
+
     if affected_account.blank? || affected_account.site_admin?
       # Cleanup tools across all shards
       Shard.with_each_shard do
-        send_later_if_production_enqueue_args(
+        send_later_enqueue_args(
           method,
           enqueue_args,
           affected_account
         )
       end
     else
-      send_later_if_production_enqueue_args(
+      send_later_enqueue_args(
         method,
         enqueue_args,
         affected_account
@@ -346,6 +356,26 @@ class DeveloperKey < ActiveRecord::Base
       ContextExternalTool.where(id: tool_ids).update(
         workflow_state: state
       )
+    end
+  end
+
+  def restore_tools_on_active_shard!(_binding_account)
+    return if tool_configuration.blank?
+    Account.root_accounts.each do |root_account|
+      next if root_account.site_admin?
+
+      binding = DeveloperKeyAccountBinding.find_by(
+        developer_key: self,
+        account: root_account
+      )
+
+      return nil if binding.blank?
+
+      if binding.on?
+        enable_tools_on_active_shard!(root_account)
+      elsif binding.off?
+        disable_tools_on_active_shard!(root_account)
+      end
     end
   end
 
