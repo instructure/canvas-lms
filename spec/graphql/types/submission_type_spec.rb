@@ -163,7 +163,7 @@ describe Types::SubmissionType do
     end
   end
 
-  describe 'submission histories' do
+  describe 'submission histories connection' do
     before(:once) do
       # In the world code path that the initial submission takes, there is a bulk
       # insert directly into the database, which causes no version to be saved
@@ -173,14 +173,14 @@ describe Types::SubmissionType do
 
     it 'works when there are no versions saved' do
       expect(
-        submission_type.resolve('submissionHistories { nodes { attempt }}')
+        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
       ).to eq [0]
     end
 
     it 'includes the zero submission when there are versions' do
       @submission.update!(attempt: 1)
       expect(
-        submission_type.resolve('submissionHistories { nodes { attempt }}')
+        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
       ).to eq [1, 0]
     end
 
@@ -191,31 +191,31 @@ describe Types::SubmissionType do
 
       it 'works for nodes' do
         expect(
-          submission_type.resolve('submissionHistories(first: 1) { nodes { attempt }}')
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { nodes { attempt }}')
         ).to eq [1]
       end
 
       it 'works for edges node' do
         expect(
-          submission_type.resolve('submissionHistories(first: 1) { edges { node { attempt }}}')
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { node { attempt }}}')
         ).to eq [1]
       end
 
       it 'works for edges cursor' do
         expect(
-          submission_type.resolve('submissionHistories(first: 1) { edges { cursor }}')
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { cursor }}')
         ).to eq ["MQ"] # Base64 encoded 1, per the graphql gem impmenetation of array paginating
       end
 
       it 'works for pageInfo endCursor' do
         expect(
-          submission_type.resolve('submissionHistories(first: 1) { pageInfo { endCursor }}')
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { endCursor }}')
         ).to eq "MQ" # Base64 encoded 1, per the graphql gem impmenetation of array paginating
       end
 
       it 'works for pageInfo hasNextPage' do
         expect(
-          submission_type.resolve('submissionHistories(first: 1) { pageInfo { hasNextPage }}')
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { hasNextPage }}')
         ).to eq true
       end
     end
