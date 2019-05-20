@@ -36,6 +36,15 @@ function renderCollapsedContainer(step) {
   )
 }
 
+function allowNextAttempt(assignment) {
+  const allowedAttempts = assignment.allowedAttempts || -1
+  if (allowedAttempts === -1) {
+    return true
+  }
+
+  return assignment.submissionsConnection.nodes[0].attempt < allowedAttempts
+}
+
 function availableStepContainer(props) {
   return (
     <div className="steps-container" data-testid="available-step-container">
@@ -94,6 +103,9 @@ function submittedStepContainer(props) {
           status="complete"
         />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {allowNextAttempt(props.assignment) && !props.isCollapsed ? (
+          <StepItem label={I18n.t('New Attempt')} status="button" />
+        ) : null}
       </Steps>
     </div>
   )
@@ -141,6 +153,9 @@ function gradedStepContainer(props) {
           }
           status="complete"
         />
+        {allowNextAttempt(props.assignment) && !props.isCollapsed ? (
+          <StepItem label={I18n.t('New Attempt')} status="button" />
+        ) : null}
       </Steps>
     </div>
   )
