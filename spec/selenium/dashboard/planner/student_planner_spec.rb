@@ -544,7 +544,7 @@ describe "student planner" do
         f('#student_planner_checkbox').click
         wait_for_ajaximations
         f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
-        fj('button:contains("Save")').click
+        expect_new_page_load{fj('button:contains("Save")').click}
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value('input[name="student_todo_at"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
