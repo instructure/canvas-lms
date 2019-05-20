@@ -690,6 +690,8 @@ class ActiveRecord::Base
       self.where(primary_key => min_id..max_id).touch_all
     end
   end
+
+  scope :non_shadow, ->(key = primary_key) { where("#{key}<=?", Shard::IDS_PER_SHARD) }
 end
 
 module UsefulFindInBatches
