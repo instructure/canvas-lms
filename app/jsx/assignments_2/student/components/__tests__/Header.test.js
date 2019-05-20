@@ -92,7 +92,7 @@ it('will render the unavailable state tracker if an assignment is not available'
   expect(getByTestId('unavailable-step-container')).toBeInTheDocument()
 })
 
-it('will render the available state tracker if an assignment is available but not submitted', () => {
+it('will render the available state tracker if an assignment is available but not uploaded and not submitted', () => {
   const assignment = mockAssignment()
   assignment.lockInfo.isLocked = false
   assignment.submissionsConnection.nodes[0].state = 'unsubmitted'
@@ -134,6 +134,27 @@ describe('the assignment is submitted', () => {
 
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
   })
+})
+
+it('will render the uploaded state tracker if an assignment is uploaded but not submitted', () => {
+  const assignment = mockAssignment()
+  assignment.submissionsConnection.nodes[0].submissionDraft = {
+    _id: 3
+  }
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'unsubmitted'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('uploaded-step-container')).toBeInTheDocument()
+})
+
+it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'submitted'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
 })
 
 describe('the assignment is graded', () => {

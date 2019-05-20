@@ -64,6 +64,9 @@ function submissionFields() {
     state
     submissionStatus
     submittedAt
+    submissionDraft {
+      _id
+    }
   `
 }
 

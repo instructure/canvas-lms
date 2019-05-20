@@ -66,7 +66,7 @@ availableStepContainer.propTypes = {
 function unavailableStepContainer(props) {
   return (
     <div className="steps-container" data-testid="unavailable-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Unvailable'))}
+      {props.isCollapsed && renderCollapsedContainer(I18n.t('Unavailable'))}
       <Steps isCollapsed={props.isCollapsed}>
         <StepItem label={I18n.t('Unavailable')} status="unavailable" />
         <StepItem label={I18n.t('Upload')} />
@@ -78,6 +78,24 @@ function unavailableStepContainer(props) {
 }
 
 unavailableStepContainer.propTypes = {
+  isCollapsed: bool
+}
+
+function uploadedStepContainer(props) {
+  return (
+    <div className="steps-container" data-testid="uploaded-step-container">
+      {props.isCollapsed && renderCollapsedContainer(I18n.t('Uploaded'))}
+      <Steps isCollapsed={props.isCollapsed}>
+        <StepItem label={I18n.t('Available')} status="complete" />
+        <StepItem label={I18n.t('Uploaded')} status="complete" />
+        <StepItem label={I18n.t('Submit')} status="in-progress" />
+        <StepItem label={I18n.t('Not Graded Yet')} />
+      </Steps>
+    </div>
+  )
+}
+
+uploadedStepContainer.propTypes = {
   isCollapsed: bool
 }
 
@@ -168,14 +186,14 @@ gradedStepContainer.propTypes = {
 
 function StepContainer(props) {
   const {assignment, isCollapsed, forceLockStatus} = props
-
-  // TODO: render the step-container based on the actual assignment data.
   if (forceLockStatus || assignment.lockInfo.isLocked) {
     return unavailableStepContainer({isCollapsed})
   } else if (assignment.submissionsConnection.nodes[0].state === 'graded') {
     return gradedStepContainer({isCollapsed, assignment})
   } else if (assignment.submissionsConnection.nodes[0].state === 'submitted') {
     return submittedStepContainer({isCollapsed, assignment})
+  } else if (assignment.submissionsConnection.nodes[0].submissionDraft) {
+    return uploadedStepContainer({isCollapsed})
   } else {
     return availableStepContainer({isCollapsed})
   }

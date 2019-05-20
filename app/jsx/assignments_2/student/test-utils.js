@@ -317,6 +317,7 @@ export function submissionFields(overrides = {}) {
     state: 'submitted',
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
+    submissionDraft: null,
     __typename: 'Submission',
     ...overrides
   }
