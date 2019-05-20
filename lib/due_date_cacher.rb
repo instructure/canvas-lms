@@ -202,6 +202,7 @@ class DueDateCacher
             submission_scope.where(user_id: deletable_student_ids_chunk).
               update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
+          User.clear_cache_keys(deletable_student_ids, :submissions)
         end
       end
 
@@ -213,6 +214,7 @@ class DueDateCacher
             where(assignment_id: assignment_ids_slice, user_id: student_slice).
             update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         end
+        User.clear_cache_keys(student_slice, :submissions)
       end
 
       return if values.empty?
@@ -280,6 +282,7 @@ class DueDateCacher
           previous_cached_dates: cached_due_dates_by_submission
         )
       end
+      User.clear_cache_keys(values.map{|v| v[1]}, :submissions)
     end
 
     if @update_grades

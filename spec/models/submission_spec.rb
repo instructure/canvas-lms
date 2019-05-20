@@ -6406,4 +6406,35 @@ describe Submission do
       end
     end
   end
+
+  context "caching" do
+    specs_require_cache(:redis_store)
+
+    def check_cache_clear
+      key = @student.cache_key(:submissions)
+      yield
+      expect(@student.cache_key(:submissions)).to_not eq key
+    end
+
+    it "should clear key when submission is deleted" do
+      check_cache_clear do
+        sub = @student.submissions.first
+        @student.enrollments.first.destroy
+        expect(sub.reload).to be_deleted
+      end
+    end
+
+    it "should clear key when a submission comment is made" do
+      check_cache_clear do
+        @student.submissions.first.add_comment(:author => @teacher, :comment => "some comment")
+      end
+    end
+
+    it "should clear key when assignment is unmuted" do
+      @assignment.mute!
+      check_cache_clear do
+        @assignment.unmute!
+      end
+    end
+  end
 end

@@ -359,11 +359,15 @@ class SubmissionComment < ActiveRecord::Base
       return if submission.assignment.deleted? || submission.assignment.muted?
       return if provisional_grade_id.present?
 
-      ContentParticipation.create_or_update({
-        :content => submission,
-        :user => submission.user,
-        :workflow_state => "unread",
-      })
+      self.class.connection.after_transaction_commit do
+        submission.user.clear_cache_key(:submissions)
+
+        ContentParticipation.create_or_update({
+          :content => submission,
+          :user => submission.user,
+          :workflow_state => "unread",
+        })
+      end
     end
   end
 

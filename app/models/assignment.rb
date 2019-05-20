@@ -1601,6 +1601,7 @@ class Assignment < ActiveRecord::Base
     Rails.logger.debug "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
     self.context.recompute_student_scores
     student_ids = context.student_ids
+    User.clear_cache_keys(student_ids, :submissions)
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
   end
 
@@ -3133,6 +3134,7 @@ class Assignment < ActiveRecord::Base
     submission_ids = submission_and_user_ids.map(&:first)
     user_ids = submission_and_user_ids.map(&:second)
 
+    User.clear_cache_keys(user_ids, :submissions)
     unless skip_updating_timestamp
       update_time = Time.zone.now
       submissions.update_all(posted_at: update_time, updated_at: update_time)
@@ -3157,6 +3159,7 @@ class Assignment < ActiveRecord::Base
     return if submissions.blank?
     user_ids = submissions.pluck(:user_id)
 
+    User.clear_cache_keys(user_ids, :submissions)
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
     hide_stream_items(submissions: submissions)

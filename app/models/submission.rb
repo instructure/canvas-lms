@@ -297,6 +297,7 @@ class Submission < ActiveRecord::Base
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
   after_save :touch_user
+  after_save :clear_user_submissions_cache
   after_save :touch_graders
   after_save :update_assignment
   after_save :update_attachment_associations
@@ -1184,6 +1185,12 @@ class Submission < ActiveRecord::Base
 
   def external_tool_url
     URI.encode(url) if self.submission_type == 'basic_lti_launch'
+  end
+
+  def clear_user_submissions_cache
+    self.class.connection.after_transaction_commit do
+      User.clear_cache_keys([self.user_id], :submissions)
+    end
   end
 
   def touch_graders

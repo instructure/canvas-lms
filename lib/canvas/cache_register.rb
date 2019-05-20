@@ -30,7 +30,7 @@ module Canvas
 
       'Account' => %w{account_chain},
       'Course' => %w{account_associations},
-      'User' => %w{enrollments groups account_users todo_list},
+      'User' => %w{enrollments groups account_users todo_list submissions},
       'Assignment' => %w{availability},
       'Quizzes::Quiz' => %w{availability}
     }.freeze
