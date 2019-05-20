@@ -75,6 +75,14 @@ module Gradezilla
     fj("span[role='menuitem']:contains('#{menu_text}')")
   end
 
+  def self.assignment_header(id)
+    f(".slick-header-column.assignment_#{id}")
+  end
+
+  def self.assignment_hidden_eye_icon(id)
+    f("svg[name='IconOff']", assignment_header(id))
+  end
+
   # student header column elements
   def self.student_column_menu
     f("span .Gradebook__ColumnHeaderAction")
