@@ -1373,6 +1373,8 @@ CanvasRails::Application.routes.draw do
 
       get 'users/:id/graded_submissions', controller: 'users', action: 'user_graded_submissions', as: :user_submissions
 
+      post 'users/:id/clear_cache', :action => :clear_cache, :as => 'clear_cache'
+
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
