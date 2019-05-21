@@ -22,7 +22,7 @@ class AddIdToDefaultHelpLinks < ActiveRecord::Migration[5.0]
   def up
     default_links = Account::HelpLinks.default_links
 
-    Account.root_accounts.active.find_each do |a|
+    Account.root_accounts.active.non_shadow.find_each do |a|
       next unless a.settings[:custom_help_links]
 
       found_link = false

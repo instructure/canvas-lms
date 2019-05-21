@@ -59,17 +59,7 @@ module Lti
 
     private
     def pseudonym
-      if @canvas_context.is_a?(Course)
-        if (enrollments = current_course_enrollments.where.not(sis_pseudonym_id: nil)).exists?
-          # in the off chance there is a user that has two sis_ids for the same
-          # course, we will order them to at least be consistent, use the first
-          @pseudonym = enrollments.first.sis_pseudonym
-        end
-      end
-      unless instance_variable_defined?(:@pseudonym)
-        @pseudonym = SisPseudonym.for(@canvas_user, @canvas_root_account, type: :trusted, require_sis: false)
-      end
-      @pseudonym
+      @pseudonym ||= SisPseudonym.for(@canvas_user, @canvas_context, type: :trusted, require_sis: false, root_account: @canvas_root_account)
     end
 
     def current_roles

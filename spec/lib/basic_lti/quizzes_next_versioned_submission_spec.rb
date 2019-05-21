@@ -263,5 +263,35 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
       subject.commit_history('url', '77', -1)
     end
+
+    context 'when grading period is closed' do
+      before do
+        gpg = GradingPeriodGroup.create(
+          course_id: @course.id,
+          workflow_state: 'active',
+          title: 'some school',
+          weighted: true,
+          display_totals_for_all_grading_periods: true
+        )
+        gp = GradingPeriod.create(
+          weight: 40.0,
+          start_date: Time.zone.now - 10.days,
+          end_date: Time.zone.now - 1.day,
+          title: 'some title',
+          workflow_state: 'active',
+          grading_period_group_id: gpg.id,
+          close_date: Time.zone.now - 1.day
+        )
+
+        submission.grading_period_id = gp.id
+        submission.without_versioning(&:save!)
+      end
+
+      it "returns without processing" do
+        expect(subject).not_to receive(:valid?)
+
+        subject.commit_history('url', '77', -1)
+      end
+    end
   end
 end

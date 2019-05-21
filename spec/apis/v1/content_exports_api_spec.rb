@@ -355,6 +355,90 @@ describe ContentExportsApiController, type: :request do
         expect(@course.attachments.where(filename: att_to_not_copy.filename)).not_to be_exists
       end
 
+      context "selection with sharding" do
+        specs_require_sharding
+
+        it "should properly select content with global ids when asset_strings are used" do
+          json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+            { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+            { :select => {:context_modules => {mod.asset_string => "1"}}})
+          export = t_course.content_exports.where(id: json['id']).first
+          expect(export).not_to be_nil
+          expect(export.workflow_state).to eql 'created'
+          expect(export.export_type).to eql 'common_cartridge'
+          expect(export.user_id).to eql t_teacher.id
+          expect(export.settings['selected_content']['context_modules']).to eq({export.create_key(mod) => "1"})
+          expect(export.job_progress).to be_queued
+
+          run_jobs
+
+          export.reload
+          expect(export.workflow_state).to eql 'exported'
+          expect(export.job_progress).to be_completed
+          expect(export.attachment).not_to be_nil
+
+          course_factory
+          cm = @course.content_migrations.new
+          cm.attachment = export.attachment
+          cm.migration_type = "canvas_cartridge_importer"
+          cm.migration_settings[:import_immediately] = true
+          cm.save!
+          cm.queue_migration
+
+          run_jobs
+
+          expect(@course.context_modules.where(migration_id: export.create_key(mod))).to be_exists
+          copied_page = @course.wiki_pages.where(migration_id: export.create_key(page_to_copy)).first
+          expect(copied_page).not_to be_nil
+          expect(@course.wiki_pages.where(migration_id: export.create_key(page_to_not_copy))).not_to be_exists
+
+          copied_att = @course.attachments.where(filename: att_to_copy.filename).first
+          expect(copied_att).not_to be_nil
+          expect(copied_page.body).to eq "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
+          expect(@course.attachments.where(filename: att_to_not_copy.filename)).not_to be_exists
+        end
+
+        it "should properly select content with global ids when arrays of ids are used" do
+          json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+            { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+            { :select => {:context_modules => [mod.id]}})
+          export = t_course.content_exports.where(id: json['id']).first
+          expect(export).not_to be_nil
+          expect(export.workflow_state).to eql 'created'
+          expect(export.export_type).to eql 'common_cartridge'
+          expect(export.user_id).to eql t_teacher.id
+          expect(export.settings['selected_content']['context_modules']).to eq({export.create_key(mod) => "1"})
+          expect(export.job_progress).to be_queued
+
+          run_jobs
+
+          export.reload
+          expect(export.workflow_state).to eql 'exported'
+          expect(export.job_progress).to be_completed
+          expect(export.attachment).not_to be_nil
+
+          course_factory
+          cm = @course.content_migrations.new
+          cm.attachment = export.attachment
+          cm.migration_type = "canvas_cartridge_importer"
+          cm.migration_settings[:import_immediately] = true
+          cm.save!
+          cm.queue_migration
+
+          run_jobs
+
+          expect(@course.context_modules.where(migration_id: export.create_key(mod))).to be_exists
+          copied_page = @course.wiki_pages.where(migration_id: export.create_key(page_to_copy)).first
+          expect(copied_page).not_to be_nil
+          expect(@course.wiki_pages.where(migration_id: export.create_key(page_to_not_copy))).not_to be_exists
+
+          copied_att = @course.attachments.where(filename: att_to_copy.filename).first
+          expect(copied_att).not_to be_nil
+          expect(copied_page.body).to eq "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
+          expect(@course.attachments.where(filename: att_to_not_copy.filename)).not_to be_exists
+        end
+      end
+
       it "should select quizzes correctly" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},

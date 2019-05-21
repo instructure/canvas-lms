@@ -555,7 +555,7 @@ module Lti
     end
 
     context "email" do
-      let(:course) { Course.create!(root_account: root_account, account: account) }
+      let(:course) { Course.create!(root_account: root_account, account: account, workflow_state: 'available') }
 
       let(:tool) do
         ContextExternalTool.create!(
@@ -600,6 +600,31 @@ module Lti
           sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
           sis_pseudonym
           expect(sub_helper.email).to eq sis_email
+        end
+
+        it "returns the email for the courses enrollment if there is one." do
+          tool = class_double("Lti::ToolProxy")
+          p = sis_pseudonym
+          # moving account so that if the pseudonym was not tied to enrollment
+          # it would return 'test@foo.com' instead of sis_email
+          p.account = Account.create!
+          p.save!
+          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
+          expect(sub_helper.email).to eq sis_email
+        end
+
+        it "only returns active logins" do
+          tool = class_double("Lti::ToolProxy")
+          p = sis_pseudonym
+          # moving account so that if the pseudonym was not tied to enrollment
+          # it would return 'test@foo.com' instead of sis_email if it was active
+          p.account = Account.create!
+          p.workflow_state = 'deleted'
+          p.save!
+          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
+          expect(sub_helper.email).to eq 'test@foo.com'
         end
 
         context "prefer_sis_email" do

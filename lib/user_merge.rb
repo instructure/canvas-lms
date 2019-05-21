@@ -162,6 +162,12 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+    @merge_data.update_attributes(workflow_state: 'active')
+  rescue => e
+    @merge_data&.update_attribute(:workflow_state, 'failed')
+    @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message))
+    Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id)
+    raise
   end
 
   def copy_favorites
@@ -332,14 +338,16 @@ class UserMerge
     return if to_retire.workflow_state == 'retired'
     time = Time.zone.now
     new_nps = []
-    to_retire.notification_policies.where.not(notification_id: keeper.notification_policies.select(:notification_id)).each do |np|
-      new_nps << NotificationPolicy.new(notification_id: np.notification_id,
-                                        communication_channel_id: keeper.id,
-                                        frequency: np.frequency,
-                                        created_at: time,
-                                        updated_at: time)
+    keeper.shard.activate do
+      to_retire.notification_policies.where.not(notification_id: keeper.notification_policies.pluck(:notification_id)).each do |np|
+        new_nps << NotificationPolicy.new(notification_id: np.notification_id,
+                                          communication_channel_id: keeper.id,
+                                          frequency: np.frequency,
+                                          created_at: time,
+                                          updated_at: time)
+      end
+      NotificationPolicy.bulk_insert_objects(new_nps)
     end
-    keeper.shard.activate { NotificationPolicy.bulk_insert_objects(new_nps) }
   end
 
   def move_observees

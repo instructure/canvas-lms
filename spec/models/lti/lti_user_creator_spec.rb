@@ -116,6 +116,16 @@ describe Lti::LtiUserCreator do
           expect(lti_user.sis_source_id).to eq 'wrong_sis'
         end
 
+        it "doesn't return deleted sis_user_id" do
+          second_sis = managed_pseudonym(canvas_user, account: root_account, username: 'second_login_id', sis_user_id: 'wrong_sis')
+          enrollment = student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true, sis_pseudonym_id: sis_pseudonym.id)
+          enrollment.update_attribute(:sis_pseudonym_id, second_sis.id)
+          second_sis.destroy
+          user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool, canvas_course)
+          lti_user = user_factory.convert
+          expect(lti_user.sis_source_id).to eq 'sis id!'
+        end
+
         it "returns a sis_user_id when no sis_id tied to enrollment" do
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
           sis_pseudonym
