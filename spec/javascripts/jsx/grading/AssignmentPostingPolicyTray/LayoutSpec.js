@@ -69,6 +69,7 @@ QUnit.module('AssignmentPostingPolicyTray Layout', suiteHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     context = {
       allowAutomaticPosting: true,
+      allowCanceling: true,
       allowSaving: true,
       onPostPolicyChanged: () => {},
       onDismiss: () => {},
@@ -91,6 +92,19 @@ QUnit.module('AssignmentPostingPolicyTray Layout', suiteHooks => {
       onDismiss: {callCount}
     } = context
     strictEqual(callCount, 1)
+  })
+
+  test('the "Cancel" button is enabled when allowCanceling is true', () => {
+    mountComponent()
+
+    strictEqual(getCancelButton().disabled, false)
+  })
+
+  test('the "Cancel" button is disabled when allowCanceling is false', () => {
+    context.allowCanceling = false
+    mountComponent()
+
+    strictEqual(getCancelButton().disabled, true)
   })
 
   test('clicking "Save" button calls the onSave prop', () => {

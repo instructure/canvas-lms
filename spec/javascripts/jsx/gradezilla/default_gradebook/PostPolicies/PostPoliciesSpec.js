@@ -413,6 +413,46 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const [{onExited}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(onExited, callback)
     })
+
+    QUnit.module('onAssignmentPostPolicyUpdated', onUpdateHooks => {
+      let updateColumnHeadersStub
+
+      onUpdateHooks.beforeEach(() => {
+        updateColumnHeadersStub = sinon.stub(gradebook, 'updateColumnHeaders')
+      })
+
+      onUpdateHooks.afterEach(() => {
+        updateColumnHeadersStub.restore()
+      })
+
+      test('calls updateColumnHeaders', () => {
+        postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+        const [
+          {onAssignmentPostPolicyUpdated}
+        ] = postPolicies._assignmentPolicyTray.show.lastCall.args
+        onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: true})
+        strictEqual(updateColumnHeadersStub.callCount, 1)
+      })
+
+      test('calls updateColumnHeaders with the column ID of the affected assignment', () => {
+        postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+        const columnId = gradebook.getAssignmentColumnId('2301')
+        const [
+          {onAssignmentPostPolicyUpdated}
+        ] = postPolicies._assignmentPolicyTray.show.lastCall.args
+        onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: true})
+        deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
+      })
+
+      test('updates the post_manually field of the assignment', () => {
+        postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+        const [
+          {onAssignmentPostPolicyUpdated}
+        ] = postPolicies._assignmentPolicyTray.show.lastCall.args
+        onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: false})
+        deepEqual(gradebook.getAssignment('2301').post_manually, false)
+      })
+    })
   })
 
   QUnit.module('#coursePostPolicy', () => {

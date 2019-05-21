@@ -35,9 +35,7 @@ const AUTOMATIC_POST = 'auto'
 export default function Layout(props) {
   const automaticallyPostLabel = (
     <View as="div">
-      <Text>{I18n.t('Automatically')}</Text>
-
-      <br />
+      <Text as="div">{I18n.t('Automatically')}</Text>
 
       <Text size="small">
         {I18n.t('Grades will be visible to students as soon as they are entered.')}
@@ -47,9 +45,7 @@ export default function Layout(props) {
 
   const manuallyPostLabel = (
     <View as="div">
-      <Text>{I18n.t('Manually')}</Text>
-
-      <br />
+      <Text as="div">{I18n.t('Manually')}</Text>
 
       <Text size="small">
         {I18n.t(`
@@ -91,7 +87,12 @@ export default function Layout(props) {
 
   return (
     <Fragment>
-      <View as="div" margin="small 0" padding="0 medium">
+      <View
+        as="div"
+        margin="small 0"
+        padding="0 medium"
+        id="AssignmentPostingPolicyTray__RadioInputGroup"
+      >
         <RadioInputGroup
           description={I18n.t('Post Grades')}
           name="postPolicy"
@@ -99,22 +100,35 @@ export default function Layout(props) {
           value={props.selectedPostManually ? MANUAL_POST : AUTOMATIC_POST}
         >
           <RadioInput
+            className="AssignmentPostingPolicyTray__RadioInput"
             disabled={!props.allowAutomaticPosting}
             name="postPolicy"
             label={automaticallyPostLabel}
             value={AUTOMATIC_POST}
           />
 
-          <RadioInput name="postPolicy" label={manuallyPostLabel} value={MANUAL_POST} />
+          <RadioInput
+            className="AssignmentPostingPolicyTray__RadioInput"
+            name="postPolicy"
+            label={manuallyPostLabel}
+            value={MANUAL_POST}
+          />
         </RadioInputGroup>
       </View>
 
       <View as="div" margin="0 medium" className="hr" />
 
-      <View as="div" margin="medium 0 0" padding="0 medium">
+      <View
+        as="div"
+        margin="medium 0 0"
+        padding="0 medium"
+        id="AssignmentPostingPolicyTray__Buttons"
+      >
         <Flex justifyItems="end">
           <FlexItem margin="0 small 0 0">
-            <Button onClick={props.onDismiss}>{I18n.t('Cancel')}</Button>
+            <Button onClick={props.onDismiss} disabled={!props.allowCanceling}>
+              {I18n.t('Cancel')}
+            </Button>
           </FlexItem>
 
           <FlexItem>
@@ -130,6 +144,7 @@ export default function Layout(props) {
 
 Layout.propTypes = {
   allowAutomaticPosting: bool.isRequired,
+  allowCanceling: bool.isRequired,
   allowSaving: bool.isRequired,
   onDismiss: func.isRequired,
   onPostPolicyChanged: func.isRequired,

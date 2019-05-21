@@ -26,6 +26,8 @@ import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!post_grades_tray'
 
 import Layout from './Layout'
+import {setAssignmentPostPolicy} from './Api'
+import {showFlashAlert} from '../../shared/FlashAlert'
 
 export default class AssignmentPostingPolicyTray extends PureComponent {
   constructor(props) {
@@ -49,8 +51,9 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
   show(context) {
     this.setState({
       ...context,
-      selectedPostManually: context.assignment.postManually,
-      open: true
+      open: true,
+      requestInProgress: false,
+      selectedPostManually: context.assignment.postManually
     })
   }
 
@@ -59,7 +62,24 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
   }
 
   handleSave() {
-    // TODO (GRADE-2192): write me
+    const {id: assignmentId, name} = this.state.assignment
+    const {selectedPostManually} = this.state
+
+    this.setState({requestInProgress: true})
+    setAssignmentPostPolicy({assignmentId, postManually: selectedPostManually})
+      .then(response => {
+        const message = I18n.t('Success! The post policy for %{name} has been updated.', {name})
+        const {postManually} = response
+
+        showFlashAlert({message, type: 'success'})
+        this.state.onAssignmentPostPolicyUpdated({assignmentId, postManually})
+        this.handleDismiss()
+      })
+      .catch(_error => {
+        const message = I18n.t('An error occurred while saving the assignment post policy')
+        showFlashAlert({message, type: 'error'})
+        this.setState({requestInProgress: false})
+      })
   }
 
   render() {
@@ -67,8 +87,9 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
       return null
     }
 
-    const {assignment, onExited, selectedPostManually} = this.state
+    const {assignment, onExited, requestInProgress, selectedPostManually} = this.state
     const allowAutomaticPosting = !(assignment.anonymousGrading || assignment.moderatedGrading)
+    const allowSaving = assignment.postManually !== selectedPostManually && !requestInProgress
 
     return (
       <Tray
@@ -95,7 +116,8 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
 
         <Layout
           allowAutomaticPosting={allowAutomaticPosting}
-          allowSaving={assignment.postManually !== selectedPostManually}
+          allowCanceling={!requestInProgress}
+          allowSaving={allowSaving}
           onPostPolicyChanged={this.handlePostPolicyChanged}
           onDismiss={this.handleDismiss}
           onSave={this.handleSave}

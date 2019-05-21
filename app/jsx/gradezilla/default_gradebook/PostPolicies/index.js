@@ -35,6 +35,7 @@ export default class PostPolicies {
     this._gradebook = gradebook
 
     this._onGradesPostedOrHidden = this._onGradesPostedOrHidden.bind(this)
+    this._onAssignmentPostPolicyUpdated = this._onAssignmentPostPolicyUpdated.bind(this)
   }
 
   initialize() {
@@ -78,6 +79,14 @@ export default class PostPolicies {
     this._gradebook.updateColumnHeaders([columnId])
   }
 
+  _onAssignmentPostPolicyUpdated({assignmentId, postManually}) {
+    const assignment = this._gradebook.getAssignment(assignmentId)
+    assignment.post_manually = postManually
+
+    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+    this._gradebook.updateColumnHeaders([columnId])
+  }
+
   showAssignmentPostingPolicyTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymous_grading, id, moderated_grading, name, post_manually} = assignment
@@ -90,6 +99,7 @@ export default class PostPolicies {
         name,
         postManually: post_manually
       },
+      onAssignmentPostPolicyUpdated: this._onAssignmentPostPolicyUpdated,
       onExited
     })
   }

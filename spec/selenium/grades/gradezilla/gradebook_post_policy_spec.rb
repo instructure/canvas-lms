@@ -262,7 +262,6 @@ describe 'Gradezilla Post Policy' do
 
   context 'assignment level post policy automatically' do
     before :each do
-      skip('Unskip in GRADE-2191')
       Gradezilla.click_grade_posting_policy(@auto_assignment.id)
       Gradezilla::AssignmentPostingPolicy.post_policy_type_radio_button('Automatically').click
       Gradezilla::AssignmentPostingPolicy.save_button.click
@@ -271,7 +270,6 @@ describe 'Gradezilla Post Policy' do
     end
 
     it 'posts grade immediately', priority: '1', test_id: 3756685 do
-      skip('Unskip in GRADE-2191')
       verify_grade_displayed_on_student_grade_page(@section_one_students.first, '9', @auto_assignment, @course_with_auto_post)
     end
   end
