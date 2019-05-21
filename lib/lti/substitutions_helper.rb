@@ -204,15 +204,15 @@ module Lti
     end
 
     def previous_lti_context_ids
-      previous_course_ids_and_context_ids.map(&:lti_context_id).compact.join(',')
+      previous_course_ids_and_context_ids.map(&:last).compact.join(',')
     end
 
     def recursively_fetch_previous_lti_context_ids
-      recursively_fetch_previous_course_ids_and_context_ids.map(&:lti_context_id).compact.join(',')
+      recursively_fetch_previous_course_ids_and_context_ids.map(&:last).compact.join(',')
     end
 
     def previous_course_ids
-      previous_course_ids_and_context_ids.map(&:id).sort.join(',')
+      previous_course_ids_and_context_ids.map(&:first).sort.join(',')
     end
 
     def section_ids
@@ -247,23 +247,30 @@ module Lti
       return [] unless @context.is_a?(Course)
       @previous_ids ||= Course.where(
         "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
-      ).select("id, lti_context_id")
+      ).pluck(:id, :lti_context_id)
     end
 
     def recursively_fetch_previous_course_ids_and_context_ids
       return [] unless @context.is_a?(Course)
 
       # now find all parents for locked folders
-      Course.where(
-        "EXISTS (?)", ContentMigration.where(workflow_state: :imported).where("context_id = ? OR context_id IN (
-            WITH RECURSIVE t AS (
-              SELECT context_id, source_course_id FROM #{ContentMigration.quoted_table_name} WHERE context_id = ?
-              UNION
-              SELECT content_migrations.context_id, content_migrations.source_course_id FROM #{ContentMigration.quoted_table_name} INNER JOIN t ON content_migrations.context_id=t.source_course_id
-            )
-            SELECT DISTINCT context_id FROM t
-          )", @context.id, @context.id).where("content_migrations.source_course_id = courses.id")
-      ).select("id, lti_context_id")
+      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(:id => :desc).limit(1).pluck(:id).first
+      return [] unless last_migration_id
+
+      # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
+      # until a new copy is made to _this_ course
+      Rails.cache.fetch(["recursive_copied_course_lti_ids", @context.global_id, last_migration_id].cache_key) do
+        Course.where(
+          "EXISTS (?)", ContentMigration.where(workflow_state: :imported).where("context_id = ? OR context_id IN (
+              WITH RECURSIVE t AS (
+                SELECT context_id, source_course_id FROM #{ContentMigration.quoted_table_name} WHERE context_id = ?
+                UNION
+                SELECT content_migrations.context_id, content_migrations.source_course_id FROM #{ContentMigration.quoted_table_name} INNER JOIN t ON content_migrations.context_id=t.source_course_id
+              )
+              SELECT DISTINCT context_id FROM t
+            )", @context.id, @context.id).where("content_migrations.source_course_id = courses.id")
+        ).pluck(:id, :lti_context_id)
+      end
     end
   end
 end

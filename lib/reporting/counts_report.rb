@@ -27,7 +27,7 @@ class CountsReport
   def self.process_shard
     reporter = new
 
-    Account.root_accounts.active.each do |account|
+    Account.root_accounts.active.non_shadow.each do |account|
       next if account.external_status == 'test'
 
       reporter.process_account(account)

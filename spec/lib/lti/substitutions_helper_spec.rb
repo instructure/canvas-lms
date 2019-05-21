@@ -527,6 +527,19 @@ module Lti
       it "should return previous lti context_ids" do
         expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
       end
+
+      it "should invalidate cache on last copied migration" do
+        enable_cache do
+          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
+          @c4 = Course.create!(:root_account => root_account, :account => account, :lti_context_id => 'jkl')
+          @c1.content_migrations.create!(:workflow_state => 'imported', :source_course => @c4)
+          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi} # not copied into subject course yet
+
+          @c5 = Course.create!(:root_account => root_account, :account => account, :lti_context_id => 'mno')
+          course.content_migrations.create!(:workflow_state => 'imported', :source_course => @c5) # direct copy
+          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi jkl mno}
+        end
+      end
     end
 
     describe "section substitutions" do
@@ -612,6 +625,19 @@ module Lti
           course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
           sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
           expect(sub_helper.email).to eq sis_email
+        end
+
+        it "only returns active logins" do
+          tool = class_double("Lti::ToolProxy")
+          p = sis_pseudonym
+          # moving account so that if the pseudonym was not tied to enrollment
+          # it would return 'test@foo.com' instead of sis_email if it was active
+          p.account = Account.create!
+          p.workflow_state = 'deleted'
+          p.save!
+          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
+          expect(sub_helper.email).to eq 'test@foo.com'
         end
 
         context "prefer_sis_email" do

@@ -6098,13 +6098,13 @@ nn:
   current_theme_62e5e8cf: "Gjeldande tema"
   current_total_67bf5f72: "Gjeldande totalt:"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Tilknytte %{tokenName}, klikk for å fjerne"
-  curve_grades_b7a75443: "Juster karakterar"
+  curve_grades_b7a75443: "Normalfordele resultat"
   curve_grades_dialog: 
     average_score: "Gjennomsnittleg resultat"
     buttons: 
-      curve_grades: "Juster karakterar"
+      curve_grades: "Normalfordele resultat"
       curving_grades: "Justerer karakterar..."
-    curve_average: "Oppgi ein gjennomsnittleg karakter for justeringa for *%{assignment.name}*. Oversikta viser det beste forsøk på å justere karakterane basert på gjeldande studentresultat."
+    curve_average: "Oppgi ein gjennomsnittleg karakterverdi for normalfordelinga for *%{assignment.name}*. Oversikta viser det beste forsøk på normalfordeling basert på gjeldande studentresultat."
     curve_grade_for_assignment: "Justert karakter for %{assignment.name}"
     labels: 
       assign_blanks: "Gi nullkarakter til studentar som ikkje har levert"
@@ -8011,7 +8011,7 @@ nn:
       points_text: "Studentane vil sjå sluttkarakter også som poeng. Er du sikker på at du vil halde fram?"
     gradebook_header_menu: 
       assignment_details: Oppgåvedetaljar
-      curve_grades: "Juster karakterar"
+      curve_grades: "Normalfordele resultat"
       download_submissions: "Last ned innleveringar"
       message_students_who: "Send melding til studentar som..."
       re_upload_submissions: "Last tilbake kommenterte filer"
@@ -15642,7 +15642,7 @@ nn:
     assignment_information: 
       actions: 
         assignment_is_muted: Skjult?
-        curve_grades: "Juster karakterar"
+        curve_grades: "Normalfordele resultat"
         message_students: "Send melding til studentar som..."
         set_default_grade: "Bruk standardkarakter"
       details: 
@@ -18076,7 +18076,7 @@ nn:
   type_of_item_8a37f69d: "Type element"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uff. Kontakt ein Catalog-utviklar. Feilmelding: %{message}"
   unable_to_accept_update_fd53a7e2: "Kan ikkje oppdatere"
-  unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikkje normalfordele karakterar fordi innleveringsfristen for oppgåva ligg innanfor ein lukka karaktersetjingsperiode for minst ein student"
+  unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikkje normalfordele resultat fordi innleveringsfristen for oppgåva ligg innanfor ein lukka vurderingsperiode for minst ein student"
   unable_to_dismiss_update_df1e32eb: "Kan ikkje avvise oppdatering"
   unable_to_find_clever_district_district_id_61deb1cb: "Finn ikkje Clever-distriktet %{district_id}"
   unable_to_remove_app_4293cb53: "Kan ikkje fjerne app"
