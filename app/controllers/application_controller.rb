@@ -671,24 +671,32 @@ class ApplicationController < ActionController::Base
   end
 
   def verified_user_check
-    if @domain_root_account&.user_needs_verification?(@current_user)
-      render_unverified_error # disable tools before verification
+    if @domain_root_account&.user_needs_verification?(@current_user) # disable tools before verification
+      if @current_user
+        render_unverified_error(
+          t("user not authorized to perform that action until verifying email"),
+          t("Complete registration by clicking the “finish the registration process” link sent to your email."))
+      else
+        render_unverified_error(
+          t("must be logged in and registered to perform that action"),
+          t("Please Log in to view this content"))
+      end
       false
     else
       true
     end
   end
 
-  def render_unverified_error
+  def render_unverified_error(json_message, flash_message)
     respond_to do |format|
       format.json do
         render json: {
           status: 'unverified',
-          errors: [{ message: I18n.t("user not authorized to perform that action until verifying email") }]
+          errors: [{ message: json_message }]
         }, status: :unauthorized
       end
       format.all do
-        flash[:warning] = t("Complete registration by clicking the “finish the registration process” link sent to your email.")
+        flash[:warning] = flash_message
         redirect_to_referrer_or_default(root_url)
       end
     end
