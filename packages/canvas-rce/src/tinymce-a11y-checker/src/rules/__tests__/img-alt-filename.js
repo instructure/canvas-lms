@@ -20,112 +20,12 @@ describe("test", () => {
 
   test("returns true if alt text is not filename", () => {
     el.setAttribute("alt", "some text")
-    return rule.test(el).then(result => expect(result).toBeTruthy())
+    expect(rule.test(el)).toBeTruthy()
   })
 
   test("returns false if alt text is filename", () => {
     el.setAttribute("alt", "file.txt")
-    return rule.test(el).then(result => expect(result).toBeFalsy())
-  })
-
-  describe("with redirects", () => {
-    beforeEach(() => {
-      moxios.install()
-    })
-
-    afterEach(() => {
-      moxios.uninstall()
-    })
-
-    test("returns true if alt text is not the filename after resolution of redirects with location header", done => {
-      el.setAttribute("alt", "some_img.jpg")
-      el.setAttribute("src", "/some_link_that_redirects")
-      const ruleResult = rule.test(el)
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 302,
-            headers: {
-              Location: "/not_some_img.jpg"
-            }
-          })
-          .then(() => {
-            ruleResult.then(response => {
-              expect(response).toBeTruthy()
-              done()
-            })
-          })
-      })
-    })
-
-    test("returns false if alt text is the filename after resolution of redirects with location header", done => {
-      el.setAttribute("alt", "some_img.jpg")
-      el.setAttribute("src", "/some_link_that_redirects")
-      const ruleResult = rule.test(el)
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 302,
-            headers: {
-              Location: "/some_img.jpg"
-            }
-          })
-          .then(() => {
-            ruleResult.then(response => {
-              expect(response).toBeFalsy()
-              done()
-            })
-          })
-      })
-    })
-
-    test("returns true if alt text is not the filename after resolution of redirects with content-disposition header", done => {
-      el.setAttribute("alt", "some_img.jpg")
-      el.setAttribute("src", "/some_link_that_redirects")
-      const ruleResult = rule.test(el)
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 302,
-            headers: {
-              Location: "/not_some_img",
-              "Content-Disposition": 'attachment; filename="not_some_img.jpg"'
-            }
-          })
-          .then(() => {
-            ruleResult.then(response => {
-              expect(response).toBeTruthy()
-              done()
-            })
-          })
-      })
-    })
-
-    test("returns false if alt text is the filename after resolution of redirects with content-disposition header", done => {
-      el.setAttribute("alt", "some_img.jpg")
-      el.setAttribute("src", "/some_link_that_redirects")
-      const ruleResult = rule.test(el)
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 302,
-            headers: {
-              Location: "/not_some_img",
-              "Content-Disposition": 'attachment; filename="some_img.jpg"'
-            }
-          })
-          .then(() => {
-            ruleResult.then(response => {
-              expect(response).toBeTruthy()
-              done()
-            })
-          })
-      })
-    })
+    expect(rule.test(el)).toBeFalsy()
   })
 })
 

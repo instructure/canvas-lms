@@ -1,37 +1,13 @@
 import formatMessage from "../format-message"
-import { filename } from "../utils/strings"
 
 import axios from "axios"
 
+const FILENAMELIKE = /^\S+\.\S+$/
+
 export default {
   id: "img-alt-filename",
-  test: elem => {
-    if (elem.tagName !== "IMG") {
-      return true
-    }
-    const alt = elem.getAttribute("alt")
-    if (alt == null || alt === "") {
-      return true
-    }
-    return axios.head(elem.src).catch(e => {
-      if (
-        e.response &&
-        (e.response.status === 301 || e.response.status === 302)
-      ) {
-        const { location } = e.response.headers
-        const contentDisposition = e.response.headers["content-disposition"]
-        const matches = []
-        if (location) {
-          matches.push(filename(alt) !== filename(location))
-        }
-        if (contentDisposition) {
-          matches.push(filename(alt) !== filename(contentDisposition))
-        }
-        return matches.some(x => x)
-      }
-      return filename(alt) !== filename(elem.src)
-    })
-  },
+
+  test: elem => !FILENAMELIKE.test(elem.getAttribute("alt")),
 
   data: elem => {
     const alt = elem.getAttribute("alt")
