@@ -226,6 +226,14 @@ module RCENextPage
     fj('[data-cid="Portal Tray"] button:contains("Done")')
   end
 
+  def keyboard_shortcut_button
+    fj('button:has([name="IconKeyboardShortcuts"])')
+  end
+
+  def keyboard_shortcut_modal
+
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -379,5 +387,9 @@ module RCENextPage
 
   def click_image_options_done_button
     image_options_done_button.click
+  end
+
+  def click_keyboard_shortcut_button
+    keyboard_shortcut_button.click
   end
 end

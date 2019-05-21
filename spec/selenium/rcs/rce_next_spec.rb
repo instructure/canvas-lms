@@ -362,6 +362,15 @@ describe "RCE next tests" do
       expect(a11y_checker_tray).to be_displayed
     end
 
+    it "should open keyboard shortcut modal when clicking button in status bar" do
+      skip('Unskip in CORE-2837')
+      visit_front_page_edit(@course)
+
+      click_keyboard_shortcut_button
+
+      expect(keyboard_shortcut_modal).to be_displayed
+    end
+
     it "should close the course links tray when pressing esc", ignore_js_errors: true do
       skip('Unskip in CORE-2878')
       visit_front_page_edit(@course)
