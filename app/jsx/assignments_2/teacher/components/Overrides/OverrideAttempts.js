@@ -40,15 +40,6 @@ export default class OverrideAttempts extends React.Component {
     readOnly: false
   }
 
-  // TODO: need the scoreToKeep data
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      scoreToKeep: 'most_recent' // TODO: need the data
-    }
-  }
-
   onChangeAttemptsAllowed = (_event, selection) => {
     const limit = selection.value === 'unlimited' ? null : 1
     this.props.onChangeOverride('allowedAttempts', limit)
@@ -81,10 +72,6 @@ export default class OverrideAttempts extends React.Component {
     }
   }
   /* eslint-enable no-restricted-globals */
-
-  onChangeScoreToKeep = (_event, selection) => {
-    this.setState({scoreToKeep: selection.value})
-  }
 
   renderLimit() {
     const attempts = this.props.override.allowedAttempts === null ? 'unlimited' : 'limited'
@@ -133,24 +120,6 @@ export default class OverrideAttempts extends React.Component {
     return null
   }
 
-  renderScoreToKeep() {
-    return (
-      <Select
-        inline
-        label={I18n.t('Score to keep')}
-        selectedOption={this.state.scoreToKeep}
-        onChange={this.onChangeScoreToKeep}
-        readOnly={this.props.readOnly}
-        allowEmpty={false}
-        data-testid="OverrideAttempts-ScoreToKeep"
-      >
-        <option value="average_score">{I18n.t('Average Score')}</option>
-        <option value="highest_score">{I18n.t('Highest Score')}</option>
-        <option value="most_recent">{I18n.t('Most Recent')}</option>
-      </Select>
-    )
-  }
-
   renderDetail() {
     return (
       <View display="block" margin="0 0 small 0" data-testid="OverrideAttempts-Detail">
@@ -158,7 +127,6 @@ export default class OverrideAttempts extends React.Component {
           {this.renderLimit()}
           {this.renderAttempts()}
         </Flex>
-        {this.renderScoreToKeep()}
       </View>
     )
   }

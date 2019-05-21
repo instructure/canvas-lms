@@ -57,9 +57,6 @@ describe('OverrideAttempts', () => {
     // the attempts
     expect(getByLabelText('Attempts Allowed').value).toBe('Unlimited')
     expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
-
-    // score to keep
-    expect(getByLabelText('Score to keep').value).toBe('Most Recent')
   })
 
   it('renders limited override attempts detail', () => {
@@ -72,8 +69,6 @@ describe('OverrideAttempts', () => {
     // the attempts
     expect(getByLabelText('Attempts Allowed').value).toBe('Limited')
     expect(getByLabelText('Attempts').value).toBe('2')
-
-    expect(getByLabelText('Score to keep').value).toBe('Most Recent')
   })
 
   it('displays the Attempts count when switched from unlimited to limited', () => {
