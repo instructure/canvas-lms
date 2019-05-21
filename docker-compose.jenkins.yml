@@ -44,6 +44,11 @@ services:
       - pg_data:/volumes/postgres_data
       - cassandra_data:/volumes/cassandra_data
 
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - "${DYNAMODB_PORT}:8000"
+
   canvasrceapi:
     image: starlord.inscloudgate.net/tmcknight/canvas-rce-api-http
     environment:
