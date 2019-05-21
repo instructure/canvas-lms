@@ -79,8 +79,7 @@ describe "student planner" do
     url = driver.current_url
     # validate the background image url
     expect(elem[:style]).
-      to include("#{url}courses/#{@course.id}/files/#{@course_attachment.id}/download?verifier=#{@course_attachment.uuid}")
-
+      to include("#{url}images/thumbnails/show")
   end
 
   context "responsive layout" do

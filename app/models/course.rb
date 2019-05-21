@@ -447,12 +447,14 @@ class Course < ActiveRecord::Base
 
   def image
     @image ||= if self.image_id.present?
-      self.shard.activate do
-        self.attachments.active.where(id: self.image_id).take&.public_download_url
-      end
+      image_attachment&.public_download_url
     elsif self.image_url
       self.image_url
     end
+  end
+
+  def image_attachment
+    @image_attachment ||= self.shard.activate { self.attachments.active.where(id: self.image_id).take }
   end
 
   def course_visibility_options

@@ -43,8 +43,7 @@ module Api::V1::Course
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
-    settings[:image] = course.image
-
+    settings[:image] = course.image_attachment ? authenticated_thumbnail_url(course.image_attachment) : course.image
     settings
   end
 

@@ -151,7 +151,7 @@ module DashboardHelper
 
   def map_courses_for_menu(courses, opts={})
     mapped = courses.map do |course|
-      presenter = CourseForMenuPresenter.new(course, @current_user, @domain_root_account, session, opts)
+      presenter = CourseForMenuPresenter.new(course, @current_user, @domain_root_account, session, file_authenticator, opts)
       presenter.to_h
     end
 
