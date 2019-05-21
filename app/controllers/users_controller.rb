@@ -2482,6 +2482,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def clear_cache
+    user = api_find(User, params[:id])
+    if user && authorized_action(user, @current_user, :manage_user_details)
+      user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
+      user.touch
+      render json: { status: "ok" }
+    end
+  end
+
   protected
 
   def teacher_activity_report(teacher, course, student_enrollments)

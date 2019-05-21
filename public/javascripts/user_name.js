@@ -23,6 +23,7 @@ import './jquery.ajaxJSON'
 import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
+import 'compiled/jquery.rails_flash_notifications'
 import './jquery.templateData'
 
 $(document).ready(function() {
@@ -75,6 +76,15 @@ $(document).ready(function() {
       $link.remove();
     }, function(data) {
       $link.text(I18n.t('errors.failed_to_report_image', "Failed to report the image, please try again"));
+    });
+  });
+  $(".clear_user_cache_link").click(function(event) {
+    event.preventDefault();
+    const $link = $(this);
+    $.ajaxJSON($link.attr('href'), 'POST', {}, function(_data) {
+      $.flashMessage(I18n.t("Cache cleared successfully"));
+    }, function(_data) {
+      $.flashMessage(I18n.t("Failed to clear cache"));
     });
   });
 });
