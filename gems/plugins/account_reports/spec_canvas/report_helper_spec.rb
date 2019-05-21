@@ -66,6 +66,11 @@ describe "report helper" do
     expect(account_report.account_report_runners.count).to eq 100
   end
 
+  it 'should fail when no csv' do
+    AccountReports.message_recipient(account_report, 'hi', nil)
+    expect(account_report.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+  end
+
   describe "load pseudonyms" do
     it 'should do one query for pseudonyms' do
       user_with_pseudonym(active_all: true, account: account, user: user)
