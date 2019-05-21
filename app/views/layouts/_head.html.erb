@@ -87,4 +87,7 @@
   </script>
   <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
   <%= include_head_js %>
+  <% @xhrs_to_prefetch_from_controller&.each do |args| %>
+    <%= prefetch_xhr(*args) %>
+  <% end %>
 </head>

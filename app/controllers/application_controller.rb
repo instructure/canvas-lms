@@ -2273,6 +2273,7 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
+  ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 50
   def set_js_assignment_data
     rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
@@ -2282,11 +2283,25 @@ class ApplicationController < ActionController::Base
       [assignment.id, {update: assignment.user_can_update?(@current_user, session)}]
     end.to_h
 
+    current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
+
+    prefetch_xhr(api_v1_course_assignment_groups_url(
+      @context,
+      include: [
+        'assignments',
+        'discussion_topic',
+        (permissions[:manage] || current_user_has_been_observer_in_this_course) && 'all_dates',
+        permissions[:manage] && 'module_ids'
+      ].reject(&:blank?),
+      exclude_response_fields: ['description', 'rubric'],
+      override_assignment_dates: !permissions[:manage],
+      per_page: ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX
+    ), id: 'assignment_groups_url')
+
     js_env({
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
         :new_quiz_url => context_url(@context, :context_quizzes_new_url),
-        :course_url => api_v1_course_url(@context),
         :sort_url => reorder_course_assignment_groups_url(@context),
         :assignment_sort_base_url => course_assignment_groups_url(@context),
         :context_modules_url => api_v1_course_context_modules_path(@context),
@@ -2299,8 +2314,9 @@ class ApplicationController < ActionController::Base
       :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
       :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
-      :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+      :current_user_has_been_observer_in_this_course => current_user_has_been_observer_in_this_course,
       :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user),
+      apply_assignment_group_weights: @context.apply_group_weights?,
     })
 
     conditional_release_js_env(includes: :active_rules)
@@ -2411,6 +2427,11 @@ class ApplicationController < ActionController::Base
 
     StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
+  end
+
+  # makes it so you can use the prefetch_xhr erb helper from controllers. They'll be rendered in _head.html.erb
+  def prefetch_xhr(*args)
+    (@xhrs_to_prefetch_from_controller ||= []) << args
   end
 
   def teardown_live_events_context
