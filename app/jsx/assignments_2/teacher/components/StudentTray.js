@@ -23,11 +23,12 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 
 import {bool, func} from 'prop-types'
 import {TeacherAssignmentShape, UserShape} from '../assignmentData'
-
 import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Avatar, Heading, Link, Text} from '@instructure/ui-elements'
 import {Tray} from '@instructure/ui-overlays'
+import {DateTimeInput} from '@instructure/ui-forms'
+import OverrideAttempts from './Overrides/OverrideAttempts'
 import {
   IconArrowOpenEndLine,
   IconArrowOpenStartLine,
@@ -50,7 +51,8 @@ export default class StudentTray extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      messageFormOpen: false
+      messageFormOpen: false,
+      allowedAttempts: this.props.assignment.allowedAttempts
     }
   }
 
@@ -122,9 +124,20 @@ export default class StudentTray extends React.Component {
     )
   }
 
+  onChangeDueAt = (_event, newValue) => {
+    this.setState({dueAt: newValue})
+  }
+
+  onChangeAttempts = (field, newValue) => {
+    this.setState({allowedAttempts: newValue})
+  }
+
   renderActionLinks() {
     return (
       <React.Fragment>
+        <Heading level="h4" as="h3" margin="medium auto auto auto">
+          {I18n.t('Actions')}
+        </Heading>
         <Link
           icon={<IconEmailLine />}
           iconPlacement="start"
@@ -134,7 +147,6 @@ export default class StudentTray extends React.Component {
         >
           <Text color="primary">{I18n.t('Message Student')}</Text>
         </Link>
-
         <Link
           icon={<IconUploadLine />}
           iconPlacement="start"
@@ -143,6 +155,38 @@ export default class StudentTray extends React.Component {
         >
           <Text color="primary">{I18n.t('Submit for Student')}</Text>
         </Link>
+      </React.Fragment>
+    )
+  }
+
+  renderOverrideActions() {
+    const hasDueDate = this.props.assignment.dueAt !== null
+    return (
+      <React.Fragment>
+        <View as="div" margin="medium auto auto auto">
+          <DateTimeInput
+            description={I18n.t('Extend Due Date')}
+            label={I18n.t('Extend Due Date')}
+            dateLabel={I18n.t('Date')}
+            datePreviousLabel={I18n.t('previous')}
+            dateNextLabel={I18n.t('next')}
+            timeLabel={I18n.t('Time')}
+            onChange={this.onChangeDueAt}
+            layout="stacked"
+            value={hasDueDate ? this.props.assignment.dueAt : null}
+            invalidDateTimeMessage={I18n.t('Invalid date and time')}
+            messages={this.state.messages}
+          />
+        </View>
+
+        <View as="div" margin="small auto auto auto">
+          <OverrideAttempts
+            allowedAttempts={this.state.allowedAttempts}
+            variant="detail"
+            stacked
+            onChange={this.onChangeAttempts}
+          />
+        </View>
       </React.Fragment>
     )
   }
@@ -220,10 +264,8 @@ export default class StudentTray extends React.Component {
           </View>
         </header>
 
-        <Heading level="h4" as="h3" margin="medium auto auto auto">
-          {I18n.t('Actions')}
-        </Heading>
         {this.renderActionLinks()}
+        {this.renderOverrideActions()}
       </View>
     )
   }

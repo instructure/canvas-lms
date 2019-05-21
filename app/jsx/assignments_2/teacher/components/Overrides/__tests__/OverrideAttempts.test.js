@@ -26,7 +26,7 @@ describe('OverrideAttempts', () => {
     const override = mockOverride()
 
     const {getByText, getByTestId} = render(
-      <OverrideAttempts override={override} variant="summary" />
+      <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
     )
     expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 
@@ -38,7 +38,7 @@ describe('OverrideAttempts', () => {
     const override = mockOverride({allowedAttempts: 2})
 
     const {getByText, getByTestId} = render(
-      <OverrideAttempts override={override} variant="summary" />
+      <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
     )
     expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 
@@ -50,7 +50,12 @@ describe('OverrideAttempts', () => {
     const override = mockOverride({})
 
     const {getByLabelText, getByTestId, queryByTestId} = render(
-      <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+      <OverrideAttempts
+        allowedAttempts={override.allowedAttempts}
+        onChange={() => {}}
+        variant="detail"
+        readOnly
+      />
     )
     expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
@@ -62,7 +67,12 @@ describe('OverrideAttempts', () => {
   it('renders limited override attempts detail', () => {
     const override = mockOverride({allowedAttempts: 2})
     const {getByLabelText, getByTestId} = render(
-      <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+      <OverrideAttempts
+        allowedAttempts={override.allowedAttempts}
+        onChange={() => {}}
+        variant="detail"
+        readOnly
+      />
     )
     expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
@@ -75,15 +85,20 @@ describe('OverrideAttempts', () => {
     const override = mockOverride({})
 
     const {container, getByTestId, queryByTestId} = render(
-      <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+      <OverrideAttempts
+        allowedAttempts={override.allowedAttempts}
+        onChange={() => {}}
+        variant="detail"
+        readOnly
+      />
     )
     expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
 
     override.allowedAttempts = 1
     render(
       <OverrideAttempts
-        override={override}
-        onChangeOverride={() => {}}
+        allowedAttempts={override.allowedAttempts}
+        onChange={() => {}}
         variant="detail"
         readOnly
       />,
@@ -97,7 +112,12 @@ describe('OverrideAttempts', () => {
     const onChange = jest.fn()
 
     const {getByLabelText} = render(
-      <OverrideAttempts override={override} onChangeOverride={onChange} variant="detail" readOnly />
+      <OverrideAttempts
+        allowedAttempts={override.allowedAttempts}
+        onChange={onChange}
+        variant="detail"
+        readOnly
+      />
     )
 
     const numberInput = getByLabelText('Attempts')
@@ -110,7 +130,12 @@ describe('OverrideAttempts', () => {
     const onChange = jest.fn()
 
     const {getByLabelText} = render(
-      <OverrideAttempts override={override} onChangeOverride={onChange} variant="detail" readOnly />
+      <OverrideAttempts
+        allowedAttempts={override.allowedAttempts}
+        onChange={onChange}
+        variant="detail"
+        readOnly
+      />
     )
 
     const numberInput = getByLabelText('Attempts')
@@ -123,7 +148,12 @@ describe('OverrideAttempts', () => {
     const onChange = jest.fn()
 
     const {getByLabelText} = render(
-      <OverrideAttempts override={override} onChangeOverride={onChange} variant="detail" readOnly />
+      <OverrideAttempts
+        allowedAttempts={override.allowedAttempts}
+        onChange={onChange}
+        variant="detail"
+        readOnly
+      />
     )
 
     const numberInput = getByLabelText('Attempts')

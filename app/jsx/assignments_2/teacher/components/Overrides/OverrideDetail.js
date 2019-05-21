@@ -76,8 +76,8 @@ export default class OverrideDetail extends React.Component {
     return (
       <OverrideAttempts
         variant="detail"
-        override={this.props.override}
-        onChangeOverride={this.props.onChangeOverride}
+        allowedAttempts={this.props.override.allowedAttempts}
+        onChange={this.props.onChangeOverride}
         readOnly={this.props.readOnly}
       />
     )
