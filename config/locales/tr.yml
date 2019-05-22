@@ -1765,7 +1765,7 @@ tr:
   all_students_have_taken_the_quiz_b558f8b4: "Tüm öğrenciler bu kısa sınavı aldı"
   all_students_have_taken_the_survey_494f9f42: "Tüm öğrenciler bu anketi aldı"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Tüm gönderilerin seçilmiş bir notu olmalı."
-  all_terms_cd27b0fb: "Tüm Koşullar"
+  all_terms_cd27b0fb: "Tüm Dönemler"
   all_timezones_5e8afa7b: "Tüm zaman dilimleri"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Tüm ağırlıklar 0'a eşit ya da daha büyük olmalıdır"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Bir moderatör seçili gönderiler için çoklu bağımsız notları inceleyebilsin"
