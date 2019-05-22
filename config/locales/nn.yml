@@ -1968,6 +1968,7 @@ nn:
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Gir brukar løyve til å sjå og legge til brukarar i eit samarbeid."
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "Gir brukarar løyve til å sjå og endre SIS-ID og integrasjons-ID i innloggingsdetaljane til ein brukar. "
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Gir brukar løyve til å sjå og administrere underkontoar for denne kontoen."
+  allows_user_to_view_course_analytics_through_the_c_5f24ec08: "Gir brukar løyve til å sjå analysedata for emne gjennom emnedashbordet. Gir brukar løyve til å sjå analysedata for student."
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
       Gir løyve til å sjå emnestatus, velje emneforside og sjekklisteknappene
       for emneoppsett på emneforsida.
@@ -2334,6 +2335,7 @@ nn:
   assignment_assignment_submission_plain_text_view_b217d372: "Oppgåveinnlevering %{assignment} rein tekst-vising"
   assignment_comments_e43ed898: Oppgåvekommentarar
   assignment_created_assignment_name_course_name_324a5639: "Oppgåve er oppretta – %{assignment_name}, %{course_name}"
+  assignment_created_b3ee04d7: "Oppgåve er oppretta"
   assignment_d8387b78: oppgåve
   assignment_details: 
     no_graded_submissions: "Ingen innleveringar som er vurderte"
@@ -5952,6 +5954,7 @@ nn:
       invalid_link: "Påmeldingslenka du brukte er ikkje lenger gyldig. Kontakt faglærar for emnet og kontroller at du framleis er registrert."
   courses_43204aae: Emne
   courses_account_72e4fca7: "Emne (konto)"
+  courses_account_navigation_f84fdec3: "Emne (kontonavigasjon)"
   courses_navigation_menu_b3638384: "Meny for emnenavigasjon"
   create_132b3be1: Opprett
   create_a_new_account_4cf7c0f9: "Opprett ny konto"
@@ -6859,7 +6862,8 @@ nn:
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like tidsluker på %{num_minutes} minutt. *Gå*"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ikkje tel med denne oppgåva i sluttresultatet"
   do_nothing_9672b478: "Gjer ingenting"
-  docviewer_highlight_updated_47dc7da2: "Docviewer highlight oppdatert"
+  docviewer_area_updated_43f60b7e: "Docviewer-område er oppdatert"
+  docviewer_highlight_updated_47dc7da2: "Docviewer-markering er oppdatert"
   does_not_meet_expectations_b0736d20: "Innfrir ikkje forventningar"
   domain_3b54c511: Domene
   domain_is_required_1d4c8b25: "Domene er obligatorisk"
@@ -8528,6 +8532,7 @@ nn:
   grades_edit_773dfc24: "Vurderingar - endre"
   grades_for_student_aff00ba: "Karakterar for %{student}"
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: "Vurderingar for denne oppgåva er no synleg for studentar."
+  grades_view_change_logs_6bc1b959: "Vurderingar - sjå endringslogg"
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -12739,6 +12744,7 @@ nn:
   outcome_results_title: Læringsmålresultat
   outcome_score_141cf00a: læringsmålpoeng
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Læringsmål: %{title} har status som %{statusTooltip}"
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Læringsmål med ID %{guid} eksisterer allereie i eit anna urelatert emne eller konto (%{name}) "
   outcomes: 
     account_standards: Kontostandardar
     account_standards_description: "TIl venstre ser du standardane institusjonen din har oppretta for å bruke på emna."
@@ -15609,6 +15615,7 @@ nn:
   save_theme_36c73e6a: "Lagre tema"
   save_theme_f706116e: "Lagre tema"
   save_this_comment_for_reuse_5eda0b70: "Lagre denne kommentarer for seinare bruk"
+  saving_2521e616: Lagrar
   saving_associations_989bd4da: "Lagrar forbindelsane"
   saving_associations_complete_e4b9634d: "Lagring av forbindelsane er ferdig"
   saving_associations_started_8ac85360: "Lagring av forbindelsane er starta"
@@ -15766,6 +15773,7 @@ nn:
     student_groups: Studentgrupper
   search_23a88d5c: Søk...
   search_280d00bd: Søk
+  search_announcements_by_title_407a998e: "Søk på kunngjeringar etter tittel"
   search_by_c559efd: "Søk etter"
   search_by_title_short_name_or_sis_id_fe84aa12: "Søk på tittel, kortnamn eller SIS-ID"
   search_by_user_dd3ad189: "Søk etter brukar"
@@ -17676,6 +17684,7 @@ nn:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Mest sannsynleg skjedde dette fordi du har importert emneinnhald utan tilknytte filer."
   this_name_appears_in_sorted_lists_dccbd84b: "Namnet kjem til syne i sorterte lister."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Faglærar brukar namnet for karaktersetjing."
+  this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Dette valet er ikkje kompatibelt med Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Læringsmålet har blitt brukt til å vurdere ein student og kan ikkje lenger oppdaterast"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Læringsmålet har blitt brukt til å vurdere ein student og kan ikkje lenger redigerast og slettast"
   this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "Læringsmålet har blitt brukt til å vurdere ein student. Berre tekstfelt kan oppdaterast "
@@ -18006,6 +18015,7 @@ nn:
   today_76e10f9c: "I dag"
   toggle_course_card_color_overlays_b5b8137a: "Slå av/på fargelag på emnekort"
   toggle_editing_answer_text_as_html_9a93fe6: "Bytt tekst for redigeringssvar til HTML"
+  toggle_outcomes_for_title_6994b198: "Vis/skjul læringsmål for %{title}"
   toggle_select_course_name_310fdee4: "Brytar for emneval %{name}"
   toggle_title_grading_period_visibility_462b2136: "Vis/sjul %{title} karaktersetjingsperiode "
   tolerance_value_9e96573c: Toleranseverdi
