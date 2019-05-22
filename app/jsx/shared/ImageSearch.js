@@ -18,6 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import qs from 'qs'
 import I18n from 'i18n!image_search'
 import ImageSearchActions from './actions/ImageSearchActions'
 import ImageSearchStore from './stores/ImageSearchStore'
@@ -28,6 +29,16 @@ import { TextInput } from '@instructure/ui-text-input'
 import { IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine } from '@instructure/ui-icons'
 import { Link } from '@instructure/ui-elements'
 import { View, Flex, FlexItem } from '@instructure/ui-layout'
+
+const unsplashParams = {
+  w: 262,
+  h: 146,
+  crop: 'faces,entropy',
+  fit: 'crop',
+  fm: 'jpg',
+  cs: 'tinysrgb',
+  q: 80
+}
 
 export default class ImageSearch extends React.Component {
   static propTypes = {
@@ -131,15 +142,18 @@ export default class ImageSearch extends React.Component {
           <div className="ImageSearch__images">
 
             {photos &&
-            photos.map(photo => (
-              <ImageSearchItem
+            photos.map(photo => {
+              const photo_url = photo.raw_url + (photo.raw_url.includes('?') ? '&' : '?') + qs.stringify(unsplashParams)
+              return <ImageSearchItem
                 key={photo.id}
                 confirmationId={photo.id}
-                src={photo.small_url}
-                description={photo.description ? photo.description : this.state.searchTerm}
+                src={photo_url}
+                description={photo.alt || photo.description || this.state.searchTerm}
                 selectImage={this.props.selectImage}
+                userUrl={photo.user_url}
+                userName={photo.user}
               />
-            ))}
+            })}
           </div>
         ) : (
           <div className="ImageSearch__loading">

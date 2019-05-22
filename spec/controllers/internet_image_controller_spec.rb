@@ -70,6 +70,7 @@ describe InternetImageController do
       expect(json['large_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
       expect(json['regular_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
       expect(json['small_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
+      expect(json['raw_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
       download_url = Canvas::Security.url_key_decrypt_data(json['id'])
       expect(download_url).to eq "https://api.unsplash.com/photos/bPxGLgJiMI/download"
     end

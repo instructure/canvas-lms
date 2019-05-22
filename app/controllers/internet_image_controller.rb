@@ -68,6 +68,8 @@ class InternetImageController < ApplicationController
   # @response_field regular_url The URL of the image
   #
   # @response_field small_url The URL of the image sized small
+  #
+  # @response_field raw_url The raw URL of the photo
 
   def image_search
     return render json: { error: 'query param is required'}, status: :bad_request unless params[:query]
@@ -91,7 +93,8 @@ class InternetImageController < ApplicationController
         user_url: sr.dig('user', 'links', 'html'),
         large_url: sr.dig('urls', 'regular'),
         regular_url: sr.dig('urls', 'small'),
-        small_url: sr.dig('urls', 'thumb')
+        small_url: sr.dig('urls', 'thumb'),
+        raw_url: sr.dig('urls', 'raw')
       }
     end
     render json: json

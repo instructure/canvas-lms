@@ -26,19 +26,20 @@ QUnit.module('ImageSearch View');
 const getDummySearchResults = () => {
   const photos = [{
     id: 1,
+    alt: 'alt desc for photo 1',
     description: "desc for photo 1",
-    small_url: "url1"
+    raw_url: "url1"
   },
-    {
-      id: 2,
-      description: "desc for photo 2",
-      small_url: "url2"
-    },
-    {
-      id: 3,
-      description: "desc for photo 3",
-      small_url: "url3"
-    }];
+  {
+    id: 2,
+    description: "desc for photo 2",
+    raw_url: "url2"
+  },
+  {
+    id: 3,
+    description: null,
+    raw_url: "url3"
+  }];
 
   return photos;
 }
@@ -210,3 +211,19 @@ test('it renders search results', assert => {
     done();
   });
 });
+
+test('it shows appropriate alt text for results', assert => {
+  const done = assert.async()
+  const imageSearch = TestUtils.renderIntoDocument(
+    <ImageSearch />
+  )
+
+  const searchResults = getDummySearchResults()
+  imageSearch.setState({searchResults, searchTerm: 'cats'}, () => {
+    const images = TestUtils.scryRenderedDOMComponentsWithClass(imageSearch, "ImageSearch__img")
+    strictEqual(images[0].alt, 'alt desc for photo 1')
+    strictEqual(images[1].alt, 'desc for photo 2')
+    strictEqual(images[2].alt, 'cats')
+    done()
+  })
+})

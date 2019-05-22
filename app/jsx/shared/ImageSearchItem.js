@@ -18,13 +18,18 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import I18n from 'i18n!image_search'
 
 class ImageSearchItem extends React.Component {
   static propTypes = {
     description: PropTypes.string,
     src: PropTypes.string,
     confirmationId: PropTypes.string,
-    selectImage: PropTypes.func
+    selectImage: PropTypes.func,
+    userUrl: PropTypes.string,
+    userName: PropTypes.string
   }
 
   handleClick = () => {
@@ -33,15 +38,25 @@ class ImageSearchItem extends React.Component {
 
   render () {
     return (
-      <button className="ImageSearch__item"
-              type="button"
-              onClick={this.handleClick}
-      >
-        <img className="ImageSearch__display"
-             alt={this.props.description}
-             src={this.props.src}
-        />
-      </button>
+      <div className="ImageSearch__wrapper">
+        <button className="ImageSearch__item"
+                type="button"
+                onClick={this.handleClick}
+        >
+          <img className="ImageSearch__img"
+               alt={this.props.description}
+               src={this.props.src}
+          />
+        </button>
+        <div className="ImageSearch__attribution">
+          <a href={this.props.userUrl}>
+            <ScreenReaderContent>
+              {I18n.t("Artist info for %{userName} for %{description}", {userName: this.props.userName, description: this.props.description})}
+            </ScreenReaderContent>
+            <PresentationContent>{this.props.userName}</PresentationContent>
+          </a>
+        </div>
+      </div>
     )
   }
 }
