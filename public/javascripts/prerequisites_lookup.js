@@ -23,6 +23,7 @@ import Spinner from 'spin.js'
 import './jquery.ajaxJSON'
 import './jquery.instructure_misc_helpers'
 
+
   var lookupStarted = false;
 
   INST.lookupPrerequisites = function() {
@@ -36,7 +37,7 @@ import './jquery.instructure_misc_helpers'
     }
     lookupStarted = true;
 
-    var url = $link.attr('href');
+    var url = $link.attr('x-canvaslms-trusted-url');
 
     var spinner = new Spinner({radius: 5});
     spinner.spin();
