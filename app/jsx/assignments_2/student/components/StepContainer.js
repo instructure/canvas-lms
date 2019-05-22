@@ -44,10 +44,12 @@ function availableStepContainer(props) {
     <div className="steps-container" data-testid="available-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Available'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Upload')} status="in-progress" />
         <StepItem label={I18n.t('Submit')} />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {!props.isCollapsed ? <StepItem label={I18n.t('Next')} status="button" /> : null}
       </Steps>
     </div>
   )
@@ -62,10 +64,12 @@ function unavailableStepContainer(props) {
     <div className="steps-container" data-testid="unavailable-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Unavailable'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Unavailable')} status="unavailable" />
         <StepItem label={I18n.t('Upload')} />
         <StepItem label={I18n.t('Submit')} />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {!props.isCollapsed ? <StepItem label={I18n.t('Next')} status="button" /> : null}
       </Steps>
     </div>
   )
@@ -80,10 +84,12 @@ function uploadedStepContainer(props) {
     <div className="steps-container" data-testid="uploaded-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Uploaded'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
         <StepItem label={I18n.t('Submit')} status="in-progress" />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {!props.isCollapsed ? <StepItem label={I18n.t('Next')} status="button" /> : null}
       </Steps>
     </div>
   )
@@ -98,6 +104,7 @@ function submittedStepContainer(props) {
     <div className="steps-container" data-testid="submitted-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Submitted'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
         <StepItem
@@ -118,6 +125,7 @@ function submittedStepContainer(props) {
         {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
           <StepItem label={I18n.t('New Attempt')} status="button" />
         ) : null}
+        {!props.isCollapsed ? <StepItem label={I18n.t('Next')} status="button" /> : null}
       </Steps>
     </div>
   )
@@ -134,6 +142,7 @@ function gradedStepContainer(props) {
     <div className="steps-container" data-testid="graded-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Graded'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
         <StepItem
@@ -169,6 +178,7 @@ function gradedStepContainer(props) {
         {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
           <StepItem label={I18n.t('New Attempt')} status="button" />
         ) : null}
+        {!props.isCollapsed ? <StepItem label={I18n.t('Next')} status="button" /> : null}
       </Steps>
     </div>
   )

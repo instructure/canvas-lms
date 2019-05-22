@@ -19,12 +19,18 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
+import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import classNames from 'classnames'
+import I18n from 'i18n!assignments_2_shared_Steps_StepItem'
+import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
+import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import IconLock from '@instructure/ui-icons/lib/Solid/IconLock'
 import IconPlus from '@instructure/ui-icons/lib/Solid/IconPlus'
 import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
 import px from '@instructure/ui-utils/lib/px'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 class StepItem extends Component {
   static propTypes = {
@@ -39,15 +45,73 @@ class StepItem extends Component {
     placement: 'interior'
   }
 
+  /**
+   * renderButton renders a small, circular, gray button. This button
+   * style is used for the Previous, New Attempt, and Next buttons in
+   * the Assignments 2 pizzatracker, which are used to navigate between
+   * submissions for a single assignment.
+   *
+   * @param ButtonIcon      An instUI icon corresponding to the rendered
+   *                    button's purpose
+   * @param a11yMessage The message to be read by the screen reader
+   *                    when focus is on the rendered button
+   */
+  renderButton(ButtonIcon, a11yMessage) {
+    return (
+      <div>
+        <ApplyTheme
+          theme={{
+            [Button.theme]: {
+              iconColor: '#C1C8CD',
+              borderRadius: '2rem'
+            }
+          }}
+        >
+          <Button
+            variant="icon"
+            icon=<ButtonIcon size="x-small" />
+            onClick={e => {
+              e.preventDefault()
+              // Temporary message to the console; will be removed
+              // when buttons are linked to back end and perform
+              // intended action
+              console.log({a11yMessage})
+            }}
+            size="small"
+          >
+            <ScreenReaderContent>{a11yMessage} </ScreenReaderContent>
+          </Button>
+        </ApplyTheme>
+      </div>
+    )
+  }
+
   renderIcon() {
-    const Icon = this.props.icon
-    if (!Icon && this.props.status === 'complete') {
+    const icon = this.props.icon
+    const status = this.props.status
+
+    if (!icon && status === 'button') {
+      switch (this.props.label) {
+        case 'Previous':
+          return this.renderButton(IconArrowOpenStart, I18n.t('View Previous Submission'))
+        case 'Next':
+          return this.renderButton(IconArrowOpenEnd, I18n.t('View Next Submission'))
+        case 'New Attempt':
+          return this.renderButton(IconPlus, I18n.t('Create New Submission'))
+        default:
+          return null
+      }
+    } else {
+      return <span aria-hidden>{this.selectIcon(icon, status)}</span>
+    }
+  }
+
+  selectIcon(Icon, status) {
+    if (!Icon && status === 'complete') {
       return <IconCheckMark color="primary-inverse" />
-    } else if (!Icon && this.props.status === 'unavailable') {
+    } else if (!Icon && status === 'unavailable') {
       return <IconLock color="error" />
-    } else if (!Icon && this.props.status === 'button') {
-      return <IconPlus color="secondary" />
-    } else if (typeof this.props.icon === 'function') {
+    } else if (typeof Icon === 'function') {
       return <Icon />
     } else if (Icon) {
       return Icon
@@ -63,6 +127,7 @@ class StepItem extends Component {
       case 'unavailable':
         return Math.round(px(this.props.pinSize) / 1.2)
       case 'button':
+        return Math.round(px(this.props.pinSize) / 1.05)
       case 'in-progress':
         return px(this.props.pinSize)
       default:
@@ -97,7 +162,6 @@ class StepItem extends Component {
           }}
         >
           <span
-            aria-hidden="true"
             style={{
               width: `${this.pinSize()}px`,
               height: `${this.pinSize()}px`

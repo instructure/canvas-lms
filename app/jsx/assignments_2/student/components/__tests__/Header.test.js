@@ -143,45 +143,6 @@ it('will render the available state tracker if an assignment is available but no
   expect(getByTestId('available-step-container')).toBeInTheDocument()
 })
 
-describe('the assignment is submitted', () => {
-  it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).toBeInTheDocument()
-  })
-
-  it('will render the New Attempt button if more attempts are allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, getByText} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt button if more attempts are not allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.allowedAttempts = 1
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, queryByText} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
-  })
-})
-
 it('will render the uploaded state tracker if an assignment is uploaded but not submitted', () => {
   const assignment = mockAssignment()
   const submission = legacyMockSubmission()
@@ -195,16 +156,67 @@ it('will render the uploaded state tracker if an assignment is uploaded but not 
   expect(getByTestId('uploaded-step-container')).toBeInTheDocument()
 })
 
-it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
-  const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  submission.state = 'submitted'
-  const {getByTestId} = render(
-    <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-  )
+describe('the assignment is submitted', () => {
+  it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
 
-  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+    expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+  })
+
+  it('will render the New Attempt step if more attempts are allowed', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, getByText} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
+
+    expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
+  })
+
+  it('will not render the New Attempt step if more attempts are not allowed', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.allowedAttempts = 1
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, queryByText} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
+
+    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
+  })
+
+  it('will render the Previous step', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, queryByText} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
+
+    expect(getByTestId('submitted-step-container')).toContainElement(queryByText('Previous'))
+  })
+
+  it('will render the Next step', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, queryByText} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
+
+    expect(getByTestId('submitted-step-container')).toContainElement(queryByText('Next'))
+  })
 })
 
 describe('the assignment is graded', () => {
@@ -232,7 +244,7 @@ describe('the assignment is graded', () => {
     expect(getByTestId('graded-step-container')).toContainElement(getByText('New Attempt'))
   })
 
-  it('will not render the New Attempt button if more attempts are not allowed', () => {
+  it('will not render the New Attempt step if more attempts are not allowed', () => {
     const assignment = mockAssignment()
     const submission = legacyMockSubmission()
     assignment.allowedAttempts = 1
@@ -243,5 +255,29 @@ describe('the assignment is graded', () => {
     )
 
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('New Attempt'))
+  })
+
+  it('will render the Previous step', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'graded'
+    const {getByTestId, queryByText} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
+
+    expect(getByTestId('graded-step-container')).toContainElement(queryByText('Previous'))
+  })
+
+  it('will render the Next step', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'graded'
+    const {getByTestId, queryByText} = render(
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+    )
+
+    expect(getByTestId('graded-step-container')).toContainElement(queryByText('Next'))
   })
 })
