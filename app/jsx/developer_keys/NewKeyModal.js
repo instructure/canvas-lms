@@ -84,7 +84,7 @@ export default class DeveloperKeyModal extends React.Component {
     const { store, actions, createLtiKeyState, createOrEditDeveloperKeyState } = this.props
 
     store.dispatch(actions.ltiKeysUpdateCustomizations(
-      createLtiKeyState.enabledScopes,
+      {scopes: createLtiKeyState.enabledScopes},
       createLtiKeyState.disabledPlacements,
       createOrEditDeveloperKeyState.developerKey.id,
       createLtiKeyState.toolConfiguration,
