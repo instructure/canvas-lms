@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Klawiatury pozwalają przejść do łączy za pomocą klawisza Tab. Dwa sąsiednie łącza prowadzącego do tej samej lokalizacji mogą wprowadzać użytkowników klawiatury w błąd."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Uzyskaj więcej informacji na temat sąsiadujących linków"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Uzyskaj więcej informacji na temat kontrastu barw"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Uzyskaj więcej informacji na temat organizacji nagłówków na stronie"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Uzyskaj więcej informacji na temat nagłówków tabeli"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Uzyskaj więcej informacji na temat alternatywnego tekstu dla obrazów"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Uzyskaj więcej informacji na temat napisów i tabel"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Uzyskaj więcej informacji na temat nazw plików jako alternatywnego tekstu"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Uzyskaj więcej informacji na temat korzystania z list"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Uzyskaj więcej informacji na temat atrybutów zakresu i tabel"
+  },
   "leave_as_is_4facfe55": {
     "message": "Pozostaw jako"
   },

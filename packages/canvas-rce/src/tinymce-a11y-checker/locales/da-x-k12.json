@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Tastaturer navigerer til links ved hjælp af Tab-tasten. To tilstødende links, der fører til samme destination, kan være forvirrende for tastaturbrugere."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Få mere at vide om tilstødende links"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Få mere at vide om farvekontrast"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Få mere at vide om at organisere sideoverskrifter"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Få mere at vide om tabeloverskrifter"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Få mere at vide om at bruge alt-tekst til billeder"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Få mere at vide om brug af billedtekster med tabeller"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Få mere at vide om at bruge filnavne som alt-tekst"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Få mere at vide om at bruge lister"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Få mere at vide om at bruge anvendelsesområde-attributter med tabeller"
+  },
   "leave_as_is_4facfe55": {
     "message": "Lad det være, som det er"
   },

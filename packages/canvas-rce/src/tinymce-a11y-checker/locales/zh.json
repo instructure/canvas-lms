@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "键盘使用 Tab 键导航至链接。转至相同目的地的两个相邻链接可以对键盘用户造成混淆。"
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "详细了解相邻链接"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "详细了解色彩对比度"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "详细了解组织页面标题"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "详细了解表标题"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "详细了解为使用图片替换文本"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "详细了解将标题与表格一起使用"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "详细了解使用文件名作为替换文本"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "详细了解使用列表"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "详细了解将范围属性与表格一起使用"
+  },
   "leave_as_is_4facfe55": {
     "message": "保持原状"
   },

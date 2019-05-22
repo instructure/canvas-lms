@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Клавиатуры используются для перехода по ссылкам с помощью клавиши Tab. Две соседние ссылки, ведущие в одно и то же место, могут запутывать пользователей клавиатур."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Узнать больше о соседних ссылках"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Узнать больше о цветовом контрасте"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Узнать больше об организации заголовков страниц"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Узнать больше о заголовках таблиц"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Узнать больше об использовании замещающего текста для изображений"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Узнать больше об использовании заголовков с таблицами"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Узнать больше об использовании имен файлов в качестве замещающего текста"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Узнать больше об использовании списков"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Узнать больше об использовании базовых атрибутов с таблицами"
+  },
   "leave_as_is_4facfe55": {
     "message": "Оставить как есть"
   },

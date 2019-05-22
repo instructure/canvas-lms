@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Os teclados navegam para ligações usando a tecla Tab. Dois links adjacentes que direcionam para o mesmo destino podem confundir os utilizadores de teclado."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Saiba mais sobre ligações adjacentes"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Saiba mais sobre o contraste de cores"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Saiba mais sobre como organizar títulos de página"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Saiba mais sobre cabeçalhos de tabelas"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Saiba mais sobre como usar o texto alternativo para imagens"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Saiba mais sobre como usar legendas com tabelas"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Saiba mais sobre como usar nomes de ficheiros como texto alternativo"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Saiba mais sobre como usar listas"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Saiba mais sobre como usar atributos de escopo com tabelas"
+  },
   "leave_as_is_4facfe55": {
     "message": "Deixe como está"
   },

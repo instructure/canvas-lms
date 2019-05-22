@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Tastaturnavigation zu Links mithilfe der Tabulatortaste. Zwei benachbarte Links, die direkt zum gleichen Ziel führen, können für den Tastaturbenutzer verwirrend sein."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Weitere Informationen über nebenstehende Links"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Weitere Informationen über Farbkontrast"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Weitere Informationen über das Organisieren der Seitenüberschriften"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Weitere Informationen über Tabellenkopfzeilen"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Weitere Informationen zur Verwendung von alternativem Text für Bilder"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Weitere Informationen zur Verwendung von Tabellenbeschriftungen"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Weitere Informationen zur Verwendung von Dateinamen als alternativen Text"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Weitere Informationen zur Verwendung von Listen"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Weitere Informationen zur Verwendung von Bereichsattributen bei Tabellen"
+  },
   "leave_as_is_4facfe55": {
     "message": "Lassen, wie es ist"
   },

@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Ka whakaterehia e ngā papa pātuhi ngā hononga ki te whakamahi i Ripa kī. Ngā hononga e rua e tata ana e tika ana ki te haerenga rite ka pōraruraru ki ngā papa pātuhi kaiwhakamahi."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Ako ano i ngā hono tata"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Ako anō i ngā tae whakarerekē"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Ako anō i ngā whakahaere ngā pane whārangi"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Ako anō i ngā pane rārangi"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Ako anō i te mahi i ngā alt kuputuhi mo ngā āhua"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Ako anō i te mahi i ngā kōrero me ngā rārangi"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Ako anō i te mahi i ngā ingoa kōnae i te alt kuputuhi"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Ako anō i te mahi i ngā rārangi"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Ako anō i te mahi i ngā whānuitanga huanga me ngā rārangi"
+  },
   "leave_as_is_4facfe55": {
     "message": "Waiho ki tēnei"
   },

@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Navigacija do povezav poteka s tabulatorkami. Dve sosednji povezavi, ki usmerjata na isti cilj, lahko zmedeta uporabnike tipkovnic."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Več o sosednjih povezavah"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Več o barvnem kontrastu"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Več o organiziranju naslovov strani"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Več o glavah preglednic"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Več o uporabi nadomestnega besedila za slike"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Več o uporabi napisov pri preglednicah"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Več o uporabi imen datotek kot nadomestno besedilo"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Več o uporabi seznamov"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Več o uporabi atributov obsega pri preglednicah"
+  },
   "leave_as_is_4facfe55": {
     "message": "Ne spreminjaj"
   },
