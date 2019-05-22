@@ -218,6 +218,14 @@ module RCENextPage
     f('[data-cid="Tray Portal"]')
   end
 
+  def display_text_link_option
+    fj('label:contains("Display Text Link (Opens in a new tab)")')
+  end
+
+  def image_options_done_button
+    fj('[data-cid="Portal Tray"] button:contains("Done")')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -363,5 +371,13 @@ module RCENextPage
 
   def click_in_body_image(title)
     in_body_image(title).click
+  end
+
+  def click_display_text_link_option
+    display_text_link_option.click
+  end
+
+  def click_image_options_done_button
+    image_options_done_button.click
   end
 end

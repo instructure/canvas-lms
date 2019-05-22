@@ -31,6 +31,21 @@ describe "RCE next tests" do
       stub_rcs_config
     end
 
+    def create_wiki_page_with_embedded_image(page_title)
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+      @course.wiki_pages.create!(title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}")
+    end
+
+    def click_embedded_image_for_options
+      in_frame tiny_rce_ifr_id do
+        f('img').click
+      end
+    end
+
     it "should click on sidebar wiki page to create link in body", ignore_js_errors: true do
       title = "test_page"
       unpublished = false
@@ -273,22 +288,31 @@ describe "RCE next tests" do
 
     it "should open tray when clicking options button on existing image" do
       page_title = "Page1"
-      @root_folder = Folder.root_folders(@course).first
-      @image = @root_folder.attachments.build(:context => @course)
-      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
-      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
-      @image.save!
+      create_wiki_page_with_embedded_image(page_title)
 
-      @page = @course.wiki_pages.create!(title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}")
       visit_existing_wiki_edit(@course, page_title)
 
-      in_frame tiny_rce_ifr_id do
-        f('img').click
-      end
-
+      click_embedded_image_for_options
       click_image_options_button
 
       expect(image_options_tray).to be_displayed
+    end
+
+    it "should change embedded image to link when selecting option" do
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      click_display_text_link_option
+      click_image_options_done_button
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body_anchor).not_to contain_css('src')
+      end
     end
 
     it "should display assignment publish status in links accordion" do
