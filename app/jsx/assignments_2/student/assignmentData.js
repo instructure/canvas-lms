@@ -203,7 +203,7 @@ export const CommentShape = shape({
   updatedAt: string
 })
 
-export const StudentAssignmentShape = shape({
+export const AssignmentShape = shape({
   _id: string,
   description: string,
   dueAt: string,
@@ -239,23 +239,23 @@ export const StudentAssignmentShape = shape({
       id: string.isRequired,
       name: string.isRequired
     }).isRequired
-  ).isRequired,
-  submissionsConnection: shape({
-    nodes: arrayOf(
-      shape({
-        commentsConnection: shape({
-          nodes: arrayOf(CommentShape)
-        }),
-        id: string,
-        deductedPoints: number,
-        enteredGrade: string,
-        grade: string,
-        gradingStatus: string,
-        latePolicyStatus: string,
-        state: string,
-        submissionStatus: string,
-        submittedAt: string
-      })
-    ).isRequired
+  ).isRequired
+})
+
+export const SubmissionShape = shape({
+  commentsConnection: shape({
+    nodes: arrayOf(CommentShape)
+  }),
+  id: string,
+  deductedPoints: number,
+  enteredGrade: string,
+  grade: string,
+  gradingStatus: string,
+  latePolicyStatus: string,
+  state: string,
+  submissionStatus: string,
+  submittedAt: string,
+  submissionDraft: shape({
+    _id: string
   })
 })

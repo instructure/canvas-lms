@@ -22,7 +22,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 
-import {StudentAssignmentShape} from '../assignmentData'
+import {AssignmentShape} from '../assignmentData'
 
 const MAX_DISPLAYED_MODULES = 2
 
@@ -60,7 +60,7 @@ function AssignmentGroupModuleNav(props) {
 }
 
 AssignmentGroupModuleNav.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: AssignmentShape
 }
 
 export default React.memo(AssignmentGroupModuleNav)

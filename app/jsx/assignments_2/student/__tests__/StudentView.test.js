@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import {fireEvent, render, waitForElement} from 'react-testing-library'
 import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from '../assignmentData'
-import {mockAssignment, submissionGraphqlMock} from '../test-utils'
+import {mockGraphqlQueryResults, submissionGraphqlMock} from '../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import StudentView from '../StudentView'
@@ -34,7 +34,7 @@ const mocks = [
     },
     result: {
       data: {
-        assignment: mockAssignment()
+        assignment: mockGraphqlQueryResults()
       }
     }
   }
@@ -106,6 +106,10 @@ describe('StudentView', () => {
 
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
+
+  // We have to do all these tests from this root component so that the apollo
+  // cache is actually populated for the components that are needed. Not ideal,
+  // maybe we could circle back later and find an easier way to handle these.
 
   it('notifies SR users when a submission has been sent', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])

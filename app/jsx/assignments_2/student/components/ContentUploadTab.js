@@ -17,8 +17,8 @@
  */
 
 import AssignmentAlert from './AssignmentAlert'
+import {AssignmentShape, CREATE_SUBMISSION, STUDENT_VIEW_QUERY} from '../assignmentData'
 import {chunk} from 'lodash'
-import {CREATE_SUBMISSION, STUDENT_VIEW_QUERY, StudentAssignmentShape} from '../assignmentData'
 import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
@@ -39,7 +39,7 @@ import theme from '@instructure/ui-themes/lib/canvas/base'
 
 export default class ContentUploadTab extends Component {
   static propTypes = {
-    assignment: StudentAssignmentShape
+    assignment: AssignmentShape
   }
 
   state = {

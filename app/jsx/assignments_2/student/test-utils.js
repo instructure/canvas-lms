@@ -55,22 +55,6 @@ export function mockAssignment(overrides = {}) {
       __typename: 'LockInfo'
     },
     modules: [],
-    submissionsConnection: {
-      nodes: [
-        submissionFields({
-          _id: '3',
-          id: '3',
-          deductedPoints: 3,
-          enteredGrade: '9',
-          grade: '6',
-          latePolicyStatus: 'late',
-          submissionStatus: 'late',
-          submittedAt: '2019-02-20T15:12:33-07:00',
-          gradingStatus: 'graded'
-        })
-      ],
-      __typename: 'SubmissionConnection'
-    },
     __typename: 'Assignment',
     ...overrides
   }
@@ -174,7 +158,7 @@ export function commentGraphqlMock(comments) {
       request: {
         query: SUBMISSION_COMMENT_QUERY,
         variables: {
-          submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+          submissionId: legacyMockSubmission().id
         }
       },
       result: {
@@ -187,7 +171,7 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: '3',
+          id: legacyMockSubmission()._id,
           comment: 'lion',
           fileIds: []
         }
@@ -217,7 +201,7 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: '3',
+          id: legacyMockSubmission()._id,
           comment: 'lion',
           fileIds: ['1', '2', '3']
         }
@@ -246,6 +230,15 @@ export function commentGraphqlMock(comments) {
   ]
 }
 
+export function mockGraphqlQueryResults(overrides = {}) {
+  const assignment = mockAssignment(overrides)
+  assignment.submissionsConnection = {
+    nodes: [legacyMockSubmission()],
+    __typename: 'SubmissionConnection'
+  }
+  return assignment
+}
+
 export function submissionGraphqlMock() {
   return [
     {
@@ -260,7 +253,7 @@ export function submissionGraphqlMock() {
       result: {
         data: {
           createSubmission: {
-            submission: submissionFields(),
+            submission: mockSubmission(),
             errors: {
               attribute: null,
               message: null,
@@ -280,7 +273,9 @@ export function submissionGraphqlMock() {
       },
       result: {
         data: {
-          assignment: mockAssignment({lockInfo: {isLocked: false, __typename: 'LockInfo'}}),
+          assignment: mockGraphqlQueryResults({
+            lockInfo: {isLocked: false, __typename: 'LockInfo'}
+          }),
           __typename: 'Assignment'
         }
       }
@@ -288,10 +283,10 @@ export function submissionGraphqlMock() {
   ]
 }
 
-export function submissionFields(overrides = {}) {
+export function mockSubmission(overrides = {}) {
   return {
     _id: '22',
-    id: 'lookAtMe',
+    id: btoa('Submisison-22'),
     commentsConnection: {
       __typename: 'CommentsConnection',
       nodes: [
@@ -321,4 +316,27 @@ export function submissionFields(overrides = {}) {
     __typename: 'Submission',
     ...overrides
   }
+}
+
+// TODO We had a split between mockSubmission and mockAssignment where they
+//     returned different submisison results. Now that submission is a separate
+//     prop, we need to rectify these changes and unify everything under one
+//     function. Ideally, each test will set the submission state explictly that
+//     is required for the test work work, and not rely on the default values
+//     provided (or we have separate helper functions like mockSubmittedAssignment).
+//     But that will come after instcon, for now we are providing a separate
+//     function that has the same results as submission in the old mockAssignment.
+export function legacyMockSubmission() {
+  const overrides = {
+    _id: '3',
+    id: btoa('Submission-3'),
+    deductedPoints: 3,
+    enteredGrade: '9',
+    grade: '6',
+    latePolicyStatus: 'late',
+    submissionStatus: 'late',
+    submittedAt: '2019-02-20T15:12:33-07:00',
+    gradingStatus: 'graded'
+  }
+  return mockSubmission(overrides)
 }

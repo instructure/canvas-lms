@@ -16,26 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import React from 'react'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
+import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import Attempt from './Attempt'
 import DateTitle from './DateTitle'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import GradeDisplay from './GradeDisplay'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import {number} from 'prop-types'
+import React from 'react'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import StepContainer from './StepContainer'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 
-import {StudentAssignmentShape} from '../assignmentData'
-
 class Header extends React.Component {
   static propTypes = {
-    assignment: StudentAssignmentShape,
-    scrollThreshold: number.isRequired
+    assignment: AssignmentShape,
+    scrollThreshold: number.isRequired,
+    submission: SubmissionShape
   }
 
   state = {
@@ -62,10 +61,17 @@ class Header extends React.Component {
     }
   }
 
+  isSubmissionLate = () => {
+    if (!this.props.submission || this.props.submission.gradingStatus !== 'graded') {
+      return false
+    }
+    return (
+      this.props.submission.latePolicyStatus === 'late' ||
+      this.props.submission.submissionStatus === 'late'
+    )
+  }
+
   render() {
-    const submission = this.props.assignment.submissionsConnection
-      ? this.props.assignment.submissionsConnection.nodes[0]
-      : {}
     return (
       <React.Fragment>
         <div
@@ -96,31 +102,31 @@ class Header extends React.Component {
             <FlexItem grow align="start">
               <GradeDisplay
                 gradingType={this.props.assignment.gradingType}
-                receivedGrade={submission.grade}
+                receivedGrade={this.props.submission ? this.props.submission.grade : null}
                 pointsPossible={this.props.assignment.pointsPossible}
               />
-              <FlexItem as="div" align="end" textAlign="end">
-                <Flex direction="column">
-                  {submission.gradingStatus === 'graded' &&
-                    (submission.latePolicyStatus === 'late' ||
-                      submission.submissionStatus === 'late') && (
+              {this.props.submission && (
+                <FlexItem as="div" align="end" textAlign="end">
+                  <Flex direction="column">
+                    {this.isSubmissionLate() && (
                       <FlexItem grow>
                         <LatePolicyStatusDisplay
                           gradingType={this.props.assignment.gradingType}
                           pointsPossible={this.props.assignment.pointsPossible}
-                          originalGrade={submission.enteredGrade}
-                          pointsDeducted={submission.deductedPoints}
-                          grade={submission.grade}
+                          originalGrade={this.props.submission.enteredGrade}
+                          pointsDeducted={this.props.submission.deductedPoints}
+                          grade={this.props.submission.grade}
                         />
                       </FlexItem>
                     )}
-                  <FlexItem grow>
-                    {submission.submissionStatus && (
-                      <SubmissionStatusPill submissionStatus={submission.submissionStatus} />
-                    )}
-                  </FlexItem>
-                </Flex>
-              </FlexItem>
+                    <FlexItem grow>
+                      <SubmissionStatusPill
+                        submissionStatus={this.props.submission.submissionStatus}
+                      />
+                    </FlexItem>
+                  </Flex>
+                </FlexItem>
+              )}
             </FlexItem>
           </Flex>
           {!this.state.isSticky && <Attempt assignment={this.props.assignment} />}
@@ -135,6 +141,7 @@ class Header extends React.Component {
             >
               <StepContainer
                 assignment={this.props.assignment}
+                submission={this.props.submission}
                 forceLockStatus={!this.props.assignment.env.currentUser} // TODO: replace with new 'self' graphql query when ready
                 isCollapsed={this.state.isSticky}
               />
@@ -142,8 +149,8 @@ class Header extends React.Component {
           </div>
         </div>
         {
-          // We need this element to fill the gap that is missing when the regular header is removed in the transtion
-          // to the sticky header
+          // We need this element to fill the gap that is missing when the regular
+          // header is removed in the transtion to the sticky header
         }
         {this.state.isSticky && (
           <div

@@ -16,29 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_2_student_content'
-import React, {Suspense, lazy} from 'react'
-import {StudentAssignmentShape} from '../assignmentData'
-import Header from './Header'
+import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import ContentTabs from './ContentTabs'
-import MissingPrereqs from './MissingPrereqs'
+import Header from './Header'
+import I18n from 'i18n!assignments_2_student_content'
 import LockedAssignment from './LockedAssignment'
+import MissingPrereqs from './MissingPrereqs'
+import React, {Suspense, lazy} from 'react'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
-function renderContentBaseOnAvailability(assignment) {
+function renderContentBaseOnAvailability(assignment, submission) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
   } else if (assignment && assignment.lockInfo.isLocked) {
     return <LockedAssignment assignment={assignment} />
-  } else if (assignment.submissionsConnection === null) {
+  } else if (submission === null) {
     // NOTE: handles case where user is not logged in
     return (
       <React.Fragment>
-        <AssignmentToggleDetails description={assignment && assignment.description} />
+        <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
         >
@@ -49,25 +49,26 @@ function renderContentBaseOnAvailability(assignment) {
   } else {
     return (
       <React.Fragment>
-        <AssignmentToggleDetails description={assignment && assignment.description} />
-        <ContentTabs assignment={assignment} />
+        <AssignmentToggleDetails description={assignment.description} />
+        <ContentTabs assignment={assignment} submission={submission} />
       </React.Fragment>
     )
   }
 }
 
 function StudentContent(props) {
-  const {assignment} = props
+  const {assignment, submission} = props
   return (
     <div data-testid="assignments-2-student-view">
-      <Header scrollThreshold={150} assignment={assignment} />
-      {renderContentBaseOnAvailability(assignment)}
+      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+      {renderContentBaseOnAvailability(assignment, submission)}
     </div>
   )
 }
 
 StudentContent.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: AssignmentShape,
+  submission: SubmissionShape
 }
 
 export default React.memo(StudentContent)

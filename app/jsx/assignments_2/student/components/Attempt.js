@@ -21,7 +21,7 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {StudentAssignmentShape} from '../assignmentData'
+import {AssignmentShape} from '../assignmentData'
 
 function Attempt(props) {
   const {assignment} = props
@@ -39,7 +39,7 @@ function Attempt(props) {
 }
 
 Attempt.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: AssignmentShape
 }
 
 export default React.memo(Attempt)
