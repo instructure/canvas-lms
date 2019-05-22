@@ -16,20 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import 'jquery.instructure_misc_helpers'
 import tooltip from 'compiled/behaviors/tooltip'
 
-QUnit.module('tooltip', {
-  setup() {
-    this.container = document.createElement('div')
-    this.container.setAttribute('id', 'tooltip-test-container')
-    document.body.appendChild(this.container)
-  },
-  teardown() {
-    document.body.removeChild(this.container)
-  }
-})
+QUnit.module('tooltip')
 
 test('provides a position hash for a cardinal direction', () => {
   const opts = {position: 'bottom'}
@@ -53,11 +42,3 @@ test('can be compelled to abandon collision detection', () => {
   equal(opts.position.collision, 'none')
 })
 
-test('sanitizes html content', () => {
-  const $field = $('<span data-tooltip="top">blah</span>')
-  $field.data('htmlTooltipTitle', '<img src="x" onerror="alert(1)">')
-  $field.appendTo($('#tooltip-test-container'))
-  $field.trigger('focus')
-  const content = $field.data('customTimeoutTooltip').options.content.bind($field[0])().string
-  equal(content, '<img src="x" />')
-})
