@@ -18,6 +18,23 @@
 
 require 'sanitize'
 
+class Sanitize; module Transformers; class CleanElement
+  # modified from sanitize.rb to allow data-* attributes EXCEPT the ones
+  # we have code of our own that treats it like it is trusted html, namely:
+  # kyle-menu|turn-into-dialog|flash-message|popup-within|html-tooltip-title
+  #
+  # Matches a valid HTML5 data attribute name. The unicode ranges included here
+  # are a conservative subset of the full range of characters that are
+  # technically allowed, with the intent of matching the most common characters
+  # used in data attribute names while excluding uncommon or potentially
+  # misleading characters, or characters with the potential to be normalized
+  # into unsafe or confusing forms.
+  #
+  # http://www.whatwg.org/specs/web-apps/current-work/multipage/elements.html#embedding-custom-non-visible-data-with-the-data-*-attributes
+  REGEX_DATA_ATTR = /\Adata-(?!xml|kyle-menu|turn-into-dialog|flash-message|popup-within|html-tooltip-title)[a-z_][\w.\u00E0-\u00F6\u00F8-\u017F\u01DD-\u02AF-]*\z/u
+
+end; end; end
+
 module CanvasSanitize #:nodoc:
   def self.included(klass)
     klass.extend(ClassMethods)

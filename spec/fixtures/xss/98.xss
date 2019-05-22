@@ -1,0 +1,2 @@
+onerror|img|src|html-tooltip-title
+<a class="btn btn-secondary" title="Tooltip on top" data-tooltip="top" data-html-tooltip-title="Triggered!<img src=x onerror=prompt(1);>">SEC-2166</a>
