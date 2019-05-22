@@ -25,8 +25,17 @@ import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
 function getSubmission(student, assignmentId) {
-  const submission = student[`assignment_${assignmentId}`] || {posted_at: null}
-  return {postedAt: submission.posted_at}
+  const submission = student[`assignment_${assignmentId}`] || {
+    posted_at: null,
+    score: null,
+    workflow_state: null
+  }
+
+  return {
+    postedAt: submission.posted_at,
+    score: submission.score,
+    workflowState: submission.workflow_state
+  }
 }
 
 export default class PostPolicies {

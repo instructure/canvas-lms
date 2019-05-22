@@ -22,6 +22,7 @@ import I18n from 'i18n!gradezilla'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
+import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 
 function getTurnitinState(submission) {
@@ -134,7 +135,7 @@ export default class AssignmentCellFormatter {
     this.postPoliciesEnabled = gradebook.options.post_policies_enabled
   }
 
-  render = (row, cell, submission /* value */, columnDef, student /* dataContext */) => {
+  render = (_row, _cell, submission /* value */, columnDef, student /* dataContext */) => {
     let submissionState
     if (submission) {
       submissionState = this.options.getSubmissionState(submission)
@@ -182,9 +183,7 @@ export default class AssignmentCellFormatter {
     }
 
     const showUnpostedIndicator =
-      columnDef.postAssignmentGradesTrayOpenForAssignmentId &&
-      submission.workflow_state === 'graded' &&
-      !submission.posted_at
+      columnDef.postAssignmentGradesTrayOpenForAssignmentId && isHidden(submission)
 
     const options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),

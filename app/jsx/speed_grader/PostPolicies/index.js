@@ -79,7 +79,7 @@ export default class PostPolicies {
     })
   }
 
-  showPostAssignmentGradesTray({submissionsMap, submissions}) {
+  showPostAssignmentGradesTray({submissionsMap, submissions = []}) {
     const onPosted = submissionsPostedAtUpdater({
       afterUpdateSubmission: this._afterUpdateSubmission,
       submissionsMap,
@@ -89,7 +89,11 @@ export default class PostPolicies {
       assignment: this._assignment,
       onPosted,
       sections: this._sections,
-      submissions
+      submissions: submissions.map(submission => ({
+        postedAt: submission.posted_at,
+        score: submission.score,
+        workflowState: submission.workflow_state
+      }))
     })
   }
 }

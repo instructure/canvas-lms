@@ -245,7 +245,9 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       }
       submission = {
         assignment_id: '2301',
-        posted_at: new Date().toISOString()
+        posted_at: new Date().toISOString(),
+        score: 1.0,
+        workflow_state: 'graded'
       }
       const student = {
         assignment_2301: submission,
@@ -298,7 +300,9 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     test('includes the submissions', () => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
       const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      deepEqual(submissions, [{postedAt: submission.posted_at}])
+      deepEqual(submissions, [
+        {postedAt: submission.posted_at, score: 1.0, workflowState: 'graded'}
+      ])
     })
 
     test('the `onExited` callback is passed in onExited', () => {

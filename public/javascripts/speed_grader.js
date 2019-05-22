@@ -35,6 +35,7 @@ import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
+import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
@@ -748,17 +749,12 @@ function renderProgressIcon(attachment) {
   }
 }
 
-function renderHiddenSubmissionPill({submission, postManually}) {
+function renderHiddenSubmissionPill(submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
-  // Show the "hidden" pill if:
-  // - Manual posting is enabled and the submission is not posted (graded or not)
-  // - Auto-posting is enabled and the submission is graded but not posted
-  //   (this means it's been manually hidden)
-  const showPill =
-    submission && submission.posted_at == null && (postManually || submission.graded_at != null)
-  if (showPill) {
+
+  if (isHidden(submission)) {
     ReactDOM.render(
-      <Pill variant="danger" text={I18n.t('Hidden')} margin="0 0 small" />,
+      <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
       mountPoint
     )
   } else {
@@ -3129,7 +3125,7 @@ EG = {
     }
 
     if (ENV.post_policies_enabled) {
-      renderHiddenSubmissionPill({submission, postManually: jsonData.post_manually})
+      renderHiddenSubmissionPill(submission)
     }
     EG.updateStatsInHeader()
   },

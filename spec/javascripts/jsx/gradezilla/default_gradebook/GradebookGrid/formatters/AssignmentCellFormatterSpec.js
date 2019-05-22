@@ -337,6 +337,12 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         submission.workflow_state = 'unsubmitted'
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
       })
+
+      test('does not display an unposted grade indicator when submission does not have a score', () => {
+        submission.workflow_state = 'graded'
+        submission.score = null
+        strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
+      })
     })
 
     QUnit.module('when a grade is pending', contextHooks => {

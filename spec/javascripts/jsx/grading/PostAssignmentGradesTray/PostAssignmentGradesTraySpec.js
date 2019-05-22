@@ -37,7 +37,8 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         anonymousGrading: false,
         gradesPublished: true,
         id: '2301',
-        name: 'Math 1.1'
+        name: 'Math 1.1',
+        postManually: false
       },
       onExited: sinon.spy(),
       onPosted: sinon.spy(),
@@ -236,22 +237,22 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
 
   QUnit.module('unposted summary', () => {
     QUnit.module('with unposted submissions', () => {
-      test('the number of unposted submissions is displayed', async () => {
+      test('graded submissions without a postedAt are counted', async () => {
         context.submissions = [
-          {postedAt: new Date().toISOString()},
-          {postedAt: null},
-          {postedAt: null}
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
+          {postedAt: null, score: 1, workflowState: 'graded'},
+          {postedAt: null, score: null, workflowState: 'unsubmitted'}
         ]
         await show()
-        strictEqual(getUnpostedCount().textContent, '2')
+        strictEqual(getUnpostedCount().textContent, '1')
       })
     })
 
     QUnit.module('with no unposted submissions', unpostedSubmissionsHooks => {
       unpostedSubmissionsHooks.beforeEach(async () => {
         context.submissions = [
-          {postedAt: new Date().toISOString()},
-          {postedAt: new Date().toISOString()}
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'}
         ]
 
         await show()

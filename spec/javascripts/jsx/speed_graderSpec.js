@@ -6095,11 +6095,18 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
             delete window.jsonData.post_manually
           })
 
-          test('is shown if the selected submission is not posted', () => {
-            SpeedGrader.EG.currentStudent.submission.graded_at = new Date('Jan 1, 2020')
+          test('is shown if the selected submission is graded but not posted', () => {
+            SpeedGrader.EG.currentStudent.submission.workflow_state = 'graded'
             SpeedGrader.EG.showGrade()
 
             ok(mountPoint.innerText.includes('HIDDEN'))
+          })
+
+          test('is not shown if the selected submission is unsubmitted', () => {
+            SpeedGrader.EG.currentStudent.submission.workflow_state = 'unsubmitted'
+            SpeedGrader.EG.showGrade()
+
+            notOk(mountPoint.innerText.includes('HIDDEN'))
           })
 
           test('is not shown if the selected submission is posted', () => {
@@ -6113,9 +6120,16 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
 
         QUnit.module('when the assignment is auto-posted', () => {
           test('is shown if the selected submission is graded but not posted', () => {
-            SpeedGrader.EG.currentStudent.submission.graded_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.currentStudent.submission.workflow_state = 'graded'
             SpeedGrader.EG.showGrade()
             ok(mountPoint.innerText.includes('HIDDEN'))
+          })
+
+          test('is not shown if the selected submission is unsubmitted', () => {
+            SpeedGrader.EG.currentStudent.submission.workflow_state = 'unsubmitted'
+            SpeedGrader.EG.showGrade()
+
+            notOk(mountPoint.innerText.includes('HIDDEN'))
           })
 
           test('is not shown if the selected submission is graded and posted', () => {

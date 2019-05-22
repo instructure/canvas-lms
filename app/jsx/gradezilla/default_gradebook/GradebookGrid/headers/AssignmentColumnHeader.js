@@ -33,6 +33,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import 'message_students'
 import I18n from 'i18n!gradezilla'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
 import ColumnHeader from './ColumnHeader'
 
@@ -142,7 +143,8 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           latePolicyStatus: string,
           postedAt: instanceOf(Date),
           score: number,
-          submittedAt: instanceOf(Date)
+          submittedAt: instanceOf(Date),
+          workflowState: string.isRequired
         }).isRequired
       })
     ).isRequired,
@@ -473,7 +475,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     const submissions = this.props.students.map(student => student.submission)
     const postableSubmissionsPresent = submissions.some(
-      submission => submission.score != null && submission.postedAt == null
+      submission => isHidden(submission)
     )
 
     // Assignment is manually-posted and has no graded-but-unposted submissions

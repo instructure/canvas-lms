@@ -74,6 +74,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       name: 'Math Assignment',
       omit_from_final_grade: false,
       only_visible_to_overrides: false,
+      post_manually: false,
       published: true,
       submission_types: ['online_text_entry']
     }
@@ -86,7 +87,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       posted_at: null,
       score: null,
       submitted_at: null,
-      user_id: '441'
+      user_id: '441',
+      workflow_state: 'unsubmitted'
     }
 
     student = {
@@ -360,7 +362,9 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
           strictEqual(component.props.postGradesAction.featureEnabled, true)
         })
 
-        test('sets hasGradesToPost to true if at least one submission has no posted_at date', () => {
+        test('sets hasGradesToPost to true if at least one graded submission has no posted_at date', () => {
+          submission.workflow_state = 'graded'
+          submission.score = 1
           gradebook.gotChunkOfStudents([student])
           render()
           strictEqual(component.props.postGradesAction.hasGradesToPost, true)

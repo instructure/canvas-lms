@@ -40,11 +40,11 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
       submission: {
         assignmentId: '1',
         excused: false,
-        gradedAt: null,
         late: false,
         missing: false,
         postedAt: null,
-        secondsLate: 0
+        secondsLate: 0,
+        workflowState: 'unsubmitted'
       }
     }
   })
@@ -168,50 +168,32 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
       strictEqual(mutedPills.length, 0)
     })
 
-    QUnit.module('post manually', postManuallyHooks => {
-      postManuallyHooks.beforeEach(() => {
-        props.assignment.postManually = true
-      })
-
-      test('shows the "Hidden" pill when the submission is not posted', function() {
-        props.submission.gradedAt = new Date().toISOString()
-        wrapper = mountComponent()
-        const hiddenPills = getHiddenPills()
-        strictEqual(hiddenPills.length, 1)
-      })
-
-      test('does not show the "Hidden" pill when the submission is posted', function() {
-        props.submission.postedAt = new Date().toISOString()
-        wrapper = mountComponent()
-        const hiddenPills = getHiddenPills()
-        strictEqual(hiddenPills.length, 0)
-      })
+    test('shows the "Hidden" pill when the submission is graded and not posted', function() {
+      props.submission.score = 1
+      props.submission.workflowState = 'graded'
+      wrapper = mountComponent()
+      const hiddenPills = getHiddenPills()
+      strictEqual(hiddenPills.length, 1)
     })
 
-    QUnit.module('post automatically', postManuallyHooks => {
-      postManuallyHooks.beforeEach(() => {
-        props.assignment.postManually = false
-      })
+    test('does not show the "Hidden" pill when the submission is not graded', function() {
+      props.submission.workflowState = 'unsubmitted'
+      wrapper = mountComponent()
+      const hiddenPills = getHiddenPills()
+      strictEqual(hiddenPills.length, 0)
+    })
 
-      test('shows the "Hidden" pill when the submission is graded and not posted', function() {
-        props.submission.gradedAt = new Date().toISOString()
-        wrapper = mountComponent()
-        const hiddenPills = getHiddenPills()
-        strictEqual(hiddenPills.length, 1)
-      })
+    test('does not show the "Hidden" pill when the submission is posted', function() {
+      props.submission.postedAt = new Date()
+      wrapper = mountComponent()
+      const hiddenPills = getHiddenPills()
+      strictEqual(hiddenPills.length, 0)
+    })
 
-      test('does not show the "Hidden" pill when the submission is posted', function() {
-        props.submission.postedAt = new Date().toISOString()
-        wrapper = mountComponent()
-        const hiddenPills = getHiddenPills()
-        strictEqual(hiddenPills.length, 0)
-      })
-
-      test('does not show the "Hidden" pill when the submission is not graded nor posted', function() {
-        wrapper = mountComponent()
-        const hiddenPills = getHiddenPills()
-        strictEqual(hiddenPills.length, 0)
-      })
+    test('does not show the "Hidden" pill when the submission is not graded nor posted', function() {
+      wrapper = mountComponent()
+      const hiddenPills = getHiddenPills()
+      strictEqual(hiddenPills.length, 0)
     })
   })
 })
@@ -239,7 +221,8 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
         late: false,
         missing: false,
         secondsLate: 0,
-        assignmentId: '1'
+        assignmentId: '1',
+        workflowState: 'unsubmitted'
       }
     }
   })
@@ -298,7 +281,8 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
         late: false,
         missing: false,
         secondsLate: 0,
-        assignmentId: '1'
+        assignmentId: '1',
+        workflowState: 'unsubmitted'
       }
     }
   })
@@ -357,7 +341,8 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
         late: false,
         missing: false,
         secondsLate: 0,
-        assignmentId: '1'
+        assignmentId: '1',
+        workflowState: 'unsubmitted'
       }
     }
   })
@@ -416,7 +401,8 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function(hooks) 
         late: false,
         missing: false,
         secondsLate: 0,
-        assignmentId: '1'
+        assignmentId: '1',
+        workflowState: 'unsubmitted'
       }
     }
   })
@@ -475,7 +461,8 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
         late: false,
         missing: false,
         secondsLate: 0,
-        assignmentId: '1'
+        assignmentId: '1',
+        workflowState: 'unsubmitted'
       }
     }
   })
