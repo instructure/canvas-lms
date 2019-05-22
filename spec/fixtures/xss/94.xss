@@ -1,0 +1,2 @@
+onerror|img|src|kyle-menu
+<a class="al-trigger" href="#" data-kyle-menu-options="{&quot;appendMenuTo&quot;:&quot;<img src=x onerror=prompt([document.cookie,document.domain]); />&quot;}"> CORE-2938 </a>
