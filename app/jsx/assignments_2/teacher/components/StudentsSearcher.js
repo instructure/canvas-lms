@@ -19,20 +19,46 @@
 import React from 'react'
 import I18n from 'i18n!assignments_2'
 import _ from 'lodash'
+import {func} from 'prop-types'
 
-import {View} from '@instructure/ui-layout'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {TextInput} from '@instructure/ui-forms'
+import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-text-input'
+import {Button} from '@instructure/ui-buttons'
+import {
+  IconSearchLine,
+  IconFilterLine,
+  IconSpeedGraderLine,
+  IconEmailLine
+} from '@instructure/ui-icons'
+import {Badge} from '@instructure/ui-elements'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import StudentSearchQuery from './StudentSearchQuery'
 import StudentsTable from './StudentsTable'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 
 const STUDENT_SEARCH_DELAY = 750
 const MIN_SEARCH_CHARS = 3
 const SORTABLE_COLUMNS = ['username', 'score', 'submitted_at']
 
+function assignmentIsNew(assignment) {
+  return !assignment.lid
+}
+
+function assignmentIsPublished(assignment) {
+  return assignment.state === 'published'
+}
+
 export default class StudentsSearcher extends React.Component {
+  static propTypes = {
+    assignment: TeacherAssignmentShape.isRequired,
+    onMessageStudentsClick: func
+  }
+
+  static defaultProps = {
+    onMessageStudentsClick: () => {}
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -41,10 +67,6 @@ export default class StudentsSearcher extends React.Component {
       sortId: '',
       sortDirection: 'none'
     }
-  }
-
-  static propTypes = {
-    assignment: TeacherAssignmentShape.isRequired
   }
 
   componentWillUnmount() {
@@ -72,6 +94,58 @@ export default class StudentsSearcher extends React.Component {
     })
   }
 
+  submissions() {
+    // TODO: We will need to exhaust the submissions pagination for this to work correctly
+    return this.props.assignment.submissions.nodes
+  }
+
+  readGradeableSubmissionsCount(count) {
+    return (
+      <AccessibleContent alt={I18n.t('You have %{count} submissions to grade', {count})}>
+        {count}
+      </AccessibleContent>
+    )
+  }
+
+  renderSpeedGraderLink() {
+    const assignmentLid = this.props.assignment.lid
+    const courseLid = this.props.assignment.course.lid
+    const speedgraderLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}`
+
+    return (
+      <Badge
+        key="speedgraderLink"
+        count={this.props.assignment.needsGradingCount}
+        margin="0 small 0 0"
+        formatOutput={this.readGradeableSubmissionsCount}
+      >
+        <Button icon={IconSpeedGraderLine} href={speedgraderLink} target="_blank">
+          {I18n.t('Speedgrader')}
+        </Button>
+      </Badge>
+    )
+  }
+
+  renderMessageStudentsWhoButton() {
+    return (
+      <Button
+        key="messageStudentsWho"
+        icon={IconEmailLine}
+        onClick={this.props.onMessageStudentsClick}
+      >
+        {I18n.t('Message Students')}
+      </Button>
+    )
+  }
+
+  renderActions() {
+    if (assignmentIsNew(this.props.assignment) || !assignmentIsPublished(this.props.assignment)) {
+      return null
+    }
+
+    return [this.renderSpeedGraderLink(), this.renderMessageStudentsWhoButton()]
+  }
+
   render() {
     const searchVariables = {
       assignmentId: this.props.assignment.lid
@@ -93,15 +167,25 @@ export default class StudentsSearcher extends React.Component {
 
     return (
       <React.Fragment>
-        <View as="div" margin="0 0 large 0">
-          <TextInput
-            label={<ScreenReaderContent>{I18n.t('Search by student name')}</ScreenReaderContent>}
-            placeholder={I18n.t('Search')}
-            messages={searchMessages}
-            onChange={this.handleNameFilterChange}
-            value={this.state.searchValue}
-          />
-        </View>
+        <Flex as="div" margin="0 0 large 0" wrapItems>
+          <FlexItem grow size="60%" margin="small 0 0 0">
+            <TextInput
+              label={<ScreenReaderContent>{I18n.t('Search by student name')}</ScreenReaderContent>}
+              placeholder={I18n.t('Search')}
+              type="search"
+              inline
+              width="70%"
+              messages={searchMessages}
+              onChange={this.handleNameFilterChange}
+              value={this.state.searchValue}
+              renderAfterInput={<IconSearchLine />}
+            />
+            <Button icon={IconFilterLine} margin="0 small">
+              {I18n.t('Filter')}
+            </Button>
+          </FlexItem>
+          <FlexItem margin="small 0 0 0">{this.renderActions()}</FlexItem>
+        </Flex>
         <StudentSearchQuery variables={searchVariables}>
           {submissions => (
             <StudentsTable

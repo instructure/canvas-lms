@@ -45,44 +45,13 @@ describe('assignments 2 teacher view toolbox', () => {
       }
     })
 
-    const {queryByText, getByText, getByLabelText, getByTestId} = renderToolbox(assignment)
+    const {getByLabelText, getByTestId} = renderToolbox(assignment)
     expect(getByLabelText('Published').getAttribute('checked')).toBe('')
-    const sgLink = closest(getByText('1 to grade'), 'a')
-    expect(sgLink).toBeTruthy()
-    expect(sgLink.getAttribute('href')).toMatch(
-      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
-    )
-    expect(closest(getByText('1 unsubmitted'), 'button')).toBeTruthy()
-    expect(queryByText(/message students/i)).toBeNull()
     expect(getByTestId('AssignmentPoints')).toBeInTheDocument()
   })
 
   it('renders unpublished value checkbox', () => {
     const {getByLabelText} = renderToolbox(mockAssignment({state: 'unpublished'}))
     expect(getByLabelText('Published').getAttribute('checked')).toBeFalsy()
-  })
-
-  it('should open speedgrader link in a new tab', () => {
-    const assignment = mockAssignment()
-    const {getByText} = renderToolbox(assignment)
-    const sgLink = closest(getByText('0 to grade'), 'a')
-    expect(sgLink.getAttribute('target')).toEqual('_blank')
-  })
-
-  it('renders the message students button when the assignment does not have an online submission', () => {
-    const assignment = mockAssignment({
-      submissionTypes: ['on_paper']
-    })
-    const {queryByText, getByText} = renderToolbox(assignment)
-    expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-    expect(getByText(/message students/i)).toBeInTheDocument()
-  })
-
-  it('does not render submission and grading links when assignment is not published', () => {
-    const assignment = mockAssignment({state: 'unpublished'})
-    const {queryByText} = renderToolbox(assignment)
-    expect(queryByText('to grade', {exact: false})).toBeNull()
-    expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-    expect(queryByText('message students', {exact: false})).toBeNull()
   })
 })

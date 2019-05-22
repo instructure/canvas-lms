@@ -27,6 +27,7 @@ import {Img} from '@instructure/ui-elements'
 
 ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
+  onMessageStudentsClick: func.isRequired,
   onChangeAssignment: func.isRequired,
   onValidate: func.isRequired,
   invalidMessage: func.isRequired,
@@ -61,7 +62,10 @@ export default function ContentTabs(props) {
         </div>
       </TabPanel>
       <TabPanel title={I18n.t('Students')}>
-        <StudentsSearcher assignment={assignment} />
+        <StudentsSearcher
+          onMessageStudentsClick={props.onMessageStudentsClick}
+          assignment={assignment}
+        />
       </TabPanel>
     </TabList>
   )

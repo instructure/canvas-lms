@@ -45,14 +45,15 @@ function mockRequest({users = [mockUser()], variables = {}}) {
 
 // each element of users and variables defines a request, its variables, and the
 // users that should be returned.
-function renderStudentsSearcher(usersAndVariables) {
+function renderStudentsSearcher(usersAndVariables, useAssignment) {
   if (usersAndVariables === undefined) {
     usersAndVariables = [{users: [mockUser()], variables: {}}]
   }
   const requests = usersAndVariables.map(uav => mockRequest(uav))
+  const assignment = useAssignment || mockAssignment()
   const fns = render(
     <CanvasValidatedMockedProvider mocks={requests} addTypename={false}>
-      <StudentsSearcher assignment={mockAssignment()} />
+      <StudentsSearcher assignment={assignment} />
     </CanvasValidatedMockedProvider>
   )
   return fns
@@ -66,12 +67,33 @@ describe('StudentsSearcher', () => {
     expect(getByText('Loading...')).toBeInTheDocument()
   })
 
+  it('shows action buttons when assignment is published', () => {
+    const {getByText} = renderStudentsSearcher()
+    expect(closest(getByText('Speedgrader'), 'a')).toBeTruthy()
+    expect(closest(getByText('Message Students'), 'button')).toBeTruthy()
+  })
+
+  it('should open speedgrader link in a new tab', () => {
+    const {getByText} = renderStudentsSearcher()
+    const sgLink = closest(getByText('Speedgrader'), 'a')
+    expect(sgLink.getAttribute('href')).toMatch(
+      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
+    )
+    expect(sgLink.getAttribute('target')).toEqual('_blank')
+  })
+
+  it('does not render submission and grading links when assignment is not published', () => {
+    const assignment = mockAssignment({state: 'unpublished'})
+    const {queryByText} = renderStudentsSearcher([], assignment)
+    expect(queryByText('Speedgrader', {exact: false})).toBeNull()
+    expect(queryByText('Message Students', {exact: false})).toBeNull()
+  })
+
   it('initially loads all students and renders results', () => {
     const foo = mockUser({lid: 'foo', shortName: 'foo'})
     const bar = mockUser({lid: 'bar', shortName: 'bar'})
-    // const submissions = [mockSubmission({user: foo}), mockSubmission({user: bar})]
     const {getByText} = renderStudentsSearcher([{users: [foo, bar]}])
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     expect(getByText(foo.shortName)).toBeInTheDocument()
     expect(getByText(bar.shortName)).toBeInTheDocument()
   })
@@ -88,13 +110,13 @@ describe('StudentsSearcher', () => {
         variables: {orderBy: [{field: 'username', direction: 'descending'}]}
       }
     ])
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     fireEvent.click(closest(getByText('Name'), 'button'))
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     expect(getByText('searched user')).toBeInTheDocument()
 
     fireEvent.click(closest(getByText('Name'), 'button'))
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     expect(getByText('reverse searched user')).toBeInTheDocument()
   })
 
@@ -106,9 +128,9 @@ describe('StudentsSearcher', () => {
         variables: {orderBy: [{field: 'score', direction: 'ascending'}]}
       }
     ])
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     fireEvent.click(closest(getByText('Score'), 'button'))
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     expect(getByText('searched user')).toBeInTheDocument()
   })
 
@@ -120,9 +142,9 @@ describe('StudentsSearcher', () => {
         variables: {orderBy: [{field: 'submitted_at', direction: 'ascending'}]}
       }
     ])
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     fireEvent.click(closest(getByText('Submission Date'), 'button'))
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
     expect(getByText('searched user')).toBeInTheDocument()
   })
 
@@ -137,7 +159,7 @@ describe('StudentsSearcher', () => {
         {},
         {users: [mockUser({shortName: 'searched user'})], variables: {userSearch: 'search'}}
       ])
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
       const searchInput = getByLabelText('Search by student name')
       const startNow = Date.now()
       fireEvent.change(searchInput, {target: {value: 'search'}})
@@ -156,12 +178,12 @@ describe('StudentsSearcher', () => {
 
     it('displays a message and does not load when 0 < search characters < 3', () => {
       const {getByText, getByLabelText} = renderStudentsSearcher()
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
       const searchInput = getByLabelText('Search by student name')
       const startNow = Date.now()
       fireEvent.change(searchInput, {target: {value: '12'}})
       MockDate.set(startNow + 1000)
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
       expect(getByText(/at least 3 characters/)).toBeInTheDocument()
     })
   })
