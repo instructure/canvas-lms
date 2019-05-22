@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Tangentbord navigerar till länkar via Tab-tangenten. Två intilliggande länkar som leder till samma destination kan vara förvirrande för användare av tangentbord."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Läs mer om närliggande länkar"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Läs mer om färgkontras"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Läs mer om att ordna sidhuvuden"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Läs mer om tabellrubriker"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Läs mer om att använda alternativtexter för bilder"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Läs mer om att använda rubriker med tabeller"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Läs mer om att använda filnamn som alternativtext"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Läs mer om att använda listor"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Läs mer om att använda omfångsattribut med tabeller"
+  },
   "leave_as_is_4facfe55": {
     "message": "Lämna som det är"
   },

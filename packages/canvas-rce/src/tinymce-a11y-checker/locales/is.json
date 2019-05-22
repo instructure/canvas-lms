@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Nota dálklykil til að fara á tengla. Tveir samliggjandi tenglar sem vísa á sama ákvörðunarstað geta valdið ruglingi hjá þeim sem nota lyklaborð."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Fá að vita meira um samliggjandi tengla"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Fá að vita meira um litaandstæður"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Fá að vita meira um skipulag á síðuhausum"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Fá að vita meira um töfluhausa"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Fá að vita meira um notkun baktexta fyrir myndir"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Fá að vita meira um notkun skýringartexta með töflum"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Fá að vita meira um notkun skráaheita sem baktexta"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Fá að vita meira um notkun lista"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Fá að vita meira um notkun umfangseiginda með töflum"
+  },
   "leave_as_is_4facfe55": {
     "message": "Halda óbreyttu"
   },

@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "使用 Tab 鍵以鍵盤導航至連結。目的地相同的兩個相連連結可能對鍵盤使用者造成混亂。"
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "了解更多有關相鄰連結"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "了解更多有關顏色對比"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "了解更多有關組織頁面標題"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "了解更多有關表格標題"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "了解更多有關使用圖像的 alt 文字"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "了解更多有關使用表格的字幕"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "了解更多有關使用檔案名稱作為 alt 文字"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "了解更多有關使用清單"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "了解更多有關使用有表格的範圍屬性"
+  },
   "leave_as_is_4facfe55": {
     "message": "不需變更"
   },

@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Los teclados navegan por los enlaces mediante la tecla Tab. Dos enlaces adyacentes que dirigen al mismo destino pueden ser confusos para los usuarios del teclado."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Obtenga más información sobre los enlaces adyacentes"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Obtenga más información sobre el contraste de colores"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Obtenga más información sobre la organización de los títulos de página"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Obtenga más información sobre los títulos de tablas"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Obtenga más información sobre texto alternativo para las imágenes"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Obtenga más información sobre el uso de leyendas con tablas"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Obtenga más información sobre el uso de nombres de archivo como texto alternativo"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Obtenga más información sobre el uso de listas"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Obtenga más información sobre el uso de atributos de alcance con tablas"
+  },
   "leave_as_is_4facfe55": {
     "message": "Dejar sin cambios"
   },

@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Gebruik de Tab-toets op het toetsenbord om te navigeren naar koppelingen. Twee aangrenzende koppelingen die naar dezelfde bestemming leiden, kunnen verwarrend werken bij gebruik van het toetsenbord."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Meer informatie over aangrenzende links"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Meer informatie over kleurcontrast"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Meer informatie over ordenen van paginakopteksten"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Meer informatie over tabelkopteksten"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Meer informatie over gebruik van alt-tekst voor afbeeldingen"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Meer informatie over gebruik van ondertiteling met tabellen"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Meer informatie over gebruik van bestandsnamen als alt-tekst"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Meer informatie over gebruik van lijsten"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Meer informatie over gebruik van bereikattributen met tabellen"
+  },
   "leave_as_is_4facfe55": {
     "message": "Ongewijzigd laten"
   },

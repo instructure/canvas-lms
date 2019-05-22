@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Mae bysellfyrddau’n symud i ddolenni drwy ddefnyddio’r fysell ‘Tab’. Gall dwy ddolen gyfagos â''r un gyrchfan fod yn ddryslyd i ddefnyddwyr bysellfyrddau."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Dysgu mwy am ddolenni cyfagos"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Dysgu mwy am gyferbynnedd lliw"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Dysgu mwy am drefnu penawdau tudalennau"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Dysgu mwy am benawdau tablau"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Dysgu mwy am ddefnyddio testun amgen ar gyfer delweddau"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Dysgu mwy am ddefnyddio capsiynau gyda thablau"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Dysgu mwy am ddefnyddio enwau ffeiliau fel testun amgen"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Dysgu mwy am ddefnyddio rhestrau"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Dysgu mwy am ddefnyddio priodoleddau cwmpas gyda thablau"
+  },
   "leave_as_is_4facfe55": {
     "message": "Gadael fel y mae"
   },

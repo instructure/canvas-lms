@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Klavye navige nan lyen yo ak touch Tab la. De lyen adjasan ki dirije nan menm destinasyon an ka pèmèt moun k ap itilize klavye yo twompe yo."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Aprann plis sou lyen adjasan yo"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Aprann plis sou kontras koulè yo"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Aprann plis sou òganizasyon antèt paj"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Aprann plis sou antèt tablo yo"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Aprann plis sou tèks alt pou imaj yo"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Aprann plis sou itilizasyon lejand nan tablo yo"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Aprann plis sou itilizasyon non fichye yo tankou tèks alt"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Aprann plis sou itilizasyon lis yo"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Aprann plis sou itilizasyon atribi pòte yo ak tablo yo"
+  },
   "leave_as_is_4facfe55": {
     "message": "Kite tankou"
   },

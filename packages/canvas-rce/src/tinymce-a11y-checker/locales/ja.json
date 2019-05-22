@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "キーボードは Tab キーを使用してリンクにナビゲートします。同じ宛先に向かう2つの隣接リンクがあると、キーボードユーザーに混乱を招く可能性があります。"
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "隣接リンクの詳細"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "カラーコントラストの詳細"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "ページヘッダーの整理の詳細"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "表ヘッダーの詳細"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "代替テキストを画像に使用する方法の詳細"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "表でキャプションを使用する方法の詳細"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "ファイル名を代替テキストに使用する方法の詳細"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "リスト使用の詳細"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "表でスコープ属性を使用する方法の詳細"
+  },
   "leave_as_is_4facfe55": {
     "message": "そのままにする"
   },

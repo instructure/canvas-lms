@@ -92,6 +92,33 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Le tastiere indirizzano ai link utilizzando il tasto TAB. Due link adiacenti che indirizzando alla stessa destinazione possono confondere gli utenti della tastiera."
   },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Per saperne di più sui link adiacenti"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Per saperne di più sul contrasto di colore"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Per saperne di più sull''organizzazione delle intestazioni di pagina"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Per saperne di più sulle intestazioni delle tabelle"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Per saperne di più sull''utilizzo di testo alternativo per le immagini"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Per saperne di più sull''uso delle didascalie con tabelle"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Per saperne di più sull''utilizzo dei nomi dei file come testo alternativo"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Per saperne di più sull''uso degli elenchi"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Per saperne di più sull''uso degli attributi dell''ambito con le tabelle"
+  },
   "leave_as_is_4facfe55": {
     "message": "Lascia così"
   },
