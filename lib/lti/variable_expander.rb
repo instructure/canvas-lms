@@ -24,6 +24,7 @@ module Lti
   class VariableExpander
 
     SUBSTRING_REGEX = /(?<=\${).*?(?=})/.freeze #matches only the stuff inside `${}`
+    PARAMETERS_REGEX = /^(\$.+)\<(.+)\>$/.freeze # matches key and argument
 
     attr_reader :context, :root_account, :controller, :current_user
 
@@ -51,6 +52,18 @@ module Lti
 
     def self.default_name_expansions
       self.expansions.values.select { |v| v.default_name.present? }.map(&:name)
+    end
+
+    def self.find_expansion(key)
+      return unless key.respond_to?(:to_sym)
+      if (md = key.to_s.match(PARAMETERS_REGEX))
+        real_key = md[1] + "<>"
+        if (expansion = self.expansions[real_key.to_sym])
+          [expansion, md[2]]
+        end
+      else
+        self.expansions[key.to_sym]
+      end
     end
 
     CONTROLLER_GUARD = -> { !!@controller }
@@ -97,15 +110,16 @@ module Lti
 
     def [](key)
       k = (key[0] == '$' && key) || "$#{key}"
-      if (expansion = self.class.expansions[k.respond_to?(:to_sym) && k.to_sym])
-        expansion.expand(self)
-      end
+      expansion, args = self.class.find_expansion(k)
+      expansion.expand(self, *args) if expansion
     end
+
 
     def expand_variables!(var_hash)
       var_hash.update(var_hash) do |_, v|
-        if (expansion = v.respond_to?(:to_sym) && self.class.expansions[v.to_sym])
-          expansion.expand(self)
+        expansion, args = self.class.find_expansion(v)
+        if expansion
+          expansion.expand(self, *args)
         elsif v.respond_to?(:to_s) && v.to_s =~ SUBSTRING_REGEX
           expand_substring_variables(v)
         else
@@ -594,6 +608,18 @@ module Lti
     register_expansion 'Canvas.membership.concludedRoles', [],
                        -> { lti_helper.concluded_lis_roles },
                        COURSE_GUARD
+
+    # Returns a comma-separated list of permissions granted to the user in the current context,
+    # given a comma-separated set to check using the format
+    # $Canvas.membership.permissions<example_permission,example_permission2,..>
+    # @internal
+    # @example
+    #   ```
+    #   example_permission_1,example_permission_2
+    #   ```
+    register_expansion 'Canvas.membership.permissions<>', [],
+                        -> (permissions_str) { lti_helper.granted_permissions(permissions_str.split(",")) },
+                        ROLES_GUARD
 
     # With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
     #

@@ -26,6 +26,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
     variable_substitution = statement.parameters.first.jump(:tstring_content, :ident).source
 
     object = register YARD::CodeObjects::MethodObject.new(namespace, variable_substitution)
+    return if object.tags(:internal).any?
     parse_block(statement, :owner => object)
 
     deprecated_str = ''

@@ -1583,6 +1583,24 @@ module Lti
           expect(exp_hash[:test]).to eq 'url'
         end
       end
+
+      it 'has substitution for $Canvas.membership.permissions' do
+        course_with_student(:active_all => true)
+        exp_hash = {test: '$Canvas.membership.permissions<moderate_forum,read_forum,create_forum>'}
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+
+        expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "read_forum,create_forum"
+      end
+
+      it 'substitutes $Canvas.membership.permissions inside substring' do
+        course_with_student(:active_all => true)
+        exp_hash = {test: 'string stuff: ${Canvas.membership.permissions<moderate_forum,create_forum,read_forum>}'}
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+
+        expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "string stuff: create_forum,read_forum"
+      end
     end
   end
 end
