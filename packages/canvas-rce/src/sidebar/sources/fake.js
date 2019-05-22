@@ -299,6 +299,37 @@ const FLICKR_RESULTS = {
   ]
 };
 
+const DOCUMENTS = {
+  documents1: {
+    files: [1,2,3].map(i => {
+      return {
+        id: i,
+        filename: `file${i}.txt`,
+        content_type: 'text/plain',
+        display_name: `file${i}`,
+        href: `http://the.net/${i}`,
+        date: `2019-05-25T13:0${i}:00Z`,
+      }
+    }),
+    bookmark: 'documents2',
+    hasMore: true
+  },
+  documents2: {
+    files: [4,5,6].map(i => {
+      return {
+        id: i,
+        filename: `file${i}.txt`,
+        content_type: 'text/plain',
+        display_name: `file${i}`,
+        href: `http://the.net/${i}`,
+        date: `2019-05-25T13:0${i}:00Z`,
+      }
+    }),
+    bookmark: null,
+    hasMore: false
+  }
+}
+
 export function getSession() {
   return Promise.resolve({
     contextType: "course",
@@ -344,6 +375,14 @@ export function initializeCollection(endpoint) {
     bookmark: endpoint,
     loading: false
   };
+}
+
+export function initializeDocuments() {
+  return {
+    files: [],
+    bookmark: 'documents1',
+    isLoading: false
+  }
 }
 
 export function fetchFolders() {
@@ -446,5 +485,22 @@ export function getFile(id) {
     name: "Test File",
     url: "test.txt",
     embed: { type: "file" }
+  });
+}
+
+export function fetchDocs(bookmark) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(() => {
+      let response
+      if (bookmark) {
+        response = DOCUMENTS[bookmark]
+      }
+
+      if (response) {
+        resolve(response)
+      } else {
+        reject(new Error('Invalid bookmark'))
+      }
+    }, FAKE_TIMEOUT)
   });
 }

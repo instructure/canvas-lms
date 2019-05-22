@@ -128,8 +128,8 @@ class RceApiSource {
     return {
       files: [],
       bookmark: this.uriFor('documents', props),
-      hasMore: false,
-      isLoading: false
+      isLoading: false,
+      hasMore: true // there's always more when you haven't tried yet
     }
   }
 
@@ -389,8 +389,7 @@ class RceApiSource {
     let {host, contextType, contextId} = props
     let extra = ''
     switch(endpoint) {
-      // eventually all could go thru /api/documents with the right content_types,
-      // but the UI has to be looking for files, not images, in the response
+      // images will eventually work, but it has to be looking for files, not images in the response
       // case 'images':
       //   extra = '&content_types=image'
       //   break;

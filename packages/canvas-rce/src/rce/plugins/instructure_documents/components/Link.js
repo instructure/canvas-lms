@@ -17,89 +17,71 @@
  */
 
 import React, {useState} from 'react'
-import {func, oneOf, string} from 'prop-types'
-import {linkShape} from './propTypes'
+import {func, instanceOf, shape} from 'prop-types'
+import {fileShape} from './propTypes'
 import {StyleSheet, css} from "aphrodite";
 import formatMessage from '../../../../format-message';
-import {renderLink as renderLinkHtml} from "../../../../rce/contentRendering";
+import {renderDoc as renderDocHtml} from "../../../../rce/contentRendering";
 import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import {
   IconDragHandleLine,
-  IconAssignmentLine,
-  IconDiscussionLine,
-  IconModuleLine,
-  IconQuizLine,
-  IconAnnouncementLine,
   IconPublishSolid,
   IconUnpublishedSolid,
-  IconQuestionLine
+  IconDocumentLine,
+  IconMsExcelLine,
+  IconMsPptLine,
+  IconMsWordLine,
+  IconPdfLine
 } from '@instructure/ui-icons'
 
 function getIcon(type) {
   switch(type) {
-    case 'assignments':
-      return IconAssignmentLine
-    case 'discussions':
-      return IconDiscussionLine
-    case 'modules':
-      return IconModuleLine
-    case 'quizzes':
-      return IconQuizLine
-    case 'announcements':
-      return IconAnnouncementLine
-    case 'wikiPages': // waiting on an answer from design
+    case 'application/msword':
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      return IconMsWordLine
+    case 'application/vnd.ms-powerpoint':
+    case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      return IconMsPptLine
+    case 'application/pdf':
+      return IconPdfLine
+    case 'application/vnd.ms-excel':
+    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      return IconMsExcelLine
     default:
-      return IconQuestionLine
+      return IconDocumentLine
   }
 }
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
-  const {title, published, date, date_type} = props.link
-  const Icon = getIcon(props.type)
+  const {filename, display_name, content_type, published, date} = props
+  const Icon = getIcon(content_type)
   const color = published ? 'success' : 'primary'
-  let dateString = null
-  if (date) {
-    if (date === 'multiple' ) {
-      dateString = formatMessage('Due: Multiple Dates')
-    } else {
-      const when = formatMessage.date(Date.parse(date), 'long')
-      switch(date_type) {
-        case 'todo':
-          dateString = formatMessage('To Do: {when}', {when})
-          break
-        case 'published':
-          dateString = formatMessage('Published: {when}', {when})
-          break;
-        case 'posted':
-          dateString = formatMessage('Posted: {when}', {when})
-          break;
-        case 'delayed_post':
-          dateString = formatMessage('To Be Posted: {when}', {when})
-          break;
-        case 'due':
-        default:
-          dateString = formatMessage('Due: {when}', {when})
-          break
-      }
-    }
-  }
-  const publishedMsg = props.link.published ? formatMessage('published') : formatMessage('unpublished')
+  let dateString = formatMessage.date(Date.parse(date), 'long')
+  const publishedMsg = published ? formatMessage('published') : formatMessage('unpublished')
 
   function handleLinkClick(e) {
     e.preventDefault();
-    props.onClick(props.link);
+    props.onClick({
+      title: props.display_name || props.filename,
+      href: props.href
+    });
   }
 
   function handleDragStart(e) {
-    dragHtml(e, renderLinkHtml(props.link));
+    dragHtml(e, renderDocHtml(props));
   }
 
   function handleHover(e) {
     setIsHovering(e.type === 'mouseenter')
+  }
+
+  let elementRef = null
+  if (props.focusRef) {
+    elementRef = ref => props.focusRef.current = ref
   }
 
   return (
@@ -116,14 +98,13 @@ export default function Link(props) {
         as="div"
         role="button"
         tabIndex="0"
+        aria-describedby={props.describedByID}
+        elementRef={elementRef}
         background="default"
-        display="block"
-        width="100%"
         borderWidth="0 0 small 0"
         padding="x-small"
-        aria-describedby={props.describedByID}
+        width="100%"
         onClick={handleLinkClick}
-        elementRef={props.elementRef}
       >
         <div style={{pointerEvents: 'none'}}>
           <Flex>
@@ -138,18 +119,16 @@ export default function Link(props) {
                   </Text>
                 </Flex.Item>
                 <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
-                  <View as="div" margin="0">{title}</View>
+                  <View as="div" margin="0">{display_name || filename}</View>
                   {dateString ? (<View as="div" margin="xx-small 0 0 0">{dateString}</View>) : null}
                 </Flex.Item>
-                {'published' in props.link && (
-                  <Flex.Item>
-                    <AccessibleContent alt={publishedMsg}>
-                      <Text color={color}>
-                        {published ? <IconPublishSolid/> : <IconUnpublishedSolid/>}
-                      </Text>
-                    </AccessibleContent>
-                  </Flex.Item>
-                )}
+                <Flex.Item>
+                  <AccessibleContent alt={publishedMsg}>
+                    <Text color={color}>
+                      {published ? <IconPublishSolid/> : <IconUnpublishedSolid/>}
+                    </Text>
+                  </AccessibleContent>
+                </Flex.Item>
               </Flex>
             </Flex.Item>
           </Flex>
@@ -160,14 +139,15 @@ export default function Link(props) {
 }
 
 Link.propTypes = {
-  link: linkShape.isRequired,
-  type: oneOf([
-    'assignments', 'discussions', 'modules', 'quizzes',
-    'announcements', 'wikiPages', 'navigation'
-  ]).isRequired,
+  focusRef: shape({
+    current: instanceOf(Element)
+  }),
+  ...fileShape,
   onClick: func.isRequired,
-  describedByID: string.isRequired,
-  elementRef: func
+}
+
+Link.defaultProps = {
+  focusRef: null
 }
 
 const styles = StyleSheet.create({
