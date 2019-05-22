@@ -60,7 +60,7 @@ function emptyTagIcon() {
 }
 export default function StatusBar(props) {
   if (props.isHtmlView) {
-    const toggleToRich = formatMessage('Switch to rich text view')
+    const toggleToRich = formatMessage('Switch to rich text editor')
     return (
       <View display="block" margin="x-small" textAlign="end" data-testid="RCEStatusBar">
         <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToRich}>
@@ -70,13 +70,13 @@ export default function StatusBar(props) {
     )
   } else {
     const kbshortcut = formatMessage('View keyboard shortcuts')
-    const a11y = formatMessage('Accessibility')
+    const a11y = formatMessage('Accessibility Checker')
     const wordCount = formatMessage(`{count, plural,
          =0 {0 words}
         one {1 word}
       other {# words}
     }`, {count: props.wordCount})
-    const toggleToHtml = formatMessage('Switch to raw html view')
+    const toggleToHtml = formatMessage('Switch to raw html editor')
 
     return (
       <Flex margin="x-small" data-testid="RCEStatusBar">

@@ -360,6 +360,11 @@ class RCEWrapper extends React.Component {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
     editor.on('wordCountUpdate', this.onWordCountUpdate)
+    // and an aria-label to the application div that wraps RCE
+    const tinyapp = document.querySelector('.tox-tinymce[role="application"]')
+    if (tinyapp) {
+      tinyapp.setAttribute('aria-label', formatMessage("Rich Content Editor"))
+    }
   }
 
   onWordCountUpdate = e => {
@@ -416,7 +421,7 @@ class RCEWrapper extends React.Component {
         'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
         'subscript | align bullist outdent indent | ' +
         'instructure_links instructure_image instructure_record | ' +
-        'removeformat table instructure_equation instructure_equella'
+        'removeformat table instructure_equation' // instructure_equella'
       ],
       contextmenu: '',  // show the browser's native context menu
 

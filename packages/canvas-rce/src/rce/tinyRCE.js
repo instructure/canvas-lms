@@ -49,7 +49,7 @@ import "./plugins/instructure-ui-icons/plugin";
 import "./plugins/instructure_condensed_buttons/plugin";
 import "./plugins/instructure_equation/plugin";
 import "./plugins/instructure_image/plugin";
-import "./plugins/instructure_equella/plugin";
+// import "./plugins/instructure_equella/plugin";
 import "./plugins/instructure_external_tools/plugin";
 import "./plugins/instructure_record/plugin";
 import "./plugins/instructure_links/plugin";
