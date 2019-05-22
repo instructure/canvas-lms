@@ -358,7 +358,7 @@ class EnrollmentsApiController < ApplicationController
   #   querying a user's enrollments (either via user_id argument or via user
   #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_and_concluded+
   #
-  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"]
+  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"]
   #   Array of additional information to include on the enrollment or user records.
   #   "avatar_url" and "group_ids" will be returned on the user record.
   #

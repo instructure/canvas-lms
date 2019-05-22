@@ -460,7 +460,7 @@ class UsersController < ApplicationController
                 enrollment_type: params[:enrollment_type]})
           end
 
-          includes = (params[:include] || []) & %w{avatar_url email last_login time_zone}
+          includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
           includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
           users = users.with_last_login if includes.include?('last_login')
           users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
@@ -1276,6 +1276,11 @@ class UsersController < ApplicationController
   #    "can_update_avatar": false // Whether the user can update their avatar.
   #   }
   #
+  # @argument include[] [String, "uuid"]
+  #   Array of additional information to include on the user record.
+  #   "locale", "avatar_url", "permissions", "email", and "effective_locale"
+  #   will always be returned
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/users/self \
   #       -X GET \
@@ -1285,7 +1290,10 @@ class UsersController < ApplicationController
   def api_show
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
-      render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions email effective_locale}, @domain_root_account)
+      includes = %w{locale avatar_url permissions email effective_locale}
+      includes << 'uuid' if Array.wrap(params[:include]).include?('uuid')
+
+      render :json => user_json(@user, @current_user, session, includes, @domain_root_account)
     else
       render_unauthorized_action
     end
