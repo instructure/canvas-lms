@@ -623,14 +623,6 @@
     margin-right: 4px;
   }
 
-  /* rotate and shrink the kabob button to more closely match the canvas standard */
-  .tox-toolbar-overlord .tox-toolbar__primary .tox-toolbar__group:last-child .tox-tbtn__icon-wrap {
-    transform: rotateZ(90deg) scale(.85, .85);
-  }
-  .tox-toolbar-overlord .tox-toolbar__primary .tox-toolbar__group:last-child button {
-    width: auto; /* to make the vertical kabob a bit narrower */
-  }
-
   /* MAKE INSTUI ICONS THE SAME SIZE AS THE DEFAULT TINYMCE ONES */
   /* this is because instUI icons don't have a "height" attribute like tinymce ones do, so this will make them consistent */
   .tox .tox-icon svg:not([height]) { height: 16px }
