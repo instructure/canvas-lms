@@ -362,15 +362,16 @@ module AccountReports::ReportHelper
       self.fail_with_error(e)
     ensure
       update_parallel_progress(account_report: @account_report,report_runner: report_runner)
-      if last_account_report_runner?(@account_report)
-        write_report headers do |csv|
-          @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each {|record| csv << record.row}
-        end
-        # total lines was used to track progress but was not accurate.
-        @account_report.update_attributes(total_lines: @account_report.current_line)
-        @account_report.delete_account_report_rows
-      end
+      compile_parallel_report(headers) if last_account_report_runner?(@account_report)
     end
+  end
+
+  def compile_parallel_report(headers)
+    @account_report.update_attributes(total_lines: @account_report.account_report_rows.count + 1)
+    write_report headers do |csv|
+      @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each { |record| csv << record.row }
+    end
+    @account_report.delete_account_report_rows
   end
 
   def fail_with_error(error)
