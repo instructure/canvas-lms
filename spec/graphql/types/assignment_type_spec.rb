@@ -232,6 +232,21 @@ describe Types::AssignmentType do
       ).to eq [submission1.id.to_s]
     end
 
+    it "returns nil when not logged in" do
+      course.update(is_public: true)
+
+      expect(
+        assignment_type.resolve("_id", current_user: nil)
+      ).to eq assignment.id.to_s
+
+      expect(
+        assignment_type.resolve(
+          "submissionsConnection { nodes { _id } }",
+          current_user: nil
+        )
+      ).to be_nil
+    end
+
     it "can filter submissions according to workflow state" do
       expect(
         assignment_type.resolve(
