@@ -21,7 +21,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import {ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 
 export default class LtiKeyFooter extends React.Component {
   get buttonText () {
@@ -58,10 +57,10 @@ export default class LtiKeyFooter extends React.Component {
 
   render() {
     return (
-      <ModalFooter>
+      <React.Fragment>
         <Button onClick={this.onCancel} margin="0 small 0 0">{I18n.t('Cancel')}</Button>
         {this.nextOrSaveButton()}
-      </ModalFooter>
+      </React.Fragment>
     )
   }
 }

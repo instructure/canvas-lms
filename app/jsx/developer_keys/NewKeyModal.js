@@ -21,7 +21,7 @@ import $ from 'jquery'
 
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
+import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 import React from 'react'
@@ -311,8 +311,12 @@ export default class DeveloperKeyModal extends React.Component {
             </CloseButton>
             <Heading>{I18n.t('Key Settings')}</Heading>
           </ModalHeader>
-          <ModalBody>{this.modalBody()}</ModalBody>
-          {this.modalFooter()}
+          <ModalBody>
+            {this.modalBody()}
+          </ModalBody>
+          <ModalFooter>
+            {this.modalFooter()}
+          </ModalFooter>
         </Modal>
       </div>
     )
