@@ -33,22 +33,19 @@ import LtiKeyFooter from './LtiKeyFooter'
 export default class DeveloperKeyModal extends React.Component {
   state = {
     toolConfiguration: null, // used to save state when saving the key, display what was there if failure
-    submitted: false
+    submitted: false,
+    developerKey: {}
   }
 
   developerKeyUrl() {
-    if (this.developerKey()) {
-      return `/api/v1/developer_keys/${this.developerKey().id}`
+    if (this.props.createOrEditDeveloperKeyState.editing) {
+      return `/api/v1/developer_keys/${this.developerKey.id}`
     }
     return `/api/v1/accounts/${this.props.ctx.params.contextId}/developer_keys`
   }
 
-  developerKey() {
-    return this.props.createOrEditDeveloperKeyState.developerKey
-  }
-
-  modalTitle() {
-    return this.developerKey() ? I18n.t('Create developer key') : I18n.t('Edit developer key')
+  get developerKey() {
+    return {...this.props.createOrEditDeveloperKeyState.developerKey, ...this.state.developerKey }
   }
 
   get manualForm () {
@@ -69,14 +66,6 @@ export default class DeveloperKeyModal extends React.Component {
 
   get submissionForm () {
     return this.newForm ? this.newForm.keyForm : <form />
-  }
-
-  get requireScopes () {
-    return this.newForm && this.newForm.requireScopes
-  }
-
-  get testClusterOnly () {
-    return this.newForm && this.newForm.testClusterOnly
   }
 
   get isLtiKey() {
@@ -100,19 +89,19 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
 
-  hasRedirectUris(formData) {
-    const redirect_uris = formData.get("developer_key[redirect_uris]")
+  get hasRedirectUris() {
+    const redirect_uris = this.developerKey.redirect_uris
     return redirect_uris && redirect_uris.trim().length !== 0
   }
 
   saveCustomizations = () => {
     const customFields = new FormData(this.submissionForm).get('custom_fields')
-    const { store, actions, createLtiKeyState, createOrEditDeveloperKeyState } = this.props
+    const { store, actions, createLtiKeyState } = this.props
 
     store.dispatch(actions.ltiKeysUpdateCustomizations(
       {scopes: createLtiKeyState.enabledScopes},
       createLtiKeyState.disabledPlacements,
-      createOrEditDeveloperKeyState.developerKey.id,
+      this.developerKey.id,
       createLtiKeyState.toolConfiguration,
       customFields,
       createLtiKeyState.privacyLevel
@@ -121,30 +110,29 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   submitForm = () => {
-    const { store: { dispatch }, actions: { createOrEditDeveloperKey } } = this.props
-    const method = this.developerKey() ? 'put' : 'post'
-    const formData = new FormData(this.submissionForm)
+    const {
+      store: { dispatch },
+      actions: { createOrEditDeveloperKey },
+      createOrEditDeveloperKeyState: { editing }
+    } = this.props
+    const method = editing ? 'put' : 'post'
+    const toSubmit = this.developerKey
 
-    if (!this.requireScopes) {
-      formData.delete('developer_key[scopes][]')
-      formData.append('developer_key[require_scopes]', false)
-    } else if (this.props.selectedScopes.length === 0) {
-      $.flashError(I18n.t('At least one scope must be selected.'))
-      return
-    } else {
-      const scopesArrayKey = 'developer_key[scopes][]'
-
-      this.props.selectedScopes.forEach((scope) => {
-        formData.append(scopesArrayKey, scope)
-      })
-      formData.append('developer_key[require_scopes]', true)
+    if(typeof toSubmit.require_scopes === 'undefined') {
+      toSubmit.require_scopes = false
+    }
+    if(typeof toSubmit.name === 'undefined') {
+      toSubmit.name = 'Unnamed Tool'
+    }
+    if(toSubmit.require_scopes) {
+      if (this.props.selectedScopes.length === 0) {
+        $.flashError(I18n.t('At least one scope must be selected.'))
+        return
+      }
+      toSubmit.scopes = this.props.selectedScopes
     }
 
-    if (this.testClusterOnly !== undefined) {
-      formData.append('developer_key[test_cluster_only]', this.testClusterOnly)
-    }
-
-    return dispatch(createOrEditDeveloperKey(formData, this.developerKeyUrl(), method))
+    return dispatch(createOrEditDeveloperKey({developer_key: toSubmit}, this.developerKeyUrl(), method))
       .then(() => { this.closeModal() })
   }
 
@@ -164,8 +152,8 @@ export default class DeveloperKeyModal extends React.Component {
       const { developer_key, tool_configuration } = data
       developer_key.tool_configuration = tool_configuration.settings
       dispatch(actions.listDeveloperKeysReplace(developer_key))
-      this.closeModal()
       $.flashMessage(I18n.t('Save successful.'))
+      this.closeModal()
     }).catch(errors => {
       $.flashError(I18n.t('Failed to save changes: %{errors}%', {errors}))
     })
@@ -174,14 +162,13 @@ export default class DeveloperKeyModal extends React.Component {
   saveLtiToolConfiguration = () => {
     const { store: { dispatch }, actions } = this.props
     const formData = new FormData(this.submissionForm)
-    const redirectUris = formData.get("developer_key[redirect_uris]")
-    if (!this.hasRedirectUris(formData)) {
+    const developer_key = {...this.developerKey}
+    if (!this.hasRedirectUris) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
       this.setState({submitted: true})
       return
     }
     let settings = {};
-    let developerKey = {}
     if (this.isJsonConfig) {
       if (!this.state.toolConfiguration) {
         this.setState({submitted: true})
@@ -194,34 +181,32 @@ export default class DeveloperKeyModal extends React.Component {
         return
       }
       settings = this.manualForm.generateToolConfiguration();
-      developerKey = {
-        scopes: settings.scopes,
-        redirectUris
-      }
+      developer_key.scopes = settings.scopes
       this.setState({toolConfiguration: settings})
     }
 
     if (this.props.createOrEditDeveloperKeyState.editing) {
-      this.saveLTIKeyEdit(settings, developerKey)
+      this.saveLTIKeyEdit(settings, developer_key)
     } else {
-      return actions.saveLtiToolConfiguration({
+      const toSave = {
         account_id: this.props.ctx.params.contextId,
-        developer_key: {
-          name: formData.get("developer_key[name]"),
-          email: formData.get("developer_key[email]"),
-          notes: formData.get("developer_key[notes]"),
-          redirect_uris: redirectUris,
-          test_cluster_only: this.testClusterOnly,
-          access_token_count: 0
-        },
-        settings,
-        settings_url: formData.get("tool_configuration_url"),
-      })(dispatch)
+        developer_key
+      }
+      if (this.isUrlConfig) {
+        toSave.settings_url = formData.get("tool_configuration_url")
+      } else {
+        toSave.settings = settings
+      }
+      return actions.saveLtiToolConfiguration(toSave)(dispatch)
     }
   }
 
   updateToolConfiguration = (update) => {
     this.setState({ toolConfiguration: update })
+  }
+
+  updateDeveloperKey = (field, update) => {
+    this.setState((state) => ({ developerKey: {...state.developerKey, [field]: update } }))
   }
 
   setNewFormRef = node => { this.newForm = node }
@@ -231,6 +216,7 @@ export default class DeveloperKeyModal extends React.Component {
     store.dispatch(actions.developerKeysModalClose())
     store.dispatch(actions.resetLtiState())
     store.dispatch(actions.editDeveloperKey())
+    store.dispatch(actions.setLtiConfigurationMethod('manual'))
     this.setState({toolConfiguration: null, submitted: false})
   }
 
@@ -241,7 +227,7 @@ export default class DeveloperKeyModal extends React.Component {
       availableScopesPending,
       store,
       actions,
-      createOrEditDeveloperKeyState: { developerKey, editing, developerKeyModalOpen }
+      createOrEditDeveloperKeyState: { editing, developerKeyModalOpen }
     } = this.props
     return (
       <div>
@@ -249,7 +235,7 @@ export default class DeveloperKeyModal extends React.Component {
           open={developerKeyModalOpen}
           onDismiss={this.closeModal}
           size="fullscreen"
-          label={this.modalTitle()}
+          label={editing ? I18n.t('Create developer key') : I18n.t('Edit developer key')}
         >
           <ModalHeader>
             <CloseButton placement="end" onClick={this.closeModal}>
@@ -264,7 +250,7 @@ export default class DeveloperKeyModal extends React.Component {
                 </View>
               : <NewKeyForm
                   ref={this.setNewFormRef}
-                  developerKey={developerKey}
+                  developerKey={this.developerKey}
                   availableScopes={availableScopes}
                   availableScopesPending={availableScopesPending}
                   dispatch={this.props.store.dispatch}
@@ -278,6 +264,7 @@ export default class DeveloperKeyModal extends React.Component {
                   editing={editing}
                   showRequiredMessages={this.state.submitted}
                   updateToolConfiguration={this.updateToolConfiguration}
+                  updateDeveloperKey={this.updateDeveloperKey}
                 />
             }
           </ModalBody>

@@ -31,17 +31,7 @@ import ToolConfiguration from './ToolConfiguration'
 
 const validationMessage = [{text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}]
 
-export default class DeveloperKeyFormFields extends React.Component {
-  constructor (props) {
-    super(props)
-
-    const { developerKey } = props
-    this.state = {
-      requireScopes: developerKey && developerKey.require_scopes,
-      testClusterOnly: developerKey && developerKey.test_cluster_only
-    }
-  }
-
+export default class NewKeyForm extends React.Component {
   generateToolConfiguration = () => {
     return this.toolConfigRef.generateToolConfiguration()
   }
@@ -54,36 +44,27 @@ export default class DeveloperKeyFormFields extends React.Component {
     return this.keyFormRef
   }
 
-  get requireScopes () {
-    return this.state.requireScopes
-  }
-
-  get testClusterOnly () {
-    return this.state.testClusterOnly
-  }
-
   setKeyFormRef = node => { this.keyFormRef = node }
 
   setToolConfigRef = node => { this.toolConfigRef = node }
 
-  fieldValue(field, defaultValue) {
-    const {developerKey} = this.props
-    if (Object.keys(developerKey).length > 0) {
-      return developerKey[field] || defaultValue
-    }
-    return developerKey[field]
-  }
-
   handleRequireScopesChange = () => {
-    this.setState({ requireScopes: !this.state.requireScopes })
+    this.props.updateDeveloperKey('require_scopes', !this.props.developerKey.require_scopes)
   }
 
   handleTestClusterOnlyChange = () => {
-    this.setState({ testClusterOnly: !this.state.testClusterOnly })
+    this.props.updateDeveloperKey('test_cluster_only', !this.props.developerKey.test_cluster_only)
   }
 
   render() {
-    const { createLtiKeyState, editing, showRequiredMessages, updateToolConfiguration } = this.props
+    const {
+      createLtiKeyState,
+      developerKey,
+      editing,
+      showRequiredMessages,
+      updateToolConfiguration,
+      updateDeveloperKey
+    } = this.props
 
     return (
       <form ref={this.setKeyFormRef}>
@@ -98,19 +79,23 @@ export default class DeveloperKeyFormFields extends React.Component {
                 <TextInput
                   label={I18n.t('Key Name:')}
                   name="developer_key[name]"
-                  defaultValue={this.fieldValue('name', 'Unnamed Tool')}
+                  value={developerKey.name}
+                  onChange={(e) => updateDeveloperKey('name', e.target.value)}
+                  placeholder="Unnamed Tool"
                   disabled={this.props.createLtiKeyState.customizing}
                 />
                 <TextInput
                   label={I18n.t('Owner Email:')}
                   name="developer_key[email]"
-                  defaultValue={this.fieldValue('email')}
+                  value={developerKey.email}
+                  onChange={(e) => updateDeveloperKey('email', e.target.value)}
                   disabled={this.props.createLtiKeyState.customizing}
                 />
                 <TextArea
                   label={this.props.createLtiKeyState.isLtiKey ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
                   name="developer_key[redirect_uris]"
-                  defaultValue={this.fieldValue('redirect_uris')}
+                  value={developerKey.redirect_uris}
+                  onChange={(e) => updateDeveloperKey('redirect_uris', e.target.value)}
                   resize="both"
                   messages={showRequiredMessages ? validationMessage : []}
                   disabled={this.props.createLtiKeyState.customizing}
@@ -120,24 +105,28 @@ export default class DeveloperKeyFormFields extends React.Component {
                     <TextInput
                       label={I18n.t('Redirect URI (Legacy):')}
                       name="developer_key[redirect_uri]"
-                      defaultValue={this.fieldValue('redirect_uri')}
+                      value={developerKey.redirect_uri}
+                      onChange={(e) => updateDeveloperKey('redirect_uri', e.target.value)}
                     />
                     <TextInput
                       label={I18n.t('Vendor Code (LTI 2):')}
                       name="developer_key[vendor_code]"
-                      defaultValue={this.fieldValue('vendor_code')}
+                      value={developerKey.vendor_code}
+                      onChange={(e) => updateDeveloperKey('vendor_code', e.target.value)}
                     />
                     <TextInput
                       label={I18n.t('Icon URL:')}
                       name="developer_key[icon_url]"
-                      defaultValue={this.fieldValue('icon_url')}
+                      value={developerKey.icon_url}
+                      onChange={(e) => updateDeveloperKey('icon_url', e.target.value)}
                     />
                   </div>
                 }
                 <TextArea
                   label={I18n.t('Notes:')}
                   name="developer_key[notes]"
-                  defaultValue={this.fieldValue('notes')}
+                  value={developerKey.notes}
+                  onChange={(e) => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
                   disabled={this.props.createLtiKeyState.customizing}
                 />
@@ -145,7 +134,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   ? <Checkbox
                       label={I18n.t('Test Cluster Only')}
                       name="developer_key[test_cluster_only]"
-                      checked={this.state.testClusterOnly}
+                      checked={developerKey.test_cluster_only}
                       onChange={this.handleTestClusterOnlyChange}
                       disabled={this.props.createLtiKeyState.customizing}
                     />
@@ -172,7 +161,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                     availableScopes={this.props.availableScopes}
                     availableScopesPending={this.props.availableScopesPending}
                     developerKey={this.props.developerKey}
-                    requireScopes={this.state.requireScopes}
+                    requireScopes={developerKey.require_scopes}
                     onRequireScopesChange={this.handleRequireScopesChange}
                     dispatch={this.props.dispatch}
                     listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
@@ -186,12 +175,11 @@ export default class DeveloperKeyFormFields extends React.Component {
   }
 }
 
-DeveloperKeyFormFields.defaultProps = {
-  developerKey: {},
-  ltiKey: false
+NewKeyForm.defaultProps = {
+  developerKey: {}
 }
 
-DeveloperKeyFormFields.propTypes = {
+NewKeyForm.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   setDisabledPlacements: PropTypes.func.isRequired,
@@ -212,7 +200,8 @@ DeveloperKeyFormFields.propTypes = {
     require_scopes: PropTypes.bool,
     tool_configuration: PropTypes.shape({
       oidc_initiation_url: PropTypes.string
-    })
+    }),
+    test_cluster_only: PropTypes.bool
   }),
   availableScopes: PropTypes.objectOf(PropTypes.arrayOf(
     PropTypes.shape({
@@ -226,5 +215,6 @@ DeveloperKeyFormFields.propTypes = {
     oidc_initiation_url: PropTypes.string
   }),
   showRequiredMessages: PropTypes.bool,
-  updateToolConfiguration: PropTypes.func
+  updateToolConfiguration: PropTypes.func,
+  updateDeveloperKey: PropTypes.func.isRequired
 }

@@ -31,12 +31,12 @@ const validationMessage = [{text: I18n.t('Json is not valid. Please submit prope
 
 export default class ToolConfigurationForm extends React.Component {
   state = {
-    poorlyFormattedJson: null
+    invalidJson: null
   }
 
   get toolConfiguration() {
-    if(this.state.poorlyFormattedJson) {
-      return this.state.poorlyFormattedJson
+    if(this.state.invalidJson) {
+      return this.state.invalidJson
     }
     const {toolConfiguration} = this.props
     return toolConfiguration ? JSON.stringify(toolConfiguration, null, 4) : ''
@@ -54,10 +54,10 @@ export default class ToolConfigurationForm extends React.Component {
     try {
       const settings = JSON.parse(value.target.value)
       this.props.updateToolConfiguration(settings)
-      this.setState({poorlyFormattedJson: null})
+      this.setState({invalidJson: null})
     } catch(e) {
       if (e instanceof SyntaxError) {
-        this.setState({poorlyFormattedJson: value.target.value})
+        this.setState({invalidJson: value.target.value})
       }
     }
   }
@@ -77,7 +77,7 @@ export default class ToolConfigurationForm extends React.Component {
           onChange={this.updatePastedJson}
           label={I18n.t('LTI 1.3 Configuration')}
           maxHeight="20rem"
-          messages={this.props.showRequiredMessages && this.state.poorlyFormattedJson ? validationMessage : []}
+          messages={this.props.showRequiredMessages && this.state.invalidJson ? validationMessage : []}
         />
       )
     } else if (this.props.configurationMethod === 'manual') {
@@ -137,7 +137,6 @@ ToolConfigurationForm.propTypes = {
   setLtiConfigurationMethod: PropTypes.func.isRequired,
   configurationMethod: PropTypes.string,
   editing: PropTypes.bool.isRequired,
-  updateDeveloperKey: PropTypes.func.isRequired,
   showRequiredMessages: PropTypes.bool.isRequired,
   updateToolConfiguration: PropTypes.func.isRequired
 }

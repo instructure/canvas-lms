@@ -87,7 +87,7 @@ describe 'Developer Keys' do
       expect(key.icon_url).to eq "/images/add.png"
     end
 
-    it 'allows editing of legacy redirect URI', test_id: 3469351 do
+    it 'allows editing of developer key', test_id: 3469351 do
       dk = root_developer_key
       dk.update_attribute(:redirect_uri, "http://a/")
       get "/accounts/#{Account.default.id}/developer_keys"
@@ -108,22 +108,6 @@ describe 'Developer Keys' do
       expect(key.email).to eq "admins@example.com"
       expect(key.redirect_uri).to eq "https://b/"
       expect(key.icon_url).to eq "/images/add.png"
-    end
-
-    it "allows editing a developer key", test_id: 3469349 do
-      skip_if_safari(:alert)
-      root_developer_key
-      get "/accounts/#{Account.default.id}/developer_keys"
-      click_edit_icon
-      f("input[name='developer_key[icon_url]']").clear
-      click_enforce_scopes
-      click_scope_group_checkbox
-      find_button("Save Key").click
-
-      expect(ff("#reactContent tbody tr").length).to eq 1
-      expect(Account.default.developer_keys.count).to eq 1
-      key = Account.default.developer_keys.last
-      expect(key.icon_url).to eq nil
     end
 
     it "allows deletion through 'delete this key button'", test_id: 344079 do
