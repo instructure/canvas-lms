@@ -20,12 +20,6 @@ class Mutations::SetCoursePostPolicy < Mutations::BaseMutation
   graphql_name "SetCoursePostPolicy"
 
   argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
-  argument :override_assignment_post_policies, Boolean,
-    <<~DOC,
-      If true, the course post policy will override and delete any currently
-      existing assignment post policies.
-    DOC
-    required: false
   argument :post_manually, Boolean, required: true
 
   field :post_policy, Types::PostPolicyType, null: true
@@ -39,13 +33,7 @@ class Mutations::SetCoursePostPolicy < Mutations::BaseMutation
 
     verify_authorized_action!(course, :manage_grades)
 
-    policy = PostPolicy.find_or_create_by(course: course, assignment_id: nil)
-    policy.update!(post_manually: input[:post_manually])
-
-    if input[:override_assignment_post_policies]
-      course.assignment_post_policies.destroy_all
-    end
-
-    {post_policy: policy}
+    course.apply_post_policy!(post_manually: input[:post_manually])
+    {post_policy: course.default_post_policy}
   end
 end

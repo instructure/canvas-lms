@@ -494,4 +494,88 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       deepEqual(postPolicies.coursePostPolicy, {postManually: false})
     })
   })
+
+  QUnit.module('#setCoursePostPolicy', hooks => {
+    hooks.beforeEach(() => {
+      createPostPolicies()
+    })
+
+    test('sets the course post policy', () => {
+      createPostPolicies()
+      postPolicies.setCoursePostPolicy({postManually: true})
+      deepEqual(postPolicies.coursePostPolicy, {postManually: true})
+    })
+  })
+
+  QUnit.module('#setAssignmentPostPolicies', hooks => {
+    hooks.beforeEach(() => {
+      createPostPolicies()
+
+      const assignment1 = {
+        anonymous_grading: false,
+        course_id: '1201',
+        grades_published: true,
+        html_url: 'http://localhost/assignments/2301',
+        id: '2301',
+        invalid: false,
+        muted: false,
+        name: 'Math 1.1',
+        omit_from_final_grade: false,
+        points_possible: 10,
+        post_manually: false,
+        published: true,
+        submission_types: ['online_text_entry']
+      }
+
+      const assignment2 = {
+        anonymous_grading: false,
+        course_id: '1201',
+        grades_published: true,
+        html_url: 'http://localhost/assignments/2301',
+        id: '2302',
+        invalid: false,
+        muted: false,
+        name: 'Math 1.2',
+        omit_from_final_grade: false,
+        points_possible: 10,
+        post_manually: false,
+        published: true,
+        submission_types: ['online_text_entry']
+      }
+
+      gradebook.setAssignments({2301: assignment1, 2302: assignment2})
+    })
+
+    test('updates the post_manually values for assignments given in assignmentPostPoliciesById', () => {
+      const assignmentPostPoliciesById = {
+        2301: {postManually: true},
+        2302: {postManually: true}
+      }
+
+      postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})
+      strictEqual(gradebook.getAssignment('2301').post_manually, true)
+    })
+
+    test('does not update the post_manually value for assignments not specified', () => {
+      const assignmentPostPoliciesById = {'2301': {postManually: true}}
+
+      postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})
+      strictEqual(gradebook.getAssignment('2302').post_manually, false)
+    })
+
+    test('does not throw an error if given an assignment ID not in the gradebook', () => {
+      const assignmentPostPoliciesById = {'2399': {postManually: true}}
+
+      postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})
+      ok('setAssignmentPostPolicies with a nonexistent assignment does not cause an error')
+    })
+
+    test('calls updateColumnHeaders on the associated Gradebook object', () => {
+      sinon.spy(gradebook, 'updateColumnHeaders')
+      postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById: {}})
+
+      strictEqual(gradebook.updateColumnHeaders.callCount, 1)
+      gradebook.updateColumnHeaders.restore()
+    })
+  })
 })

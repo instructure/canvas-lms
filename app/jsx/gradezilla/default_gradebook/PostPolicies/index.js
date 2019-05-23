@@ -160,7 +160,20 @@ export default class PostPolicies {
     return this._coursePostPolicy
   }
 
-  setCoursePostPolicy(policy) {
-    this._coursePostPolicy = policy
+  setCoursePostPolicy({postManually}) {
+    this._coursePostPolicy = {postManually}
+  }
+
+  setAssignmentPostPolicies({assignmentPostPoliciesById}) {
+    Object.entries(assignmentPostPoliciesById).forEach(([id, postPolicy]) => {
+      const assignment = this._gradebook.getAssignment(id)
+      if (assignment != null) {
+        assignment.post_manually = postPolicy.postManually
+      }
+    })
+
+    // The changed assignments may not all be visible, so update all column
+    // headers rather than worrying about which ones are or aren't shown
+    this._gradebook.updateColumnHeaders()
   }
 }

@@ -3386,6 +3386,26 @@ class Course < ActiveRecord::Base
     default_post_policy.present? && default_post_policy.post_manually?
   end
 
+  def apply_post_policy!(post_manually:)
+    return unless feature_enabled?(:post_policies)
+
+    course_policy = PostPolicy.find_or_create_by(course: self, assignment_id: nil)
+    course_policy.update!(post_manually: post_manually) unless course_policy.post_manually == post_manually
+
+    matching_post_policies_scope = PostPolicy.
+      where("assignment_id = #{Assignment.quoted_table_name}.id").
+      where(post_manually: post_manually)
+
+    assignments.active.
+      where(anonymous_grading: false, moderated_grading: false).
+      where("NOT EXISTS (?)", matching_post_policies_scope).
+      preload(:post_policy).
+      each do |assignment|
+
+      assignment.ensure_post_policy(post_manually: post_manually)
+    end
+  end
+
   def apply_overridden_course_visibility(visibility)
     if !['institution', 'public', 'course'].include?(visibility) &&
         self.root_account.available_course_visibility_override_options.keys.include?(visibility)

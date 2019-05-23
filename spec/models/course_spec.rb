@@ -1282,6 +1282,71 @@ describe Course do
       expect(course).not_to be_post_manually
     end
   end
+
+  describe "#apply_post_policy!" do
+    let_once(:course) { Course.create! }
+
+    context "when post policies are enabled" do
+      before(:once) { course.enable_feature!(:post_policies) }
+
+      it "sets the post policy for the course" do
+        course.apply_post_policy!(post_manually: true)
+        expect(course).to be_post_manually
+      end
+
+      it "explicitly sets a post policy for assignments without one" do
+        assignment = course.assignments.create!
+
+        course.apply_post_policy!(post_manually: true)
+        expect(assignment.reload.post_policy).to be_post_manually
+      end
+
+      it "updates the post policy for assignments with an existing-but-different policy" do
+        assignment = course.assignments.create!
+        assignment.ensure_post_policy(post_manually: false)
+
+        course.apply_post_policy!(post_manually: true)
+        expect(assignment.reload.post_policy).to be_post_manually
+      end
+
+      it "does not update assignments that have an equivalent post policy" do
+        assignment = course.assignments.create!
+        assignment.ensure_post_policy(post_manually: true)
+
+        expect {
+          course.apply_post_policy!(post_manually: true)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: assignment).updated_at
+        }
+      end
+
+      it "does not change the post policy for anonymous assignments" do
+        course.apply_post_policy!(post_manually: true)
+        anonymous_assignment = course.assignments.create!(anonymous_grading: true)
+
+        expect {
+          course.apply_post_policy!(post_manually: false)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: anonymous_assignment).post_manually
+        }
+      end
+
+      it "does not change the post policy for moderated assignments" do
+        course.apply_post_policy!(post_manually: true)
+        moderated_assignment = course.assignments.create!(
+          final_grader: course.enroll_teacher(User.create!, enrollment_state: :active).user,
+          grader_count: 2,
+          moderated_grading: true
+        )
+
+        expect {
+          course.apply_post_policy!(post_manually: false)
+        }.not_to change {
+          PostPolicy.find_by(assignment: moderated_assignment).post_manually
+        }
+      end
+    end
+  end
 end
 
 describe Course do
