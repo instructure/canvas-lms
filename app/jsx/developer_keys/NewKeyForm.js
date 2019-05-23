@@ -26,7 +26,7 @@ import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import DeveloperKeyScopes from './Scopes'
+import Scopes from './Scopes'
 import ToolConfiguration from './ToolConfiguration'
 
 const validationMessage = [{text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}]
@@ -82,48 +82,9 @@ export default class DeveloperKeyFormFields extends React.Component {
     this.setState({ testClusterOnly: !this.state.testClusterOnly })
   }
 
-  renderTestClusterOnlyCheckbox() {
-    if (ENV.enableTestClusterChecks) {
-      return (
-        <Checkbox
-          label={I18n.t('Test Cluster Only')}
-          name="developer_key[test_cluster_only]"
-          checked={this.state.testClusterOnly}
-          onChange={this.handleTestClusterOnlyChange}
-          disabled={this.props.createLtiKeyState.customizing}
-        />
-      )
-    }
-  }
-
-  formBody() {
+  render() {
     const { createLtiKeyState, editing } = this.props
 
-    if (!createLtiKeyState.isLtiKey) {
-      return <DeveloperKeyScopes
-        availableScopes={this.props.availableScopes}
-        availableScopesPending={this.props.availableScopesPending}
-        developerKey={this.props.developerKey}
-        requireScopes={this.state.requireScopes}
-        onRequireScopesChange={this.handleRequireScopesChange}
-        dispatch={this.props.dispatch}
-        listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
-      />
-    }
-    return <ToolConfiguration
-      ref={this.setToolConfigRef}
-      createLtiKeyState={createLtiKeyState}
-      setEnabledScopes={this.props.setEnabledScopes}
-      setDisabledPlacements={this.props.setDisabledPlacements}
-      setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
-      setPrivacyLevel={this.props.setPrivacyLevel}
-      dispatch={this.props.dispatch}
-      toolConfiguration={this.props.tool_configuration}
-      editing={editing}
-    />
-  }
-
-  render() {
     return (
       <form ref={this.setKeyFormRef}>
         <Grid hAlign="center">
@@ -180,11 +141,41 @@ export default class DeveloperKeyFormFields extends React.Component {
                   resize="both"
                   disabled={this.props.createLtiKeyState.customizing}
                 />
-                {this.renderTestClusterOnlyCheckbox()}
+                {ENV.enableTestClusterChecks
+                  ? <Checkbox
+                      label={I18n.t('Test Cluster Only')}
+                      name="developer_key[test_cluster_only]"
+                      checked={this.state.testClusterOnly}
+                      onChange={this.handleTestClusterOnlyChange}
+                      disabled={this.props.createLtiKeyState.customizing}
+                    />
+                  : null
+                }
               </FormFieldGroup>
             </GridCol>
             <GridCol width={8}>
-              {this.formBody()}
+              {createLtiKeyState.isLtiKey
+                ? <ToolConfiguration
+                    ref={this.setToolConfigRef}
+                    createLtiKeyState={createLtiKeyState}
+                    setEnabledScopes={this.props.setEnabledScopes}
+                    setDisabledPlacements={this.props.setDisabledPlacements}
+                    setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
+                    setPrivacyLevel={this.props.setPrivacyLevel}
+                    dispatch={this.props.dispatch}
+                    toolConfiguration={this.props.tool_configuration}
+                    editing={editing}
+                  />
+                : <Scopes
+                    availableScopes={this.props.availableScopes}
+                    availableScopesPending={this.props.availableScopesPending}
+                    developerKey={this.props.developerKey}
+                    requireScopes={this.state.requireScopes}
+                    onRequireScopesChange={this.handleRequireScopesChange}
+                    dispatch={this.props.dispatch}
+                    listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
+                  />
+              }
             </GridCol>
           </GridRow>
         </Grid>

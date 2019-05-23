@@ -373,58 +373,6 @@ test('allows saving if the key previously had scopes', () => {
   wrapper.unmount()
 })
 
-test('renders the LTI footer if "ltiKey" is true', () => {
-  window.ENV = window.ENV || {}
-  window.ENV.validLtiScopes = {}
-  window.ENV.validLtiPlacements = []
-
-  const createLtiKeyStateOn = {
-    isLtiKey: true,
-    customizing: true,
-    toolConfiguration: {},
-    validScopes: [],
-    validPlacements: []
-  }
-
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyStateOn}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-
-  ok(wrapper.instance().modalFooter().props.customizing)
-  wrapper.unmount()
-  window.ENV.validLtiScopes = undefined
-  window.ENV.validLtiPlacements = undefined
-})
-
-test('renders the non LTI footer if "ltiKey" is false', () => {
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-    />
-  )
-
-  notOk(wrapper.instance().modalFooter().props.customizing)
-  wrapper.unmount()
-})
-
 test('clears the lti key state when modal is closed', () => {
   const ltiStub = sinon.spy()
   const actions = Object.assign(fakeActions, {

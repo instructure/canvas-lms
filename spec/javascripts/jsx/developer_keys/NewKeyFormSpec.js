@@ -172,6 +172,6 @@ test('renders the developer key scopes form if isLtiKey is false', () => {
       createLtiKeyState={ {customizing: false, isLtiKey: false} }
     />
   )
-  ok(wrapper.find('DeveloperKeyScopes').exists())
+  ok(wrapper.find('Scopes').exists())
   wrapper.unmount()
 })
