@@ -205,7 +205,8 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     })
 
     test('is not shown when there are no sections', async () => {
-      await show({sections: []})
+      context.sections = []
+      await show()
       notOk(getLabel('Freshmen'))
     })
   })
@@ -241,7 +242,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
           {postedAt: null},
           {postedAt: null}
         ]
-        await show(context)
+        await show()
         strictEqual(getUnpostedCount().textContent, '2')
       })
     })
@@ -253,7 +254,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
           {postedAt: new Date().toISOString()}
         ]
 
-        await show(context)
+        await show()
       })
 
       test('a summary of unposted submissions is not displayed', () => {

@@ -2715,6 +2715,14 @@ export default do ->
         @gradebookGrid.invalidate()
       )
 
+    postAssignmentGradesTrayOpenChanged: ({assignmentId, isOpen}) =>
+      columnId = @getAssignmentColumnId(assignmentId)
+      definition = @gridData.columns.definitions[columnId]
+      return unless definition && definition.type == 'assignment'
+
+      definition.postAssignmentGradesTrayOpenForAssignmentId = isOpen
+      @updateGrid()
+
     ## Course Settings Access Methods
 
     getCourseGradingScheme: ->

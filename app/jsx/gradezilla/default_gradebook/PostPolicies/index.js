@@ -122,7 +122,7 @@ export default class PostPolicies {
     })
   }
 
-  showPostAssignmentGradesTray({assignmentId, onExited}) {
+  showPostAssignmentGradesTray({assignmentId, onExited = () => {}}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
@@ -138,10 +138,21 @@ export default class PostPolicies {
         id,
         name
       },
-      onExited,
+      onExited: () => {
+        this._gradebook.postAssignmentGradesTrayOpenChanged({
+          assignmentId: assignment.id,
+          isOpen: false
+        })
+        onExited()
+      },
       sections,
       submissions,
       onPosted: this._onGradesPostedOrHidden
+    })
+
+    this._gradebook.postAssignmentGradesTrayOpenChanged({
+      assignmentId: assignment.id,
+      isOpen: true
     })
   }
 

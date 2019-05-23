@@ -290,11 +290,22 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       deepEqual(submissions, [{postedAt: submission.posted_at}])
     })
 
-    test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
+    test('the `onExited` callback is passed in onExited', () => {
       const callback = sinon.stub()
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
       const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(onExited, callback)
+      onExited()
+      strictEqual(callback.callCount, 1)
+    })
+
+    test('the `postAssignmentGradesTrayOpenChanged` callback is passed in onExited', () => {
+      const trayOpenOrCloseStub = sinon.stub(gradebook, 'postAssignmentGradesTrayOpenChanged')
+      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      const existingCallCount = trayOpenOrCloseStub.callCount
+      onExited()
+      strictEqual(trayOpenOrCloseStub.callCount, existingCallCount + 1)
+      trayOpenOrCloseStub.restore()
     })
 
     QUnit.module('onPosted', onPostedHooks => {
@@ -377,13 +388,13 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(postPolicies._assignmentPolicyTray.show.callCount, 1)
     })
 
-    test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
+    test('includes the assignment id', () => {
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(assignment.id, '2301')
     })
 
-    test('includes the assignment name when showing the "Post Assignment Grades" tray', () => {
+    test('includes the assignment name', () => {
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
@@ -407,7 +418,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.postManually, true)
     })
 
-    test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
+    test('includes the `onExited` callback', () => {
       const callback = sinon.stub()
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301', onExited: callback})
       const [{onExited}] = postPolicies._assignmentPolicyTray.show.lastCall.args

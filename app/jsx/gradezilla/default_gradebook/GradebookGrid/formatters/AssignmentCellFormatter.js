@@ -63,6 +63,11 @@ function formatGrade(submissionData, assignment, options) {
 
 function renderStartContainer(options) {
   let content = ''
+
+  if (options.showUnpostedIndicator) {
+    content += '<div class="Grid__GradeCell__UnpostedGrade"></div>'
+  }
+
   if (options.invalid) {
     content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
   }
@@ -127,7 +132,7 @@ export default class AssignmentCellFormatter {
     }
   }
 
-  render = (row, cell, submission /* value */, _columnDef, student /* dataContext */) => {
+  render = (row, cell, submission /* value */, columnDef, student /* dataContext */) => {
     let submissionState
     if (submission) {
       submissionState = this.options.getSubmissionState(submission)
@@ -169,12 +174,18 @@ export default class AssignmentCellFormatter {
       submissionData.excused = pendingGradeInfo.excused
     }
 
+    const showUnpostedIndicator =
+      columnDef.postAssignmentGradesTrayOpenForAssignmentId &&
+      submission.workflow_state === 'graded' &&
+      !submission.posted_at
+
     const options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),
       dimmed: student.isInactive || student.isConcluded || submissionState.locked,
       disabled: student.isConcluded || submissionState.locked,
       hidden: submissionState.hideGrade,
       invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
+      showUnpostedIndicator,
       turnitinState: getTurnitinState(submission)
     }
 
