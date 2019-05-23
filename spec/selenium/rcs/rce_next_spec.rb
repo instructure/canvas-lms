@@ -315,6 +315,24 @@ describe "RCE next tests" do
       end
     end
 
+    it "should add alt text to image using options tray" do
+      alt_text = "fear is the mindkiller"
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      alt_text_textbox.send_keys(alt_text)
+      click_image_options_done_button
+
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_image.attribute('alt')).to include alt_text
+      end
+    end
+
     it "should display assignment publish status in links accordion" do
       skip('Unskip in CORE-2619')
       title = "Assignment-Title"

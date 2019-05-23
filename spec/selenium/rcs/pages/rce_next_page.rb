@@ -234,6 +234,10 @@ module RCENextPage
 
   end
 
+  def alt_text_textbox
+    f('textarea[aria-describedby="alt-text-label-tooltip"]')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
