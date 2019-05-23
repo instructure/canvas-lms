@@ -542,6 +542,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should load mathjax if mathml" do
+      skip('CORE-2994')
       text = '<p><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></p>'
       wysiwyg_state_setup(@course, text, html: true)
       wait_for_new_page_load{f('button.submit').click}
