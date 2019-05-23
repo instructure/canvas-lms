@@ -10,7 +10,7 @@
     "lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "eslint --fix \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
     "test": "Test cafe will be added back to test as part of CORE-2995",
-    "test": "npm run test:mocha && npm run test:jest",
+    "test": "yarn test:mocha && yarn test:jest",
     "test:mocha": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
     "test:jest": "jest",
     "test:cafe": "yarn build:cafe && yarn test:cafe:only",
@@ -26,7 +26,7 @@
     "build:canvas": "scripts/build-canvas",
     "build:watch": "rm -rf lib && TRANSPILE=true ./node_modules/.bin/babel --out-dir lib src --watch",
     "build:cafe": "webpack --config webpack.testcafe.config.js",
-    "prepublishOnly": "npm run test && npm run build:all",
+    "prepublishOnly": "yarn test && yarn build:all",
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'"
   },
