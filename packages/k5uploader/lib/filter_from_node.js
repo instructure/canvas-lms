@@ -1,14 +1,12 @@
 import FileFilter from "./file_filter";
-import $ from "jquery";
 
 export default function(node) {
-  node = $(node);
   return  new FileFilter({
-    id: node.attr('id'),
-    description: node.attr('description'),
-    entryType: node.attr('entryType'),
-    mediaType: node.attr('mediaType'),
-    type: node.attr('type'),
-    extensions: node.attr('extensions')
+    id: node.getAttribute('id'),
+    description: node.getAttribute('description'),
+    entryType: node.getAttribute('entryType'),
+    mediaType: node.getAttribute('mediaType'),
+    type: node.getAttribute('type'),
+    extensions: node.getAttribute('extensions')
   });
 };

@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/instructure/canvas-lms/issues"
   },
-  "homepage": "https://github.com/instructure/canvas-lms#readme",
-  "dependencies": {
-    "jquery": "*"
-  }
+  "homepage": "https://github.com/instructure/canvas-lms#readme"
 }

@@ -1,4 +1,6 @@
-import $ from "jquery";
+// this is commented out so that we don't break canvas-rce's mocha tests
+// since when they run there is not neccisarily a DOM with a `window` or `document` available
+// import $ from "jquery";
 
 function XmlParser (){}
 
