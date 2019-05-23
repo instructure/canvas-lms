@@ -83,7 +83,7 @@ export default class DeveloperKeyFormFields extends React.Component {
   }
 
   render() {
-    const { createLtiKeyState, editing } = this.props
+    const { createLtiKeyState, editing, showRequiredMessages, updateToolConfiguration } = this.props
 
     return (
       <form ref={this.setKeyFormRef}>
@@ -112,7 +112,7 @@ export default class DeveloperKeyFormFields extends React.Component {
                   name="developer_key[redirect_uris]"
                   defaultValue={this.fieldValue('redirect_uris')}
                   resize="both"
-                  messages={this.props.showRequiredMessages ? validationMessage : []}
+                  messages={showRequiredMessages ? validationMessage : []}
                   disabled={this.props.createLtiKeyState.customizing}
                 />
                 {!this.props.createLtiKeyState.isLtiKey &&
@@ -165,6 +165,8 @@ export default class DeveloperKeyFormFields extends React.Component {
                     dispatch={this.props.dispatch}
                     toolConfiguration={this.props.tool_configuration}
                     editing={editing}
+                    showRequiredMessages={showRequiredMessages}
+                    updateToolConfiguration={updateToolConfiguration}
                   />
                 : <Scopes
                     availableScopes={this.props.availableScopes}
@@ -223,5 +225,6 @@ DeveloperKeyFormFields.propTypes = {
   tool_configuration: PropTypes.shape({
     oidc_initiation_url: PropTypes.string
   }),
-  showRequiredMessages: PropTypes.bool
+  showRequiredMessages: PropTypes.bool,
+  updateToolConfiguration: PropTypes.func
 }

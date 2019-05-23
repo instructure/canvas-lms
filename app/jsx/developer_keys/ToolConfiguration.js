@@ -50,6 +50,8 @@ export default class ToolConfiguration extends React.Component {
           setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
           configurationMethod={this.props.createLtiKeyState.configurationMethod}
           editing={this.props.editing}
+          showRequiredMessages={this.props.showRequiredMessages}
+          updateToolConfiguration={this.props.updateToolConfiguration}
         />
       )
     }
@@ -94,5 +96,7 @@ ToolConfiguration.propTypes = {
   toolConfiguration: PropTypes.shape({
     oidc_initiation_url: PropTypes.string
   }),
-  editing: PropTypes.bool.isRequired
+  editing: PropTypes.bool.isRequired,
+  showRequiredMessages: PropTypes.bool.isRequired,
+  updateToolConfiguration: PropTypes.func
 }

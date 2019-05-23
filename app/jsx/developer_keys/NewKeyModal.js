@@ -183,14 +183,11 @@ export default class DeveloperKeyModal extends React.Component {
     let settings = {};
     let developerKey = {}
     if (this.isJsonConfig) {
-      try {
-        settings = JSON.parse(formData.get("tool_configuration"))
-      } catch(e) {
-        if (e instanceof SyntaxError) {
-          $.flashError(I18n.t('Json is not valid. Please submit properly formatted json.'))
-          return
-        }
+      if (!this.state.toolConfiguration) {
+        this.setState({submitted: true})
+        return
       }
+      settings = this.state.toolConfiguration
     } else if(this.isManualConfig) {
       if (!this.manualForm.valid()) {
         this.setState({submitted: true})
@@ -223,6 +220,10 @@ export default class DeveloperKeyModal extends React.Component {
     }
   }
 
+  updateToolConfiguration = (update) => {
+    this.setState({ toolConfiguration: update })
+  }
+
   setNewFormRef = node => { this.newForm = node }
 
   closeModal = () => {
@@ -230,7 +231,7 @@ export default class DeveloperKeyModal extends React.Component {
     store.dispatch(actions.developerKeysModalClose())
     store.dispatch(actions.resetLtiState())
     store.dispatch(actions.editDeveloperKey())
-    this.setState({toolConfiguration: null})
+    this.setState({toolConfiguration: null, submitted: false})
   }
 
   render() {
@@ -275,7 +276,8 @@ export default class DeveloperKeyModal extends React.Component {
                   setLtiConfigurationMethod={actions.setLtiConfigurationMethod}
                   tool_configuration={this.toolConfiguration}
                   editing={editing}
-                  showRequiredMessages={this.state.submitted && !this.hasRedirectUris(new FormData(this.submissionForm))}
+                  showRequiredMessages={this.state.submitted}
+                  updateToolConfiguration={this.updateToolConfiguration}
                 />
             }
           </ModalBody>

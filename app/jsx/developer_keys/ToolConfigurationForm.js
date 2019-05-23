@@ -27,8 +27,17 @@ import View from '@instructure/ui-layout/lib/components/View'
 
 import ManualConfigurationForm from './ManualConfigurationForm'
 
+const validationMessage = [{text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'}]
+
 export default class ToolConfigurationForm extends React.Component {
+  state = {
+    poorlyFormattedJson: null
+  }
+
   get toolConfiguration() {
+    if(this.state.poorlyFormattedJson) {
+      return this.state.poorlyFormattedJson
+    }
     const {toolConfiguration} = this.props
     return toolConfiguration ? JSON.stringify(toolConfiguration, null, 4) : ''
   }
@@ -39,6 +48,18 @@ export default class ToolConfigurationForm extends React.Component {
 
   valid = () => {
     return this.manualConfigRef.valid();
+  }
+
+  updatePastedJson = (value) => {
+    try {
+      const settings = JSON.parse(value.target.value)
+      this.props.updateToolConfiguration(settings)
+      this.setState({poorlyFormattedJson: null})
+    } catch(e) {
+      if (e instanceof SyntaxError) {
+        this.setState({poorlyFormattedJson: value.target.value})
+      }
+    }
   }
 
   handleConfigTypeChange = (e, option) => {
@@ -52,9 +73,11 @@ export default class ToolConfigurationForm extends React.Component {
       return (
         <TextArea
           name="tool_configuration"
-          defaultValue={this.toolConfiguration}
+          value={this.toolConfiguration}
+          onChange={this.updatePastedJson}
           label={I18n.t('LTI 1.3 Configuration')}
           maxHeight="20rem"
+          messages={this.props.showRequiredMessages && this.state.poorlyFormattedJson ? validationMessage : []}
         />
       )
     } else if (this.props.configurationMethod === 'manual') {
@@ -113,7 +136,10 @@ ToolConfigurationForm.propTypes = {
   validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
   setLtiConfigurationMethod: PropTypes.func.isRequired,
   configurationMethod: PropTypes.string,
-  editing: PropTypes.bool.isRequired
+  editing: PropTypes.bool.isRequired,
+  updateDeveloperKey: PropTypes.func.isRequired,
+  showRequiredMessages: PropTypes.bool.isRequired,
+  updateToolConfiguration: PropTypes.func.isRequired
 }
 
 ToolConfigurationForm.defaultProps = {
