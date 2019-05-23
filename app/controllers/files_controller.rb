@@ -240,6 +240,11 @@ class FilesController < ApplicationController
   #   'image/jpeg'), or simply types (e.g., 'image', which will match
   #   'image/gif', 'image/jpeg', etc.).
   #
+  # @argument exclude_content_types[] [String]
+  #   Exclude given content-types from your results. You can specify type/subtype pairs (e.g.,
+  #   'image/jpeg'), or simply types (e.g., 'image', which will match
+  #   'image/gif', 'image/jpeg', etc.).
+  #
   # @argument search_term [String]
   #   The partial name of the files to match and return.
   #
@@ -306,6 +311,10 @@ class FilesController < ApplicationController
 
         if params[:content_types].present?
           scope = scope.by_content_types(Array(params[:content_types]))
+        end
+
+        if params[:exclude_content_types].present?
+          scope = scope.by_exclude_content_types(Array(params[:exclude_content_types]))
         end
 
         url = @context ? context_files_url : api_v1_list_files_url(@folder)
