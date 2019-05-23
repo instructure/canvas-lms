@@ -126,8 +126,8 @@ RUN mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %> \
   && find ${APP_HOME} /home/docker ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 USER docker
-# update any existing lock file since it wasn't used to bundle install
-RUN [[ -f Gemfile.lock || -f Gemfile.lock.52 ]] && bundle lock --update
+# update Gemfile.lock in cases where a lock file was pulled in during the `COPY . $APP_HOME` step
+RUN bundle lock --update
 # TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
 RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
 <% end -%>
