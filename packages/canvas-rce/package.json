@@ -100,6 +100,7 @@
   },
   "dependencies": {
     "@instructure/canvas-theme": "6",
+    "@instructure/media-capture": "^5",
     "@instructure/ui-a11y": "6",
     "@instructure/ui-alerts": "6",
     "@instructure/ui-billboard": "6",
@@ -109,7 +110,6 @@
     "@instructure/ui-forms": "6",
     "@instructure/ui-icons": "6",
     "@instructure/ui-layout": "6",
-    "@instructure/media-capture": "^5",
     "@instructure/ui-overlays": "6",
     "@instructure/ui-react-utils": "6",
     "@instructure/ui-svg-images": "6",
@@ -119,6 +119,7 @@
     "@instructure/ui-themes": "6",
     "@instructure/ui-toggle-details": "6",
     "@instructure/uid": "6",
+    "@tinymce/tinymce-react": "^3.0.1",
     "aphrodite": "^2",
     "bloody-offset": "0.0.0",
     "format-message": "^6",
@@ -134,8 +135,7 @@
     "redux-batch-middleware": "^0.2.0",
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
-    "tinymce": "^5",
-    "@tinymce/tinymce-react": "^3.0.1"
+    "tinymce": "^5"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -163,6 +163,7 @@
     "format-message-parse": "^6",
     "jest": "^24",
     "jest-canvas-mock": "^1",
+    "jest-junit": "^6.4.0",
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",
     "jsdomify": "^3",

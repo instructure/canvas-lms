@@ -63,7 +63,7 @@ docker-compose.local.*
 /packages/*/node_modules
 /packages/*/lib
 /packages/*/es
-/packages/canvas-planner/coverage/
+/packages/*/coverage/
 /packages/canvas-planner/.babel-cache
 
 # pact artifacts
