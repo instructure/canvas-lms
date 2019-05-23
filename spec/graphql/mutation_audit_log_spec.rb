@@ -19,7 +19,13 @@
 require_relative "../spec_helper"
 require_relative "./graphql_spec_helper"
 
-describe "GraphQL Mutation Audit Log" do
+describe  AuditLogFieldExtension do
+  before do
+    if !AuditLogFieldExtension.enabled?
+      skip("AuditLog needs to be enabled by configuring dynamodb.yml")
+    end
+  end
+
   before(:once) do
     course_with_student(active_all: true)
     @assignment = @course.assignments.create! name: "asdf"
@@ -32,13 +38,21 @@ describe "GraphQL Mutation Audit Log" do
     MUTATION
   end
 
-  before do
-    allow(AuditLogFieldExtension).to receive(:enabled?) { true }
-  end
-
   it "logs" do
     expect(AuditLogFieldExtension::Logger).to receive(:log).once
     CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
+  end
+
+  it "logs to dynamo" do
+    CanvasSchema.execute(MUTATION, context: {current_user: @teacher, domain_root_account: Account.default})
+    db = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
+    expect(
+      db.query(
+        table_name: "graphql_mutations",
+        key_condition_expression: "object_id = :id",
+        expression_attribute_values: {":id" => @assignment.global_asset_string}
+      ).items.size
+    ).to eq 1
   end
 
   it "creates a log for every item" do
