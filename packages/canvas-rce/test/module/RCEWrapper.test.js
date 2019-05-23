@@ -108,7 +108,8 @@ describe("RCEWrapper", () => {
         return editor.hidden;
       },
       execCommand: editorCommandSpy,
-      serializer: { serialize: sinon.stub() }
+      serializer: { serialize: sinon.stub() },
+      ui: { registry: { addIcon: () => {} } }
     };
 
     fakeTinyMCE = {
@@ -133,7 +134,9 @@ describe("RCEWrapper", () => {
   describe("static methods", () => {
     describe("getByEditor", () => {
       it("gets instances by rendered tinymce object reference", () => {
-        const editor = {};
+        const editor = {
+          ui: { registry: { addIcon: () => {} } }
+        };
         const wrapper = new RCEWrapper({});
         const options = wrapper.wrapOptions({});
         options.setup(editor);
@@ -556,14 +559,14 @@ describe("RCEWrapper", () => {
     });
 
     it("registers editor to allow getting wrapper by editor", () => {
-      const editor = {};
+      const editor = {ui: { registry: { addIcon: () => {} } }};
       const tree = createdMountedElement({ editorOptions });
       tree.subTree("Editor").props.init.setup(editor);
       assert.equal(RCEWrapper.getByEditor(editor), tree.getMountedInstance());
     });
 
     it("it calls original setup from editorOptions", () => {
-      const editor = {};
+      const editor = {ui: { registry: { addIcon: () => {} } }};
       const spy = editorOptions.setup;
       const tree = createdMountedElement({ editorOptions });
       tree.subTree("Editor").props.init.setup(editor);

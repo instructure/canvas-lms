@@ -38,6 +38,16 @@ import theme from '../skins/theme'
 const styles = require('../skins/skin-delta.css')
 const {template} = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
 
+// If we ever get our jest tests configured so they can handle importing real esModules,
+// we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
+function addKebabIcon(editor) {
+  editor.ui.registry.addIcon('more-drawer', `
+    <svg viewBox="0 0 1920 1920">
+      <path d="M1129.412 1637.647c0 93.448-75.964 169.412-169.412 169.412-93.448 0-169.412-75.964-169.412-169.412 0-93.447 75.964-169.412 169.412-169.412 93.448 0 169.412 75.965 169.412 169.412zm0-677.647c0 93.448-75.964 169.412-169.412 169.412-93.448 0-169.412-75.964-169.412-169.412 0-93.448 75.964-169.412 169.412-169.412 93.448 0 169.412 75.964 169.412 169.412zm0-677.647c0 93.447-75.964 169.412-169.412 169.412-93.448 0-169.412-75.965-169.412-169.412 0-93.448 75.964-169.412 169.412-169.412 93.448 0 169.412 75.964 169.412 169.412z" stroke="none" stroke-width="1" fill-rule="evenodd"/>
+    </svg>
+  `)
+}
+
 // Get oxide the default skin injected into the DOM before the overrides loaded by themeable
 let inserted = false
 function injectTinySkin() {
@@ -414,6 +424,7 @@ class RCEWrapper extends React.Component {
       ].join('; '),
 
       setup: editor => {
+        addKebabIcon(editor)
         editorWrappers.set(editor, this);
         Bridge.trayProps.set(editor, this.props.trayProps)
         if (typeof setupCallback === "function") {
