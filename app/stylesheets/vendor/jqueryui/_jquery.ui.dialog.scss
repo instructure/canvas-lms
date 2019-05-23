@@ -54,12 +54,17 @@
       opacity: 0.6;
     }
     &.ui-state-hover, &.ui-state-focus {
-      border: 1px solid;
-      border-color: #16a8ff !important;
+      border: 1px solid transparent;
+      box-shadow: 0 0 0 2px var(--ic-brand-button--primary-bgd);
       border-radius: 3px;
       span {
         opacity: 0.8;
       }
+    }
+    &:focus {
+      outline-style: none;
+      border-color: transparent;
+      box-shadow: 0 0 0 2px var(--ic-brand-button--primary-bgd);
     }
   }
 }

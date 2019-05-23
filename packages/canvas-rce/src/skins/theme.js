@@ -66,7 +66,7 @@ export default function generator ({ borders, colors, forms, shadows, spacing, t
 
     canvasFocusBorderColor: borders.brand,
     canvasFocusBorderWidth: borders.widthSmall, // canvas really uses widthMedium
-    canvasFocusBoxShadow: `0 0 0 0 2px ${colors.brand}`,
+    canvasFocusBoxShadow: `0 0 0 2px ${colors.brand}`,
 
     canvasFontFamily: typography.fontFamily,
     canvasFontSize: '1rem',
@@ -114,6 +114,7 @@ generator['canvas-a11y'] = generator['canvas-high-contrast'] = function ({colors
     canvasButtonBackground: colors.backgroundLight,
     canvasSecondaryButtonBorderColor: colors.borderMedium,
     canvasLinkDecoration: 'underline',
-    canvasFocusBorderColor: colors.brand
+    canvasFocusBorderColor: colors.brand,
+    canvasFocusBoxShadow: `0 0 0 2px ${colors.brand}`,
   }
 }

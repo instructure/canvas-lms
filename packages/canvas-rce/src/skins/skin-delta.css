@@ -121,7 +121,6 @@
   }
   .tox .tox-button--naked:active:not(:disabled) {
     background-color: inherit;
-    border-color: inherit;
     color: inherit;
   }
   .tox .tox-button--naked.tox-button--icon {
