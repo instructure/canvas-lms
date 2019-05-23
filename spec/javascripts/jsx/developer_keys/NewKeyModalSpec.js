@@ -175,7 +175,7 @@ test('it closes the modal if isOpen prop is false', () => {
 
 test('it sends the contents of the form saving', () => {
   const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
 
   const fakeActions = {
     createOrEditDeveloperKey: createOrEditSpy
@@ -220,7 +220,7 @@ test('it sends the contents of the form saving', () => {
 
 test('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
   const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
 
   const fakeActions = {
     createOrEditDeveloperKey: createOrEditSpy
@@ -263,7 +263,7 @@ test('sends form content without scopes and require_scopes set to false when not
 
 test('it adds each selected scope to the form data', () => {
   const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
   const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
@@ -291,7 +291,7 @@ test('it adds each selected scope to the form data', () => {
 
 test('it removes testClusterOnly from the form data if it is undefined', () => {
   const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
   const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
@@ -321,7 +321,7 @@ test('it removes testClusterOnly from the form data if it is undefined', () => {
 test('flashes an error if no scopes are selected', () => {
   const flashStub = sinon.stub($, 'flashError')
   const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
   const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: [] })
@@ -349,7 +349,7 @@ test('flashes an error if no scopes are selected', () => {
 
 test('allows saving if the key previously had scopes', () => {
   const flashStub = sinon.stub($, 'flashError')
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
   const fakeStore = { dispatch: dispatchSpy }
   const keyWithScopes = Object.assign({}, developerKey, { require_scopes: true, scopes: selectedScopes })
   const editKeyWithScopesState = Object.assign({}, editDeveloperKeyState, { developerKey: keyWithScopes })
@@ -426,7 +426,7 @@ test('saves customizations', () => {
 test('flashes an error if redirect_uris is empty', () => {
   const flashStub = sinon.stub($, 'flashError')
   const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
   const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: [], redirect_uris: '' })

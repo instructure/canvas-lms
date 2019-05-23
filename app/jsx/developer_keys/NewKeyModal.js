@@ -87,6 +87,19 @@ export default class DeveloperKeyModal extends React.Component {
     return this.props.createOrEditDeveloperKeyState.developerKeyCreateOrEditPending || this.props.createLtiKeyState.saveToolConfigurationPending
   }
 
+  get isJsonConfig () {
+    return this.props.createLtiKeyState.configurationMethod === 'json'
+  }
+
+  get isUrlConfig () {
+    return this.props.createLtiKeyState.configurationMethod === 'url'
+  }
+
+  get isManualConfig () {
+    return this.props.createLtiKeyState.configurationMethod === 'manual'
+  }
+
+
   hasRedirectUris(formData) {
     const redirect_uris = formData.get("developer_key[redirect_uris]")
     return redirect_uris && redirect_uris.trim().length !== 0
@@ -108,6 +121,7 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   submitForm = () => {
+    const { store: { dispatch }, actions: { createOrEditDeveloperKey } } = this.props
     const method = this.developerKey() ? 'put' : 'post'
     const formData = new FormData(this.submissionForm)
 
@@ -130,9 +144,8 @@ export default class DeveloperKeyModal extends React.Component {
       formData.append('developer_key[test_cluster_only]', this.testClusterOnly)
     }
 
-    this.props.store.dispatch(
-      this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
-    )
+    return dispatch(createOrEditDeveloperKey(formData, this.developerKeyUrl(), method))
+      .then(() => { this.closeModal() })
   }
 
   saveLTIKeyEdit (settings, developerKey) {
@@ -169,7 +182,7 @@ export default class DeveloperKeyModal extends React.Component {
     }
     let settings = {};
     let developerKey = {}
-    if (this.props.createLtiKeyState.configurationMethod === 'json') {
+    if (this.isJsonConfig) {
       try {
         settings = JSON.parse(formData.get("tool_configuration"))
       } catch(e) {
@@ -178,7 +191,7 @@ export default class DeveloperKeyModal extends React.Component {
           return
         }
       }
-    } else if(this.props.createLtiKeyState.configurationMethod === 'manual') {
+    } else if(this.isManualConfig) {
       if (!this.manualForm.valid()) {
         this.setState({submitted: true})
         return
@@ -276,7 +289,7 @@ export default class DeveloperKeyModal extends React.Component {
                   disable={this.isSaving}
                   ltiKeysSetCustomizing={actions.ltiKeysSetCustomizing}
                   dispatch={store.dispatch}
-                  saveOnly={editing || createLtiKeyState.configurationMethod === 'manual'}
+                  saveOnly={editing || this.isManualConfig}
                 />
               : <NewKeyFooter
                   disable={this.isSaving}
