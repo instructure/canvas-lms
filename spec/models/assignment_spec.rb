@@ -7798,7 +7798,7 @@ describe Assignment do
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
-          expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+          expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           expect(assignment.external_tool_tag.content).to eq tool
           expect(assignment.line_items.first.resource_link.line_items.first).to eq assignment.line_items.first
         end
@@ -7854,7 +7854,7 @@ describe Assignment do
           shared_examples 'unchanged line item and resource link check' do
             it 'does not change nor add to the line item nor resource link' do
               expect(assignment.line_items.length).to eq 1
-              expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+              expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
               # some sanity checks to make sure the update did what we thought it did
               expect(different_tool.id).not_to eq tool.id
               expect(assignment.external_tool_tag.content.id).to eq different_tool.id
@@ -7881,7 +7881,7 @@ describe Assignment do
             assignment.update!(submission_types: 'none')
             assignment.reload
             expect(assignment.line_items.length).to eq 1
-            expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+            expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           end
 
           it_behaves_like 'assignment to line item attribute sync check'

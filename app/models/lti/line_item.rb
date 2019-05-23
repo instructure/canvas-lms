@@ -72,12 +72,12 @@ class Lti::LineItem < ApplicationRecord
 
   def set_client_id_if_possible
     return if client_id.present?
-    self.client_id = resource_link.context_external_tool.developer_key&.global_id unless lti_resource_link_id.blank?
+    self.client_id = resource_link.current_external_tool(assignment.context)&.developer_key&.global_id unless lti_resource_link_id.blank?
     self.client_id ||= assignment&.external_tool_tag&.content&.developer_key&.global_id
   end
 
   def client_id_is_global?
-    self.client_id > Shard::IDS_PER_SHARD
+    client_id.present? && client_id > Shard::IDS_PER_SHARD
   end
 
   # this is to prevent orphaned (ie undeleted state) line_items when an assignment is destroyed
