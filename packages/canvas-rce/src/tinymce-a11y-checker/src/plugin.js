@@ -5,29 +5,27 @@ import formatMessage from "./format-message"
 
 let instance
 const pendingInstanceCallbacks = []
+const container = document.createElement("div")
+container.className = "tinymce-a11y-checker-container"
+document.body.appendChild(container)
 
 tinymce.create("tinymce.plugins.AccessibilityChecker", {
   init: function(ed) {
-    const container = document.createElement("div")
-    container.className = "tinymce-a11y-checker-container"
-    document.body.appendChild(container)
-
-    ReactDOM.render(
-      <Checker getBody={ed.getBody.bind(ed)} editor={ed} />,
-      container,
-      function() {
-        // this is a workaround for react 16 since ReactDOM.render is not
-        // guaranteed to return the instance synchronously (especially if called
-        // within another component's lifecycle method eg: componentDidMount). see:
-        // https://github.com/facebook/react/issues/10309#issuecomment-318434635
-        instance = this
-        pendingInstanceCallbacks.forEach(cb => cb(instance))
-      }
-    )
-
-    ed.addCommand("openAccessibilityChecker", (...args) =>
-      instance.check(...args)
-    )
+    ed.addCommand("openAccessibilityChecker", (...args) => {
+      ReactDOM.render(
+        <Checker getBody={ed.getBody.bind(ed)} editor={ed} />,
+        container,
+        function() {
+          // this is a workaround for react 16 since ReactDOM.render is not
+          // guaranteed to return the instance synchronously (especially if called
+          // within another component's lifecycle method eg: componentDidMount). see:
+          // https://github.com/facebook/react/issues/10309#issuecomment-318434635
+          instance = this
+          pendingInstanceCallbacks.forEach(cb => cb(instance))
+          instance.check(...args)
+        }
+      )
+    })
 
     if (tinymce.majorVersion === "4") {
       // remove this branch when everything is on tinymce 5

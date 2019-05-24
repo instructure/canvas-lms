@@ -1,7 +1,7 @@
 describe("Indicator", () => {
   beforeEach(() => {
     cy.visit("http://127.0.0.1:8080")
-    cy.get("[aria-label='Check Accessibility']").click()
+    cy.get("#editor1 [aria-label='Check Accessibility']").click()
   })
 
   it("should indicate errors when they are active in the checker", () => {
@@ -10,7 +10,7 @@ describe("Indicator", () => {
 
   it("should not show the indicator when scrolling down out of the iframe", () => {
     cy.get(".a11y-checker-selection-indicator").should("be.visible")
-    cy.get("iframe").then($iframe => {
+    cy.get("#editor1 iframe").then($iframe => {
       const $body = $iframe.contents().find("body")
       $body
         .find("p")
@@ -28,7 +28,7 @@ describe("Indicator", () => {
       cy.contains("Prev").click()
     })
     cy.get(".a11y-checker-selection-indicator").should("be.visible")
-    cy.get("iframe").then($iframe => {
+    cy.get("#editor1 iframe").then($iframe => {
       const $body = $iframe.contents().find("body")
       $body
         .find("p")
@@ -49,8 +49,8 @@ describe("Indicator", () => {
 
 describe("Indicator Error Interactions", () => {
   beforeEach(() => {
-    cy.visit("http://127.0.0.1:8080/single_error.html")
-    cy.get("[aria-label='Check Accessibility']").click()
+    cy.visit("http://127.0.0.1:8080")
+    cy.get("#editor2 [aria-label='Check Accessibility']").click()
   })
 
   it("should remove the indicator after clearing the last error", () => {
