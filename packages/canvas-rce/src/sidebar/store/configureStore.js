@@ -21,7 +21,6 @@ import rootReducer from "../reducers";
 import initialState from "./initialState";
 import thunkMiddleware from "redux-thunk";
 import { batch, batching } from "redux-batch-middleware";
-import initialActions from "./initialActions";
 
 export default function(props, state) {
   const store = createStore(
@@ -29,8 +28,6 @@ export default function(props, state) {
     state || initialState(props),
     applyMiddleware(thunkMiddleware, batch)
   );
-
-  initialActions(store);
 
   return store;
 }

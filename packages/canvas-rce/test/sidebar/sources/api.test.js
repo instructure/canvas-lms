@@ -38,6 +38,7 @@ describe('sources/api', () => {
         callback('freshJWT')
       }
     })
+    fetchMock.mock('/api/session', '{}')
   })
 
   afterEach(() => {
@@ -399,11 +400,7 @@ describe('sources/api', () => {
   })
 
   describe('getSession', () => {
-    const uri = '/api/session'
-
-    beforeEach(() => {
-      fetchMock.mock(uri, '{}')
-    })
+    const uri = '/api/session' // already mocked
 
     it('includes jwt in Authorization header', () => {
       return apiSource.getSession().then(() => {

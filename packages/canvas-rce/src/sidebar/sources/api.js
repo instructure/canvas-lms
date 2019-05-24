@@ -83,12 +83,17 @@ class RceApiSource {
     this.jwt = options.jwt
     this.host = options.host
     this.refreshToken = options.refreshToken || defaultRefreshTokenHandler
+    this.hasSession = false
   }
 
   getSession() {
     const headers = headerFor(this.jwt)
     const uri = this.baseUri('session')
-    return this.apiFetch(uri, headers).catch(throwConnectionError)
+    return this.apiReallyFetch(uri, headers)
+      .then(() => {
+        this.hasSession = true
+      })
+      .catch(throwConnectionError)
   }
 
   // initial state of a collection is empty, not loading, with bookmark set to
@@ -119,6 +124,15 @@ class RceApiSource {
     }
   }
 
+  initializeDocuments(props) {
+    return {
+      files: [],
+      bookmark: this.uriFor('documents', props),
+      hasMore: false,
+      isLoading: false
+    }
+  }
+
   initializeFlickr() {
     return {
       searchResults: [],
@@ -129,6 +143,10 @@ class RceApiSource {
 
   // fetches the given URI and filters it to either an error or parsed response
   fetchPage(uri) {
+    return this.apiFetch(uri, headerFor(this.jwt))
+  }
+
+  fetchDocs(uri) {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
@@ -251,7 +269,14 @@ class RceApiSource {
   }
 
   // @private
-  apiFetch(uri, headers) {
+  async apiFetch(uri, headers) {
+    if (!this.hasSession) {
+      await this.getSession()
+    }
+    return this.apiReallyFetch(uri, headers)
+  }
+
+  apiReallyFetch(uri, headers) {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, {headers})
       .then(response => {
@@ -338,7 +363,9 @@ class RceApiSource {
         host = `${windowHandle.location.protocol}${host}`
       }
     }
-    return `${host}/api/${endpoint}`
+    const sharedEndpoints = ['media', 'documents', 'all']
+    let endpt = sharedEndpoints.includes(endpoint) ? 'documents' : endpoint
+    return `${host}/api/${endpt}`
   }
 
   // returns the URI to use with the fetchPage method to fetch the first page of
@@ -348,7 +375,21 @@ class RceApiSource {
   //
   uriFor(endpoint, props) {
     let {host, contextType, contextId} = props
-    return `${this.baseUri(endpoint, host)}?contextType=${contextType}&contextId=${contextId}`
+    let extra = ''
+    switch(endpoint) {
+      // eventually all could go thru /api/documents with the right content_types,
+      // but the UI has to be looking for files, not images, in the response
+      // case 'images':
+      //   extra = '&content_types=image'
+      //   break;
+      case 'media':
+        extra = '&content_types=video,audio'
+        break;
+      case 'documents':
+        extra = '&exclude_content_types=image,video,audio'
+        break;
+    }
+    return `${this.baseUri(endpoint, host)}?contextType=${contextType}&contextId=${contextId}${extra}`
   }
 }
 
