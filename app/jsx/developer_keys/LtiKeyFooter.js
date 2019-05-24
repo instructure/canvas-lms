@@ -35,8 +35,9 @@ export default class LtiKeyFooter extends React.Component {
   }
 
   onSave = e => {
-    this.props.dispatch(this.props.ltiKeysSetCustomizing(false))
-    this.props.onSaveClick(e)
+    return this.props.onSaveClick(e).then(() => {
+      this.props.dispatch(this.props.ltiKeysSetCustomizing(false))
+    }).catch((err) => err) // validation error most likely
   }
 
   onCancel = e => {

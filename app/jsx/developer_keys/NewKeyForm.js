@@ -63,7 +63,10 @@ export default class NewKeyForm extends React.Component {
       editing,
       showRequiredMessages,
       updateToolConfiguration,
-      updateDeveloperKey
+      updateToolConfigurationUrl,
+      toolConfigurationUrl,
+      updateDeveloperKey,
+      showCustomizationMessages
     } = this.props
 
     return (
@@ -156,6 +159,9 @@ export default class NewKeyForm extends React.Component {
                     editing={editing}
                     showRequiredMessages={showRequiredMessages}
                     updateToolConfiguration={updateToolConfiguration}
+                    updateToolConfigurationUrl={updateToolConfigurationUrl}
+                    toolConfigurationUrl={toolConfigurationUrl}
+                    showCustomizationMessages={showCustomizationMessages}
                   />
                 : <Scopes
                     availableScopes={this.props.availableScopes}
@@ -216,5 +222,8 @@ NewKeyForm.propTypes = {
   }),
   showRequiredMessages: PropTypes.bool,
   updateToolConfiguration: PropTypes.func,
-  updateDeveloperKey: PropTypes.func.isRequired
+  updateToolConfigurationUrl: PropTypes.func,
+  updateDeveloperKey: PropTypes.func.isRequired,
+  toolConfigurationUrl: PropTypes.string.isRequired,
+  showCustomizationMessages: PropTypes.bool.isRequired
 }

@@ -30,11 +30,15 @@ import NewKeyForm from './NewKeyForm'
 import NewKeyFooter from './NewKeyFooter'
 import LtiKeyFooter from './LtiKeyFooter'
 
+import { objectToCustomVariablesString } from './CustomizationForm'
+
 export default class DeveloperKeyModal extends React.Component {
   state = {
-    toolConfiguration: null, // used to save state when saving the key, display what was there if failure
+    toolConfiguration: {}, // used to save state when saving the key, display what was there if failure
     submitted: false,
-    developerKey: {}
+    developerKey: {},
+    toolConfigurationUrl: '',
+    showCustomizationMessages: false
   }
 
   developerKeyUrl() {
@@ -58,14 +62,7 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   get toolConfiguration () {
-    const {
-      createOrEditDeveloperKeyState: { developerKey }
-    } = this.props;
-    return this.state.toolConfiguration ? this.state.toolConfiguration : (developerKey && developerKey.tool_configuration || {})
-  }
-
-  get submissionForm () {
-    return this.newForm ? this.newForm.keyForm : <form />
+    return {...(this.developerKey.tool_configuration || {}), ...this.state.toolConfiguration}
   }
 
   get isLtiKey() {
@@ -95,18 +92,22 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   saveCustomizations = () => {
-    const customFields = new FormData(this.submissionForm).get('custom_fields')
     const { store, actions, createLtiKeyState } = this.props
+    if(this.state.toolConfiguration.custom_fields === null) {
+      this.setState({showCustomizationMessages: true})
+      return Promise.reject()
+    }
 
-    store.dispatch(actions.ltiKeysUpdateCustomizations(
+    return store.dispatch(actions.ltiKeysUpdateCustomizations(
       {scopes: createLtiKeyState.enabledScopes},
       createLtiKeyState.disabledPlacements,
       this.developerKey.id,
       createLtiKeyState.toolConfiguration,
-      customFields,
+      objectToCustomVariablesString(this.toolConfiguration.custom_fields),
       createLtiKeyState.privacyLevel
-    ))
-    this.closeModal()
+    )).then(() => {
+      this.closeModal()
+    })
   }
 
   submitForm = () => {
@@ -143,7 +144,7 @@ export default class DeveloperKeyModal extends React.Component {
     return actions.ltiKeysUpdateCustomizations(
       developerKey,
       [],
-      this.props.createOrEditDeveloperKeyState.developerKey.id,
+      this.developerKey.id,
       settings,
       '',
       null
@@ -161,7 +162,6 @@ export default class DeveloperKeyModal extends React.Component {
 
   saveLtiToolConfiguration = () => {
     const { store: { dispatch }, actions } = this.props
-    const formData = new FormData(this.submissionForm)
     const developer_key = {...this.developerKey}
     if (!this.hasRedirectUris) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
@@ -193,7 +193,8 @@ export default class DeveloperKeyModal extends React.Component {
         developer_key
       }
       if (this.isUrlConfig) {
-        toSave.settings_url = formData.get("tool_configuration_url")
+        if(!this.state.toolConfigurationUrl) { return }
+        toSave.settings_url = this.state.toolConfigurationUrl
       } else {
         toSave.settings = settings
       }
@@ -201,8 +202,16 @@ export default class DeveloperKeyModal extends React.Component {
     }
   }
 
-  updateToolConfiguration = (update) => {
-    this.setState({ toolConfiguration: update })
+  updateToolConfigurationUrl = (toolConfigurationUrl) => {
+    this.setState({ toolConfigurationUrl })
+  }
+
+  updateToolConfiguration = (update, field = null) => {
+    if(field) {
+      this.setState(state => ({ toolConfiguration: {...state.toolConfiguration, [field]: update }}))
+    } else {
+      this.setState({ toolConfiguration: update })
+    }
   }
 
   updateDeveloperKey = (field, update) => {
@@ -217,7 +226,13 @@ export default class DeveloperKeyModal extends React.Component {
     store.dispatch(actions.resetLtiState())
     store.dispatch(actions.editDeveloperKey())
     store.dispatch(actions.setLtiConfigurationMethod('manual'))
-    this.setState({toolConfiguration: null, submitted: false})
+    this.setState({
+      toolConfiguration: null,
+      submitted: false,
+      toolConfigurationUrl: null,
+      developerKey: {},
+      showCustomizationMessages: false
+    })
   }
 
   render() {
@@ -265,6 +280,9 @@ export default class DeveloperKeyModal extends React.Component {
                   showRequiredMessages={this.state.submitted}
                   updateToolConfiguration={this.updateToolConfiguration}
                   updateDeveloperKey={this.updateDeveloperKey}
+                  updateToolConfigurationUrl={this.updateToolConfigurationUrl}
+                  toolConfigurationUrl={this.state.toolConfigurationUrl}
+                  showCustomizationMessages={this.state.showCustomizationMessages}
                 />
             }
           </ModalBody>

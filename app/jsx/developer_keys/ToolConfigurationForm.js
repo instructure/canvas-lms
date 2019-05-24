@@ -62,6 +62,10 @@ export default class ToolConfigurationForm extends React.Component {
     }
   }
 
+  updateToolConfigurationUrl = (e) => {
+    this.props.updateToolConfigurationUrl(e.target.value)
+  }
+
   handleConfigTypeChange = (e, option) => {
     this.props.dispatch(this.props.setLtiConfigurationMethod(option.value))
   }
@@ -93,7 +97,8 @@ export default class ToolConfigurationForm extends React.Component {
     return (
       <TextInput
         name="tool_configuration_url"
-        defaultValue={this.props.toolConfigurationUrl}
+        value={this.props.toolConfigurationUrl}
+        onChange={this.updateToolConfigurationUrl}
         label={I18n.t('JSON URL')}
       />
     )
@@ -138,7 +143,8 @@ ToolConfigurationForm.propTypes = {
   configurationMethod: PropTypes.string,
   editing: PropTypes.bool.isRequired,
   showRequiredMessages: PropTypes.bool.isRequired,
-  updateToolConfiguration: PropTypes.func.isRequired
+  updateToolConfiguration: PropTypes.func.isRequired,
+  updateToolConfigurationUrl: PropTypes.func.isRequired
 }
 
 ToolConfigurationForm.defaultProps = {

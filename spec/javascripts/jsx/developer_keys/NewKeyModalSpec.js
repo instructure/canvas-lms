@@ -417,6 +417,7 @@ test('clears the lti key state when modal is closed', () => {
 
 test('saves customizations', () => {
   const ltiStub = sinon.spy()
+  const dispatchSpy = sinon.stub().resolves()
   const actions = Object.assign(fakeActions, {
     ltiKeysUpdateCustomizations: ltiStub
   })
@@ -429,14 +430,14 @@ test('saves customizations', () => {
       closeModal={() => {}}
       createOrEditDeveloperKeyState={createDeveloperKeyState}
       actions={actions}
-      store={{dispatch: () => {}}}
+      store={{dispatch: dispatchSpy}}
       mountNode={modalMountNode}
       selectedScopes={selectedScopes}
       ctx={{params: {contextId: '1'}}}
     />
   )
   wrapper.instance().saveCustomizations()
-  ok(ltiStub.calledWith({scopes: ['https://www.test.com/lineitem']}, ['account_navigation'], 22, {}, null))
+  ok(ltiStub.calledWith({scopes: ['https://www.test.com/lineitem']}, ['account_navigation'], 22, {}, ""))
   wrapper.unmount()
 })
 

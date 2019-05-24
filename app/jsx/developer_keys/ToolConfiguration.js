@@ -44,7 +44,7 @@ export default class ToolConfiguration extends React.Component {
           ref={this.setConfigurationMethodsRef}
           dispatch={this.props.dispatch}
           toolConfiguration={this.props.toolConfiguration}
-          toolConfigurationUrl={this.props.createLtiKeyState.toolConfigurationUrl}
+          toolConfigurationUrl={this.props.toolConfigurationUrl}
           validScopes={ENV.validLtiScopes}
           validPlacements={ENV.validLtiPlacements}
           setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
@@ -52,6 +52,7 @@ export default class ToolConfiguration extends React.Component {
           editing={this.props.editing}
           showRequiredMessages={this.props.showRequiredMessages}
           updateToolConfiguration={this.props.updateToolConfiguration}
+          updateToolConfigurationUrl={this.props.updateToolConfigurationUrl}
         />
       )
     }
@@ -65,7 +66,9 @@ export default class ToolConfiguration extends React.Component {
         dispatch={this.props.dispatch}
         setEnabledScopes={this.props.setEnabledScopes}
         setDisabledPlacements={this.props.setDisabledPlacements}
+        updateToolConfiguration={this.props.updateToolConfiguration}
         setPrivacyLevel={this.props.setPrivacyLevel}
+        showCustomizationMessages={this.props.showCustomizationMessages}
       />
     )
   }
@@ -98,5 +101,8 @@ ToolConfiguration.propTypes = {
   }),
   editing: PropTypes.bool.isRequired,
   showRequiredMessages: PropTypes.bool.isRequired,
-  updateToolConfiguration: PropTypes.func
+  showCustomizationMessages: PropTypes.bool.isRequired,
+  updateToolConfiguration: PropTypes.func,
+  updateToolConfigurationUrl: PropTypes.func,
+  toolConfigurationUrl: PropTypes.string.isRequired
 }
