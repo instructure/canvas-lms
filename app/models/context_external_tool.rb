@@ -137,6 +137,7 @@ class ContextExternalTool < ActiveRecord::Base
       :icon_url,
       :message_type,
       :prefer_sis_email,
+      :required_permissions,
       :selection_height,
       :selection_width,
       :text,
@@ -794,6 +795,17 @@ class ContextExternalTool < ActiveRecord::Base
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
       Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)
+    end
+  end
+
+  def visible_with_permission_check?(launch_type, user, context, session=nil)
+    return false unless self.class.visible?(self.extension_setting(launch_type, 'visibility'), user, context, session)
+    if (required_permissions_str = self.extension_setting(launch_type, 'required_permissions'))
+      # if configured with a comma-separated string of permissions, will only show the link
+      # if all permissions are granted
+      required_permissions_str.split(",").map(&:to_sym).all?{|p| context&.grants_right?(user, session, p)}
+    else
+      true
     end
   end
 

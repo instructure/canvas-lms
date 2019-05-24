@@ -234,6 +234,7 @@ class AssignmentsController < ApplicationController
     css_bundle :assignment_grade_summary
     js_bundle :assignment_grade_summary
     js_env(show_moderate_env)
+    set_student_context_cards_js_env
 
     @page_title = @assignment.title
 
@@ -642,7 +643,6 @@ class AssignmentsController < ApplicationController
         id: @assignment.final_grader_id
       },
       GRADERS: moderation_graders_json(@assignment, @current_user, session),
-      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     }
   end
 

@@ -168,7 +168,7 @@ class ContextController < ApplicationController
         end
       end
       if @context.grants_right? @current_user, session, :read_as_admin
-        js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+        set_student_context_cards_js_env
       end
     elsif @context.is_a?(Group)
       if @context.grants_right?(@current_user, :read_as_admin)

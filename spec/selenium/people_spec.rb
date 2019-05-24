@@ -737,7 +737,6 @@ describe "people" do
     end
 
     context "student tray" do
-
       before :once do
         preload_graphql_schema
         @account = Account.default
@@ -758,6 +757,35 @@ describe "people" do
         get("/courses/#{@course.id}/users")
         f("a[data-student_id='#{@student.id}']").click
         expect(f('.StudentContextTray-Header')).not_to contain_css('i.icon-email')
+      end
+
+      context "student context card tool placement" do
+        before :once do
+          @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @tool.student_context_card = {
+            :url => "http://www.example.com",
+            :text => "See data for this student or whatever",
+            :required_permissions => "view_all_grades,manage_grades"}
+          @tool.save!
+        end
+
+        it "should show a link to the tool" do
+          get("/courses/#{@course.id}/users")
+          f("a[data-student_id='#{@student.id}']").click
+
+          link = ff(".StudentContextTray-QuickLinks__Link a")[1]
+          expect(link).to include_text(@tool.label_for(:student_context_card))
+          expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=student_context_card&student_id=#{@student.id}"
+        end
+
+        it "should not show link if the user doesn't have the permissions specified by the tool" do
+          @course.account.role_overrides.create!(:permission => "manage_grades", :role => admin_role, :enabled => false)
+          get("/courses/#{@course.id}/users")
+          f("a[data-student_id='#{@student.id}']").click
+
+          link = ff(".StudentContextTray-QuickLinks__Link a")[1]
+          expect(link).to be_nil
+        end
       end
     end
   end

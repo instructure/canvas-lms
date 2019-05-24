@@ -324,7 +324,6 @@ class GradebooksController < ApplicationController
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     grading_standard = @context.grading_standard_or_default
     {
-      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
@@ -422,6 +421,7 @@ class GradebooksController < ApplicationController
   end
 
   def set_gradebook_env
+    set_student_context_cards_js_env
     env = old_gradebook_env
 
     if new_gradebook_enabled?

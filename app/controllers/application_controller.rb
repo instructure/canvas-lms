@@ -223,6 +223,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :conditional_release_js_env
 
+  def set_student_context_cards_js_env
+    if @domain_root_account.feature_enabled?(:student_context_cards)
+      js_env(
+        STUDENT_CONTEXT_CARDS_ENABLED: true,
+        student_context_card_tools: external_tools_display_hashes(:student_context_card)
+      )
+    end
+  end
+
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
     return [] if context.is_a?(Group)
 
@@ -230,7 +239,9 @@ class ApplicationController < ActionController::Base
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user}).to_a
 
-    tools.select!{|tool| ContextExternalTool.visible?(tool.extension_setting(type)['visibility'], @current_user, context, session)}
+    tools.select!{|tool|
+      tool.visible_with_permission_check?(type, @current_user, context, session)
+    }
 
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
@@ -238,7 +249,6 @@ class ApplicationController < ActionController::Base
   end
 
   def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
-
     url_params = {
       id: tool.id,
       launch_type: type

@@ -520,6 +520,12 @@ class ExternalToolsController < ApplicationController
 
     lti_launch.params = if selection_type == 'homework_submission' && assignment && !tool.use_1_3?
                           adapter.generate_post_payload_for_homework_submission(assignment)
+                        elsif selection_type == "student_context_card" && params[:student_id]
+                          student = api_find(User, params[:student_id])
+                          can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session) &&
+                            @context.user_has_been_student?(student)
+                          raise Lti::Errors::UnauthorizedError unless can_launch
+                          adapter.generate_post_payload(student_id: student.global_id)
                         else
                           adapter.generate_post_payload
                         end

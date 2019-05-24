@@ -55,6 +55,7 @@ module Lti
                   :post_grades,
                   :quiz_menu,
                   :resource_selection,
+                  :student_context_card,
                   :tool_configuration,
                   :user_navigation,
                   :wiki_page_menu].freeze

@@ -46,6 +46,7 @@ import StudentContextTray from '../context_cards/GraphQLStudentContextTray'
           courseId={courseId}
           studentId={studentId}
           returnFocusTo={returnFocusToHandler}
+          externalTools={ENV.student_context_card_tools}
         />, container
       )
     }
