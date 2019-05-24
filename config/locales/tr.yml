@@ -1386,7 +1386,7 @@ tr:
         one: "İşlenmeyi bekleyen %{count} toplu işlem."
         other: "İşlenmeyi bekleyen %{count} toplu işlem."
       pending_batches_title: "Bekleyen Toplu İşlemler"
-      process_data_button: "İşlem Verisi"
+      process_data_button: "Veriyi İşle"
       select_file_instructions: |-
           İçeri aktarmak istediğiniz zip dosyasını seçin.
           Bu zip dosyalarının oluşturulması ile ilgili açıklama için [lütfen bu
