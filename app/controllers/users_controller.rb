@@ -2487,7 +2487,7 @@ class UsersController < ApplicationController
 
   def clear_cache
     user = api_find(User, params[:id])
-    if user && authorized_action(user, @current_user, :manage_user_details)
+    if user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
       user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
       user.touch
       render json: { status: "ok" }
