@@ -277,6 +277,13 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
+  searchUnsplash(term, page) {
+    let headers = headerFor(this.jwt)
+    let base = this.baseUri('unsplash/search')
+    let uri = `${base}?term=${encodeURIComponent(term)}&page=${page}&per_page=12`
+    return this.apiFetch(uri, headers)
+  }
+
   getFile(id) {
     let headers = headerFor(this.jwt)
     let base = this.baseUri('file')

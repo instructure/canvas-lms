@@ -20,12 +20,24 @@ import clickCallback from '../clickCallback'
 import {getByLabelText} from 'react-testing-library'
 
 describe('Instructure Image Plugin: clickCallback', () => {
+  let trayProps;
+  beforeEach(() => {
+      trayProps = {
+        source: {
+          initializeCollection () {},
+          initializeUpload () {},
+          initializeFlickr () {},
+          initializeImages() {},
+          initializeDocuments() {}
+        }
+      }
+  })
   afterEach(() => {
     document.querySelector('.canvas-rce-upload-container').remove()
   })
 
   it('adds the canvas-rce-upload-container element when opened', async () => {
-    await clickCallback({}, document)
+    await clickCallback({}, document, trayProps)
     expect(document.querySelector('.canvas-rce-upload-container')).toBeTruthy()
   })
 
@@ -33,12 +45,12 @@ describe('Instructure Image Plugin: clickCallback', () => {
     const container = document.createElement('div')
     container.className = 'canvas-rce-upload-container'
     document.body.appendChild(container)
-    await clickCallback({}, document)
+    await clickCallback({}, document, trayProps)
     expect(document.querySelectorAll('.canvas-rce-upload-container').length).toEqual(1)
   })
 
   it('opens the UploadImage modal when called', async () => {
-    await clickCallback({}, document)
+    await clickCallback({}, document, trayProps)
     expect(
       getByLabelText(document, 'Upload Image', {
         selector: 'form'

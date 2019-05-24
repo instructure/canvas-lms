@@ -28,10 +28,12 @@ import {isImage} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
 import {StoreProvider} from '../../shared/StoreContext'
+import RceApiSource from "../../../../sidebar/sources/api";
 import Bridge from '../../../../bridge'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const UrlPanel = React.lazy(() => import('./UrlPanel'))
+const UnsplashPanel = React.lazy(() => import('./UnsplashPanel'))
 
 /**
  * Handles uploading data based on what type of data is submitted.
@@ -71,13 +73,20 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
   afterInsert()
 }
 
-export function UploadFile({accept, editor, label, panels, onDismiss, onSubmit = handleSubmit}) {
+export function UploadFile({accept, editor, label, panels, onDismiss, trayProps, onSubmit = handleSubmit}) {
   const [theFile, setFile] = useState(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
   const [fileUrl, setFileUrl] = useState('')
   const [selectedPanel, setSelectedPanel] = useState(panels[0])
+  const [unsplashUrl, setUnsplashUrl] = useState('');
 
-  const trayProps = Bridge.trayProps.get(editor)
+  trayProps = trayProps || Bridge.trayProps.get(editor)
+
+  const source = trayProps.source || new RceApiSource({
+    jwt: trayProps.jwt,
+    refreshToken: trayProps.refreshToken,
+    host: trayProps.host
+  });
 
   function renderTabs() {
     return panels.map(panel => {
@@ -99,7 +108,18 @@ export function UploadFile({accept, editor, label, panels, onDismiss, onSubmit =
             </Tabs.Panel>
           )
         case 'UNSPLASH':
-          break;
+          return (
+            <Tabs.Panel key={panel} title='Unsplash'>
+              <Suspense fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}>
+                  <UnsplashPanel
+                    editor={editor}
+                    unsplashUrl={unsplashUrl}
+                    setUnsplashUrl={setUnsplashUrl}
+                    source={source}
+                  />
+                </Suspense>
+              </Tabs.Panel>
+          )
         case 'URL':
           return (
             <Tabs.Panel key={panel} title={formatMessage('URL')}>
@@ -157,6 +177,7 @@ UploadFile.propTypes = {
   accept: oneOfType([arrayOf(string), string]),
   editor: object.isRequired,
   label: string.isRequired,
-  panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL']))
+  panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
+  trayProps: object
 }
 

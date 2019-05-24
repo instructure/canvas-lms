@@ -21,10 +21,28 @@ import {render, fireEvent} from 'react-testing-library'
 import {UploadFile, handleSubmit} from '../UploadFile'
 
 describe('UploadFile', () => {
+  let trayProps;
+  let fakeEditor;
+  beforeEach(() => {
+    trayProps = {
+      source: {
+        initializeCollection () {},
+        initializeUpload () {},
+        initializeFlickr () {},
+        initializeImages() {},
+        initializeDocuments() {}
+      }
+    }
+    fakeEditor = {}
+  })
+  afterEach(() => {
+    trayProps = null
+    fakeEditor = null
+  })
   it('calls onDismiss prop when closing', () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(
-      <UploadFile onDismiss={handleDismiss} panels={['COMPUTER', 'URL']} />
+      <UploadFile label="Test" editor={fakeEditor} trayProps={trayProps} onDismiss={handleDismiss} panels={['COMPUTER', 'URL']} />
     )
 
     const closeBtn = getByText('Close')
@@ -36,7 +54,7 @@ describe('UploadFile', () => {
     const handleSubmit = jest.fn()
     const handleDismiss = () => {}
     const {getByText} = render(
-      <UploadFile onDismiss={handleDismiss} onSubmit={handleSubmit} panels={['COMPUTER', 'URL']} />
+      <UploadFile label="Test" editor={fakeEditor}  trayProps={trayProps} onDismiss={handleDismiss} onSubmit={handleSubmit} panels={['COMPUTER', 'URL']} />
     )
     const submitBtn = getByText('Submit').closest('button')
     fireEvent.click(submitBtn)
@@ -47,6 +65,9 @@ describe('UploadFile', () => {
     it('adds computer and url panels', () => {
       const {getByLabelText} = render(
         <UploadFile
+        label="Test"
+        editor={fakeEditor}
+        trayProps={trayProps}
           onDismiss={() => {}}
           panels={['COMPUTER', 'URL']}
         />
@@ -59,6 +80,9 @@ describe('UploadFile', () => {
     it('adds only the computer panel', () => {
       const {getByLabelText, queryByLabelText} = render(
         <UploadFile
+        label="Test"
+        editor={fakeEditor}
+        trayProps={trayProps}
           onDismiss={() => {}}
           panels={['COMPUTER']}
         />

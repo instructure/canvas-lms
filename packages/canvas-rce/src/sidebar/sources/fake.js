@@ -330,6 +330,237 @@ const DOCUMENTS = {
   }
 }
 
+const UNSPLASH_RESULTS = {
+  kittens1: {
+    total_results: 2,
+    total_pages: 1,
+    results: [
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'Y_pLBbSAhHI',
+        alt_text: 'four brown tabby kittens',
+        user: {
+          name: "Q'AILA",
+          avatar:
+            'https://images.unsplash.com/profile-fb-1478804329-75cc0bd7b087.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'gAPXLS1LRVE',
+        alt_text: 'two short-fur orange cats lying on gray surface',
+        user: {
+          name: 'Olya Kuzovkina',
+          avatar:
+            'https://images.unsplash.com/profile-1484733460542-9653d0439bd9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      }
+    ]
+  },
+  kittens2: {
+    total_results: '3',
+    total_pages: 2,
+    results: [
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'bhO_wSXegfI',
+        alt_text: 'grey cat',
+        user: {
+          name: 'Sandy Millar',
+          avatar:
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: '2qzT9qKvI9U',
+        alt_text: 'brown tabby cat',
+        user: {
+          name: 'Sandy Millar',
+          avatar:
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      }
+    ]
+  },
+  kittens3: {
+    total_results: 2009,
+    total_pages: 201,
+    results: [
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'Y_pLBbSAhHI',
+        alt_text: 'four brown tabby kittens',
+        user: {
+          name: "Q'AILA",
+          avatar:
+            'https://images.unsplash.com/profile-fb-1478804329-75cc0bd7b087.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'gAPXLS1LRVE',
+        alt_text: 'two short-fur orange cats lying on gray surface',
+        user: {
+          name: 'Olya Kuzovkina',
+          avatar:
+            'https://images.unsplash.com/profile-1484733460542-9653d0439bd9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'bhO_wSXegfI',
+        alt_text: 'grey cat',
+        user: {
+          name: 'Sandy Millar',
+          avatar:
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: '2qzT9qKvI9U',
+        alt_text: 'brown tabby cat',
+        user: {
+          name: 'Sandy Millar',
+          avatar:
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1554146445-58ae3448247d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1554146445-58ae3448247d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'zgQXEtEnaxA',
+        alt_text: 'long-fur brown cat sitting on white desk',
+        user: {
+          name: 'Rikki Austin',
+          avatar:
+            'https://images.unsplash.com/profile-1542043341496-520a51bf0ccb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1547239246-d2f052bdccf8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1547239246-d2f052bdccf8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'S10uzabOxr4',
+        alt_text: 'selective focus photography of gray cat beside window',
+        user: {
+          name: 'Rikki Austin',
+          avatar:
+            'https://images.unsplash.com/profile-1542043341496-520a51bf0ccb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1520811607976-6d7812b0ecac?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1520811607976-6d7812b0ecac?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: '2Cl0lX_4bag',
+        alt_text: 'two gray and black cats eating food on white plastic pet bowl',
+        user: {
+          name: 'Bonnie Kittle',
+          avatar:
+            'https://images.unsplash.com/profile-1520272805752-525f71e721ca?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1532386236358-a33d8a9434e3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1532386236358-a33d8a9434e3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: '1l2waV8glIQ',
+        alt_text: 'selective focus photography brown cat lying over black cat',
+        user: {
+          name: 'Raul Varzar',
+          avatar:
+            'https://images.unsplash.com/profile-1538941834664-a6d8eb80866b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1554181192-3ebfd857cc40?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1554181192-3ebfd857cc40?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: '4mA9_5vbZ_s',
+        alt_text: 'three cats beside road',
+        user: {
+          name: 'Yuliya Kosolapova',
+          avatar:
+            'https://images.unsplash.com/profile-1542573282965-bd0ef4147e78?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      },
+      {
+        urls: {
+          link:
+            'https://images.unsplash.com/photo-1557369560-a25f3fad22cf?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
+          thumbnail:
+            'https://images.unsplash.com/photo-1557369560-a25f3fad22cf?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+        },
+        id: 'TszVNhi39a8',
+        alt_text: null,
+        user: {
+          name: 'Karly Gomez',
+          avatar:
+            'https://images.unsplash.com/profile-1556908132245-1b888ce7e85d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
+        }
+      }
+    ]
+  }
+}
+
 export function getSession() {
   return Promise.resolve({
     contextType: "course",
@@ -471,6 +702,18 @@ export function searchFlickr(term) {
       }
     }, 1000);
   });
+}
+
+export function searchUnsplash(term) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(() => {
+      if (UNSPLASH_RESULTS[term]) {
+        resolve(UNSPLASH_RESULTS[term])
+      } else {
+        reject('No search results!')
+      }
+    }, 1000)
+  })
 }
 
 export function setUsageRights(id, usageRights) {
