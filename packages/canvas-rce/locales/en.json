@@ -1,6 +1,6 @@
 {
-  "accessibility_a662153d": {
-    "message": "Accessibility"
+  "accessibility_checker_b3af1f6c": {
+    "message": "Accessibility Checker"
   },
   "add_8523c19b": {
     "message": "Add"
@@ -22,6 +22,9 @@
   },
   "alphabetical_55b5b4e0": {
     "message": "Alphabetical"
+  },
+  "alt_text_611fb322": {
+    "message": "Alt Text"
   },
   "alternative_text_a834dcad": {
     "message": "Alternative text:"
@@ -149,6 +152,9 @@
   "current_volume_level_c55ab825": {
     "message": "Current Volume Level"
   },
+  "custom_6979cd81": {
+    "message": "Custom"
+  },
   "date_added_ed5ad465": {
     "message": "Date Added"
   },
@@ -167,6 +173,9 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "default numerical ordered list"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Describe the image)"
+  },
   "discussions_a5f96392": {
     "message": "Discussions",
     "description": "Title of Sidebar accordion tab containing links to discussions."
@@ -174,8 +183,17 @@
   "discussions_index_6c36ced": {
     "message": "Discussions Index"
   },
+  "display_options_315aba85": {
+    "message": "Display Options"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Display Text Link (Opens in a new tab)"
+  },
   "documents_81393201": {
     "message": "Documents"
+  },
+  "done_54e3d4b6": {
+    "message": "Done"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Drag and drop, or click to browse your computer"
@@ -185,6 +203,12 @@
   },
   "due_when_7eed10c6": {
     "message": "Due: { when }"
+  },
+  "edit_link_7f53bebb": {
+    "message": "Edit Link"
+  },
+  "embed_image_1080badc": {
+    "message": "Embed Image"
   },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
@@ -239,6 +263,9 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
   },
+  "image_options_5412d02c": {
+    "message": "Image Options"
+  },
   "image_options_tray_90a46006": {
     "message": "Image Options Tray"
   },
@@ -268,6 +295,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "Invalid file type"
+  },
+  "large_9c5e80e7": {
+    "message": "Large"
   },
   "link_7262adec": {
     "message": "Link",
@@ -307,12 +337,18 @@
   "media_af190855": {
     "message": "Media"
   },
+  "medium_5a8e9ead": {
+    "message": "Medium"
+  },
   "mic_a7f3d311": {
     "message": "Mic"
   },
   "modules_c4325335": {
     "message": "Modules",
     "description": "Title of Sidebar accordion tab containing links to course modules."
+  },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "No Alt Text (Decorative Image)"
   },
   "no_results_940393cf": {
     "message": "No results."
@@ -374,8 +410,11 @@
   "recording_98da6bda": {
     "message": "Recording"
   },
-  "remove_link_71c05bee": {
-    "message": "Remove link"
+  "remove_link_d1f2f4d0": {
+    "message": "Remove Link"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Rich Content Editor"
   },
   "save_11a80ec3": {
     "message": "Save"
@@ -394,6 +433,12 @@
   },
   "show_image_options_1e2ecc6b": {
     "message": "Show image options"
+  },
+  "size_b30e1077": {
+    "message": "Size"
+  },
+  "small_b070434a": {
+    "message": "Small"
   },
   "small_header_168fb9f9": {
     "message": "Small header"
@@ -428,11 +473,11 @@
   "superscript_8cb349a2": {
     "message": "Superscript"
   },
-  "switch_to_raw_html_view_1f016020": {
-    "message": "Switch to raw html view"
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Switch to raw html editor"
   },
-  "switch_to_rich_text_view_5286f610": {
-    "message": "Switch to rich text view"
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Switch to rich text editor"
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
@@ -499,6 +544,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Usage Right:"
+  },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Used by screen readers to describe the content of an image"
   },
   "video_player_b371005": {
     "message": "Video Player"
