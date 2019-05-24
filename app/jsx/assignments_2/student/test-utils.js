@@ -91,6 +91,7 @@ export function mockMultipleAttachments() {
       _id: '1',
       displayName: 'awesome-test-image1.png',
       mimeClass: 'data',
+      thumbnailUrl: 'https://some/awesome/thumbnail1.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     },
@@ -98,6 +99,7 @@ export function mockMultipleAttachments() {
       _id: '2',
       displayName: 'awesome-test-image2.png',
       mimeClass: 'data',
+      thumbnailUrl: 'https://some/awesome/thumbnail2.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     },
@@ -105,6 +107,7 @@ export function mockMultipleAttachments() {
       _id: '3',
       displayName: 'awesome-test-image3.png',
       mimeClass: 'data',
+      thumbnailUrl: 'https://some/awesome/thumbnail3.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     }
@@ -147,6 +150,7 @@ export function singleAttachment(overrides = {}) {
     _id: '20',
     displayName: 'lookatme.pdf',
     mimeClass: 'pdf',
+    thumbnailUrl: 'https://some/awesome/thumbnail.jpg',
     url: 'https://some-awesome/url/goes/here',
     ...overrides
   }
@@ -310,9 +314,9 @@ export function mockSubmission(overrides = {}) {
     gradingStatus: 'needs_grading',
     latePolicyStatus: null,
     state: 'submitted',
+    submissionDraft: null,
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
-    submissionDraft: null,
     __typename: 'Submission',
     ...overrides
   }

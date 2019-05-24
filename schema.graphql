@@ -1035,6 +1035,7 @@ type File implements ModuleItemInterface & Node & Timestamped {
   id: ID!
   mimeClass: String
   modules: [Module!]
+  thumbnailUrl: URL
   updatedAt: DateTime
   url: URL
 }

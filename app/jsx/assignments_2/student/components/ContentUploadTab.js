@@ -17,7 +17,12 @@
  */
 
 import AssignmentAlert from './AssignmentAlert'
-import {AssignmentShape, CREATE_SUBMISSION, STUDENT_VIEW_QUERY} from '../assignmentData'
+import {
+  AssignmentShape,
+  CREATE_SUBMISSION,
+  STUDENT_VIEW_QUERY,
+  SubmissionShape
+} from '../assignmentData'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
@@ -39,11 +44,25 @@ import theme from '@instructure/ui-themes/lib/canvas/base'
 
 export default class ContentUploadTab extends Component {
   static propTypes = {
-    assignment: AssignmentShape
+    assignment: AssignmentShape,
+    submission: SubmissionShape
+  }
+
+  loadDraftFiles = () => {
+    if (this.props.submission.submissionDraft) {
+      return this.props.submission.submissionDraft.attachments.map(attachment => ({
+        id: attachment._id,
+        mimeClass: attachment.mimeClass,
+        name: attachment.displayName,
+        preview: attachment.thumbnailUrl
+      }))
+    } else {
+      return []
+    }
   }
 
   state = {
-    files: [],
+    files: this.loadDraftFiles(),
     messages: [],
     submissionFailed: false,
     uploadingFiles: false
@@ -84,7 +103,7 @@ export default class ContentUploadTab extends Component {
   handleRemoveFile = e => {
     e.preventDefault()
     const fileId = parseInt(e.currentTarget.id, 10)
-    const fileIndex = this.state.files.findIndex(file => file.id === fileId)
+    const fileIndex = this.state.files.findIndex(file => parseInt(file.id, 10) === fileId)
 
     this.setState(
       prevState => ({
@@ -99,6 +118,10 @@ export default class ContentUploadTab extends Component {
         document.getElementById(focusElement).focus()
       }
     )
+  }
+
+  shouldDisplayThumbnail = file => {
+    return (file.mimeClass || mimeClass(file.type)) === 'image' && file.preview
   }
 
   ellideString = title => {
@@ -151,7 +174,7 @@ export default class ContentUploadTab extends Component {
                     heading={I18n.t('Uploaded')}
                     headingLevel="h3"
                     hero={
-                      mimeClass(file.type) === 'image' ? (
+                      this.shouldDisplayThumbnail(file) ? (
                         <img
                           alt={I18n.t('%{filename} preview', {filename: file.name})}
                           height="75"

@@ -52,6 +52,16 @@ export function GetAssignmentEnvVariables() {
   return {...defaults}
 }
 
+function attachmentFields() {
+  return `
+    _id
+    displayName
+    mimeClass
+    thumbnailUrl
+    url
+  `
+}
+
 function submissionFields() {
   return `
     _id
@@ -62,11 +72,14 @@ function submissionFields() {
     gradingStatus
     latePolicyStatus
     state
-    submissionStatus
-    submittedAt
     submissionDraft {
       _id
+      attachments {
+        ${attachmentFields()}
+      }
     }
+    submissionStatus
+    submittedAt
   `
 }
 
@@ -91,10 +104,7 @@ function submissionCommentQueryParams() {
       shortName
     }
     attachments {
-      _id
-      displayName
-      mimeClass
-      url
+      ${attachmentFields()}
     }`
 }
 
@@ -178,7 +188,13 @@ export const AttachmentShape = shape({
   _id: string,
   displayName: string,
   mimeClass: string,
+  thumbnailUrl: string,
   url: string
+})
+
+export const SubmissionDraftShape = shape({
+  _id: string,
+  attachments: arrayOf(AttachmentShape)
 })
 
 export const MediaObjectShape = shape({
@@ -253,9 +269,7 @@ export const SubmissionShape = shape({
   gradingStatus: string,
   latePolicyStatus: string,
   state: string,
+  submissionDraft: SubmissionDraftShape,
   submissionStatus: string,
-  submittedAt: string,
-  submissionDraft: shape({
-    _id: string
-  })
+  submittedAt: string
 })
