@@ -28,6 +28,8 @@ import I18n from 'i18n!course_images'
 import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
 
+let overflow = ''
+
 export default class CourseImageSelector extends React.Component {
   state = this.props.store.getState()
 
@@ -37,7 +39,15 @@ export default class CourseImageSelector extends React.Component {
     this.setState({gettingImage: true})
   }
 
-  handleModalClose = () => this.props.store.dispatch(Actions.setModalVisibility(false))
+  handleModalOpen = () => {
+    overflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+  }
+
+  handleModalClose = () => {
+    document.body.style.overflow = overflow
+    this.props.store.dispatch(Actions.setModalVisibility(false))
+  }
 
   changeImage = () => this.props.store.dispatch(Actions.setModalVisibility(true))
 
@@ -80,6 +90,7 @@ export default class CourseImageSelector extends React.Component {
           size="fullscreen"
           label={I18n.t('Choose Image')}
           onDismiss={this.handleModalClose}
+          onEnter={this.handleModalOpen}
         >
           <ModalBody>
             <CourseImagePicker
