@@ -185,7 +185,7 @@ describe "permissions index" do
     end
 
     it "filter based on role" do
-      role_name = "Student"
+      role_name = "TA"
       PermissionsIndex.select_filter(role_name)
       expect(PermissionsIndex.role_link(role_name)).to be_displayed
       expect(f('#content')).not_to contain_css(PermissionsIndex.role_link_css("Teacher"))
