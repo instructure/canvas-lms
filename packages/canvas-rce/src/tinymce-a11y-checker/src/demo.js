@@ -12,7 +12,7 @@ canvasTheme.use()
 
 function renderEditor(editorEl, textareaId) {
   renderIntoDiv(editorEl, {
-    defaultContent: document.getElementById("textarea1").value,
+    defaultContent: document.getElementById(textareaId).value,
     editorOptions: () => {
       return {
         height: "600px",
@@ -28,3 +28,4 @@ function renderEditor(editorEl, textareaId) {
 }
 
 renderEditor(document.getElementById("editor1"), "textarea1")
+renderEditor(document.getElementById("editor2"), "textarea2")
