@@ -38,7 +38,10 @@ import 'jqueryui/datepicker'
     // output.toString('yyyy-MM-dd hh:mm:ss') == tz.format(input, '%Y-%m-%d %H:%M:%S')
     var year = tz.format(date, '%Y');
     while (year.length < 4) year = "0" + year;
-    return Date.parse(tz.format(date, year + '-%m-%d %T'));
+
+    const formatted = tz.format(date, year + '-%m-%d %T')
+    const fudgedDate = new Date(formatted)
+    return fudgedDate
   }
 
   $.unfudgeDateForProfileTimezone = function(date) {
