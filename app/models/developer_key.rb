@@ -320,7 +320,7 @@ class DeveloperKey < ActiveRecord::Base
   def tool_management_enqueue_args
     {
       n_strand: ['developer_key_tool_management', account&.global_id || 'site_admin'],
-      priority: Delayed::HIGH_PRIORITY
+      priority: Delayed::LOW_PRIORITY
     }
   end
 
