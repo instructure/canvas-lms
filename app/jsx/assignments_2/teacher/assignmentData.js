@@ -266,6 +266,13 @@ export const STUDENT_SEARCH_QUERY = gql`
           user {
             ...UserFields
           }
+          submissionHistories: submissionHistoriesConnection {
+            nodes {
+              attempt
+              score
+              submittedAt
+            }
+          }
         }
       }
     }
@@ -352,7 +359,7 @@ export const OverrideShape = shape({
   dueAt: string,
   lockAt: string,
   unlockAt: string,
-  submissionTypes: arrayOf(string), // currently copied from the asisgnment
+  submissionTypes: arrayOf(string), // currently copied from the assignment
   allowedAttempts: number, // currently copied from the assignment
   allowedExtensions: arrayOf(string), // currently copied from the assignment
   set: shape({
@@ -372,6 +379,12 @@ export const UserShape = shape({
   email: string
 })
 
+export const SubmissionHistoryShape = shape({
+  attempt: number,
+  score: number,
+  submittedAt: string
+})
+
 export const SubmissionShape = shape({
   gid: string,
   lid: string,
@@ -383,7 +396,10 @@ export const SubmissionShape = shape({
   excused: bool,
   latePolicyStatus: oneOf([null, 'missing']),
   submittedAt: string, // datetime
-  user: UserShape
+  user: UserShape,
+  submissionHistoriesConnection: shape({
+    nodes: arrayOf(SubmissionHistoryShape)
+  })
 })
 
 export const TeacherAssignmentShape = shape({

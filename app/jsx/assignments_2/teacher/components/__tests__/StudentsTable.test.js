@@ -28,26 +28,75 @@ import tz from 'timezone'
 jest.mock('compiled/str/apiUserContent')
 apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
 
+function displayedTime(datetimeStr) {
+  return `${tz.format(datetimeStr, I18n.t('#date.formats.full'))}`
+}
+
 it('renders basic information', () => {
   const user = mockUser()
   const submission = mockSubmission({nodes: [user]})
   const assignment = mockAssignment()
-  const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
 
   const {getByText} = render(<StudentsTable assignment={assignment} submissions={[submission]} />)
   expect(getByText('Name')).toBeInTheDocument()
   expect(getByText(user.shortName)).toBeInTheDocument()
   expect(getByText('Attempts')).toBeInTheDocument()
-  expect(getByText('View Submission')).toBeInTheDocument()
+  expect(getByText('Attempt 1')).toBeInTheDocument()
   expect(getByText('Score')).toBeInTheDocument()
   expect(getByText('4/5')).toBeInTheDocument()
   expect(getByText('Submission Date')).toBeInTheDocument()
-  expect(getByText(submittedAt)).toBeInTheDocument()
+  expect(getByText(displayedTime(submission.submittedAt))).toBeInTheDocument()
   expect(getByText('Status')).toBeInTheDocument()
   expect(getByText('More')).toBeInTheDocument()
 
-  const viewSubmissionLink = closest(getByText('View Submission'), 'a')
+  const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink).toBeTruthy()
+  expect(viewSubmissionLink.getAttribute('href')).toMatch(
+    /\/courses\/course-lid\/assignments\/assignment-lid\/submissions\/user_1/
+  )
+})
+
+it('displays no attempts, scores, or submission dates with zero attempts', () => {
+  const user = mockUser()
+  const submission = mockSubmission({nodes: [user], submissionHistories: {nodes: []}})
+  const assignment = mockAssignment()
+
+  const {getByText, queryByText} = render(
+    <StudentsTable assignment={assignment} submissions={[submission]} />
+  )
+  expect(getByText('Name')).toBeInTheDocument()
+  expect(getByText(user.shortName)).toBeInTheDocument()
+  expect(getByText('Attempts')).toBeInTheDocument()
+  expect(queryByText(/Attempt 1/i)).toBeNull()
+  expect(getByText('Score')).toBeInTheDocument()
+  expect(queryByText('-/5')).toBeNull()
+  expect(getByText('Submission Date')).toBeInTheDocument()
+  expect(getByText('Status')).toBeInTheDocument()
+  expect(getByText('More')).toBeInTheDocument()
+})
+
+it('displays multiple attempts', () => {
+  const user = mockUser()
+  const attempts = [
+    {attempt: 1, score: 2, submittedAt: '2019-01-13T08:21:42Z'},
+    {attempt: 2, score: 3, submittedAt: '2019-01-14T09:21:42Z'},
+    {attempt: 3, score: 4, submittedAt: '2019-01-15T12:21:42Z'}
+  ]
+  const submission = mockSubmission({nodes: [user], submissionHistories: {nodes: attempts}})
+  const assignment = mockAssignment()
+
+  const {getByText} = render(<StudentsTable assignment={assignment} submissions={[submission]} />)
+  expect(getByText('Attempt 1')).toBeInTheDocument()
+  expect(getByText('Attempt 2')).toBeInTheDocument()
+  expect(getByText('Attempt 3')).toBeInTheDocument()
+  expect(getByText('2/5')).toBeInTheDocument()
+  expect(getByText('3/5')).toBeInTheDocument()
+  expect(getByText('4/5')).toBeInTheDocument()
+  expect(getByText(displayedTime(attempts[0].submittedAt))).toBeInTheDocument()
+  expect(getByText(displayedTime(attempts[1].submittedAt))).toBeInTheDocument()
+  expect(getByText(displayedTime(attempts[2].submittedAt))).toBeInTheDocument()
+
+  const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink.getAttribute('href')).toMatch(
     /\/courses\/course-lid\/assignments\/assignment-lid\/submissions\/user_1/
   )

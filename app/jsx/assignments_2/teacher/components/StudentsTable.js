@@ -92,37 +92,55 @@ export default class StudentsTable extends React.Component {
     )
   }
 
-  renderAttemptsColumn(student) {
-    if (!student.submission.submittedAt) {
-      return null
-    }
-    const assignmentLid = this.props.assignment.lid
-    const courseLid = this.props.assignment.course.lid
-    const viewLink = `/courses/${courseLid}/assignments/${assignmentLid}/submissions/${student.lid}`
+  // This becomes unnecessary after near-future GraphQL changes
+  submissionAttempts(submission) {
     return (
-      <Link href={viewLink} target="_blank">
-        {I18n.t('View Submission')}
-      </Link>
+      submission.submissionHistories &&
+      submission.submissionHistories.nodes.filter(function(item) {
+        return item.attempt !== 0
+      })
     )
   }
 
+  renderAttemptsColumn(student) {
+    const assignmentLid = this.props.assignment.lid
+    const courseLid = this.props.assignment.course.lid
+    return this.submissionAttempts(student.submission).map(attempt => {
+      const viewLink = `/courses/${courseLid}/assignments/${assignmentLid}/submissions/${
+        student.lid
+      }/?submittedAt=${attempt.submittedAt}`
+      return (
+        <View as="div" margin="0 0 x-small" key={attempt.attempt}>
+          <Link href={viewLink} target="_blank">
+            {I18n.t('Attempt %{number}', {number: attempt.attempt})}
+          </Link>
+        </View>
+      )
+    })
+  }
+
   renderScoreColumn(student) {
-    const validScore = student.submission.score || student.submission.score === 0
-    return I18n.t('{{student_points}}/{{possible_points}}', {
-      student_points: validScore ? student.submission.score : '\u2013',
-      possible_points: this.props.assignment.pointsPossible
+    return this.submissionAttempts(student.submission).map(attempt => {
+      const validScore = attempt.score || attempt.score === 0
+      return (
+        <View as="div" margin="0 0 x-small" key={attempt.attempt}>
+          {I18n.t('{{student_points}}/{{possible_points}}', {
+            student_points: validScore ? attempt.score : '\u2013',
+            possible_points: this.props.assignment.pointsPossible
+          })}
+        </View>
+      )
     })
   }
 
   renderSubmittedAtColumn(student) {
-    return (
-      student.submission.submittedAt && (
-        <FriendlyDatetime
-          dateTime={student.submission.submittedAt}
-          format={I18n.t('#date.formats.full')}
-        />
+    return this.submissionAttempts(student.submission).map(attempt => {
+      return (
+        <View as="div" margin="0 0 x-small" key={attempt.attempt}>
+          <FriendlyDatetime dateTime={attempt.submittedAt} format={I18n.t('#date.formats.full')} />
+        </View>
       )
-    )
+    })
   }
 
   renderSubmissionStatusColumn(student) {
