@@ -823,6 +823,11 @@ describe Api do
       expect(Api::Html::Content).to receive(:process_incoming).with(anything, host: 'some-host.com', port: 80)
       T.process_incoming_html_content('<div/>')
     end
+
+    it "doesn't explode with invalid mailtos" do
+      html = %{<a href="mailto:spamme%20example.com">beep</a>http://some-host.com/linktotricktheparserintoparsinglinks}
+      expect(T.process_incoming_html_content(html)).to eq html
+    end
   end
 
   context ".paginate" do
