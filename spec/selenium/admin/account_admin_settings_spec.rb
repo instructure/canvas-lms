@@ -59,6 +59,13 @@ describe "root account basic settings" do
     expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end
 
+  it "handles linking directly to reports tab" do
+    course_with_admin_logged_in
+    get account_settings_url + "#tab-reports"
+    f('#configure_zero_activity_csv').click()
+    expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
+  end
+
   it "should change the default user quota", priority: "1", test_id: 250002 do
     course_with_admin_logged_in
     group_model(context: @course)
