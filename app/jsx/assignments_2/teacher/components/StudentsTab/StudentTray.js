@@ -22,13 +22,13 @@ import I18n from 'i18n!assignments_2'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {bool, func} from 'prop-types'
-import {TeacherAssignmentShape, UserShape} from '../assignmentData'
+import {TeacherAssignmentShape, UserShape} from '../../assignmentData'
 import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Avatar, Heading, Link, Text} from '@instructure/ui-elements'
 import {Tray} from '@instructure/ui-overlays'
 import {DateTimeInput} from '@instructure/ui-forms'
-import OverrideAttempts from './Overrides/OverrideAttempts'
+import OverrideAttempts from '../Overrides/OverrideAttempts'
 import {
   IconArrowOpenEndLine,
   IconArrowOpenStartLine,

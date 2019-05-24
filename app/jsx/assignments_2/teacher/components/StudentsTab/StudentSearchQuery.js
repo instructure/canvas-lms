@@ -24,7 +24,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 
 import I18n from 'i18n!assignments_2'
 
-import {STUDENT_SEARCH_QUERY, StudentSearchQueryShape} from '../assignmentData'
+import {STUDENT_SEARCH_QUERY, StudentSearchQueryShape} from '../../assignmentData'
 
 StudentSearchQuery.propTypes = {
   children: func,

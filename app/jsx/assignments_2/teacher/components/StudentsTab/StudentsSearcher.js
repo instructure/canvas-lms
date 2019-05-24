@@ -32,7 +32,7 @@ import {
 } from '@instructure/ui-icons'
 import {Badge} from '@instructure/ui-elements'
 
-import {TeacherAssignmentShape} from '../assignmentData'
+import {TeacherAssignmentShape} from '../../assignmentData'
 import StudentSearchQuery from './StudentSearchQuery'
 import StudentsTable from './StudentsTable'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'

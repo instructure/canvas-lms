@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
-import {closest, mockAssignment, mockUser, mockSubmission} from '../../test-utils'
+import {closest, mockAssignment, mockUser, mockSubmission} from '../../../test-utils'
 import StudentTray from '../StudentTray'
 
 describe('student tray data', () => {

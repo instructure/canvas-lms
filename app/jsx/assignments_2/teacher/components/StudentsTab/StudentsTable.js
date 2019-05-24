@@ -22,15 +22,15 @@ import I18n from 'i18n!assignments_2'
 
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-import {TeacherAssignmentShape, SubmissionShape} from '../assignmentData'
+import {TeacherAssignmentShape, SubmissionShape} from '../../assignmentData'
 
 import View from '@instructure/ui-layout/lib/components/View'
 import {Table} from '@instructure/ui-table'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
-import FriendlyDatetime from '../../../shared/FriendlyDatetime'
+import SubmissionStatusPill from '../../../shared/SubmissionStatusPill'
+import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import StudentTray from './StudentTray'
 
