@@ -14833,7 +14833,7 @@ nn:
           group_name: Gruppenamn
           number_of_questions: "Tal på spørsmål"
           points_per_question: "Poeng per spørsmål"
-          question_bank: "Spørsmål vil bli fjerna frå banken"
+          question_bank: "Spørsmål vil bli henta frå banken"
         links: 
           link_to_a_question_bank: "Lenke til ein spørsmålsbank"
         show_questions_and_points: "Vel *%{num_questions}* spørmål, #%{num_points}# poeng per spørsmål"
@@ -17715,7 +17715,7 @@ nn:
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Denne pakka inkluderer spørsmålstype, Pattern Match, som ikkje er kompatibel med Canvas, og er difor ikkje inkludert i importen."
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Sida kan ikkje endrast fordi karakterane allereie er posta."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "Panelet listar brukarar som kan leggast til emnet."
-  this_permission_only_affects_course_announcements__6bc2b0a5: "Denne løyva påverkar berre kunngjeringar på emnenivå; for å administrere globale kunngjeringar må 'Globale kunngjeringar - legg til / endre / slette' vere slått på. "
+  this_permission_only_affects_course_announcements__6bc2b0a5: "Dette løyvet påverkar berre kunngjeringar på emnenivå; for å administrere globale kunngjeringar må 'Globale kunngjeringar - legg til / endre / slette' vere slått på. "
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Spørsmålsgruppa er stilt inn på fleire spørsmålsval enn det som er tilgjengeleg."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Spørsmålet viser ei avmerkingsboks ved sidan av kvart svar."
   this_quiz_has_been_excused_d89d2b74: "Fritak for denne quizen"
@@ -19121,7 +19121,7 @@ nn:
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nådd maksimal grense for webkrokar per brukar (%{max})"
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Du har usynkroniserte endringar som vert synkronisert til alle tilknytta emne når ein ny forbindelse er lagra. "
   you_just_sent_a_message_in_canvas_86b4945c: "Du sendte nettopp ei melding i Canvas"
-  you_left_the_required_name_field_empty_8f9bce5c: "Du lot obligatorisk namnnefelt stå tomt"
+  you_left_the_required_name_field_empty_8f9bce5c: "Du lét det obligatoriske namnnefeltet stå tomt"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du treng sikkert nokre av desse. Kva er moroa med å undervise på eit emne dersom ingen lyttar?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du må oppdatere token, følge trinna i denne lenka og kanskje du treng kanskje hjelp frå ein teknisk ekspert"
   you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: "Du må godta invitasjonen til påmelding før du kan delta på emnet fullt ut."
