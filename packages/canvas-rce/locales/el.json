@@ -95,8 +95,14 @@
   "discussions_index_6c36ced": {
     "message": "Ευρετήριο Συζητήσεων"
   },
+  "done_54e3d4b6": {
+    "message": "Ολοκληρώθηκε"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
+  },
+  "embed_image_1080badc": {
+    "message": "Ενσωμάτωση εικόνας"
   },
   "enter_search_terms_e397b1f0": {
     "message": "εισαγωγή όρων αναζήτησης"
@@ -212,6 +218,9 @@
   "recording_98da6bda": {
     "message": "Εγγράφεται"
   },
+  "rich_content_editor_2708ef21": {
+    "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
+  },
   "save_11a80ec3": {
     "message": "Αποθήκευση"
   },
@@ -223,6 +232,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Επιλέξτε το φάκελο στον οποίο θέλετε να φορτώσετε το αρχείο "
+  },
+  "size_b30e1077": {
+    "message": "Μέγεθος"
   },
   "start_over_f7552aa9": {
     "message": "Ξεκινήστε Ξανά"

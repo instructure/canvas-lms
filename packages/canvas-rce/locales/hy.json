@@ -95,8 +95,14 @@
   "discussions_index_6c36ced": {
     "message": "Քննարկումների ցուցիչ"
   },
+  "done_54e3d4b6": {
+    "message": "Պատրաստ է"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ"
+  },
+  "embed_image_1080badc": {
+    "message": "Տեղադրել պատկերը"
   },
   "enter_search_terms_e397b1f0": {
     "message": "մուտքագրել որոնման պայմանները"
@@ -212,6 +218,9 @@
   "recording_98da6bda": {
     "message": "Ձայնագրում"
   },
+  "rich_content_editor_2708ef21": {
+    "message": "Ֆորմատավորված տեքստի խմբագիր"
+  },
   "save_11a80ec3": {
     "message": "Պահպանել"
   },
@@ -223,6 +232,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "size_b30e1077": {
+    "message": "Չափ"
   },
   "start_over_f7552aa9": {
     "message": "Սկսել նորից"

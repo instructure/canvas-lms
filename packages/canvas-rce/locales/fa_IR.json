@@ -86,6 +86,9 @@
   "creative_commons_license_725584ae": {
     "message": "مجوز کریتیو کامنز:"
   },
+  "custom_6979cd81": {
+    "message": "سفارشی"
+  },
   "decrease_indent_de6343ab": {
     "message": "کاهش تورفتگی"
   },
@@ -95,8 +98,14 @@
   "discussions_index_6c36ced": {
     "message": "فهرست بحث ها"
   },
+  "done_54e3d4b6": {
+    "message": "انجام شد"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "مهلت: چند تاریخ"
+  },
+  "embed_image_1080badc": {
+    "message": "درج تصویر"
   },
   "enter_search_terms_e397b1f0": {
     "message": "وارد کردن عبارت های جستجو"
@@ -212,6 +221,9 @@
   "recording_98da6bda": {
     "message": "در حال ضبط"
   },
+  "rich_content_editor_2708ef21": {
+    "message": "ویرایشگر محتوای غنی"
+  },
   "save_11a80ec3": {
     "message": "ذخیره سازی"
   },
@@ -223,6 +235,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "size_b30e1077": {
+    "message": "اندازه"
   },
   "something_went_wrong_89195131": {
     "message": "اشکالی رخ داده است."

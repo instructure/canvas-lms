@@ -140,6 +140,9 @@
   "current_volume_level_c55ab825": {
     "message": "Gjeldande volumnivå"
   },
+  "custom_6979cd81": {
+    "message": "Eigendefinert"
+  },
   "date_added_ed5ad465": {
     "message": "Dato lagd til"
   },
@@ -167,11 +170,17 @@
   "documents_81393201": {
     "message": "Dokument"
   },
+  "done_54e3d4b6": {
+    "message": "Fullført"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Dra og slipp, eller klikk for å hente fil frå disk"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Frist: Fleire datoar"
+  },
+  "embed_image_1080badc": {
+    "message": "Sett inn bilde"
   },
   "enter_search_terms_e397b1f0": {
     "message": "oppgi søkeord"
@@ -347,6 +356,9 @@
   "recording_98da6bda": {
     "message": "Opptak"
   },
+  "rich_content_editor_2708ef21": {
+    "message": "Redigeringsprogram for rikt innhald"
+  },
   "save_11a80ec3": {
     "message": "Lagre"
   },
@@ -361,6 +373,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vel ei mappe å laste opp fila til"
+  },
+  "size_b30e1077": {
+    "message": "Storleik"
   },
   "small_header_168fb9f9": {
     "message": "Liten overskrift"
