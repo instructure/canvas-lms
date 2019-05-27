@@ -464,15 +464,18 @@ class RCEWrapper extends React.Component {
   }
 
   componentDidUpdate(_prevProps, prevState) {
+    const {...mceProps} = this.props
     this.registerTextareaChange();
     if(prevState.isHtmlView !== this.state.isHtmlView) {
       if (this.state.isHtmlView) {
         this.getTextarea().removeAttribute('aria-hidden');
         this.mceInstance().hide()
+        document.getElementById(mceProps.textareaId).focus()
       } else {
         this.setCode(this.textareaValue());
         this.getTextarea().setAttribute('aria-hidden', true);
         this.mceInstance().show()
+        this.mceInstance().focus()
       }
     }
   }
