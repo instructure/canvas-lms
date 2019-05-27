@@ -100,10 +100,14 @@ li[id$=service_google_docs] {
   }
 }
 
-.profile_pic_link {
+.profile_pic {
   position: relative;
   float: direction(left);
   margin-#{direction(right)}: 5px;
+}
+
+.profile_pic_link {
+  @extend .profile_pic;
 
   .icon-edit {
     background: rgba(0, 0, 0, .75);
