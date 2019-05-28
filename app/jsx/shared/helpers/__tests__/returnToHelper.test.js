@@ -34,6 +34,12 @@ describe('returnToHelper', () => {
       expect(isValid('JaVaScRiPt:alert("nice try")')).toEqual(false)
     })
 
+    test('returns false for data: protocol', () => {
+      expect(isValid('data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(false)
+      expect(isValid('  data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(false)
+      expect(isValid('DaTa:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(false)
+    })
+
     test('returns true for other urls', () => {
       expect(isValid('https://github.com')).toEqual(true)
       expect(isValid('/')).toEqual(true)
