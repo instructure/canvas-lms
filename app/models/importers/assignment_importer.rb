@@ -106,6 +106,14 @@ module Importers
       )
     end
 
+    def self.create_default_line_item(assignment, migration)
+      assignment.create_assignment_line_item!
+    rescue
+      migration.add_warning(
+        t('Error associating assignment "%{assignment_name}" with an LTI tool.', assignment_name: assignment.title)
+      )
+    end
+
     def self.import_from_migration(hash, context, migration, item=nil, quiz=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
@@ -374,6 +382,7 @@ module Importers
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end
         end
+        create_default_line_item(item, migration)
       end
 
       if hash["similarity_detection_tool"].present?

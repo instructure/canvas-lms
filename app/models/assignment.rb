@@ -997,6 +997,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def create_assignment_line_item!
+    update_line_items
+  end
+
   def update_line_items
     # TODO: Edits to existing Assignment<->Tool associations are (mostly) ignored
     #

@@ -7833,6 +7833,62 @@ describe Assignment do
         it_behaves_like 'line item and resource link existence check'
         it_behaves_like 'assignment to line item attribute sync check'
 
+        context 'and no resource link or line item exist' do
+          let(:resource_link) { subject.line_items.first.resource_link }
+          let(:line_item) { subject.line_items.first }
+
+          before do
+            resource_link
+            line_item
+            subject.line_items.destroy_all
+            resource_link.destroy!
+            subject.create_assignment_line_item!
+          end
+
+          describe '#create_assignment_line_item!' do
+            subject { assignment }
+
+            it 'sets a line item' do
+              expect(subject.line_items.count).to eq 1
+            end
+
+            it 'creates a new assignment line item' do
+              expect(subject.line_items.first).not_to eq line_item
+            end
+
+            it 'sets a resource link' do
+              expect(subject.line_items.first.resource_link).to be_present
+            end
+
+            it 'creates a new resource link' do
+              expect(subject.line_items.first.resource_link).not_to eq resource_link
+            end
+          end
+        end
+
+        context 'and resource link and line item exist' do
+          let(:resource_link) { subject.line_items.first.resource_link }
+          let(:line_item) { subject.line_items.first }
+
+          describe '#create_assignment_line_item!' do
+            subject { assignment }
+
+            before { subject.create_assignment_line_item! }
+
+            it 'does not add a new line item' do
+              expect(subject.line_items.count).to eq 1
+            end
+
+            it 'does not replace the existing line item' do
+              expect(subject.line_items.first).to eq line_item
+            end
+
+            it 'does not replace the existing resource link' do
+              expect(subject.line_items.first.resource_link).to eq resource_link
+            end
+          end
+        end
+
         context 'and the tool binding is changed' do
           let(:different_tool_use_1_3) { true }
           let!(:different_tool) do
@@ -7893,6 +7949,26 @@ describe Assignment do
 
         it 'does not create line items and resource links' do
           expect(assignment.line_items).to be_empty
+        end
+
+        describe "#create_assignment_line_items!" do
+          subject { assignment }
+
+          it 'does not create a new line item' do
+            expect do
+              subject.create_assignment_line_item!
+            end.not_to change { Lti::LineItem.count }
+          end
+
+          it 'does not associate a line item with the assignment' do
+            expect(subject.line_items).to be_empty
+          end
+
+          it 'does not create a new resource link' do
+            expect do
+              subject.create_assignment_line_item!
+            end.not_to change { Lti::ResourceLink.count }
+          end
         end
       end
 
