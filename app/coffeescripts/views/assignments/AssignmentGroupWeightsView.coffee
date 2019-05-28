@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import I18n from 'i18nObj'
 import round from '../../util/round'
 import Backbone from 'Backbone'
 import AssignmentGroupWeightsTemplate from 'jst/assignments/AssignmentGroupWeights'
