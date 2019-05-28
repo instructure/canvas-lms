@@ -41,7 +41,7 @@ export default function UsersListHeader(props) {
           })}
         >
           {label}
-          {sort === id ? order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp /> : ''}
+          {sort === id ? order === 'asc' ? <IconMiniArrowUp /> : <IconMiniArrowDown /> : ''}
         </Tooltip>
       </ApplyTheme>
     </th>

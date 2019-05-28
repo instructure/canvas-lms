@@ -22,10 +22,8 @@ import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import React from 'react'
-import {string} from 'prop-types'
-import {pick} from 'lodash'
+import {string, func} from 'prop-types'
 import preventDefault from 'compiled/fn/preventDefault'
-import CoursesList from './CoursesList'
 
 export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   return (
@@ -36,18 +34,23 @@ export default function CourseListHeader({sort, order, onChangeSort, id, label, 
         onClick={preventDefault(() => onChangeSort(id))}
       >
         {label}
-        {sort === id ? order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp /> : ''}
+        {sort === id ? order === 'asc' ? <IconMiniArrowUp /> : <IconMiniArrowDown /> : ''}
       </Tooltip>
     </ApplyTheme>
   )
 }
 
 CourseListHeader.propTypes = {
-  ...pick(CoursesList.propTypes, ['sort', 'order', 'onChangeSort']),
+  sort: string,
+  order: string,
+  onChangeSort: func.isRequired,
   id: string.isRequired,
   label: string.isRequired,
   tipDesc: string.isRequired,
   tipAsc: string.isRequired
 }
 
-CourseListHeader.defaultProps = pick(CoursesList.defaultProps, ['sort', 'order'])
+CourseListHeader.defaultProps = {
+  sort: 'sis_course_id',
+  order: 'asc'
+}
