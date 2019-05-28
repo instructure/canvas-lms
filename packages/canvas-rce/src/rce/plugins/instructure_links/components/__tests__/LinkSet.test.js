@@ -74,7 +74,7 @@ describe('RCE "Links" Plugin > LinkSet', () => {
       }
     })
 
-    expect(getByText('Load more results')).toBeInTheDocument()
+    expect(getByText('Load More')).toBeInTheDocument()
   })
 
   it('fetches initial data when mounted', () => {
@@ -105,7 +105,7 @@ describe('RCE "Links" Plugin > LinkSet', () => {
       fetchNextPage
     })
 
-    const loadMoreBtn = getByText('Load more results')
+    const loadMoreBtn = getByText('Load More')
     loadMoreBtn.click()
     expect(fetchNextPage).toHaveBeenCalled()
   })
@@ -159,6 +159,6 @@ describe('RCE "Links" Plugin > LinkSet', () => {
       fetchNextPage
     })
 
-    expect(getByText('Loading more results...')).toBeInTheDocument()
+    expect(getByText('Loading...')).toBeInTheDocument()
   })
 })

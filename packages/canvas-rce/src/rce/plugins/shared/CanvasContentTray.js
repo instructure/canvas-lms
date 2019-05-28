@@ -149,7 +149,7 @@ export default function CanvasContentTray(props) {
           <ErrorBoundary>
             <StoreProvider {...props}>
               {contentProps => (
-                <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+                <Suspense fallback={<Spinner renderTitle={() => formatMessage('Loading')} size="large" />}>
                   {renderContentComponent(filterSettings, contentProps)}
                 </Suspense>
               )}
