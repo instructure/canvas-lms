@@ -38,6 +38,7 @@ describe('LatePolicyStatusDisplay', () => {
   it('renders -3 points for tooltip launch', () => {
     ReactDOM.render(
       <LatePolicyStatusDisplay
+        attempt={1}
         grade="5"
         gradingType="points"
         originalGrade="8"
@@ -54,6 +55,7 @@ describe('LatePolicyStatusDisplay', () => {
   it('renders tip content correctly', () => {
     ReactDOM.render(
       <LatePolicyStatusDisplay
+        attempt={2}
         grade="5"
         gradingType="points"
         originalGrade="8"
@@ -71,12 +73,13 @@ describe('LatePolicyStatusDisplay', () => {
     // const tooltipLaunchLink = $('[data-test-id="late-policy-container"] a').focus()
 
     const tooltipContent = $('[data-test-id="late-policy-tip-content"]')
-    expect(tooltipContent.text()).toEqual('Attempt 18/32Late Penalty-3Grade5/32')
+    expect(tooltipContent.text()).toEqual('Attempt 28/32Late Penalty-3Grade5/32')
   })
 
   it('renders accessible tip content correctly', () => {
     ReactDOM.render(
       <LatePolicyStatusDisplay
+        attempt={2}
         grade="5"
         originalGrade="8"
         gradingType="points"
@@ -94,6 +97,6 @@ describe('LatePolicyStatusDisplay', () => {
     // const tooltipLaunchLink = $('[data-test-id="late-policy-container"] a').focus()
 
     const tooltipContent = $('[data-test-id="late-policy-accessible-tip-content"]')
-    expect(tooltipContent.text()).toEqual('Attempt 1: 8/32Late Penalty: minus 3 PointsGrade: 5/32')
+    expect(tooltipContent.text()).toEqual('Attempt 2: 8/32Late Penalty: minus 3 PointsGrade: 5/32')
   })
 })

@@ -22,11 +22,6 @@ module Types
 
     field :_id, ID, 'legacy canvas id', null: false, method: :id
 
-    field :submission, Types::SubmissionType, null: false
-    def submission
-      load_association(:submission)
-    end
-
     field :submission_attempt, Integer, null: false
 
     field :attachments, [Types::FileType], null: true

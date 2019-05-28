@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import ContentTabs from './ContentTabs'
@@ -28,47 +29,158 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
-function renderContentBaseOnAvailability(assignment, submission) {
-  if (assignment.env.modulePrereq) {
-    const prereq = assignment.env.modulePrereq
-    return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
-  } else if (assignment && assignment.lockInfo.isLocked) {
-    return <LockedAssignment assignment={assignment} />
-  } else if (submission === null) {
-    // NOTE: handles case where user is not logged in
-    return (
-      <React.Fragment>
-        <AssignmentToggleDetails description={assignment.description} />
-        <Suspense
-          fallback={<Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
-        >
-          <LoggedOutTabs assignment={assignment} />
-        </Suspense>
-      </React.Fragment>
+class StudentContent extends React.Component {
+  static propTypes = {
+    assignment: AssignmentShape,
+    onLoadMore: func,
+    pageInfo: shape({
+      hasNextPage: bool,
+      endCursor: string
+    }),
+    submissionHistoryEdges: arrayOf(
+      shape({
+        cursor: string,
+        node: SubmissionShape
+      })
     )
-  } else {
+  }
+
+  state = {
+    displayedCursor: null,
+    orderedCursors: [],
+    loadingMore: false
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const historyEdges = props.submissionHistoryEdges
+    const newOrderedCursors = historyEdges.map(e => e.cursor)
+
+    let newDisplayCursor = state.displayedCursor
+    let newLoadingMore = state.loadingMore
+    if (historyEdges.length === 1) {
+      // Handle when we did a mutation and cleared our cache, so there is only
+      // the new submission present. See the mutation for details on why we
+      // clear the cache in this sceniaro.
+      newDisplayCursor = newOrderedCursors[0]
+    } else if (state.orderedCursors.length < historyEdges.length) {
+      newDisplayCursor = newOrderedCursors.filter(c => !state.orderedCursors.includes(c)).pop()
+      newLoadingMore = false
+    } else {
+      return null
+    }
+
+    return {
+      displayedCursor: newDisplayCursor,
+      orderedCursors: newOrderedCursors,
+      loadingMore: newLoadingMore
+    }
+  }
+
+  getCurrentSubmission = () => {
+    const historyEdges = this.props.submissionHistoryEdges
+    const currentSubmissionEdge = historyEdges.find(e => e.cursor === this.state.displayedCursor)
+    if (currentSubmissionEdge) {
+      return currentSubmissionEdge.node
+    }
+  }
+
+  hasNextSubmission = () => {
+    const historyEdges = this.props.submissionHistoryEdges
+    const currentIndex = historyEdges.findIndex(e => e.cursor === this.state.displayedCursor)
+    return currentIndex !== historyEdges.length - 1
+  }
+
+  hasPrevSubmission = () => {
+    if (this.props.pageInfo.hasNextPage) {
+      return true
+    }
+
+    const historyEdges = this.props.submissionHistoryEdges
+    const currentIndex = historyEdges.findIndex(e => e.cursor === this.state.displayedCursor)
+    return currentIndex !== 0
+  }
+
+  onNextSubmission = () => {
+    this.setState((state, props) => {
+      const historyEdges = props.submissionHistoryEdges
+      const currentIndex = historyEdges.findIndex(e => e.cursor === state.displayedCursor)
+      if (currentIndex === historyEdges.length - 1) {
+        return null
+      } else {
+        const nextCursor = state.orderedCursors[currentIndex + 1]
+        return {displayedCursor: nextCursor}
+      }
+    })
+  }
+
+  onPrevSubmission = () => {
+    this.setState((state, props) => {
+      const historyEdges = props.submissionHistoryEdges
+      const currentIndex = historyEdges.findIndex(e => e.cursor === state.displayedCursor)
+
+      if (currentIndex > 0) {
+        const prevCursor = state.orderedCursors[currentIndex - 1]
+        return {displayedCursor: prevCursor}
+      } else if (props.pageInfo.hasNextPage && !state.loadingMore) {
+        this.props.onLoadMore()
+        return {loadingMore: true}
+      } else {
+        return null
+      }
+    })
+  }
+
+  renderContentBaseOnAvailability = () => {
+    const submission = this.getCurrentSubmission()
+
+    if (this.props.assignment.env.modulePrereq) {
+      const prereq = this.props.assignment.env.modulePrereq
+      return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
+    } else if (this.props.assignment.lockInfo.isLocked) {
+      return <LockedAssignment assignment={this.props.assignment} />
+    } else if (submission === null) {
+      // NOTE: handles case where user is not logged in
+      return (
+        <React.Fragment>
+          <AssignmentToggleDetails description={this.props.assignment.description} />
+          <Suspense
+            fallback={<Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
+          >
+            <LoggedOutTabs assignment={this.props.assignment} />
+          </Suspense>
+        </React.Fragment>
+      )
+    } else {
+      return (
+        <React.Fragment>
+          <AssignmentToggleDetails description={this.props.assignment.description} />
+          <ContentTabs assignment={this.props.assignment} submission={submission} />
+        </React.Fragment>
+      )
+    }
+  }
+
+  render() {
+    const submission = this.getCurrentSubmission()
     return (
-      <React.Fragment>
-        <AssignmentToggleDetails description={assignment.description} />
-        <ContentTabs assignment={assignment} submission={submission} />
-      </React.Fragment>
+      <div data-testid="assignments-2-student-view">
+        <Header scrollThreshold={150} assignment={this.props.assignment} submission={submission} />
+        {this.renderContentBaseOnAvailability()}
+
+        {/* TODO: Remove these and replace with the real buttons */}
+        <button
+          type="button"
+          onClick={this.onPrevSubmission}
+          disabled={!this.hasPrevSubmission() || this.state.loadingMore}
+        >
+          Load Previous
+        </button>
+        <button type="button" onClick={this.onNextSubmission} disabled={!this.hasNextSubmission()}>
+          Load Next
+        </button>
+      </div>
     )
   }
 }
 
-function StudentContent(props) {
-  const {assignment, submission} = props
-  return (
-    <div data-testid="assignments-2-student-view">
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-      {renderContentBaseOnAvailability(assignment, submission)}
-    </div>
-  )
-}
-
-StudentContent.propTypes = {
-  assignment: AssignmentShape,
-  submission: SubmissionShape
-}
-
-export default React.memo(StudentContent)
+export default StudentContent

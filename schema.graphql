@@ -1666,6 +1666,7 @@ enum NodeType {
   PostPolicy
   Progress
   Section
+  Submission
   Term
   User
 }
@@ -2276,7 +2277,6 @@ type SubmissionDraft {
   """
   _id: ID!
   attachments: [File!]
-  submission: Submission!
   submissionAttempt: Int!
 }
 
@@ -2302,6 +2302,7 @@ input SubmissionFilterInput {
 
 type SubmissionHistory implements SubmissionInterface & Timestamped {
   assignment: Assignment
+  attachments: [File!]
   attempt: Int!
   commentsConnection(
     """
@@ -2351,8 +2352,14 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   gradingStatus: String
   latePolicyStatus: LatePolicyStatusType
   postedAt: DateTime
+
+  """
+  The canvas legacy id of the root submission this history belongs to
+  """
+  rootId: ID!
   score: Float
   state: SubmissionState!
+  submissionDraft: SubmissionDraft
   submissionStatus: String
   submittedAt: DateTime
   updatedAt: DateTime
@@ -2399,6 +2406,7 @@ Types for submission or submission history
 """
 interface SubmissionInterface {
   assignment: Assignment
+  attachments: [File!]
   attempt: Int!
   commentsConnection(
     """
@@ -2449,6 +2457,7 @@ interface SubmissionInterface {
   postedAt: DateTime
   score: Float
   state: SubmissionState!
+  submissionDraft: SubmissionDraft
   submissionStatus: String
   submittedAt: DateTime
   user: User

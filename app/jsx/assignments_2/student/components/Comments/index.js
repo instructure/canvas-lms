@@ -28,7 +28,7 @@ import React from 'react'
 
 function Comments(props) {
   return (
-    <Query query={SUBMISSION_COMMENT_QUERY} variables={{submissionId: props.submission.id}}>
+    <Query query={SUBMISSION_COMMENT_QUERY} variables={{submissionId: props.submission.rootId}}>
       {({loading, error, data}) => {
         if (loading) return <LoadingIndicator />
         if (error) {

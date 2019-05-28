@@ -119,4 +119,19 @@ module Interfaces::SubmissionInterface
 
   field :grading_status, String, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
+
+  field :attachments, [Types::FileType], null: true
+  def attachments
+    load_association(:attachment_associations).then do |associations|
+      Loaders::IDLoader.for(Attachment).load_many(associations.map(&:attachment_id))
+    end
+  end
+
+  field :submission_draft, Types::SubmissionDraftType, null: true
+  def submission_draft
+    load_association(:submission_drafts).then do |drafts|
+      # Submission.attempt can be in either 0 or nil which mean the same thing
+      drafts.select { |draft| draft.submission_attempt == (object.attempt || 0) }.first
+    end
+  end
 end

@@ -25,13 +25,16 @@ import LatePolicyToolTipContent from './LatePolicyToolTipContent'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 function LatePolicyStatusDisplay(props) {
-  const {gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
+  // TODO: actually pass the assignment and submission in here instead of all these
+  //       separate props
+  const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
     <div data-testid="late-policy-container">
       <Text size="medium">{I18n.t('Late Policy:')}</Text>
       <Tooltip
         tip={
           <LatePolicyToolTipContent
+            attempt={attempt}
             grade={grade}
             gradingType={gradingType}
             originalGrade={originalGrade}
@@ -59,6 +62,7 @@ function LatePolicyStatusDisplay(props) {
 }
 
 LatePolicyStatusDisplay.propTypes = {
+  attempt: PropTypes.number.isRequired,
   grade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,

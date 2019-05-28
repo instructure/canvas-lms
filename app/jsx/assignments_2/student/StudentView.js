@@ -22,12 +22,12 @@ import {string} from 'prop-types'
 import {Query} from 'react-apollo'
 import GenericErrorPage from '../../shared/components/GenericErrorPage/index'
 import errorShipUrl from './SVG/ErrorShip.svg'
-import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from './assignmentData'
+import {GetAssignmentEnvVariables, NEXT_SUBMISSION, STUDENT_VIEW_QUERY} from './assignmentData'
 import LoadingIndicator from '../shared/LoadingIndicator'
 
 const StudentView = props => (
   <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
-    {({loading, error, data}) => {
+    {({loading, error, data, fetchMore}) => {
       if (loading) return <LoadingIndicator />
       if (error) {
         return (
@@ -51,7 +51,38 @@ const StudentView = props => (
       }
       delete assignment.submissionsConnection
 
-      return <StudentContent assignment={assignment} submission={submission} />
+      return (
+        <StudentContent
+          assignment={assignment}
+          pageInfo={submission && submission.submissionHistoriesConnection.pageInfo}
+          submissionHistoryEdges={submission && submission.submissionHistoriesConnection.edges}
+          onLoadMore={() => {
+            if (!submission) {
+              return
+            }
+
+            return fetchMore({
+              query: NEXT_SUBMISSION,
+              variables: {
+                cursor: submission.submissionHistoriesConnection.pageInfo.endCursor,
+                submissionID: submission.submissionHistoriesConnection.edges[0].node.rootId
+              },
+              updateQuery: (previousResult, {fetchMoreResult}) => {
+                const nextResult = JSON.parse(JSON.stringify(previousResult))
+                const histories =
+                  nextResult.assignment.submissionsConnection.nodes[0].submissionHistoriesConnection
+                const nextPageInfo =
+                  fetchMoreResult.legacyNode.submissionHistoriesConnection.pageInfo
+                const newHistory = fetchMoreResult.legacyNode.submissionHistoriesConnection.edges[0]
+                const newHistories = [newHistory, ...histories.edges]
+                nextResult.assignment.submissionsConnection.nodes[0].submissionHistoriesConnection.pageInfo = nextPageInfo
+                nextResult.assignment.submissionsConnection.nodes[0].submissionHistoriesConnection.edges = newHistories
+                return nextResult
+              }
+            })
+          }}
+        />
+      )
     }}
   </Query>
 )

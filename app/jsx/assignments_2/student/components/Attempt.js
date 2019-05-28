@@ -21,17 +21,21 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {AssignmentShape} from '../assignmentData'
+import {AssignmentShape, SubmissionShape} from '../assignmentData'
 
 function Attempt(props) {
-  const {assignment} = props
+  const {assignment, submission} = props
+  let current_attempt = 1
+  if (submission && submission.attempt !== 0) {
+    current_attempt = submission.attempt
+  }
 
   return (
     <Text size="medium" weight="bold" data-test-id="attempt">
       {!assignment.allowedAttempts
-        ? I18n.t('Attempt %{current_attempt}', {current_attempt: 1})
+        ? I18n.t('Attempt %{current_attempt}', {current_attempt})
         : I18n.t('Attempt %{current_attempt} of %{max_attempts}', {
-            current_attempt: 1,
+            current_attempt,
             max_attempts: assignment.allowedAttempts.toString()
           })}
     </Text>
@@ -39,7 +43,8 @@ function Attempt(props) {
 }
 
 Attempt.propTypes = {
-  assignment: AssignmentShape
+  assignment: AssignmentShape,
+  submission: SubmissionShape
 }
 
 export default React.memo(Attempt)

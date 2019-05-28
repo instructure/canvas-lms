@@ -111,6 +111,7 @@ class Header extends React.Component {
                     {this.isSubmissionLate() && (
                       <FlexItem grow>
                         <LatePolicyStatusDisplay
+                          attempt={this.props.submission.attempt}
                           gradingType={this.props.assignment.gradingType}
                           pointsPossible={this.props.assignment.pointsPossible}
                           originalGrade={this.props.submission.enteredGrade}
@@ -129,7 +130,9 @@ class Header extends React.Component {
               )}
             </FlexItem>
           </Flex>
-          {!this.state.isSticky && <Attempt assignment={this.props.assignment} />}
+          {!this.state.isSticky && (
+            <Attempt assignment={this.props.assignment} submission={this.props.submission} />
+          )}
           <div className="assignment-pizza-header-outer">
             <div
               className="assignment-pizza-header-inner"

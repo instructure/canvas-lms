@@ -54,7 +54,7 @@ export default class CommentTextArea extends Component {
   queryVariables() {
     return {
       query: SUBMISSION_COMMENT_QUERY,
-      variables: {submissionId: this.props.submission.id}
+      variables: {submissionId: this.props.submission.rootId}
     }
   }
 

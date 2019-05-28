@@ -44,9 +44,6 @@ RSpec.describe Types::SubmissionDraftType do
                   displayName
                 }
                 submissionAttempt
-                submission {
-                  _id
-                }
               }
             }
           }
@@ -62,11 +59,6 @@ RSpec.describe Types::SubmissionDraftType do
     ).first['submissionDraft']
   end
 
-  it 'returns the associated submission' do
-    submission_draft = resolve_submission_draft
-    expect(submission_draft['submission']['_id']).to eq(@submission.id.to_s)
-  end
-
   it 'returns the submission attempt' do
     submission_draft = resolve_submission_draft
     expect(submission_draft['submissionAttempt']).to eq(@submission.attempt)
@@ -74,11 +66,11 @@ RSpec.describe Types::SubmissionDraftType do
 
   context 'the submission attempt is nil' do
     it 'returns the draft for attempt 0' do
-      @submission.attempt = nil
-      @submission_draft.submission_attempt = 0
+      @submission.update_columns(attempt: nil) # bypass #infer_details for test
+      @submission_draft.update!(submission_attempt: 0)
 
       submission_draft = resolve_submission_draft
-      expect(submission_draft['submission']['_id']).to eq(@submission.id.to_s)
+      expect(submission_draft['submissionAttempt']).to eq(0)
     end
   end
 

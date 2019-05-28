@@ -15,35 +15,34 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
-
-import {mockAssignment} from '../../test-utils'
 import Attempt from '../Attempt'
+import {mockAssignment, mockSubmission} from '../../test-utils'
+import React from 'react'
+import {render} from 'react-testing-library'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
+describe('unlimited attempts', () => {
+  it('renders correctly', () => {
+    const submission = mockSubmission()
+    submission.attempt = 1
+    const {getByText} = render(<Attempt assignment={mockAssignment()} submission={submission} />)
+    expect(getByText('Attempt 1')).toBeInTheDocument()
+  })
+
+  it('renders the curent submission attempt', () => {
+    const submission = mockSubmission()
+    submission.attempt = 3
+    const {getByText} = render(<Attempt assignment={mockAssignment()} submission={submission} />)
+    expect(getByText('Attempt 3')).toBeInTheDocument()
+  })
 })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
-
-it('renders attempt line correctly with unlimited allowed attempts', () => {
-  ReactDOM.render(<Attempt assignment={mockAssignment()} />, document.getElementById('fixtures'))
-  const attempt_line = $('[data-test-id="attempt"]')
-  expect(attempt_line.text()).toEqual('Attempt 1')
-})
-
-it('renders attempt line correctly with 4 allowed attempts', () => {
-  const assignment = mockAssignment({allowedAttempts: 4})
-  ReactDOM.render(<Attempt assignment={assignment} />, document.getElementById('fixtures'))
-  const attempt_line = $('[data-test-id="attempt"]')
-  expect(attempt_line.text()).toEqual('Attempt 1 of 4')
+describe('limited attempts', () => {
+  it('renders attempt', () => {
+    const assignment = mockAssignment()
+    const submission = mockSubmission()
+    assignment.allowedAttempts = 4
+    submission.attempt = 2
+    const {getByText} = render(<Attempt assignment={assignment} submission={submission} />)
+    expect(getByText('Attempt 2 of 4')).toBeInTheDocument()
+  })
 })

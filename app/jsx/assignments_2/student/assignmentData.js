@@ -64,22 +64,31 @@ function attachmentFields() {
 
 function submissionFields() {
   return `
-    _id
-    id
-    deductedPoints
-    enteredGrade
-    grade
-    gradingStatus
-    latePolicyStatus
-    state
-    submissionDraft {
-      _id
-      attachments {
-        ${attachmentFields()}
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      cursor
+      node {
+        rootId
+        attempt
+        deductedPoints
+        enteredGrade
+        grade
+        gradingStatus
+        latePolicyStatus
+        state
+        submissionStatus
+        submittedAt
+        submissionDraft {
+          _id
+          attachments {
+            ${attachmentFields()}
+          }
+        }
       }
     }
-    submissionStatus
-    submittedAt
   `
 }
 
@@ -138,7 +147,9 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
-            ${submissionFields()}
+            submissionHistoriesConnection(first: 1) {
+              ${submissionFields()}
+            }
           }
         }
       }
@@ -148,7 +159,7 @@ export const STUDENT_VIEW_QUERY = gql`
 
 export const SUBMISSION_COMMENT_QUERY = gql`
   query GetSubmissionComments($submissionId: ID!) {
-    submissionComments: node(id: $submissionId) {
+    submissionComments: legacyNode(_id: $submissionId, type: Submission) {
       ... on Submission {
         commentsConnection(filter: {allComments: true}) {
           nodes {
@@ -174,11 +185,25 @@ export const CREATE_SUBMISSION = gql`
   mutation CreateSubmission($id: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
     createSubmission(input: {assignmentId: $id, submissionType: $type, fileIds: $fileIds}) {
       submission {
-        ${submissionFields()}
+        submissionHistoriesConnection(first: 1) {
+          ${submissionFields()}
+        }
       }
       errors {
         attribute
         message
+      }
+    }
+  }
+`
+
+export const NEXT_SUBMISSION = gql`
+  query NextSubmission($submissionID: ID!, $cursor: String) {
+    legacyNode(_id: $submissionID, type: Submission) {
+      ... on Submission {
+        submissionHistoriesConnection(after: $cursor, first: 1) {
+          ${submissionFields()}
+        }
       }
     }
   }
@@ -262,7 +287,7 @@ export const SubmissionShape = shape({
   commentsConnection: shape({
     nodes: arrayOf(CommentShape)
   }),
-  id: string,
+  rootId: string,
   deductedPoints: number,
   enteredGrade: string,
   grade: string,

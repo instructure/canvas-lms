@@ -28,5 +28,9 @@ module Types
 
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
+
+    field :root_id, ID, <<~DESC, method: :id, null: false
+      The canvas legacy id of the root submission this history belongs to
+    DESC
   end
 end

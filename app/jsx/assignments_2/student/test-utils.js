@@ -162,7 +162,7 @@ export function commentGraphqlMock(comments) {
       request: {
         query: SUBMISSION_COMMENT_QUERY,
         variables: {
-          submissionId: legacyMockSubmission().id
+          submissionId: legacyMockSubmission().rootId
         }
       },
       result: {
@@ -234,10 +234,35 @@ export function commentGraphqlMock(comments) {
   ]
 }
 
+export function mockSubmissionHistoriesConnection() {
+  const submissionHistory = mockSubmission()
+
+  return {
+    __typename: 'SubmissionHistoryConnection',
+    pageInfo: {
+      __typename: 'PageInfo',
+      hasNextPage: false,
+      endCursor: btoa('1')
+    },
+    edges: [
+      {
+        __typename: 'SubmissionHistoryEdge',
+        cursor: btoa('1'),
+        node: submissionHistory
+      }
+    ]
+  }
+}
+
 export function mockGraphqlQueryResults(overrides = {}) {
   const assignment = mockAssignment(overrides)
   assignment.submissionsConnection = {
-    nodes: [legacyMockSubmission()],
+    nodes: [
+      {
+        __typename: 'Submission',
+        submissionHistoriesConnection: mockSubmissionHistoriesConnection()
+      }
+    ],
     __typename: 'SubmissionConnection'
   }
   return assignment
@@ -257,7 +282,10 @@ export function submissionGraphqlMock() {
       result: {
         data: {
           createSubmission: {
-            submission: mockSubmission(),
+            submission: {
+              __typename: 'Submission',
+              submissionHistoriesConnection: mockSubmissionHistoriesConnection()
+            },
             errors: {
               attribute: null,
               message: null,
@@ -289,8 +317,7 @@ export function submissionGraphqlMock() {
 
 export function mockSubmission(overrides = {}) {
   return {
-    _id: '22',
-    id: btoa('Submisison-22'),
+    attempt: 1,
     commentsConnection: {
       __typename: 'CommentsConnection',
       nodes: [
@@ -313,11 +340,12 @@ export function mockSubmission(overrides = {}) {
     grade: null,
     gradingStatus: 'needs_grading',
     latePolicyStatus: null,
+    rootId: '22',
     state: 'submitted',
     submissionDraft: null,
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
-    __typename: 'Submission',
+    __typename: 'SubmissionHistory',
     ...overrides
   }
 }
@@ -332,8 +360,7 @@ export function mockSubmission(overrides = {}) {
 //     function that has the same results as submission in the old mockAssignment.
 export function legacyMockSubmission() {
   const overrides = {
-    _id: '3',
-    id: btoa('Submission-3'),
+    rootId: '3',
     deductedPoints: 3,
     enteredGrade: '9',
     grade: '6',
