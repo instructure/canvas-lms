@@ -1756,14 +1756,16 @@ class User < ActiveRecord::Base
   end
 
   def has_active_enrollment?
+    return @_has_active_enrollment if defined?(@_has_active_enrollment)
     # don't need an expires_at here because user will be touched upon enrollment activation
-    Rails.cache.fetch([self, 'has_active_enrollment', ApplicationController.region ].cache_key) do
+    @_has_active_enrollment = Rails.cache.fetch([self, 'has_active_enrollment', ApplicationController.region ].cache_key) do
       self.enrollments.shard(in_region_associated_shards).current.active_by_date.exists?
     end
   end
 
   def has_future_enrollment?
-    Rails.cache.fetch([self, 'has_future_enrollment', ApplicationController.region ].cache_key, :expires_in => 1.hour) do
+    return @_has_future_enrollment if defined?(@_has_future_enrollment)
+    @_has_future_enrollment = Rails.cache.fetch([self, 'has_future_enrollment', ApplicationController.region ].cache_key, :expires_in => 1.hour) do
       self.enrollments.shard(in_region_associated_shards).active_or_pending_by_date.exists?
     end
   end
@@ -1785,7 +1787,8 @@ class User < ActiveRecord::Base
   end
 
   def has_student_enrollment?
-    Rails.cache.fetch_with_batched_keys(['has_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
+    return @_has_student_enrollment if defined?(@_has_student_enrollment)
+    @_has_student_enrollment = Rails.cache.fetch_with_batched_keys(['has_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
       self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment}).
         where.not(:workflow_state => %w{rejected inactive deleted}).exists?
     end
@@ -1793,7 +1796,8 @@ class User < ActiveRecord::Base
 
   def non_student_enrollment?
     # We should be able to remove this method when the planner works for teachers/other course roles
-    Rails.cache.fetch_with_batched_keys(['has_non_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
+    return @_non_student_enrollment if defined?(@_non_student_enrollment)
+    @_non_student_enrollment = Rails.cache.fetch_with_batched_keys(['has_non_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
       self.enrollments.shard(in_region_associated_shards).where.not(type: %w{StudentEnrollment StudentViewEnrollment ObserverEnrollment}).
         where.not(workflow_state: %w{rejected inactive deleted}).exists?
     end
