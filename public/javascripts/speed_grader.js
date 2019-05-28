@@ -821,7 +821,7 @@ function initCommentBox() {
       ),
       mic_blocked: I18n.t(
         'mic_blocked_message',
-        'Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream'
+        'Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone'
       ),
       no_speech: I18n.t(
         'nodetect_message',
