@@ -212,7 +212,7 @@ module Lti::Ims
     end
 
     def result
-      @_result ||= Lti::Result.where(line_item: line_item, user: user).first
+      @_result ||= Lti::Result.active.where(line_item: line_item, user: user).first
     end
 
     def timestamp

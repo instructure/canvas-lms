@@ -166,7 +166,7 @@ module Lti
       # @returns LineItem
       def index
         line_items = Api.paginate(
-          Lti::LineItem.where(index_query).eager_load(:resource_link),
+          Lti::LineItem.active.where(index_query).eager_load(:resource_link),
           self,
           lti_line_item_index_url(course_id: context.id),
           pagination_args
@@ -248,7 +248,7 @@ module Lti
       end
 
       def check_for_bad_resource_link
-        resource_link.line_items.blank? ||
+        resource_link.line_items.active.blank? ||
         assignment&.context != context ||
         !assignment&.active?
       end

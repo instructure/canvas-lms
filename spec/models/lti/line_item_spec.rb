@@ -82,4 +82,9 @@ RSpec.describe Lti::LineItem, type: :model do
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Assignment does not match ltiLink")
     end
   end
+
+  it_behaves_like "soft deletion" do
+    let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
+    subject { Lti::LineItem }
+  end
 end

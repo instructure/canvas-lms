@@ -17,6 +17,8 @@
 #
 
 class Lti::ResourceLink < ApplicationRecord
+  include Canvas::SoftDeletable
+
   validates :resource_link_id, presence: true
   validates :context_external_tool, presence: true
 

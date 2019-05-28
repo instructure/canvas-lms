@@ -17,6 +17,8 @@
 #
 
 class Lti::LineItem < ApplicationRecord
+  include Canvas::SoftDeletable
+
   validates :score_maximum, :label, :assignment, presence: true
   validates :score_maximum, numericality: true
   validates :client_id, presence: true
@@ -36,6 +38,8 @@ class Lti::LineItem < ApplicationRecord
            class_name: 'Lti::Result',
            foreign_key: :lti_line_item_id,
            dependent: :destroy
+
+  before_destroy :destroy_resource_link, if: :assignment_line_item? # assignment will destroy all the other line_items of a resourceLink
 
   def assignment_line_item?
     return true if resource_link.blank?
@@ -74,5 +78,10 @@ class Lti::LineItem < ApplicationRecord
 
   def client_id_is_global?
     self.client_id > Shard::IDS_PER_SHARD
+  end
+
+  # this is to prevent orphaned (ie undeleted state) line_items when an assignment is destroyed
+  def destroy_resource_link
+    self.resource_link&.destroy
   end
 end

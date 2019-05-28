@@ -24,7 +24,7 @@ module Lti::Ims::Concerns
       before_action :verify_line_item_client_id_connection, only: %i[show update destroy]
 
       def line_item
-        @_line_item ||= Lti::LineItem.where(id: params.fetch(:line_item_id, params[:id])).eager_load(:resource_link).take!
+        @_line_item ||= Lti::LineItem.active.where(id: params.fetch(:line_item_id, params[:id])).eager_load(:resource_link).take!
       end
 
       def context

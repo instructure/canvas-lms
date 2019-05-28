@@ -587,7 +587,7 @@ module Lti
 
           it 'deletes the correct line item' do
             send_request
-            expect(Lti::LineItem.find_by(id: line_item_id)).to be_nil
+            expect(Lti::LineItem.active.find_by(id: line_item_id)).to be_nil
           end
 
           it 'responds with no content' do
