@@ -17,5 +17,5 @@
  */
 
 export function isValid(url) {
-  return !!url && !/^\s*javascript:/i.test(url)
+  return !!url && !/^\s*javascript:/i.test(url) && !/^\s*data:/i.test(url)
 }
