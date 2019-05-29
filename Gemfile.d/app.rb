@@ -116,7 +116,7 @@ gem 'ruby-duration', '3.2.3', require: false
 gem 'saml2', '3.0.7'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
-gem 'rubyzip', '1.2.1', require: 'zip'
+gem 'rubyzip', '1.2.2', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'shackles', '1.4.1'

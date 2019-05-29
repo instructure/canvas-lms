@@ -112,7 +112,7 @@ module CustomValidators
     wait_for(method: :wait_for_new_page_load) do
       begin
         driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
-      rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
+      rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError, Selenium::WebDriver::Error::UnknownError
         raise unless accept_alert
         driver.switch_to.alert.accept
       end
