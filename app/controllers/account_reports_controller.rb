@@ -230,7 +230,7 @@ class AccountReportsController < ApplicationController
       results = []
 
       available_reports.each do |key, value|
-        last_run = @account.account_reports.active.where(:report_type => key).order('created_at DESC').first
+        last_run = @account.account_reports.active.where(report_type: key).most_recent.take
         last_run = account_report_json(last_run, @current_user, session) if last_run
         report = {
           :title => value.title,
