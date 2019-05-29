@@ -5096,6 +5096,9 @@ nn:
   count_criteria_22927713: 
     one: "1 kriterium"
     other: "%{count} kriterium"
+  count_errors_prohibited_this_plugin_from_being_sav_e796e372: 
+    one: "1 feil forhindra lagring av app-tillegget:"
+    other: "%{count} feil forhindra lagring av app-tillegget:"
   count_exceptions_1176c596: 
     one: "%{count} unntak"
     other: "%{count} unntak"
@@ -6866,6 +6869,7 @@ nn:
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ikkje tel med denne oppgåva i sluttresultatet"
   do_nothing_9672b478: "Gjer ingenting"
   docviewer_area_updated_43f60b7e: "Docviewer-område er oppdatert"
+  docviewer_free_text_created_1b9c8cf9: "Docviewer-fritekst oppretta"
   docviewer_highlight_updated_47dc7da2: "Docviewer-markering er oppdatert"
   does_not_meet_expectations_b0736d20: "Innfrir ikkje forventningar"
   domain_3b54c511: Domene
@@ -13556,6 +13560,7 @@ nn:
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: Øvingsquiz
   pre_processing_92865c1d: "Førebur behandling"
+  prerequisite_completion_period_c562d63: "Periode føresetnaden må ferdigstillast innanfor"
   prerequisites_49659f16: "Føresetnader:"
   prerequisites_lookup: 
     headers: 
@@ -17640,6 +17645,7 @@ nn:
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
   this_assignment_has_been_excused_87f1dc13: "Oppgåva er fritatt."
+  this_assignment_is_currently_being_moderated_ffd280f2: "Denne oppgåva er under retting akkurat no"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Denne oppgåva er skjult. Det betyr at studentane ikkje kan sjå karakterane og tilbakemeldingane. Vil du oppheve skjuling?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Oppgåva er fjerna og er ikkje med i den totale utrekninga"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Oppgåva er fritatt og er ikkje med i den totale utrekninga"
