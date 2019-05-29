@@ -85,7 +85,7 @@ describe('ltiKeysUpdateCustomizations', () => {
   const customFields = 'foo=bar\r\nkey=value'
   const developerKey = {
     scopes,
-    redirectUris
+    redirect_uris: redirectUris
   }
 
   const update = dispatch => {

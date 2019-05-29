@@ -154,7 +154,7 @@ actions.ltiKeysUpdateCustomizations = (developerKey, disabled_placements, develo
     .put(url, {
       developer_key: {
         scopes: developerKey.scopes,
-        redirect_uris: developerKey.redirectUris
+        redirect_uris: developerKey.redirect_uris
       },
       tool_configuration: {
         custom_fields: customFields,
