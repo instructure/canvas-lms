@@ -334,8 +334,8 @@
         </td>
       </tr>
       <tr>
-        <td class="form-label"><%= f.label :license, :en => "License" %></td>
-        <td colspan="3">
+        <td class="form-label"><label for="license"><%= before_label('license', %{License}) %></label></td>
+        <td colspan="3" id="license">
           <% if can_manage %>
             <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license].call, id]}.partition{|n, id| id.start_with?('cc')} %>
             <select name="course[license]" id="course_license">
