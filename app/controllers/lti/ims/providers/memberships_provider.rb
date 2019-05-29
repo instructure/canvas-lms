@@ -178,7 +178,7 @@ module Lti::Ims::Providers
     end
 
     def preload_past_lti_ids(enrollments)
-      UserPastLtiId.manual_preload_past_lti_ids(enrollments.map(&:user), @context)
+      UserPastLtiId.manual_preload_past_lti_ids(enrollments, @context)
     end
 
     def limit

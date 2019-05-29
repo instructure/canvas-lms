@@ -88,7 +88,7 @@ module Lti::Ims::Providers
     end
 
     def base_enrollments_scope(user_ids)
-      context.participating_enrollments.where(user_id: user_ids).order(:user_id)
+      context.participating_enrollments.where(user_id: user_ids).order(:user_id).preload(:sis_pseudonym)
     end
 
     def to_memberships(enrollments)

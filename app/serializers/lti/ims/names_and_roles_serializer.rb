@@ -46,18 +46,19 @@ module Lti::Ims
     def serialize_membership(enrollment)
       # Inbound model is either an ActiveRecord Enrollment or GroupMembership, with delegations in place
       # to make them behave more or less the same for our purposes
-      expander = variable_expander(enrollment.user)
+      expander = variable_expander(enrollment)
       member(enrollment, expander).merge!(message(enrollment, expander))
     end
 
-    def variable_expander(user)
+    def variable_expander(enrollment)
       Lti::VariableExpander.new(
         page[:context].root_account,
         Lti::Ims::Providers::MembershipsProvider.unwrap(page[:context]),
         page[:controller],
         {
-          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(user),
+          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
+          enrollment: enrollment,
           variable_whitelist: %w(
             Person.name.full
             Person.name.display
