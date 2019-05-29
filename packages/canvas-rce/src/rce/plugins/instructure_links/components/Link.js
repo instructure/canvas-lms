@@ -109,10 +109,13 @@ export default function Link(props) {
       onDragStart={handleDragStart}
       onMouseEnter={handleHover}
       onMouseLeave={handleHover}
+      style={{position: 'relative'}}
     >
       <View
         className={css(styles.link)}
-        as="button"
+        as="div"
+        role="button"
+        tabIndex="0"
         background="default"
         display="block"
         width="100%"

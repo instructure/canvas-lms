@@ -139,7 +139,7 @@ module RCENextPage
   end
 
   def course_item_link(title)
-    fj("[data-testid='instructure_links-Link'] button:contains('#{title}')")
+    fj("[data-testid='instructure_links-Link'] [role='button']:contains('#{title}')")
   end
 
   def more_toolbar_button
