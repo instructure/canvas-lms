@@ -261,7 +261,7 @@ module AccountReports
     end
 
     def outcome_order
-      param = @account_report.has_parameter? 'order'
+      param = @account_report.value_for_param('order')
       param = param.downcase if param
       order_options = %w(users courses outcomes)
       select = order_options & [param]

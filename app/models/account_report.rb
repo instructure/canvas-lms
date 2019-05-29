@@ -117,6 +117,10 @@ class AccountReport < ActiveRecord::Base
     self.parameters.is_a?(Hash) && self.parameters[key].presence
   end
 
+  def value_for_param(key)
+    self.parameters.is_a?(Hash) && self.parameters[key].presence
+  end
+
   def self.available_reports
     # check if there is a reports plugin for this account
     AccountReports.available_reports
