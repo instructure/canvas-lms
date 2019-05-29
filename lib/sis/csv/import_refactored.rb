@@ -306,7 +306,7 @@ module SIS
 
       def is_last_parallel_importer_of_type?(parallel_importer)
         importer_type = parallel_importer.importer_type.to_sym
-        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w{queued running retry}).exists?
+        return false if @batch.parallel_importers.where(:importer_type => importer_type).not_completed.exists?
 
         SisBatch.transaction do
           @batch.reload(:lock => true)
