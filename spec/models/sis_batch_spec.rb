@@ -65,6 +65,15 @@ describe SisBatch do
     end
   end
 
+  it 'should see pending imports as not completed' do
+    batch = process_csv_data([%{user_id,login_id,status
+                                user_1,user_1,active},
+                              %{course_id,short_name,long_name,term_id,status
+                                course_1,course_1,course_1,term_1,active}])
+    ParallelImporter.where(sis_batch_id: batch).update_all(workflow_state: 'pending')
+    expect(batch.parallel_importers.not_completed.count).to eq 2
+  end
+
   it 'should restore scores when restoring enrollments' do
     course = @account.courses.create!(name: 'one', sis_source_id: 'c1')
     user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
