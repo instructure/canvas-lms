@@ -51,7 +51,43 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     def log_entry_id(entry, field_name)
       override_entry_method = :"#{field_name}_log_entry"
       entry = @mutation.send(override_entry_method, entry) if @mutation.respond_to?(override_entry_method)
-      entry.global_asset_string
+
+      domain_root_account = root_account_for(entry)
+
+      "#{domain_root_account.global_id}-#{entry.asset_string}"
+    end
+
+    ##
+    # it's too expensive to try to determine if a user has permission for each
+    # log entry on the mutation audit log, so instead we make sure that they
+    # have permission to view logs in their domain root account, and embed the
+    # root_account_id for every object in its identifier.
+    #
+    # this method will have to know how to resolve a root account for every
+    # object that is logged by a mutation
+    def root_account_for(entry)
+      if Progress === entry
+        entry = entry.context
+      end
+
+      if entry.respond_to? :root_account_id
+        return entry.root_account
+      end
+
+      case entry
+      when Course
+        entry.root_account
+      when Assignment, ContextModule, SubmissionComment
+        entry.context.root_account
+      when Submission
+        entry.assignment.course.root_account
+      when SubmissionDraft
+        entry.submission.assignment.course.root_account
+      when PostPolicy
+        (entry.assignment&.course || entry.course).root_account
+      else
+        raise "don't know how to resolve root_account for #{entry.inspect}"
+      end
     end
 
     # TODO: i need the timestamp in this column for ordering, and

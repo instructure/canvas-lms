@@ -77,7 +77,11 @@ end
 
 describe AuditLogFieldExtension::Logger do
   let(:mutation) { double(graphql_name: "asdf") }
-  let(:entry) { double(global_asset_string: "asdf_1234") }
+
+  before(:once) do
+    course_with_teacher(active_all: true)
+    @entry = @course.assignments.create! name: "asdf"
+  end
 
   it "sanitizes arguments" do
     logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {password: "TOP SECRET"}})
@@ -85,15 +89,15 @@ describe AuditLogFieldExtension::Logger do
   end
 
   context "#log_entry_id" do
-    it "uses #global_asset_string for the object_id" do
+    it "uses #asset_string and includes the domain_root_account id for the object_id" do
       logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})
-      expect(logger.log_entry_id(entry, "some_field")).to eq "asdf_1234"
+      expect(logger.log_entry_id(@entry, "some_field")).to eq "#{@course.root_account.global_id}-assignment_#{@entry.id}"
     end
 
     it "allows overriding the logged object" do
-      expect(mutation).to receive(:whatever_log_entry) { double(global_asset_string: "overridden_5678") }
+      expect(mutation).to receive(:whatever_log_entry) { @entry.context }
       logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})
-      expect(logger.log_entry_id(entry, "whatever")).to eq "overridden_5678"
+      expect(logger.log_entry_id(@entry, "whatever")).to eq "#{@course.root_account.global_id}-course_#{@course.id}"
     end
   end
 
