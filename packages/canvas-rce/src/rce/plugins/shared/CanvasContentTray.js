@@ -97,7 +97,7 @@ export default function CanvasContentTray(props) {
         setIsOpen(true)
       },
       hideTray() {
-        setIsOpen(false)
+        handleDismissTray()
       }
     }
 
@@ -108,19 +108,31 @@ export default function CanvasContentTray(props) {
     }
   }, [props.bridge])
 
+  // called to close the tray
+  function handleDismissTray() {
+    setIsOpen(false)
+  }
+
+  // called after the tray is closed
+  function handleCloseTray() {
+    props.bridge.getEditor().mceInstance().focus(false)
+  }
+
   return (
     <Tray
       label={getTrayLabel(filterSettings)}
       open={isOpen}
       placement="end"
+      shouldReturnFocus={false}
       size="regular"
-      onDismiss={() => setIsOpen(false)}
+      onDismiss={handleDismissTray}
+      onClose={handleCloseTray}
     >
       <Flex direction="column" display="block" height="100vh" overflowY="hidden">
         <Flex.Item padding="medium" shadow="above">
           <Flex margin="none none medium none">
             <Flex.Item>
-              <CloseButton placement="static" variant="icon" onClick={() => setIsOpen(false)}>
+              <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
                 {formatMessage('Close')}
               </CloseButton>
             </Flex.Item>

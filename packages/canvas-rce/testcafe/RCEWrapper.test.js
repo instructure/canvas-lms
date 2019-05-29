@@ -18,7 +18,7 @@
 
 /* eslint-disable mocha/no-global-tests, mocha/handle-done-callback */
 
-import {Selector} from 'testcafe'
+import {Selector, ClientFunction} from 'testcafe'
 
 fixture`RCEWrapper`.page`./testcafe.html`
 
@@ -33,6 +33,7 @@ const editLinkMenuItem = Selector('[role="menuitem"]').withText("Edit Link")
 const removeLinkMenuItem = Selector('[role="menuitem"]').withText("Remove Link")
 const linkDialog = Selector('.tox-dialog__title').withText('Insert/Edit Link')
 const selectword = Selector('#selectword')
+const linksTraySelector = '[role="dialog"][aria-label="Course Links"]'
 
 // given a DOM with
 // <label for="someid">some label text</label><input id="someid"/>
@@ -137,4 +138,33 @@ test('can remove a link', async t => {
   await t
     .switchToIframe(tinyIframe)
     .expect(Selector('a').exists).notOk()
+})
+
+test('focus returns on dismissing tray', async t => {
+  const tinymceSelection = ClientFunction(() => tinymce.get('textarea').selection.getContent()) // the textarea id is from testcafe.html
+  const focusedId = ClientFunction(() => document.activeElement.id)
+  const focusedTag = ClientFunction(() => document.activeElement.tagName)
+
+  await t
+    .click(toggleButton)
+    .typeText(textarea, '<div>this is <span id="selectword">selected</span> text</div>')
+    .click(toggleButton)
+    .expect(rceContainer.visible).ok()
+
+  await t
+    .switchToIframe(tinyIframe)
+    .selectEditableContent(selectword, selectword)
+    .switchToMainWindow()
+    .click(linksButton)
+    .click(courseLinksMenuItem)
+    .expect(Selector(linksTraySelector).visible).ok()
+    .click(Selector(`${linksTraySelector} button`).withText('Close'))
+    .expect(Selector(linksTraySelector).exist).notOk()
+
+  await t
+    .expect(tinymceSelection()).eql('selected')
+    .expect(focusedId()).eql('textarea_ifr')
+
+    .switchToIframe(tinyIframe)
+    .expect(focusedTag()).eql('BODY')
 })
