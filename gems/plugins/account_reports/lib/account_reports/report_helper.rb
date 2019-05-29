@@ -272,7 +272,7 @@ module AccountReports::ReportHelper
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
       Shackles.activate(:slave) { yield csv } if block_given?
-      @account_report.update_attribute(:current_line, csv.lineno)
+      Shackles.activate(:master) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
   end
