@@ -119,10 +119,10 @@ export default class DeveloperKeyModal extends React.Component {
     const method = editing ? 'put' : 'post'
     const toSubmit = this.developerKey
 
-    if(typeof toSubmit.require_scopes === 'undefined') {
+    if(!toSubmit.require_scopes) {
       toSubmit.require_scopes = false
     }
-    if(typeof toSubmit.name === 'undefined') {
+    if(!toSubmit.name) {
       toSubmit.name = 'Unnamed Tool'
     }
     if(toSubmit.require_scopes) {
