@@ -1405,13 +1405,37 @@ class Enrollment < ActiveRecord::Base
         override_scope.where(assignment_id: assignment_ids).find_each(&:destroy)
       end
     end
+
+    if being_accepted?
+      return unless ConditionalRelease::Service.enabled_in_context?(self.course)
+      # Deleted student overrides associated with assignments with a Mastery Path override
+      releases = override_scope.where(workflow_state: 'deleted').
+        where(assignment: assignment_scope).
+        joins(assignment: :assignment_overrides).
+        where(assignment_overrides: {
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS,
+          workflow_state: 'active'
+        }).distinct
+      return unless releases.exists?
+      # Add parent join to reduce duplication, which are used in both cases below
+      releases = releases.
+        joins("INNER JOIN #{AssignmentOverride.quoted_table_name} parent ON assignment_override_students.assignment_override_id = parent.id")
+      # Restore student overrides associated with an active assignment override
+      releases.where('parent.workflow_state = \'active\'').update(workflow_state: 'active')
+      # Restore student overrides and assignment overrides if assignment override is deleted
+      releases.preload(:assignment_override).where('parent.workflow_state = \'deleted\'').find_each do |release|
+        release.update(workflow_state: 'active')
+        release.assignment_override.update(workflow_state: 'active')
+      end
+    end
   end
 
   def section_or_course_date_in_past?
-    if self.course_section && self.course_section.end_at
-      self.course_section.end_at < Time.now
+    if self.course_section&.end_at
+      self.course_section.end_at < Time.zone.now
     elsif self.course.conclude_at
-      self.course.conclude_at < Time.now
+      self.course.conclude_at < Time.zone.now
     end
   end
 
@@ -1514,6 +1538,10 @@ class Enrollment < ActiveRecord::Base
   def remove_user_as_final_grader?
     instructor? &&
       !other_enrollments_of_type(['TaEnrollment', 'TeacherEnrollment']).exists?
+  end
+
+  def being_accepted?
+    saved_change_to_workflow_state? && workflow_state == 'active' && workflow_state_before_last_save == 'invited'
   end
 
   def being_restored?(to_state: workflow_state)
