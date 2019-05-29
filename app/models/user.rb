@@ -2717,9 +2717,14 @@ class User < ActiveRecord::Base
   end
 
   def current_active_groups?
-    return true if self.current_groups.preload(:context).any?(&:context_available?)
-    return true if self.current_groups.shard(self.in_region_associated_shards).preload(:context).any?(&:context_available?)
-    false
+    return @_current_active_groups if defined?(@_current_active_groups)
+    @_current_active_groups = self.shard.activate do
+      Rails.cache.fetch_with_batched_keys(['current_active_groups', ApplicationController.region].cache_key, batch_object: self, batched_keys: :groups) do
+        return true if self.current_groups.preload(:context).any?(&:context_available?)
+        return true if self.current_groups.shard(self.in_region_associated_shards).preload(:context).any?(&:context_available?)
+        false
+      end
+    end
   end
 
   def all_active_pseudonyms(reload=false)
