@@ -19,9 +19,9 @@
 class AccountReport < ActiveRecord::Base
   include Workflow
 
-  belongs_to :account
-  belongs_to :user
-  belongs_to :attachment
+  belongs_to :account, inverse_of: :account_reports
+  belongs_to :user, inverse_of: :account_reports
+  belongs_to :attachment, inverse_of: :account_report
   has_many :account_report_runners, inverse_of: :account_report, autosave: false
   has_many :account_report_rows, inverse_of: :account_report, autosave: false
 

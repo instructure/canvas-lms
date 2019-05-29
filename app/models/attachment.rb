@@ -64,7 +64,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user
-  has_one :account_report
+  has_one :account_report, inverse_of: :attachment
   has_one :media_object
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }

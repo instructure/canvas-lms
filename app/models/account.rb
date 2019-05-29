@@ -68,7 +68,7 @@ class Account < ActiveRecord::Base
            inverse_of: :account,
            extend: AuthenticationProvider::FindWithType
 
-  has_many :account_reports
+  has_many :account_reports, inverse_of: :account
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, :through => :assessment_question_banks
