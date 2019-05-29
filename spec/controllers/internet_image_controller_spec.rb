@@ -37,7 +37,7 @@ describe InternetImageController do
     before :once do
       # these specs need an enabled unsplash plugin
       @plugin = PluginSetting.create!(name: 'unsplash')
-      @plugin.update_attribute(:settings, { access_key: 'key' }.with_indifferent_access)
+      @plugin.update_attribute(:settings, { access_key: 'key', application_name: 'canvas' }.with_indifferent_access)
     end
 
     before :each do
@@ -66,11 +66,11 @@ describe InternetImageController do
       expect(json['description']).to eq nil
       expect(json['alt']).to eq 'selective focus photo of gray tabby cat'
       expect(json['user']).to eq "Erika Jan"
-      expect(json['user_url']).to eq "https://unsplash.com/@ejan"
-      expect(json['large_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
-      expect(json['regular_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
-      expect(json['small_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
-      expect(json['raw_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjQxMzYwfQ"
+      expect(json['user_url']).to eq "https://unsplash.com/@ejan?utm_medium=referral&utm_source=canvas"
+      expect(json['large_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ&utm_medium=referral&utm_source=canvas"
+      expect(json['regular_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ&utm_medium=referral&utm_source=canvas"
+      expect(json['small_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjQxMzYwfQ&utm_medium=referral&utm_source=canvas"
+      expect(json['raw_url']).to eq "https://images.unsplash.com/photo-1841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjQxMzYwfQ&utm_medium=referral&utm_source=canvas"
       download_url = Canvas::Security.url_key_decrypt_data(json['id'])
       expect(download_url).to eq "https://api.unsplash.com/photos/bPxGLgJiMI/download"
     end
