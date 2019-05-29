@@ -23,10 +23,12 @@ class ParallelImporter < ActiveRecord::Base
 
   scope :running, -> {where(workflow_state: 'running')}
   scope :completed, -> {where(workflow_state: 'completed')}
+  scope :not_completed, -> {where(workflow_state: %w{pending queued running retry})}
 
   include Workflow
   workflow do
     state :pending
+    state :queued
     state :running
     state :retry
     state :failed
@@ -55,4 +57,3 @@ class ParallelImporter < ActiveRecord::Base
     self.update_attributes!(updates)
   end
 end
-
