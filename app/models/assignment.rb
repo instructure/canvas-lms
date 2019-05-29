@@ -1524,7 +1524,7 @@ class Assignment < ActiveRecord::Base
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
-    can :grade and can :attach_submission_comment_files
+    can :grade and can :attach_submission_comment_files and can :manage_files
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :create and can :read and can :attach_submission_comment_files
