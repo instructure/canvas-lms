@@ -7842,6 +7842,7 @@ describe Assignment do
             line_item
             subject.line_items.destroy_all
             resource_link.destroy!
+            subject.update!(lti_context_id: SecureRandom.uuid)
             subject.create_assignment_line_item!
           end
 
@@ -7849,7 +7850,7 @@ describe Assignment do
             subject { assignment }
 
             it 'sets a line item' do
-              expect(subject.line_items.count).to eq 1
+              expect(subject.line_items.active.count).to eq 1
             end
 
             it 'creates a new assignment line item' do
