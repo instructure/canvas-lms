@@ -415,14 +415,6 @@ restrict_students_from_annotating:
     apply to peer-reviewed assignments.
   applies_to: Course
   development: true
-post_policies:
-  state: hidden
-  display_name: Post Policies
-  description: |-
-    Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
-    posted and hidden manually.
-  applies_to: Course
-  development: true
 rce_enhancements:
   state: hidden
   display_name: RCE Enhancements

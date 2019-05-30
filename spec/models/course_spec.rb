@@ -1261,7 +1261,8 @@ describe Course do
     let_once(:course) { Course.create! }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:post_policies) }
+      before(:once) { course.enable_feature!(:new_gradebook) }
+      before(:once) { PostPolicy.enable_feature! }
 
       it "returns true if a policy with manual posting is attached to the course" do
         course.default_post_policy.update!(post_manually: true)
@@ -1283,7 +1284,8 @@ describe Course do
     let_once(:course) { Course.create! }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:post_policies) }
+      before(:once) { course.enable_feature!(:new_gradebook) }
+      before(:once) { PostPolicy.enable_feature! }
 
       it "sets the post policy for the course" do
         course.apply_post_policy!(post_manually: true)
@@ -1360,6 +1362,26 @@ describe Course do
 
       course.save!
       expect(course.reload.default_post_policy).to be_post_manually
+    end
+  end
+
+  describe "#post_policies_enabled?" do
+    let_once(:course) { Course.create! }
+
+    it "returns true when both post policies and new gradebook are enabled" do
+      PostPolicy.enable_feature!
+      course.enable_feature!(:new_gradebook)
+      expect(course).to be_post_policies_enabled
+    end
+
+    it "returns false when post policies is enabled but new gradebook is not enabled" do
+      PostPolicy.enable_feature!
+      expect(course).not_to be_post_policies_enabled
+    end
+
+    it "returns false when post policies is not enabled" do
+      course.enable_feature!(:new_gradebook)
+      expect(course).not_to be_post_policies_enabled
     end
   end
 end

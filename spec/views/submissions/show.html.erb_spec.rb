@@ -228,7 +228,7 @@ describe "/submissions/show" do
 
       context "when post policies are enabled" do
         before(:each) do
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
         end
 
         it "is present when the submission is posted" do
@@ -263,7 +263,7 @@ describe "/submissions/show" do
 
     context "when post policies are enabled" do
       before(:each) do
-        @course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
       end
 
       it "displays a message when submission is unposted" do
@@ -370,7 +370,7 @@ describe "/submissions/show" do
 
         context "when post policies are enabled" do
           before(:each) do
-            course.enable_feature!(:post_policies)
+            PostPolicy.enable_feature!
           end
 
           it 'shows all comments if the submission is posted' do
@@ -403,7 +403,7 @@ describe "/submissions/show" do
 
         context "when post policies are enabled" do
           before(:each) do
-            course.enable_feature!(:post_policies)
+            PostPolicy.enable_feature!
           end
 
           it 'shows all comments if the submission is posted' do

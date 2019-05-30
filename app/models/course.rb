@@ -3381,13 +3381,13 @@ class Course < ActiveRecord::Base
   end
 
   def post_manually?
-    return false unless feature_enabled?(:post_policies)
+    return false unless post_policies_enabled?
 
     default_post_policy.present? && default_post_policy.post_manually?
   end
 
   def apply_post_policy!(post_manually:)
-    return unless feature_enabled?(:post_policies)
+    return unless PostPolicy.feature_enabled?
 
     course_policy = PostPolicy.find_or_create_by(course: self, assignment_id: nil)
     course_policy.update!(post_manually: post_manually) unless course_policy.post_manually == post_manually
@@ -3438,6 +3438,10 @@ class Course < ActiveRecord::Base
         self.public_syllabus_to_auth = false
       end
     end
+  end
+
+  def post_policies_enabled?
+    feature_enabled?(:new_gradebook) && PostPolicy.feature_enabled?
   end
 
   private

@@ -239,7 +239,8 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#posted_to_student?" do
     context "when post policies are enabled" do
-      before(:each) { @course.enable_feature!(:post_policies) }
+      before(:each) { @course.enable_feature!(:new_gradebook) }
+      before(:each) { PostPolicy.enable_feature! }
 
       it "returns true when the student's submission is posted" do
         @submission.update!(posted_at: Time.zone.now)

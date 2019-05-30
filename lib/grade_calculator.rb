@@ -966,6 +966,6 @@ class GradeCalculator
   def ignore_submission?(submission:, assignment:)
     return false unless @ignore_muted
 
-    @course.feature_enabled?(:post_policies) ? !submission.posted? : assignment.muted?
+    @course.post_policies_enabled? ? !submission.posted? : assignment.muted?
   end
 end

@@ -267,7 +267,10 @@ describe "/gradebooks/grade_summary" do
     end
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:post_policies) }
+      before(:once) do
+        course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+      end
 
       context "when a submission is unposted" do
         it "displays the 'hidden' icon" do

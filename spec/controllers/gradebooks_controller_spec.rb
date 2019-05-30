@@ -915,7 +915,7 @@ describe GradebooksController do
 
       it "sets post_policies_enabled to true when Post Policies are enabled" do
         @course.enable_feature!(:new_gradebook)
-        @course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
         get :show, params: { course_id: @course.id }
         expect(gradebook_options[:post_policies_enabled]).to be(true)
       end
@@ -936,7 +936,7 @@ describe GradebooksController do
       describe "post_policies_enabled" do
         it "is set to true if New Gradebook is enabled and post policies are enabled" do
           @course.enable_feature!(:new_gradebook)
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
 
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_policies_enabled]).to be true
@@ -958,7 +958,7 @@ describe GradebooksController do
       describe "post_manually" do
         it "is set to true if post policies are enabled and the course is manually-posted" do
           @course.enable_feature!(:new_gradebook)
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
 
           @course.post_policies.create!(post_manually: true)
           get :show, params: {course_id: @course.id}
@@ -967,7 +967,7 @@ describe GradebooksController do
 
         it "is set to false if post policies are enabled and the course is not manually-posted" do
           @course.enable_feature!(:new_gradebook)
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
 
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be false
@@ -2127,7 +2127,8 @@ describe GradebooksController do
         before(:each) { @course.enable_feature!(:new_gradebook) }
 
         it "is set to true if the Post Policies feature is enabled" do
-          @course.enable_feature!(:post_policies)
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
 
           get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
           expect(assigns[:js_env][:post_policies_enabled]).to be true

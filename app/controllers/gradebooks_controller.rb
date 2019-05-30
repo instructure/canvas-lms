@@ -681,7 +681,7 @@ class GradebooksController < ApplicationController
 
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
-          env[:post_policies_enabled] = true if @context.feature_enabled?(:post_policies)
+          env[:post_policies_enabled] = true if @context.post_policies_enabled?
           env[:selected_student_group_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'student_group_id')
         end
 
@@ -853,9 +853,9 @@ class GradebooksController < ApplicationController
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
-      post_policies_enabled: @context.feature_enabled?(:post_policies)
+      post_policies_enabled: @context.post_policies_enabled?
     }
-    new_gradebook_options[:post_manually] = @context.post_manually? if @context.feature_enabled?(:post_policies)
+    new_gradebook_options[:post_manually] = @context.post_manually? if @context.post_policies_enabled?
 
     {GRADEBOOK_OPTIONS: new_gradebook_options}
   end

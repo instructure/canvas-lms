@@ -37,8 +37,8 @@ describe 'Gradezilla Post Policy' do
     ).course
     @teacher1 = @teacher
     @course_with_manual_post.enable_feature!(:new_gradebook)
-    @course_with_manual_post.enable_feature!(:post_policies)
-    @course_with_manual_post.default_post_policy.update!(post_manually: true)
+    PostPolicy.enable_feature!
+    @course_with_manual_post.post_policies.create!(post_manually: true)
     # second course with post manually
     @course_with_auto_post = course_with_teacher(
       course_name: "Post Policy Course Manually",
@@ -49,8 +49,8 @@ describe 'Gradezilla Post Policy' do
     ).course
     @teacher2 = @teacher
     @course_with_auto_post.enable_feature!(:new_gradebook)
-    @course_with_auto_post.enable_feature!(:post_policies)
-    @course_with_auto_post.default_post_policy.update!(post_manually: false)
+    PostPolicy.enable_feature!
+    @course_with_auto_post.post_policies.create!(post_manually: false)
 
     # sections
     @section1 = @course_with_manual_post.course_sections.first

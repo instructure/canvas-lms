@@ -397,7 +397,7 @@ class GradebookExporter
   end
 
   def show_as_hidden?(assignment)
-    if @course.feature_enabled?(:post_policies)
+    if @course.post_policies_enabled?
       assignment.post_manually?
     else
       assignment.muted?
@@ -405,6 +405,6 @@ class GradebookExporter
   end
 
   def hidden_assignment_text
-    @course.feature_enabled?(:post_policies) ? "Manual Posting" : "Muted"
+    @course.post_policies_enabled? ? "Manual Posting" : "Muted"
   end
 end

@@ -427,7 +427,8 @@ describe SpeedGrader::Assignment do
 
       context "when post policies are enabled" do
         before(:each) do
-          @course.enable_feature!(:post_policies)
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
         end
 
         it "includes the submission's posted-at date in the posted_at field" do
@@ -2777,7 +2778,8 @@ describe SpeedGrader::Assignment do
 
     context "when post policies are enabled" do
       before(:once) do
-        @course.enable_feature!(:post_policies)
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
       end
 
       it "sets post_manually to true in the response if the assignment is manually-posted" do

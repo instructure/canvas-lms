@@ -237,7 +237,7 @@ describe Assignment do
 
       it "newly-created anonymous assignments are set to post manually" do
         assignment = @course.assignments.create!(title: 'hi', anonymous_grading: true)
-        expect(assignment).to be_post_manually
+        expect(assignment.post_policy).to be_post_manually
       end
 
       it "existing assignments are set to post manually if anonymous grading is enabled" do
@@ -245,7 +245,7 @@ describe Assignment do
         assignment.post_policy.update!(post_manually: false)
 
         assignment.update!(anonymous_grading: true)
-        expect(assignment).to be_post_manually
+        expect(assignment.post_policy).to be_post_manually
       end
 
       it "newly-created moderated assignments are set to post manually" do
@@ -255,7 +255,7 @@ describe Assignment do
           title: 'hi',
           moderated_grading: true
         )
-        expect(assignment).to be_post_manually
+        expect(assignment.post_policy).to be_post_manually
       end
 
       it "existing assignments are set to post manually if moderated grading is enabled" do
@@ -263,26 +263,26 @@ describe Assignment do
         assignment.post_policy.update!(post_manually: false)
 
         assignment.update!(moderated_grading: true, grader_count: 5, final_grader: teacher)
-        expect(assignment).to be_post_manually
+        expect(assignment.post_policy).to be_post_manually
       end
 
       context "for newly-created non-anonymous, non-moderated assignments" do
         it "the post policy is set to manual for a manually-posted course" do
           @course.default_post_policy.update!(post_manually: true)
           assignment = @course.assignments.create!
-          expect(assignment).not_to be_post_manually
+          expect(assignment.post_policy).to be_post_manually
         end
 
         it "the post policy is set to automatic for a automatically-posted course" do
           @course.default_post_policy.update!(post_manually: false)
           assignment = @course.assignments.create!
-          expect(assignment).not_to be_post_manually
+          expect(assignment.post_policy).not_to be_post_manually
         end
 
         it "the post policy is set to automatic if the course has no post policy" do
           @course.default_post_policy.destroy
           assignment = @course.assignments.create!
-          expect(assignment).not_to be_post_manually
+          expect(assignment.post_policy).not_to be_post_manually
         end
 
         it "the assignment receives its own PostPolicy object" do
@@ -1994,7 +1994,8 @@ describe Assignment do
         end
 
         it "does not post the submission for a manually-posted assignment when post policies are enabled" do
-          course.enable_feature!(:post_policies)
+          course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
 
           assignment.post_policy.update!(post_manually: true)
           assignment.grade_student(student, grader: teacher, score: 50)
@@ -2882,25 +2883,26 @@ describe Assignment do
 
     it "ensures an assignment with no previous post policy posts manually when it is muted" do
       @assignment.mute!
-      expect(@assignment).to be_post_manually
+      expect(@assignment.post_policy).to be_post_manually
+    end
+
+    it "defaults to muted when post policies are enabled" do
+      @course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
+      expect(@course.assignments.create!).to be_muted
     end
 
     it "ensures an auto-posting assignment posts manually when it is muted" do
       @assignment.post_policy.update!(post_manually: false)
 
       @assignment.mute!
-      expect(@assignment).to be_post_manually
+      expect(@assignment.post_policy).to be_post_manually
     end
 
     it "ensures a muted assignment posts automatically when it is unmuted" do
       @assignment.mute!
       @assignment.unmute!
       expect(@assignment.reload).not_to be_post_manually
-    end
-
-    it "mutes assignments by default when post policies are enabled" do
-      @course.enable_feature!(:post_policies) 
-      expect(@course.assignments.create!).to be_muted
     end
   end
 
@@ -7078,7 +7080,8 @@ describe Assignment do
     let(:assignment) { course.assignments.create!(title: 'hello') }
 
     context "when the post_policies feature flag is enabled" do
-      before(:each) { course.enable_feature!(:post_policies) }
+      before(:each) { course.enable_feature!(:new_gradebook) }
+      before(:each) { PostPolicy.enable_feature! }
 
       context "when the assignment has a post policy" do
         it "returns true if the assignment's post policy has manual posting enabled" do
@@ -7139,7 +7142,8 @@ describe Assignment do
       student1
       student2
 
-      @course.enable_feature!(:post_policies)
+      @course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
     end
 
     describe "#post_submissions" do
@@ -7218,7 +7222,7 @@ describe Assignment do
       end
 
       it "does not update the assignment's muted status when post policies are not enabled" do
-        @course.disable_feature!(:post_policies)
+        PostPolicy.disable_feature!
         assignment.mute!
 
         assignment.post_submissions
@@ -7338,7 +7342,7 @@ describe Assignment do
       end
 
       it "does not update the assignment's muted status when post policies are not enabled" do
-        @course.disable_feature!(:post_policies)
+        PostPolicy.disable_feature!
         assignment.hide_submissions
         expect(assignment).not_to be_muted
       end

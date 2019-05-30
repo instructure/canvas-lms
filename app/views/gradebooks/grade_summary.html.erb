@@ -27,8 +27,8 @@
 <%
   whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
 
-  hidden_text = @context.feature_enabled?(:post_policies) ? t("Hidden") : t("Muted")
-  hidden_icon_class = @context.feature_enabled?(:post_policies) ? "icon-off" : "icon-muted"
+  hidden_text = @context.post_policies_enabled? ? t("Hidden") : t("Muted")
+  hidden_icon_class = @context.post_policies_enabled? ? "icon-off" : "icon-muted"
 %>
 <div id="grade-summary-content" style="display: none;">
   <% content_for :right_side do %>

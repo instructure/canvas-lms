@@ -1760,7 +1760,7 @@ describe Submission do
 
       context "when post policies feature is enabled" do
         before(:once) do
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
         end
 
         it "user can read their own grade when their submission is posted" do
@@ -2042,7 +2042,7 @@ describe Submission do
 
     context "when post policies feature is enabled" do
       before(:once) do
-        @course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
       end
 
       it "user can read their own grade when their submission is posted" do
@@ -4547,7 +4547,7 @@ describe Submission do
 
     context "when post policies are enabled" do
       before(:each) do
-        @course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
       end
 
       it "returns empty if submission is unposted and user cannot :read_grade" do
@@ -4804,7 +4804,7 @@ describe Submission do
       let(:comment_params) { {comment: "oh no", author: teacher} }
 
       before(:each) do
-        course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
       end
 
       context "when the submission is unposted" do
@@ -4843,7 +4843,8 @@ describe Submission do
         end
 
         it "does not post the submission if post policies are enabled and the assignment is manually-posted" do
-          course.enable_feature!(:post_policies)
+          course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
 
           assignment.ensure_post_policy(post_manually: true)
           submission.add_comment(comment_params)
@@ -5010,7 +5011,7 @@ describe Submission do
 
     context "when post policies enabled" do
       before(:once) do
-        @course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
       end
 
       it "shows teacher all comments" do
@@ -6442,7 +6443,8 @@ describe Submission do
 
   describe "posting and unposting" do
     before(:each) do
-      @assignment.course.enable_feature!(:post_policies)
+      @assignment.course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
     end
 
     let(:submission) { @assignment.submissions.first }
@@ -6480,7 +6482,7 @@ describe Submission do
         end
 
         context "when post policies are disabled" do
-          before(:each) { @assignment.course.disable_feature!(:post_policies) }
+          before(:each) { PostPolicy.disable_feature! }
 
           it "does not call post_submissions on the assignment" do
             expect(@assignment).not_to receive(:post_submissions)
@@ -6512,7 +6514,7 @@ describe Submission do
         end
 
         context "when post policies are disabled" do
-          before(:each) { @assignment.course.disable_feature!(:post_policies) }
+          before(:each) { PostPolicy.disable_feature! }
 
           it "does not call post_submissions on the assignment" do
             expect(@assignment).not_to receive(:hide_submissions)

@@ -2446,7 +2446,7 @@ class Submission < ActiveRecord::Base
   end
 
   def posted?
-    if assignment.course.feature_enabled?(:post_policies)
+    if PostPolicy.feature_enabled?
       posted_at.present?
     else
       !assignment.muted?
@@ -2667,7 +2667,7 @@ class Submission < ActiveRecord::Base
     # where all submissions in a section are updated. In this case, we call
     # [un]post_submissions to follow the normal workflow, but skip updating the
     # posted_at date since that already happened.
-    return unless assignment.course.feature_enabled?(:post_policies)
+    return unless assignment.course.post_policies_enabled?
 
     previously_posted = posted_at_before_last_save.present?
     if posted? && !previously_posted

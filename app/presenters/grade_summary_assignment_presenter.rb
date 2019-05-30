@@ -53,7 +53,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def posted_to_student?
-    assignment.course&.feature_enabled?(:post_policies) ? submission.posted? : !assignment.muted?
+    assignment.course&.post_policies_enabled? ? submission.posted? : !assignment.muted?
   end
 
   def graded?

@@ -233,7 +233,7 @@ class GradeSummaryPresenter
   end
 
   def hidden_submissions?
-    if @context.feature_enabled?(:post_policies)
+    if @context.post_policies_enabled?
       !submissions.all?(&:posted?)
     else
       assignments.any?(&:muted?)
