@@ -397,7 +397,7 @@ class Submission < ActiveRecord::Base
     given do |user|
       user &&
         user.id == self.user_id &&
-        !self.assignment.muted?
+        self.posted?
     end
     can :read_grade
 
@@ -437,7 +437,7 @@ class Submission < ActiveRecord::Base
 
     given do |user|
       self.assignment &&
-        !self.assignment.muted? &&
+        self.posted? &&
         self.assignment.context &&
         user &&
         self.user &&
@@ -516,7 +516,7 @@ class Submission < ActiveRecord::Base
     # improves performance by checking permissions on the assignment before the submission
     return true if self.assignment.user_can_read_grades?(user, session)
 
-    return false if self.assignment.muted? # if you don't have manage rights from the assignment you can't read if it's muted
+    return false unless self.posted?
     return true if user && user.id == self.user_id # this is fast, so skip the policy cache check if possible
 
     self.grants_right?(user, session, :read_grade)
@@ -2444,7 +2444,11 @@ class Submission < ActiveRecord::Base
   end
 
   def posted?
-    posted_at.present?
+    if assignment.course.feature_enabled?(:post_policies)
+      posted_at.present?
+    else
+      !assignment.muted?
+    end
   end
 
   def assignment_muted_changed
@@ -2456,7 +2460,7 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_rubric_assessments_for(viewing_user)
-    return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    return [] unless posted? || grants_right?(viewing_user, :read_grade)
     return [] unless self.assignment.rubric_association
 
     filtered_assessments = self.rubric_assessments.select do |a|

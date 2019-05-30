@@ -97,7 +97,8 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments).
-        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at").
+        preload(:assignment)
 
       Rails.logger.debug "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
       submissions

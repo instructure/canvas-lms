@@ -1796,7 +1796,7 @@ class Assignment < ActiveRecord::Base
       submission.grade_matches_current_submission = true
       submission.regraded = true
       submission.graded_at = Time.zone.now
-      submission.posted_at = submission.graded_at unless submission.posted? || post_manually?
+      submission.posted_at = submission.graded_at unless submission.posted_at.present? || post_manually?
     end
     submission.audit_grade_changes = did_grade || submission.excused_changed?
 
