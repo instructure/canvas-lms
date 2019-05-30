@@ -206,7 +206,7 @@ module SIS
 
       def update_progress
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
-        current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
+        current_progress = (completed_count.to_f * 100 / @batch.parallel_importers.count).round
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
@@ -283,7 +283,7 @@ module SIS
       end
 
       def queue_next_importer_set
-        next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
+        next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @batch.parallel_importers.where(importer_type: i).not_completed.exists?}
         return finish unless next_importer_type
 
         enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error!, :max_attempts => 5}
@@ -293,14 +293,14 @@ module SIS
           enqueue_args[:n_strand] = ["sis_parallel_import", @batch.data[:strand_account_id] || @root_account.global_id]
         end
 
-        importers_to_queue = @parallel_importers[next_importer_type]
+        importers_to_queue = @batch.parallel_importers.where(importer_type: next_importer_type).not_completed.pluck(:id)
         updated_count = @batch.parallel_importers.where(:id => importers_to_queue, :workflow_state => "pending").
           update_all(:workflow_state => "queued")
         if updated_count != importers_to_queue.count
           raise "state mismatch error queuing parallel import jobs"
         end
-        importers_to_queue.each do |pi|
-          self.send_later_enqueue_args(:run_parallel_importer, enqueue_args, pi)
+        importers_to_queue.each do |pi_id|
+          self.send_later_enqueue_args(:run_parallel_importer, enqueue_args, pi_id)
         end
       end
 
