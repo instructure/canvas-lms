@@ -140,6 +140,15 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq tool.url
     end
 
+    context 'when the target_link_uri is specified in opts' do
+      let(:target_link_uri) { 'https://www.cool-tool.com/test?foo=bar' }
+      let(:opts) { { resource_type: 'course_navigation', target_link_uri: target_link_uri } }
+
+      it 'sets the "target_link_uri" claim' do
+        expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq target_link_uri
+      end
+    end
+
     context 'when security claim group disabled' do
       let(:opts) { super().merge({claim_group_blacklist: [:security]}) }
 

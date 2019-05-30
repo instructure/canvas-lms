@@ -73,7 +73,13 @@ module Lti::Messages
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
       @message.sub = old_lti_id || @user.lti_id
-      @message.target_link_uri = @tool.extension_setting(@opts[:resource_type], :target_link_uri) || @tool.url
+      @message.target_link_uri = target_link_uri
+    end
+
+    def target_link_uri
+      @opts[:target_link_uri] ||
+      @tool.extension_setting(@opts[:resource_type], :target_link_uri) ||
+      @tool.url
     end
 
     def old_lti_id
