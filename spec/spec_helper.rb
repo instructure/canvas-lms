@@ -371,10 +371,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.before :each do |example|
-    if example.file_path.match? /\.\/spec\/selenium\/.*rcs/
-      skip("Skipping RCS tests until config changes are merged in")
-    end
+  config.before :each do
     raise "all specs need to use transactions" unless using_transactions_properly?
     reset_all_the_things!
   end
