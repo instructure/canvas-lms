@@ -254,7 +254,7 @@
     "postinstall": "yarn build:packages && ./script/install_hooks",
     "webpack:analyze": "NODE_ENV=production SKIP_SOURCEMAPS=1 node --max_old_space_size=8096 $(yarn bin)/webpack --json > stats-prod.json && NODE_OPTIONS=\"--max_old_space_size=8192\" npx webpack-bundle-analyzer stats-prod.json public/dist/webpack-production",
     "webpack": "gulp rev 1> /dev/null & webpack --progress --color --watch",
-    "webpack-development": "gulp rev 1> /dev/null & webpack --color && yarn lint:browser-code",
+    "webpack-development": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color && yarn lint:browser-code",
     "webpack-production": "NODE_ENV=production gulp rev && NODE_ENV=production NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color && yarn lint:browser-code",
     "workspace-run": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report -c $@; exit $?; } && r",
     "workspace-run-serial": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report --serial -c $@; exit $?; } && r",
