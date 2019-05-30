@@ -49,7 +49,7 @@ class ImageSearchItem extends React.Component {
           />
         </button>
         <div className="ImageSearch__attribution">
-          <a href={this.props.userUrl}>
+          <a href={this.props.userUrl} target="_blank" rel="noopener noreferrer">
             <ScreenReaderContent>
               {I18n.t("Artist info for %{userName} for %{description}", {userName: this.props.userName, description: this.props.description})}
             </ScreenReaderContent>

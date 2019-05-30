@@ -52,7 +52,7 @@ const ImageSearchActions = {
   },
 
   clearImageSearch() {
-    this.cancelImageSearch();
+    this.searchApiGet(null)
     return { type: 'CLEAR_IMAGE_SEARCH' }
   },
 
@@ -80,8 +80,9 @@ const ImageSearchActions = {
     }
   },
 
-  searchApiGet: _.debounce(function (url, dispatch) {
+  searchApiGet: _.debounce(function (url, dispatch=null) {
     this.cancelImageSearch();
+    if (url===null) return
     dispatch(this.startImageSearch())
 
     const config = {
@@ -99,7 +100,7 @@ const ImageSearchActions = {
 
   composeSearchUrl(term) {
     const per_page = '12';
-    return `/api/v1/image_search/?query=${term}&per_page=${per_page}`
+    return `/api/v1/image_search/?query=${term}&per_page=${per_page}&orientation=landscape`
   }
 }
 

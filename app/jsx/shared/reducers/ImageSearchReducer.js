@@ -22,12 +22,13 @@
   const imageSearchHandlers = {
     UPDATE_SEARCH_TERM (state, action) {
       state.searchTerm = action.term;
+      state.alert = null;
       return state;
     },
     START_IMAGE_SEARCH (state, action) {
       state.searching = true;
       state.prevUrl = null;
-      state.nextUrl= null;
+      state.nextUrl = null;
       return state;
     },
     RECEIVE_IMAGE_SEARCH_RESULTS (state, action) {
@@ -35,19 +36,22 @@
       state.prevUrl = action.results.prevUrl
       state.nextUrl = action.results.nextUrl
       state.searching = false;
+      state.alert = 'success';
       return state;
     },
     CLEAR_IMAGE_SEARCH (state) {
       state.searchResults = [];
       state.searching = false;
       state.prevUrl = null;
-      state.nextUrl= null;
+      state.nextUrl = null;
       state.searchTerm = '';
+      state.alert = null;
       return state;
     },
     FAIL_IMAGE_SEARCH (state) {
       state.searchResults = [];
       state.searching = false;
+      state.alert = 'failure';
       return state;
     }
   };

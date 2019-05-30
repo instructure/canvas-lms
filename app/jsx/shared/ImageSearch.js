@@ -29,6 +29,8 @@ import { TextInput } from '@instructure/ui-text-input'
 import { IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine } from '@instructure/ui-icons'
 import { Link } from '@instructure/ui-elements'
 import { View, Flex, FlexItem } from '@instructure/ui-layout'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 const unsplashParams = {
   w: 262,
@@ -85,6 +87,17 @@ export default class ImageSearch extends React.Component {
     ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.prevUrl))
   }
 
+  renderAlert() {
+    if (!this.state.alert) return null
+    const alert = (<Alert
+      screenReaderOnly
+      liveRegion={() => document.getElementById('flash_screenreader_holder')}
+    >
+      {I18n.t('%{count} images found for %{term}', {count: this.state.searchResults.length, term: this.state.searchTerm})}
+    </Alert>)
+    return alert
+  }
+
   renderPagination(photos) {
     if (!photos || photos.length === 0) {
       return null
@@ -122,13 +135,14 @@ export default class ImageSearch extends React.Component {
 
     return (
       <div>
+        {this.renderAlert()}
         <View as="div" className="Unsplash__logo" textAlign="start" margin="medium 0 small">
           <SVGWrapper url="/images/unsplash_logo.svg" />
         </View>
         <View as="div" margin="small 0 small">
           <TextInput
             placeholder={I18n.t('Search')}
-            aria-label="Search"
+            label={<ScreenReaderContent>{I18n.t("Search")}</ScreenReaderContent>}
             value={this.state.searchTerm}
             type="search"
             layout="inline"

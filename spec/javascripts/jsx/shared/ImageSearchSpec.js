@@ -20,23 +20,31 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import ImageSearch from 'jsx/shared/ImageSearch'
+import $ from 'jquery'
 
-QUnit.module('ImageSearch View');
+QUnit.module('ImageSearch View', {
+  setup: () => {
+    $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+  },
+  teardown: () => {
+    $('#flash_screenreader_holder').remove()
+  }
+});
 
 const getDummySearchResults = () => {
   const photos = [{
-    id: 1,
+    id: 'crazy_id_1',
     alt: 'alt desc for photo 1',
     description: "desc for photo 1",
     raw_url: "url1"
   },
   {
-    id: 2,
+    id: 'crazy_id_2',
     description: "desc for photo 2",
     raw_url: "url2"
   },
   {
-    id: 3,
+    id: 'crazy_id_3',
     description: null,
     raw_url: "url3"
   }];
@@ -225,5 +233,21 @@ test('it shows appropriate alt text for results', assert => {
     strictEqual(images[1].alt, 'desc for photo 2')
     strictEqual(images[2].alt, 'cats')
     done()
+  })
+})
+
+test('it announces when search results are returned for screenreaders', assert => {
+  const done = assert.async()
+  const imageSearch = TestUtils.renderIntoDocument(
+    <ImageSearch />
+  )
+
+  const searchResults = getDummySearchResults()
+  imageSearch.setState({searchResults, searchTerm: 'cats', alert: 'success'}, () => {
+    const srElement = $('body').find('#flash_screenreader_holder')
+    setTimeout(() => {
+      strictEqual(srElement.text(), '3 images found for cats')
+      done()
+    })
   })
 })
