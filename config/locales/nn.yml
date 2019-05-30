@@ -9308,6 +9308,7 @@ nn:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Innleveringshistorikk for Quizzes.Next er handsama separat dersom funksjonsvalet er slått på."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Dersom ingen er markerte sender du til alle som tilhøyrer kontoen)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Dersom ingen er markerte sender du til alle som tilhøyrer underkontoen)"
+  if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Sjølv om dette løyvet er slått av, kan brukarar framleis installere godkjende appar gjennom Canvas App Center (så fremt det er gjort tilgjengeleg for institusjonen). Brukarar kan imidlertid ikkje manuelt slette eksterne appar etter at dei er lagde til. "
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Om du endrar moglege poeng for ei oppgåve, vert eksisterande karakterar automatisk rekna ut på nytt. "
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Om du endrar moglege poeng for ei oppgåve, må du karaktersetje oppgåva på nytt."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Om du endrar moglege poeng for ei oppgåve, må du karaktersetje alle innleveringar på nytt."
@@ -18000,6 +18001,12 @@ nn:
   to_51406be9: Til
   to_access_the_assignments_index_page_course_conten_a5b00f98: "For å sjå oppgåveoversikta må 'Emneinnhald - vis' vere slått på. For å skilje mellom oppgåver fordelt på enkeltstudentar må 'Brukarar - sjå liste' òg vere slått på."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "For å sjå sida Personar må 'Brukarar - sjå liste' vere slått på. Dersom denne løyva er slått på samstundes som 'Brukarar - sjå primær e-postadresse' er slått av, vil brukarane sjå e-postadresser som login-ID. For å sjå login-ID må 'Brukarar - legg til / fjern studentar i emne' og 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar i emne' óg vere slått på."
+  to_access_the_people_page_users_view_list_must_be__756d7188: |-
+      For å sjå sida Personar må 'Brukarar - sjå liste' vere slått på.
+      Dersom open registrering er slått på for konto, kan brukarar med dette løyvet legge til studentar på eit emne via e-postadresse dersom ikkje brukaren allereie har ein Canvas-konto.
+      For å sjå SIS-ID-ar må 'SIS-data - lese' vere slått på. For å legge til ein brukar på eit emne via SIS-ID må 'SIS-data - administrer' òg vere slått på.
+      For å endre seksjonen til ein student må 'Brukarar - sjå liste' og 'Meldingar - send meldinger til individuelle emnemedlemmar' òg vere slått på.
+      For å kople ein observatør til ein student må 'Meldingar - send meldingar til individuelle emnemedlemmar' òg vere slått på.
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "For å legge til, endre eller slette grupper må 'Grupper - legg til / endre / slette' og vere slått på."
   to_be_added_2959cc72: "Skal leggast til"
@@ -18020,7 +18027,13 @@ nn:
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
       For å endre seksjonen til ein student, må 'Brukarar - legg til / fjern studentar i emne' og 'Brukarar - sjå liste' begge vere slått på.
       For å endre seksjonen til ein faglærar, kursdesigner eller undervisingsassistent må 'Brukarar - legg til / fjern faglærarar, kursdesignere eller undervisingsassistentar i emne' og 'Brukarar - sjå liste' begge vere slått på.
+  to_edit_a_student_s_section_users_add_remove_stude_aab8752b: |-
+      For å endre seksjonen til ein student må 'Brukarar - legg til / fjern studentar frå emne' og 'Brukarar - sjå liste' òg vere slått på.
+      For å endre seksjonen til ein faglærar, designar eller undervisingsassistent må 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassistentar frå emne' og 'Brukarar - sjå liste' òg vere slått på.
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "For å generere ein paringskode frå sida brukardetaljar, må løyva 'Personar - legg til / fjern studentar i emne' òg vere slått på."
+  to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
+      For å generere ein paringskode frå brukarinnstillingane til ein student, må løyvet 'Brukar - opptre som' òg vere slått på.
+      For å generere ein paringskode frå brukardetaljane til ein student, må løyvet 'Brukarar - legg til / fjern studentar frå emne' òg vere slått på.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
@@ -18861,6 +18874,7 @@ nn:
   what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
+  when_disabled_students_can_still_send_individual_m_567a911c: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker emnet. Du kan la sida vise aktivitetsstraum, liste over emnemodular, emneoversikt eller ei tilpassa side du lagar sjølv. Standard er aktivitetsstraumen på emnet."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Når brukarar går til emnet ditt er dette den første sida dei får sjå.
