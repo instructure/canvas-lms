@@ -251,6 +251,7 @@ export default class DeveloperKeyModal extends React.Component {
           onDismiss={this.closeModal}
           size="fullscreen"
           label={editing ? I18n.t('Create developer key') : I18n.t('Edit developer key')}
+          shouldCloseOnDocumentClick={false}
         >
           <ModalHeader>
             <CloseButton placement="end" onClick={this.closeModal}>
