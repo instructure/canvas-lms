@@ -32,18 +32,17 @@ describe PostPolicy do
     let(:assignment) { course.assignments.create!(title: '!!!') }
 
     it "is valid if a valid course and assignment are specified" do
-      post_policy = assignment.create_post_policy!(post_manually: true)
+      post_policy = PostPolicy.new(course: course, assignment: assignment)
       expect(post_policy).to be_valid
     end
 
     it "is valid if a valid course is specified without an assignment" do
-      post_policy = course.post_policies.create!
+      post_policy = PostPolicy.new(course: course)
       expect(post_policy).to be_valid
     end
 
     it "sets the course based on the associated assignment if no course is specified" do
-      policy = assignment.create_post_policy!
-      expect(policy.course).to eq(course)
+      expect(assignment.post_policy.course).to eq(course)
     end
   end
 end

@@ -503,7 +503,8 @@ class Assignment < ActiveRecord::Base
               :apply_late_policy,
               :update_line_items,
               :ensure_manual_posting_if_anonymous,
-              :ensure_manual_posting_if_moderated
+              :ensure_manual_posting_if_moderated,
+              :create_default_post_policy
 
   with_options if: -> { auditable? && @updating_user.present? } do
     after_create :create_assignment_created_audit_event!
@@ -3183,7 +3184,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def ensure_post_policy(post_manually:)
-    return unless course.feature_enabled?(:post_policies)
+    # Anonymous assignments can never be set to automatically posted
+    return if anonymous_grading? && !post_manually
 
     build_post_policy(course: course) if post_policy.blank?
     post_policy.update!(post_manually: post_manually)
@@ -3227,13 +3229,23 @@ class Assignment < ActiveRecord::Base
   private :set_muted_if_post_policies_enabled
 
   def ensure_manual_posting_if_anonymous
-    return unless course.feature_enabled?(:post_policies) && saved_change_to_anonymous_grading?(from: false, to: true)
-    ensure_post_policy(post_manually: true)
+    ensure_post_policy(post_manually: true) if saved_change_to_anonymous_grading?(from: false, to: true)
   end
 
   def ensure_manual_posting_if_moderated
-    return unless course.feature_enabled?(:post_policies) && saved_change_to_moderated_grading?(from: false, to: true)
-    ensure_post_policy(post_manually: true)
+    ensure_post_policy(post_manually: true) if saved_change_to_moderated_grading?(from: false, to: true)
+  end
+
+  def create_default_post_policy
+    return if post_policy.present?
+
+    post_manually = if course.default_post_policy.present?
+      course.default_post_policy.post_manually
+    else
+      false
+    end
+
+    create_post_policy!(course: course, post_manually: post_manually)
   end
 
   def due_date_ok?

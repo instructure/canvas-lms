@@ -217,6 +217,8 @@ class Course < ActiveRecord::Base
   after_save :clear_caches_if_necessary
   after_commit :update_cached_due_dates
 
+  after_create :set_default_post_policy
+
   after_update :clear_cached_short_name, :if => :saved_change_to_course_code?
 
   before_update :handle_syllabus_changes_for_master_migration
@@ -3444,5 +3446,11 @@ class Course < ActiveRecord::Base
 
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(self)
+  end
+
+  def set_default_post_policy
+    return if default_post_policy.present?
+
+    create_default_post_policy(assignment: nil, post_manually: false)
   end
 end

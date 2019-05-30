@@ -1264,16 +1264,12 @@ describe Course do
       before(:once) { course.enable_feature!(:post_policies) }
 
       it "returns true if a policy with manual posting is attached to the course" do
-        course.post_policies.create!(post_manually: true)
+        course.default_post_policy.update!(post_manually: true)
         expect(course).to be_post_manually
       end
 
       it "returns false if a policy without manual posting is attached to the course" do
-        course.post_policies.create!(post_manually: false)
-        expect(course).not_to be_post_manually
-      end
-
-      it "returns false if no policy is attached to the course" do
+        course.default_post_policy.update!(post_manually: false)
         expect(course).not_to be_post_manually
       end
     end
@@ -1291,7 +1287,7 @@ describe Course do
 
       it "sets the post policy for the course" do
         course.apply_post_policy!(post_manually: true)
-        expect(course).to be_post_manually
+        expect(course.reload).to be_post_manually
       end
 
       it "explicitly sets a post policy for assignments without one" do
@@ -1345,6 +1341,25 @@ describe Course do
           PostPolicy.find_by(assignment: moderated_assignment).post_manually
         }
       end
+    end
+  end
+
+  describe "post policy defaults" do
+    it "a post policy is created when a newly-created course is saved with no policy" do
+      course = Course.create!
+
+      aggregate_failures do
+        expect(course.default_post_policy).not_to be nil
+        expect(course.default_post_policy).not_to be_post_manually
+      end
+    end
+
+    it "a course retains its existing post policy when saved if one is set" do
+      course = Course.new
+      course.build_default_post_policy(assignment_id: nil, post_manually: true)
+
+      course.save!
+      expect(course.reload.default_post_policy).to be_post_manually
     end
   end
 end

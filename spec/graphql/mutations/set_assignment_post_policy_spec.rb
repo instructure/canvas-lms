@@ -86,9 +86,8 @@ describe Mutations::SetAssignmentPostPolicy do
     end
 
     it "updates an existing assignment post policy when one exists" do
-      policy = PostPolicy.create!(course: course, assignment: assignment, post_manually: false)
       result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: true), context)
-      expect(result.dig("data", "setAssignmentPostPolicy", "postPolicy", "_id").to_i).to be policy.id
+      expect(result.dig("data", "setAssignmentPostPolicy", "postPolicy", "_id").to_i).to be assignment.post_policy.id
     end
   end
 
