@@ -832,12 +832,14 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.global_navigation_tools(root_account, visibility)
-    tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
-    if visibility == 'members'
-      # reject the admin only tools
-      tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
+    RequestCache.cache('global_navigation_tools', root_account, visibility) do
+      tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
+      if visibility == 'members'
+        # reject the admin only tools
+        tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
+      end
+      tools
     end
-    tools
   end
 
   def self.global_navigation_menu_cache_key(root_account, visibility)
