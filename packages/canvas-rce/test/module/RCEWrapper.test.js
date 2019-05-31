@@ -291,7 +291,8 @@ describe("RCEWrapper", () => {
           name: 'green_square',
           domObject: {
             preview: greenSquare
-          }
+          },
+          contentType: 'image/png'
         }
 
         const imageMarkup = `
@@ -308,7 +309,29 @@ describe("RCEWrapper", () => {
         heightStub.restore()
         widthStub.restore()
       })
+
+      it('inserts a text file placeholder image with the proper metadata', () => {
+        const props = {
+          name: 'file.txt',
+          domObject: {
+          },
+          contentType: 'text/plain'
+        }
+
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="file.txt"
+      style="width: 8rem; height: 1rem; border: solid 1px #8B969E;"
+    />`;
+        const stub = sinon.stub(contentInsertion, 'insertContent')
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(stub, editor, imageMarkup)
+        contentInsertion.insertContent.restore()
+      })
     })
+
 
     describe('removePlaceholders', () => {
       it('removes placeholders that match the given name', () => {

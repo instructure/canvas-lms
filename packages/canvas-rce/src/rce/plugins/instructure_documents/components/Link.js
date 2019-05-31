@@ -19,46 +19,26 @@
 import React, {useState} from 'react'
 import {func, instanceOf, shape} from 'prop-types'
 import {fileShape} from './propTypes'
+
 import {StyleSheet, css} from "aphrodite";
-import formatMessage from '../../../../format-message';
-import {renderDoc as renderDocHtml} from "../../../../rce/contentRendering";
-import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import {
   IconDragHandleLine,
   IconPublishSolid,
-  IconUnpublishedSolid,
-  IconDocumentLine,
-  IconMsExcelLine,
-  IconMsPptLine,
-  IconMsWordLine,
-  IconPdfLine
+  IconUnpublishedSolid
 } from '@instructure/ui-icons'
 
-function getIcon(type) {
-  switch(type) {
-    case 'application/msword':
-    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      return IconMsWordLine
-    case 'application/vnd.ms-powerpoint':
-    case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-      return IconMsPptLine
-    case 'application/pdf':
-      return IconPdfLine
-    case 'application/vnd.ms-excel':
-    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-      return IconMsExcelLine
-    default:
-      return IconDocumentLine
-  }
-}
+import formatMessage from '../../../../format-message';
+import {renderDoc as renderDocHtml} from "../../../../rce/contentRendering";
+import dragHtml from "../../../../sidebar/dragHtml";
+import {getIconFromType} from '../../shared/fileTypeUtils'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
   const {filename, display_name, content_type, published, date} = props
-  const Icon = getIcon(content_type)
+  const Icon = getIconFromType(content_type)
   const color = published ? 'success' : 'primary'
   let dateString = formatMessage.date(Date.parse(date), 'long')
   const publishedMsg = published ? formatMessage('published') : formatMessage('unpublished')

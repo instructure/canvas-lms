@@ -256,6 +256,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
     return source.fetchMediaFolder({ jwt, host, contextId, contextType })
     .then(({folders}) => {
       fileMetaProps.parentFolderId = folders[0].id
+      delete fileMetaProps.domObject.preview // don't need this anymore
       dispatch(uploadPreflight(tabContext, fileMetaProps))
     })
   }

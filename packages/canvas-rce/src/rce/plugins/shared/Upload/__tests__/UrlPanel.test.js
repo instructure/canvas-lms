@@ -20,11 +20,11 @@ import React from 'react'
 import {render, fireEvent, } from 'react-testing-library'
 import UrlPanel from '../UrlPanel'
 
-describe('UploadImage: UrlPanel', () => {
-  it('calls setImageUrl when the image url input changes', () => {
-    const fakeSetImageUrl = jest.fn()
-    const {getByLabelText} = render(<UrlPanel imageUrl="" setImageUrl={fakeSetImageUrl}/>)
-    fireEvent.change(getByLabelText('Image URL'), { target: { value: 'instructure.com' }})
-    expect(fakeSetImageUrl).toHaveBeenCalledWith('instructure.com')
+describe('UploadFile: UrlPanel', () => {
+  it('calls setFileUrl when the file url input changes', () => {
+    const fakeSetFileUrl = jest.fn()
+    const {getByLabelText} = render(<UrlPanel fileUrl="" setFileUrl={fakeSetFileUrl}/>)
+    fireEvent.change(getByLabelText('File URL'), { target: { value: 'instructure.com' }})
+    expect(fakeSetFileUrl).toHaveBeenCalledWith('instructure.com')
   })
 })

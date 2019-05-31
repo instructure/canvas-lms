@@ -47,7 +47,7 @@ function queryIconByName(elem, name) {
 
 describe('RCE "Documents" Plugin > Document', () => {
   describe('renders', () => {
-    it('renders the date', () => {
+    it('the date', () => {
       const value = '2019-04-24T13:00:00Z'
       const formattedValue = formatMessage.date(Date.parse(value), 'long')
 
@@ -56,52 +56,52 @@ describe('RCE "Documents" Plugin > Document', () => {
       expect(getByText(formattedValue)).toBeInTheDocument()
     })
 
-    it('renders the display_name', () => {
+    it('the display_name', () => {
       const {getByText} = renderComponent()
       expect(getByText('file display name')).toBeInTheDocument()
     })
 
-    it('renders the filename if there is no display_name', () => {
+    it('the filename if there is no display_name', () => {
       const {getByText} = renderComponent({display_name: undefined})
       expect(getByText('filename.txt')).toBeInTheDocument()
     })
 
-    it('renders as published', () => {
+    it('as published', () => {
       const {container} = renderComponent({published: true})
       expect(queryIconByName(container, 'IconPublish')).toBeInTheDocument()
     })
 
-    it('renders as unpublished', () => {
+    it('as unpublished', () => {
       const {container} = renderComponent({published: false})
       expect(queryIconByName(container, 'IconUnpublished')).toBeInTheDocument()
     })
 
-    it('renders the doc icon', () => {
+    it('the doc icon', () => {
       const {container} = renderComponent()
       expect(queryIconByName(container, 'IconDocument')).toBeInTheDocument()
     })
 
-    it('renders the ppt icon', () => {
+    it('the ppt icon', () => {
       const {container} = renderComponent({content_type: 'application/vnd.ms-powerpoint'})
       expect(queryIconByName(container, 'IconMsPpt')).toBeInTheDocument()
     })
 
-    it('renders the word icon', () => {
+    it('the word icon', () => {
       const {container} = renderComponent({content_type: 'application/msword'})
       expect(queryIconByName(container, 'IconMsWord')).toBeInTheDocument()
     })
 
-    it('renders the excel icon', () => {
+    it('the excel icon', () => {
       const {container} = renderComponent({content_type: 'application/vnd.ms-excel'})
       expect(queryIconByName(container, 'IconMsExcel')).toBeInTheDocument()
     })
 
-    it('renders the pdf icon', () => {
+    it('the pdf icon', () => {
       const {container} = renderComponent({content_type: 'application/pdf'})
       expect(queryIconByName(container, 'IconPdf')).toBeInTheDocument()
     })
 
-    it('only shows drag handle on hover', () => {
+    it('the drag handle only on hover', () => {
       const {container, getByTestId} = renderComponent()
 
       expect(queryIconByName(container, "IconDragHandle")).not.toBeInTheDocument()

@@ -16,6 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function() {
-  alert('bet you wish you could upload a file now')
+import React from 'react'
+import ReactDOM from 'react-dom'
+import formatMessage from '../../../format-message'
+
+export default function(ed, document) {
+  return import('../shared/Upload/UploadFile').then(({UploadFile}) => {
+    let container = document.querySelector('.canvas-rce-upload-container')
+    if (!container) {
+      container = document.createElement('div')
+      container.className = 'canvas-rce-upload-container'
+      document.body.appendChild(container)
+    }
+
+    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
+
+    // acccept=undefined -> can upload anything
+    ReactDOM.render(
+      <UploadFile
+        accept={undefined}
+        editor={ed}
+        label={formatMessage('Upload File')}
+        panels={['COMPUTER']}
+        onDismiss={handleDismiss}
+      />, container
+    )
+  })
 }

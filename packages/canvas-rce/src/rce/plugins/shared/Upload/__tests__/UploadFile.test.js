@@ -18,12 +18,14 @@
 
 import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
-import {UploadImage, PANELS, handleSubmit} from '../index'
+import {UploadFile, handleSubmit} from '../UploadFile'
 
-describe('UploadImage', () => {
+describe('UploadFile', () => {
   it('calls onDismiss prop when closing', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<UploadImage onDismiss={handleDismiss} />)
+    const {getByText} = render(
+      <UploadFile onDismiss={handleDismiss} panels={['COMPUTER', 'URL']} />
+    )
 
     const closeBtn = getByText('Close')
     fireEvent.click(closeBtn)
@@ -33,10 +35,38 @@ describe('UploadImage', () => {
   it('calls handleSubmit on submit', () => {
     const handleSubmit = jest.fn()
     const handleDismiss = () => {}
-    const {getByText} = render(<UploadImage onDismiss={handleDismiss} onSubmit={handleSubmit}/>)
+    const {getByText} = render(
+      <UploadFile onDismiss={handleDismiss} onSubmit={handleSubmit} panels={['COMPUTER', 'URL']} />
+    )
     const submitBtn = getByText('Submit').closest('button')
     fireEvent.click(submitBtn)
     expect(handleSubmit).toHaveBeenCalled()
+  })
+
+  describe('panel selection', () => {
+    it('adds computer and url panels', () => {
+      const {getByLabelText} = render(
+        <UploadFile
+          onDismiss={() => {}}
+          panels={['COMPUTER', 'URL']}
+        />
+      )
+
+      expect(getByLabelText('Computer')).toBeInTheDocument()
+      expect(getByLabelText('URL')).toBeInTheDocument()
+    })
+
+    it('adds only the computer panel', () => {
+      const {getByLabelText, queryByLabelText} = render(
+        <UploadFile
+          onDismiss={() => {}}
+          panels={['COMPUTER']}
+        />
+      )
+
+      expect(getByLabelText('Computer')).toBeInTheDocument()
+      expect(queryByLabelText('URL')).not.toBeInTheDocument()
+    })
   })
 
   describe('handleSubmit', () => {
@@ -51,7 +81,7 @@ describe('UploadImage', () => {
       selection: { getEnd () {return fakeNode  }}
     }
     it('inserts image with url source when URL panel is selected', () => {
-      handleSubmit(fakeEditor, PANELS.URL, {imageUrl: 'http://fake/path'})
+      handleSubmit(fakeEditor, 'images/*', 'URL', {fileUrl: 'http://fake/path'})
       expect(fakeEditor.content).toEqual('<img src="http://fake/path" />')
     })
 
@@ -62,7 +92,7 @@ describe('UploadImage', () => {
         size: 3000,
         type: 'image/png'
       }
-      handleSubmit(fakeEditor, PANELS.COMPUTER, { imageFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
+      handleSubmit(fakeEditor, 'images/*', 'COMPUTER', { theFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
       expect(fakeMediaUpload).toHaveBeenCalledWith("images", {
         parentFolderId: 'media',
         name: 'foo.png',

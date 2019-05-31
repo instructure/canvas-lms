@@ -33,6 +33,7 @@ import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar';
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
+import {isImage} from './plugins/shared/fileTypeUtils'
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
@@ -229,14 +230,22 @@ class RCEWrapper extends React.Component {
   }
 
   insertImagePlaceholder(fileMetaProps) {
+    let width, height;
     const image = new Image();
-    image.src = fileMetaProps.domObject.preview
+    if (isImage(fileMetaProps.contentType)) {
+      image.src = fileMetaProps.domObject.preview
+      width = `${image.width}px`
+      height = `${image.height}px`
+    } else {
+      width = `${fileMetaProps.name.length}rem`
+      height = '1rem'
+    }
     const markup = `
     <img
       alt="${formatMessage('Loading...')}"
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="${fileMetaProps.name}"
-      style="width: ${image.width}px; height: ${image.height}px; border: solid 1px #8B969E;"
+      style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
     />`;
 
     this.insertCode(markup);

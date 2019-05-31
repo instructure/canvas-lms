@@ -21,20 +21,20 @@ import {getByLabelText} from 'react-testing-library'
 
 describe('Instructure Image Plugin: clickCallback', () => {
   afterEach(() => {
-    document.querySelector('.canvas-rce-image-upload').remove()
+    document.querySelector('.canvas-rce-upload-container').remove()
   })
 
-  it('adds the canvas-rce-image-upload element when opened', async () => {
+  it('adds the canvas-rce-upload-container element when opened', async () => {
     await clickCallback({}, document)
-    expect(document.querySelector('.canvas-rce-image-upload')).toBeTruthy()
+    expect(document.querySelector('.canvas-rce-upload-container')).toBeTruthy()
   })
 
-  it('does not add the canvas-rce-image-upload element when opened if it exists already', async () => {
+  it('does not add the canvas-rce-upload-container element when opened if it exists already', async () => {
     const container = document.createElement('div')
-    container.className = 'canvas-rce-image-upload'
+    container.className = 'canvas-rce-upload-container'
     document.body.appendChild(container)
     await clickCallback({}, document)
-    expect(document.querySelectorAll('.canvas-rce-image-upload').length).toEqual(1)
+    expect(document.querySelectorAll('.canvas-rce-upload-container').length).toEqual(1)
   })
 
   it('opens the UploadImage modal when called', async () => {

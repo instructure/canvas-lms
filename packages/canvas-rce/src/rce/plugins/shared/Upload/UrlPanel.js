@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import { string, func } from 'prop-types'
 import { TextInput } from '@instructure/ui-text-input'
 import formatMessage from '../../../../format-message'
 
-export default function UrlPanel ({imageUrl, setImageUrl}) {
+export default function UrlPanel ({fileUrl, setFileUrl}) {
   return (
     <>
-      <TextInput label={formatMessage('Image URL')} type="url" value={imageUrl} onChange={(e, val) => setImageUrl(val)} />
+      <TextInput label={formatMessage('File URL')} type="url" value={fileUrl} onChange={(e, val) => setFileUrl(val)} />
     </>
   )
 }
 
 UrlPanel.propTypes = {
-  imageUrl: string.isRequired,
-  setImageUrl: func.isRequired
+  fileUrl: string.isRequired,
+  setFileUrl: func.isRequired
 }
