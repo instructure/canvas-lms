@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {element, func, oneOf, oneOfType, string} from 'prop-types'
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
+
+import ButtonContext from '../../../student/components/Context'
+import classNames from 'classnames'
+import I18n from 'i18n!assignments_2_shared_Steps_StepItem'
 
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import classNames from 'classnames'
-import I18n from 'i18n!assignments_2_shared_Steps_StepItem'
 import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
 import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
@@ -34,11 +36,11 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 
 class StepItem extends Component {
   static propTypes = {
-    status: PropTypes.oneOf(['button', 'complete', 'in-progress', 'unavailable']),
-    label: PropTypes.oneOfType([PropTypes.func, PropTypes.string, PropTypes.element]).isRequired,
-    icon: PropTypes.element,
-    pinSize: PropTypes.string,
-    placement: PropTypes.oneOf(['first', 'last', 'interior'])
+    status: oneOf(['button', 'complete', 'in-progress', 'unavailable']),
+    label: oneOfType([func, string, element]).isRequired,
+    icon: element,
+    pinSize: string,
+    placement: oneOf(['first', 'last', 'interior'])
   }
 
   static defaultProps = {
@@ -51,12 +53,15 @@ class StepItem extends Component {
    * the Assignments 2 pizzatracker, which are used to navigate between
    * submissions for a single assignment.
    *
-   * @param ButtonIcon      An instUI icon corresponding to the rendered
+   * @param ButtonIcon  An instUI icon corresponding to the rendered
    *                    button's purpose
+   * @param action      The action to be performed when the rendered
+   *                    button is clicked
    * @param a11yMessage The message to be read by the screen reader
    *                    when focus is on the rendered button
    */
-  renderButton(ButtonIcon, a11yMessage) {
+  renderButton(ButtonIcon, action, a11yMessage) {
+    const icon = <ButtonIcon size="x-small" />
     return (
       <div>
         <ApplyTheme
@@ -67,18 +72,7 @@ class StepItem extends Component {
             }
           }}
         >
-          <Button
-            variant="icon"
-            icon=<ButtonIcon size="x-small" />
-            onClick={e => {
-              e.preventDefault()
-              // Temporary message to the console; will be removed
-              // when buttons are linked to back end and perform
-              // intended action
-              console.log({a11yMessage})
-            }}
-            size="small"
-          >
+          <Button variant="icon" icon={icon} size="small" onClick={action}>
             <ScreenReaderContent>{a11yMessage} </ScreenReaderContent>
           </Button>
         </ApplyTheme>
@@ -86,18 +80,30 @@ class StepItem extends Component {
     )
   }
 
-  renderIcon() {
+  renderIcon(context) {
     const icon = this.props.icon
     const status = this.props.status
 
     if (!icon && status === 'button') {
       switch (this.props.label) {
         case 'Previous':
-          return this.renderButton(IconArrowOpenStart, I18n.t('View Previous Submission'))
+          return this.renderButton(
+            IconArrowOpenStart,
+            context.prevButtonAction,
+            I18n.t('View Previous Submission')
+          )
         case 'Next':
-          return this.renderButton(IconArrowOpenEnd, I18n.t('View Next Submission'))
+          return this.renderButton(
+            IconArrowOpenEnd,
+            context.nextButtonAction,
+            I18n.t('View Next Submission')
+          )
         case 'New Attempt':
-          return this.renderButton(IconPlus, I18n.t('Create New Submission'))
+          return this.renderButton(
+            IconPlus,
+            () => console.log('New Attempt'),
+            I18n.t('Create New Attempt')
+          )
         default:
           return null
       }
@@ -172,7 +178,7 @@ class StepItem extends Component {
             }}
             className="step-item-pin"
           >
-            {this.renderIcon()}
+            <ButtonContext.Consumer>{context => this.renderIcon(context)}</ButtonContext.Consumer>
           </span>
         </span>
         <span className="step-item-label">{this.renderLabel()}</span>

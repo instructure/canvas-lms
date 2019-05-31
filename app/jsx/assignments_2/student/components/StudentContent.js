@@ -19,6 +19,7 @@
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
+import ButtonContext from './Context'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
@@ -92,12 +93,12 @@ class StudentContent extends React.Component {
 
   hasPrevSubmission = () => {
     if (this.props.pageInfo.hasPreviousPage) {
-      return true
+      return !this.state.loadingMore
     }
 
     const historyEdges = this.props.submissionHistoryEdges
     const currentIndex = historyEdges.findIndex(e => e.cursor === this.state.displayedCursor)
-    return currentIndex !== 0
+    return currentIndex !== 0 && !this.state.loadingMore
   }
 
   onNextSubmission = () => {
@@ -164,20 +165,21 @@ class StudentContent extends React.Component {
     const submission = this.getCurrentSubmission()
     return (
       <div data-testid="assignments-2-student-view">
-        <Header scrollThreshold={150} assignment={this.props.assignment} submission={submission} />
-        {this.renderContentBaseOnAvailability()}
-
-        {/* TODO: Remove these and replace with the real buttons */}
-        <button
-          type="button"
-          onClick={this.onPrevSubmission}
-          disabled={!this.hasPrevSubmission() || this.state.loadingMore}
+        <ButtonContext.Provider
+          value={{
+            prevButtonEnabled: this.hasPrevSubmission(),
+            nextButtonEnabled: this.hasNextSubmission(),
+            prevButtonAction: this.onPrevSubmission,
+            nextButtonAction: this.onNextSubmission
+          }}
         >
-          Load Previous
-        </button>
-        <button type="button" onClick={this.onNextSubmission} disabled={!this.hasNextSubmission()}>
-          Load Next
-        </button>
+          <Header
+            scrollThreshold={150}
+            assignment={this.props.assignment}
+            submission={submission}
+          />
+        </ButtonContext.Provider>
+        {this.renderContentBaseOnAvailability()}
       </div>
     )
   }

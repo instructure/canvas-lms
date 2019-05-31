@@ -18,7 +18,8 @@
 import React from 'react'
 import {render} from 'react-testing-library'
 
-import {mockAssignment, legacyMockSubmission} from '../../test-utils'
+import ButtonContext from '../Context'
+import {legacyMockSubmission, mockAssignment} from '../../test-utils'
 import StepContainer from '../StepContainer'
 
 const unavailableSteps = ['Unavailable', 'Upload', 'Submit', 'Not Graded Yet']
@@ -168,14 +169,68 @@ describe('the assignment is submitted', () => {
     expect(getByTestId('submitted-step-container')).toBeInTheDocument()
   })
 
+  it('will render the Previous step if the Previous button is enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, getByText} = render(
+      <ButtonContext.Provider value={{prevButtonEnabled: true}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('submitted-step-container')).toContainElement(getByText('Previous'))
+  })
+
+  it('will not render the Previous step if the Previous button is not enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, queryByText} = render(
+      <ButtonContext.Provider value={{prevButtonEnabled: false}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Previous'))
+  })
+
+  it('will render the Next step if it is enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, getByText} = render(
+      <ButtonContext.Provider value={{nextButtonEnabled: true}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('submitted-step-container')).toContainElement(getByText('Next'))
+  })
+
+  it('will not render the Next step if it is not enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'submitted'
+    const {getByTestId, queryByText} = render(
+      <ButtonContext.Provider value={{nextButtonEnabled: false}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Next'))
+  })
+
   it('will render the New Attempt step if more attempts are allowed', () => {
     const assignment = mockAssignment()
     const submission = legacyMockSubmission()
     assignment.lockInfo.isLocked = false
     submission.state = 'submitted'
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
+    const {getByTestId, getByText} = render(
+      <StepContainer assignment={assignment} submission={submission} />
+    )
 
-    expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+    expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
   })
 
   it('will not render the New Attempt step if more attempts are not allowed', () => {
@@ -190,30 +245,6 @@ describe('the assignment is submitted', () => {
 
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
   })
-
-  it('will render the Previous step', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('Previous'))
-  })
-
-  it('will render the Next step', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('Next'))
-  })
 })
 
 describe('the assignment is graded', () => {
@@ -227,6 +258,58 @@ describe('the assignment is graded', () => {
     )
 
     verifySteps(getByTestId('graded-step-container'), gradedSteps, getByText)
+  })
+
+  it('will render the Previous step if the Previous button is enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'graded'
+    const {getByTestId, getByText} = render(
+      <ButtonContext.Provider value={{prevButtonEnabled: true}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('graded-step-container')).toContainElement(getByText('Previous'))
+  })
+
+  it('will not render the Previous step if the Previous button is not enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'graded'
+    const {getByTestId, queryByText} = render(
+      <ButtonContext.Provider value={{prevButtonEnabled: false}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Previous'))
+  })
+
+  it('will render the Next step if the Next button is is enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'graded'
+    const {getByTestId, getByText} = render(
+      <ButtonContext.Provider value={{nextButtonEnabled: true}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('graded-step-container')).toContainElement(getByText('Next'))
+  })
+
+  it('will not render the Next step if the Next button is not enabled', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.state = 'graded'
+    const {getByTestId, queryByText} = render(
+      <ButtonContext.Provider value={{nextButtonEnabled: false}}>
+        <StepContainer assignment={assignment} submission={submission} />
+      </ButtonContext.Provider>
+    )
+    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Next'))
   })
 
   it('will render the New Attempt button if more attempts are allowed', () => {
@@ -252,29 +335,5 @@ describe('the assignment is graded', () => {
     )
 
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('New Attempt'))
-  })
-
-  it('will render the Previous step', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, queryByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('graded-step-container')).toContainElement(queryByText('Previous'))
-  })
-
-  it('will render the Next step', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, queryByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('graded-step-container')).toContainElement(queryByText('Next'))
   })
 })
