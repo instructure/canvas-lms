@@ -580,7 +580,8 @@
     background-image: none;
   }
   .tox .tox-toolbar .tox-toolbar__group,
-  .tox .tox-toolbar-overlord .tox-toolbar__group {
+  .tox .tox-toolbar-overlord .tox-toolbar__group,
+  .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
     border-style: none;
   }
   .tox-toolbar .tox-toolbar__group::after,

@@ -36,7 +36,6 @@ function LinksPanel(props) {
   return (
     <View
       as="div"
-      margin="small 0 0 0"
       data-testid="instructure_links-LinksPanel"
     >
       {(isCourse || isGroup) && (

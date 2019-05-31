@@ -128,24 +128,24 @@ export default function Link(props) {
         <div style={{pointerEvents: 'none'}}>
           <Flex>
             <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
-              {isHovering ? <IconDragHandleLine size="x-small"/> : null}
+              {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
             </Flex.Item>
             <Flex.Item grow shrink>
               <Flex>
                 <Flex.Item padding="0 x-small 0 0">
                   <Text color={color}>
-                    <Icon size="x-small"/>
+                    <Icon size="x-small" inline={false} />
                   </Text>
                 </Flex.Item>
                 <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
                   <View as="div" margin="0">{title}</View>
-                  {dateString ? (<View as="div" margin="xx-small 0 0 0">{dateString}</View>) : null}
+                  {dateString ? (<View as="div">{dateString}</View>) : null}
                 </Flex.Item>
                 {'published' in props.link && (
                   <Flex.Item>
                     <AccessibleContent alt={publishedMsg}>
                       <Text color={color}>
-                        {published ? <IconPublishSolid/> : <IconUnpublishedSolid/>}
+                        {published ? <IconPublishSolid inline={false}/> : <IconUnpublishedSolid inline={false} />}
                       </Text>
                     </AccessibleContent>
                   </Flex.Item>

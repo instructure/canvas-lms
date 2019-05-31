@@ -142,7 +142,7 @@ export default function CanvasContentTray(props) {
               <Filter {...filterSettings} onChange={setFilterSettings} />
             </Flex.Item>
 
-            <Flex.Item grow shrink>
+            <Flex.Item grow shrink margin="xx-small 0 0 0">
               <ErrorBoundary>
                     <Suspense fallback={<Spinner renderTitle={() => formatMessage('Loading')} size="large" />}>
                       {renderContentComponent(filterSettings, contentProps)}
