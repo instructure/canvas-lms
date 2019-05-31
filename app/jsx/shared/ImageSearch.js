@@ -65,7 +65,7 @@ export default class ImageSearch extends React.Component {
     if (event.target.value === '') {
       this.clearResults()
     } else {
-      this.search(event.target.value, 1)
+      this.search(event.target.value)
     }
   }
 
@@ -78,11 +78,11 @@ export default class ImageSearch extends React.Component {
   }
 
   loadNextPage = () => {
-    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.term, this.state.nextUrl))
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.nextUrl))
   }
 
   loadPreviousPage = () => {
-    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.term, this.state.prevUrl))
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.prevUrl))
   }
 
   renderPagination(photos) {

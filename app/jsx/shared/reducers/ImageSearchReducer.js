@@ -20,9 +20,12 @@
   import _ from 'underscore'
 
   const imageSearchHandlers = {
+    UPDATE_SEARCH_TERM (state, action) {
+      state.searchTerm = action.term;
+      return state;
+    },
     START_IMAGE_SEARCH (state, action) {
       state.searching = true;
-      state.searchTerm = action.term;
       state.prevUrl = null;
       state.nextUrl= null;
       return state;

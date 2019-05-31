@@ -18,6 +18,7 @@
 
 import axios from 'axios';
 import parseLinkHeader from "parse-link-header"
+import _ from 'lodash'
 
 let request
 
@@ -33,8 +34,12 @@ const once = (config = {}) => {
 
 const ImageSearchActions = {
 
-  startImageSearch(term) {
-    return { type: 'START_IMAGE_SEARCH', term }
+  updateSearchTerm(term) {
+    return { type: 'UPDATE_SEARCH_TERM', term }
+  },
+
+  startImageSearch() {
+    return { type: 'START_IMAGE_SEARCH' }
   },
 
   receiveImageSearchResults(originalResults) {
@@ -63,20 +68,21 @@ const ImageSearchActions = {
 
   search(term) {
     return (dispatch) => {
-      dispatch(this.startImageSearch(term))
+      dispatch(this.updateSearchTerm(term))
       this.searchApiGet(this.composeSearchUrl(term), dispatch)
     }
   },
 
-  loadMore(term, url) {
+  loadMore(url) {
     return (dispatch) => {
-      dispatch(this.startImageSearch(term))
+      dispatch(this.startImageSearch())
       this.searchApiGet(url, dispatch)
     }
   },
 
-  searchApiGet(url, dispatch){
+  searchApiGet: _.debounce(function (url, dispatch) {
     this.cancelImageSearch();
+    dispatch(this.startImageSearch())
 
     const config = {
       method: "get",
@@ -89,7 +95,7 @@ const ImageSearchActions = {
     }).catch((error) => {
       dispatch(this.failImageSearch(error))
     })
-  },
+  }, 750),
 
   composeSearchUrl(term) {
     const per_page = '12';
