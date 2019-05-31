@@ -100,7 +100,7 @@ test('it clears search results when input is cleared', () => {
   ok(called, 'clearResults was called');
 });
 
-test('it disables previous and next when there is only one page of results', assert => {
+test('it hides previous and next when there is only one page of results', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
@@ -110,15 +110,14 @@ test('it disables previous and next when there is only one page of results', ass
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: null}, () => {
     ok(
-      Boolean(imageSearch.refs.imageSearchControlNext.props.disabled &&
-        imageSearch.refs.imageSearchControlPrev.props.disabled),
-      'next and previous are disabled'
+      Boolean(!imageSearch._imageSearchControlNext && !imageSearch._imageSearchControlPrev),
+      'next and previous are not present'
     );
     done();
   });
 });
 
-test('it only enables next page when there is a next-page', assert => {
+test('it only renders next page when there is a next-page', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
@@ -128,15 +127,15 @@ test('it only enables next page when there is a next-page', assert => {
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
     ok(
-      Boolean(!imageSearch.refs.imageSearchControlNext.props.disabled &&
-        imageSearch.refs.imageSearchControlPrev.props.disabled),
-      'next button is enabled'
+      Boolean(imageSearch._imageSearchControlNext &&
+        !imageSearch._imageSearchControlPrev),
+      'next button is present'
     );
     done();
   });
 });
 
-test('it only enables previous when there is a previous-page', assert => {
+test('it only renders previous when there is a previous-page', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
@@ -146,9 +145,9 @@ test('it only enables previous when there is a previous-page', assert => {
 
   imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
     ok(
-      Boolean(imageSearch.refs.imageSearchControlNext.props.disabled &&
-        !imageSearch.refs.imageSearchControlPrev.props.disabled),
-      'previous button is enabled');
+      Boolean(!imageSearch._imageSearchControlNext &&
+        imageSearch._imageSearchControlPrev),
+      'previous button is present');
     done();
   });
 });
@@ -162,8 +161,8 @@ test('it enables next and previous when there are both next and previous pages',
   const searchResults = getDummySearchResults();
 
   image.setState({searchResults, prevUrl: "http://prev", nextUrl: "http://next"}, () => {
-    ok(Boolean(!image.refs.imageSearchControlNext.props.disabled && !image.refs.imageSearchControlPrev.props.disabled),
-      'next and previous are both enabled');
+    ok(Boolean(image._imageSearchControlNext && image._imageSearchControlPrev),
+      'next and previous are both present');
     done();
   });
 });
@@ -179,7 +178,7 @@ test('it loads next page of results when next is clicked', assert => {
   const searchResults = getDummySearchResults();
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
-    TestUtils.Simulate.click(ReactDOM.findDOMNode(imageSearch.refs.imageSearchControlNext));
+    TestUtils.Simulate.click(imageSearch._imageSearchControlNext);
     ok(called, 'clicking next triggered next results action');
     done();
   });
@@ -196,7 +195,7 @@ test('it loads previous page of results when previous is clicked', assert => {
   const searchResults = getDummySearchResults();
 
   imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
-    TestUtils.Simulate.click(ReactDOM.findDOMNode(imageSearch.refs.imageSearchControlPrev));
+    TestUtils.Simulate.click(imageSearch._imageSearchControlPrev);
     ok(called, 'clicking previous triggered previous results action');
     done();
   });

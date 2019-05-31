@@ -57,6 +57,18 @@ export default class ImageSearch extends React.Component {
     this.unsubscribe()
   }
 
+  componentDidUpdate() {
+    let toFocus
+    if (this.state.pageDirection === 'prev') {
+        toFocus = this._imageSearchControlPrev || this._imageSearchControlNext || this._imageSearchInput
+    } else if (this.state.pageDirection === 'next') {
+        toFocus = this._imageSearchControlNext || this._imageSearchControlPrev || this._imageSearchInput
+    }
+    if (toFocus) {
+      setTimeout(function() { toFocus.focus() }, 0)
+    }
+  }
+
   handleChange() {
     this.setState(ImageSearchStore.getState())
   }
@@ -80,11 +92,11 @@ export default class ImageSearch extends React.Component {
   }
 
   loadNextPage = () => {
-    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.nextUrl))
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.nextUrl, 'next'))
   }
 
   loadPreviousPage = () => {
-    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.prevUrl))
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.prevUrl, 'prev'))
   }
 
   renderAlert() {
@@ -104,27 +116,25 @@ export default class ImageSearch extends React.Component {
     }
 
     return (
-      <Flex as="div" width="100%" justifyItems="center" margin="small 0 small">
-        <FlexItem margin="auto small auto small">
-          <Link
-            ref="imageSearchControlPrev"
+      <Flex as="div" width="100%" justifyItems="space-between" margin="small 0 small">
+        <FlexItem>
+          { this.state.prevUrl && <Link
+            linkRef={(e) => this._imageSearchControlPrev = e}
             onClick={this.loadPreviousPage}
             icon={IconArrowOpenStartLine}
-            disabled={!this.state.prevUrl}
           >
             {I18n.t('Previous Page')}
-          </Link>
+          </Link> }
         </FlexItem>
         <FlexItem>
-          <Link
-            ref="imageSearchControlNext"
+          { this.state.nextUrl && <Link
+            linkRef={(e) => this._imageSearchControlNext = e}
             onClick={this.loadNextPage}
             icon={IconArrowOpenEndLine}
             iconPlacement="end"
-            disabled={!this.state.nextUrl}
           >
             {I18n.t('Next Page')}
-          </Link>
+          </Link> }
         </FlexItem>
       </Flex>
     )
@@ -141,6 +151,7 @@ export default class ImageSearch extends React.Component {
         </View>
         <View as="div" margin="small 0 small">
           <TextInput
+            inputRef={(e) => this._imageSearchInput = e}
             placeholder={I18n.t('Search')}
             label={<ScreenReaderContent>{I18n.t("Search")}</ScreenReaderContent>}
             value={this.state.searchTerm}
@@ -151,7 +162,6 @@ export default class ImageSearch extends React.Component {
           />
         </View>
 
-        {this.renderPagination(photos)}
         {!this.state.searching ? (
           <div className="ImageSearch__images">
 

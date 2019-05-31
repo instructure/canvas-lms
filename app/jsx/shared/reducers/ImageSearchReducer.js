@@ -29,6 +29,7 @@
       state.searching = true;
       state.prevUrl = null;
       state.nextUrl = null;
+      state.pageDirection = null;
       return state;
     },
     RECEIVE_IMAGE_SEARCH_RESULTS (state, action) {
@@ -37,6 +38,7 @@
       state.nextUrl = action.results.nextUrl
       state.searching = false;
       state.alert = 'success';
+      state.pageDirection = action.pageDirection;
       return state;
     },
     CLEAR_IMAGE_SEARCH (state) {
@@ -46,12 +48,14 @@
       state.nextUrl = null;
       state.searchTerm = '';
       state.alert = null;
+      state.pageDirection = null;
       return state;
     },
-    FAIL_IMAGE_SEARCH (state) {
+    FAIL_IMAGE_SEARCH (state, action) {
       state.searchResults = [];
       state.searching = false;
       state.alert = 'failure';
+      state.pageDirection = action.pageDirection;
       return state;
     }
   };

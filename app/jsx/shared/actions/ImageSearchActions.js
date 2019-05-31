@@ -42,13 +42,13 @@ const ImageSearchActions = {
     return { type: 'START_IMAGE_SEARCH' }
   },
 
-  receiveImageSearchResults(originalResults) {
+  receiveImageSearchResults(originalResults, pageDirection) {
     const results = Object.assign({}, originalResults)
     results.prevUrl = parseLinkHeader(results.headers.link).prev ?
       parseLinkHeader(results.headers.link).prev.url : null
     results.nextUrl = parseLinkHeader(results.headers.link).next ?
       parseLinkHeader(results.headers.link).next.url : null
-    return { type: 'RECEIVE_IMAGE_SEARCH_RESULTS', results }
+    return { type: 'RECEIVE_IMAGE_SEARCH_RESULTS', results, pageDirection }
   },
 
   clearImageSearch() {
@@ -56,8 +56,8 @@ const ImageSearchActions = {
     return { type: 'CLEAR_IMAGE_SEARCH' }
   },
 
-  failImageSearch(error) {
-    return { type: 'FAIL_IMAGE_SEARCH', error }
+  failImageSearch(error, pageDirection) {
+    return { type: 'FAIL_IMAGE_SEARCH', error, pageDirection }
   },
 
   cancelImageSearch() {
@@ -69,18 +69,18 @@ const ImageSearchActions = {
   search(term) {
     return (dispatch) => {
       dispatch(this.updateSearchTerm(term))
-      this.searchApiGet(this.composeSearchUrl(term), dispatch)
+      this.searchApiGet(this.composeSearchUrl(term), null, dispatch)
     }
   },
 
-  loadMore(url) {
+  loadMore(url, page_direction) {
     return (dispatch) => {
       dispatch(this.startImageSearch())
-      this.searchApiGet(url, dispatch)
+      this.searchApiGet(url, page_direction, dispatch)
     }
   },
 
-  searchApiGet: _.debounce(function (url, dispatch=null) {
+  searchApiGet: _.debounce(function (url, pageDirection, dispatch=null) {
     this.cancelImageSearch();
     if (url===null) return
     dispatch(this.startImageSearch())
@@ -92,9 +92,9 @@ const ImageSearchActions = {
     }
 
     once(config).then(response => {
-      dispatch(this.receiveImageSearchResults(response))
+      dispatch(this.receiveImageSearchResults(response, pageDirection))
     }).catch((error) => {
-      dispatch(this.failImageSearch(error))
+      dispatch(this.failImageSearch(error, pageDirection))
     })
   }, 750),
 
