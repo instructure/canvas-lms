@@ -23,7 +23,6 @@ import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import View from '@instructure/ui-layout/lib/components/View'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 
 function readCookie(key) {
@@ -37,7 +36,7 @@ export default function ProfileTray({
   eportfoliosEnabled
 }) {
   return (
-    <View as="div" padding="medium">
+    <View as="div" padding="medium small">
       <View textAlign="center">
         <Avatar
           name={userDisplayName}
@@ -47,7 +46,7 @@ export default function ProfileTray({
           inline={false}
           margin="auto"
         />
-        <Heading level="h3" as="h2">{userDisplayName}</Heading>
+        <Heading level="h3" as="h2" margin="0 0 0 small">{userDisplayName}</Heading>
         <form action="/logout" method="post">
           <input name="utf8" value="✓" type="hidden" />
           <input name="_method" value="delete" type="hidden" />
@@ -56,25 +55,25 @@ export default function ProfileTray({
         </form>
       </View>
       <hr role="presentation"/>
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List variant="unstyled" margin="small 0" itemSpacing="x-small">
         {[
           profileEnabled && (
             <ListItem key="profile">
-              <Link href="/profile">{I18n.t('Profile')}</Link>
+              <Button variant="link" href="/profile">{I18n.t('Profile')}</Button>
             </ListItem>
           ),
           <ListItem key="settings">
-            <Link href="/profile/settings">{I18n.t('Settings')}</Link>
+            <Button variant="link" href="/profile/settings">{I18n.t('Settings')}</Button>
           </ListItem>,
           <ListItem key="notifications">
-            <Link href="/profile/communication">{I18n.t('Notifications')}</Link>
+            <Button variant="link" href="/profile/communication">{I18n.t('Notifications')}</Button>
           </ListItem>,
           <ListItem key="files">
-            <Link href="/files">{I18n.t('Files')}</Link>
+            <Button variant="link" href="/files">{I18n.t('Files')}</Button>
           </ListItem>,
           eportfoliosEnabled && (
             <ListItem key="eportfolios">
-              <Link href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</Link>
+              <Button variant="link" href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</Button>
             </ListItem>
           )
         ].filter(Boolean)}
