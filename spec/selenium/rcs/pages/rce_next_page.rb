@@ -222,6 +222,10 @@ module RCENextPage
     f('[role="menuitemcheckbox"][title=" Small header"]')
   end
 
+  def preformatted_option
+    f('[role="menuitemcheckbox"][title=" Preformatted"]')
+  end
+
   def rce_next_toolbar
     f(".tox-toolbar__primary")
   end
@@ -403,6 +407,10 @@ module RCENextPage
 
   def click_small_header_option
     small_header_option.click
+  end
+
+  def click_preformatted_option
+    preformatted_option.click
   end
 
   def click_editor_window
