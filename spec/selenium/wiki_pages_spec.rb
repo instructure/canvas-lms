@@ -605,7 +605,7 @@ describe "Wiki Pages" do
         <p>
           <iframe style="width: 640px; height: 480px;"
                   title="Instructure - About Us"
-                  src="https://player.vimeo.com/video/58752872"
+                  src="https://player.vimeo.com/video/51408381"
                   width="300"
                   height="150"
                   allowfullscreen="allowfullscreen"
