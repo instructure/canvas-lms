@@ -17,9 +17,6 @@
 
 module Lti::Ims
   # @API Result
-  # @internal
-  #
-  # TODO: remove internal flags
   #
   # Result API for IMS Assignment and Grade Services
   #
@@ -36,7 +33,7 @@ module Lti::Ims
   #          "userId": {
   #            "description": "The lti_user_id or the Canvas user_id",
   #            "example": "50 | 'abcasdf'",
-  #            "type": "number|string"
+  #            "type": "string"
   #          },
   #          "resultScore": {
   #            "description": "The score of the result as defined by Canvas, scaled to the resultMaximum",
@@ -44,9 +41,7 @@ module Lti::Ims
   #            "type": "number"
   #          },
   #          "resultMaximum": {
-  #            "description": "Maximum possible score for this result;
-  #                            1 is the default value and will be assumed if not specified otherwise. Minimum
-  #                            value of 0 required.",
+  #            "description": "Maximum possible score for this result; 1 is the default value and will be assumed if not specified otherwise. Minimum value of 0 required.",
   #            "example": "50",
   #            "type": "number"
   #          },
@@ -70,7 +65,6 @@ module Lti::Ims
     MIME_TYPE = 'application/vnd.ims.lis.v2.resultcontainer+json'.freeze
 
     # @API Show a collection of Results
-    # @internal
     #
     # Show existing Results of a line item. Can be used to retrieve a specific student's
     # result by adding the user_id (defined as the lti_user_id or the Canvas user_id) as
@@ -89,7 +83,6 @@ module Lti::Ims
     end
 
     # @API Show a Result
-    # @internal
     #
     # Show existing Result of a line item.
     #

@@ -18,7 +18,7 @@
 module Lti
   module Ims
     # @API Line Items
-    # @internal
+    #
     # Line Item API for IMS Assignment and Grade Services
     #
     # @model LineItem
@@ -47,8 +47,7 @@ module Lti
     #            "type": "string"
     #          },
     #          "resourceId": {
-    #            "description": "A Tool Provider specified id for the Line Item.
-    #                            Multiple line items can share the same resourceId within a given context",
+    #            "description": "A Tool Provider specified id for the Line Item. Multiple line items can share the same resourceId within a given context",
     #            "example": "50",
     #            "type": "string"
     #          },
