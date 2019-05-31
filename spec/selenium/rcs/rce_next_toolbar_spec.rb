@@ -35,6 +35,10 @@ describe "RCE Next toolbar features" do
       stub_rcs_config
     end
 
+    def create_wiki_page_with_text(page_title)
+      @course.wiki_pages.create!(title: page_title, body: "<p>The sleeper must awaken.</p>")
+    end
+
     it "should add bullet lists", priority: "1", test_id: 307623 do
       skip('Unskip in CORE-2636')
       wysiwyg_state_setup(@course)
@@ -233,6 +237,20 @@ describe "RCE Next toolbar features" do
       visit_front_page_edit(@course)
 
       expect(rce_next_toolbar.size.height).to be 39
+    end
+
+    it "should verify selecting Header from dropdown sets H2" do
+      page_title = "header"
+      create_wiki_page_with_text(page_title)
+      visit_existing_wiki_edit(@course, page_title)
+
+      select_all_wiki
+      click_formatting_dropdown
+      click_header_option
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body).to contain_css('h2')
+      end
     end
   end
 end

@@ -60,6 +60,10 @@ module RCENextPage
     f('#rcs-LinkToNewPage-submit')
   end
 
+  def wiki_body
+    f('#tinymce')
+  end
+
   def wiki_body_anchor
     f('#tinymce p a')
   end
@@ -200,6 +204,14 @@ module RCENextPage
 
   def align_right_button
     # put align right button locator here
+  end
+
+  def formatting_dropdown
+    f("button[aria-label='Blocks'")
+  end
+
+  def header_option
+    f('[role="menuitemcheckbox"][title="Header"]')
   end
 
   def rce_next_toolbar
@@ -367,6 +379,14 @@ module RCENextPage
 
   def click_align_right_button
     align_right_button.click
+  end
+
+  def click_formatting_dropdown
+    formatting_dropdown.click
+  end
+
+  def click_header_option
+    header_option.click
   end
 
   def click_editor_window
