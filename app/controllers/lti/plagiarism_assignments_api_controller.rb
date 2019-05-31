@@ -59,7 +59,7 @@ module Lti
 #         }
 #       }
 #     }
-  class AssignmentsApiController < ApplicationController
+  class PlagiarismAssignmentsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
     skip_before_action :load_user

@@ -21,9 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 require_dependency "lti/ims/access_token_helper"
-require_dependency "lti/assignments_api_controller"
+require_dependency "lti/plagiarism_assignments_api_controller"
 module Lti
-  describe AssignmentsApiController, type: :request do
+  describe PlagiarismAssignmentsApiController, type: :request do
     include_context 'lti2_api_spec_helper'
 
     before do
@@ -37,7 +37,7 @@ module Lti
     end
 
     describe '#show' do
-      let(:service_name) { AssignmentsApiController::ASSIGNMENT_SERVICE }
+      let(:service_name) { PlagiarismAssignmentsApiController::ASSIGNMENT_SERVICE }
       let(:endpoint) { "/api/lti/assignments" }
       let(:authorized_services) do
         [{"service"=>"vnd.Canvas.Assignment", "action"=>["GET"], "@type"=>"RestServiceProfile"}]
