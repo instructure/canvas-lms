@@ -266,5 +266,19 @@ describe "RCE Next toolbar features" do
         expect(wiki_body).to contain_css('h3')
       end
     end
+
+    it "should verify selecting small header from dropdown sets H4" do
+      page_title = "header"
+      create_wiki_page_with_text(page_title)
+      visit_existing_wiki_edit(@course, page_title)
+
+      select_all_wiki
+      click_formatting_dropdown
+      click_small_header_option
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body).to contain_css('h4')
+      end
+    end
   end
 end

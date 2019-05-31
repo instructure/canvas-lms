@@ -218,6 +218,10 @@ module RCENextPage
     f('[role="menuitemcheckbox"][title=" Subheader"]')
   end
 
+  def small_header_option
+    f('[role="menuitemcheckbox"][title=" Small header"]')
+  end
+
   def rce_next_toolbar
     f(".tox-toolbar__primary")
   end
@@ -395,6 +399,10 @@ module RCENextPage
 
   def click_subheader_option
     subheader_option.click
+  end
+
+  def click_small_header_option
+    small_header_option.click
   end
 
   def click_editor_window
