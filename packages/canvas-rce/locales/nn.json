@@ -119,6 +119,9 @@
   "copyright_holder_66ee111": {
     "message": "Rettshavar:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 words}\n    one {1 word}\n  other {# words}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Emnedokument"
   },
@@ -178,6 +181,9 @@
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Frist: Fleire datoar"
+  },
+  "due_when_7eed10c6": {
+    "message": "Frist: { when }"
   },
   "embed_image_1080badc": {
     "message": "Sett inn bilde"
@@ -286,9 +292,6 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Lastar mapper..."
-  },
-  "loading_more_results_def6df65": {
-    "message": "Lastar fleire resultat..."
   },
   "media_af190855": {
     "message": "Media"

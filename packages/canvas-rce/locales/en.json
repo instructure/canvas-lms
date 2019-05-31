@@ -130,6 +130,9 @@
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 words}\n    one {1 word}\n  other {# words}\n}"
   },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# item loaded}\n  other {# items loaded}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Course Documents"
   },
@@ -215,6 +218,9 @@
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Enter the alternative text for this image"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Error uploading video/audio recording"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Expand to see { types }"
@@ -316,6 +322,9 @@
     "message": "Links",
     "description": "Title of Sidebar tab containing links to course pages."
   },
+  "load_more_35d33c7": {
+    "message": "Load More"
+  },
   "load_more_results_460f49a9": {
     "message": "Load more results"
   },
@@ -331,8 +340,8 @@
   "loading_folders_8d4d5d5a": {
     "message": "Loading folders..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Loading more results..."
+  "loading_media_f3455841": {
+    "message": "Loading media"
   },
   "media_af190855": {
     "message": "Media"
@@ -547,6 +556,9 @@
   },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Used by screen readers to describe the content of an image"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Video/audio recording uploaded"
   },
   "video_player_b371005": {
     "message": "Video Player"
