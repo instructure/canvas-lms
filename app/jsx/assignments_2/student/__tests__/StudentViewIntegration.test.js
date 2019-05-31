@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import {fireEvent, render, waitForElement} from 'react-testing-library'
+import * as uploadFileModule from '../../../shared/upload_file'
+import {fireEvent, render, wait, waitForElement} from 'react-testing-library'
 import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from '../assignmentData'
+import InitialQuery from '../components/InitialQuery'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import {singleAttachment, submissionGraphqlMock} from '../test-utils'
-import StudentView from '../StudentView'
-import * as uploadFileModule from '../../../shared/upload_file'
 
 let mocks
 
-describe('StudentView', () => {
+describe('InitialQuery', () => {
   beforeAll(() => {
     window.URL.createObjectURL = jest.fn()
     uploadFileModule.uploadFiles = jest.fn()
@@ -35,8 +35,14 @@ describe('StudentView', () => {
 
   beforeEach(() => {
     mocks = submissionGraphqlMock()
-    mocks[2].result.data.assignment.submissionsConnection.nodes[0].submissionHistoriesConnection.edges[0].node.state =
-      'unsubmitted'
+    mocks[2].result.data.assignment.submissionsConnection.nodes[0].state = 'unsubmitted'
+
+    window.ENV = {
+      context_asset_string: 'test_1',
+      COURSE_ID: '1',
+      current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
+      PREREQS: {}
+    }
   })
 
   const uploadFiles = (element, files) => {
@@ -50,7 +56,7 @@ describe('StudentView', () => {
   it('renders normally', async () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks} removeTypename addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
     expect(
@@ -59,6 +65,7 @@ describe('StudentView', () => {
   })
 
   it('renders default env correctly', async () => {
+    window.ENV = {}
     const defaultEnv = GetAssignmentEnvVariables()
 
     expect(defaultEnv).toEqual({
@@ -71,13 +78,6 @@ describe('StudentView', () => {
   })
 
   it('renders with env params set', async () => {
-    window.ENV = {
-      context_asset_string: 'test_1',
-      COURSE_ID: '1',
-      current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
-      PREREQS: {}
-    }
-
     const env = GetAssignmentEnvVariables()
 
     expect(env).toEqual({
@@ -92,7 +92,7 @@ describe('StudentView', () => {
   it('renders loading', async () => {
     const {getByTitle} = render(
       <MockedProvider mocks={mocks} removeTypename addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -108,7 +108,7 @@ describe('StudentView', () => {
 
     const {container, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -123,109 +123,102 @@ describe('StudentView', () => {
     ).toBeInTheDocument()
   })
 
-  it.skip('notifies SR users when an attachment has been uploaded', async () => {
+  it('notifies SR users when an attachment has been uploaded', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
-    const {container, getByText} = render(
+    const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="inputFileDrop"]')
-    )
+    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    expect(await waitForElement(() => getByText('Submission draft updated'))).toBeInTheDocument()
+    await wait(() => {
+      expect(getByText('Submission draft updated')).toBeInTheDocument()
+    })
   })
 
-  it.skip('notifies users of error when attachments fail to upload in the API', async () => {
+  it('notifies users of error when attachments fail to upload in the API', async () => {
     uploadFileModule.uploadFiles.mock.results = [
       {type: 'throw', value: 'Error uploading file to Canvas API'}
     ]
 
-    const {container, getByText} = render(
+    const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="inputFileDrop"]')
-    )
+    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    expect(
-      await waitForElement(() => getByText('Error updating submission draft'))
-    ).toBeInTheDocument()
+    await wait(() => {
+      expect(getByText('Error updating submission draft')).toBeInTheDocument()
+    })
   })
 
-  it.skip('notifies users of error when a submission fails to upload via graphql', async () => {
+  it('notifies users of error when a submission fails to upload via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     mocks[0].error = new Error('aw shucks')
-    const {container, getByText} = render(
+    const {getByTestId, getByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="inputFileDrop"]')
-    )
+    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    expect(
-      await waitForElement(() => getByText('Error updating submission draft'))
-    ).toBeInTheDocument()
+    await wait(() => {
+      expect(getByText('Error updating submission draft')).toBeInTheDocument()
+    })
   })
 
-  it.skip('notifies SR users when a submission has been sent', async () => {
+  it('notifies SR users when a submission has been sent', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
-    const {container, getByText} = render(
+    const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="inputFileDrop"]')
-    )
+    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    fireEvent.click(
-      await waitForElement(() => container.querySelector('button[id="submit-button"]'))
-    )
-
-    expect(await waitForElement(() => getByText('Submission sent'))).toBeInTheDocument()
+    const submitButton = await waitForElement(() => getByTestId('submit-button'))
+    fireEvent.click(submitButton)
+    await wait(() => {
+      expect(getByText('Submission sent')).toBeInTheDocument()
+    })
   })
 
-  it.skip('notifies users of error when a submission fails to send via graphql', async () => {
+  it('notifies users of error when a submission fails to send via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     mocks[1].error = new Error('aw shucks')
-    const {container, getByText} = render(
+    const {getByTestId, getByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
-        <StudentView assignmentLid="22" />
+        <InitialQuery assignmentLid="22" />
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="inputFileDrop"]')
-    )
+    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    fireEvent.click(
-      await waitForElement(() => container.querySelector('button[id="submit-button"]'))
-    )
-    expect(await waitForElement(() => getByText('Error sending submission'))).toBeInTheDocument()
+    const submitButton = await waitForElement(() => getByTestId('submit-button'))
+    fireEvent.click(submitButton)
+    await wait(() => {
+      expect(getByText('Error sending submission')).toBeInTheDocument()
+    })
   })
 
   it('renders error', async () => {
@@ -242,7 +235,7 @@ describe('StudentView', () => {
     ]
     const {getByText} = render(
       <MockedProvider mocks={errorMock} removeTypename addTypename>
-        <StudentView assignmentLid="7" />
+        <InitialQuery assignmentLid="7" />
       </MockedProvider>
     )
 

@@ -23,7 +23,7 @@ import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {Component} from 'react'
-import {submissionFileUploadUrl, uploadFiles} from '../../../shared/upload_file'
+import {uploadFiles} from '../../../shared/upload_file'
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -34,6 +34,12 @@ import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import theme from '@instructure/ui-themes/lib/canvas/base'
+
+function submissionFileUploadUrl(assignment) {
+  return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${
+    assignment.env.currentUser.id
+  }/files`
+}
 
 export default class FileUpload extends Component {
   static propTypes = {
@@ -78,7 +84,7 @@ export default class FileUpload extends Component {
 
         await this.props.createSubmissionDraft({
           variables: {
-            id: this.props.submission.rootId,
+            id: this.props.submission.id,
             attempt: this.props.submission.attempt,
             fileIds: this.getDraftAttachments()
               .map(file => file._id)
@@ -118,7 +124,7 @@ export default class FileUpload extends Component {
     const updatedFiles = this.getDraftAttachments().filter((_, i) => i !== fileIndex)
     await this.props.createSubmissionDraft({
       variables: {
-        id: this.props.submission.rootId,
+        id: this.props.submission.id,
         attempt: this.props.submission.attempt,
         fileIds: updatedFiles.map(file => file._id)
       }
@@ -132,6 +138,10 @@ export default class FileUpload extends Component {
       this.getDraftAttachments().length === 0 || fileIndex === 0
         ? 'inputFileDrop'
         : this.getDraftAttachments()[fileIndex - 1]._id
+
+    // TODO: this could break if there is ever another element in the dom that
+    //       shares an id. As we are using _id (ie, '4') as the id, it's not
+    //       exactly a great unique id. Should probably swap to using refs here.
     document.getElementById(focusElement).focus()
   }
 
@@ -295,6 +305,7 @@ export default class FileUpload extends Component {
         <div style={innerFooterStyle}>
           <Button
             id="submit-button"
+            data-testid="submit-button"
             variant="primary"
             margin="xx-small 0"
             onClick={() => this.submitAssignment()}
@@ -317,6 +328,7 @@ export default class FileUpload extends Component {
         allowMultiple
         enablePreview
         id="inputFileDrop"
+        data-testid="inputFileDrop"
         label={
           this.getDraftAttachments().length || this.state.uploadingFiles
             ? this.renderUploadedFiles()

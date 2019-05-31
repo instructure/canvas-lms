@@ -220,17 +220,3 @@ export async function uploadFiles(files, uploadUrl) {
   })
   return Promise.all(uploadPromises)
 }
-
-/*
- * Creats a url for the files submission endpoint in the files api from
- * an assignment
- *
- * @returns a url for uploading files to an assignment
- */
-export function submissionFileUploadUrl(assignment) {
-  return `/api/v1/courses/${
-    assignment.env.courseId
-  }/assignments/${assignment._id}/submissions/${
-    assignment.env.currentUser.id
-  }/files`
-}

@@ -78,29 +78,38 @@ function submissionDraftFields() {
   `
 }
 
+function baseSubmissionFields() {
+  return `
+    attempt
+    deductedPoints
+    enteredGrade
+    grade
+    gradingStatus
+    latePolicyStatus
+    state
+    submissionStatus
+    submittedAt
+    submissionDraft {
+      ${submissionDraftFields()}
+    }
+  `
+}
+
 function submissionFields() {
+  return `
+    id
+    ${baseSubmissionFields()}
+  `
+}
+
+function submissionHistoryFields() {
   return `
     pageInfo {
       hasPreviousPage
       startCursor
     }
-    edges {
-      cursor
-      node {
-        rootId
-        attempt
-        deductedPoints
-        enteredGrade
-        grade
-        gradingStatus
-        latePolicyStatus
-        state
-        submissionStatus
-        submittedAt
-        submissionDraft {
-          ${submissionDraftFields()}
-        }
-      }
+    nodes {
+      ${baseSubmissionFields()}
     }
   `
 }
@@ -160,9 +169,7 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
-            submissionHistoriesConnection(last: 1) {
-              ${submissionFields()}
-            }
+            ${submissionFields()}
           }
         }
       }
@@ -172,7 +179,7 @@ export const STUDENT_VIEW_QUERY = gql`
 
 export const SUBMISSION_COMMENT_QUERY = gql`
   query GetSubmissionComments($submissionId: ID!, $submissionAttempt: Int!) {
-    submissionComments: legacyNode(_id: $submissionId, type: Submission) {
+    submissionComments: node(id: $submissionId) {
       ... on Submission {
         commentsConnection(filter: {forAttempt: $submissionAttempt}) {
           nodes {
@@ -208,9 +215,7 @@ export const CREATE_SUBMISSION = gql`
   mutation CreateSubmission($id: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
     createSubmission(input: {assignmentId: $id, submissionType: $type, fileIds: $fileIds}) {
       submission {
-        submissionHistoriesConnection(last: 1) {
-          ${submissionFields()}
-        }
+        ${submissionFields()}
       }
       errors {
         ${errorFields()}
@@ -232,12 +237,12 @@ export const CREATE_SUBMISSION_DRAFT = gql`
   }
 `
 
-export const NEXT_SUBMISSION = gql`
+export const SUBMISSION_HISTORIES_QUERY = gql`
   query NextSubmission($submissionID: ID!, $cursor: String) {
-    legacyNode(_id: $submissionID, type: Submission) {
+    node(id: $submissionID) {
       ... on Submission {
-        submissionHistoriesConnection(before: $cursor, last: 1) {
-          ${submissionFields()}
+        submissionHistoriesConnection(before: $cursor, last: 5, filter: {includeCurrentSubmission: false}) {
+          ${submissionHistoryFields()}
         }
       }
     }
@@ -246,7 +251,7 @@ export const NEXT_SUBMISSION = gql`
 
 export const SUBMISSION_ATTACHMENTS_QUERY = gql`
   query GetSubmissionAttachments($submissionId: ID!) {
-    submission: legacyNode(type: Submission, _id: $submissionId) {
+    submission: node(id: $submissionId) {
       ... on Submission {
         attachments {
           displayName
@@ -340,14 +345,30 @@ export const SubmissionShape = shape({
   commentsConnection: shape({
     nodes: arrayOf(CommentShape)
   }),
-  rootId: string,
+  attempt: number,
   deductedPoints: number,
   enteredGrade: string,
   grade: string,
   gradingStatus: string,
+  id: string,
   latePolicyStatus: string,
   state: string,
   submissionDraft: SubmissionDraftShape,
   submissionStatus: string,
   submittedAt: string
+})
+
+export const InitialQueryShape = shape({
+  ...AssignmentShape.propTypes,
+  submissionsConnection: shape({
+    nodes: arrayOf(SubmissionShape)
+  })
+})
+
+export const SubmissionHistoriesQueryShape = shape({
+  node: shape({
+    submissionHistoriesConnection: shape({
+      nodes: arrayOf(SubmissionShape)
+    })
+  })
 })

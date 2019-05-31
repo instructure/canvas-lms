@@ -163,8 +163,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: SUBMISSION_COMMENT_QUERY,
         variables: {
-          submissionId: legacyMockSubmission().rootId,
-          submissionAttempt: legacyMockSubmission().attempt
+          submissionAttempt: legacyMockSubmission().attempt,
+          submissionId: legacyMockSubmission().id
         }
       },
       result: {
@@ -177,8 +177,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: legacyMockSubmission().rootId,
           submissionAttempt: legacyMockSubmission().attempt,
+          id: legacyMockSubmission().id,
           comment: 'lion',
           fileIds: []
         }
@@ -208,8 +208,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: legacyMockSubmission().rootId,
           submissionAttempt: legacyMockSubmission().attempt,
+          id: legacyMockSubmission().id,
           comment: 'lion',
           fileIds: ['1', '2', '3']
         }
@@ -261,12 +261,7 @@ export function mockSubmissionHistoriesConnection() {
 export function mockGraphqlQueryResults(overrides = {}) {
   const assignment = mockAssignment(overrides)
   assignment.submissionsConnection = {
-    nodes: [
-      {
-        __typename: 'Submission',
-        submissionHistoriesConnection: mockSubmissionHistoriesConnection()
-      }
-    ],
+    nodes: [mockSubmission()],
     __typename: 'SubmissionConnection'
   }
   return assignment
@@ -278,7 +273,7 @@ export function submissionGraphqlMock() {
       request: {
         query: CREATE_SUBMISSION_DRAFT,
         variables: {
-          id: '22',
+          id: mockSubmission().id,
           attempt: 1,
           fileIds: ['1']
         }
@@ -313,10 +308,7 @@ export function submissionGraphqlMock() {
       result: {
         data: {
           createSubmission: {
-            submission: {
-              __typename: 'Submission',
-              submissionHistoriesConnection: mockSubmissionHistoriesConnection()
-            },
+            submission: mockSubmission(),
             errors: {
               attribute: null,
               message: null,
@@ -338,8 +330,7 @@ export function submissionGraphqlMock() {
         data: {
           assignment: mockGraphqlQueryResults({
             lockInfo: {isLocked: false, __typename: 'LockInfo'}
-          }),
-          __typename: 'Assignment'
+          })
         }
       }
     }
@@ -370,15 +361,21 @@ export function mockSubmission(overrides = {}) {
     enteredGrade: null,
     grade: null,
     gradingStatus: 'needs_grading',
+    id: btoa('Submission-22'),
     latePolicyStatus: null,
-    rootId: '22',
     state: 'submitted',
     submissionDraft: null,
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
-    __typename: 'SubmissionHistory',
+    __typename: 'Submission',
     ...overrides
   }
+}
+
+export function mockSubmissionHistory() {
+  const submissionHistory = mockSubmission()
+  delete submissionHistory.id
+  return submissionHistory
 }
 
 export function mockSubmissionDraft(overrides = {}) {
@@ -399,10 +396,10 @@ export function mockSubmissionDraft(overrides = {}) {
 //     function that has the same results as submission in the old mockAssignment.
 export function legacyMockSubmission() {
   const overrides = {
-    rootId: '3',
     deductedPoints: 3,
     enteredGrade: '9',
     grade: '6',
+    id: btoa('Submission-3'),
     latePolicyStatus: 'late',
     submissionStatus: 'late',
     submittedAt: '2019-02-20T15:12:33-07:00',

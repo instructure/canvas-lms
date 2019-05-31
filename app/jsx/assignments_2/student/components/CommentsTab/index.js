@@ -28,7 +28,7 @@ import React from 'react'
 
 function CommentsTab(props) {
   const queryVariables = {
-    submissionId: props.submission.rootId,
+    submissionId: props.submission.id,
     submissionAttempt: props.submission.attempt
   }
   // Using the key prop on the query as a work around to these issues:

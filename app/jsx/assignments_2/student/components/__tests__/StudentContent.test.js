@@ -18,44 +18,18 @@
 
 import {CREATE_SUBMISSION_COMMENT, SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
 import {fireEvent, render, waitForElement} from 'react-testing-library'
-import {legacyMockSubmission, mockAssignment, mockComments, mockSubmission} from '../../test-utils'
+import {legacyMockSubmission, mockAssignment, mockComments} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import StudentContent from '../StudentContent'
-
-function mockSubmissionHistoryEdges(count, opts = {}) {
-  const historyEdges = []
-  for (let i = 1; i <= count; i++) {
-    const submission = opts.useLegacyMock ? legacyMockSubmission() : mockSubmission()
-    submission.attempt = i
-    historyEdges.push({
-      cursor: btoa(i.toString()),
-      node: submission
-    })
-  }
-  return historyEdges
-}
-
-function mockPageInfo(options = {}) {
-  const optsWithDefaults = {
-    hasPreviousPage: false,
-    startCursor: 1,
-    ...options
-  }
-
-  return {
-    hasPreviousPage: optsWithDefaults.hasPreviousPage,
-    startCursor: btoa(optsWithDefaults.startCursor.toString())
-  }
-}
 
 const mocks = [
   {
     request: {
       query: SUBMISSION_COMMENT_QUERY,
       variables: {
-        submissionId: legacyMockSubmission().rootId,
-        submissionAttempt: legacyMockSubmission().attempt
+        submissionAttempt: legacyMockSubmission().attempt,
+        submissionId: legacyMockSubmission().id
       }
     },
     result: {
@@ -68,8 +42,8 @@ const mocks = [
     request: {
       query: CREATE_SUBMISSION_COMMENT,
       variables: {
-        submissionId: legacyMockSubmission().rootId,
-        submissionAttempt: legacyMockSubmission().attempt
+        submissionAttempt: legacyMockSubmission().attempt,
+        submissionId: legacyMockSubmission().id
       }
     },
     result: {
@@ -78,43 +52,36 @@ const mocks = [
   }
 ]
 
+function makeProps(overrides = {}) {
+  return {
+    assignment: mockAssignment({lockInfo: {isLocked: false}}),
+    submission: legacyMockSubmission(),
+    ...overrides
+  }
+}
+
 describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is unlocked', () => {
-    const props = {
-      assignment: mockAssignment({lockInfo: {isLocked: false}}),
-      submissionHistoryEdges: mockSubmissionHistoryEdges(1, {useLegacyMock: true}),
-      pageInfo: mockPageInfo(),
-      onLoadMore: () => {}
-    }
     const {getByTestId} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        <StudentContent {...makeProps()} />
       </MockedProvider>
     )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
 
   it('renders the student header if the assignment is locked', () => {
-    const props = {
-      assignment: mockAssignment({lockInfo: {isLocked: true}}),
-      submissionHistoryEdges: mockSubmissionHistoryEdges(1, {useLegacyMock: true}),
-      pageInfo: mockPageInfo(),
-      onLoadMore: () => {}
-    }
+    const props = makeProps({
+      assignment: mockAssignment({lockInfo: {isLocked: true}})
+    })
     const {getByTestId} = render(<StudentContent {...props} />)
     expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
   })
 
   it('renders the assignment details and student content tab if the assignment is unlocked', () => {
-    const props = {
-      assignment: mockAssignment({lockInfo: {isLocked: false}}),
-      submissionHistoryEdges: mockSubmissionHistoryEdges(1, {useLegacyMock: true}),
-      pageInfo: mockPageInfo(),
-      onLoadMore: () => {}
-    }
     const {getByRole, getByText, queryByText} = render(
       <MockedProvider>
-        <StudentContent {...props} />
+        <StudentContent {...makeProps()} />
       </MockedProvider>
     )
     expect(getByRole('tablist')).toHaveTextContent('Attempt 1')
@@ -123,12 +90,9 @@ describe('Assignment Student Content View', () => {
   })
 
   it('renders the availability dates if the assignment is locked', () => {
-    const props = {
-      assignment: mockAssignment({lockInfo: {isLocked: true}}),
-      submissionHistoryEdges: mockSubmissionHistoryEdges(1, {useLegacyMock: true}),
-      pageInfo: mockPageInfo(),
-      onLoadMore: () => {}
-    }
+    const props = makeProps({
+      assignment: mockAssignment({lockInfo: {isLocked: true}})
+    })
     const {queryByRole, getByText} = render(
       <MockedProvider>
         <StudentContent {...props} />
@@ -139,15 +103,9 @@ describe('Assignment Student Content View', () => {
   })
 
   it('renders Comments', async () => {
-    const props = {
-      assignment: mockAssignment({lockInfo: {isLocked: false}}),
-      submissionHistoryEdges: mockSubmissionHistoryEdges(1, {useLegacyMock: true}),
-      pageInfo: mockPageInfo(),
-      onLoadMore: () => {}
-    }
     const {getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentContent {...props} />
+        <StudentContent {...makeProps()} />
       </MockedProvider>
     )
     fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
@@ -156,16 +114,9 @@ describe('Assignment Student Content View', () => {
   })
 
   it('renders spinner while lazy loading comments', () => {
-    const props = {
-      assignment: mockAssignment({lockInfo: {isLocked: false}}),
-      submissionHistoryEdges: mockSubmissionHistoryEdges(1, {useLegacyMock: true}),
-      pageInfo: mockPageInfo(),
-      onLoadMore: () => {}
-    }
-
     const {getByTitle, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentContent {...props} />
+        <StudentContent {...makeProps()} />
       </MockedProvider>
     )
     fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
