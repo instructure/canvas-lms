@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!bundles_quesiton_bank'
 import $ from 'jquery'
 import {map} from 'underscore'
 import OutcomeGroup from 'compiled/models/OutcomeGroup'

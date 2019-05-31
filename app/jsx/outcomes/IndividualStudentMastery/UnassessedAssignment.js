@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { object } from 'prop-types'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividualStudentMasteryUnassessedAssignment'
 import _ from 'lodash'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'

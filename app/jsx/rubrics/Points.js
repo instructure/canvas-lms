@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import I18n from 'i18n!edit_rubric'
+import I18n from 'i18n!edit_rubricPoints'
 
 import { assessmentShape } from './types'
 

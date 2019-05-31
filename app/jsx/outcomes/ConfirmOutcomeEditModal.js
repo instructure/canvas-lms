@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!confirmOutcomeEditModal'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, shape, bool} from 'prop-types'

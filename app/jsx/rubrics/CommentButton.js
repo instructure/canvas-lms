@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import I18n from 'i18n!edit_rubric'
+import I18n from 'i18n!edit_rubricCommentButton'
 
 const CommentButton = ({ onClick }) => (
   <div>

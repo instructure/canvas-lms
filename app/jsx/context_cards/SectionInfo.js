@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'underscore'
-import I18n from 'i18n!student_context_tray'
+import I18n from 'i18n!student_context_traySectionInfo'
 
 const sectionShape = PropTypes.shape({
   name: PropTypes.string.isRequired

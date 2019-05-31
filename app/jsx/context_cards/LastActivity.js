@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!student_context_tray'
+import I18n from 'i18n!student_context_trayLastActivity'
 import FriendlyDatetime from '../shared/FriendlyDatetime'
 
   class LastActivity extends React.Component {

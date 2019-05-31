@@ -19,7 +19,7 @@
 import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividualStudentMasteryOutcome'
 import View from '@instructure/ui-layout/lib/components/View'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGroup'

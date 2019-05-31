@@ -22,7 +22,7 @@ import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!edit_rubric'
+import I18n from 'i18n!edit_rubricRatings'
 
 import { ratingShape, tierShape } from './types'
 

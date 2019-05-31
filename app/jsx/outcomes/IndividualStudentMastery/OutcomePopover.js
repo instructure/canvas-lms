@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'lodash'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividualStudentMasteryOutcomePopover'
 import View from '@instructure/ui-layout/lib/components/View'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import Text from '@instructure/ui-elements/lib/components/Text'
