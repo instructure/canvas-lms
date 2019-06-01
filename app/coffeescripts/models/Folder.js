@@ -155,7 +155,7 @@ class __Folder extends FilesystemObject {
       .map(component => encodeURIComponent(component))
       .join('/')
 
-    if (!filesEnv) filesEnv = require('../react_files/modules/filesEnv') // circular dep
+    if (!filesEnv) filesEnv = require('../react_files/modules/filesEnv').default // circular dep
 
     // when we are viewing all files we need to pad the context_asset_string on the front of the url
     // so it would be something like /files/folder/users_1/some/sub/folder

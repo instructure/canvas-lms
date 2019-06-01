@@ -24,6 +24,27 @@ describe "better_file_browsing" do
   include_context "in-process server selenium tests"
   include FilesCommon
 
+  context "On user's root /files page" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    before(:each) do
+      user_session @teacher
+    end
+
+    it "should work in the user's root /files page, not just /courses/x/files" do
+      get "/files"
+      add_folder("A New Folder")
+      created_folder = @teacher.folders.find_by(name: "A New Folder")
+      expect(created_folder).to be_present
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @user, "example.pdf", created_folder)
+      fj('a.treeLabel:contains("A New Folder")').click
+      wait_for_ajaximations
+      expect(ff('.ef-name-col__text')[0]).to include_text 'example.pdf'
+    end
+  end
+
   context "As a teacher" do
     before(:once) do
       course_with_teacher(active_all: true)
