@@ -20,12 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
 import qs from 'qs'
-import redux from 'redux'
 import CollaborationsApp from '../collaborations/CollaborationsApp'
 import CollaborationsToolLaunch from '../collaborations/CollaborationsToolLaunch'
 import actions from '../collaborations/actions/collaborationsActions'
 import store from '../collaborations/store/store'
-import splitAssetString from 'compiled/str/splitAssetString'
 
   $(window).on('externalContentReady', (e, data) => store.dispatch(actions.externalContentReady(e, data)));
 

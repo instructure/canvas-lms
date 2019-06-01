@@ -19,7 +19,6 @@
 import React from 'react'
 import createReactClass from 'create-react-class';
 import I18n from 'i18n!react_files'
-import classnames from 'classnames'
 import Breadcrumbs from 'compiled/react_files/components/Breadcrumbs'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import BreadcrumbCollapsedContainer from '../files/BreadcrumbCollapsedContainer'

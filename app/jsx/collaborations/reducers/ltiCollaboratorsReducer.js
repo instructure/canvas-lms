@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import redux from 'redux'
 import _ from 'underscore'
+
   let initialState = {
     listLTICollaboratorsPending: false,
     listLTICollaboratorsSuccessful: false,

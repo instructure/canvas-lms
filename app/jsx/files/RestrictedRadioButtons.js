@@ -19,7 +19,6 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 import I18n from 'i18n!restrict_student_access'
 import $ from 'jquery'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'

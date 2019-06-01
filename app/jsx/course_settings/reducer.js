@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from './actions'
 import initialState from './store/initialState'
 import _ from 'underscore'
 

@@ -19,11 +19,6 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import IconLti from '@instructure/ui-icons/lib/Line/IconLti'
-import { Tooltip } from '@instructure/ui-overlays'
-import Button from '@instructure/ui-buttons/lib/components/Button'
 
 import EditExternalToolButton from './EditExternalToolButton'
 import ManageUpdateExternalToolButton from './ManageUpdateExternalToolButton'

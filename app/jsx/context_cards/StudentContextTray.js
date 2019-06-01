@@ -19,7 +19,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_trayStudentContextTray'
-import FriendlyDatetime from '../shared/FriendlyDatetime'
 import Avatar from './Avatar'
 import LastActivity from './LastActivity'
 import MetricsList from './MetricsList'
