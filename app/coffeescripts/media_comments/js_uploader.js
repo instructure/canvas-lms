@@ -17,7 +17,7 @@
 
 import DialogManager from '../media_comments/dialog_manager'
 import CommentUiLoader from '../media_comments/comment_ui_loader'
-import K5Uploader from 'bower/k5uploader/k5uploader'
+import K5Uploader from '@instructure/k5uploader'
 import UploadViewManager from '../media_comments/upload_view_manager'
 import KalturaSessionLoader from '../media_comments/kaltura_session_loader'
 import FileInputManager from '../media_comments/file_input_manager'

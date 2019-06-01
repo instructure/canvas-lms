@@ -17,23 +17,15 @@
  */
 
 import React from 'react'
-import {func, number, shape, string} from 'prop-types'
+import {func, instanceOf, number, shape, string} from 'prop-types'
+import {Img, Link, Text, TruncateText} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 import dragHtml from '../../../../sidebar/dragHtml'
 import formatMessage from '../../../../format-message'
 import {renderImage as renderImageHtml} from '../../../contentRendering'
 
-const imgLinkStyles = {
-  border: '1px solid #ccc',
-  cursor: 'pointer',
-  float: 'left',
-  margin: '3px',
-  overflow: 'hidden',
-  padding: '3px'
-}
-
-export default function Image({image, onImageEmbed}) {
-  const title = formatMessage('Click to embed image')
+export default function Image({focusRef, image, onClick}) {
   const imgTitle = formatMessage('Click to embed {imageName}', {
     imageName: image.display_name
   })
@@ -44,43 +36,65 @@ export default function Image({image, onImageEmbed}) {
 
   function handleImageClick(event) {
     event.preventDefault()
-    onImageEmbed(image)
+    onClick(image)
+  }
+
+  let elementRef = null
+  if (focusRef) {
+    elementRef = ref => {
+      focusRef.current = ref
+    }
   }
 
   return (
-    <a
+    <Link
       draggable={false}
-      href={image.href}
+      elementRef={elementRef}
       onClick={handleImageClick}
       onDragStart={handleDragStart}
-      role="button"
-      style={imgLinkStyles}
-      title={title}
     >
-      <div style={{minHeight: '50px'}}>
-        <img
+      <View
+        as="div"
+        borderRadius="medium"
+        margin="none none small none"
+        overflowX="hidden"
+        overflowY="hidden"
+      >
+        <Img
           alt={image.display_name}
+          constrain="cover"
           draggable
+          height="6rem"
+          inline={false}
           onDragStart={handleDragStart}
           src={image.thumbnail_url}
-          style={{maxHeight: 50, maxWidth: 200}}
           title={imgTitle}
+          width="6rem"
         />
-      </div>
+      </View>
 
-      <div style={{wordBreak: 'break-all'}}>{image.display_name}</div>
-    </a>
+      <TruncateText>
+        <Text size="small">{image.display_name}</Text>
+      </TruncateText>
+    </Link>
   )
 }
 
 Image.propTypes = {
+  focusRef: shape({
+    current: instanceOf(Element)
+  }),
   image: shape({
     display_name: string.isRequired,
     filename: string,
-    href: string,
-    id: number.isRequired,
-    preview_url: string.isRequired,
-    thumbnail_url: string
+    href: string.isRequired,
+    id: number,
+    preview_url: string,
+    thumbnail_url: string.isRequired
   }).isRequired,
-  onImageEmbed: func.isRequired
+  onClick: func.isRequired
+}
+
+Image.defaultProps = {
+  focusRef: null
 }

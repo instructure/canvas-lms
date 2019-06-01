@@ -18,7 +18,7 @@
 module Lti::Ims::NamesAndRolesMatchers
 
   def expected_lti_id(entity)
-    Lti::Asset.opaque_identifier_for(entity)
+    entity.is_a?(User) ? entity.lti_id : Lti::Asset.opaque_identifier_for(entity)
   end
 
   def expected_course_lti_roles(*enrollment)
@@ -209,5 +209,3 @@ module Lti::Ims::NamesAndRolesMatchers
     attr_reader :actual, :expected
   end
 end
-
-

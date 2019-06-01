@@ -23,6 +23,7 @@ import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 import StudentsSearcher from './StudentsSearcher'
+import {Img} from '@instructure/ui-elements'
 
 ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
@@ -49,8 +50,16 @@ export default function ContentTabs(props) {
           readOnly={props.readOnly}
         />
       </TabPanel>
-      <TabPanel title={I18n.t('Grading')}>Grading</TabPanel>
-      <TabPanel title={I18n.t('Rubric')}>Rubric</TabPanel>
+      <TabPanel title={I18n.t('Grading')}>
+        <div style={{width: '680px'}}>
+          <Img src="/images/assignments2_grading_static.png" />
+        </div>
+      </TabPanel>
+      <TabPanel title={I18n.t('Rubric')}>
+        <div style={{width: '730px'}}>
+          <Img src="/images/assignments2_rubric_static.png" />
+        </div>
+      </TabPanel>
       <TabPanel title={I18n.t('Students')}>
         <StudentsSearcher assignment={assignment} />
       </TabPanel>

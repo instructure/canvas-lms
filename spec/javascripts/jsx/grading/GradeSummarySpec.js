@@ -19,7 +19,7 @@
 import _ from 'lodash'
 
 import $ from 'jquery'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradingGradeSummary'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'

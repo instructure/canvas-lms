@@ -268,6 +268,32 @@ describe EportfoliosController do
     end
   end
 
+  describe "POST 'reorder_categories' cross shard" do
+    specs_require_sharding
+    let!(:user) { user_model }
+
+    it "should reorder categories" do
+      user.associate_with_shard(@shard1)
+      @shard1.activate { @portfolio = Eportfolio.create!(user_id: user) }
+      user_session(user)
+      c1 = eportfolio_category
+      c2 = eportfolio_category
+      c3 = eportfolio_category
+      expect(c1.position).to eql(1)
+      expect(c2.position).to eql(2)
+      expect(c3.position).to eql(3)
+      [c2, c3, c1].map(&:id).join(',')
+      post 'reorder_categories', params: { eportfolio_id: @portfolio.id, order: "#{c2.id},#{c3.id},#{c1.id}" }
+      expect(response).to be_successful
+      c1.reload
+      c2.reload
+      c3.reload
+      expect(c1.position).to eql(3)
+      expect(c2.position).to eql(1)
+      expect(c3.position).to eql(2)
+    end
+  end
+
   describe "POST 'reorder_entries'" do
     before(:once){ eportfolio }
     it "should require authorization" do

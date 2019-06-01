@@ -19,7 +19,7 @@
 
 define(function(require) {
   var React = require('../../ext/react');
-  var I18n = require('i18n!quiz_statistics');
+  var I18n = require('i18n!quiz_statistics').default;
   var Question = require('jsx!../question');
   var QuestionHeader = require('jsx!./header');
   var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut');

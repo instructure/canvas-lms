@@ -15,115 +15,113 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jquery'
-  'underscore'
-  'i18n!content_migrations'
-  'jst/content_migrations/SelectContent'
-  'jst/EmptyDialogFormWrapper'
-  'jst/content_migrations/ContentCheckboxCollection'
-  '../DialogFormView'
-  '../CollectionView'
-  '../../collections/content_migrations/ContentCheckboxCollection'
-  './ContentCheckboxView'
-  './NavigationForTree'
-  './ExpandCollapseContentSelectTreeItems'
-  './CheckingCheckboxesForTree'
-  './ScrollPositionForTree'
-], (Backbone, $, _, I18n, template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView, NavigationForTree, ExpandCollapseContentSelectTreeItems, CheckingCheckboxesForTree, ScrollPositionForTree) ->
-  class SelectContentView extends DialogFormView
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!content_migrations'
+import template from 'jst/content_migrations/SelectContent'
+import wrapperTemplate from 'jst/EmptyDialogFormWrapper'
+import checkboxCollectionTemplate from 'jst/content_migrations/ContentCheckboxCollection'
+import DialogFormView from '../DialogFormView'
+import CollectionView from '../CollectionView'
+import CheckboxCollection from '../../collections/content_migrations/ContentCheckboxCollection'
+import CheckboxView from './ContentCheckboxView'
+import NavigationForTree from './NavigationForTree'
+import ExpandCollapseContentSelectTreeItems from './ExpandCollapseContentSelectTreeItems'
+import CheckingCheckboxesForTree from './CheckingCheckboxesForTree'
+import ScrollPositionForTree from './ScrollPositionForTree'
 
-    els:
-      '.form-dialog-content' : '$formDialogContent'
-      '#selectContentBtn'    : '$selectContentBtn'
+export default class SelectContentView extends DialogFormView
 
-    template: template
-    wrapperTemplate: wrapperTemplate
+  els:
+    '.form-dialog-content' : '$formDialogContent'
+    '#selectContentBtn'    : '$selectContentBtn'
 
-    # Remove attributes from the model that shouldn't be sent by picking
-    # them out of the original attributes, clearning the model then
-    # re-setting the model. Trigger the models continue event which
-    # will start polling the progress bar again. See the
-    # ProgressingMigrationView for the 'continue' event handler.
-    #
-    # @api private
+  template: template
+  wrapperTemplate: wrapperTemplate
 
-    submit: (event) =>
-      attr = _.pick @model.attributes, "id", "workflow_state", "user_id"
-      @model.clear(silent: true)
-      @model.set attr
+  # Remove attributes from the model that shouldn't be sent by picking
+  # them out of the original attributes, clearning the model then
+  # re-setting the model. Trigger the models continue event which
+  # will start polling the progress bar again. See the
+  # ProgressingMigrationView for the 'continue' event handler.
+  #
+  # @api private
 
-      @$el.find('.module_options').each ->
-        $mo = $(this)
-        if $mo.find('input[value="separate"]').is(':checked')
-          $mo.data('checkbox').prop(checked: false)
-          $('input[name="copy\[all_context_modules\]"]').prop(checked: false)
+  submit: (event) =>
+    attr = _.pick @model.attributes, "id", "workflow_state", "user_id"
+    @model.clear(silent: true)
+    @model.set attr
 
-      if _.isEmpty(@getFormData())
-        event.preventDefault()
-        alert(I18n.t('no_content_selected', 'You have not selected any content to import.'))
-        return false
-      else
-        dfd = super
-        dfd?.done =>
-          @model.trigger 'continue'
+    @$el.find('.module_options').each ->
+      $mo = $(this)
+      if $mo.find('input[value="separate"]').is(':checked')
+        $mo.data('checkbox').prop(checked: false)
+        $('input[name="copy\[all_context_modules\]"]').prop(checked: false)
 
-    # Fetch top level checkboxes that have lower level checkboxes.
-    # If the dialog has been opened before it will cache the old
-    # dialog window and re-open it instead of fetching the
-    # check boxes again.
-    # @api private
+    if _.isEmpty(@getFormData())
+      event.preventDefault()
+      alert(I18n.t('no_content_selected', 'You have not selected any content to import.'))
+      return false
+    else
+      dfd = super
+      dfd?.done =>
+        @model.trigger 'continue'
 
-    firstOpen: =>
-      super
+  # Fetch top level checkboxes that have lower level checkboxes.
+  # If the dialog has been opened before it will cache the old
+  # dialog window and re-open it instead of fetching the
+  # check boxes again.
+  # @api private
 
-      @checkboxCollection ||= new CheckboxCollection null,
-                                courseID: @model?.course_id
-                                migrationID: @model?.get('id')
-                                isTopLevel: true
-                                ariaLevel: 1
+  firstOpen: =>
+    super
 
-      @checkboxCollectionView ||= new CollectionView
-                                    collection: @checkboxCollection
-                                    itemView: CheckboxView
-                                    el: @$formDialogContent
-                                    template: checkboxCollectionTemplate
+    @checkboxCollection ||= new CheckboxCollection null,
+                              courseID: @model?.course_id
+                              migrationID: @model?.get('id')
+                              isTopLevel: true
+                              ariaLevel: 1
 
-      dfd = @checkboxCollection.fetch()
-      @$el.disableWhileLoading dfd
+    @checkboxCollectionView ||= new CollectionView
+                                  collection: @checkboxCollection
+                                  itemView: CheckboxView
+                                  el: @$formDialogContent
+                                  template: checkboxCollectionTemplate
 
-      dfd.done =>
-        @maintainTheTree(@$el.find('ul[role=tree]'))
-        @selectContentDialogEvents()
+    dfd = @checkboxCollection.fetch()
+    @$el.disableWhileLoading dfd
 
-      @checkboxCollectionView.render()
+    dfd.done =>
+      @maintainTheTree(@$el.find('ul[role=tree]'))
+      @selectContentDialogEvents()
 
-    # Private Methods
+    @checkboxCollectionView.render()
 
-    # You must have at least one checkbox selected in order to submit the form. Disable the submit
-    # button if there are not items selected.
+  # Private Methods
 
-    setSubmitButtonState: =>
-      buttonState = true
-      @$el.find('input[type=checkbox]').each ->
-        if this.checked
-          buttonState = false
+  # You must have at least one checkbox selected in order to submit the form. Disable the submit
+  # button if there are not items selected.
 
-      @$selectContentBtn.prop('disabled', buttonState)
+  setSubmitButtonState: =>
+    buttonState = true
+    @$el.find('input[type=checkbox]').each ->
+      if this.checked
+        buttonState = false
 
-    # Add SelectContent dialog box events. These events are general to the whole box.
-    # Keeps everything in one place
+    @$selectContentBtn.prop('disabled', buttonState)
 
-    selectContentDialogEvents: =>
-      @$el.on 'click', "#cancelSelect", => @close()
-      @$el.on "change", "input[type=checkbox]", @setSubmitButtonState
+  # Add SelectContent dialog box events. These events are general to the whole box.
+  # Keeps everything in one place
 
-    # These are the classes that help modify the tree. These methods will add events to the
-    # tree and keep things like scroll position correct as well as ensuring focus is being mantained.
+  selectContentDialogEvents: =>
+    @$el.on 'click', "#cancelSelect", => @close()
+    @$el.on "change", "input[type=checkbox]", @setSubmitButtonState
 
-    maintainTheTree: ($tree) =>
-      new NavigationForTree($tree)
-      new ExpandCollapseContentSelectTreeItems($tree)
-      new CheckingCheckboxesForTree($tree)
-      new ScrollPositionForTree($tree, @$formDialogContent)
+  # These are the classes that help modify the tree. These methods will add events to the
+  # tree and keep things like scroll position correct as well as ensuring focus is being mantained.
+
+  maintainTheTree: ($tree) =>
+    new NavigationForTree($tree)
+    new ExpandCollapseContentSelectTreeItems($tree)
+    new CheckingCheckboxesForTree($tree)
+    new ScrollPositionForTree($tree, @$formDialogContent)

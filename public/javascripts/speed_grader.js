@@ -30,6 +30,7 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
+import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
@@ -46,7 +47,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!speed_grader'
 import natcompare from 'compiled/util/natcompare'
 import $ from 'jquery'
 import qs from 'qs'
@@ -1345,6 +1346,17 @@ EG = {
       setupHandleStatePopped()
 
       if (ENV.post_policies_enabled) {
+        const {jsonData} = window
+
+        EG.postPolicies = new PostPolicies({
+          assignment: {
+            anonymizeStudents: jsonData.anonymize_students,
+            gradesPublished: !jsonData.moderated_grading || jsonData.grades_published_at != null,
+            id: jsonData.id,
+            name: jsonData.title
+          },
+          sections: jsonData.context.active_course_sections
+        })
         renderPostGradesMenu()
       }
     }
@@ -1493,23 +1505,12 @@ EG = {
   },
 
   goToStudent(studentIdentifier, historyBehavior = null) {
-    const hideStudentNames = utils.shouldHideStudentNames()
     const student = jsonData.studentMap[studentIdentifier]
 
     if (student) {
       $selectmenu.selectmenu('value', student[anonymizableId])
       if (!this.currentStudent || this.currentStudent[anonymizableId] !== student[anonymizableId]) {
-        handleStudentOrSectionSelected(studentIdentifier, historyBehavior)
-      }
-
-      if (hideStudentNames || isAnonymous || !student.avatar_path) {
-        $avatar_image.hide()
-      } else {
-        // If there's any kind of delay in loading the user's avatar, it's
-        // better to show a blank image than the previous student's image.
-        const $new_image = $avatar_image.clone().show()
-        $avatar_image.after($new_image.attr('src', student.avatar_path)).remove()
-        $avatar_image = $new_image
+        EG.handleStudentChanged(historyBehavior)
       }
     }
   },
@@ -1561,6 +1562,20 @@ EG = {
       $full_width_container.disableWhileLoading(this.fetchProvisionalGrades())
     } else {
       this.showStudent()
+    }
+
+    this.setCurrentStudentAvatar()
+  },
+
+  setCurrentStudentAvatar() {
+    if (utils.shouldHideStudentNames() || isAnonymous || !this.currentStudent.avatar_path) {
+      $avatar_image.hide()
+    } else {
+      // If there's any kind of delay in loading the user's avatar, it's
+      // better to show a blank image than the previous student's image.
+      const $new_image = $avatar_image.clone().show()
+      $avatar_image.after($new_image.attr('src', this.currentStudent.avatar_path)).remove()
+      $avatar_image = $new_image
     }
   },
 
@@ -1781,13 +1796,10 @@ EG = {
       })
 
       const defaultInfoMessage = I18n.t(
-          'turnitin.info_message',
-          'This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score.'
-        ),
-        defaultErrorMessage = I18n.t(
-          'turnitin.error_message',
-          'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
-        )
+        'turnitin.info_message',
+        'This file is still being processed by the plagiarism detection tool associated with the assignment. Please check back later to see the score.'
+      )
+      const defaultErrorMessage = SpeedgraderHelpers.plagiarismErrorMessage(turnitinAsset)
       const $turnitinInfo = $(
         turnitinInfoTemplate({
           assetString,
@@ -1944,7 +1956,8 @@ EG = {
       submission.turnitin_data && submission.turnitin_data.provider === 'vericite'
 
     SpeedgraderHelpers.plagiarismResubmitButton(
-      submission.has_originality_score,
+      submission.has_originality_score &&
+        Object.values(submission.turnitin_data).every(tiid => tiid.status !== 'error'),
       $('#plagiarism_platform_info_container')
     )
 
@@ -1997,6 +2010,8 @@ EG = {
       }
     }
 
+    let studentViewedAtHTML = ''
+
     // handle the files
     $submission_files_list.empty()
     $turnitinInfoContainer = $('#submission_files_container .turnitin_info_container').empty()
@@ -2025,13 +2040,11 @@ EG = {
         inlineableAttachments.push(attachment)
       }
 
-      let viewedAtHTML = ''
       if (!jsonData.anonymize_students || isAdmin) {
-        viewedAtHTML = studentViewedAtTemplate({
+        studentViewedAtHTML = studentViewedAtTemplate({
           viewed_at: $.datetimeString(attachment.viewed_at)
         })
       }
-      $submission_attachment_viewed_at.html($.raw(viewedAtHTML))
 
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment)
@@ -2099,9 +2112,11 @@ EG = {
 
       renderProgressIcon(attachment)
     })
+    $submission_attachment_viewed_at.html($.raw(studentViewedAtHTML))
 
     $submission_files_container.showIf(
-      submission.versioned_attachments && submission.versioned_attachments.length
+      submission.submission_type === 'online_text_entry' ||
+        (submission.versioned_attachments && submission.versioned_attachments.length)
     )
 
     let preview_attachment = null
@@ -2232,7 +2247,7 @@ EG = {
         })
       })
     }
-    $multiple_submissions.html($.raw(innerHTML))
+    $multiple_submissions.html($.raw(innerHTML || ''))
     StatusPill.renderPills()
   },
 
@@ -3633,8 +3648,12 @@ function renderPostGradesMenu() {
   const props = {
     allowHidingGrades,
     allowPostingGrades,
-    onHideGrades: () => {},
-    onPostGrades: () => {}
+    onHideGrades: () => {
+      EG.postPolicies.showHideAssignmentGradesTray({onExited: () => {}})
+    },
+    onPostGrades: () => {
+      EG.postPolicies.showPostAssignmentGradesTray({onExited: () => {}, submissions})
+    }
   }
 
   const postGradesMenu = <SpeedGraderPostGradesMenu {...props} />
@@ -3702,6 +3721,10 @@ export default {
   teardown() {
     if (ENV.can_view_audit_trail) {
       EG.tearDownAssessmentAuditTray()
+    }
+
+    if (EG.postPolicies) {
+      EG.postPolicies.destroy()
     }
 
     teardownHandleStatePopped()

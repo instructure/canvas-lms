@@ -22,7 +22,7 @@ define(function(require) {
   var classSet = require('canvas_quizzes/util/class_set');
   var K = require('../../constants');
   var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
-  var I18n = require('i18n!quiz_log_auditing.event_stream');
+  var I18n = require('i18n!quiz_log_auditing.event_stream').default;
   var Icon = require('jsx!canvas_quizzes/components/icon');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
   var Router = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');

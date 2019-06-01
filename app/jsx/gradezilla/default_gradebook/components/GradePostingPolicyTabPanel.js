@@ -25,7 +25,7 @@ import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGrou
 import Text from '@instructure/ui-elements/lib/components/Text'
 import {showFlashAlert} from '../../../shared/FlashAlert'
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 const MANUAL_POST = 'manual'
 const AUTOMATIC_POST = 'auto'

@@ -21,7 +21,7 @@ import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import Select from '@instructure/ui-core/lib/components/Select'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 import {parseTextValue} from '../../../grading/helpers/GradeInputHelper'
 import {isUnusuallyHigh} from '../../../grading/helpers/OutlierScoreHelper'
@@ -281,7 +281,6 @@ export default class GradeInput extends React.Component {
         onBlur={this.handleTextBlur}
         placeholder="–"
         value={this.state.formattedGrade}
-        width="6em"
       />
     )
   }

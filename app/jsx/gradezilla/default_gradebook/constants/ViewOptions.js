@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla_constants'
 
 export const filterLabels = {
   assignmentGroups: I18n.t('Assignment Groups'),

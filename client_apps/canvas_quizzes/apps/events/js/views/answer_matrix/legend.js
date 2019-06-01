@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var Emblem = require('jsx!./emblem');
-  var I18n = require('i18n!quiz_log_auditing.table_view');
+  var I18n = require('i18n!quiz_log_auditing.table_view').default;
 
   /**
    * @class Events.Views.AnswerMatrix.Legend

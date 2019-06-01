@@ -38,10 +38,9 @@ import BlueprintModal from './BlueprintModal'
 import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
 import { ConnectedMigrationOptions as MigrationOptions } from './MigrationOptions'
 
-const getDefault = module => (module.default ? module : {default: module}) // can go away when we remove the add-module-export babel plugin
-const BlueprintAssociations = lazy(() => import('./ConnectedBlueprintAssociations').then(getDefault))
-const SyncHistory = lazy(() => import('./ConnectedSyncHistory').then(getDefault))
-const UnsyncedChanges = lazy(() => import('./ConnectedUnsyncedChanges').then(getDefault))
+const BlueprintAssociations = lazy(() => import('./ConnectedBlueprintAssociations'))
+const SyncHistory = lazy(() => import('./ConnectedSyncHistory'))
+const UnsyncedChanges = lazy(() => import('./ConnectedUnsyncedChanges'))
 
 
 export default class CourseSidebar extends Component {

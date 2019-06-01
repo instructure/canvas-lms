@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!sharedMessageStudentsWhoHelper'
 
 const MessageStudentsWhoHelper = {
   settings(assignment, students) {

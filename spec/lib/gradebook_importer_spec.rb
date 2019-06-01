@@ -76,6 +76,17 @@ describe GradebookImporter do
       expect(@gi.students.length).to eq 2
     end
 
+    it "ignores the line denoting manually posted assignments if present" do
+      importer_with_rows(
+        'Student,ID,Section,Assignment 1,Final Score',
+        'Points Possible,,,10,',
+        ', ,,Manual Posting,',
+        '"Blend, Bill",6,My Course,-,',
+        '"Farner, Todd",4,My Course,-,'
+      )
+      expect(@gi.students.length).to eq 2
+    end
+
     context 'when dealing with a file containing semicolon field separators' do
       context 'with interspersed commas to throw you off' do
         before(:each) do

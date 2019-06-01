@@ -960,6 +960,11 @@ is removed or the cross-listing is removed, the section will revert to its previ
 If xlist_course_id does not reference an existing course, it will be created. If you want to
 provide more information about the cross-listed course, please do so in courses.csv.
 
+While the xlists.csv does not have any sticky fields, the sections.csv does have
+course_id as a sticky field. If the section's course_id is "sticky", the import
+will not cross list the section to another course unless it is run with the
+Override UI option on the sis import.
+
 Sample:
 
 <pre>xlist_course_id,section_id,status

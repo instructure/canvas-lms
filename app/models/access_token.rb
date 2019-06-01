@@ -87,7 +87,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.visible_tokens(tokens)
-    tokens.reject { |token| token.developer_key.internal_service }
+    tokens.reject { |token| token.developer_key&.internal_service }
   end
 
   def usable?(token_key = :crypted_token)
@@ -203,6 +203,12 @@ class AccessToken < ActiveRecord::Base
     else
       "#{token_hint}..."
     end
+  end
+
+  def self.always_allowed_scopes
+    [
+      "/login/oauth2/token"
+    ].map{ |path| Regexp.new("^#{path}$")}
   end
 
   def url_scopes_for_method(method)

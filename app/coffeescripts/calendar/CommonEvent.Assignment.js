@@ -21,6 +21,7 @@ import $ from 'jquery'
 import CommonEvent from '../calendar/CommonEvent'
 import fcUtil from '../util/fcUtil'
 import {extend} from '../legacyCoffeesScriptHelpers'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_misc_helpers'
 
@@ -85,7 +86,7 @@ Object.assign(Assignment.prototype, {
   },
 
   save(params, success, error) {
-    $.publish('CommonEvent/assignmentSaved', this)
+    publish('CommonEvent/assignmentSaved', this)
     return Assignment.__super__.save.apply(this, arguments)
   },
 

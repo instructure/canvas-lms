@@ -15,108 +15,106 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
 
-import {mockAssignment} from '../../test-utils'
 import Header from '../Header'
-
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-  window.pageYOffset = 0
-})
-
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
+import {mockAssignment} from '../../test-utils'
+import React from 'react'
+import {render} from 'react-testing-library'
 
 it('renders normally', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
-  const element = $('[data-testid="assignments-2-student-header"]')
-  expect(element).toHaveLength(1)
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={mockAssignment()} />)
+
+  expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
 })
 
 it('dispatches scroll event properly when less than threshold', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={mockAssignment()} />)
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 100
   window.dispatchEvent(scrollEvent)
-  const foundClassElement = $('[data-test-id="assignment-student-header-normal"]')
-  expect(foundClassElement).toHaveLength(1)
+
+  expect(getByTestId('assignment-student-pizza-header-normal')).toBeInTheDocument()
 })
 
-it('dispatches scroll event properly when greather than threshold', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
+it('dispatches scroll event properly when greater than threshold', () => {
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={mockAssignment()} />)
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 500
   window.dispatchEvent(scrollEvent)
-  const foundClassElement = $('[data-test-id="assignment-student-header-sticky"]')
-  expect(foundClassElement).toHaveLength(1)
+
+  expect(getByTestId('assignment-student-pizza-header-sticky')).toBeInTheDocument()
 })
 
 it('displays element filler when scroll offset is in correct place', () => {
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={mockAssignment()} />)
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 100
   window.dispatchEvent(scrollEvent)
-  const normalHeader = $('[data-test-id="assignment-student-header-normal"]')
-  expect(normalHeader).toHaveLength(1)
+
+  expect(getByTestId('assignment-student-pizza-header-normal')).toBeInTheDocument()
+
   window.pageYOffset = 200
   window.dispatchEvent(scrollEvent)
-  const fillerElement = $('[data-test-id="header-element-filler"]')
-  expect(fillerElement).toHaveLength(1)
-  const stickyHeader = $('.assignment-student-header-sticky')
-  expect(stickyHeader).toHaveLength(1)
+
+  expect(getByTestId('header-element-filler')).toBeInTheDocument()
+  expect(getByTestId('assignment-student-header-sticky')).toBeInTheDocument()
 })
 
 it('will not render LatePolicyStatusDisplay if the submission is not late', () => {
   const assignment = mockAssignment()
   assignment.submissionsConnection.nodes[0].latePolicyStatus = null
   assignment.submissionsConnection.nodes[0].submissionStatus = null
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const foundClassElement = $('[data-test-id="late-policy-container"]')
-  expect(foundClassElement).toHaveLength(0)
+  const {queryByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(queryByTestId('late-policy-container')).not.toBeInTheDocument()
 })
 
 it('will render LatePolicyStatusDisplay if the submission status is late', () => {
   const assignment = mockAssignment()
   assignment.submissionsConnection.nodes[0].latePolicyStatus = null
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const foundClassElement = $('[data-test-id="late-policy-container"]')
-  expect(foundClassElement).toHaveLength(1)
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
 
 it('will render LatePolicyStatusDisplay if the latePolicyStatus is late status is late', () => {
   const assignment = mockAssignment()
   assignment.submissionsConnection.nodes[0].submissionStatus = null
-  ReactDOM.render(
-    <Header scrollThreshold={150} assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const foundClassElement = $('[data-test-id="late-policy-container"]')
-  expect(foundClassElement).toHaveLength(1)
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('late-policy-container')).toBeInTheDocument()
+})
+
+it('will render the unavailable state tracker if an assignment is not available', () => {
+  const assignment = mockAssignment()
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('unavailable-step-container')).toBeInTheDocument()
+})
+
+it('will render the available state tracker if an assignment is available but not submitted', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'unsubmitted'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('available-step-container')).toBeInTheDocument()
+})
+
+it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'submitted'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+})
+
+it('will render the graded state tracker if an assignment is graded', () => {
+  const assignment = mockAssignment()
+  assignment.lockInfo.isLocked = false
+  assignment.submissionsConnection.nodes[0].state = 'graded'
+  const {getByTestId} = render(<Header scrollThreshold={150} assignment={assignment} />)
+
+  expect(getByTestId('graded-step-container')).toBeInTheDocument()
 })

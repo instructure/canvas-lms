@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import classnames from 'classnames'
-import I18n from 'i18n!lock_btn_module'
+import I18n from 'i18n!MasterCourseLock'
 import FilesystemObject from 'compiled/models/FilesystemObject'
 import { showFlashError } from './FlashAlert'
 

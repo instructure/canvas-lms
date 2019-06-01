@@ -17,16 +17,59 @@
  */
 
 import PropTypes from "prop-types";
-
 import React from "react";
-import ReactDOM from "react-dom";
 import TinyMCE from "react-tinymce";
+
+import formatMessage from "../format-message";
 import * as contentInsertion from "./contentInsertion";
 import indicatorRegion from "./indicatorRegion";
 import indicate from "../common/indicate";
 import Bridge from "../bridge";
+import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
+import StatusBar from './StatusBar';
 
 const editorWrappers = new WeakMap();
+
+function showMenubar(el, show) {
+  const $menubar = el.querySelector('.tox-menubar')
+  $menubar && ($menubar.style.display = show ? '' : 'none')
+  if (show) {
+    focusFirstMenuButton(el)
+  }
+}
+
+function focusToolbar(el) {
+  const $firstToolbarButton = el.querySelector('.tox-tbtn')
+  $firstToolbarButton  && $firstToolbarButton.focus()
+}
+
+function focusFirstMenuButton(el) {
+  const $firstMenu = el.querySelector('.tox-mbtn')
+  $firstMenu && $firstMenu.focus()
+}
+
+function initKeyboardShortcuts(el, editor) {
+  // hide the menubar
+  showMenubar(el, false)
+
+  // when typed w/in the editor's edit area
+  editor.addShortcut('Alt+F9', '', () => {
+    showMenubar(el, true)
+  })
+  // when typed somewhere else w/in RCEWrapper
+  el.addEventListener('keyup', e => {
+    if (e.altKey && e.code === 'F9') {
+      showMenubar(el, true)
+    }
+  })
+
+  // toolbar help
+  el.addEventListener('keyup', e => {
+    if (e.altKey && e.code === 'F10') {
+      focusToolbar(el)
+    }
+  })
+}
 
 export default class RCEWrapper extends React.Component {
   static getByEditor(editor) {
@@ -43,6 +86,8 @@ export default class RCEWrapper extends React.Component {
 
     // test override points
     this.indicator = false;
+
+    this._elementRef = null;
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -145,7 +190,6 @@ export default class RCEWrapper extends React.Component {
   }
 
   onRemove() {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.refs.rce));
     Bridge.detachEditor(this);
     this.props.onRemove && this.props.onRemove(this);
   }
@@ -158,9 +202,12 @@ export default class RCEWrapper extends React.Component {
     return this.getTextarea().value;
   }
 
-  toggle() {
+  toggle = () => {
     if (this.isHidden()) {
       this.setCode(this.textareaValue());
+      this.getTextarea().setAttribute('aria-hidden', true);
+    } else {
+      this.getTextarea().removeAttribute('aria-hidden');
     }
     this.onTinyMCEInstance("mceToggleEditor");
   }
@@ -208,6 +255,10 @@ export default class RCEWrapper extends React.Component {
     editor.rceWrapper = this;
   }
 
+  onInit(_e, editor) {
+    initKeyboardShortcuts(this._elementRef, editor)
+  }
+
   componentWillUnmount() {
     if (!this._destroyCalled) {
       this.destroy();
@@ -216,13 +267,36 @@ export default class RCEWrapper extends React.Component {
 
   wrapOptions(options = {}) {
     const setupCallback = options.setup;
-    options.setup = editor => {
-      editorWrappers.set(editor, this);
-      if (typeof setupCallback === "function") {
-        setupCallback(editor);
-      }
-    };
-    return options;
+
+    return {
+      ...options,
+
+      block_formats: [
+        `${formatMessage('Header')}=h2`,
+        `${formatMessage('Subheader')}=h3`,
+        `${formatMessage('Small header')}=h4`,
+        `${formatMessage('Preformatted')}=pre`,
+        `${formatMessage('Paragraph')}=p`
+      ].join('; '),
+
+      setup: editor => {
+        editorWrappers.set(editor, this);
+        Bridge.trayProps.set(editor, this.props.trayProps)
+        if (typeof setupCallback === "function") {
+          setupCallback(editor);
+        }
+      },
+
+      toolbar: [
+        'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
+        'subscript | align bullist outdent indent | ' +
+        'instructure_links instructure_image instructure_record | ' +
+        'removeformat table instructure_equation instructure_equella'
+      ],
+      contextmenu: '',  // show the browser's native context menu
+
+      toolbar_drawer: 'floating'
+    }
   }
 
   handleTextareaChange = () => {
@@ -255,32 +329,45 @@ export default class RCEWrapper extends React.Component {
   }
 
   render() {
+    const {trayProps, ...mceProps} = this.props
+    mceProps.editorOptions.statusbar = false
+
     return (
-      <TinyMCE
-        ref="rce"
-        id={this.props.textareaId}
-        tinymce={this.props.tinymce}
-        className={this.props.textareaClassName}
-        onPreInit={this.annotateEditor.bind(this)}
-        onClick={this.onFocus.bind(this)}
-        onKeypress={this.onFocus.bind(this)}
-        onActivate={this.onFocus.bind(this)}
-        onRemove={this.onRemove.bind(this)}
-        content={this.props.defaultContent}
-        config={this.wrapOptions(this.props.editorOptions)}
-      />
+      <div ref={el => this._elementRef = el}>
+        <TinyMCE
+          id={mceProps.textareaId}
+          tinymce={mceProps.tinymce}
+          className={mceProps.textareaClassName}
+          onPreInit={this.annotateEditor.bind(this)}
+          onInit={this.onInit.bind(this)}
+          onClick={this.onFocus.bind(this)}
+          onKeypress={this.onFocus.bind(this)}
+          onActivate={this.onFocus.bind(this)}
+          onRemove={this.onRemove.bind(this)}
+          content={mceProps.defaultContent}
+          config={this.wrapOptions(mceProps.editorOptions)}
+        />
+
+        <StatusBar onToggleHtml={this.toggle} />
+        <CanvasContentTray bridge={Bridge} {...trayProps} />
+      </div>
     );
   }
 }
 
 RCEWrapper.propTypes = {
   defaultContent: PropTypes.string,
-  language: PropTypes.string,
-  tinymce: PropTypes.object,
-  textareaId: PropTypes.string,
-  textareaClassName: PropTypes.string,
   editorOptions: PropTypes.object,
+  handleUnmount: PropTypes.func,
+  language: PropTypes.string,
   onFocus: PropTypes.func,
   onRemove: PropTypes.func,
-  handleUnmount: PropTypes.func
+  textareaClassName: PropTypes.string,
+  textareaId: PropTypes.string,
+  tinymce: PropTypes.object,
+  trayProps
 };
+
+RCEWrapper.defaultProps = {
+  trayProps: null
+}

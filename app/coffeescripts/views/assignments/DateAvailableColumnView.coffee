@@ -15,36 +15,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/assignments/DateAvailableColumnView'
-  'jquery'
-  'underscore'
-  '../../behaviors/tooltip'
-], (Backbone, template, $, _) ->
+import Backbone from 'Backbone'
+import template from 'jst/assignments/DateAvailableColumnView'
+import $ from 'jquery'
+import '../../behaviors/tooltip'
 
-  class DateAvailableColumnView extends Backbone.View
-    template: template
+export default class DateAvailableColumnView extends Backbone.View
+  template: template
 
-    els:
-      '.vdd_tooltip_link': '$link'
+  els:
+    '.vdd_tooltip_link': '$link'
 
-    afterRender: ->
-      @$link.tooltip
-        position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
-        tooltipClass: 'center bottom vertical',
-        content: -> $($(@).data('tooltipSelector')).html()
+  afterRender: ->
+    @$link.tooltip
+      position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
+      tooltipClass: 'center bottom vertical',
+      content: -> $($(@).data('tooltipSelector')).html()
 
-    toJSON: ->
-      group = @model.defaultDates()
+  toJSON: ->
+    group = @model.defaultDates()
 
-      data = @model.toView()
-      data.defaultDates = group.toJSON()
-      data.canManage    = @canManage()
-      data.selector     = @model.get("id") + "_lock"
-      data.linkHref     = @model.htmlUrl()
-      data.allDates     = @model.allDates()
-      data
+    data = @model.toView()
+    data.defaultDates = group.toJSON()
+    data.canManage    = @canManage()
+    data.selector     = @model.get("id") + "_lock"
+    data.linkHref     = @model.htmlUrl()
+    data.allDates     = @model.allDates()
+    data
 
-    canManage: ->
-      ENV.PERMISSIONS.manage
+  canManage: ->
+    ENV.PERMISSIONS.manage

@@ -37,7 +37,7 @@ gem 'active_model_serializers',   '0.9.0alpha1',
 gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.13.0'
+gem 'switchman', '1.13.2'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -119,7 +119,7 @@ gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'shackles', '1.4.1'
 
-gem 'useragent', '0.16.10', require: false
+gem 'browser', '2.5.3', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false

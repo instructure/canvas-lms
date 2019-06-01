@@ -21,6 +21,7 @@ import {bool, number, shape, string, arrayOf} from 'prop-types'
 export function GetAssignmentEnvVariables() {
   const defaults = {
     assignmentUrl: '',
+    courseId: null,
     currentUser: null,
     modulePrereq: null,
     moduleUrl: ''
@@ -35,6 +36,7 @@ export function GetAssignmentEnvVariables() {
   defaults.assignmentUrl = `${baseUrl}/assignments`
   defaults.moduleUrl = `${baseUrl}/modules`
   defaults.currentUser = ENV.current_user
+  defaults.courseId = ENV.context_asset_string.split('_')[1]
 
   if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
     const prereq = ENV.PREREQS.items[0].prev
@@ -62,6 +64,8 @@ function submissionCommentQueryParams() {
       mediaSources {
         src: url
         type: contentType
+        height
+        width
       }
     }
     author {
@@ -80,6 +84,7 @@ export const STUDENT_VIEW_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
       ... on Assignment {
+        _id
         description
         dueAt
         lockAt
@@ -112,7 +117,9 @@ export const STUDENT_VIEW_QUERY = gql`
             grade
             gradingStatus
             latePolicyStatus
+            state
             submissionStatus
+            submittedAt
           }
         }
       }
@@ -124,7 +131,7 @@ export const SUBMISSION_COMMENT_QUERY = gql`
   query GetSubmissionComments($submissionId: ID!) {
     submissionComments: node(id: $submissionId) {
       ... on Submission {
-        commentsConnection {
+        commentsConnection(filter: {allComments: true}) {
           nodes {
             ${submissionCommentQueryParams()}
           }
@@ -135,8 +142,8 @@ export const SUBMISSION_COMMENT_QUERY = gql`
 `
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment($id: ID!, $comment: String!) {
-    createSubmissionComment(input: {submissionId: $id, comment: $comment}) {
+  mutation CreateSubmissionComment($id: ID!, $comment: String!, $fileIds: [ID!]) {
+    createSubmissionComment(input: {submissionId: $id, comment: $comment, fileIds: $fileIds}) {
       submissionComment {
         ${submissionCommentQueryParams()}
       }
@@ -174,6 +181,7 @@ export const CommentShape = shape({
 })
 
 export const StudentAssignmentShape = shape({
+  _id: string,
   description: string,
   dueAt: string,
   lockAt: string,
@@ -220,7 +228,9 @@ export const StudentAssignmentShape = shape({
         grade: string,
         gradingStatus: string,
         latePolicyStatus: string,
-        submissionStatus: string
+        state: string,
+        submissionStatus: string,
+        submittedAt: string
       })
     ).isRequired
   })

@@ -16,8 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define ['i18n!gradezilla'], (I18n) ->
- GRADEBOOK_TRANSLATIONS =
+import I18n from 'i18n!gradezillaGradebookTranslations'
+
+export default GRADEBOOK_TRANSLATIONS =
     submission_tooltip_unpublished_assignment: I18n.t('This assignment is unpublished')
     submission_tooltip_dropped: I18n.t('Dropped for grading purposes')
     submission_tooltip_excused: I18n.t('Assignment Excused')

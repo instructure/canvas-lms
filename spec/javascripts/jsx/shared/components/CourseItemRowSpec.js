@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import CourseItemRow from 'jsx/shared/components/CourseItemRow'
 import AnnouncementModel from 'compiled/models/Announcement'
 import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
@@ -138,17 +138,17 @@ test('renders unread indicator if isRead: false', () => {
   const rowNode = tree.find('Badge')
   ok(rowNode.exists())
 
-  const srNode = tree.find('.ic-item-row__content-col ScreenReaderContent')
+  const srNode = tree.find('.ic-item-row__content-col Heading ScreenReaderContent')
   ok(srNode.exists())
-  ok(srNode.text().includes('Unread'))
+  ok(srNode.text().includes('unread,'))
 })
 
 test('renders no unread indicator if isRead: true', () => {
   const tree = mount(<CourseItemRow {...props} isRead />)
-  const rowNode = tree.find('.ic-item-row')
-  notOk(rowNode.hasClass('ic-item-row__unread'))
+  const rowNode = tree.find('Badge')
+  notOk(rowNode.exists())
 
-  const srNode = tree.find('.ic-item-row__content-col ScreenReaderContent')
+  const srNode = tree.find('.ic-item-row__content-col Heading ScreenReaderContent')
   notOk(srNode.exists())
 })
 

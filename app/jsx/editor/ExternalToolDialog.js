@@ -22,11 +22,11 @@ import PropTypes from 'prop-types'
 import ExternalToolDialogModal from './ExternalToolDialog/Modal'
 import ExternalToolDialogTray from './ExternalToolDialog/Tray'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import I18n from 'i18n!editor'
+import I18n from 'i18n!ExternalToolDialog'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
 import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
-import {processContentItemsForEditor} from '../deep_linking/ContentItemProcessor'
+import processEditorContentItems from '../deep_linking/processors/processEditorContentItems'
 
 const EMPTY_BUTTON = {
   height: 300,
@@ -119,8 +119,12 @@ export default class ExternalToolDialog extends React.Component {
   handleDeepLinking = ev => {
     const {editor, deepLinkingOrigin} = this.props
     // Only accept messages from the same origin
-    if (ev.origin === deepLinkingOrigin) {
-      processContentItemsForEditor(ev, editor, this)
+    if (
+      ev.origin === deepLinkingOrigin &&
+      ev.data &&
+      ev.data.messageType === 'LtiDeepLinkingResponse'
+    ) {
+      processEditorContentItems(ev, editor, this)
     }
   }
 
@@ -183,22 +187,24 @@ export default class ExternalToolDialog extends React.Component {
               <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
             </div>
           </FlexItem>
-          <iframe
-            title={label}
-            ref={ref => (this.iframeRef = ref)}
-            name="external_tool_launch"
-            src="/images/ajax-loader-medium-444.gif"
-            id="external_tool_button_frame"
-            style={{
-              flexGrow: '1',
-              flexShrink: '1',
-              width: button.use_tray ? undefined : button.width || 800,
-              height: button.use_tray ? undefined : button.height || frameHeight,
-              border: '0'
-            }}
-            allow={iframeAllowances}
-            borderstyle="0"
-          />
+          <FlexItem>
+            <iframe
+              title={label}
+              ref={ref => (this.iframeRef = ref)}
+              name="external_tool_launch"
+              src="/images/ajax-loader-medium-444.gif"
+              id="external_tool_button_frame"
+              style={{
+                flexGrow: '1',
+                flexShrink: '1',
+                width: button.use_tray ? undefined : button.width || 800,
+                height: button.use_tray ? undefined : button.height || frameHeight,
+                border: '0'
+              }}
+              allow={iframeAllowances}
+              borderstyle="0"
+            />
+          </FlexItem>
           <FlexItem>
             <div
               ref={ref => (this.afterInfoAlertRef = ref)}

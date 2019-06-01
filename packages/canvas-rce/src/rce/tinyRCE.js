@@ -44,6 +44,8 @@ import "tinymce/plugins/paste/plugin";
 import "tinymce/plugins/table/plugin";
 
 // add custom plugins
+import "./plugins/instructure-ui-icons/plugin";
+import "./plugins/instructure_condensed_buttons/plugin";
 import "./plugins/instructure_equation/plugin";
 import "./plugins/instructure_image/plugin";
 import "./plugins/instructure_equella/plugin";

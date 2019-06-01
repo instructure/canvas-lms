@@ -24,13 +24,22 @@ import PropTypes from 'prop-types'
 export default class ConfigurationTypeSelector extends React.Component {
   static propTypes = {
     handleChange: PropTypes.func.isRequired,
-    configurationType: PropTypes.string.isRequired
+    configurationType: PropTypes.string.isRequired,
+    lti13Enabled: PropTypes.bool.isRequired
   }
 
   componentDidMount() {
     const configSelector = $('#configuration_type_selector')
     if (configSelector && configSelector.length >= 0) {
       configSelector.change(this.props.handleChange)
+    }
+  }
+
+  ltiAdvantageOption() {
+    if (this.props.lti13Enabled) {
+      return(
+        <option value="byClientId">{I18n.t('LTI 1.3')}</option>
+      )
     }
   }
 
@@ -50,6 +59,7 @@ export default class ConfigurationTypeSelector extends React.Component {
               <option value="manual">{I18n.t('Manual Entry')}</option>
               <option value="url">{I18n.t('By URL')}</option>
               <option value="xml">{I18n.t('Paste XML')}</option>
+              {this.ltiAdvantageOption()}
               <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option>
             </select>
           </label>

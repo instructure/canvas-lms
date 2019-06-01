@@ -106,12 +106,13 @@ export default class HideAssignmentGradesTray extends PureComponent {
 
     try {
       const progress = await hideRequest
-      await resolveHideAssignmentGradesStatus(progress)
+      const hiddenSubmissionInfo = await resolveHideAssignmentGradesStatus(progress)
+      this.dismiss()
+      this.state.onHidden(hiddenSubmissionInfo)
       showFlashAlert({
         message: successMessage,
         type: 'success'
       })
-      this.dismiss()
     } catch (error) {
       showFlashAlert({
         message: I18n.t('There was a problem hiding assignment grades.'),

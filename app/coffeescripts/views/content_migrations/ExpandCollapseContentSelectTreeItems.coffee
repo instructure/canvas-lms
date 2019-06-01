@@ -15,84 +15,83 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'jquery'
-], (_, $) ->
-  class ExpandCollapseContentSelectTreeItems
+import _ from 'underscore'
+import $ from 'jquery'
 
-    # Public Functions
+export default class ExpandCollapseContentSelectTreeItems
 
-    linkedResourceTypes = ['assignments', 'quizzes', 'discussion_topics', 'wiki_pages']
+  # Public Functions
 
-    # Take in an tree that should have treeitems and 
-    # a .checkbox-caret associated with it
+  linkedResourceTypes = ['assignments', 'quizzes', 'discussion_topics', 'wiki_pages']
 
-    constructor: (@$tree, bindEvents=true) ->
-      @bindEvents() if bindEvents
+  # Take in an tree that should have treeitems and
+  # a .checkbox-caret associated with it
 
-    # Events this class will be calling on the tree. Once again
-    # expecting there to be treeitems
+  constructor: (@$tree, bindEvents=true) ->
+    @bindEvents() if bindEvents
 
-    bindEvents: ->
-      @$tree.on "click", ".checkbox-caret", @caretEvent
-      @$tree.on 'expand', '[role=treeitem]', @expand
-      @$tree.on 'collapse', '[role=treeitem]', @collapse
+  # Events this class will be calling on the tree. Once again
+  # expecting there to be treeitems
 
-    # Stop propagation from bubbling and call the expand function.
+  bindEvents: ->
+    @$tree.on "click", ".checkbox-caret", @caretEvent
+    @$tree.on 'expand', '[role=treeitem]', @expand
+    @$tree.on 'collapse', '[role=treeitem]', @collapse
 
-    expand: (event) =>
-      event.stopPropagation()
-      @expandTreeItem $(event.currentTarget)
+  # Stop propagation from bubbling and call the expand function.
 
-    # Stop propagation from bubbling and call the collapse/expand functions. If you don't stop propagation
-    # it will try to collapse/expand child tree items and parent tree items.
+  expand: (event) =>
+    event.stopPropagation()
+    @expandTreeItem $(event.currentTarget)
 
-    collapse: (event) =>
-      event.stopPropagation()
-      @collapseTreeItem $(event.currentTarget)
+  # Stop propagation from bubbling and call the collapse/expand functions. If you don't stop propagation
+  # it will try to collapse/expand child tree items and parent tree items.
 
-    caretEvent: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
+  collapse: (event) =>
+    event.stopPropagation()
+    @collapseTreeItem $(event.currentTarget)
 
-      $treeitem = $(event.currentTarget).closest('[role=treeitem]')
-      if $treeitem.attr('aria-expanded') == "true"
-        @collapseTreeItem($treeitem) 
-      else 
-        @expandTreeItem($treeitem)
+  caretEvent: (event) =>
+    event.preventDefault()
+    event.stopPropagation()
 
-    # Expanding the tree item will display all sublevel items, change the caret class 
-    # to better visualize whats happening and add the appropriate aria attributes.
+    $treeitem = $(event.currentTarget).closest('[role=treeitem]')
+    if $treeitem.attr('aria-expanded') == "true"
+      @collapseTreeItem($treeitem)
+    else
+      @expandTreeItem($treeitem)
 
-    expandTreeItem: ($treeitem) ->
-      $treeitem.attr('aria-expanded', true)
-      @triggerTreeItemFetches($treeitem)
+  # Expanding the tree item will display all sublevel items, change the caret class
+  # to better visualize whats happening and add the appropriate aria attributes.
 
-    # Collapsing the tree item will display all sublevel items, change the caret class 
-    # to better visualize whats happening and add the appropriate aria attributes.
+  expandTreeItem: ($treeitem) ->
+    $treeitem.attr('aria-expanded', true)
+    @triggerTreeItemFetches($treeitem)
 
-    collapseTreeItem: ($treeitem) ->
-      $treeitem.attr('aria-expanded', false)
+  # Collapsing the tree item will display all sublevel items, change the caret class
+  # to better visualize whats happening and add the appropriate aria attributes.
 
-    # Triggering a checkbox fetch will trigger an event that pulls down via ajax
-    # the checkboxes for any given view and caret in that view. There is an edge case
-    # with linked_resources where we need to also load the quizzes and discusssions 
-    # checkboxes when the assignments checkboxes are selected so in order to accomplish
-    # this we use the checkboxFetches object to facilitate that.
+  collapseTreeItem: ($treeitem) ->
+    $treeitem.attr('aria-expanded', false)
 
-    triggerTreeItemFetches: ($treeitem) ->
-      $treeitem.trigger('fetchCheckboxes')
+  # Triggering a checkbox fetch will trigger an event that pulls down via ajax
+  # the checkboxes for any given view and caret in that view. There is an edge case
+  # with linked_resources where we need to also load the quizzes and discusssions
+  # checkboxes when the assignments checkboxes are selected so in order to accomplish
+  # this we use the checkboxFetches object to facilitate that.
 
-      type = $treeitem.data('type')
-      if type in linkedResourceTypes
-        @triggerLinkedResourcesCheckboxes(type)
+  triggerTreeItemFetches: ($treeitem) ->
+    $treeitem.trigger('fetchCheckboxes')
 
-    # Trigger linked resources for checkboxes. 
-    # Exclude the checkbox that you all ready clicked on
+    type = $treeitem.data('type')
+    if type in linkedResourceTypes
+      @triggerLinkedResourcesCheckboxes(type)
 
-    triggerLinkedResourcesCheckboxes: (excludedType) ->
-      types = _.without linkedResourceTypes, excludedType
+  # Trigger linked resources for checkboxes.
+  # Exclude the checkbox that you all ready clicked on
 
-      _.each types, (type) => 
-        @$tree.find("[data-type=#{type}]").trigger('fetchCheckboxes', {silent: true})
+  triggerLinkedResourcesCheckboxes: (excludedType) ->
+    types = _.without linkedResourceTypes, excludedType
+
+    _.each types, (type) =>
+      @$tree.find("[data-type=#{type}]").trigger('fetchCheckboxes', {silent: true})

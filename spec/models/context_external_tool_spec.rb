@@ -587,6 +587,18 @@ describe ContextExternalTool do
         expect(@found_tool).to eql(@tool)
       end
 
+      it "should not find the preferred tool if it is disabled" do
+        @preferred = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @preferred.update!(workflow_state: 'disabled')
+        @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool = @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+        expect(@found_tool).to eql(@tool)
+      end
+
       it "should not return preferred tool outside of context chain" do
         preferred = @root_account.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(ContextExternalTool.find_external_tool("http://www.google.com", @course, preferred.id)).to eq preferred
@@ -1241,6 +1253,34 @@ describe ContextExternalTool do
       tool.workflow_state = 'deleted'
       tool.save!
       expect { ContextExternalTool.find_for(tool.id, @account, :account_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    context 'when the workflow state is "disabled"' do
+      let(:tool) do
+        tool = new_external_tool @account
+        tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+        tool.workflow_state = 'disabled'
+        tool.save!
+        tool
+      end
+
+      it "should not find an account tool with workflow_state disabled" do
+        expect { ContextExternalTool.find_for(tool.id, @account, :account_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      context 'when the tool is installed in a course' do
+        let(:tool) do
+          tool = new_external_tool @course
+          tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+          tool.workflow_state = 'disabled'
+          tool.save!
+          tool
+        end
+
+        it "should not find a course tool with workflow_state disabled" do
+          expect { ContextExternalTool.find_for(tool.id, @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+      end
     end
   end
 

@@ -25,8 +25,8 @@ class AccountUser < ActiveRecord::Base
   has_many :role_overrides, :as => :context, :inverse_of => :context
   has_a_broadcast_policy
   before_validation :infer_defaults
-  after_save :touch_user
-  after_destroy :touch_user
+  after_save :clear_user_cache
+  after_destroy :clear_user_cache
   after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
 
@@ -44,6 +44,13 @@ class AccountUser < ActiveRecord::Base
 
     state :deleted do
       event :reactivate, transitions_to: :active
+    end
+  end
+
+  def clear_user_cache
+    self.class.connection.after_transaction_commit do
+      self.user.touch unless User.skip_touch_for_type?(:account_users)
+      self.user.clear_cache_key(:account_users)
     end
   end
 

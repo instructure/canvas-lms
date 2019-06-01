@@ -200,12 +200,6 @@ class SubmissionsController < SubmissionsBaseController
 
     return unless authorized_action(@assignment, @current_user, :submit)
 
-    if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, :update)
-      flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
-      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
-      return
-    end
-
     @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
     return unless valid_text_entry?

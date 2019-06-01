@@ -726,7 +726,8 @@ class Submission < ActiveRecord::Base
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         report_url: originality_report.originality_report_url,
-        status: originality_report.workflow_state
+        status: originality_report.workflow_state,
+        error_message: originality_report.error_message
       }
     end
     ret_val = turnitin_data.merge(data)

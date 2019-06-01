@@ -16,126 +16,124 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'jquery'
-  'Backbone'
-  'underscore'
-], ($, Backbone, _) ->
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import _ from 'underscore'
 
-  capitalize = (string = '') ->
-    string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
+capitalize = (string = '') ->
+  string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
 
-  class PaginatedCollection extends Backbone.Collection
+export default class PaginatedCollection extends Backbone.Collection
 
-    # Matches the name of each link: "current", "next," "prev," "first," or "last."
-    nameRegex: /rel="([a-z]+)/
+  # Matches the name of each link: "current", "next," "prev," "first," or "last."
+  nameRegex: /rel="([a-z]+)/
 
-    # Matches the full link, e.g. "/api/v1/accounts/1/users?page=1&per_page=15"
-    linkRegex: /^<([^>]+)/
+  # Matches the full link, e.g. "/api/v1/accounts/1/users?page=1&per_page=15"
+  linkRegex: /^<([^>]+)/
 
-    pageRegex: /\Wpage=(\d+)/
+  pageRegex: /\Wpage=(\d+)/
 
-    perPageRegex: /\Wper_page=(\d+)/
+  perPageRegex: /\Wper_page=(\d+)/
 
-    initialize: ->
-      super
-      @urls = {}
+  initialize: ->
+    super
+    @urls = {}
 
-    ##
-    # options.page: 'current', 'next', 'prev', 'first', 'last', 'top', 'bottom'
-    fetch: (options = {}) ->
-      options = _.clone(options)
-      @loadedAll = false
-      exclusionFlag = "fetching#{capitalize options.page}Page"
-      @[exclusionFlag] = true
+  ##
+  # options.page: 'current', 'next', 'prev', 'first', 'last', 'top', 'bottom'
+  fetch: (options = {}) ->
+    options = _.clone(options)
+    @loadedAll = false
+    exclusionFlag = "fetching#{capitalize options.page}Page"
+    @[exclusionFlag] = true
 
-      if options.page?
-        options.remove = false unless options.remove?
-        if @urls?[options.page]
-          options.url = @urls[options.page]
-          # API keeps params intact, kill data if we're using a
-          # pagination url to avoid appending in super
-          options.data = ''
-      else
-        # we want the first fetch to reset (since a lot of existing code wants a reset event)
-        options.reset = true unless options.reset?
+    if options.page?
+      options.remove = false unless options.remove?
+      if @urls?[options.page]
+        options.url = @urls[options.page]
+        # API keeps params intact, kill data if we're using a
+        # pagination url to avoid appending in super
+        options.data = ''
+    else
+      # we want the first fetch to reset (since a lot of existing code wants a reset event)
+      options.reset = true unless options.reset?
 
-      if options.fetchOptions?
-        options.data = options.fetchOptions
+    if options.fetchOptions?
+      options.data = options.fetchOptions
 
-      @trigger 'beforeFetch', this, options
-      @trigger "beforeFetch:#{options.page}", this, options if options.page?
+    @trigger 'beforeFetch', this, options
+    @trigger "beforeFetch:#{options.page}", this, options if options.page?
 
-      # have to do this stuff here or else 'reset' and other events are fired
-      # before _setStateAfterFetch has happened, so the state is just barely off
-      xhr = null
-      options.dataFilter = (data) =>
-        @[exclusionFlag] = false
-        @_setStateAfterFetch(xhr, options)
-        data
+    # have to do this stuff here or else 'reset' and other events are fired
+    # before _setStateAfterFetch has happened, so the state is just barely off
+    xhr = null
+    options.dataFilter = (data) =>
+      @[exclusionFlag] = false
+      @_setStateAfterFetch(xhr, options)
+      data
 
-      dfd = options.dfd || $.Deferred()
-      xhr = super(options).done (response, text, xhr) =>
-        @trigger 'fetch', this, response, options
-        @trigger "fetch:#{options.page}", this, response, options if options.page?
-        unless @urls?.next
-          @trigger 'fetched:last', arguments...
-        if @loadAll and @urls.next?
-          setTimeout =>
-            @fetch page: 'next', dfd: dfd # next tick so we can show loading indicator, etc.
-        else
-          dfd.resolve(response, text, xhr)
-      dfd.abort = xhr.abort
-      dfd.success = dfd.done
-      dfd.error = dfd.fail
-      dfd
-
-    canFetch: (page) ->
-      @urls? and @urls[page]?
-
-    _setStateAfterFetch: (xhr, options) =>
-      @_urlCache ?= []
-      urlIsNotCached = options.url not in @_urlCache
-      @_urlCache.push options.url unless urlIsNotCached
-      firstRequest = !@atLeastOnePageFetched
-      setBottom = firstRequest or (options.page in ['next', 'bottom'] and urlIsNotCached)
-      setTop = firstRequest or (options.page in ['prev', 'top'] and urlIsNotCached)
-      oldUrls = @urls
-      @urls = @_parsePageLinks xhr
-
-      if setBottom and @urls.next?
-        @urls.bottom = @urls.next
-      else if !@urls.next
-        delete @urls.bottom
-      else
-        @urls.bottom = oldUrls.bottom
-
-      if setTop and @urls.prev?
-        @urls.top = @urls.prev
-      else if !@urls.prev
-        delete @urls.top
-      else
-        @urls.top = oldUrls.top
-
-      url = @urls.first ? @urls.next
-      if url?
-        perPage = parseInt(url.match(@perPageRegex)[1], 10)
-        ((@options ?= {}).params ?= {}).per_page = perPage
-
-      if @urls.last and match = @urls.last.match(@pageRegex)
-        @totalPages = parseInt(match[1], 10)
-
+    dfd = options.dfd || $.Deferred()
+    xhr = super(options).done (response, text, xhr) =>
+      @trigger 'fetch', this, response, options
+      @trigger "fetch:#{options.page}", this, response, options if options.page?
       unless @urls?.next
-        @loadedAll = true
+        @trigger 'fetched:last', arguments...
+      if @loadAll and @urls.next?
+        setTimeout =>
+          @fetch page: 'next', dfd: dfd # next tick so we can show loading indicator, etc.
+      else
+        dfd.resolve(response, text, xhr)
+    dfd.abort = xhr.abort
+    dfd.success = dfd.done
+    dfd.error = dfd.fail
+    dfd
 
-      @atLeastOnePageFetched = true
+  canFetch: (page) ->
+    @urls? and @urls[page]?
 
-    _parsePageLinks: (xhr) ->
-      linkHeader = xhr.getResponseHeader('link')?.split(',')
-      linkHeader ?= []
-      _.reduce linkHeader, (links, link) =>
-        key = link.match(@nameRegex)[1]
-        val = link.match(@linkRegex)[1]
-        links[key] = val
-        links
-      , {}
+  _setStateAfterFetch: (xhr, options) =>
+    @_urlCache ?= []
+    urlIsNotCached = options.url not in @_urlCache
+    @_urlCache.push options.url unless urlIsNotCached
+    firstRequest = !@atLeastOnePageFetched
+    setBottom = firstRequest or (options.page in ['next', 'bottom'] and urlIsNotCached)
+    setTop = firstRequest or (options.page in ['prev', 'top'] and urlIsNotCached)
+    oldUrls = @urls
+    @urls = @_parsePageLinks xhr
+
+    if setBottom and @urls.next?
+      @urls.bottom = @urls.next
+    else if !@urls.next
+      delete @urls.bottom
+    else
+      @urls.bottom = oldUrls.bottom
+
+    if setTop and @urls.prev?
+      @urls.top = @urls.prev
+    else if !@urls.prev
+      delete @urls.top
+    else
+      @urls.top = oldUrls.top
+
+    url = @urls.first ? @urls.next
+    if url?
+      perPage = parseInt(url.match(@perPageRegex)[1], 10)
+      ((@options ?= {}).params ?= {}).per_page = perPage
+
+    if @urls.last and match = @urls.last.match(@pageRegex)
+      @totalPages = parseInt(match[1], 10)
+
+    unless @urls?.next
+      @loadedAll = true
+
+    @atLeastOnePageFetched = true
+
+  _parsePageLinks: (xhr) ->
+    linkHeader = xhr.getResponseHeader('link')?.split(',')
+    linkHeader ?= []
+    _.reduce linkHeader, (links, link) =>
+      key = link.match(@nameRegex)[1]
+      val = link.match(@linkRegex)[1]
+      links[key] = val
+      links
+    , {}

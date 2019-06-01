@@ -15,40 +15,38 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-  'jquery'
-  '../models/AssignmentOverride'
-  '../models/Section'
-], (Backbone, _, $, AssignmentOverride, Section) ->
+import Backbone from 'Backbone'
+import _ from 'underscore'
+import $ from 'jquery'
+import AssignmentOverride from '../models/AssignmentOverride'
+import Section from '../models/Section'
 
-  # Class Summary
-  #   Assignments can have overrides ie DueDates.
-  class AssignmentOverrideCollection extends Backbone.Collection
+# Class Summary
+#   Assignments can have overrides ie DueDates.
+export default class AssignmentOverrideCollection extends Backbone.Collection
 
-    model: AssignmentOverride
+  model: AssignmentOverride
 
-    courseSectionIDs: => @pluck 'course_section_id'
+  courseSectionIDs: => @pluck 'course_section_id'
 
-    comparator: ( override ) -> override.id
+  comparator: ( override ) -> override.id
 
-    getDefaultDueDate: =>
-      @detect ( override ) ->
-        override.getCourseSectionID() is Section.defaultDueDateSectionID
+  getDefaultDueDate: =>
+    @detect ( override ) ->
+      override.getCourseSectionID() is Section.defaultDueDateSectionID
 
-    containsDefaultDueDate: =>
-      !!@getDefaultDueDate()
+  containsDefaultDueDate: =>
+    !!@getDefaultDueDate()
 
-    blank: =>
-      @select ( override ) -> override.isBlank()
+  blank: =>
+    @select ( override ) -> override.isBlank()
 
-    toJSON: =>
-      json = @reject ( override ) -> override.representsDefaultDueDate()
-      _.map json, ( override ) -> override.toJSON().assignment_override
+  toJSON: =>
+    json = @reject ( override ) -> override.representsDefaultDueDate()
+    _.map json, ( override ) -> override.toJSON().assignment_override
 
-    datesJSON: =>
-      @map ( override ) -> override.toJSON().assignment_override
+  datesJSON: =>
+    @map ( override ) -> override.toJSON().assignment_override
 
-    isSimple: =>
-      _.difference(@courseSectionIDs(), [Section.defaultDueDateSectionID]).length == 0
+  isSimple: =>
+    _.difference(@courseSectionIDs(), [Section.defaultDueDateSectionID]).length == 0

@@ -18,7 +18,7 @@
 
 import {bool} from 'prop-types'
 import React from 'react'
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!GraderNamesVisibleToFinalGraderCheckbox'
 
 export default class GraderNamesVisibleToFinalGraderCheckbox extends React.Component {
   static propTypes = {checked: bool.isRequired}

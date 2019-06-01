@@ -15,254 +15,225 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!content_migrations'
-  'jquery'
-  '../../collections/ProgressingContentMigrationCollection'
-  '../../models/ContentMigration'
-  '../../collections/DaySubstitutionCollection'
-  '../../views/CollectionView'
-  '../../views/PaginatedCollectionView'
-  '../../views/content_migrations/ProgressingContentMigrationView'
-  '../../views/content_migrations/MigrationConverterView'
-  '../../views/content_migrations/CommonCartridgeView'
-  '../../views/content_migrations/ConverterViewControl'
-  '../../views/content_migrations/ZipFilesView'
-  '../../views/content_migrations/CopyCourseView'
-  '../../views/content_migrations/MoodleZipView'
-  '../../views/content_migrations/CanvasExportView'
-  '../../views/content_migrations/QTIZipView'
-  '../../views/content_migrations/subviews/ChooseMigrationFileView'
-  '../../views/content_migrations/subviews/FolderPickerView'
-  '../../views/content_migrations/subviews/SelectContentCheckboxView'
-  '../../views/content_migrations/subviews/QuestionBankView'
-  '../../views/content_migrations/subviews/CourseFindSelectView'
-  '../../views/content_migrations/subviews/DateShiftView'
-  '../../views/content_migrations/subviews/DaySubstitutionView'
-  'jst/content_migrations/ProgressingContentMigrationCollection'
-  '../../views/content_migrations/ExternalToolContentView'
-  '../../views/content_migrations/subviews/ExternalToolLaunchView'
-  '../../views/ExternalTools/ExternalContentReturnView'
-  '../../models/ExternalTool'
-  'vendor/jquery.ba-tinypubsub'
-  'jst/content_migrations/subviews/DaySubstitutionCollection'
-  '../../views/content_migrations/subviews/OverwriteAssessmentContentView'
-  '../../views/content_migrations/subviews/ImportQuizzesNextView'
-], (I18n, $,
-    ProgressingContentMigrationCollection,
-    ContentMigrationModel,
-    DaySubstitutionCollection,
-    CollectionView,
-    PaginatedCollectionView,
-    ProgressingContentMigrationView,
-    MigrationConverterView,
-    CommonCartridgeView,
-    ConverterViewControl,
-    ZipFilesView,
-    CopyCourseView,
-    MoodleZipView,
-    CanvasExportView,
-    QTIZipView,
-    ChooseMigrationFileView,
-    FolderPickerView,
-    SelectContentCheckboxView,
-    QuestionBankView,
-    CourseFindSelectView,
-    DateShiftView,
-    DaySubView,
-    progressingMigrationCollectionTemplate,
-    ExternalToolContentView,
-    ExternalToolLaunchView,
-    ExternalContentReturnView,
-    ExternalTool,
-    pubsub,
-    daySubCollectionTemplate,
-    OverwriteAssessmentContentView,
-    ImportQuizzesNextView) ->
-  ConverterViewControl.setModel new ContentMigrationModel
-                                 course_id: ENV.COURSE_ID
-                                 daySubCollection: daySubCollection
+import I18n from 'i18n!content_migrations'
+import $ from 'jquery'
+import progressingMigrationCollectionTemplate from 'jst/content_migrations/ProgressingContentMigrationCollection'
+import pubsub from 'vendor/jquery.ba-tinypubsub'
+import daySubCollectionTemplate from 'jst/content_migrations/subviews/DaySubstitutionCollection'
+import ProgressingContentMigrationCollection from '../../collections/ProgressingContentMigrationCollection'
+import ContentMigrationModel from '../../models/ContentMigration'
+import DaySubstitutionCollection from '../../collections/DaySubstitutionCollection'
+import CollectionView from '../../views/CollectionView'
+import PaginatedCollectionView from '../../views/PaginatedCollectionView'
+import ProgressingContentMigrationView from '../../views/content_migrations/ProgressingContentMigrationView'
+import MigrationConverterView from '../../views/content_migrations/MigrationConverterView'
+import CommonCartridgeView from '../../views/content_migrations/CommonCartridgeView'
+import ConverterViewControl from '../../views/content_migrations/ConverterViewControl'
+import ZipFilesView from '../../views/content_migrations/ZipFilesView'
+import CopyCourseView from '../../views/content_migrations/CopyCourseView'
+import MoodleZipView from '../../views/content_migrations/MoodleZipView'
+import CanvasExportView from '../../views/content_migrations/CanvasExportView'
+import QTIZipView from '../../views/content_migrations/QTIZipView'
+import ChooseMigrationFileView from '../../views/content_migrations/subviews/ChooseMigrationFileView'
+import FolderPickerView from '../../views/content_migrations/subviews/FolderPickerView'
+import SelectContentCheckboxView from '../../views/content_migrations/subviews/SelectContentCheckboxView'
+import QuestionBankView from '../../views/content_migrations/subviews/QuestionBankView'
+import CourseFindSelectView from '../../views/content_migrations/subviews/CourseFindSelectView'
+import DateShiftView from '../../views/content_migrations/subviews/DateShiftView'
+import DaySubView from '../../views/content_migrations/subviews/DaySubstitutionView'
+import ExternalToolContentView from '../../views/content_migrations/ExternalToolContentView'
+import ExternalToolLaunchView from '../../views/content_migrations/subviews/ExternalToolLaunchView'
+import ExternalContentReturnView from '../../views/ExternalTools/ExternalContentReturnView'
+import ExternalTool from '../../models/ExternalTool'
+import OverwriteAssessmentContentView from '../../views/content_migrations/subviews/OverwriteAssessmentContentView'
+import ImportQuizzesNextView from '../../views/content_migrations/subviews/ImportQuizzesNextView'
+import processMigrationContentItem from './processMigrationContentItem'
+import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 
-  daySubCollection          = new DaySubstitutionCollection
-  daySubCollectionView      = new CollectionView
-                                 collection: daySubCollection
-                                 emptyMessage: -> I18n.t('no_day_substitutions', "No Day Substitutions Added")
-                                 itemView: DaySubView
-                                 template: daySubCollectionTemplate
+ConverterViewControl.setModel new ContentMigrationModel
+                                course_id: ENV.COURSE_ID
+                                daySubCollection: daySubCollection
 
-  progressingMigCollection  = new ProgressingContentMigrationCollection null,
-                                 course_id: ENV.COURSE_ID
-
-  progressingCollectionView = new PaginatedCollectionView
-                                 el: '#progress'
-                                 collection: progressingMigCollection
-                                 template: progressingMigrationCollectionTemplate
-                                 emptyMessage: -> I18n.t('no_migrations_running', "There are no migrations currently running")
-                                 itemView: ProgressingContentMigrationView
-  questionBankView = new QuestionBankView
-                        model: ConverterViewControl.getModel()
-                        questionBanks: ENV.QUESTION_BANKS
-
-  progressingCollectionView.getStatusView = (migProgress) ->
-    if getView = ConverterViewControl.getView(migProgress.get('migration_type'))?.view?.getStatusView
-      getView(migProgress)
-
-  progressingCollectionView.render()
-
-  migrationConverterView    = new MigrationConverterView
-                                 el: '#migrationConverterContainer'
-                                 selectOptions: ENV.SELECT_OPTIONS
-                                 model: ConverterViewControl.getModel()
-  migrationConverterView.render()
-
-  dfd = progressingMigCollection.fetch()
-  progressingCollectionView.$el.disableWhileLoading dfd
-
-  # Migration has now started and is being processed at this point.
-  $.subscribe 'migrationCreated', (migrationModelData) ->
-    progressingMigCollection.add migrationModelData
-    $.screenReaderFlashMessageExclusive(I18n.t('Content migration queued'))
-
-  # Registers any subviews with any changes that happen
-  # when selecting a converter. Give it the value to
-  # look for then the subview to insert. Works like
-  # this
-  #
-  # ie   ConverterChange.register key: 'some_dropdown_value', view: new BackboneView
-
-  ConverterViewControl.register
-    key: 'zip_file_importer'
-    view: new ZipFilesView
-            chooseMigrationFile: new ChooseMigrationFileView
-                                   model: ConverterViewControl.getModel()
-                                   fileSizeLimit: ENV.UPLOAD_LIMIT
-
-            folderPicker:        new FolderPickerView
-                                   model: ConverterViewControl.getModel()
-                                   folderOptions: ENV.FOLDER_OPTIONS
-
-  ConverterViewControl.register
-    key: 'course_copy_importer'
-    view: new CopyCourseView
-            courseFindSelect: new CourseFindSelectView
-                                current_user_id: ENV.current_user_id
-                                model: ConverterViewControl.getModel()
-                                show_select: ENV.SHOW_SELECT
-
-            selectContent:    new SelectContentCheckboxView(model: ConverterViewControl.getModel())
-
-            dateShift:        new DateShiftView
-                                model: ConverterViewControl.getModel()
+daySubCollection          = new DaySubstitutionCollection
+daySubCollectionView      = new CollectionView
                                 collection: daySubCollection
-                                daySubstitution: daySubCollectionView
-                                oldStartDate: ENV.OLD_START_DATE
-                                oldEndDate: ENV.OLD_END_DATE
+                                emptyMessage: -> I18n.t('no_day_substitutions', "No Day Substitutions Added")
+                                itemView: DaySubView
+                                template: daySubCollectionTemplate
 
+progressingMigCollection  = new ProgressingContentMigrationCollection null,
+                                course_id: ENV.COURSE_ID
 
-  ConverterViewControl.register
-    key: 'moodle_converter'
-    view: new MoodleZipView
-            chooseMigrationFile: new ChooseMigrationFileView
-                                   model: ConverterViewControl.getModel()
-                                   fileSizeLimit: ENV.UPLOAD_LIMIT
+progressingCollectionView = new PaginatedCollectionView
+                                el: '#progress'
+                                collection: progressingMigCollection
+                                template: progressingMigrationCollectionTemplate
+                                emptyMessage: -> I18n.t('no_migrations_running', "There are no migrations currently running")
+                                itemView: ProgressingContentMigrationView
+questionBankView = new QuestionBankView
+                      model: ConverterViewControl.getModel()
+                      questionBanks: ENV.QUESTION_BANKS
 
-            selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+progressingCollectionView.getStatusView = (migProgress) ->
+  if getView = ConverterViewControl.getView(migProgress.get('migration_type'))?.view?.getStatusView
+    getView(migProgress)
 
-            questionBank:        questionBankView
+progressingCollectionView.render()
 
-            dateShift:        new DateShiftView
+migrationConverterView    = new MigrationConverterView
+                                el: '#migrationConverterContainer'
+                                selectOptions: ENV.SELECT_OPTIONS
                                 model: ConverterViewControl.getModel()
-                                collection: daySubCollection
-                                daySubstitution: daySubCollectionView
-                                oldStartDate: ENV.OLD_START_DATE
-                                oldEndDate: ENV.OLD_END_DATE
+migrationConverterView.render()
 
-  ConverterViewControl.register
-    key: 'canvas_cartridge_importer'
-    view: new CanvasExportView
-            chooseMigrationFile: new ChooseMigrationFileView
-                                   model: ConverterViewControl.getModel()
-                                   fileSizeLimit: ENV.UPLOAD_LIMIT
+dfd = progressingMigCollection.fetch()
+progressingCollectionView.$el.disableWhileLoading dfd
 
-            selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+# Migration has now started and is being processed at this point.
+subscribe 'migrationCreated', (migrationModelData) ->
+  progressingMigCollection.add migrationModelData
+  $.screenReaderFlashMessageExclusive(I18n.t('Content migration queued'))
 
-            dateShift:        new DateShiftView
-                                model: ConverterViewControl.getModel()
-                                collection: daySubCollection
-                                daySubstitution: daySubCollectionView
-                                oldStartDate: ENV.OLD_START_DATE
-                                oldEndDate: ENV.OLD_END_DATE
+# Registers any subviews with any changes that happen
+# when selecting a converter. Give it the value to
+# look for then the subview to insert. Works like
+# this
+#
+# ie   ConverterChange.register key: 'some_dropdown_value', view: new BackboneView
 
-  ConverterViewControl.register
-    key: 'common_cartridge_importer'
-    view: new CommonCartridgeView
-            chooseMigrationFile: new ChooseMigrationFileView
-                                   model: ConverterViewControl.getModel()
-                                   fileSizeLimit: ENV.UPLOAD_LIMIT
-
-            selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
-
-            questionBank:        questionBankView
-
-            importQuizzesNext:     new ImportQuizzesNextView
+ConverterViewControl.register
+  key: 'zip_file_importer'
+  view: new ZipFilesView
+          chooseMigrationFile: new ChooseMigrationFileView
                                   model: ConverterViewControl.getModel()
-                                  quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED
-                                  questionBank: questionBankView
+                                  fileSizeLimit: ENV.UPLOAD_LIMIT
 
-            overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
+          folderPicker:        new FolderPickerView
+                                  model: ConverterViewControl.getModel()
+                                  folderOptions: ENV.FOLDER_OPTIONS
+
+ConverterViewControl.register
+  key: 'course_copy_importer'
+  view: new CopyCourseView
+          courseFindSelect: new CourseFindSelectView
+                              current_user_id: ENV.current_user_id
+                              model: ConverterViewControl.getModel()
+                              show_select: ENV.SHOW_SELECT
+
+          selectContent:    new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+          dateShift:        new DateShiftView
+                              model: ConverterViewControl.getModel()
+                              collection: daySubCollection
+                              daySubstitution: daySubCollectionView
+                              oldStartDate: ENV.OLD_START_DATE
+                              oldEndDate: ENV.OLD_END_DATE
 
 
-            dateShift:        new DateShiftView
+ConverterViewControl.register
+  key: 'moodle_converter'
+  view: new MoodleZipView
+          chooseMigrationFile: new ChooseMigrationFileView
+                                  model: ConverterViewControl.getModel()
+                                  fileSizeLimit: ENV.UPLOAD_LIMIT
+
+          selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+          questionBank:        questionBankView
+
+          dateShift:        new DateShiftView
+                              model: ConverterViewControl.getModel()
+                              collection: daySubCollection
+                              daySubstitution: daySubCollectionView
+                              oldStartDate: ENV.OLD_START_DATE
+                              oldEndDate: ENV.OLD_END_DATE
+
+ConverterViewControl.register
+  key: 'canvas_cartridge_importer'
+  view: new CanvasExportView
+          chooseMigrationFile: new ChooseMigrationFileView
+                                  model: ConverterViewControl.getModel()
+                                  fileSizeLimit: ENV.UPLOAD_LIMIT
+
+          selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+          dateShift:        new DateShiftView
+                              model: ConverterViewControl.getModel()
+                              collection: daySubCollection
+                              daySubstitution: daySubCollectionView
+                              oldStartDate: ENV.OLD_START_DATE
+                              oldEndDate: ENV.OLD_END_DATE
+
+ConverterViewControl.register
+  key: 'common_cartridge_importer'
+  view: new CommonCartridgeView
+          chooseMigrationFile: new ChooseMigrationFileView
+                                  model: ConverterViewControl.getModel()
+                                  fileSizeLimit: ENV.UPLOAD_LIMIT
+
+          selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+
+          questionBank:        questionBankView
+
+          importQuizzesNext:     new ImportQuizzesNextView
                                 model: ConverterViewControl.getModel()
-                                collection: daySubCollection
-                                daySubstitution: daySubCollectionView
-                                oldStartDate: ENV.OLD_START_DATE
-                                oldEndDate: ENV.OLD_END_DATE
+                                quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED
+                                questionBank: questionBankView
 
-            quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
-            quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
+          overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
+
+
+          dateShift:        new DateShiftView
+                              model: ConverterViewControl.getModel()
+                              collection: daySubCollection
+                              daySubstitution: daySubCollectionView
+                              oldStartDate: ENV.OLD_START_DATE
+                              oldEndDate: ENV.OLD_END_DATE
+
+          quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
+          quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
+
+ConverterViewControl.register
+  key: 'qti_converter'
+  view: new QTIZipView
+          chooseMigrationFile: new ChooseMigrationFileView
+                                  model: ConverterViewControl.getModel()
+                                  fileSizeLimit: ENV.UPLOAD_LIMIT
+
+          questionBank:        questionBankView
+
+          importQuizzesNext:     new ImportQuizzesNextView
+                                model: ConverterViewControl.getModel()
+                                quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED
+                                questionBank: questionBankView
+
+          overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
+          quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
+          quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
+
+# Listen for deep linking messages
+window.addEventListener 'message', processMigrationContentItem
+
+registerExternalTool = (et) ->
+  toolModel = new ExternalTool(et)
+  returnView = new ExternalContentReturnView
+    model: toolModel
+    launchType: 'migration_selection'
+
+  launchView = new ExternalToolLaunchView
+    model: ConverterViewControl.getModel()
+    contentReturnView: returnView
+
+  selectContentView = new SelectContentCheckboxView
+    model: ConverterViewControl.getModel()
+
+  contentView = new ExternalToolContentView
+    selectContent: selectContentView
+    externalToolLaunch: launchView
 
   ConverterViewControl.register
-    key: 'qti_converter'
-    view: new QTIZipView
-            chooseMigrationFile: new ChooseMigrationFileView
-                                   model: ConverterViewControl.getModel()
-                                   fileSizeLimit: ENV.UPLOAD_LIMIT
+    key: toolModel.assetString()
+    view: contentView
 
-            questionBank:        questionBankView
-
-            importQuizzesNext:     new ImportQuizzesNextView
-                                  model: ConverterViewControl.getModel()
-                                  quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED
-                                  questionBank: questionBankView
-
-            overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
-            quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
-            quizzes_next_configured_root: ENV.QUIZZES_NEXT_CONFIGURED_ROOT
-
-
-
-
-  registerExternalTool = (et) ->
-    toolModel = new ExternalTool(et)
-    returnView = new ExternalContentReturnView
-      model: toolModel
-      launchType: 'migration_selection'
-
-    launchView = new ExternalToolLaunchView
-      model: ConverterViewControl.getModel()
-      contentReturnView: returnView
-
-    selectContentView = new SelectContentCheckboxView
-      model: ConverterViewControl.getModel()
-
-    contentView = new ExternalToolContentView
-      selectContent: selectContentView
-      externalToolLaunch: launchView
-
-    ConverterViewControl.register
-      key: toolModel.assetString()
-      view: contentView
-
-  for et in ENV.EXTERNAL_TOOLS
-    registerExternalTool(et)
+export default for et in ENV.EXTERNAL_TOOLS
+  registerExternalTool(et)

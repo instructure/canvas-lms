@@ -127,7 +127,9 @@ let reportsTabHasLoaded = false
         if (ui.newTab.context.id === 'tab-reports-link' && !reportsTabHasLoaded) {
           reportsTabHasLoaded = true
           const splitContext = window.ENV.context_asset_string.split('_')
-          fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`).then(req => req.text()).then(html => {
+
+          fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`, {headers: {accept: 'text/html'}}).then(req => req.text()).then(html => {
+
             $('#tab-reports').html(html)
             $("#tab-reports .datetime_field").datetime_field();
 

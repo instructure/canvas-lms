@@ -16,66 +16,64 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!collaborations'
-  'Backbone'
-  './CollaboratorPickerView'
-], (I18n, {View}, CollaboratorPickerView) ->
+import I18n from 'i18n!collaborations'
+import {View} from 'Backbone'
+import CollaboratorPickerView from './CollaboratorPickerView'
 
-  class CollaborationFormView extends View
-    translations:
-      errors:
-        noName: I18n.t('errors.no_name', 'Please enter a name for this collaboration.')
-        titleTooLong: I18n.t('errors.title_too_long', "Please use %{maxLength} characters or less for the name. Use the description for additional content.", {maxLength: ENV.TITLE_MAX_LEN})
+export default class CollaborationFormView extends View
+  translations:
+    errors:
+      noName: I18n.t('errors.no_name', 'Please enter a name for this collaboration.')
+      titleTooLong: I18n.t('errors.title_too_long', "Please use %{maxLength} characters or less for the name. Use the description for additional content.", {maxLength: ENV.TITLE_MAX_LEN})
 
-    events:
-      'submit': 'onSubmit'
-      'click .cancel_button': 'onCancel'
-      'keydown': 'onKeydown'
+  events:
+    'submit': 'onSubmit'
+    'click .cancel_button': 'onCancel'
+    'keydown': 'onKeydown'
 
-    initialize: ->
-      super
-      @cacheElements()
-      @picker = new CollaboratorPickerView(el: @$collaborators)
-      @titleMaxLength = ENV.TITLE_MAX_LEN #255
+  initialize: ->
+    super
+    @cacheElements()
+    @picker = new CollaboratorPickerView(el: @$collaborators)
+    @titleMaxLength = ENV.TITLE_MAX_LEN #255
 
-    cacheElements: ->
-      @$titleInput    = @$el.find('#collaboration_title')
-      @$collaborators = @$el.find('.collaborator_list')
+  cacheElements: ->
+    @$titleInput    = @$el.find('#collaboration_title')
+    @$collaborators = @$el.find('.collaborator_list')
 
-    render: (focus = true) ->
-      @$el.show()
-      @$el.find('[name="collaboration[collaboration_type]"]').focus() if focus
-      @picker.render() if @$collaborators.is(':empty')
-      this
+  render: (focus = true) ->
+    @$el.show()
+    @$el.find('[name="collaboration[collaboration_type]"]').focus() if focus
+    @picker.render() if @$collaborators.is(':empty')
+    this
 
-    onSubmit: (e) ->
-      data = @$el.getFormData()
-      unless data['collaboration[title]']
-        e.preventDefault()
-        e.stopPropagation()
-        return @raiseTitleError()
-      if @titleMaxLength && data['collaboration[title]'].length > @titleMaxLength
-        e.preventDefault()
-        e.stopPropagation()
-        return @raiseTitleLengthError()
-      setTimeout ->
-        window.location = window.location.pathname
-      , 2500
-
-    onCancel: (e) ->
+  onSubmit: (e) ->
+    data = @$el.getFormData()
+    unless data['collaboration[title]']
       e.preventDefault()
-      @$el.hide()
-      @trigger('hide')
+      e.stopPropagation()
+      return @raiseTitleError()
+    if @titleMaxLength && data['collaboration[title]'].length > @titleMaxLength
+      e.preventDefault()
+      e.stopPropagation()
+      return @raiseTitleLengthError()
+    setTimeout ->
+      window.location = window.location.pathname
+    , 2500
 
-    onKeydown: (e) ->
-      if e.which == 27
-        @onCancel(e)
+  onCancel: (e) ->
+    e.preventDefault()
+    @$el.hide()
+    @trigger('hide')
 
-    raiseTitleError: ->
-      @trigger('error', @$titleInput, @translations.errors.noName)
-      false
+  onKeydown: (e) ->
+    if e.which == 27
+      @onCancel(e)
 
-    raiseTitleLengthError: ->
-      @trigger('error', @$titleInput, @translations.errors.titleTooLong)
-      false
+  raiseTitleError: ->
+    @trigger('error', @$titleInput, @translations.errors.noName)
+    false
+
+  raiseTitleLengthError: ->
+    @trigger('error', @$titleInput, @translations.errors.titleTooLong)
+    false

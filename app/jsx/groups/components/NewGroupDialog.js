@@ -78,7 +78,7 @@ const NewGroupDialog = createReactClass({
               <tbody>
                 <tr>
                   <td>
-                    <label htmlFor="group_name">{I18n.t('Group Name')}</label>
+                    <label htmlFor="groupName">{I18n.t('Group Name')}</label>
                   </td>
                   <td>
                     <input
@@ -94,7 +94,7 @@ const NewGroupDialog = createReactClass({
                 </tr>
                 <tr>
                   <td>
-                    <label htmlFor="">{I18n.t('Joining')}</label>
+                    <label htmlFor="joinLevelSelect">{I18n.t('Joining')}</label>
                   </td>
                   <td>
                     <select
@@ -113,13 +113,14 @@ const NewGroupDialog = createReactClass({
                 </tr>
                 <tr>
                   <td>
-                    <label htmlFor="">{I18n.t('Invite')}</label>
+                    <label id="inviteLabel">{I18n.t('Invite')}</label>
                   </td>
                   <td>
                     <PaginatedUserCheckList
                       checked={this.state.checked}
                       users={users}
                       onUserCheck={this._onUserCheck}
+                      labelId='inviteLabel'
                     />
                   </td>
                 </tr>

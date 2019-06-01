@@ -15,49 +15,50 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['Backbone', 'underscore'], ({Model}, _) ->
+import {Model} from 'Backbone'
+import _ from 'underscore'
 
-  class CreateUserList extends Model
+export default class CreateUserList extends Model
 
-    defaults:
-      roles: null
-      sections: null
-      course_section_id: null
-      role_id: null
-      user_list: null
-      readURL: null
-      updateURL: null
-      step: 1
-      enrolledUsers: null
+  defaults:
+    roles: null
+    sections: null
+    course_section_id: null
+    role_id: null
+    user_list: null
+    readURL: null
+    updateURL: null
+    step: 1
+    enrolledUsers: null
 
-    present: ->
-      @attributes
+  present: ->
+    @attributes
 
-    toJSON: ->
-      attrs = [
-        'course_section_id'
-        'role_id'
-        'user_list'
-        'limit_privileges_to_course_section'
-      ]
-      json = _.pick @attributes, attrs...
+  toJSON: ->
+    attrs = [
+      'course_section_id'
+      'role_id'
+      'user_list'
+      'limit_privileges_to_course_section'
+    ]
+    json = _.pick @attributes, attrs...
 
-    url: ->
-      if @get('step') is 1
-        @get 'readURL'
-      else
-        @get 'updateURL'
+  url: ->
+    if @get('step') is 1
+      @get 'readURL'
+    else
+      @get 'updateURL'
 
-    incrementStep: ->
-      @set 'step', @get('step') + 1
+  incrementStep: ->
+    @set 'step', @get('step') + 1
 
-    startOver: ->
-      @set 'users', null
-      @set 'step', 1
+  startOver: ->
+    @set 'users', null
+    @set 'step', 1
 
-    parse: (data) ->
-      if _.isArray(data)
-        enrolledUsers: data
-      else
-        data
+  parse: (data) ->
+    if _.isArray(data)
+      enrolledUsers: data
+    else
+      data
 

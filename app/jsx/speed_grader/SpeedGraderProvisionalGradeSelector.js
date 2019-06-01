@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, number, objectOf, shape, string} from 'prop-types'
+
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
@@ -26,7 +27,10 @@ import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGrou
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
-import I18n from 'i18n!gradebook'
+
+import natcompare from 'compiled/util/natcompare'
+
+import I18n from 'i18n!SpeedGraderProvisionalGradeSelector'
 
 const NEW_CUSTOM_GRADE = 'custom'
 
@@ -124,11 +128,11 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
 
     const gradesIssuedByOthers = provisionalGrades.filter(grade => grade.readonly)
 
+    let sortKey = 'scorer_id'
     if (gradesIssuedByOthers.length > 0 && gradesIssuedByOthers[0].anonymous_grader_id) {
-      gradesIssuedByOthers.sort((a, b) => a.anonymous_grader_id > b.anonymous_grader_id)
-    } else {
-      gradesIssuedByOthers.sort((a, b) => a.scorer_id > b.scorer_id)
+      sortKey = 'anonymous_grader_id'
     }
+    gradesIssuedByOthers.sort(natcompare.byKey(sortKey))
 
     return (
       <View as="div" id="grading_details" margin="small">

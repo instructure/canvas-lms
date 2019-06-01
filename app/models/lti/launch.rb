@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'useragent'
+require 'browser/browser'
 
 module Lti
   class Launch
@@ -25,7 +25,7 @@ module Lti
     attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
 
     def self.iframe_allowances(user_agent = nil)
-      if user_agent.blank? || UserAgent.parse(user_agent).browser == 'Chrome'
+      if user_agent.blank? || Browser.new(user_agent).chrome?
         return FRAME_ALLOWANCES.map { |s| "#{s} *" }
       end
       FRAME_ALLOWANCES

@@ -88,8 +88,13 @@
           <% end %>
 
           <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
-            <%= "|" unless first %>
+            <%= "|" unless first %><% first = false %>
             <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
+          <% end %>
+
+          <% if Canvas::CacheRegister.enabled? && @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
+            <%= "|" unless first %>
+            <a class="clear_user_cache_link" href="<%= api_v1_clear_cache_url(@user) %>"><%= t('Clear User Cache') %></a>
           <% end %>
         </td>
       <% end %>

@@ -1490,15 +1490,19 @@ class Account < ActiveRecord::Base
           link[:type] = 'custom'
         end
       end
-      links = HelpLinks.map_default_links(links)
+      links = help_links_builder.map_default_links(links)
     end
 
     result = if settings[:new_custom_help_links]
-      links || HelpLinks.default_links
+      links || help_links_builder.default_links
     else
-      HelpLinks.default_links + (links || [])
+      help_links_builder.default_links + (links || [])
     end
-    HelpLinks.instantiate_links(result)
+    help_links_builder.instantiate_links(result)
+  end
+
+  def help_links_builder
+    @help_links_builder ||= HelpLinks.new(self)
   end
 
   def set_service_availability(service, enable)

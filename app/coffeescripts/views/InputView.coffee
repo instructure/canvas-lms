@@ -15,56 +15,54 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-], ({View}) ->
+import {View} from 'Backbone'
+
+##
+# Generic form element View that manages the inputs data and the model
+# or collection it belongs to.
+
+export default class InputView extends View
+
+  tagName: 'input'
+
+  defaults:
+    modelAttribute: 'unnamed'
+
+  initialize: ->
+    super
+    @setupElement()
 
   ##
-  # Generic form element View that manages the inputs data and the model
-  # or collection it belongs to.
+  # When setElement is called, need to setupElement again
 
-  class InputView extends View
+  setElement: ->
+    super
+    @setupElement()
 
-    tagName: 'input'
+  setupElement: ->
+    @lastValue = @el?.value
+    @modelAttribute = @$el.attr('name') or @options?.modelAttribute
 
-    defaults:
-      modelAttribute: 'unnamed'
+  attach: ->
+    return unless @collection
+    @collection.on 'beforeFetch', => @$el.addClass 'loading'
+    @collection.on 'fetch', => @$el.removeClass 'loading'
+    @collection.on 'fetch:fail', => @$el.removeClass 'loading'
 
-    initialize: ->
-      super
-      @setupElement()
+  updateModel: ->
+    {value} = @el
+    # TODO this needs to be refactored out into some validation
+    # rules or something
+    if value and value.length < @options.minLength and !(@options.allowSmallerNumbers && value > 0)
+      return unless @options.setParamOnInvalid
+      value = false
+    @setParam value
 
-    ##
-    # When setElement is called, need to setupElement again
-
-    setElement: ->
-      super
-      @setupElement()
-
-    setupElement: ->
-      @lastValue = @el?.value
-      @modelAttribute = @$el.attr('name') or @options?.modelAttribute
-
-    attach: ->
-      return unless @collection
-      @collection.on 'beforeFetch', => @$el.addClass 'loading'
-      @collection.on 'fetch', => @$el.removeClass 'loading'
-      @collection.on 'fetch:fail', => @$el.removeClass 'loading'
-
-    updateModel: ->
-      {value} = @el
-      # TODO this needs to be refactored out into some validation
-      # rules or something
-      if value and value.length < @options.minLength and !(@options.allowSmallerNumbers && value > 0)
-        return unless @options.setParamOnInvalid
-        value = false
-      @setParam value
-
-    setParam: (value) ->
-      @model?.set @modelAttribute, value
-      if value is ''
-        @collection?.deleteParam @modelAttribute
-      else
-        @collection?.setParam @modelAttribute, value
+  setParam: (value) ->
+    @model?.set @modelAttribute, value
+    if value is ''
+      @collection?.deleteParam @modelAttribute
+    else
+      @collection?.setParam @modelAttribute, value
 
 

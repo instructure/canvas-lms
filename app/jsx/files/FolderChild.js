@@ -206,7 +206,7 @@ FolderChild.render = function() {
 
   return (
     <div {...this.getAttributesForRootNode()}>
-      <label className={keyboardCheckboxClass} role="gridcell">
+      <label className={keyboardCheckboxClass}>
         <input
           type="checkbox"
           onFocus={() => {

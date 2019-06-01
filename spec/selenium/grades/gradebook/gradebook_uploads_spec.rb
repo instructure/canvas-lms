@@ -283,7 +283,7 @@ describe "gradebook uploads" do
 
   it "should highlight scores if the original grade is more than the new grade", priority: "1", test_id: 209981 do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
-    assignment1.grade_student(@student, grade: 10, grader: @teacher)
+    assignment1.grade_student(@student, grade: 9.1, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
@@ -317,11 +317,11 @@ describe "gradebook uploads" do
 
   it "should not highlight scores if the original grade is less than the new grade", priority: "1", test_id: 209983 do
     assignment1 = @course.assignments.create!(title: "Assignment 1")
-    assignment1.grade_student(@student, grade: 10, grader: @teacher)
+    assignment1.grade_student(@student, grade: 100, grader: @teacher)
 
     filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
-          "User,#{@student.id},,100")
+          "User,#{@student.id},,100.1")
 
     @upload_element.send_keys(fullpath)
     @upload_form.submit

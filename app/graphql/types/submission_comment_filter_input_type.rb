@@ -18,8 +18,8 @@
 
 module Types
   class SubmissionCommentFilterInputType < Types::BaseInputObject
-    graphql_name "SubmissionCommentFilterInput"
+    graphql_name 'SubmissionCommentFilterInput'
 
-    argument :attempts, [Integer], required: false, default_value: nil
+    argument :all_comments, Boolean, required: false, default_value: false
   end
 end

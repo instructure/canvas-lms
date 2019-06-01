@@ -53,7 +53,7 @@ export default class Outcome extends React.Component {
 
   renderHeader () {
     const { outcome, outcomeProficiency } = this.props
-    const { assignments, mastered, title, score, points_possible, results } = outcome
+    const { assignments, display_name, mastered, title, score, points_possible, results } = outcome
     const numAlignments = assignments.length
     const pillAttributes = {margin: "0 0 0 x-small", text: I18n.t('Not mastered')}
     if (mastered) {
@@ -70,7 +70,7 @@ export default class Outcome extends React.Component {
                   <FlexItem>
                     <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency}/>
                   </FlexItem>
-                  <FlexItem shrink padding="0 x-small"><TruncateText>{ title }</TruncateText></FlexItem>
+                  <FlexItem shrink padding="0 x-small"><TruncateText>{ display_name || title }</TruncateText></FlexItem>
                 </Flex>
               </Text>
             </FlexItem>

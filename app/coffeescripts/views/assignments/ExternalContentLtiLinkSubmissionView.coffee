@@ -15,33 +15,31 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'jst/assignments/ExternalContentHomeworkUrlSubmissionView'
-  './ExternalContentHomeworkSubmissionView'
-], ($, template, ExternalContentHomeworkSubmissionView) ->
+import $ from 'jquery'
+import template from 'jst/assignments/ExternalContentHomeworkUrlSubmissionView'
+import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
 
-  class ExternalContentLtiLinkSubmissionView extends ExternalContentHomeworkSubmissionView
-    template: template
-    @optionProperty 'externalTool'
+export default class ExternalContentLtiLinkSubmissionView extends ExternalContentHomeworkSubmissionView
+  template: template
+  @optionProperty 'externalTool'
 
-    buildSubmission: ->
-      submission_type: 'basic_lti_launch'
-      url: @model.get('url')
+  buildSubmission: ->
+    submission_type: 'basic_lti_launch'
+    url: @model.get('url')
 
-    extractComment: ->
-      text_comment: @model.get('comment')
+  extractComment: ->
+    text_comment: @model.get('comment')
 
-    submissionURL: ->
-      "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions"
+  submissionURL: ->
+    "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions"
 
-    submitHomework: =>
-      data =
-        submission: @buildSubmission()
-        comment: @extractComment()
-      $.ajaxJSON @submissionURL(), "POST", data, @redirectSuccessfulAssignment
+  submitHomework: =>
+    data =
+      submission: @buildSubmission()
+      comment: @extractComment()
+    $.ajaxJSON @submissionURL(), "POST", data, @redirectSuccessfulAssignment
 
-    redirectSuccessfulAssignment: (responseData) =>
-      $(window).off('beforeunload') # remove alert message from being triggered
-      window.location.reload()
+  redirectSuccessfulAssignment: (responseData) =>
+    $(window).off('beforeunload') # remove alert message from being triggered
+    window.location.reload()
 

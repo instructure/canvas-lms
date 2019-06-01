@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!speed_grader_helpers'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
@@ -202,6 +202,15 @@ const speedGraderHelpers = {
     } else {
       buttonContainer.show()
     }
+  },
+
+  plagiarismErrorMessage(turnitinAsset) {
+    return (
+      turnitinAsset.error_message ||
+      I18n.t(
+        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+      )
+    )
   },
 
   reloadPage() {

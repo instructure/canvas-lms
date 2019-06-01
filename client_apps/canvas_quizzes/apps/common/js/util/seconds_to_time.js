@@ -17,7 +17,8 @@
  */
 
 define(function(require) {
-  var I18n = require('i18n!quiz_statistics');
+  function getDefault(m) { return m.default ? m.default: m}
+  var I18n = getDefault(require('i18n!quiz_statistics'));
   var floor = Math.floor;
 
   var pad = function(duration) {

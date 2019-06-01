@@ -17,7 +17,7 @@
  */
 
 
-import I18n from 'i18n!assignments'
+import I18n from 'i18n!submit_assignment'
 import $ from 'jquery'
 import _ from 'underscore'
 import GoogleDocsTreeView from 'compiled/views/GoogleDocsTreeView'
@@ -114,8 +114,10 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
     var homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer('#submit_from_external_tool_form');
 
     // Add the Keyboard shortcuts info button
-    var keyboardShortcutsView = new RCEKeyboardShortcuts();
-    keyboardShortcutsView.render().$el.insertBefore($(".switch_text_entry_submission_views:first"));
+    if (!ENV.use_rce_enhancements) {
+      var keyboardShortcutsView = new RCEKeyboardShortcuts();
+      keyboardShortcutsView.render().$el.insertBefore($(".switch_text_entry_submission_views:first"));
+    }
 
     // grow and shrink the comments box on focus/blur if the user
     // hasn't entered any content.

@@ -50,6 +50,7 @@ class ContextExternalTool < ActiveRecord::Base
     state :email_only
     state :public
     state :deleted
+    state :disabled # The tool's developer key is "off" but not deleted
   end
 
   set_policy do
@@ -742,7 +743,9 @@ class ContextExternalTool < ActiveRecord::Base
 
     tool
   end
-  scope :active, -> { where("context_external_tools.workflow_state<>'deleted'") }
+  scope :active, -> do
+    where.not(workflow_state: ['deleted', 'disabled'])
+  end
 
   def self.find_all_for(context, type)
     tools = []

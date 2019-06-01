@@ -91,6 +91,7 @@ export default class OutcomePopover extends React.Component {
       exampleScores,
       exampleResult
     } = popoverContent
+    const { outcome } = this.props
     return (
       <View as='div' padding='large' maxWidth='30rem'>
         <CloseButton placement='end' onClick={() => this.setState({linkHover: false, linkClicked: false})}>
@@ -103,6 +104,8 @@ export default class OutcomePopover extends React.Component {
             justifyItems='space-between'
           >
             <FlexItem grow shrink>
+              { /* word-wrap used for IE support */ }
+              <div style={{wordWrap: 'break-word', overflowWrap: 'break-word'}}>{outcome.title}</div>
               <div>{I18n.t('Last Assessment: ')}
                 { latestTime ?
                   <DatetimeDisplay datetime={latestTime} format='%b %d, %l:%M %p' /> :

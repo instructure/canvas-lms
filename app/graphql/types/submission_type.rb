@@ -16,121 +16,68 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
+class SubmissionHistoryEdgeType < GraphQL::Types::Relay::BaseEdge
+  node_type(Types::SubmissionHistoryType)
 
-  class LatePolicyStatusType < Types::BaseEnum
-    graphql_name "LatePolicyStatusType"
-    value "late"
-    value "missing"
-    value "none"
+  def node
+    # Submission models or version ids for submission models can be handled here.
+    if object.node.is_a? Integer
+      Loaders::IDLoader.for(Version).load(object.node).then(&:model)
+    else
+      object.node
+    end
   end
+end
 
+class SubmissionHistoryConnection < GraphQL::Types::Relay::BaseConnection
+  edge_type(SubmissionHistoryEdgeType)
+
+  def nodes
+    # Submission models or version ids for submission models can be handled here.
+    node_values = super
+    version_ids, submissions = node_values.partition { |n| n.is_a? Integer }
+    Loaders::IDLoader.for(Version).load_many(version_ids).then do |versions|
+      versions.map(&:model) + submissions
+    end
+  end
+end
+
+
+module Types
   class SubmissionType < ApplicationObjectType
-    graphql_name "Submission"
+    graphql_name 'Submission'
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::SubmissionInterface
 
-    alias :submission :object
-
-    field :_id, ID, "legacy canvas id", method: :id, null: false
+    field :_id, ID, 'legacy canvas id', method: :id, null: false
     global_id_field :id
 
-    field :assignment, AssignmentType, null: true
-    def assignment
-      load_association(:assignment)
-    end
-
-    field :user, UserType, null: true
-    def user
-      load_association(:user)
-    end
-
-    def protect_submission_grades(attr)
-      load_association(:assignment).then do
-        if submission.user_can_read_grade?(current_user, session)
-          submission.send(attr)
-        end
-      end
-    end
-    private :protect_submission_grades
-
-    field :attempt, Integer, null: false
-    def attempt
-      submission.attempt || 0 # Nil in database, make it 0 here for easier api
-    end
-
-    field :comments_connection, SubmissionCommentType.connection_type, null: true do
-      argument :filter, Types::SubmissionCommentFilterInputType, required: false
-    end
-    def comments_connection(filter: nil)
-      filter ||= {}
-      load_association(:assignment).then do
-        scope = submission.comments_for(current_user).published
-        if filter[:attempts].present?
-          # Attempt 0 is represented as attempt nil in the database. It proved
-          # to be a PITA to try and chagne that, so we are fixing it up at the
-          # API boundary instead
-          attempts = filter[:attempts].map{ |i| i == 0 ? nil : i }
-          scope = scope.where(attempt: attempts)
-        end
-        scope
-      end
-    end
-
-    field :score, Float, null: true
-    def score
-      protect_submission_grades(:score)
-    end
-
-    field :grade, String, null: true
-    def grade
-      protect_submission_grades(:grade)
-    end
-
-    field :entered_score, Float,
-      "the submission score *before* late policy deductions were applied",
-      null: true
-    def entered_score
-      protect_submission_grades(:entered_score)
-    end
-
-    field :entered_grade, String,
-      "the submission grade *before* late policy deductions were applied",
-      null: true
-    def entered_grade
-      protect_submission_grades(:entered_grade)
-    end
-
-    field :deducted_points, Float,
-      "how many points are being deducted due to late policy",
-      null: true
-    def deducted_points
-      protect_submission_grades(:points_deducted)
-    end
-
-    field :excused, Boolean,
-      "excused assignments are ignored when calculating grades",
-      method: :excused?, null: true
-
-    field :submitted_at, DateTimeType, null: true
-    field :graded_at, DateTimeType, null: true
-    field :posted_at, DateTimeType, null: true
-
-    field :state, SubmissionStateType, method: :workflow_state, null: false
-
-    field :submission_status, String, null: true
-    def submission_status
-      if submission.submission_type == "online_quiz"
-        Loaders::AssociationLoader.for(Submission, :quiz_submission).
-          load(submission).
-          then { submission.submission_status }
+    field :submission_histories_connection, SubmissionHistoryConnection, null: true, connection: true
+    def submission_histories_connection
+      # There is not a version saved for submission attempt zero, so we fake it
+      # here. If there are no versions, we are still on attempt zero and can use
+      # the current submission, otherwise we fudge it with a model that is not
+      # actually persisted to the database.
+      submission_zero = if object.version_ids.empty?
+        object
       else
-        submission.submission_status
+        Submission.new(
+          id: object.id,
+          assignment_id: object.assignment_id,
+          user_id: object.user_id,
+          submission_type: object.submission_type,
+          workflow_state: 'unsubmitted',
+          created_at: object.created_at,
+          updated_at: object.created_at, # Don't use the current updated_at time
+          group_id: object.group_id,
+          attempt: 0,
+          context_code: object.context_code
+        )
       end
-    end
 
-    field :grading_status, String, null: true
-    field :late_policy_status, LatePolicyStatusType, null: true
+      object.version_ids + [submission_zero]
+    end
   end
 end

@@ -549,6 +549,22 @@ describe CoursesController do
       student_in_course(active_all: true)
     end
 
+    it 'sets the external tools create url' do
+      user_session(@teacher)
+      get 'settings', params: {:course_id => @course.id}
+      expect(controller.js_env[:EXTERNAL_TOOLS_CREATE_URL]).to eq(
+        "http://test.host/courses/#{@course.id}/external_tools"
+      )
+    end
+
+    it 'sets the tool configuration show url' do
+      user_session(@teacher)
+      get 'settings', params: {:course_id => @course.id}
+      expect(controller.js_env[:TOOL_CONFIGURATION_SHOW_URL]).to eq(
+        "http://test.host/api/lti/courses/#{@course.id}/developer_keys/:developer_key_id/tool_configuration"
+      )
+    end
+
     it "should set tool creation permissions true for roles that are granted rights" do
       user_session(@teacher)
       get 'settings', params: {:course_id => @course.id}

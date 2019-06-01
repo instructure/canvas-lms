@@ -22,15 +22,28 @@ import messageStudents from 'message_students'
 
 QUnit.module('MessageStudents dialog', hooks => {
   let fixtures
-  const settings = {
-    context_code: 'Z',
-    options: [],
-    points_possible: 0,
-    students: [],
-    title: 'My Great Course!!!'
+  let settings
+
+  function selectedStudentNames() {
+    // Ignore the "template" entry, which is still in the list
+    const $studentNames = document.querySelectorAll('#message_students_dialog .student_list .student:not(.blank) .name')
+    return [...$studentNames].map(nameElement => nameElement.innerText)
   }
 
   hooks.beforeEach(() => {
+    settings = {
+      context_code: 'Z',
+      options: [],
+      points_possible: 0,
+      students: [
+        {name: 'Boudica', sortableName: 'Boudica', id: '1', score: 50},
+        {name: 'Vercingetorix', sortableName: 'Vercingetorix', id: '2', score: 40},
+        {name: 'Ariovistus', sortableName: 'Ariovistus', id: '10', score: 53},
+        {name: 'Gaius Julius Caesar', sortableName: 'Caesar, Gaius Julius', id: '20', score: 48},
+      ],
+      title: 'My Great Course!!!'
+    }
+
     fixtures = $('#fixtures')
     fixtures.append(`
       <div id="message_students_dialog">
@@ -44,6 +57,14 @@ QUnit.module('MessageStudents dialog', hooks => {
             <button class="Button cancel_button">Cancel</button>
             <button class="Button Button--primary send_button">Send Message</button>
           </div>
+
+          <ul class="student_list">
+            <li class="student blank">
+              <span class="name">&nbsp;</span>
+              <span class="score">&nbsp;</span>
+              <button class="remove-button Button Button--icon-action"><i class="icon-x"></i></button>
+            </li>
+          </ul>
         </form>
       </div>
     `)
@@ -76,5 +97,29 @@ QUnit.module('MessageStudents dialog', hooks => {
     messageStudents(settings)
     $('#message_students_dialog').dialog('close')
     strictEqual($('.ui-dialog').attr('aria-label'), undefined)
+  })
+
+  test('renders the students alphabetically by sortable name', () => {
+    messageStudents(settings)
+    deepEqual(
+      selectedStudentNames(),
+      ['Ariovistus', 'Boudica', 'Gaius Julius Caesar', 'Vercingetorix']
+    )
+  })
+
+  test('includes users with IDs higher than Javascript numbers can handle', () => {
+    const crossShardStudent = {
+      id: String(Number.MAX_SAFE_INTEGER + 1),
+      name: 'Student From Another World',
+      score: 48,
+      sortableName: 'World, Student From Another'
+    }
+    settings.students.push(crossShardStudent)
+
+    messageStudents(settings)
+    deepEqual(
+      selectedStudentNames(),
+      ['Ariovistus', 'Boudica', 'Gaius Julius Caesar', 'Vercingetorix', 'Student From Another World']
+    )
   })
 })

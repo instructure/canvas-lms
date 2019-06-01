@@ -898,15 +898,30 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def downloadable_attachments
-    @downloadable_attachments ||=
-      begin
-        ids = data[:downloadable_attachment_ids]
-        if ids.present?
-          self.shard.activate { Attachment.where(:id => ids).polymorphic_where(:context => self).to_a }
-        else
-          []
+  def downloadable_attachments(type=:all)
+    return [] unless data
+    self.shard.activate do
+      @downloadable_attachments ||=
+        begin
+          ids = data[:downloadable_attachment_ids]
+          if ids.present?
+            Attachment.where(:id => ids).polymorphic_where(:context => self).to_a
+          else
+            []
+          end
         end
+
+      diff_att_ids = data[:diffed_attachment_ids] || []
+      case type
+      when :all
+        @downloadable_attachments
+      when :uploaded
+        @downloadable_attachments.reject{|att| diff_att_ids.include?(att.id)}
+      when :diffed
+        @downloadable_attachments.select{|att| diff_att_ids.include?(att.id)}
+      else
+        raise "invalid attachment type"
       end
+    end
   end
 end

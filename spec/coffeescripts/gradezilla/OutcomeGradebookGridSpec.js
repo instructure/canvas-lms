@@ -19,7 +19,7 @@
 import {isEqual, pluck} from 'underscore'
 import Grid from 'compiled/gradezilla/OutcomeGradebookGrid'
 import fakeENV from 'helpers/fakeENV'
-import 'i18n!gradezilla'
+import 'i18n!gradezillaOutcomeGradebookGrid'
 
 QUnit.module('OutcomeGradebookGrid', {
   setup() {

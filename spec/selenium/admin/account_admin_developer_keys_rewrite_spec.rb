@@ -360,7 +360,7 @@ describe 'Developer Keys' do
 
       it "adds scopes to backend developer key via UI in site admin" do
         site_admin_logged_in
-        expand_scope_group_by_filter('Assignment Groups', Account.site_admin.id)
+        expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         find_button("Save Key").click
         wait_for_ajaximations

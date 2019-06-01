@@ -27,7 +27,7 @@ import Menu, {
 } from '@instructure/ui-menu/lib/components/Menu'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import {filterLabels} from '../constants/ViewOptions'
 
 function renderTriggerButton(bindButton) {

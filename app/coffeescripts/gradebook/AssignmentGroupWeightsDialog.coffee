@@ -15,18 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../util/round'
-  'i18nObj'
-  'jquery'
-  'jst/AssignmentGroupWeightsDialog'
-  'jsx/shared/helpers/numberHelper'
-  'jquery.ajaxJSON'
-  'jquery.disableWhileLoading'
-  'jqueryui/dialog'
-  'jquery.instructure_misc_helpers'
-  'vendor/jquery.ba-tinypubsub'
-], (round, I18n, $, assignmentGroupWeightsDialogTemplate, numberHelper) -> class AssignmentGroupWeightsDialog
+import round from '../util/round'
+import I18n from 'i18nObj'
+import $ from 'jquery'
+import assignmentGroupWeightsDialogTemplate from 'jst/AssignmentGroupWeightsDialog'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import 'jquery.ajaxJSON'
+import 'jquery.disableWhileLoading'
+import 'jqueryui/dialog'
+import 'jquery.instructure_misc_helpers'
+import 'vendor/jquery.ba-tinypubsub'
+
+export default class AssignmentGroupWeightsDialog
 
   constructor: (options) ->
     @$dialog = $ assignmentGroupWeightsDialogTemplate()

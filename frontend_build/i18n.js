@@ -51,13 +51,18 @@ module.exports.pitch = function(remainingRequest, precedingRequest, data) {
     process.env.RAILS_ENV == 'production' ||
     process.env.NODE_ENV == 'production'
   const translationDependency = shouldTranslate
-    ? ` 'translations/${scopeName}', 'translations/_core',`
+    ? `
+      import 'translations/${scopeName}';
+      import 'translations/_core';
+    `
     : ''
 
   const scopedJavascript = `
-    define(['i18nObj',${translationDependency} 'translations/_core_en'], function(I18n) {
-      return I18n.scoped('${scopeName}')
-    });
+    import I18n from 'i18nObj';
+    ${translationDependency}
+    import 'translations/_core_en';
+
+    export default I18n.scoped('${scopeName}');
   `
 
   return scopedJavascript

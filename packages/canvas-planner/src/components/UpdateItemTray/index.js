@@ -19,7 +19,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import themeable from '@instructure/ui-themeable/lib';
 import View from '@instructure/ui-layout/lib/components/View';
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import formatMessage from '../../format-message';

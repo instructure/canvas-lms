@@ -81,22 +81,17 @@ class AssignmentsController < ApplicationController
 
   def show
     Shackles.activate(:slave) do
-      rce_js_env
       @assignment ||= @context.assignments.find(params[:id])
-      @assignment_presenter = AssignmentPresenter.new(@assignment)
+
       if @assignment.deleted?
-        respond_to do |format|
-          flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
-          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-        end
+        flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
+        redirect_to named_context_url(@context, :context_assignments_url)
         return
       end
       if authorized_action(@assignment, @current_user, :read)
         if @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
-          respond_to do |format|
-            flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
-            format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          end
+          flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
+          redirect_to named_context_url(@context, :context_assignments_url)
           return
         end
 
@@ -104,7 +99,6 @@ class AssignmentsController < ApplicationController
         @assignment.ensure_assignment_group
 
         @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-        @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
@@ -113,45 +107,78 @@ class AssignmentsController < ApplicationController
           end
         end
 
-        if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
+        can_read_submissions = @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
+        if can_read_submissions
           @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
           @current_user_submission = nil if @current_user_submission &&
             !@current_user_submission.graded? &&
             !@current_user_submission.submission_type
-          Shackles.activate(:master) do
-            @current_user_submission.send_later(:context_module_action) if @current_user_submission
+          if @current_user_submission
+            Shackles.activate(:master) do
+              @current_user_submission.send_later(:context_module_action)
+            end
           end
-          @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
         end
 
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
-        if request.format.html?
-          if @assignment.quiz?
-            return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
-          elsif @assignment.discussion_topic? &&
-            @assignment.discussion_topic.grants_right?(@current_user, session, :read)
-            return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
-          elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
-            @assignment.wiki_page.grants_right?(@current_user, session, :read)
-            return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
-          elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
-            tag_type = params[:module_item_id].present? ? :modules : :assignments
-            return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)
+        if @assignment.quiz?
+          return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
+        elsif @assignment.discussion_topic? &&
+          @assignment.discussion_topic.grants_right?(@current_user, session, :read)
+          return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
+        elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
+          @assignment.wiki_page.grants_right?(@current_user, session, :read)
+          return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
+        elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
+          tag_type = params[:module_item_id].present? ? :modules : :assignments
+          return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)
+        end
+
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+        @page_title = if @assignment.new_record?
+          t(:new_assignment, "New Assignment")
+        else
+          @assignment.title
+        end
+
+        rce_js_env
+        assignment_prereqs = {}
+        if @locked && !@locked[:can_view]
+          assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+        end
+        js_env({
+          ASSIGNMENT_ID: @assignment.id,
+          COURSE_ID: @context.id,
+          PREREQS: assignment_prereqs
+        })
+
+        if @context.root_account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2])
+          if can_do(@context, @current_user, :read_as_admin)
+            css_bundle :assignments_2_teacher
+            js_bundle :assignments_2_show_teacher
+          else
+            css_bundle :assignments_2_student
+            js_bundle :assignments_2_show_student
           end
+
+          render html: '', layout: true
+          return
+        end
+
+        # everything else here is only for the old assignment page and can be
+        # deleted once the :assignments_2 feature flag is deleted
+        @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
+
+        @assignment_presenter = AssignmentPresenter.new(@assignment)
+        if can_read_submissions
+          @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
         end
 
         if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
           @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
         else
           @external_tools = []
-        end
-
-
-        assignment_prereqs = {}
-
-        if @locked && !@locked[:can_view]
-          assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
         end
 
         permissions = {
@@ -162,15 +189,12 @@ class AssignmentsController < ApplicationController
         @similarity_pledge = pledge_text
 
         js_env({
-                 :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
-                 :COURSE_ID => @context.id,
-                 :ASSIGNMENT_ID => @assignment.id,
-                 :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
-                 :EULA_URL => tool_eula_url,
-                 :SIMILARITY_PLEDGE => @similarity_pledge,
-                 PERMISSIONS: permissions,
-                 PREREQS: assignment_prereqs
-               })
+                :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
+                :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
+                :EULA_URL => tool_eula_url,
+                :SIMILARITY_PLEDGE => @similarity_pledge,
+                PERMISSIONS: permissions,
+              })
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)
 
@@ -185,20 +209,14 @@ class AssignmentsController < ApplicationController
         # this will set @user_has_google_drive
         user_has_google_drive
 
-        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
-
         @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
 
-        respond_to do |format|
-          format.html do
-            render locals: {
-              eula_url: tool_eula_url,
-              show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
-            }
-          end
-        end
+        render locals: {
+          eula_url: tool_eula_url,
+          show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
+        }
       end
     end
   end

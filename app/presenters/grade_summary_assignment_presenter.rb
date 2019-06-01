@@ -52,10 +52,13 @@ class GradeSummaryAssignmentPresenter
     (submission.present? ? @summary.unread_submission_ids.include?(submission.id) : false)
   end
 
+  def posted_to_student?
+    assignment.course&.feature_enabled?(:post_policies) ? submission.posted? : !assignment.muted?
+  end
+
   def graded?
-    submission &&
-      (submission.grade || submission.excused?) &&
-      !assignment.muted?
+    return false if submission.blank?
+    (submission.grade || submission.excused?) && posted_to_student?
   end
 
   def is_letter_graded?
@@ -79,7 +82,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def has_no_score_display?
-    assignment.muted? || submission.nil?
+    !posted_to_student? || submission.nil?
   end
 
   def original_points
@@ -95,11 +98,13 @@ class GradeSummaryAssignmentPresenter
   end
 
   def has_scoring_details?
-    submission && submission.score && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted?
+    return false unless submission&.score.present? && assignment&.points_possible.present?
+    assignment.points_possible > 0 && posted_to_student?
   end
 
   def has_grade_distribution?
-    assignment && assignment.points_possible && assignment.points_possible > 0 && !assignment.muted?
+    return false if assignment&.points_possible.blank?
+    assignment.points_possible > 0 && posted_to_student?
   end
 
   def has_rubric_assessments?

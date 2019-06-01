@@ -15,26 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  '../PaginatedView'
-  './RecentStudentView'
-], ($, _, PaginatedView, RecentStudentView) ->
+import PaginatedView from '../PaginatedView'
+import RecentStudentView from './RecentStudentView'
 
-  class RecentStudentCollectionView extends PaginatedView
+export default class RecentStudentCollectionView extends PaginatedView
 
-    initialize: (options) ->
-      @collection.on 'add', @renderUser
-      @collection.on 'reset', @render
-      @paginationScrollContainer = @$el
-      super
+  initialize: (options) ->
+    @collection.on 'add', @renderUser
+    @collection.on 'reset', @render
+    @paginationScrollContainer = @$el
+    super
 
-    render: =>
-      ret = super
-      @collection.each (user) => @renderUser user
-      ret
+  render: =>
+    ret = super
+    @collection.each (user) => @renderUser user
+    ret
 
-    renderUser: (user) =>
-      user.set('course_id', @collection.course_id, silent: true)
-      @$el.append (new RecentStudentView model: user).render().el
+  renderUser: (user) =>
+    user.set('course_id', @collection.course_id, silent: true)
+    @$el.append (new RecentStudentView model: user).render().el

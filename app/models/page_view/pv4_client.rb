@@ -84,7 +84,7 @@ class PageView
       end
 
       def bookmark_for(pv)
-        [pv.created_at.iso8601(PRECISION), pv.request_id]
+        [pv&.created_at&.iso8601(PRECISION), pv&.request_id]
       end
 
       def validate(bookmark)

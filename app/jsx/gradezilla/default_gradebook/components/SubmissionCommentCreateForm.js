@@ -17,7 +17,7 @@
  */
 
 import {func} from 'prop-types'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import SubmissionCommentForm from './SubmissionCommentForm'
 
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {

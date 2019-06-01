@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Legg til"
+  },
+  "all_4321c3a1": {
+    "message": "Alle"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetisk"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klikk for å sette inn en kobling i dette elementet."
   },
+  "close_d634289d": {
+    "message": "Lukk"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Lukk Flickr-skjema"
   },
   "collaborations_5c56c15f": {
     "message": "Samarbeid"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Datamaskin"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Innhold undertype"
+  },
+  "content_type_2cf90d95": {
+    "message": "Innholdstype"
   },
   "copyright_holder_66ee111": {
     "message": "Opphavsrett Innehaver:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Kreative Allmenninger Lisens:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Lagt til dato"
+  },
+  "date_published_371c4ad0": {
+    "message": "Publisering dato"
   },
   "decorative_image_fde98579": {
     "message": "Dekorativt bilde"
@@ -161,9 +188,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Lenke til annet innhold i gruppen."
   },
-  "link_to_url_52dd935c": {
-    "message": "Lenke til URL"
-  },
   "links_14b70841": {
     "message": "Lenker"
   },
@@ -181,6 +205,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Laster mapper..."
+  },
+  "media_af190855": {
+    "message": "Medie"
   },
   "modules_c4325335": {
     "message": "Moduler"
@@ -212,6 +239,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Velg mappen du vil laste opp filen til"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Sortert på"
+  },
+  "submit_a3cc6859": {
+    "message": "Send inn"
+  },
   "syllabus_f191f65b": {
     "message": "Fagoversikt"
   },
@@ -230,6 +263,9 @@
   "tray_839df38a": {
     "message": "Brett"
   },
+  "unsplash_ee049fbf": {
+    "message": "Ikke skvette"
+  },
   "upload_8b403d05": {
     "message": "Last opp"
   },
@@ -238,6 +274,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Last opp et nytt bilde"
+  },
+  "upload_image_6120b609": {
+    "message": "Last opp bilde"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Brukerrettigheter:"

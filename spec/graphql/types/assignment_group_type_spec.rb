@@ -23,14 +23,27 @@ describe Types::AssignmentGroupType do
   context "AssignmentGroup" do
     before(:once) do
       course_with_student(active_all: true)
+      # adding another student
+      @student_enrollment = @course.enroll_student(User.create!, enrollment_state: 'active')
       @group = @course.assignment_groups.create!(name: "a group")
       @assignment = @course.assignments.create!(name: "a assignment")
 
       @other_group = @course.assignment_groups.create!(name: "other group")
+      @group.context.recompute_student_scores
       @other_assignment = @course.assignments.create!(
         name: "other",
         assignment_group: @other_group,
       )
+
+      @group.scores.eager_load(:enrollment, :course).all.each do |score|
+        score.update!(
+          current_score: 68.0,
+          final_score: 78.1,
+          override_score: 88.2,
+          unposted_current_score: 71.3,
+          unposted_final_score: 81.4
+        )
+      end
     end
 
     before do
@@ -50,16 +63,31 @@ describe Types::AssignmentGroupType do
       end
     end
 
+    describe 'scores' do
+      it "returns scores for the assignment group" do
+        expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @student)).to eq [78.1]
+      end
+
+      it "teacher may see all scores" do
+        expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @teacher).size).to eq 2
+      end
+
+      it "student may only see their scores" do
+        expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @student).size).to eq 1
+      end
+    end
+
     it "returns information about the group" do
       expect(@group_type.resolve("_id")).to eq @group.id.to_s
       expect(@group_type.resolve("name")).to eq @group.name
     end
 
     it "returns assignments from the assignment group" do
-      expect(@group_type.resolve(
-        "assignmentsConnection { edges { node { _id } } }"
-      )).to eq @group.assignments.map &:to_param
+      expect(@group_type.resolve("assignmentsConnection { edges { node { _id } } }")).
+        to eq @group.assignments.map(&:to_param)
     end
+
+
 
     describe Types::AssignmentGroupRulesType do
       before do

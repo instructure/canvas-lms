@@ -94,7 +94,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       assignment_2301: submission,
       isInactive: false,
       name: 'Guy B. Studying',
-      enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
+      enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}],
+      sortable_name: 'Studying, Guy B.'
     }
 
     gradebook.gotAllAssignmentGroups([

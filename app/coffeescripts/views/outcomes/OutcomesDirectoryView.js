@@ -26,6 +26,7 @@ import OutcomeCollection from '../../collections/OutcomeCollection'
 import OutcomeGroupCollection from '../../collections/OutcomeGroupCollection'
 import OutcomeGroupIconView from './OutcomeGroupIconView'
 import OutcomeIconView from './OutcomeIconView'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.disableWhileLoading'
 import 'jqueryui/droppable'
 import '../../jquery.rails_flash_notifications'
@@ -37,7 +38,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      let thisName = thisFn.match(/_this\d*/)[0];
       eval(`${thisName} = this;`);
     }
     this.moveModelHere = this.moveModelHere.bind(this)
@@ -302,9 +303,9 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
       _.isEmpty(this.outcomes.models) &&
       _.isEmpty(this.views())
     ) {
-      return $.publish('renderNoOutcomeWarning')
+      return publish('renderNoOutcomeWarning')
     } else {
-      return $.publish('clearNoOutcomeWarning')
+      return publish('clearNoOutcomeWarning')
     }
   }
 

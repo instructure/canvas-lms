@@ -78,17 +78,17 @@ export default class ShowEventDetailsDialog {
       prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
       confirmed: () => {
         this.popover.hide()
-        $.publish('CommonEvent/eventDeleting', event)
+        publish('CommonEvent/eventDeleting', event)
       },
       success: () => {
-        $.publish('CommonEvent/eventDeleted', event)
+        publish('CommonEvent/eventDeleted', event)
       }
     })
   }
 
   reserveErrorCB = (data, request, ...otherArgs) => {
     let errorHandled
-    $.publish('CommonEvent/eventSaveFailed', this.event)
+    publish('CommonEvent/eventSaveFailed', this.event)
     data.forEach(error => {
       if (error.message === 'participant has met per-participant limit') {
         errorHandled = true
@@ -152,7 +152,7 @@ export default class ShowEventDetailsDialog {
           v.calendarEvent.parent_event_id &&
           v.calendarEvent.appointment_group_id === this.event.calendarEvent.appointment_group_id
         ) {
-          results.push($.publish('CommonEvent/eventDeleted', v))
+          results.push(publish('CommonEvent/eventDeleted', v))
         } else {
           results.push(void 0)
         }
@@ -163,17 +163,17 @@ export default class ShowEventDetailsDialog {
     // Update the parent event
     this.event.calendarEvent.reserved = true
     this.event.calendarEvent.available_slots -= 1
-    $.publish('CommonEvent/eventSaved', this.event)
+    publish('CommonEvent/eventSaved', this.event)
 
     // Add the newly created child event
     const childEvent = commonEventFactory(data, this.dataSource.contexts)
-    $.publish('CommonEvent/eventSaved', childEvent)
+    publish('CommonEvent/eventSaved', childEvent)
   }
 
   reserveEvent = (params = {}) => {
     params.comments = $('#appointment-comment').val()
     this.popover.hide()
-    $.publish('CommonEvent/eventSaving', this.event)
+    publish('CommonEvent/eventSaving', this.event)
     return $.ajaxJSON(
       this.event.object.reserve_url,
       'POST',
@@ -235,7 +235,7 @@ export default class ShowEventDetailsDialog {
         const in_scheduler = $('#scheduler').prop('checked')
         const appointments = this.event.calendarEvent.child_events
         if (!in_scheduler && appointments.length === 0) {
-          $.publish('CommonEvent/eventDeleted', this.event)
+          publish('CommonEvent/eventDeleted', this.event)
           this.popover.hide()
         }
       }
@@ -286,8 +286,9 @@ export default class ShowEventDetailsDialog {
       (params.reservations == null || params.reservations === []) &&
       this.event.object.parent_event_id != null
     ) {
+      const MAX_PAGE_SIZE = 25
       axios
-        .get(`api/v1/calendar_events/${this.event.object.parent_event_id}/participants`)
+        .get(`api/v1/calendar_events/${this.event.object.parent_event_id}/participants?per_page=${MAX_PAGE_SIZE}`)
         .then(response => {
           if (response.data && response.data.length) {
             const $ul = $('<ul>')
@@ -295,13 +296,21 @@ export default class ShowEventDetailsDialog {
               const $li = $('<li>').text(p.display_name)
               $ul.append($li)
             })
+
+            if(response.data.length > (MAX_PAGE_SIZE - 1)) {
+              const $lidot = $('<li>').text("(...)")
+              $ul.append($lidot)
+            }
+
             const $header = $('<th>').attr("id", 'attendees_header_text').attr("scope", 'row').text('Attendees')
             $('#reservations').empty()
             $('#reservations').append($header)
             $('#reservations').append($ul)
+
           } else {
             $('#reservations').remove()
           }
+
         })
         .catch(() => $('#reservations').remove())
     }

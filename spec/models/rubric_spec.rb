@@ -433,5 +433,37 @@ describe Rubric do
         expect(@rubric.criteria[0][:ratings][0][:description]).to eq 'No Description'
       end
     end
+
+    context "updates description to be xss safe" do
+      before do
+        assignment_model
+        outcome_with_rubric({mastery_points: 3})
+        @rubric.update_criteria(
+          criteria: {
+            '0' => {
+              long_description: "<script>alert('danger');</script>",
+              ratings: {
+                '0' => {
+                  description: ''
+                }
+              }
+            },
+            '1' => {
+              long_description: "<script>alert('danger');</script>",
+              learning_outcome_id: @outcome.id
+            }
+          }
+        )
+      end
+
+      it "cannot be used for XSS when edited directly" do
+        expect(@rubric.criteria[0][:long_description]).to eq "&lt;script&gt;alert(&#39;danger&#39;);&lt;/script&gt;"
+      end
+
+      it "uses the sanitized outcome description when an id is provided" do
+        @outcome.description = '<b>beta</b>'
+        expect(@rubric.criteria[1][:long_description]).to eq '<p>This is <b>awesome</b>.</p>'
+      end
+    end
   end
 end

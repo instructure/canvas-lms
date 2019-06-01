@@ -51,7 +51,8 @@ export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBo
 
         if (!ENV.use_rce_enhancements) {
           ed.on('init', function(){
-            const EditorAccessibility = require('compiled/editor/editorAccessibility')
+            const getDefault = mod => mod.default ? mod.default : mod
+            const EditorAccessibility = getDefault(require('compiled/editor/editorAccessibility'))
             new EditorAccessibility(ed).accessiblize();
           });
         }

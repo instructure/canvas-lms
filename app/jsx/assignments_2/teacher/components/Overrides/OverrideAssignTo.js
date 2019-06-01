@@ -26,7 +26,7 @@ import I18n from 'i18n!assignments_2'
 import FormField from '@instructure/ui-form-field/lib/components/FormField'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
-import generateElementId from '@instructure/ui-utils/lib/dom/generateElementId'
+import generateElementId from '@instructure/uid/lib/uid'
 import {OverrideShape} from '../../assignmentData'
 
 OverrideAssignTo.propTypes = {
@@ -60,7 +60,7 @@ export default function OverrideAssignTo(props) {
 }
 
 function renderSummary(assignedTo) {
-  const list = assignedTo.length > 0 ? assignedTo.map(t => t.name).join(', ') : null
+  const list = assignedTo.length > 0 ? assignedTo.map(renderOverrideName).join(', ') : null
   return (
     <Text weight="bold" data-testid="OverrideAssignTo">
       {list || <span dangerouslySetInnerHTML={{__html: '&nbsp;'}} />}
@@ -77,11 +77,20 @@ function renderDetail(assignedTo) {
         <View id={id} as="div" borderWidth="small">
           {assignedTo.map(a => (
             <div key={a.lid} style={pillStyle}>
-              {a.name}
+              {renderOverrideName(a)}
             </div>
           ))}
         </View>
       </FormField>
     </View>
+  )
+}
+
+function renderOverrideName(assignedTo) {
+  return (
+    assignedTo.sectionName ||
+    assignedTo.studentName ||
+    (assignedTo.hasOwnProperty('groupName') && (assignedTo.groupName || 'unnamed group')) ||
+    ''
   )
 }

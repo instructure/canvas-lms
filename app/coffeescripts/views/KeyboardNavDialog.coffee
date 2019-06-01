@@ -15,52 +15,50 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!instructure'
-  'Backbone'
-  'jquery'
-  'jqueryui/dialog'
-], (I18n, {View}, $) ->
+import I18n from 'i18n!KeyboardNavDialog'
+import {View} from 'Backbone'
+import $ from 'jquery'
+import 'jqueryui/dialog'
 
-  class KeyboardNavDialog extends View
+export default class KeyboardNavDialog extends View
 
-    el: '#keyboard_navigation'
+  el: '#keyboard_navigation'
 
-    initialize: ->
-      super
-      @bindOpenKeys
-      @
+  initialize: ->
+    super
+    @bindOpenKeys
+    @
 
-    # you're responsible for rendering the content via HB
-    # and passing it in
-    render: (html) ->
-      @$el.html(html)
-      @
+  # you're responsible for rendering the content via HB
+  # and passing it in
+  render: (html) ->
+    @$el.html(html)
+    @
 
-    bindOpenKeys: ->
-      activeElement = null
-      $(document).keydown((e) =>
-        commaOrQuestionMark = e.keyCode == 188 || e.keyCode == 191
-        if (commaOrQuestionMark && !$(e.target).is(":input"))
-          e.preventDefault()
-          if(@$el.is(":visible"))
-            @$el.dialog("close")
-            if(activeElement)
-              $(activeElement).focus()
-          else
-            activeElement = document.activeElement
+  bindOpenKeys: ->
+    activeElement = null
+    $(document).keydown((e) =>
+      commaOrQuestionMark = e.keyCode == 188 || e.keyCode == 191
+      if (commaOrQuestionMark && !$(e.target).is(":input"))
+        e.preventDefault()
+        if(@$el.is(":visible"))
+          @$el.dialog("close")
+          if(activeElement)
+            $(activeElement).focus()
+        else
+          activeElement = document.activeElement
 
-            @$el.dialog(
-              title: I18n.t 'titles.keyboard_shortcuts', "Keyboard Shortcuts"
+          @$el.dialog(
+            title: I18n.t 'titles.keyboard_shortcuts', "Keyboard Shortcuts"
 
-              width: 400
+            width: 400
 
-              height: "auto"
+            height: "auto"
 
-              close: ->
-                $("li", @).attr("tabindex", "") # prevents chrome bsod
-                if(activeElement)
-                  $(activeElement).focus()
-            )
-        )
+            close: ->
+              $("li", @).attr("tabindex", "") # prevents chrome bsod
+              if(activeElement)
+                $(activeElement).focus()
+          )
+      )
 

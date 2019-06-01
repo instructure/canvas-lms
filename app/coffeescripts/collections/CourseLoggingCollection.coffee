@@ -16,25 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  '../collections/PaginatedCollection'
-  '../models/CourseEvent'
-], (PaginatedCollection, CourseEvent) ->
+import PaginatedCollection from '../collections/PaginatedCollection'
+import CourseEvent from '../models/CourseEvent'
 
-  class CourseLoggingCollection extends PaginatedCollection
-    model: CourseEvent
+export default class CourseLoggingCollection extends PaginatedCollection
+  model: CourseEvent
 
-    url: ->
-      "/api/v1/audit/course/courses/#{@options.params.id}"
+  url: ->
+    "/api/v1/audit/course/courses/#{@options.params.id}"
 
-    sideLoad:
-      course: true
-      user: true
-      copied_to:
-        collection: 'courses'
-      copied_from:
-        collection: 'courses'
-      reset_to:
-        collection: 'courses'
-      reset_from:
-        collection: 'courses'
+  sideLoad:
+    course: true
+    user: true
+    copied_to:
+      collection: 'courses'
+    copied_from:
+      collection: 'courses'
+    reset_to:
+      collection: 'courses'
+    reset_from:
+      collection: 'courses'

@@ -66,6 +66,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   before_save :build_assignment
   before_save :set_defaults
   after_save :update_assignment
+  after_save :clear_availability_cache
   after_save :touch_context
   after_save :regrade_if_published
 
@@ -459,6 +460,12 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   protected :update_assignment
 
+  def clear_availability_cache
+    if saved_change_to_due_at? || saved_change_to_lock_at? || saved_change_to_unlock_at? || saved_change_to_workflow_state?
+      self.clear_cache_key(:availability)
+    end
+  end
+
   ##
   # when a quiz is updated, this method should be called to update the end_at
   # of all open quiz submissions. this ensures that students who are taking the
@@ -749,7 +756,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias_method :to_s, :quiz_title
 
   def low_level_locked_for?(user, opts={})
-    ::Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    RequestCache.cache(locked_request_cache_key(user)) do
       user_submission = user && quiz_submissions.where(user_id: user.id).first
       return false if user_submission && user_submission.manually_unlocked
 
@@ -780,11 +787,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     return false unless for_assignment?
 
     assignment.low_level_locked_for?(user, opts)
-  end
-
-  def clear_locked_cache(user)
-    super
-    Rails.cache.delete(assignment.locked_cache_key(user)) if self.for_assignment?
   end
 
   def context_module_action(user, action, points=nil)
@@ -1431,6 +1433,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def run_if_overrides_changed!
     self.relock_modules!
+    self.clear_cache_key(:availability)
     self.assignment.relock_modules! if self.assignment
   end
 

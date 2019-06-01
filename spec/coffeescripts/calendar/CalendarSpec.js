@@ -24,6 +24,7 @@ import tz from 'timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
+import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 QUnit.module('Calendar', {
   setup() {
@@ -103,7 +104,7 @@ test('animates loading', () => {
 
 test('publishes event when date is changed', () => {
   const eventSpy = sinon.spy()
-  $.subscribe('Calendar/currentDate', eventSpy)
+  subscribe('Calendar/currentDate', eventSpy)
   const cal = makeCal()
   cal.navigateDate(Date.now())
   ok(eventSpy.called)

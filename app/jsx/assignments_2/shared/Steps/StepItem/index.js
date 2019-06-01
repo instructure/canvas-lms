@@ -28,7 +28,7 @@ import px from '@instructure/ui-utils/lib/px'
 class StepItem extends Component {
   static propTypes = {
     status: PropTypes.oneOf(['complete', 'in-progress', 'unavailable']),
-    label: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
+    label: PropTypes.oneOfType([PropTypes.func, PropTypes.string, PropTypes.element]).isRequired,
     icon: PropTypes.element,
     pinSize: PropTypes.string,
     placement: PropTypes.oneOf(['first', 'last', 'interior'])

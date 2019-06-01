@@ -21,7 +21,7 @@ define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var Text = require('jsx!canvas_quizzes/components/text');
   var K = require('../../constants');
-  var I18n = require('i18n!quiz_reports');
+  var I18n = require('i18n!quiz_reports').default;
   var Actions = require('../../actions');
   var Descriptor = require('../../models/quiz_report_descriptor');
   var Alert = require('jsx!canvas_quizzes/components/alert');

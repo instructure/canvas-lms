@@ -88,4 +88,8 @@ describe("sidebarHandlers", () => {
   it("ties toggle upload form to store", () => {
     testHandler("toggleUploadForm", upload, "openOrCloseUploadForm");
   });
+
+  it("ties media up;load to store", () => {
+    testHandler("startMediaUpload", upload, "uploadToMediaFolder", "images", {})
+  })
 });

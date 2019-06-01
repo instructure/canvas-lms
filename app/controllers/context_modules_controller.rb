@@ -237,9 +237,6 @@ class ContextModulesController < ApplicationController
       locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
         @context.context_modules.active.each { |m| m.evaluate_for(@current_user) }
-        if tag.content.respond_to?(:clear_locked_cache)
-          tag.content.clear_locked_cache(@current_user)
-        end
       end
     end
   end
@@ -297,13 +294,32 @@ class ContextModulesController < ApplicationController
       all_tags = Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).to_a }
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
 
+      ActiveRecord::Associations::Preloader.new.preload(all_tags, :content)
+
       preload_assignments_and_quizzes(all_tags, user_is_admin)
+
+      assignment_ids = []
+      quiz_ids = []
+      all_tags.each do |tag|
+        if tag.can_have_assignment? && tag.assignment
+          assignment_ids << tag.assignment.id
+        elsif tag.content_type_quiz?
+          quiz_ids << tag.content.id
+        end
+      end
+
+      submitted_assignment_ids = @current_user.submissions.shard(@context.shard).
+        having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id) if assignment_ids.any?
+      submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard).
+        completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if quiz_ids.any?
 
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
-          tag.assignment.context_module_tag_info(@current_user, @context, user_is_admin: user_is_admin)
+          tag.assignment.context_module_tag_info(@current_user, @context,
+            user_is_admin: user_is_admin, has_submission: submitted_assignment_ids.include?(tag.assignment.id))
         elsif tag.content_type_quiz?
-          tag.content.context_module_tag_info(@current_user, @context, user_is_admin: user_is_admin)
+          tag.content.context_module_tag_info(@current_user, @context,
+            user_is_admin: user_is_admin, has_submission: submitted_quiz_ids.include?(tag.content.id))
         else
           {:points_possible => nil, :due_date => nil}
         end
@@ -519,7 +535,7 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
-      unless @tag.valid?
+      unless @tag&.valid?
         return render :json => @tag.errors, :status => :bad_request
       end
       json = @tag.as_json
@@ -636,7 +652,6 @@ class ContextModulesController < ApplicationController
   def preload_assignments_and_quizzes(tags, user_is_admin)
     assignment_tags = tags.select{|ct| ct.can_have_assignment?}
     return unless assignment_tags.any?
-    ActiveRecord::Associations::Preloader.new.preload(assignment_tags, :content)
 
     content_with_assignments = assignment_tags.
       select{|ct| ct.content_type != "Assignment" && ct.content.assignment_id}.map(&:content)
@@ -658,7 +673,7 @@ class ContextModulesController < ApplicationController
   end
 
   def should_preload_override_data?
-    key = ['preloaded_module_override_data', @context.global_asset_string, @current_user].cache_key
+    key = ['preloaded_module_override_data2', @context.global_asset_string, @current_user.cache_key(:enrollments), @current_user.cache_key(:groups)].cache_key
     # if the user has been touched we should preload all of the overrides because it's almost certain we'll need them all
     if Rails.cache.read(key)
       false

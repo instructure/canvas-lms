@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  'jst/gradebook/total_column_header'
-], ($, Backbone, template) ->
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import template from 'jst/gradebook/total_column_header'
 
-  class TotalColumnHeaderView extends Backbone.View
+export default class TotalColumnHeaderView extends Backbone.View
 
     el: '#total_column_header'
 

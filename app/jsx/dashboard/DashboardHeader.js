@@ -118,7 +118,7 @@ class DashboardHeader extends React.Component {
     const promiseToGetHtml = axios.get('/dashboard/stream_items')
     $dashboardActivity.show().disableWhileLoading(
       Promise.all([promiseToGetCode, promiseToGetHtml])
-        .then(([DashboardView, axiosResponse]) => {
+        .then(([{default: DashboardView}, axiosResponse]) => {
           // xsslint safeString.property data
           $dashboardActivity.html(axiosResponse.data)
           new DashboardView()
@@ -223,7 +223,7 @@ function showTodoList () {
     const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
     const promiseToGetHtml = $.get(ENV.DASHBOARD_SIDEBAR_URL)
     rightSide.disableWhileLoading(
-      Promise.all([promiseToGetNewCourseForm, promiseToGetHtml]).then(([newCourseForm, html]) => {
+      Promise.all([promiseToGetNewCourseForm, promiseToGetHtml]).then(([{default: newCourseForm}, html]) => {
         // inject the erb html we got from the server
         rightSide.html(html)
         newCourseForm()

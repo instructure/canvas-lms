@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!rubrics'
+import I18n from 'i18n!rubric_delete_confirmation'
 
 const confirmationMessage = () => {
   if (ENV.context_asset_string.includes('course')) {

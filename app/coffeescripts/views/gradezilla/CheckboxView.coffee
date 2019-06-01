@@ -15,12 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone',
-  'jst/gradezilla/checkbox_view'
-], ({View}, template) ->
+import {View} from 'Backbone'
+import template from 'jst/gradezilla/checkbox_view'
 
-  class CheckboxView extends View
+export default class CheckboxView extends View
 
     tagName: 'label'
 

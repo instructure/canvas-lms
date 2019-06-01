@@ -142,42 +142,6 @@ describe "course settings" do
     end
   end
 
-  describe 'csp settings' do
-    before(:once) do
-      @csp_account = Account.create!(name: 'csp account')
-      @csp_account.enable_feature!(:javascript_csp)
-      @csp_account.enable_csp!
-      @csp_course = @csp_account.courses.create!(name: 'csp course')
-      @csp_user = User.create!(name: 'csp user')
-      @csp_user.accept_terms
-      @csp_user.register!
-      @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: 'csp@example.com')
-      @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
-    end
-
-    before(:each) {create_session(@csp_pseudonym)}
-
-    it "should not allow teachers to click CSP check" do
-      get "/courses/#{@csp_course.id}/settings"
-      f('.course_form_more_options_link').click
-      expect(f("#csp_options input[type='checkbox']")).not_to be_enabled
-    end
-
-    it "should save CSP check by admin" do
-      @csp_account.account_users.create!(user: @csp_user)
-      get "/courses/#{@csp_course.id}/settings"
-
-      f('.course_form_more_options_link').click
-      expect(f("#csp_options input[type='checkbox']")).to be_enabled
-
-      force_click("#csp_options input[type='checkbox']")
-      wait_for_new_page_load { submit_form('#course_form') }
-
-      f('.course_form_more_options_link').click
-      expect(is_checked(f("#csp_options input[type='checkbox']"))).to be_truthy
-    end
-  end
-
   describe "course items" do
 
     def admin_cog(id)

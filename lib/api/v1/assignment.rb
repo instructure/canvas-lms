@@ -504,6 +504,7 @@ module Api::V1::Assignment
     end
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
+      assignment.clear_cache_key(:availability)
       DueDateCacher.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 
@@ -940,7 +941,10 @@ module Api::V1::Assignment
   def clear_tool_settings_tools?(assignment, assignment_params)
     assignment.assignment_configuration_tool_lookups.present? &&
       assignment_params['submission_types']&.present? &&
-      (!assignment_params['submission_types'].include?(assignment.submission_types) || assignment_params['submission_types'].blank?)
+      (
+        !assignment.submission_types.split(',').any? { |t| assignment_params['submission_types'].include?(t) } ||
+        assignment_params['submission_types'].blank?
+      )
   end
 
   def plagiarism_capable?(assignment_params)

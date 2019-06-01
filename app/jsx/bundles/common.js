@@ -32,11 +32,10 @@ import 'jquery.instructure_forms'
 import 'ajax_errors'
 import 'compiled/behaviors/activate'
 import 'compiled/behaviors/tooltip'
-import 'media_comments'
 
 
 import('../runOnEveryPageButDontBlockAnythingElse')
-if (ENV.csp) import('../account_settings/alert_enforcement').then(setupCSP => setupCSP(window.document))
+if (ENV.csp) import('../account_settings/alert_enforcement').then(({default: setupCSP}) => setupCSP(window.document))
 if (ENV.INCOMPLETE_REGISTRATION) import('compiled/registration/incompleteRegistrationWarning')
 if (ENV.badge_counts) import('compiled/badge_counts')
 
@@ -44,10 +43,7 @@ $('html').removeClass('scripts-not-loaded')
 
 $('.help_dialog_trigger').click((event) => {
   event.preventDefault()
-  require.ensure([], (require) => {
-    const helpDialog = require('compiled/helpDialog')
-    helpDialog.open()
-  }, 'helpDialogAsyncChunk')
+  import('compiled/helpDialog').then(({default: helpDialog}) => helpDialog.open())
 })
 
 
@@ -61,10 +57,9 @@ if (
   window.ENV.NEW_USER_TUTORIALS.is_enabled &&
   (window.ENV.context_asset_string && (splitAssetString(window.ENV.context_asset_string)[0] === 'courses'))
 ) {
-  require.ensure([], (require) => {
-    const initializeNewUserTutorials = require('../new_user_tutorial/initializeNewUserTutorials')
+  import('../new_user_tutorial/initializeNewUserTutorials').then(({default: initializeNewUserTutorials}) => {
     initializeNewUserTutorials()
-  }, 'NewUserTutorialsAsyncChunk')
+  })
 }
 
 // edge < 15 does not support css vars
@@ -72,9 +67,9 @@ if (
 const edge = window.navigator.userAgent.indexOf("Edge") > -1
 const supportsCSSVars = !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
 if (!supportsCSSVars) {
-  require.ensure([], (require) => {
-    window.canvasCssVariablesPolyfill = require('../canvasCssVariablesPolyfill')
-  }, 'canvasCssVariablesPolyfill')
+  import('../canvasCssVariablesPolyfill').then(({default: canvasCssVariablesPolyfill}) => {
+    window.canvasCssVariablesPolyfill = canvasCssVariablesPolyfill
+  })
 }
 
 $(() => {

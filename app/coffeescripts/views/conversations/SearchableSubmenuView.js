@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import htmlEscape from 'str/htmlEscape'
-import I18n from 'i18n!conversations'
+import I18n from 'i18n!SearchableSubmenuView'
 import $ from 'jquery'
 import _ from 'underscore'
 import {View} from 'Backbone'
@@ -27,7 +27,7 @@ export default class SearchableSubmenuView extends View {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      let thisName = thisFn.match(/_this\d*/)[0];
       eval(`${thisName} = this;`);
     }
     this.search = this.search.bind(this)

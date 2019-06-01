@@ -22,7 +22,7 @@ define(function(require) {
   var d3 = require('d3');
   var _ = require('lodash');
   var AnswerRow = require('jsx!./answer_table/answer_row');
-  var I18n = require("i18n!quiz_statistics.answer_table");
+  var I18n = require("i18n!quiz_statistics.answer_table").default;
 
   var SPECIAL_DATUM_IDS = [ 'other', 'none' ];
 

@@ -60,7 +60,7 @@ describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is locked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: true}})
     const {getByTestId} = render(<StudentContent assignment={assignment} />)
-    expect(getByTestId('assignments-2-student-header')).toBeInTheDocument()
+    expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
   })
 
   it('renders the assignment details and student content tab if the assignment is unlocked', () => {

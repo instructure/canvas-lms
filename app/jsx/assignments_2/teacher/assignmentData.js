@@ -111,16 +111,16 @@ export const TEACHER_QUERY = gql`
             __typename
             ... on Section {
               lid: _id
-              name
+              sectionName: name
             }
             ... on Group {
               lid: _id
-              name
+              groupName: name
             }
             ... on AdhocStudents {
               students {
                 lid: _id
-                name
+                studentName: name
               }
             }
           }
@@ -158,6 +158,7 @@ export const TEACHER_QUERY = gql`
 
 const assignmentGroup = gql`
   fragment CourseAssignmentGroups on AssignmentGroupConnection {
+    __typename
     nodes {
       lid: _id
       gid: id
@@ -198,6 +199,7 @@ export const COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL = gql`
 
 const assignmentModule = gql`
   fragment CourseModules on ModuleConnection {
+    __typename
     nodes {
       lid: _id
       gid: id

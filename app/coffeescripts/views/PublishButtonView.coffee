@@ -15,226 +15,223 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!publish_btn_module'
-  'jquery'
-  '../fn/preventDefault'
-  'Backbone'
-  'str/htmlEscape'
-  'jquery.instructure_forms'
-], (I18n, $, preventDefault, Backbone, htmlEscape) ->
+import I18n from 'i18n!publish_btn_module'
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import htmlEscape from 'str/htmlEscape'
+import 'jquery.instructure_forms'
 
-  class PublishButton extends Backbone.View
-    disabledClass: 'disabled'
-    publishClass: 'btn-publish'
-    publishedClass: 'btn-published'
-    unpublishClass: 'btn-unpublish'
+export default class PublishButton extends Backbone.View
+  disabledClass: 'disabled'
+  publishClass: 'btn-publish'
+  publishedClass: 'btn-published'
+  unpublishClass: 'btn-unpublish'
 
-    # This value allows the text to include the item title
-    @optionProperty 'title'
+  # This value allows the text to include the item title
+  @optionProperty 'title'
 
-    # These values allow the default text to be overridden if necessary
-    @optionProperty 'publishText'
-    @optionProperty 'unpublishText'
+  # These values allow the default text to be overridden if necessary
+  @optionProperty 'publishText'
+  @optionProperty 'unpublishText'
 
-    # This indicates that the button is disabled specifically because it is
-    # associated with a moderated assignment that the current user does not
-    # have the Select Final Grade permission.
-    @optionProperty 'disabledForModeration'
+  # This indicates that the button is disabled specifically because it is
+  # associated with a moderated assignment that the current user does not
+  # have the Select Final Grade permission.
+  @optionProperty 'disabledForModeration'
 
-    tagName:   'button'
-    className: 'btn'
+  tagName:   'button'
+  className: 'btn'
 
-    events: {'click', 'hover'}
+  events: {'click', 'hover'}
 
-    els:
-      'i':             '$icon'
-      '.publish-text': '$text'
+  els:
+    'i':             '$icon'
+    '.publish-text': '$text'
 
-    initialize: ->
-      super
-      @model?.on 'change:unpublishable', =>
-        @disable() if !@model.get('unpublishable') && @model.get('published')
-
-    setElement: ->
-      super
-      @$el.attr 'data-tooltip', ''
+  initialize: ->
+    super
+    @model?.on 'change:unpublishable', =>
       @disable() if !@model.get('unpublishable') && @model.get('published')
 
-    # events
+  setElement: ->
+    super
+    @$el.attr 'data-tooltip', ''
+    @disable() if !@model.get('unpublishable') && @model.get('published')
 
-    hover: ({type}) ->
-      if type is 'mouseenter'
-        return if @keepState or @isPublish() or @isDisabled()
-        @renderUnpublish()
-        @keepState = true
-      else
-        @keepState = false
-        @renderPublished() unless @isPublish() or @isDisabled()
+  # events
 
-    click: (event) ->
-      event.preventDefault()
-      event.stopPropagation()
-      return if @isDisabled()
+  hover: ({type}) ->
+    if type is 'mouseenter'
+      return if @keepState or @isPublish() or @isDisabled()
+      @renderUnpublish()
       @keepState = true
-      if @isPublish()
-        @publish()
-      else if @isUnpublish() or @isPublished()
-        @unpublish()
+    else
+      @keepState = false
+      @renderPublished() unless @isPublish() or @isDisabled()
 
-    addAriaLabel: (label) ->
-      $label = @$el.find('span.screenreader-only.accessible_label')
-      $label = $('<span class="screenreader-only accessible_label"></span>').appendTo(@$el) unless $label.length
+  click: (event) ->
+    event.preventDefault()
+    event.stopPropagation()
+    return if @isDisabled()
+    @keepState = true
+    if @isPublish()
+      @publish()
+    else if @isUnpublish() or @isPublished()
+      @unpublish()
 
-      $label.text label
-      @$el.attr 'aria-label', label
+  addAriaLabel: (label) ->
+    $label = @$el.find('span.screenreader-only.accessible_label')
+    $label = $('<span class="screenreader-only accessible_label"></span>').appendTo(@$el) unless $label.length
 
-    setFocusToElement: ->
-      @$el.focus()
+    $label.text label
+    @$el.attr 'aria-label', label
 
-    # calling publish/unpublish on the model expects a deferred object
+  setFocusToElement: ->
+    @$el.focus()
 
-    publish: (event) ->
-      @renderPublishing()
-      @model.publish().always =>
-        @trigger("publish")
-        @enable()
-        @render()
-        @setFocusToElement()
+  # calling publish/unpublish on the model expects a deferred object
 
-    unpublish: (event) ->
-      @renderUnpublishing()
-      @model.unpublish()
-      .done =>
-        @trigger("unpublish")
-        @disable()
-        @render()
-        @setFocusToElement()
-      .fail (error) =>
-        errors = JSON.parse(error.responseText)['errors']
-        $.flashError errors.published[0].message
-        @model.set 'unpublishable', true
-        @disable()
-        @renderPublished()
-        @setFocusToElement()
+  publish: (event) ->
+    @renderPublishing()
+    @model.publish().always =>
+      @trigger("publish")
+      @enable()
+      @render()
+      @setFocusToElement()
 
-    # state
-
-    isPublish: ->
-      @$el.hasClass @publishClass
-
-    isPublished: ->
-      @$el.hasClass @publishedClass
-
-    isUnpublish: ->
-      @$el.hasClass @unpublishClass
-
-    isDisabled: ->
-      @$el.hasClass @disabledClass
-
-    disable: ->
-      @$el.addClass @disabledClass
-
-    enable: ->
-      @$el.removeClass @disabledClass
-
-    reset: ->
-      @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
-      @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
-      @$el.removeAttr 'aria-label'
-
-    publishLabel: ->
-      return @publishText if @publishText
-      return I18n.t('Unpublished.  Click to publish %{title}.', title: @title) if @title
-      I18n.t('Unpublished.  Click to publish.')
-
-    unpublishLabel: ->
-      return @unpublishText if @unpublishText
-      return I18n.t('Published.  Click to unpublish %{title}.', title: @title) if @title
-      I18n.t('Published.  Click to unpublish.')
-
-    # render
-
-    render: ->
-      @$el.attr 'role', 'button'
-      @$el.attr 'tabindex', '0'
-      @$el.html '<i></i><span class="publish-text"></span>'
-      @cacheEls()
-
-      # don't read text of button with screenreader
-      @$text.attr 'tabindex', '-1'
-
-      if @model.get('published')
-        @renderPublished()
-      else
-        @renderPublish()
-      @
-
-    renderPublish: ->
-      @renderState
-        text:        I18n.t 'buttons.publish', 'Publish'
-        label:       @publishLabel()
-        buttonClass: @publishClass
-        iconClass:   'icon-unpublish'
-
-    renderPublished: ->
-      @renderState
-        text:        I18n.t 'buttons.published', 'Published'
-        label:       @unpublishLabel()
-        buttonClass: @publishedClass
-        iconClass:   'icon-publish icon-Solid'
-
-    renderUnpublish: ->
-      text = I18n.t 'buttons.unpublish', 'Unpublish'
-      @renderState
-        text:        text
-        buttonClass: @unpublishClass
-        iconClass:   'icon-unpublish'
-
-    renderPublishing: ->
+  unpublish: (event) ->
+    @renderUnpublishing()
+    @model.unpublish()
+    .done =>
+      @trigger("unpublish")
       @disable()
-      text = I18n.t 'buttons.publishing', 'Publishing...'
-      @renderState
-        text:        text
-        buttonClass: @publishClass
-        iconClass:   'icon-publish icon-Solid'
-
-    renderUnpublishing: ->
+      @render()
+      @setFocusToElement()
+    .fail (error) =>
+      errors = JSON.parse(error.responseText)['errors']
+      $.flashError errors.published[0].message
+      @model.set 'unpublishable', true
       @disable()
-      text = I18n.t 'buttons.unpublishing', 'Unpublishing...'
-      @renderState
-        text:        text
-        buttonClass: @unpublishClass
-        iconClass:   'icon-unpublished'
+      @renderPublished()
+      @setFocusToElement()
 
-    renderState: (options) ->
-      @reset()
-      @$el.addClass options.buttonClass
-      @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
-      @$icon.addClass options.iconClass
+  # state
 
-      @$text.html "&nbsp;#{htmlEscape(options.text)}"
+  isPublish: ->
+    @$el.hasClass @publishClass
 
-      # uneditable because the current user does not have the Select Final
-      # Grade permission.
-      if @model.get('disabledForModeration')
-        @disableWithMessage('You do not have permissions to edit this moderated assignment')
+  isPublished: ->
+    @$el.hasClass @publishedClass
 
-      # unpublishable (i.e., able to be unpublished)
-      else if !@model.get('unpublishable')? or @model.get('unpublishable')
-        @enable()
-        @$el.attr 'title', options.text
+  isUnpublish: ->
+    @$el.hasClass @unpublishClass
 
-        # label for screen readers
-        if options.label
-          @addAriaLabel(options.label)
+  isDisabled: ->
+    @$el.hasClass @disabledClass
 
-      # editable, but cannot be unpublished because submissions exist
-      else
-        @disableWithMessage(@model.disabledMessage()) if @model.get('published')
+  disable: ->
+    @$el.addClass @disabledClass
 
-    disableWithMessage: (message) ->
-      @disable()
-      @$el.attr 'aria-disabled', true
-      @$el.attr 'title', message
-      @addAriaLabel(message)
+  enable: ->
+    @$el.removeClass @disabledClass
+
+  reset: ->
+    @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
+    @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
+    @$el.removeAttr 'aria-label'
+
+  publishLabel: ->
+    return @publishText if @publishText
+    return I18n.t('Unpublished.  Click to publish %{title}.', title: @title) if @title
+    I18n.t('Unpublished.  Click to publish.')
+
+  unpublishLabel: ->
+    return @unpublishText if @unpublishText
+    return I18n.t('Published.  Click to unpublish %{title}.', title: @title) if @title
+    I18n.t('Published.  Click to unpublish.')
+
+  # render
+
+  render: ->
+    @$el.attr 'role', 'button'
+    @$el.attr 'tabindex', '0'
+    @$el.html '<i></i><span class="publish-text"></span>'
+    @cacheEls()
+
+    # don't read text of button with screenreader
+    @$text.attr 'tabindex', '-1'
+
+    if @model.get('published')
+      @renderPublished()
+    else
+      @renderPublish()
+    @
+
+  renderPublish: ->
+    @renderState
+      text:        I18n.t 'buttons.publish', 'Publish'
+      label:       @publishLabel()
+      buttonClass: @publishClass
+      iconClass:   'icon-unpublish'
+
+  renderPublished: ->
+    @renderState
+      text:        I18n.t 'buttons.published', 'Published'
+      label:       @unpublishLabel()
+      buttonClass: @publishedClass
+      iconClass:   'icon-publish icon-Solid'
+
+  renderUnpublish: ->
+    text = I18n.t 'buttons.unpublish', 'Unpublish'
+    @renderState
+      text:        text
+      buttonClass: @unpublishClass
+      iconClass:   'icon-unpublish'
+
+  renderPublishing: ->
+    @disable()
+    text = I18n.t 'buttons.publishing', 'Publishing...'
+    @renderState
+      text:        text
+      buttonClass: @publishClass
+      iconClass:   'icon-publish icon-Solid'
+
+  renderUnpublishing: ->
+    @disable()
+    text = I18n.t 'buttons.unpublishing', 'Unpublishing...'
+    @renderState
+      text:        text
+      buttonClass: @unpublishClass
+      iconClass:   'icon-unpublished'
+
+  renderState: (options) ->
+    @reset()
+    @$el.addClass options.buttonClass
+    @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
+    @$icon.addClass options.iconClass
+
+    @$text.html "&nbsp;#{htmlEscape(options.text)}"
+
+    # uneditable because the current user does not have the Select Final
+    # Grade permission.
+    if @model.get('disabledForModeration')
+      @disableWithMessage('You do not have permissions to edit this moderated assignment')
+
+    # unpublishable (i.e., able to be unpublished)
+    else if !@model.get('unpublishable')? or @model.get('unpublishable')
+      @enable()
+      @$el.attr 'title', options.text
+
+      # label for screen readers
+      if options.label
+        @addAriaLabel(options.label)
+
+    # editable, but cannot be unpublished because submissions exist
+    else
+      @disableWithMessage(@model.disabledMessage()) if @model.get('published')
+
+  disableWithMessage: (message) ->
+    @disable()
+    @$el.attr 'aria-disabled', true
+    @$el.attr 'title', message
+    @addAriaLabel(message)

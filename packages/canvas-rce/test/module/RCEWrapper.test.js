@@ -49,6 +49,7 @@ function createdMountedElement(additionalProps = {}) {
       defaultContent: "an example string",
       textareaId: textareaId,
       tinymce: fakeTinyMCE,
+      editorOptions: {},
       ...additionalProps
     })
   );
@@ -445,14 +446,10 @@ describe("RCEWrapper", () => {
 
     beforeEach(() => {
       domNode = {};
-      sinon.stub(ReactDOM, "unmountComponentAtNode");
-      sinon.stub(ReactDOM, "findDOMNode").returns(domNode);
       sinon.stub(Bridge, "detachEditor");
     });
 
     afterEach(() => {
-      ReactDOM.unmountComponentAtNode.restore();
-      ReactDOM.findDOMNode.restore();
       Bridge.detachEditor.restore();
     });
 
@@ -466,14 +463,6 @@ describe("RCEWrapper", () => {
       const editor = createBasicElement({ onRemove: sinon.spy() });
       editor.onRemove();
       sinon.assert.calledWith(editor.props.onRemove, editor);
-    });
-
-    it("unmounts the rce component", () => {
-      const editor = createBasicElement();
-      editor.refs = { rce: {} };
-      editor.onRemove();
-      sinon.assert.calledWith(ReactDOM.findDOMNode, editor.refs.rce);
-      sinon.assert.calledWith(ReactDOM.unmountComponentAtNode, domNode);
     });
   });
 

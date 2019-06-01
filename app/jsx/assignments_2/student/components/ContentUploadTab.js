@@ -31,6 +31,7 @@ import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import theme from '@instructure/ui-themes/lib/canvas/base'
 
 export default class ContentUploadTab extends Component {
   static propTypes = {
@@ -174,22 +175,55 @@ export default class ContentUploadTab extends Component {
     )
   }
 
+  renderSubmitButton = () => {
+    const outerFooterStyle = {
+      position: 'fixed',
+      bottom: '0',
+      left: '0',
+      right: '0',
+      maxWidth: '1366px',
+      margin: '0 0 0 84px',
+      zIndex: '5'
+    }
+
+    const innerFooterStyle = {
+      backgroundColor: theme.variables.colors.white,
+      borderColor: theme.variables.colors.borderMedium,
+      borderTop: `1px solid ${theme.variables.colors.borderMedium}`,
+      textAlign: 'right',
+      margin: `0 ${theme.variables.spacing.medium}`
+    }
+
+    return (
+      <div style={outerFooterStyle}>
+        <div style={innerFooterStyle}>
+          <Button variant="primary" margin="xx-small 0">
+            {I18n.t('Submit')}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   render() {
     return (
-      <FileDrop
-        accept={
-          this.props.assignment.allowedExtensions.length
-            ? this.props.assignment.allowedExtensions
-            : ''
-        }
-        allowMultiple
-        enablePreview
-        id="inputFileDrop"
-        label={this.state.files.length ? this.renderUploadedFiles() : this.renderEmptyUpload()}
-        messages={this.state.messages}
-        onDropAccepted={this.handleDropAccepted}
-        onDropRejected={this.handleDropRejected}
-      />
+      <React.Fragment>
+        <FileDrop
+          accept={
+            this.props.assignment.allowedExtensions.length
+              ? this.props.assignment.allowedExtensions
+              : ''
+          }
+          allowMultiple
+          enablePreview
+          id="inputFileDrop"
+          label={this.state.files.length ? this.renderUploadedFiles() : this.renderEmptyUpload()}
+          messages={this.state.messages}
+          onDropAccepted={this.handleDropAccepted}
+          onDropRejected={this.handleDropRejected}
+        />
+        {this.state.files.length !== 0 && this.renderSubmitButton()}
+      </React.Fragment>
     )
   }
 }

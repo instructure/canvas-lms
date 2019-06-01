@@ -57,7 +57,7 @@
             class="appointment-blocks-per-slot-option-button" uniqid=true
           }}
           {{#ifEqual participant_type "Group"}}
-            <label for="participants_per_appointment">
+            <label for="appointment-blocks-per-slot-option-button">
               {{#t}}
                 Limit each time slot to {{{num_participants}}}
                 <span class="per_appointment_groups_label">groups.</span>
@@ -65,7 +65,7 @@
               {{/t}}
             </label>
           {{else}}
-            <label>
+            <label for="appointment-blocks-per-slot-option-button">
               {{#t}}
                 Limit each time slot to {{{num_participants}}}
                 <span style="display:none;" class="per_appointment_groups_label">groups.</span>
@@ -86,7 +86,7 @@
           {{checkbox "max_appointments_per_participant_option"
             id="max-per-student-option" uniqid=true class="max-per-student-option"
           }}
-          <label for="max_appointments_per_participant">
+          <label for="max-per-student-option">
             {{#t}}
               Limit participants to attend {{{num_appointments}}} appointment(s).
             {{/t}}

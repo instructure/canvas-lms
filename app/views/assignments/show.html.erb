@@ -15,24 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-
-<% if @context.root_account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2]) %>
-  <% if can_do(@context, @current_user, :read_as_admin) %>
-    <% css_bundle :assignments_2_teacher %>
-    <% js_bundle :assignments_2_show_teacher %>
-  <% else %>
-
-    <% css_bundle :assignments_2_student %>
-    <% js_bundle :assignments_2_show_student %>
-  <% end %>
-  <div id="assignments_2"></div>
-<% else %>
-
 <%
-  content_for :page_title, @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title
   content_for :right_side, render(:partial => "assignment_sidebar")
 %>
+<% content_for :stylesheets do %>
+  <style>
+    #right-side-wrapper {
+      height: 100%;
+    }
+  </style>
+<% end %>
 
 <% if @locked && !@locked[:can_view] %>
   <% js_bundle :module_sequence_footer %>
@@ -276,5 +268,3 @@
 <% end %>
 
 <%= render partial: "shared/rubrics_component" %>
-
-<% end %>

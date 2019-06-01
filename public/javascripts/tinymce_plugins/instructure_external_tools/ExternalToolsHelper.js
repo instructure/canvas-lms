@@ -55,6 +55,7 @@ export default {
     }
     if (ENV.use_rce_enhancements) {
       config.onAction = () => editor.execCommand(`instructureExternalButton${button.id}`)
+      config.type = 'menuitem'
     } else {
       config.cmd = `instructureExternalButton${button.id}`
     }

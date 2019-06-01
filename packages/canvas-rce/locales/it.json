@@ -1,4 +1,25 @@
 {
+  "add_8523c19b": {
+    "message": "Aggiungi"
+  },
+  "align_11050992": {
+    "message": "Allinea"
+  },
+  "align_center_ca078feb": {
+    "message": "Allinea al centro"
+  },
+  "align_left_e9f1f93b": {
+    "message": "Allinea a sinistra"
+  },
+  "align_right_9bad3ac1": {
+    "message": "Allinea a destra"
+  },
+  "all_4321c3a1": {
+    "message": "Tutto"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetico"
+  },
   "alternative_text_a834dcad": {
     "message": "Testo alternativo:"
   },
@@ -44,6 +65,9 @@
   "choose_usage_rights_33683854": {
     "message": "Scegli diritti di utilizzo..."
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "cerchia elenco non ordinato"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Fai clic su un file per inserire un link di download per il file."
   },
@@ -65,11 +89,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Fai clic per inserire un link a questo elemento."
   },
+  "close_d634289d": {
+    "message": "Chiudi"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Chiudi modulo Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Collaborazioni"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Computer"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Sottocategoria di contenuto"
+  },
+  "content_type_2cf90d95": {
+    "message": "Tipo di contenuto"
   },
   "copyright_holder_66ee111": {
     "message": "Titolare del copyright:"
@@ -92,8 +128,23 @@
   "creative_commons_license_725584ae": {
     "message": "Licenza Creative Commons:"
   },
+  "date_added_ed5ad465": {
+    "message": "Data aggiunta"
+  },
+  "date_published_371c4ad0": {
+    "message": "Data pubblicazione"
+  },
   "decorative_image_fde98579": {
     "message": "Immagine decorativa"
+  },
+  "decrease_indent_de6343ab": {
+    "message": "Riduci rientro"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "elenco non ordinato puntato predefinito"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "elenco ordinato numericamente predefinito"
   },
   "discussions_a5f96392": {
     "message": "Discussioni"
@@ -101,11 +152,17 @@
   "discussions_index_6c36ced": {
     "message": "Indice discussioni"
   },
+  "documents_81393201": {
+    "message": "Documenti"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "inserisci i termini di ricerca"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Inserisci testo alternativo per questa immagine"
+  },
+  "external_links_3d9f074e": {
+    "message": "Link esterni"
   },
   "file_upload_form_4aaad554": {
     "message": "Modulo caricamento file"
@@ -125,6 +182,9 @@
   "group_navigation_99f191a": {
     "message": "Esplorazione gruppo"
   },
+  "header_f28f73db": {
+    "message": "Intestazione"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ho ottenuto l''autorizzazione a utilizzare questo file."
   },
@@ -137,8 +197,14 @@
   "image_upload_form_7b74079a": {
     "message": "Modulo caricamento immagine"
   },
+  "image_url_2aee2734": {
+    "message": "URL immagine"
+  },
   "images_7ce26570": {
     "message": "Immagini"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "Aumenta rientro"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Inserisci link Equella"
@@ -161,9 +227,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Collega ad altro contenuto del gruppo."
   },
-  "link_to_url_52dd935c": {
-    "message": "Collega a URL"
-  },
   "links_14b70841": {
     "message": "Link"
   },
@@ -182,17 +245,32 @@
   "loading_folders_8d4d5d5a": {
     "message": "Caricamento cartelle in corso..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Caricamento di ulteriori risultati in corso..."
+  },
+  "media_af190855": {
+    "message": "Elementi multimediali"
+  },
   "modules_c4325335": {
     "message": "Moduli"
   },
   "no_results_940393cf": {
     "message": "Nessun risultato."
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Elenchi ordinati e non ordinati"
+  },
   "pages_e5414c2c": {
     "message": "Pagine"
   },
+  "paragraph_5e5ad8eb": {
+    "message": "Paragrafo"
+  },
   "people_b4ebb13c": {
     "message": "Persone"
+  },
+  "preformatted_d0670862": {
+    "message": "Preformattato"
   },
   "quizzes_7e598f57": {
     "message": "Quiz"
@@ -212,6 +290,30 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleziona una cartella in cui caricare il file"
   },
+  "small_header_168fb9f9": {
+    "message": "Breve intestazione"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Si è verificato un errore."
+  },
+  "sort_by_e75f9e3e": {
+    "message": "Ordina per"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "incornicia elenco non ordinato"
+  },
+  "subheader_2b87606d": {
+    "message": "Sottotitolo"
+  },
+  "submit_a3cc6859": {
+    "message": "Invia"
+  },
+  "subscript_59744f96": {
+    "message": "Pedice"
+  },
+  "superscript_8cb349a2": {
+    "message": "Apice"
+  },
   "syllabus_f191f65b": {
     "message": "Piano di studio"
   },
@@ -230,6 +332,9 @@
   "tray_839df38a": {
     "message": "Barra delle applicazioni"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Carica"
   },
@@ -238,6 +343,18 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Carica una nuova immagine"
+  },
+  "upload_image_6120b609": {
+    "message": "Carica immagine"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "elenco ordinato per lettera maiuscola"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "elenco ordinato per cifra romana maiuscola"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Diritto di utilizzo:"

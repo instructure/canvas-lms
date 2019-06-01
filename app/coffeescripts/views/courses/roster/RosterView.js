@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!roster'
+import I18n from 'i18n!RosterView'
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import template from 'jst/courses/roster/index'
@@ -28,7 +28,7 @@ export default class RosterView extends Backbone.View {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
+      let thisName = thisFn.match(/_this\d*/)[0];
       eval(`${thisName} = this;`);
     }
     this.fetchOnCreateUsersClose = this.fetchOnCreateUsersClose.bind(this)

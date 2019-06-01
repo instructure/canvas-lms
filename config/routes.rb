@@ -987,8 +987,9 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/folders', controller: :folders, action: :create
       get 'courses/:course_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'courses/:course_id/folders/by_path', controller: :folders, action: :resolve_path
-      get  'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
-      put  'accounts/:account_id/courses', action: :batch_update
+      get 'courses/:course_id/folders/media', controller: :folders, action: :media_folder
+      get 'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
+      put 'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 
       get 'courses/:course_id/link_validation', action: :link_validation, as: 'course_link_validation'
@@ -1257,10 +1258,6 @@ CanvasRails::Application.routes.draw do
         post "#{context}s/:#{context}_id/create_tool_with_verification", action: :create_tool_with_verification, as: "#{context}_create_tool_with_verification"
         put "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :update, as: "#{context}_external_tools_update"
         delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :destroy, as: "#{context}_external_tools_delete"
-        post "#{context}s/:#{context}_id/developer_keys/:developer_key_id/create_tool", action: :create_tool_from_tool_config
-        post "#{context}s/:#{context}_id/developer_keys/:developer_key_id/create_tool", action: :create_tool_from_tool_config
-        delete "#{context}s/:#{context}_id/developer_keys/:developer_key_id/delete_tool", action: :delete_tool_from_tool_config
-        delete "#{context}s/:#{context}_id/developer_keys/:developer_key_id/delete_tool", action: :delete_tool_from_tool_config
       end
 
       get "groups/:group_id/external_tools", action: :index, as: "group_external_tools"
@@ -1375,6 +1372,8 @@ CanvasRails::Application.routes.draw do
       get 'dashboard/dashboard_cards', controller: 'users', action: 'dashboard_cards', as: :dashboard_dashboard_cards
 
       get 'users/:id/graded_submissions', controller: 'users', action: 'user_graded_submissions', as: :user_submissions
+
+      post 'users/:id/clear_cache', :action => :clear_cache, :as => 'clear_cache'
 
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
@@ -1590,6 +1589,7 @@ CanvasRails::Application.routes.draw do
       post 'groups/:group_id/folders', controller: :folders, action: :create
       get 'groups/:group_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
       get 'groups/:group_id/folders/by_path', controller: :folders, action: :resolve_path
+      get 'groups/:group_id/folders/media', controller: :folders, action: :media_folder
       get 'groups/:group_id/folders/:id', controller: :folders, action: :show, as: 'group_folder'
     end
 
@@ -1634,8 +1634,10 @@ CanvasRails::Application.routes.draw do
       # returned after upload to S3, when that was the create_success URL.
       # that's no longer necessary, but they are still given a Location header
       # pointed at this endpoint which they can GET for the file details (which
-      # create_success would have provided). for those that are still POSTing,
-      # we'll allow this but it's a noop (as far as side effects)
+      # create_success would have provided).
+      #
+      # such behavior is now undocumented, and subject to removal once open
+      # sourcing of inst-fs is complete.
       #
       # to actually change the file metadata (e.g. rename), the PUT route above
       # must be used.
@@ -2220,8 +2222,11 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/tool_configurations_api') do
       put 'developer_keys/:developer_key_id/tool_configuration', action: :update
       post 'accounts/:account_id/developer_keys/tool_configuration', action: :create
-      get 'developer_keys/:developer_key_id/tool_configuration', action: :show
       delete 'developer_keys/:developer_key_id/tool_configuration', action: :destroy
+
+      %w(account course).each do |context|
+        get "#{context}s/:#{context}_id/developer_keys/:developer_key_id/tool_configuration", action: :show, as: "#{context}_show_tool_configuration"
+      end
     end
 
     scope(controller: 'lti/subscriptions_api') do

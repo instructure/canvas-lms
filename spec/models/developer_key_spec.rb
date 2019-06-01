@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 describe DeveloperKey do
   let(:account) { Account.create! }
@@ -39,6 +40,93 @@ describe DeveloperKey do
       redirect_uri: 'http://test.com',
     )
   end
+
+  describe 'usable_in_context?' do
+    let(:account) { account_model }
+    let(:developer_key) { DeveloperKey.create!(account: account) }
+
+    shared_examples_for 'a boolean indicating the key is usable in context' do
+      subject { developer_key.usable_in_context?(context) }
+
+      let(:context) { raise 'set in examples' }
+
+      context 'when the key is usable and the binding is on' do
+        before do
+          developer_key.account_binding_for(account).update!(workflow_state: 'on')
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when the key is not usable' do
+        before { developer_key.update!(workflow_state: 'deleted') }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'when the binding is not on' do
+        it { is_expected.to eq false }
+      end
+    end
+
+    context 'when the context is an account' do
+      it_behaves_like 'a boolean indicating the key is usable in context' do
+        let(:context) { account }
+      end
+    end
+
+    context 'when the context is a course' do
+      it_behaves_like 'a boolean indicating the key is usable in context' do
+        let(:context) { course_model(account: account) }
+      end
+    end
+  end
+
+  describe "site_admin_lti scope" do
+    specs_require_sharding
+    include_context 'lti_1_3_spec_helper'
+
+    context "when root account and site admin keys exist" do
+      subject do
+        DeveloperKey.site_admin_lti(
+          [
+            root_account_key,
+            site_admin_key,
+            lti_site_admin_key
+          ].map(&:global_id)
+        )
+      end
+
+      let(:root_account_key) do
+        @shard1.activate do
+          a = account_model
+          DeveloperKey.create!(
+            account: a,
+            tool_configuration: tool_configuration.dup
+          )
+        end
+      end
+
+      let(:site_admin_key) do
+        Account.site_admin.shard.activate do
+          DeveloperKey.create!
+        end
+      end
+
+      let(:lti_site_admin_key) do
+        Account.site_admin.shard.activate do
+          k = DeveloperKey.create!
+          Lti::ToolConfiguration.create!(
+            developer_key: k,
+            settings: settings.merge(public_jwk: tool_config_public_jwk)
+          )
+          k
+        end
+      end
+
+      it { is_expected.to match_array [lti_site_admin_key] }
+    end
+  end 
 
   describe "sets a default value" do
     it "when visible is not specified" do
@@ -196,9 +284,66 @@ describe DeveloperKey do
     end
 
     context 'when site admin' do
+      let(:key) { DeveloperKey.create!(account: nil) }
+
       it 'it creates a binding on save' do
-        key = DeveloperKey.create!(account: nil)
         expect(key.developer_key_account_bindings.find_by(account: Account.site_admin)).to be_present
+      end
+
+      describe 'destroy_external_tools!' do
+        include_context 'lti_1_3_spec_helper'
+        specs_require_sharding
+
+        subject do
+          @shard1.activate { ContextExternalTool.active }.merge(
+            @shard2.activate { ContextExternalTool.active }
+          )
+        end
+
+        context 'when developer key is an LTI key' do
+          let(:shard_1_account) { @shard1.activate { account_model } }
+          let(:shard_2_account) { @shard2.activate { account_model } }
+          let(:configuration) { Account.site_admin.shard.activate { tool_configuration } }
+          let(:shard_1_tool) do
+            t = @shard1.activate { configuration.new_external_tool(shard_1_account) }
+            t.save!
+            t
+          end
+          let(:shard_2_tool) do
+            t = @shard2.activate { configuration.new_external_tool(shard_2_account) }
+            t.save!
+            t
+          end
+
+          before do
+            shard_1_tool
+            shard_2_tool
+            developer_key.update!(account: nil)
+          end
+
+          it 'destroys associated tools across all shards' do
+            developer_key.destroy
+            expect(subject).to be_empty
+          end
+
+          context 'when tools are installed at the course level' do
+            let(:shard_1_course) { shard_1_account.shard.activate { course_model(account: shard_1_account) } }
+            let(:shard_1_course_tool) do
+              t = @shard1.activate { configuration.new_external_tool(shard_1_course) }
+              t.save!
+              t
+            end
+
+            before do
+              shard_1_course_tool
+            end
+
+            it 'destroys associated tools across all shards' do
+              developer_key.destroy
+              expect(subject).to be_empty
+            end
+          end
+        end
       end
     end
 
@@ -206,6 +351,47 @@ describe DeveloperKey do
       it 'it creates a binding on save' do
         key = DeveloperKey.create!(account: account)
         expect(key.developer_key_account_bindings.find_by(account: account)).to be_present
+      end
+
+      describe 'destroy_external_tools!' do
+        include_context 'lti_1_3_spec_helper'
+        specs_require_sharding
+
+        subject { ContextExternalTool.active }
+
+        let(:account) { account_model }
+        let(:tool) do
+          t = tool_configuration.new_external_tool(account)
+          t.save!
+          t
+        end
+
+        before do
+          tool
+        end
+
+        context 'when developer key is an LTI key' do
+          it 'destroys associated tools on the current shard' do
+            developer_key.destroy
+            expect(subject).to be_empty
+          end
+
+          context 'when tools are installed at the course level' do
+            let(:course) { course_model(account: account) }
+            let(:course_tool) do
+              t = tool_configuration.new_external_tool(course)
+              t.save!
+              t
+            end
+
+            before { course_tool }
+
+            it 'destroys associated tools on the current shard' do
+              developer_key.destroy
+              expect(subject).to be_empty
+            end
+          end
+        end
       end
     end
   end

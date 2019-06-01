@@ -705,6 +705,22 @@ describe "Accounts API", type: :request do
       expect(c2_hash['teacher_count']).to eq 2
     end
 
+    it "should return a better teacher count if a teacher is in too many sections" do
+      @c1 = course_with_teacher(:account => @a1, :course_name => 'c1').course
+      s2 = @c1.course_sections.create!
+      # should not think there are two teachers if one is in multiple sections
+      @c1.enroll_teacher(@teacher, :section => s2, :allow_multiple_enrollments => true)
+      @c2 = course_with_teacher(:account => @a1, :course_name => 'c2', :user => @teacher).course
+
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=teachers&teacher_limit=1",
+        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+          :format => 'json', :include => ['teachers'], :teacher_limit => "1" })
+      [@c1, @c2].each do |c|
+        expect(json.detect{|h| h['id'] == c.id}['teachers'].map{|t| t['id']}).to eq [@teacher.id]
+      end
+    end
+
     describe 'sort' do
       before :once do
         @me = @user

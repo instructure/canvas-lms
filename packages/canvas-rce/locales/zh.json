@@ -1,4 +1,25 @@
 {
+  "add_8523c19b": {
+    "message": "添加"
+  },
+  "align_11050992": {
+    "message": "协调"
+  },
+  "align_center_ca078feb": {
+    "message": "居中对齐"
+  },
+  "align_left_e9f1f93b": {
+    "message": "左对齐"
+  },
+  "align_right_9bad3ac1": {
+    "message": "右对齐"
+  },
+  "all_4321c3a1": {
+    "message": "全部"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "按字母顺序"
+  },
   "alternative_text_a834dcad": {
     "message": "替代文本："
   },
@@ -44,6 +65,9 @@
   "choose_usage_rights_33683854": {
     "message": "选择使用权限..."
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "圆形无序列表"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "单击任何文件以插入该文件的下载链接。"
   },
@@ -65,11 +89,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "单击以插入指向该项目的链接。"
   },
+  "close_d634289d": {
+    "message": "关闭"
+  },
   "close_flickr_form_b32e600a": {
     "message": "关闭 Flickr 窗体"
   },
   "collaborations_5c56c15f": {
     "message": "协作"
+  },
+  "computer_1d7dfa6f": {
+    "message": "计算机"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "内容子类型"
+  },
+  "content_type_2cf90d95": {
+    "message": "内容类型"
   },
   "copyright_holder_66ee111": {
     "message": "版权持有者："
@@ -92,8 +128,23 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons 许可证："
   },
+  "date_added_ed5ad465": {
+    "message": "按添加日期排序"
+  },
+  "date_published_371c4ad0": {
+    "message": "发布日期"
+  },
   "decorative_image_fde98579": {
     "message": "装饰图片"
+  },
+  "decrease_indent_de6343ab": {
+    "message": "减少缩进"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "默认项目符号无序列表"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "默认数字有序列表"
   },
   "discussions_a5f96392": {
     "message": "讨论"
@@ -101,11 +152,17 @@
   "discussions_index_6c36ced": {
     "message": "讨论索引"
   },
+  "documents_81393201": {
+    "message": "文档"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "搜索搜索条件"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "为此图片输入替代文本"
+  },
+  "external_links_3d9f074e": {
+    "message": "外部链接"
   },
   "file_upload_form_4aaad554": {
     "message": "文件上传窗体"
@@ -125,6 +182,9 @@
   "group_navigation_99f191a": {
     "message": "小组导航"
   },
+  "header_f28f73db": {
+    "message": "标题"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "我已获得使用此文件的权限。"
   },
@@ -137,8 +197,14 @@
   "image_upload_form_7b74079a": {
     "message": "图片上传窗体"
   },
+  "image_url_2aee2734": {
+    "message": "图像 URL"
+  },
   "images_7ce26570": {
     "message": "图像"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "增加缩进"
   },
   "insert_equella_links_49a8dacd": {
     "message": "插入 Equella 链接"
@@ -161,9 +227,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "链接至小组中的其它内容。"
   },
-  "link_to_url_52dd935c": {
-    "message": "URL 链接"
-  },
   "links_14b70841": {
     "message": "链接"
   },
@@ -182,17 +245,32 @@
   "loading_folders_8d4d5d5a": {
     "message": "正在加载文件夹..."
   },
+  "loading_more_results_def6df65": {
+    "message": "正在载入更多的结果..."
+  },
+  "media_af190855": {
+    "message": "媒体"
+  },
   "modules_c4325335": {
     "message": "单元"
   },
   "no_results_940393cf": {
     "message": "无结果。"
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "有序列表和无序列表"
+  },
   "pages_e5414c2c": {
     "message": "页面"
   },
+  "paragraph_5e5ad8eb": {
+    "message": "段落"
+  },
   "people_b4ebb13c": {
     "message": "人员"
+  },
+  "preformatted_d0670862": {
+    "message": "预定义格式"
   },
   "quizzes_7e598f57": {
     "message": "测验"
@@ -212,6 +290,30 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "选择您的文件要上传至其中的文件夹"
   },
+  "small_header_168fb9f9": {
+    "message": "小标题"
+  },
+  "something_went_wrong_89195131": {
+    "message": "出了些问题。"
+  },
+  "sort_by_e75f9e3e": {
+    "message": "排序"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "方形无序列表"
+  },
+  "subheader_2b87606d": {
+    "message": "子标题"
+  },
+  "submit_a3cc6859": {
+    "message": "提交"
+  },
+  "subscript_59744f96": {
+    "message": "下标"
+  },
+  "superscript_8cb349a2": {
+    "message": "上标"
+  },
   "syllabus_f191f65b": {
     "message": "教学大纲"
   },
@@ -230,6 +332,9 @@
   "tray_839df38a": {
     "message": "托盘"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "上传"
   },
@@ -238,6 +343,18 @@
   },
   "upload_a_new_image_890df275": {
     "message": "上传新图片"
+  },
+  "upload_image_6120b609": {
+    "message": "上传图像"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "大写字母有序列表"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "大写罗马数字有序列表"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "使用权限："

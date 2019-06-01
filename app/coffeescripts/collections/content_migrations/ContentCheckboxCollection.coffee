@@ -15,16 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  '../../models/content_migrations/ContentCheckbox'
-], (Backbone, CheckboxModel) -> 
-  class ContentCheckboxCollection extends Backbone.Collection
-    @optionProperty 'courseID'
-    @optionProperty 'migrationID'
-    @optionProperty 'isTopLevel'
-    @optionProperty 'ariaLevel'
+import Backbone from 'Backbone'
+import CheckboxModel from '../../models/content_migrations/ContentCheckbox'
 
-    # This is the default url. This can change for sub-level checkbox collections
-    url: -> "/api/v1/courses/#{@courseID}/content_migrations/#{@migrationID}/selective_data"
-    model: CheckboxModel
+export default class ContentCheckboxCollection extends Backbone.Collection
+  @optionProperty 'courseID'
+  @optionProperty 'migrationID'
+  @optionProperty 'isTopLevel'
+  @optionProperty 'ariaLevel'
+
+  # This is the default url. This can change for sub-level checkbox collections
+  url: -> "/api/v1/courses/#{@courseID}/content_migrations/#{@migrationID}/selective_data"
+  model: CheckboxModel

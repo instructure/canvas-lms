@@ -31,7 +31,7 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
         })
       ),
       onAction: () => ed.execCommand("instructureRecord"),
-      icon: "video icon-video"
+      icon: "video"
     });
   }
 });

@@ -27,10 +27,9 @@ export default function Description() {
     <Fragment>
       <View as="p" margin="0 0 small">
         <Text>
-          {I18n.t(`
-            While the grades for this assignment are hidden, students will not
-            receive new notifications about or be able to see:
-          `)}
+          {I18n.t(
+            'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:'
+          )}
         </Text>
       </View>
 
@@ -46,19 +45,13 @@ export default function Description() {
 
       <View as="p" margin="0 0 small">
         <Text>
-          {I18n.t(`
-            Students will be able to see that the grades for this assignment
-            are hidden.
-          `)}
+          {I18n.t('Students will be able to see that the grades for this assignment are hidden.')}
         </Text>
       </View>
 
       <View as="p">
         <Text>
-          {I18n.t(`
-            You can begin sending notifications again by clicking the Post
-            Grades link.
-          `)}
+          {I18n.t('You can begin sending notifications again by clicking the Post Grades link.')}
         </Text>
       </View>
     </Fragment>

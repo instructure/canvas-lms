@@ -32,7 +32,7 @@ export default class Placement extends React.Component {
   constructor (props) {
     super(props);
     let placement
-    if (this.specialTypes.includes(props.placementName)) {
+    if (this.alwaysDeeplinking.includes(props.placementName)) {
       placement =  {...props.placement, message_type: 'LtiDeepLinkingRequest' }
     } else if (!props.placement.message_type) {
       placement =  {...props.placement, message_type: 'LtiResourceLinkRequest' }
@@ -43,12 +43,29 @@ export default class Placement extends React.Component {
     this.state = { placement }
   }
 
-  get specialTypes() {
-    return ["editor_button"]
+  alwaysDeeplinking = ["editor_button", "migration_selection", "homework_submission"]
+
+  canBeEither = ["assignment_selection", "link_selection"]
+
+  isAlwaysDeeplinking (placementName) {
+    return this.alwaysDeeplinking.includes(placementName)
+  }
+
+  messageTypeSelectable (placementName) {
+    return this.canBeEither.includes(placementName)
+  }
+
+  isSpecialType (placementName) {
+    return this.isAlwaysDeeplinking(placementName) ||
+      this.state.placement.message_type === "LtiDeepLinkingRequest" && this.messageTypeSelectable(placementName)
   }
 
   generateToolConfigurationPart = () => {
     return this.state.placement
+  }
+
+  valid = () => {
+    return true
   }
 
   handleTargetLinkUriChange = e => {
@@ -81,7 +98,6 @@ export default class Placement extends React.Component {
   render() {
     const { placement } = this.state;
     const { placementName, displayName } = this.props;
-    const isSpecialType = this.specialTypes.includes(placementName)
 
     return <View as="div" margin="medium 0">
       <ToggleDetails
@@ -96,7 +112,7 @@ export default class Placement extends React.Component {
             description={<ScreenReaderContent>{I18n.t("Placement Values")}</ScreenReaderContent>}
           >
             {
-              isSpecialType
+              this.isSpecialType(placementName)
                 ? <Alert
                     variant="warning"
                     margin="small"
@@ -121,7 +137,7 @@ export default class Placement extends React.Component {
                 description={I18n.t("Select Message Type")}
                 required
                 onChange={this.handleMessageTypeChange}
-                disabled={isSpecialType}
+                disabled={!this.messageTypeSelectable(placementName)}
               >
                 <RadioInput
                   value="LtiDeepLinkingRequest"
@@ -156,13 +172,13 @@ export default class Placement extends React.Component {
             >
               <TextInput
                 name={`${placementName}_selection_height`}
-                value={placement.selection_height}
+                value={placement.selection_height && placement.selection_height.toString()}
                 label={I18n.t("Selection Height")}
                 onChange={this.handleSelectionHeightChange}
               />
               <TextInput
                 name={`${placementName}_selection_width`}
-                value={placement.selection_width}
+                value={placement.selection_width && placement.selection_width.toString()}
                 label={I18n.t("Selection Width")}
                 onChange={this.handleSelectionWidthChange}
               />

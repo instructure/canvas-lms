@@ -40,6 +40,8 @@ describe DeveloperKeysController do
       end
 
       context 'with a session' do
+        let(:expected_id) { json_parse(response.body).first['id'] }
+
         before do
           user_session(@admin)
         end
@@ -57,11 +59,16 @@ describe DeveloperKeysController do
           end
         end
 
+        it 'Should set LTI_1_3_ENABLED to true' do
+          get 'index', params: { account_id: Account.site_admin.id }
+          expect(assigns.dig(:js_env, :LTI_1_3_ENABLED)).to eq true
+        end
+
         it 'should return the list of developer keys' do
           dk = DeveloperKey.create!
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: { account_id: Account.site_admin.id }, format: :json
           expect(response).to be_successful
-          expect(assigns[:keys]).to be_include(dk)
+          expect(expected_id).to eq(dk.global_id)
         end
 
         it 'includes valid LTI scopes in js env' do
@@ -87,23 +94,23 @@ describe DeveloperKeysController do
         it 'should not include deleted keys' do
           dk = DeveloperKey.create!
           dk.destroy
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: { account_id: Account.site_admin.id }, format: :json
           expect(response).to be_successful
-          expect(assigns[:keys]).not_to be_include(dk)
+          expect(expected_id).not_to eq(dk.global_id)
         end
 
         it 'should include inactive keys' do
           dk = DeveloperKey.create!
           dk.deactivate!
-          get 'index', params: { account_id: Account.site_admin.id }
+          get 'index', params: { account_id: Account.site_admin.id }, format: :json
           expect(response).to be_successful
-          expect(assigns[:keys]).to be_include(dk)
+          expect( json_parse(response.body).second['id']).to eq(dk.global_id)
         end
 
         it "should include the key's 'vendor_code'" do
           DeveloperKey.create!(vendor_code: 'test_vendor_code')
-          get 'index', params: { account_id: Account.site_admin.id }
-          expect(assigns[:keys].first.vendor_code).to eq 'test_vendor_code'
+          get 'index', params: { account_id: Account.site_admin.id }, format: :json
+          expect(json_parse(response.body).first['vendor_code']).to eq 'test_vendor_code'
         end
 
         it "should include the key's 'visibility'" do
@@ -116,8 +123,8 @@ describe DeveloperKeysController do
 
         it 'includes non-visible keys created in site admin' do
           site_admin_key = DeveloperKey.create!(name: 'Site Admin Key', visible: false)
-          get 'index', params: { account_id: 'site_admin' }
-          expect(assigns[:keys]).to eq [site_admin_key]
+          get 'index', params: { account_id: 'site_admin' }, format: :json
+          expect(expected_id).to eq site_admin_key.global_id
         end
 
         context 'with inherited param' do
@@ -290,10 +297,17 @@ describe DeveloperKeysController do
     end
 
     describe '#index' do
+      let(:expected_id) { json_parse(response.body).first['id'] }
+
       before do
         site_admin_key
         root_account_key
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+      end
+
+      it 'Should set LTI_1_3_ENABLED to false' do
+        get 'index', params: {account_id: sub_account.id}
+        expect(assigns.dig(:js_env, :LTI_1_3_ENABLED)).to be_falsey
       end
 
       it 'responds with not found if the account is a sub account' do
@@ -304,32 +318,32 @@ describe DeveloperKeysController do
 
       it 'does not inherit site admin keys if feature flag is off' do
         site_admin_key.update!(visible: true)
-        get 'index', params: {account_id: test_domain_root_account.id}
-        expect(assigns[:keys]).to match_array [root_account_key]
+        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        expect(expected_id).to eq root_account_key.global_id
       end
 
       it 'does not include non-visible keys from site admin' do
-        get 'index', params: {account_id: test_domain_root_account.id}
-        expect(assigns[:keys]).to match_array [root_account_key]
+        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        expect(expected_id).to eq root_account_key.global_id
       end
 
       it 'does not include visible keys from site admin' do
         site_admin_key.update!(visible: true)
-        get 'index', params: {account_id: test_domain_root_account.id}
-        expect(assigns[:keys]).to match_array [root_account_key]
+        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        expect(expected_id).to eq root_account_key.global_id
       end
 
       it 'includes non-visible keys created in the current context' do
         root_account_key.update!(visible: false)
-        get 'index', params: {account_id: test_domain_root_account.id}
-        expect(assigns[:keys]).to match_array [root_account_key]
+        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        expect(expected_id).to eq root_account_key.global_id
       end
 
       context 'with "inherited" parameter' do
         it 'does not include account developer keys' do
           root_account_key
-          get 'index', params: {account_id: test_domain_root_account.id, inherited: true}
-          expect(assigns[:keys]).to be_blank
+          get 'index', params: {account_id: test_domain_root_account.id, inherited: true}, format: :json
+          expect(json_parse(response.body)).to be_blank
         end
       end
 
@@ -363,10 +377,10 @@ describe DeveloperKeysController do
           user_session(root_account_admin)
 
           root_account_shard.activate do
-            get 'index', params: {account_id: root_account.id, inherited: true}
+            get 'index', params: {account_id: root_account.id, inherited: true}, format: :json
           end
 
-          expect(assigns[:keys]).to match_array [site_admin_key]
+          expect(expected_id).to eq site_admin_key.global_id
         end
       end
     end

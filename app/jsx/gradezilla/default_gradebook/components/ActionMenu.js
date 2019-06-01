@@ -27,7 +27,7 @@ import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import tz from 'timezone'
 import DateHelper from '../../../shared/helpers/dateHelper'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezillaActionMenu'
 import 'compiled/jquery.rails_flash_notifications'
 
 const {arrayOf, bool, func, object, shape, string} = PropTypes

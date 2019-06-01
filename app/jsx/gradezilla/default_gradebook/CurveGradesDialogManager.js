@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import 'compiled/jquery.rails_flash_notifications'
 
 const CurveGradesDialogManager = {

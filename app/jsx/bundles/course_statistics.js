@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import UserCollection from 'compiled/collections/UserCollection'
 import RecentStudentCollectionView from 'compiled/views/RecentStudents/RecentStudentCollectionView'
+import 'jqueryui/tabs'
 
 $(() => {
   $('#reports-tabs').tabs().show()

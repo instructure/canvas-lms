@@ -15,15 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  '../jquery/sticky'
-], ($) ->
+import '../jquery/sticky'
 
-  # Remember, you must define a toolbar with data attribute 'data-sticky'
-  # for this to work. Also don't forget to create your own styles for the 
-  # sticky class that gets added to the dom element
-
+# Remember, you must define a toolbar with data attribute 'data-sticky'
+# for this to work. Also don't forget to create your own styles for the
+# sticky class that gets added to the dom element
+export default
   afterRender: ->
     @stickyHeader.remove() if @stickyHeader
     @stickyHeader = @$('[data-sticky]').sticky()

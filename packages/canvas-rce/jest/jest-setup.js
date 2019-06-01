@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ // Several components use aphrodite, which tries to manipulate the dom
+ // on a timer which expires after the test completes and the document no longer exists
+import {StyleSheetTestUtils} from 'aphrodite'
+StyleSheetTestUtils.suppressStyleInjection()
+
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
 
@@ -26,6 +31,10 @@ if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
     value: require('@sheerun/mutationobserver-shim')
   })
+}
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'createObjectURL', { value: ()=> {}})
 }
 
 window.scroll = () => {}

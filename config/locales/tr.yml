@@ -1386,7 +1386,7 @@ tr:
         one: "İşlenmeyi bekleyen %{count} toplu işlem."
         other: "İşlenmeyi bekleyen %{count} toplu işlem."
       pending_batches_title: "Bekleyen Toplu İşlemler"
-      process_data_button: "İşlem Verisi"
+      process_data_button: "Veriyi İşle"
       select_file_instructions: |-
           İçeri aktarmak istediğiniz zip dosyasını seçin.
           Bu zip dosyalarının oluşturulması ile ilgili açıklama için [lütfen bu
@@ -1765,7 +1765,7 @@ tr:
   all_students_have_taken_the_quiz_b558f8b4: "Tüm öğrenciler bu kısa sınavı aldı"
   all_students_have_taken_the_survey_494f9f42: "Tüm öğrenciler bu anketi aldı"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Tüm gönderilerin seçilmiş bir notu olmalı."
-  all_terms_cd27b0fb: "Tüm Koşullar"
+  all_terms_cd27b0fb: "Tüm Dönemler"
   all_timezones_5e8afa7b: "Tüm zaman dilimleri"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Tüm ağırlıklar 0'a eşit ya da daha büyük olmalıdır"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Bir moderatör seçili gönderiler için çoklu bağımsız notları inceleyebilsin"
@@ -6269,7 +6269,7 @@ tr:
   deactivate_this_key_3e79a2b5: "Bu anahtarı etkisiz kıl"
   deactivate_user_86c09036: "Kullanıcıyı etkisiz kıl"
   debugging_f98fcd74: "Hata  Ayıklaması"
-  decaying_average_8bf6a0dd: "Düşüş Ortalaması"
+  decaying_average_8bf6a0dd: "Azalan Ortalama"
   decorative_image_3c28aa7d: "Dekoratif Görsel"
   decrease_indent_d9cf469d: "İçerden başlatma sınırını azalt"
   decrease_indent_de6343ab: "İçerden başlatma sınırını azalt"
@@ -11747,6 +11747,7 @@ tr:
   more_information_3dfb76b5: "Daha fazla bilgi "
   more_than_999_submissions_need_grading_bc087dd0: "999'dan fazla gönderinin notlandırılması gerek"
   more_than_a19b440: "%{more_than}+"
+  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "En güncel puan yeterlik ağırlığının %{calculation_int} olarak alınır ve diğer tüm sonuçların%{remainder}hesaplanır. Tek bir puan varsa alınan tek puan gösterilir."
   most_recent_score_13a87e8c: "En Güncel Puan"
   move_abf00365: Taşı
   move_assignment_name_aa253f26: "%{name} Ödevini Taşı"
@@ -14820,7 +14821,7 @@ tr:
   recent_activity_51239235: "En Son Etkinlik"
   recent_student: 
     last_logged_in: "son oturum %{last_login}"
-  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Düşüş Ortalaması"
+  recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Azalan Ortalama"
   recently_deleted_courses_title: "Son Silinen Dersler"
   recipient_input: 
     context_search_placeholder: "Bir isim, ders ya da grup girin"

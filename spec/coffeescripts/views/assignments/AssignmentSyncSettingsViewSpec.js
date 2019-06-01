@@ -16,28 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
 import Course from 'compiled/models/Course'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
 import AssignmentSyncSettingsView from 'compiled/views/assignments/AssignmentSyncSettingsView'
-import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import 'helpers/jquery.simulate'
 
-const group = (opts = {}) =>
-  new AssignmentGroup({
-    group_weight: 50,
-    ...opts
-  })
-const assignmentGroups = function() {
-  this.groups = new AssignmentGroupCollection([group(), group()])
-}
 const createView = function(opts = {}) {
-  this.course = new Course()
-  this.course.urlRoot = '/courses/1'
+  const course = new Course()
+  course.urlRoot = '/courses/1'
   const view = new AssignmentSyncSettingsView({
-    model: this.course,
+    model: course,
     userIsAdmin: opts.userIsAdmin,
     sisName: 'PowerSchool'
   })

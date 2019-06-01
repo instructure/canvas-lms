@@ -71,6 +71,7 @@ export default class EditExternalToolButton extends React.Component {
     const success = res => {
       const updatedTool = _.extend(this.state.tool, res)
       // refresh app config index with latest tool state
+      store.reset()
       store.fetch()
       this.setState({updatedTool})
       this.closeModal()

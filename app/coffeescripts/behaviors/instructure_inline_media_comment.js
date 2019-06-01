@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!media_comments'
+import I18n from 'i18n!instructure_inline_media_comment'
 import $ from 'jquery'
 import preventDefault from '../fn/preventDefault'
 import htmlEscape from 'str/htmlEscape'

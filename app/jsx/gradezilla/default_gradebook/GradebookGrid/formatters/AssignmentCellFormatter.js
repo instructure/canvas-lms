@@ -18,7 +18,7 @@
 
 // xsslint safeString.method I18n.t
 
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'

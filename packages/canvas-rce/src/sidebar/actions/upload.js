@@ -141,6 +141,17 @@ export function fetchFolders(bookmark) {
   };
 }
 
+export function uploadToMediaFolder(tabContext, fileMetaProps) {
+  return (dispatch, getState) => {
+    const { source, jwt, host, contextId, contextType } = getState();
+    return source.fetchMediaFolder({ jwt, host, contextId, contextType })
+    .then(({folders}) => {
+      fileMetaProps.parentFolderId = folders[0].id
+      dispatch(uploadPreflight(tabContext, fileMetaProps))
+    })
+  }
+}
+
 export function setUsageRights(source, fileMetaProps, results) {
   const { usageRights } = fileMetaProps;
   if (usageRights) {

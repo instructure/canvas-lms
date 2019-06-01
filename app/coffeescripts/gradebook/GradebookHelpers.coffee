@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'i18n!gradebook'
-  'jsx/gradebook/shared/constants'
-], ($, I18n, GradebookConstants) ->
+import $ from 'jquery'
+import I18n from 'i18n!gradebookHelpers'
+import GradebookConstants from 'jsx/gradebook/shared/constants'
+
+export default {
   FLASH_ERROR_CLASS: '.ic-flash-error'
 
   flashMaxLengthError: () ->
@@ -39,3 +39,4 @@ define [
 
   textareaIsLessThanOrEqualToMaxLength: (textareaLength) ->
     textareaLength <= GradebookConstants.MAX_NOTE_LENGTH
+}

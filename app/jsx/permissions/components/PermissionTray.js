@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import IconX from '@instructure/ui-icons/lib/Solid/IconX'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
@@ -72,7 +72,7 @@ export default function PermissionTray(props) {
         <IconX title={I18n.t('Close')} />
       </Button>
 
-      <Container as="div" padding="small small x-large small">
+      <View as="div" padding="small small x-large small">
         <Heading level="h3" as="h2" margin="0 0 medium 0">
           {props.label}
         </Heading>
@@ -109,7 +109,7 @@ export default function PermissionTray(props) {
             ))}
           </RoleTrayTable>
         )}
-      </Container>
+      </View>
     </Tray>
   )
 }

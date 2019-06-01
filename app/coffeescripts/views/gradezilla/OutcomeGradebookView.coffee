@@ -16,40 +16,38 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!gradezilla'
-  'jquery'
-  'underscore'
-  'react'
-  'react-dom'
-  'Backbone'
-  'vendor/slickgrid'
-  '../../gradezilla/OutcomeGradebookGrid'
-  '../../userSettings'
-  '../gradezilla/CheckboxView'
-  '../gradebook/SectionMenuView'
-  'jsx/gradezilla/default_gradebook/components/SectionFilter'
-  'jst/gradezilla/outcome_gradebook'
-  'vendor/jquery.ba-tinypubsub'
-  '../../jquery.rails_flash_notifications'
-  'jquery.instructure_misc_plugins'
-], (I18n, $, _, React, ReactDOM, {View}, Slick, Grid, userSettings, CheckboxView, SectionMenuView, SectionFilter, template, cellTemplate) ->
+import I18n from 'i18n!gradezillaOutcomeGradebookView'
+import $ from 'jquery'
+import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {View} from 'Backbone'
+import Slick from 'vendor/slickgrid'
+import Grid from '../../gradezilla/OutcomeGradebookGrid'
+import userSettings from '../../userSettings'
+import CheckboxView from './CheckboxView'
+import SectionMenuView from '../gradebook/SectionMenuView'
+import SectionFilter from 'jsx/gradezilla/default_gradebook/components/SectionFilter'
+import template from 'jst/gradezilla/outcome_gradebook'
+import 'vendor/jquery.ba-tinypubsub'
+import '../../jquery.rails_flash_notifications'
+import 'jquery.instructure_misc_plugins'
 
-  Dictionary =
-    exceedsMastery:
-      color : '#127A1B'
-      label : I18n.t('Exceeds Mastery')
-    mastery:
-      color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
-      label : I18n.t('Meets Mastery')
-    nearMastery:
-      color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
-      label : I18n.t('Near Mastery')
-    remedial:
-      color : '#EE0612'
-      label : I18n.t('Well Below Mastery')
+Dictionary =
+  exceedsMastery:
+    color : '#127A1B'
+    label : I18n.t('Exceeds Mastery')
+  mastery:
+    color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
+    label : I18n.t('Meets Mastery')
+  nearMastery:
+    color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
+    label : I18n.t('Near Mastery')
+  remedial:
+    color : '#EE0612'
+    label : I18n.t('Well Below Mastery')
 
-  class OutcomeGradebookView extends View
+export default class OutcomeGradebookView extends View
 
     tagName: 'div'
 

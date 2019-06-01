@@ -152,6 +152,10 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
+  fetchMediaFolder(props) {
+    return this.fetchPage(this.uriFor('folders/media', props))
+  }
+
   fetchImages(props) {
     if (props.bookmark) {
       return this.apiFetch(props.bookmark, headerFor(this.jwt))
@@ -318,7 +322,7 @@ class RceApiSource {
     }
     if (typeof host !== 'string') {
       host = ''
-    } else if (host.substr(0, 4) !== 'http') {
+    } else if (host && host.substr(0, 4) !== 'http') {
       host = `//${host}`
       let windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
       if (

@@ -85,7 +85,7 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
 
   return ajaxLib.post(preflightUrl, preflightData)
     .catch(preflightFailed)
-    .then((response) => exports.completeUpload(response.data, file, { ajaxLib }));
+    .then((response) => completeUpload(response.data, file, { ajaxLib }));
 }
 
 /*
@@ -184,3 +184,23 @@ export function completeUpload(preflightResponse, file, options={}) {
     }
   });
 }
+
+/*
+ * This is a helper file for uploading a file to a submissions comment
+ * for a logged in user before actually creating the submissions comment
+ *
+ * @returns an array of attachment objects. The attachment objects contain ids
+ * that a submissions comment can link to
+ */
+export async function submissionCommentAttachmentsUpload(files, courseId, assignmentId) {
+  const preflightFileUploadUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/self/comments/files`
+  const uploadPromises = files.map(currentFile => {
+    const preflightFileData = {
+      name: currentFile.name,
+      content_type: currentFile.type
+    }
+    return uploadFile(preflightFileUploadUrl, preflightFileData, currentFile)
+  })
+  return Promise.all(uploadPromises)
+}
+

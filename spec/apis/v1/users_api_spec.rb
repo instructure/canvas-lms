@@ -2642,6 +2642,18 @@ PUBLIC
 
       expect(json.count).to eq 1
     end
+
+    it 'will include the assignment when asked for' do
+      json = api_call_as_user(@student1, :get, "/api/v1/users/#{@student1.id}/graded_submissions?include[]=assignment", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json',
+        include: ['assignment']
+      })
+      expect(json.count).to eq 3
+      expect(json[0]['assignment']['id']).to eq @most_recent_submission.assignment.id
+    end
   end
 
 end

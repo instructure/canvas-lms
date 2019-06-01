@@ -15,106 +15,109 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
 
-  class FeatureFlag extends Backbone.Model
 
-    LABEL:
-      beta        : { cssClass: 'info',      name: 'beta'        }
-      hidden      : { cssClass: 'default',   name: 'hidden'      }
-      development : { cssClass: 'important', name: 'development' }
+export default class FeatureFlag extends Backbone.Model
 
-    resourceName: 'features'
+  LABEL:
+    beta        : { cssClass: 'info',      name: 'beta'        }
+    hidden      : { cssClass: 'default',   name: 'hidden'      }
+    development : { cssClass: 'important', name: 'development' }
 
-    urlRoot: ->
-      "/api/v1/#{@contextType()}s/#{@contextId()}/features/flags"
+  resourceName: 'features'
 
-    flag: ->
-      @get('feature_flag')
+  urlRoot: ->
+    "/api/v1/#{@contextType()}s/#{@contextId()}/features/flags"
 
-    state: ->
-      @flag().state
+  flag: ->
+    @get('feature_flag')
 
-    isAllowed: ->
-      @state() == 'allowed'
+  state: ->
+    @flag().state
 
-    isOn: ->
-      @state() == 'on'
+  isAllowed: ->
+    @state() == 'allowed'
 
-    isOff: ->
-      _.include(['off', 'hidden'], @state()) or (!@currentContextIsAccount() and @isAllowed())
+  isOn: ->
+    @state() == 'on'
 
-    isHidden: ->
-      @flag().hidden
+  isOff: ->
+    _.include(['off', 'hidden'], @state()) or (!@currentContextIsAccount() and @isAllowed())
 
-    isLocked: ->
-      @flag().locked
+  isHidden: ->
+    @flag().hidden
 
-    isSiteAdmin: ->
-      !!ENV.ACCOUNT?.site_admin
+  isLocked: ->
+    @flag().locked
 
-    contextType: ->
-      ENV.context_asset_string.split('_')[0]
+  isSiteAdmin: ->
+    !!ENV.ACCOUNT?.site_admin
 
-    contextId: ->
-      ENV.context_asset_string.split('_')[1]
+  contextType: ->
+    ENV.context_asset_string.split('_')[0]
 
-    isContext: (type) ->
-      @contextType() == type.toLowerCase()
+  contextId: ->
+    ENV.context_asset_string.split('_')[1]
 
-    currentContextIsAccount: ->
-      ENV.context_asset_string.split('_')[0] == 'account'
+  isContext: (type) ->
+    @contextType() == type.toLowerCase()
 
-    warningFor: (action) ->
-      settings = @transitions()[action]
-      return if settings?.message then settings else false
+  currentContextIsAccount: ->
+    ENV.context_asset_string.split('_')[0] == 'account'
 
-    shouldDelete: (action) ->
-      @isHidden() && action == 'off'
+  warningFor: (action) ->
+    settings = @transitions()[action]
+    return if settings?.message then settings else false
 
-    updateState: (new_state) =>
-      if @shouldDelete(new_state)
-        $.ajaxJSON @url(), "DELETE", {}, =>
-          # get inherited state
-          $.ajaxJSON @url(), "GET", {}, (data) =>
-            @updateLocalState(data)
-      else
-        $.ajaxJSON @url(), "PUT", {state: new_state}, (data) =>
+  shouldDelete: (action) ->
+    @isHidden() && action == 'off'
+
+  updateState: (new_state) =>
+    if @shouldDelete(new_state)
+      $.ajaxJSON @url(), "DELETE", {}, =>
+        # get inherited state
+        $.ajaxJSON @url(), "GET", {}, (data) =>
           @updateLocalState(data)
+    else
+      $.ajaxJSON @url(), "PUT", {state: new_state}, (data) =>
+        @updateLocalState(data)
 
-    updateLocalState: (data) ->
-      @flag().state = data.state
-      @flag().transitions = data.transitions
+  updateLocalState: (data) ->
+    @flag().state = data.state
+    @flag().transitions = data.transitions
 
-    transitions: ->
-      @get('feature_flag').transitions
+  transitions: ->
+    @get('feature_flag').transitions
 
-    transitionLocked: (action) ->
-      settings = @transitions()[action]
-      # the button remains enabled if there's an associated message
-      return settings?.locked && !settings.message
+  transitionLocked: (action) ->
+    settings = @transitions()[action]
+    # the button remains enabled if there's an associated message
+    return settings?.locked && !settings.message
 
-    toJSON: ->
-      _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
-        isOff: @isOff(), isOn: @isOn(), isSiteAdmin: @isSiteAdmin() && !@isOn() && !@isLocked(),
-        currentContextIsAccount: @isContext('account'),
-        threeState: @currentContextIsAccount() && !@transitionLocked('allowed'),
-        disableOn: @isLocked() || @isSiteAdmin() || @transitionLocked('on'),
-        disableAllow: @isLocked() || @transitionLocked('allowed'),
-        disableOff: @isLocked() || @transitionLocked('off'),
-        disableToggle: @isLocked() || @transitionLocked('on') || @transitionLocked('off'))
+  toJSON: ->
+    _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
+      isOff: @isOff(), isOn: @isOn(), isSiteAdmin: @isSiteAdmin() && !@isOn() && !@isLocked(),
+      currentContextIsAccount: @isContext('account'),
+      threeState: @currentContextIsAccount() && !@transitionLocked('allowed'),
+      disableOn: @isLocked() || @isSiteAdmin() || @transitionLocked('on'),
+      disableAllow: @isLocked() || @transitionLocked('allowed'),
+      disableOff: @isLocked() || @transitionLocked('off'),
+      disableToggle: @isLocked() || @transitionLocked('on') || @transitionLocked('off'))
 
-    parse: (json) ->
-      _.extend(json, @attributes)
-      feature =
-        appliesTo: json.applies_to.toLowerCase()
-        id: json.feature
-        isExpanded: json.autoexpand
-        title: json.display_name
-        releaseOn: if json.enable_at then new Date(json.enable_at) else null
-        releaseNotesUrl: json.release_notes_url
-        labels: []
-      feature.labels.push(FeatureFlag::LABEL.beta)        if json.beta
-      feature.labels.push(FeatureFlag::LABEL.hidden)      if json.feature_flag.hidden
-      feature.labels.push(FeatureFlag::LABEL.development) if json.development
-      _.extend(json, feature)
+  parse: (json) ->
+    _.extend(json, @attributes)
+    feature =
+      appliesTo: json.applies_to.toLowerCase()
+      id: json.feature
+      isExpanded: json.autoexpand
+      title: json.display_name
+      releaseOn: if json.enable_at then new Date(json.enable_at) else null
+      releaseNotesUrl: json.release_notes_url
+      labels: []
+    feature.labels.push(FeatureFlag::LABEL.beta)        if json.beta
+    feature.labels.push(FeatureFlag::LABEL.hidden)      if json.feature_flag.hidden
+    feature.labels.push(FeatureFlag::LABEL.development) if json.development
+    _.extend(json, feature)

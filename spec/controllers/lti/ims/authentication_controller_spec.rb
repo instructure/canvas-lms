@@ -260,6 +260,17 @@ describe Lti::Ims::AuthenticationController do
           let(:expected_error) { "unauthorized_client" }
         end
       end
+
+      context 'when key has no bindings to the context' do
+        before do
+          developer_key.developer_key_account_bindings.destroy_all
+        end
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "Client not authorized in requested context" }
+          let(:expected_error) { "unauthorized_client" }
+        end
+      end
     end
 
     context 'when the developer key redirect uri does not match' do

@@ -55,6 +55,7 @@ describe('StudentView', () => {
 
     expect(defaultEnv).toEqual({
       assignmentUrl: '',
+      courseId: null,
       currentUser: null,
       modulePrereq: null,
       moduleUrl: ''
@@ -64,6 +65,7 @@ describe('StudentView', () => {
   it('renders with env params set', async () => {
     window.ENV = {
       context_asset_string: 'test_1',
+      COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
       PREREQS: {}
     }
@@ -72,6 +74,7 @@ describe('StudentView', () => {
 
     expect(env).toEqual({
       assignmentUrl: 'http://localhost/tests/1/assignments',
+      courseId: '1',
       currentUser: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
       modulePrereq: null,
       moduleUrl: 'http://localhost/tests/1/modules'

@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!grading_periods'
+import I18n from 'i18n!gradingPeriodSetsApi'
 import DateHelper from 'jsx/shared/helpers/dateHelper'
 import gradingPeriodsApi from './gradingPeriodsApi'
 import axios from 'axios'

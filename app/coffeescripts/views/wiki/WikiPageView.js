@@ -26,6 +26,7 @@ import WikiPageReloadView from './WikiPageReloadView'
 import PublishButtonView from '../PublishButtonView'
 import I18n from 'i18n!pages'
 import htmlEscape from 'str/htmlEscape'
+import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'prerequisites_lookup'
 import 'content_locks'
 
@@ -145,7 +146,7 @@ export default class WikiPageView extends Backbone.View {
     this.reloadView.on('reload', () => this.render())
     this.reloadView.pollForChanges()
 
-    return $.publish('userContent/change')
+    return publish('userContent/change')
   }
 
   deleteWikiPage(ev) {

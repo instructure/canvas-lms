@@ -66,6 +66,7 @@ module Login::Shared
       }
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
+    @current_user = user
 
     respond_to do |format|
       if (oauth = session[:oauth2])

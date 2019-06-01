@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!blueprint_settings'
+import I18n from 'i18n!blueprint_settingsMigrationOptions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from '../../shared/select'

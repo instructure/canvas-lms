@@ -6,4 +6,9 @@
     <%= t :subject, "New Discussion - %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
 <% end %>
 
-<%= CanvasTextHelper.truncate_text(html_to_text(asset.message, :base_url => dashboard_url), :max_length => 200) %>
+<% available_from = asset.available_from_for(user) %>
+<% if available_from && available_from > Time.now.utc %>
+  <%= t("Discussion content is locked or not yet available") %>
+<% else %>
+  <%= CanvasTextHelper.truncate_text(html_to_text(asset.message, :base_url => dashboard_url), :max_length => 200) %>
+<% end %>

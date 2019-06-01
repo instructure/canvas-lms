@@ -15,17 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'underscore'
-  'Backbone'
-  '../../util/Popover'
-  '../../models/grade_summary/Outcome'
-  'd3'
-  'i18nObj'
-  'jst/outcomes/outcomePopover'
-], (_, {View}, Popover, Outcome, d3, I18n, popover_template) ->
+import _ from 'underscore'
+import {View} from 'Backbone'
+import Popover from '../../util/Popover'
+import Outcome from '../../models/grade_summary/Outcome'
+import d3 from 'd3'
+import I18n from 'i18nObj'
+import popover_template from 'jst/outcomes/outcomePopover'
 
-  class OutcomeColumnView extends View
+export default class OutcomeColumnView extends View
 
     popover_template: popover_template
 

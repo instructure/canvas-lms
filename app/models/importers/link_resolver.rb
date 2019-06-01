@@ -56,7 +56,8 @@ module Importers
         type = 'context_modules' if type == 'modules'
         type = 'pages' if type == 'wiki'
         if type == 'pages'
-          link[:new_value] = "#{context_path}/pages/#{migration_id}#{link[:query]}"
+          query = resolve_module_item_query(context, link[:query])
+          link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == 'attachments'
           if att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"

@@ -24,7 +24,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import IconEnd from '@instructure/ui-icons/lib/Solid/IconEnd'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
 
 const themeOverrides = {

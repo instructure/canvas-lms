@@ -50,10 +50,12 @@ DOC
       %>
 </div>
 <%= form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
-  <div style="float: <%= direction('right') %>;">
-    <a href="#" class="toggle_views_link toggle_html_editor_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
-    <a href="#" class="toggle_views_link toggle_rich_editor_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
-  </div>
+  <% unless @context.feature_enabled?(:rce_enhancements) %>
+    <div style="float: <%= direction('right') %>;">
+      <a href="#" class="toggle_views_link toggle_html_editor_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
+      <a href="#" class="toggle_views_link toggle_rich_editor_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
+    </div>
+  <% end %>
   <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>

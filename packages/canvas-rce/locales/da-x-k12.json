@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Tilføj"
+  },
+  "all_4321c3a1": {
+    "message": "Alle"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alfabetisk"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst:"
   },
@@ -65,11 +74,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klik for at indsætte et link i dette element."
   },
+  "close_d634289d": {
+    "message": "Luk"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Luk Flickr-formular"
   },
   "collaborations_5c56c15f": {
     "message": "Samarbejde"
+  },
+  "computer_1d7dfa6f": {
+    "message": "Computer"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Indholdsundertype"
+  },
+  "content_type_2cf90d95": {
+    "message": "Indholdstype"
   },
   "copyright_holder_66ee111": {
     "message": "Rettighedshaver:"
@@ -91,6 +112,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Dato tilføjet"
+  },
+  "date_published_371c4ad0": {
+    "message": "Dato offentliggjort"
   },
   "decorative_image_fde98579": {
     "message": "Dekorativt billede"
@@ -161,9 +188,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Link til andet indhold i gruppen."
   },
-  "link_to_url_52dd935c": {
-    "message": "Link til URL"
-  },
   "links_14b70841": {
     "message": "Links"
   },
@@ -181,6 +205,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Indlæser mapper ..."
+  },
+  "media_af190855": {
+    "message": "Medier"
   },
   "modules_c4325335": {
     "message": "Forløb"
@@ -212,6 +239,12 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vælg en mappe at uploade din fil til"
   },
+  "sort_by_e75f9e3e": {
+    "message": "Sorter efter"
+  },
+  "submit_a3cc6859": {
+    "message": "Aflever"
+  },
   "syllabus_f191f65b": {
     "message": "Fagplan"
   },
@@ -230,6 +263,9 @@
   "tray_839df38a": {
     "message": "Bakke"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Upload"
   },
@@ -238,6 +274,12 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Upload et nyt billede"
+  },
+  "upload_image_6120b609": {
+    "message": "Upload billede"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Brugsrettigheder:"

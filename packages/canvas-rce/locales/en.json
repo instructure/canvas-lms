@@ -1,6 +1,21 @@
 {
+  "accessibility_a662153d": {
+    "message": "Accessibility"
+  },
   "add_8523c19b": {
     "message": "Add"
+  },
+  "align_11050992": {
+    "message": "Align"
+  },
+  "align_center_ca078feb": {
+    "message": "Align center"
+  },
+  "align_left_e9f1f93b": {
+    "message": "Align left"
+  },
+  "align_right_9bad3ac1": {
+    "message": "Align right"
   },
   "all_4321c3a1": {
     "message": "All"
@@ -55,6 +70,12 @@
   "choose_usage_rights_33683854": {
     "message": "Choose usage rights..."
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "circle unordered list"
+  },
+  "clear_upload_34efa419": {
+    "message": "Clear Upload"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Click any file to insert a download link for that file."
   },
@@ -84,6 +105,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Collaborations"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Collapse to hide { types }"
   },
   "computer_1d7dfa6f": {
     "message": "Computer"
@@ -125,6 +149,15 @@
   "decorative_image_fde98579": {
     "message": "Decorative image"
   },
+  "decrease_indent_de6343ab": {
+    "message": "Decrease indent"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "default bulleted unordered list"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "default numerical ordered list"
+  },
   "discussions_a5f96392": {
     "message": "Discussions",
     "description": "Title of Sidebar accordion tab containing links to discussions."
@@ -135,14 +168,32 @@
   "documents_81393201": {
     "message": "Documents"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Drag and drop, or click to browse your computer"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Due: Multiple Dates"
+  },
+  "due_when_7eed10c6": {
+    "message": "Due: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Enter the alternative text for this image"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Expand to see { types }"
+  },
+  "external_links_3d9f074e": {
+    "message": "External Links"
+  },
   "file_upload_form_4aaad554": {
     "message": "File Upload Form"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename } preview"
   },
   "files_c300e900": {
     "message": "Files",
@@ -161,6 +212,9 @@
     "message": "Group Navigation",
     "description": "Title of Sidebar accordion tab containing links to group pages."
   },
+  "header_f28f73db": {
+    "message": "Header"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "I have obtained permission to use this file."
   },
@@ -173,9 +227,15 @@
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
   },
+  "image_url_2aee2734": {
+    "message": "Image URL"
+  },
   "images_7ce26570": {
     "message": "Images",
     "description": "Title for RCE button to embed an image"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "Increase indent"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Insert Equella Links",
@@ -187,6 +247,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Insert Math Equation",
     "description": "Title for RCE button to insert a math equation"
+  },
+  "invalid_file_type_881cc9b2": {
+    "message": "Invalid file type"
   },
   "link_7262adec": {
     "message": "Link",
@@ -200,10 +263,6 @@
   },
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "Link to other content in the group."
-  },
-  "link_to_url_52dd935c": {
-    "message": "Link to URL",
-    "description": "Title for RCE button to insert links to a URL"
   },
   "links_14b70841": {
     "message": "Links",
@@ -224,6 +283,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Loading folders..."
   },
+  "loading_more_results_def6df65": {
+    "message": "Loading more results..."
+  },
   "media_af190855": {
     "message": "Media"
   },
@@ -234,12 +296,30 @@
   "no_results_940393cf": {
     "message": "No results."
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Ordered and Unordered Lists"
+  },
   "pages_e5414c2c": {
     "message": "Pages",
     "description": "Title of Sidebar accordion tab containing links to wiki pages."
   },
+  "paragraph_5e5ad8eb": {
+    "message": "Paragraph"
+  },
   "people_b4ebb13c": {
     "message": "People"
+  },
+  "posted_when_a578f5ab": {
+    "message": "Posted: { when }"
+  },
+  "preformatted_d0670862": {
+    "message": "Preformatted"
+  },
+  "published_c944a23d": {
+    "message": "published"
+  },
+  "published_when_302d8e23": {
+    "message": "Published: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Quizzes",
@@ -248,6 +328,9 @@
   "record_upload_media_5fdce166": {
     "message": "Record/Upload Media",
     "description": "Title for RCE button to insert or record media"
+  },
+  "remove_link_71c05bee": {
+    "message": "Remove link"
   },
   "search_280d00bd": {
     "message": "Search"
@@ -261,11 +344,29 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "small_header_168fb9f9": {
+    "message": "Small header"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Something went wrong."
+  },
   "sort_by_e75f9e3e": {
     "message": "Sort By"
   },
+  "square_unordered_list_b15ce93b": {
+    "message": "square unordered list"
+  },
+  "subheader_2b87606d": {
+    "message": "Subheader"
+  },
   "submit_a3cc6859": {
     "message": "Submit"
+  },
+  "subscript_59744f96": {
+    "message": "Subscript"
+  },
+  "superscript_8cb349a2": {
+    "message": "Superscript"
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
@@ -282,8 +383,20 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "This upload exceeds the file storage quota. Please speak to your system administrator."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "To Be Posted: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "To Do: { when }"
+  },
+  "toggle_raw_html_view_d1aaea9e": {
+    "message": "Toggle raw html view"
+  },
   "tray_839df38a": {
     "message": "Tray"
+  },
+  "unpublished_dfd8801": {
+    "message": "unpublished"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -297,14 +410,26 @@
   "upload_a_new_image_890df275": {
     "message": "Upload a new image"
   },
+  "upload_file_fd2361b8": {
+    "message": "Upload File"
+  },
   "upload_image_6120b609": {
     "message": "Upload Image"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "uppercase alphabetic ordered list"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "uppercase Roman numeral ordered list"
   },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Usage Right:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "View keyboard shortcuts"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "What would you like to call the new page?"

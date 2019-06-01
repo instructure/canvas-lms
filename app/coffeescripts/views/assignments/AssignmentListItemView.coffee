@@ -15,427 +15,425 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!assignments'
-  'Backbone'
-  'jquery'
-  'jsx/shared/conditional_release/CyoeHelper'
-  'jsx/move_item'
-  '../../models/Assignment'
-  '../PublishIconView'
-  '../LockIconView'
-  './DateDueColumnView'
-  './DateAvailableColumnView'
-  './CreateAssignmentView'
-  '../SisButtonView'
-  '../../fn/preventDefault'
-  'jst/assignments/AssignmentListItem'
-  'jst/assignments/_assignmentListItemScore'
-  '../../util/round'
-  './AssignmentKeyBindingsMixin'
-  'jqueryui/tooltip'
-  '../../behaviors/tooltip'
-  '../../jquery.rails_flash_notifications'
-], (I18n, Backbone, $, CyoeHelper, MoveItem, Assignment, PublishIconView, LockIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+import I18n from 'i18n!AssignmentListItemView'
+import Backbone from 'Backbone'
+import $ from 'jquery'
+import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import * as MoveItem from 'jsx/move_item'
+import Assignment from '../../models/Assignment'
+import PublishIconView from '../PublishIconView'
+import LockIconView from '../LockIconView'
+import DateDueColumnView from './DateDueColumnView'
+import DateAvailableColumnView from './DateAvailableColumnView'
+import CreateAssignmentView from './CreateAssignmentView'
+import SisButtonView from '../SisButtonView'
+import preventDefault from '../../fn/preventDefault'
+import template from 'jst/assignments/AssignmentListItem'
+import scoreTemplate from 'jst/assignments/_assignmentListItemScore'
+import round from '../../util/round'
+import AssignmentKeyBindingsMixin from './AssignmentKeyBindingsMixin'
+import 'jqueryui/tooltip'
+import '../../behaviors/tooltip'
+import '../../jquery.rails_flash_notifications'
 
-  class AssignmentListItemView extends Backbone.View
-    @mixin AssignmentKeyBindingsMixin
-    @optionProperty 'userIsAdmin'
+export default class AssignmentListItemView extends Backbone.View
+  @mixin AssignmentKeyBindingsMixin
+  @optionProperty 'userIsAdmin'
 
-    tagName: "li"
-    className: ->
-      "assignment#{if @canMove() then '' else ' sort-disabled'}"
-    template: template
+  tagName: "li"
+  className: ->
+    "assignment#{if @canMove() then '' else ' sort-disabled'}"
+  template: template
 
-    @child 'publishIconView',         '[data-view=publish-icon]'
-    @child 'lockIconView',            '[data-view=lock-icon]'
-    @child 'dateDueColumnView',       '[data-view=date-due]'
-    @child 'dateAvailableColumnView', '[data-view=date-available]'
-    @child 'editAssignmentView',      '[data-view=edit-assignment]'
-    @child 'sisButtonView',           '[data-view=sis-button]'
+  @child 'publishIconView',         '[data-view=publish-icon]'
+  @child 'lockIconView',            '[data-view=lock-icon]'
+  @child 'dateDueColumnView',       '[data-view=date-due]'
+  @child 'dateAvailableColumnView', '[data-view=date-available]'
+  @child 'editAssignmentView',      '[data-view=edit-assignment]'
+  @child 'sisButtonView',           '[data-view=sis-button]'
 
-    els:
-      '.edit_assignment': '$editAssignmentButton'
-      '.move_assignment': '$moveAssignmentButton'
+  els:
+    '.edit_assignment': '$editAssignmentButton'
+    '.move_assignment': '$moveAssignmentButton'
 
-    events:
-      'click .delete_assignment': 'onDelete'
-      'click .duplicate_assignment': 'onDuplicate'
-      'click .tooltip_link': preventDefault ->
-      'keydown': 'handleKeys'
-      'mousedown': 'stopMoveIfProtected'
-      'click .icon-lock': 'onUnlockAssignment'
-      'click .icon-unlock': 'onLockAssignment'
-      'click .move_assignment': 'onMove'
-      'click .duplicate-failed-retry': 'onDuplicateFailedRetry'
-      'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel'
-      'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
+  events:
+    'click .delete_assignment': 'onDelete'
+    'click .duplicate_assignment': 'onDuplicate'
+    'click .tooltip_link': preventDefault ->
+    'keydown': 'handleKeys'
+    'mousedown': 'stopMoveIfProtected'
+    'click .icon-lock': 'onUnlockAssignment'
+    'click .icon-unlock': 'onLockAssignment'
+    'click .move_assignment': 'onMove'
+    'click .duplicate-failed-retry': 'onDuplicateFailedRetry'
+    'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel'
+    'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
 
-    messages:
-      confirm: I18n.t('Are you sure you want to delete this assignment?')
-      ag_move_label: I18n.beforeLabel I18n.t('Assignment Group')
+  messages:
+    confirm: I18n.t('Are you sure you want to delete this assignment?')
+    ag_move_label: I18n.beforeLabel I18n.t('Assignment Group')
 
-    initialize: ->
-      super
-      @initializeChildViews()
+  initialize: ->
+    super
+    @initializeChildViews()
 
-      # we need the following line in order to access this view later
-      @model.assignmentView = @
+    # we need the following line in order to access this view later
+    @model.assignmentView = @
 
-      @model.on('change:hidden', @toggleHidden)
-      @model.set('disabledForModeration', !@canEdit())
+    @model.on('change:hidden', @toggleHidden)
+    @model.set('disabledForModeration', !@canEdit())
 
-      if @canManage()
-        @model.on('change:published', @updatePublishState)
+    if @canManage()
+      @model.on('change:published', @updatePublishState)
 
-        # re-render for attributes we are showing
-        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules", "published", "workflow_state"]
-        observe = attrs.map((attr) -> "change:#{attr}").join(" ")
-        @model.on(observe, @render)
-      @model.on 'change:submission', @updateScore
+      # re-render for attributes we are showing
+      attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules", "published", "workflow_state"]
+      observe = attrs.map((attr) -> "change:#{attr}").join(" ")
+      @model.on(observe, @render)
+    @model.on 'change:submission', @updateScore
 
-      @model.pollUntilFinishedLoading()
+    @model.pollUntilFinishedLoading()
 
-    initializeChildViews: ->
-      @publishIconView = false
-      @lockIconView = false
-      @sisButtonView = false
-      @editAssignmentView = false
-      @dateAvailableColumnView = false
+  initializeChildViews: ->
+    @publishIconView = false
+    @lockIconView = false
+    @sisButtonView = false
+    @editAssignmentView = false
+    @dateAvailableColumnView = false
 
-      if @canManage()
-        @publishIconView = new PublishIconView({
-          model: @model,
-          title: @model.get('name')
-        })
-        @lockIconView = new LockIconView({
-          model: @model,
-          unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('name')),
-          lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('name')),
-          course_id: @model.get('course_id'),
-          content_id: @model.get('id'),
-          content_type: 'assignment'
-        })
-        @editAssignmentView = new CreateAssignmentView(model: @model)
+    if @canManage()
+      @publishIconView = new PublishIconView({
+        model: @model,
+        title: @model.get('name')
+      })
+      @lockIconView = new LockIconView({
+        model: @model,
+        unlockedText: I18n.t("%{name} is unlocked. Click to lock.", name: @model.get('name')),
+        lockedText: I18n.t("%{name} is locked. Click to unlock", name: @model.get('name')),
+        course_id: @model.get('course_id'),
+        content_id: @model.get('id'),
+        content_type: 'assignment'
+      })
+      @editAssignmentView = new CreateAssignmentView(model: @model)
 
-        if @isGraded() && @model.postToSISEnabled() && @model.published()
-          @sisButtonView = new SisButtonView
-            model: @model
-            sisName: @model.postToSISName()
-            dueDateRequired: @model.dueDateRequiredForAccount()
-            maxNameLengthRequired: @model.maxNameLengthRequiredForAccount()
+      if @isGraded() && @model.postToSISEnabled() && @model.published()
+        @sisButtonView = new SisButtonView
+          model: @model
+          sisName: @model.postToSISName()
+          dueDateRequired: @model.dueDateRequiredForAccount()
+          maxNameLengthRequired: @model.maxNameLengthRequiredForAccount()
 
-      @dateDueColumnView       = new DateDueColumnView(model: @model)
-      @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
+    @dateDueColumnView       = new DateDueColumnView(model: @model)
+    @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
 
-    # Public: Called when move menu item is selected
-    #
-    # Returns nothing.
-    onMove: () =>
-      @moveTrayProps =
-        title: I18n.t('Move Assignment')
-        items: [
-          id: @model.get('id')
-          title: @model.get('name')
-        ]
-        moveOptions:
-          groupsLabel:  @messages.ag_move_label
-          groups: MoveItem.backbone.collectionToGroups(@model.collection.view?.parentCollection, (col) => col.get('assignments'))
-        onMoveSuccess: (res) =>
-          keys =
-            model: 'assignments'
-            parent: 'assignment_group_id'
-          MoveItem.backbone.reorderAcrossCollections(res.data.order, res.groupId, @model, keys)
-        focusOnExit: =>
-          document.querySelector("#assignment_#{@model.id} a[id*=manage_link]")
-        formatSaveUrl: ({ groupId }) ->
-          "#{ENV.URLS.assignment_sort_base_url}/#{groupId}/reorder"
+  # Public: Called when move menu item is selected
+  #
+  # Returns nothing.
+  onMove: () =>
+    @moveTrayProps =
+      title: I18n.t('Move Assignment')
+      items: [
+        id: @model.get('id')
+        title: @model.get('name')
+      ]
+      moveOptions:
+        groupsLabel:  @messages.ag_move_label
+        groups: MoveItem.backbone.collectionToGroups(@model.collection.view?.parentCollection, (col) => col.get('assignments'))
+      onMoveSuccess: (res) =>
+        keys =
+          model: 'assignments'
+          parent: 'assignment_group_id'
+        MoveItem.backbone.reorderAcrossCollections(res.data.order, res.groupId, @model, keys)
+      focusOnExit: =>
+        document.querySelector("#assignment_#{@model.id} a[id*=manage_link]")
+      formatSaveUrl: ({ groupId }) ->
+        "#{ENV.URLS.assignment_sort_base_url}/#{groupId}/reorder"
 
-      MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
+    MoveItem.renderTray(@moveTrayProps, document.getElementById('not_right_side'))
 
-    updatePublishState: =>
-      @$('.ig-row').toggleClass('ig-published', @model.get('published'))
+  updatePublishState: =>
+    @$('.ig-row').toggleClass('ig-published', @model.get('published'))
 
-    # call remove on children so that they can clean up old dialogs.
-    render: ->
-      @toggleHidden(@model, @model.get('hidden'))
-      @publishIconView.remove()         if @publishIconView
-      @lockIconView.remove()            if @lockIconView
-      @sisButtonView.remove()           if @sisButtonView
-      @editAssignmentView.remove()      if @editAssignmentView
-      @dateDueColumnView.remove()       if @dateDueColumnView
-      @dateAvailableColumnView.remove() if @dateAvailableColumnView
+  # call remove on children so that they can clean up old dialogs.
+  render: ->
+    @toggleHidden(@model, @model.get('hidden'))
+    @publishIconView.remove()         if @publishIconView
+    @lockIconView.remove()            if @lockIconView
+    @sisButtonView.remove()           if @sisButtonView
+    @editAssignmentView.remove()      if @editAssignmentView
+    @dateDueColumnView.remove()       if @dateDueColumnView
+    @dateAvailableColumnView.remove() if @dateAvailableColumnView
 
-      super
-      # reset the model's view property; it got overwritten by child views
-      @model.view = this if @model
+    super
+    # reset the model's view property; it got overwritten by child views
+    @model.view = this if @model
 
-    afterRender: ->
-      @createModuleToolTip()
+  afterRender: ->
+    @createModuleToolTip()
 
-      if @editAssignmentView
-        @editAssignmentView.hide()
-        @editAssignmentView.setTrigger @$editAssignmentButton if @canEdit()
+    if @editAssignmentView
+      @editAssignmentView.hide()
+      @editAssignmentView.setTrigger @$editAssignmentButton if @canEdit()
 
-      @updateScore() if @canReadGrades()
+    @updateScore() if @canReadGrades()
 
-    toggleHidden: (model, hidden) =>
-      @$el.toggleClass('hidden', hidden)
-      @$el.toggleClass('search_show', !hidden)
+  toggleHidden: (model, hidden) =>
+    @$el.toggleClass('hidden', hidden)
+    @$el.toggleClass('search_show', !hidden)
 
-    stopMoveIfProtected: (e) ->
-      e.stopPropagation() unless @canMove()
+  stopMoveIfProtected: (e) ->
+    e.stopPropagation() unless @canMove()
 
-    createModuleToolTip: =>
-      link = @$el.find('.tooltip_link')
-      if link.length > 0
-        link.tooltip
-          position:
-            my: 'center bottom'
-            at: 'center top-10'
-            collision: 'fit fit'
-          tooltipClass: 'center bottom vertical'
-          content: ->
-            $(link.data('tooltipSelector')).html()
+  createModuleToolTip: =>
+    link = @$el.find('.tooltip_link')
+    if link.length > 0
+      link.tooltip
+        position:
+          my: 'center bottom'
+          at: 'center top-10'
+          collision: 'fit fit'
+        tooltipClass: 'center bottom vertical'
+        content: ->
+          $(link.data('tooltipSelector')).html()
 
-    toJSON: ->
-      data = @model.toView()
-      data.canManage = @canManage()
-      data = @_setJSONForGrade(data) unless data.canManage
+  toJSON: ->
+    data = @model.toView()
+    data.canManage = @canManage()
+    data = @_setJSONForGrade(data) unless data.canManage
 
-      data.canEdit = @canEdit()
-      data.canMove = @canMove()
-      data.canDelete = @canDelete()
-      data.canDuplicate = @canDuplicate()
-      data.is_locked =  @model.isRestrictedByMasterCourse()
-      data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
-      data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
+    data.canEdit = @canEdit()
+    data.canMove = @canMove()
+    data.canDelete = @canDelete()
+    data.canDuplicate = @canDuplicate()
+    data.is_locked =  @model.isRestrictedByMasterCourse()
+    data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
+    data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
 
-      data.cyoe = CyoeHelper.getItemData(data.id, @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment))
-      data.return_to = encodeURIComponent window.location.pathname
+    data.cyoe = CyoeHelper.getItemData(data.id, @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment))
+    data.return_to = encodeURIComponent window.location.pathname
 
-      if data.canManage
-        data.spanWidth      = 'span3'
-        data.alignTextClass = ''
-      else
-        data.spanWidth      = 'span4'
-        data.alignTextClass = 'align-right'
+    if data.canManage
+      data.spanWidth      = 'span3'
+      data.alignTextClass = ''
+    else
+      data.spanWidth      = 'span4'
+      data.alignTextClass = 'align-right'
 
-      if @model.isQuiz()
-        data.menu_tools = ENV.quiz_menu_tools || []
-        data.menu_tools.forEach (tool) =>
-          tool.url = tool.base_url + "&quizzes[]=#{@model.get("quiz_id")}"
-      else if @model.isDiscussionTopic()
-        data.menu_tools = ENV.discussion_topic_menu_tools || []
-        data.menu_tools.forEach (tool) =>
-          tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic")?.id}"
-      else
-        data.menu_tools = ENV.assignment_menu_tools || []
-        data.menu_tools.forEach (tool) =>
-          tool.url = tool.base_url + "&assignments[]=#{@model.get("id")}"
+    if @model.isQuiz()
+      data.menu_tools = ENV.quiz_menu_tools || []
+      data.menu_tools.forEach (tool) =>
+        tool.url = tool.base_url + "&quizzes[]=#{@model.get("quiz_id")}"
+    else if @model.isDiscussionTopic()
+      data.menu_tools = ENV.discussion_topic_menu_tools || []
+      data.menu_tools.forEach (tool) =>
+        tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("discussion_topic")?.id}"
+    else
+      data.menu_tools = ENV.assignment_menu_tools || []
+      data.menu_tools.forEach (tool) =>
+        tool.url = tool.base_url + "&assignments[]=#{@model.get("id")}"
 
-      if modules = @model.get('modules')
-        moduleName = modules[0]
-        has_modules = modules.length > 0
-        joinedNames = modules.join(",")
-        Object.assign data, {
-          modules: modules
-          module_count: modules.length
-          module_name: moduleName
-          has_modules: has_modules
-          joined_names: joinedNames
-        }
-      else
-        data
+    if modules = @model.get('modules')
+      moduleName = modules[0]
+      has_modules = modules.length > 0
+      joinedNames = modules.join(",")
+      Object.assign data, {
+        modules: modules
+        module_count: modules.length
+        module_name: moduleName
+        has_modules: has_modules
+        joined_names: joinedNames
+      }
+    else
+      data
 
-    addAssignmentToList: (response) =>
-      return unless response
-      assignment = new Assignment(response)
-      # Force the positions to match what is in the db.
-      @model.collection.forEach((a) =>
-        a.set('position', response.new_positions[a.get('id')])
-      )
-      if @hasIndividualPermissions()
-        ENV.PERMISSIONS.by_assignment_id[assignment.id] = ENV.PERMISSIONS.by_assignment_id[assignment.originalAssignmentID()]
-      @model.collection.add(assignment)
-      @focusOnAssignment(response)
+  addAssignmentToList: (response) =>
+    return unless response
+    assignment = new Assignment(response)
+    # Force the positions to match what is in the db.
+    @model.collection.forEach((a) =>
+      a.set('position', response.new_positions[a.get('id')])
+    )
+    if @hasIndividualPermissions()
+      ENV.PERMISSIONS.by_assignment_id[assignment.id] = ENV.PERMISSIONS.by_assignment_id[assignment.originalAssignmentID()]
+    @model.collection.add(assignment)
+    @focusOnAssignment(response)
 
-    onDuplicate: (e) =>
-      return unless @canDuplicate()
-      e.preventDefault()
-      @model.duplicate(@addAssignmentToList)
+  onDuplicate: (e) =>
+    return unless @canDuplicate()
+    e.preventDefault()
+    @model.duplicate(@addAssignmentToList)
 
-    onDuplicateFailedRetry: (e) =>
-      e.preventDefault()
-      $button = $(e.target)
-      $button.prop('disabled', true)
-      @model.duplicate_failed((response) =>
-        @addAssignmentToList(response)
-        @delete(silent: true)
-      ).always -> $button.prop('disabled', false)
-
-    onDuplicateOrImportFailedCancel: (e) =>
-      e.preventDefault()
+  onDuplicateFailedRetry: (e) =>
+    e.preventDefault()
+    $button = $(e.target)
+    $button.prop('disabled', true)
+    @model.duplicate_failed((response) =>
+      @addAssignmentToList(response)
       @delete(silent: true)
+    ).always -> $button.prop('disabled', false)
 
-    onDelete: (e) =>
-      e.preventDefault()
-      return unless @canDelete()
-      return @$el.find('a[id*=manage_link]').focus() unless confirm(@messages.confirm)
-      if @previousAssignmentInGroup()?
-        @focusOnAssignment(@previousAssignmentInGroup())
-        @delete()
-      else
-        id = @model.attributes.assignment_group_id
-        @delete()
-        @focusOnGroupByID(id)
+  onDuplicateOrImportFailedCancel: (e) =>
+    e.preventDefault()
+    @delete(silent: true)
 
-    onUnlockAssignment: (e) =>
-      e.preventDefault()
+  onDelete: (e) =>
+    e.preventDefault()
+    return unless @canDelete()
+    return @$el.find('a[id*=manage_link]').focus() unless confirm(@messages.confirm)
+    if @previousAssignmentInGroup()?
+      @focusOnAssignment(@previousAssignmentInGroup())
+      @delete()
+    else
+      id = @model.attributes.assignment_group_id
+      @delete()
+      @focusOnGroupByID(id)
 
-    onLockAssignment: (e) =>
-      e.preventDefault()
+  onUnlockAssignment: (e) =>
+    e.preventDefault()
 
-    delete: (opts = { silent: false }) ->
-      callbacks = {}
-      unless opts.silent
-        callbacks.success = -> $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
-      @model.destroy(callbacks)
-      @$el.remove()
+  onLockAssignment: (e) =>
+    e.preventDefault()
 
-    hasIndividualPermissions: ->
-      ENV.PERMISSIONS.by_assignment_id?
+  delete: (opts = { silent: false }) ->
+    callbacks = {}
+    unless opts.silent
+      callbacks.success = -> $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
+    @model.destroy(callbacks)
+    @$el.remove()
 
-    canDelete: ->
-      result = (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
-      if @hasIndividualPermissions() then result && @canEdit() else result
+  hasIndividualPermissions: ->
+    ENV.PERMISSIONS.by_assignment_id?
 
-    canDuplicate: ->
-      (@userIsAdmin || @canManage()) && @model.canDuplicate()
+  canDelete: ->
+    result = (@userIsAdmin or @model.canDelete()) && !@model.isRestrictedByMasterCourse()
+    if @hasIndividualPermissions() then result && @canEdit() else result
 
-    canMove: ->
-      @userIsAdmin or (@canManage() and @model.canMove())
+  canDuplicate: ->
+    (@userIsAdmin || @canManage()) && @model.canDuplicate()
 
-    canEdit: ->
-      if !@hasIndividualPermissions()
-        return @userIsAdmin or @canManage()
+  canMove: ->
+    @userIsAdmin or (@canManage() and @model.canMove())
 
-      @userIsAdmin or (@canManage() && !!(ENV.PERMISSIONS.by_assignment_id[@model.id] && ENV.PERMISSIONS.by_assignment_id[@model.id].update))
+  canEdit: ->
+    if !@hasIndividualPermissions()
+      return @userIsAdmin or @canManage()
 
-    canManage: ->
-      ENV.PERMISSIONS.manage
+    @userIsAdmin or (@canManage() && !!(ENV.PERMISSIONS.by_assignment_id[@model.id] && ENV.PERMISSIONS.by_assignment_id[@model.id].update))
 
-    isGraded: ->
-      submission_types = @model.get('submission_types')
-      submission_types && !submission_types.includes('not_graded') && !submission_types.includes('wiki_page')
+  canManage: ->
+    ENV.PERMISSIONS.manage
 
-    gradeStrings: (grade) ->
-      pass_fail_map =
-        incomplete:
-          I18n.t 'incomplete', 'Incomplete'
-        complete:
-          I18n.t 'complete', 'Complete'
+  isGraded: ->
+    submission_types = @model.get('submission_types')
+    submission_types && !submission_types.includes('not_graded') && !submission_types.includes('wiki_page')
 
-      grade = pass_fail_map[grade] or grade
+  gradeStrings: (grade) ->
+    pass_fail_map =
+      incomplete:
+        I18n.t 'incomplete', 'Incomplete'
+      complete:
+        I18n.t 'complete', 'Complete'
 
-      'percent':
-        nonscreenreader: I18n.t 'grade_percent', '%{grade}%', grade: grade
-        screenreader: I18n.t 'grade_percent_screenreader', 'Grade: %{grade}%', grade: grade
-      'pass_fail':
-        nonscreenreader: "#{grade}"
-        screenreader: I18n.t 'grade_pass_fail_screenreader', 'Grade: %{grade}', grade: grade
-      'letter_grade':
-        nonscreenreader: "#{grade}"
-        screenreader: I18n.t 'grade_letter_grade_screenreader', 'Grade: %{grade}', grade: grade
-      'gpa_scale':
-        nonscreenreader: "#{grade}"
-        screenreader: I18n.t 'grade_gpa_scale_screenreader', 'Grade: %{grade}', grade: grade
+    grade = pass_fail_map[grade] or grade
+
+    'percent':
+      nonscreenreader: I18n.t 'grade_percent', '%{grade}%', grade: grade
+      screenreader: I18n.t 'grade_percent_screenreader', 'Grade: %{grade}%', grade: grade
+    'pass_fail':
+      nonscreenreader: "#{grade}"
+      screenreader: I18n.t 'grade_pass_fail_screenreader', 'Grade: %{grade}', grade: grade
+    'letter_grade':
+      nonscreenreader: "#{grade}"
+      screenreader: I18n.t 'grade_letter_grade_screenreader', 'Grade: %{grade}', grade: grade
+    'gpa_scale':
+      nonscreenreader: "#{grade}"
+      screenreader: I18n.t 'grade_gpa_scale_screenreader', 'Grade: %{grade}', grade: grade
 
 
-    _setJSONForGrade: (json) ->
-      if submission = @model.get('submission')
-        submissionJSON = if submission.present then submission.present() else submission.toJSON()
-        score = submission.get('score')
-        if typeof score is 'number' && !isNaN(score)
-          submissionJSON.score = round score, round.DEFAULT
-        json.submission = submissionJSON
-        grade = submission.get('grade')
-        gradeString = @gradeStrings(grade)[json.gradingType]
-        json.submission.gradeDisplay = gradeString?.nonscreenreader
-        json.submission.gradeDisplayForScreenreader = gradeString?.screenreader
+  _setJSONForGrade: (json) ->
+    if submission = @model.get('submission')
+      submissionJSON = if submission.present then submission.present() else submission.toJSON()
+      score = submission.get('score')
+      if typeof score is 'number' && !isNaN(score)
+        submissionJSON.score = round score, round.DEFAULT
+      json.submission = submissionJSON
+      grade = submission.get('grade')
+      gradeString = @gradeStrings(grade)[json.gradingType]
+      json.submission.gradeDisplay = gradeString?.nonscreenreader
+      json.submission.gradeDisplayForScreenreader = gradeString?.screenreader
 
-      pointsPossible = json.pointsPossible
+    pointsPossible = json.pointsPossible
 
-      if typeof pointsPossible is 'number' && !isNaN(pointsPossible)
-        json.pointsPossible = round pointsPossible, round.DEFAULT
-        json.submission.pointsPossible = json.pointsPossible if json.submission?
+    if typeof pointsPossible is 'number' && !isNaN(pointsPossible)
+      json.pointsPossible = round pointsPossible, round.DEFAULT
+      json.submission.pointsPossible = json.pointsPossible if json.submission?
 
-      json.submission.gradingType = json.gradingType if json.submission?
+    json.submission.gradingType = json.gradingType if json.submission?
 
-      if json.gradingType is 'not_graded'
-        json.hideGrade = true
-      json
+    if json.gradingType is 'not_graded'
+      json.hideGrade = true
+    json
 
-    updateScore: =>
-      json = @model.toView()
-      json = @_setJSONForGrade(json) unless @canManage()
-      @$('.js-score').html scoreTemplate(json)
+  updateScore: =>
+    json = @model.toView()
+    json = @_setJSONForGrade(json) unless @canManage()
+    @$('.js-score').html scoreTemplate(json)
 
-    canReadGrades: ->
-      ENV.PERMISSIONS.read_grades
+  canReadGrades: ->
+    ENV.PERMISSIONS.read_grades
 
-    goToNextItem: =>
-      if @nextAssignmentInGroup()?
-        @focusOnAssignment(@nextAssignmentInGroup())
-      else if @nextVisibleGroup()?
-        @focusOnGroup(@nextVisibleGroup())
-      else
-        @focusOnFirstGroup()
+  goToNextItem: =>
+    if @nextAssignmentInGroup()?
+      @focusOnAssignment(@nextAssignmentInGroup())
+    else if @nextVisibleGroup()?
+      @focusOnGroup(@nextVisibleGroup())
+    else
+      @focusOnFirstGroup()
 
-    goToPrevItem: =>
-      if @previousAssignmentInGroup()?
-        @focusOnAssignment(@previousAssignmentInGroup())
-      else
-        @focusOnGroupByID(@model.attributes.assignment_group_id)
+  goToPrevItem: =>
+    if @previousAssignmentInGroup()?
+      @focusOnAssignment(@previousAssignmentInGroup())
+    else
+      @focusOnGroupByID(@model.attributes.assignment_group_id)
 
-    editItem: =>
-      @$("#assignment_#{@model.id}_settings_edit_item").click()
+  editItem: =>
+    @$("#assignment_#{@model.id}_settings_edit_item").click()
 
-    deleteItem: =>
-      @$("#assignment_#{@model.id}_settings_delete_item").click()
+  deleteItem: =>
+    @$("#assignment_#{@model.id}_settings_delete_item").click()
 
-    addItem: =>
-      group_id = @model.attributes.assignment_group_id
-      $(".add_assignment", "#assignment_group_#{group_id}").click()
+  addItem: =>
+    group_id = @model.attributes.assignment_group_id
+    $(".add_assignment", "#assignment_group_#{group_id}").click()
 
-    showAssignment: =>
-      $(".ig-title", "#assignment_#{@model.id}")[0].click()
+  showAssignment: =>
+    $(".ig-title", "#assignment_#{@model.id}")[0].click()
 
-    assignmentGroupView: =>
-      @model.collection.view
+  assignmentGroupView: =>
+    @model.collection.view
 
-    visibleAssignments: =>
-      @assignmentGroupView().visibleAssignments()
+  visibleAssignments: =>
+    @assignmentGroupView().visibleAssignments()
 
-    nextVisibleGroup: =>
-      @assignmentGroupView().nextGroup()
+  nextVisibleGroup: =>
+    @assignmentGroupView().nextGroup()
 
-    nextAssignmentInGroup: =>
-      current_assignment_index = @visibleAssignments().indexOf(@model)
-      @visibleAssignments()[current_assignment_index + 1]
+  nextAssignmentInGroup: =>
+    current_assignment_index = @visibleAssignments().indexOf(@model)
+    @visibleAssignments()[current_assignment_index + 1]
 
-    previousAssignmentInGroup: =>
-      current_assignment_index = @visibleAssignments().indexOf(@model)
-      @visibleAssignments()[current_assignment_index - 1]
+  previousAssignmentInGroup: =>
+    current_assignment_index = @visibleAssignments().indexOf(@model)
+    @visibleAssignments()[current_assignment_index - 1]
 
-    focusOnAssignment: (assignment) =>
-      $("#assignment_#{assignment.id}").attr("tabindex",-1).focus()
+  focusOnAssignment: (assignment) =>
+    $("#assignment_#{assignment.id}").attr("tabindex",-1).focus()
 
-    focusOnGroup: (group) =>
-      $("#assignment_group_#{group.attributes.id}").attr("tabindex",-1).focus()
+  focusOnGroup: (group) =>
+    $("#assignment_group_#{group.attributes.id}").attr("tabindex",-1).focus()
 
-    focusOnGroupByID: (group_id) =>
-      $("#assignment_group_#{group_id}").attr("tabindex",-1).focus()
+  focusOnGroupByID: (group_id) =>
+    $("#assignment_group_#{group_id}").attr("tabindex",-1).focus()
 
-    focusOnFirstGroup: =>
-      $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()
+  focusOnFirstGroup: =>
+    $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()

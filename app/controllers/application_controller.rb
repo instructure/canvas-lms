@@ -1650,6 +1650,9 @@ class ApplicationController < ActionController::Base
                                                         tool: @tool})
 
         adapter = if @tool.use_1_3?
+          # Use the resource URL as the target_link_uri
+          opts[:launch_url] = @resource_url
+
           Lti::LtiAdvantageAdapter.new(
             tool: @tool,
             user: @current_user,
@@ -1945,7 +1948,7 @@ class ApplicationController < ActionController::Base
         context: context,
         user: user,
         preloaded_attachments: {},
-        in_app: Setting.get("skip_verifier_if_in_app", "true") == "true" && in_app?,
+        in_app: in_app?,
         is_public: is_public
       ).processed_url
     end
@@ -2150,14 +2153,10 @@ class ApplicationController < ActionController::Base
   end
 
   def browser_supported?
-    # the user_agent gem likes to (ab)use objects and metaprogramming, so
-    # we just do this check once per session. or maybe more than once, if
-    # you upgrade your browser and it treats session cookie expiration
-    # rules as a suggestion
     key = request.user_agent.to_s.sum # keep cookie size in check. a legitimate collision here would be 1. extremely unlikely and 2. not a big deal
     if key != session[:browser_key]
       session[:browser_key] = key
-      session[:browser_supported] = Browser.supported?(request.user_agent)
+      session[:browser_supported] = BrowserSupport.supported?(request.user_agent)
     end
     session[:browser_supported]
   end

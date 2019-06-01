@@ -18,12 +18,26 @@
 
 module Types
   class TermType < ApplicationObjectType
+    implements GraphQL::Types::Relay::Node
     graphql_name "Term"
 
+    alias term object
+
+    global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
 
     field :name, String, null: true
     field :start_at, DateTimeType, null: true
     field :end_at, DateTimeType, null: true
+
+    field :courses_connection, CourseType.connection_type, null: true do
+      description "courses for this term"
+    end
+    def courses_connection
+      load_association(:root_account).then do |account|
+        next unless account.grants_any_right?(current_user, :manage_courses, :manage_account_settings)
+        term.courses
+      end
+    end
   end
 end

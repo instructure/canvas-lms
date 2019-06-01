@@ -63,7 +63,9 @@ class Reply {
   }
 
   attachKeyboardShortcuts () {
-    return this.view.$('.toggle-wrapper').first().before(new KeyboardShortcuts().render().$el)
+    if (!ENV.use_rce_enhancements) {
+      return this.view.$('.toggle-wrapper').first().before(new KeyboardShortcuts().render().$el)
+    }
   }
 
   // #

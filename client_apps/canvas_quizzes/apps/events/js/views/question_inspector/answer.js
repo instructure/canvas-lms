@@ -20,7 +20,7 @@
 define(function(require) {
   var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var K = require('../../constants');
-  var I18n = require('i18n!quiz_log_auditing');
+  var I18n = require('i18n!quiz_log_auditing').default;
   var classSet = require('canvas_quizzes/util/class_set');
   var MultipleChoice = require('jsx!./answers/multiple_choice');
   var MultipleAnswers = require('jsx!./answers/multiple_answers');

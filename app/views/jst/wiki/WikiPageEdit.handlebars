@@ -12,15 +12,17 @@
       <h2>{{title}}</h2>
     {{/if}}
     {{#unless content_is_locked}}
-      <div class="switch_views_container">
-        <div class="help_dialog"></div>
-        <a href="#" class="switch_views">
-          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-        </a>
-        <a href="#" class="switch_views" style="display:none;">
-          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-        </a>
-      </div>
+      {{#unless use_rce_enhancements}}
+        <div class="switch_views_container">
+          <div class="help_dialog"></div>
+          <a href="#" class="switch_views">
+            {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+          </a>
+          <a href="#" class="switch_views" style="display:none;">
+            {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+          </a>
+        </div>
+      {{/unless}}
     {{/unless}}
   </div>
 

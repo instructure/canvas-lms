@@ -15,28 +15,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../../models/Account'
-  '../../views/accounts/settings/QuotasView'
-  '../../views/accounts/settings/ManualQuotasView'
-], ($, _, Backbone, Account, QuotasView, ManualQuotasView) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import Account from '../../models/Account'
+import QuotasView from '../../views/accounts/settings/QuotasView'
+import ManualQuotasView from '../../views/accounts/settings/ManualQuotasView'
 
-  if ENV.ACCOUNT
-    account = new Account(ENV.ACCOUNT)
+if ENV.ACCOUNT
+  account = new Account(ENV.ACCOUNT)
 
-    # replace toJSON so only the quota fields are sent to the server
-    account.toJSON = ->
-      id: @get('id')
-      account: _.pick(@attributes, 'default_storage_quota_mb', 'default_user_storage_quota_mb', 'default_group_storage_quota_mb')
+  # replace toJSON so only the quota fields are sent to the server
+  account.toJSON = ->
+    id: @get('id')
+    account: _.pick(@attributes, 'default_storage_quota_mb', 'default_user_storage_quota_mb', 'default_group_storage_quota_mb')
 
-    quotasView = new QuotasView
-      model: account
-    $('#tab-quotas').append(quotasView.el)
-    quotasView.render()
+  quotasView = new QuotasView
+    model: account
+  $('#tab-quotas').append(quotasView.el)
+  quotasView.render()
 
-    manualQuotasView = new ManualQuotasView()
-    $('#tab-quotas').append(manualQuotasView.el)
-    manualQuotasView.render()
+  manualQuotasView = new ManualQuotasView()
+  $('#tab-quotas').append(manualQuotasView.el)
+  manualQuotasView.render()
+export default {}

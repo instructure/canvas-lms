@@ -30,6 +30,6 @@ export default function(ed, document) {
 
     const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
 
-    ReactDOM.render(<UploadImage onDismiss={handleDismiss} />, container)
+    ReactDOM.render(<UploadImage editor={ed} onDismiss={handleDismiss} />, container)
   })
 }

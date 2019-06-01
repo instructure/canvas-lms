@@ -604,6 +604,27 @@ describe AccountsController do
   end
 
   describe "#settings" do
+    describe "js_env" do
+      let(:account) do
+        account_with_admin_logged_in
+        @account
+      end
+
+      it 'sets the external tools create url' do
+        get 'settings', params: {account_id: account.id}
+        expect(assigns.dig(:js_env, :EXTERNAL_TOOLS_CREATE_URL)).to eq(
+          "http://test.host/accounts/#{account.id}/external_tools"
+        )
+      end
+
+      it 'sets the tool configuration show url' do
+        get 'settings', params: {account_id: account.id}
+        expect(assigns.dig(:js_env, :TOOL_CONFIGURATION_SHOW_URL)).to eq(
+          "http://test.host/api/lti/accounts/#{account.id}/developer_keys/:developer_key_id/tool_configuration"
+        )
+      end
+    end
+
     it "should load account report details" do
       account_with_admin_logged_in
       report_type = AccountReport.available_reports.keys.first

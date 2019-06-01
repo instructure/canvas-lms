@@ -565,3 +565,17 @@ QUnit.module('SpeedGraderHelpers.plagiarismResubmitUrl', () => {
     $('#assignment_submission_resubmit_to_turnitin_url').remove()
   })
 })
+
+QUnit.module('SpeedGraderHelpers.plagiarismErrorMessage', () => {
+  test('returns the error_message if present', () => {
+    const errorMessage = 'Error message :('
+    equal(SpeedgraderHelpers.plagiarismErrorMessage({error_message: errorMessage}), errorMessage)
+  })
+
+  test('returns the default error message if "error_message" is missing', () => {
+    equal(
+      SpeedgraderHelpers.plagiarismErrorMessage({}),
+      'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+    )
+  })
+})

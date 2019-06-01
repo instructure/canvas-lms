@@ -61,18 +61,6 @@ tinymce.create("tinymce.plugins.InstructureImagePlugin", {
           }
         ]
         callback(items);
-      },
-
-      onSetup(buttonApi) {
-        // highlight our button when an image is selected
-        const toggleActive = eventApi => {
-          buttonApi.setActive(
-            eventApi.element.nodeName.toLowerCase() === "IMG" &&
-              eventApi.element.className !== "equation_image"
-          );
-        };
-        ed.on("NodeChange", toggleActive);
-        return () => ed.off("NodeChange", toggleActive);
       }
     });
   }

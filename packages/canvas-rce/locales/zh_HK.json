@@ -1,4 +1,25 @@
 {
+  "add_8523c19b": {
+    "message": "添加"
+  },
+  "align_11050992": {
+    "message": "對齊"
+  },
+  "align_center_ca078feb": {
+    "message": "置中對齊"
+  },
+  "align_left_e9f1f93b": {
+    "message": "向左對齊"
+  },
+  "align_right_9bad3ac1": {
+    "message": "向右對齊"
+  },
+  "all_4321c3a1": {
+    "message": "全部"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "字母"
+  },
   "alternative_text_a834dcad": {
     "message": "替代文字："
   },
@@ -44,6 +65,9 @@
   "choose_usage_rights_33683854": {
     "message": "選擇使用權限…"
   },
+  "circle_unordered_list_9e3a0763": {
+    "message": "圓形無序清單"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "按一下任何文檔，以向該文檔中插入一個下載連結。"
   },
@@ -65,11 +89,23 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "按一下以插入一個連結至此項目。"
   },
+  "close_d634289d": {
+    "message": "關閉"
+  },
   "close_flickr_form_b32e600a": {
     "message": "關閉 Flickr 表單"
   },
   "collaborations_5c56c15f": {
     "message": "協作"
+  },
+  "computer_1d7dfa6f": {
+    "message": "電腦"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "內容子類型"
+  },
+  "content_type_2cf90d95": {
+    "message": "內容類型"
   },
   "copyright_holder_66ee111": {
     "message": "版權持有人："
@@ -92,8 +128,23 @@
   "creative_commons_license_725584ae": {
     "message": "創意共享授權："
   },
+  "date_added_ed5ad465": {
+    "message": "添加的日期"
+  },
+  "date_published_371c4ad0": {
+    "message": "發佈的日期"
+  },
   "decorative_image_fde98579": {
     "message": "裝飾圖像"
+  },
+  "decrease_indent_de6343ab": {
+    "message": "減少縮排"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "預設符號無序清單"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "預設數字有序清單"
   },
   "discussions_a5f96392": {
     "message": "討論"
@@ -101,11 +152,17 @@
   "discussions_index_6c36ced": {
     "message": "討論索引"
   },
+  "documents_81393201": {
+    "message": "文件"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "輸入搜索字詞"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "輸入此圖像的替代文字"
+  },
+  "external_links_3d9f074e": {
+    "message": "外部連結"
   },
   "file_upload_form_4aaad554": {
     "message": "文檔上傳表單"
@@ -125,6 +182,9 @@
   "group_navigation_99f191a": {
     "message": "群組導覽"
   },
+  "header_f28f73db": {
+    "message": "標題"
+  },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "我已經獲得了該文檔的使用權限。"
   },
@@ -137,8 +197,14 @@
   "image_upload_form_7b74079a": {
     "message": "影像上傳表單"
   },
+  "image_url_2aee2734": {
+    "message": "影像 URL"
+  },
   "images_7ce26570": {
     "message": "影像"
+  },
+  "increase_indent_6d550a4a": {
+    "message": "增加縮排"
   },
   "insert_equella_links_49a8dacd": {
     "message": "插入 Equella 連結"
@@ -161,9 +227,6 @@
   "link_to_other_content_in_the_group_3fe25379": {
     "message": "連結到群組中的其他內容。"
   },
-  "link_to_url_52dd935c": {
-    "message": "連結到 URL"
-  },
   "links_14b70841": {
     "message": "連結"
   },
@@ -182,17 +245,32 @@
   "loading_folders_8d4d5d5a": {
     "message": "載入資料夾中..."
   },
+  "loading_more_results_def6df65": {
+    "message": "正在載入更多結果..."
+  },
+  "media_af190855": {
+    "message": "媒體"
+  },
   "modules_c4325335": {
     "message": "單元"
   },
   "no_results_940393cf": {
     "message": "無結果。"
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "有序和無序的清單"
+  },
   "pages_e5414c2c": {
     "message": "頁面"
   },
+  "paragraph_5e5ad8eb": {
+    "message": "段落"
+  },
   "people_b4ebb13c": {
     "message": "人員"
+  },
+  "preformatted_d0670862": {
+    "message": "預先格式化的"
   },
   "quizzes_7e598f57": {
     "message": "測驗"
@@ -212,6 +290,30 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "選擇一個文件夾，以上傳您的文檔"
   },
+  "small_header_168fb9f9": {
+    "message": "小標題"
+  },
+  "something_went_wrong_89195131": {
+    "message": "似乎出問題了。"
+  },
+  "sort_by_e75f9e3e": {
+    "message": "排序依據"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "方形無序清單"
+  },
+  "subheader_2b87606d": {
+    "message": "子標題"
+  },
+  "submit_a3cc6859": {
+    "message": "提交"
+  },
+  "subscript_59744f96": {
+    "message": "下標"
+  },
+  "superscript_8cb349a2": {
+    "message": "上標"
+  },
   "syllabus_f191f65b": {
     "message": "課程大綱"
   },
@@ -230,6 +332,9 @@
   "tray_839df38a": {
     "message": "收集箱"
   },
+  "unsplash_ee049fbf": {
+    "message": "取消開頭顯示"
+  },
   "upload_8b403d05": {
     "message": "上傳"
   },
@@ -238,6 +343,18 @@
   },
   "upload_a_new_image_890df275": {
     "message": "上傳新影像"
+  },
+  "upload_image_6120b609": {
+    "message": "上載圖像"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "大寫字母有序清單"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "大寫羅馬數字有序清單"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "使用權："

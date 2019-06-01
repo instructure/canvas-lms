@@ -18,6 +18,7 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
+import get from 'lodash/get'
 
 import View from '@instructure/ui-layout/lib/components/View'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
@@ -29,14 +30,26 @@ import AdditionalSettings from './AdditionalSettings';
 import Placements from './Placements';
 
 export default class ManualConfigurationForm extends React.Component {
+  state = {
+    showMessages: false
+  }
+
   generateToolConfiguration = () => {
     const toolConfig = {
       ...this.requiredRef.generateToolConfigurationPart(),
       scopes: this.servicesRef.generateToolConfigurationPart(),
       ...this.additionalRef.generateToolConfigurationPart()
     }
-    toolConfig.extensions[0].placements = this.placementsRef.generateToolConfigurationPart();
+    toolConfig.extensions[0].settings.placements = this.placementsRef.generateToolConfigurationPart();
     return toolConfig
+  }
+
+  valid = () => {
+    this.setState({showMessages: true})
+    return this.requiredRef.valid()
+      && this.servicesRef.valid()
+      && this.additionalRef.valid()
+      && this.placementsRef.valid()
   }
 
   setRequiredRef = node => this.requiredRef = node;
@@ -47,6 +60,21 @@ export default class ManualConfigurationForm extends React.Component {
 
   setPlacementsRef = node => this.placementsRef = node;
 
+  additionalSettings = () => {
+    const { toolConfiguration } = this.props
+    return get(toolConfiguration, ['extensions', '0'])
+  }
+
+  customFields = () => {
+    const { toolConfiguration } = this.props
+    return get(toolConfiguration, ['custom_fields'])
+  }
+
+  placements = () => {
+    const { toolConfiguration } = this.props
+    return get(toolConfiguration, ['extensions', '0', 'settings', 'placements'])
+  }
+
   render() {
     const { toolConfiguration, validScopes, validPlacements } = this.props;
 
@@ -56,10 +84,10 @@ export default class ManualConfigurationForm extends React.Component {
           description={<ScreenReaderContent>{I18n.t('Manual Configuration')}</ScreenReaderContent>}
           layout="stacked"
         >
-          <RequiredValues ref={this.setRequiredRef} toolConfiguration={toolConfiguration} />
-          <Services ref={this.setServicesRef}  validScopes={validScopes} scopes={toolConfiguration.scopes} />
-          <AdditionalSettings ref={this.setAdditionalRef}  additionalSettings={this.additionalSettings} custom_fields={this.custom_fields} />
-          <Placements ref={this.setPlacementsRef}  validPlacements={validPlacements} placements={this.placements} />
+          <RequiredValues ref={this.setRequiredRef} toolConfiguration={toolConfiguration} showMessages={this.state.showMessages} />
+          <Services ref={this.setServicesRef} validScopes={validScopes} scopes={toolConfiguration.scopes} />
+          <AdditionalSettings ref={this.setAdditionalRef}  additionalSettings={this.additionalSettings()} custom_fields={this.customFields()} />
+          <Placements ref={this.setPlacementsRef}  validPlacements={validPlacements} placements={this.placements()} />
         </FormFieldGroup>
       </View>
     )

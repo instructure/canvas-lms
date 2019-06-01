@@ -27,6 +27,7 @@ import htmlEscape from 'str/htmlEscape'
 import { uploadFile } from 'jsx/shared/upload_file'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import SelectContent from './lti/select_content'
+import processSingleContentItem from 'jsx/deep_linking/processors/processSingleContentItem'
 import './jquery.instructure_date_and_time' /* datetime_field */
 import './jquery.ajaxJSON'
 import './jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
@@ -39,6 +40,60 @@ import './jquery.loadingImg'
 import './jquery.templateData'
 
   var SelectContentDialog = {};
+
+  SelectContentDialog.deepLinkingListener = (event) => {
+    if (
+      event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
+      event.data &&
+      event.data.messageType === 'LtiDeepLinkingResponse'
+    ) {
+      processSingleContentItem(event)
+        .then((result) => {
+          if (result.type !== 'ltiResourceLink') { $.flashError(I18n.t('Selected content is not an LTI link.')) }
+
+          const $dialog = $dialog || $("#resource_selection_dialog")
+          const tool = $("#context_external_tools_select .tools .tool.selected").data('tool')
+
+          $dialog.off("dialogbeforeclose", SelectContentDialog.dialogCancelHandler)
+          $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+
+          SelectContentDialog.handleContentItemResult(result, tool)
+        })
+        .catch((e) => {
+          $.flashError(I18n.t('Error retrieving content'))
+          console.error(e)
+        })
+        .finally(() => {
+          const $dialog = $dialog || $("#resource_selection_dialog")
+          $dialog.dialog('close')
+        })
+    }
+  }
+
+  SelectContentDialog.attachDeepLinkingListner = function() {
+    window.addEventListener('message', this.deepLinkingListener)
+  }
+
+  SelectContentDialog.detachDeepLinkingListener = function() {
+    window.removeEventListener('message', this.deepLinkingListener)
+  }
+
+  SelectContentDialog.dialogCancelHandler = function(event) {[]
+    const response = confirm(I18n.t("Are you sure you want to cancel? Changes you made may not be saved."))
+    if (!response) {
+      event.preventDefault()
+    }
+  }
+
+  SelectContentDialog.beforeUnloadHandler = function(e) {
+    return (e.returnValue = I18n.t("Changes you made may not be saved."))
+  }
+
+  SelectContentDialog.handleContentItemResult = function(result, tool) {
+    $("#external_tool_create_url").val(result.url)
+    $("#external_tool_create_title").val(result.title || tool.name)
+    $("#context_external_tools_select .domain_message").hide()
+  }
 
   SelectContentDialog.Events = {
     init: function() {
@@ -68,15 +123,7 @@ import './jquery.templateData'
         var width = placement.selection_width;
         var height = placement.selection_height;
         var $dialog = $("#resource_selection_dialog");
-        var beforeUnloadHandler = function(e) {
-          return (e.returnValue = I18n.t("Changes you made may not be saved."));
-        };
-        var dialogCancelHandler = function(event, ui) {
-          var r = confirm(I18n.t("Are you sure you want to cancel? Changes you made may not be saved."));
-          if (r == false){
-            event.preventDefault();
-          }
-        };
+
         if($dialog.length == 0) {
           $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
           $dialog.append(`<div class="before_external_content_info_alert screenreader-only" tabindex="0">
@@ -132,16 +179,18 @@ import './jquery.templateData'
           });
 
           $("body").append($dialog.hide());
-          $dialog.on("dialogbeforeclose", dialogCancelHandler);
+          $dialog.on("dialogbeforeclose", SelectContentDialog.dialogCancelHandler);
           $dialog
             .dialog({
               autoOpen: false,
               width: 'auto',
               resizable: true,
               close: function() {
-                $(window).off('beforeunload', beforeUnloadHandler);
+                SelectContentDialog.detachDeepLinkingListener()
+                $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler);
                 $dialog.find("iframe").attr('src', '/images/ajax-loader-medium-444.gif');
               },
+              open: () => { SelectContentDialog.attachDeepLinkingListner() },
               title: I18n.t('link_from_external_tool', "Link Resource from External Tool")
             })
             .bind('dialogresize', function() {
@@ -164,16 +213,14 @@ import './jquery.templateData'
             .bind('selection', function(event) {
               var item = event.contentItems[0];
               if(item["@type"] === 'LtiLinkItem' && item.url) {
-                $("#external_tool_create_url").val(item.url);
-                $("#external_tool_create_title").val(item.title || tool.name);
-                $("#context_external_tools_select .domain_message").hide();
+                SelectContentDialog.handleContentItemResult(item, tool)
               } else {
                 alert(I18n.t('invalid_lti_resource_selection', "There was a problem retrieving a valid link from the external tool"));
                 $("#external_tool_create_url").val('');
                 $("#external_tool_create_title").val('');
               }
               $("#resource_selection_dialog iframe").attr('src', 'about:blank');
-              $dialog.off("dialogbeforeclose", dialogCancelHandler);
+              $dialog.off("dialogbeforeclose", SelectContentDialog.dialogCancelHandler);
               $("#resource_selection_dialog").dialog('close');
 
               if (item.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window') {
@@ -189,7 +236,7 @@ import './jquery.templateData'
         var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
         url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val();
         $dialog.find("iframe").attr('src', url);
-        $(window).on('beforeunload', beforeUnloadHandler);
+        $(window).on('beforeunload', SelectContentDialog.beforeUnloadHandler);
       } else {
         var placements = $tool.data('tool').placements
         var placement = placements.assignment_selection || placements.link_selection

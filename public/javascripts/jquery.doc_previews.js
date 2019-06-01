@@ -17,7 +17,7 @@
  */
 
 import INST from './INST'
-import I18n from 'i18n!instructure'
+import I18n from 'i18n!jquery_doc_previews'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from './str/htmlEscape'

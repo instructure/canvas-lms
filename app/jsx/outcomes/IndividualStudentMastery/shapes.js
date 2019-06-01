@@ -45,7 +45,8 @@ export const outcomeShape = PropTypes.shape({
   results: PropTypes.arrayOf(outcomeResultShape).isRequired,
   title: PropTypes.string.isRequired,
   mastery_points: PropTypes.number.isRequired,
-  points_possible: PropTypes.number.isRequired
+  points_possible: PropTypes.number.isRequired,
+  display_name: PropTypes.string
 })
 
 export const outcomeLinkShape = PropTypes.shape({

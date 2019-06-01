@@ -65,6 +65,15 @@ describe SisBatch do
     end
   end
 
+  it 'should see pending imports as not completed' do
+    batch = process_csv_data([%{user_id,login_id,status
+                                user_1,user_1,active},
+                              %{course_id,short_name,long_name,term_id,status
+                                course_1,course_1,course_1,term_1,active}])
+    ParallelImporter.where(sis_batch_id: batch).update_all(workflow_state: 'pending')
+    expect(batch.parallel_importers.not_completed.count).to eq 2
+  end
+
   it 'should restore scores when restoring enrollments' do
     course = @account.courses.create!(name: 'one', sis_source_id: 'c1')
     user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
@@ -894,6 +903,26 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
       expect(b4.generated_diff_id).to_not be_nil
+    end
+
+    it "should mark files separately when created for diffing" do
+      f1 = %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active}
+      b1 = process_csv_data([f1], diffing_data_set_identifier: 'default')
+
+      f2 = %{course_id,short_name,long_name,account_id,term_id,status
+        test_1,TC 101,Test Course 101,,term1,active
+        test_4,TC 104,Test Course 104,,term1,active}
+      b2 = process_csv_data([f2], diffing_data_set_identifier: 'default')
+
+      uploaded = b2.downloadable_attachments(:uploaded)
+      expect(uploaded.count).to eq 1
+      expect(uploaded.first.open.read).to match_ignoring_whitespace(f2)
+      diffed = b2.downloadable_attachments(:diffed)
+      expect(diffed.count).to eq 1
+      expected_diff = %{course_id,short_name,long_name,account_id,term_id,status
+        test_4,TC 104,Test Course 104,,term1,active}
+      expect(diffed.first.open.read).to match_ignoring_whitespace(expected_diff)
     end
 
     it 'should compare files for diffing correctly' do

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {helpers} from 'compiled/handlebars_helpers'
+import Handlebars from 'compiled/handlebars_helpers'
 import $ from 'jquery'
 import _ from 'underscore'
 import assertions from 'helpers/assertions'
@@ -28,6 +28,7 @@ import chicago from 'timezone/America/Chicago'
 import newYork from 'timezone/America/New_York'
 import I18n from 'i18n-js'
 
+const {helpers} = Handlebars
 const {contains} = assertions
 
 QUnit.module('handlebars_helpers')

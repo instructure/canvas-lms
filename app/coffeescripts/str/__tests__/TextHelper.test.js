@@ -1,5 +1,5 @@
-import {truncateText} from '../TextHelper'
+import TextHelper from '../TextHelper'
 
 test('truncateText', () => {
-  expect(truncateText('this is longer than 30 characters')).toBe('this is longer than 30...')
+  expect(TextHelper.truncateText('this is longer than 30 characters')).toBe('this is longer than 30...')
 })

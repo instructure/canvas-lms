@@ -32,7 +32,7 @@ $('#form').disableWhileLoading(promise, {
 });
 
 */
-import I18n from 'i18n!instructure'
+import I18n from 'i18n!disableWhileLoading'
 import $ from 'jquery'
 import './jquery.ajaxJSON'
 import 'spin.js/jquery.spin'

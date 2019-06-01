@@ -15,32 +15,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/assignments/DateDueColumnView'
-  'jquery'
-  '../../behaviors/tooltip'
-], (Backbone, template, $) ->
+import Backbone from 'Backbone'
+import template from 'jst/assignments/DateDueColumnView'
+import $ from 'jquery'
+import '../../behaviors/tooltip'
 
-  class DateDueColumnView extends Backbone.View
-    template: template
+export default class DateDueColumnView extends Backbone.View
+  template: template
 
-    els:
-      '.vdd_tooltip_link': '$link'
+  els:
+    '.vdd_tooltip_link': '$link'
 
-    afterRender: ->
-      @$link.tooltip
-        position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
-        tooltipClass: 'center bottom vertical',
-        content: -> $($(@).data('tooltipSelector')).html()
+  afterRender: ->
+    @$link.tooltip
+      position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
+      tooltipClass: 'center bottom vertical',
+      content: -> $($(@).data('tooltipSelector')).html()
 
-    # has to handle both the discusson's model,
-    # and a graded discussion's child assignment model
-    toJSON: ->
-      data = @model.toView()
-      m = @model.get('assignment') || @model
+  # has to handle both the discusson's model,
+  # and a graded discussion's child assignment model
+  toJSON: ->
+    data = @model.toView()
+    m = @model.get('assignment') || @model
 
-      data.selector  = m.get("id") + "_due"
-      data.linkHref  = m.htmlUrl()
-      data.allDates  = m.allDates()
-      data
+    data.selector  = m.get("id") + "_due"
+    data.linkHref  = m.htmlUrl()
+    data.allDates  = m.allDates()
+    data

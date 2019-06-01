@@ -128,55 +128,95 @@ describe Types::SubmissionType do
     end
   end
 
-  describe "submission comments" do
+  describe 'submission comments' do
     before(:once) do
       student_in_course(active_all: true)
-      @comment = @submission.add_comment(author: @teacher, comment: "test3")
+      @submission.update_column(:attempt, 2) # bypass infer_values callback
+      @comment1 = @submission.add_comment(author: @teacher, comment: 'test1', attempt: 1)
+      @comment2 = @submission.add_comment(author: @teacher, comment: 'test2', attempt: 2)
     end
 
-    it "works" do
+    it 'will only be shown for the current submission attempt by default' do
       expect(
-        submission_type.resolve("commentsConnection { nodes { _id }}")
-      ).to eq [@comment.id.to_s]
+        submission_type.resolve('commentsConnection { nodes { _id }}')
+      ).to eq [@comment2.id.to_s]
     end
 
-    it "requires permission" do
+    it 'will show alll comments for all attempts if all_comments is true' do
+      expect(
+        submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { _id }}')
+      ).to eq [@comment1.id.to_s, @comment2.id.to_s]
+    end
+
+    it 'will only return published drafts' do
+      @submission.add_comment(author: @teacher, comment: 'test3', attempt: 2, draft_comment: true)
+      expect(
+        submission_type.resolve('commentsConnection { nodes { _id }}')
+      ).to eq [@comment2.id.to_s]
+    end
+
+    it 'requires permission' do
       other_course_student = student_in_course(course: course_factory).user
       expect(
-        submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
+        submission_type.resolve('commentsConnection { nodes { _id }}', current_user: other_course_student)
       ).to be nil
     end
+  end
 
-    describe "filtering" do
+  describe 'submission histories connection' do
+    before(:once) do
+      # In the world code path that the initial submission takes, there is a bulk
+      # insert directly into the database, which causes no version to be saved
+      # for the zero submission. Delete the version_ids here to simulate that.
+      @submission.update!(version_ids: [])
+    end
+
+    it 'works when there are no versions saved' do
+      expect(
+        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+      ).to eq [0]
+    end
+
+    it 'includes the zero submission when there are versions' do
+      @submission.update!(attempt: 1)
+      expect(
+        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+      ).to eq [1, 0]
+    end
+
+    context 'custom pagination' do
       before(:once) do
-        @submission.update!(attempt: 2)
-        @comment2 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 2)
+        @submission.update!(attempt: 1)
       end
 
-      it "can be done on an attempt number" do
+      it 'works for nodes' do
         expect(
-          submission_type.resolve(
-            "commentsConnection(filter: {attempts: [2]}) { nodes { _id }}",
-          )
-        ).to eq [@comment2.id.to_s]
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { nodes { attempt }}')
+        ).to eq [1]
       end
 
-      it "will only return published drafts" do
-        @comment3 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 1, draft_comment: true)
-        @comment4 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 1, draft_comment: false)
+      it 'works for edges node' do
         expect(
-          submission_type.resolve(
-            "commentsConnection { nodes { _id }}",
-          )
-        ).to eq [@comment.id.to_s, @comment2.id.to_s, @comment4.id.to_s]
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { node { attempt }}}')
+        ).to eq [1]
       end
 
-      it "translates attempt 0 to attempt nil in the database query" do
+      it 'works for edges cursor' do
         expect(
-          submission_type.resolve(
-            "commentsConnection(filter: {attempts: [0]}) { nodes { _id }}",
-          )
-        ).to eq [@comment.id.to_s]
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { cursor }}')
+        ).to eq ["MQ"] # Base64 encoded 1, per the graphql gem impmenetation of array paginating
+      end
+
+      it 'works for pageInfo endCursor' do
+        expect(
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { endCursor }}')
+        ).to eq "MQ" # Base64 encoded 1, per the graphql gem impmenetation of array paginating
+      end
+
+      it 'works for pageInfo hasNextPage' do
+        expect(
+          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { hasNextPage }}')
+        ).to eq true
       end
     end
   end

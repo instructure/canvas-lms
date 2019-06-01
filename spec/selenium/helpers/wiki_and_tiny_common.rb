@@ -198,6 +198,10 @@ module WikiAndTinyCommon
     wait_for_ajax_requests
   end
 
+  def tiny_rce_ifr_id
+    f('.tox-editor-container iframe')['id']
+  end
+
   def wiki_page_body_ifr_id
     f('.mce-container iframe')['id']
   end

@@ -680,6 +680,19 @@ RSpec.describe ApplicationController do
                 expect(assigns[:lti_launch].resource_url).to eq oidc_initiation_url
               end
             end
+
+            context 'when the content tag has a custom url' do
+              let(:custom_url) { 'http://www.example.com/basic_lti?deep_linking=true' }
+
+              before do
+                content_tag.update!(url: custom_url)
+                controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              it 'uses the custom url as the target_link_uri' do
+                expect(assigns[:lti_launch].params['target_link_uri']).to eq custom_url
+              end
+            end
           end
 
           context 'assignments' do
@@ -1404,7 +1417,8 @@ describe CoursesController do
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
         params: {},
-        method: 'GET'
+        method: 'GET',
+        path: '/not_allowed_path'
       }))
       expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
     end

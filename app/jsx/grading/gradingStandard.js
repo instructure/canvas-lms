@@ -22,7 +22,7 @@ import {shape, string} from 'prop-types'
 import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
+import I18n from 'i18n!gradinggradingStandard'
 import _ from 'underscore'
 import splitAssetString from 'compiled/str/splitAssetString'
 

@@ -125,6 +125,15 @@ describe('header', () => {
     expect(summary.text()).toMatch('My outcome')
   })
 
+  it('includes the outcome friendly name', () => {
+    const props = defaultProps()
+    props.outcome.display_name = 'Friendly name'
+    const wrapper = shallow(<Outcome {...props}/>)
+    const header = wrapper.find('ToggleGroup')
+    const summary = render(header.prop('summary'))
+    expect(summary.text()).toMatch('Friendly name')
+  })
+
   it('includes mastery when mastered', () => {
     const props = defaultProps()
     props.outcome.mastered = true

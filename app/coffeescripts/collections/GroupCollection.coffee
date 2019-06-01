@@ -16,45 +16,43 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  '../collections/PaginatedCollection'
-  '../collections/GroupUserCollection'
-  '../models/Group'
-  '../util/natcompare'
-], (PaginatedCollection, GroupUserCollection, Group, natcompare) ->
+import PaginatedCollection from '../collections/PaginatedCollection'
+import GroupUserCollection from '../collections/GroupUserCollection'
+import Group from '../models/Group'
+import natcompare from '../util/natcompare'
 
-  class GroupCollection extends PaginatedCollection
-    model: Group
-    comparator: natcompare.byGet('name')
+export default class GroupCollection extends PaginatedCollection
+  model: Group
+  comparator: natcompare.byGet('name')
 
-    @optionProperty 'category'
-    @optionProperty 'loadAll'
-    @optionProperty 'markInactiveStudents'
+  @optionProperty 'category'
+  @optionProperty 'loadAll'
+  @optionProperty 'markInactiveStudents'
 
-    _defaultUrl: ->
-      if @forCourse
-        url = super
-        unless ENV.CAN_MANAGE_GROUPS
-          url = url + "?only_own_groups=1"
-        url
-      else
-        '/api/v1/users/self/groups'
+  _defaultUrl: ->
+    if @forCourse
+      url = super
+      unless ENV.CAN_MANAGE_GROUPS
+        url = url + "?only_own_groups=1"
+      url
+    else
+      '/api/v1/users/self/groups'
 
-    url: ->
-      if @category?
-        @url = "/api/v1/group_categories/#{@category.id}/groups?per_page=50"
-      else
-        @url = super
+  url: ->
+    if @category?
+      @url = "/api/v1/group_categories/#{@category.id}/groups?per_page=50"
+    else
+      @url = super
 
-    fetchAll: ->
-      @fetchAllDriver(success: @fetchNext)
+  fetchAll: ->
+    @fetchAllDriver(success: @fetchNext)
 
-    fetchNext: =>
-      if @canFetch 'next'
-        @fetch(page: 'next', success: @fetchNext)
-      else
-        @trigger('finish')
+  fetchNext: =>
+    if @canFetch 'next'
+      @fetch(page: 'next', success: @fetchNext)
+    else
+      @trigger('finish')
 
-    fetchAllDriver: (options = {}) ->
-      options.data = Object.assign per_page: 20, include: "can_message", options.data || {}
-      @fetch options
+  fetchAllDriver: (options = {}) ->
+    options.data = Object.assign per_page: 20, include: "can_message", options.data || {}
+    @fetch options

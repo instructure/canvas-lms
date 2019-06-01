@@ -63,6 +63,9 @@
             "name": "Submission"
           },
           {
+            "name": "Term"
+          },
+          {
             "name": "User"
           }
         ]
@@ -133,6 +136,9 @@
           },
           {
             "name": "SubmissionComment"
+          },
+          {
+            "name": "SubmissionHistory"
           },
           {
             "name": "User"
@@ -214,6 +220,18 @@
           },
           {
             "name": "AdhocStudents"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "SubmissionInterface",
+        "possibleTypes": [
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "SubmissionHistory"
           }
         ]
       },

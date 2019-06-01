@@ -28,6 +28,7 @@ import updateSubnavMenuToggle from './subnav_menu/updateSubnavMenuToggle'
 import preventDefault from 'compiled/fn/preventDefault'
 
 // modules that do their own thing on every page that simply need to be required
+import 'media_comments'
 import 'reminders'
 import 'instructure'
 import 'page_views'

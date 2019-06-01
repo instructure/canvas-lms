@@ -8,7 +8,4 @@ Instructure may deprecate API elements according to the timelines indicated in t
 <div class="changelog"></div>
 ## Removals
 
-### 2018-10-06
-| API | File | Change | Removal Date |
-| --- | --- | --- | --- |
-| [Uploading Files](file.file_uploads.html) | Uploading via POST process | Step 3: Identifies deprecated behavior in replacing GET calls with the deprecated POST request | 2019-04-21 |
+No breaking API changes currently exist.

@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define ['i18n!gradebook'], (I18n) ->
- GRADEBOOK_TRANSLATIONS =
+import I18n from 'i18n!gradebooktranslations'
+
+export default GRADEBOOK_TRANSLATIONS =
     submission_tooltip_dropped: I18n.t('Dropped for grading purposes')
     submission_tooltip_late: I18n.t('Submitted late')
     submission_tooltip_anonymous: I18n.t('Anonymous')

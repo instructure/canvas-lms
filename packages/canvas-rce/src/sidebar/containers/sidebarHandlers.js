@@ -22,7 +22,8 @@ import { fetchImages } from "../actions/images";
 import {
   fetchFolders,
   uploadPreflight,
-  openOrCloseUploadForm
+  openOrCloseUploadForm,
+  uploadToMediaFolder
 } from "../actions/upload";
 import { searchFlickr, openOrCloseFlickrForm } from "../actions/flickr";
 import { toggle as toggleFolder } from "../actions/files";
@@ -42,6 +43,8 @@ export default function propsFromDispatch(dispatch) {
     flickrSearch: term => dispatch(searchFlickr(term)),
     toggleFlickrForm: () => dispatch(openOrCloseFlickrForm()),
     toggleUploadForm: () => dispatch(openOrCloseUploadForm()),
-    toggleNewPageForm: () => dispatch(openOrCloseNewPageForm())
+    toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
+    startMediaUpload: (tabContext, fileMetaProps) =>
+      dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
   };
 }

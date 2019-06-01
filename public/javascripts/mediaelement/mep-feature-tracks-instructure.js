@@ -424,10 +424,9 @@ import htmlEscape from 'str/htmlEscape'
         .wrap('<li>')
         .click(function(e){
           e.preventDefault();
-					require.ensure([], function(require){
-            var UploadMediaTrackForm = require('compiled/widget/UploadMediaTrackForm');
+          import('compiled/widget/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
 						new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
-					}, 'UploadMediaTrackFormAsyncChunk');
+          });
         });
       t.adjustLanguageBox();
     },

@@ -15,14 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  '../collections/PaginatedCollection'
-], ($, Backbone, PaginatedCollection) ->
-  class WrappedCollection extends PaginatedCollection
-    @optionProperty 'key'
+import PaginatedCollection from './PaginatedCollection'
 
-    parse: (response) ->
-      @linked = response.linked
-      response[@key]
+export default class WrappedCollection extends PaginatedCollection
+  @optionProperty 'key'
+
+  parse: (response) ->
+    @linked = response.linked
+    response[@key]

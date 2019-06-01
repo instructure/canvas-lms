@@ -16,27 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'react-dom/test-utils',
-  'jsx/due_dates/DisabledTokenInput'
-], (React, ReactDOM, {scryRenderedDOMComponentsWithTag}, DisabledTokenInput) => {
-  const wrapper = document.getElementById("fixtures");
-  const tokens = ["John Smith", "Section 2", "Group 1"];
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {scryRenderedDOMComponentsWithTag} from 'react-dom/test-utils'
+import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
 
-  QUnit.module('DisabledTokenInput', {
-    setup() {
-      this.input = ReactDOM.render(<DisabledTokenInput tokens={tokens}/>, wrapper);
-    },
+const wrapper = document.getElementById("fixtures");
+const tokens = ["John Smith", "Section 2", "Group 1"];
 
-    teardown() {
-      ReactDOM.unmountComponentAtNode(wrapper);
-    }
-  });
+QUnit.module('DisabledTokenInput', {
+  setup() {
+    this.input = ReactDOM.render(<DisabledTokenInput tokens={tokens}/>, wrapper);
+  },
 
-  test('renders a list item for each token passed in', function() {
-    const listItems = scryRenderedDOMComponentsWithTag(this.input, "li");
-    propEqual(listItems.map(item => item.textContent), tokens);
-  });
+  teardown() {
+    ReactDOM.unmountComponentAtNode(wrapper);
+  }
+});
+
+test('renders a list item for each token passed in', function() {
+  const listItems = scryRenderedDOMComponentsWithTag(this.input, "li");
+  propEqual(listItems.map(item => item.textContent), tokens);
 });

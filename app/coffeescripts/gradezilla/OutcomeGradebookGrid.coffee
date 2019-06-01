@@ -15,25 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18nObj'
-  'i18n!gradezilla'
-  'jquery'
-  'underscore'
-  '../util/natcompare'
-  '../views/gradezilla/HeaderFilterView'
-  '../views/gradezilla/OutcomeColumnView'
-  '../util/NumberCompare'
-  'jst/gradezilla/outcome_gradebook_cell'
-  'jst/gradezilla/outcome_gradebook_student_cell'
-  'jsx/context_cards/StudentContextCardTrigger'
-], (i18nObj, I18n, $, _, natcompare, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
+import I18n from 'i18n!gradezillaOutcomeGradebookGrid'
+import $ from 'jquery'
+import _ from 'underscore'
+import HeaderFilterView from '../views/gradezilla/HeaderFilterView'
+import OutcomeColumnView from '../views/gradezilla/OutcomeColumnView'
+import cellTemplate from 'jst/gradezilla/outcome_gradebook_cell'
+import studentCellTemplate from 'jst/gradezilla/outcome_gradebook_student_cell'
+import 'jsx/context_cards/StudentContextCardTrigger'
 
-  ###
-  xsslint safeString.method cellHtml
-  ###
+###
+xsslint safeString.method cellHtml
+###
 
-  Grid =
+export default Grid =
     filter: []
 
     ratings: []

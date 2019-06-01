@@ -22,7 +22,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import I18n from 'i18n!gradebook'
+import I18n from 'i18n!gradezilla'
 
 export default function InvalidGradeIndicator(props) {
   return (

@@ -19,9 +19,13 @@
 import htmlEscape from "escape-html";
 import formatMessage from "../../../format-message";
 import clickCallback from "./clickCallback";
+import {IconEquationLine} from '@instructure/ui-icons/es/svg'
 
 tinymce.create("tinymce.plugins.InstructureEquation", {
   init(ed) {
+
+    ed.ui.registry.addIcon('equation', IconEquationLine.src)
+
     ed.addCommand(
       "instructureEquation",
       clickCallback.bind(this, ed, document)
@@ -35,7 +39,7 @@ tinymce.create("tinymce.plugins.InstructureEquation", {
         })
       ),
       onAction: () => ed.execCommand("instructureEquation"),
-      icon: "equation icon-equation",
+      icon: "equation",
       onSetup: function(buttonApi) {
         const toggleActive = eventApi => {
           buttonApi.setActive(

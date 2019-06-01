@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!quizzes'
+import I18n from 'i18nObj'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import './jquery.instructure_misc_plugins' /* fragmentChange */
 import './jquery.templateData'

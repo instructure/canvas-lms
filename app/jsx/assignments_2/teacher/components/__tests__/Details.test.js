@@ -21,8 +21,8 @@ import {render} from 'react-testing-library'
 import {mockAssignment, mockOverride} from '../../test-utils'
 import Details from '../Details'
 
-const override1 = {lid: '18', title: 'Section A', set: {name: 'Section A'}}
-const override2 = {lid: '19', title: 'Section B', set: {name: 'Section B'}}
+const override1 = {lid: '18', title: 'Section A', set: {sectionName: 'Section A'}}
+const override2 = {lid: '19', title: 'Section B', set: {sectionName: 'Section B'}}
 
 function renderDetails(assignment, props = {}) {
   return render(

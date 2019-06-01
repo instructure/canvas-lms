@@ -21,31 +21,31 @@ module RCENextPage
   # ---------------------- Controls ----------------------
 
   def pages_accordion_button
-    fj('button:contains("Pages")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Pages")')
   end
 
   def assignments_accordion_button
-    fj('button:contains("Assignments")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Assignments")')
   end
 
   def quizzes_accordion_button
-    fj('button:contains("Quizzes")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Quizzes")')
   end
 
   def announcements_accordion_button
-    fj('button:contains("Announcements")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Announcements")')
   end
 
   def discussions_accordion_button
-    fj('button:contains("Discussions")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Discussions")')
   end
 
   def modules_accordion_button
-    fj('button:contains("Modules")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Modules")')
   end
 
   def navigation_accordion_button
-    fj('button:contains("Course Navigation")')
+    fj('[data-testid="instructure_links-AccordionSection"] button:contains("Course Navigation")')
   end
 
   def new_page_link
@@ -89,7 +89,7 @@ module RCENextPage
   end
 
   def image_link(title)
-    fj("aside [role='button']:contains('#{title}')")
+    fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
 
   def assignment_published_status
@@ -100,20 +100,98 @@ module RCENextPage
     # add selector
   end
 
+  def assignment_due_date
+    # add (selector).text
+  end
+
+  def possibly_hidden_toolbar_button(selector)
+    button = driver.execute_script("return document.querySelector('#{selector}')")
+    more_toolbar_button.click unless button
+    f(selector)
+  end
+
   def links_toolbar_button
-    # put new links toolbar locator here
+    possibly_hidden_toolbar_button('button[title="Links"]')
   end
 
   def course_links
-    # put course links option in links dropdown here
+    f('[role="menuitem"][title="Course Links"]')
   end
 
   def images_toolbar_button
-    # put new images toolbar locator here
+    possibly_hidden_toolbar_button('button[aria-label="Images"]')
   end
 
   def course_images
-    # put course images option in images dropdown here
+    f('[role="menuitem"][title="Course Images"]')
+  end
+
+  def rce_page_body_ifr_id
+    f('iframe.tox-edit-area__iframe')['id']
+  end
+
+  def course_item_link(title)
+    fj("[data-testid='instructure_links-Link'] button:contains('#{title}')")
+  end
+
+  def more_toolbar_button
+    f('button[aria-label="More..."]')
+  end
+
+  def list_toggle_button
+    # put side arrow to switch list locator here
+  end
+
+  def bullet_list_button
+    # put bullet list button locator here
+  end
+
+  def numbered_list_button
+    # put numbered list button locator here
+  end
+
+  def editor_window
+    f("form.edit-form .edit-content")
+  end
+
+  def indent_toggle_button
+    # put side arrow to switch indent locator here
+  end
+
+  def indent_button
+    # put indent button locator here
+  end
+
+  def outdent_button
+    # put outdent button locator here
+  end
+
+  def super_toggle_button
+    # put side arrow to switch super locator here
+  end
+
+  def superscript_button
+    # put superscript button locator here
+  end
+
+  def subscript_button
+    # put subscript button locator here
+  end
+
+  def align_toggle_button
+    # put side arrow to switch align locator here
+  end
+
+  def align_left_button
+    # put align left button locator here
+  end
+
+  def align_center_button
+    # put align center button locator here
+  end
+
+  def align_right_button
+    # put align right button locator here
   end
 
   # ---------------------- Actions ----------------------
@@ -146,6 +224,10 @@ module RCENextPage
     navigation_accordion_button.click
   end
 
+  def click_course_item_link(title)
+    course_item_link(title).click
+  end
+
   def click_new_page_link
     new_page_link.click
   end
@@ -171,18 +253,79 @@ module RCENextPage
   end
 
   def click_links_toolbar_button
-    # links_toolbar_button.click
+    links_toolbar_button.click
   end
 
   def click_course_links
-    # course_links.click
+    course_links.click
   end
 
   def click_images_toolbar_button
-    # images_toolbar_button.click
+    images_toolbar_button.click
   end
 
   def click_course_images
-    # course_images.click
+    course_images.click
+    wait_for_ajaximations
+  end
+
+  def click_more_toolbar_button
+    more_toolbar_button.click
+  end
+
+  def click_list_toggle_button
+    list_toggle_button.click
+  end
+
+  def click_bullet_list_button
+    bullet_list_button.click
+  end
+
+  def click_numbered_list_button
+    numbered_list_button.click
+  end
+
+  def click_indent_toggle_button
+    indent_toggle_button.click
+  end
+
+  def click_indent_button
+    indent_button.click
+  end
+
+  def click_outdent_button
+    outdent_button.click
+  end
+
+  def click_super_toggle_button
+    super_toggle_button.click
+  end
+
+  def click_superscript_button
+    superscript_button.click
+  end
+
+  def click_subscript_button
+    subscript_button.click
+  end
+
+  def click_align_toggle_button
+    align_toggle_button.click
+  end
+
+  def click_align_left_button
+    align_left_button.click
+  end
+
+  def click_align_center_button
+    align_center_button.click
+  end
+
+  def click_align_right_button
+    align_right_button.click
+  end
+
+  def click_editor_window
+    editor_window.click
   end
 end

@@ -23,7 +23,8 @@ const initialState = {
   developerKeyCreateOrEditSuccessful: false,
   developerKeyCreateOrEditFailed: false,
   developerKeyCreateOrEditPending: false,
-  developerKey: undefined
+  developerKey: undefined,
+  editing: false
 }
 
 const developerKeysHandlers = {
@@ -55,7 +56,8 @@ const developerKeysHandlers = {
   }),
   [ACTION_NAMES.SET_EDITING_DEVELOPER_KEY]: (state, action) => ({
     ...state,
-    developerKey: action.payload
+    developerKey: action.payload,
+    editing: !!action.payload
   })
 };
 
