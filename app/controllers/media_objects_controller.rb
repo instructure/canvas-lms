@@ -93,4 +93,17 @@ class MediaObjectsController < ApplicationController
     render :json => media_object_api_json(media_object, @current_user, session)
   end
 
+  def iframe_media_player
+    media_object = MediaObject.by_media_id(params[:id]).first
+    js_bundle :media_player_iframe_content
+
+    media_sources = media_object.media_sources.map do |mo|
+      mo[:src] = mo[:url]
+      mo[:label] = "#{(mo[:bitrate].to_i / 1024).floor} kbps"
+      mo
+    end
+
+    js_env media_sources: media_sources
+    render html: '', layout: 'layouts/bare'
+  end
 end

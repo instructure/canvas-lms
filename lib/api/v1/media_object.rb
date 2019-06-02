@@ -21,7 +21,12 @@ module Api::V1::MediaObject
   def media_object_api_json(media_object, current_user, session)
     hash = {}
     hash['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
-    hash['media_sources'] = media_object.media_sources
+    hash['media_sources'] = media_object.media_sources&.map do |mo|
+      mo[:src] = mo[:url]
+      mo[:label] = "#{(mo[:bitrate].to_i / 1024).floor} kbps"
+      mo
+    end
+
     hash['media_tracks'] = media_object.media_tracks.map do |track|
       api_json(track, current_user, session, :only => %w(kind created_at updated_at id locale)).tap do |json|
         json.merge! :url => show_media_tracks_url(media_object.media_id, track.id)

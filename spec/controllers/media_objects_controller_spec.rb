@@ -23,9 +23,9 @@ describe MediaObjectsController do
     before do
       # We don't actually want to ping kaltura during these tests
       allow(MediaObject).to receive(:media_id_exists?).and_return(true)
-      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return([])
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return([{:url => "whatever man", :bitrate => 12345}])
     end
-    
+
     it "should create a MediaObject if necessary on request" do
       # this test is purposely run with no user logged in to make sure it works in public courses
 
@@ -36,23 +36,23 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to eq({
               'can_add_captions' => false,
               'media_tracks' => [],
-              'media_sources' => []
+              'media_sources' => [{"bitrate"=>12345, "label"=>"12 kbps", "src"=>"whatever man", "url"=>"whatever man"}]
       })
       expect(MediaObject.by_media_id(missing_media_id).first.media_id).to eq missing_media_id
     end
-    
+
     it "should retrieve info about a 'deleted' MediaObject" do
       deleted_media_id = '0_deadbeef'
       course_factory
       media_object = course_factory.media_objects.build :media_id => deleted_media_id
       media_object.workflow_state = 'deleted'
       media_object.save!
-      
+
       get 'show', params: {:media_object_id => deleted_media_id}
       expect(json_parse(response.body)).to eq({
           'can_add_captions' => false,
           'media_tracks' => [],
-          'media_sources' => []
+          'media_sources' => [{"bitrate"=>12345, "label"=>"12 kbps", "src"=>"whatever man", "url"=>"whatever man"}]
       })
     end
   end
