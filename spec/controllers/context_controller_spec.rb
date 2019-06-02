@@ -312,6 +312,16 @@ describe ContextController do
       expect(@media_object.title.size).to be <= 255
       expect(@media_object.user_entered_title.size).to be <= 255
     end
+
+    it "should return the embedded_ifram_url" do
+      post :create_media_object,
+        params: {:context_code => "user_#{@user.id}",
+        :id => "new_object",
+        :type => "audio",
+        :title => "title"}
+      @media_object = @user.reload.media_objects.last
+      expect(JSON.parse(response.body)["embedded_iframe_url"]).to eq media_object_iframe_url(@media_object.media_id)
+    end
   end
 
   describe "GET 'prior_users" do

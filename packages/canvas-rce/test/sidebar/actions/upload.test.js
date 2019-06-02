@@ -59,7 +59,7 @@ describe("Upload data actions", () => {
     },
 
     uploadMediaToCanvas() {
-      return Promise.resolve({});
+      return Promise.resolve({"media_object": {"media_id": 2}});
     },
 
     preflightUpload() {

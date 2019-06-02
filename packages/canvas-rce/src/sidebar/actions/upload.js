@@ -20,7 +20,6 @@ import * as files from "./files";
 import * as images from "./images";
 import Bridge from "../../bridge";
 import {fileEmbed} from "../../common/mimeClass";
-import K5Uploader from '@instructure/k5uploader'
 
 export const RECEIVE_FOLDER = "RECEIVE_FOLDER";
 export const FAIL_FOLDERS_LOAD = "FAIL_FOLDERS_LOAD";
@@ -208,40 +207,39 @@ function addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismi
   uploader.addEventListener('K5.complete', (mediaServerMediaObject) => {
     mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
     mediaServerMediaObject.type= `${context.contextType}_${context.contextId}`
-    source.uploadMediaToCanvas(mediaServerMediaObject).then(() => {
+    source.uploadMediaToCanvas(mediaServerMediaObject).then((mediaObject) => {
       var videoElement = editor.dom.add(editor.getBody(), 'div', { 'class': 'draggableTemplate' }, ' ');
-      editor.dom.add(videoElement, 'video', { 'width': '550', 'height': ' 426', 'controls': 'true','src': 'http://www.google.com'});
-      dispatch(mediaUploadSuccess());
+      editor.dom.add(videoElement, 'iframe', { 'width': '550', 'height': '550', 'src': mediaObject.embedded_iframe_url, 'scrolling': 'no'});
+      dispatch(mediaUploadSuccess())
       dismiss()
     }).catch((error)=> {
-      dispatch(failMediaUpload(error));
+      dispatch(failMediaUpload(error))
     })
   })
 }
 
 export function saveMediaRecording(file, editor, dismiss) {
   return (dispatch, getState) => {
-    dispatch(startLoading());
-    const { source, contextId, contextType } = getState();
+    dispatch(startLoading())
+    const { source, contextId, contextType } = getState()
     return source.mediaServerSession()
     .then((mediaServerSession) => {
-      Bridge.setMediaServerSession(mediaServerSession)
       const session = generateUploadOptions(['video', 'audio', 'webm', 'video/webm', 'audio/webm'], mediaServerSession)
-      const uploader = new K5Uploader(session)
-      addUploaderReadyEventListeners(uploader, file)
-      addUploaderFileErrorEventListeners(uploader, dispatch)
-      addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, {contextId, contextType}, source)
-      return uploader
+      Bridge.setMediaServerSession(session)
+      addUploaderReadyEventListeners(Bridge.mediaServerUploader, file)
+      addUploaderFileErrorEventListeners(Bridge.mediaServerUploader, dispatch)
+      addUploaderFileCompleteEventListeners(Bridge.mediaServerUploader, dispatch, editor, dismiss, {contextId, contextType}, source)
+      return Bridge.mediaServerUploader
     })
     .catch(error => {
-      dispatch(failMediaUpload(error));
+      dispatch(failMediaUpload(error))
     })
   }
 }
 
 export function createMediaServerSession() {
   return (dispatch, getState) => {
-    const { source } = getState();
+    const { source } = getState()
     if(!Bridge.mediaServerSession) {
       return source.mediaServerSession()
       .then((data) => {
@@ -254,7 +252,7 @@ export function createMediaServerSession() {
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     dispatch(activateMediaUpload(fileMetaProps))
-    const { source, jwt, host, contextId, contextType } = getState();
+    const { source, jwt, host, contextId, contextType } = getState()
     return source.fetchMediaFolder({ jwt, host, contextId, contextType })
     .then(({folders}) => {
       fileMetaProps.parentFolderId = folders[0].id

@@ -39,7 +39,7 @@ export function UploadMedia(props) {
       {contentProps => (
         <Modal
           label={formatMessage('Upload Media')}
-          size="large"
+          size="medium"
           onDismiss={props.onDismiss}
           open
           shouldCloseOnDocumentClick

@@ -190,6 +190,10 @@ class RceApiSource {
     return this.fetchPage(this.uriFor('folders/media', props))
   }
 
+  fetchMediaObjectIframe(mediaObjectId) {
+    return this.fetchPage(this.uriFor(`media_objects_iframe/${mediaObjectId}`))
+  }
+
   fetchImages(props) {
     if (props.bookmark) {
       return this.apiFetch(props.bookmark, headerFor(this.jwt))
