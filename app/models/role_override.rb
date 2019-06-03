@@ -1078,7 +1078,7 @@ class RoleOverride < ActiveRecord::Base
           overrides.each_key do |permission|
             overrides_by_account = overrides[permission].index_by(&:context_id)
             overrides[permission] = accounts.map do |account|
-              overrides_by_account[account.id] || RoleOverride.new { |ro| ro.context = account }
+              overrides_by_account[account.id] || RoleOverride.new(:context_id => account.id, :context_type => "Account")
             end
           end
           overrides
