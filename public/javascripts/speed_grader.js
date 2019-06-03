@@ -31,6 +31,7 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
+import originalityReportSubmissionKey from 'jsx/gradebook/shared/helpers/originalityReportSubmissionKey'
 import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
@@ -2012,8 +2013,14 @@ EG = {
       var $turnitinScoreContainer = $grade_container.find('.turnitin_score_container').empty(),
         $turnitinInfoContainer = $grade_container.find('.turnitin_info_container').empty(),
         assetString = `submission_${submission.id}`,
+        turnitinAsset = null
+
+      if (turnitinEnabled && submission.turnitin_data) {
         turnitinAsset =
-          turnitinEnabled && submission.turnitin_data && submission.turnitin_data[assetString]
+          submission.turnitin_data[originalityReportSubmissionKey(submission)] ||
+          submission.turnitin_data[assetString]
+      }
+
       // There might be a previous submission that was text_entry, but the
       // current submission is an upload. The turnitin asset for the text
       // entry would still exist

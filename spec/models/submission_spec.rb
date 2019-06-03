@@ -2175,7 +2175,7 @@ describe Submission do
         submission.update_attributes!(attachment_ids: attachment.id.to_s)
         originality_report.update_attributes!(attachment: nil)
         expect(submission.originality_data).to eq({
-          submission.asset_string => {
+          OriginalityReport.submission_asset_key(submission) => {
             similarity_score: originality_report.originality_score,
             state: originality_report.state,
             report_url: originality_report.originality_report_url,

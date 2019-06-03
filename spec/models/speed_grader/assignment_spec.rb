@@ -1448,7 +1448,10 @@ describe SpeedGrader::Assignment do
       OriginalityReport.create!(originality_score: '1', submission: submission)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       keys = json['submissions'].first['submission_history'].first['submission']['turnitin_data'].keys
-      expect(keys).to include submission.asset_string, attachment.asset_string
+      expect(keys).to include(
+        OriginalityReport.submission_asset_key(submission),
+        attachment.asset_string
+      )
     end
 
     it 'does not override "turnitin_data"' do

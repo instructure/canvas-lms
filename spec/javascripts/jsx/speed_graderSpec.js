@@ -5882,6 +5882,50 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       teardownFixtures()
     })
 
+    QUnit.module('when text entry submission', textEntryHooks => {
+      const resubmissionTurnitinData = {
+        similarity_score: '80'
+      }
+
+      textEntryHooks.beforeEach(() => {
+        const originalityData = Object.assign({}, turnitinData)
+        originalityData['submission_1_2019-06-05T19:51:35Z'] = originalityData.submission_1
+        originalityData['submission_1_2019-07-05T19:51:35Z'] = resubmissionTurnitinData
+        delete originalityData.submission_1
+        submission.submission_history[0].turnitin_data = originalityData
+        submission.submission_history[0].has_originality_score = true
+        submission.submission_history[0].submitted_at = '2019-06-05T19:51:35Z'
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+      })
+
+      test('displays the report for the current submission', () => {
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(
+          document.querySelector(gradeSimilaritySelector).innerHTML.trim(),
+          '60%'
+        )
+      })
+
+      test('displays the report for a past submission', () => {
+        submission.submission_history[0].submitted_at = '2019-07-05T19:51:35Z'
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(
+          document.querySelector(gradeSimilaritySelector).innerHTML.trim(),
+          '80%'
+        )
+      })
+    })
+
     QUnit.module('when anonymous grading is inactive', () => {
       test('links to a detailed report for Turnitin submissions', () => {
         submission.submission_history[0].turnitin_data = turnitinData
