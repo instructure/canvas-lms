@@ -1052,6 +1052,7 @@ type File implements ModuleItemInterface & Node & Timestamped {
   id: ID!
   mimeClass: String
   modules: [Module!]
+  submissionPreviewUrl(submissionId: ID!): URL
   thumbnailUrl: URL
   updatedAt: DateTime
   url: URL

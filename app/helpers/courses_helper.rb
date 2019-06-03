@@ -120,6 +120,7 @@ module CoursesHelper
 
     type
   end
+  module_function :user_type
 
   def why_cant_i_enable_master_course(course)
     return nil if MasterCourses::MasterTemplate.is_master_course?(course)
