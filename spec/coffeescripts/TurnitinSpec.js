@@ -80,6 +80,21 @@ QUnit.module('Turnitin', {
   }
 })
 
+test('uses the score when the score is 0', () => {
+  submissionWithReport.turnitin_data.attachment_103.similarity_score = 0
+
+  const tii_data = Turnitin.extractDataForTurnitin(
+    submissionWithReport,
+    'attachment_103',
+    '/courses/2'
+  )
+
+  equal(
+    tii_data.score,
+    '0%'
+  )
+})
+
 test('uses originality_report type in url if submission has an OriginalityReport', () => {
   const tii_data = Turnitin.extractDataForTurnitin(
     submissionWithReport,
