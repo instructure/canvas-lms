@@ -2727,13 +2727,13 @@ describe User do
       ag = Account.default.groups.create! name: "ag"
       ag.users << @student
       ag.save!
-      expect(@student.current_group_memberships_by_date.map(&:group)).to match_array([@group, ag])
+      expect(@student.cached_current_group_memberships_by_date.map(&:group)).to match_array([@group, ag])
 
       @course.start_at = 1.year.ago
       @course.conclude_at = 1.hour.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
-      expect(@student.reload.current_group_memberships_by_date.map(&:group)).to match_array([ag])
+      expect(User.find(@student.id).cached_current_group_memberships_by_date.map(&:group)).to match_array([ag])
     end
 
   end
