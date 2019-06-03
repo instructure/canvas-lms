@@ -152,35 +152,43 @@ QUnit.module('SpeedGrader#showDiscussion', {
 })
 
 test('showDiscussion should not show private comments for a group assignment', () => {
+  const originalKalturaSettings = INST.kalturaSettings
+  INST.kalturaSettings = {resource_domain: 'example.com', partner_id: 'asdf'}
+  const deferFake = sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
+    func(elem, size, keepOriginalText)
+  })
   window.jsonData.GROUP_GRADING_MODE = true
   SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null
   SpeedGrader.EG.showDiscussion()
   sinon.assert.notCalled($.fn.append)
+  deferFake.restore()
+  INST.kalturaSettings = originalKalturaSettings
 })
 
 test('showDiscussion should show group comments for group assignments', () => {
+  const originalKalturaSettings = INST.kalturaSettings
+  INST.kalturaSettings = {resource_domain: 'example.com', partner_id: 'asdf'}
+  const deferFake = sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
+    func(elem, size, keepOriginalText)
+  })
   window.jsonData.GROUP_GRADING_MODE = true
   SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo'
   SpeedGrader.EG.showDiscussion()
   strictEqual(document.querySelector('.comment').innerText, 'a comment!')
-})
-
-test('showDiscussion should show private comments for non group assignments', () => {
-  window.jsonData.GROUP_GRADING_MODE = false
-  SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null
-  SpeedGrader.EG.showDiscussion()
-  sinon.assert.calledTwice($.fn.append)
+  deferFake.restore()
+  INST.kalturaSettings = originalKalturaSettings
 })
 
 test('thumbnails of media comments have screenreader text', () => {
   const originalKalturaSettings = INST.kalturaSettings
   INST.kalturaSettings = {resource_domain: 'example.com', partner_id: 'asdf'}
-  sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
+  const deferFake = sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
     func(elem, size, keepOriginalText)
   })
   SpeedGrader.EG.showDiscussion()
   const screenreaderText = document.querySelector('.play_comment_link .screenreader-only').innerText
   strictEqual(screenreaderText, 'Play media comment by An Author from Jul 12, 2016 at 11:47pm.')
+  deferFake.restore()
   INST.kalturaSettings = originalKalturaSettings
 })
 
@@ -1428,8 +1436,6 @@ test('should not call numberHelper#parse if grading type is neither points nor p
 })
 
 QUnit.module('SpeedGrader', suiteHooks => {
-  let $container
-
   suiteHooks.beforeEach(() => {
     setupFixtures(`
       <div id="combo_box_container"></div>
@@ -1914,7 +1920,6 @@ test('shows an error when the gateway times out', function() {
 })
 
 QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
-  let disableWhileLoadingStub
   const assignment = {}
   const student = {
     id: '1',
@@ -2153,7 +2158,7 @@ test('does not show an error when the gateway times out', function() {
   SpeedGrader.teardown()
 })
 
-QUnit.module('SpeedGrader', function(suiteHooks) {
+QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/no-identical-names */
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
       assignment_id: '2',
@@ -2714,7 +2719,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
   })
 
-  QUnit.module('#addCommentSubmissionHandler', hooks => {
+  QUnit.module('#addCommentSubmissionHandler', () => {
     const originalJsonData = window.jsonData
     const alphaIdPair = {id: '1'}
     const omegaIdPair = {id: '9'}
@@ -2967,7 +2972,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         fakeENV.teardown()
       })
 
-      QUnit.module('given a non-concluded enrollment', () => {
+      QUnit.module('given a non-concluded enrollment', () => { /* eslint-disable-line qunit/no-identical-names */
         test('button is shown when comment is publishable', () => {
           SpeedGrader.EG.addCommentSubmissionHandler(commentElement, {publishable: true})
           const submitButtons = document.querySelectorAll('.submit_comment_button')
@@ -2981,7 +2986,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         })
       })
 
-      QUnit.module('given a concluded enrollment', concludedHooks => {
+      QUnit.module('given a concluded enrollment', concludedHooks => { /* eslint-disable-line qunit/no-identical-names */
         concludedHooks.beforeEach(() => {
           originalWorkflowState =
             window.jsonData.studentMap[alphaAnonymousStudent.anonymous_id].enrollments[0]
@@ -4456,7 +4461,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
     })
 
-    QUnit.module('#renderSubmissionPreview', hooks => {
+    QUnit.module('#renderSubmissionPreview', hooks => { /* eslint-disable-line qunit/no-identical-names */
       const {context_id: course_id} = windowJsonData
       const {assignment_id} = alphaSubmission
       const {anonymous_id} = alphaStudent
@@ -5924,7 +5929,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
     })
 
-    QUnit.module('when anonymous grading is active', hooks => {
+    QUnit.module('when anonymous grading is active', hooks => { /* eslint-disable-line qunit/no-identical-names */
       hooks.beforeEach(() => {
         const reportURL = document.querySelector('#assignment_submission_turnitin_report_url')
         reportURL.href = reportURL.href.replace('user_id', 'anonymous_id')
@@ -6072,7 +6077,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         $grade.restore()
       })
 
-      QUnit.module('when post policies are enabled', postPolicyHooks => {
+      QUnit.module('when post policies are enabled', postPolicyHooks => { /* eslint-disable-line qunit/no-identical-names */
         postPolicyHooks.beforeEach(() => {
           ENV.post_policies_enabled = true
         })
