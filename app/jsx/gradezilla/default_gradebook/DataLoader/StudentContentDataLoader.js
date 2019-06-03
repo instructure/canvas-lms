@@ -20,7 +20,6 @@ import _ from 'lodash'
 import I18n from 'i18n!gradezilla'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
-import NaiveRequestDispatch from './NaiveRequestDispatch'
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
@@ -134,9 +133,9 @@ function getContentForStudentIdChunk(studentIds, options, dispatch) {
 }
 
 export default class StudentContentDataLoader {
-  constructor(options) {
+  constructor(options, dispatch) {
     this.options = options
-    this.dispatch = new NaiveRequestDispatch()
+    this.dispatch = dispatch
   }
 
   load(studentIds) {
