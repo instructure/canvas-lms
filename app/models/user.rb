@@ -92,12 +92,6 @@ class User < ActiveRecord::Base
 
   has_many :current_group_memberships, -> { eager_load(:group).where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'") }, class_name: 'GroupMembership'
   has_many :current_groups, :through => :current_group_memberships, :source => :group
-  has_many :current_group_memberships_by_date, -> {
-    joins(:group).
-      joins("LEFT OUTER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=group_memberships.user_id AND enrollments.course_id=groups.context_id AND groups.context_type='Course'").
-      joins("LEFT OUTER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id").
-      where("group_memberships.workflow_state='accepted' AND groups.workflow_state<>'deleted' AND COALESCE(enrollment_states.state,'active') IN ('invited','active')")
-  }, class_name: 'GroupMembership'
   has_many :user_account_associations
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
   has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
@@ -1780,8 +1774,13 @@ class User < ActiveRecord::Base
 
   def cached_current_group_memberships_by_date
     @cached_current_group_memberships_by_date ||= self.shard.activate do
-      Rails.cache.fetch_with_batched_keys(['current_group_memberships_by_date', ApplicationController.region].cache_key, batch_object: self, batched_keys: :groups) do
-        self.current_group_memberships_by_date.shard(self.in_region_associated_shards).to_a
+      Rails.cache.fetch_with_batched_keys(['current_group_memberships_by_date', ApplicationController.region].cache_key, batch_object: self, batched_keys: [:enrollments, :groups]) do
+        Shard.with_each_shard(self.in_region_associated_shards) do
+          GroupMembership.where(:user_id => self).joins(:group).
+            joins("LEFT OUTER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=group_memberships.user_id AND enrollments.course_id=groups.context_id AND groups.context_type='Course'").
+            joins("LEFT OUTER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id").
+            where("group_memberships.workflow_state='accepted' AND groups.workflow_state<>'deleted' AND COALESCE(enrollment_states.state,'active') IN ('invited','active')").to_a
+        end
       end
     end
   end
