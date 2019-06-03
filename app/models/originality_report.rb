@@ -31,6 +31,7 @@ class OriginalityReport < ActiveRecord::Base
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
+  before_validation :set_submission_time
   before_validation :infer_workflow_state
 
   def state
@@ -94,6 +95,10 @@ class OriginalityReport < ActiveRecord::Base
 
   def assignment
     submission.assignment
+  end
+
+  def set_submission_time
+    self.submission_time = submission&.submitted_at
   end
 
   def infer_workflow_state

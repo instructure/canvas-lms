@@ -96,6 +96,10 @@ module Lti
 #         "error_report": {
 #            "description": "A message describing the error. If set, the workflow_state will become 'error.'",
 #            "type": "String"
+#         },
+#         "submission_time": {
+#            "description": "The submitted_at date time of the submission.",
+#            "type": "datetime"
 #         }
 #       }
 #     }

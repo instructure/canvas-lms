@@ -77,6 +77,10 @@ describe OriginalityReport do
     expect(subject.errors[:submission]).to eq ["can't be blank"]
   end
 
+  it 'sets the submission time' do
+    expect(subject.submission_time).to eq submission.submitted_at
+  end
+
   it 'can have an originality report attachment' do
     originality_attachemnt = attachment_model
     subject.originality_report_attachment = originality_attachemnt
