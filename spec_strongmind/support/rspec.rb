@@ -3,6 +3,7 @@ RSpec.configure do |config|
   config.include Capybara::DSL,          type: :controller
   config.include FeatureHelpers,         type: :feature
   config.include FeatureJsHelpers,       type: :feature
+  config.include GeneralHelpers
 
   config.include FactoryBot::Syntax::Methods
   config.include ActionView::Helpers::TextHelper
@@ -66,9 +67,6 @@ RSpec.configure do |config|
 
     DatabaseCleaner.strategy = Capybara.current_driver == :rack_test ? :transaction : :truncation
     DatabaseCleaner.start
-
-    allow(SettingsService).to receive(:get_settings).with(anything).and_return({})
-    allow(PipelineService).to receive(:publish).with(anything)
   end
 
   config.after(:each) do

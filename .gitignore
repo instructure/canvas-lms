@@ -72,3 +72,4 @@ yarn-error.log
 /spec_strongmind/support/example_failures.txt
 /.env.development
 /.env.test
+/test.log

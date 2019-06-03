@@ -48,6 +48,4 @@ before_script:
   - bundle exec rake canvas:compile_assets_dev # skip build of styleguide, api docs, npm install
   - rm Gemfile.lock
   - STRONGMIND_SPEC=1 bundle install --path vendor/bundle --without production --jobs=3 --retry=1
-  # - STRONGMIND_SPEC=1 RAILS_ENV=test bundle exec rake db:test:prepare
-script:
-  - STRONGMIND_SPEC=1 HEADLESS=1 bundle exec rspec spec_strongmind
+script: 'STRONGMIND_SPEC=1 HEADLESS=1 ./script/run-tests.sh'

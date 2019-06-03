@@ -78,6 +78,7 @@ class Enrollment < ActiveRecord::Base
   after_save :add_to_favorites_later
   after_destroy :update_assignment_overrides_if_needed
 
+  # StrongMind Added
   after_commit -> { PipelineService.publish(self) }
   after_create -> { AssignmentsService.distribute_due_dates(enrollment: self)}
 

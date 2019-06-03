@@ -25,4 +25,16 @@ RSpec.describe 'Enrollment', type: :model do
       expect(Score.first).not_to receive(:update)
     end
   end
+  
+  describe '#after_create' do
+      let(:command) { double("Command", perform: nil)}
+
+    describe 'AssignmentsService.distribute_due_dates' do
+          it 'calls SetEnrollmentAssignmentDueDates command and enqueues it to run in background' do
+              expect(AssignmentsService::Commands::SetEnrollmentAssignmentDueDates).to receive(:new).and_return(command)
+              expect(Delayed::Job).to receive(:enqueue).with(command)
+              course_with_student
+          end
+      end
+  end
 end

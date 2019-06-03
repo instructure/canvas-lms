@@ -3,6 +3,7 @@ require_relative '../rails_helper'
 
 RSpec.describe 'Speedgrader improvements for teacher productivity', type: :feature, js: true do
   include_context 'stubbed_network'
+
   before(:each) do
     course_with_teacher_logged_in
     outcome_with_rubric
