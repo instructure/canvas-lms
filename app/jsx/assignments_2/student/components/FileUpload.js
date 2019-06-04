@@ -293,7 +293,12 @@ export default class FileUpload extends Component {
     return (
       <div style={outerFooterStyle}>
         <div style={innerFooterStyle}>
-          <Button variant="primary" margin="xx-small 0" onClick={() => this.submitAssignment()}>
+          <Button
+            id="submit-button"
+            variant="primary"
+            margin="xx-small 0"
+            onClick={() => this.submitAssignment()}
+          >
             {I18n.t('Submit')}
           </Button>
         </div>

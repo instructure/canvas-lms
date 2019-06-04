@@ -244,10 +244,24 @@ export const NEXT_SUBMISSION = gql`
   }
 `
 
+export const SUBMISSION_ATTACHMENTS_QUERY = gql`
+  query GetSubmissionAttachments($submissionId: ID!) {
+    submission: legacyNode(type: Submission, _id: $submissionId) {
+      ... on Submission {
+        attachments {
+          submissionPreviewUrl(submissionId: $submissionId)
+          displayName
+        }
+      }
+    }
+  }
+`
+
 export const AttachmentShape = shape({
   _id: string,
   displayName: string,
   mimeClass: string,
+  submissionPreviewUrl: string,
   thumbnailUrl: string,
   url: string
 })

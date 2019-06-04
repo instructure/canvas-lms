@@ -17,8 +17,8 @@
  */
 
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import AttemptTab from './AttemptTab'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
-import ContentUploadTab from './ContentUploadTab'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
@@ -32,7 +32,7 @@ import {Img} from '@instructure/ui-elements'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-const Comments = lazy(() => import('./Comments'))
+const CommentsTab = lazy(() => import('./CommentsTab'))
 
 ContentTabs.propTypes = {
   assignment: AssignmentShape,
@@ -82,12 +82,12 @@ function ContentTabs(props) {
         <TabPanel
           title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
         >
-          <ContentUploadTab assignment={props.assignment} submission={props.submission} />
+          <AttemptTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
           {!props.assignment.muted ? (
             <Suspense fallback={<LoadingIndicator />}>
-              <Comments assignment={props.assignment} submission={props.submission} />
+              <CommentsTab assignment={props.assignment} submission={props.submission} />
             </Suspense>
           ) : (
             <SVGWithTextPlaceholder

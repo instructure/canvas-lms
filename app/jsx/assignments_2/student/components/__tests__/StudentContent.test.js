@@ -117,7 +117,7 @@ describe('Assignment Student Content View', () => {
         <StudentContent {...props} />
       </MockedProvider>
     )
-    expect(getByRole('tablist')).toHaveTextContent('Upload')
+    expect(getByRole('tablist')).toHaveTextContent('Attempt 1')
     expect(getByText('Details')).toBeInTheDocument()
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })

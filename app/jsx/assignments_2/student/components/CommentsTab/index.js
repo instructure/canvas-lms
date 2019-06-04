@@ -26,7 +26,7 @@ import LoadingIndicator from '../../../shared/LoadingIndicator'
 import {Query} from 'react-apollo'
 import React from 'react'
 
-function Comments(props) {
+function CommentsTab(props) {
   const queryVariables = {
     submissionId: props.submission.rootId,
     submissionAttempt: props.submission.attempt
@@ -71,9 +71,9 @@ function Comments(props) {
   )
 }
 
-Comments.propTypes = {
+CommentsTab.propTypes = {
   assignment: AssignmentShape,
   submission: SubmissionShape
 }
 
-export default React.memo(Comments)
+export default React.memo(CommentsTab)

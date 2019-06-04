@@ -18,33 +18,25 @@
 import $ from 'jquery'
 import {fireEvent, render, waitForElement} from 'react-testing-library'
 import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from '../assignmentData'
-import {mockGraphqlQueryResults, singleAttachment, submissionGraphqlMock} from '../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
+import {singleAttachment, submissionGraphqlMock} from '../test-utils'
 import StudentView from '../StudentView'
 import * as uploadFileModule from '../../../shared/upload_file'
 
-const mocks = [
-  {
-    request: {
-      query: STUDENT_VIEW_QUERY,
-      variables: {
-        assignmentLid: '7'
-      }
-    },
-    result: {
-      data: {
-        assignment: mockGraphqlQueryResults()
-      }
-    }
-  }
-]
+let mocks
 
 describe('StudentView', () => {
   beforeAll(() => {
     window.URL.createObjectURL = jest.fn()
     uploadFileModule.uploadFiles = jest.fn()
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+  })
+
+  beforeEach(() => {
+    mocks = submissionGraphqlMock()
+    mocks[2].result.data.assignment.submissionsConnection.nodes[0].submissionHistoriesConnection.edges[0].node.state =
+      'unsubmitted'
   })
 
   const uploadFiles = (element, files) => {
@@ -58,7 +50,7 @@ describe('StudentView', () => {
   it('renders normally', async () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks} removeTypename addTypename>
-        <StudentView assignmentLid="7" />
+        <StudentView assignmentLid="22" />
       </MockedProvider>
     )
     expect(
@@ -100,7 +92,7 @@ describe('StudentView', () => {
   it('renders loading', async () => {
     const {getByTitle} = render(
       <MockedProvider mocks={mocks} removeTypename addTypename>
-        <StudentView assignmentLid="7" />
+        <StudentView assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -115,7 +107,7 @@ describe('StudentView', () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const {container, getByText} = render(
-      <MockedProvider mocks={submissionGraphqlMock()} addTypename>
+      <MockedProvider mocks={mocks} addTypename>
         <StudentView assignmentLid="22" />
       </MockedProvider>
     )
@@ -135,7 +127,7 @@ describe('StudentView', () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const {container, getByText} = render(
-      <MockedProvider mocks={submissionGraphqlMock()} addTypename>
+      <MockedProvider mocks={mocks} addTypename>
         <StudentView assignmentLid="22" />
       </MockedProvider>
     )
@@ -155,7 +147,7 @@ describe('StudentView', () => {
     ]
 
     const {container, getByText} = render(
-      <MockedProvider mocks={submissionGraphqlMock()} addTypename>
+      <MockedProvider mocks={mocks} addTypename>
         <StudentView assignmentLid="22" />
       </MockedProvider>
     )
@@ -174,14 +166,9 @@ describe('StudentView', () => {
   it.skip('notifies users of error when a submission fails to upload via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
-    const assignmentMocks = submissionGraphqlMock()
-    assignmentMocks[0].error = new Error('aw shucks')
+    mocks[0].error = new Error('aw shucks')
     const {container, getByText} = render(
-      <MockedProvider
-        defaultOptions={{mutate: {errorPolicy: 'all'}}}
-        mocks={assignmentMocks}
-        addTypename
-      >
+      <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
         <StudentView assignmentLid="22" />
       </MockedProvider>
     )
@@ -201,7 +188,7 @@ describe('StudentView', () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const {container, getByText} = render(
-      <MockedProvider mocks={submissionGraphqlMock()} addTypename>
+      <MockedProvider mocks={mocks} addTypename>
         <StudentView assignmentLid="22" />
       </MockedProvider>
     )
@@ -212,7 +199,9 @@ describe('StudentView', () => {
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    fireEvent.click(await waitForElement(() => getByText('Submit')))
+    fireEvent.click(
+      await waitForElement(() => container.querySelector('button[id="submit-button"]'))
+    )
 
     expect(await waitForElement(() => getByText('Submission sent'))).toBeInTheDocument()
   })
@@ -220,14 +209,9 @@ describe('StudentView', () => {
   it.skip('notifies users of error when a submission fails to send via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
-    const assignmentMocks = submissionGraphqlMock()
-    assignmentMocks[1].error = new Error('aw shucks')
+    mocks[1].error = new Error('aw shucks')
     const {container, getByText} = render(
-      <MockedProvider
-        defaultOptions={{mutate: {errorPolicy: 'all'}}}
-        mocks={assignmentMocks}
-        addTypename
-      >
+      <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
         <StudentView assignmentLid="22" />
       </MockedProvider>
     )
@@ -238,7 +222,9 @@ describe('StudentView', () => {
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
-    fireEvent.click(await waitForElement(() => getByText('Submit')))
+    fireEvent.click(
+      await waitForElement(() => container.querySelector('button[id="submit-button"]'))
+    )
     expect(await waitForElement(() => getByText('Error sending submission'))).toBeInTheDocument()
   })
 
