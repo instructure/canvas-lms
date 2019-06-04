@@ -68,7 +68,7 @@ export default class EditorConfig {
       [!window.ENV.use_rce_enhancements && 'theme']: 'modern',
       [!window.ENV.use_rce_enhancements && 'skin']: false,
       directionality: getDirection(),
-      plugins: `autolink,media,paste,table,lists,${window.ENV.use_rce_enhancements ? ',instructure-context-bindings,instructure-ui-icons,instructure_condensed_buttons' : 'textcolor'},link,directionality,a11y_checker,wordcount`,
+      plugins: `autolink,media,paste,table,lists,${window.ENV.use_rce_enhancements ? ',instructure-context-bindings,instructure-embeds,instructure-ui-icons,instructure_condensed_buttons' : 'textcolor'},link,directionality,a11y_checker,wordcount`,
       external_plugins: {
         instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
         instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
