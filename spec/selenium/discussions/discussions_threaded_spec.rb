@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
+require_relative 'pages/discussion_page'
 
 describe "threaded discussions" do
   include_context "in-process server selenium tests"
@@ -33,14 +34,14 @@ describe "threaded discussions" do
   end
 
   it "should create a threaded discussion", priority: "1", test_id: 150511 do
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     expect(f('.discussion-title').text).to eq @topic_title
   end
 
   it "should reply to the threaded discussion", priority: "2", test_id: 222519 do
     entry_text = 'new entry'
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     add_reply(entry_text)
     last_entry = DiscussionEntry.last
@@ -54,7 +55,7 @@ describe "threaded discussions" do
     reply_depth.times { |i| @topic.discussion_entries.create!(user: @student,
                                                               message: "new threaded reply #{i} from student",
                                                               parent_entry: DiscussionEntry.last) }
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     expect(DiscussionEntry.last.depth).to eq reply_depth
     expect(DiscussionEntry.last.parent_entry).to_not eq DiscussionEntry.first
   end
@@ -78,7 +79,7 @@ describe "threaded discussions" do
     child_entry = @topic.discussion_entries.create!(user: @student,
                                                     message: 'new threaded child reply from student',
                                                     parent_entry: entry)
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     edit_entry(entry, edit_text)
     expect(entry.reload.message).to match(edit_text)
   end
@@ -88,9 +89,9 @@ describe "threaded discussions" do
     entry = @topic.discussion_entries.create!(user: @student,
                                               message: 'new threaded reply from student')
     user_session(@student)
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     student_enrollment.send("conclude")
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     wait_for_ajaximations
 
     fj("#entry-#{entry.id} .al-trigger").click
@@ -102,9 +103,9 @@ describe "threaded discussions" do
     entry = @topic.discussion_entries.create!(user: @student,
                                               message: 'new threaded reply from student')
     user_session(@student)
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     student_enrollment.send("conclude")
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     wait_for_ajaximations
 
     fj("#entry-#{entry.id} .al-trigger").click
@@ -116,8 +117,8 @@ describe "threaded discussions" do
     reply_depth.times { |i| @topic.discussion_entries.create!(user: @student,
                                                               message: "new threaded reply #{i} from student",
                                                               parent_entry: DiscussionEntry.last) }
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-    expect_new_page_load{f(' .edit-btn').click}
+    Discussion.visit(@course, @topic)
+    expect_new_page_load{ f('.edit-btn').click }
     edit_topic('edited title', 'edited message')
     expect(get_all_replies.count).to eq 3
   end
@@ -125,7 +126,7 @@ describe "threaded discussions" do
   it "should edit a reply", priority: "1", test_id: 150514 do
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     edit_entry(entry, edit_text)
   end
 
@@ -133,7 +134,7 @@ describe "threaded discussions" do
     user_session(@student)
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     @topic.lock!
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     wait_for_ajaximations
 
     fj("#entry-#{entry.id} .al-trigger").click
@@ -155,7 +156,7 @@ describe "threaded discussions" do
     reply.update_attribute(:created_at, Time.zone.now - 1.minute)
 
     # Navigate to discussion URL
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     replied_at = f('.discussion-pubdate.hide-if-collapsed > time').attribute("data-html-tooltip-title")
 
@@ -174,7 +175,7 @@ describe "threaded discussions" do
   it "should delete a reply", priority: "1", test_id: 150515 do
     skip_if_safari(:alert)
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     delete_entry(entry)
   end
 
@@ -182,7 +183,7 @@ describe "threaded discussions" do
     skip_if_chrome('needs research: passes locally fails on Jenkins ')
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     edit_entry(entry, edit_text)
     wait_for_ajaximations
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
@@ -190,7 +191,7 @@ describe "threaded discussions" do
 
   it "should support repeated editing", priority: "2", test_id: 222523 do
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     edit_entry(entry, 'New text 1')
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
     # second edit
@@ -203,7 +204,7 @@ describe "threaded discussions" do
     edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
 
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
     @last_entry = f("#entry-#{entry.id}")
     reply_text = "this is a reply"
     add_reply(reply_text)
@@ -218,7 +219,7 @@ describe "threaded discussions" do
 
   it "should display editor name and timestamp after delete", priority: "2", test_id: 222525  do
     entry_text = 'new entry'
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     fj('label[for="showDeleted"]').click()
     add_reply(entry_text)
@@ -242,7 +243,7 @@ describe "threaded discussions" do
       topic.discussion_entries.create!(user: @student,
                                                     message: "new threaded reply from student",
                                                     parent_entry: DiscussionEntry.last)
-      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      Discussion.visit(@course, topic)
       f("a[data-student_id='#{@student.id}']").click
       expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student")
     end
