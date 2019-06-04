@@ -56,7 +56,7 @@ describe 'announcement_reply' do
     it "the url to the image should exist on the internet" do
       # this is the image we are counting on in our templates to exist, if it ever gets removed from the internet
       # we need to do something about it
-      expect(Faraday.head('https://du11hjcvx0uqb.cloudfront.net/dist/images/email_signature-ea0b2cda73.png').status).to eq 200
+      expect(Faraday.head('https://du11hjcvx0uqb.cloudfront.net/dist/images/email_signature-d2c5880612.png').status).to eq 200
     end
   end
 
