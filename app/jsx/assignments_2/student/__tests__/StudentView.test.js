@@ -120,7 +120,9 @@ describe('StudentView', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => container.querySelector('input[type="file"]'))
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="inputFileDrop"]')
+    )
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
@@ -132,11 +134,11 @@ describe('StudentView', () => {
     )
   })
 
-  it('notifies users of error when a submission fails to send', async () => {
+  it('notifies users of error when a submission fails to send via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const assignmentMocks = submissionGraphqlMock()
-    assignmentMocks[0].result = {errors: [{message: 'Error!'}]}
+    assignmentMocks[0].error = new Error('aw shucks')
     const {container, getByText} = render(
       <MockedProvider
         defaultOptions={{mutate: {errorPolicy: 'all'}}}
@@ -147,7 +149,9 @@ describe('StudentView', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => container.querySelector('input[type="file"]'))
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="inputFileDrop"]')
+    )
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
@@ -157,7 +161,7 @@ describe('StudentView', () => {
     expect(await waitForElement(() => getByText('Error sending submission'))).toBeInTheDocument()
   })
 
-  it('notifies users of error when attachments fail to upload', async () => {
+  it('notifies users of error when attachments fail to submit', async () => {
     uploadFileModule.uploadFiles.mock.results = [
       {type: 'throw', value: 'Error uploading file to Canvas API'}
     ]
@@ -168,14 +172,18 @@ describe('StudentView', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => container.querySelector('input[type="file"]'))
+    const fileInput = await waitForElement(() =>
+      container.querySelector('input[id="inputFileDrop"]')
+    )
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
     expect(getByText('Submit')).toBeInTheDocument()
     fireEvent.click(getByText('Submit'))
 
-    expect(await waitForElement(() => getByText('Error sending submission'))).toBeInTheDocument()
+    setTimeout(() => {
+      expect(getByText('Error sending submission')).toBeInTheDocument()
+    }, 1000)
   })
 })
 

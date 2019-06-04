@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import $ from 'jquery'
-import ContentUploadTab from '../ContentUploadTab'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
+import FileUpload from '../FileUpload'
 import {fireEvent, render} from 'react-testing-library'
 import {
   mockAssignment,
@@ -36,7 +37,7 @@ beforeEach(() => {
   window.URL.createObjectURL = jest.fn().mockReturnValue('perry_preview')
 })
 
-describe('ContentUploadTab', () => {
+describe('FileUpload', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {
@@ -48,7 +49,7 @@ describe('ContentUploadTab', () => {
   it('renders the empty upload tab by default', async () => {
     const {container, getByTestId, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('empty-upload')
@@ -62,10 +63,10 @@ describe('ContentUploadTab', () => {
   it('renders the uploaded files if there are any', async () => {
     const {container, getByTestId, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
-    const emptyRender = container.querySelector('input[type="file"]')
+    const emptyRender = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
 
     uploadFiles(emptyRender, [file])
@@ -77,7 +78,7 @@ describe('ContentUploadTab', () => {
   it('renders in an img tag if the file type is an image', async () => {
     const {container, getByTestId} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const emptyRender = container.querySelector('input[type="file"]')
@@ -94,7 +95,7 @@ describe('ContentUploadTab', () => {
   it('renders an icon if a non-image file is uploaded', async () => {
     const {container, getByTestId} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const emptyRender = container.querySelector('input[type="file"]')
@@ -110,7 +111,7 @@ describe('ContentUploadTab', () => {
   it('allows uploading multiple files at a time', async () => {
     const {container, getByTestId, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -127,7 +128,7 @@ describe('ContentUploadTab', () => {
   it('concatenates separate file additions together', async () => {
     const {container, getByTestId, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -145,7 +146,7 @@ describe('ContentUploadTab', () => {
   it('renders a button to remove the file', async () => {
     const {container, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const emptyRender = container.querySelector('input[type="file"]')
@@ -161,7 +162,7 @@ describe('ContentUploadTab', () => {
   it('removes the correct file when the Remove button is clicked', async () => {
     const {container, getByText, queryByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -180,7 +181,7 @@ describe('ContentUploadTab', () => {
   it('ellides filenames for files greater than 21 characters', async () => {
     const {container, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -195,7 +196,7 @@ describe('ContentUploadTab', () => {
     const filename = 'c'.repeat(21)
     const {container, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -210,7 +211,7 @@ describe('ContentUploadTab', () => {
     const mockedAssignment = mockAssignment({allowedExtensions: ['jpg, png']})
     const {getByTestId, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockedAssignment} submission={mockSubmission()} />
+        <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('empty-upload')
@@ -221,7 +222,7 @@ describe('ContentUploadTab', () => {
   it('does not display any allowed extensions if there are none', async () => {
     const {getByTestId, queryByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('empty-upload')
@@ -233,7 +234,7 @@ describe('ContentUploadTab', () => {
     const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
     const {container, getByText, queryByTestId} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockedAssignment} submission={mockSubmission()} />
+        <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -249,7 +250,7 @@ describe('ContentUploadTab', () => {
     const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
     const {container, getByTestId, getByText, queryByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockedAssignment} submission={mockSubmission()} />
+        <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -265,7 +266,7 @@ describe('ContentUploadTab', () => {
   it('renders a submit button only when a file has been uploaded', async () => {
     const {container, getByText, queryByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
 
@@ -294,7 +295,7 @@ describe('ContentUploadTab', () => {
 
     const {getByTestId, getByText} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mocked_submission} />
+        <FileUpload assignment={mockAssignment()} submission={mocked_submission} />
       </MockedProvider>
     )
     const uploadRender = getByTestId('non-empty-upload')
@@ -316,7 +317,7 @@ describe('ContentUploadTab', () => {
 
     const {container, getByTestId} = render(
       <MockedProvider>
-        <ContentUploadTab assignment={mockAssignment()} submission={mocked_submission} />
+        <FileUpload assignment={mockAssignment()} submission={mocked_submission} />
       </MockedProvider>
     )
     const uploadRender = getByTestId('non-empty-upload')
