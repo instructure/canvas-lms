@@ -251,6 +251,12 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       ok(renderCell().classList.contains('muted'))
     })
 
+    test('does not include the "muted" class when post policies are enabled', () => {
+      gradebook.options.post_policies_enabled = true
+      gradebook.getAssignment('2301').muted = true
+      ok(renderCell().classList.contains('muted'))
+    })
+
     test('escapes html in the grade', () => {
       gradebook.getDefaultGradingScheme().data[0][0] = '<img src=null onerror=alert(1) >'
       gradebook.getAssignment('2301').grading_type = 'letter_grade'

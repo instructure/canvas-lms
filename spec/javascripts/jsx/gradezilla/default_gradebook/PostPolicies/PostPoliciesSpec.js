@@ -104,10 +104,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
   })
 
   QUnit.module('#showHideAssignmentGradesTray()', hooks => {
+    let assignment
+
     hooks.beforeEach(() => {
       createPostPolicies()
 
-      const assignment = {
+      assignment = {
         anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
@@ -173,7 +175,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     QUnit.module('onHidden', onHiddenHooks => {
       let postedOrHiddenInfo
       let student
-      let updateColumnHeadersStub
+      let handleSubmissionPostedChangeStub
 
       onHiddenHooks.beforeEach(() => {
         student = {
@@ -188,26 +190,34 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         }
 
         gradebook.gotChunkOfStudents([student])
-        updateColumnHeadersStub = sinon.stub(gradebook, 'updateColumnHeaders')
+        handleSubmissionPostedChangeStub = sinon.stub(gradebook, 'handleSubmissionPostedChange')
       })
 
       onHiddenHooks.afterEach(() => {
-        updateColumnHeadersStub.restore()
+        handleSubmissionPostedChangeStub.restore()
       })
 
-      test('calls updateColumnHeaders', () => {
+      test('calls handleSubmissionPostedChange', () => {
         postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
         const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
         onHidden(postedOrHiddenInfo)
-        strictEqual(updateColumnHeadersStub.callCount, 1)
+        strictEqual(handleSubmissionPostedChangeStub.callCount, 1)
       })
 
-      test('calls updateColumnHeaders with the column ids', () => {
+      test('calls handleSubmissionPostedChange with the assignment', () => {
         postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
-        const columnId = gradebook.getAssignmentColumnId('2301')
         const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
         onHidden(postedOrHiddenInfo)
-        deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
+        strictEqual(handleSubmissionPostedChangeStub.firstCall.args[0].id, '2301')
+      })
+
+      test('updates the assignment anonymize_students when hiding for an anonymous assignment', () => {
+        assignment = {...assignment, anonymize_students: false, anonymous_grading: true}
+        gradebook.setAssignments({2301: assignment})
+        postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+        const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+        onHidden(postedOrHiddenInfo)
+        strictEqual(gradebook.getAssignment('2301').anonymize_students, true)
       })
 
       test('updates the posted_at of the submissions', () => {
@@ -220,12 +230,13 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
   })
 
   QUnit.module('#showPostAssignmentGradesTray()', hooks => {
+    let assignment
     let submission
 
     hooks.beforeEach(() => {
       createPostPolicies()
 
-      const assignment = {
+      assignment = {
         anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
@@ -311,7 +322,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     QUnit.module('onPosted', onPostedHooks => {
       let postedOrHiddenInfo
       let student
-      let updateColumnHeadersStub
+      let handleSubmissionPostedChangeStub
 
       onPostedHooks.beforeEach(() => {
         student = {
@@ -326,26 +337,34 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         }
 
         gradebook.gotChunkOfStudents([student])
-        updateColumnHeadersStub = sinon.stub(gradebook, 'updateColumnHeaders')
+        handleSubmissionPostedChangeStub = sinon.stub(gradebook, 'handleSubmissionPostedChange')
       })
 
       onPostedHooks.afterEach(() => {
-        updateColumnHeadersStub.restore()
+        handleSubmissionPostedChangeStub.restore()
       })
 
-      test('calls updateColumnHeaders', () => {
+      test('calls handleSubmissionPostedChange', () => {
         postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
         const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
         onPosted(postedOrHiddenInfo)
-        strictEqual(updateColumnHeadersStub.callCount, 1)
+        strictEqual(handleSubmissionPostedChangeStub.callCount, 1)
       })
 
-      test('calls updateColumnHeaders with the column ids', () => {
+      test('calls handleSubmissionPostedChange with the assignment', () => {
         postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-        const columnId = gradebook.getAssignmentColumnId('2301')
         const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
         onPosted(postedOrHiddenInfo)
-        deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
+        strictEqual(handleSubmissionPostedChangeStub.firstCall.args[0].id, '2301')
+      })
+
+      test('updates the assignment anonymize_students when posting for an anonymous assignment', () => {
+        assignment = {...assignment, anonymize_students: true, anonymous_grading: true}
+        gradebook.setAssignments({2301: assignment})
+        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        onPosted(postedOrHiddenInfo)
+        strictEqual(gradebook.getAssignment('2301').anonymize_students, false)
       })
 
       test('updates the posted_at of the submissions', () => {

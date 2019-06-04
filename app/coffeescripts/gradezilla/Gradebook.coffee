@@ -301,7 +301,7 @@ export default do ->
       else
         @postPolicies = null
 
-      $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
+      $.subscribe 'assignment_muting_toggled',        @handleSubmissionPostedChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
 
       # emitted by SectionMenuView; also subscribed in OutcomeGradebookView
@@ -939,7 +939,7 @@ export default do ->
 
     ## Course Content Event Handlers
 
-    handleAssignmentMutingChange: (assignment) =>
+    handleSubmissionPostedChange: (assignment) =>
       if assignment.anonymize_students
         anonymousColumnIds = [
           @getAssignmentColumnId(assignment.id),

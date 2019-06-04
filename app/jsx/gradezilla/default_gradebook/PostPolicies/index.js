@@ -68,15 +68,20 @@ export default class PostPolicies {
   }
 
   _onGradesPostedOrHidden({assignmentId, postedAt, userIds}) {
-    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+    const assignment = this._gradebook.getAssignment(assignmentId)
+    const parsedPostedAt = tz.parse(postedAt)
 
     userIds.forEach(userId => {
       const submission = this._gradebook.getSubmission(userId, assignmentId)
-      submission.posted_at = tz.parse(postedAt)
+      submission.posted_at = parsedPostedAt
       this._gradebook.updateSubmission(submission)
     })
 
-    this._gradebook.updateColumnHeaders([columnId])
+    if (assignment.anonymous_grading) {
+      assignment.anonymize_students = !postedAt
+    }
+
+    this._gradebook.handleSubmissionPostedChange(assignment)
   }
 
   _onAssignmentPostPolicyUpdated({assignmentId, postManually}) {
