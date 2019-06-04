@@ -24,7 +24,7 @@ describe CourseForMenuPresenter do
   let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
 
   let_once(:presenter) do
-    CourseForMenuPresenter.new(course, user, nil, nil, nil,{tabs: dashboard_card_tabs})
+    CourseForMenuPresenter.new(course, user, nil, nil, {tabs: dashboard_card_tabs})
   end
 
   describe '#to_h' do
@@ -88,35 +88,6 @@ describe CourseForMenuPresenter do
         cs_presenter = CourseForMenuPresenter.new(course, user, @account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq nil
-      end
-    end
-
-    context 'Image' do
-      before {course.account.enable_feature!(:course_card_images)}
-      let!(:attachment) {attachment_with_context(course)}
-      let(:thumbnail_url){ 'http://example.com/thumbnail'}
-      let(:file_authenticator){ double(thumbnail_url: thumbnail_url)}
-      let(:auth_presenter) do
-        CourseForMenuPresenter.new(course, user, nil, nil, file_authenticator,{tabs: dashboard_card_tabs})
-      end
-
-      it "returns the image_url when image_url is set" do
-        course.image_url = "http://example.com"
-        course.save!
-        h = auth_presenter.to_h
-        expect(h[:image]).to eq "http://example.com"
-      end
-
-      it "returns the download_url for a course file if image_id is set" do
-        course.image_id = attachment.id
-        course.save!
-        h = auth_presenter.to_h
-        expect(h[:image]).to eq thumbnail_url
-      end
-
-      it "returns nil if image_id and image_url are not set" do
-        h = auth_presenter.to_h
-        expect(h[:image]).to be_nil
       end
     end
 
