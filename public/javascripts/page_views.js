@@ -18,91 +18,82 @@
 
 import INST from './INST'
 import $ from 'jquery'
+import authenticity_token from 'compiled/behaviors/authenticity_token'
 import './jquery.ajaxJSON'
 
-$(document).ready(function() {
-  let interactionSeconds = 0,
-    update_url = window.ENV.page_view_update_url
-  eventInTime = false
+let update_url = window.ENV.page_view_update_url
+if (update_url) {
+  $(() => {
+    let interactionSeconds = 0
 
-  INST.interaction_contexts = {}
+    INST.interaction_contexts = {}
 
-  if (document.cookie && document.cookie.match(/last_page_view/)) {
-    const match = document.cookie.match(/last_page_view=([^;]+)/)
-    if (match && match[1]) {
-      try {
-        const data = $.parseJSON(unescape(match[1]))
-        if (data && data.url && data.seconds) {
-          setTimeout(function() {
-            $.ajaxJSON(
-              data.url,
-              'PUT',
-              {interaction_seconds: data.seconds},
-              function() {},
-              function() {},
-              3000
-            )
+    if (update_url) {
+      let secondsSinceLastEvent = 0
+      const intervalInSeconds = 60 * 5
+
+      $(document).bind('page_view_update_url_received', function(event, new_update_url) {
+        update_url = new_update_url
+      })
+
+      let updateTrigger
+      $(document).bind('page_view_update', function(event, force) {
+        const data = {}
+
+        if (force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
+          data.interaction_seconds = interactionSeconds
+          $.ajaxJSON(update_url, 'PUT', data, null, function(result, xhr) {
+            if (xhr.status === 422) {
+              clearInterval(updateTrigger)
+            }
           })
+          interactionSeconds = 0
         }
-      } catch (e) {}
-    }
-    document.cookie = 'last_page_view=; Path=/; expires=Thu, 01-Jan-1970 00:00:01 GMT'
-  }
+      })
 
-  if (update_url) {
-    let secondsSinceLastEvent = 0
-    const intervalInSeconds = 60 * 5
+      updateTrigger = setInterval(function() {
+        $(document).triggerHandler('page_view_update')
+      }, 1000 * intervalInSeconds)
 
-    $(document).bind('page_view_update_url_received', function(event, new_update_url) {
-      update_url = new_update_url
-    })
-
-    let updateTrigger
-    $(document).bind('page_view_update', function(event, force) {
-      const data = {}
-
-      if (force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
-        data.interaction_seconds = interactionSeconds
-        $.ajaxJSON(update_url, 'PUT', data, null, function(result, xhr) {
-          if (xhr.status === 422) {
-            clearInterval(updateTrigger)
+      window.addEventListener(
+        'unload',
+        () => {
+          if (interactionSeconds > 30) {
+            // Use sendBeacon so the request doesn't get cancelled as we navigate away like a normal XHR would,
+            // but because sendBeacon only sends POST requests, we have to use FormData to fake the "_method" to PUT
+            // like Rail's `form_for` does
+            const formData = new FormData()
+            formData.append('interaction_seconds', interactionSeconds)
+            formData.append('_method', 'put')
+            formData.append('authenticity_token', authenticity_token())
+            formData.append('utf8', '&#x2713')
+            navigator.sendBeacon(update_url, formData)
           }
-        })
-        interactionSeconds = 0
-      }
-    })
+        },
+        false
+      )
 
-    updateTrigger = setInterval(function() {
-      $(document).triggerHandler('page_view_update')
-    }, 1000 * intervalInSeconds)
-
-    window.addEventListener('beforeunload', function(e) {
-      if (interactionSeconds > 30) {
-        const value = JSON.stringify({url: update_url, seconds: interactionSeconds})
-        document.cookie = `last_page_view=${escape(value)}; Path=/;`
-      }
-    })
-
-    var eventInTime = false
-    $(document).bind('mousemove keypress mousedown focus', function() {
-      eventInTime = true
-    })
-    setInterval(function() {
-      if (eventInTime) {
-        interactionSeconds++
-        if (INST && INST.interaction_context && INST.interaction_contexts) {
-          INST.interaction_contexts[INST.interaction_context] =
-            (INST.interaction_contexts[INST.interaction_context] || 0) + 1
-        }
-        eventInTime = false
-        if (secondsSinceLastEvent >= intervalInSeconds) {
+      let eventInTime = false
+      $(document).bind('mousemove keypress mousedown focus', function() {
+        eventInTime = true
+      })
+      setInterval(function() {
+        if (eventInTime) {
+          interactionSeconds++
+          if (INST && INST.interaction_context && INST.interaction_contexts) {
+            INST.interaction_contexts[INST.interaction_context] =
+              (INST.interaction_contexts[INST.interaction_context] || 0) + 1
+          }
+          eventInTime = false
+          if (secondsSinceLastEvent >= intervalInSeconds) {
+            secondsSinceLastEvent = 0
+            $(document).triggerHandler('page_view_update')
+          }
           secondsSinceLastEvent = 0
-          $(document).triggerHandler('page_view_update')
+        } else {
+          secondsSinceLastEvent++
         }
-        secondsSinceLastEvent = 0
-      } else {
-        secondsSinceLastEvent++
-      }
-    }, 1000)
-  }
-})
+      }, 1000)
+    }
+  })
+}
