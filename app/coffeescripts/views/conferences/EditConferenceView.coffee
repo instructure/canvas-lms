@@ -204,7 +204,7 @@ export default class EditConferenceView extends DialogBaseView
 
   markInvitedUsers: ->
     _.each(@model.get('user_ids'), (id) ->
-      el = @$("#members_list .member.user_" + id).find(":checkbox")
+      el = $("#members_list .member.user_" + id).find(":checkbox")
       el.attr('checked', true)
       el.attr('disabled', true)
     )
