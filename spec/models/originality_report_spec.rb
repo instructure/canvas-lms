@@ -83,6 +83,25 @@ describe OriginalityReport do
     subject.save!
     expect(subject.originality_report_attachment).to eq originality_attachemnt
   end
+  it 'can create multiple originality reports with the same originality_report_attachment_id' do
+    report = OriginalityReport.create!(
+      attachment: attachment,
+      originality_score: '1',
+      submission: submission,
+      workflow_state: 'pending'
+    )
+    report2 = OriginalityReport.create!(
+      attachment: attachment,
+      originality_score: '1',
+      submission: submission,
+      workflow_state: 'pending'
+    )
+    report.originality_report_attachment_id = 123
+    report2.originality_report_attachment_id = 123
+    report.save!
+    report2.save!
+    expect(report.originality_report_attachment_id).to eq report2.originality_report_attachment_id
+  end
 
   it 'returns the state of the originality report' do
     expect(subject.state).to eq 'acceptable'
@@ -358,3 +377,4 @@ describe OriginalityReport do
     end
   end
 end
+
