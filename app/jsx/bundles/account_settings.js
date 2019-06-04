@@ -25,9 +25,14 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 import 'account_settings'
 import 'compiled/modules/account_quota_settings'
+import FeatureFlags from "../feature_flags/FeatureFlags"
 
-const featureFlags = new FeatureFlagAdminView({el: '#tab-features'})
-featureFlags.collection.fetchAll()
+if (window.ENV.NEW_FEATURES_UI) {
+  ReactDOM.render(<FeatureFlags/>, document.getElementById('tab-features'))
+} else {
+  const featureFlags = new FeatureFlagAdminView({el: '#tab-features'})
+  featureFlags.collection.fetchAll()
+}
 
 if (document.getElementById('custom_help_link_settings')) {
   ReactDOM.render(
