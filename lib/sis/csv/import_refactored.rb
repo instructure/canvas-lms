@@ -205,12 +205,12 @@ module SIS
       end
 
       def calculate_progress
-        (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
+        [(((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100, 99].min
       end
 
       def update_progress
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
-        current_progress = (completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round
+        current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.map(&:count).sum).round, 99].min
         SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
