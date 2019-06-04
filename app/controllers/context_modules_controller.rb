@@ -307,8 +307,14 @@ class ContextModulesController < ApplicationController
         end
       end
 
-      submitted_assignment_ids = @current_user.submissions.shard(@context.shard).
-        having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id) if @current_user && assignment_ids.any?
+      submitted_assignment_ids = if @current_user && assignment_ids.any?
+        assignments_key = Digest::MD5.hexdigest(assignment_ids.sort.join(","))
+        Rails.cache.fetch_with_batched_keys("submitted_assignment_ids/#{assignments_key}",
+            batch_object: @current_user, batched_keys: :submissions) do
+          @current_user.submissions.shard(@context.shard).
+            having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id)
+        end
+      end
       submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard).
         completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if @current_user && quiz_ids.any?
       submitted_assignment_ids ||=[]
