@@ -68,7 +68,7 @@ class Account < ActiveRecord::Base
            inverse_of: :account,
            extend: AuthenticationProvider::FindWithType
 
-  has_many :account_reports
+  has_many :account_reports, inverse_of: :account
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -412,7 +412,18 @@ class Account < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    send_later_if_production(:update_account_associations) if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
+    if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
+      self.shard.activate do
+        send_later_if_production(:clear_downstream_caches, :account_chain)
+        send_later_if_production(:update_account_associations)
+      end
+    end
+  end
+
+  def clear_downstream_caches(*key_types)
+    self.shard.activate do
+      Account.clear_cache_keys([self.id] + Account.sub_account_ids_recursive(self.id), *key_types)
+    end
   end
 
   def equella_settings
@@ -749,7 +760,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_chain_ids(starting_account_id)
-    if connection.adapter_name == 'PostgreSQL'
+    block = lambda do |_name|
       Shard.shard_for(starting_account_id).activate do
         id_chain = []
         if (starting_account_id.is_a?(Account))
@@ -772,9 +783,9 @@ class Account < ActiveRecord::Base
         end
         id_chain
       end
-    else
-      account_chain(starting_account_id).map(&:id)
     end
+    key = Account.cache_key_for_id(starting_account_id, :account_chain)
+    key ? Rails.cache.fetch(['account_chain_ids', key], &block) : block.call(nil)
   end
 
   def self.multi_account_chain_ids(starting_account_ids)
@@ -986,29 +997,25 @@ class Account < ActiveRecord::Base
   end
 
   def account_users_for(user)
-    return [] unless user
-    @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
-        @account_users_cache[user.global_id] ||= begin
-          all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
-            # this is a plain ruby hash to keep the cached portion as small as possible
-            self.account_users.active.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
-          end
-          (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
-            au = AccountUser.new
-            au.id = id
-            au.account = Account.site_admin
-            au.user = user
-            au.role_id = role_id
-            au.readonly!
-            au
-          end
+        all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
+          # this is a plain ruby hash to keep the cached portion as small as possible
+          self.account_users.active.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
+        end
+        (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
+          au = AccountUser.new
+          au.id = id
+          au.account = Account.site_admin
+          au.user = user
+          au.role_id = role_id
+          au.readonly!
+          au
         end
       end
     else
       @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
-      @account_users_cache[user.global_id] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+      Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
@@ -1016,8 +1023,21 @@ class Account < ActiveRecord::Base
         end
       end
     end
-    @account_users_cache[user.global_id] ||= []
-    @account_users_cache[user.global_id]
+  end
+
+  def cached_account_users_for(user)
+    return [] unless user
+    @account_users_cache ||= {}
+    @account_users_cache[user.global_id] ||= begin
+      if self.site_admin?
+        account_users_for(user) # has own cache
+      else
+        Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
+            batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
+          account_users_for(user)
+        end
+      end
+    end
   end
 
   # returns all active account users for this entire account tree
@@ -1029,17 +1049,25 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def cached_all_account_users_for(user)
+    return [] unless user
+    Rails.cache.fetch_with_batched_keys(['all_account_users_for_user', user.cache_key(:account_users)].cache_key,
+        batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
+      all_account_users_for(user)
+    end
+  end
+
   set_policy do
     RoleOverride.permissions.each do |permission, _details|
-      given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
+      given { |user| self.cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
       can :create_courses if permission == :manage_courses
     end
 
-    given { |user| !self.account_users_for(user).empty? }
+    given { |user| !self.cached_account_users_for(user).empty? }
     can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes and can :read_terms
 
-    given { |user| self.root_account? && self.all_account_users_for(user).any? }
+    given { |user| self.root_account? && self.cached_all_account_users_for(user).any? }
     can :read_terms
 
     given { |user|

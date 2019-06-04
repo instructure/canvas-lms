@@ -28,7 +28,10 @@ export default function(ed, document) {
       document.body.appendChild(container)
     }
 
-    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
+    const handleDismiss = () => {
+      ReactDOM.unmountComponentAtNode(container)
+      ed.focus(false)
+    }
 
     ReactDOM.render(<UploadImage editor={ed} onDismiss={handleDismiss} />, container)
   })

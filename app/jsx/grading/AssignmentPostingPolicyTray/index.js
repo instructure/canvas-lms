@@ -25,27 +25,61 @@ import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!post_grades_tray'
 
+import Layout from './Layout'
+import {setAssignmentPostPolicy} from './Api'
+import {showFlashAlert} from '../../shared/FlashAlert'
+
 export default class AssignmentPostingPolicyTray extends PureComponent {
   constructor(props) {
     super(props)
 
-    this.dismiss = this.dismiss.bind(this)
+    this.handleDismiss = this.handleDismiss.bind(this)
     this.show = this.show.bind(this)
 
     this.state = {
       open: false
     }
+
+    this.handlePostPolicyChanged = this.handlePostPolicyChanged.bind(this)
+    this.handleSave = this.handleSave.bind(this)
   }
 
-  dismiss() {
+  handleDismiss() {
     this.setState({open: false})
   }
 
   show(context) {
     this.setState({
       ...context,
-      open: true
+      open: true,
+      requestInProgress: false,
+      selectedPostManually: context.assignment.postManually
     })
+  }
+
+  handlePostPolicyChanged({postManually}) {
+    this.setState({selectedPostManually: postManually})
+  }
+
+  handleSave() {
+    const {id: assignmentId, name} = this.state.assignment
+    const {selectedPostManually} = this.state
+
+    this.setState({requestInProgress: true})
+    setAssignmentPostPolicy({assignmentId, postManually: selectedPostManually})
+      .then(response => {
+        const message = I18n.t('Success! The post policy for %{name} has been updated.', {name})
+        const {postManually} = response
+
+        showFlashAlert({message, type: 'success'})
+        this.state.onAssignmentPostPolicyUpdated({assignmentId, postManually})
+        this.handleDismiss()
+      })
+      .catch(_error => {
+        const message = I18n.t('An error occurred while saving the assignment post policy')
+        showFlashAlert({message, type: 'error'})
+        this.setState({requestInProgress: false})
+      })
   }
 
   render() {
@@ -53,7 +87,9 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
       return null
     }
 
-    const {assignment, onExited} = this.state
+    const {assignment, onExited, requestInProgress, selectedPostManually} = this.state
+    const allowAutomaticPosting = !(assignment.anonymousGrading || assignment.moderatedGrading)
+    const allowSaving = assignment.postManually !== selectedPostManually && !requestInProgress
 
     return (
       <Tray
@@ -65,7 +101,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 medium 0">
             <FlexItem>
-              <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
+              <CloseButton onClick={this.handleDismiss}>{I18n.t('Close')}</CloseButton>
             </FlexItem>
 
             <FlexItem margin="0 0 0 small" shrink>
@@ -77,6 +113,16 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
             </FlexItem>
           </Flex>
         </View>
+
+        <Layout
+          allowAutomaticPosting={allowAutomaticPosting}
+          allowCanceling={!requestInProgress}
+          allowSaving={allowSaving}
+          onPostPolicyChanged={this.handlePostPolicyChanged}
+          onDismiss={this.handleDismiss}
+          onSave={this.handleSave}
+          selectedPostManually={selectedPostManually}
+        />
       </Tray>
     )
   }

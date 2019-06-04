@@ -112,13 +112,6 @@ describe Mutations::PostAssignmentGradesForSections do
       expect(result.dig("errors", 0, "message")).to eql expected_error
     end
 
-    it "allows posting by section for assignments that are no longer anonymized" do
-      assignment.update!(anonymous_grading: true)
-      assignment.post_submissions
-      result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result.dig("errors")).to be nil
-    end
-
     it "does not allow posting by section for moderated assignments that have not had grades published yet" do
       assignment.update!(moderated_grading: true, grader_count: 2, final_grader: teacher)
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)

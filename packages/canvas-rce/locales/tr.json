@@ -86,6 +86,9 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Lisansı:"
   },
+  "custom_6979cd81": {
+    "message": "Özelleştir"
+  },
   "decrease_indent_de6343ab": {
     "message": "İçerden başlatma sınırını azalt"
   },
@@ -95,8 +98,14 @@
   "discussions_index_6c36ced": {
     "message": "Tartışma Başlıkları"
   },
+  "done_54e3d4b6": {
+    "message": "Tamam"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Teslim Tarihi: Birden Çok Gün"
+  },
+  "embed_image_1080badc": {
+    "message": "Görsel Ekle"
   },
   "enter_search_terms_e397b1f0": {
     "message": "arama ifadelerini gir"
@@ -182,9 +191,6 @@
   "loading_failed_b3524381": {
     "message": "Yükleme Başarısız..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Daha fazla sonuç yükleniyor..."
-  },
   "media_af190855": {
     "message": "Medya"
   },
@@ -193,6 +199,9 @@
   },
   "no_results_940393cf": {
     "message": "Sonuç yok."
+  },
+  "options_3ab0ea65": {
+    "message": "Seçenekler"
   },
   "pages_e5414c2c": {
     "message": "Sayfalar"
@@ -206,6 +215,18 @@
   "quizzes_7e598f57": {
     "message": "Kısa sınavlar"
   },
+  "record_7c9448b": {
+    "message": "Kayıt"
+  },
+  "recording_98da6bda": {
+    "message": "Kaydediliyor"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Zengin İçerik Editörü"
+  },
+  "save_11a80ec3": {
+    "message": "Kaydet"
+  },
   "search_280d00bd": {
     "message": "Ara"
   },
@@ -215,11 +236,17 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
   },
+  "size_b30e1077": {
+    "message": "Boyut"
+  },
   "something_went_wrong_89195131": {
     "message": "Bazı sorunlar oluştu."
   },
   "sort_by_e75f9e3e": {
     "message": "Sırala"
+  },
+  "start_over_f7552aa9": {
+    "message": "Baştan Başla"
   },
   "submit_a3cc6859": {
     "message": "Gönder"
@@ -250,6 +277,9 @@
   },
   "upload_file_fd2361b8": {
     "message": "Dosya Yükle"
+  },
+  "upload_media_ce31135a": {
+    "message": "Ortama Yükle"
   },
   "url_22a5f3b8": {
     "message": "URL"

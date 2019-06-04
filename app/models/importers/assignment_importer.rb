@@ -79,7 +79,7 @@ module Importers
         end
       end
 
-      context.touch_admins if context.respond_to?(:touch_admins)
+      context.clear_todo_list_cache(:admins) if context.is_a?(Course)
     end
 
     def self.create_tool_settings(tool_setting_hash, tool_proxy, assignment)
@@ -103,6 +103,14 @@ module Importers
         custom_parameters: ts_custom_params,
         vendor_code: ts_vendor_code,
         product_code: ts_product_code
+      )
+    end
+
+    def self.create_default_line_item(assignment, migration)
+      assignment.create_assignment_line_item!
+    rescue
+      migration.add_warning(
+        t('Error associating assignment "%{assignment_name}" with an LTI tool.', assignment_name: assignment.title)
       )
     end
 
@@ -374,6 +382,7 @@ module Importers
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end
         end
+        create_default_line_item(item, migration)
       end
 
       if hash["similarity_detection_tool"].present?

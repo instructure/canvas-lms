@@ -72,5 +72,11 @@ describe Canvas::Cdn do
       expect(request).to receive(:headers).and_return({'Accept-Encoding'=> 'gzip, deflate, br'})
       expect(Canvas::Cdn.supports_brotli?(request)).to be_truthy
     end
+
+    it "doesn't die if there is no accept-encoding header" do
+      request = double()
+      expect(request).to receive(:headers).and_return({'Accept-Encoding'=> nil})
+      expect(Canvas::Cdn.supports_brotli?(request)).to be_falsy
+    end
   end
 end

@@ -652,19 +652,23 @@ class AccountsController < ApplicationController
 
     page_opts = {}
     page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
-    preload_teachers(@courses) if includes.include?("teachers")
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
+    all_precalculated_permissions = nil
+    Shackles.activate(:slave) do
+      @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
-    if includes.include?("total_students")
-      student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
-        where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
-      @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
+      ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
+      preload_teachers(@courses) if includes.include?("teachers")
+      ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
+
+      if includes.include?("total_students")
+        student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
+          where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
+        @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
+      end
+      all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(@courses, [:read_sis, :manage_sis])
     end
 
-    all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(@courses, [:read_sis, :manage_sis])
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil,
       precalculated_permissions: all_precalculated_permissions&.dig(c.global_id)) }
   end

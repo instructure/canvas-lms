@@ -25,6 +25,26 @@ import View from '@instructure/ui-layout/lib/components/View'
 import CustomizationTable from './CustomizationTable'
 import OtherOptions from './OtherOptions'
 
+export const customFieldsStringToObject = (data) => {
+  const output = {}
+  data.split('\n').forEach(field => {
+    const value = field.split('=')
+    if(value.length > 1) {
+      output[value[0]] = value[1]
+    }
+  })
+  return output
+}
+
+export const objectToCustomVariablesString = (custom_fields) => {
+  if(!custom_fields || Object.keys(custom_fields).length === 0) { return '' }
+  return Object.keys(custom_fields).map(
+    k => `${k}=${custom_fields[k]}`
+  ).join('\n')
+}
+
+const validationMessage = [{text: I18n.t('Invalid custom fields.'), type: 'error'}]
+
 export default class CustomizationForm extends React.Component {
   static propTypes = {
     toolConfiguration: PropTypes.object.isRequired,
@@ -35,7 +55,9 @@ export default class CustomizationForm extends React.Component {
     dispatch: PropTypes.func.isRequired,
     setEnabledScopes: PropTypes.func.isRequired,
     setDisabledPlacements: PropTypes.func.isRequired,
-    setPrivacyLevel: PropTypes.func.isRequired
+    setPrivacyLevel: PropTypes.func.isRequired,
+    updateToolConfiguration: PropTypes.func.isRequired,
+    showCustomizationMessages: PropTypes.bool
   }
 
   constructor(props) {
@@ -43,6 +65,10 @@ export default class CustomizationForm extends React.Component {
     const {dispatch, setPrivacyLevel} = this.props
     this.invertedScopes = invert(this.props.validScopes)
     dispatch(setPrivacyLevel(this.privacyLevel))
+    this.state = {
+      custom_fields: objectToCustomVariablesString(props.toolConfiguration.custom_fields),
+      valid: true
+    }
   }
 
   get privacyLevel() {
@@ -107,7 +133,7 @@ export default class CustomizationForm extends React.Component {
   }
 
   handlePlacementChange = e => {
-    const {dispatch, setDisabledPlacements, validPlacements} = this.props
+    const {dispatch, setDisabledPlacements} = this.props
     const value = e.target.value
     const newDisabledPlacements = this.props.disabledPlacements.slice()
 
@@ -137,6 +163,16 @@ export default class CustomizationForm extends React.Component {
       array.push(value)
     }
     return array
+  }
+
+  updateCustomFields = (e) => {
+    const customFieldsObject = customFieldsStringToObject(e.target.value)
+    const toUpdate = Object.keys(customFieldsObject).length > 0 ? customFieldsObject : null
+    this.setState({custom_fields: e.target.value, valid: !!toUpdate})
+    this.props.updateToolConfiguration(
+      toUpdate,
+      'custom_fields'
+    )
   }
 
   scopeTable() {
@@ -174,13 +210,19 @@ export default class CustomizationForm extends React.Component {
   }
 
   customFields() {
+    const messages = [{text: I18n.t('One per line. Format: name=value'), type: 'hint'}]
+    if (this.props.showCustomizationMessages && !this.state.valid) {
+      messages.push(validationMessage[0])
+    }
     return (
       <TextArea
         label={I18n.t('Custom Fields')}
         maxHeight="20rem"
         width="50%"
-        messages={[{text: I18n.t('One per line. Format: name=value'), type: 'hint'}]}
         name="custom_fields"
+        onChange={this.updateCustomFields}
+        value={this.state.custom_fields}
+        messages={messages}
       />
     )
   }

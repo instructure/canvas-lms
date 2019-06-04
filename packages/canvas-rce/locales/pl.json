@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "oznacz nieuporządkowaną listę"
   },
+  "clear_upload_34efa419": {
+    "message": "Wyczyść przesłane pliki"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Kliknij dowolny plik, aby umieścić łącze umożliwiające jego pobranie."
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Projekty współpracy"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Kliknij, aby ukryć { types }"
   },
   "computer_1d7dfa6f": {
     "message": "Komputer"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "Dokumenty"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Przeciągnij i upuść lub kliknij, aby przeglądać komputer"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Termin: Wiele dat"
+  },
+  "due_when_7eed10c6": {
+    "message": "Termin: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "wprowadź szukane terminy"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Wpisz alternatywny tekst dla tego obrazu"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Rozszerz, aby zobaczyć { types }"
+  },
   "external_links_3d9f074e": {
     "message": "Łącza zewnętrzne"
   },
   "file_upload_form_4aaad554": {
     "message": "Formularz przesyłania plików"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "Podgląd { filename }"
   },
   "files_c300e900": {
     "message": "Pliki"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Wpisz równanie matematyczne"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "Nieprawidłowy typ pliku"
+  },
   "link_7262adec": {
     "message": "Łącze"
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Wczytywanie folderów..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Trwa ładowanie kolejnych wyników..."
-  },
   "media_af190855": {
     "message": "Multimedia"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "Brak wyników."
+  },
+  "options_3ab0ea65": {
+    "message": "Opcje"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listy uporządkowane i nieuporządkowane"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "Użytkownicy"
   },
+  "posted_when_a578f5ab": {
+    "message": "Opublikował(a): { when }"
+  },
   "preformatted_d0670862": {
     "message": "Wstępnie formatowane"
+  },
+  "published_c944a23d": {
+    "message": "opublikowane"
+  },
+  "published_when_302d8e23": {
+    "message": "Opublikowane: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Testy"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Wybierz folder, aby przesłać do niego plik"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Pokaż opcje obrazów"
   },
   "small_header_168fb9f9": {
     "message": "Mały nagłówek"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Ta przesyłka przekracza przydział magazynowania plików. Skontaktuj się z administratorem systemu."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "Do opublikowania: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "Lista zadań: { when }"
+  },
   "tray_839df38a": {
     "message": "Zasobnik"
+  },
+  "unpublished_dfd8801": {
+    "message": "nieopublikowane"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Przekaż nowy obraz"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Prześlij plik"
   },
   "upload_image_6120b609": {
     "message": "Prześlij obraz"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Prawo użytkowania:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Wyświetl skróty klawiszowe"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Jak chcesz nazwać nową stronę?"

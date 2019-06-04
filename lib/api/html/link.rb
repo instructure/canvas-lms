@@ -49,7 +49,7 @@ module Api
           else
             link
           end
-        rescue URI::InvalidURIError
+        rescue URI::Error
           link
         end
       end

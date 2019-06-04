@@ -23,18 +23,19 @@ import _ from 'underscore'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
+import ImageSearch from '../../shared/ImageSearch'
 
 export default class CourseImagePicker extends React.Component {
   static propTypes = {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     handleFileUpload: PropTypes.func,
-    handleFlickrUrlUpload: PropTypes.func,
+    handleImageSearchUrlUpload: PropTypes.func,
     uploadingImage: PropTypes.bool
   }
 
   static defaultProps = {
     handleFileUpload: () => {},
-    handleFlickrUrlUpload: () => {},
+    handleImageSearchUrlUpload: () => {},
     uploadingImage: false
   }
 
@@ -96,7 +97,17 @@ export default class CourseImagePicker extends React.Component {
             courseId={this.props.courseId}
             handleFileUpload={this.props.handleFileUpload}
           />
-          <FlickrSearch selectImage={flickrUrl => this.props.handleFlickrUrlUpload(flickrUrl)} />
+          {ENV.use_unsplash_image_search ? (
+            <ImageSearch
+              selectImage={(imageUrl, confirmationId) =>
+                this.props.handleImageSearchUrlUpload(imageUrl, confirmationId)
+              }
+            />
+          ) : (
+            <FlickrSearch
+              selectImage={imageUrl => this.props.handleImageSearchUrlUpload(imageUrl)}
+            />
+          )}
         </div>
       </div>
     )

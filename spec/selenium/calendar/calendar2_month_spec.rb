@@ -225,6 +225,7 @@ describe "calendar2" do
         end
 
         it "allows dropping onto the minical" do
+          skip("fix in COMMS-2096")
           event = make_event(start: @initial_time)
           load_month_view
           quick_jump_to_date(@initial_time_str)

@@ -39,7 +39,7 @@ shared_context 'advantage services context' do
     {
       iss: 'https://canvas.instructure.com',
       sub: developer_key.global_id,
-      aud: "https://#{test_request_host}/login/oauth2/token",
+      aud: "http://#{test_request_host}/login/oauth2/token",
       iat: timestamp,
       exp: (timestamp + 1.hour.to_i),
       nbf: (timestamp - 30),

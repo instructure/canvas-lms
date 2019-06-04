@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= title %></title>
+  <title><%= HtmlTextHelper.escape_html(title) %></title>
   <%= style %>
 </head>
   <body>
-    <h1 id="<%="#{title}_TOC"%>"><%="#{title}"%></h1>
+    <h1 id="<%="#{HtmlTextHelper.escape_html(title)}_TOC"%>"><%="#{HtmlTextHelper.escape_html(title)}"%></h1>
     <ol>
     <% content.each do |item| %>
-      <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
+      <li><a href="#<%= "#{item[:identifier]}" %>"><%= HtmlTextHelper.escape_html(item[:title]) %></a></li>
     <% end %>
     </ol>
     <hr/>
@@ -17,7 +17,7 @@
     <% content.each do |item| %>
       <%=build(item)%>
       <hr/>
-      <p><a href="<%= "##{reference}.xhtml" %>"><%= I18n.t("Back to %{ref_title}", {ref_title: title}) %></a></p>
+      <p><a href="<%= "##{reference}.xhtml" %>"><%= I18n.t("Back to %{ref_title}", {ref_title: HtmlTextHelper.escape_html(title)}) %></a></p>
       <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
       <div style="page-break-before:always;"></div>
     <% end %>

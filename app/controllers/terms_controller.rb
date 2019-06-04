@@ -160,6 +160,11 @@ class TermsController < ApplicationController
         sis_id != @account.sis_source_id &&
         @context.root_account.grants_right?(@current_user, session, :manage_sis)
       @term.sis_source_id = sis_id.presence
+      if @term.sis_source_id && @term.sis_source_id_changed?
+        scope = @term.root_account.enrollment_terms.where(sis_source_id: @term.sis_source_id)
+        scope = scope.where("id<>?", @term) unless @term.new_record?
+        @term.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: @term.sis_source_id)) if scope.exists?
+      end
     end
   end
 

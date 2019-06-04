@@ -122,12 +122,17 @@ let reportsTabHasLoaded = false
     globalAnnouncements.bindDomEvents()
 
     $('#account_settings_tabs')
-    .tabs({
-      beforeActivate: (event, ui) => {
-        if (ui.newTab.context.id === 'tab-reports-link' && !reportsTabHasLoaded) {
+      .on('tabsbeforeactivate tabscreate', (event, ui) => {
+        const tabId = event.type === 'tabscreate'
+          ? location.hash.replace('#', '') + '-link'
+          : ui.newTab.context.id
+
+        if (tabId === 'tab-reports-link' && !reportsTabHasLoaded) {
           reportsTabHasLoaded = true
           const splitContext = window.ENV.context_asset_string.split('_')
-          fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`).then(req => req.text()).then(html => {
+
+          fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`, {headers: {accept: 'text/html'}}).then(req => req.text()).then(html => {
+
             $('#tab-reports').html(html)
             $("#tab-reports .datetime_field").datetime_field();
 
@@ -175,7 +180,7 @@ let reportsTabHasLoaded = false
           }).catch(() => {
             $('#tab-reports').text(I18n.t('There are no reports for you to view.'))
           })
-        } else if (ui.newTab.context.id === 'tab-security-link') {
+        } else if (tabId === 'tab-security-link') {
           // Set up axios and send a prefetch request to get the data we need,
           // this should make things appear to be much quicker once the bundle
           // loads in.
@@ -214,9 +219,9 @@ let reportsTabHasLoaded = false
               $('#tab-security').text(I18n.t('Security Tab failed to load'))
             })
         }
-      }
-    })
-    .show()
+      })
+      .tabs()
+      .show()
 
 
     $(".add_ip_filter_link").click(function(event) {

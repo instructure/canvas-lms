@@ -92,6 +92,9 @@
   "creative_commons_license_725584ae": {
     "message": "זכויות במסגרת Creative Commons"
   },
+  "custom_6979cd81": {
+    "message": "ידני"
+  },
   "decorative_image_fde98579": {
     "message": "תמונת קישוט"
   },
@@ -104,8 +107,14 @@
   "discussions_index_6c36ced": {
     "message": "אינדקס דיונים"
   },
+  "done_54e3d4b6": {
+    "message": "בוצע"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "יעד: תאריכים מרובים"
+  },
+  "embed_image_1080badc": {
+    "message": "הטמעת תמונה"
   },
   "enter_search_terms_e397b1f0": {
     "message": "הקלדת ערכי חיפוש"
@@ -194,9 +203,6 @@
   "loading_failed_b3524381": {
     "message": "טעינה נכשלה..."
   },
-  "loading_more_results_def6df65": {
-    "message": "טוען תוצאות נוספות..."
-  },
   "media_af190855": {
     "message": "מדיה"
   },
@@ -205,6 +211,9 @@
   },
   "no_results_940393cf": {
     "message": "אין תוצאות"
+  },
+  "options_3ab0ea65": {
+    "message": "אפשרויות"
   },
   "pages_e5414c2c": {
     "message": "דפים"
@@ -218,6 +227,18 @@
   "quizzes_7e598f57": {
     "message": "בחנים"
   },
+  "record_7c9448b": {
+    "message": "הקלטה"
+  },
+  "recording_98da6bda": {
+    "message": "מקליט"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "עורך תוכן עשיר"
+  },
+  "save_11a80ec3": {
+    "message": "שמירה "
+  },
   "search_280d00bd": {
     "message": "חיפוש"
   },
@@ -229,6 +250,12 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "בחירת תיקיה להעלאת הקובץ שלך"
+  },
+  "size_b30e1077": {
+    "message": "גודל"
+  },
+  "start_over_f7552aa9": {
+    "message": "התחל/י מהתחלה"
   },
   "submit_a3cc6859": {
     "message": "הגשה"
@@ -260,11 +287,17 @@
   "upload_file_fd2361b8": {
     "message": "העלאת קובץ"
   },
+  "upload_media_ce31135a": {
+    "message": "העלאת מדיה"
+  },
   "url_22a5f3b8": {
     "message": "כתובת דף אינטרנט"
   },
   "usage_right_ff96f3e2": {
     "message": "זכויות שימוש"
+  },
+  "video_player_b371005": {
+    "message": "נגן הוידאו"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "איך לקרוא לדף החדש?"

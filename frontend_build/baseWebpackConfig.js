@@ -18,96 +18,137 @@
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
-const glob = require('glob')
-const ManifestPlugin = require('webpack-manifest-plugin')
+// terser-webpack-plugin is a dependency of 'webpack'. It's not in our package.json
+// because we always want to use the same version as whatever webpack would use
+// by default and if webpack ever stops using it by default we _want_ an
+// `Error: Cannot find module` here so we know we need to change things
+// eslint-disable-next-line import/no-extraneous-dependencies
+const TerserPlugin = require('terser-webpack-plugin')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
 const webpack = require('webpack')
-const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
-const HappyPack = require('happypack')
-const bundleEntries = require('./bundles')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
 const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
 const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
-const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
-const momentLocaleBundles = require('./momentBundles')
+require('./bundles')
+
+// We have a bunch of things (like our selenium jenkins builds) that have
+// historically used the environment variable JS_BUILD_NO_UGLIFY to make their
+// prod webpack builds go faster. But the slowest thing was not actually uglify
+// (aka terser), it is generating the sourcemaps. Now that we added the
+// performance hints and want to fail the build if you accidentally make our
+// bundles larger than a certain size, we need to always uglify to check the
+// after-uglify size of things, but can skip making sourcemaps if you want it to
+// go faster. So this is to allow people to use either environment variable:
+// the technically more correct SKIP_SOURCEMAPS one or the historically used JS_BUILD_NO_UGLIFY one.
+const skipSourcemaps = Boolean(process.env.SKIP_SOURCEMAPS || process.env.JS_BUILD_NO_UGLIFY)
 
 const root = path.resolve(__dirname, '..')
-const USE_BABEL_CACHE =
-  process.env.NODE_ENV !== 'production' && process.env.DISABLE_HAPPYPACK === '1'
-
-const happypackPlugins = []
-const getHappyThreadPool = (() => {
-  let pool
-  return () => pool || (pool = new HappyPack.ThreadPool({size: 4}))
-})()
-
-function happify(id, loaders) {
-  if (process.env.DISABLE_HAPPYPACK !== '1') {
-    happypackPlugins.push(
-      new HappyPack({
-        id,
-        loaders,
-        threadPool: getHappyThreadPool(),
-        tempDir: process.env.HAPPYPACK_TEMPDIR || 'node_modules/.happypack_tmp/',
-
-        // by default, we use the cache everywhere exept prod. but you can
-        // set HAPPYPACK_CACHE environment variable to override
-        cache:
-          typeof process.env.HAPPYPACK_CACHE === 'undefined'
-            ? process.env.NODE_ENV !== 'production'
-            : process.env.HAPPYPACK_CACHE === '1',
-        cacheContext: {
-          env: process.env.NODE_ENV
-        }
-      })
-    )
-    return [`happypack/loader?id=${id}`]
-  }
-  return loaders
-}
 
 module.exports = {
+  mode: process.env.NODE_ENV,
+  performance: {
+    // This just reflects how big the 'main' entry is at the time of writing. Every
+    // time we get it smaller we should change this to the new smaller number so it
+    // only goes down over time instead of growing bigger over time
+    maxEntrypointSize: 990000,
+    // This is how big our biggest js bundles are at the time of writing. We should
+    // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
+    // tracking them too. Then, as we work to get all chunks smaller, we should change
+    // this number to the size of our biggest known asset and hopefully someday get
+    // to where they are all under the default value of 250000 and then remove this
+    maxAssetSize: 1500000,
+    assetFilter: assetFilename => {
+      const thingsWeKnowAreWayTooBig = [
+        'canvas-rce-async-chunk',
+        'permissions_index',
+        'gradezilla',
+        'screenreader_gradebook'
+      ]
+      return (
+        assetFilename.endsWith('.js') &&
+        !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
+      )
+    }
+  },
+  optimization: {
+    moduleIds: 'hashed',
+    minimizer: [
+      new TerserPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: !skipSourcemaps,
+        terserOptions: {
+          compress: {
+            sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
+
+            // these are all things that terser does by default but we turn
+            // them off because they don't reduce file size enough to justify the
+            // time they take, especially after gzip:
+            // see: https://slack.engineering/keep-webpack-fast-a-field-guide-for-better-build-performance-f56a5995e8f1
+            booleans: false,
+            collapse_vars: false,
+            comparisons: false,
+            computed_props: false,
+            hoist_props: false,
+            if_return: false,
+            join_vars: false,
+            keep_infinity: true,
+            loops: false,
+            negate_iife: false,
+            properties: false,
+            reduce_funcs: false,
+            reduce_vars: false,
+            typeofs: false
+          },
+          output: {
+            comments: false,
+            semicolons: false // prevents everything being on one line so it's easier to view in devtools
+          }
+        }
+      })
+    ],
+    splitChunks: {
+      name: false,
+
+      // we can play with these numbers based on what we find to be the best tradeofffs with http2
+      maxAsyncRequests: 30,
+      maxInitialRequests: 10,
+
+      chunks: 'all',
+      cacheGroups: {vendors: false} // don't split out node_modules and app code in different chunks
+    }
+  },
   // In prod build, don't attempt to continue if there are any errors.
   bail: process.env.NODE_ENV === 'production',
 
-  // In production, and when not using JS_BUILD_NO_UGLIFY, generate separate sourcemap files.
-  // In development, generate `eval` sourcemaps.
-  devtool:
-    process.env.NODE_ENV === 'production'
-      ? process.env.JS_BUILD_NO_UGLIFY
-        ? undefined
-        : 'source-map'
-      : process.env.COVERAGE || process.env.SENTRY_DSN
-        ? 'source-map'
-        : 'eval',
+  devtool: skipSourcemaps
+    ? false
+    : process.env.NODE_ENV === 'production' || process.env.COVERAGE || process.env.SENTRY_DSN
+    ? 'source-map'
+    : 'eval',
 
-  entry: Object.assign(
-    {
-      vendor: require('./modulesToIncludeInVendorBundle'),
-      appBootstrap: 'jsx/appBootstrap'
-    },
-    bundleEntries,
-    momentLocaleBundles
-  ),
+  entry: {main: 'jsx/main'},
 
   output: {
     // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
     // chunkhashes are insensitive to moduleid changes. It should be changed again
     // if this plugin is reconfigured or removed, or if there is another reason to
     // prevent previously cached assets from being mixed with those from the new build
-    hashSalt: '2018-01-29',
+    hashSalt: '2019-04-19',
     path: path.join(__dirname, '../public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
     pathinfo: true,
 
-    filename: '[name].bundle-[chunkhash:10].js',
-    chunkFilename: '[name].chunk-[chunkhash:10].js',
-    sourceMapFilename: '[file].[id]-[chunkhash:10].sourcemap',
+    // "e" is for "entry" and "c" is for "chunk"
+    filename: '[name]-e-[chunkhash:10].js',
+    chunkFilename: '[name]-c-[chunkhash:10].js',
     jsonpFunction: 'canvasWebpackJsonp'
   },
 
@@ -147,7 +188,7 @@ module.exports = {
       'node_modules'
     ],
 
-    extensions: ['.js']
+    extensions: ['.mjs', '.js']
   },
 
   module: {
@@ -157,7 +198,7 @@ module.exports = {
     noParse: [
       /node_modules\/jquery\//,
       /vendor\/md5/,
-      /tinymce\/tinymce/, // has 'require' and 'define' but they are from it's own internal closure
+      /tinymce\/tinymce$/, // has 'require' and 'define' but they are from it's own internal closure
       /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
@@ -177,7 +218,12 @@ module.exports = {
           path.resolve(__dirname, '../public/javascripts/lodash.underscore'),
           /bower\//
         ],
-        loaders: happify('babel', [`babel-loader?cacheDirectory=${USE_BABEL_CACHE}`])
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: process.env.NODE_ENV !== 'production'
+          }
+        }
       },
       {
         test: /\.js$/,
@@ -192,7 +238,7 @@ module.exports = {
           /app\/coffeescripts\//,
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
-        loaders: happify('coffee', ['coffee-loader'])
+        loaders: ['coffee-loader']
       },
       {
         test: /\.handlebars$/,
@@ -200,7 +246,7 @@ module.exports = {
           path.resolve(__dirname, '../app/views/jst'),
           /gems\/plugins\/.*\/app\/views\/jst\//
         ],
-        loaders: happify('handlebars-i18n', ['i18nLinerHandlebars'])
+        loaders: ['i18nLinerHandlebars']
       },
       {
         test: /\.hbs$/,
@@ -208,12 +254,7 @@ module.exports = {
           /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
           /app\/coffeescripts\/ember\/shared\/templates\//
         ],
-        loaders: happify('handlebars-ember', [path.join(root, 'frontend_build/emberHandlebars')])
-      },
-      {
-        test: /\.json$/,
-        exclude: /public\/javascripts\/vendor/,
-        loader: 'json-loader'
+        loaders: [path.join(root, 'frontend_build/emberHandlebars')]
       },
       {
         test: /\.css$/,
@@ -253,10 +294,6 @@ module.exports = {
       endYear: new Date().getFullYear() + 15
     }),
 
-    new WebpackCleanupPlugin({
-      exclude: ['selinimum-manifest.json']
-    }),
-
     // handles our custom i18n stuff
     new I18nPlugin(),
 
@@ -277,45 +314,29 @@ module.exports = {
     // be removed when that issue is fixed
     new webpack.IgnorePlugin(/\.flow$/),
 
-    new webpack.HashedModuleIdsPlugin({
-      hashDigestLength: 10
-    })
-  ]
-    .concat(
-      process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE
-        ? [new SelinimumManifestPlugin()]
-        : []
-    )
-    .concat(happypackPlugins)
-    .concat(
-      process.env.NODE_ENV === 'test'
-        ? []
-        : [
-            // don't include any of the moment locales in the common bundle (otherwise it is huge!)
-            // we load them explicitly onto the page in include_js_bundles from rails.
-            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new CleanWebpackPlugin()
+  ].concat(
+    process.env.NODE_ENV === 'test'
+      ? []
+      : [
+          // don't include any of the moment locales in the common bundle (otherwise it is huge!)
+          // we load them explicitly onto the page in include_js_bundles from rails.
+          new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-            // outputs a json file so Rails knows which hash fingerprints to add to each script url
-            new ManifestPlugin({fileName: 'webpack-manifest.json'}),
-
-            // these multiple commonsChunks make it so anything in the vendor bundle,
-            // or in the common bundle, won't get loaded any of our other app bundles.
-            new webpack.optimize.CommonsChunkPlugin({
-              name: 'vendor',
-              // children: true,
-
-              // ensures that no other module goes into the vendor chunk
-              minChunks: Infinity
-            }),
-            // gets moment locale setup before any app code runs
-            new webpack.optimize.CommonsChunkPlugin({
-              name: 'appBootstrap',
-              children: true
-            }),
-            new webpack.optimize.CommonsChunkPlugin({
-              name: bundleEntries.common,
-              children: true
-            })
-          ]
-    )
+          // outputs a json file so Rails knows which hash fingerprints to add
+          // to each script url and so it knows which split chunks to make a
+          // <link rel=preload ... /> for for each `js_bundle`
+          new StatsWriterPlugin({
+            filename: 'webpack-manifest.json',
+            fields: ['namedChunkGroups'],
+            transform(data) {
+              const res = {}
+              Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
+                res[key] = value.assets.filter(a => a.endsWith('.js'))
+              })
+              return JSON.stringify(res, null, 2)
+            }
+          })
+        ]
+  )
 }

@@ -57,6 +57,7 @@ QUnit.module('SubmissionTray', function(hooks) {
       isOpen: true,
       courseId: '1',
       currentUserId: '2',
+      postPoliciesEnabled: false,
       speedGraderEnabled: true,
       student: {
         id: '27',
@@ -70,10 +71,12 @@ QUnit.module('SubmissionTray', function(hooks) {
         enteredScore: 10,
         excused: false,
         grade: '7',
+        gradedAt: null,
         id: '2501',
         late: false,
         missing: false,
         pointsDeducted: 3,
+        postedAt: null,
         secondsLate: 0,
         score: 7
       },
@@ -86,6 +89,7 @@ QUnit.module('SubmissionTray', function(hooks) {
         htmlUrl: 'http://htmlUrl/',
         muted: false,
         pointsPossible: 10,
+        postManually: false,
         published: true
       },
       isFirstAssignment: false,
@@ -306,6 +310,13 @@ QUnit.module('SubmissionTray', function(hooks) {
     defaultProps.isInNoGradingPeriod = true
     mountComponent()
     ok(content.textContent.includes('This submission is not in any grading period'))
+  })
+
+  test('passes along postPoliciesEnabled prop to SubmissionStatus', function() {
+    defaultProps.postPoliciesEnabled = true
+    defaultProps.submission.gradedAt = new Date().toISOString()
+    mountComponent()
+    ok(content.textContent.includes('Hidden'))
   })
 
   test('shows student name', function() {

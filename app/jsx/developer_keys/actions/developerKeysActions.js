@@ -259,7 +259,7 @@ actions.setBindingWorkflowState = (developerKeyId, accountId, workflowState) => 
 actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
   dispatch(actions.createOrEditDeveloperKeyStart())
 
-  axios({
+  return axios({
     method,
     url,
     data: formData,
@@ -272,7 +272,6 @@ actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
         dispatch(actions.listDeveloperKeysReplace(response.data))
       }
       dispatch(actions.createOrEditDeveloperKeySuccessful())
-      dispatch(actions.developerKeysModalClose())
     })
     .catch(error => {
       $.flashError(error.message)

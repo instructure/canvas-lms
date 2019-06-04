@@ -74,6 +74,5 @@ export default class AssignmentSyncSettingsView extends DialogFormView
 
   toJSON: ->
     data = super
-    data.course
     data.sisName = @sisName
     data

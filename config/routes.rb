@@ -732,7 +732,7 @@ CanvasRails::Application.routes.draw do
   get 'grades_for_student' => 'users#grades_for_student'
 
   get 'login' => 'login#new'
-  get 'login/session_token' => 'login#session_token'
+  get 'login/session_token' => 'login#session_token', as: :login_session_token
   delete 'logout' => 'login#destroy'
   get 'logout' => 'login#logout_landing'
 
@@ -1373,6 +1373,8 @@ CanvasRails::Application.routes.draw do
 
       get 'users/:id/graded_submissions', controller: 'users', action: 'user_graded_submissions', as: :user_submissions
 
+      post 'users/:id/clear_cache', :action => :clear_cache, :as => 'clear_cache'
+
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
@@ -1603,6 +1605,11 @@ CanvasRails::Application.routes.draw do
 
       get 'accounts/:account_id/developer_keys', action: :index, as: 'account_developer_keys'
       post 'accounts/:account_id/developer_keys', action: :create
+    end
+
+    scope(controller: :internet_image) do
+      get 'image_search', action: :image_search
+      post 'image_selection/:id', action: :image_selection
     end
 
     scope(controller: :search) do
@@ -2178,6 +2185,10 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/csp_settings/domains/batch_create", :action => :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
       get "accounts/:account_id/csp_log", action: :csp_log
+    end
+
+    scope(:controller => :context) do
+      post 'media_objects', action: 'create_media_object', as: :create_media_object
     end
   end
 

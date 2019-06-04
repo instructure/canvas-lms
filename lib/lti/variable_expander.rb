@@ -1249,7 +1249,8 @@ module Lti
     private
 
     def sis_pseudonym
-      @sis_pseudonym ||= SisPseudonym.for(@current_user, @context, type: :trusted, require_sis: false, root_account: @root_account) if @current_user
+      context = @enrollment || @context
+      @sis_pseudonym ||= SisPseudonym.for(@current_user, context, type: :trusted, require_sis: false, root_account: @root_account) if @current_user
     end
 
     def expand_substring_variables(value)

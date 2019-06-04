@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "Ungeordnete Liste einkreisen"
   },
+  "clear_upload_34efa419": {
+    "message": "Upload löschen"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Um einen Downloadlink für eine Datei einzufügen, klicken Sie auf die entsprechende Datei."
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Kollaborationen"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "{ types } ausblenden"
   },
   "computer_1d7dfa6f": {
     "message": "Computer"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "Dokumente"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Drag-and-Drop oder klicken Sie, um Ihren Computer zu durchsuchen."
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Fällig: Mehrere Daten"
+  },
+  "due_when_7eed10c6": {
+    "message": "Fällig: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "Suchbegriffe eingeben"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Alternativen Text für dieses Bild eingeben"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "{ types } erweitern"
+  },
   "external_links_3d9f074e": {
     "message": "Externe Links"
   },
   "file_upload_form_4aaad554": {
     "message": "Datei hochladen (Formular)"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename }-Vorschau"
   },
   "files_c300e900": {
     "message": "Dateien"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Math. Gleichung einfügen"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "Ungültiger Dateityp"
+  },
   "link_7262adec": {
     "message": "Link"
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Ordner laden ..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Weitere Ergebnisse werden geladen ..."
-  },
   "media_af190855": {
     "message": "Medien"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "Keine Ergebnisse."
+  },
+  "options_3ab0ea65": {
+    "message": "Optionen"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Geordnete und ungeordnete Listen"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "Personen"
   },
+  "posted_when_a578f5ab": {
+    "message": "Gepostet am: { when }"
+  },
   "preformatted_d0670862": {
     "message": "Vorformatiert"
+  },
+  "published_c944a23d": {
+    "message": "veröffentlicht"
+  },
+  "published_when_302d8e23": {
+    "message": "Veröffentlicht am: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Quizzes"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Wählen Sie einen Ordner zum Hochladen Ihrer Datei aus."
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Bildoptionen anzeigen"
   },
   "small_header_168fb9f9": {
     "message": "Kleine Überschrift"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Dieser Upload überschreitet das Dateispeicherkontingent. Wenden Sie sich an den Systemadministrator."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "Bereit für Post: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "Zu erledigen: { when }"
+  },
   "tray_839df38a": {
     "message": "Fach"
+  },
+  "unpublished_dfd8801": {
+    "message": "nicht veröffentlicht"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Neues Bild hochladen"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Datei hochladen"
   },
   "upload_image_6120b609": {
     "message": "Bild hochladen"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Nutzungsrecht:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Tastenkombinationen anzeigen"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Welchen Namen möchten Sie der neuen Seite geben?"

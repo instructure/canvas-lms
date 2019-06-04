@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative 'post_grades_tray_page'
+require_relative 'hide_grades_tray_page'
 
 module Gradezilla
   extend SeleniumDependencies
@@ -71,6 +73,14 @@ module Gradezilla
 
   def self.assignment_menu_selector(menu_text)
     fj("span[role='menuitem']:contains('#{menu_text}')")
+  end
+
+  def self.assignment_header(id)
+    f(".slick-header-column.assignment_#{id}")
+  end
+
+  def self.assignment_hidden_eye_icon(id)
+    f("svg[name='IconOff']", assignment_header(id))
   end
 
   # student header column elements
@@ -218,15 +228,19 @@ module Gradezilla
   end
 
   def self.post_grades_option
-    assignment_menu_selector("Post Grades")
+    assignment_menu_selector("Post grades")
+  end
+
+  def self.grades_posted_option
+    assignment_menu_selector("All grades posted")
   end
 
   def self.hide_grades_option
-    assignment_menu_selector("Hide Grades")
+    assignment_menu_selector("Hide grades")
   end
 
   def self.grade_posting_policy_option
-    # TODO: locator for grade posting policy
+    assignment_menu_selector("Grade Posting Policy")
   end
 
   # actions
@@ -306,6 +320,12 @@ module Gradezilla
     wait_for_ajaximations
   end
 
+  def self.select_student_group(student_group)
+    student_group = student_group.name if student_group.is_a?(Group)
+    click_option(student_group_dropdown, student_group, :text)
+    wait_for_ajaximations
+  end
+
   def self.show_notes
     view_menu = open_gradebook_menu('View')
     select_gradebook_menu_option('Notes', container: view_menu, role: 'menuitemcheckbox')
@@ -359,7 +379,7 @@ module Gradezilla
     begin
       spinner = loading_spinner
       keep_trying_until(3) { (spinner.displayed? == false) }
-    rescue Selenium::WebDriver::Error::TimeOutError
+    rescue Selenium::WebDriver::Error::TimeoutError
       # ignore - sometimes spinner doesn't appear in Chrome
     end
     wait_for_ajaximations
@@ -501,6 +521,10 @@ module Gradezilla
 
   def self.module_dropdown
     f('#modules-filter-container select')
+  end
+
+  def self.student_group_dropdown
+    f('#student-group-filter-container select')
   end
 
   def self.filter_menu_item(menu_item_name)
@@ -770,16 +794,16 @@ module Gradezilla
 
   def self.click_post_grades(assignment_id)
     click_assignment_header_menu(assignment_id)
-    # TODO: click post grades wait for tray
     post_grades_option.click
-    Gradezilla::PostGradesTray.full_content
+    PostGradesTray.full_content
   end
 
   def self.click_hide_grades(assignment_id)
     click_assignment_header_menu(assignment_id)
     # TODO: click hide grades
     hide_grades_option.click
-    Gradezilla::HideGradesTray.full_content
+    HideGradesTray.full_content
+    HideGradesTray.hide_button
   end
 
   def self.click_grade_posting_policy(assignment_id)
@@ -787,6 +811,13 @@ module Gradezilla
     # TODO: click posting policy
     grade_posting_policy_option.click
     Gradezilla::AssignmentPostingPolicy
+  end
+
+  def self.manually_post_grades(assignment, type, section = nil)
+    Gradezilla.click_post_grades(assignment.id)
+    PostGradesTray.post_type_radio_button(type).click
+    PostGradesTray.select_section(section.name) unless section.nil?
+    PostGradesTray.post_grades
   end
 
   delegate :click, to: :save_button, prefix: true

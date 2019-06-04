@@ -1,10 +1,4 @@
 ---
-integrate_arc_rce:
-  state: allowed
-  display_name: HTML5 Media Recorder in RCE
-  description: Use HTML5 Recorder in Content Editor instead of Flash
-  applies_to: RootAccount
-  root_opt_in: true
 google_docs_domain_restriction:
   state: hidden
   display_name:
@@ -393,7 +387,7 @@ non_scoring_rubrics:
   applies_to: RootAccount
   root_opt_in: true
 lti_1_3:
-  state: hidden
+  state: allowed
   display_name: LTI 1.3 and LTI Advantage
   description: If enabled, access to LTI 1.3 and LTI Advantage will be enabled.
   applies_to: RootAccount

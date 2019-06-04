@@ -24,7 +24,7 @@ import CustomHelpLinkSettings from '../custom_help_link_settings/CustomHelpLinkS
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 import 'account_settings'
-import 'compiled/bundles/modules/account_quota_settings'
+import 'compiled/modules/account_quota_settings'
 
 const featureFlags = new FeatureFlagAdminView({el: '#tab-features'})
 featureFlags.collection.fetchAll()

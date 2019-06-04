@@ -78,14 +78,19 @@ describe('ltiKeysUpdateCustomizations', () => {
   })
 
   const scopes = ['https://www.test.com/scope']
+  const redirectUris = "https://www.test.com"
   const disabledPlacements = ['account_navigation', 'course_navigaiton']
   const developerKeyId = 123
   const toolConfiguration = {}
   const customFields = 'foo=bar\r\nkey=value'
+  const developerKey = {
+    scopes,
+    redirect_uris: redirectUris
+  }
 
   const update = dispatch => {
     actions.ltiKeysUpdateCustomizations(
-      scopes,
+      developerKey,
       disabledPlacements,
       developerKeyId,
       toolConfiguration,
@@ -100,7 +105,8 @@ describe('ltiKeysUpdateCustomizations', () => {
       `/api/lti/developer_keys/${developerKeyId}/tool_configuration`,
       {
         developer_key: {
-          scopes
+          scopes,
+          redirect_uris: redirectUris
         },
         tool_configuration: {
           disabled_placements: disabledPlacements,

@@ -142,6 +142,7 @@ describe ContentZipper do
 
     it "should zip up online_text_entry submissions" do
       course_with_student(active_all: true)
+      @student.update_attribute(:name, "some student name")
       submission_model(body: "hai this is my answer")
       attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
@@ -151,11 +152,32 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       expect(attachment.workflow_state).to eq 'zipped'
+
+      content = nil
       Zip::File.foreach(attachment.full_filename) do |f|
-        if f.file?
-          expect(f.get_input_stream.read).to be_include("hai this is my answer")
-        end
+        content = f.get_input_stream.read if f.file?
       end
+      expect(content).to include("hai this is my answer")
+      expect(content).to include(@student.name)
+    end
+
+    it "should not include student name in online_text_entry submissions if anonymous" do
+      course_with_student(active_all: true)
+      @student.update_attribute(:name, "some student name")
+
+      @assignment = @course.assignments.create!(anonymous_grading: true, muted: true)
+      submission_model(body: "hai this is my answer", assignment: @assignment, user: @student)
+      attachment = Attachment.create!(display_name: 'my_download.zip', user: @teacher,
+        workflow_state: 'to_be_zipped', context: @assignment)
+      ContentZipper.process_attachment(attachment, @teacher)
+      attachment.reload
+      content = nil
+      Zip::File.foreach(attachment.full_filename) do |f|
+        content = f.get_input_stream.read if f.file?
+      end
+      expect(content).to include("hai this is my answer")
+      expect(content).to_not include(@student.name)
+      expect(content).to include("Anonymous User")
     end
 
     it "should only include submissions in the correct section " do

@@ -95,8 +95,14 @@
   "discussions_index_6c36ced": {
     "message": "Ευρετήριο Συζητήσεων"
   },
+  "done_54e3d4b6": {
+    "message": "Ολοκληρώθηκε"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
+  },
+  "embed_image_1080badc": {
+    "message": "Ενσωμάτωση εικόνας"
   },
   "enter_search_terms_e397b1f0": {
     "message": "εισαγωγή όρων αναζήτησης"
@@ -179,9 +185,6 @@
   "loading_failed_b3524381": {
     "message": "Η Φόρτωση Απέτυχε"
   },
-  "loading_more_results_def6df65": {
-    "message": "Γίνεται φόρτωση περισσοτέρων αποτελεσμάτων..."
-  },
   "media_af190855": {
     "message": "Δεδομένα"
   },
@@ -190,6 +193,9 @@
   },
   "no_results_940393cf": {
     "message": "Δεν υπάρχουν Αποτελέσματα"
+  },
+  "options_3ab0ea65": {
+    "message": "Επιλογές"
   },
   "pages_e5414c2c": {
     "message": "Σελίδες"
@@ -203,6 +209,18 @@
   "quizzes_7e598f57": {
     "message": "Κουίζ"
   },
+  "record_7c9448b": {
+    "message": "Ηχογράφηση"
+  },
+  "recording_98da6bda": {
+    "message": "Εγγράφεται"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
+  },
+  "save_11a80ec3": {
+    "message": "Αποθήκευση"
+  },
   "search_280d00bd": {
     "message": "Αναζήτηση"
   },
@@ -211,6 +229,12 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Επιλέξτε το φάκελο στον οποίο θέλετε να φορτώσετε το αρχείο "
+  },
+  "size_b30e1077": {
+    "message": "Μέγεθος"
+  },
+  "start_over_f7552aa9": {
+    "message": "Ξεκινήστε Ξανά"
   },
   "submit_a3cc6859": {
     "message": "Υποβολή"
@@ -242,11 +266,17 @@
   "upload_file_fd2361b8": {
     "message": "Φόρτωση Αρχείου"
   },
+  "upload_media_ce31135a": {
+    "message": "Μεταφόρτωση Αρχείου Πολυμέσων"
+  },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Δικαίωμα Χρήσης:"
+  },
+  "video_player_b371005": {
+    "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Πως θέλετε να ονομάσετε τη νέα σελίδα;"

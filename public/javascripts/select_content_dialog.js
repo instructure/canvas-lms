@@ -49,13 +49,16 @@ import './jquery.templateData'
     ) {
       processSingleContentItem(event)
         .then((result) => {
-          if (result.type !== 'ltiResourceLink') { $.flashError(I18n.t('Selected content is not an LTI link.')) }
-
           const $dialog = $dialog || $("#resource_selection_dialog")
           const tool = $("#context_external_tools_select .tools .tool.selected").data('tool')
 
           $dialog.off("dialogbeforeclose", SelectContentDialog.dialogCancelHandler)
           $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+
+          if (result.type !== 'ltiResourceLink') {
+            $.flashError(I18n.t('Selected content is not an LTI link.'))
+            return
+          }
 
           SelectContentDialog.handleContentItemResult(result, tool)
         })

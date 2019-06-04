@@ -112,7 +112,7 @@ export default class OverrideSummary extends React.Component {
                   <OverrideAssignTo override={override} variant="summary" />
                 </View>
                 <View display="block">
-                  <OverrideAttempts override={override} variant="summary" />
+                  <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
                 </View>
               </View>
             )

@@ -29,7 +29,7 @@ import I18n from 'i18n!SpeedGraderPostGradesMenu'
 export default function SpeedGraderPostGradesMenu(props) {
   const menuTrigger = (
     <Button variant="icon-inverse" icon={props.allowPostingGrades ? IconOff : IconEye}>
-      <ScreenReaderContent>{I18n.t('Post and Hide Grades')}</ScreenReaderContent>
+      <ScreenReaderContent>{I18n.t('Post or Hide Grades')}</ScreenReaderContent>
     </Button>
   )
 

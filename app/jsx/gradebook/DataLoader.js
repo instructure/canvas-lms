@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import _ from 'underscore'
 
-import cheaterDepaginate from '../shared/CheatDepaginator'
 import NaiveRequestDispatch from '../gradezilla/default_gradebook/DataLoader/NaiveRequestDispatch'
 
 function getGradingPeriodAssignments(courseId) {
@@ -32,9 +31,6 @@ const getAssignmentGroups = (url, params, dispatch) => {
   return dispatch.getDepaginated(url, params)
 }
 const getCustomColumns = url => {
-  return $.ajaxJSON(url, 'GET', {})
-}
-const getSections = url => {
   return $.ajaxJSON(url, 'GET', {})
 }
 
@@ -63,9 +59,9 @@ const getPendingSubmissions = dispatch => {
   while (pendingStudentsForSubmissions.length) {
     const studentIds = pendingStudentsForSubmissions.splice(0, submissionChunkSize)
     submissionChunkCount++
-    dispatch.getDepaginated(submissionURL, {student_ids: studentIds, ...submissionParams}).then(
-      gotSubmissionsChunk
-    )
+    dispatch
+      .getDepaginated(submissionURL, {student_ids: studentIds, ...submissionParams})
+      .then(gotSubmissionsChunk)
   }
 }
 
@@ -98,24 +94,29 @@ const getStudents = (url, params, studentChunkCb, dispatch) => {
     }
   }
 
-  studentsLoaded = cheaterDepaginate(url, params, gotStudentPage)
+  studentsLoaded = dispatch.getDepaginated(url, params, gotStudentPage)
   return studentsLoaded
 }
 
-const getDataForColumn = (column, url, params, cb) => {
+// This function is called from showNoteColumn in Gradebook.coffee
+// when the notes column is revealed. In that case dispatch won't
+// exist so we'll create a new Dispatcher for this request.
+const getDataForColumn = (column, url, params, cb, dispatch = new NaiveRequestDispatch()) => {
   url = url.replace(/:id/, column.id)
   const augmentedCallback = data => cb(column, data)
-  return cheaterDepaginate(url, params, augmentedCallback)
+  return dispatch.getDepaginated(url, params, augmentedCallback)
 }
 
-const getCustomColumnData = (url, params, cb, customColumnsDfd, waitForDfds) => {
+const getCustomColumnData = (url, params, cb, customColumnsDfd, waitForDfds, dispatch) => {
   const customColumnDataLoaded = $.Deferred()
   let customColumnDataDfds
 
   // waitForDfds ensures that custom column data is loaded *last*
   $.when.apply($, waitForDfds).then(() => {
     customColumnsDfd.then(customColumns => {
-      customColumnDataDfds = customColumns.map(col => getDataForColumn(col, url, params, cb))
+      customColumnDataDfds = customColumns.map(col =>
+        getDataForColumn(col, url, params, cb, dispatch)
+      )
     })
   })
 
@@ -159,7 +160,8 @@ const loadGradebookData = opts => {
     opts.customColumnDataParams,
     opts.customColumnDataPageCb,
     gotCustomColumns,
-    [gotSubmissions]
+    [gotSubmissions],
+    dispatch
   )
 
   return {
@@ -172,4 +174,4 @@ const loadGradebookData = opts => {
   }
 }
 
-export default {loadGradebookData: loadGradebookData, getDataForColumn: getDataForColumn}
+export default {loadGradebookData, getDataForColumn}

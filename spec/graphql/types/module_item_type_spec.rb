@@ -31,7 +31,7 @@ describe Types::ModuleItemType do
   end
 
   context "permissions" do
-    let_once(:student) { student_in_course(course: course) }
+    let_once(:student) { student_in_course(course: course).user }
 
     it "requires read permission on context module" do
       module1.workflow_state = "unpublished"
@@ -41,7 +41,7 @@ describe Types::ModuleItemType do
     end
 
     it "requires read permission on context" do
-      other_course_student = student_in_course(course: course_factory)
+      other_course_student = student_in_course(course: course_factory).user
       resolver = GraphQLTypeTester.new(module_item1, current_user: other_course_student)
       expect(resolver.resolve("_id")).to be_nil
     end

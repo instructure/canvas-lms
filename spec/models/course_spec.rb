@@ -5369,6 +5369,23 @@ describe Course, "#image" do
   end
 end
 
+describe Course, "#image_attachment" do
+  before(:once) do
+    course_with_teacher(active_all: true)
+    attachment_with_context(@course)
+  end
+
+  it "returns the attachment for a course file if image_id is set" do
+    @course.image_id = @attachment.id
+    @course.save!
+    expect(@course.image_attachment).to eq @attachment
+  end
+
+  it "returns nil if image_id and image_url are not set" do
+    expect(@course.image_attachment).to be_nil
+  end
+end
+
 describe Course, "#filter_users_by_permission" do
   it "filters out course users that don't have a permission based on their enrollment roles" do
     permission = :moderate_forum # happens to be true for ta's, but available to students
@@ -5536,6 +5553,50 @@ describe Course, "#show_total_grade_as_points?" do
       it "returns false if there are no policies and no submissions with late_policy_status" do
         expect(course.gradebook_backwards_incompatible_features_enabled?).to be false
       end
+    end
+  end
+
+  context "cached_account_users_for" do
+    specs_require_cache(:redis_store)
+
+    before :once do
+      @course = Course.create!
+      @user = User.create!
+    end
+
+    def cached_account_users
+      Course.find(@course.id).cached_account_users_for(@user)
+    end
+
+    it "should cache" do
+      expect_any_instantiation_of(@course).to receive(:account_users_for).once
+      2.times { cached_account_users }
+    end
+
+    it "should clear if an account user is added to the user" do
+      cached_account_users
+      au = AccountUser.create!(:account => Account.default, :user => @user)
+      expect(cached_account_users).to eq [au]
+    end
+
+    it "should clear if the course is moved to another account" do
+      sub_account = Account.default.sub_accounts.create!
+      au = AccountUser.create!(:account => sub_account, :user => @user)
+      expect(cached_account_users).to eq []
+      @course.update_attribute(:account, sub_account)
+      expect(cached_account_users).to eq [au]
+    end
+
+    it "should clear if the sub_account is moved" do
+      sub_account1 = Account.default.sub_accounts.create!
+      au = AccountUser.create!(:account => sub_account1, :user => @user)
+
+      sub_account2 = Account.default.sub_accounts.create!
+      @course.update_attribute(:account, sub_account2)
+      expect(cached_account_users).to eq []
+
+      sub_account2.update_attribute(:parent_account, sub_account1)
+      expect(cached_account_users).to eq [au]
     end
   end
 end

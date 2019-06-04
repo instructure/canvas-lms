@@ -84,7 +84,11 @@ module CC
           ext_node.lticm(:property, tool.domain, 'name' => 'domain') unless tool.domain.blank?
 
           [:selection_width, :selection_height].each do |key|
-            ext_node.lticm(:property, tool.settings[key], 'name' => key) unless tool.settings[key].blank?
+            ext_node.lticm(:property, tool.settings[key], 'name' => key) if tool.settings[key].present?
+          end
+
+          if tool.developer_key_id.present?
+            ext_node.lticm :property, tool.developer_key.global_id, 'name' => 'client_id'
           end
 
           if for_course_copy

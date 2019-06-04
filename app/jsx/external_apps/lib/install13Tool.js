@@ -18,7 +18,11 @@
 
 import axios from 'axios'
 
-export default async function install13Tool(client_id, createUrl) {
-  const response = await axios.post(createUrl, {client_id})
+export default async function install13Tool(client_id, createUrl, verify_uniqueness = false) {
+  const params = { client_id }
+  if (verify_uniqueness) {
+    params.external_tool = { verify_uniqueness }
+  }
+  const response = await axios.post(createUrl, params)
   return response.data
 }

@@ -97,7 +97,7 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments).
-        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at")
 
       Rails.logger.debug "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
       submissions
@@ -119,12 +119,11 @@ class GradeCalculator
     scores_prior_to_compute = Score.where(enrollment: @enrollments.map(&:id), assignment_group_id: nil, course_score: true).to_a
     save_scores
     update_score_statistics
-    invalidate_caches
     create_course_grade_alerts(scores_prior_to_compute)
     # The next line looks weird, but it is intended behaviour.  Its
-    # saying "if we're on the branch not calculating muted scores, run
+    # saying "if we're on the branch not calculating hidden scores, run
     # the branch that does."
-    calculate_muted_scores if @ignore_muted
+    calculate_hidden_scores if @ignore_muted
     calculate_course_score if @update_course_score
   end
 
@@ -298,8 +297,8 @@ class GradeCalculator
     GradeCalculator.new(@user_ids, @course, opts).compute_and_save_scores
   end
 
-  def calculate_muted_scores
-    # re-run this calculator, except include muted assignments
+  def calculate_hidden_scores
+    # re-run this calculator, except include muted assignments/unposted submissions
     compute_branch(ignore_muted: false)
   end
 
@@ -693,8 +692,8 @@ class GradeCalculator
       group_submissions = assignments.map do |a|
         s = submissions_by_assignment_id[a.id]
 
-        # ignore submissions for muted assignments
-        s = nil if @ignore_muted && a.muted?
+        # ignore unposted submissions and all submissions for muted assignments
+        s = nil if ignore_submission?(submission: s, assignment: a)
 
         # ignore pending_review quiz submissions
         s = nil if ignore_ungraded && s.try(:pending_review?)
@@ -756,7 +755,7 @@ class GradeCalculator
     if never_drop_ids.present? || @ignore_muted
       cant_drop, submissions = submissions.partition do |submission|
         assignment = submission[:assignment]
-        (@ignore_muted && assignment.muted?) || never_drop_ids.include?(assignment.id)
+        ignore_submission?(submission: submission, assignment: assignment) || never_drop_ids.include?(assignment.id)
       end
     end
 
@@ -796,11 +795,11 @@ class GradeCalculator
   end
 
   def keep_highest(submissions, cant_drop, keep, max_total)
-    keep_helper(submissions, cant_drop, keep, max_total) { |*args| big_f_best(*args) }
+    keep_helper(submissions, cant_drop, keep, max_total, keep_mode: :highest) { |*args| big_f_best(*args) }
   end
 
   def keep_lowest(submissions, cant_drop, keep, max_total)
-    keep_helper(submissions, cant_drop, keep, max_total) { |*args| big_f_worst(*args) }
+    keep_helper(submissions, cant_drop, keep, max_total, keep_mode: :lowest) { |*args| big_f_worst(*args) }
   end
 
   # @submissions: set of droppable submissions
@@ -809,30 +808,51 @@ class GradeCalculator
   # @max_total: the highest number of points possible
   # @big_f_blk: sorting block for the big_f function
   # returns +keep+ +submissions+
-  def keep_helper(submissions, cant_drop, keep, max_total, &big_f_blk)
+  def keep_helper(submissions, cant_drop, keep, max_total, keep_mode: nil, &big_f_blk)
     return submissions if submissions.size <= keep
 
     unpointed, pointed = (submissions + cant_drop).partition { |s|
       s[:total].zero?
     }
-    grades = pointed.map { |s| s[:score].to_f / s[:total] }.sort
 
-    q_high = estimate_q_high(pointed, unpointed, grades)
-    q_low  = grades.first
-    q_mid  = (q_low + q_high) / 2
+    kept = nil
+    if pointed.empty? && keep_mode == :lowest
+      # this is a really dumb situation that we saw in the wild.  17
+      # assignments, 2 of them have points possible, the rest have 0
+      # points possible with drop rules of drop 8 lowest and drop 7
+      # highest.
+      #
+      # In drop_pointed above, the call to keep_highest that
+      # goes here ends up eliminating the pointed assignments, so when
+      # keep_lowest is called, we end up here with unpointed
+      # assignments which completely breaks math. estimate_q_high
+      # comes back as NaN and q_low is nil.  "(nil + NaN)/2" means
+      # you're gonna have a bad time.
+      #
+      # What we'll do instead is just sort by score like
+      # drop_unpointed above, and drop the unpointed
+      # ones up to keep.
+      kept = unpointed.sort_by { |s| s[:score].to_f }[-keep,keep]
+    else
+      grades = pointed.map { |s| s[:score].to_f / s[:total] }.sort
 
-    x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
-    threshold = 1 / (2 * keep * max_total**2)
-    until q_high - q_low < threshold
-      x < 0 ?
-        q_high = q_mid :
-        q_low  = q_mid
-      q_mid = (q_low + q_high) / 2
-
-      # bail if we can't can't ever satisfy the threshold (floats!)
-      break if q_mid == q_high || q_mid == q_low
+      q_high = estimate_q_high(pointed, unpointed, grades)
+      q_low  = grades.first
+      q_mid  = (q_low + q_high) / 2
 
       x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
+      threshold = 1 / (2 * keep * max_total**2)
+      until q_high - q_low < threshold
+        x < 0 ?
+          q_high = q_mid :
+          q_low  = q_mid
+        q_mid = (q_low + q_high) / 2
+
+        # bail if we can't can't ever satisfy the threshold (floats!)
+        break if q_mid == q_high || q_mid == q_low
+
+        x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
+      end
     end
 
     kept
@@ -942,8 +962,9 @@ class GradeCalculator
     }
   end
 
-  # If you need to invalidate caches with associated classes, put those calls here.
-  def invalidate_caches
-    GradeSummaryPresenter.invalidate_cache(@course)
+  def ignore_submission?(submission:, assignment:)
+    return false unless @ignore_muted
+
+    @course.feature_enabled?(:post_policies) ? !submission.posted? : assignment.muted?
   end
 end

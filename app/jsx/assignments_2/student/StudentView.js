@@ -40,14 +40,18 @@ const StudentView = props => (
       }
 
       document.title = data.assignment.name
-      const assignmentEnv = GetAssignmentEnvVariables()
-      const mergedAssignment = {
-        ...data.assignment,
-        env: {
-          ...assignmentEnv
-        }
+
+      const dataCopy = JSON.parse(JSON.stringify(data))
+      const assignment = dataCopy.assignment
+      assignment.env = GetAssignmentEnvVariables()
+
+      let submission = null
+      if (assignment.submissionsConnection && assignment.submissionsConnection.nodes.length !== 0) {
+        submission = assignment.submissionsConnection.nodes[0]
       }
-      return <StudentContent assignment={mergedAssignment} />
+      delete assignment.submissionsConnection
+
+      return <StudentContent assignment={assignment} submission={submission} />
     }}
   </Query>
 )

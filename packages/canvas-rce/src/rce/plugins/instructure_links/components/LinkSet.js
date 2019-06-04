@@ -16,52 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import React, { Component } from "react";
+import React, { Component, useRef } from "react";
 import {bool, func} from "prop-types";
 import {linksShape, linkType} from './propTypes'
 import formatMessage from "../../../../format-message";
-import LoadMoreButton from '../../../../common/components/LoadMoreButton'
-import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
-import {List, ListItem, Spinner} from '@instructure/ui-elements'
+import { ScreenReaderContent } from '@instructure/ui-a11y'
+import {List} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import uid from '@instructure/uid'
 
+import {
+  LoadMoreButton,
+  LoadingIndicator,
+  LoadingStatus,
+  useIncrementalLoading
+} from '../../../../common/incremental-loading'
 import Link from './Link'
+
+/*
+ * This is needed only as long as `LinkSet` is a class component.
+ */
+function IncrementalLoader(props) {
+  const {children, collection, fetchInitialPage, fetchNextPage} = props
+  const {hasMore, isLoading, links} = collection
+  const lastItemRef = useRef(null)
+
+  const loader = useIncrementalLoading({
+    hasMore: hasMore && fetchNextPage != null,
+    isLoading,
+    lastItemRef,
+
+    onLoadInitial() {
+      if (fetchInitialPage) {
+        fetchInitialPage()
+      }
+    },
+
+    onLoadMore() {
+      fetchNextPage()
+    },
+
+    records: links
+  })
+
+  return children({loader, lastItemRef})
+}
 
 class LinkSet extends Component {
   constructor(props) {
     super(props);
     this.describedByID = `rce-LinkSet-describedBy-${uid()}`;
     this.loadMoreButtonRef = null
-    this.lastLinkRef = null
-    this.listRef = null
   }
 
-  componentWillMount() {
-    if (this.props.fetchInitialPage) {
-      this.props.fetchInitialPage();
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if (!this.props.collection.isLoading) {
-      if (this.hasLinks(prevProps) && !this.hasFocus()) {
-        this.lastLinkRef && this.lastLinkRef.focus()
-      }
-    }
-  }
-
-  handleLoadMoreClick = e => {
-    e.preventDefault();
-    if (this.props.fetchNextPage) {
-      this.props.fetchNextPage();
-    }
-  }
-
-  hasFocus() {
-    return this.listRef.contains(document.activeElemnt)
-  }
   hasLinks(props) {
     return props.collection.links.length > 0
   }
@@ -74,30 +81,36 @@ class LinkSet extends Component {
     );
   }
 
-  renderLink(link, index, allLinks) {
-    const linkRef = index === allLinks.length-1 ? el => this.lastLinkRef = el : null
+  renderLinks(lastItemRef) {
+    function refFor(index, array) {
+      if (!lastItemRef || index !== array.length - 1) {
+        return null
+      }
 
-    return (
-      <ListItem key={link.href} spacing="none" padding="0">
-        <Link
-          link={link}
-          type={this.props.type}
-          onClick={this.props.onLinkClick}
-          describedByID={this.describedByID}
-          elementRef={linkRef}
-        />
-      </ListItem>
-    );
-  }
+      // Return a compatible callback ref for InstUI
+      return ref => {
+        lastItemRef.current = ref
+      }
+    }
 
-  renderLinks() {
     return (
       <>
         <ScreenReaderContent id={this.describedByID}>
           {formatMessage("Click to insert a link into the editor.")}
         </ScreenReaderContent>
-        <List variant="unstyled" as="ul" margin="0" elementRef={el => this.listRef = el}>
-          {this.props.collection.links.map(this.renderLink, this)}
+
+        <List variant="unstyled" as="ul" margin="0">
+          {this.props.collection.links.map((link, index, array) => (
+            <List.Item key={link.href} spacing="none" padding="0">
+              <Link
+                link={link}
+                type={this.props.type}
+                onClick={this.props.onLinkClick}
+                describedByID={this.describedByID}
+                elementRef={refFor(index, array)}
+              />
+            </List.Item>
+          ))}
         </List>
       </>
     );
@@ -121,39 +134,28 @@ class LinkSet extends Component {
   }
 
   render() {
-    if (this.props.fetchNextPage) {
-      let hasMore = this.props.collection.hasMore || false;
-      let isLoading = this.props.collection.isLoading || false;
-      const showInitialLoadingIndicator = !this.hasLinks(this.props) && isLoading
-      const showLoadMoreButton = this.hasLinks(this.props) && hasMore
+    return (
+      <IncrementalLoader {...this.props}>
+        {({loader, lastItemRef}) => (
+          <>
+            <div data-testid="instructure_links-LinkSet">
+              {this.hasLinks(this.props) && this.renderLinks(lastItemRef)}
+              {this.renderLoadingError()}
 
-      return (
-        <div data-testid="instructure_links-LinkSet">
-          {showInitialLoadingIndicator && (
-            <View as="div" margin="medium" textAlign="center">
-              <Spinner size="small" title={formatMessage('Loading...')} />
-            </View>
-          )}
+              {loader.isLoading && <LoadingIndicator loader={loader} />}
 
-          {this.hasLinks(this.props) && this.renderLinks()}
-          {this.renderLoadingError()}
+              {!loader.isLoading && loader.hasMore && <LoadMoreButton loader={loader} />}
 
-          {showLoadMoreButton && (
-            <View margin="x-small medium medium medium">
-              <LoadMoreButton
-                isLoading={isLoading}
-                onLoadMore={this.props.fetchNextPage}
-              />
-            </View>
-          )}
+              {this.isEmpty(this.props) &&
+                !this.props.suppressRenderEmpty &&
+                this.renderEmptyIndicator()}
+            </div>
 
-          {this.isEmpty(this.props) &&
-            !this.props.suppressRenderEmpty &&
-            this.renderEmptyIndicator()}
-        </div>
-      );
-    }
-    return this.hasLinks(this.props) ? this.renderLinks() : this.renderEmptyIndicator()
+            <LoadingStatus loader={loader} />
+          </>
+        )}
+      </IncrementalLoader>
+    )
   }
 }
 

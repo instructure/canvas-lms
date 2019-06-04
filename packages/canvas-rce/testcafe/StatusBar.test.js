@@ -20,18 +20,54 @@
 
 import {Selector} from 'testcafe'
 
-fixture`StatusBar`.page`./testcafe.html` //.beforeEach(addTestcafeTestingLibrary).page`./testcafe.html`
+fixture`StatusBar`.page`./testcafe.html`
+
+const tinyIframe = Selector('.tox-edit-area__iframe')
 
 test('toggles between rce and html views', async t => {
   const textarea = Selector('#textarea')
-  const rce = Selector('.tox-tinymce')
+  const rceContainer = Selector('.tox-tinymce')
   const toggleButton = Selector('button').withText('</>')
-  await t.expect(rce.visible).ok('rce should be initially visible')
+  const wordCount = Selector('span').withText('0 words').nth(-1)
+  await t.expect(rceContainer.visible).ok('rce should be initially visible')
+  await t.expect(wordCount.count).eql(1)
   await t.expect(textarea.visible).notOk('textarea should be initially invisible')
   await t.click(toggleButton)
-  await t.expect(rce.visible).notOk('rce should be invisible after toggle')
+  await t.expect(rceContainer.visible).notOk('rce should be invisible after toggle')
+  await t.expect(wordCount.count).eql(0)
   await t.expect(textarea.visible).ok('textarea should be visible after toggle')
   await t.click(toggleButton)
-  await t.expect(rce.visible).ok('rce should be visible after toggling again')
+  await t.expect(rceContainer.visible).ok('rce should be visible after toggling again')
+  await t.expect(wordCount.count).eql(1)
   await t.expect(textarea.visible).notOk('textarea should be hidden after toggling again')
+})
+
+test('counts words', async t => {
+  // search for the exact text for the selector will wait for it to change to this text
+  await t.expect(Selector('span').withText('0 words')).exists
+
+  await t.switchToIframe(tinyIframe).typeText('body', 'foo')
+  await t
+    .switchToMainWindow()
+    .expect(Selector('span').withText('1 word').exists)
+    .ok()
+
+  await t.switchToIframe(tinyIframe).typeText('body', ' bar baz bing')
+  await t
+    .switchToMainWindow()
+    .expect(Selector('span').withText('4 words').exists)
+    .ok()
+})
+
+test('displays the current html path', async t => {
+  await t.switchToIframe(tinyIframe).typeText('body', 'foo ')
+  await t.expect(Selector('span').withText(/p.*strong.*em/).exists).notOk()
+  await t.switchToMainWindow().click(Selector('button[title="Bold"]'))
+  await t.switchToIframe(tinyIframe).typeText('body', 'bar ')
+  await t.switchToMainWindow().click(Selector('button[title="Italic"]'))
+  await t.switchToIframe(tinyIframe).typeText('body', 'baz ')
+  await t
+    .switchToMainWindow()
+    .expect(Selector('span').withText(/p.*strong.*em/).exists)
+    .ok()
 })

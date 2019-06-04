@@ -24,6 +24,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
+  belongs_to :root_account, class_name: 'Account'
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:name, :description]
@@ -44,24 +45,28 @@ class ContextExternalTool < ActiveRecord::Base
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   validate :check_for_xml_error
 
+  scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
+
+  CUSTOM_EXTENSION_KEYS = {
+    :file_menu => [:accept_media_types].freeze,
+    :editor_button => [:use_tray].freeze
+  }.freeze
+
+  DISABLED_STATE = 'disabled'.freeze
+
   workflow do
     state :anonymous
     state :name_only
     state :email_only
     state :public
     state :deleted
-    state :disabled # The tool's developer key is "off" but not deleted
+    state DISABLED_STATE.to_sym # The tool's developer key is "off" but not deleted
   end
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :lti_add_edit) }
     can :read and can :update and can :delete and can :update_manually
   end
-
-  CUSTOM_EXTENSION_KEYS = {
-    :file_menu => [:accept_media_types].freeze,
-    :editor_button => [:use_tray].freeze
-  }.freeze
 
   Lti::ResourcePlacement::PLACEMENTS.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -454,6 +459,7 @@ class ContextExternalTool < ActiveRecord::Base
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
+    self.root_account ||= context.root_account
 
     ContextExternalTool.normalize_sizes!(self.settings)
 
@@ -813,7 +819,8 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.global_navigation_visibility_for_user(root_account, user)
-    Rails.cache.fetch(['external_tools/global_navigation/visibility', root_account.asset_string, user].cache_key) do
+    Rails.cache.fetch_with_batched_keys(['external_tools/global_navigation/visibility', root_account.asset_string].cache_key,
+        batch_object: user, batched_keys: [:enrollments, :account_users]) do
       # let them see admin level tools if there are any courses they can manage
       if root_account.grants_right?(user, :manage_content) ||
         Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists?
@@ -825,12 +832,14 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.global_navigation_tools(root_account, visibility)
-    tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
-    if visibility == 'members'
-      # reject the admin only tools
-      tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
+    RequestCache.cache('global_navigation_tools', root_account, visibility) do
+      tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
+      if visibility == 'members'
+        # reject the admin only tools
+        tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
+      end
+      tools
     end
-    tools
   end
 
   def self.global_navigation_menu_cache_key(root_account, visibility)

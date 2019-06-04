@@ -55,8 +55,8 @@ import zhHans from '../../config/locales/zh.json';
 import zhHant from '../../config/locales/zh_HK.json';
 
 export default {
-  enflip: flipAll(en), ar, bg, cs, da, de, el, 'en-AU': enAU, 'en-GB': enGB, en,
-  es, 'fa-IR': faIR, 'fr-CA': frCA, fr, he, ht, hu, hy, it, ja, ko, mi, nl, nn,
-  nb, pl, 'pt-BR': ptBR, pt, ro, ru, sq, sr, sv, tr, 'uk-UA': ukUA, vi,
-  'zh-Hans': zhHans, 'zh-Hant': zhHant,
+  enflip: flipAll(en), ar, bg, cs, da, de, el, 'en-au': enAU, 'en-gb': enGB, en,
+  es, 'fa-ir': faIR, 'fr-ca': frCA, fr, he, ht, hu, hy, it, ja, ko, mi, nl, nn,
+  nb, pl, 'pt-br': ptBR, pt, ro, ru, sq, sr, sv, tr, 'uk-ua': ukUA, vi,
+  'zh-cn': zhHans, 'zh-tw': zhHant,
 };

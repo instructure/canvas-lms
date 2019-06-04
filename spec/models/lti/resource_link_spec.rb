@@ -19,16 +19,53 @@
 require_relative '../../spec_helper'
 
 RSpec.describe Lti::ResourceLink, type: :model do
-  context 'when validating' do
-    let(:tool) { external_tool_model }
-    let(:resource_link) { Lti::ResourceLink.create!(context_external_tool: tool) }
+  let(:tool) { external_tool_model }
+  let(:resource_link) { Lti::ResourceLink.create!(context_external_tool: tool) }
 
+  context 'when validating' do
     it 'sets the "resource_link_id" if it is not specified' do
       expect(resource_link.resource_link_id).not_to be_blank
     end
 
     it 'sets the "context_external_tool"' do
-      expect(resource_link.context_external_tool).to eq tool
+      expect(resource_link.original_context_external_tool).to eq tool
+    end
+  end
+
+  describe "#context_external_tool" do
+    it 'raises an error' do
+      expect { resource_link.context_external_tool }.to raise_error 'Use Lti::ResourceLink#current_external_tool to lookup associated tool'
+    end
+  end
+
+  describe "#current_external_tool" do
+    subject { resource_link.current_external_tool(context) }
+
+    context 'when the original tool has been deleted' do
+      let(:context) { tool.context }
+
+      before do
+        tool.destroy!
+        second_tool
+      end
+
+      context 'when a matching tool exists in the specified context' do
+        let(:second_tool) { external_tool_model(context: context) }
+
+        it { is_expected.to eq second_tool }
+      end
+
+      context 'when a matching tool exists up the context account chain' do
+        let(:second_tool) { external_tool_model(context: context.root_account) }
+
+        it { is_expected.to eq second_tool }
+      end
+
+      context 'when a matching tool does not exist' do
+        let(:second_tool) { nil }
+
+        it { is_expected.to be_nil }
+      end
     end
   end
 end

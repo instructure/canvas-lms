@@ -64,11 +64,6 @@ test('populates the key name', () => {
   equal(input.value, developerKey.name)
 })
 
-test('defaults name to "Unnamed Tool"', () => {
-  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name')
-  equal(input.value, 'Unnamed Tool')
-})
-
 test('populates the key owner email', () => {
   const input = formFieldOfTypeAndName(developerKey, 'input', 'email')
   equal(input.value, developerKey.email)
@@ -132,11 +127,6 @@ test('populates the key name when lti key', () => {
   equal(input.value, developerKey.name)
 })
 
-test('defaults name to "Unnamed Tool" when lti key', () => {
-  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name', true)
-  equal(input.value, 'Unnamed Tool')
-})
-
 test('populates the key owner email when lti key', () => {
   const input = formFieldOfTypeAndName(developerKey, 'input', 'email', true)
   equal(input.value, developerKey.email)
@@ -172,6 +162,6 @@ test('renders the developer key scopes form if isLtiKey is false', () => {
       createLtiKeyState={ {customizing: false, isLtiKey: false} }
     />
   )
-  ok(wrapper.find('DeveloperKeyScopes').exists())
+  ok(wrapper.find('Scopes').exists())
   wrapper.unmount()
 })

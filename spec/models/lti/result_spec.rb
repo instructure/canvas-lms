@@ -128,5 +128,28 @@ RSpec.describe Lti::Result, type: :model do
         end
       end
     end
+
+    it_behaves_like "soft deletion" do
+      let(:user) { user_model }
+      let(:line_item) { line_item_model }
+      let(:second_line_item) { line_item_model }
+      let(:creation_arguments) do
+        [
+          {
+            line_item: line_item,
+            user: user,
+            created_at: Time.zone.now,
+            updated_at: Time.zone.now
+          },
+          {
+            line_item: second_line_item,
+            user: user,
+            created_at: Time.zone.now,
+            updated_at: Time.zone.now
+          }
+        ]
+      end
+      subject { Lti::Result }
+    end
   end
 end

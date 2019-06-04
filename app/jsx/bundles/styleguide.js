@@ -25,6 +25,7 @@ import Backbone from 'Backbone'
 import 'jqueryui/tabs'
 import 'jqueryui/button'
 import 'jqueryui/tooltip'
+import 'jqueryui/progressbar'
 import 'jquery.instructure_date_and_time'
 
 const dialog = $('#dialog-buttons-dialog').dialog({
@@ -148,8 +149,6 @@ $('#animateProgress').click(preventDefault(() => {
 
 // Combinations
 $('#tabs2').tabs()
-$('#accordion2').accordion({header: 'h4'})
-
 
 // Toolbar
 $('#play, #shuffle').button()

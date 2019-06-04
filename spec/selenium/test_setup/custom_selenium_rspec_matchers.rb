@@ -160,13 +160,13 @@ end
 RSpec::Matchers.define :be_disabled do
   match do |element|
     wait_for(method: :be_disabled) do
-      element.attribute(:disabled) == "true"
+      element.attribute(:disabled) == "true" || element.attribute("aria-disabled") == "true"
     end
   end
 
   match_when_negated do |element|
     wait_for(method: :be_disabled) do
-      element.attribute(:disabled) != "true"
+      element.attribute(:disabled) != "true" && element.attribute("aria-disabled") != "true"
     end
   end
 

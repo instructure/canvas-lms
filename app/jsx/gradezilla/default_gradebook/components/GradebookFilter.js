@@ -22,10 +22,33 @@ import Select from '@instructure/ui-core/lib/components/Select'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradezilla'
 
+function renderItem(item) {
+  return (
+    <option key={item.id} value={item.id}>
+      {item.name}
+    </option>
+  )
+}
+
+function renderItemAndChildren(item) {
+  return (
+    <optgroup label={item.name} key={`group_${item.id}`}>
+      {item.children.map(child => renderItem(child))}
+    </optgroup>
+  )
+}
+
 class GradebookFilter extends React.Component {
   static propTypes = {
     items: arrayOf(
       shape({
+        /* groups can only ever be a single level deep */
+        children: arrayOf(
+          shape({
+            id: string.isRequired,
+            name: string.isRequired
+          })
+        ),
         id: string.isRequired,
         name: string.isRequired
       })
@@ -59,11 +82,10 @@ class GradebookFilter extends React.Component {
         <option key="0" value="0">
           {this.props.allItemsLabel}
         </option>
-        {this.props.items.map(item => (
-          <option key={item.id} value={item.id}>
-            {item.name}
-          </option>
-        ))}
+
+        {this.props.items.map(item =>
+          item.children ? renderItemAndChildren(item) : renderItem(item)
+        )}
       </Select>
     )
   }

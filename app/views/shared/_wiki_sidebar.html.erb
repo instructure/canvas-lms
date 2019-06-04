@@ -14,7 +14,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
+unless @context.try(:feature_enabled?, :rce_enhancements) %>
 <div id="editor_tabs" style="display: none;">
   <!-- this is just here so canvas-rce knows where to render the sidebar into -->
 </div>
+<% end %>

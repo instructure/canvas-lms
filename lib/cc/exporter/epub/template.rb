@@ -94,7 +94,7 @@ module CC::Exporter::Epub
       if item[:href].present?
         content_tag(:a, content, href: item[:href])
       else
-        content
+        HtmlTextHelper.escape_html(content)
       end
     end
 

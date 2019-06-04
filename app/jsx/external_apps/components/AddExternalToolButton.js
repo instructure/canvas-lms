@@ -54,6 +54,10 @@ export default class AddExternalToolButton extends React.Component {
 
   throttleCreation = false
 
+  get isInstalling13Tool () {
+    return this.state.type === 'byClientId'
+  }
+
   openModal = e => {
     e.preventDefault()
     this.setState({
@@ -107,16 +111,20 @@ export default class AddExternalToolButton extends React.Component {
     )
   }
 
-  _errorHandler = xhr => {
-    const errors = JSON.parse(xhr.responseText).errors
-    let errorMessage = I18n.t('We were unable to add the app.')
-
+  _duplicate_check_error (errors) {
     if (errors.tool_currently_installed) {
       this.setState({duplicateTool: true})
       this.throttleCreation = false
-      return
+      return true
     }
+    return false
+  }
 
+  _errorHandler = xhr => {
+    const errors = JSON.parse(xhr.responseText).errors
+    if (this._duplicate_check_error(errors)) { return }
+
+    let errorMessage = I18n.t('We were unable to add the app.')
     if (this.state.configurationType !== 'manual') {
       const errorName = `config_${this.state.configurationType}`
       if (errors[errorName]) {
@@ -152,7 +160,7 @@ export default class AddExternalToolButton extends React.Component {
       })
       e.currentTarget.closest('form').submit()
     } else if (configurationType === 'byClientId') {
-      fetchToolConfiguration(
+      return fetchToolConfiguration(
         data.client_id,
         ENV.TOOL_CONFIGURATION_SHOW_URL,
         toolConfigurationError
@@ -179,15 +187,22 @@ export default class AddExternalToolButton extends React.Component {
     }
   }
 
-  create13Tool = () => {
-    install13Tool(
+  create13Tool = (verify_uniqueness = true) => {
+    return install13Tool(
       this.state.clientId,
-      ENV.EXTERNAL_TOOLS_CREATE_URL
-    ).then(() => {
-      this._successHandler()
-    }).catch(() => {
+      ENV.EXTERNAL_TOOLS_CREATE_URL,
+      verify_uniqueness
+    ).then(
+      () => {
+        this._successHandler()
+        this.closeModal()
+      },
+      (response) => {
+        const errors = response.response.data.errors
+        this._duplicate_check_error(errors)
+      }
+    ).catch(() => {
       $.flashError(I18n.t('We were unable to add the app.'))
-    }).finally(() => {
       this.closeModal()
     })
   }
@@ -199,8 +214,9 @@ export default class AddExternalToolButton extends React.Component {
           onCancel={this.closeModal}
           toolData={this.state.attemptedToolSaveData}
           configurationType={this.state.attemptedToolConfigurationType}
-          onSuccess={this._successHandler.bind(this)}
-          onError={this._errorHandler.bind(this)}
+          onSuccess={this._successHandler}
+          onError={this._errorHandler}
+          forceSaveTool={this.isInstalling13Tool && (() => this.create13Tool(false))}
           store={store}
         />
       )
@@ -213,7 +229,7 @@ export default class AddExternalToolButton extends React.Component {
           handleActivateLti2={this.handleActivateLti2}
         />
       )
-    } else if (this.state.type === 'byClientId' && this.state.toolConfiguration) {
+    } else if (this.isInstalling13Tool && this.state.toolConfiguration) {
       const {clientId} = this.state
       const toolName = this.state.toolConfiguration.settings.title
 
@@ -222,7 +238,7 @@ export default class AddExternalToolButton extends React.Component {
           onCancel={() => {
             this.closeModal();
           }}
-          onConfirm={this.create13Tool}
+          onConfirm={() => this.create13Tool()}
           message={I18n.t(
             'Tool "%{toolName}" found for client ID %{clientId}. Would you like to install it?',
             { toolName, clientId }

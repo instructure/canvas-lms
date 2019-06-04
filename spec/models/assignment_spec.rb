@@ -2873,6 +2873,10 @@ describe Assignment do
     context "when post policies are enabled" do
       before(:once) { @course.enable_feature!(:post_policies) }
 
+      it "should default to muted" do
+        expect(@course.assignments.create!).to be_muted
+      end
+
       it "ensures an assignment with no previous post policy posts manually when it is muted" do
         @assignment.mute!
         expect(@assignment).to be_post_manually
@@ -5771,16 +5775,17 @@ describe Assignment do
       @assignment.update!(anonymous_grading: true)
 
       s1 = @students.first
-      sub = submit_homework(s1)
+      att = submit_homework(s1)
+      sub = @assignment.submissions.where(:user_id => s1).first
 
       zip = zip_submissions
       filename = Zip::File.new(zip.open).entries.map(&:name).first
-      expect(filename).to eq "#{s1.id}_#{sub.id}_homework.pdf"
+      expect(filename).to eq "anon_#{sub.anonymous_id}_#{att.id}_homework.pdf"
 
       comments, ignored = @assignment.generate_comments_from_files(
         zip.open.path,
         @teacher)
-
+      
       expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
       expect(ignored).to be_empty
     end
@@ -7195,6 +7200,13 @@ describe Assignment do
           assignment.post_submissions(submission_ids: [student1_submission.id])
           expect(assignment).to be_muted
         end
+
+        it "recomputes grades for the affected students" do
+          assignment.mute!
+
+          expect(@course).to receive(:recompute_student_scores).with([student1.id])
+          assignment.post_submissions(submission_ids: [student1_submission.id])
+        end
       end
 
       it "does not update the assignment's muted status when post policies are not enabled" do
@@ -7309,6 +7321,11 @@ describe Assignment do
         it "leaves the assignment unmuted if all submissions remain posted" do
           assignment.hide_submissions(submission_ids: [])
           expect(assignment).not_to be_muted
+        end
+
+        it "recomputes grades for the affected students" do
+          expect(@course).to receive(:recompute_student_scores).with([student1.id])
+          assignment.hide_submissions(submission_ids: [student1_submission.id])
         end
       end
 
@@ -7781,7 +7798,7 @@ describe Assignment do
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
-          expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+          expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           expect(assignment.external_tool_tag.content).to eq tool
           expect(assignment.line_items.first.resource_link.line_items.first).to eq assignment.line_items.first
         end
@@ -7816,6 +7833,63 @@ describe Assignment do
         it_behaves_like 'line item and resource link existence check'
         it_behaves_like 'assignment to line item attribute sync check'
 
+        context 'and no resource link or line item exist' do
+          let(:resource_link) { subject.line_items.first.resource_link }
+          let(:line_item) { subject.line_items.first }
+
+          before do
+            resource_link
+            line_item
+            subject.line_items.destroy_all
+            resource_link.destroy!
+            subject.update!(lti_context_id: SecureRandom.uuid)
+            subject.create_assignment_line_item!
+          end
+
+          describe '#create_assignment_line_item!' do
+            subject { assignment }
+
+            it 'sets a line item' do
+              expect(subject.line_items.active.count).to eq 1
+            end
+
+            it 'creates a new assignment line item' do
+              expect(subject.line_items.first).not_to eq line_item
+            end
+
+            it 'sets a resource link' do
+              expect(subject.line_items.first.resource_link).to be_present
+            end
+
+            it 'creates a new resource link' do
+              expect(subject.line_items.first.resource_link).not_to eq resource_link
+            end
+          end
+        end
+
+        context 'and resource link and line item exist' do
+          let(:resource_link) { subject.line_items.first.resource_link }
+          let(:line_item) { subject.line_items.first }
+
+          describe '#create_assignment_line_item!' do
+            subject { assignment }
+
+            before { subject.create_assignment_line_item! }
+
+            it 'does not add a new line item' do
+              expect(subject.line_items.count).to eq 1
+            end
+
+            it 'does not replace the existing line item' do
+              expect(subject.line_items.first).to eq line_item
+            end
+
+            it 'does not replace the existing resource link' do
+              expect(subject.line_items.first.resource_link).to eq resource_link
+            end
+          end
+        end
+
         context 'and the tool binding is changed' do
           let(:different_tool_use_1_3) { true }
           let!(:different_tool) do
@@ -7837,7 +7911,7 @@ describe Assignment do
           shared_examples 'unchanged line item and resource link check' do
             it 'does not change nor add to the line item nor resource link' do
               expect(assignment.line_items.length).to eq 1
-              expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+              expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
               # some sanity checks to make sure the update did what we thought it did
               expect(different_tool.id).not_to eq tool.id
               expect(assignment.external_tool_tag.content.id).to eq different_tool.id
@@ -7864,7 +7938,7 @@ describe Assignment do
             assignment.update!(submission_types: 'none')
             assignment.reload
             expect(assignment.line_items.length).to eq 1
-            expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+            expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           end
 
           it_behaves_like 'assignment to line item attribute sync check'
@@ -7876,6 +7950,26 @@ describe Assignment do
 
         it 'does not create line items and resource links' do
           expect(assignment.line_items).to be_empty
+        end
+
+        describe "#create_assignment_line_items!" do
+          subject { assignment }
+
+          it 'does not create a new line item' do
+            expect do
+              subject.create_assignment_line_item!
+            end.not_to change { Lti::LineItem.count }
+          end
+
+          it 'does not associate a line item with the assignment' do
+            expect(subject.line_items).to be_empty
+          end
+
+          it 'does not create a new resource link' do
+            expect do
+              subject.create_assignment_line_item!
+            end.not_to change { Lti::ResourceLink.count }
+          end
         end
       end
 

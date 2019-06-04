@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "gera hring utan um óraðaðan lista"
   },
+  "clear_upload_34efa419": {
+    "message": "Hreinsa upphleðslu"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Smelltu á hvaða skrá sem er til að setja inn tengil til að sækja skrána."
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Samvinnutól"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Fella saman til að fela { types }"
   },
   "computer_1d7dfa6f": {
     "message": "Tölva"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "Skjöl"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Dragðu og slepptu, eða smelltu til að vafra í tölvunni."
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Skil: Margar dagsetningar"
+  },
+  "due_when_7eed10c6": {
+    "message": "Skil: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "slá inn leitarorð"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Settu inn þann texta sem þú kýst við þessa mynd"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Útvíkka til að sjá { types }"
+  },
   "external_links_3d9f074e": {
     "message": "Ytri tenglar"
   },
   "file_upload_form_4aaad554": {
     "message": "Form fyrir upphleðslu skráar"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename } forskoða"
   },
   "files_c300e900": {
     "message": "Skrár"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Setja inn stærðfræðijöfnu"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "Ógild skráartegund"
+  },
   "link_7262adec": {
     "message": "Tengill "
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Hleð inn skrám..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Sæki fleiri niðurstöður..."
-  },
   "media_af190855": {
     "message": "Miðill"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "Engar niðurstöður."
+  },
+  "options_3ab0ea65": {
+    "message": "Valkostir"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Raðaðir og óraðaðir listar"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "Fólk"
   },
+  "posted_when_a578f5ab": {
+    "message": "Birt: { when }"
+  },
   "preformatted_d0670862": {
     "message": "Forsniðnir"
+  },
+  "published_c944a23d": {
+    "message": "birt"
+  },
+  "published_when_302d8e23": {
+    "message": "birt: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Próf"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Velja möppu til að hlaða skránni þinni upp í"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Sýna valkosti myndar"
   },
   "small_header_168fb9f9": {
     "message": "Lítill haus"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Þetta uppflutta efni er stærra en geymsluhluti skráa. Vinsamlegast hafðu samband við kerfisstjórnanda þinn."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "Verður birt: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "Verkefni: { when }"
+  },
   "tray_839df38a": {
     "message": "Bakki"
+  },
+  "unpublished_dfd8801": {
+    "message": "óbirt"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Hlaða upp nýrri mynd"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Hlaða upp skrá"
   },
   "upload_image_6120b609": {
     "message": "Hleð upp mynd"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Notkunarréttindi:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Skoða flýtileiðir lyklaborð"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Hvað vilt þú nefna nýju síðuna?"

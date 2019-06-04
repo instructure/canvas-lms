@@ -17,70 +17,112 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
-
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import View from '@instructure/ui-layout/lib/components/View'
-
-import IconA11y from '@instructure/ui-icons/lib/Line/IconA11y'
-import IconKeyboardShortcuts from '@instructure/ui-icons/lib/Line/IconKeyboardShortcuts'
-
+import {arrayOf, bool, func, number, string} from 'prop-types'
+import {StyleSheet, css} from 'aphrodite'
+import { Button } from '@instructure/ui-buttons'
+import { Flex, View } from '@instructure/ui-layout'
+import { ScreenReaderContent } from '@instructure/ui-a11y'
+import { Text } from '@instructure/ui-elements'
+import {SVGIcon} from '@instructure/ui-svg-images'
+import { IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 
 StatusBar.propTypes = {
-  onToggleHtml: func
+  onToggleHtml: func,
+  path: arrayOf(string),
+  wordCount: number,
+  isHtmlView: bool
 }
 
-export default function StatusBar(props) {
+function renderPath({path}) {
+  return path.reduce((result, pathName, index) => {
+    return result.concat(
+      <span key={`${pathName}-${index}`}>
+        <Text>
+          {index > 0 ? <IconMiniArrowEndLine /> : null}
+          {pathName}
+        </Text>
+      </span>
+    )
+  }, [])
+}
+
+function emptyTagIcon() {
   return (
-    <div>
-      <Flex margin="small 0 0 0">
-        <FlexItem grow>
-          <View>
-            <Text>p</Text>
-          </View>
-        </FlexItem>
-        <FlexItem>
-          <View padding="small" borderWidth="0 small 0 0">
-            <Button variant="link" icon={IconKeyboardShortcuts}>
-              <ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>
-            </Button>
-            <Button variant="link" icon={IconA11y}>
-              <ScreenReaderContent>{formatMessage('Accessibility')}</ScreenReaderContent>
-            </Button>
-          </View>
-        </FlexItem>
-        <FlexItem>
-          <View padding="small" borderWidth="0 small 0 0">
-            <Button variant="link" onClick={props.onToggleHtml}>
-              <PresentationContent>{'</>'}</PresentationContent>
-              <ScreenReaderContent>{formatMessage('Toggle raw html view')}</ScreenReaderContent>
-            </Button>
-          </View>
-        </FlexItem>
-        <FlexItem>
-          <View padding="small" borderWidth="0 small 0 0">
-            <Select
-              inline
-              width="12rem"
-              label={<ScreenReaderContent>Select a language</ScreenReaderContent>}
-            >
-              <option value="en-us">English (US)</option>
-              <option value="fr">French</option>
-            </Select>
-          </View>
-        </FlexItem>
-        <FlexItem>
-          <View padding="small 0 small small">
-            <Text>42 words</Text>
-          </View>
-        </FlexItem>
-      </Flex>
-    </div>
+    <SVGIcon viewBox="0 0 24 24" fontSize="24px">
+      <g role="presentation">
+        <text textAnchor="start" x="0" y="18px" fontSize="16">
+          &lt;/&gt;
+        </text>
+      </g>
+    </SVGIcon>
   )
 }
+export default function StatusBar(props) {
+  if (props.isHtmlView) {
+    const toggleToRich = formatMessage('Switch to rich text editor')
+    return (
+      <View display="block" margin="x-small" textAlign="end" data-testid="RCEStatusBar">
+        <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToRich}>
+          <ScreenReaderContent>{toggleToRich}</ScreenReaderContent>
+        </Button>
+      </View>
+    )
+  } else {
+    const kbshortcut = formatMessage('View keyboard shortcuts')
+    const a11y = formatMessage('Accessibility Checker')
+    const wordCount = formatMessage(`{count, plural,
+         =0 {0 words}
+        one {1 word}
+      other {# words}
+    }`, {count: props.wordCount})
+    const toggleToHtml = formatMessage('Switch to raw html editor')
+
+    return (
+      <Flex margin="x-small" data-testid="RCEStatusBar">
+        <Flex.Item grow>
+          <View>{renderPath(props)}</View>
+        </Flex.Item>
+
+        <Flex.Item>
+          <View display="inline-block" padding="0 x-small">
+            <Button variant="link" icon={IconKeyboardShortcutsLine} title={kbshortcut}>
+              <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
+            </Button>
+            <Button variant="link" icon={IconA11yLine} title={a11y}>
+              <ScreenReaderContent>{a11y}</ScreenReaderContent>
+            </Button>
+          </View>
+          <div className={css(styles.separator)}/>
+        </Flex.Item>
+
+        <Flex.Item>
+          <View display="inline-block" padding="0 small xx-small small">
+            <Text>{wordCount}</Text>
+          </View>
+          <div className={css(styles.separator)}/>
+        </Flex.Item>
+
+        <Flex.Item>
+          <View display="inline-block" padding="0 0 0 small">
+            <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToHtml}>
+              <ScreenReaderContent>{toggleToHtml}</ScreenReaderContent>
+            </Button>
+          </View>
+        </Flex.Item>
+      </Flex>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  separator: {
+    display: 'inline-block',
+    'box-sizing': 'border-box',
+    'border-right': '1px solid #ccc',
+    width: '1px',
+    height: '1.5rem',
+    position: 'relative',
+    top: '.5rem'
+  }
+});

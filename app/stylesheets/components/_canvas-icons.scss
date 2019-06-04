@@ -97,6 +97,7 @@ $icon_index: (
       url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.svg#InstructureIcons-#{$variant}') format('svg');
     font-weight: normal;
     font-style: normal;
+    font-display: block; /* tell the browser to never fall back to rendering using system fonts */
   }
 }
 

@@ -352,13 +352,13 @@ class EnrollmentsApiController < ApplicationController
   #   roles created by the {api:RoleOverridesController#add_role Add Role API}
   #   as well as the base enrollment types accepted by the `type` argument above.
   #
-  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"]
+  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"|"current_and_invited"|"current_and_future"|"current_and_concluded"]
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
-  #   are returned. When querying a user's enrollments (either via user_id
-  #   argument or via user enrollments endpoint), the following additional
-  #   synthetic states are supported: "current_and_invited"|"current_and_future"|"current_and_concluded"
+  #   are returned. The following synthetic states are supported only when
+  #   querying a user's enrollments (either via user_id argument or via user
+  #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_and_concluded+
   #
-  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"]
+  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"]
   #   Array of additional information to include on the enrollment or user records.
   #   "avatar_url" and "group_ids" will be returned on the user record.
   #
@@ -863,7 +863,8 @@ class EnrollmentsApiController < ApplicationController
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
       if params[:state].present?
-        enrollments = user.enrollments.where(enrollment_index_conditions(true))
+        enrollments = user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state).
+            where("enrollment_states.state IN (?)", enrollment_states_for_state_param)
       else
         enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions).
             joins(:enrollment_state).where("enrollment_states.state<>'completed'")
@@ -947,6 +948,14 @@ class EnrollmentsApiController < ApplicationController
     end
 
     [ clauses.join(' AND '), replacements ]
+  end
+
+  def enrollment_states_for_state_param
+    states = Array(params[:state]).uniq
+    states.concat(%w(active invited)) if states.delete 'current_and_invited'
+    states.concat(%w(active invited creation_pending)) if states.delete 'current_and_future'
+    states.concat(%w(active completed)) if states.delete 'current_and_concluded'
+    states.uniq
   end
 
   def check_sis_permissions(sis_context)

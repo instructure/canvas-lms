@@ -116,4 +116,33 @@ describe "Filter" do
       expect(Gradezilla::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
     end
   end
+
+  context "by Student Group" do
+    before(:once) do
+      gradebook_data_setup
+      show_student_groups_filter(@teacher)
+
+      @category = @course.group_categories.create!(name: "a group category")
+      @category.create_groups(2)
+
+      @category.groups.first.add_user(@student_1)
+      @category.groups.second.add_user(@student_2)
+    end
+
+    before(:each) { user_session(@teacher) }
+
+    it "should allow showing only a specific student group", priority: "1" do
+      Gradezilla.visit(@course)
+      Gradezilla.select_student_group("All Student Groups")
+
+      Gradezilla::Cells.edit_grade(@student_1, @first_assignment, 0)
+      Gradezilla::Cells.edit_grade(@student_2, @first_assignment, 1)
+
+      group2 = @category.groups.second
+      Gradezilla.select_student_group(group2)
+      expect(Gradezilla.student_group_dropdown).to include_text(group2.name)
+
+      expect(Gradezilla::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
+    end
+  end
 end

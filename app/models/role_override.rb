@@ -27,10 +27,13 @@ class RoleOverride < ActiveRecord::Base
 
   validate :must_apply_to_something
 
-  after_save :update_role_changed_at
+  after_save :clear_caches
 
-  def update_role_changed_at
-    self.role.touch
+  def clear_caches
+    self.class.connection.after_transaction_commit do
+      self.account.send_later_if_production(:clear_downstream_caches, :role_overrides)
+      self.role.touch
+    end
   end
 
   def must_apply_to_something
@@ -954,8 +957,8 @@ class RoleOverride < ActiveRecord::Base
     end
   end
 
-  def self.css_class_for(context, permission, role, role_context=nil)
-    generated_permission = self.permission_for(context, permission, role, role_context=nil)
+  def self.css_class_for(context, permission, role, role_context=:role_account)
+    generated_permission = self.permission_for(context, permission, role, role_context=:role_account)
 
     css = []
     if generated_permission[:readonly]
@@ -969,11 +972,11 @@ class RoleOverride < ActiveRecord::Base
     css.join(' ')
   end
 
-  def self.readonly_for(context, permission, role, role_context=nil)
+  def self.readonly_for(context, permission, role, role_context=:role_account)
     self.permission_for(context, permission, role, role_context)[:readonly]
   end
 
-  def self.title_for(context, permission, role, role_context=nil)
+  def self.title_for(context, permission, role, role_context=:role_account)
     if self.readonly_for(context, permission, role, role_context)
       t 'tooltips.readonly', "you do not have permission to change this."
     else
@@ -981,11 +984,11 @@ class RoleOverride < ActiveRecord::Base
     end
   end
 
-  def self.locked_for(context, permission, role, role_context=nil)
+  def self.locked_for(context, permission, role, role_context=:role_account)
     self.permission_for(context, permission, role, role_context)[:locked]
   end
 
-  def self.hidden_value_for(context, permission, role, role_context=nil)
+  def self.hidden_value_for(context, permission, role, role_context=:role_account)
     generated_permission = self.permission_for(context, permission, role, role_context)
     if !generated_permission[:readonly] && generated_permission[:explicit]
       generated_permission[:enabled] ? 'checked' : 'unchecked'
@@ -998,22 +1001,33 @@ class RoleOverride < ActiveRecord::Base
     @teacherless_permissions ||= permissions.select{|p, data| data[:available_to].include?('TeacherlessStudentEnrollment') }.map{|p, data| p }
   end
 
-  def self.clear_cached_contexts
-    @@role_override_chain = {}
-    @cached_permissions = {}
+  def self.clear_cached_contexts; end
+
+  def self.permission_for(context, permission, role_or_role_id, role_context=:role_account)
+    account = context.is_a?(Account) ? context :
+      Account.new(id: context.account_id) # we can avoid a query since we're just using it for the batched keys on redis
+    permissionless_base_key = ["role_override_calculation", Shard.global_id_for(role_or_role_id)].compact.join("/")
+    full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
+    default_data = self.permissions[permission]
+
+    if default_data[:account_allows]
+      # could depend on anything - can't cache (but that's okay because it's not super common)
+      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
+    else
+      Rails.cache.fetch_with_batched_keys(full_base_key, batch_object: account,
+          batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
+        uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
+      end
+    end.freeze
   end
 
-  def self.permission_for(context, permission, role, role_context=nil)
-    # TODO: optimize all this stuff
+  def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
+    role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
 
-    @cached_permissions ||= {}
-    role_context ||= role.account
-    permissionless_key = [context.cache_key, context.global_id, role.global_id, role_context.try(:global_id)].join("/")
-    key = [permissionless_key, permission].join("/")
+    # be explicit that we're expecting calculation to stop at the role's account rather than, say, passing in a course
+    # unnecessarily to make sure we go all the way down the chain (when nil would work just as well)
+    role_context = role.account if role_context == :role_account
 
-    return @cached_permissions[key] if @cached_permissions[key]
-
-    default_data = self.permissions[permission]
     # Determine if the permission is able to be used for the account. A non-setting is 'true'.
     # Execute linked proc if given.
     account_allows = !!(default_data[:account_allows].nil? || (default_data[:account_allows].respond_to?(:call) &&
@@ -1024,7 +1038,7 @@ class RoleOverride < ActiveRecord::Base
 
     generated_permission = {
       :account_allows => account_allows,
-      :permission =>  default_data,
+      :permission =>  permission,
       :enabled    =>  account_allows && (default_data[:true_for].include?(base_role) ? [:self, :descendants] : false),
       :locked     => locked,
       :readonly   => locked,
@@ -1046,27 +1060,29 @@ class RoleOverride < ActiveRecord::Base
     # cannot be overridden; don't bother looking for overrides
     return generated_permission if locked
 
-    @@role_override_chain ||= {}
-    overrides = @@role_override_chain[permissionless_key] ||= begin
-      context.shard.activate do
-        accounts = context.account_chain(include_site_admin: true)
-        overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
-          # skip loading from site admin if the role is not from site admin
-          next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
-          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-        end
-
-        accounts.reverse!
-        overrides = overrides.group_by(&:permission)
-
-        # every context has to be represented so that we can't miss role_context below
-        overrides.each_key do |permission|
-          overrides_by_account = overrides[permission].index_by(&:context_id)
-          overrides[permission] = accounts.map do |account|
-            overrides_by_account[account.id] || RoleOverride.new { |ro| ro.context = account }
+    overrides = RequestCache.cache(permissionless_base_key, account) do
+      Rails.cache.fetch_with_batched_keys(permissionless_base_key, batch_object: account,
+          batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
+        context.shard.activate do
+          accounts = context.account_chain(include_site_admin: true)
+          overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
+            # skip loading from site admin if the role is not from site admin
+            next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
+            RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
           end
+
+          accounts.reverse!
+          overrides = overrides.group_by(&:permission)
+
+          # every context has to be represented so that we can't miss role_context below
+          overrides.each_key do |permission|
+            overrides_by_account = overrides[permission].index_by(&:context_id)
+            overrides[permission] = accounts.map do |account|
+              overrides_by_account[account.id] || RoleOverride.new(:context_id => account.id, :context_type => "Account")
+            end
+          end
+          overrides
         end
-        overrides
       end
     end
 
@@ -1113,12 +1129,12 @@ class RoleOverride < ActiveRecord::Base
       generated_permission[:readonly] = true if generated_permission[:locked]
     end
 
-    @cached_permissions[key] = generated_permission.freeze
+    generated_permission
   end
 
   # returns just the :enabled key of permission_for, adjusted for applying it to a certain
   # context
-  def self.enabled_for?(context, permission, role, role_context=nil)
+  def self.enabled_for?(context, permission, role, role_context=:role_account)
     permission = permission_for(context, permission, role, role_context)
     return [] unless permission[:enabled]
 

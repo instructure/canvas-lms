@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cerchia elenco non ordinato"
   },
+  "clear_upload_34efa419": {
+    "message": "Cancella caricamento"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Fai clic su un file per inserire un link di download per il file."
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Collaborazioni"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Riduci per nascondere { types }"
   },
   "computer_1d7dfa6f": {
     "message": "Computer"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "Documenti"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Trascina la selezione o fai clic per cercare nel tuo computer"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Scadenza: Più date"
+  },
+  "due_when_7eed10c6": {
+    "message": "Scadenza: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "inserisci i termini di ricerca"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Inserisci testo alternativo per questa immagine"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Espandi per vedere { types }"
+  },
   "external_links_3d9f074e": {
     "message": "Link esterni"
   },
   "file_upload_form_4aaad554": {
     "message": "Modulo caricamento file"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "Anteprima { filename }"
   },
   "files_c300e900": {
     "message": "File"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Inserisci equazione matematica"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "Tipo file non valido"
+  },
   "link_7262adec": {
     "message": "Link"
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Caricamento cartelle in corso..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Caricamento di ulteriori risultati in corso..."
-  },
   "media_af190855": {
     "message": "Elementi multimediali"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "Nessun risultato."
+  },
+  "options_3ab0ea65": {
+    "message": "Opzioni"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Elenchi ordinati e non ordinati"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "Persone"
   },
+  "posted_when_a578f5ab": {
+    "message": "Postato: { when }"
+  },
   "preformatted_d0670862": {
     "message": "Preformattato"
+  },
+  "published_c944a23d": {
+    "message": "pubblicato"
+  },
+  "published_when_302d8e23": {
+    "message": "Pubblicato: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Quiz"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleziona una cartella in cui caricare il file"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Mostra opzioni immagine"
   },
   "small_header_168fb9f9": {
     "message": "Breve intestazione"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Questo caricamento supera il limite massimo di archiviazione file. Consultare l’amministratore di sistema."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "Da postare: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "Elenco attività: { when }"
+  },
   "tray_839df38a": {
     "message": "Barra delle applicazioni"
+  },
+  "unpublished_dfd8801": {
+    "message": "non pubblicato"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Carica una nuova immagine"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Carica File"
   },
   "upload_image_6120b609": {
     "message": "Carica immagine"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Diritto di utilizzo:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Visualizza scelte rapide da tastiera"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Come desideri chiamare la nuova pagina?"

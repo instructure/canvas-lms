@@ -340,7 +340,6 @@ RSpec.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Folder.reset_path_lookups!
-    RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.current_root_account = nil
@@ -602,6 +601,19 @@ RSpec.configure do |config|
     importer = process_csv_data(*lines_or_opts)
     raise "csv errors: #{importer.errors.inspect}" if importer.errors.present?
     importer
+  end
+
+  def specs_require_cache(new_cache=:memory_store)
+    before :each do
+      skip "redis required" if new_cache == :redis_store && !Canvas.redis_enabled?
+      new_cache = ActiveSupport::Cache.lookup_store(new_cache)
+      allow(Rails).to receive(:cache).and_return(new_cache)
+      allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+      allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+      allow(ActionController::Base).to receive(:perform_caching).and_return(true)
+      allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
+      MultiCache.reset
+    end
   end
 
   def enable_cache(new_cache=:memory_store)

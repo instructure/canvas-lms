@@ -43,19 +43,26 @@ module BasicLTI
       true
     end
 
+    def revert_history(launch_url, grader_id)
+      reverter = QuizzesNextSubmissionReverter.new(submission, launch_url, grader_id)
+      reverter.revert_attempt
+    end
+
     def with_params(params_hash)
       params.merge!(params_hash)
       self
     end
 
     def grade_history
+      return @_grade_history unless @_grade_history.nil?
       # attempt submitted time should be submitted_at from the first version
-      attempts_history.map do |attempt|
+      attempts = attempts_history.map do |attempt|
         last = attempt.last
         first = attempt.first
         last[:submitted_at] = first[:submitted_at]
-        last
+        last[:score].blank? ? nil : last
       end
+      @_grade_history = attempts.compact
     end
 
     private
@@ -82,8 +89,27 @@ module BasicLTI
     end
 
     def save_submission!(launch_url, grade, score, grader_id)
-      submit_submission
-      grade_submission(launch_url, grade, score, grader_id)
+      initialize_version
+      with_versioning(launch_url) do
+        submit_submission
+        grade_submission(launch_url, grade, score, grader_id)
+      end
+    end
+
+    def initialize_version
+      return if submission.versions.present?
+      # create a padding unsubmitted version for reopen request
+      save_with_versioning
+    end
+
+    def with_versioning(launch_url)
+      is_initial_unsubmitted_version = submission.versions.count == 1 && submission.submitted_at.blank?
+      is_updatable_nil_version = !is_initial_unsubmitted_version && submission.submitted_at.blank?
+      is_different_attempt = submission.url != launch_url
+      # create a new version if the open (last) version is another attempt
+      #   and the open version is not a nil version (excluding the first padding)
+      save_with_versioning if !is_updatable_nil_version && is_different_attempt
+      yield
     end
 
     def submit_submission
@@ -103,14 +129,18 @@ module BasicLTI
       submission.grade_matches_current_submission = true
       submission.grader_id = grader_id
       clear_cache
-      return submission.save! if submission.url == launch_url
       submission.url = launch_url
+      submission.save!
+    end
+
+    def save_with_versioning
       submission.with_versioning(:explicit => true) { submission.save! }
     end
 
     def clear_cache
       @_attempts_hash = nil
       @_attempts_history = nil
+      @_grade_history = nil
     end
 
     def attempt_history_by_key(url)
@@ -131,7 +161,7 @@ module BasicLTI
         attempts = submission.versions.sort_by(&:created_at).each_with_object({}) do |v, a|
           h = YAML.safe_load(v.yaml).with_indifferent_access
           url = v.model.url
-          next if url.blank?
+          next if url.blank? # exclude invalid versions (url is actual attempt identifier)
           h[:url] = url
           (a[url] = (a[url] || [])) << h.slice(*JSON_FIELDS)
         end
@@ -139,7 +169,7 @@ module BasicLTI
         # ruby hash will perserve insertion order
         sorted_list = attempts.keys.sort_by do |k|
           matches = k.match(/\?.*=(\d+)\&/)
-          next if matches.blank?
+          next 0 if matches.blank?
           matches.captures.first.to_i # ordered by the first lti parameter
         end
         sorted_list.each_with_object({}) { |k, a| a[k] = attempts[k] }

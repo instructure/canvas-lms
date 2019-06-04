@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, func, instanceOf, shape} from 'prop-types'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 
 import Image from './Image'
 
@@ -38,14 +38,14 @@ export default function ImageList({images, lastItemRef, onImageClick}) {
         }
 
         return (
-          <FlexItem
+          <Flex.Item
             as="div"
             key={'image-' + image.id}
             margin="xx-small xx-small small xx-small"
             size="6rem"
           >
             <Image focusRef={focusRef} image={image} onClick={onImageClick} />
-          </FlexItem>
+          </Flex.Item>
         )
       })}
     </Flex>

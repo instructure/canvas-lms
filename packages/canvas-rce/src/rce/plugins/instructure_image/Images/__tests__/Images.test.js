@@ -49,7 +49,7 @@ describe('RCE "Images" Plugin > Images', () => {
     }
   }
 
-  function getInitialLoadIndicator() {
+  function getLoadingIndicator() {
     return component.queryByTitle('Loading...')
   }
 
@@ -57,10 +57,12 @@ describe('RCE "Images" Plugin > Images', () => {
     return component.container.querySelectorAll('img')
   }
 
-  function getLoadMoreButton(label) {
-    return [...component.container.querySelectorAll('button')].find(
-      $button => $button.textContent.match(label)
-    ) || null
+  function getLoadMoreButton() {
+    return (
+      [...component.container.querySelectorAll('button')].find(
+        $button => $button.textContent.trim() === 'Load More'
+      ) || null
+    )
   }
 
   describe('upon initial render', () => {
@@ -74,9 +76,9 @@ describe('RCE "Images" Plugin > Images', () => {
       expect(props.fetchImages).toHaveBeenCalledWith({calledFromRender: true})
     })
 
-    it('does not display the "Load more results" button', () => {
+    it('does not display the "Load More" button', () => {
       renderComponent()
-      expect(getLoadMoreButton(/Load more results/)).not.toBeInTheDocument()
+      expect(getLoadMoreButton()).not.toBeInTheDocument()
     })
   })
 
@@ -89,16 +91,16 @@ describe('RCE "Images" Plugin > Images', () => {
     })
 
     it('indicates the initial load in progress', () => {
-      expect(getInitialLoadIndicator()).toBeInTheDocument()
+      expect(getLoadingIndicator()).toBeInTheDocument()
     })
 
     it('does not call the .fetchImages prop again', () => {
       expect(props.fetchImages).toHaveBeenCalledTimes(0)
     })
 
-    it('does not display the "Load more results" button', () => {
+    it('does not display the "Load More" button', () => {
       renderComponent()
-      expect(getLoadMoreButton(/Load more results/)).not.toBeInTheDocument()
+      expect(getLoadMoreButton()).not.toBeInTheDocument()
     })
   })
 
@@ -117,7 +119,7 @@ describe('RCE "Images" Plugin > Images', () => {
 
     it('removes the initial load indicator', () => {
       renderComponent()
-      expect(getInitialLoadIndicator()).not.toBeInTheDocument()
+      expect(getLoadingIndicator()).not.toBeInTheDocument()
     })
 
     it('displays the loaded images', () => {
@@ -125,16 +127,16 @@ describe('RCE "Images" Plugin > Images', () => {
       expect(getImages()).toHaveLength(3)
     })
 
-    it('displays the "Load more results" button when more results can be loaded', () => {
+    it('displays the "Load More" button when more results can be loaded', () => {
       props.images.hasMore = true
       renderComponent()
-      expect(getLoadMoreButton(/Load more results/)).toBeInTheDocument()
+      expect(getLoadMoreButton()).toBeInTheDocument()
     })
 
-    it('does not display the "Load more results" button when no more results can be loaded', () => {
+    it('does not display the "Load More" button when no more results can be loaded', () => {
       props.images.hasMore = false
       renderComponent()
-      expect(getLoadMoreButton(/Load more results/)).not.toBeInTheDocument()
+      expect(getLoadMoreButton()).not.toBeInTheDocument()
     })
 
     it('does not change focus', () => {
@@ -165,15 +167,11 @@ describe('RCE "Images" Plugin > Images', () => {
         ]
       }
       renderComponent()
+      fireEvent.focus(getLoadMoreButton())
 
       // Load more
       props.images.isLoading = true
       renderComponent()
-    })
-
-    it('does not display the initial load indicator', () => {
-      renderComponent()
-      expect(getInitialLoadIndicator()).not.toBeInTheDocument()
     })
 
     it('displays all previously-loaded images', () => {
@@ -181,8 +179,14 @@ describe('RCE "Images" Plugin > Images', () => {
       expect(getImages()).toHaveLength(3)
     })
 
-    it('displays the "Loading..." button', () => {
-      expect(getLoadMoreButton(/Loading.../)).toBeInTheDocument()
+    it('displays the loading indicator', () => {
+      expect(getLoadingIndicator()).toBeInTheDocument()
+    })
+
+    it('moves focus from the "Load More" button to the last image', () => {
+      const $images = getImages()
+      const $lastImage = $images[$images.length - 1]
+      expect(document.activeElement.contains($lastImage)).toEqual(true)
     })
   })
 
@@ -215,10 +219,7 @@ describe('RCE "Images" Plugin > Images', () => {
       props.images = {
         hasMore: true,
         isLoading: false,
-        records: [
-          ...props.images.records,
-          buildImage(3, 'example_4.png', 103, 203)
-        ]
+        records: [...props.images.records, buildImage(3, 'example_4.png', 103, 203)]
       }
     })
 
@@ -227,31 +228,16 @@ describe('RCE "Images" Plugin > Images', () => {
       expect(getImages()).toHaveLength(4)
     })
 
-    it('moves focus from the "Load more results" button to the last image', () => {
-      fireEvent.focus(getLoadMoreButton(/Loading.../))
-      renderComponent()
-      const $images = getImages()
-      const $lastImage = $images[$images.length - 1]
-      expect(document.activeElement.contains($lastImage)).toEqual(true)
-    })
-
-    it('does not change focus when the user has changed focus', () => {
-      const previousActiveElement = document.activeElement
-      fireEvent.focus(getImages()[1])
-      renderComponent()
-      expect(document.activeElement).toEqual(previousActiveElement)
-    })
-
-    it('displays the "Load more results" button when more results can be loaded', () => {
+    it('displays the "Load More" button when more results can be loaded', () => {
       props.images.hasMore = true
       renderComponent()
-      expect(getLoadMoreButton(/Load more results/)).toBeInTheDocument()
+      expect(getLoadMoreButton()).toBeInTheDocument()
     })
 
-    it('does not display the "Load more results" button when no more results can be loaded', () => {
+    it('does not display the "Load More" button when no more results can be loaded', () => {
       props.images.hasMore = false
       renderComponent()
-      expect(getLoadMoreButton(/Load more results/)).not.toBeInTheDocument()
+      expect(getLoadMoreButton()).not.toBeInTheDocument()
     })
   })
 })

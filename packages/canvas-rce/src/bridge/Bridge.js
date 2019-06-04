@@ -49,6 +49,14 @@ export default class Bridge {
     this.focusedEditor = editor;
   }
 
+  get mediaServerSession() {
+    return this._mediaServerSession;
+  }
+
+  setMediaServerSession(session) {
+    this._mediaServerSession = session;
+  }
+
   detachEditor(editor) {
     if (editor === this.focusedEditor) {
       this.focusedEditor = null;
@@ -118,6 +126,20 @@ export default class Bridge {
       }
     } else {
       console.warn("clicked sidebar image without a focused editor");
+    }
+  }
+
+  insertImagePlaceholder(fileMetaProps) {
+    if (this.focusedEditor) {
+      this.focusedEditor.insertImagePlaceholder(fileMetaProps);
+    } else {
+      console.warn("clicked sidebar image without a focused editor");
+    }
+  }
+
+  removePlaceholders(name) {
+    if (this.focusedEditor) {
+      this.focusedEditor.removePlaceholders(name);
     }
   }
 

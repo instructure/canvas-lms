@@ -28,6 +28,7 @@ module Lti::Ims::Providers
       scope = users_scope
       enrollments, metadata = paginate(scope)
       enrollments = preload_enrollments(enrollments)
+      preload_past_lti_ids(enrollments)
 
       memberships = to_memberships(enrollments)
       [ memberships, metadata ]

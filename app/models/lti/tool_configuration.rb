@@ -25,6 +25,8 @@ module Lti
     before_validation :store_configuration_from_url, only: :create
     before_save :normalize_configuration
 
+    after_update :update_external_tools!, if: :update_external_tools?
+
     validates :developer_key_id, :settings, presence: true
     validates :developer_key_id, uniqueness: true
     validate :valid_configuration?, unless: Proc.new { |c| c.developer_key_id.blank? || c.settings.blank? }
@@ -37,8 +39,8 @@ module Lti
     alias_attribute :configuration, :settings
     alias_attribute :configuration_url, :settings_url
 
-    def new_external_tool(context)
-      tool = ContextExternalTool.new(context: context)
+    def new_external_tool(context, existing_tool: nil)
+      tool = existing_tool || ContextExternalTool.new(context: context)
       Importers::ContextExternalToolImporter.import_from_migration(
         importable_configuration,
         context,
@@ -81,6 +83,14 @@ module Lti
     end
 
     private
+
+    def update_external_tools?
+      saved_change_to_settings?
+    end
+
+    def update_external_tools!
+      developer_key.update_external_tools!
+    end
 
     def valid_configuration?
       errors.add(:configuration, '"public_jwk" must be present') if configuration['public_jwk'].blank?

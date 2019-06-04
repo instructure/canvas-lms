@@ -31,6 +31,7 @@ describe "RCE Next toolbar features" do
 
     before(:each) do
       course_with_teacher_logged_in
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
     end
 
@@ -226,6 +227,12 @@ describe "RCE Next toolbar features" do
       click_align_toggle_button
       click_align_right_button
       validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should verify the rce-next toolbar is one row" do
+      visit_front_page_edit(@course)
+
+      expect(rce_next_toolbar.size.height).to be 39
     end
   end
 end

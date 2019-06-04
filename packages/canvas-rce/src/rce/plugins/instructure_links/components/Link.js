@@ -24,34 +24,35 @@ import formatMessage from '../../../../format-message';
 import {renderLink as renderLinkHtml} from "../../../../rce/contentRendering";
 import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
-import IconDragHandle from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconDiscussion from '@instructure/ui-icons/lib/Line/IconDiscussion'
-import IconModule from '@instructure/ui-icons/lib/Line/IconModule'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import IconAnnouncement from '@instructure/ui-icons/lib/Line/IconAnnouncement'
-import IconPublish from '@instructure/ui-icons/lib/Solid/IconPublish'
-import IconUnpublished from '@instructure/ui-icons/lib/Solid/IconUnpublished'
-import IconUnknown from '@instructure/ui-icons/lib/Line/IconQuestion'
-import {SVGIcon} from '@instructure/ui-svg-images'
+import {
+  IconDragHandleLine,
+  IconAssignmentLine,
+  IconDiscussionLine,
+  IconModuleLine,
+  IconQuizLine,
+  IconAnnouncementLine,
+  IconPublishSolid,
+  IconUnpublishedSolid,
+  IconQuestionLine
+} from '@instructure/ui-icons'
 
 function getIcon(type) {
   switch(type) {
     case 'assignments':
-      return IconAssignment
+      return IconAssignmentLine
     case 'discussions':
-      return IconDiscussion
+      return IconDiscussionLine
     case 'modules':
-      return IconModule
+      return IconModuleLine
     case 'quizzes':
-      return IconQuiz
+      return IconQuizLine
     case 'announcements':
-      return IconAnnouncement
+      return IconAnnouncementLine
     case 'wikiPages': // waiting on an answer from design
     default:
-      return IconUnknown
+      return IconQuestionLine
   }
 }
 
@@ -108,10 +109,13 @@ export default function Link(props) {
       onDragStart={handleDragStart}
       onMouseEnter={handleHover}
       onMouseLeave={handleHover}
+      style={{position: 'relative'}}
     >
       <View
         className={css(styles.link)}
-        as="button"
+        as="div"
+        role="button"
+        tabIndex="0"
         background="default"
         display="block"
         width="100%"
@@ -123,31 +127,31 @@ export default function Link(props) {
       >
         <div style={{pointerEvents: 'none'}}>
           <Flex>
-            <FlexItem margin="0 xx-small 0 0" size="1.125rem">
-              {isHovering ? <IconDragHandle size="x-small"/> : null}
-            </FlexItem>
-            <FlexItem grow>
+            <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
+              {isHovering ? <IconDragHandleLine size="x-small"/> : null}
+            </Flex.Item>
+            <Flex.Item grow>
               <Flex>
-                <FlexItem padding="0 x-small 0 0">
+                <Flex.Item padding="0 x-small 0 0">
                   <Text color={color}>
                     <Icon size="x-small"/>
                   </Text>
-                </FlexItem>
-                <FlexItem padding="0 x-small 0 0" grow textAlign="start">
+                </Flex.Item>
+                <Flex.Item padding="0 x-small 0 0" grow textAlign="start">
                   <View as="div" margin="0">{title}</View>
                   {dateString ? (<View as="div" margin="xx-small 0 0 0">{dateString}</View>) : null}
-                </FlexItem>
+                </Flex.Item>
                 {'published' in props.link && (
-                  <FlexItem>
+                  <Flex.Item>
                     <AccessibleContent alt={publishedMsg}>
                       <Text color={color}>
-                        {published ? <IconPublish/> : <IconUnpublished/>}
+                        {published ? <IconPublishSolid/> : <IconUnpublishedSolid/>}
                       </Text>
                     </AccessibleContent>
-                  </FlexItem>
+                  </Flex.Item>
                 )}
               </Flex>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </div>
       </View>

@@ -47,7 +47,7 @@ if (process.env.DEPRECATION_SENTRY_DSN) {
     release: process.env.GIT_COMMIT
   }).install();
 
-  const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin');
+  const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin').default;
   setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console-jest' });
 }
 

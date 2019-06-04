@@ -17,17 +17,26 @@
  */
 
 import ContentTabs from '../ContentTabs'
-import {mockAssignment} from '../../test-utils'
+import {mockAssignment, mockSubmission} from '../../test-utils'
+import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import {render} from 'react-testing-library'
 
 it('renders the content tabs', () => {
-  const {getAllByTestId} = render(<ContentTabs assignment={mockAssignment()} />)
+  const {getAllByTestId} = render(
+    <MockedProvider>
+      <ContentTabs assignment={mockAssignment()} submission={mockSubmission()} />
+    </MockedProvider>
+  )
   expect(getAllByTestId('assignment-2-student-content-tabs')).toHaveLength(1)
 })
 
 it('renders the tabs in the correct order', () => {
-  const {getAllByRole, getByText} = render(<ContentTabs assignment={mockAssignment()} />)
+  const {getAllByRole, getByText} = render(
+    <MockedProvider>
+      <ContentTabs assignment={mockAssignment()} submission={mockSubmission()} />
+    </MockedProvider>
+  )
   const tabs = getAllByRole('tab')
 
   expect(tabs).toHaveLength(3)

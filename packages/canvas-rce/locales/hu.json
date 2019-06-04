@@ -95,8 +95,14 @@
   "discussions_index_6c36ced": {
     "message": "Fórumok indexe"
   },
+  "done_54e3d4b6": {
+    "message": "Kész"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Határidő: Több határidő van érvényben"
+  },
+  "embed_image_1080badc": {
+    "message": "Beágyazott kép"
   },
   "enter_search_terms_e397b1f0": {
     "message": "keresőszavak megadása"
@@ -179,9 +185,6 @@
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
-  "loading_more_results_def6df65": {
-    "message": "További találatok betöltése..."
-  },
   "media_af190855": {
     "message": "Média"
   },
@@ -190,6 +193,9 @@
   },
   "no_results_940393cf": {
     "message": "No results."
+  },
+  "options_3ab0ea65": {
+    "message": "Beállítások"
   },
   "pages_e5414c2c": {
     "message": "Oldalak"
@@ -203,6 +209,18 @@
   "quizzes_7e598f57": {
     "message": "Kvízek"
   },
+  "record_7c9448b": {
+    "message": "Felvétel"
+  },
+  "recording_98da6bda": {
+    "message": "Felvétel"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Vizuális szövegszerkesztő"
+  },
+  "save_11a80ec3": {
+    "message": "Mentés"
+  },
   "search_280d00bd": {
     "message": "Keresés"
   },
@@ -211,6 +229,12 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "size_b30e1077": {
+    "message": "Méret"
+  },
+  "start_over_f7552aa9": {
+    "message": "Újrakezdés"
   },
   "submit_a3cc6859": {
     "message": "Beküldés"
@@ -239,11 +263,17 @@
   "upload_a_new_image_890df275": {
     "message": "Új kép feltöltése"
   },
+  "upload_media_ce31135a": {
+    "message": "Médiafájl feltöltése"
+  },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Felhasználási jog:"
+  },
+  "video_player_b371005": {
+    "message": "Videólejátszó"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Mi legyen az új oldal neve?"

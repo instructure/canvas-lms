@@ -40,6 +40,14 @@ module Lti::Messages
 
     private
 
+    def tool_from_tag(tag, context)
+      ContextExternalTool.find_external_tool(
+        tag.url,
+        context,
+        tag.content_id
+      )
+    end
+
     def add_resource_link_request_claims!
       resource_link = assignment_resource_link
       assignment = line_item_for_assignment&.assignment
@@ -58,11 +66,11 @@ module Lti::Messages
       unless @assignment.external_tool?
         raise launch_error.new(nil, api_message: 'Assignment not configured for external tool launches')
       end
-      unless @assignment.external_tool_tag&.content == @tool
+      unless tool_from_tag(@assignment.external_tool_tag, @context) == @tool
         raise launch_error.new(nil, api_message: 'Assignment not configured for launches with specified tool')
       end
       resource_link = line_item_for_assignment&.resource_link
-      unless resource_link&.context_external_tool == @tool
+      unless resource_link&.current_external_tool(@context) == @tool
         raise launch_error.new(nil, api_message: 'Mismatched assignment vs resource link tool configurations')
       end
       resource_link

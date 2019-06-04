@@ -18,6 +18,8 @@
 
 import { createActions, createAction } from 'redux-actions';
 import axios from 'axios';
+import buildURL from 'axios/lib/helpers/buildURL.js';
+import {asAxios, getPrefetchedXHR} from '@instructure/js-utils';
 import { transformApiToInternalItem } from '../utilities/apiUtils';
 import { alert } from '../utilities/alertUtils';
 import formatMessage from '../format-message';
@@ -84,11 +86,11 @@ export function getFirstNewActivityDate (fromMoment) {
   // specifically so we know what the very oldest new activity is
   return (dispatch, getState) => {
     fromMoment = fromMoment.clone().subtract(6, 'months');
-    return axios.get('/api/v1/planner/items', { params: {
-      start_date: fromMoment.toISOString(),
-      filter: 'new_activity',
-      order: 'asc'
-    }}).then(response => {
+
+    const url = `/api/v1/planner/items?start_date=${fromMoment.toISOString()}&filter=new_activity&order=asc`
+    const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
+
+    return request.then(response => {
       if (response.data.length) {
         const first = transformApiToInternalItem(response.data[0], getState().courses, getState().groups, getState().timeZone);
         dispatch(foundFirstNewActivityDate(first.dateBucketMoment));
@@ -156,10 +158,11 @@ export const loadPastUntilToday = () => (dispatch, getState) => {
 
 
 export function sendFetchRequest (loadingOptions) {
-  return axios.get(...fetchParams(loadingOptions))
-    .then(response => handleFetchResponse(loadingOptions, response))
-    // no .catch: it's up to the sagas to handle errors
-  ;
+  const [urlPrefix, {params}] = fetchParams(loadingOptions)
+  const url = buildURL(urlPrefix, params)
+  const request = asAxios(getPrefetchedXHR(url)) ||  axios.get(url)
+  return request.then(response => handleFetchResponse(loadingOptions, response))
+  // no .catch: it's up to the sagas to handle errors
 }
 
 function fetchParams (loadingOptions) {

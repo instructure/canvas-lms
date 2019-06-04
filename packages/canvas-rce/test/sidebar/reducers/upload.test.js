@@ -32,7 +32,8 @@ describe("Upload reducer", () => {
       rootFolderId: null,
       folderTree: {},
       error: {},
-      loadingFolders: false
+      loadingFolders: false,
+      uploadingMediaStatus: false
     };
   });
 
@@ -204,6 +205,30 @@ describe("Upload reducer", () => {
 
     it("sets loadingFolders to true", () => {
       assert.equal(true, upload(state, action).loadingFolders);
+    });
+
+    it("sets uploadingMediaStatus loading true", () => {
+      assert.deepEqual({loading: true, uploaded: false, error: false}, upload(state, action).uploadingMediaStatus);
+    });
+  });
+
+  describe("FAIL_MEDIA_UPLOAD", () => {
+    beforeEach(() => {
+      action = { type: actions.FAIL_MEDIA_UPLOAD };
+    });
+
+    it("sets uploadingMediaStatus error to true", () => {
+      assert.deepEqual({loading: false, uploaded: false, error: true}, upload(state, action).uploadingMediaStatus);
+    });
+  });
+
+  describe("MEDIA_UPLOAD_SUCCESS", () => {
+    beforeEach(() => {
+      action = { type: actions.MEDIA_UPLOAD_SUCCESS };
+    });
+
+    it("sets uploadingMediaStatus uploaded to true", () => {
+      assert.deepEqual({loading: false, uploaded: true, error: false}, upload(state, action).uploadingMediaStatus);
     });
   });
 

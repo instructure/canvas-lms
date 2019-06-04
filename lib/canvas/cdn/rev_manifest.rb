@@ -25,7 +25,7 @@ module Canvas
 
         def include?(source)
           if webpack_request?(source)
-            webpack_revved_urls.include?(source)
+            true
           else
             gulp_revved_urls.include?(source)
           end
@@ -46,11 +46,6 @@ module Canvas
           @gulp_revved_urls
         end
 
-        def webpack_revved_urls
-          load_webpack_data_if_needed
-          @webpack_revved_urls
-        end
-
         def webpack_request?(source)
           source =~ Regexp.new(webpack_dir)
         end
@@ -67,10 +62,14 @@ module Canvas
           end
         end
 
+        def all_webpack_chunks_for(bundle)
+          webpack_manifest[bundle]
+        end
+
         def webpack_url_for(source)
           # source will look something like: "dist/webpack-prod/vendor.js"
-          # the manifest looks something like: {"vendor.js" : "vendor.bundle-d4be58c989364f9fe7db.js", ...}
-          # we want to return something like: "/dist/webpack-prod/vendor.bundle-d4be58c989364f9fe7db.js"
+          # the manifest looks something like: {"vendor.js" : "vendor-c-d4be58c989364f9fe7db.js", ...}
+          # we want to return something like: "/dist/webpack-prod/vendor-c-d4be58c989364f9fe7db.js"
           key = source.sub(webpack_dir + '/', '')
           fingerprinted = webpack_manifest[key]
           "/#{webpack_dir}/#{fingerprinted}" if fingerprinted
@@ -114,9 +113,8 @@ module Canvas
             @webpack_manifest = JSON.parse(file.read).freeze
           else
             raise "you need to run webpack" unless Rails.env.test?
-            @webpack_manifest = Hash.new("Error: you need to run webpack").freeze
+            @webpack_manifest = Hash.new(["Error: you need to run webpack"]).freeze
           end
-          @webpack_revved_urls = Set.new(@webpack_manifest.values.map{|s| "/#{webpack_dir}/#{s}" }).freeze
         end
 
       end

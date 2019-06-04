@@ -28,6 +28,7 @@ import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
 import loadCardDashboard from '../bundles/dashboard_card'
 import $ from 'jquery'
+import {asText, getPrefetchedXHR} from '@instructure/js-utils'
 import 'jquery.disableWhileLoading'
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
@@ -221,7 +222,8 @@ function showTodoList () {
   if (ENV.DASHBOARD_SIDEBAR_URL) {
     const rightSide = $('#right-side')
     const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
-    const promiseToGetHtml = $.get(ENV.DASHBOARD_SIDEBAR_URL)
+    const promiseToGetHtml = asText(getPrefetchedXHR(ENV.DASHBOARD_SIDEBAR_URL)) || $.get(ENV.DASHBOARD_SIDEBAR_URL)
+
     rightSide.disableWhileLoading(
       Promise.all([promiseToGetNewCourseForm, promiseToGetHtml]).then(([{default: newCourseForm}, html]) => {
         // inject the erb html we got from the server

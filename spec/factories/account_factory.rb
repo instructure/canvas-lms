@@ -25,7 +25,7 @@ module Factories
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
       ActiveSupport::HashWithIndifferentAccess.new({
-        "app-host":"http://localhost:3000",
+        "app-host":"http://localhost:3001",
       })
     )
     allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(
@@ -91,6 +91,5 @@ module Factories
         end
       end
     end
-    RoleOverride.clear_cached_contexts
   end
 end

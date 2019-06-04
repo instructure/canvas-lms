@@ -981,6 +981,30 @@ describe GradebooksController do
         end
       end
 
+      describe "student_groups" do
+        let(:category) { @course.group_categories.create!(name: "category") }
+        let(:category2) { @course.group_categories.create!(name: "another category") }
+
+        let(:group_categories_json) { assigns[:js_env][:GRADEBOOK_OPTIONS][:student_groups] }
+
+        before(:each) do
+          category.create_groups(2)
+          category2.create_groups(2)
+        end
+
+        it "includes the student group categories for the course" do
+          get :show, params: {course_id: @course.id}
+          expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id)
+        end
+
+        it "includes the groups within each category" do
+          get :show, params: {course_id: @course.id}
+
+          category2_json = group_categories_json.find { |category_json| category_json["id"] == category2.id }
+          expect(category2_json["groups"].pluck("id")).to match_array(category2.groups.pluck(:id))
+        end
+      end
+
       context "publish_to_sis_enabled" do
         before(:once) do
           @course.sis_source_id = 'xyz'

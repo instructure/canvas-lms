@@ -38,7 +38,7 @@ export default class ConfigurationTypeSelector extends React.Component {
   ltiAdvantageOption() {
     if (this.props.lti13Enabled) {
       return(
-        <option value="byClientId">{I18n.t('LTI 1.3')}</option>
+        <option value="byClientId">{I18n.t('By Client ID')}</option>
       )
     }
   }

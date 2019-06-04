@@ -141,7 +141,7 @@ class AccountUser < ActiveRecord::Base
   end
 
   def self.all_permissions_for(user, account)
-    account_users = account.account_users_for(user)
+    account_users = account.cached_account_users_for(user)
     result = {}
     account_users.each do |account_user|
       RoleOverride.permissions.keys.each do |permission|

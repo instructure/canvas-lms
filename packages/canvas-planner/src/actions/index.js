@@ -17,6 +17,7 @@
  */
 import { createActions, createAction } from 'redux-actions';
 import axios from 'axios';
+import {asAxios, getPrefetchedXHR} from '@instructure/js-utils';
 import configureAxios from '../utilities/configureAxios';
 import { alert } from '../utilities/alertUtils';
 import formatMessage from '../format-message';
@@ -110,15 +111,12 @@ export const getInitialOpportunities = () => {
   return (dispatch, getState) => {
     dispatch(startLoadingOpportunities());
 
-    axios({
-      method: 'get',
-      url: getState().opportunities.nextUrl || '/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable',
-    }).then(response => {
-      if(parseLinkHeader(response.headers.link).next) {
-        dispatch(addOpportunities({items: response.data, nextUrl: parseLinkHeader(response.headers.link).next.url }));
-      }else {
-        dispatch(addOpportunities({items: response.data, nextUrl: null}));
-      }
+    const url = getState().opportunities.nextUrl || '/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable'
+    const request = asAxios(getPrefetchedXHR(url)) || axios({method: 'get', url})
+
+    request.then(response => {
+      const next = parseLinkHeader(response.headers.link).next;
+      dispatch(addOpportunities({items: response.data, nextUrl: (next ? next.url : null)}));
     }).catch(() => alert(formatMessage('Failed to load opportunities'), true));
   };
 };

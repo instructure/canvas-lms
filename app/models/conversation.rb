@@ -285,9 +285,12 @@ class Conversation < ActiveRecord::Base
   end
 
   def reset_unread_counts
-    Shard.partition_by_shard(self.conversation_participants.map(&:user_id)) do |shard_user_ids|
-      User.where(id: shard_user_ids).find_each do |user|
-        user.reset_unread_conversations_counter
+    Shard.partition_by_shard(self.conversation_participants.pluck(:user_id)) do |shard_user_ids|
+      shard_user_ids.compact.sort.each_slice(1000) do |sliced_ids|
+        counts_by_user_id = ConversationParticipant.visible.unread.where(:user_id => sliced_ids).group(:user_id).count
+        User.where(id: sliced_ids).select(:id, :unread_conversations_count).each do |user|
+          user.reset_unread_conversations_counter(counts_by_user_id[user.id] || 0)
+        end
       end
     end
   end

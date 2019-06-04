@@ -34,10 +34,9 @@
   })
   should log: underscore, jquery and the colors
 */
+import jQuery from 'jquery'
 
 if (!('require' in window)) {
-  const jQuery = require('jquery')
-
   const getDefaultExport = m => m.default
 
   const thingsWeStillAllowThemToRequire = {

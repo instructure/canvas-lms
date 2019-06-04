@@ -99,6 +99,7 @@ class Submission < ActiveRecord::Base
   has_many :originality_reports
   has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact, inverse_of: :artifact
   has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result', dependent: :destroy
+  has_many :submission_drafts, inverse_of: :submission, dependent: :destroy
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -296,6 +297,7 @@ class Submission < ActiveRecord::Base
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
   after_save :touch_user
+  after_save :clear_user_submissions_cache
   after_save :touch_graders
   after_save :update_assignment
   after_save :update_attachment_associations
@@ -313,6 +315,7 @@ class Submission < ActiveRecord::Base
   after_save :reset_regraded
   after_save :create_audit_event!
   after_save :handle_posted_at_changed, if: :saved_change_to_posted_at?
+  after_save :delete_submission_drafts!, if: :saved_change_to_attempt?
 
   def reset_regraded
     @regraded = false
@@ -1181,13 +1184,19 @@ class Submission < ActiveRecord::Base
   # End Plagiarism functions
 
   def external_tool_url
-    URI.encode(url) if self.submission_type == 'basic_lti_launch'
+    URI.encode(url) if url && self.submission_type == 'basic_lti_launch'
+  end
+
+  def clear_user_submissions_cache
+    self.class.connection.after_transaction_commit do
+      User.clear_cache_keys([self.user_id], :submissions)
+    end
   end
 
   def touch_graders
     self.class.connection.after_transaction_commit do
       if self.assignment && self.user && self.assignment.context.is_a?(Course)
-        self.assignment.context.touch_admins_later
+        self.assignment.context.clear_todo_list_cache_later(:admins)
       end
     end
   end
@@ -2363,6 +2372,10 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  def delete_submission_drafts!
+    self.submission_drafts.destroy_all
+  end
+
   def point_data?
     !!(self.score || self.grade)
   end
@@ -2547,7 +2560,7 @@ class Submission < ActiveRecord::Base
       progress.fail
     end
   ensure
-    context.touch_admins_later
+    context.clear_todo_list_cache_later(:admins)
     user_ids = graded_user_ids.to_a
     if user_ids.any?
       Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"

@@ -998,7 +998,17 @@ describe "Files API", type: :request do
       account_admin_user(account: @account)
       @att.context = u
       @att.save!
-      expect_any_instance_of(Attachment).to receive(:destroy_content_and_replace).once
+      expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+      @file_path_options[:replace] = true
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+    end
+
+    it 'should delete/replace a file tied to an assignment' do
+      assignment = @course.assignments.create!(title: 'one')
+      account_admin_user(account: @account)
+      @att.context = assignment
+      @att.save!
+      expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
       @file_path_options[:replace] = true
       api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
     end

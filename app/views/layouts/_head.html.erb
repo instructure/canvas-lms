@@ -26,7 +26,7 @@
   <meta charset="utf-8">
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet">
   <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
   <%= browser_performance_monitor_embed %>
   <%= favicon_link_tag(favicon) %>
@@ -67,7 +67,7 @@
   <%= yield :stylesheets %>
   <%= include_account_css %>
   <script>
-    <%# 
+    <%#
       listen for any clicks on links that have href="#" or data-method set and queue them to be fired on dom ready.
       note: the events targeted for a[data-method] elems don't get properly replayed, but
       at least we can gobble them up here to prevent errors.
@@ -87,4 +87,7 @@
   </script>
   <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
   <%= include_head_js %>
+  <% @xhrs_to_prefetch_from_controller&.each do |args| %>
+    <%= prefetch_xhr(*args) %>
+  <% end %>
 </head>

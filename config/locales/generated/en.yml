@@ -568,8 +568,6 @@ en:
     manaus: Manaus
     cuiaba: Cuiaba
     eirunepe: Eirunepe
-  html5_media_recorder_in_rce_bb59b78f: HTML5 Media Recorder in RCE
-  use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: Use HTML5 Recorder in Content Editor instead of Flash
   features:
     google_docs_domain_restriction: Google Docs Domain Restriction
     high_contrast: High Contrast UI
@@ -580,6 +578,8 @@ en:
     allow_opt_out_of_inbox: Allow Users to Opt-out of the Inbox
     lor: LOR External Tools
     gradebook_list_students_by_sortable_name: Gradebook - List Students by Sortable Name
+    quizzes:
+      next: Quizzes.Next
     quiz_log_auditing: Quiz Log Auditing
   google_docs_domain_restriction_description: |-
     Google Docs Domain Restriction allows Google Docs submissions and collaborations
@@ -689,7 +689,6 @@ en:
   specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: Specify max and min points to clarify boundaries of a rubric criterion rating.
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: Encrypted Sourcedids for Basic Outcomes
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.
-  quizzes_next_27c59ce3: Quizzes.Next
   create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.
   quizzes_next_submission_history_c0f7cd20: Quizzes.Next submission history
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: If enabled, submission history for Quizzes.Next quizzes is dealt with separately.
@@ -1390,17 +1389,6 @@ en:
             check_box: Reports
           major:
             check_box: Major
-    big_picture_learning_user_access_csv_parameters:
-      account_reports:
-        usu:
-          enrollment_type:
-            header: Enrollment Type
-      all: All Enrollments
-      students: Student Enrollments
-      teachers: Teacher Enrollments
-      ta: Ta Enrollments
-      observer: Observer Enrollments
-      designer: Designer Enrollments
     ccp_zero_activity_csv_parameters:
       account_reports:
         ccp:
@@ -1539,17 +1527,6 @@ en:
       ta: Ta Enrollments
       observer: Observer Enrollments
       designer: Designer Enrollments
-    user_access_prospect_education_csv_parameters:
-      account_reports:
-        usu:
-          enrollment_type:
-            header: Enrollment Type
-      all: All Enrollments
-      students: Student Enrollments
-      teachers: Teacher Enrollments
-      ta: Ta Enrollments
-      observer: Observer Enrollments
-      designer: Designer Enrollments
     user_inactivity_csv_parameters:
       account_reports:
         webster:
@@ -1589,19 +1566,6 @@ en:
             end:
               parameters:
                 header: 'End at:'
-    argo:
-      user_access:
-        parameters:
-          account_reports:
-            usu:
-              enrollment_type:
-                header: Enrollment Type
-          all: All Enrollments
-          students: Student Enrollments
-          teachers: Teacher Enrollments
-          ta: Ta Enrollments
-          observer: Observer Enrollments
-          designer: Designer Enrollments
     devry_u:
       attendance_extract:
         parameters:
@@ -1793,6 +1757,8 @@ en:
     wiki_front_page_default_content_group: Welcome to your new group wiki!
   user_not_authorized_to_perform_that_action_until_v_4f095a7c: user not authorized to perform that action until verifying email
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: Complete registration by clicking the “finish the registration process” link sent to your email.
+  must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: must be logged in and registered to perform that action
+  please_log_in_to_view_this_content_eec6cd0: Please Log in to view this content
   you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: You'll need to accept the enrollment invitation before you can fully participate in this course, starting on %{date}.
   you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: You'll need to accept the enrollment invitation before you can fully participate in this course.
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: This course hasn’t started yet. You will not be able to participate in this course until %{date}.
@@ -3080,14 +3046,11 @@ en:
       no_subject: No subject
       reply: Reply
       more_options: More options
-      message_actions: Message actions
       reply_all: Reply all
       forward: Forward
       delete: Delete
     message_item:
-      reply: Reply
       more_options: More options
-      message_actions: Message actions
       reply_all: Reply all
       forward: Forward
       delete: Delete
@@ -4788,6 +4751,7 @@ en:
       description: You will need to register a [new app on Unsplash](%{unsplash_url}).
       labels:
         access_key: Access Key
+        application_name: Application Name
     vericite_settings:
       plagiarism_compatibility: 'Plagiarism plugins compatibility notice:'
       labels:
@@ -6194,6 +6158,58 @@ en:
     eportfolios: ePortfolios
     observees: Observing
   end_dates_cannot_be_before_start_dates_d6018daf: End dates cannot be before start dates
+  terms:
+    errors:
+      not_unique: SIS ID "%{sis_source_id}" is already in use
+    term:
+      labels:
+        sis_id: SIS ID
+        grading_period_set_title: Grading Period Set
+        students_can_access_from: "**Students** can access from"
+        teachers_can_access_from: "**Teachers** can access from"
+        tas_can_access_from: "**TAs** can access from"
+        designers_can_access_from: "**Designers** can access from"
+      course_count:
+        one: 1 Course
+        other: "%{count} Courses"
+      name: 'Term Name:'
+      sis_source_id: 'SIS ID:'
+      term_runs_from: "**Term Runs** from"
+      titles:
+        term_starts: Term starts
+        term_ends: Term ends
+      tooltips:
+        term_starts_students: For students the term starts
+        term_ends_students: For students the term ends
+        term_starts_teachers: For teachers the term starts
+        term_ends_teachers: For teachers the term ends
+        term_starts_tas: For TAs the term starts
+        term_ends_tas: For TAs the term ends
+        term_starts_designers: For designers the term starts
+        term_ends_designers: For designers the term ends
+      buttons:
+        update: Update Term
+        add: Add Term
+    timespan:
+      date:
+        unspecified: whenever
+        term_start: term start
+        term_end: term end
+      timespan: "%{start_at} *to* %{end_at}"
+    index:
+      page_title: "%{account} Terms"
+      titles:
+        term_details: Term Details
+      messages:
+        classes_in_term: You can't delete a term that still has classes in it.
+        submitting: Submitting...
+      prompts:
+        delete: Are you sure you want to delete this term?
+      update_term: Update Term
+      date:
+        term_end: term end
+        unspecified: whenever
+      add_term: Add Term
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: Must supply 'file_ids' and/or 'folder_ids' parameter
   no_usage_rights_object_supplied_304b8d40: No 'usage_rights' object supplied
   count_files_updated_4570a8a:
@@ -6477,6 +6493,9 @@ en:
         pages: Pages
     revisions:
       page_revisions_title: "%{title} revisions: %{context_name}"
+  no_attachments_found_for_the_following_ids_ids_49c9192f: 'No attachments found for the following ids: %{ids}'
+  you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: You must attach at least one file to this assignment
+  invalid_file_type_881cc9b2: Invalid file type
   global_message_icons:
     information: information
     error: error
@@ -6679,6 +6698,10 @@ en:
     report_problem_sub: If Canvas misbehaves, tell us about it
     training_services_portal: Training Services Portal
     training_services_portal_sub: Access Canvas training videos and courses
+    stuff: Stuff
+    things: Things
+    hi: Hi
+    hello: Hello
     Help: Help
     Back: Back
     which_course_is_this_question_about: Which course is this question about?
@@ -7244,6 +7267,7 @@ en:
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank
   the_imported_question_text_for_this_question_was_t_83b4e6fb: The imported question text for this question was too long.
   the_question_text_for_the_question_question_name_w_3a68a2c7: The question text for the question "%{question_name}" was too long.
+  error_associating_assignment_assignment_name_with__d92e9acf: Error associating assignment "%{assignment_name}" with an LTI tool.
   untitled_assignment_59354b34: untitled assignment
   importers/assignment_importer:
     imported_assignments_group: Imported Assignments
@@ -8946,6 +8970,7 @@ en:
   image_search_b0944fc2: Image Search
   jwts_4f397c85: JWTs
   late_policy_9d0e76b5: Late Policy
+  line_items_828f62cc: Line Items
   liveassessments_92d9edc0: LiveAssessments
   logins_9aee0cbe: Logins
   modules_c4325335: Modules
@@ -8980,11 +9005,13 @@ en:
   quiz_submission_user_list_9d782163: Quiz Submission User List
   quiz_submissions_75eaf377: Quiz Submissions
   quizzes_7e598f57: Quizzes
+  result_8f971a09: Result
   roles_730b879e: Roles
   rubrics_b5ef369b: Rubrics
   sis_import_errors_d7fe542b: SIS Import Errors
   sis_imports_d88db59e: SIS Imports
   sis_integration_ffd3705d: SIS Integration
+  score_f7ac9e08: Score
   search_280d00bd: Search
   sections_94731e51: Sections
   services_ccd7bca0: Services
@@ -10845,6 +10872,7 @@ en:
   canvas_alert_grade_change_date_for_name_56f680ed: 'Canvas Alert - Grade Change: %{date} for %{name}'
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} has been graded for %{name}."
   canvas_alert_graded_assignment_context_for_name_459fdf31: 'Canvas Alert - Graded: %{assignment}, %{context} for %{name}'
+  wiki_page_content_is_locked_or_not_yet_available_6fdad388: Wiki page content is locked or not yet available
   user_just_updated_title_88074ab2: "%{user} just updated %{title}"
   remove_name_as_an_admin_c296cf49: Remove %{name} as an admin
   add_a_new_course_4a041207: Add a New Course
@@ -12130,56 +12158,6 @@ en:
   paper_view_7405eeab: Paper View
   assignment_assignment_submission_plain_text_view_b217d372: Assignment %{assignment} submission Plain Text View
   plain_text_view_7640af4c: Plain Text View
-  terms:
-    term:
-      labels:
-        sis_id: SIS ID
-        grading_period_set_title: Grading Period Set
-        students_can_access_from: "**Students** can access from"
-        teachers_can_access_from: "**Teachers** can access from"
-        tas_can_access_from: "**TAs** can access from"
-        designers_can_access_from: "**Designers** can access from"
-      course_count:
-        one: 1 Course
-        other: "%{count} Courses"
-      name: 'Term Name:'
-      sis_source_id: 'SIS ID:'
-      term_runs_from: "**Term Runs** from"
-      titles:
-        term_starts: Term starts
-        term_ends: Term ends
-      tooltips:
-        term_starts_students: For students the term starts
-        term_ends_students: For students the term ends
-        term_starts_teachers: For teachers the term starts
-        term_ends_teachers: For teachers the term ends
-        term_starts_tas: For TAs the term starts
-        term_ends_tas: For TAs the term ends
-        term_starts_designers: For designers the term starts
-        term_ends_designers: For designers the term ends
-      buttons:
-        update: Update Term
-        add: Add Term
-    timespan:
-      date:
-        unspecified: whenever
-        term_start: term start
-        term_end: term end
-      timespan: "%{start_at} *to* %{end_at}"
-    index:
-      page_title: "%{account} Terms"
-      titles:
-        term_details: Term Details
-      messages:
-        classes_in_term: You can't delete a term that still has classes in it.
-        submitting: Submitting...
-      prompts:
-        delete: Are you sure you want to delete this term?
-      update_term: Update Term
-      date:
-        term_end: term end
-        unspecified: whenever
-      add_term: Add Term
   edit_term_name_29a8a322: Edit Term %{name}
   delete_term_name_f707abc9: Delete Term %{name}
   add_new_term_d2217c0d: Add New Term
@@ -12194,6 +12172,7 @@ en:
   this_login_is_for_provider_6f17462: This login is for %{provider}
   unnamed_account_id_e688ad87: Unnamed Account (%{id})
   note_this_login_s_account_uses_delegated_authentic_89227914: 'Note: This login''s account uses delegated authentication, but allows fallback Canvas password authentication. The password fields in this form update the fallback Canvas password, *not* the delegated authentication.'
+  clear_user_cache_ef079f7f: Clear User Cache
   view_grades_8d3bae6c: View Grades
   send_a_message_to_the_teacher_1ae115b6: Send a Message to the Teacher
   academic_benchmark:
@@ -12953,8 +12932,6 @@ en:
       invalid_entry_for_field: 'Invalid entry: %{field}'
       field_is_required: This field is required
   instructure_misc_helpers:
-    browsers:
-      unrecognized: Unrecognized Browser
     buttons:
       search: Search
       search_by_tag: Search by Tag
@@ -13281,7 +13258,7 @@ en:
     allow_message: Click the "Allow" button to begin recording.
     recording_message: Recording...
     recording_expired_message: Speech recognition has expired due to inactivity. Click the "Stop" button to use current text for comment or "Cancel" to discard.
-    mic_blocked_message: Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream
+    mic_blocked_message: Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone
     nodetect_message: No speech was detected. You may need to adjust your microphone settings.
     titles:
       click_to_record: Speech to Text
@@ -13412,6 +13389,8 @@ en:
       remove_profile_picture: Are you sure you want to remove this user's profile picture?
     notices:
       image_reported: This image has been reported
+  cache_cleared_successfully_9ab84d5a: Cache cleared successfully
+  failed_to_clear_cache_7361ab: Failed to clear cache
   no_graded_submissions_e40c957a: No graded submissions
   muting_assignment_a9aeb5c7: Muting Assignment...
   this_assignment_is_currently_muted_that_means_stud_94d63139: This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?
@@ -13433,7 +13412,6 @@ en:
   whenever_b943b119: whenever
   show_all_artifacts_34b91a83: Show All Artifacts
   hide_all_artifacts_d654fbd5: Hide All Artifacts
-  content_migration_queued_46c27790: Content migration queued
   calendar:
     today: Today
     calendar_title: 'Calendar:'
@@ -13722,8 +13700,6 @@ en:
       manage_discussion_entry: Manage Discussion Entry
       go_to_parent: Go To Parent
       go_to_topic: Go To Topic
-      edit: Edit
-      delete: Delete
       open_in_speedgrader: Open in SpeedGrader
       edited_comment: Edited by *%{editor.display_name}* on %{edited_at}
       write_a_reply: Reply
@@ -14019,6 +13995,9 @@ en:
   models_DateGroup:
     everyone_else: Everyone else
   could_not_duplicate_discussion_953ed67f: Could not duplicate discussion
+  modelsPageView:
+    browsers:
+      unrecognized: Unrecognized Browser
   pseudonym:
     errors:
       required: Required
@@ -14098,6 +14077,7 @@ en:
   highest_score_e080551e: Highest Score
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: Mastery score reflects the highest score of a graded assignment or quiz.
   unstarted_932f2990: Unstarted
+  content_migration_queued_46c27790: Content migration queued
   notification_preferences:
     groups:
       course: Course Activities
@@ -14995,12 +14975,13 @@ en:
   upload_8b403d05: Upload
   comments_e07bcbe3: Comments
   rubric_fc39da76: Rubric
-  invalid_file_type_881cc9b2: Invalid file type
   _5a374287: "..."
   upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
   uploaded_285a2bfb: Uploaded
+  error_sending_submission_d32dc075: Error sending submission
+  submission_sent_3f0d2ee1: Submission sent
   due_5d7267be: 'Due:'
   ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
   ungraded_147a0dce: ungraded
@@ -15030,9 +15011,9 @@ en:
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
   go_to_prerequisite_175c1f3f: Go to Prerequisite
   not_graded_yet_82f63c67: Not Graded Yet
-  unvailable_c8756542: Unvailable
   unavailable_46d2c344: Unavailable
   submitted_318fad53: Submitted
+  new_attempt_57eae3d9: New Attempt
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
   points_must_0_3bff353: Points must >= 0
@@ -15099,9 +15080,6 @@ en:
   attempts_22baad:
     one: Attempt
     other: Attempts
-  score_to_keep_e89e4fa5: Score to keep
-  average_score_15cd7c3c: Average Score
-  most_recent_b2797d2: Most Recent
   unlimited_attempts_81a37d4: Unlimited Attempts
   count_attempts_d23c69a0:
     one: 1 Attempt
@@ -15132,6 +15110,8 @@ en:
   go_to_name_s_profile_eaa1826b: Go to %{name}'s profile
   message_student_f12b37a6: Message Student
   submit_for_student_d90838e8: Submit for Student
+  extend_due_date_20651e76: Extend Due Date
+  invalid_date_and_time_1a42d206: Invalid date and time
   score_student_points_possible_points_78360e86: Score {{student_points}}/{{possible_points}}
   previous_student_46275eae: Previous student
   next_student_b62869f4: Next student
@@ -15140,7 +15120,6 @@ en:
   search_by_student_name_26536097: Search by student name
   assignments_2:
     submission_attempts: Attempts
-  score_f7ac9e08: Score
   submission_date_8f659c0c: Submission Date
   more_cf9cc661: More
   view_submission_ff3da5d: View Submission
@@ -15555,6 +15534,7 @@ en:
   show_all_keys_fa88c55c: Show All Keys
   developer_keys_d70ba44a: Developer Keys
   inherited_d4d0bc33: Inherited
+  invalid_custom_fields_c66dcdb6: Invalid custom fields.
   placements_5b5e056b: Placements
   one_per_line_format_name_value_79647700: 'One per line. Format: name=value'
   customize_configuration_69c22ef3: Customize Configuration
@@ -15601,7 +15581,6 @@ en:
   required_values_1eb5841f: Required Values
   title_f8e03596: "* Title"
   description_61f4296: "* Description"
-  open_id_connect_values_a60c9206: "* Open Id Connect Values"
   target_link_uri_bbed67d1: "* Target Link URI"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect Initiation Url"
   public_jwk_44d1e8a9: "* Public JWK"
@@ -15610,7 +15589,7 @@ en:
   check_services_to_enable_8877c451: Check Services to enable
   manual_configuration_b586fe54: Manual Configuration
   save_key_b4dede06: Save Key
-  test_cluster_only_70e61c19: Test Cluster Only
+  must_have_at_least_one_redirect_uri_defined_bb236d38: Must have at least one redirect_uri defined.
   developer_key_settings_889721f1: Developer Key Settings
   key_name_7311d22: 'Key Name:'
   owner_email_4d02f795: 'Owner Email:'
@@ -15620,15 +15599,15 @@ en:
   vendor_code_lti_2_ef36207b: 'Vendor Code (LTI 2):'
   icon_url_ecce6557: 'Icon URL:'
   notes_6cfc3988: 'Notes:'
-  create_developer_key_78de8510: Create developer key
-  edit_developer_key_d8fa33c4: Edit developer key
+  test_cluster_only_70e61c19: Test Cluster Only
   at_least_one_scope_must_be_selected_97d6fce9: At least one scope must be selected.
   save_successful_b2f64da4: Save successful.
   failed_to_save_changes_errors_6920f334: 'Failed to save changes: %{errors}%'
   a_redirect_uri_is_required_please_supply_one_471908db: A redirect_uri is required, please supply one.
-  json_is_not_valid_please_submit_properly_formatted_e3b2f88f: Json is not valid. Please submit properly formatted json.
-  creating_key_8a026e61: Creating Key
+  create_developer_key_78de8510: Create developer key
+  edit_developer_key_d8fa33c4: Edit developer key
   key_settings_44df6a41: Key Settings
+  creating_key_8a026e61: Creating Key
   create_an_ba36d171: Create an
   create_a_64f6f82: Create a
   api_key_eeeb2167: API Key
@@ -15650,6 +15629,7 @@ en:
   disable_all_read_only_scopes_f9ffdd28: Disable all read only scopes.
   enable_all_read_only_scopes_3ddc2bb5: Enable all read only scopes.
   read_only_3d26d8fe: Read only
+  json_is_not_valid_please_submit_properly_formatted_e3b2f88f: Json is not valid. Please submit properly formatted json.
   lti_1_3_configuration_c3534f3b: LTI 1.3 Configuration
   json_url_adbee260: JSON URL
   manual_entry_e4a4f99a: Manual Entry
@@ -15794,6 +15774,7 @@ en:
   launch_registration_tool_38d4781: Launch Registration Tool
   client_id_is_required_1afd54d1: Client ID is required
   client_id_cb2502af: Client ID
+  to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: To obtain a client ID, an account admin will need to generate an LTI developer key.
   this_field_is_required_fa58c4a: This field is required
   registration_url_60e0eaaa: Registration URL
   example_https_lti_tool_provider_example_herokuapp__e9802142: 'Example: https://lti-tool-provider-example.herokuapp.com/register'
@@ -15809,7 +15790,7 @@ en:
   config_url_e96ceaf3: Config URL
   example_https_example_com_config_xml_be5f36ac: 'Example: https://example.com/config.xml'
   xml_configuration_5ea1b942: XML Configuration
-  lti_1_3_c84fd177: LTI 1.3
+  by_client_id_4f2fe02c: By Client ID
   configuration_type_25a084a4: Configuration Type
   by_url_a163275e: By URL
   paste_xml_cda3a64e: Paste XML
@@ -16147,6 +16128,8 @@ en:
   all_modules_20c9a1c8: All Modules
   status_color_picker_9ea0156b: "%{status} Color Picker"
   statuses_f41543d8: Statuses
+  all_student_groups_f74cd6c3: All Student Groups
+  student_group_filter_185fb085: Student Group Filter
   cancel_submitting_comment_2666e98b: Cancel Submitting Comment
   submit_comment_e5cc2718: Submit Comment
   leave_a_comment_7991725b: Leave a comment
@@ -16181,6 +16164,7 @@ en:
   statuses_497dfa15: Statuses…
   columns_464bd055: Columns
   unpublished_assignments_9cdbcc87: Unpublished Assignments
+  student_groups_863201c1: Student Groups
   resubmitted_2080646f: Resubmitted
   first_last_name_9820d256: First, Last Name
   last_first_name_95a078f5: Last, First Name
@@ -16203,6 +16187,15 @@ en:
   ends_4fcb632: 'Ends:'
   closes_5c6b4367: 'Closes:'
   grading_schemes_1c3c3252: Grading Schemes
+  automatically_dff02416: Automatically
+  grades_will_be_visible_to_students_as_soon_as_they_62805e34: Grades will be visible to students as soon as they are entered.
+  manually_9de23e1f: Manually
+  grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n          Grades will be hidden by default. Any grades that have already posted will remain visible.\n          Choose when to post grades for this assignment in the gradebook.\n        "
+  while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: 'While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:'
+  once_a_grade_is_posted_manually_it_will_automatica_26aff290: "\n              Once a grade is posted manually, it will automatically send new notifications and be visible to students.\n              Future grade changes for posted grades will not need to be manually posted.\n            "
+  post_grades_39c52870: Post Grades
+  success_the_post_policy_for_name_has_been_updated_ea92283f: Success! The post policy for %{name} has been updated.
+  an_error_occurred_while_saving_the_assignment_post_94f1184e: An error occurred while saving the assignment post policy
   grade_posting_policy_tray_c929cfd: Grade posting policy tray
   grade_posting_policy_name_a6d6f178: 'Grade Posting Policy: %{name}'
   all_grading_period_sets_must_have_a_title_799538f: All grading period sets must have a title
@@ -16264,11 +16257,11 @@ en:
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: 'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:'
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: Students will be able to see that the grades for this assignment are hidden.
   you_can_begin_sending_notifications_again_by_click_50d3f0cf: You can begin sending notifications again by clicking the Post Grades link.
-  hide_grades_585e63b4: Hide Grades
   hiding_grades_82691e44: Hiding grades
-  hiding_grades_is_not_allowed_because_grades_have_n_55e83813: Hiding grades is not allowed because grades have not been released for this assignment.
-  anonymous_assignments_cannot_be_hidden_by_section_ca5991a3: Anonymous assignments cannot be hidden by section.
   hide_e057ff36: Hide
+  hiding_grades_is_not_allowed_because_grades_have_n_55e83813: Hiding grades is not allowed because grades have not been released for this assignment.
+  you_can_only_hide_grades_for_everyone_when_the_ass_e29be786: You can only hide grades for everyone when the assignment is anonymous.
+  hide_grades_585e63b4: Hide Grades
   at_least_one_section_must_be_selected_to_hide_grad_f88c946f: At least one section must be selected to hide grades by section.
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: Success! Grades have been hidden for the selected sections of %{assignmentName}.
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: Success! Grades have been hidden for %{assignmentName}.
@@ -16277,10 +16270,9 @@ en:
   a_name_for_this_set_is_required_222bad23: A name for this set is required
   successfully_created_a_set_38374719: Successfully created a set
   there_was_a_problem_submitting_your_set_27ca2ed0: There was a problem submitting your set
-  post_grades_39c52870: Post Grades
   posting_grades_cd7cd758: Posting grades
-  anonymous_assignments_cannot_be_posted_by_section_317ceb3d: Anonymous assignments cannot be posted by section.
   posting_grades_is_not_allowed_because_grades_have__229d9c9e: Posting grades is not allowed because grades have not been released for this assignment.
+  you_can_only_post_grades_for_everyone_when_the_ass_c0f858f4: You can only post grades for everyone when the assignment is anonymous.
   select_whether_to_post_for_all_submissions_or_only_b18d681f: Select whether to post for all submissions, or only graded ones.
   post_types_93ff86d9: Post types
   grades_will_be_made_visible_to_all_students_1cc4d67e: Grades will be made visible to all students
@@ -17348,6 +17340,7 @@ en:
                   However, safe search results are not guaranteed, as some images may not include a
                   specified safety level by their owners.
   search_flickr_6f28b02e: Search flickr
+  artist_info_for_username_for_description_12d5d862: Artist info for %{userName} for %{description}
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts
   press_the_esc_key_to_close_this_modal_14d10601: Press the esc key to close this modal
   this_file_16b24f02: this file
@@ -17515,7 +17508,7 @@ en:
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
   assessment_audit_tray_5dd11721: Assessment audit tray
   loading_assessment_audit_trail_5cf4c10: Loading assessment audit trail
-  post_and_hide_grades_8fa63c02: Post and Hide Grades
+  post_or_hide_grades_2d1d7815: Post or Hide Grades
   all_grades_posted_d5b8cb68: All Grades Posted
   all_grades_hidden_84409b76: All Grades Hidden
   out_of_pointspossible_c163105a: out of %{pointsPossible}
@@ -17706,6 +17699,7 @@ en:
       migrate_courses: Migrate Courses
     errors:
       upload_failed: Upload Failed, please try again
+  are_you_sure_you_want_to_delete_domain_domain_c9b4b5f5: Are you sure you want to delete domain %{domain}?
   assignment_details_dialog:
     grading_statistics_for_assignment: 'Grade statistics for: %{assignment.name}'
     no_one_scored_lower: No one scored lower than %{min}
@@ -17946,6 +17940,12 @@ en:
   starred_no_subject_click_to_unstar_bff04bce: Starred "(No subject)", Click to unstar.
   not_starred_no_subject_click_to_star_adfefe93: '''Not starred "(No Subject)", Click to star.'
   open_message_d7b12975: Open Message
+  reply_to_conversation_subject_4b2e6fe7: Reply to conversation %{subject}
+  reply_to_conversation_f1aa0d4: Reply to conversation
+  message_actions_for_conversation_subject_fdb54c88: Message actions for conversation %{subject}
+  message_actions_for_conversation_d29b26cc: Message actions for conversation
+  reply_to_bodyhtml_7a27da28: Reply to %{bodyHTML}
+  message_actions_for_bodyhtml_bae2de92: Message actions for %{bodyHTML}
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: This attachment has been unpublished by the author.
   calendar_event_89aadc1c: Calendar Event
   due_by_c263dc10: due by
@@ -17978,6 +17978,8 @@ en:
     notes: 'Notes:'
     cancel: Cancel
     save_key: Save Key
+  edit_disabled_e6a5ea0a: Edit (Disabled)
+  delete_disabled_3196ce47: Delete (Disabled)
   reply_to_comment_72d96728: Reply to Comment
   reply_to_title_f227303f: Reply to %{title}
   feature_flags:

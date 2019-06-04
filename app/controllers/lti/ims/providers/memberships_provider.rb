@@ -177,6 +177,10 @@ module Lti::Ims::Providers
       enrollments
     end
 
+    def preload_past_lti_ids(enrollments)
+      UserPastLtiId.manual_preload_past_lti_ids(enrollments, @context)
+    end
+
     def limit
       controller.params[:limit].to_i
     end

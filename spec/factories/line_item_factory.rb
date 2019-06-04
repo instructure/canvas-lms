@@ -30,18 +30,28 @@ module Factories
         nil
     }.compact
     assignment = overrides[:assignment] || assignment_model(assignment_opts)
-    params = {
+    params = base_line_item_params_with_resource_link(assignment, overrides).merge(
+      overrides.except(:assignment, :course, :resource_link, :with_resource_link, :tool)
+    )
+    params[:client_id] = DeveloperKey.create!.id unless assignment.external_tool? || overrides[:with_resource_link]
+    Lti::LineItem.create!(params)
+  end
+
+  def base_line_item_params(assignment, developer_key = nil)
+    {
       score_maximum: 10,
       label: 'Test Line Item',
       assignment: assignment,
-      resource_link: overrides.fetch(
-        :resource_link,
-        overrides[:with_resource_link] ?
-          resource_link_model(overrides: overrides.merge(resource_link_id:  assignment.lti_context_id)) :
-          nil
-      )
-    }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link, :tool))
-    params[:client_id] = DeveloperKey.create!.id unless assignment.external_tool? || overrides[:with_resource_link]
-    Lti::LineItem.create!(params)
+      client_id: developer_key&.global_id
+    }
+  end
+
+  def base_line_item_params_with_resource_link(assignment, overrides)
+    base_line_item_params(assignment).merge(resource_link: overrides.fetch(
+      :resource_link,
+      overrides[:with_resource_link] ?
+        resource_link_model(overrides: overrides.merge(resource_link_id:  assignment.lti_context_id)) :
+        nil
+    ))
   end
 end

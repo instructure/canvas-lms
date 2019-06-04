@@ -53,7 +53,8 @@ module Assignments
     def count
       assignment.shard.activate do
         # the needs_grading_count trigger should change assignment.updated_at, invalidating the cache
-        Rails.cache.fetch(['assignment_user_grading_count', assignment, user].cache_key) do
+        Rails.cache.fetch_with_batched_keys(['assignment_user_grading_count', assignment, user].cache_key,
+            batch_object: user, batched_keys: :todo_list) do
           if assignment.moderated_grading? && !assignment.grades_published?
             needs_moderated_grading_count
           else
@@ -103,7 +104,8 @@ module Assignments
 
     def count_by_section
       assignment.shard.activate do
-        Rails.cache.fetch(['assignment_user_grading_count_by_section', assignment, user].cache_key) do
+        Rails.cache.fetch(['assignment_user_grading_count_by_section', assignment, user].cache_key,
+            batch_object: user, batched_keys: :todo_list) do
           if visibility_level == :sections
             submissions = section_filtered_submissions
           else

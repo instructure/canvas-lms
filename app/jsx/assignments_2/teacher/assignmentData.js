@@ -401,6 +401,7 @@ export const TeacherAssignmentShape = shape({
   lockInfo: LockInfoShape.isRequired,
   submissionTypes: arrayOf(string).isRequired,
   allowedExtensions: arrayOf(string).isRequired,
+  allowedAttempts: number,
   assignmentOverrides: shape({
     nodes: arrayOf(OverrideShape)
   }).isRequired,

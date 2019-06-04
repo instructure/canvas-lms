@@ -233,6 +233,8 @@ describe Canvas::CacheRegister do
   end
 
   context "batch fetch" do
+    specs_require_cache(:redis_store)
+
     def check_cache
       some_key = "some_base_key/withstuff"
       some_value = "some value"
@@ -262,54 +264,48 @@ describe Canvas::CacheRegister do
     end
 
     it "should be able to do a fetch using new cache keys in a single call" do
-      enable_cache(:redis_store) do
-        expect(Rails.cache).to receive(:fetch_with_cache_register).at_least(:once).and_call_original
-        check_cache
-      end
+      expect(Rails.cache).to receive(:fetch_with_cache_register).at_least(:once).and_call_original
+      check_cache
     end
 
     it "should still work with expiration" do
-      enable_cache(:redis_store) do
-        some_key = "some_base_key/withstuff"
-        some_value = "some value"
-        some_other_value = "some other value"
+      some_key = "some_base_key/withstuff"
+      some_value = "some value"
+      some_other_value = "some other value"
 
-        Timecop.freeze(time1) do
-          Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups], expires_in: 5.minutes) do
-            some_value
-          end
+      Timecop.freeze(time1) do
+        Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups], expires_in: 5.minutes) do
+          some_value
         end
-        Timecop.freeze(time2) do
-          res2 = Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups], expires_in: 5.minutes) do
-            some_other_value
-          end
-          expect(res2).to eq some_value # not expired yet
+      end
+      Timecop.freeze(time2) do
+        res2 = Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups], expires_in: 5.minutes) do
+          some_other_value
         end
-        Timecop.freeze(10.minutes.from_now) do
-          res3 = Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups], expires_in: 5.minutes) do
-            some_other_value
-          end
-          expect(res3).to eq some_other_value
+        expect(res2).to eq some_value # not expired yet
+      end
+      Timecop.freeze(10.minutes.from_now) do
+        res3 = Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups], expires_in: 5.minutes) do
+          some_other_value
         end
+        expect(res3).to eq some_other_value
       end
     end
 
     it "should be separate by user" do
-      enable_cache(:redis_store) do
-        some_key = "some_base_key/withstuff"
-        some_value = "some value"
-        some_other_value = "some other value"
-        user2 = User.create!
+      some_key = "some_base_key/withstuff"
+      some_value = "some value"
+      some_other_value = "some other value"
+      user2 = User.create!
 
-        Timecop.freeze(time1) do
-          Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups]) do
-            some_value
-          end
-          res2 = Rails.cache.fetch_with_batched_keys(some_key, batch_object: user2, batched_keys: [:enrollments, :groups]) do
-            some_other_value
-          end
-          expect(res2).to eq some_other_value
+      Timecop.freeze(time1) do
+        Rails.cache.fetch_with_batched_keys(some_key, batch_object: @user, batched_keys: [:enrollments, :groups]) do
+          some_value
         end
+        res2 = Rails.cache.fetch_with_batched_keys(some_key, batch_object: user2, batched_keys: [:enrollments, :groups]) do
+          some_other_value
+        end
+        expect(res2).to eq some_other_value
       end
     end
 
@@ -321,11 +317,37 @@ describe Canvas::CacheRegister do
     end
 
     it "should check the key types" do
-      enable_cache(:redis_store) do
-        expect {
-          Rails.cache.fetch_with_batched_keys("k", batch_object: @user, batched_keys: :blah) { "v" }
-        }.to raise_error("invalid cache_key type 'blah' for User")
+      expect {
+        Rails.cache.fetch_with_batched_keys("k", batch_object: @user, batched_keys: :blah) { "v" }
+      }.to raise_error("invalid cache_key type 'blah' for User")
+    end
+  end
+
+  context "without an object" do
+    it "should try to find the cache key by the id alone" do
+      @user2 = User.create!
+      Timecop.freeze(time1) do
+        @user.cache_key(:enrollments)
       end
+
+      Timecop.freeze(time2) do
+        expect(User.cache_key_for_id(@user.id, :enrollments)).to include(to_stamp(time1))
+        expect(User.cache_key_for_id(@user2.id, :enrollments)).to include(to_stamp(time2))
+      end
+    end
+
+    it "should return nil if cache register is disabled" do
+      set_revert!
+      Timecop.freeze(time1) do
+        @user.cache_key(:enrollments)
+      end
+      Timecop.freeze(time2) do
+        expect(User.cache_key_for_id(@user.id, :enrollments)).to eq nil
+      end
+    end
+
+    it "should check the types in dev/test" do
+      expect { User.cache_key_for_id(@user.id, :blah) }.to raise_error("invalid cache_key type 'blah' for User")
     end
   end
 end

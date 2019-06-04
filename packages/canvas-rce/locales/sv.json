@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cirkelmarkera osorterad lista"
   },
+  "clear_upload_34efa419": {
+    "message": "Rensa uppladdning"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klicka på en fil för att lägga till en nedladdningslänk för den filen."
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Samarbeten"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Minimera för att dölja { types }"
   },
   "computer_1d7dfa6f": {
     "message": "Dator"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "Dokument"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Dra och släpp, eller klicka för att söka i din dator"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Förfallodatum: Flera datum"
+  },
+  "due_when_7eed10c6": {
+    "message": "Förfallodatum: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "uppge söktermer"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Ange alternativ text för den här bilden"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Expandera för att visa { types }"
+  },
   "external_links_3d9f074e": {
     "message": "Externa länkar"
   },
   "file_upload_form_4aaad554": {
     "message": "Fil uppladdningsformulär"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename } förhandsgranskning"
   },
   "files_c300e900": {
     "message": "Filer"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "För in en matematisk ekvation"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "Ogiltig filtyp"
+  },
   "link_7262adec": {
     "message": "Länk"
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Läser in mappar..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Ladda fler resultat.."
-  },
   "media_af190855": {
     "message": "Media"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "Inga resultat."
+  },
+  "options_3ab0ea65": {
+    "message": "Alternativ"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Sorterade och osorterade listor"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "Personer"
   },
+  "posted_when_a578f5ab": {
+    "message": "Publicerad: { when }"
+  },
   "preformatted_d0670862": {
     "message": "Förformaterade"
+  },
+  "published_c944a23d": {
+    "message": "publicerad"
+  },
+  "published_when_302d8e23": {
+    "message": "Publicerad: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Quizzes"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Välj en mapp att ladda upp din fil till"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Visa bildalternativ"
   },
   "small_header_168fb9f9": {
     "message": "Liten rubrik"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Den här uppladdningen överskrider fillagringskvoten. Kontakta din systemadministratör."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "För publicering: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "Att göra: { when }"
+  },
   "tray_839df38a": {
     "message": "Fack"
+  },
+  "unpublished_dfd8801": {
+    "message": "Avpublicerad"
   },
   "unsplash_ee049fbf": {
     "message": "Ångra stänk"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Ladda upp en ny bild"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Ladda upp fil"
   },
   "upload_image_6120b609": {
     "message": "Ladda upp bild"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Användarrättigheter:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Visa tangentbordskommandon"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Vad vill du kalla den nya sidan?"

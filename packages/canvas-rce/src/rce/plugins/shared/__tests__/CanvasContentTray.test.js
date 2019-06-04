@@ -28,7 +28,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
   let props
 
   beforeEach(() => {
-    jest.setTimeout(10000)
+    jest.setTimeout(20000)
 
     props = {
       bridge: new Bridge(),
@@ -55,7 +55,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
     act(() => {
       props.bridge.controller.showTrayForPlugin(plugin)
     })
-    await wait(getTray, {timeout: 10000})
+    await wait(getTray, {timeout: 19500})
   }
 
   describe('Tray Label', () => {

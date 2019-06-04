@@ -182,7 +182,7 @@ module AccountReports
     attachment = report_attachment(account_report, csv) if csv
     account_report.message = message
     account_report.parameters ||= {}
-    self.failed_report unless csv
+    failed_report(account_report) unless csv
     if account_report.workflow_state == 'aborted'
       account_report.parameters["extra_text"] = (I18n.t('Report has been aborted'))
     else

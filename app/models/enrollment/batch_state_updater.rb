@@ -137,9 +137,7 @@ class Enrollment::BatchStateUpdater
     admin_ids = Enrollment.where(course_id: courses_to_touch_admins,
       type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).
       active.distinct.order(:user_id).pluck(:user_id)
-    admin_ids.each_slice(1000) do |sliced_admin_ids|
-      User.where(id: sliced_admin_ids).touch_all
-    end
+    User.clear_cache_keys(admin_ids, :todo_list)
   end
 
   def self.reset_notifications_cache(user_course_tuples)

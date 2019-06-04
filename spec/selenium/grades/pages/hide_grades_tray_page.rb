@@ -18,21 +18,37 @@
 require_relative '../../common'
 
 module HideGradesTray
-  include SeleniumDependencies
+  extend SeleniumDependencies
 
-  def full_content
+  def self.full_content
     fj("h3:contains('Hide Grades')")
   end
 
-  def hide_button
-    fj("label:contains('Hide')")
+  def self.hide_button
+    fj("button:contains('Hide')")
   end
 
-  def specific_sections_toggle
+  def self.specific_sections_toggle
     fj("label:contains('Specific Sections')")
   end
 
-  def select_section(section_name)
+  def self.section_checkbox(section_name)
     fj("label:contains(#{section_name})")
+  end
+
+  def self.select_section(section_name)
+    specific_sections_toggle.click
+    section_checkbox(section_name).click
+  end
+
+  def self.spinner
+    fxpath("//div[@data-cid='Spinner']")
+  end
+
+  def self.hide_grades
+    hide_button.click
+    spinner
+    run_jobs
+    wait_for_no_such_element { PostGradesTray.spinner }
   end
 end

@@ -108,7 +108,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymize_students: false,
+        anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
         html_url: 'http://localhost/assignments/2301',
@@ -145,10 +145,10 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.name, 'Math 1.1')
     })
 
-    test('includes the assignment anonymize_students', () => {
+    test('includes the assignment anonymous_grading', () => {
       postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.anonymizeStudents, false)
+      strictEqual(assignment.anonymousGrading, false)
     })
 
     test('includes the assignment grades_published', () => {
@@ -226,7 +226,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymize_students: false,
+        anonymous_grading: false,
         course_id: '1201',
         grades_published: true,
         id: '2301',
@@ -266,10 +266,10 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.name, 'Math 1.1')
     })
 
-    test('includes the assignment anonymize_students', () => {
+    test('includes the assignment anonymous_grading', () => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
-      strictEqual(assignment.anonymizeStudents, false)
+      strictEqual(assignment.anonymousGrading, false)
     })
 
     test('includes the assignment grades_published', () => {
@@ -310,7 +310,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         }
         postedOrHiddenInfo = {
           assignmentId: '2301',
-          postedAt: new Date().toISOString(),
+          postedAt: new Date(),
           userIds: ['1101']
         }
 
@@ -341,7 +341,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
         const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
         onPosted(postedOrHiddenInfo)
-        strictEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
+        deepEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
       })
     })
   })
@@ -351,16 +351,18 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       createPostPolicies()
 
       const assignment = {
-        anonymize_students: false,
+        anonymous_grading: true,
         course_id: '1201',
         grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,
+        moderated_grading: true,
         muted: false,
         name: 'Math 1.1',
         omit_from_final_grade: false,
         points_possible: 10,
+        post_manually: true,
         published: true,
         submission_types: ['online_text_entry']
       }
@@ -387,11 +389,69 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.name, 'Math 1.1')
     })
 
+    test('passes the assignment anonymous-grading status to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.anonymousGrading, true)
+    })
+
+    test('passes the assignment moderated-grading status to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.moderatedGrading, true)
+    })
+
+    test('passes the current manual-posting status of the assignment to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.postManually, true)
+    })
+
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
       const callback = sinon.stub()
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301', onExited: callback})
       const [{onExited}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(onExited, callback)
+    })
+
+    QUnit.module('onAssignmentPostPolicyUpdated', onUpdateHooks => {
+      let updateColumnHeadersStub
+
+      onUpdateHooks.beforeEach(() => {
+        updateColumnHeadersStub = sinon.stub(gradebook, 'updateColumnHeaders')
+      })
+
+      onUpdateHooks.afterEach(() => {
+        updateColumnHeadersStub.restore()
+      })
+
+      test('calls updateColumnHeaders', () => {
+        postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+        const [
+          {onAssignmentPostPolicyUpdated}
+        ] = postPolicies._assignmentPolicyTray.show.lastCall.args
+        onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: true})
+        strictEqual(updateColumnHeadersStub.callCount, 1)
+      })
+
+      test('calls updateColumnHeaders with the column ID of the affected assignment', () => {
+        postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+        const columnId = gradebook.getAssignmentColumnId('2301')
+        const [
+          {onAssignmentPostPolicyUpdated}
+        ] = postPolicies._assignmentPolicyTray.show.lastCall.args
+        onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: true})
+        deepEqual(updateColumnHeadersStub.firstCall.args[0], [columnId])
+      })
+
+      test('updates the post_manually field of the assignment', () => {
+        postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+        const [
+          {onAssignmentPostPolicyUpdated}
+        ] = postPolicies._assignmentPolicyTray.show.lastCall.args
+        onAssignmentPostPolicyUpdated({assignmentId: '2301', postManually: false})
+        deepEqual(gradebook.getAssignment('2301').post_manually, false)
+      })
     })
   })
 

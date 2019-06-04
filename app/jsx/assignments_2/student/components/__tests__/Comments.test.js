@@ -23,15 +23,15 @@ import {
   commentGraphqlMock,
   mockAssignment,
   mockComments,
+  legacyMockSubmission,
   singleAttachment,
-  singleComment,
-  singleMediaObject
+  singleComment
 } from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {render, waitForElement, fireEvent} from 'react-testing-library'
 
 describe('Comments', () => {
-  beforeEach(() => {
+  beforeAll(() => {
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
 
@@ -40,7 +40,7 @@ describe('Comments', () => {
     errorMock[1].result = {errors: [{message: 'Error!'}]}
     const {getByPlaceholderText, getByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={errorMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -56,7 +56,7 @@ describe('Comments', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByTestId} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
 
@@ -67,7 +67,7 @@ describe('Comments', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByLabelText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
 
@@ -78,7 +78,7 @@ describe('Comments', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByPlaceholderText, getByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -92,7 +92,7 @@ describe('Comments', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByPlaceholderText, getByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -106,7 +106,7 @@ describe('Comments', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getAllByTestId, getByPlaceholderText, getByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -122,7 +122,7 @@ describe('Comments', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByTitle} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     expect(getByTitle('Loading')).toBeInTheDocument()
@@ -133,7 +133,7 @@ describe('Comments', () => {
     noDataMock[0].result = {data: null}
     const {getByText} = render(
       <MockedProvider mocks={noDataMock} addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
@@ -145,7 +145,7 @@ describe('Comments', () => {
     errorMock[0].error = new Error('aw shucks')
     const {getByText} = render(
       <MockedProvider mocks={errorMock} removeTypename addTypename>
-        <Comments assignment={mockAssignment()} />
+        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
 

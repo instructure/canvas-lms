@@ -55,6 +55,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
     this.state = {
       hideBySections: false,
       hidingGrades: false,
+      onExited() {},
       open: false,
       selectedSectionIds: []
     }
@@ -113,7 +114,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
         message: successMessage,
         type: 'success'
       })
-    } catch (error) {
+    } catch (_error) {
       showFlashAlert({
         message: I18n.t('There was a problem hiding assignment grades.'),
         type: 'error'

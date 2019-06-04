@@ -17,7 +17,7 @@
  */
 import React from 'react'
 
-import {mockAssignment, mockComments} from '../../test-utils'
+import {mockAssignment, mockComments, legacyMockSubmission} from '../../test-utils'
 import StudentContent from '../StudentContent'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY, CREATE_SUBMISSION_COMMENT} from '../../assignmentData'
@@ -28,7 +28,7 @@ const mocks = [
     request: {
       query: SUBMISSION_COMMENT_QUERY,
       variables: {
-        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+        submissionId: legacyMockSubmission().id
       }
     },
     result: {
@@ -41,7 +41,7 @@ const mocks = [
     request: {
       query: CREATE_SUBMISSION_COMMENT,
       variables: {
-        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+        submissionId: legacyMockSubmission().id
       }
     },
     result: {
@@ -53,19 +53,29 @@ const mocks = [
 describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is unlocked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByTestId} = render(<StudentContent assignment={assignment} />)
+    const {getByTestId} = render(
+      <MockedProvider>
+        <StudentContent assignment={assignment} submission={legacyMockSubmission()} />
+      </MockedProvider>
+    )
     expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
 
   it('renders the student header if the assignment is locked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    const {getByTestId} = render(<StudentContent assignment={assignment} />)
+    const {getByTestId} = render(
+      <StudentContent assignment={assignment} submission={legacyMockSubmission()} />
+    )
     expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
   })
 
   it('renders the assignment details and student content tab if the assignment is unlocked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    const {getByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
+    const {getByRole, getByText, queryByText} = render(
+      <MockedProvider>
+        <StudentContent assignment={assignment} submission={legacyMockSubmission()} />
+      </MockedProvider>
+    )
 
     expect(getByRole('tablist')).toHaveTextContent('Upload')
     expect(getByText('Details')).toBeInTheDocument()
@@ -74,16 +84,19 @@ describe('Assignment Student Content View', () => {
 
   it('renders the availability dates if the assignment is locked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    const {queryByRole, getByText} = render(<StudentContent assignment={assignment} />)
+    const {queryByRole, getByText} = render(
+      <StudentContent assignment={assignment} submission={legacyMockSubmission()} />
+    )
 
     expect(queryByRole('tablist')).not.toBeInTheDocument()
     expect(getByText('Availability Dates')).toBeInTheDocument()
   })
 
   it('renders Comments', async () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: false}})
     const {getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentContent assignment={mockAssignment({lockInfo: {isLocked: false}})} />
+        <StudentContent assignment={assignment} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
@@ -95,7 +108,7 @@ describe('Assignment Student Content View', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
     const {getByTitle, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <StudentContent assignment={assignment} />
+        <StudentContent assignment={assignment} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))

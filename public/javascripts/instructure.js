@@ -839,7 +839,10 @@ function handleYoutubeLink () {
     // in 2 seconds (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)
     setTimeout(function() {
-      $("#content a:external,#content a.explicit_external_link").each(function(){
+      $("#content a:external,#content a.explicit_external_link")
+      // don't mess with the ones that were already processed in enhanceUserContent
+      .not(".external")
+      .each(function(){
         var indicatorText = I18n.t('titles.external_link', 'Links to an external site.');
         var $linkIndicator = $('<span class="ui-icon ui-icon-extlink ui-icon-inline"/>').attr('title', indicatorText);
         $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText));

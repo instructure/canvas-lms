@@ -43,29 +43,45 @@ class AssignmentScoreStatisticsGenerator
     # require score then add a filter when the DA feature is on
     statistics = Shackles.activate(:slave) do
       course.assignments.published.preload(score_statistic: :assignment).
-      joins(:submissions).
-      joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
-      merge(course.all_enrollments.of_student_type.active_or_pending).
-      merge(Submission.not_placeholder.where("submissions.excused IS NOT TRUE")).
-      where.not(submissions: { score: nil }).
-      where(submissions: { workflow_state: 'graded' }).
-      group("assignments.id").
-      select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").to_a
+        joins(:submissions).
+        joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON submissions.user_id = enrollments.user_id").
+        merge(course.all_enrollments.of_student_type.active_or_pending).
+        merge(Submission.not_placeholder.where("submissions.excused IS NOT TRUE")).
+        where.not(submissions: { score: nil }).
+        where(submissions: { workflow_state: 'graded' }).
+        group("assignments.id").
+        select("assignments.id, max(score) max, min(score) min, avg(score) avg, count(submissions.id) count").to_a
     end
 
-    statistics.map do |assignment|
-      assignment_stats = {
-        maximum: assignment.max,
-        minimum: assignment.min,
-        mean: assignment.avg,
-        count: assignment.count
-      }
+    connection = ScoreStatistic.connection
+    now = connection.quote(Time.now.utc)
+    bulk_values = statistics.map do |assignment|
+      values =
+        [
+          connection.quote(assignment.id),
+          connection.quote(assignment.max),
+          connection.quote(assignment.min),
+          connection.quote(assignment.avg),
+          connection.quote(assignment.count),
+          now,
+          now
+        ].join(',')
+      "(#{values})"
+    end
 
-      if assignment.score_statistic.present?
-        assignment.score_statistic.update!(assignment_stats)
-      else
-        assignment.create_score_statistic!(assignment_stats)
-      end
+    bulk_values.each_slice(100) do |bulk_slice|
+      connection.execute(<<~SQL)
+        INSERT INTO #{ScoreStatistic.quoted_table_name}
+          (assignment_id, maximum, minimum, mean, count, created_at, updated_at)
+        VALUES #{bulk_slice.join(',')}
+        ON CONFLICT (assignment_id)
+        DO UPDATE SET
+           minimum = excluded.minimum,
+           maximum = excluded.maximum,
+           mean = excluded.mean,
+           count = excluded.count,
+           updated_at = excluded.updated_at
+      SQL
     end
   end
 end

@@ -31,9 +31,9 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import View from '@instructure/ui-layout/lib/components/View'
 
-import DeveloperKeyScopesList from './ScopesList'
+import ScopesList from './ScopesList'
 
-export default class DeveloperKeyScopes extends React.Component {
+export default class Scopes extends React.Component {
   state = { filter: '' }
 
   handleFilterChange = e => {
@@ -67,7 +67,7 @@ export default class DeveloperKeyScopes extends React.Component {
         <GridCol>
           <View>
               {this.props.requireScopes
-                ? <DeveloperKeyScopesList
+                ? <ScopesList
                     availableScopes={this.props.availableScopes}
                     selectedScopes={developerKey ? developerKey.scopes : []}
                     filter={this.state.filter}
@@ -133,7 +133,7 @@ export default class DeveloperKeyScopes extends React.Component {
   }
 }
 
-DeveloperKeyScopes.propTypes = {
+Scopes.propTypes = {
   availableScopes: PropTypes.objectOf(PropTypes.arrayOf(
     PropTypes.shape({
       resource: PropTypes.string,
@@ -156,7 +156,7 @@ DeveloperKeyScopes.propTypes = {
   onRequireScopesChange: PropTypes.func.isRequired
 }
 
-DeveloperKeyScopes.defaultProps = {
+Scopes.defaultProps = {
   developerKey: undefined,
   requireScopes: false
 }

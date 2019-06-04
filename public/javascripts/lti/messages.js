@@ -105,6 +105,6 @@ export function ltiMessageHandler(e) {
 
 export function monitorLtiMessages() {
   window.addEventListener('message', function(e) {
-    ltiMessageHandler(e);
+    if (e.data !== "") ltiMessageHandler(e);
   });
 }

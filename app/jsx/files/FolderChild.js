@@ -136,6 +136,7 @@ FolderChild.renderEditingState = function() {
         href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
         className="ef-name-col__link"
         params={{splat: this.props.model.urlPath()}}
+        role="button"
       >
         {/* we use an internal click wrapper span and handle a native js click event so we can
               intercept the link click event before page.js gets it. We want to prevent page.js from
@@ -162,6 +163,7 @@ FolderChild.renderEditingState = function() {
         onClick={preventDefault(this.handleFileLinkClick)}
         className="ef-name-col__link"
         ref="nameLink"
+        role="button"
       >
         <span className="ef-big-icon-container">
           <FilesystemObjectThumbnail model={this.props.model} />

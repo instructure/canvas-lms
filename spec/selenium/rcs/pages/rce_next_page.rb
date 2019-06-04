@@ -126,12 +126,20 @@ module RCENextPage
     f('[role="menuitem"][title="Course Images"]')
   end
 
+  def image_options_button
+    f('button[aria-label="Show image options"]')
+  end
+
+  def image_options_tray
+    f('[role="dialog"][aria-label="Image Options Tray"]')
+  end
+
   def rce_page_body_ifr_id
     f('iframe.tox-edit-area__iframe')['id']
   end
 
   def course_item_link(title)
-    fj("[data-testid='instructure_links-Link'] button:contains('#{title}')")
+    fj("[data-testid='instructure_links-Link'] [role='button']:contains('#{title}')")
   end
 
   def more_toolbar_button
@@ -192,6 +200,30 @@ module RCENextPage
 
   def align_right_button
     # put align right button locator here
+  end
+
+  def rce_next_toolbar
+    f(".tox-toolbar__primary")
+  end
+
+  def a11y_checker_button
+    fj('button:has([name="IconA11y"])')
+  end
+
+  def a11y_checker_tray
+    f("div[aria-label='Accessibility Checker'")
+  end
+
+  def tray_container
+    f('[data-cid="Tray Portal"]')
+  end
+
+  def display_text_link_option
+    fj('label:contains("Display Text Link (Opens in a new tab)")')
+  end
+
+  def image_options_done_button
+    fj('[data-cid="Portal Tray"] button:contains("Done")')
   end
 
   # ---------------------- Actions ----------------------
@@ -327,5 +359,25 @@ module RCENextPage
 
   def click_editor_window
     editor_window.click
+  end
+
+  def click_a11y_checker_button
+    a11y_checker_button.click
+  end
+
+  def click_image_options_button
+    image_options_button.click
+  end
+
+  def click_in_body_image(title)
+    in_body_image(title).click
+  end
+
+  def click_display_text_link_option
+    display_text_link_option.click
+  end
+
+  def click_image_options_done_button
+    image_options_done_button.click
   end
 end

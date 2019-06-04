@@ -17,9 +17,6 @@
 
 module Lti::Ims
   # @API Score
-  # @internal
-  #
-  # TODO: remove internal flags
   #
   # Score API for IMS Assignment and Grade Services
   #
@@ -31,11 +28,10 @@ module Lti::Ims
   #          "userId": {
   #            "description": "The lti_user_id or the Canvas user_id",
   #            "example": "50 | 'abcasdf'",
-  #            "type": "number|string"
+  #            "type": "string"
   #          },
   #          "scoreGiven": {
-  #            "description": "The Current score received in the tool for this line item and user,
-  #                            scaled to the scoreMaximum",
+  #            "description": "The Current score received in the tool for this line item and user, scaled to the scoreMaximum",
   #            "example": "50",
   #            "type": "number"
   #          },
@@ -52,19 +48,14 @@ module Lti::Ims
   #            "description": "Date and time when the score was modified in the tool. Should use subsecond precision.",
   #            "example": "2017-04-16T18:54:36.736+00:00",
   #            "type": "string"
-  #          }
+  #          },
   #          "activityProgress": {
-  #            "description": "Indicate to Canvas the status of the user towards the activity's completion.
-  #                            Must be one of Initialized, Started, InProgress, Submitted, Completed",
+  #            "description": "Indicate to Canvas the status of the user towards the activity's completion. Must be one of Initialized, Started, InProgress, Submitted, Completed",
   #            "example": "Completed",
   #            "type": "string"
-  #          }
+  #          },
   #          "gradingProgress": {
-  #            "description": "Indicate to Canvas the status of the grading process.
-  #                            A value of PendingManual will require intervention by a grader.
-  #                            Values of NotReady, Failed, and Pending will cause the scoreGiven to be ignored.
-  #                            FullyGraded values will require no action.
-  #                            Possible values are NotReady, Failed, Pending, PendingManual, FullyGraded",
+  #            "description": "Indicate to Canvas the status of the grading process. A value of PendingManual will require intervention by a grader. Values of NotReady, Failed, and Pending will cause the scoreGiven to be ignored. FullyGraded values will require no action. Possible values are NotReady, Failed, Pending, PendingManual, FullyGraded",
   #            "example": "FullyGraded",
   #            "type": "string"
   #          }
@@ -84,7 +75,6 @@ module Lti::Ims
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
 
     # @API Create a Score
-    # @internal
     #
     # Create a new Result from the score params. If this is for the first created line_item for a
     # resourceLinkId, or it is a line item that is not attached to a resourceLinkId, then a submission
@@ -212,7 +202,7 @@ module Lti::Ims
     end
 
     def result
-      @_result ||= Lti::Result.where(line_item: line_item, user: user).first
+      @_result ||= Lti::Result.active.where(line_item: line_item, user: user).first
     end
 
     def timestamp

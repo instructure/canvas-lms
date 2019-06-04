@@ -153,7 +153,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     this.$el.hide()
     $('body').removeClass('index')
-    $('body').addClass('edit with-right-side')
+    $('body').addClass(`edit ${window.ENV.use_rce_enhancements ? '' : 'with-right-side'}`)
 
     this.editModel = new WikiPage(
       {editing_roles: this.default_editing_roles},

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,8 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+
 export default function(ed, document) {
-  var ev = document.createEvent("CustomEvent");
-  ev.initCustomEvent("tinyRCE/initRecord", true, true, { ed: ed });
-  document.dispatchEvent(ev);
+  return import('./UploadMedia').then(({UploadMedia}) => {
+    let container = document.querySelector('.canvas-rce-media-upload')
+    if (!container) {
+      container = document.createElement('div')
+      container.className = 'canvas-rce-media-upload'
+      document.body.appendChild(container)
+    }
+
+    const handleDismiss = () => {
+      ReactDOM.unmountComponentAtNode(container)
+      ed.focus(false)
+    }
+
+    ReactDOM.render(<UploadMedia onDismiss={handleDismiss} editor={ed} />, container)
+  })
 }

@@ -49,11 +49,19 @@ describe "root account basic settings" do
     expect(f('#course_storage_csv .last-run a').attribute('href')).to match(/download_frd=1/)
   end
 
-  it "has date pickers for reports", custom_timeout: 30  do
+  it "has date pickers for reports tab" do
     course_with_admin_logged_in
     get account_settings_url
     f('#tab-reports-link').click()
     wait_for_ajax_requests
+    wait_for(method: nil, timeout: 2) { f('#configure_zero_activity_csv') }
+    f('#configure_zero_activity_csv').click()
+    expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
+  end
+
+  it "handles linking directly to reports tab" do
+    course_with_admin_logged_in
+    get account_settings_url + "#tab-reports"
     f('#configure_zero_activity_csv').click()
     expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end

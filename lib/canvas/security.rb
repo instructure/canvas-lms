@@ -49,6 +49,37 @@ module Canvas::Security
     end
   end
 
+  def self.encrypt_data(data)
+    nonce = SecureRandom.bytes(12)
+    encryptor = OpenSSL::Cipher.new('aes-256-gcm').encrypt
+    encryptor.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    encryptor.iv = nonce
+    encryptor.auth_data = 'Canvas-v1.0.0'
+    encrypted_data = encryptor.update(data) + encryptor.final
+    tag = encryptor.auth_tag
+    [encrypted_data, nonce, tag]
+  end
+
+  def self.decrypt_data(data, nonce, tag)
+    decipher = OpenSSL::Cipher.new('aes-256-gcm').decrypt
+    decipher.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    decipher.iv = nonce
+    decipher.auth_tag = tag
+    decipher.auth_data = 'Canvas-v1.0.0'
+    decipher.update(data) + decipher.final
+  end
+
+  def self.url_key_encrypt_data(data)
+    encryption_data = encrypt_data("#{data.encoding}~#{data.dup.force_encoding('ASCII-8BIT')}")
+    encryption_data.map{|item| Base64.urlsafe_encode64(item, padding: false)}.join('~')
+  end
+
+  def self.url_key_decrypt_data(data)
+    encrypted_data, nonce, tag = data.split('~').map{|item| Base64.urlsafe_decode64(item)}
+    encoding, data = decrypt_data(encrypted_data, nonce, tag).split('~', 2)
+    data.force_encoding(encoding)
+  end
+
   def self.encrypt_password(secret, key)
     require 'base64'
     c = OpenSSL::Cipher.new('aes-256-cbc')

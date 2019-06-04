@@ -491,6 +491,29 @@ function initDropdown() {
   }
 }
 
+function setupPostPolicies() {
+  if (!ENV.post_policies_enabled) return
+  const {jsonData} = window
+  const gradesPublished = !jsonData.moderated_grading || jsonData.grades_published_at != null
+
+  EG.postPolicies = new PostPolicies({
+    assignment: {
+      anonymousGrading: jsonData.anonymous_grading,
+      gradesPublished,
+      id: jsonData.id,
+      name: jsonData.title
+    },
+    sections: jsonData.context.active_course_sections,
+    updateSubmission: EG.setOrUpdateSubmission,
+    afterUpdateSubmission() {
+      renderPostGradesMenu()
+      EG.showGrade()
+    }
+  })
+
+  renderPostGradesMenu()
+}
+
 function setupHeader({showMuteButton = true}) {
   const elements = {
     nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
@@ -798,7 +821,7 @@ function initCommentBox() {
       ),
       mic_blocked: I18n.t(
         'mic_blocked_message',
-        'Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream'
+        'Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone'
       ),
       no_speech: I18n.t(
         'nodetect_message',
@@ -1344,21 +1367,7 @@ EG = {
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
-
-      if (ENV.post_policies_enabled) {
-        const {jsonData} = window
-
-        EG.postPolicies = new PostPolicies({
-          assignment: {
-            anonymizeStudents: jsonData.anonymize_students,
-            gradesPublished: !jsonData.moderated_grading || jsonData.grades_published_at != null,
-            id: jsonData.id,
-            name: jsonData.title
-          },
-          sections: jsonData.context.active_course_sections
-        })
-        renderPostGradesMenu()
-      }
+      setupPostPolicies()
     }
   },
 
@@ -3636,29 +3645,38 @@ function renderSettingsMenu() {
     showHelpMenuItem: ENV.show_help_menu_item
   }
 
-  const settingsMenu = <SpeedGraderSettingsMenu {...props} />
-  ReactDOM.render(settingsMenu, document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT))
+  const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
+}
+
+function teardownSettingsMenu() {
+  const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  ReactDOM.unmountComponentAtNode(mountPoint)
 }
 
 function renderPostGradesMenu() {
+  const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
   const allowHidingGrades = submissions.some(submission => submission.posted_at != null)
   const allowPostingGrades = submissions.some(submission => submission.posted_at == null)
 
+  function onHideGrades() {
+    EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
+  }
+
+  function onPostGrades() {
+    EG.postPolicies.showPostAssignmentGradesTray({submissionsMap, submissions})
+  }
+
   const props = {
     allowHidingGrades,
     allowPostingGrades,
-    onHideGrades: () => {
-      EG.postPolicies.showHideAssignmentGradesTray({onExited: () => {}})
-    },
-    onPostGrades: () => {
-      EG.postPolicies.showPostAssignmentGradesTray({onExited: () => {}, submissions})
-    }
+    onHideGrades,
+    onPostGrades
   }
 
-  const postGradesMenu = <SpeedGraderPostGradesMenu {...props} />
   ReactDOM.render(
-    postGradesMenu,
+    <SpeedGraderPostGradesMenu {...props} />,
     document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
   )
 }
@@ -3727,6 +3745,7 @@ export default {
       EG.postPolicies.destroy()
     }
 
+    teardownSettingsMenu()
     teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()
   },

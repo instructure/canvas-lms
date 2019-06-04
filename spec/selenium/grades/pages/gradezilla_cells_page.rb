@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative 'gradezilla_grade_detail_tray_page'
 
 module Gradezilla
   class Cells

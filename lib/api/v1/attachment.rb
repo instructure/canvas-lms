@@ -163,8 +163,9 @@ module Api::V1::Attachment
     params[:name] || params[:filename]
   end
 
-  def infer_upload_content_type(params)
-    params[:content_type].presence || Attachment.mimetype(infer_upload_filename(params))
+  def infer_upload_content_type(params, default_mimetype = nil)
+    mime_type = params[:content_type].presence || Attachment.mimetype(infer_upload_filename(params))
+    mime_type && mime_type != 'unknown/unknown' ? mime_type : default_mimetype
   end
 
   def infer_upload_folder(context, params)
@@ -279,7 +280,7 @@ module Api::V1::Attachment
       @attachment.context = context
       @attachment.user = @current_user
       @attachment.filename = infer_upload_filename(params)
-      @attachment.content_type = infer_upload_content_type(params)
+      @attachment.content_type = infer_upload_content_type(params, 'unknown/unknown')
       @attachment.folder = folder
       @attachment.set_publish_state_for_usage_rights
       @attachment.file_state = 'deleted'

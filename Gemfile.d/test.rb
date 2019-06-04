@@ -43,9 +43,8 @@ group :test do
   gem 'sauce_whisk', '0.1.0'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
-  gem 'selenium-webdriver', '3.14.0'
+  gem 'selenium-webdriver', '3.142.3'
     gem 'childprocess', '0.9.0', require: false
-    gem 'websocket', '1.2.5', require: false
   gem 'chromedriver-helper', '2.1.0', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false

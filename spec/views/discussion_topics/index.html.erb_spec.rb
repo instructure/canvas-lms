@@ -24,6 +24,7 @@ describe "/discussion_topics/index" do
     course_with_teacher
     view_context(@course, @user)
     assign(:body_classes, [])
+    assign(:discussion_topics_urls_to_prefetch, [])
     render "discussion_topics/index"
     expect(response).not_to be_nil
   end

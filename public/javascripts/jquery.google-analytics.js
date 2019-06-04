@@ -42,10 +42,17 @@ import $ from 'jquery'
     if (!asyncScriptInserted) {
       asyncScriptInserted = true;
 
-      // insert ga.js async
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      // insert ga.js async, right after the window "load" event so it doesn't block any required js or images from downloading
+      const loadGAscript = () => {
+        const onIdle = window.requestIdleCallback || (cb => setTimeout(cb, 1))
+
+        onIdle(() => {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })
+      }
+      document.readyState === 'complete' ? loadGAscript() : $(window).one('load', loadGAscript)
     }
 
     options = $.extend({status_code: 200}, options);

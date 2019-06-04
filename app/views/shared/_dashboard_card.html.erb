@@ -20,11 +20,17 @@ css_bundle :dashboard_card
 default_number_of_fake_dashcards_to_show = 5
 
 number_of_fake_cards_to_show =
-  Rails.cache.read(['last_known_dashboard_cards_count', @current_user].cache_key) ||
+  Rails.cache.read(['last_known_dashboard_cards_count', @current_user.global_id].cache_key) ||
   default_number_of_fake_dashcards_to_show
-%>
 
-<div id="DashboardCard_Container" style="display: <%= user_dashboard_view == 'cards' ? 'block' : 'none' %>">
+render_on_pageload = user_dashboard_view == 'cards'
+%>
+<% if render_on_pageload %>
+  <%# fire off these `fetch` requests now so they are ready sooner %>
+  <%= prefetch_xhr('/api/v1/dashboard/dashboard_cards') %>
+  <%= prefetch_xhr(dashboard_sidebar_url) %>
+<% end %>
+<div id="DashboardCard_Container" style="display: <%= render_on_pageload ? 'block' : 'none' %>">
   <div class="ic-DashboardCard__box">
     <% for i in 1..number_of_fake_cards_to_show do %>
       <div class="ic-DashboardCard">

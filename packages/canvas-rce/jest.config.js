@@ -21,6 +21,10 @@ module.exports = {
     'jest-canvas-mock',
     '<rootDir>/jest/jest-setup.js'
   ],
+  reporters: [
+     "default",
+     ["jest-junit", {outputDirectory: './coverage'}]
+  ],
   setupFilesAfterEnv: ['<rootDir>/jest/jest-setup-framework.js'],
   testPathIgnorePatterns: [
     "<rootDir>/node_modues",

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import DeveloperKeyScopesGroup from '../ScopesGroup'
+import ScopesGroup from '../ScopesGroup'
 
 const scopes = [{
     "resource":"account_domain_lookups",
@@ -42,14 +42,14 @@ const props = {
 }
 
 it("adds all scopes to 'selected scopes' when the checkbox is checked", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
+  const wrapper = mount(<ScopesGroup {...props} />)
   const checkBox = wrapper.find('input[type="checkbox"]')
   checkBox.simulate('change', { target: { checked: true } })
   expect(props.setSelectedScopes).toBeCalled()
 })
 
 it("removes all scopes from 'selected scopes' when the checbox is unchecked", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
+  const wrapper = mount(<ScopesGroup {...props} />)
   const checkBox = wrapper.find('input[type="checkbox"]')
   checkBox.simulate('change', { target: { checked: true } })
   checkBox.simulate('change', { target: { checked: false } })
@@ -57,26 +57,26 @@ it("removes all scopes from 'selected scopes' when the checbox is unchecked", ()
 })
 
 it("checks the selected scopes", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
+  const wrapper = mount(<ScopesGroup {...props} />)
   wrapper.find('button').first().simulate('click')
   const checkBox = wrapper.find('input[value="url:GET|/api/v1/accounts/search"]').first()
   expect(checkBox.props().checked).toBe(true)
 })
 
 it("renders the http verb for each selected scope", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
+  const wrapper = mount(<ScopesGroup {...props} />)
   const button = wrapper.find('button').first()
   expect(button.text()).toContain('GET')
 })
 
 it("does not render the http verb for non-selected scopes", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
+  const wrapper = mount(<ScopesGroup {...props} />)
   const button = wrapper.find('button').first()
   expect(button.text()).not.toContain('POST')
 })
 
 it("renders the scope group name", () => {
-  const wrapper = mount(<DeveloperKeyScopesGroup {...props} />)
+  const wrapper = mount(<ScopesGroup {...props} />)
   const button = wrapper.find('button').first()
   expect(button.text()).toContain(props.name)
 })

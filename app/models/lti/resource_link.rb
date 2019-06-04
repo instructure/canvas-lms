@@ -17,10 +17,14 @@
 #
 
 class Lti::ResourceLink < ApplicationRecord
+  include Canvas::SoftDeletable
+
   validates :resource_link_id, presence: true
-  validates :context_external_tool, presence: true
+  validates :context_external_tool_id, presence: true
 
   belongs_to :context_external_tool
+  alias_method :original_context_external_tool, :context_external_tool
+
   has_many :line_items,
             inverse_of: :resource_link,
             class_name: 'Lti::LineItem',
@@ -28,6 +32,20 @@ class Lti::ResourceLink < ApplicationRecord
             foreign_key: :lti_resource_link_id
 
   before_validation :generate_resource_link_id, on: :create
+
+  def context_external_tool
+    # Use 'current_external_tool' to lookup the tool in a way that is safe with
+    # tool reinstallation and content migrations
+    raise 'Use Lti::ResourceLink#current_external_tool to lookup associated tool'
+  end
+
+  def current_external_tool(context)
+    ContextExternalTool.find_external_tool(
+      original_context_external_tool.url,
+      context,
+      original_context_external_tool.id
+    )
+  end
 
   private
 

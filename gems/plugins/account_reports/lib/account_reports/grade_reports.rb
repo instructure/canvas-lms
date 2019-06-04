@@ -28,7 +28,7 @@ module AccountReports
       extra_text_term(@account_report)
       include_deleted_objects
 
-      if @account_report.has_parameter? "limiting_period"
+      if @account_report.value_for_param("limiting_period")
         add_extra_text(I18n.t('account_reports.grades.limited',
                               'deleted objects limited by days specified;'))
       end

@@ -415,5 +415,38 @@ describe "assignments" do
         expect(f("#assignment_group_upcoming #assignment_#{a.id}")).not_to be_nil
       end
     end
+
+    context "with more than one page of assignment groups" do
+      before do
+        ApplicationController::ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 10
+        @count_to_make = ApplicationController::ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX + 2
+
+        # we suspend these callbacks here to speed up the spec
+        AssignmentGroup.suspend_callbacks(kind: :save) do
+          Assignment.suspend_callbacks(kind: :save) do
+            @count_to_make.times do |i|
+              ag = @course.assignment_groups.create!(name: "AG #{i}")
+              ag.assignments.create!(context: @course, name: "assignment #{i}")
+            end
+          end
+        end
+        # by enrolling a new user it will do all the DuedateCacher stuff we skipped above
+        course_with_student_logged_in(course: @course)
+      end
+
+      it "should exhaust all pagination of assignment groups" do
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        # if there are more assignment_groups visible than we fetch per page,
+        # it must mean that it paginated succcessfully
+
+        count_to_expect = @count_to_make + 1 # add one for the @assignment created in the root `before` block
+        expect(ff('[data-view="assignmentGroups"] .assignment').length).to be(count_to_expect)
+
+        move_to_click("label[for=show_by_type]")
+        expect(ff('[data-view="assignmentGroups"] .assignment_group').length).to be(count_to_expect)
+      end
+    end
   end
 end

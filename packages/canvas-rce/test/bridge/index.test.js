@@ -27,7 +27,9 @@ describe("Bridge actions, embed image", () => {
       existingContentToLink: sinon.stub(),
       existingContentToLinkIsImg: sinon.stub(),
       insertImage: sinon.spy(),
-      insertLink: sinon.spy()
+      insertLink: sinon.spy(),
+      insertImagePlaceholder: sinon.spy(),
+      removePlaceholders: sinon.spy()
     };
     origEditor = Bridge.getEditor();
     Bridge.focusEditor(mockEditor);
@@ -70,4 +72,14 @@ describe("Bridge actions, embed image", () => {
       embed: { type: "image" }
     });
   });
+
+  it('inserts a image placeholder through the bridge', () => {
+    Bridge.insertImagePlaceholder({})
+    sinon.assert.called(mockEditor.insertImagePlaceholder)
+  })
+
+  it('removes placeholders through the bridge', () => {
+    Bridge.removePlaceholders('abc')
+    sinon.assert.called(mockEditor.removePlaceholders)
+  })
 });

@@ -19,10 +19,8 @@
 import PropTypes from "prop-types";
 
 import React, { Component } from "react";
-import TabList from "@instructure/ui-tabs/lib/components/TabList";
-import TabPanel from "@instructure/ui-tabs/lib/components/TabList/TabPanel";
-import Tab from "@instructure/ui-core/lib/components/TabList/Tab";
-import ApplyTheme from "@instructure/ui-themeable/lib/components/ApplyTheme";
+import { TabList } from '@instructure/ui-tabs'
+import { ApplyTheme } from "@instructure/ui-themeable";
 import LinksPanel from "./LinksPanel";
 import FilesPanel from "./FilesPanel";
 import ImagesPanel from "./ImagesPanel";
@@ -57,7 +55,7 @@ class Sidebar extends Component {
     });
 
     const panels = [
-      <TabPanel title={linksTitle} key="linksPanel">
+      <TabList.Panel title={linksTitle} key="linksPanel">
         <LinksPanel
           selectedIndex={this.props.selectedAccordionIndex}
           onChange={this.props.onChangeAccordion}
@@ -71,9 +69,9 @@ class Sidebar extends Component {
           newPageLinkExpanded={this.props.newPageLinkExpanded}
           canCreatePages={this.props.session.canCreatePages}
         />
-      </TabPanel>,
+      </TabList.Panel>,
       !this.props.filesTabDisabled && (
-        <TabPanel
+        <TabList.Panel
           title={filesTitle}
           key="filesPanel"
           disabled={this.disableFilesPanel()}
@@ -92,9 +90,9 @@ class Sidebar extends Component {
             canUploadFiles={this.props.session.canUploadFiles}
             usageRightsRequired={this.props.session.usageRightsRequired}
           />
-        </TabPanel>
+        </TabList.Panel>
       ),
-      <TabPanel id="ImagesSidebarPanel" key="imagesPanel" title={imagesTitle}>
+      <TabList.Panel id="ImagesSidebarPanel" key="imagesPanel" title={imagesTitle}>
         <ImagesPanel
           withUploadForm={this.props.canUploadFiles}
           upload={this.props.upload}
@@ -109,11 +107,11 @@ class Sidebar extends Component {
           onImageEmbed={this.props.onImageEmbed}
           usageRightsRequired={this.props.session.usageRightsRequired}
         />
-      </TabPanel>
+      </TabList.Panel>
     ].filter(Boolean);
 
     return (
-      <ApplyTheme theme={{ [Tab.theme]: { fontSize: "0.8125rem" } }}>
+      <ApplyTheme>
         <TabList
           selectedIndex={this.props.selectedTabIndex}
           onChange={this.props.onChangeTab}

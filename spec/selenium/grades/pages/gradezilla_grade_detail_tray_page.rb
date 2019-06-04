@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-require_relative '../pages/post_grades_tray_page'
-require_relative '../pages/hide_grades_tray_page'
+require_relative 'post_grades_tray_page'
+require_relative 'hide_grades_tray_page'
 
 
 module Gradezilla
@@ -130,12 +130,8 @@ module Gradezilla
       f('#grade-detail-tray--grade-input')
     end
 
-    def self.not_posted_pill
-      # TODO: locator for not posted pill
-    end
-
-    def self.hidden_pill
-      # TODO: hidden pill locator
+    def self.hidden_pill_locator
+       "//*[@data-cid='Pill'][//span[text() = 'Hidden']]"
     end
 
     # methods
@@ -187,11 +183,11 @@ module Gradezilla
     end
 
     def self.post_policy_type_radio_button(policy)
-      # TODO: locator for radio buttons similar to fj(".SubmissionTray__RadioInput label:contains('#{type}')")
+      fj("#AssignmentPostingPolicyTray__RadioInputGroup label:contains('#{policy}')")
     end
 
     def self.save_button
-      # TODO: locator for save button
+      fj("#AssignmentPostingPolicyTray__Buttons button:contains('Save')")
     end
   end
 end

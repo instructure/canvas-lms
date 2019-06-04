@@ -23,11 +23,11 @@ import I18n from 'i18n!external_tools'
 
 
 export default function DuplicateConfirmationForm (props) {
-  const forceSaveTool = () => {
+  const forceSaveTool = props.forceSaveTool || (() => {
     const data = props.toolData
     data.verifyUniqueness = undefined
     props.store.save(props.configurationType, data, props.onSuccess, props.onError)
-  }
+  })
 
   return (
     <div id="duplicate-confirmation-form">
@@ -54,6 +54,7 @@ DuplicateConfirmationForm.propTypes = {
   onCancel: func.isRequired,
   onSuccess: func.isRequired,
   onError: func.isRequired,
+  forceSaveTool: func,
   toolData: object.isRequired,
   configurationType: string.isRequired,
   store: object.isRequired

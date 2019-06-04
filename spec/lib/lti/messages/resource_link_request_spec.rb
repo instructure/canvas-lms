@@ -21,6 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/lti_advantage_shared_example
 describe Lti::Messages::ResourceLinkRequest do
   include_context 'lti_advantage_shared_examples'
 
+  let(:tool_override) { nil }
+
   before(:each) do
     course.root_account.enable_feature!(:lti_1_3)
     course.root_account.save!
@@ -92,24 +94,44 @@ describe Lti::Messages::ResourceLinkRequest do
         ).and_return('lti_line_item_show_url')
       end
 
-      it 'sets the AGS scopes' do
-        expect_assignment_and_grade_scope(jws)
+      shared_examples_for 'an authorized launch' do
+        it 'sets the AGS scopes' do
+          expect_assignment_and_grade_scope(jws)
+        end
+
+        it 'sets the AGS line items url' do
+          expect_assignment_and_grade_line_items_url(jws)
+        end
+
+        it 'sets the AGS line item url' do
+          expect_assignment_and_grade_line_item_url(jws)
+        end
+
+        it 'can still be used to output a course launch after an assignment launch' do
+          expect_assignment_resource_link_id(jws)
+          expect_course_resource_link_id(course_jws)
+          expect_assignment_and_grade_scope(course_jws)
+          expect_assignment_and_grade_line_items_url(course_jws)
+          expect_assignment_and_grade_line_item_url_absent(course_jws)
+        end
       end
 
-      it 'sets the AGS line items url' do
-        expect_assignment_and_grade_line_items_url(jws)
-      end
+      it_behaves_like 'an authorized launch'
 
-      it 'sets the AGS line item url' do
-        expect_assignment_and_grade_line_item_url(jws)
-      end
+      context 'when the tool has been re-installed' do
+        let(:tool_override) do
+          t = tool.dup
+          t.save!
+          t
+        end
 
-      it 'can still be used to output a course launch after an assignment launch' do
-        expect_assignment_resource_link_id(jws)
-        expect_course_resource_link_id(course_jws)
-        expect_assignment_and_grade_scope(course_jws)
-        expect_assignment_and_grade_line_items_url(course_jws)
-        expect_assignment_and_grade_line_item_url_absent(course_jws)
+        before do
+          assignment.external_tool_tag.update!(url: tool.url)
+          tool_override
+          tool.destroy!
+        end
+
+        it_behaves_like 'an authorized launch'
       end
     end
 
@@ -207,7 +229,7 @@ describe Lti::Messages::ResourceLinkRequest do
 
   def jwt_message
     Lti::Messages::ResourceLinkRequest.new(
-      tool: tool,
+      tool: tool_override || tool,
       context: course,
       user: user,
       expander: expander,

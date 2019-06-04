@@ -27,6 +27,7 @@ const primaryInfoKeys = ['first_last', 'last_first']
 const defaultPrimaryInfo = 'first_last'
 
 const secondaryInfoLabels = {
+  group: I18n.t('Group'),
   section: I18n.t('Section'),
   sis_id: I18n.t('SIS ID'),
   integration_id: I18n.t('Integration ID'),
@@ -34,7 +35,7 @@ const secondaryInfoLabels = {
   none: I18n.t('None')
 }
 
-const secondaryInfoKeys = ['section', 'sis_id', 'integration_id', 'login_id', 'none']
+const secondaryInfoKeys = ['section', 'sis_id', 'integration_id', 'login_id', 'group', 'none']
 const defaultSecondaryInfo = 'none'
 const sectionSecondaryInfo = 'section'
 

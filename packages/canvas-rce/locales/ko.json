@@ -83,6 +83,12 @@
   "discussions_index_6c36ced": {
     "message": "토론 색인"
   },
+  "done_54e3d4b6": {
+    "message": "마침"
+  },
+  "embed_image_1080badc": {
+    "message": "이미지 포함"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "검색 용어 입력"
   },
@@ -167,6 +173,9 @@
   "no_results_940393cf": {
     "message": "No results."
   },
+  "options_3ab0ea65": {
+    "message": "옵션"
+  },
   "pages_e5414c2c": {
     "message": "페이지"
   },
@@ -175,6 +184,15 @@
   },
   "quizzes_7e598f57": {
     "message": "퀴즈"
+  },
+  "record_7c9448b": {
+    "message": "녹음/녹화"
+  },
+  "recording_98da6bda": {
+    "message": "녹음/녹화"
+  },
+  "save_11a80ec3": {
+    "message": "저장"
   },
   "search_280d00bd": {
     "message": "검색"
@@ -187,6 +205,9 @@
   },
   "sort_by_e75f9e3e": {
     "message": "정렬 조건"
+  },
+  "start_over_f7552aa9": {
+    "message": "새로 시작"
   },
   "submit_a3cc6859": {
     "message": "제출"

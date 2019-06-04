@@ -62,11 +62,11 @@ class ContentParticipationCount < ActiveRecord::Base
     end
   end
 
-  def self.unread_submission_count_for(context, user, enrollment = nil)
-    unread_count = 0
-    if context.is_a?(Course)
-      enrollment ||= context.enrollments.where(:user_id => user).order(Enrollment.state_rank_sql, Enrollment.type_rank_sql).first
-      if enrollment.try(:student?)
+  def self.unread_submission_count_for(context, user)
+    return 0 unless context.is_a?(Course) && context.user_is_student?(user)
+    Shackles.activate(:slave) do
+      potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
+          batch_object: user, batched_keys: :submissions) do
         submission_conditions = sanitize_sql_for_conditions([<<-SQL, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
           assignments.context_type = ? AND
@@ -89,17 +89,16 @@ class ContentParticipationCount < ActiveRecord::Base
               AND submission_comments.provisional_grade_id IS NULL
               AND submission_comments.author_id <> ?
             SQL
-        potential_ids = (subs_with_grades + subs_with_comments).uniq
-        already_read_count = ContentParticipation.where(
-          :content_type => "Submission",
-          :content_id => potential_ids,
-          :user_id => user,
-          :workflow_state => "read"
-        ).count
-        unread_count = potential_ids.size - already_read_count
+        (subs_with_grades + subs_with_comments).uniq
       end
+      already_read_count = ContentParticipation.where(
+        :content_type => "Submission",
+        :content_id => potential_ids,
+        :user_id => user,
+        :workflow_state => "read"
+      ).count
+      potential_ids.size - already_read_count
     end
-    unread_count
   end
 
   def unread_count(refresh = true)

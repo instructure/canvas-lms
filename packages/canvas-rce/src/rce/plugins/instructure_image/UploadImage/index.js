@@ -18,7 +18,7 @@
 
 import React, {Suspense, useState} from 'react'
 import {func, object} from 'prop-types'
-import {Modal, ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-overlays'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
 import {Tabs} from '@instructure/ui-tabs'
@@ -94,13 +94,13 @@ export function UploadImage({editor, onDismiss, onSubmit = handleSubmit}) {
           open
           shouldCloseOnDocumentClick
         >
-          <ModalHeader>
+          <Modal.Header>
             <CloseButton onClick={onDismiss} offset="small" placement="end">
               {formatMessage('Close')}
             </CloseButton>
             <Heading>{formatMessage('Upload Image')}</Heading>
-          </ModalHeader>
-          <ModalBody>
+          </Modal.Header>
+          <Modal.Body>
             <Tabs focus size="large" selectedIndex={selectedPanel} onChange={newIndex => setSelectedPanel(newIndex)}>
               <Tabs.Panel title={formatMessage('Computer')}>
                 <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
@@ -120,13 +120,13 @@ export function UploadImage({editor, onDismiss, onSubmit = handleSubmit}) {
                 </Suspense>
               </Tabs.Panel>
             </Tabs>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
             <Button variant="primary" type="submit">
               {formatMessage('Submit')}
             </Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       )}
     </StoreProvider>

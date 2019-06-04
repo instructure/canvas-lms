@@ -155,10 +155,11 @@ module Lti::Ims::Concerns
       end
 
       def expected_access_token_audience
-        Rails.application.routes.url_helpers.oauth2_token_url(host: host, protocol: 'https://')
+        Rails.application.routes.url_helpers.oauth2_token_url(host: host, protocol: protocol)
       end
 
       delegate :host, to: :request
+      delegate :protocol, to: :request
 
       def access_token_scopes
         @_access_token_scopes ||= (access_token&.claim('scopes')&.split(' ').presence || [])

@@ -51,29 +51,6 @@ describe "security" do
     end
   end
 
-  describe "permissions" do
-    # if we end up moving the permissions cache to memcache, this test won't be
-    # valid anymore and we need some more extensive tests for actual cache
-    # invalidation. right now, though, this is the only really valid way to
-    # test that we're actually flushing on every request.
-    it "should flush the role_override caches on every request" do
-      course_with_teacher_logged_in
-
-      get "/courses/#{@course.to_param}/users"
-      assert_response :success
-
-      expect(RoleOverride.send(:instance_variable_get, '@cached_permissions')).not_to be_empty
-      expect(RoleOverride.send(:class_variable_get, '@@role_override_chain')).not_to be_empty
-
-      get "/dashboard"
-      assert_response 301
-
-      # verify the cache is emptied on every request
-      expect(RoleOverride.send(:instance_variable_get, '@cached_permissions')).to be_empty
-      expect(RoleOverride.send(:class_variable_get, '@@role_override_chain')).to be_empty
-    end
-  end
-
   describe 'session cookies' do
     it "should always set the primary cookie to session expiration" do
       # whether they select "stay logged in" or not, the actual session cookie
