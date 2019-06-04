@@ -12335,6 +12335,7 @@ tr:
     confirm: 
       delete: "Silmek istediğinize emin misiniz?"
       import_group: "\"%{group}\" grubunu \"%{target}\" grubuna aktarsın mı ? "
+      import_outcome: "\"%{outcome}\" öğrenme çıktısı \"%{outcome}\" grubuna aktarılsın mı?"
     criteria: 
       does_not_meet_expectations: "Beklentileri Karşılamıyor"
       exceeds_expectations: "Beklentilerin Üstünde"
