@@ -5449,23 +5449,6 @@ describe Course, "#image" do
   end
 end
 
-describe Course, "#image_attachment" do
-  before(:once) do
-    course_with_teacher(active_all: true)
-    attachment_with_context(@course)
-  end
-
-  it "returns the attachment for a course file if image_id is set" do
-    @course.image_id = @attachment.id
-    @course.save!
-    expect(@course.image_attachment).to eq @attachment
-  end
-
-  it "returns nil if image_id and image_url are not set" do
-    expect(@course.image_attachment).to be_nil
-  end
-end
-
 describe Course, "#filter_users_by_permission" do
   it "filters out course users that don't have a permission based on their enrollment roles" do
     permission = :moderate_forum # happens to be true for ta's, but available to students

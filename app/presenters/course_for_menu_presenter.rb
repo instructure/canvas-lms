@@ -19,12 +19,11 @@ class CourseForMenuPresenter
   include I18nUtilities
   include Rails.application.routes.url_helpers
 
-  def initialize(course, user = nil, context = nil, session = nil, file_authenticator = nil, opts={})
+  def initialize(course, user = nil, context = nil, session = nil, opts={})
     @course = course
     @user = user
     @context = context
     @session = session
-    @file_authenticator = file_authenticator
     @opts = opts
   end
   attr_reader :course
@@ -41,7 +40,7 @@ class CourseForMenuPresenter
       subtitle: subtitle,
       enrollmentType: course.primary_enrollment_type,
       id: course.id,
-      image: course.feature_enabled?(:course_card_images) ? thumbnail : nil,
+      image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       position: @user.dashboard_positions[course.asset_string] || nil,
     }.tap do |hash|
       if @opts[:tabs]
@@ -76,15 +75,6 @@ class CourseForMenuPresenter
       before_label('#shared.menu_enrollment.labels.enrolled_as', 'enrolled as')
     end
     [ label, role.try(:label) ].join(' ')
-  end
-
-  def thumbnail
-    attachment = course.image_attachment
-    if attachment
-      @file_authenticator.thumbnail_url(attachment)
-    else
-      course.image
-    end
   end
 
   def term

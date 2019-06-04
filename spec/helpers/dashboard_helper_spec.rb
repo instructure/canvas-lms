@@ -79,7 +79,6 @@ describe DashboardHelper do
         @account = Account.default
         @domain_root_account = @account
       end
-      let(:file_authenticator){ double } # Used by the 'map_courses_for_menu method'
 
       it "returns the list of courses sorted by position" do
         course1 = @account.courses.create!
