@@ -16,45 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import htmlEscape from 'escape-html'
 
 import formatMessage from '../../../format-message'
 import bridge from '../../../bridge'
+import {getContentFromElement, IMAGE_EMBED_TYPE} from '../shared/ContentSelection'
+import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 
 const PLUGIN_KEY = 'images'
-
-import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
 
 const trayController = new TrayController()
 
 tinymce.create('tinymce.plugins.InstructureImagePlugin', {
   init(editor) {
     // Register commands
-    editor.addCommand(
-      "mceInstructureImage",
-      clickCallback.bind(this, editor, document)
-    );
+    editor.addCommand('mceInstructureImage', clickCallback.bind(this, editor, document))
 
     // Register buttons
-    editor.ui.registry.addMenuButton("instructure_image", {
+    editor.ui.registry.addMenuButton('instructure_image', {
       tooltip: htmlEscape(
         formatMessage({
-          default: "Images",
-          description: "Title for RCE button to embed an image"
+          default: 'Images',
+          description: 'Title for RCE button to embed an image'
         })
       ),
 
-      icon: "image",
+      icon: 'image',
 
       fetch(callback) {
         const items = [
           {
             type: 'menuitem',
             text: formatMessage('Upload Image'),
-            onAction: () => editor.execCommand('mceInstructureImage'),
+            onAction: () => editor.execCommand('mceInstructureImage')
           },
 
           {
@@ -66,9 +62,9 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
             }
           }
         ]
-        callback(items);
+        callback(items)
       }
-    });
+    })
 
     /*
      * Register the Image "Options" button that will open the Image Options
@@ -76,41 +72,38 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
      */
     const buttonAriaLabel = formatMessage('Show image options')
     editor.ui.registry.addButton('instructure-image-options', {
-      onAction(buttonApi) {
+      onAction(/* buttonApi */) {
         // show the tray
         trayController.showTrayForEditor(editor)
       },
 
-      onSetup(buttonApi) {
+      onSetup(/* buttonApi */) {
         globalRegistry.bindToolbarToEditor(editor, buttonAriaLabel)
       },
 
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
-    });
+    })
 
     const defaultFocusSelector = `.tox-pop__dialog button[aria-label="${buttonAriaLabel}"]`
     globalRegistry.addContextKeydownListener(editor, defaultFocusSelector)
 
-    function isImageElement($el) {
-      return $el.nodeName.toLowerCase() === 'img'
+    function isImageEmbed($el) {
+      return getContentFromElement($el).type === IMAGE_EMBED_TYPE
     }
 
     editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
       items: 'instructure-image-options',
       position: 'node',
-      predicate: isImageElement,
+      predicate: isImageEmbed,
       scope: 'node'
     })
   },
 
-  destroy() {
+  remove(editor) {
     trayController.hideTrayForEditor(editor)
   }
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add(
-  "instructure_image",
-  tinymce.plugins.InstructureImagePlugin
-);
+tinymce.PluginManager.add('instructure_image', tinymce.plugins.InstructureImagePlugin)
