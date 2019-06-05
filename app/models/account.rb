@@ -1806,7 +1806,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_course_visibility_override_options(_options=nil)
-    {}
+    _options || {}
   end
 
   def user_needs_verification?(user)
