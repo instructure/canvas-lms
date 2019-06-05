@@ -43,6 +43,11 @@
   background: transparent;
   border: none;
   padding: 0;
+
+  &:focus {
+    outline: 2px solid var(--ic-brand-primary);
+    outline-offset: 2px;
+  }
 }
 
 .ImageSearch__screenreader {
@@ -86,5 +91,9 @@
     color: rgba($ic-color-light, 1);
     overflow: wrap;
     margin: 0 .25rem;
+  }
+
+  & a:focus, & a:hover {
+    outline: 1px solid rgba($ic-color-light, 1);
   }
 }
