@@ -1981,7 +1981,9 @@ describe CoursesController do
 
   describe "POST 'unconclude'" do
     it "should unconclude the course" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_factory(:active_all => true)
+      account_admin_user(:active_all => true)
+      user_session(@admin)
       delete 'destroy', params: {:id => @course.id, :event => 'conclude'}
       expect(response).to be_redirect
       expect(@course.reload).to be_completed
