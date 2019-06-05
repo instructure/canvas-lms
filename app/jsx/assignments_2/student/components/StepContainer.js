@@ -18,9 +18,6 @@
 
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import {bool} from 'prop-types'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import FriendlyDatetime from '../../../shared/FriendlyDatetime'
-import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import StepItem from '../../shared/Steps/StepItem'
@@ -107,20 +104,7 @@ function submittedStepContainer(props) {
         {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem
-          label={
-            <Flex direction="column">
-              <FlexItem>{I18n.t('Submitted')}</FlexItem>
-              <FlexItem>
-                <FriendlyDatetime
-                  format={I18n.t('#date.formats.full')}
-                  dateTime={props.submission.submittedAt}
-                />
-              </FlexItem>
-            </Flex>
-          }
-          status="complete"
-        />
+        <StepItem label={I18n.t('Submitted')} status="complete" />
         <StepItem label={I18n.t('Not Graded Yet')} />
         {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
           <StepItem label={I18n.t('New Attempt')} status="button" />
@@ -145,36 +129,8 @@ function gradedStepContainer(props) {
         {!props.isCollapsed ? <StepItem label={I18n.t('Previous')} status="button" /> : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem
-          label={
-            <Flex direction="column">
-              <FlexItem>{I18n.t('Submitted')}</FlexItem>
-              <FlexItem>
-                <FriendlyDatetime
-                  format={I18n.t('#date.formats.full')}
-                  dateTime={props.submission.submittedAt}
-                />
-              </FlexItem>
-            </Flex>
-          }
-          status="complete"
-        />
-        <StepItem
-          label={
-            <Flex direction="column">
-              <FlexItem>{I18n.t('Grade')}</FlexItem>
-              <FlexItem>
-                <GradeDisplay
-                  displaySize="small"
-                  gradingType={props.assignment.gradingType}
-                  pointsPossible={props.assignment.pointsPossible}
-                  receivedGrade={props.submission.grade}
-                />
-              </FlexItem>
-            </Flex>
-          }
-          status="complete"
-        />
+        <StepItem label={I18n.t('Submitted')} status="complete" />
+        <StepItem label={I18n.t('Graded')} status="complete" />
         {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
           <StepItem label={I18n.t('New Attempt')} status="button" />
         ) : null}
