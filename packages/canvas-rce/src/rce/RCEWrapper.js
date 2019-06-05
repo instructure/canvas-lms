@@ -430,7 +430,10 @@ class RCEWrapper extends React.Component {
 
   wrapOptions(options = {}) {
     const setupCallback = options.setup;
-
+    options.toolbar = options.toolbar || []
+    const lti_tool_dropdown = options.toolbar.some(str => str.includes('lti_tool_dropdown')) ?
+      'lti_tool_dropdown' :
+      ''
     return {
       ...options,
 
@@ -455,7 +458,7 @@ class RCEWrapper extends React.Component {
         'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
         'subscript | align bullist outdent indent | ' +
         'instructure_links instructure_image instructure_record instructure_documents | ' +
-        'removeformat table instructure_equation' // instructure_equella
+        `removeformat table instructure_equation ${lti_tool_dropdown}` // instructure_equella
       ],
       contextmenu: '',  // show the browser's native context menu
 
