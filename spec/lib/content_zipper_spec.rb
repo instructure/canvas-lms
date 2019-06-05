@@ -469,29 +469,51 @@ describe ContentZipper do
       }.to_not raise_error
     end
 
-    it "does not process attachments that user cannot see" do
-      course_with_student(active_all: true)
-      folder = Folder.root_folders(@course).first
-      attachment_model(uploaded_data: stub_png_data('hidden.png'),
-                       content_type: 'image/png', folder: folder, display_name: 'hidden.png')
-
-      user = User.create!
-      eportfolio = user.eportfolios.create!(name: 'an name')
-      eportfolio.ensure_defaults
-      entry = eportfolio.eportfolio_entries.first
-      entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "/files/#{@attachment.id}/download"}})
-      entry.save!
-      attachment = eportfolio.attachments.build do |attachment|
-        attachment.display_name = 'an_attachment'
-        attachment.user = user
-        attachment.workflow_state = 'to_be_zipped'
+    context "with restricted permissions" do
+      before do
+        course_with_student(active_all: true)
+        folder = Folder.root_folders(@course).first
+        attachment_model(uploaded_data: stub_png_data('hidden.png'),
+                         content_type: 'image/png', folder: folder, display_name: 'hidden.png')
       end
-      attachment.save!
-      expect(Attachment).to receive(:find_by_id).with(@attachment.id.to_s)
-      expect(ContentZipper::StaticAttachment).to_not receive(:new)
-      expect {
-        ContentZipper.new.zip_eportfolio(attachment, eportfolio)
-      }.to_not raise_error
+
+      let(:eportfolio) do
+        eportfolio = @user.eportfolios.create!(name: 'an name')
+        eportfolio.ensure_defaults
+        entry = eportfolio.eportfolio_entries.first
+        entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "/files/#{@attachment.id}/download"}})
+        entry.save!
+        eportfolio
+      end
+
+      let(:zipped_file) do
+        eportfolio.attachments.create do |attachment|
+          attachment.display_name = 'an_attachment'
+          attachment.user = @user
+          attachment.workflow_state = 'to_be_zipped'
+        end
+      end
+
+      let(:zipped_filenames) { Zip::File.new(zipped_file.full_filename).entries.map(&:name) }
+
+      it "does not process attachments that user cannot see" do
+        @user = User.create!
+        ContentZipper.new.zip_eportfolio(zipped_file, eportfolio)
+        expect(zipped_filenames).not_to include a_string_matching(/hidden.png/)
+      end
+
+      it "does not process attachments that user cannot download" do
+        @user = @student
+        @attachment.update! locked: true
+        ContentZipper.new.zip_eportfolio(zipped_file, eportfolio)
+        expect(zipped_filenames).not_to include a_string_matching(/hidden.png/)
+      end
+
+      it "does process attachments that user can download" do
+        @user = @student
+        ContentZipper.new.zip_eportfolio(zipped_file, eportfolio)
+        expect(zipped_filenames).to include a_string_matching(/hidden.png/)
+      end
     end
 
     it "processes the zip file name" do
