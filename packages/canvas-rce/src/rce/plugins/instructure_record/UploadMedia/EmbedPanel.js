@@ -16,20 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import { string, func } from 'prop-types'
-import { TextInput } from '@instructure/ui-text-input'
+import { TextArea } from '@instructure/ui-forms'
 import formatMessage from '../../../../format-message'
 
-export default function UrlPanel ({imageUrl, setImageUrl}) {
+export default function EmbedPanel ({embedCode, setEmbedCode}) {
   return (
-    <>
-      <TextInput label={formatMessage('Image URL')} type="url" value={imageUrl} onChange={(e, val) => setImageUrl(val)} />
-    </>
+    <TextArea
+      maxHeight="10rem"
+      label={formatMessage('Embed Video Code')}
+      value={embedCode}
+      onChange={(e) =>{
+        setEmbedCode(e.target.value)}
+      }/>
   )
 }
 
-UrlPanel.propTypes = {
-  imageUrl: string.isRequired,
-  setImageUrl: func.isRequired
+EmbedPanel.propTypes = {
+  embedCode: string.isRequired,
+  setEmbedCode: func.isRequired
 }

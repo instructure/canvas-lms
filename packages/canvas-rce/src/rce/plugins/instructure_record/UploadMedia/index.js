@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import formatMessage from '../../../../format-message'
 import {func, object} from 'prop-types'
 import {Heading, Spinner} from '@instructure/ui-elements'
@@ -29,10 +29,34 @@ import Bridge from '../../../../bridge'
 import {StoreProvider} from '../../shared/StoreContext'
 
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
+const EmbedPanel = React.lazy(() => import('./EmbedPanel'))
+
+export const PANELS = {
+  COMPUTER: 0,
+  RECORD: 1,
+  EMBED: 2
+}
+
+export const handleSubmit = (editor, selectedPanel, uploadData, onDismiss) => {
+  switch (selectedPanel) {
+    case PANELS.COMPUTER: {
+      throw new Error('not yet implemented')
+    }
+    case PANELS.EMBED: {
+      const {embedCode} = uploadData
+      editor.insertContent(embedCode)
+      onDismiss()
+      break
+    }
+    default:
+      throw new Error('Selected Panel is invalid') // Should never get here
+  }
+}
 
 export function UploadMedia(props) {
   const [ selectedPanel, setSelectedPanel ] = useState(0)
   const trayProps = Bridge.trayProps.get(props.editor)
+  const [embedCode, setEmbedCode] = useState('')
 
   return (
     <StoreProvider {...trayProps}>
@@ -51,7 +75,7 @@ export function UploadMedia(props) {
             <Heading>{formatMessage('Upload Media')}</Heading>
           </Modal.Header>
           <Modal.Body>
-            <Tabs selectedIndex={selectedPanel} onChange={(newIndex) => setSelectedPanel(newIndex)}>
+            <Tabs focus size="large" selectedIndex={selectedPanel} onChange={newIndex => setSelectedPanel(newIndex)}>
               <Tabs.Panel title={formatMessage('Computer')}>Computer Panel Here</Tabs.Panel>
               <Tabs.Panel title={formatMessage('Record')}>
                 <Suspense fallback={
@@ -62,10 +86,31 @@ export function UploadMedia(props) {
                   <MediaRecorder editor={props.editor} dismiss={props.onDismiss} contentProps={contentProps}/>
                 </Suspense>
               </Tabs.Panel>
-              <Tabs.Panel title={formatMessage('URL')}>
+              <Tabs.Panel title={formatMessage('Embed')}>
+                <Suspense fallback={
+                  <View as="div" height="100%" width="100%" textAlign="center">
+                    <Spinner renderTitle={formatMessage('Loading media')} size="large" margin="0 0 0 medium" />
+                  </View>
+                }>
+                  <EmbedPanel embedCode={embedCode} setEmbedCode={setEmbedCode} />
+                </Suspense>
               </Tabs.Panel>
             </Tabs>
           </Modal.Body>
+          {selectedPanel !== PANELS.RECORD &&
+            <Modal.Footer>
+              <Button onClick={props.onDismiss}>{formatMessage('Close')}</Button>&nbsp;
+              <Button
+                onClick={e => {
+                  e.preventDefault()
+                  handleSubmit(props.editor, selectedPanel, {embedCode},  props.onDismiss)
+                }}
+                variant="primary"
+                type="submit">
+                {formatMessage('Submit')}
+              </Button>
+            </Modal.Footer>
+          }
         </Modal>
       )}
     </StoreProvider>
