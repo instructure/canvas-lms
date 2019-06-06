@@ -26,6 +26,7 @@ import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
+import {SVGIcon} from '@instructure/ui-svg-images'
 import {
   IconDragHandleLine,
   IconAssignmentLine,
@@ -35,8 +36,16 @@ import {
   IconAnnouncementLine,
   IconPublishSolid,
   IconUnpublishedSolid,
-  IconQuestionLine
+  IconDocumentLine
 } from '@instructure/ui-icons'
+
+function IconBlank() {
+  return (
+    <SVGIcon name="IconBlank" viewBox="0 0 1920 1920">
+      <g role="presentation"></g>
+    </SVGIcon>
+  )
+}
 
 function getIcon(type) {
   switch(type) {
@@ -50,9 +59,12 @@ function getIcon(type) {
       return IconQuizLine
     case 'announcements':
       return IconAnnouncementLine
-    case 'wikiPages': // waiting on an answer from design
+    case 'wikiPages':
+      return IconDocumentLine
+    case 'navigation':
+      return IconBlank
     default:
-      return IconQuestionLine
+      return IconDocumentLine
   }
 }
 
