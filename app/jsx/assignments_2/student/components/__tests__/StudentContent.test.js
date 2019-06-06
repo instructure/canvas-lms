@@ -38,14 +38,14 @@ function mockSubmissionHistoryEdges(count, opts = {}) {
 
 function mockPageInfo(options = {}) {
   const optsWithDefaults = {
-    hasNextPage: false,
-    endCursor: 1,
+    hasPreviousPage: false,
+    startCursor: 1,
     ...options
   }
 
   return {
-    hasNextPage: optsWithDefaults.hasNextPage,
-    endCursor: btoa(optsWithDefaults.endCursor.toString())
+    hasPreviousPage: optsWithDefaults.hasPreviousPage,
+    startCursor: btoa(optsWithDefaults.startCursor.toString())
   }
 }
 
@@ -240,7 +240,7 @@ describe('Previous Button', () => {
     const props = {
       assignment: mockAssignment(),
       submissionHistoryEdges: mockSubmissionHistoryEdges(1),
-      pageInfo: mockPageInfo({hasNextPage: false}),
+      pageInfo: mockPageInfo({hasPreviousPage: false}),
       onLoadMore: () => {}
     }
     const {getByText} = render(<StudentContent {...props} />)
@@ -264,7 +264,7 @@ describe('Previous Button', () => {
     const props = {
       assignment: mockAssignment(),
       submissionHistoryEdges: mockSubmissionHistoryEdges(1),
-      pageInfo: mockPageInfo({hasNextPage: true}),
+      pageInfo: mockPageInfo({hasPreviousPage: true}),
       onLoadMore: () => {}
     }
     const {getByText} = render(<StudentContent {...props} />)
@@ -304,7 +304,7 @@ describe('Previous Button', () => {
     const props = {
       assignment: mockAssignment(),
       submissionHistoryEdges: mockSubmissionHistoryEdges(1),
-      pageInfo: mockPageInfo({hasNextPage: true}),
+      pageInfo: mockPageInfo({hasPreviousPage: true}),
       onLoadMore: mockedOnLoadMore
     }
     const {getByText} = render(<StudentContent {...props} />)
@@ -318,7 +318,7 @@ describe('Previous Button', () => {
     const props = {
       assignment: mockAssignment(),
       submissionHistoryEdges: mockSubmissionHistoryEdges(1),
-      pageInfo: mockPageInfo({hasNextPage: true}),
+      pageInfo: mockPageInfo({hasPreviousPage: true}),
       onLoadMore: mockedOnLoadMore
     }
     const {getByText} = render(<StudentContent {...props} />)

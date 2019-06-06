@@ -65,8 +65,8 @@ function attachmentFields() {
 function submissionFields() {
   return `
     pageInfo {
-      hasNextPage
-      endCursor
+      hasPreviousPage
+      startCursor
     }
     edges {
       cursor
@@ -147,7 +147,7 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
-            submissionHistoriesConnection(first: 1) {
+            submissionHistoriesConnection(last: 1) {
               ${submissionFields()}
             }
           }
@@ -185,7 +185,7 @@ export const CREATE_SUBMISSION = gql`
   mutation CreateSubmission($id: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
     createSubmission(input: {assignmentId: $id, submissionType: $type, fileIds: $fileIds}) {
       submission {
-        submissionHistoriesConnection(first: 1) {
+        submissionHistoriesConnection(last: 1) {
           ${submissionFields()}
         }
       }
@@ -201,7 +201,7 @@ export const NEXT_SUBMISSION = gql`
   query NextSubmission($submissionID: ID!, $cursor: String) {
     legacyNode(_id: $submissionID, type: Submission) {
       ... on Submission {
-        submissionHistoriesConnection(after: $cursor, first: 1) {
+        submissionHistoriesConnection(before: $cursor, last: 1) {
           ${submissionFields()}
         }
       }

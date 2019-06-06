@@ -2182,6 +2182,12 @@ type Submission implements Node & SubmissionInterface & Timestamped {
     first: Int
 
     """
+    If the most current submission should be included in the submission
+    history results. Defaults to true.
+    """
+    includeCurrentSubmission: Boolean = true
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int

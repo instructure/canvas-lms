@@ -165,58 +165,47 @@ describe Types::SubmissionType do
 
   describe 'submission histories connection' do
     before(:once) do
-      # In the world code path that the initial submission takes, there is a bulk
-      # insert directly into the database, which causes no version to be saved
-      # for the zero submission. Delete the version_ids here to simulate that.
-      @submission.update!(version_ids: [])
+      assignment = @course.assignments.create! name: "asdf2", points_possible: 10
+      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @submission3 = assignment.submit_homework(@student, body: 'Attempt 3')
     end
 
-    it 'works when there are no versions saved' do
+    let(:submission_history_type) { GraphQLTypeTester.new(@submission3, current_user: @teacher) }
+
+    it 'returns the submission histories' do
       expect(
-        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
-      ).to eq [0]
+        submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+      ).to eq [1, 2, 3]
     end
 
-    it 'includes the zero submission when there are versions' do
-      @submission.update!(attempt: 1)
+    it 'properly handles cursors for submission histories' do
       expect(
-        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
-      ).to eq [1, 0]
+        submission_history_type.resolve('submissionHistoriesConnection { edges { cursor }}')
+      ).to eq ["MQ", "Mg", "Mw"]
     end
 
-    context 'custom pagination' do
-      before(:once) do
-        @submission.update!(attempt: 1)
+    context 'include_current_submission argument' do
+      it 'includes the current submission history by default' do
+        expect(
+          submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+        ).to eq [1, 2, 3]
       end
 
-      it 'works for nodes' do
+      it 'includes the current submission history when true' do
         expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { nodes { attempt }}')
-        ).to eq [1]
+          submission_history_type.resolve(
+            'submissionHistoriesConnection(includeCurrentSubmission: true) { nodes { attempt }}'
+          )
+        ).to eq [1, 2, 3]
       end
 
-      it 'works for edges node' do
+      it 'does not includes the current submission history when false' do
         expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { node { attempt }}}')
-        ).to eq [1]
-      end
-
-      it 'works for edges cursor' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { cursor }}')
-        ).to eq ["MQ"] # Base64 encoded 1, per the graphql gem impmenetation of array paginating
-      end
-
-      it 'works for pageInfo endCursor' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { endCursor }}')
-        ).to eq "MQ" # Base64 encoded 1, per the graphql gem impmenetation of array paginating
-      end
-
-      it 'works for pageInfo hasNextPage' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { hasNextPage }}')
-        ).to eq true
+          submission_history_type.resolve(
+            'submissionHistoriesConnection(includeCurrentSubmission: false) { nodes { attempt }}'
+          )
+        ).to eq [1, 2]
       end
     end
   end

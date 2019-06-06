@@ -92,20 +92,10 @@ export default class StudentsTable extends React.Component {
     )
   }
 
-  // This becomes unnecessary after near-future GraphQL changes
-  submissionAttempts(submission) {
-    return (
-      submission.submissionHistories &&
-      submission.submissionHistories.nodes.filter(function(item) {
-        return item.attempt !== 0
-      })
-    )
-  }
-
   renderAttemptsColumn(student) {
     const assignmentLid = this.props.assignment.lid
     const courseLid = this.props.assignment.course.lid
-    return this.submissionAttempts(student.submission).map(attempt => {
+    return student.submission.submissionHistories.nodes.map(attempt => {
       const viewLink = `/courses/${courseLid}/assignments/${assignmentLid}/submissions/${
         student.lid
       }/?submittedAt=${attempt.submittedAt}`
@@ -120,7 +110,7 @@ export default class StudentsTable extends React.Component {
   }
 
   renderScoreColumn(student) {
-    return this.submissionAttempts(student.submission).map(attempt => {
+    return student.submission.submissionHistories.nodes.map(attempt => {
       const validScore = attempt.score || attempt.score === 0
       return (
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
@@ -134,7 +124,7 @@ export default class StudentsTable extends React.Component {
   }
 
   renderSubmittedAtColumn(student) {
-    return this.submissionAttempts(student.submission).map(attempt => {
+    return student.submission.submissionHistories.nodes.map(attempt => {
       return (
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
           <FriendlyDatetime dateTime={attempt.submittedAt} format={I18n.t('#date.formats.full')} />

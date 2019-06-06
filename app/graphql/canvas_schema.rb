@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'graphql_custom_connections'
+
 class CanvasSchema < GraphQL::Schema
   use GraphQL::Execution::Interpreter
 

@@ -34,8 +34,8 @@ class StudentContent extends React.Component {
     assignment: AssignmentShape,
     onLoadMore: func,
     pageInfo: shape({
-      hasNextPage: bool,
-      endCursor: string
+      hasPreviousPage: bool,
+      startCursor: string
     }),
     submissionHistoryEdges: arrayOf(
       shape({
@@ -91,7 +91,7 @@ class StudentContent extends React.Component {
   }
 
   hasPrevSubmission = () => {
-    if (this.props.pageInfo.hasNextPage) {
+    if (this.props.pageInfo.hasPreviousPage) {
       return true
     }
 
@@ -121,7 +121,7 @@ class StudentContent extends React.Component {
       if (currentIndex > 0) {
         const prevCursor = state.orderedCursors[currentIndex - 1]
         return {displayedCursor: prevCursor}
-      } else if (props.pageInfo.hasNextPage && !state.loadingMore) {
+      } else if (props.pageInfo.hasPreviousPage && !state.loadingMore) {
         this.props.onLoadMore()
         return {loadingMore: true}
       } else {

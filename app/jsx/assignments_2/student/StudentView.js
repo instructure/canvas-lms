@@ -64,7 +64,7 @@ const StudentView = props => (
             return fetchMore({
               query: NEXT_SUBMISSION,
               variables: {
-                cursor: submission.submissionHistoriesConnection.pageInfo.endCursor,
+                cursor: submission.submissionHistoriesConnection.pageInfo.startCursor,
                 submissionID: submission.submissionHistoriesConnection.edges[0].node.rootId
               },
               updateQuery: (previousResult, {fetchMoreResult}) => {

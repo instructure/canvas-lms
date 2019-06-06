@@ -241,8 +241,8 @@ export function mockSubmissionHistoriesConnection() {
     __typename: 'SubmissionHistoryConnection',
     pageInfo: {
       __typename: 'PageInfo',
-      hasNextPage: false,
-      endCursor: btoa('1')
+      hasPreviousPage: false,
+      startCursor: btoa('1')
     },
     edges: [
       {
