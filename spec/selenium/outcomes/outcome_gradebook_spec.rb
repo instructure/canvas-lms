@@ -195,9 +195,7 @@ describe "outcome gradebook" do
 
           # mean
           means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
-          expect(means).to have_size 2
-          expect(means).to include "2.33"
-          expect(means).to include "2.67"
+          expect(means).to contain_exactly("2.33", "2.67")
 
           f('#no_results_outcomes').click
           wait_for_ajax_requests
