@@ -52,6 +52,13 @@ export function GetAssignmentEnvVariables() {
   return {...defaults}
 }
 
+function errorFields() {
+  return `
+    attribute
+    message
+  `
+}
+
 function attachmentFields() {
   return `
     _id
@@ -59,6 +66,15 @@ function attachmentFields() {
     mimeClass
     thumbnailUrl
     url
+  `
+}
+
+function submissionDraftFields() {
+  return `
+    _id
+    attachments {
+      ${attachmentFields()}
+    }
   `
 }
 
@@ -82,10 +98,7 @@ function submissionFields() {
         submissionStatus
         submittedAt
         submissionDraft {
-          _id
-          attachments {
-            ${attachmentFields()}
-          }
+          ${submissionDraftFields()}
         }
       }
     }
@@ -190,8 +203,20 @@ export const CREATE_SUBMISSION = gql`
         }
       }
       errors {
-        attribute
-        message
+        ${errorFields()}
+      }
+    }
+  }
+`
+
+export const CREATE_SUBMISSION_DRAFT = gql`
+  mutation CreateSubmissionDraft($id: ID!, $attempt: Int!, $fileIds: [ID!]) {
+    createSubmissionDraft(input: {submissionId: $id, attempt: $attempt, fileIds: $fileIds}) {
+      submissionDraft {
+        ${submissionDraftFields()}
+      }
+      errors {
+        ${errorFields()}
       }
     }
   }

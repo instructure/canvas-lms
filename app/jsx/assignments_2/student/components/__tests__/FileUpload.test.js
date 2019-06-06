@@ -22,18 +22,23 @@ import FileUpload from '../FileUpload'
 import {fireEvent, render} from 'react-testing-library'
 import {
   mockAssignment,
-  mockMultipleAttachments,
   mockSubmission,
+  mockSubmissionDraft,
   singleAttachment
 } from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
+
+let mockedSubmission
 
 beforeAll(() => {
   $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 })
 
 beforeEach(() => {
+  mockedSubmission = mockSubmission({
+    submissionDraft: mockSubmissionDraft()
+  })
   window.URL.createObjectURL = jest.fn().mockReturnValue('perry_preview')
 })
 
@@ -60,52 +65,48 @@ describe('FileUpload', () => {
     )
   })
 
-  it('renders the uploaded files if there are any', async () => {
-    const {container, getByTestId, getByText} = render(
+  it('renders the submission draft files if there are any', async () => {
+    const {getByTestId, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const emptyRender = container.querySelector('input[id="inputFileDrop"]')
-    const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
-
-    uploadFiles(emptyRender, [file])
     const uploadRender = getByTestId('non-empty-upload')
 
-    expect(uploadRender).toContainElement(getByText('awesome-test-image.png'))
+    mockedSubmission.submissionDraft.attachments.forEach(function(attachment) {
+      expect(uploadRender).toContainElement(getByText(attachment.displayName))
+    })
   })
 
   it('renders in an img tag if the file type is an image', async () => {
+    const mockedAttachment = singleAttachment({
+      mimeClass: 'image'
+    })
+    mockedSubmission.submissionDraft.attachments = [mockedAttachment]
     const {container, getByTestId} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const emptyRender = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
-
-    uploadFiles(emptyRender, [file])
     const uploadRender = getByTestId('non-empty-upload')
 
     expect(uploadRender).toContainElement(
-      container.querySelector('img[alt="awesome-test-image.png preview"]')
+      container.querySelector(`img[alt="${mockedAttachment.displayName} preview"]`)
     )
   })
 
   it('renders an icon if a non-image file is uploaded', async () => {
     const {container, getByTestId} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const emptyRender = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
-
-    uploadFiles(emptyRender, [file])
     const uploadRender = getByTestId('non-empty-upload')
 
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconPdf"]'))
-    expect(container.querySelector('img[alt="awesome-test-file.pdf preview"]')).toBeNull()
+    mockedSubmission.submissionDraft.attachments.forEach(function(attachment) {
+      expect(container.querySelector(`img[alt="${attachment.displayName} preview"]`)).toBeNull()
+    })
   })
 
   it('allows uploading multiple files at a time', async () => {
@@ -119,90 +120,60 @@ describe('FileUpload', () => {
     const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
 
     uploadFiles(fileInput, [file, file2])
-    const uploadRender = getByTestId('non-empty-upload')
 
-    expect(uploadRender).toContainElement(getByText('file1.pdf'))
-    expect(uploadRender).toContainElement(getByText('file2.pdf'))
-  })
+    const filesRender = getByTestId('non-empty-upload')
 
-  it('concatenates separate file additions together', async () => {
-    const {container, getByTestId, getByText} = render(
-      <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
-      </MockedProvider>
-    )
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
-    const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
-
-    uploadFiles(fileInput, [file])
-    uploadFiles(fileInput, [file2])
-    const uploadRender = getByTestId('non-empty-upload')
-
-    expect(uploadRender).toContainElement(getByText('file1.pdf'))
-    expect(uploadRender).toContainElement(getByText('file2.pdf'))
+    expect(filesRender).toContainElement(getByText('Loading'))
   })
 
   it('renders a button to remove the file', async () => {
     const {container, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const emptyRender = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
+    const button = container.querySelector(
+      `button[id="${mockedSubmission.submissionDraft.attachments[0]._id}"]`
+    )
 
-    uploadFiles(emptyRender, [file])
-    const button = container.querySelector('button')
-
-    expect(button).toContainElement(getByText('Remove awesome-test-file.pdf'))
+    mockedSubmission.submissionDraft.attachments.forEach(function(attachment) {
+      expect(button).toContainElement(getByText(`Remove ${attachment.displayName}`))
+    })
     expect(button).toContainElement(container.querySelector('svg[name="IconTrash"]'))
   })
 
-  it('removes the correct file when the Remove button is clicked', async () => {
-    const {container, getByText, queryByText} = render(
+  it('renders a remove button for each uploaded file', async () => {
+    const {container, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
-    const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
 
-    uploadFiles(fileInput, [file, file2])
-    const button = container.querySelector('button[id="1"]')
-    expect(button).toContainElement(getByText('Remove file1.pdf'))
-    fireEvent.click(button)
-
-    expect(queryByText('Remove file1.pdf')).toBeNull()
-    expect(getByText('Remove file2.pdf')).toBeInTheDocument()
+    mockedSubmission.submissionDraft.attachments.forEach(function(attachment) {
+      const button = container.querySelector(`button[id="${attachment._id}"]`)
+      expect(button).toContainElement(getByText(`Remove ${attachment.displayName}`))
+    })
   })
 
   it('ellides filenames for files greater than 21 characters', async () => {
-    const {container, getByText} = render(
+    mockedSubmission.submissionDraft.attachments[0].displayName = 'c'.repeat(22)
+    const {getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'c'.repeat(22), {type: 'application/pdf'})
-
-    uploadFiles(fileInput, [file])
 
     expect(getByText(/^c+\.{3}c+$/)).toBeInTheDocument()
   })
 
   it('does not ellide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
-    const {container, getByText} = render(
+    mockedSubmission.submissionDraft.attachments[0].displayName = filename
+    const {getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], filename, {type: 'application/pdf'})
-
-    uploadFiles(fileInput, [file])
 
     expect(getByText(filename)).toBeInTheDocument()
   })
@@ -237,7 +208,7 @@ describe('FileUpload', () => {
         <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
       </MockedProvider>
     )
-    const fileInput = container.querySelector('input[type="file"]')
+    const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
 
     uploadFiles(fileInput, [file])
@@ -248,82 +219,56 @@ describe('FileUpload', () => {
 
   it('does not render an error when adding a file that is an allowed extension', async () => {
     const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
-    const {container, getByTestId, getByText, queryByText} = render(
+    const {container, queryByText} = render(
       <MockedProvider>
         <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
       </MockedProvider>
     )
-    const fileInput = container.querySelector('input[type="file"]')
+    const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
 
     uploadFiles(fileInput, [file])
-    const uploadRender = getByTestId('non-empty-upload')
 
-    expect(uploadRender).toContainElement(getByText('file1.jpg'))
     expect(queryByText('Invalid file type')).toBeNull()
   })
 
-  it('renders a submit button only when a file has been uploaded', async () => {
-    const {container, getByText, queryByText} = render(
+  it('does not render a submit button when a file has not been uploaded', async () => {
+    const {getByTestId, queryByText} = render(
+      <MockedProvider>
+        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+      </MockedProvider>
+    )
+    const emptyRender = getByTestId('empty-upload')
+
+    expect(emptyRender).not.toContainElement(queryByText('Submit'))
+  })
+
+  it('renders a submit button when a file has been uploaded', async () => {
+    const {getByText} = render(
+      <MockedProvider>
+        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+      </MockedProvider>
+    )
+
+    expect(getByText('Submit')).toBeInTheDocument()
+  })
+
+  it('renders a loading indicator when a file is being uploaded', async () => {
+    const {container, getByTestId, getByText, queryByText} = render(
       <MockedProvider>
         <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
     )
 
-    expect(queryByText('Submit')).toBeNull()
+    const emptyRender = getByTestId('empty-upload')
+    expect(emptyRender).not.toContainElement(queryByText('Loading'))
 
-    const fileInput = container.querySelector('input[type="file"]')
+    const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
+
     uploadFiles(fileInput, [file])
 
-    expect(getByText('Submit')).toBeInTheDocument()
-
-    const button = container.querySelector('button[id="1"]')
-    expect(button).toContainElement(getByText('Remove file1.jpg'))
-    fireEvent.click(button)
-
-    expect(queryByText('Submit')).toBeNull()
-  })
-
-  it('renders any saved submission drafts in the files list', async () => {
-    const mocked_attachments = mockMultipleAttachments()
-    const mocked_submission = mockSubmission()
-    mocked_submission.submissionDraft = {
-      _id: '50',
-      attachments: mocked_attachments
-    }
-
-    const {getByTestId, getByText} = render(
-      <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mocked_submission} />
-      </MockedProvider>
-    )
-    const uploadRender = getByTestId('non-empty-upload')
-
-    mocked_attachments.forEach(function(attachment) {
-      expect(uploadRender).toContainElement(getByText(attachment.displayName))
-    })
-  })
-
-  it('renders in an img tag if the draft file is an image', async () => {
-    const mocked_attachment = singleAttachment({
-      mimeClass: 'image'
-    })
-    const mocked_submission = mockSubmission()
-    mocked_submission.submissionDraft = {
-      _id: '50',
-      attachments: [mocked_attachment]
-    }
-
-    const {container, getByTestId} = render(
-      <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mocked_submission} />
-      </MockedProvider>
-    )
-    const uploadRender = getByTestId('non-empty-upload')
-
-    expect(uploadRender).toContainElement(
-      container.querySelector(`img[alt="${mocked_attachment.displayName} preview"]`)
-    )
+    const filesRender = getByTestId('non-empty-upload')
+    expect(filesRender).toContainElement(getByText('Loading'))
   })
 })

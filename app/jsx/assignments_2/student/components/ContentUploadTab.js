@@ -20,6 +20,7 @@ import AssignmentAlert from './AssignmentAlert'
 import {
   AssignmentShape,
   CREATE_SUBMISSION,
+  CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
   SubmissionShape
 } from '../assignmentData'
@@ -36,7 +37,8 @@ export default class ContentUploadTab extends Component {
   }
 
   state = {
-    submissionState: null
+    submissionState: null,
+    uploadState: null
   }
 
   updateAssignmentCache = (cache, mutationResult) => {
@@ -65,9 +67,22 @@ export default class ContentUploadTab extends Component {
     // previous submissions after an assignment is submitted. To get around that,
     // we are wiping out our local cache of submission histories when we create
     // a new submission, instead of appending the new submission to our cache.
-    const newHistories =
-      mutationResult.data.createSubmission.submission.submissionHistoriesConnection
-    assignment.submissionsConnection.nodes[0].submissionHistoriesConnection = newHistories
+    if (mutationResult.data.createSubmission) {
+      const newHistories =
+        mutationResult.data.createSubmission.submission.submissionHistoriesConnection
+      assignment.submissionsConnection.nodes[0].submissionHistoriesConnection = newHistories
+    } else if (mutationResult.data.createSubmissionDraft) {
+      // TODO: if we remove all of the attachments from a draft we should set it back to null
+      // we will need to update this to account for other submission types when we implement them
+      const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft.attachments.length
+        ? mutationResult.data.createSubmissionDraft.submissionDraft
+        : null
+      // TODO: we should change how we update the submission data when we refactor
+      // the submission histories
+      assignment.submissionsConnection.nodes[0].submissionHistoriesConnection.edges[
+        assignment.submissionsConnection.nodes[0].submissionHistoriesConnection.edges.length - 1
+      ].node.submissionDraft = newDraft
+    }
 
     cache.writeQuery({
       query: STUDENT_VIEW_QUERY,
@@ -78,40 +93,91 @@ export default class ContentUploadTab extends Component {
     })
   }
 
+  updateUploadState = state => {
+    this.setState({uploadState: state})
+  }
+
   updateSubmissionState = state => {
     this.setState({submissionState: state})
   }
 
-  renderErrorAlert = () => {
-    return (
-      <AssignmentAlert
-        errorMessage={I18n.t('Error sending submission')}
-        onDismiss={() => this.updateSubmissionState(null)}
-      />
-    )
+  renderUploadAlert() {
+    if (this.state.uploadState) {
+      let errorMessage, successMessage
+
+      if (this.state.uploadState === 'error') {
+        errorMessage = I18n.t('Error updating submission draft')
+      } else if (this.state.uploadState === 'success') {
+        successMessage = I18n.t('Submission draft updated')
+      }
+
+      return (
+        <AssignmentAlert
+          errorMessage={errorMessage}
+          successMessage={successMessage}
+          onDismiss={() => this.updateUploadState(null)}
+        />
+      )
+    }
   }
 
-  renderSuccessAlert = () => {
-    return <AssignmentAlert successMessage={I18n.t('Submission sent')} />
+  renderSubmissionAlert() {
+    if (this.state.submissionState) {
+      let errorMessage, successMessage
+
+      if (this.state.submissionState === 'error') {
+        errorMessage = I18n.t('Error sending submission')
+      } else if (this.state.uploadState === 'success') {
+        successMessage = I18n.t('Submission sent')
+      }
+
+      return (
+        <AssignmentAlert
+          errorMessage={errorMessage}
+          successMessage={successMessage}
+          onDismiss={() => this.updateSubmissionState(null)}
+        />
+      )
+    }
   }
 
   renderFileUpload = createSubmission => {
+    return (
+      <Mutation
+        mutation={CREATE_SUBMISSION_DRAFT}
+        onCompleted={() => this.updateUploadState('success')}
+        onError={() => this.updateUploadState('error')}
+        update={this.updateAssignmentCache}
+      >
+        {createSubmissionDraft => (
+          <React.Fragment>
+            {this.renderUploadAlert()}
+            <FileUpload
+              assignment={this.props.assignment}
+              createSubmission={createSubmission}
+              createSubmissionDraft={createSubmissionDraft}
+              submission={this.props.submission}
+              updateSubmissionState={this.updateSubmissionState}
+              updateUploadState={this.updateUploadState}
+            />
+          </React.Fragment>
+        )}
+      </Mutation>
+    )
+  }
+
+  renderSubmission = createSubmission => {
     switch (this.state.submissionState) {
       case 'error':
-        return this.renderErrorAlert()
+        return this.renderSubmissionAlert()
       case 'in-progress':
         return <LoadingIndicator />
       case 'success':
       default:
         return (
           <React.Fragment>
-            {this.renderSuccessAlert()}
-            <FileUpload
-              assignment={this.props.assignment}
-              createSubmission={createSubmission}
-              submission={this.props.submission}
-              updateSubmissionState={this.updateSubmissionState}
-            />
+            {this.renderSubmissionAlert()}
+            {this.renderFileUpload(createSubmission)}
           </React.Fragment>
         )
     }
@@ -125,7 +191,7 @@ export default class ContentUploadTab extends Component {
         onError={() => this.updateSubmissionState('error')}
         update={this.updateAssignmentCache}
       >
-        {this.renderFileUpload}
+        {this.renderSubmission}
       </Mutation>
     )
   }

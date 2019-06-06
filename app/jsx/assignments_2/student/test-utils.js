@@ -18,6 +18,7 @@
 import {
   CREATE_SUBMISSION,
   CREATE_SUBMISSION_COMMENT,
+  CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
   SUBMISSION_COMMENT_QUERY
 } from './assignmentData'
@@ -272,6 +273,33 @@ export function submissionGraphqlMock() {
   return [
     {
       request: {
+        query: CREATE_SUBMISSION_DRAFT,
+        variables: {
+          id: '22',
+          attempt: 1,
+          fileIds: ['1']
+        }
+      },
+      result: {
+        data: {
+          createSubmissionDraft: {
+            submissionDraft: {
+              __typename: 'SubmissionDraft',
+              _id: '22',
+              attachments: [singleAttachment({_id: '1'})]
+            },
+            errors: {
+              attribute: null,
+              message: null,
+              __typename: 'Errors'
+            },
+            __typename: 'CreateSubmissionDraftPayload'
+          }
+        }
+      }
+    },
+    {
+      request: {
         query: CREATE_SUBMISSION,
         variables: {
           id: '22',
@@ -346,6 +374,14 @@ export function mockSubmission(overrides = {}) {
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
     __typename: 'SubmissionHistory',
+    ...overrides
+  }
+}
+
+export function mockSubmissionDraft(overrides = {}) {
+  return {
+    _id: '50',
+    attachments: [singleAttachment()],
     ...overrides
   }
 }
