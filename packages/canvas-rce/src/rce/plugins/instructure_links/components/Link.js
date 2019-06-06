@@ -106,6 +106,13 @@ export default function Link(props) {
     props.onClick(props.link);
   }
 
+  function handleLinkKey(e) {
+    // press the button on enter or space
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      handleLinkClick(e)
+    }
+  }
+
   function handleDragStart(e) {
     dragHtml(e, renderLinkHtml(props.link));
   }
@@ -135,6 +142,7 @@ export default function Link(props) {
         padding="x-small"
         aria-describedby={props.describedByID}
         onClick={handleLinkClick}
+        onKeyDown={handleLinkKey}
         elementRef={props.elementRef}
       >
         <div style={{pointerEvents: 'none'}}>

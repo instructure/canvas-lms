@@ -173,13 +173,41 @@ describe('RCE "Links" Plugin > Link', () => {
       btn.click()
       expect(onClick).toHaveBeenCalled()
     })
-  })
 
-  it('only shows drag handle on hover', () => {
-    const {container, getByTestId} = renderComponent()
+    it('calls onClick on <Enter>', () => {
+      const onClick = jest.fn()
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true
+      }
+      const {getByText} = renderComponent({link, onClick})
 
-    expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
-    fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
-    expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
+      const btn = getByText(link.title)
+      fireEvent.keyDown(btn, {keyCode: 13})
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('calls onClick on <Space>', () => {
+      const onClick = jest.fn()
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true
+      }
+      const {getByText} = renderComponent({link, onClick})
+
+      const btn = getByText(link.title)
+      fireEvent.keyDown(btn, {keyCode: 32})
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('only shows drag handle on hover', () => {
+      const {container, getByTestId} = renderComponent()
+
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
+      fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
+    })
   })
 })

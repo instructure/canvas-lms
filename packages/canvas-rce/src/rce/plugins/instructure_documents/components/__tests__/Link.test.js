@@ -119,8 +119,32 @@ describe('RCE "Documents" Plugin > Document', () => {
       btn.click()
       expect(onClick).toHaveBeenCalled()
     })
+
+    it('calls onClick on <Enter>', () => {
+      const onClick = jest.fn()
+      const {getByText} = renderComponent({display_name: 'click me', onClick: onClick})
+
+      const btn = getByText('click me')
+      fireEvent.keyDown(btn, {keyCode: 13})
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('calls onClick on <Space>', () => {
+      const onClick = jest.fn()
+      const {getByText} = renderComponent({display_name: 'click me', onClick: onClick})
+
+      const btn = getByText('click me')
+      fireEvent.keyDown(btn, {keyCode: 32})
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('only shows drag handle on hover', () => {
+      const {container, getByTestId} = renderComponent()
+
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
+      fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
+    })
   })
-
-
 })
 

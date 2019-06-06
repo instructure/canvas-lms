@@ -51,6 +51,13 @@ export default function Link(props) {
     });
   }
 
+  function handleLinkKey(e) {
+    // press the button on enter or space
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      handleLinkClick(e)
+    }
+  }
+
   function handleDragStart(e) {
     dragHtml(e, renderDocHtml(props));
   }
@@ -85,6 +92,7 @@ export default function Link(props) {
         padding="x-small"
         width="100%"
         onClick={handleLinkClick}
+        onKeyDown={handleLinkKey}
       >
         <div style={{pointerEvents: 'none'}}>
           <Flex>
