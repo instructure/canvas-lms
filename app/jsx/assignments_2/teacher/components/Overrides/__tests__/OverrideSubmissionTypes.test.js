@@ -24,65 +24,93 @@ import OverrideSubmissionTypes from '../OverrideSubmissionTypes'
 it('renders an OverrideSubmissionType summary', () => {
   const override = mockOverride({
     submissionTypes: [
-      'arc',
       'none',
       'external_tool',
-      'o365',
       'online_upload',
       'on_paper',
-      'google',
       'online_text_entry',
-      'image',
-      'online_url',
-      'media_recording',
-      'any',
-      'foo'
+      'online_url'
     ]
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="summary" override={override} onChangeOverride={() => {}} />
   )
-
-  const submission_types =
-    'Arc & External Tool & File & Google Template & Image & Media & No Submission & O365 Template & On Paper & Student Choice & Text Entry & Url & Other'
-
-  const elem = getByText(/^Arc/)
+  const submission_types = 'No Submission & App & File & On Paper & Text Entry & URL'
+  const elem = getByText(/^No Submission/)
   expect(elem.textContent).toEqual(submission_types)
 })
 
-it('renders an OverrideSubmissionType detail', () => {
+it('renders details of a file submission type', () => {
   const override = mockOverride({
-    submissionTypes: [
-      'arc',
-      'none',
-      'external_tool',
-      'o365',
-      'online_upload',
-      'on_paper',
-      'google',
-      'online_text_entry',
-      'image',
-      'online_url',
-      'media_recording',
-      'any',
-      'foo'
-    ]
+    submissionTypes: ['online_upload']
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
   )
-
-  expect(getByText('Arc')).toBeInTheDocument()
-  expect(getByText('No Submission')).toBeInTheDocument()
-  expect(getByText('External Tool')).toBeInTheDocument()
-  expect(getByText('O365 Template')).toBeInTheDocument()
+  expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('File')).toBeInTheDocument()
-  expect(getByText('On Paper')).toBeInTheDocument()
-  expect(getByText('Google Template')).toBeInTheDocument()
+  expect(getByText('All Types Allowed')).toBeInTheDocument()
+})
+
+it('renders details of a restricted-type file submission type', () => {
+  const override = mockOverride({
+    submissionTypes: ['online_upload'],
+    allowedExtensions: ['doc', 'xls']
+  })
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+  )
+  expect(getByText('Item 1')).toBeInTheDocument()
+  expect(getByText('File')).toBeInTheDocument()
+  expect(getByText('DOC')).toBeInTheDocument()
+  expect(getByText('XLS')).toBeInTheDocument()
+})
+
+it('renders details of an external tool submission type', () => {
+  const override = mockOverride({
+    submissionTypes: ['external_tool']
+  })
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+  )
+  expect(getByText('Item 1')).toBeInTheDocument()
+  expect(getByText('App')).toBeInTheDocument()
+})
+
+it('renders details of a text submission type', () => {
+  const override = mockOverride({
+    submissionTypes: ['online_text_entry']
+  })
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+  )
+  expect(getByText('Item 1')).toBeInTheDocument()
   expect(getByText('Text Entry')).toBeInTheDocument()
-  expect(getByText('Image')).toBeInTheDocument()
-  expect(getByText('Url')).toBeInTheDocument()
-  expect(getByText('Media')).toBeInTheDocument()
-  expect(getByText('Student Choice')).toBeInTheDocument()
-  expect(getByText('Other')).toBeInTheDocument()
+})
+
+it('renders details of a url submission type', () => {
+  const override = mockOverride({
+    submissionTypes: ['online_url']
+  })
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+  )
+  expect(getByText('Item 1')).toBeInTheDocument()
+  expect(getByText('URL')).toBeInTheDocument()
+})
+
+it('renders details of multiple submission types', () => {
+  const override = mockOverride({
+    submissionTypes: ['online_text_entry', 'online_url', 'online_upload']
+  })
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+  )
+  expect(getByText('Item 1')).toBeInTheDocument()
+  expect(getByText('Text Entry')).toBeInTheDocument()
+  expect(getByText('Item 2')).toBeInTheDocument()
+  expect(getByText('URL')).toBeInTheDocument()
+  expect(getByText('Item 3')).toBeInTheDocument()
+  expect(getByText('File')).toBeInTheDocument()
+  expect(getByText('All Types Allowed')).toBeInTheDocument()
 })
