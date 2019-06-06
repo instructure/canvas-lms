@@ -202,6 +202,9 @@
     /* Need !important to override Chrome's focus styling unfortunately */
     border-color: var(--canvasErrorColor) !important;
   }
+  .tox .tox-rgb-form {
+    padding: 2px; /* make room for the canvas focus ring on contained input elements */
+  }
   .tox .tox-swatches__picker-btn:hover {
     background: #e0e2e3;
   }
