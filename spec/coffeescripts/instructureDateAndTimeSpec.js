@@ -26,9 +26,8 @@ import 'jquery.instructure_date_and_time'
 
 QUnit.module('fudgeDateForProfileTimezone', {
   setup() {
-    let expectedTimestamp
     this.snapshot = tz.snapshot()
-    this.original = new Date((expectedTimestamp = Date.UTC(2013, 8, 1)))
+    this.original = new Date(Date.UTC(2013, 8, 1))
   },
   teardown() {
     tz.restore(this.snapshot)
@@ -75,9 +74,8 @@ test('should be sensitive to profile time zone', function() {
 
 QUnit.module('unfudgeDateForProfileTimezone', {
   setup() {
-    let expectedTimestamp
     this.snapshot = tz.snapshot()
-    this.original = new Date((expectedTimestamp = Date.UTC(2013, 8, 1)))
+    this.original = new Date(Date.UTC(2013, 8, 1))
   },
   teardown() {
     tz.restore(this.snapshot)
