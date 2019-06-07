@@ -124,6 +124,7 @@ actions.saveLtiToolConfiguration = ({
     })
     .catch(error => {
       dispatch(actions.saveLtiToolConfigurationFailed(error))
+      dispatch(developerKeysActions.setEditingDeveloperKey(false))
       $.flashError(error.message)
       return error
     })
