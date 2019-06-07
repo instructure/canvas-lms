@@ -474,8 +474,11 @@ class RCEWrapper extends React.Component {
       contextmenu: '',  // show the browser's native context menu
 
       toolbar_drawer: 'floating',
-      target_list: false, // don't show the target list when creating/editing links
-      link_title: false   // don't show the title input when creating/editing links
+
+      // tiny's external link create/edit dialog config
+      target_list: false,  // don't show the target list when creating/editing links
+      link_title: false,   // don't show the title input when creating/editing links
+      default_link_target: '_blank'
     }
   }
 

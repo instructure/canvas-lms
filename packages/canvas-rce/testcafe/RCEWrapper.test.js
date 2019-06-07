@@ -93,8 +93,14 @@ test('can create a link', async t => {
     .click(linksButton)
     .click(externalLinksMenuItem)
     .expect(linkDialog.visible).ok()
+    .expect(labeledBy('URL').visible).ok()
 
-    await t.expect(labeledBy('URL').visible).ok()
+  await t
+    .typeText(labeledBy('URL'), 'https://instructure.com')
+    .click(Selector('button').withText('Save'))
+    .switchToIframe(tinyIframe)
+    .debug()
+    .expect(Selector('a').withAttribute('href', 'https://instructure.com').withAttribute('target', '_blank').exists).ok()
 })
 
 test('can edit a link', async t => {

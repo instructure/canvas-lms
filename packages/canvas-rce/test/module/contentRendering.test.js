@@ -135,7 +135,7 @@ describe("contentRendering", () => {
       const rendered = contentRendering.renderDoc(doc)
       assert.equal(
         rendered,
-        '<a href="/some/path">the display name</a>'
+        '<a target="_blank" rel="noopener noreferrer" href="/some/path">the display name</a>'
       );
     });
 
@@ -147,7 +147,7 @@ describe("contentRendering", () => {
       const rendered = contentRendering.renderDoc(doc)
       assert.equal(
         rendered,
-        '<a href="/some/path">the_filename.txt</a>'
+        '<a target="_blank" rel="noopener noreferrer" href="/some/path">the_filename.txt</a>'
       );
     });
   })
