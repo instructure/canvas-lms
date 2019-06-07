@@ -235,7 +235,7 @@ module SeleniumDriverSetup
         # yay interframe compression
         codec: 'libx264',
         # use less CPU. doesn't actually shrink the resulting file much.
-        frame_rate: 12,
+        frame_rate: 4,
         extra: [
           # quicktime doesn't understand the default yuv422p
           '-pix_fmt', 'yuv420p',
