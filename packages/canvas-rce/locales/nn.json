@@ -71,9 +71,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "sirkulær uordna liste"
   },
-  "clear_upload_34efa419": {
-    "message": "Fjern opplasting"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klikk på ei fil for å sette inn ei nedlastingslenke for fila. "
   },
@@ -203,9 +200,6 @@
   "file_upload_form_4aaad554": {
     "message": "Filopplastingsdialog"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } førehandsvising"
-  },
   "files_c300e900": {
     "message": "Filer"
   },
@@ -241,9 +235,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Bildeopplastingsdialog"
-  },
-  "image_url_2aee2734": {
-    "message": "Bilde-URL"
   },
   "images_7ce26570": {
     "message": "Bilde"

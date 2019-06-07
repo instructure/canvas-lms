@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "Antoure lis ki pa òdone"
   },
-  "clear_upload_34efa419": {
-    "message": "Efase Transfè"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klike sou nenpòt fichye pou ensere yon lyen telechajan pou fichye sa a."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "Fòmilè Transfè Fichye"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } apèsi"
-  },
   "files_c300e900": {
     "message": "Fichye"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Fòmilè Transfè Imaj"
-  },
-  "image_url_2aee2734": {
-    "message": "URL Imaj"
   },
   "images_7ce26570": {
     "message": "Imaj"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "pa pibliye"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Deklanche"
   },
   "upload_8b403d05": {
     "message": "Chajman"

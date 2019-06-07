@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "заключить неупорядоченный список в круг"
   },
-  "clear_upload_34efa419": {
-    "message": "Очистить загрузку"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Щелкните любой файл для вставки ссылки на этот файл."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "Форма отправки файла"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } предпросмотр"
-  },
   "files_c300e900": {
     "message": "Файлы"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Форма отправки изображения"
-  },
-  "image_url_2aee2734": {
-    "message": "URL-адрес изображения"
   },
   "images_7ce26570": {
     "message": "Изображения"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "не опубликовано"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Без образования брызг"
   },
   "upload_8b403d05": {
     "message": "Загрузить"

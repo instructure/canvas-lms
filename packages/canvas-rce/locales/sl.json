@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "nerazvrščeni seznam s krogi"
   },
-  "clear_upload_34efa419": {
-    "message": "Počisti nalaganje"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Kliknite katero koli datoteko, da vstavite povezavo za prenos te datoteke."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "Obrazec za nalaganje datoteke"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } predogled"
-  },
   "files_c300e900": {
     "message": "Datoteke"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Obrazec za nalaganje slike"
-  },
-  "image_url_2aee2734": {
-    "message": "Naslov URL slike"
   },
   "images_7ce26570": {
     "message": "Slike"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "neobjavljeno"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Pozdravna"
   },
   "upload_8b403d05": {
     "message": "Naloži"

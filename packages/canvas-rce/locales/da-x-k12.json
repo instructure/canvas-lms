@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cirkel usorteret liste"
   },
-  "clear_upload_34efa419": {
-    "message": "Slet upload"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klik på en vilkårlig fil for at indsætte et download-link til den pågældende fil."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "Upload-formular til filer"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } forhåndsvisning"
-  },
   "files_c300e900": {
     "message": "Filer"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Uploadformular for billeder"
-  },
-  "image_url_2aee2734": {
-    "message": "Billed-URL"
   },
   "images_7ce26570": {
     "message": "Billeder"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "Ikke offentliggjort"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
   },
   "upload_8b403d05": {
     "message": "Upload"

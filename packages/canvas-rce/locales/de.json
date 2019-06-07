@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "Ungeordnete Liste einkreisen"
   },
-  "clear_upload_34efa419": {
-    "message": "Upload löschen"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Um einen Downloadlink für eine Datei einzufügen, klicken Sie auf die entsprechende Datei."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "Datei hochladen (Formular)"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename }-Vorschau"
-  },
   "files_c300e900": {
     "message": "Dateien"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Bild hochladen (Formular)"
-  },
-  "image_url_2aee2734": {
-    "message": "Bild-URL"
   },
   "images_7ce26570": {
     "message": "Bilder"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "nicht veröffentlicht"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
   },
   "upload_8b403d05": {
     "message": "Hochladen"

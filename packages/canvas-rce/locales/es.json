@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "marque con un círculo la lista no ordenada"
   },
-  "clear_upload_34efa419": {
-    "message": "Despejar carga"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Hacer clic en cualquier archivo para insertar un enlace descargado para ese archivo."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "Formulario Cargar archivos"
   },
-  "filename_preview_ffaa1515": {
-    "message": "Vista previa de { filename }"
-  },
   "files_c300e900": {
     "message": "Archivos"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Formulario Cargar imágenes"
-  },
-  "image_url_2aee2734": {
-    "message": "URL de la imagen"
   },
   "images_7ce26570": {
     "message": "Imagenes"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "no publicado"
-  },
-  "unsplash_ee049fbf": {
-    "message": "No distribuir"
   },
   "upload_8b403d05": {
     "message": "Cargar"

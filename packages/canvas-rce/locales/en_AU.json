@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "circle unordered list"
   },
-  "clear_upload_34efa419": {
-    "message": "Clear Upload"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Click any file to insert a download link for that file."
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "File Upload Form"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } preview"
-  },
   "files_c300e900": {
     "message": "Files"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
-  },
-  "image_url_2aee2734": {
-    "message": "Image URL"
   },
   "images_7ce26570": {
     "message": "Images"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "unpublished"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
   },
   "upload_8b403d05": {
     "message": "Upload"

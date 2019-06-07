@@ -68,9 +68,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "丸い番号無しリスト"
   },
-  "clear_upload_34efa419": {
-    "message": "アップロードの消去"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "ファイルをクリックして、そのファイルにダウンロード リンクを挿入します。"
   },
@@ -185,9 +182,6 @@
   "file_upload_form_4aaad554": {
     "message": "ファイルアップロードフォーム"
   },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename }をプレビュー"
-  },
   "files_c300e900": {
     "message": "ファイル"
   },
@@ -217,9 +211,6 @@
   },
   "image_upload_form_7b74079a": {
     "message": "画像アップロードフォーム"
-  },
-  "image_url_2aee2734": {
-    "message": "画像 URL"
   },
   "images_7ce26570": {
     "message": "画像"
@@ -376,9 +367,6 @@
   },
   "unpublished_dfd8801": {
     "message": "未公開"
-  },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
   },
   "upload_8b403d05": {
     "message": "アップロード"
