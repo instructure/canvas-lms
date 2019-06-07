@@ -88,7 +88,6 @@ describe OriginalityReport do
     expect(subject.originality_report_attachment).to eq originality_attachemnt
   end
   it 'can create multiple originality reports with the same originality_report_attachment_id' do
-    skip('Fix in PLAT-4566')
     report = OriginalityReport.create!(
       attachment: attachment,
       originality_score: '1',
