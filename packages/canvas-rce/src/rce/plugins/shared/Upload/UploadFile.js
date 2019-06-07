@@ -85,7 +85,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, onSubmit =
         case 'COMPUTER':
           return (
             <Tabs.Panel key={panel} title={formatMessage('Computer')}>
-              <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+              <Suspense fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}>
                 <ComputerPanel
                   editor={editor}
                   theFile={theFile}
@@ -103,7 +103,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, onSubmit =
         case 'URL':
           return (
             <Tabs.Panel key={panel} title={formatMessage('URL')}>
-              <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+              <Suspense fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}>
                 <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} />
               </Suspense>
             </Tabs.Panel>

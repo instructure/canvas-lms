@@ -27,10 +27,11 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Img, Text, TruncateText} from '@instructure/ui-elements'
 import {Flex, View} from '@instructure/ui-layout'
+import {VideoPlayer} from '@instructure/ui-media-player'
 
 import RocketSVG from './RocketSVG'
 import formatMessage from '../../../../format-message'
-import {getIconFromType, isImage, isText} from '../fileTypeUtils'
+import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
 
 function readFile(theFile) {
   const p =  new Promise((resolve, reject) => {
@@ -49,6 +50,11 @@ function readFile(theFile) {
       reader.readAsDataURL(theFile)
     } else if (isText(theFile.type)) {
       reader.readAsText(theFile)
+    } else if(isAudioOrVideo(theFile.type)) {
+      const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
+      resolve(
+        <VideoPlayer sources={sources} />
+      )
     } else {
       const icon = getIconFromType(theFile.type)
       resolve(icon)
@@ -138,6 +144,8 @@ export default function ComputerPanel({
             <TruncateText maxLines={21}>{preview.preview}</TruncateText>
           </View>
         )
+      } else if(isAudioOrVideo(theFile.type)) {
+        return preview.preview
       } else {
         return (
           <div
@@ -176,9 +184,14 @@ export default function ComputerPanel({
             </PresentationContent>
           </Flex.Item>
         </Flex>
+      {(isAudioOrVideo(theFile.type)) ?
+        (<View as="div" height="100%" width="100%" textAlign="center">
+          {renderPreview(theFile)}
+        </View>) :
         <View as="div" height="300px" width="300px" margin="0 auto">
           {renderPreview(theFile)}
         </View>
+      }
       </>
     )
   }

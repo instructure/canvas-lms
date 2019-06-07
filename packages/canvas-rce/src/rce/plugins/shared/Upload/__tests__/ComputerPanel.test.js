@@ -185,5 +185,25 @@ describe('UploadFile: ComputerPanel', () => {
         expect(handleSetHasUploadedFile).toHaveBeenCalledWith(false)
         expect(handleSetFile).toHaveBeenCalledWith(null)
       })
+
+      it('Renders a video player preview if afile type is a video', async () => {
+        const aFile = new File(["foo"], "foo.mp4", {
+          type: "video/mp4",
+        });
+        const handleSetFile = jest.fn()
+        const handleSetHasUploadedFile = jest.fn()
+        const {getByText} = render(
+          <ComputerPanel
+            theFile={aFile}
+            setFile={handleSetFile}
+            hasUploadedFile={true}
+            setHasUploadedFile={handleSetHasUploadedFile}
+            accept="mp4"
+            label="Upload File"
+          />
+        )
+        const playButton = await waitForElement(() => getByText('Play'))
+        expect(playButton).toBeInTheDocument()
+      })
     })
 })

@@ -46,6 +46,18 @@ export function isImage(type) {
   return /^image/.test(type)
 }
 
+export function isAudioOrVideo(type) {
+  return isVideo(type) || isAudio(type)
+}
+
+export function isVideo(type) {
+  return /^video/.test(type)
+}
+
+export function isAudio(type) {
+  return /^audio/.test(type)
+}
+
 export function isText(type) {
   return /^text/.test(type)
 }
