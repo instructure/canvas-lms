@@ -59,6 +59,10 @@ export default class ShowOnFocusButton extends Component {
     });
   }
 
+  focus() {
+    this.btnRef.focus()
+  }
+
   renderButton () {
     const { buttonProps, children } = this.props;
     return (

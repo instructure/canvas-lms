@@ -192,3 +192,42 @@ test('focus returns on dismissing tray', async t => {
     .switchToIframe(tinyIframe)
     .expect(focusedTag()).eql('BODY')
 })
+
+test('show the kb shortcut modal various ways', async t => {
+  const hiddenbutton = Selector('[data-testid="ShowOnFocusButton__sronly"]')
+  const kbshortcutbutton = Selector('button[data-testid="ShowOnFocusButton__button"]')
+  const shortcutmodal = Selector('[data-testid="RCE_KeyboardShortcutModal"]')
+  const focusKBSCBtn = ClientFunction(
+    () => kbshortcutbutton().focus(),
+    {dependencies: {kbshortcutbutton}}
+  )
+
+  await t
+    .expect(hiddenbutton.exists).ok()
+    .expect(kbshortcutbutton.exists).ok()
+
+  await focusKBSCBtn()
+
+  // open keyboard shortcut modal from the show-on-focus button
+  // close with escape
+  await t
+    .expect(hiddenbutton.exists).notOk()
+    .expect(kbshortcutbutton.visible).ok()
+    .click(kbshortcutbutton)
+    .expect(shortcutmodal.visible).ok()
+    .pressKey('esc')
+    .expect(shortcutmodal.exists).notOk()
+
+  // open modal using alt+0
+  // close with the close button
+  await t
+    .pressKey('alt+0')
+    .expect(shortcutmodal.visible).ok()
+    .click(Selector('button').withText('Close'))
+    .expect(shortcutmodal.exists).notOk()
+
+  // open modal from button in status bar
+  await t
+    .click(Selector('[data-testid="RCEStatusBar"] button').withText('View keyboard shortcuts'))
+    .expect(shortcutmodal.visible).ok()
+})

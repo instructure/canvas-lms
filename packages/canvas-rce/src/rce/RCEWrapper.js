@@ -34,6 +34,8 @@ import StatusBar from './StatusBar';
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
 import {isImage} from './plugins/shared/fileTypeUtils'
+import KeyboardShortcutModal from './KeyboardShortcutModal'
+
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
@@ -155,7 +157,8 @@ class RCEWrapper extends React.Component {
     this.state = {
       path: [],
       wordCount: 0,
-      isHtmlView: false
+      isHtmlView: false,
+      KBShortcutModalOpen: false
     }
   }
 
@@ -391,6 +394,7 @@ class RCEWrapper extends React.Component {
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
+    editor.on('KeyDown', this.handleShortcutKeyShortcut) // keyUp puts the char in the editor
   }
 
   onWordCountUpdate = e => {
@@ -427,10 +431,33 @@ class RCEWrapper extends React.Component {
     this.mceInstance().fire('ResizeEditor')
   }
 
+  handleShortcutKeyShortcut = (event) => {
+    if (event.altKey && (event.keyCode === 48 || event.keyCode === 119)) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.openKBShortcutModal()
+    }
+  }
+
+  openKBShortcutModal = () => {
+    this.setState({KBShortcutModalOpen: true})
+  }
+
+  closeKBShortcutModal = () => {
+    this.setState({KBShortcutModalOpen: false})
+  }
+
+  KBShortcutModalClosed = () => {
+    if(Bridge.activeEditor() === this) {
+      this.onTinyMCEInstance('mceFocus')
+    }
+  }
+
   componentWillUnmount() {
     if (!this._destroyCalled) {
       this.destroy();
     }
+    this._elementRef.removeEventListener('keyup', this.handleShortcutKeyShortcut, true)
   }
 
   wrapOptions(options = {}) {
@@ -508,6 +535,7 @@ class RCEWrapper extends React.Component {
 
   componentDidMount() {
     this.registerTextareaChange();
+    this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -534,15 +562,14 @@ class RCEWrapper extends React.Component {
     return (
       <div ref={el => this._elementRef = el} className={styles.root}>
         <ShowOnFocusButton
-          buttonRef={ref => this.loadPriorButton = ref}
           buttonProps={{
             variant: 'link',
-            onClick: () => {alert('thataway')},
+            onClick: this.openKBShortcutModal,
             icon: IconKeyboardShortcutsLine,
             margin: 'xx-small'
           }}
-          >
-            {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
+        >
+          {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
         </ShowOnFocusButton>
         <Editor
           id={mceProps.textareaId}
@@ -564,8 +591,14 @@ class RCEWrapper extends React.Component {
           wordCount={this.state.wordCount}
           isHtmlView={this.state.isHtmlView}
           onResize={this.onResize}
+          onKBShortcutModalOpen={this.openKBShortcutModal}
         />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
+        <KeyboardShortcutModal
+          onClose={this.KBShortcutModalClosed}
+          onDismiss={this.closeKBShortcutModal}
+          open={this.state.KBShortcutModalOpen}
+        />
       </div>
     );
   }

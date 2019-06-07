@@ -39,6 +39,24 @@ function renderStatusBar() {
 }
 
 describe('RCE StatusBar', () => {
+  it('calls callback when clicking kb shortcut button', () => {
+    const onkbcallback = jest.fn()
+    const {getByText} = render(
+      <StatusBar
+          onToggleHtml={() => {}}
+          path={[]}
+          wordCount={0}
+          isHtmlView={false}
+          onResize={() => {}}
+          onKBShortcutModalOpen={onkbcallback}
+        />
+    )
+
+    const kbBtn = getByText('View keyboard shortcuts')
+    kbBtn.click()
+    expect(onkbcallback).toHaveBeenCalled()
+  })
+
   it('cycles focus with right arrow keys', () => {
     const {container} = renderStatusBar()
     const buttons = container.querySelectorAll('button, *[tabindex]')

@@ -35,7 +35,8 @@ StatusBar.propTypes = {
   path: arrayOf(string),
   wordCount: number,
   isHtmlView: bool,
-  onResize: func // react-draggable onDrag handler.
+  onResize: func, // react-draggable onDrag handler.
+  onKBShortcutModalOpen: func.isRequired
 }
 
 function renderPathString({path}) {
@@ -100,7 +101,13 @@ export default function StatusBar(props) {
     const a11y = formatMessage('Accessibility Checker')
     return (
       <View display="inline-block" padding="0 x-small">
-        <Button variant="link" icon={IconKeyboardShortcutsLine} title={kbshortcut} tabIndex={tabIndexForPosition(0)}>
+        <Button
+          variant="link"
+          icon={IconKeyboardShortcutsLine}
+          title={kbshortcut}
+          tabIndex={tabIndexForPosition(0)}
+          onClick={props.onKBShortcutModalOpen}
+        >
           <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
         </Button>
         <Button variant="link" icon={IconA11yLine} title={a11y} tabIndex={tabIndexForPosition(1)}>
