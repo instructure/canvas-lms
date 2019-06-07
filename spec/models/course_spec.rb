@@ -1941,46 +1941,66 @@ describe Course, "gradebook_to_csv" do
     expect(rows[1]["Current Score"]).to eq "90.00"
   end
 
-  it "should include sis ids if enabled" do
-    course_factory(active_all: true)
-    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
-    student_in_course(:user => @user1)
-    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
-    student_in_course(:user => @user2)
-    @user3 = user_factory(active_all: true, :name => 'JT')
-    student_in_course(:user => @user3)
-    @user1.pseudonym.sis_user_id = "SISUSERID"
-    @user1.pseudonym.save!
-    @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-    @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user1, grade: "10", grader: @teacher)
-    @assignment.grade_student(@user2, grade: "9", grader: @teacher)
-    @assignment.grade_student(@user3, grade: "9", grader: @teacher)
-    @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
-    @course.recompute_student_scores
-    @course.reload
+  describe 'sis_ids' do
+    before(:once) do
+      @account = Account.create!(name: "A new root")
+      course_factory(active_all: true, account: @account)
+      @user1 = user_with_managed_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com',
+                                           account: @account, sis_user_id: "SISUSERID", integration_id: 'int1')
+      student_in_course(:user => @user1)
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', account: @account)
+      student_in_course(:user => @user2)
+      @user3 = user_factory(active_all: true, :name => 'JT')
+      student_in_course(:user => @user3)
+      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @assignment.grade_student(@user1, grade: "10", grader: @teacher)
+      @assignment.grade_student(@user2, grade: "9", grader: @teacher)
+      @assignment.grade_student(@user3, grade: "9", grader: @teacher)
+      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @course.recompute_student_scores
+      @course.reload
+    end
 
-    csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
-    expect(csv).not_to be_nil
-    rows = CSV.parse(csv)
-    expect(rows.length).to eq 5
-    expect(rows[0][1]).to eq 'ID'
-    expect(rows[0][2]).to eq 'SIS User ID'
-    expect(rows[0][3]).to eq 'SIS Login ID'
-    expect(rows[0][4]).to eq 'Section'
-    expect(rows[1][2]).to eq nil
-    expect(rows[1][3]).to eq nil
-    expect(rows[1][4]).to eq nil
-    expect(rows[1][-1]).to eq '(read only)'
-    expect(rows[2][1]).to eq @user1.id.to_s
-    expect(rows[2][2]).to eq 'SISUSERID'
-    expect(rows[2][3]).to eq @user1.pseudonym.unique_id
-    expect(rows[3][1]).to eq @user2.id.to_s
-    expect(rows[3][2]).to be_nil
-    expect(rows[3][3]).to eq @user2.pseudonym.unique_id
-    expect(rows[4][1]).to eq @user3.id.to_s
-    expect(rows[4][2]).to be_nil
-    expect(rows[4][3]).to be_nil
+    it "should include sis ids if enabled" do
+      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      expect(csv).not_to be_nil
+      rows = CSV.parse(csv)
+      expect(rows.length).to eq 5
+      expect(rows.first.length).to eq 19
+      expect(rows[0][1]).to eq 'ID'
+      expect(rows[0][2]).to eq 'SIS User ID'
+      expect(rows[0][3]).to eq 'SIS Login ID'
+      expect(rows[0][4]).to eq 'Section'
+      expect(rows[1][2]).to eq nil
+      expect(rows[1][3]).to eq nil
+      expect(rows[1][4]).to eq nil
+      expect(rows[1][-1]).to eq '(read only)'
+      expect(rows[2][1]).to eq @user1.id.to_s
+      expect(rows[2][2]).to eq 'SISUSERID'
+      expect(rows[2][3]).to eq @user1.pseudonym.unique_id
+      expect(rows[3][1]).to eq @user2.id.to_s
+      expect(rows[3][2]).to be_nil
+      expect(rows[3][3]).to eq @user2.pseudonym.unique_id
+      expect(rows[4][1]).to eq @user3.id.to_s
+      expect(rows[4][2]).to be_nil
+      expect(rows[4][3]).to be_nil
+    end
+
+    it "should include integration ids if enabled" do
+      @account.settings[:include_integration_ids_in_gradebook_exports] = true
+      @account.save!
+      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      rows = CSV.parse(csv)
+      expect(rows.first.length).to eq 20
+      expect(rows[0][1]).to eq 'ID'
+      expect(rows[0][2]).to eq 'SIS User ID'
+      expect(rows[0][3]).to eq 'SIS Login ID'
+      expect(rows[0][4]).to eq 'Integration ID'
+      expect(rows[2][1]).to eq @user1.id.to_s
+      expect(rows[2][2]).to eq 'SISUSERID'
+      expect(rows[2][4]).to eq 'int1'
+    end
   end
 
   it "should include primary domain if a trust exists" do

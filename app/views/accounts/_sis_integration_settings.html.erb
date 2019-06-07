@@ -29,6 +29,12 @@
     <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
     <%= f.label :allow_sis_import, t("SIS imports") %>
   </div>
+  <div>
+    <%= f.fields_for :settings do |settings| %>
+      <%= settings.check_box :include_integration_ids_in_gradebook_exports, :checked => @account.settings[:include_integration_ids_in_gradebook_exports] == true %>
+      <%= settings.label :include_integration_ids_in_gradebook_exports, t("Include Integration IDs in the gradebook exports.") %>
+    <% end %>
+  </div>
   <% if @account.feature_allowed?(:post_grades)%>
     <%= f.fields_for :settings do |settings| %>
       <%= settings.fields_for :sis_syncing do |ff_syncing| %>

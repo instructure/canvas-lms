@@ -34,7 +34,7 @@ describe "Default Account Reports" do
     @term1.save!
     @user1 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
                                          :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-                                         :sis_user_id => "user_sis_id_01")
+                                         :sis_user_id => "user_sis_id_01", integration_id: 'int1')
     @user2 = user_with_managed_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
                                          :name => 'Michael Bolton', :account => @account,
                                          :sis_user_id => "user_sis_id_02")
@@ -43,7 +43,7 @@ describe "Default Account Reports" do
                                          :sis_user_id => "user_sis_id_03")
     @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
                                          :name => 'Jason Donovan', :account => @account,
-                                         :sis_user_id => "user_sis_id_04")
+                                         :sis_user_id => "user_sis_id_04", integration_id: 'int2')
     @user5 = user_with_managed_pseudonym(:active_all => true, :username => 'john@smith.com',
                                          :name => 'John Smith', :sis_user_id => "user_sis_id_05",
                                          :account => @account)
@@ -307,8 +307,22 @@ describe "Default Account Reports" do
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
 
       expect(parsed[0]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", "English 101", @course1.id.to_s,
-                           "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
-                           @term1.id.to_s, "fall12", nil, "88.0", "active", "82.0", "92.0"]
+                               "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                               @term1.id.to_s, "fall12", nil, "88.0", "active", "82.0", "92.0"]
+    end
+
+    it "returns integration_ids when account setting set" do
+      @account.settings[:include_integration_ids_in_gradebook_exports] = true
+      @account.save!
+      parsed = read_report('grade_export_csv', {order: 14, header: true})
+
+      expect(parsed[0]).to eq ["student name", "student id", "student sis", "student integration id",
+                               "course", "course id", "course sis", "section", "section id", "section sis",
+                               "term", "term id", "term sis", "current score", "final score", "enrollment state",
+                               "unposted current score", "unposted final score", 'override score']
+      expect(parsed[1]).to eq ["John St. Clair", @user1.id.to_s, "user_sis_id_01", 'int1', "English 101", @course1.id.to_s,
+                               "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
+                               @term1.id.to_s, "fall12", nil, "88.0", "active", "82.0", "92.0", "102.0"]
     end
   end
 
@@ -494,6 +508,18 @@ describe "Default Account Reports" do
         csv = reports["Fall.csv"]
         expect(csv.size).to eq 1
         expect(csv.first).to eq ["no grading periods configured for this term"]
+      end
+
+      it "returns integration_ids on mgp report when account setting set" do
+        @account.settings[:include_integration_ids_in_gradebook_exports] = true
+        @account.save!
+
+        reports = read_report("mgp_grade_export_csv",
+                              params: {enrollment_term_id: @default_term.id},
+                              parse_header: true,
+                              order: ["student name", "section id"])
+        csv = reports["Default Term.csv"]
+        expect(csv[1]["student integration id"]).to eq 'int2'
       end
 
       it "omits override scores if Final Grade Override is disabled for the account" do

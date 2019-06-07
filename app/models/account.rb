@@ -171,6 +171,7 @@ class Account < ActiveRecord::Base
   add_setting :sis_name, :root_only => true
   add_setting :sis_syncing, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_default_grade_export, :boolean => true, :default => false, :inheritable => true
+  add_setting :include_integration_ids_in_gradebook_exports, :boolean => true, :default => false, :root_only => true
   add_setting :sis_require_assignment_due_date, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_assignment_name_length, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_assignment_name_length_input, :inheritable => true
