@@ -122,9 +122,7 @@ module Interfaces::SubmissionInterface
 
   field :attachments, [Types::FileType], null: true
   def attachments
-    load_association(:attachment_associations).then do |associations|
-      Loaders::IDLoader.for(Attachment).load_many(associations.map(&:attachment_id))
-    end
+    Loaders::IDLoader.for(Attachment).load_many(object.attachment_ids_for_version)
   end
 
   field :submission_draft, Types::SubmissionDraftType, null: true

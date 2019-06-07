@@ -163,6 +163,34 @@ describe Types::SubmissionType do
     end
   end
 
+  describe 'attachments' do
+    before(:once) do
+      assignment = @course.assignments.create! name: "asdf", points_possible: 10
+      @attachment1 = attachment_model
+      @attachment2 = attachment_model
+      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission1.attachments = [@attachment1]
+      @submission1.save!
+      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @submission2.attachments = [@attachment2]
+      @submission2.save!
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission2, current_user: @teacher) }
+
+    it 'works for a submission' do
+      expect(submission_type.resolve('attachments { _id }')).to eq [@attachment2.id.to_s]
+    end
+
+    it 'works for a submission history' do
+      expect(
+        submission_type.resolve(
+          'submissionHistoriesConnection(first: 1) { nodes { attachments { _id }}}'
+        )
+      ).to eq [[@attachment1.id.to_s]]
+    end
+  end
+
   describe 'submission histories connection' do
     before(:once) do
       assignment = @course.assignments.create! name: "asdf2", points_possible: 10
