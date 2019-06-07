@@ -170,6 +170,7 @@ class PermissionsIndex
     def open_edit_role_tray(role)
       role_name(role).click
       f('.ic-permissions_role_tray')
+      sleep 2 # TODO fix in COMMS-2115
       keep_trying_until do
         disable_implicit_wait{edit_role_icon.click}
         disable_implicit_wait{edit_name_box.displayed?}
