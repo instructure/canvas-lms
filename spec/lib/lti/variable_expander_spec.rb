@@ -982,6 +982,14 @@ module Lti
           expect(exp_hash[:test]).to eq '5,6'
         end
 
+        it 'has substitution for $Canvas.course.sectionRestricted' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:section_restricted).and_return(true)
+          exp_hash = {test: '$Canvas.course.sectionRestricted'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
         it 'has substitution for $Canvas.course.sectionSisSourceIds' do
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           allow(substitution_helper).to receive(:section_sis_ids).and_return('5a,6b')

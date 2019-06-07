@@ -970,6 +970,16 @@ module Lti
                        -> { lti_helper.section_ids },
                        ENROLLMENT_GUARD
 
+    # Returns true if the user can only view and interact with users in their own sections
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion 'Canvas.course.sectionRestricted', [],
+      -> { lti_helper.section_restricted },
+      ENROLLMENT_GUARD
+
     # Returns a comma separated list of section sis_id's that the user is enrolled in.
     #
     # @example

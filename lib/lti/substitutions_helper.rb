@@ -219,6 +219,10 @@ module Lti
       course_enrollments.map(&:course_section_id).uniq.sort.join(',')
     end
 
+    def section_restricted
+      @context.is_a?(Course) && @user && @context.visibility_limited_to_course_sections?(@user)
+    end
+
     def section_sis_ids
       course_sections.map(&:sis_source_id).compact.uniq.sort.join(',')
     end

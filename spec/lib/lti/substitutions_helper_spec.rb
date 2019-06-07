@@ -554,12 +554,22 @@ module Lti
         # course.reload
 
         user.save!
-        multiple_student_enrollment(user, @sec1, course: course)
-        multiple_student_enrollment(user, @sec2, course: course)
+        @e1 = multiple_student_enrollment(user, @sec1, course: course)
+        @e2 = multiple_student_enrollment(user, @sec2, course: course)
       end
 
       it "should return all canvas section ids" do
         expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
+      end
+
+      it "should return section restricted if all enrollments are restricted" do
+        [@e1, @e2].each{|e| e.update_attribute(:limit_privileges_to_course_section, true)}
+        expect(subject.section_restricted).to eq true
+      end
+
+      it "should not return section restricted if only one is" do
+        @e1.update_attribute(:limit_privileges_to_course_section, true)
+        expect(subject.section_restricted).to eq false
       end
 
       it "should return all canvas section sis ids" do
