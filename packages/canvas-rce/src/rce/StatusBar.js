@@ -19,12 +19,12 @@
 import React from 'react'
 import {arrayOf, bool, func, number, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
-import { Button } from '@instructure/ui-buttons'
-import { Flex, View } from '@instructure/ui-layout'
-import { ScreenReaderContent } from '@instructure/ui-a11y'
-import { Text } from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import { IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine } from '@instructure/ui-icons'
+import {IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine} from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
 
@@ -62,64 +62,98 @@ function emptyTagIcon() {
 }
 
 export default function StatusBar(props) {
-  if (props.isHtmlView) {
-    const toggleToRich = formatMessage('Switch to rich text editor')
+  /* eslint-disable react/prop-types */
+  function renderPathFlexItem() {
+    if (props.isHtmlView) return null
     return (
-      <View display="block" margin="x-small" textAlign="end" data-testid="RCEStatusBar">
-        <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToRich}>
-          <ScreenReaderContent>{toggleToRich}</ScreenReaderContent>
-        </Button>
-      </View>
+      <Flex.Item grow>
+        <View data-testid="whole-status-bar-path">{renderPath(props)}</View>
+      </Flex.Item>
     )
-  } else {
+  }
+
+  function renderIconButtonFlexItem() {
+    if (props.isHtmlView) return null
     const kbshortcut = formatMessage('View keyboard shortcuts')
     const a11y = formatMessage('Accessibility Checker')
-    const wordCount = formatMessage(`{count, plural,
+    return (
+      <Flex.Item>
+        <View display="inline-block" padding="0 x-small">
+          <Button variant="link" icon={IconKeyboardShortcutsLine} title={kbshortcut}>
+            <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
+          </Button>
+          <Button variant="link" icon={IconA11yLine} title={a11y}>
+            <ScreenReaderContent>{a11y}</ScreenReaderContent>
+          </Button>
+        </View>
+        <div className={css(styles.separator)} />
+      </Flex.Item>
+    )
+  }
+
+  function renderWordCountFlexItem() {
+    if (props.isHtmlView) return null
+    const wordCount = formatMessage(
+      `{count, plural,
          =0 {0 words}
         one {1 word}
       other {# words}
-    }`, {count: props.wordCount})
-    const toggleToHtml = formatMessage('Switch to raw html editor')
-
+    }`,
+      {count: props.wordCount}
+    )
     return (
-      <Flex margin="x-small 0 x-small x-small" data-testid="RCEStatusBar">
-        <Flex.Item grow>
-          <View>{renderPath(props)}</View>
-        </Flex.Item>
-
-        <Flex.Item>
-          <View display="inline-block" padding="0 x-small">
-            <Button variant="link" icon={IconKeyboardShortcutsLine} title={kbshortcut}>
-              <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
-            </Button>
-            <Button variant="link" icon={IconA11yLine} title={a11y}>
-              <ScreenReaderContent>{a11y}</ScreenReaderContent>
-            </Button>
-          </View>
-          <div className={css(styles.separator)}/>
-        </Flex.Item>
-
-        <Flex.Item>
-          <View display="inline-block" padding="0 small xx-small small">
-            <Text>{wordCount}</Text>
-          </View>
-          <div className={css(styles.separator)}/>
-        </Flex.Item>
-
-        <Flex.Item>
-          <View display="inline-block" padding="0 0 0 small">
-            <Button variant="link" icon={emptyTagIcon()} onClick={props.onToggleHtml} title={toggleToHtml}>
-              <ScreenReaderContent>{toggleToHtml}</ScreenReaderContent>
-            </Button>
-          </View>
-        </Flex.Item>
-
-        <Flex.Item>
-          <ResizeHandle onDrag={props.onResize} />
-        </Flex.Item>
-      </Flex>
+      <Flex.Item>
+        <View
+          display="inline-block"
+          padding="0 small xx-small small"
+          data-testid="status-bar-word-count"
+        >
+          <Text>{wordCount}</Text>
+        </View>
+        <div className={css(styles.separator)} />
+      </Flex.Item>
     )
   }
+
+  function renderToggleHtmlFlexItem() {
+    const toggleToHtml = formatMessage('Switch to raw html editor')
+    const toggleToRich = formatMessage('Switch to rich text editor')
+    const toggleText = props.isHtmlView ? toggleToRich : toggleToHtml
+    return (
+      <Flex.Item>
+        <View display="inline-block" padding="0 0 0 small">
+          <Button
+            variant="link"
+            icon={emptyTagIcon()}
+            onClick={props.onToggleHtml}
+            title={toggleText}
+          >
+            <ScreenReaderContent>{toggleText}</ScreenReaderContent>
+          </Button>
+        </View>
+      </Flex.Item>
+    )
+  }
+
+  function renderResizeHandleFlexItem() {
+    return (
+      <Flex.Item>
+        <ResizeHandle onDrag={props.onResize} />
+      </Flex.Item>
+    )
+  }
+  /* eslint-enable react/prop-types */
+
+  const flexJustify = props.isHtmlView ? 'end' : 'start'
+  return (
+    <Flex margin="x-small 0 x-small x-small" data-testid="RCEStatusBar" justifyItems={flexJustify}>
+      {renderPathFlexItem()}
+      {renderIconButtonFlexItem()}
+      {renderWordCountFlexItem()}
+      {renderToggleHtmlFlexItem()}
+      {renderResizeHandleFlexItem()}
+    </Flex>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -132,4 +166,4 @@ const styles = StyleSheet.create({
     position: 'relative',
     top: '.5rem'
   }
-});
+})

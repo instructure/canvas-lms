@@ -389,6 +389,8 @@ class RCEWrapper extends React.Component {
     if (tinyapp) {
       tinyapp.setAttribute('aria-label', formatMessage("Rich Content Editor"))
     }
+    // Probably should do this in tinymce.scss, but we only want it in new rce
+    this.getTextarea().style.resize = 'none'
   }
 
   onWordCountUpdate = e => {
@@ -418,7 +420,9 @@ class RCEWrapper extends React.Component {
     const currentContainerHeight = Number.parseInt(container.style.height, 10)
     if (isNaN(currentContainerHeight)) return
     const modifiedHeight = currentContainerHeight + coordinates.deltaY
-    container.style.height = `${modifiedHeight}px`
+    const newHeight = `${modifiedHeight}px`
+    container.style.height = newHeight
+    this.getTextarea().style.height = newHeight
     // play nice and send the same event that the silver theme would send
     this.mceInstance().fire('ResizeEditor')
   }
