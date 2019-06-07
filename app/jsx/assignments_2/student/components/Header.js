@@ -71,6 +71,19 @@ class Header extends React.Component {
     )
   }
 
+  /* eslint-disable jsx-a11y/anchor-is-valid */
+  renderFakeMostRecent = () => {
+    // This field is only for use in the InstructureCon demo and will be replaced;
+    // <a> tags without href elements are inaccessible by keyboard and should not normally
+    // be used, this is a quick and dirty measure that will not persist to consumer use.
+    return (
+      <FlexItem as="div" align="end" textAlign="end">
+        Calculated by: <a>Most Recent</a>
+      </FlexItem>
+    )
+  }
+  /* eslint-enable jsx-a11y/anchor-is-valid */
+
   render() {
     return (
       <React.Fragment>
@@ -105,6 +118,7 @@ class Header extends React.Component {
                 receivedGrade={this.props.submission ? this.props.submission.grade : null}
                 pointsPossible={this.props.assignment.pointsPossible}
               />
+              {this.renderFakeMostRecent()}
               {this.props.submission && (
                 <FlexItem as="div" align="end" textAlign="end">
                   <Flex direction="column">
