@@ -37,7 +37,8 @@ import {isImage} from './plugins/shared/fileTypeUtils'
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
-const {template} = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
+const skinCSS = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css').template().replace(/tinymce__oxide--/g, "")
+const contentCSS = require('../../node_modules/tinymce/skins/ui/oxide/content.css').template().replace(/tinymce__oxide--/g, "")
 
 // If we ever get our jest tests configured so they can handle importing real esModules,
 // we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
@@ -58,7 +59,7 @@ function injectTinySkin() {
   style.setAttribute('data-skin', 'tiny oxide skin')
   style.appendChild(
     // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
-    document.createTextNode(template().replace(/tinymce__oxide--/g, ""))
+    document.createTextNode(skinCSS)
   );
   const beforeMe =
     document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
@@ -453,6 +454,12 @@ class RCEWrapper extends React.Component {
           setupCallback(editor);
         }
       },
+
+      // Consumers can, and should!, still pass a content_css prop so that the content
+      // in the editor matches the styles of the app it will be displayed in when saved.
+      // This is just so we inject the helper class names that tinyMCE uses for
+      // things like table resizing and stuff.
+      content_style: contentCSS,
 
       toolbar: [
         'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
