@@ -62,7 +62,7 @@ export default function OverrideAssignTo(props) {
 function renderSummary(assignedTo) {
   const list = assignedTo.length > 0 ? assignedTo.map(renderOverrideName).join(', ') : null
   return (
-    <Text weight="bold" data-testid="OverrideAssignTo">
+    <Text weight="bold" color="primary" data-testid="OverrideAssignTo" size="large">
       {list || <span dangerouslySetInnerHTML={{__html: '&nbsp;'}} />}
     </Text>
   )

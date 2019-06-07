@@ -102,6 +102,6 @@ it('renders correctly if unlockAt and lockAt are set and rendered in short mode'
   const element = $('#fixtures')
 
   // Rendered twice cause one of them is a screenreader only
-  const expected = 'Jul 11Jul 117/11/2016 to Jul 15, 2016 11:00pm to Jul 15, 2016 11:00pm7/15/2016'
+  const expected = 'Jul 11Jul 117/11/2016 to Jul 15 to Jul 157/15/2016'
   expect(element.text()).toEqual(expected)
 })

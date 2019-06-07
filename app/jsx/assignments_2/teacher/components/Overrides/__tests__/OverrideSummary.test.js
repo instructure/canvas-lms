@@ -45,7 +45,7 @@ describe('OverrideSummary', () => {
     expect(getByText(due)).toBeInTheDocument()
 
     const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
-    const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.full'))}`
+    const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.short'))}`
     expect(getByText(unlock)).toBeInTheDocument()
     expect(getByText(lock)).toBeInTheDocument()
 
@@ -83,7 +83,7 @@ describe('OverrideSummary', () => {
     })
     const {getByText} = render(<OverrideSummary override={override} />)
 
-    const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.full'))}`
+    const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
     expect(getByText(`Available after ${unlock}`)).toBeInTheDocument()
   })
 
@@ -101,7 +101,7 @@ describe('OverrideSummary', () => {
     })
     const {getByText} = render(<OverrideSummary override={override} />)
 
-    const lock = `${tz.format(lockAt, I18n.t('#date.formats.full'))}`
+    const lock = `${tz.format(lockAt, I18n.t('#date.formats.short'))}`
     expect(getByText(`Available until ${lock}`)).toBeInTheDocument()
   })
 })
