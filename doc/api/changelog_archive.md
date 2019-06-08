@@ -6,6 +6,22 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2019-03-30
+### Changes
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Content Migrations API] | Update a Content Migration Endpoint | Clarified the endpoint takes same arguments as creating a migration<br><br>Clarified that updating the content migration will also be used when importing content selectively |
+
+[Content Migrations API]: content_migrations.html
+
+### Additions
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Content Migrations API] | Create a Content Migration Endpoint | Added selective_import parameter
+|                          | List Items for Selective Import Endpoint | Added endpoint
+
+[Content Migrations API]: content_migrations.html
+
 ## 2019-03-09
 ### Changes
 | API Calls | Function |  |
