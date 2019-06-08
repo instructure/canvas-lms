@@ -250,12 +250,12 @@ module RCENextPage
     fj('[data-cid="Portal Tray"] button:contains("Done")')
   end
 
-  def keyboard_shortcut_button
-    fj('button:has([name="IconKeyboardShortcuts"])')
+  def visible_keyboard_shortcut_button
+    ffj('button:has([name="IconKeyboardShortcuts"])')[1]
   end
 
   def keyboard_shortcut_modal
-
+    f('[role="dialog"][aria-label="Keyboard Shortcuts"]')
   end
 
   def alt_text_textbox
@@ -437,7 +437,7 @@ module RCENextPage
     image_options_done_button.click
   end
 
-  def click_keyboard_shortcut_button
-    keyboard_shortcut_button.click
+  def click_visible_keyboard_shortcut_button
+    visible_keyboard_shortcut_button.click
   end
 end
