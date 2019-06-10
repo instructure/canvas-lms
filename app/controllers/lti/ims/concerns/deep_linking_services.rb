@@ -86,7 +86,8 @@ module Lti::Ims::Concerns
         validator = Canvas::Security::JwtValidator.new(
           jwt: hash,
           expected_aud: Canvas::Security.config['lti_iss'],
-          require_iss: true
+          require_iss: true,
+          skip_jti_check: true
         )
         validator.validate
         validator.errors.to_h.each do |k, v|
