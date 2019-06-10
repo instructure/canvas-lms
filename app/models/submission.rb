@@ -267,10 +267,12 @@ class Submission < ActiveRecord::Base
 
   scope :needs_grading, -> {
     all.primary_shard.activate do
-      joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id=enrollments.user_id")
-      .where(needs_grading_conditions)
-      .where(Enrollment.active_student_conditions)
-      .distinct
+      joins(:assignment).
+        joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id=enrollments.user_id
+                                                         AND assignments.context_id = enrollments.course_id").
+        where(needs_grading_conditions).
+        where(Enrollment.active_student_conditions).
+        distinct
     end
   }
 

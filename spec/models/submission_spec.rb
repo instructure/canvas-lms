@@ -5437,6 +5437,12 @@ describe Submission do
       expect(Submission.needs_grading.count).to eq(0)
     end
 
+    it 'does not include submissions for inactive/concluded students who have other active enrollments somewhere' do
+      @course.enroll_student(@student).update_attribute(:workflow_state, 'inactive')
+      course_with_student(user: @student, active_all: true)
+      expect(Submission.needs_grading).not_to include @assignment.submissions.first
+    end
+
     context "sharding" do
       require_relative '../sharding_spec_helper'
       specs_require_sharding

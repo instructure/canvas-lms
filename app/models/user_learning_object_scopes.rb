@@ -276,11 +276,10 @@ module UserLearningObjectScopes
   end
 
   # opts forwaded to course_ids_for_todo_lists
-  def assignments_needing_grading_count(**opts)
+  def submissions_needing_grading_count(**opts)
     course_ids = course_ids_for_todo_lists(:instructor, **opts)
     Submission.active.
       needs_grading.
-      joins(:assignment).
       joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id").
       where(assignments: {context_id: course_ids}).
       merge(Assignment.expecting_submission).
@@ -320,13 +319,17 @@ module UserLearningObjectScopes
   def grader_visible_submissions_sql
     "SELECT submissions.id
        FROM #{Submission.quoted_table_name}
+       INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
+                                                                        AND student_enrollments.course_id = assignments.context_id
       WHERE submissions.assignment_id = assignments.id
         AND enrollments.limit_privileges_to_course_section = 'f'
         AND #{Submission.needs_grading_conditions}
+        AND student_enrollments.workflow_state = 'active'
       UNION
      SELECT submissions.id
        FROM #{Submission.quoted_table_name}
       INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
+                                                                       AND student_enrollments.course_id = assignments.context_id
       WHERE submissions.assignment_id = assignments.id
         AND #{Submission.needs_grading_conditions}
         AND enrollments.limit_privileges_to_course_section = 't'
