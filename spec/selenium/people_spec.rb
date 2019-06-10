@@ -113,21 +113,22 @@ describe "people" do
 
   context "people as a teacher" do
 
-    before (:each) do
-      course_with_teacher_logged_in
-
+    before :once do
+      course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: 'Mrs. Commanderson'
       # add first student
       @student_1 = create_user('student@test.com')
 
       enroll_student(@student_1)
 
       # adding users for tests to work correctly
-      @test_teacher = create_user('teacher@test.com')
       @student_2 = create_user('student2@test.com')
       @test_ta = create_user('ta@test.com')
-      @test_observer = create_user('observer@test.com')
 
       enroll_ta(@test_ta)
+    end
+
+    before :each do
+      user_session @teacher
     end
 
     it "should have tabs" do
@@ -366,8 +367,12 @@ describe "people" do
 
   context "people as a TA" do
 
-    before (:each) do
-      course_with_ta_logged_in(:active_all => true)
+    before :once do
+      course_with_ta(:active_all => true)
+    end
+
+    before :each do
+      user_session @ta
     end
 
     it "should validate that the TA cannot delete / conclude or reset course" do
@@ -384,8 +389,12 @@ describe "people" do
 
   context "people as a student" do
 
-    before (:each) do
-      course_with_student_logged_in(:active_all => true)
+    before :once do
+      course_with_student(:active_all => true)
+    end
+
+    before :each do
+      user_session @student
     end
 
     it "should not link avatars to a user's profile page if profiles are disabled" do
@@ -399,9 +408,13 @@ describe "people" do
   end
 
   context "course with multiple sections", priority: "2" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before :once do
+      course_with_teacher active_course: true, active_user: true
       @section2 = @course.course_sections.create!(name: 'section2')
+    end
+
+    before :each do
+      user_session @teacher
     end
 
     it "should save add people form data" do
@@ -725,18 +738,26 @@ describe "people" do
 
     context "student tray" do
 
-      before(:each) do
+      before :once do
         preload_graphql_schema
         @account = Account.default
         @account.enable_feature!(:student_context_cards)
         @student = create_user('student@test.com')
-        @course.enroll_student(@student, enrollment_state: :active)
+        @enrollment = @course.enroll_student(@student, enrollment_state: :active)
       end
 
       it "course people page should display student name in tray", priority: "1", test_id: 3022066 do
         get("/courses/#{@course.id}/users")
         f("a[data-student_id='#{@student.id}']").click
         expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student@test.com")
+        expect(f('.StudentContextTray-Header')).to contain_css('i.icon-email')
+      end
+
+      it "should not display the message button if the student enrollment is inactive" do
+        @enrollment.deactivate
+        get("/courses/#{@course.id}/users")
+        f("a[data-student_id='#{@student.id}']").click
+        expect(f('.StudentContextTray-Header')).not_to contain_css('i.icon-email')
       end
     end
   end

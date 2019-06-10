@@ -237,7 +237,7 @@ export default class StudentContextTray extends React.Component {
                           <LastActivity user={user} />
                         </Text>
                       </div>
-                      {course.permissions.send_messages ? (
+                      {course.permissions.send_messages && user.enrollments.some(e => e.state == 'active') ? (
                         <div className="StudentContextTray-Header__Actions">
                           <Button
                             ref={ (b) => this.messageStudentsButton = b }

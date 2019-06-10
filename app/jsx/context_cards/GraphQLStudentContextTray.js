@@ -64,6 +64,7 @@ const SCC_QUERY = gql`
         avatar_url: avatarUrl
         enrollments(courseId: $courseId) {
           last_activity_at: lastActivityAt
+          state
           section {
             name
           }
