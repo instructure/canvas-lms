@@ -19,8 +19,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe RoleOverridesController do
+  let(:parent_account) { Account.default }
   before :each do
-    @account = account_model(:parent_account => Account.default)
+    @account = account_model(:parent_account => parent_account)
     account_admin_user(:account => @account)
     user_session(@admin)
   end
@@ -214,6 +215,22 @@ describe RoleOverridesController do
         expect(response).to be_successful
         expect(assigns[:js_bundles].length).to eq 1
         expect(assigns[:js_bundles].first).to include :permissions_index
+      end
+
+      it 'does not load the manage_developer_keys role on sub account' do
+        get 'index', params: {:account_id => @account.id}
+        expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to_not include(:manage_developer_keys)
+        expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys}).to eq false
+      end
+
+      context 'in root_account' do
+        let(:parent_account) { nil }
+
+        it 'does load the manage_developer_keys role on root account' do
+          get 'index', params: {:account_id => @account.id}
+          expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to include(:manage_developer_keys)
+          expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys}).to eq true
+        end
       end
     end
   end
