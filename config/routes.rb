@@ -2327,7 +2327,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
     end
 
-    # Public Developer Key Update Service
+    # Public JWK Service
     scope(controller: 'lti/public_jwk') do
       put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
     end
