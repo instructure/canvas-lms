@@ -111,7 +111,7 @@
     "@instructure/ui-elements": "6",
     "@instructure/ui-forms": "6",
     "@instructure/ui-icons": "6",
-    "@instructure/ui-layout": "6",
+    "@instructure/ui-layout": "6.3.1-rc.1+2dd401cc",
     "@instructure/ui-overlays": "6",
     "@instructure/ui-react-utils": "6",
     "@instructure/ui-svg-images": "6",

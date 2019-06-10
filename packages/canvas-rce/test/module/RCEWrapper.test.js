@@ -282,6 +282,7 @@ describe("RCEWrapper", () => {
 
     describe('insertImagePlaceholder', () => {
       let globalImage
+      let contentInsertionStub
       function mockImage() {
         // jsdom doesn't support Image
         // mock enough for RCEWrapper.insertImagePlaceholder
@@ -294,10 +295,15 @@ describe("RCEWrapper", () => {
           }
         }
       }
-
       function restoreImage() {
         global.Image = globalImage
       }
+      beforeEach(() => {
+        contentInsertionStub = sinon.stub(contentInsertion, 'insertContent')
+      })
+      afterEach(() => {
+        contentInsertion.insertContent.restore()
+      })
 
       it('inserts a placeholder image with the proper metadata', () => {
         mockImage()
@@ -317,10 +323,8 @@ describe("RCEWrapper", () => {
       data-placeholder-for="green_square"
       style="width: 10px; height: 10px; border: solid 1px #8B969E;"
     />`;
-        const stub = sinon.stub(contentInsertion, 'insertContent')
         instance.insertImagePlaceholder(props)
-        sinon.assert.calledWith(stub, editor, imageMarkup)
-        contentInsertion.insertContent.restore()
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
         restoreImage()
       })
 
@@ -339,10 +343,8 @@ describe("RCEWrapper", () => {
       data-placeholder-for="file.txt"
       style="width: 8rem; height: 1rem; border: solid 1px #8B969E;"
     />`;
-        const stub = sinon.stub(contentInsertion, 'insertContent')
         instance.insertImagePlaceholder(props)
-        sinon.assert.calledWith(stub, editor, imageMarkup)
-        contentInsertion.insertContent.restore()
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
       })
     })
 

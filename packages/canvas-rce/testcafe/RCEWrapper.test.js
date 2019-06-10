@@ -118,7 +118,6 @@ test('can create a link', async t => {
     .typeText(labeledBy('URL'), 'https://instructure.com')
     .click(Selector('button').withText('Save'))
     .switchToIframe(tinyIframe)
-    .debug()
     .expect(Selector('a').withAttribute('href', 'https://instructure.com').withAttribute('target', '_blank').exists).ok()
 })
 
