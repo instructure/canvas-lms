@@ -20,6 +20,7 @@ const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
 export const FILE_LINK_TYPE = 'file-link'
 export const IMAGE_EMBED_TYPE = 'image-embed'
+export const VIDEO_EMBED_TYPE = 'video-embed'
 export const NONE_TYPE = 'none'
 
 function asImageEmbed($element) {
@@ -57,6 +58,21 @@ function asFileLink($element) {
   }
 }
 
+function asVideoElement($element) {
+  if (!$element.id) {
+    return null
+  }
+  if (!$element.id.includes("media_object")) {
+    return null
+  }
+
+  return {
+    displayAs: 'div',
+    type: VIDEO_EMBED_TYPE,
+    id: $element.id.split("_")[2]
+  }
+}
+
 function asNone() {
   return {type: NONE_TYPE}
 }
@@ -66,7 +82,7 @@ export function getContentFromElement($element) {
     return asNone()
   }
 
-  const content = asFileLink($element) || asImageEmbed($element) || asNone()
+  const content = asFileLink($element) || asImageEmbed($element) || asVideoElement($element) || asNone()
   content.$element = $element
   return content
 }

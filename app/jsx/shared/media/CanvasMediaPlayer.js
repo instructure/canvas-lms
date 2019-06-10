@@ -30,7 +30,6 @@ export default class CanvasMediaPlayer extends React.Component {
   }
 
   state = {
-    containingIframe: null,
     mediaSources: this.props.mediaSources
   }
 
@@ -48,7 +47,6 @@ export default class CanvasMediaPlayer extends React.Component {
     if (!this.props.mediaSources.length) {
       this.pollInfo()
     }
-    this.setState({containingIframe})
   }
 
   componentWillUnmount () {
@@ -72,10 +70,6 @@ export default class CanvasMediaPlayer extends React.Component {
   }
 
   render() {
-    if(this.state.mediaSources.length && this.state.containingIframe) {
-        this.state.containingIframe.height = this.state.mediaSources[0].height
-        this.state.containingIframe.width = this.state.mediaSources[0].width
-    }
     return (
       <div>
         {this.state.mediaSources.length ?

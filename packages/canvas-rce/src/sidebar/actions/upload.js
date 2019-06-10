@@ -20,21 +20,22 @@ import * as files from "./files";
 import * as images from "./images";
 import Bridge from "../../bridge";
 import {fileEmbed} from "../../common/mimeClass";
+import {VIDEO_SIZE_OPTIONS} from '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 
-export const RECEIVE_FOLDER = "RECEIVE_FOLDER";
+export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
+export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
 export const FAIL_FOLDERS_LOAD = "FAIL_FOLDERS_LOAD";
 export const FAIL_MEDIA_UPLOAD = "FAIL_MEDIA_UPLOAD";
 export const MEDIA_UPLOAD_SUCCESS = "MEDIA_UPLOAD_SUCCESS";
-export const START_FILE_UPLOAD = "START_FILE_UPLOAD";
-export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
-export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
-export const TOGGLE_UPLOAD_FORM = "TOGGLE_UPLOAD_FORM";
 export const PROCESSED_FOLDER_BATCH = "PROCESSED_FOLDER_BATCH";
 export const QUOTA_EXCEEDED_UPLOAD = "QUOTA_EXCEEDED_UPLOAD";
+export const RECEIVE_FOLDER = "RECEIVE_FOLDER";
+export const START_FILE_UPLOAD = "START_FILE_UPLOAD";
 export const START_LOADING = "START_LOADING";
-export const STOP_LOADING = "STOP_LOADING";
 export const START_MEDIA_UPLOADING = "START_MEDIA_UPLOADING";
+export const STOP_LOADING = "STOP_LOADING";
 export const STOP_MEDIA_UPLOADING = "STOP_MEDIA_UPLOADING";
+export const TOGGLE_UPLOAD_FORM = "TOGGLE_UPLOAD_FORM";
 
 export function startLoading() {
   return { type: START_LOADING };
@@ -206,10 +207,11 @@ function addUploaderFileErrorEventListeners(uploader, dispatch) {
 function addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, context, source) {
   uploader.addEventListener('K5.complete', (mediaServerMediaObject) => {
     mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
-    mediaServerMediaObject.type= `${context.contextType}_${context.contextId}`
+    mediaServerMediaObject.type = `${context.contextType}_${context.contextId}`
     source.uploadMediaToCanvas(mediaServerMediaObject).then((mediaObject) => {
-      var videoElement = editor.dom.add(editor.getBody(), 'div', { 'class': 'draggableTemplate' }, ' ');
-      editor.dom.add(videoElement, 'iframe', { 'width': '550', 'height': '550', 'src': mediaObject.embedded_iframe_url, 'scrolling': 'no'});
+      const videoElement = editor.dom.add(editor.getBody(), 'div', { 'id': `media_object_${mediaObject.media_object.media_id}` }, ' ')
+      editor.dom.setStyles(videoElement, {'width': VIDEO_SIZE_OPTIONS['medium'].width, 'height': VIDEO_SIZE_OPTIONS['medium'].height})
+      editor.dom.add(videoElement, 'iframe', {'src': mediaObject.embedded_iframe_url, 'width': '100%', 'height': '100%', 'scrolling': 'no'});
       dispatch(mediaUploadSuccess())
       dismiss()
     }).catch((error)=> {
