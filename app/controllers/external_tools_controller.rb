@@ -1087,8 +1087,8 @@ class ExternalToolsController < ApplicationController
     end
 
     if @tool.use_1_3?
-      context_path = @context.is_a?(Account) ? account_external_tools_url(@context) : course_external_tools_url(@context)
-      render :json => { id: @tool.id, name: @tool.name, url: "#{login_session_token_url}?return_to=#{context_path}" }
+      context_path = "#{@context.is_a?(Account) ? account_external_tools_url(@context) : course_external_tools_url(@context)}/#{@tool.id}"
+      render :json => { id: @tool.id, name: @tool.name, url: "#{login_session_token_url}?return_to=#{CGI.escape(context_path)}" }
     else
       # generate the launch
       opts = {
