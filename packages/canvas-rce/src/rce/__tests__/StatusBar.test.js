@@ -16,42 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import React from 'react'
 import 'jest-dom/extend-expect'
-import {render, cleanup, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from 'react-testing-library'
 import keycode from 'keycode'
 import StatusBar from '../StatusBar'
 
-afterEach(cleanup)
-
-function renderStatusBar() {
+function renderStatusBar(overrideProps) {
   return render(
     <StatusBar
-        onToggleHtml={() => {}}
-        path={[]}
-        wordCount={0}
-        isHtmlView={false}
-        onResize={() => {}}
-        onKBShortcutModalOpen={() => {}}
-      />
+      onToggleHtml={() => {}}
+      path={[]}
+      wordCount={0}
+      isHtmlView={false}
+      onResize={() => {}}
+      onKBShortcutModalOpen={() => {}}
+      onA11yChecker={() => {}}
+      {...overrideProps}
+    />
   )
 }
 
 describe('RCE StatusBar', () => {
   it('calls callback when clicking kb shortcut button', () => {
     const onkbcallback = jest.fn()
-    const {getByText} = render(
-      <StatusBar
-          onToggleHtml={() => {}}
-          path={[]}
-          wordCount={0}
-          isHtmlView={false}
-          onResize={() => {}}
-          onKBShortcutModalOpen={onkbcallback}
-        />
-    )
-
+    const {getByText} = renderStatusBar({onKBShortcutModalOpen: onkbcallback})
     const kbBtn = getByText('View keyboard shortcuts')
     kbBtn.click()
     expect(onkbcallback).toHaveBeenCalled()
@@ -66,7 +55,7 @@ describe('RCE StatusBar', () => {
     expect(document.activeElement === buttons[0])
 
     // wraps to the right
-    for(let i = 0; i === buttons.length; ++i) {
+    for (let i = 0; i === buttons.length; ++i) {
       fireEvent.keyDown(container, {keyCode: keycode.codes.right})
       expect(document.activeElement === buttons[i % buttons.length])
     }
@@ -82,10 +71,18 @@ describe('RCE StatusBar', () => {
     expect(document.activeElement === buttons[3])
 
     // wraps to the left
-    for(let i = 0; i < buttons.length; ++i) {
+    for (let i = 0; i < buttons.length; ++i) {
       fireEvent.keyDown(container, {keyCode: keycode.codes.left})
       expect(document.activeElement === buttons[(3 - i + buttons.length) % buttons.length])
     }
     expect(document.activeElement === buttons[3])
+  })
+
+  it('calls the callback when clicking the a11y checker button', () => {
+    const onA11yCallback = jest.fn()
+    const {getByText} = renderStatusBar({onA11yChecker: onA11yCallback})
+    const a11yButton = getByText('Accessibility Checker')
+    a11yButton.click()
+    expect(onA11yCallback).toHaveBeenCalled()
   })
 })

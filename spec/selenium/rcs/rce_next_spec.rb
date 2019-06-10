@@ -372,7 +372,6 @@ describe "RCE next tests" do
     end
 
     it "should open a11y checker when clicking button in status bar" do
-      skip('Unskip in CORE-2638')
       visit_front_page_edit(@course)
 
       click_a11y_checker_button

@@ -431,6 +431,10 @@ class RCEWrapper extends React.Component {
     this.mceInstance().fire('ResizeEditor')
   }
 
+  onA11yChecker = () => {
+    this.onTinyMCEInstance('openAccessibilityChecker')
+  }
+
   handleShortcutKeyShortcut = (event) => {
     if (event.altKey && (event.keyCode === 48 || event.keyCode === 119)) {
       event.preventDefault()
@@ -592,6 +596,7 @@ class RCEWrapper extends React.Component {
           isHtmlView={this.state.isHtmlView}
           onResize={this.onResize}
           onKBShortcutModalOpen={this.openKBShortcutModal}
+          onA11yChecker={this.onA11yChecker}
         />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
         <KeyboardShortcutModal
