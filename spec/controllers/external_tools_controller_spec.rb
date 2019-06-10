@@ -1708,7 +1708,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
         json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
         return_to = CGI.parse(URI.parse(json['url']).query)['return_to']
-        expect(return_to.first).to eq(course_external_tools_url(@course))
+        expect(return_to.first).to eq("#{course_external_tools_url(@course)}/#{tool.id}")
       end
     end
   end
