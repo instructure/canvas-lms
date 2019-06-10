@@ -44,12 +44,7 @@ module Lti::Ims::Concerns
       end
 
       def active_binding_for_account?
-        if context.is_a? Account
-          return false if context.site_admin?
-          developer_key.binding_on_in_account?(context)
-        else
-          context&.account.present? && developer_key.binding_on_in_account?(context.account)
-        end
+        developer_key.usable_in_context?(context)
       end
 
       def tool
