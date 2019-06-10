@@ -184,6 +184,11 @@
 #           "description": "A unique short ID identifying this submission without reference to the owning user. Only included if the caller has administrator access for the current account.",
 #           "example": "acJ4Q",
 #           "type": "string"
+#         },
+#         "posted_at" : {
+#           "description": "The date this submission was posted to the student, or nil if it has not been posted.",
+#           "example": "2020-01-02T11:10:30Z",
+#           "type": "datetime"
 #         }
 #       }
 #     }
