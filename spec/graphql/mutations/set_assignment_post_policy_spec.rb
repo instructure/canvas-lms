@@ -27,7 +27,7 @@ describe Mutations::SetAssignmentPostPolicy do
 
   def mutation_str(assignment_id: nil, post_manually: nil)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
-    input_string += " postManually: #{post_manually} " if post_manually.present?
+    input_string += " postManually: #{post_manually} " unless post_manually.nil?
 
     <<~GQL
       mutation {
@@ -77,6 +77,31 @@ describe Mutations::SetAssignmentPostPolicy do
       result = execute_query(mutation_str(assignment_id: bad_id, post_manually: true), context)
       expected_error = "An assignment with that id does not exist"
       expect(result.dig("errors", 0, "message")).to eql expected_error
+    end
+
+    it "raises an error on setting an anonymous assignment to automatic posting" do
+      assignment.update!(anonymous_grading: true)
+      result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: false), context)
+      expected_error = "Anonymous assignments must be manually posted"
+      expect(result.dig("errors", 0, "message")).to eql expected_error
+    end
+
+    context "for a moderated, non-anonymous assignment" do
+      let(:moderated_assignment) do
+        course.assignments.create!(moderated_grading: true, final_grader: teacher, grader_count: 2)
+      end
+
+      it "raises an error when setting an automatic post policy before grades are published" do
+        result = execute_query(mutation_str(assignment_id: moderated_assignment.id, post_manually: false), context)
+        expected_error = "Moderated assignments must be manually posted until grades are released"
+        expect(result.dig("errors", 0, "message")).to eql expected_error
+      end
+
+      it "allows setting an automatic post policy when grades have been published" do
+        moderated_assignment.update!(grades_published_at: Time.zone.now)
+        result = execute_query(mutation_str(assignment_id: moderated_assignment.id, post_manually: false), context)
+        expect(result.dig("data", "setAssignmentPostPolicy")).to have_key('postPolicy')
+      end
     end
 
     it "returns the related post policy" do
