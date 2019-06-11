@@ -137,7 +137,7 @@ describe("RCEWrapper", () => {
         const editor = {
           ui: { registry: { addIcon: () => {} } }
         };
-        const wrapper = new RCEWrapper({});
+        const wrapper = new RCEWrapper({tinymce: fakeTinyMCE});
         const options = wrapper.wrapOptions({});
         options.setup(editor);
         assert.equal(RCEWrapper.getByEditor(editor), wrapper);
@@ -281,11 +281,26 @@ describe("RCEWrapper", () => {
     })
 
     describe('insertImagePlaceholder', () => {
+      let globalImage
+      function mockImage() {
+        // jsdom doesn't support Image
+        // mock enough for RCEWrapper.insertImagePlaceholder
+        globalImage = global.Image
+        global.Image = function() {
+          return {
+            src: null,
+            width: '10',
+            height: '10'
+          }
+        }
+      }
+
+      function restoreImage() {
+        global.Image = globalImage
+      }
+
       it('inserts a placeholder image with the proper metadata', () => {
-        // This image should be 10x10px but jsdom doesn't return the proper size
-        // so we stub it out to always return 10 here.
-        const heightStub = sinon.stub(HTMLImageElement.prototype, 'height').get(() => 10)
-        const widthStub = sinon.stub(HTMLImageElement.prototype, 'width').get(() => 10)
+        mockImage()
         const greenSquare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
         const props = {
           name: 'green_square',
@@ -306,8 +321,7 @@ describe("RCEWrapper", () => {
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(stub, editor, imageMarkup)
         contentInsertion.insertContent.restore()
-        heightStub.restore()
-        widthStub.restore()
+        restoreImage()
       })
 
       it('inserts a text file placeholder image with the proper metadata', () => {
@@ -623,53 +637,6 @@ describe("RCEWrapper", () => {
       instance = createBasicElement();
       elem = document.getElementById(textareaId);
       stubEventListeners(elem);
-    });
-
-    describe("lifecycle", () => {
-      // since RCEWrapper is now a themeable component, it
-      // really needs to get mounted, but that seems to be
-      // problematic as I get "ReferenceError: tinymce is not defined"
-      // if I try to ReactDOM.render it.
-      it.skip("adds change listener after mount", () => {
-        instance.componentDidMount();
-        sinon.assert.calledWith(
-          elem.addEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-      });
-
-      it.skip("updates change listener if textarea changes", () => {
-        instance.componentDidMount();
-        const oldElem = elem;
-        const appElem = document.getElementById("app");
-        appElem.removeChild(elem);
-        elem = document.createElement("textarea");
-        elem.id = textareaId;
-        stubEventListeners(elem);
-        appElem.appendChild(elem);
-        instance.componentDidUpdate();
-        sinon.assert.calledWith(
-          elem.addEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-        sinon.assert.calledWith(
-          oldElem.removeEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-      });
-
-      it.skip("removes change listener before component unmounts", () => {
-        instance.componentDidMount();
-        instance.componentWillUnmount();
-        sinon.assert.calledWith(
-          elem.removeEventListener,
-          "change",
-          instance.handleTextareaChange
-        );
-      });
     });
 
     describe("handleTextareaChange", () => {

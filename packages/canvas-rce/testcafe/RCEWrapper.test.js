@@ -47,6 +47,25 @@ function labeledBy(text) {
   ))
 }
 
+test('edits in the textarea are reflected in the editor', async (t) => {
+  await t
+    .click(toggleButton)
+    .typeText(textarea, 'this is new content')
+    .click(toggleButton)
+    .switchToIframe(tinyIframe)
+    .expect(Selector('body').withText('this is new content').visible).ok()
+    .switchToMainWindow()
+
+  await t
+    .click(toggleButton)
+    .typeText(textarea, 'this is more content')
+    .click(toggleButton)
+    .switchToIframe(tinyIframe)
+    .expect(Selector('body').withText('this is new content').visible).ok()
+    .expect(Selector('body').withText('this is more content').visible).ok()
+    .switchToMainWindow()
+})
+
 test('shows the create links menu', async t => {
   await t
     .click(toggleButton)
