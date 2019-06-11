@@ -24,6 +24,7 @@ import EditExternalToolButton from './EditExternalToolButton'
 import ManageUpdateExternalToolButton from './ManageUpdateExternalToolButton'
 import ExternalToolPlacementButton from './ExternalToolPlacementButton'
 import DeleteExternalToolButton from './DeleteExternalToolButton'
+import DeploymentIdButton from './DeploymentIdButton'
 import ConfigureExternalToolButton from './ConfigureExternalToolButton'
 import ReregisterExternalToolButton from './ReregisterExternalToolButton'
 import classMunger from '../lib/classMunger'
@@ -178,6 +179,14 @@ export default class ExternalToolsTableRow extends React.Component {
                 canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
+              {
+                this.is13Tool
+                ? <DeploymentIdButton
+                    tool={tool}
+                    returnFocus={this.returnFocus}
+                  />
+                : null
+              }
               <DeleteExternalToolButton
                 ref="deleteExternalToolButton"
                 tool={tool}
