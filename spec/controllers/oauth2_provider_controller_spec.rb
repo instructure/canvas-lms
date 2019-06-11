@@ -51,6 +51,7 @@ describe Oauth2ProviderController do
         }
         assert_status(400)
         expect(response.body).to match /A requested scope is invalid/
+        expect(response.body).to include 'not|valid'
       end
 
       it 'renders 400 when scopes empty' do

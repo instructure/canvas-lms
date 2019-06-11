@@ -99,6 +99,10 @@ module Canvas::Oauth
       @scopes.present? && @scopes.all? { |scope| key.scopes.include?(scope) }
     end
 
+    def missing_scopes
+      @scopes.reject { |scope| key.scopes.include?(scope) }
+    end
+
     def self.is_oob?(uri)
       uri == OAUTH2_OOB_URI
     end

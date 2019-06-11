@@ -38,7 +38,7 @@ class Oauth2ProviderController < ApplicationController
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
     if provider.key.require_scopes?
-      raise Canvas::Oauth::RequestError, :invalid_scope unless provider.valid_scopes?
+      raise Canvas::Oauth::InvalidScopeError, provider.missing_scopes unless provider.valid_scopes?
     end
 
     session[:oauth2] = provider.session_hash
