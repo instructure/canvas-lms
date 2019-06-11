@@ -136,7 +136,7 @@ class CommunicationChannel < ActiveRecord::Base
       'cspire1.com' => { name: 'C Spire', country_code: 1 }.with_indifferent_access.freeze,
       'cingularme.com' => { name: 'Cingular', country_code: 1 }.with_indifferent_access.freeze,
       'mobile.celloneusa.com' => { name: 'CellularOne', country_code: 1 }.with_indifferent_access.freeze,
-      'sms.mycricket.com' => { name: 'Cricket', country_code: 1 }.with_indifferent_access.freeze,
+      'mms.cricketwireless.net' => { name: 'Cricket', country_code: 1 }.with_indifferent_access.freeze,
       'messaging.nextel.com' => { name: 'Nextel', country_code: 1 }.with_indifferent_access.freeze,
       'messaging.sprintpcs.com' => { name: 'Sprint PCS', country_code: 1 }.with_indifferent_access.freeze,
       'tmomail.net' => { name: 'T-Mobile', country_code: 1 }.with_indifferent_access.freeze,
