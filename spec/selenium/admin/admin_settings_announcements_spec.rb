@@ -87,6 +87,18 @@ describe "settings tabs" do
       expect(AccountNotification.count).to eq 0
     end
 
+    it "should check title length" do
+      get "/accounts/#{Account.default.id}/settings"
+      wait_for_ajaximations
+      f("#tab-announcements-link").click
+      fj(".element_toggler:visible").click
+      long_subject = "yikers " * 42
+      f("#account_notification_subject").send_keys(long_subject)
+      submit_form("#add_notification_form")
+      wait_for_ajaximations
+      assert_error_box("#account_notification_subject")
+    end
+
     it "should edit an announcement" do
       skip_if_chrome('issue with edit_announcement method')
       notification = account_notification(user: @user)
