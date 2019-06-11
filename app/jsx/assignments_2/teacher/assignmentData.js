@@ -266,7 +266,9 @@ export const STUDENT_SEARCH_QUERY = gql`
           user {
             ...UserFields
           }
-          submissionHistories: submissionHistoriesConnection {
+          submissionHistories: submissionHistoriesConnection(
+            filter: {states: [graded, pending_review, submitted, ungraded]}
+          ) {
             nodes {
               attempt
               score

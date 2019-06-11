@@ -2176,17 +2176,12 @@ type Submission implements Node & SubmissionInterface & Timestamped {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    filter: SubmissionHistoryFilterInput = {}
 
     """
     Returns the first _n_ elements from the list.
     """
     first: Int
-
-    """
-    If the most current submission should be included in the submission
-    history results. Defaults to true.
-    """
-    includeCurrentSubmission: Boolean = true
 
     """
     Returns the last _n_ elements from the list.
@@ -2400,6 +2395,15 @@ type SubmissionHistoryEdge {
   The item at the end of the edge.
   """
   node: SubmissionHistory
+}
+
+input SubmissionHistoryFilterInput {
+  """
+  If the most current submission should be included in the submission
+  history results. Defaults to true.
+  """
+  includeCurrentSubmission: Boolean = true
+  states: [SubmissionState!] = [deleted, graded, pending_review, submitted, ungraded, unsubmitted]
 }
 
 """

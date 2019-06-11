@@ -213,27 +213,53 @@ describe Types::SubmissionType do
       ).to eq ["MQ", "Mg", "Mw"]
     end
 
-    context 'include_current_submission argument' do
-      it 'includes the current submission history by default' do
-        expect(
-          submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
-        ).to eq [1, 2, 3]
+    context 'filter' do
+      describe 'states' do
+        before(:once) do
+          # Cannot use .first here, because versionable changes .first to .last :knife:
+          history_version = @submission3.versions[0]
+          history = YAML.load(history_version.yaml)
+          history['workflow_state'] = 'unsubmitted'
+          history_version.update!(yaml: history.to_yaml)
+        end
+
+        it 'does not filter by states by default' do
+          expect(
+            submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+          ).to eq [1, 2, 3]
+        end
+
+        it 'can be used to filter by workflow state' do
+          expect(
+            submission_history_type.resolve(
+              'submissionHistoriesConnection(filter: {states: [submitted]}) { nodes { attempt }}'
+            )
+          ).to eq [1, 2]
+        end
       end
 
-      it 'includes the current submission history when true' do
-        expect(
-          submission_history_type.resolve(
-            'submissionHistoriesConnection(includeCurrentSubmission: true) { nodes { attempt }}'
-          )
-        ).to eq [1, 2, 3]
-      end
+      describe 'include_current_submission' do
+        it 'includes the current submission history by default' do
+          expect(
+            submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+          ).to eq [1, 2, 3]
+        end
 
-      it 'does not includes the current submission history when false' do
-        expect(
-          submission_history_type.resolve(
-            'submissionHistoriesConnection(includeCurrentSubmission: false) { nodes { attempt }}'
-          )
-        ).to eq [1, 2]
+        it 'includes the current submission history when true' do
+          expect(
+            submission_history_type.resolve(
+              'submissionHistoriesConnection(filter: {includeCurrentSubmission: true}) { nodes { attempt }}'
+            )
+          ).to eq [1, 2, 3]
+        end
+
+        it 'does not includes the current submission history when false' do
+          expect(
+            submission_history_type.resolve(
+              'submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) { nodes { attempt }}'
+            )
+          ).to eq [1, 2]
+        end
       end
     end
   end

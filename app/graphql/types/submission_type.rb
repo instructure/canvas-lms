@@ -17,6 +17,18 @@
 #
 
 module Types
+  class SubmissionHistoryFilterInputType < Types::BaseInputObject
+    graphql_name 'SubmissionHistoryFilterInput'
+
+    argument :states, [SubmissionStateType], required: false,
+      default_value: DEFAULT_SUBMISSION_HISTORY_STATES
+
+    argument :include_current_submission, Boolean, <<~DESC, required: false, default_value: true
+      If the most current submission should be included in the submission
+      history results. Defaults to true.
+    DESC
+  end
+
   class SubmissionType < ApplicationObjectType
     graphql_name 'Submission'
 
@@ -32,19 +44,19 @@ module Types
     #       both submissions and submission histories
 
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
-      argument :include_current_submission, Boolean, <<~DESC, required: false, default_value: true
-        If the most current submission should be included in the submission
-        history results. Defaults to true.
-      DESC
+      argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
-    def submission_histories_connection(include_current_submission: true)
+    def submission_histories_connection(filter:)
+      filter = filter.to_h
+      states, include_current_submission = filter.values_at(:states, :include_current_submission)
+
       Promise.all([
         load_association(:versions),
         load_association(:assignment)
       ]).then do
         histories = object.submission_history
         histories.pop unless include_current_submission
-        histories
+        histories.select{ |h| states.include?(h.workflow_state) }
       end
     end
   end
