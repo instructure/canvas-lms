@@ -40,7 +40,27 @@ it('renders the tabs in the correct order', () => {
   const tabs = getAllByRole('tab')
 
   expect(tabs).toHaveLength(3)
-  expect(tabs[0]).toContainElement(getByText('Upload'))
+  expect(tabs[0]).toContainElement(getByText('Attempt 1'))
   expect(tabs[1]).toContainElement(getByText('Comments'))
   expect(tabs[2]).toContainElement(getByText('Rubric'))
+})
+
+it('titles the attempt tab as Attempt 1 on a brand new submission', () => {
+  const {getAllByRole, getByText} = render(
+    <MockedProvider>
+      <ContentTabs assignment={mockAssignment()} submission={mockSubmission({attempt: 0})} />
+    </MockedProvider>
+  )
+  const tabs = getAllByRole('tab')
+  expect(tabs[0]).toContainElement(getByText('Attempt 1'))
+})
+
+it('titles the attempt tab with the correct attempt number on a submission with multiple attempts', () => {
+  const {getAllByRole, getByText} = render(
+    <MockedProvider>
+      <ContentTabs assignment={mockAssignment()} submission={mockSubmission({attempt: 50})} />
+    </MockedProvider>
+  )
+  const tabs = getAllByRole('tab')
+  expect(tabs[0]).toContainElement(getByText('Attempt 50'))
 })

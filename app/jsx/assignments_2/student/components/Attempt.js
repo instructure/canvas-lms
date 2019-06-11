@@ -23,12 +23,13 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 
+export const getCurrentAttempt = submission => {
+  return submission && submission.attempt !== 0 ? submission.attempt : 1
+}
+
 function Attempt(props) {
   const {assignment, submission} = props
-  let current_attempt = 1
-  if (submission && submission.attempt !== 0) {
-    current_attempt = submission.attempt
-  }
+  const current_attempt = getCurrentAttempt(submission)
 
   return (
     <Text size="medium" weight="bold" data-test-id="attempt">

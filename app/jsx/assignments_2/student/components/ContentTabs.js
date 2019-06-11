@@ -19,6 +19,7 @@
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import ContentUploadTab from './ContentUploadTab'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
@@ -38,7 +39,9 @@ function ContentTabs(props) {
   return (
     <div data-testid="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel title={I18n.t('Upload')}>
+        <TabPanel
+          title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+        >
           <ContentUploadTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
