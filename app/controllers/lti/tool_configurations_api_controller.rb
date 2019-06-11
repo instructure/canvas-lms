@@ -164,7 +164,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     developer_key = tool_config.developer_key
     developer_key.redirect_uris = redirect_uris unless redirect_uris.nil?
     developer_key.public_jwk = tool_config.settings['public_jwk']
+    developer_key.public_jwk_url = tool_config.settings['public_jwk_url']
     developer_key.oidc_initiation_url = tool_config.settings['oidc_initiation_url']
+    developer_key.is_lti_key = true
     developer_key.update!(developer_key_params)
   end
 
