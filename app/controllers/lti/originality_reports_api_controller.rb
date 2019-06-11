@@ -371,9 +371,18 @@ module Lti
     def find_originality_report
       raise ActiveRecord::RecordNotFound if submission.blank?
       @report = OriginalityReport.find_by(id: params[:id])
-      @report ||= (OriginalityReport.find_by(attachment_id: attachment&.id) if attachment.present?)
+      @report ||= report_by_attachment(attachment)
       return if params[:originality_report].blank? || attachment.present?
       @report ||= submission.originality_reports.find_by(attachment: nil) unless attachment_required?
+    end
+
+    def report_by_attachment(attachment)
+      return if attachment.blank?
+      if submission.present?
+        OriginalityReport.find_by(attachment_id: attachment&.id, submission: submission)
+      else
+        OriginalityReport.find_by(attachment_id: attachment&.id)
+      end
     end
 
     def report_in_context
