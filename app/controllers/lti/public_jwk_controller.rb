@@ -45,7 +45,7 @@ module Lti
   #          },
   #          "public_jwk":{
   #             "description":"The public key in jwk format",
-  #             "example":"\{\n\t\"kty\":\"RSA\",\n\t\"e\":\"AQAB\",\n\t\"n\":\"ufmgt156hs168mgdhy168jrsydt168ju816rtahesuvdbmnrtd87t7h8ser\",\n\t\"alg\":\"RS256\",\n\t\"use\":\"sig\",\n\t\"kid\":\"Se68gr16s6tj_87sdr98g489dsfjy-547a6eht1\",\n\}",
+  #             "example":"{\n\t\"kty\":\"RSA\",\n\t\"e\":\"AQAB\",\n\t\"n\":\"ufmgt156hs168mgdhy168jrsydt168ju816rtahesuvdbmnrtd87t7h8ser\",\n\t\"alg\":\"RS256\",\n\t\"use\":\"sig\",\n\t\"kid\":\"Se68gr16s6tj_87sdr98g489dsfjy-547a6eht1\",\n}",
   #             "type":"string"
   #          },
   #          "vendor_code":{
