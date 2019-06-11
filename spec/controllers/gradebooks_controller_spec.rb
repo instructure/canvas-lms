@@ -196,6 +196,14 @@ describe GradebooksController do
       expect(order).to eq :due_at
     end
 
+    it "includes the post_policies_enabled in the ENV" do
+      @course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:post_policies_enabled]).to be true
+    end
+
     it "includes the current grading period id in the ENV" do
       group = @course.root_account.grading_period_groups.create!
       period = group.grading_periods.create!(title: "GP", start_date: 3.months.ago, end_date: 3.months.from_now)

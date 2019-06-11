@@ -128,7 +128,8 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency
+      outcome_proficiency: outcome_proficiency,
+      post_policies_enabled: @context.post_policies_enabled?
     }
 
     if @context.feature_enabled?(:final_grades_override)
