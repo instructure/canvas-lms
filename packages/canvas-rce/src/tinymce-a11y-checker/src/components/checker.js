@@ -55,7 +55,9 @@ export default class Checker extends React.Component {
     this.setState({ config })
   }
 
-  check(done = noop) {
+  check(done) {
+    if (typeof done !== "function") done = noop
+
     this.setState(
       {
         open: true,
@@ -109,9 +111,7 @@ export default class Checker extends React.Component {
         () => {
           this.setState({ errorIndex: 0, errors, checking: false }, () => {
             this.selectCurrent()
-            if (typeof done === "function") {
-              done()
-            }
+            done()
           })
         }
       )

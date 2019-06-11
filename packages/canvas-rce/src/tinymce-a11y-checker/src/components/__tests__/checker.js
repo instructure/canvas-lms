@@ -173,10 +173,16 @@ describe("check", () => {
     expect(spy).not.toHaveBeenCalled()
   })
 
-  test("does not try to call done if it is not a function", () => {
-    expect(() => {
-      instance.check("123")
-    }).not.toThrow()
+  describe("done", () => {
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => jest.useRealTimers())
+
+    test("does not try to call done if it is not a function", () => {
+      expect(() => {
+        instance.check("123")
+        jest.runAllTimers()
+      }).not.toThrow()
+    })
   })
 })
 
