@@ -90,11 +90,8 @@ $icon_index: (
 @mixin InstIconFontFace($variant) {
   @font-face {
     font-family: "InstructureIcons-#{$variant}";
-    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot');
-    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot?#iefix') format('eot'),
-      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.woff') format('woff'),
-      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.ttf') format('truetype'),
-      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.svg#InstructureIcons-#{$variant}') format('svg');
+    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.woff2') format('woff2'),
+         url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.woff') format('woff'); /* TODO: remove the woff version when we drop IE 11 because everyone else supports woff2 */
     font-weight: normal;
     font-style: normal;
     font-display: block; /* tell the browser to never fall back to rendering using system fonts */
@@ -123,7 +120,6 @@ a[class^=icon-] {
     display: inline-block;
     vertical-align: top;
     line-height: 1;
-    text-rendering: optimizeLegibility;
 
     // the specific reason for this being in the :before and not part of the <i> was to get
     // .input-appends to work with .btns that had an <i> icon in them.
