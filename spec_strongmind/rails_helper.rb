@@ -22,6 +22,7 @@ require 'capybara-screenshot/rspec'
 require 'shoulda/matchers'
 require 'rake'
 require 'capybara-screenshot/rspec'
+require 'delayed/testing' # inst-jobs testing
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are

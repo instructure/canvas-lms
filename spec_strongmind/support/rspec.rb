@@ -19,7 +19,7 @@ RSpec.configure do |config|
 
   def reset_all_the_things!
     I18n.locale = :en
-    Time.zone = 'UTC'
+    Time.zone = 'Arizona'
     LoadAccount.force_special_account_reload = true
     Account.clear_special_account_cache!(true)
     PluginSetting.current_account = nil
@@ -46,7 +46,7 @@ RSpec.configure do |config|
   end
 
   # Mirror canvas's specs
-  Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
+  Account.time_zone_attribute_defaults[:default_time_zone] = 'Arizona'
 
   config.before :all do
     Role.ensure_built_in_roles!
@@ -64,9 +64,12 @@ RSpec.configure do |config|
 
   config.before(:each) do
     reset_all_the_things!
+    Delayed::Testing.clear_all! # delete all queued jobs
 
     DatabaseCleaner.strategy = Capybara.current_driver == :rack_test ? :transaction : :truncation
     DatabaseCleaner.start
+
+    Role.ensure_built_in_roles!
   end
 
   config.after(:each) do

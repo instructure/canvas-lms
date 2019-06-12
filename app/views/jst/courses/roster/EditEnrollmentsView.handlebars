@@ -1,0 +1,31 @@
+
+<div class="ic-flash-warning" style="width: auto !important;">
+  <div class="ic-flash__icon" aria-hidden="true">
+    <i class="icon-warning"></i>
+  </div>
+  Warning: <b>This action cannot be undone</b>.  Students placed far ahead in a course cannot be moved back to a previous lesson activity.
+</div>
+
+<br/>
+
+<div class="ic-flash-info" style="width: auto !important;">
+  <div class="ic-flash__icon" aria-hidden="true">
+    <i class="icon-info"></i>
+  </div>
+  Info: It can take a few minutes to custom place a student.  Click <b>Update</b> to continue working in the system while this action is performed.
+</div>
+
+<p>Please select an initial place to start this student at.</p>
+
+<div class="ic-Form-control">
+  <label class="ic-Label" for="content_tag_id">Unit to start</label>
+  <select class="ic-Input" name="content_tag_id" id="content_tag_id" class="">
+    {{#each context_modules}}
+      <optgroup label="{{name}}">
+        {{#each this.content_tags}}
+          <option value="{{this.id}}">{{this.title}}</option>
+        {{/each}}
+      </optgroup>
+    {{/each}}
+  </select>
+</div>

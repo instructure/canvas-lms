@@ -196,6 +196,7 @@ class ContextController < ApplicationController
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
       js_env({
+        :CUSTOM_PLACEMENT => SettingsService.get_settings(object: :school, id: 1)['enable_custom_placement'] == true,
         :ALL_ROLES => all_roles,
         :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name} },
         :CONCLUDED_SECTIONS => concluded_sections,
@@ -219,7 +220,15 @@ class ContextController < ApplicationController
           :concluded => @context.concluded?,
           :teacherless => @context.teacherless?,
           :available => @context.available?,
-          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
+          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user),
+          :context_modules => @context.context_modules.order(position: :asc).map do |context_module|
+            {
+              name: context_module.name,
+              content_tags: context_module.content_tags.active.order(position: :asc).map do |tag|
+                { title: tag.title, id: tag.id }
+              end
+            }
+          end
         }
       })
 

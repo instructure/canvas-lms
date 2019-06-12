@@ -22,6 +22,7 @@ define [
   'Backbone'
   'jst/courses/roster/rosterUser'
   'compiled/views/courses/roster/EditSectionsView'
+  'compiled/views/courses/roster/EditEnrollmentsView'
   'compiled/views/courses/roster/EditRolesView'
   'compiled/views/courses/roster/InvitationsView'
   'compiled/views/courses/roster/LinkToStudentsView'
@@ -29,12 +30,13 @@ define [
   'str/htmlEscape'
   'compiled/jquery.kylemenu'
   'jquery.disableWhileLoading'
-], (I18n, $, _, Backbone, template, EditSectionsView, EditRolesView, InvitationsView, LinkToStudentsView, toUnderscore, h) ->
+], (I18n, $, _, Backbone, template, EditSectionsView, EditEnrollmentsView, EditRolesView, InvitationsView, LinkToStudentsView, toUnderscore, h) ->
 
   editSectionsDialog = null
   editRolesDialog = null
   linkToStudentsDialog = null
   invitationDialog = null
+  editEnrollmentsDialog = null
 
   class RosterUserView extends Backbone.View
 
@@ -72,15 +74,16 @@ define [
         json.course_id = enrollment.course_id
 
     permissionsJSON: (json) ->
+      json.canCustomPlacement = ENV.CUSTOM_PLACEMENT
       json.url = "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
       json.isObserver = @model.hasEnrollmentType('ObserverEnrollment')
       json.isPending = @model.pending(@model.currentRole)
       json.isInactive = @model.inactive()
 
-      # <- ADDED BY STRONGMIND FOR PLAY-896 
+      # <- ADDED BY STRONGMIND FOR PLAY-896
       json.isAdmin = ('admin' in ENV.current_user_roles)
       # ->
-      
+
       if !json.isInactive
         json.enrollments = _.reject json.enrollments, (en) -> en.enrollment_state == 'inactive' # if not _completely_ inactive, treat the inactive enrollments as deleted
 
@@ -140,6 +143,14 @@ define [
       editSectionsDialog ||= new EditSectionsView
       editSectionsDialog.model = @model
       editSectionsDialog.render().show()
+
+    editEnrollments: (e) ->
+      editEnrollmentsDialog ||= new EditEnrollmentsView
+      enrollment = @model.get('enrollments').find (el) -> ENV.course.id == el.course_id
+      editEnrollmentsDialog.model           = @model
+      editEnrollmentsDialog.enrollment      = enrollment
+      editEnrollmentsDialog.context_modules = @options.course.context_modules
+      editEnrollmentsDialog.render().show()
 
     editRoles: (e) ->
       editRolesDialog ||= new EditRolesView

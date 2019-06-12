@@ -1,4 +1,10 @@
 # Users
+
+# If testing progressions or submissions with users
+# Don't enroll students in course before course content is setup,
+# otherwise submissions/progressions/etc will not exist.
+# See custom_placement_spec.rb for reference
+
   teacher_in_course; @teacher
   student_in_course(course: @course).user
   user_with_pseudonym(active_all: true)
