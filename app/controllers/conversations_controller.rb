@@ -305,10 +305,6 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def toggle_new_conversations
-    redirect_to action: 'index'
-  end
-
   # @API Create a conversation
   # Create a new conversation with one or more recipients. If there is already
   # an existing private conversation with the given recipients, it will be
@@ -1060,14 +1056,6 @@ class ConversationsController < ApplicationController
     end
     content += "</div>"
     content
-  end
-
-  def watched_intro
-    unless @current_user.watched_conversations_intro?
-      @current_user.watched_conversations_intro
-      @current_user.save
-    end
-    render :json => {}
   end
 
   private

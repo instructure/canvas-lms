@@ -45,9 +45,7 @@ CanvasRails::Application.routes.draw do
 
   get 'search/recipients' => 'search#recipients'
   post 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read'
-  post 'conversations/watched_intro' => 'conversations#watched_intro'
   get 'conversations/batches' => 'conversations#batches', as: :conversation_batches
-  post 'conversations/toggle_new_conversations' => 'conversations#toggle_new_conversations', as: :toggle_new_conversations
   resources :conversations, only: [:index, :show, :update, :create, :destroy] do
     post :add_recipients
     post :add_message
