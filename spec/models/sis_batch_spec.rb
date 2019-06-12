@@ -545,6 +545,37 @@ s2,test_1,section2,active},
       run_jobs
     end
 
+    it "should have correct counts for batch_mode" do
+      @term = @account.enrollment_terms.first
+      @term.update_attribute(:sis_source_id, 'term_1')
+      @previous_batch = @account.sis_batches.create!
+
+      process_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,active},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,active},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,active}
+        ])
+
+      b = process_csv_data(
+        [
+          %{user_id,login_id,status},
+          %{course_id,short_name,long_name,term_id,status},
+          %{section_id,course_id,name,status},
+          %{section_id,user_id,role,status}
+        ], batch_mode: true, batch_mode_term: @term
+      )
+      expect(b.data[:counts][:batch_enrollments_deleted]).to eq 1
+      expect(b.data[:counts][:batch_sections_deleted]).to eq 1
+      expect(b.data[:counts][:batch_courses_deleted]).to eq 1
+    end
+
+
     it "should only do batch mode removals for supplied data types" do
       @term = @account.enrollment_terms.first
       @term.update_attribute(:sis_source_id, 'term_1')
