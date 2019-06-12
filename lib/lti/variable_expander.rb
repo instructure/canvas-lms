@@ -528,6 +528,12 @@ module Lti
                        -> { @context.workflow_state },
                        COURSE_GUARD
 
+    # returns true if the current course has the setting "Hide grade distribution graphs from students" enabled
+    # @internal
+    register_expansion 'Canvas.course.hideDistributionGraphs', [],
+      -> { @context.hide_distribution_graphs? },
+      COURSE_GUARD
+
     # returns the current course's term start date.
     # @example
     #   ```
