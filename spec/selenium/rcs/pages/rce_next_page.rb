@@ -130,6 +130,14 @@ module RCENextPage
     f('[role="menuitem"][title="Course Images"]')
   end
 
+  def upload_image_button
+    f('[role="menuitem"][title="Upload Image"]')
+  end
+
+  def upload_image_modal
+    f('[role="dialog"][aria-label="Upload Image"')
+  end
+
   def image_options_button
     f('button[aria-label="Show image options"]')
   end
@@ -334,6 +342,11 @@ module RCENextPage
 
   def click_course_images
     course_images.click
+    wait_for_ajaximations
+  end
+
+  def click_upload_image
+    upload_image_button.click
     wait_for_ajaximations
   end
 

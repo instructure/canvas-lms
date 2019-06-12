@@ -414,5 +414,15 @@ describe "RCE next tests" do
 
       expect(tray_container).not_to be_displayed
     end
+
+    it "should open upload image modal when clicking upload option" do
+      visit_front_page_edit(@course)
+
+      click_more_toolbar_button
+      click_images_toolbar_button
+      click_upload_image
+
+      expect(upload_image_modal).to be_displayed
+    end
   end
 end
