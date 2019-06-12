@@ -62,7 +62,8 @@ export default class DeveloperKeyModal extends React.Component {
   }
 
   get toolConfiguration () {
-    return {...(this.developerKey.tool_configuration || {}), ...this.state.toolConfiguration}
+    const public_jwk = this.developerKey.public_jwk ? { public_jwk: this.developerKey.public_jwk } : {}
+    return {...(this.developerKey.tool_configuration || {}), ...this.state.toolConfiguration, ...public_jwk}
   }
 
   get isLtiKey() {
