@@ -241,6 +241,35 @@ module Lti
             it 'sets the context of the new assignment' do
               expect(item.assignment.context).to eq course
             end
+
+            context 'when submission type is external tool' do
+              let(:params_overrides) {
+                super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
+                  type: "external_tool",
+                  external_tool_url: "http://www.google.com"
+                })
+              }
+
+              it 'sets the assignment submission type to external tool' do
+                expect(item.assignment.submission_types).to eq 'external_tool'
+              end
+              it 'sets the assignment external url' do
+                expect(item.assignment.external_tool_tag.url).to eq "http://www.google.com"
+              end
+            end
+
+            context 'when submission type is invalid' do
+              let(:params_overrides) {
+                super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
+                  type: "a_bad_submission_type",
+                  external_tool_url: "http://www.google.com"
+                })
+              }
+
+              it 'returns a 400 error response code' do
+                expect(response).to have_http_status(:bad_request)
+              end
+            end
           end
         end
       end
