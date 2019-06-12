@@ -3564,8 +3564,8 @@ function buildAlertMessage() {
   return {__html: alertMessage.string}
 }
 
-function speedGraderJSONErrorFn(data, _xhr, _textStatus, _errorThrown) {
-  if (data.status === 504) {
+function speedGraderJSONErrorFn(_data, xhr, _textStatus, _errorThrown) {
+  if (xhr.status === 504) {
     const alertProps = {
       variant: 'error',
       dismissible: false

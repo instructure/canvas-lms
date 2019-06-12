@@ -1895,9 +1895,10 @@ QUnit.module('SpeedGrader - gateway timeout', {
       show_help_menu_item: false
     })
     this.server = sinon.fakeServer.create({respondImmediately: true})
+    // in production, json responses that timeout receive html content type responses unfortunately
     this.server.respondWith('GET', `${window.location.pathname}.json${window.location.search}`, [
       504,
-      {'Content-Type': 'application/json'},
+      {'Content-Type': 'text/html'},
       ''
     ])
     setupFixtures('<div id="speed_grader_timeout_alert"></div>')
