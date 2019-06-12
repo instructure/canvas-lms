@@ -148,6 +148,28 @@ describe('StudentsSearcher', () => {
     expect(getByText('searched user')).toBeInTheDocument()
   })
 
+  it('hides extended filters by default', () => {
+    const {queryByTestId} = renderStudentsSearcher()
+    jest.runOnlyPendingTimers()
+    expect(queryByTestId('assignToFilter')).toBeNull()
+    expect(queryByTestId('attemptsFilter')).toBeNull()
+    expect(queryByTestId('assignToFilter')).toBeNull()
+  })
+
+  it('toggles extended filters when button is clicked', () => {
+    const {queryByTestId, getByTestId, getByText} = renderStudentsSearcher()
+    fireEvent.click(closest(getByText('Filter'), 'button'))
+    jest.runOnlyPendingTimers()
+    expect(getByTestId('assignToFilter')).toBeInTheDocument()
+    expect(getByTestId('attemptFilter')).toBeInTheDocument()
+    expect(getByTestId('statusFilter')).toBeInTheDocument()
+
+    fireEvent.click(closest(getByText('Filter'), 'button'))
+    jest.runOnlyPendingTimers()
+    expect(queryByTestId('assignToFilter')).toBeNull()
+    expect(queryByTestId('attemptFilter')).toBeNull()
+    expect(queryByTestId('assignToFilter')).toBeNull()
+  })
   // _.debounce requires time to actually advance
   describe('with MockDate', () => {
     afterEach(() => {

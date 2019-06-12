@@ -176,6 +176,7 @@ export function mockSubmission(overrides) {
     __typename: 'Submission',
     gid: '1',
     lid: '1',
+    attempt: 1,
     state: 'submitted',
     submissionStatus: 'submitted',
     grade: '4',

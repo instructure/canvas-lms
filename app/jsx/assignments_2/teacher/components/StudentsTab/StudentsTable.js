@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import {arrayOf, func, string} from 'prop-types'
+import {arrayOf, func, string, number} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {TeacherAssignmentShape, SubmissionShape} from '../../assignmentData'
 
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
 import {Table} from '@instructure/ui-table'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -49,10 +48,13 @@ export default class StudentsTable extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     submissions: arrayOf(SubmissionShape).isRequired,
+    onRequestSort: func,
     sortableColumns: arrayOf(string),
     sortId: string, // id of column above, or ''
     sortDirection: string, // 'ascending', 'descending', or 'none'
-    onRequestSort: func
+    assignToFilter: string,
+    attemptFilter: number,
+    statusFilter: string
   }
 
   static defaultProps = {
@@ -76,7 +78,25 @@ export default class StudentsTable extends React.Component {
   }
 
   static prepareStudentData(props) {
-    return props.submissions.map(submission => ({
+    let submissions = props.submissions
+
+    if (props.attemptFilter) {
+      submissions = submissions.filter(sub => {
+        return sub.attempt >= props.attemptFilter
+      })
+    }
+
+    if (props.statusFilter === 'excused') {
+      submissions = submissions.filter(sub => {
+        return sub.excused
+      })
+    } else if (props.statusFilter) {
+      submissions = submissions.filter(sub => {
+        return sub.submissionStatus === props.statusFilter
+      })
+    }
+
+    return submissions.map(submission => ({
       ...submission.user,
       ...{submission}
     }))
@@ -143,7 +163,12 @@ export default class StudentsTable extends React.Component {
   }
 
   renderSubmissionStatusColumn(student) {
-    return <SubmissionStatusPill submissionStatus={student.submission.submissionStatus} />
+    return (
+      <SubmissionStatusPill
+        excused={student.submission.excused}
+        submissionStatus={student.submission.submissionStatus}
+      />
+    )
   }
 
   renderTrayButton(student) {

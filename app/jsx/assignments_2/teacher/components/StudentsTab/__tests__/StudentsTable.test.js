@@ -131,6 +131,24 @@ it('renders submission status pill', () => {
   expect(getByText('Late')).toBeInTheDocument()
 })
 
+it('renders excused status pill', () => {
+  const submission = mockSubmission({
+    submittedAt: null,
+    submissionStatus: 'late',
+    excused: true
+  })
+  const assignment = mockAssignment()
+  const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
+
+  const {queryByText, getByText} = render(
+    <StudentsTable assignment={assignment} submissions={[submission]} />
+  )
+  expect(queryByText('View Submission', {exact: false})).toBeNull()
+  expect(queryByText(submittedAt)).toBeNull()
+  expect(getByText('Excused')).toBeInTheDocument()
+  expect(queryByText('Late')).toBeNull()
+})
+
 it('renders the specified sort direction', () => {
   const {getByText} = render(
     <StudentsTable

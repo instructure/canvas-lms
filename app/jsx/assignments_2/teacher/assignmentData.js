@@ -138,6 +138,7 @@ export const TEACHER_QUERY = gql`
         nodes {
           gid: id
           lid: _id
+          attempt
           submissionStatus
           grade
           gradingStatus
@@ -260,12 +261,15 @@ export const STUDENT_SEARCH_QUERY = gql`
         nodes {
           lid: _id
           gid: id
+          attempt
+          excused
           state
           score
           submittedAt
           submissionDraft {
             submissionAttempt
           }
+          submissionStatus
           user {
             ...UserFields
           }
@@ -397,6 +401,7 @@ export const SubmissionDraftShape = shape({
 export const SubmissionShape = shape({
   gid: string,
   lid: string,
+  attempt: number,
   submissionStatus: oneOf(['resubmitted', 'missing', 'late', 'submitted', 'unsubmitted']),
   grade: string,
   gradingStatus: oneOf([null, 'excused', 'needs_review', 'needs_grading', 'graded']),

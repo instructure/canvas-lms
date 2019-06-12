@@ -21,7 +21,7 @@ import I18n from 'i18n!assignments_2'
 import _ from 'lodash'
 import {func} from 'prop-types'
 
-import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent, AccessibleContent, PresentationContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {
@@ -35,6 +35,7 @@ import {Badge} from '@instructure/ui-elements'
 import {TeacherAssignmentShape} from '../../assignmentData'
 import StudentSearchQuery from './StudentSearchQuery'
 import StudentsTable from './StudentsTable'
+import Filters from './Filters'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 
 const STUDENT_SEARCH_DELAY = 750
@@ -61,11 +62,21 @@ export default class StudentsSearcher extends React.Component {
 
   constructor(props) {
     super(props)
+
+    const attemptsCount = this.props.assignment.submissions.nodes.map(sub => {
+      return sub.attempt
+    })
+
     this.state = {
       searchValue: '',
       debouncedSearchValue: '',
       sortId: '',
-      sortDirection: 'none'
+      sortDirection: 'none',
+      showFilters: false,
+      assignToFilter: null,
+      attemptFilter: null,
+      statusFilter: null,
+      numAttempts: Math.max(...attemptsCount)
     }
   }
 
@@ -146,6 +157,23 @@ export default class StudentsSearcher extends React.Component {
     return [this.renderSpeedGraderLink(), this.renderMessageStudentsWhoButton()]
   }
 
+  toggleFilters = () => {
+    this.setState(state => {
+      const newState = {showFilters: !state.showFilters}
+      if (state.showFilters) {
+        newState.assignToFilter = null
+        newState.attemptFilter = null
+        newState.statusFilter = null
+      }
+      return newState
+    })
+  }
+
+  updateFilters = (field, value) => {
+    const key = `${field}Filter`
+    this.setState({[key]: value})
+  }
+
   render() {
     const searchVariables = {
       assignmentId: this.props.assignment.lid
@@ -167,7 +195,7 @@ export default class StudentsSearcher extends React.Component {
 
     return (
       <React.Fragment>
-        <Flex as="div" margin="0 0 large 0" wrapItems>
+        <Flex as="div" margin="0 0 medium 0" wrapItems>
           <FlexItem grow size="60%" margin="small 0 0 0">
             <TextInput
               label={<ScreenReaderContent>{I18n.t('Search by student name')}</ScreenReaderContent>}
@@ -180,23 +208,43 @@ export default class StudentsSearcher extends React.Component {
               value={this.state.searchValue}
               renderAfterInput={<IconSearchLine />}
             />
-            <Button icon={IconFilterLine} margin="0 small">
-              {I18n.t('Filter')}
+            <Button icon={IconFilterLine} margin="0 small" onClick={this.toggleFilters}>
+              <PresentationContent>{I18n.t('Filter')}</PresentationContent>
+              <ScreenReaderContent>
+                {this.state.showFilters
+                  ? I18n.t('disable extra filter options')
+                  : I18n.t('enable extra filter options')}
+              </ScreenReaderContent>
             </Button>
+            {this.state.showFilters && (
+              <Filters
+                onChange={this.updateFilters}
+                overrides={this.props.assignment.assignmentOverrides.nodes}
+                numAttempts={this.state.numAttempts}
+              />
+            )}
           </FlexItem>
-          <FlexItem margin="small 0 0 0">{this.renderActions()}</FlexItem>
+          <FlexItem margin="small 0 0 0" align="start">
+            {this.renderActions()}
+          </FlexItem>
         </Flex>
+
         <StudentSearchQuery variables={searchVariables}>
-          {submissions => (
-            <StudentsTable
-              assignment={this.props.assignment}
-              submissions={submissions}
-              sortableColumns={SORTABLE_COLUMNS}
-              sortId={this.state.sortId}
-              sortDirection={this.state.sortDirection}
-              onRequestSort={this.handleRequestSort}
-            />
-          )}
+          {submissions => {
+            return (
+              <StudentsTable
+                assignment={this.props.assignment}
+                submissions={submissions}
+                sortableColumns={SORTABLE_COLUMNS}
+                sortId={this.state.sortId}
+                sortDirection={this.state.sortDirection}
+                onRequestSort={this.handleRequestSort}
+                assignToFilter={this.state.assignToFilter}
+                attemptFilter={this.state.attemptFilter}
+                statusFilter={this.state.statusFilter}
+              />
+            )
+          }}
         </StudentSearchQuery>
       </React.Fragment>
     )
