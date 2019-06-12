@@ -219,6 +219,22 @@ test('it renders search results', assert => {
   });
 });
 
+test('it shows text when no results found', assert => {
+  const done = assert.async()
+  const imageSearch = TestUtils.renderIntoDocument(
+    <ImageSearch />
+  );
+
+  imageSearch.setState({searchResults: [], searchTerm: 'lkjlkj', alert: 'failure'}, () => {
+    strictEqual(
+      TestUtils.findRenderedDOMComponentWithClass(imageSearch, 'ImageSearch__images').innerText,
+      'No results found for lkjlkj',
+      'rendered no search results'
+    );
+    done();
+  });
+});
+
 test('it shows appropriate alt text for results', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(

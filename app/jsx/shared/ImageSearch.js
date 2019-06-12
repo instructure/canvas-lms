@@ -27,7 +27,7 @@ import SVGWrapper from './SVGWrapper'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import { TextInput } from '@instructure/ui-text-input'
 import { IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine } from '@instructure/ui-icons'
-import { Link } from '@instructure/ui-elements'
+import { Link, Text } from '@instructure/ui-elements'
 import { View, Flex, FlexItem } from '@instructure/ui-layout'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
@@ -110,6 +110,39 @@ export default class ImageSearch extends React.Component {
     return alert
   }
 
+  renderResults() {
+    if (this.state.searching) {
+      return (
+        <div className="ImageSearch__loading">
+          <Spinner title="Loading" />
+        </div>
+      )
+    } else if (!this.state.searching && this.state.searchResults.length) {
+      return (
+        <div className="ImageSearch__images">
+          {this.state.searchResults.map(photo => {
+            const photo_url = photo.raw_url + (photo.raw_url.includes('?') ? '&' : '?') + qs.stringify(unsplashParams)
+            return <ImageSearchItem
+              key={photo.id}
+              confirmationId={photo.id}
+              src={photo_url}
+              description={photo.alt || photo.description || this.state.searchTerm}
+              selectImage={this.props.selectImage}
+              userUrl={photo.user_url}
+              userName={photo.user}
+            />
+          })}
+        </div>
+      )
+    } else if (!this.state.searching && this.state.searchTerm && !this.state.searchResults.length && this.state.alert) {
+      return (
+        <div className="ImageSearch__images">
+          <Text>{I18n.t("No results found for %{searchTerm}", {searchTerm: this.state.searchTerm})}</Text>
+        </div>
+      )
+    }
+  }
+
   renderPagination(photos) {
     if (!photos || photos.length === 0) {
       return null
@@ -141,8 +174,6 @@ export default class ImageSearch extends React.Component {
   }
 
   render() {
-    const photos = this.state.searchResults
-
     return (
       <div>
         {this.renderAlert()}
@@ -161,30 +192,8 @@ export default class ImageSearch extends React.Component {
             renderAfterInput={<IconSearchLine />}
           />
         </View>
-
-        {!this.state.searching ? (
-          <div className="ImageSearch__images">
-
-            {photos &&
-            photos.map(photo => {
-              const photo_url = photo.raw_url + (photo.raw_url.includes('?') ? '&' : '?') + qs.stringify(unsplashParams)
-              return <ImageSearchItem
-                key={photo.id}
-                confirmationId={photo.id}
-                src={photo_url}
-                description={photo.alt || photo.description || this.state.searchTerm}
-                selectImage={this.props.selectImage}
-                userUrl={photo.user_url}
-                userName={photo.user}
-              />
-            })}
-          </div>
-        ) : (
-          <div className="ImageSearch__loading">
-            <Spinner title="Loading" />
-          </div>
-        )}
-        {this.renderPagination(photos)}
+        {this.renderResults()}
+        {this.renderPagination(this.state.searchResults)}
       </div>
     )
   }
