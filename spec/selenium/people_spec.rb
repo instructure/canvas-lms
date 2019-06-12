@@ -457,6 +457,22 @@ describe "people" do
      expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
+    it "should edit a designer's sections" do
+      designer = create_user("student@example.com")
+      @course.enroll_designer(designer, :enrollment_state => "active")
+      get "/courses/#{@course.id}/users"
+      f(".DesignerEnrollment .icon-more").click
+      fln("Edit Sections").click
+      f(".token_input.browsable").click
+      section_input_element = driver.find_element(:name, "token_capture")
+      section_input_element.send_keys("section2")
+      f('.last.context').click
+      wait_for_ajaximations
+      ff('.ui-button-text')[1].click
+      wait_for_ajaximations
+      expect(ff(".DesignerEnrollment")[0]).to include_text("section2")
+    end
+
     it "removes students linked to an observer" do
       @student1 = user_factory; @course.enroll_student(@student1, enrollment_state: :active)
       @student2 = user_factory; @course.enroll_student(@student2, enrollment_state: :active)

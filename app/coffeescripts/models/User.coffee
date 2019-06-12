@@ -63,5 +63,5 @@ export default class User extends Backbone.Model
     _.all @get('enrollments'), (e) -> e.enrollment_state == 'inactive'
 
   sectionEditableEnrollments: ->
-    _.select @get('enrollments'), (e) -> not _.include(['DesignerEnrollment', 'ObserverEnrollment'], e.type)
+    _.select @get('enrollments'), (e) -> e.type != 'ObserverEnrollment'
 
