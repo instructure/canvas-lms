@@ -449,5 +449,15 @@ describe "RCE next tests" do
 
       expect(upload_media_modal).to be_displayed
     end
+
+    it "should open upload document modal when clicking upload option" do
+      visit_front_page_edit(@course)
+
+      click_more_toolbar_button
+      click_document_toolbar_button
+      click_upload_document
+
+      expect(upload_document_modal).to be_displayed
+    end
   end
 end

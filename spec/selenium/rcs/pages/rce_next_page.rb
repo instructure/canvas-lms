@@ -130,6 +130,10 @@ module RCENextPage
     possibly_hidden_toolbar_button('button[aria-label="Record/Upload Media"]')
   end
 
+  def document_toolbar_button
+    possibly_hidden_toolbar_button('button[aria-label="Documents"]')
+  end
+
   def course_images
     f('[role="menuitem"][title="Course Images"]')
   end
@@ -156,6 +160,14 @@ module RCENextPage
 
   def upload_media_modal
     f('[role="dialog"][aria-label="Upload Media"')
+  end
+
+  def upload_document_button
+    f('[role="menuitem"][title="Upload Document"]')
+  end
+
+  def upload_document_modal
+    f('[role="dialog"][aria-label="Upload File"')
   end
 
   def rce_page_body_ifr_id
@@ -360,6 +372,10 @@ module RCENextPage
     media_toolbar_button.click
   end
 
+  def click_document_toolbar_button
+    document_toolbar_button.click
+  end
+
   def click_course_images
     course_images.click
     wait_for_ajaximations
@@ -372,6 +388,11 @@ module RCENextPage
 
   def click_upload_media
     upload_media_button.click
+    wait_for_ajaximations
+  end
+
+  def click_upload_document
+    upload_document_button.click
     wait_for_ajaximations
   end
 
