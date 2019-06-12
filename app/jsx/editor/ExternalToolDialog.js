@@ -187,24 +187,22 @@ export default class ExternalToolDialog extends React.Component {
               <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
             </div>
           </FlexItem>
-          <FlexItem>
-            <iframe
-              title={label}
-              ref={ref => (this.iframeRef = ref)}
-              name="external_tool_launch"
-              src="/images/ajax-loader-medium-444.gif"
-              id="external_tool_button_frame"
-              style={{
-                flexGrow: '1',
-                flexShrink: '1',
-                width: button.use_tray ? undefined : button.width || 800,
-                height: button.use_tray ? undefined : button.height || frameHeight,
-                border: '0'
-              }}
-              allow={iframeAllowances}
-              borderstyle="0"
-            />
-          </FlexItem>
+          <iframe
+            title={label}
+            ref={ref => (this.iframeRef = ref)}
+            name="external_tool_launch"
+            src="/images/ajax-loader-medium-444.gif"
+            id="external_tool_button_frame"
+            style={{
+              flexGrow: '1',
+              flexShrink: '1',
+              width: button.use_tray ? undefined : button.width || 800,
+              height: button.use_tray ? undefined : button.height || frameHeight,
+              border: '0'
+            }}
+            allow={iframeAllowances}
+            borderstyle="0"
+          />
           <FlexItem>
             <div
               ref={ref => (this.afterInfoAlertRef = ref)}
