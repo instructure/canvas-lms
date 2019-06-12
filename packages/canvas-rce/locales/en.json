@@ -222,6 +222,12 @@
   "embed_image_1080badc": {
     "message": "Embed Image"
   },
+  "embed_options_tray_901cfd19": {
+    "message": "Embed Options Tray"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Embed Preview"
+  },
   "embed_video_code_703e10f2": {
     "message": "Embed Video Code"
   },
@@ -464,6 +470,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Show embed options"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Show image options"
   },
@@ -514,6 +523,9 @@
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
+  },
+  "text_7f4593da": {
+    "message": "Text"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"
