@@ -254,21 +254,23 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         })
       })
 
-      QUnit.module('when the assignment is manually-posted', () => {
-        test('displays an "eye" icon when no submissions are graded but unposted', () => {
+      QUnit.module('when the assignment is manually-posted', manualPostingHooks => {
+        manualPostingHooks.beforeEach(() => {
+          props.assignment.postManually = true
+        })
+
+        test('displays an "off" icon when no submissions are graded but unposted', () => {
           props.students.forEach(student => {
             if (student.submission.workflowState === 'graded') {
               student.submission.postedAt = new Date()
             }
           })
 
-          props.assignment.postManually = true
           mountComponent()
-          ok(getColumnHeaderIcon('IconEye'))
+          ok(getColumnHeaderIcon('IconOff'))
         })
 
         test('displays an "off" icon when at least one submission is graded but unposted', () => {
-          props.assignment.postManually = true
           mountComponent()
           ok(getColumnHeaderIcon('IconOff'))
         })

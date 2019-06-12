@@ -19,7 +19,7 @@
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
-import IconEyeLine from '@instructure/ui-icons/lib/Line/IconEye'
+import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
 import IconOffSolid from '@instructure/ui-icons/lib/Solid/IconOff'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
@@ -474,14 +474,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }
 
     const submissions = this.props.students.map(student => student.submission)
-    const postableSubmissionsPresent = submissions.some(
-      submission => isHidden(submission)
-    )
+    const postableSubmissionsPresent = submissions.some(isHidden)
 
     // Assignment is manually-posted and has no graded-but-unposted submissions
     // (i.e., no unposted submissions that are in a suitable state to post)
     if (this.props.assignment.postManually && !postableSubmissionsPresent) {
-      return <IconEyeLine size="x-small" />
+      return <IconOffLine size="x-small" />
     }
 
     // Assignment has at least one hidden submission that can be posted
