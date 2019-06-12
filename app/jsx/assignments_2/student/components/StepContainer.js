@@ -26,7 +26,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 
 function renderCollapsedContainer(step) {
   return (
-    <div className="steps-main-status-label">
+    <div className="steps-main-status-label" data-testid="collapsed-step-container">
       <Text weight="bold">{step}</Text>
     </div>
   )

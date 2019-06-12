@@ -154,7 +154,11 @@ class StepItem extends Component {
     }
 
     return (
-      <span className={classNames(classes)} {...omitProps(this.props, StepItem.propTypes)}>
+      <span
+        className={classNames(classes)}
+        data-testid="step-item-step"
+        {...omitProps(this.props, StepItem.propTypes)}
+      >
         <span
           className="pinLayout"
           style={{
