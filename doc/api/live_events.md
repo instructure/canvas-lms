@@ -52,6 +52,7 @@ event originated as part of a web request:
 | `session_id` | String | The session identifier for this request. Can be used to correlate events in the same session for a user. |
 | `user_account_id` | String | The Canvas id of the account that the current user belongs to. |
 | `user_sis_id` | String | The SIS id of the user. |
+| `url` | String | The URL of the request that triggered the event. |
 
 For events originating as part of an asynchronous job, the following
 fields may be set:

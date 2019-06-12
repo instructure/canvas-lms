@@ -24,6 +24,7 @@ RSpec.describe ApplicationController do
     request_double = double(
       host_with_port: "www.example.com",
       host: "www.example.com",
+      url: "http://www.example.com",
       headers: {},
       format: double(:html? => true),
       user_agent: nil,
@@ -1094,7 +1095,8 @@ describe ApplicationController do
         hostname: 'test.host',
         user_agent: 'Rails Testing',
         client_ip: '0.0.0.0',
-        producer: 'canvas'
+        producer: 'canvas',
+        url: 'http://test.host'
       }
     end
 

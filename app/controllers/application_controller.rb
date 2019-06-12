@@ -2423,6 +2423,7 @@ class ApplicationController < ActionController::Base
     ctx[:hostname] = request.host
     ctx[:user_agent] = request.headers['User-Agent']
     ctx[:client_ip] = request.remote_ip
+    ctx[:url] = request.url
     ctx[:producer] = 'canvas'
 
     StringifyIds.recursively_stringify_ids(ctx)
