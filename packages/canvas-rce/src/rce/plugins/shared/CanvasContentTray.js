@@ -99,7 +99,7 @@ export default function CanvasContentTray(props) {
         setIsOpen(true)
       },
       hideTray() {
-        closeTray()
+        handleDismissTray()
       }
     }
 
@@ -110,26 +110,35 @@ export default function CanvasContentTray(props) {
     }
   }, [props.bridge])
 
-  function closeTray() {
-    setOpenCount(openCount + 1)
+  function handleDismissTray() {
     setIsOpen(false)
+  }
+
+  function handleCloseTray() {
+    props.bridge.focusActiveEditor(false)
+    setOpenCount(openCount + 1)
   }
 
   return (
     <StoreProvider {...props} key={openCount}>
       {contentProps => (
         <Tray
+          data-testid="CanvasContentTray"
           label={getTrayLabel(filterSettings)}
           open={isOpen}
           placement="end"
           size="regular"
-          onClose={closeTray}
+          shouldContainFocus
+          shouldReturnFocus={false}
+          shouldCloseOnDocumentClick={false}
+          onDismiss={handleDismissTray}
+          onClose={handleCloseTray}
         >
           <Flex direction="column" display="block" height="100vh" overflowY="hidden">
             <Flex.Item padding="medium" shadow="above">
               <Flex margin="none none medium none">
                 <Flex.Item>
-                  <CloseButton placement="static" variant="icon" onClick={closeTray}>
+                  <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
                     {formatMessage('Close')}
                   </CloseButton>
                 </Flex.Item>

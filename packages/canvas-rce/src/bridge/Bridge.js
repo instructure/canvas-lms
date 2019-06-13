@@ -51,6 +51,10 @@ export default class Bridge {
     this.focusedEditor = editor;
   }
 
+  focusActiveEditor(skipFocus = false) {
+    this.getEditor().mceInstance().focus(skipFocus)
+  }
+
   get mediaServerSession() {
     return this._mediaServerSession;
   }
