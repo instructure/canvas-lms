@@ -562,7 +562,8 @@ class ContextExternalTool < ActiveRecord::Base
     end
     if domain.present?
       host = Addressable::URI.parse(url).normalize.host rescue nil
-      !!(host && ('.' + host).match(/\.#{domain}\z/))
+      d = domain.gsub(/http[s]?\:\/\//, '')
+      !!(host && ('.' + host).match(/\.#{d}\z/))
     end
   end
 
