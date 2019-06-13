@@ -2410,10 +2410,12 @@ class ApplicationController < ActionController::Base
 
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:time_zone] = @current_user.time_zone if @current_user
+    ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
+    ctx[:context_account_id] = Context.get_account_or_parent_account(@context)&.global_id if @context
 
     if @context_membership
       ctx[:context_role] =
@@ -2432,6 +2434,7 @@ class ApplicationController < ActionController::Base
     end
 
     ctx[:hostname] = request.host
+    ctx[:http_method] = request.method
     ctx[:user_agent] = request.headers['User-Agent']
     ctx[:client_ip] = request.remote_ip
     ctx[:url] = request.url

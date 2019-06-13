@@ -25,6 +25,7 @@ RSpec.describe ApplicationController do
       host_with_port: "www.example.com",
       host: "www.example.com",
       url: "http://www.example.com",
+      method: "GET",
       headers: {},
       format: double(:html? => true),
       user_agent: nil,
@@ -1096,7 +1097,8 @@ describe ApplicationController do
         user_agent: 'Rails Testing',
         client_ip: '0.0.0.0',
         producer: 'canvas',
-        url: 'http://test.host'
+        url: 'http://test.host',
+        http_method: 'GET'
       }
     end
 
@@ -1188,6 +1190,27 @@ describe ApplicationController do
       end
     end
 
+    context 'when an access_token exists' do
+      let(:real_access_token_attributes) do
+        {
+          developer_key: double(global_id: '1111')
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          developer_key_id: '1111'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        real_access_token = double(real_access_token_attributes)
+        controller.instance_variable_set(:@access_token, real_access_token)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
     context 'when a real current_pseudonym exists' do
       let(:current_pseudonym_attributes) do
         {
@@ -1224,7 +1247,8 @@ describe ApplicationController do
       let(:expected_context_attributes) do
         {
           context_type: 'Class',
-          context_id: 'context_global_id'
+          context_id: 'context_global_id',
+          context_account_id: nil
         }.merge(non_conditional_values)
       end
 
@@ -1233,6 +1257,24 @@ describe ApplicationController do
         controller.instance_variable_set(:@context, canvas_context)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+
+      context 'when a course' do
+        let(:course) { course_model }
+        let(:expected_context_attributes) do
+          {
+            context_type: 'Course',
+            context_id: course.global_id.to_s,
+            context_account_id: course.account.global_id.to_s,
+            context_sis_source_id: nil
+          }.merge(non_conditional_values)
+        end
+
+        it 'sets the correct attributes on the LiveEvent context' do
+          controller.instance_variable_set(:@context, course)
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context).to eq(expected_context_attributes)
+        end
       end
     end
 

@@ -36,6 +36,7 @@ event originated as part of a web request:
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | `user_id`    | String | The Canvas id of the currently logged in user. |
+| `developer_key_id`    | String | The id of the Developer Key used to create the access token for user. |
 | `real_user_id` | String | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
 | `time_zone` | String | Time zone of the currently logged in user. |
 | `user_login` | String | The login of the current user. |
@@ -46,8 +47,10 @@ event originated as part of a web request:
 | `context_type` | String | The type of context where the event happened. |
 | `context_id` | String | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `context_sis_source_id` | String | The Canvas SIS source id of the current context. |
+| `context_account_id` | String | The account id of the current context. This is the actual accound the context is attached to. |
 | `role` | String | The role of the current user in the current context.  |
 | `hostname` | String | The hostname of the current request |
+| `http_method` | String | The method of the request that triggered the event. |
 | `producer` | String | The name of the producer of an event. Will always be 'canvas' when an event is originating in canvas. |
 | `request_id` | String | The identifier for this request. |
 | `session_id` | String | The session identifier for this request. Can be used to correlate events in the same session for a user. |
