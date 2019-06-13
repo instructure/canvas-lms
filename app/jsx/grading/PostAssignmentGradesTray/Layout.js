@@ -17,7 +17,7 @@
  */
 
 import React, {Fragment} from 'react'
-import {any, arrayOf, bool, shape} from 'prop-types'
+import {any, arrayOf, bool, shape, string} from 'prop-types'
 
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
@@ -30,6 +30,7 @@ import FormContent from './FormContent'
 
 export default function Layout({
   assignment: {anonymousGrading, gradesPublished},
+  containerName,
   dismiss,
   onPostClick,
   postBySections,
@@ -42,7 +43,6 @@ export default function Layout({
   selectedSectionIds,
   unpostedCount
 }) {
-  const hasSections = sections.length > 0
 
   return (
     <Fragment>
@@ -54,9 +54,17 @@ export default function Layout({
         </Alert>
       )}
 
-      {gradesPublished && hasSections && anonymousGrading && (
+      {gradesPublished && anonymousGrading && containerName === 'SPEED_GRADER' && (
+        <Alert margin="x-small" variant="warning">
+          {I18n.t('Posting grades will refresh your browser. This may take a moment.')}
+        </Alert>
+      )}
+
+      {gradesPublished && anonymousGrading && (
         <Alert margin="x-small" variant="info">
-          {I18n.t('You can only post grades for everyone when the assignment is anonymous.')}
+          {I18n.t(
+            'Grades can only be posted to everyone when the assignment is anonymous. Anonymity will be removed.'
+          )}
         </Alert>
       )}
 
@@ -95,6 +103,7 @@ Layout.propTypes = {
     anonymousGrading: bool.isRequired,
     gradesPublished: bool.isRequired
   }).isRequired,
+  containerName: string,
   sections: arrayOf(any).isRequired,
   ...FormContent.propTypes
 }

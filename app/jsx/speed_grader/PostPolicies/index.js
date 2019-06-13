@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 
 import HideAssignmentGradesTray from '../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../grading/PostAssignmentGradesTray'
+import SpeedGraderHelpers from '../../../../public/javascripts/speed_grader_helpers'
 
 function submissionsPostedAtUpdater({submissionsMap, updateSubmission, afterUpdateSubmission}) {
   return function({postedAt, userIds}) {
@@ -36,6 +37,7 @@ function submissionsPostedAtUpdater({submissionsMap, updateSubmission, afterUpda
 export default class PostPolicies {
   constructor({assignment, sections, updateSubmission, afterUpdateSubmission}) {
     this._assignment = assignment
+    this._containerName = 'SPEED_GRADER'
     this._sections = sections
     this._updateSubmission = updateSubmission
     this._afterUpdateSubmission = afterUpdateSubmission
@@ -67,26 +69,46 @@ export default class PostPolicies {
   }
 
   showHideAssignmentGradesTray({submissionsMap}) {
-    const onHidden = submissionsPostedAtUpdater({
-      afterUpdateSubmission: this._afterUpdateSubmission,
-      submissionsMap,
-      updateSubmission: this._updateSubmission
-    })
+    let onHidden
+
+    if (this._assignment.anonymousGrading) {
+      onHidden = () => {
+        SpeedGraderHelpers.reloadPage()
+      }
+    } else {
+      onHidden = submissionsPostedAtUpdater({
+        afterUpdateSubmission: this._afterUpdateSubmission,
+        submissionsMap,
+        updateSubmission: this._updateSubmission
+      })
+    }
+
     this._hideAssignmentGradesTray.show({
       assignment: this._assignment,
+      containerName: this._containerName,
       onHidden,
       sections: this._sections
     })
   }
 
   showPostAssignmentGradesTray({submissionsMap, submissions = []}) {
-    const onPosted = submissionsPostedAtUpdater({
-      afterUpdateSubmission: this._afterUpdateSubmission,
-      submissionsMap,
-      updateSubmission: this._updateSubmission
-    })
+    let onPosted
+
+    if (this._assignment.anonymousGrading) {
+      onPosted = () => {
+        SpeedGraderHelpers.reloadPage()
+      }
+    } else {
+      onPosted = submissionsPostedAtUpdater({
+        afterUpdateSubmission: this._afterUpdateSubmission,
+        submissionsMap,
+        updateSubmission: this._updateSubmission
+      })
+    }
+
     this._postAssignmentGradesTray.show({
       assignment: this._assignment,
+      containerName: this._containerName,
       onPosted,
       sections: this._sections,
       submissions: submissions.map(submission => ({

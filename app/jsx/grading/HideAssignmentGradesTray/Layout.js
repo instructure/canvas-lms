@@ -17,7 +17,7 @@
  */
 
 import React, {Fragment} from 'react'
-import {any, arrayOf, bool, shape} from 'prop-types'
+import {any, arrayOf, bool, shape, string} from 'prop-types'
 
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
@@ -30,6 +30,7 @@ import FormContent from './FormContent'
 
 export default function Layout({
   assignment: {anonymousGrading, gradesPublished},
+  containerName,
   dismiss,
   hideBySections,
   hideBySectionsChanged,
@@ -51,9 +52,17 @@ export default function Layout({
         </Alert>
       )}
 
+      {gradesPublished && anonymousGrading && containerName === 'SPEED_GRADER' && (
+        <Alert margin="x-small" variant="warning">
+          {I18n.t('Hiding grades will refresh your browser. This may take a moment.')}
+        </Alert>
+      )}
+
       {gradesPublished && hasSections && anonymousGrading && (
         <Alert margin="x-small" variant="info">
-          {I18n.t('You can only hide grades for everyone when the assignment is anonymous.')}
+          {I18n.t(
+            'Grades can only be hidden for everyone when the assignment is anonymous. Anonymity will be enabled.'
+          )}
         </Alert>
       )}
 
@@ -89,6 +98,7 @@ Layout.propTypes = {
     anonymousGrading: bool.isRequired,
     gradesPublished: bool.isRequired
   }).isRequired,
+  containerName: string,
   sections: arrayOf(any).isRequired,
   ...FormContent.propTypes
 }

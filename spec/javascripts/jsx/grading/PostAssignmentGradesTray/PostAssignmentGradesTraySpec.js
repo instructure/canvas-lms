@@ -371,6 +371,14 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         await clickPost()
         notOk(getTrayElement())
       })
+
+      test('does not render an alert if the tray is launched from SpeedGrader and assignment is anonymous', async () => {
+        context.containerName = 'SPEED_GRADER'
+        context.assignment.anonymousGrading = true
+        await show()
+        await clickPost()
+        strictEqual(showFlashAlertStub.callCount, 0)
+      })
     })
 
     QUnit.module('gradedOnly', contextHooks => {

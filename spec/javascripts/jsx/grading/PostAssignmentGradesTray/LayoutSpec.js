@@ -32,8 +32,14 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   }
 
   function getAnonymousText() {
-    const postText = 'You can only post grades for everyone when the assignment is anonymous.'
+    const postText =
+      'Grades can only be posted to everyone when the assignment is anonymous. Anonymity will be removed.'
     return [...$container.querySelectorAll('div')].find($el => $el.textContent === postText)
+  }
+
+  function getRefreshText() {
+    const refreshText = 'Posting grades will refresh your browser. This may take a moment.'
+    return [...$container.querySelectorAll('div')].find($el => $el.textContent === refreshText)
   }
 
   function getUnreleasedGradesAlertText() {
@@ -94,31 +100,63 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     })
   })
 
-  QUnit.module('"Post for everyone when assignment is anonymous" text behavior', () => {
-    test('when "gradesPublished" and "anonymousGrading" are true and at least one section, anonymous descriptive text is present', () => {
-      mountComponent({
-        assignment: {
-          gradesPublished: true,
-          anonymousGrading: true
-        },
-        sections: [{id: '2001', name: 'Freshmen'}]
-      })
+  QUnit.module('"will refresh your browser" text behavior', contextHooks => {
+    let assignment
+    let containerName
 
+    contextHooks.beforeEach(() => {
+      assignment = {anonymousGrading: true, gradesPublished: true}
+      containerName = 'SPEED_GRADER'
+    })
+
+    test('when gradesPublished and anonymousGrading are true, and containerName is SPEED_GRADER, refresh text is present', () => {
+      mountComponent({assignment, containerName})
+      ok(getRefreshText())
+    })
+
+    test('when gradesPublished is false, refresh text is not present', () => {
+      assignment.gradesPublished = false
+      mountComponent({assignment, containerName})
+      notOk(getRefreshText())
+    })
+
+    test('when anonymousGrading is false, refresh text is not present', () => {
+      assignment.anonymousGrading = false
+      mountComponent({assignment, containerName})
+      notOk(getRefreshText())
+    })
+
+    test('when containerName is not SPEED_GRADER, refresh text is not present', () => {
+      containerName = 'NOT_SPEED_GRADER'
+      mountComponent({assignment, containerName})
+      notOk(getRefreshText())
+    })
+  })
+
+  QUnit.module('"Post for everyone when assignment is anonymous" text behavior', contextHooks => {
+    let assignment
+
+    contextHooks.beforeEach(() => {
+      assignment = {
+        gradesPublished: true,
+        anonymousGrading: true
+      }
+    })
+
+    test('when "gradesPublished" and "anonymousGrading" are true, anonymous descriptive text is present', () => {
+      mountComponent({assignment})
       ok(getAnonymousText())
     })
 
     test('when "gradesPublished" is false, anonymous descriptive text is hidden', () => {
-      mountComponent({assignment: {gradesPublished: false}})
-      notOk(getAnonymousText())
-    })
-
-    test('when "sections" are empty, anonymous descriptive text is hidden', () => {
-      mountComponent({sections: []})
+      assignment.gradesPublished = false
+      mountComponent({assignment})
       notOk(getAnonymousText())
     })
 
     test('when "anonymousGrading" is false, anonymous descriptive text is hidden', () => {
-      mountComponent({assignment: {anonymousGrading: false}})
+      assignment.anonymousGrading = false
+      mountComponent({assignment})
       notOk(getAnonymousText())
     })
   })
