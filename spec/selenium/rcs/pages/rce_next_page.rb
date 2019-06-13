@@ -282,6 +282,10 @@ module RCENextPage
     f('textarea[aria-describedby="alt-text-label-tooltip"]')
   end
 
+  def decorative_options_checkbox
+    f('[data-cid="Checkbox"]')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -473,5 +477,9 @@ module RCENextPage
 
   def click_visible_keyboard_shortcut_button
     visible_keyboard_shortcut_button.click
+  end
+
+  def click_decorative_options_checkbox
+    decorative_options_checkbox.click
   end
 end

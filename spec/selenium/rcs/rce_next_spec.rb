@@ -333,6 +333,23 @@ describe "RCE next tests" do
       end
     end
 
+    it "should make alt text blank when selecting decorative" do
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      click_decorative_options_checkbox
+      click_image_options_done_button
+
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_image.attribute('alt')).to be_empty
+      end
+    end
+
     it "should display assignment publish status in links accordion" do
       skip('Unskip in CORE-2619')
       title = "Assignment-Title"
