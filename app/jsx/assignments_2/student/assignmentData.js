@@ -249,8 +249,11 @@ export const SUBMISSION_ATTACHMENTS_QUERY = gql`
     submission: legacyNode(type: Submission, _id: $submissionId) {
       ... on Submission {
         attachments {
-          submissionPreviewUrl(submissionId: $submissionId)
           displayName
+          id
+          mimeClass
+          submissionPreviewUrl(submissionId: $submissionId)
+          thumbnailUrl
         }
       }
     }
@@ -260,6 +263,7 @@ export const SUBMISSION_ATTACHMENTS_QUERY = gql`
 export const AttachmentShape = shape({
   _id: string,
   displayName: string,
+  id: string,
   mimeClass: string,
   submissionPreviewUrl: string,
   thumbnailUrl: string,

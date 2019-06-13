@@ -42,8 +42,13 @@ describe('AttemptTab', () => {
                 attachments: [
                   {
                     __typename: 'Attachment',
+                    _id: 'some_id',
+                    displayName: 'some_dope_file.pdf',
+                    id: 'some_id',
+                    mimeClass: 'pdf',
                     submissionPreviewUrl: '/some_dope_url',
-                    displayName: 'some_dope_file.pdf'
+                    thumbnailUrl: '/thumbnail_url',
+                    url: '/url'
                   }
                 ],
                 __typename: 'Submission'
