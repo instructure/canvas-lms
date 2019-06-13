@@ -131,7 +131,7 @@ describe('StudentView', () => {
     ).toBeInTheDocument()
   })
 
-  it('notifies SR users when an attachment has been uploaded', async () => {
+  it.skip('notifies SR users when an attachment has been uploaded', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const {container, getByText} = render(
@@ -149,7 +149,7 @@ describe('StudentView', () => {
     expect(await waitForElement(() => getByText('Submission draft updated'))).toBeInTheDocument()
   })
 
-  it('notifies users of error when attachments fail to upload in the API', async () => {
+  it.skip('notifies users of error when attachments fail to upload in the API', async () => {
     uploadFileModule.uploadFiles.mock.results = [
       {type: 'throw', value: 'Error uploading file to Canvas API'}
     ]
@@ -171,7 +171,7 @@ describe('StudentView', () => {
     ).toBeInTheDocument()
   })
 
-  it('notifies users of error when a submission fails to upload via graphql', async () => {
+  it.skip('notifies users of error when a submission fails to upload via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const assignmentMocks = submissionGraphqlMock()
@@ -197,7 +197,7 @@ describe('StudentView', () => {
     ).toBeInTheDocument()
   })
 
-  it('notifies SR users when a submission has been sent', async () => {
+  it.skip('notifies SR users when a submission has been sent', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const {container, getByText} = render(
@@ -217,7 +217,7 @@ describe('StudentView', () => {
     expect(await waitForElement(() => getByText('Submission sent'))).toBeInTheDocument()
   })
 
-  it('notifies users of error when a submission fails to send via graphql', async () => {
+  it.skip('notifies users of error when a submission fails to send via graphql', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     const assignmentMocks = submissionGraphqlMock()
