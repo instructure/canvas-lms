@@ -77,7 +77,7 @@ class FriendlyDatetime extends Component {
     }
 
     return (
-      <span>
+      <span data-testid="friendly-date-time">
         <ScreenReaderContent>
           {fixedPrefix + friendly}
         </ScreenReaderContent>
