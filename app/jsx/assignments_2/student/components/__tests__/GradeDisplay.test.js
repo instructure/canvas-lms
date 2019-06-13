@@ -15,144 +15,114 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
+import {render} from 'react-testing-library'
 
 import GradeDisplay from '../GradeDisplay'
 
 describe('GradeDisplay', () => {
-  beforeAll(() => {
-    const found = document.getElementById('fixtures')
-    if (!found) {
-      const fixtures = document.createElement('div')
-      fixtures.setAttribute('id', 'fixtures')
-      document.body.appendChild(fixtures)
-    }
-  })
-
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-  })
-
   it('renders points correctly when no receivedGrade are set', () => {
-    ReactDOM.render(
-      <GradeDisplay gradingType="points" pointsPossible={32} />,
-      document.getElementById('fixtures')
+    const {getByTestId, getByText} = render(
+      <GradeDisplay gradingType="points" pointsPossible={32} />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('–/32 Points')
+
+    expect(getByTestId('grade-display')).toContainElement(getByText('–/32 Points'))
   })
 
   it('renders points correctly when receivedGrade is set', () => {
-    ReactDOM.render(
-      <GradeDisplay gradingType="points" receivedGrade={4} pointsPossible={5} />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay gradingType="points" receivedGrade={4} pointsPossible={5} />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('4/5 Points')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('4/5 Points')[1])
   })
 
   it('renders correctly when receivedGrade is 0', () => {
-    ReactDOM.render(
-      <GradeDisplay receivedGrade={0} pointsPossible={5} />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade={0} pointsPossible={5} />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('0/5 Points')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('0/5 Points')[1])
   })
 
   it('defaults to using points if gradingType is not explictly set', () => {
-    ReactDOM.render(
-      <GradeDisplay receivedGrade={4} pointsPossible={5} />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade={4} pointsPossible={5} />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('4/5 Points')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('4/5 Points')[1])
   })
 
   it('renders correctly when displayType is percent', () => {
-    ReactDOM.render(
-      <GradeDisplay receivedGrade="15%" pointsPossible={5} gradingType="percent" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade="15%" pointsPossible={5} gradingType="percent" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('15%')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('15%')[1])
   })
 
   it('renders percent correctly when no grade is set', () => {
-    ReactDOM.render(
-      <GradeDisplay pointsPossible={5} gradingType="percent" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getByText} = render(
+      <GradeDisplay pointsPossible={5} gradingType="percent" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('–')
+
+    expect(getByTestId('grade-display')).toContainElement(getByText('–'))
   })
 
   it('renders grading scheme correcty with grade', () => {
-    ReactDOM.render(
-      <GradeDisplay
-        receivedGrade="Absolutely Amazing"
-        pointsPossible={5}
-        gradingType="gpa_scale"
-      />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade="Absolutely Amazing" pointsPossible={5} gradingType="gpa_scale" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('Absolutely Amazing')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('Absolutely Amazing')[1])
   })
 
   it('renders grading scheme correcty with no grade', () => {
-    ReactDOM.render(
-      <GradeDisplay pointsPossible={5} gradingType="gpa_scale" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getByText} = render(
+      <GradeDisplay pointsPossible={5} gradingType="gpa_scale" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('–')
+
+    expect(getByTestId('grade-display')).toContainElement(getByText('–'))
   })
 
   it('renders pass fail correcty with grade', () => {
-    ReactDOM.render(
-      <GradeDisplay receivedGrade="complete" pointsPossible={5} gradingType="pass_fail" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade="complete" pointsPossible={5} gradingType="pass_fail" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('complete')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('complete')[1])
   })
 
   it('renders pass fail correcty with incomplete grade', () => {
-    ReactDOM.render(
-      <GradeDisplay receivedGrade="incomplete" pointsPossible={100} gradingType="pass_fail" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade="incomplete" pointsPossible={100} gradingType="pass_fail" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('incomplete')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('incomplete')[1])
   })
 
   it('renders pass fail correcty with no grade', () => {
-    ReactDOM.render(
-      <GradeDisplay pointsPossible={5} gradingType="pass_fail" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay pointsPossible={5} gradingType="pass_fail" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('ungraded')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('ungraded')[1])
   })
 
   it('renders letter grade correctly with grade', () => {
-    ReactDOM.render(
-      <GradeDisplay receivedGrade="A" pointsPossible={5} gradingType="letter_grade" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getAllByText} = render(
+      <GradeDisplay receivedGrade="A" pointsPossible={5} gradingType="letter_grade" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('A')
+
+    expect(getByTestId('grade-display')).toContainElement(getAllByText('A')[1])
   })
 
   it('renders letter grade correctly with no grade', () => {
-    ReactDOM.render(
-      <GradeDisplay pointsPossible={5} gradingType="letter_grade" />,
-      document.getElementById('fixtures')
+    const {getByTestId, getByText} = render(
+      <GradeDisplay pointsPossible={5} gradingType="letter_grade" />
     )
-    const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('–')
+
+    expect(getByTestId('grade-display')).toContainElement(getByText('–'))
   })
 })
