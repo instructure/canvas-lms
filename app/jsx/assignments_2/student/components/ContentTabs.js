@@ -18,15 +18,14 @@
 
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import ContentUploadTab from './ContentUploadTab'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
+import {Img} from '@instructure/ui-elements'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import Text from '@instructure/ui-elements/lib/components/Text'
 
 const Comments = lazy(() => import('./Comments'))
 
@@ -59,11 +58,7 @@ function ContentTabs(props) {
           )}
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>
-          <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-            <FlexItem>
-              <Text>`TODO: Input Rubric Content Here...`</Text>
-            </FlexItem>
-          </Flex>
+          <Img src="/images/assignments2_rubric_student_static.png" />
         </TabPanel>
       </TabList>
     </div>
