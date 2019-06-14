@@ -223,6 +223,10 @@ $gradebook_cell_padding_top: 8px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    a {
+      color: var(--ic-link-color);
+    }
   }
 
   .Gradebook__ColumnHeaderContent {

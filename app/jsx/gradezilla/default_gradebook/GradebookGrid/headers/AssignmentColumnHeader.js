@@ -286,9 +286,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     return (
       <span className="assignment-name">
-        <Link ref={this.bindAssignmentLink} href={assignment.htmlUrl}>
+        <Button
+          size="small"
+          variant="link"
+          theme={{smallPadding: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
+          ref={this.bindAssignmentLink}
+          href={assignment.htmlUrl}
+        >
           {assignment.name}
-        </Link>
+        </Button>
       </span>
     )
   }

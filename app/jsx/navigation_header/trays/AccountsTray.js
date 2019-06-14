@@ -27,19 +27,19 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 export default function AccountsTray({accounts, hasLoaded}) {
   return (
-    <View as="div" padding="medium small">
-      <Heading level="h3" as="h2" margin="0 0 0 small">{I18n.t('Admin')}</Heading>
+    <View as="div" padding="medium">
+      <Heading level="h3" as="h2">{I18n.t('Admin')}</Heading>
       <hr role="presentation"/>
-      <List variant="unstyled" margin="small 0" itemSpacing="xx-small">
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           accounts.map(account =>
             <ListItem key={account.id}>
-              <Button variant="link" href={`/accounts/${account.id}`}>{account.name}</Button>
+              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/accounts/${account.id}`}>{account.name}</Button>
             </ListItem>
           ).concat([
             <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
-              <Button variant="link" href="/accounts">{I18n.t('All Accounts')}</Button>
+              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/accounts">{I18n.t('All Accounts')}</Button>
             </ListItem>
           ])
         ) : (

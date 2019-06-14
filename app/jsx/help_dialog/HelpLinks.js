@@ -23,11 +23,10 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
   return (
-    <List variant="unstyled" margin="small 0" itemSpacing="medium">
+    <List variant="unstyled" margin="small 0" itemSpacing="small">
       {hasLoaded ? (
         links
           .map((link, index) => (
@@ -43,15 +42,14 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                     onClick(link.url)
                   }
                 }}
+                theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
               >
                 {link.text}
               </Button>
               {link.subtext && (
-                <View as="div" padding="0 0 0 small">
-                  <Text size="small">
-                    {link.subtext}
-                  </Text>
-                </View>
+                <Text as="div" size="small">
+                  {link.subtext}
+                </Text>
               )}
             </ListItem>
           ))
@@ -64,7 +62,11 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                   <hr role="presentation" />
                 </ListItem>,
                 <ListItem key="customize">
-                  <Button variant="link" href="/accounts/self/settings#custom_help_link_settings">
+                  <Button
+                    variant="link"
+                    theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                    href="/accounts/self/settings#custom_help_link_settings"
+                  >
                     {I18n.t('Customize this menu')}
                   </Button>
                 </ListItem>

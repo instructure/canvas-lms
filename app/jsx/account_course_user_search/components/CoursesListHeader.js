@@ -18,8 +18,7 @@
 
 import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
 import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import React from 'react'
 import {string, func} from 'prop-types'
@@ -27,16 +26,16 @@ import preventDefault from 'compiled/fn/preventDefault'
 
 export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   return (
-    <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
-      <Tooltip
-        as={Link}
-        tip={sort === id && order === 'asc' ? tipAsc : tipDesc}
+    <Tooltip tip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
+      <Button
+        variant="link"
         onClick={preventDefault(() => onChangeSort(id))}
+        theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
       >
         {label}
         {sort === id ? order === 'asc' ? <IconMiniArrowUp /> : <IconMiniArrowDown /> : ''}
-      </Tooltip>
-    </ApplyTheme>
+      </Button>
+    </Tooltip>
   )
 }
 

@@ -19,7 +19,7 @@
 import React from 'react'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!sections_tooltip'
@@ -57,7 +57,10 @@ export default function SectionsTooltip ({ sections, totalUserCount}) {
   return (
     <span className='ic-section-tooltip'>
       <Tooltip tip={tipContent} placement='bottom'>
-        <Link>
+        <Button
+          variant="link"
+          theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+        >
           {
             <Text size='small'>{sectionsCountText}
               {nonNullSections.map(sec => (
@@ -67,7 +70,7 @@ export default function SectionsTooltip ({ sections, totalUserCount}) {
               ))}
             </Text>
           }
-        </Link>
+        </Button>
       </Tooltip>
     </span>
   )

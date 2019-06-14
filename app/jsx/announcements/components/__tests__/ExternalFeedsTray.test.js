@@ -75,10 +75,10 @@ test('does not render the RSSFeedList component when user is student', () => {
 test('renders the external feeds link', () => {
   const tree = mount(<ExternalFeedsTray {...defaultProps()} />)
   const node = tree.find('Button')
-  expect(node.text()).toBe('External feeds')
+  expect(node.text()).toBe('External Feeds')
 })
 
 test('renders the RSS feed link', () => {
   const tree = shallow(<ExternalFeedsTray {...defaultProps()} />)
-  expect(tree.find('#rss-feed-link View').prop('children')).toMatch('RSS Feed')
+  expect(tree.find('#rss-feed-link').prop('children')).toMatch('RSS Feed')
 })
