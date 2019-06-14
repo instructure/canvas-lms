@@ -20,16 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
+import {asImageEmbed} from '../../shared/ContentSelection'
 import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
-
-function imageOptionsFromElement($image) {
-  return {
-    altText: $image.alt || '',
-    isDecorativeImage: $image.getAttribute('data-is-decorative') === 'true'
-  }
-}
 
 export default class TrayController {
   constructor() {
@@ -55,6 +49,7 @@ export default class TrayController {
 
   showTrayForEditor(editor) {
     this._editor = editor
+    this.$img = editor.selection.getNode()
     this._shouldOpen = true
     this._renderTray()
   }
@@ -67,11 +62,19 @@ export default class TrayController {
 
   _applyImageOptions(imageOptions) {
     const editor = this._editor
-    const $img = editor.selection.getNode()
+    const {$img} = this
 
     if (imageOptions.displayAs === 'embed') {
       $img.alt = imageOptions.altText
       $img.setAttribute('data-is-decorative', imageOptions.isDecorativeImage)
+      $img.setAttribute('height', imageOptions.appliedHeight)
+      $img.setAttribute('width', imageOptions.appliedWidth)
+      // tell tinymce so the context toolbar resets
+      editor.fire('ObjectResized', {
+        target: $img,
+        width: imageOptions.appliedWidth,
+        height: imageOptions.appliedHeight
+      })
       this._dismissTray()
     } else {
       const link = `<a href="${$img.src}" target="_blank">${$img.src}</a>`
@@ -84,12 +87,11 @@ export default class TrayController {
   _dismissTray() {
     this._shouldOpen = false
     this._renderTray()
+    this.$img = null
     this._editor = null
   }
 
   _renderTray() {
-    const $img = this._editor.selection.getNode()
-
     if (this._shouldOpen) {
       /*
        * When the tray is being opened again, it should be rendered fresh
@@ -102,7 +104,7 @@ export default class TrayController {
     const element = (
       <ImageOptionsTray
         key={this._renderId}
-        imageOptions={imageOptionsFromElement($img)}
+        imageOptions={asImageEmbed(this.$img)}
         onEntered={() => {
           this._isOpen = true
         }}

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'escape-html'
-
 import formatMessage from '../../../format-message'
 import bridge from '../../../bridge'
 import {isImageEmbed} from '../shared/ContentSelection'
@@ -35,13 +33,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
 
     // Register buttons
     editor.ui.registry.addMenuButton('instructure_image', {
-      tooltip: htmlEscape(
-        formatMessage({
-          default: 'Images',
-          description: 'Title for RCE button to embed an image'
-        })
-      ),
-
+      tooltip: formatMessage('Images'),
       icon: 'image',
 
       fetch(callback) {

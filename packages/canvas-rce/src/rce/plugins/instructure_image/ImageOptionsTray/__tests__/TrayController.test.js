@@ -53,6 +53,8 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
     const $el = document.createElement('img')
     $el.src = `https://www.fillmurray.com/${height}/${width}`
     $el.alt = `Bill Murray, ${width} by ${height}`
+    $el.setAttribute('height', height)
+    $el.setAttribute('width', width)
     return $el
   }
 

@@ -33,7 +33,9 @@
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
-  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
+  "browserslist": [
+    "extends @instructure/browserslist-config-canvas-lms"
+  ],
   "nyc": {
     "include": [
       "shared/**/*.js",
@@ -49,8 +51,8 @@
   },
   "dependencies": {
     "@instructure/canvas-theme": "^6.8.1",
-    "@instructure/media-capture": "^5.54.0",
     "@instructure/k5uploader": ">=1",
+    "@instructure/media-capture": "^5.54.0",
     "@instructure/ui-a11y": "^6.8.1",
     "@instructure/ui-alerts": "^6.8.1",
     "@instructure/ui-billboard": "^6.8.1",
@@ -58,6 +60,7 @@
     "@instructure/ui-color-utils": "^6.8.1",
     "@instructure/ui-elements": "^6.8.1",
     "@instructure/ui-focusable": "^6.8.1",
+    "@instructure/ui-form-field": "^6.8.1",
     "@instructure/ui-forms": "^6.8.1",
     "@instructure/ui-icons": "^6.8.1",
     "@instructure/ui-layout": "^6.8.1",

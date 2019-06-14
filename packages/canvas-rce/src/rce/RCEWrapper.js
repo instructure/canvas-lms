@@ -125,7 +125,7 @@ class RCEWrapper extends React.Component {
   static propTypes = {
     confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
-    editorOptions: PropTypes.object,
+    editorOptions: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     handleUnmount: PropTypes.func,
     language: PropTypes.string,
     onFocus: PropTypes.func,
@@ -133,7 +133,7 @@ class RCEWrapper extends React.Component {
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
     textareaId: PropTypes.string,
-    tinymce: PropTypes.object,
+    tinymce: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     trayProps
   };
 
@@ -304,7 +304,7 @@ class RCEWrapper extends React.Component {
   onTinyMCEInstance(command, args) {
     const editor = this.mceInstance();
     if (editor) {
-      if (command == "mceRemoveEditor") {
+      if (command === "mceRemoveEditor") {
         editor.execCommand("mceNewDocument");
       } // makes sure content can't persist past removal
       editor.execCommand(command, false, this.props.textareaId, args);
@@ -462,7 +462,7 @@ class RCEWrapper extends React.Component {
     this.handleFocus()
   }
 
-  handleBlurEditor() {
+  handleBlurEditor(event) {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.remove('active')
     this.handleBlur(event)
@@ -486,8 +486,8 @@ class RCEWrapper extends React.Component {
       showMenubar(el, true)
     })
     // when typed somewhere else w/in RCEWrapper
-    el.addEventListener('keydown', e => {
-      if (e.altKey && e.code === 'F9') {
+    el.addEventListener('keydown', event => {
+      if (event.altKey && event.code === 'F9') {
         event.preventDefault()
         event.stopPropagation()
         showMenubar(el, true)
@@ -495,8 +495,8 @@ class RCEWrapper extends React.Component {
     })
 
     // toolbar help
-    el.addEventListener('keydown', e => {
-      if (e.altKey && e.code === 'F10') {
+    el.addEventListener('keydown', event => {
+      if (event.altKey && event.code === 'F10') {
         event.preventDefault()
         event.stopPropagation()
         focusToolbar(el)
@@ -526,6 +526,7 @@ class RCEWrapper extends React.Component {
   }
 
   announcing = 0
+
   announceContextToolbars(editor) {
     editor.on('NodeChange', () => {
       const node = editor.selection.getNode()
@@ -594,7 +595,7 @@ class RCEWrapper extends React.Component {
       const container = editor.getContainer()
       if (!container) return
       const currentContainerHeight = Number.parseInt(container.style.height, 10)
-      if (isNaN(currentContainerHeight)) return
+      if (isNaN(currentContainerHeight)) return // eslint-disable-line no-restricted-globals
       const modifiedHeight = currentContainerHeight + coordinates.deltaY
       const newHeight = `${modifiedHeight}px`
       container.style.height = newHeight

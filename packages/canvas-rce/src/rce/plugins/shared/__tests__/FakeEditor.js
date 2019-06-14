@@ -82,4 +82,6 @@ export default class FakeEditor {
   focus() {
     this._$container.focus()
   }
+
+  fire(_eventName, _args) {}
 }
