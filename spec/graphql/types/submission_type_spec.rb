@@ -163,6 +163,30 @@ describe Types::SubmissionType do
     end
   end
 
+  describe 'submission_drafts' do
+    it 'returns the draft for attempt 0 when the submission attempt is nil' do
+      @submission.update_columns(attempt: nil) # bypass #infer_details for test
+      SubmissionDraft.create!(submission: @submission, submission_attempt: 0)
+      expect(
+        submission_type.resolve('submissionDraft { submissionAttempt }')
+      ).to eq 0
+    end
+
+    it 'returns nil for a non current submission history that has a draft' do
+      assignment = @course.assignments.create! name: "asdf", points_possible: 10
+      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      SubmissionDraft.create!(submission: @submission1, submission_attempt: @submission1.attempt)
+      SubmissionDraft.create!(submission: @submission2, submission_attempt: @submission2.attempt)
+      resolver = GraphQLTypeTester.new(@submission2, current_user: @teacher)
+      expect(
+        resolver.resolve(
+          'submissionHistoriesConnection { nodes { submissionDraft { submissionAttempt }}}'
+        )
+      ).to eq [nil, @submission2.attempt]
+    end
+  end
+
   describe 'attachments' do
     before(:once) do
       assignment = @course.assignments.create! name: "asdf", points_possible: 10
