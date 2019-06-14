@@ -83,12 +83,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       await tray.setSize('Large')
       expect(tray.size).toEqual('Large')
     })
-
-    it('can be set to "Custom"', async () => {
-      renderComponent()
-      await tray.setSize('Custom')
-      expect(tray.size).toEqual('Custom')
-    })
   })
 
   describe('"Done" button', () => {

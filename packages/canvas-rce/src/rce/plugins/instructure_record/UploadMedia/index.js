@@ -100,7 +100,6 @@ function loadingErrorSuccess(states) {
   } else if (states.uploadingMediaStatus.uploaded) {
     return (
       <Alert
-        screenReaderOnly
         timeout={ALERT_TIMEOUT}
       >
         {formatMessage('Video/audio recording uploaded')}

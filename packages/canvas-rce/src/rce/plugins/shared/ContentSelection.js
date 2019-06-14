@@ -62,12 +62,16 @@ function asVideoElement($element) {
   if (!$element.id) {
     return null
   }
-  if (!$element.id.includes("media_object")) {
+
+  if ($element.childElementCount !== 1) {
+    return null
+  }
+
+  if (!$element.id.includes("media_object") ||  $element.children[0].tagName !== "IFRAME") {
     return null
   }
 
   return {
-    displayAs: 'div',
     type: VIDEO_EMBED_TYPE,
     id: $element.id.split("_")[2]
   }

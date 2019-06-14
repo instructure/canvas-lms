@@ -38,9 +38,6 @@ function labelForVideoSize(videoSize) {
     case 'large': {
       return formatMessage('Large')
     }
-    default: {
-      return formatMessage('Custom')
-    }
   }
 }
 
@@ -96,12 +93,8 @@ export default function VideoOptionsTray(props) {
                     selectedOption={videoSizeOption}
                   >
                     <option value="small">{labelForVideoSize('small')}</option>
-
                     <option value="medium">{labelForVideoSize('medium')}</option>
-
                     <option value="large">{labelForVideoSize('large')}</option>
-
-                    <option value="custom">{labelForVideoSize('custom')}</option>
                   </Select>
                 </Flex.Item>
               </Flex>
