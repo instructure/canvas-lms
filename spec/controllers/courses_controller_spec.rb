@@ -543,6 +543,42 @@ describe CoursesController do
     end
   end
 
+  describe 'observer_pairing_codes' do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(course: @course, active_all: true)
+    end
+
+    it "returns unauthorized if self registration is off" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: true, permission: :generate_observer_pairing_code)
+      ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized if role does not have permission" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: false, permission: :generate_observer_pairing_code)
+      @teacher.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_unauthorized
+    end
+
+    it "generates an observer pairing codes csv" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: true, permission: :generate_observer_pairing_code)
+      @teacher.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(response.header['Content-Type']).to eql("text/csv")
+      expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
+      expect(response.body.split(",")[-2]).to eql(ObserverPairingCode.last.code)
+    end
+  end
+
   describe "GET 'settings'" do
     before :once do
       course_with_teacher(active_all: true)

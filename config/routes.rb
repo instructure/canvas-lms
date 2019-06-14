@@ -189,6 +189,7 @@ CanvasRails::Application.routes.draw do
     post 'self_unenrollment/:self_unenrollment' => 'courses#self_unenrollment', as: :self_unenrollment
     post :unconclude
     get :students
+    get 'observer_pairing_codes.csv', action: :observer_pairing_codes_csv, as: 'observer_pairing_codes'
     post :enrollment_invitation
     # this needs to come before the users concern, or users/:id will preempt it
     get 'users/prior' => 'context#prior_users', as: :prior_users
