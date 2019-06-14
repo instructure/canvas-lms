@@ -173,7 +173,8 @@ export default class StudentsTable extends React.Component {
   }
 
   handleTrayOpen = event => {
-    const chosenId = event.target.dataset.studentId
+    const button = event.target.closest('button')
+    const chosenId = button.dataset.studentId
     this.setState(prevState => {
       const selectedStudentIndex = prevState.studentData.findIndex(
         aStudent => aStudent.lid === chosenId
