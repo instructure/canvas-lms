@@ -37,6 +37,7 @@ event originated as part of a web request:
 | ---- | ---- | ----------- |
 | `user_id`    | String | The Canvas id of the currently logged in user. |
 | `real_user_id` | String | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
+| `time_zone` | String | Time zone of the currently logged in user. |
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
 | `root_account_uuid` | String | The Canvas uuid of the root account associated with the current user. |

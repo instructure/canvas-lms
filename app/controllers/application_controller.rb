@@ -2399,6 +2399,7 @@ class ApplicationController < ActionController::Base
     end
 
     ctx[:user_id] = @current_user.global_id if @current_user
+    ctx[:time_zone] = @current_user.time_zone if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context

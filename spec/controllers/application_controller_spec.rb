@@ -1105,12 +1105,12 @@ describe ApplicationController do
     end
 
     it 'stringifies the non-strings in the context attributes' do
-      current_user_attributes = { global_id: 12345 }
+      current_user_attributes = { global_id: 12345, time_zone: 'asdf' }
 
       current_user = double(current_user_attributes)
       controller.instance_variable_set(:@current_user, current_user)
       controller.send(:setup_live_events_context)
-      expect(LiveEvents.get_context).to eq({user_id: '12345'}.merge(non_conditional_values))
+      expect(LiveEvents.get_context).to eq({user_id: '12345', time_zone: 'asdf'}.merge(non_conditional_values))
     end
 
     it 'sets the "context_sis_source_id"' do
@@ -1147,13 +1147,15 @@ describe ApplicationController do
     context 'when a current_user exists' do
       let(:current_user_attributes) do
         {
-          global_id: 'user_global_id'
+          global_id: 'user_global_id',
+          time_zone: 'America/Denver'
         }
       end
 
       let(:expected_context_attributes) do
         {
-          user_id: 'user_global_id'
+          user_id: 'user_global_id',
+          time_zone: 'America/Denver'
         }.merge(non_conditional_values)
       end
 
