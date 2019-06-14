@@ -328,4 +328,35 @@ describe Canvas::CacheRegister do
       end
     end
   end
+
+  context "redis node lookup and sharding" do
+    specs_require_sharding
+    specs_require_cache(:redis_store)
+
+    before :each do
+      @user = @shard1.activate { User.create! }
+      @base_key = User.base_cache_register_key_for(@user)
+    end
+
+    def expect_redis_call
+      expect(Canvas::CacheRegister).to receive(:redis).with(@base_key, @user.shard).and_call_original
+    end
+
+    it "should pass the object's shard when looking up node for cache_key" do
+      expect_redis_call
+      @user.cache_key(:enrollments)
+    end
+
+    it "should pass the object's shard when looking up node for clear_cache_keys" do
+      expect_redis_call
+      User.clear_cache_keys([@user.id], :enrollments)
+    end
+
+    it "should pass the object's shard when looking up node for fetch_with_batched_keys" do
+      expect_redis_call
+      Rails.cache.fetch_with_batched_keys("somekey", batch_object: @user, batched_keys: [:enrollments]) do
+        "something"
+      end
+    end
+  end
 end
