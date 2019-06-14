@@ -26,12 +26,17 @@ module Schemas::Lti
         # to be reenabled after scopes bug fix
         # "scopes",
         "target_link_uri",
-        "oidc_initiation_url",
-        "public_jwk"
+        "oidc_initiation_url"
       ].freeze,
       "properties" => {
         "title" => {
           "type" => "string"
+        }.freeze,
+        "public_jwk_url" => {
+          "type" => "string"
+        }.freeze,
+        "is_lti_key" => {
+          "type" => "boolean"
         }.freeze,
         "description" => {
           "type" => "string"

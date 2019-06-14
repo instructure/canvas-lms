@@ -41,7 +41,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       test_cluster_only: true,
       scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'],
       require_scopes: true,
-      redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com"
+      redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com",
+      public_jwk_url: "https://www.test.com"
     }
   end
   let(:new_url) { 'https://www.new-url.com/test' }

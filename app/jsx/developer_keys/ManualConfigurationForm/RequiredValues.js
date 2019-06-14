@@ -92,6 +92,11 @@ export default class RequiredValues extends React.Component {
     this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk: value}}))
   }
 
+  handlePublicJwkUrlChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk_url: value}}))
+  }
+
   render() {
     const { toolConfiguration } = this.state;
     const { showMessages } = this.props
@@ -156,6 +161,13 @@ export default class RequiredValues extends React.Component {
           onChange={this.handlePublicJwkChange}
           messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
         />
+        <TextInput
+                name="public_jwk_url"
+                value={toolConfiguration.public_jwk_url}
+                label={I18n.t("* Public JWK URL")}
+                onChange={this.handlePublicJwkUrlChange}
+                messages={showMessages && !toolConfiguration.public_jwk_url ? validationMessage : []}
+              />
         <PresentationContent>
           <hr />
         </PresentationContent>
