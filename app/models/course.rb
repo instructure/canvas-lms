@@ -1921,7 +1921,7 @@ class Course < ActiveRecord::Base
     progress.process_job(
       self,
       :generate_csv,
-      { preserve_method_args: true },
+      { preserve_method_args: true, priority: Delayed::HIGH_PRIORITY },
       user,
       options,
       attachment
