@@ -16,16 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module LiveEvents
-  class EventSerializerProvider
-    CLASS_MAP = {
-      ContextExternalTool.name => ExternalToolSerializer,
-      Attachment.name => LiveEvents::AttachmentSerializer
-    }.freeze
+  class AttachmentSerializer
+    def initialize(attachment)
+      @attachment = attachment
+    end
 
-    class << self
-      def serialize(asset)
-        CLASS_MAP[asset.class.name]&.new(asset)&.as_json || {}
-      end
+    def as_json
+      {
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }.compact
     end
   end
 end

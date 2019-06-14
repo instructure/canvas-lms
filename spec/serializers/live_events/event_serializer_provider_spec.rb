@@ -36,6 +36,17 @@ RSpec.describe LiveEvents::EventSerializerProvider do
       end
     end
 
+    context 'when asset is an Attachment' do
+      let(:asset) { attachment_model }
+
+      it 'serializes the asset' do
+        expect(subject).to include(
+          filename: asset.filename,
+          display_name: asset.display_name
+        )
+      end
+    end
+
     context 'when asset class does not have a serializer' do
       let(:asset) { "'String' has no serializer" }
 
