@@ -2889,10 +2889,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz_lti?
-    external_tool? &&
-      external_tool_tag.present? &&
-      external_tool_tag.content.present? &&
-      external_tool_tag.content.try(:tool_id) == 'Quizzes 2'
+    external_tool? && !!external_tool_tag&.content&.try(:quiz_lti?)
   end
 
   def quiz_lti!

@@ -46,6 +46,7 @@ class ContextExternalTool < ActiveRecord::Base
   validate :check_for_xml_error
 
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
+  scope :quiz_lti, -> { where(tool_id: 'Quizzes 2') }
 
   CUSTOM_EXTENSION_KEYS = {
     :file_menu => [:accept_media_types].freeze,
@@ -810,6 +811,10 @@ end
     else
       true
     end
+  end
+
+  def quiz_lti?
+    tool_id == "Quizzes 2"
   end
 
   private
