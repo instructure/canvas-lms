@@ -42,6 +42,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
       inviteUsersURL: PropTypes.string,
       onChange: PropTypes.func.isRequired
     };
+
     static defaultProps = {
       inviteUsersURL: undefined
     }
@@ -121,6 +122,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
       this.onUncheckUserByAddress(event.currentTarget.value);
       this.setState({selectAll: false});
     }
+
     onUncheckUserByAddress = (address) => {
       this.props.onChange(address, false);
     }
@@ -208,6 +210,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
         return row;
       });
     }
+
     // render each of the missing email addresses
     // @returns an array of table rows, one for each missing id
     renderMissingEmail () {
@@ -259,7 +262,12 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
                 />
               </td>
               <td>
-                <Button variant="link" onClick={this.onSelectNewForMissing} data-address={missing.address}>
+                <Button
+                  variant="link"
+                  onClick={this.onSelectNewForMissing}
+                  data-address={missing.address}
+                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                >
                   {namePrompt}
                 </Button>
               </td>
@@ -307,6 +315,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
         </thead>
       );
     }
+
     // render the list of login_ids where we did not find users
     render () {
       return (
