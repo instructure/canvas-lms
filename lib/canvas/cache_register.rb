@@ -106,7 +106,7 @@ module Canvas
               !self.class.valid_cache_key_type?(key_type) || !CacheRegister.enabled?
 
           base_key = self.class.base_cache_register_key_for(self)
-          redis = CacheRegister.redis(base_key)
+          redis = CacheRegister.redis(base_key, self.shard)
           full_key = "#{base_key}/#{key_type}"
           RequestCache.cache(full_key) do
             now = Time.now.utc.to_s(self.cache_timestamp_format)
