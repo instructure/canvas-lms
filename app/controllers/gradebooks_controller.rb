@@ -841,6 +841,8 @@ class GradebooksController < ApplicationController
       value_to_boolean(user_preference)
     end
 
+    visible_sections = @context.sections_visible_to(@current_user)
+
     new_gradebook_options = {
       colors: gradebook_settings.fetch(:colors, {}),
 
@@ -854,7 +856,8 @@ class GradebooksController < ApplicationController
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
-      post_policies_enabled: @context.post_policies_enabled?
+      post_policies_enabled: @context.post_policies_enabled?,
+      sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true)
     }
     new_gradebook_options[:post_manually] = @context.post_manually? if @context.post_policies_enabled?
 

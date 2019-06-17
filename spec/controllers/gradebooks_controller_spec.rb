@@ -1106,6 +1106,26 @@ describe GradebooksController do
           end
         end
       end
+
+      describe "sections" do
+        before(:each) do
+          @course.course_sections.create!
+          Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+        end
+
+        let(:returned_section_ids) { gradebook_options.fetch(:sections).pluck(:id) }
+
+        it "only includes course sections visible to the user when new gradebook is enabled" do
+          @course.enable_feature!(:new_gradebook)
+          get :show, params: {course_id: @course.id}
+          expect(returned_section_ids).to contain_exactly(@course.default_section.id)
+        end
+
+        it "includes all course sections when new gradebook is disabled" do
+          get :show, params: {course_id: @course.id}
+          expect(returned_section_ids).to match_array(@course.course_sections.pluck(:id))
+        end
+      end
     end
 
     describe "csv" do

@@ -193,6 +193,27 @@ describe Mutations::HideAssignmentGradesForSections do
         execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
         expect(section1_student_submission).to be_posted
       end
+
+      context "when the hider has limited visibility" do
+        let(:ta) { User.create! }
+
+        before(:each) do
+          course.enroll_ta(ta, enrollment_state: "active", section: section1, limit_privileges_to_course_section: true)
+        end
+
+        it "does not hide grades for the requested sections if the user cannot see them" do
+          execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id, section2.id]), {current_user: ta})
+          hide_submissions_job.invoke_job
+          expect(assignment.submission_for_student(@section2_student).posted_at).not_to be nil
+        end
+
+        it "stores only the user ids of affected students on the Progress object" do
+          result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id, section2.id]), {current_user: ta})
+          hide_submissions_job.invoke_job
+          progress = Progress.find(result.dig("data", "hideAssignmentGradesForSections", "progress", "_id"))
+          expect(progress.results[:user_ids]).to match_array [@section1_student.id]
+        end
+      end
     end
   end
 
