@@ -54,7 +54,8 @@ const mocks = [
     request: {
       query: SUBMISSION_COMMENT_QUERY,
       variables: {
-        submissionId: legacyMockSubmission().rootId
+        submissionId: legacyMockSubmission().rootId,
+        submissionAttempt: legacyMockSubmission().attempt
       }
     },
     result: {
@@ -67,7 +68,8 @@ const mocks = [
     request: {
       query: CREATE_SUBMISSION_COMMENT,
       variables: {
-        submissionId: legacyMockSubmission().rootId
+        submissionId: legacyMockSubmission().rootId,
+        submissionAttempt: legacyMockSubmission().attempt
       }
     },
     result: {

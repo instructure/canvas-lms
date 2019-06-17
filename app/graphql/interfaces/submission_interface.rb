@@ -55,13 +55,21 @@ module Interfaces::SubmissionInterface
   end
 
   field :comments_connection, Types::SubmissionCommentType.connection_type, null: true do
-    argument :filter, Types::SubmissionCommentFilterInputType, required: false
+    argument :filter, Types::SubmissionCommentFilterInputType, required: false, default_value: {}
   end
-  def comments_connection(filter: nil)
-    filter ||= {}
+  def comments_connection(filter:)
+    filter = filter.to_h
+    all_comments, for_attempt = filter.values_at(:all_comments, :for_attempt)
+
     load_association(:assignment).then do
       scope = submission.comments_for(current_user).published
-      scope = scope.where(attempt: submission.attempt || 0) unless filter[:all_comments]
+      unless all_comments
+        target_attempt = for_attempt || submission.attempt || 0
+        if target_attempt <= 1
+          target_attempt = [0, 1] # Submission 0 and 1 share comments
+        end
+        scope = scope.where(attempt: target_attempt)
+      end
       scope
     end
   end

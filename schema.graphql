@@ -2124,7 +2124,7 @@ type Submission implements Node & SubmissionInterface & Timestamped {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    filter: SubmissionCommentFilterInput
+    filter: SubmissionCommentFilterInput = {}
 
     """
     Returns the first _n_ elements from the list.
@@ -2244,7 +2244,17 @@ type SubmissionCommentEdge {
 }
 
 input SubmissionCommentFilterInput {
+  """
+  If all of the comments, regardless of the submission attempt, should be returned.
+  If this is true, the for_attempt argument will be ignored.
+  """
   allComments: Boolean = false
+
+  """
+  What submission attempt the comments should be returned for. If not specified,
+  it will return the comments for the current submisssion or submission history.
+  """
+  forAttempt: Int = null
 }
 
 """
@@ -2310,7 +2320,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    filter: SubmissionCommentFilterInput
+    filter: SubmissionCommentFilterInput = {}
 
     """
     Returns the first _n_ elements from the list.
@@ -2423,7 +2433,7 @@ interface SubmissionInterface {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    filter: SubmissionCommentFilterInput
+    filter: SubmissionCommentFilterInput = {}
 
     """
     Returns the first _n_ elements from the list.

@@ -142,10 +142,26 @@ describe Types::SubmissionType do
       ).to eq [@comment2.id.to_s]
     end
 
+    it 'will show comments for a given attempt using the target_attempt argument' do
+      expect(
+        submission_type.resolve('commentsConnection(filter: {forAttempt: 1}) { nodes { _id }}')
+      ).to eq [@comment1.id.to_s]
+    end
+
     it 'will show alll comments for all attempts if all_comments is true' do
       expect(
         submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { _id }}')
       ).to eq [@comment1.id.to_s, @comment2.id.to_s]
+    end
+
+    it 'will combine comments for attempt 0 and 1' do
+      @comment0 = @submission.add_comment(author: @teacher, comment: 'test1', attempt: 0)
+
+      (0..1).each do |i|
+        expect(
+          submission_type.resolve("commentsConnection(filter: {forAttempt: #{i}}) { nodes { _id }}")
+        ).to eq [@comment1.id.to_s, @comment0.id.to_s]
+      end
     end
 
     it 'will only return published drafts' do

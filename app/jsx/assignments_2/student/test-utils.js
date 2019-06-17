@@ -163,7 +163,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: SUBMISSION_COMMENT_QUERY,
         variables: {
-          submissionId: legacyMockSubmission().rootId
+          submissionId: legacyMockSubmission().rootId,
+          submissionAttempt: legacyMockSubmission().attempt
         }
       },
       result: {
@@ -176,7 +177,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: legacyMockSubmission()._id,
+          id: legacyMockSubmission().rootId,
+          submissionAttempt: legacyMockSubmission().attempt,
           comment: 'lion',
           fileIds: []
         }
@@ -206,7 +208,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: legacyMockSubmission()._id,
+          id: legacyMockSubmission().rootId,
+          submissionAttempt: legacyMockSubmission().attempt,
           comment: 'lion',
           fileIds: ['1', '2', '3']
         }

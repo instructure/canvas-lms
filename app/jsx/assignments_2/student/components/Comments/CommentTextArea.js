@@ -54,7 +54,10 @@ export default class CommentTextArea extends Component {
   queryVariables() {
     return {
       query: SUBMISSION_COMMENT_QUERY,
-      variables: {submissionId: this.props.submission.rootId}
+      variables: {
+        submissionId: this.props.submission.rootId,
+        submissionAttempt: this.props.submission.attempt
+      }
     }
   }
 
@@ -114,7 +117,8 @@ export default class CommentTextArea extends Component {
 
       await createSubmissionComment({
         variables: {
-          id: this.props.submission._id,
+          id: this.props.submission.rootId,
+          submissionAttempt: this.props.submission.attempt,
           comment: this.state.commentText,
           fileIds: attachmentIds
         }

@@ -171,10 +171,10 @@ export const STUDENT_VIEW_QUERY = gql`
 `
 
 export const SUBMISSION_COMMENT_QUERY = gql`
-  query GetSubmissionComments($submissionId: ID!) {
+  query GetSubmissionComments($submissionId: ID!, $submissionAttempt: Int!) {
     submissionComments: legacyNode(_id: $submissionId, type: Submission) {
       ... on Submission {
-        commentsConnection(filter: {allComments: true}) {
+        commentsConnection(filter: {forAttempt: $submissionAttempt}) {
           nodes {
             ${submissionCommentQueryParams()}
           }
@@ -185,8 +185,18 @@ export const SUBMISSION_COMMENT_QUERY = gql`
 `
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment($id: ID!, $comment: String!, $fileIds: [ID!]) {
-    createSubmissionComment(input: {submissionId: $id, comment: $comment, fileIds: $fileIds}) {
+  mutation CreateSubmissionComment(
+    $id: ID!,
+    $submissionAttempt: Int!,
+    $comment: String!,
+    $fileIds: [ID!]
+  ) {
+    createSubmissionComment(input: {
+      submissionId: $id,
+      attempt: $submissionAttempt,
+      comment: $comment,
+      fileIds: $fileIds
+    }) {
       submissionComment {
         ${submissionCommentQueryParams()}
       }

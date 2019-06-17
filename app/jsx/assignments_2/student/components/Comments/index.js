@@ -27,8 +27,19 @@ import {Query} from 'react-apollo'
 import React from 'react'
 
 function Comments(props) {
+  const queryVariables = {
+    submissionId: props.submission.rootId,
+    submissionAttempt: props.submission.attempt
+  }
+  // Using the key prop on the query as a work around to these issues:
+  // https://github.com/apollographql/react-apollo/issues/2202
+  // https://github.com/apollographql/apollo-client/issues/1186
   return (
-    <Query query={SUBMISSION_COMMENT_QUERY} variables={{submissionId: props.submission.rootId}}>
+    <Query
+      query={SUBMISSION_COMMENT_QUERY}
+      variables={queryVariables}
+      key={props.submission.attempt}
+    >
       {({loading, error, data}) => {
         if (loading) return <LoadingIndicator />
         if (error) {
