@@ -199,6 +199,7 @@ export function mockSubmission(overrides) {
         }
       ]
     },
+    submissionDraft: null,
     ...overrides
   }
 }

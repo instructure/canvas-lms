@@ -102,6 +102,19 @@ it('displays multiple attempts', () => {
   )
 })
 
+it('indicates when a submission draft is present', () => {
+  const user = mockUser()
+  const submission = mockSubmission({
+    nodes: [user],
+    submissionHistories: {nodes: []},
+    submissionDraft: {submissionAttempt: 0}
+  })
+  const assignment = mockAssignment()
+
+  const {getByText} = render(<StudentsTable assignment={assignment} submissions={[submission]} />)
+  expect(getByText('In Progress')).toBeInTheDocument()
+})
+
 it('renders submission status pill', () => {
   const submission = mockSubmission({
     submittedAt: null,

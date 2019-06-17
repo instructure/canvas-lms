@@ -95,7 +95,7 @@ export default class StudentsTable extends React.Component {
   renderAttemptsColumn(student) {
     const assignmentLid = this.props.assignment.lid
     const courseLid = this.props.assignment.course.lid
-    return student.submission.submissionHistories.nodes.map(attempt => {
+    const attempts = student.submission.submissionHistories.nodes.map(attempt => {
       const viewLink = `/courses/${courseLid}/assignments/${assignmentLid}/submissions/${
         student.lid
       }/?submittedAt=${attempt.submittedAt}`
@@ -107,6 +107,15 @@ export default class StudentsTable extends React.Component {
         </View>
       )
     })
+    if (attempts.length) {
+      return attempts
+    } else if (student.submission.submissionDraft) {
+      return (
+        <View as="div" margin="0 0 x-small" key="draft">
+          {I18n.t('In Progress')}
+        </View>
+      )
+    }
   }
 
   renderScoreColumn(student) {

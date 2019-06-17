@@ -263,6 +263,9 @@ export const STUDENT_SEARCH_QUERY = gql`
           state
           score
           submittedAt
+          submissionDraft {
+            submissionAttempt
+          }
           user {
             ...UserFields
           }
@@ -387,6 +390,10 @@ export const SubmissionHistoryShape = shape({
   submittedAt: string
 })
 
+export const SubmissionDraftShape = shape({
+  submissionAttempt: string
+})
+
 export const SubmissionShape = shape({
   gid: string,
   lid: string,
@@ -401,7 +408,8 @@ export const SubmissionShape = shape({
   user: UserShape,
   submissionHistoriesConnection: shape({
     nodes: arrayOf(SubmissionHistoryShape)
-  })
+  }),
+  submissionDraft: SubmissionDraftShape
 })
 
 export const TeacherAssignmentShape = shape({
