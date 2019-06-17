@@ -269,12 +269,25 @@ export default class FileUpload extends Component {
       zIndex: '5'
     }
 
+    // TODO: Delete this once the better global footers are implemented. This
+    //       is some pretty ghetto stuff to handle the fixed buttom bars (for
+    //       masquarading and beta instances) that would otherwise hide the
+    //       submit button.
+    let paddingOffset = 0
+    if (document.getElementById('masquerade_bar')) {
+      paddingOffset += 52
+    }
+    if (document.getElementById('element_toggler_0')) {
+      paddingOffset += 63
+    }
+
     const innerFooterStyle = {
       backgroundColor: theme.variables.colors.white,
       borderColor: theme.variables.colors.borderMedium,
       borderTop: `1px solid ${theme.variables.colors.borderMedium}`,
       textAlign: 'right',
-      margin: `0 ${theme.variables.spacing.medium}`
+      margin: `0 ${theme.variables.spacing.medium}`,
+      paddingBottom: `${paddingOffset}px`
     }
 
     return (
