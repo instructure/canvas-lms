@@ -847,7 +847,8 @@ class GradebooksController < ApplicationController
       colors: gradebook_settings.fetch(:colors, {}),
 
       course_settings: {
-        allow_final_grade_override: allow_final_grade_override
+        allow_final_grade_override: allow_final_grade_override,
+        filter_speed_grader_by_student_group: @context.filter_speed_grader_by_student_group?
       },
 
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
