@@ -28,7 +28,6 @@ import SubmissionProgressBars from './SubmissionProgressBars'
 import MessageStudents from '../shared/MessageStudents'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
@@ -230,14 +229,15 @@ export default class StudentContextTray extends React.Component {
                         {user.short_name ? (
                           <div className="StudentContextTray-Header__Name">
                             <Heading level="h3" as="h2">
-                              <span className="StudentContextTray-Header__NameLink">
-                                <Link
-                                  href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
-                                  aria-label={I18n.t('Go to %{name}\'s profile', {name: user.short_name})}
-                                >
-                                  {user.short_name}
-                                </Link>
-                              </span>
+                              <Button
+                                variant="link"
+                                size="large"
+                                href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
+                                aria-label={I18n.t('Go to %{name}\'s profile', {name: user.short_name})}
+                                theme={{largePadding: '0', largeHeight: 'normal'}}
+                              >
+                                {user.short_name}
+                              </Button>
                             </Heading>
                           </div>
                         ) : null}
