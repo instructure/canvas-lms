@@ -267,7 +267,7 @@ module RCENextPage
   end
 
   def image_options_done_button
-    fj('[data-cid="Portal Tray"] button:contains("Done")')
+    fj('[aria-label="Image Options Tray"] button:contains("Done")')
   end
 
   def visible_keyboard_shortcut_button
