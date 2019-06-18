@@ -88,8 +88,8 @@
     </div>
 
     <div id="print-grades-button-container" class="ic-Action-header__Secondary">
-      <a id="print-grades-button" class="Button print-grades icon-printer" href="javascript:window.print()">
-        <%= t :print_grades, "Print" %>
+      <a role="button" id="print-grades-button" class="Button print-grades icon-printer" href="javascript:window.print()">
+        <%= t("Print Grades") %>
       </a>
     </div>
   </div>
@@ -217,7 +217,7 @@
                 <% if !assignment_presenter.posted_to_student? %>
                   <i class="<%= hidden_icon_class %>" title="<%= hidden_text %>"></i>
                 <% else %>
-                  <span class="screenreader-only" role="link">
+                  <span class="screenreader-only" role="button">
                     <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
                   </span>
                   <% if submission.try :pending_review? %>
@@ -288,6 +288,7 @@
             <% if assignment_presenter.has_comments? && assignment_presenter.posted_to_student? %>
               aria-expanded="false"
               aria-controls="comments_thread_<%= assignment.id %>"
+              role="button"
             <% else %>
               aria-hidden='true'
               role='presentation'
