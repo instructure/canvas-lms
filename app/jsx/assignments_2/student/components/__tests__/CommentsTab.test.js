@@ -234,11 +234,11 @@ describe('CommentsTab', () => {
     const comment = singleComment()
     const attachment = singleAttachment()
     comment.attachments = [attachment]
-    const {getByText} = render(<CommentContent comments={[comment]} />)
+    const {container, getByText} = render(<CommentContent comments={[comment]} />)
 
-    expect(
-      getByText(attachment.displayName, {selector: `a[href*='${attachment.url}']`})
-    ).toBeInTheDocument()
+    const renderedAttachment = container.querySelector(`a[href*='${attachment.url}']`)
+    expect(renderedAttachment).toBeInTheDocument()
+    expect(renderedAttachment).toContainElement(getByText(attachment.displayName))
   })
 
   it('displays multiple attachments', async () => {
@@ -250,14 +250,15 @@ describe('CommentsTab', () => {
       url: 'https://second-attachment/url.com'
     })
     comment.attachments = [attachment1, attachment2]
-    const {getByText} = render(<CommentContent comments={[comment]} />)
+    const {container, getByText} = render(<CommentContent comments={[comment]} />)
 
-    expect(
-      getByText(attachment1.displayName, {selector: `a[href*='${attachment1.url}']`})
-    ).toBeInTheDocument()
-    expect(
-      getByText(attachment2.displayName, {selector: `a[href*='${attachment2.url}']`})
-    ).toBeInTheDocument()
+    const renderedAttachment1 = container.querySelector(`a[href*='${attachment1.url}']`)
+    expect(renderedAttachment1).toBeInTheDocument()
+    expect(renderedAttachment1).toContainElement(getByText(attachment1.displayName))
+
+    const renderedAttachment2 = container.querySelector(`a[href*='${attachment2.url}']`)
+    expect(renderedAttachment2).toBeInTheDocument()
+    expect(renderedAttachment2).toContainElement(getByText(attachment2.displayName))
   })
 
   it('does not display attachments if there are none', async () => {
@@ -299,8 +300,9 @@ describe('CommentsTab', () => {
 
     const {container, getByText} = render(<CommentContent comments={[comment]} />)
 
-    expect(
-      getByText(attachment.displayName, {selector: `a[href*='${attachment.url}']`})
-    ).toContainElement(container.querySelector("svg[name='IconPdf']"))
+    const renderedAttachment = container.querySelector(`a[href*='${attachment.url}']`)
+    expect(renderedAttachment).toBeInTheDocument()
+    expect(renderedAttachment).toContainElement(getByText(attachment.displayName))
+    expect(renderedAttachment).toContainElement(container.querySelector("svg[name='IconPdf']"))
   })
 })

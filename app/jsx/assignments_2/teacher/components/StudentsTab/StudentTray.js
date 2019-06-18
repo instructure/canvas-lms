@@ -87,17 +87,17 @@ export default class StudentTray extends React.Component {
       `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}#{"student_id":"${studentLid}"}`
     )
     return (
-      <Link
+      <Button
         href={speedgraderLink}
         margin="xx-small auto xx-small auto"
-        icon={<IconSpeedGraderLine />}
-        iconPlacement="start"
+        icon={IconSpeedGraderLine}
         target="_blank"
+        variant="link"
       >
         <Text transform="uppercase" size="small" lineHeight="fit">
           {I18n.t('SpeedGrader')}
         </Text>
-      </Link>
+      </Button>
     )
   }
 
@@ -138,23 +138,25 @@ export default class StudentTray extends React.Component {
         <Heading level="h4" as="h3" margin="medium auto auto auto">
           {I18n.t('Actions')}
         </Heading>
-        <Link
-          icon={<IconEmailLine />}
-          iconPlacement="start"
-          linkRef={b => (this.messageStudentsButton = b)}
-          onClick={this.handleMessageButtonClick}
-          margin="small auto auto auto"
-        >
-          <Text color="primary">{I18n.t('Message Student')}</Text>
-        </Link>
-        <Link
-          icon={<IconUploadLine />}
-          iconPlacement="start"
+        <View display="block" margin="x-small none">
+          <Button
+            variant="link"
+            icon={IconEmailLine}
+            buttonRef={b => (this.messageStudentsButton = b)}
+            onClick={this.handleMessageButtonClick}
+            theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+          >
+            {I18n.t('Message Student')}
+          </Button>
+        </View>
+        <Button
+          variant="link"
+          icon={IconUploadLine}
           onClick={this.handleSubmitForStudent}
-          margin="small auto auto auto"
+          theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
         >
-          <Text color="primary">{I18n.t('Submit for Student')}</Text>
-        </Link>
+          {I18n.t('Submit for Student')}
+        </Button>
       </React.Fragment>
     )
   }
@@ -237,13 +239,16 @@ export default class StudentTray extends React.Component {
               </FlexItem>
               <FlexItem grow textAlign="center">
                 <Heading level="h3" as="h2">
-                  <Link
+                  <Button
+                    size="large"
                     href={studentProfileUrl}
                     aria-label={I18n.t("Go to %{name}'s profile", {name: student.shortName})}
                     target="_blank"
+                    variant="link"
+                    theme={{largePadding: '0.75rem', largeHeight: 'normal'}}
                   >
                     {student.shortName}
-                  </Link>
+                  </Button>
                 </Heading>
               </FlexItem>
               <FlexItem shrink textAlign="end">

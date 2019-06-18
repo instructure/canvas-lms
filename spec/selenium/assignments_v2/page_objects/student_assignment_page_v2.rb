@@ -46,7 +46,7 @@ class StudentAssignmentPageV2
     end
 
     def assignment_group_link
-      f("a[data-test-id='assignmentgroup-link']")
+      f("a[data-testid='assignmentgroup-link']")
     end
 
     def due_date_css(due_at)

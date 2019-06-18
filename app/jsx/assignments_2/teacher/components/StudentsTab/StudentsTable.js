@@ -30,7 +30,6 @@ import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import SubmissionStatusPill from '../../../shared/SubmissionStatusPill'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import StudentTray from './StudentTray'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
@@ -121,9 +120,14 @@ export default class StudentsTable extends React.Component {
       }&attempt=${attempt.attempt}`
       return (
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
-          <Link href={viewLink} target="_blank">
+          <Button
+            href={viewLink}
+            target="_blank"
+            variant="link"
+            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          >
             {I18n.t('Attempt %{number}', {number: attempt.attempt})}
-          </Link>
+          </Button>
         </View>
       )
     })
