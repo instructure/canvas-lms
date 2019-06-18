@@ -685,7 +685,7 @@ module QuizzesHelper
   end
 
   def points_possible_display
-    @quiz.quiz_type == "survey" ? "" : round_if_whole(@quiz.points_possible)
+    @quiz.quiz_type == "survey" ? "" : render_score(@quiz.points_possible)
   end
 
   def label_for_question_type(question_type)
