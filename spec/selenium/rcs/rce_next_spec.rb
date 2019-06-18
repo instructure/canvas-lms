@@ -381,7 +381,6 @@ describe "RCE next tests" do
     end
 
     it "should open keyboard shortcut modal when clicking button in status bar" do
-      skip('Unskip in CORE-3021')
       visit_front_page_edit(@course)
 
       click_visible_keyboard_shortcut_button
