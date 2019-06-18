@@ -73,7 +73,7 @@ module PostGradesTray
     post_button.click
     spinner # wait for spinner to appear
     # rubocop:disable Specs/NoWaitForNoSuchElement
-    raise 'spinner never left' unless wait_for_no_such_element do
+    raise "spinner still spinning after waiting" unless wait_for_no_such_element timeout: 8 do
       # there's a small chance the job hasn't been queued
       # yet so keep looking for jobs just in case
       run_jobs
