@@ -21,7 +21,7 @@ import React from 'react'
 import {string} from 'prop-types'
 
 import View from '@instructure/ui-layout/lib/components/View'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import propTypes from '../propTypes'
@@ -67,9 +67,12 @@ export const unpinnedDiscussionsBackground = props => (
       {I18n.t('There are no discussions to show in this section')}
     </Text>
     {props.permissions.create && (
-      <Link href={`/${props.contextType}s/${props.contextID}/discussion_topics/new`}>
+      <Button
+        variant="link"
+        href={`/${props.contextType}s/${props.contextID}/discussion_topics/new`}
+      >
         {I18n.t('Click here to add a discussion')}
-      </Link>
+      </Button>
     )}
   </View>
 )
