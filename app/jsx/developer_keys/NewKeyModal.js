@@ -147,7 +147,7 @@ export default class DeveloperKeyModal extends React.Component {
       [],
       this.developerKey.id,
       settings,
-      '',
+      settings.custom_fields,
       null
     )(dispatch).then((data) => {
       dispatch(actions.saveLtiToolConfigurationSuccessful())
