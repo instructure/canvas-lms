@@ -46,6 +46,9 @@ export default class CourseImageSelector extends React.Component {
 
   handleModalClose = () => {
     document.body.style.overflow = overflow
+  }
+
+  handleModalDismiss = () => {
     this.props.store.dispatch(Actions.setModalVisibility(false))
   }
 
@@ -89,8 +92,9 @@ export default class CourseImageSelector extends React.Component {
           open={this.state.showModal}
           size="fullscreen"
           label={I18n.t('Choose Image')}
-          onDismiss={this.handleModalClose}
+          onDismiss={this.handleModalDismiss}
           onEnter={this.handleModalOpen}
+          onExit={this.handleModalClose}
         >
           <ModalBody>
             <CourseImagePicker
