@@ -177,8 +177,15 @@ class ApplicationController < ActionController::Base
       end
       if context
         current_user.enrollments.active.where(:course_id => context.id).each do |enrollment|
-          enrollment.course_section.students.active.each do |student|
-            res[student.id] = student.name
+          # FIXME: remove Test Student too
+
+          # the idea here is to find their main cohort, which by convention at Braven, will
+          # have (Tu) or (We) or something in the name. Searching for that to filter other
+          # sections for more administrative grouping.
+          if enrollment.course_section.name.include?("(")
+            enrollment.course_section.students.active.each do |student|
+              res[student.id] = student.name
+            end
           end
         end
       end
