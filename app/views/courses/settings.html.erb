@@ -321,6 +321,17 @@
         </td>
       <% end %>
       </tr>
+      <% if @context.feature_enabled?(:new_gradebook) %>
+        <tr>
+          <td class="form-label">
+            <label for="course_large_course"><%= t("Large Course:") %></label>
+          </td>
+          <td id="course_large_course">
+            <%= f.check_box :filter_speed_grader_by_student_group, disabled: !can_manage %>
+            <%= f.label :filter_speed_grader_by_student_group, t("Launch SpeedGrader Filtered by Student Group") %>
+          </td>
+        </tr>
+      <% end %>
       <tr>
         <td class="form-label">
           <label for="course_grading_scheme"><%= before_label('grading_scheme', %{Grading Scheme}) %></label>
