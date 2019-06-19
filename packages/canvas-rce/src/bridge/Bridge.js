@@ -85,7 +85,7 @@ export default class Bridge {
   renderEditor(editor) {
     this.resolveEditorRendered();
     if (this.focusedEditor === null) {
-      this.focusedEditor = editor;
+      this.focusEditor(editor)
     }
   }
 
@@ -124,6 +124,9 @@ export default class Bridge {
         node: selection.getNode(),
         range: selection.getRng()
       };
+      if (!link.text) {
+        link.text = link.title || link.href
+      }
       this.focusedEditor.insertLink(link);
       if (this.controller) {
         this.controller.hideTray()

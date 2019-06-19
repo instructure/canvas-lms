@@ -17,6 +17,7 @@
  */
 
 import {
+  LINK_TYPE,
   FILE_LINK_TYPE,
   IMAGE_EMBED_TYPE,
   NONE_TYPE,
@@ -75,14 +76,14 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         expect(getContentFromElement($element).type).toEqual(FILE_LINK_TYPE)
       })
 
-      it('returns content of type "none" when linking to unhandled canvas content', () => {
+      it('returns content of type "link" when linking to unhandled canvas content', () => {
         $element.href = 'http://example.instructure.com/courses/1201/grades'
-        expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
+        expect(getContentFromElement($element).type).toEqual(LINK_TYPE)
       })
 
-      it('returns content of type "none" when the anchor links to an unhandled location', () => {
+      it('returns content of type "link" when the anchor links to an unhandled location', () => {
         $element.href = 'http://www.example.com/foo/bar'
-        expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
+        expect(getContentFromElement($element).type).toEqual(LINK_TYPE)
       })
 
       it('returns content of type "none" when the anchor has no href attribute', () => {

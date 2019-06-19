@@ -82,7 +82,7 @@ describe("contentInsertion", () => {
         href: "/some/path",
         url: "/other/path",
         title: "Here Be Links",
-        contents: "Click On Me",
+        text: "Click On Me",
         selectionDetails: {
           node: undefined,
           range: undefined
@@ -110,6 +110,7 @@ describe("contentInsertion", () => {
 
     it("can use url if no href", () => {
       link.href = undefined;
+      link.url = '/other/path'
       contentInsertion.insertLink(editor, link);
       assert.equal(
         editor.content,

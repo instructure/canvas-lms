@@ -509,7 +509,7 @@ class RCEWrapper extends React.Component {
         'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
         'subscript | align bullist outdent indent directionality | ' +
         'instructure_links instructure_image instructure_record instructure_documents | ' +
-        `removeformat table instructure_equation ${lti_tool_dropdown}` // instructure_equella
+        `removeformat table instructure_equation ${lti_tool_dropdown}`
       ],
       contextmenu: '',  // show the browser's native context menu
 

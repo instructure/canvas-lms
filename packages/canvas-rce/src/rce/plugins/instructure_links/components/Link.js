@@ -114,7 +114,7 @@ export default function Link(props) {
   }
 
   function handleDragStart(e) {
-    dragHtml(e, renderLinkHtml(props.link));
+    dragHtml(e, renderLinkHtml(props.link, props.link.title));
   }
 
   function handleHover(e) {

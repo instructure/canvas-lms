@@ -463,6 +463,20 @@ describe("Upload data actions", () => {
         sinon.assert.calledWithMatch(Bridge.insertLink, { href: expected });
       });
 
+      it("inserts link with data-canvas-previewable if the content-type is previewable by canvas", () => {
+        const uploadResult = {
+          display_name: 'display_name',
+          url: 'http://somewhere',
+          'content-type': 'application/pdf'
+        }
+        actions.embedUploadResult(uploadResult)
+        sinon.assert.calledWithMatch(Bridge.insertLink, {
+          'data-canvas-previewable': true,
+          title: uploadResult.display_name,
+          href: uploadResult.url
+        })
+      })
+
       it("delegates to fileEmbed for embed data", () => {
         actions.embedUploadResult({ preview_url: "http://a.preview.com/url" });
         sinon.assert.calledWithMatch(Bridge.insertLink, {

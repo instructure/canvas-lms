@@ -18,9 +18,11 @@
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
+export const LINK_TYPE = 'link'
 export const FILE_LINK_TYPE = 'file-link'
 export const IMAGE_EMBED_TYPE = 'image-embed'
 export const VIDEO_EMBED_TYPE = 'video-embed'
+export const TEXT_TYPE = 'text'
 export const NONE_TYPE = 'none'
 
 function asImageEmbed($element) {
@@ -39,21 +41,21 @@ function asImageEmbed($element) {
   }
 }
 
-function asFileLink($element) {
+function asLink($element) {
   const nodeName = $element.nodeName.toLowerCase()
   if (nodeName !== 'a' || !$element.href) {
     return null
   }
 
   const path = new URL($element.href).pathname
-  if (!path.match(FILE_DOWNLOAD_PATH_REGEX)) {
-    return null
-  }
+  const type = FILE_DOWNLOAD_PATH_REGEX.test(path) ? FILE_LINK_TYPE : LINK_TYPE
+  const displayAs = $element.classList.contains('auto_open') ? 'embed' : 'link'
 
   return {
-    displayAs: 'link',
+    displayAs,
     text: $element.textContent,
-    type: FILE_LINK_TYPE,
+    type,
+    isPreviewable: $element.hasAttribute('data-canvas-previewable'),
     url: $element.href
   }
 }
@@ -77,16 +79,28 @@ function asVideoElement($element) {
   }
 }
 
+function asText(editor) {
+  const text = editor && editor.selection.getContent()
+  if (!text) {
+    return null
+  }
+
+  return {
+    text: editor.selection.getContent(),
+    type: 'TEXT_TYPE'
+  }
+}
+
 function asNone() {
   return {type: NONE_TYPE}
 }
 
-export function getContentFromElement($element) {
+export function getContentFromElement($element, editor) {
   if (!($element && $element.nodeName)) {
     return asNone()
   }
 
-  const content = asFileLink($element) || asImageEmbed($element) || asVideoElement($element) || asNone()
+  const content = asLink($element) || asImageEmbed($element) || asVideoElement($element) || asText(editor) || asNone()
   content.$element = $element
   return content
 }
@@ -101,5 +115,5 @@ export function getContentFromEditor(editor) {
     return asNone()
   }
 
-  return getContentFromElement($element)
+  return getContentFromElement($element, editor)
 }
