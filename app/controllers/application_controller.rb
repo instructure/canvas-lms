@@ -177,8 +177,11 @@ class ApplicationController < ActionController::Base
       end
       if context
         current_user.enrollments.active.where(:course_id => context.id).each do |enrollment|
-          enrollment.course_section.students.active.each do |student|
-            res[student.id] = student.name
+          # FIXME: remove Test Student too
+          if enrollment.course_section.name.include?("(")
+            enrollment.course_section.students.active.each do |student|
+              res[student.id] = student.name
+            end
           end
         end
       end
