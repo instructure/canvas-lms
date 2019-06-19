@@ -27,14 +27,7 @@ SVGWithTextPlaceholder.propTypes = {
 function SVGWithTextPlaceholder(props) {
   return (
     <div className="svg-placeholder-container">
-      <span
-        style={{
-          display: 'flex',
-          justifyContent: 'center'
-        }}
-      >
-        <img alt="" src={props.url} />
-      </span>
+      <img alt="" src={props.url} style={{width: '400px'}} />
       <Text weight="bold" as="div" margin="x-small auto">
         {props.text}
       </Text>
