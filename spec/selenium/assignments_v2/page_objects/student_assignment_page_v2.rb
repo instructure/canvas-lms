@@ -22,7 +22,7 @@ class StudentAssignmentPageV2
     include SeleniumDependencies
 
     def visit(course, assignment)
-      get "/courses/#{course.id}/assignments/#{assignment.id}/?assignments_2=true"
+      get "/courses/#{course.id}/assignments/#{assignment.id}/"
     end
 
     def assignment_locked_image

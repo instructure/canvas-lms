@@ -396,8 +396,8 @@ lti_1_3:
 assignments_2:
   state: hidden
   display_name: Assignments 2
-  description: Allow switching to the new assignments page
-  applies_to: RootAccount
+  description: Use the new assignments page
+  applies_to: Course
   root_opt_in: true
   beta: true
   development: true
