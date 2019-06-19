@@ -106,6 +106,9 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Close a menu or dialog. Also returns you to the editor area"
+  },
   "close_d634289d": {
     "message": "Close"
   },
@@ -277,11 +280,20 @@
   "finish_bc343002": {
     "message": "Finish"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Focus the popup context toolbar"
+  },
   "folder_705fd2d7": {
     "message": "Folder"
   },
   "generating_preview_45b53be0": {
     "message": "Generating preview..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Go to the editor''s menubar"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Go to the editor''s toolbar"
   },
   "grades_a61eba0a": {
     "message": "Grades"
@@ -331,6 +343,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "Invalid file type"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Keyboard Shortcuts"
   },
   "large_9c5e80e7": {
     "message": "Large"
@@ -389,6 +404,12 @@
     "message": "Modules",
     "description": "Title of Sidebar accordion tab containing links to course modules."
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Navigate through the menu or toolbar"
+  },
+  "next_page_d2a39853": {
+    "message": "Next Page"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "No Alt Text (Decorative Image)"
   },
@@ -398,11 +419,17 @@
   "no_video_1ed00b26": {
     "message": "No Video"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Open this keyboard shortcuts dialog"
+  },
   "options_3ab0ea65": {
     "message": "Options"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Ordered and Unordered Lists"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Other editor shortcuts may be found at"
   },
   "pages_e5414c2c": {
     "message": "Pages",
@@ -431,6 +458,9 @@
   },
   "preview_a3f8f854": {
     "message": "PREVIEW"
+  },
+  "previous_page_928fc112": {
+    "message": "Previous Page"
   },
   "published_c944a23d": {
     "message": "published"
@@ -466,6 +496,9 @@
   },
   "search_flickr_6884b518": {
     "message": "Search Flickr"
+  },
+  "search_term_b2d2235": {
+    "message": "Search Term"
   },
   "select_a_file_53ba40ac": {
     "message": "Select a file"
@@ -529,6 +562,9 @@
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
+  },
+  "tab_arrows_4cf5abfc": {
+    "message": "TAB/Arrows"
   },
   "text_7f4593da": {
     "message": "Text"
