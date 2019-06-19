@@ -1,0 +1,29 @@
+<h2 class="todo-list-header" tabindex="-1">Alerts</h2>
+<ul class="right-side-list to-do-list">
+  <li class="todo">
+    <a class="item" href="/cs_alerts">
+      <div class="todo-badge-wrapper">
+        <div class="">
+          <%
+            alert_count = AlertsService::Client.list(@current_user.id).payload.count
+            badge_class = if alert_count > 0
+              'badge-important'
+            else
+              'badge-success'
+            end
+          %>
+
+          <span class="badge <%= badge_class %>"><%= alert_count %></span>
+          <span class="screenreader-only">You have <%= alert_count %> alerts</span>
+        </div>
+      </div>
+      <div class="todo-details">
+        <% if alert_count > 0 %>
+          <b class="todo-details__title">You have <%= alert_count %> alerts that need attention</b>
+        <% else %>
+          <b class="todo-details__title">You have no alerts</b>
+        <% end %>
+      </div>
+    </a>
+  </li>
+</ul>

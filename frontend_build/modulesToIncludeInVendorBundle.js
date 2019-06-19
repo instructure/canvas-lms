@@ -46,6 +46,7 @@ module.exports = [
   'vendor/jquery.scrollTo',
   'vendor/jqueryui/dialog',
   'vendor/mediaelement-and-player',
+  'datatables.min',
 
   // without putting these here, they get included in each bundle
   // seperately. since they are not actual vendor libs, we should get

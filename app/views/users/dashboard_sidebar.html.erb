@@ -22,6 +22,7 @@
   <%= image_tag(brand_variable("ic-brand-right-sidebar-logo"), :class => "ic-sidebar-logo__image", :alt => "Canvas by Instructure") %>
 </div>
 <% end %>
+<%= render partial: 'cs_alerts' if TeacherEnrollment.where(user_id: @current_user.id).present? %>
 <% if planner_enabled? %>
   <div class="Sidebar__TodoListContainer"></div>
 <% else %>
