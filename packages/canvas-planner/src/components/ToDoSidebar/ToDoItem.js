@@ -19,7 +19,6 @@
 import React from 'react';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import Link from '@instructure/ui-elements/lib/components/Link';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import List from '@instructure/ui-elements/lib/components/List';
 import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
@@ -94,14 +93,21 @@ export default class ToDoItem extends React.Component {
   itemTitle () {
     if (this.props.item.type === 'Peer Review') {
       return formatMessage('Peer Review for {itemTitle}', {itemTitle: this.props.item.title});
-    } 
+    }
     return this.props.item.title;
   }
 
   render () {
     const title = <Text size="small" lineHeight="fit">{this.itemTitle()}</Text>;
     const titleComponent = this.props.item.html_url ? (
-      <Link linkRef={(elt) => {this.linkRef = elt;}} href={this.props.item.html_url}>{title}</Link>
+      <Button
+        variant="link"
+        theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+        buttonRef={(elt) => {this.linkRef = elt;}}
+        href={this.props.item.html_url}
+      >
+        {title}
+      </Button>
     ) : (
       <Text>{title}</Text>
     );

@@ -22,7 +22,7 @@ import { momentObj } from 'react-moment-proptypes';
 
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
 import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Link from '@instructure/ui-elements/lib/components/Link';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal';
 import Text from '@instructure/ui-elements/lib/components/Text';
@@ -110,7 +110,16 @@ export default class CalendarEventModal extends React.Component {
       shouldCloseOnDocumentClick
     >
       <ModalHeader>
-        <Heading><Link href={this.props.html_url}>{this.props.title}</Link></Heading>
+        <Heading>
+          <Button
+            variant="link"
+            size="large"
+            theme={{largePadding: '0', largeHeight: 'normal'}}
+            href={this.props.html_url}
+          >
+            {this.props.title}
+          </Button>
+        </Heading>
         <CloseButton
           placement="end"
           onClick={this.props.requestClose}

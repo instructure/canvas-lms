@@ -20,7 +20,6 @@ import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import Checkbox, {CheckboxFacade} from '@instructure/ui-forms/lib/components/Checkbox';
-import Link from '@instructure/ui-elements/lib/components/Link';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
 import Pill from '@instructure/ui-elements/lib/components/Pill';
@@ -314,15 +313,16 @@ export class PlannerItem extends Component {
     }
 
     return <div className={styles.title} style={{position: 'relative'}}>
-      <Link
-        linkRef={(link) => {this.itemLink = link;}}
-        ellipsis={true}
+      <Button
+        variant="link"
+        theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+        buttonRef={(link) => {this.itemLink = link;}}
         {...linkProps}
       >
         <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
-        <PresentationContent><Text color="primary">{this.props.title}</Text></PresentationContent>
+        <PresentationContent>{this.props.title}</PresentationContent>
         {this.renderCalendarEventModal()}
-      </Link>
+      </Button>
     </div>;
   }
 

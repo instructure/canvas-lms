@@ -49,24 +49,32 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         }
       }
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="/courses/1/grades"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="small"
+        theme={
+          Object {
+            "smallHeight": "normal",
+            "smallPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         <Text
           as="span"
-          color="primary"
           letterSpacing="normal"
-          size="small"
+          size="medium"
           transform="uppercase"
         >
           Ticket to Ride 101
         </Text>
-      </Link>
+      </Button>
     </div>
     <Text
       as="div"
@@ -218,24 +226,32 @@ exports[`renders some course grades 1`] = `
         }
       }
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="/courses/1/grades"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="small"
+        theme={
+          Object {
+            "smallHeight": "normal",
+            "smallPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         <Text
           as="span"
-          color="primary"
           letterSpacing="normal"
-          size="small"
+          size="medium"
           transform="uppercase"
         >
           Ticket to Ride 101
         </Text>
-      </Link>
+      </Button>
     </div>
     <Text
       as="div"
@@ -264,24 +280,32 @@ exports[`renders some course grades 1`] = `
         }
       }
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="/courses/2/grades"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="small"
+        theme={
+          Object {
+            "smallHeight": "normal",
+            "smallPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         <Text
           as="span"
-          color="primary"
           letterSpacing="normal"
-          size="small"
+          size="medium"
           transform="uppercase"
         >
           Ingenious 101
         </Text>
-      </Link>
+      </Button>
     </div>
     <Text
       as="div"
@@ -310,24 +334,32 @@ exports[`renders some course grades 1`] = `
         }
       }
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="/courses/3/grades"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="small"
+        theme={
+          Object {
+            "smallHeight": "normal",
+            "smallPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         <Text
           as="span"
-          color="primary"
           letterSpacing="normal"
-          size="small"
+          size="medium"
           transform="uppercase"
         >
           Settlers of Catan 201
         </Text>
-      </Link>
+      </Button>
     </div>
     <Text
       as="div"
