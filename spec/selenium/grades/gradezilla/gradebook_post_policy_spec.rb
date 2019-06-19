@@ -49,8 +49,8 @@ describe 'Gradezilla Post Policy' do
     @course_with_manual_post.enable_feature!(:new_gradebook)
     @course_with_auto_post.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
-    @course_with_manual_post.post_policies.create!(post_manually: true)
-    @course_with_auto_post.post_policies.create!(post_manually: false)
+    @course_with_manual_post.default_post_policy.update!(post_manually: true)
+    @course_with_auto_post.default_post_policy.update!(post_manually: false)
 
     # sections
     @section1 = @course_with_manual_post.course_sections.first

@@ -364,7 +364,7 @@ describe Types::CourseType do
       let(:context) { { current_user: student } }
 
       it "returns null in place of the PostPolicy" do
-        course.post_policies.create!(post_manually: true)
+        course.default_post_policy.update!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
         expect(resolver.resolve("postPolicy { _id }")).to be nil
       end

@@ -968,7 +968,7 @@ describe GradebooksController do
           @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
 
-          @course.post_policies.create!(post_manually: true)
+          @course.default_post_policy.update!(post_manually: true)
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be true
         end
