@@ -210,7 +210,7 @@ function addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismi
     mediaServerMediaObject.type = `${context.contextType}_${context.contextId}`
     source.uploadMediaToCanvas(mediaServerMediaObject).then((mediaObject) => {
       const videoElement = editor.dom.add(editor.getBody(), 'div', { 'id': `media_object_${mediaObject.media_object.media_id}` }, ' ')
-      editor.dom.setStyles(videoElement, {'width': VIDEO_SIZE_OPTIONS['medium'].width, 'height': VIDEO_SIZE_OPTIONS['medium'].height})
+      editor.dom.setStyles(videoElement, {'width': VIDEO_SIZE_OPTIONS.width, 'height': VIDEO_SIZE_OPTIONS.height})
       editor.dom.add(videoElement, 'iframe', {'src': mediaObject.embedded_iframe_url, 'width': '100%', 'height': '100%', 'scrolling': 'no'});
       dispatch(mediaUploadSuccess())
       dismiss()

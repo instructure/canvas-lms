@@ -85,7 +85,7 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
     ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
       items: 'instructure-video-options',
       position: 'node',
-      predicate: isVideoElement,
+      predicate: false,
       scope: 'node'
     })
   },

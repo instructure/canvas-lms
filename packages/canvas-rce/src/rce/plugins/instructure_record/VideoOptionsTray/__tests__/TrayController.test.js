@@ -21,7 +21,6 @@ import ReactDOM from 'react-dom'
 import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
-import {VIDEO_SIZE_OPTIONS} from '../TrayController'
 
 describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   let $videos
@@ -61,23 +60,11 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     return VideoOptionsTrayDriver.find()
   }
 
-  function getVideoOptionsFromTray() {
-    const driver = VideoOptionsTrayDriver.find()
-    return {
-      size: driver.size
-    }
-  }
-
   describe('#showTrayForEditor()', () => {
     describe('when the tray is not already open', () => {
       it('opens the tray', async () => {
         trayController.showTrayForEditor(editors[0])
         expect(getTray()).not.toBeNull()
-      })
-
-      it('uses the selected video from the editor', async () => {
-        trayController.showTrayForEditor(editors[0])
-        expect(getVideoOptionsFromTray().size).toEqual("Medium")
       })
     })
 
@@ -89,10 +76,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
       it('keeps the tray open', () => {
         expect(getTray()).not.toBeNull()
-      })
-
-      it('updates the tray for the given editor', () => {
-        expect(getVideoOptionsFromTray().altText).toEqual($videos[1].alt)
       })
     })
 
@@ -109,10 +92,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
       it('keeps the tray open', () => {
         expect(getTray()).not.toBeNull()
-      })
-
-      it('updates the tray with the selected image from the editor', () => {
-        expect(getVideoOptionsFromTray().altText).toEqual($otherVideo.alt)
       })
     })
   })
@@ -135,21 +114,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       // In effect, it does not explode.
       trayController.hideTrayForEditor(editors[0])
       expect(getTray()).toBeNull()
-    })
-  })
-
-  describe('when saving video options', () => {
-    let tray
-
-    describe('when the video size is changing', () => {
-      it('updates the video element size', async () => {
-        trayController.showTrayForEditor(editors[0])
-        tray = getTray()
-        await tray.setSize('Large')
-        tray.$doneButton.click()
-        expect($videos[0].style.height).toEqual(VIDEO_SIZE_OPTIONS['large'].height)
-        expect($videos[0].style.width).toEqual(VIDEO_SIZE_OPTIONS['large'].width)
-      })
     })
   })
 })

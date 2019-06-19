@@ -21,40 +21,16 @@ import {Button} from '@instructure/ui-buttons'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-layout'
 import {Heading} from '@instructure/ui-elements'
-import React, {useState} from 'react'
-import {Select} from '@instructure/ui-forms'
+import React from 'react'
 import {Tray} from '@instructure/ui-overlays'
 
 import formatMessage from '../../../../format-message'
 
-function labelForVideoSize(videoSize) {
-  switch (videoSize) {
-    case 'small': {
-      return formatMessage('Small')
-    }
-    case 'medium': {
-      return formatMessage('Medium')
-    }
-    case 'large': {
-      return formatMessage('Large')
-    }
-  }
-}
-
 export default function VideoOptionsTray(props) {
-  const {onRequestClose, open, videoOptions} = props
-
-  const [videoSize, setVideoSize] = useState(videoOptions.size)
-
-  const videoSizeOption = {label: labelForVideoSize(videoSize), value: videoSize}
-
-  function handleVideoSizeChange(event, selectedOption) {
-    setVideoSize(selectedOption.value)
-  }
+  const {onRequestClose, open} = props
 
   function handleSave(event) {
     event.preventDefault()
-    props.onSave({ videoSize })
   }
 
   return (
@@ -84,21 +60,6 @@ export default function VideoOptionsTray(props) {
 
         <Flex.Item as="form" grow margin="none" shrink>
           <Flex justifyItems="space-between" direction="column" height="100%">
-            <Flex.Item grow padding="small" shrink>
-              <Flex direction="column">
-                <Flex.Item margin="small none none none" padding="small">
-                  <Select
-                    label={formatMessage('Size')}
-                    onChange={handleVideoSizeChange}
-                    selectedOption={videoSizeOption}
-                  >
-                    <option value="small">{labelForVideoSize('small')}</option>
-                    <option value="medium">{labelForVideoSize('medium')}</option>
-                    <option value="large">{labelForVideoSize('large')}</option>
-                  </Select>
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
 
             <Flex.Item
               background="light"
@@ -121,9 +82,6 @@ export default function VideoOptionsTray(props) {
 }
 
 VideoOptionsTray.propTypes = {
-  videoOptions: shape({
-    size: string.isRequired,
-  }).isRequired,
   onEntered: func,
   onExited: func,
   onRequestClose: func.isRequired,

@@ -23,22 +23,7 @@ import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
-export const VIDEO_SIZE_OPTIONS = {
-  small: {height: '200px', width: '200px'},
-  medium: {height: '320px', width: '320px'},
-  large: {height: '400px', width: '400px'}
-}
-
-function videoOptionsFromElement($video) {
-  let size = 'medium'
-  Object.keys(VIDEO_SIZE_OPTIONS).forEach(function(key){
-    if(VIDEO_SIZE_OPTIONS[key].width === $video.style.width
-      && VIDEO_SIZE_OPTIONS[key].height === $video.style.height) {
-      size = key
-    }
-  })
-  return {size}
-}
+export const VIDEO_SIZE_OPTIONS = { height: '432px', width: '768px' }
 
 export default class TrayController {
   constructor() {
@@ -88,7 +73,8 @@ export default class TrayController {
   }
 
   _renderTray() {
-    const $video = this._editor.selection.getNode()
+    // we will need this element when we do tracks but not for now.
+    // const $video = this._editor.selection.getNode()
 
     if (this._shouldOpen) {
       /*
@@ -113,7 +99,6 @@ export default class TrayController {
         }}
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}
-        videoOptions={videoOptionsFromElement($video)}
       />
     )
     ReactDOM.render(element, this.$container)
