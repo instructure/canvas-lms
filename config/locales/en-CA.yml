@@ -5148,6 +5148,7 @@ en-CA:
     points_possible_short: "%{points} pts"
     titles: 
       add: "Add Module"
+      add_item: "Add Item to %{module}"
       add_prerequisite: "Add Prerequisite to %{module}"
       edit: "Edit Module Settings"
       edit_item: "Edit Item Details"
