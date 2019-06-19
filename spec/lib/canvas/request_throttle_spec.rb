@@ -185,6 +185,7 @@ describe 'RequestThrottle' do
 
     it "should throttle if bucket is full" do
       bucket = throttled_request
+      expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req['PATH_INFO']).and_return(1)
       expect(bucket).to receive(:remaining).and_return(-2)
       expected = rate_limit_exceeded
       expected[1]['X-Rate-Limit-Remaining'] = "-2"
@@ -195,6 +196,7 @@ describe 'RequestThrottle' do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
       bucket = double('Bucket')
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req['PATH_INFO']).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:remaining).and_return(1)
       # the cost is still returned anyway
@@ -208,6 +210,7 @@ describe 'RequestThrottle' do
     it "should not throttle, but update, if bucket is not full" do
       bucket = double('Bucket')
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req['PATH_INFO']).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:full?).and_return(false)
       expect(bucket).to receive(:remaining).and_return(599)
@@ -355,6 +358,18 @@ describe 'RequestThrottle' do
             end
             expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(5)
           end
+        end
+
+        it "uses regexes to predict up front costs by path if set" do
+          hash = {
+            /\A\/files\/\d+\/download/ => 1,
+            "equation_images\/" => 2
+          }
+          expect(RequestThrottle).to receive(:dynamic_settings).and_return({'up_front_cost_by_path_regex' => hash})
+
+          expect(@bucket.get_up_front_cost_for_path("/files/1/download?frd=1")).to eq 1
+          expect(@bucket.get_up_front_cost_for_path("/equation_images/stuff")).to eq 2
+          expect(@bucket.get_up_front_cost_for_path("/somethingelse")).to eq @bucket.up_front_cost
         end
 
         it "does nothing if disabled" do

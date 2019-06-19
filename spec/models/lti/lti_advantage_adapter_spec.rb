@@ -92,6 +92,21 @@ describe Lti::LtiAdvantageAdapter do
       end
     end
 
+    context 'when target_link_uri is set' do
+      let(:launch_url) { 'https://www.cool-tool.com/test?foo=bar' }
+      let(:opts) do
+        {
+          resource_type: 'course_navigation',
+          domain: 'test.com',
+          launch_url: launch_url
+        }
+      end
+
+      it 'sets the target_link_uri in the id_token' do
+        expect(params['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq launch_url
+      end
+    end
+
     it "generates a resource link request if the tool's resource type setting is 'ResourceLinkRequest'" do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end

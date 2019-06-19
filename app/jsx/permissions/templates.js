@@ -1233,6 +1233,10 @@ const courseContentViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Courses'),
       description: I18n.t('Allows user to view published and unpublished course content.')
+    },
+    {
+      title: I18n.t('New Gradebook'),
+      description: I18n.t('Allows user to view the New Gradebook.')
     }
   ],
   [

@@ -44,15 +44,18 @@ class RequestThrottle
     starting_cpu = Process.times()
 
     request = ActionDispatch::Request.new(env)
-    # workaround a rails bug where some ActionDispatch::Request methods blow
+
+    # NOTE: calling fullpath was a workaround for a rails bug where some ActionDispatch::Request methods blow
     # up when using certain servers until fullpath is called once to set env['REQUEST_URI']
-    request.fullpath
+    # so don't remove
+    path = request.fullpath
 
     status, headers, response = nil
     throttled = false
     bucket = LeakyBucket.new(client_identifier(request))
 
-    cost = bucket.reserve_capacity do
+    up_front_cost = bucket.get_up_front_cost_for_path(path)
+    cost = bucket.reserve_capacity(up_front_cost) do
       status, headers, response = if !allowed?(request, bucket)
         throttled = true
         rate_limit_exceeded
@@ -163,7 +166,7 @@ class RequestThrottle
   end
 
   def self.reload!
-    @whitelist = @blacklist = nil
+    @whitelist = @blacklist = @dynamic_settings = nil
     LeakyBucket.reload!
   end
 
@@ -173,6 +176,10 @@ class RequestThrottle
 
   def self.list_from_setting(key)
     Set.new(Setting.get(key, '').split(',').map(&:strip).reject(&:blank?))
+  end
+
+  def self.dynamic_settings
+    @dynamic_settings ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['request_throttle.yml'] || '') || {}
   end
 
   def rate_limit_exceeded
@@ -259,14 +266,38 @@ class RequestThrottle
       end
     end
 
+    def self.up_front_cost_by_path_regex
+      @up_front_cost_regex_map ||=
+        begin
+          hash = RequestThrottle.dynamic_settings['up_front_cost_by_path_regex'] || {}
+          hash.keys.select{|k| k.is_a?(String)}.map{|k| hash[Regexp.new(k)] = hash.delete(k)} #regexify strings
+          hash.each do |k, v|
+            unless k.is_a?(Regexp) && v.is_a?(Numeric)
+              ::Rails.logger.error("ERROR in request_throttle.yml: up_front_cost_by_path_regex must use Regex => Numeric key-value pairs")
+              hash.clear
+              break
+            end
+          end
+          hash
+        end
+    end
+
     def self.reload!
       @custom_settings_hash = nil
+      @up_front_cost_regex_map = nil
     end
 
     # up_front_cost is a placeholder cost. Essentially it adds some cost to
     # doing multiple requests in parallel, but that cost is transient -- it
     # disappears again when the request finishes.
-    #
+    def get_up_front_cost_for_path(path)
+      # if it matches any of the regexes in the setting, return the specified cost
+      self.class.up_front_cost_by_path_regex.each do |regex, cost|
+        return cost if regex =~ path
+      end
+      self.up_front_cost # otherwise use the default
+    end
+
     # This method does an initial increment by the up_front_cost, loading the
     # data out of redis at the same time. It then yields to the block,
     # expecting the block to return the final cost. It then increments again,

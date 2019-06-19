@@ -104,6 +104,7 @@ describe 'Account Reports API', type: :request do
       expect(json['status']).to eq @report.workflow_state
       expect(json['progress']).to eq @report.progress
       expect(json['file_url']).to eq "http://www.example.com/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
+      expect(json['start_at']).to be_nil
       #test that attachment object is here, no need to test attachment json
       expect(json['attachment']['id']).to eq @report.attachment_id
       @report.parameters.each do |key, value|

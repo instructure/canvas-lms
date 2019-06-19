@@ -11,6 +11,15 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 <div class="changelog"></div>
 
+## 2019-06-22
+### Additions
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Users API] | List Users in Account Endpoint | Added enrollment_type parameter |
+
+[Users API]: Users.html
+
+
 ## 2019-06-01
 ### Additions
 | API Calls | Function |  |
@@ -56,20 +65,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 [Submissions API]: submissions.html
 [Users API]: users.html
-
-
-## 2019-03-30
-### Changes
-| API Calls | Function |  |
-|----------------------|----------------------|--------------------------|
-| [Content Migrations API] | Update a Content Migration Endpoint | Clarified the endpoint takes same arguments as creating a migration<br><br>Clarified that updating the content migration will also be used when importing content selectively |
-
-[Content Migrations API]: content_migrations.html
-
-### Additions
-| API Calls | Function |  |
-|----------------------|----------------------|--------------------------|
-| [Content Migrations API] | Create a Content Migration Endpoint | Added selective_import parameter
-|                          | List Items for Selective Import Endpoint | Added endpoint
-
-[Content Migrations API]: content_migrations.html
