@@ -88,13 +88,17 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
     host: trayProps.host
   });
 
+  function renderLoading() {
+    return formatMessage('Loading')
+  }
+
   function renderTabs() {
     return panels.map(panel => {
       switch(panel) {
         case 'COMPUTER':
           return (
             <Tabs.Panel key={panel} title={formatMessage('Computer')}>
-              <Suspense fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}>
+              <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                 <ComputerPanel
                   editor={editor}
                   theFile={theFile}
@@ -110,7 +114,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
         case 'UNSPLASH':
           return (
             <Tabs.Panel key={panel} title='Unsplash'>
-              <Suspense fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}>
+              <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                   <UnsplashPanel
                     editor={editor}
                     unsplashUrl={unsplashUrl}
@@ -123,7 +127,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
         case 'URL':
           return (
             <Tabs.Panel key={panel} title={formatMessage('URL')}>
-              <Suspense fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}>
+              <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                 <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} />
               </Suspense>
             </Tabs.Panel>

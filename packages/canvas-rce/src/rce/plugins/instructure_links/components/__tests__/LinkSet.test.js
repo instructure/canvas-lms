@@ -140,7 +140,7 @@ describe('RCE "Links" Plugin > LinkSet', () => {
       fetchInitialPage
     })
 
-    expect(getByText('Loading...')).toBeInTheDocument()
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 
 
@@ -159,6 +159,6 @@ describe('RCE "Links" Plugin > LinkSet', () => {
       fetchNextPage
     })
 
-    expect(getByText('Loading...')).toBeInTheDocument()
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 })

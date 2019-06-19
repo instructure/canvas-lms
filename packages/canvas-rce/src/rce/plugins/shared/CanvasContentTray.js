@@ -119,6 +119,10 @@ export default function CanvasContentTray(props) {
     setOpenCount(openCount + 1)
   }
 
+  function renderLoading() {
+    return formatMessage('Loading')
+  }
+
   return (
     <StoreProvider {...props} key={openCount}>
       {contentProps => (
@@ -153,7 +157,7 @@ export default function CanvasContentTray(props) {
 
             <Flex.Item grow shrink margin="xx-small 0 0 0">
               <ErrorBoundary>
-                    <Suspense fallback={<Spinner renderTitle={() => formatMessage('Loading')} size="large" />}>
+                    <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                       {renderContentComponent(filterSettings, contentProps)}
                     </Suspense>
               </ErrorBoundary>

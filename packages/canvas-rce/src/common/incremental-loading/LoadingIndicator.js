@@ -22,14 +22,14 @@ import {View} from '@instructure/ui-layout'
 
 import formatMessage from '../../format-message'
 
-function renderTitle() {
-  return formatMessage('Loading...')
+function renderLoading() {
+  return formatMessage('Loading')
 }
 
 export default function LoadingIndicator() {
   return (
     <View as="div" margin="medium none" textAlign="center">
-      <Spinner size="small" renderTitle={renderTitle} />
+      <Spinner size="small" renderTitle={renderLoading} />
     </View>
   )
 }

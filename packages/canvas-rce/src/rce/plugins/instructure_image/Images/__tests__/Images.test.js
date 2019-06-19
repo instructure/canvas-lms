@@ -50,7 +50,7 @@ describe('RCE "Images" Plugin > Images', () => {
   }
 
   function getLoadingIndicator() {
-    return component.queryByTitle('Loading...')
+    return component.queryByTitle('Loading')
   }
 
   function getImages() {

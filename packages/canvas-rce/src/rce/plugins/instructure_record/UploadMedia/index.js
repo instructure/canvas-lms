@@ -80,11 +80,20 @@ export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecordi
       throw new Error('Selected Panel is invalid') // Should never get here
   }
 }
+
+function renderLoading() {
+  return formatMessage('Loading')
+}
+
+function renderLoadingMedia() {
+  return formatMessage('Loading media')
+}
+
 function loadingErrorSuccess(states) {
   if (states.uploadingMediaStatus.loading) {
     return (
       <Mask>
-        <Spinner renderTitle={formatMessage('Loading')} size="large" margin="0 0 0 medium" />
+        <Spinner renderTitle={renderLoading} size="large" margin="0 0 0 medium" />
       </Mask>
     )
   } else if (states.uploadingMediaStatus.error) {
@@ -137,7 +146,7 @@ export function UploadMedia(props) {
               <Tabs.Panel title={formatMessage('Computer')}>
                 <Suspense fallback={
                   <View as="div" height="100%" width="100%" textAlign="center">
-                    <Spinner renderTitle={formatMessage('Loading media')} size="large" margin="0 0 0 medium" />
+                    <Spinner renderTitle={renderLoadingMedia} size="large" margin="0 0 0 medium" />
                   </View>
                 } size="large">
                   <ComputerPanel
@@ -154,7 +163,7 @@ export function UploadMedia(props) {
               <Tabs.Panel title={formatMessage('Record')}>
                 <Suspense fallback={
                   <View as="div" height="100%" width="100%" textAlign="center">
-                    <Spinner renderTitle={formatMessage('Loading media')} size="large" margin="0 0 0 medium" />
+                    <Spinner renderTitle={renderLoadingMedia} size="large" margin="0 0 0 medium" />
                   </View>
                 }>
                   <MediaRecorder editor={props.editor} dismiss={props.onDismiss} contentProps={contentProps}/>
@@ -163,7 +172,7 @@ export function UploadMedia(props) {
               <Tabs.Panel title={formatMessage('Embed')}>
                 <Suspense fallback={
                   <View as="div" height="100%" width="100%" textAlign="center">
-                    <Spinner renderTitle={formatMessage('Loading media')} size="large" margin="0 0 0 medium" />
+                    <Spinner renderTitle={renderLoadingMedia} size="large" margin="0 0 0 medium" />
                   </View>
                 }>
                   <EmbedPanel embedCode={embedCode} setEmbedCode={setEmbedCode} />

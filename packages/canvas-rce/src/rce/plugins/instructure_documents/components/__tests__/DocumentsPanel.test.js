@@ -65,7 +65,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
 
   it('renders loading spinner', () => {
     const {getByText} = renderComponent({documents: {files: [], isLoading: true}})
-    expect(getByText('Loading...')).toBeInTheDocument()
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 
   it('renders documents', () => {
@@ -124,7 +124,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
       fetchInitialDocs
     })
 
-    expect(getByText('Loading...')).toBeInTheDocument()
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 
 
@@ -135,6 +135,6 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
       fetchNextDocs
     })
 
-    expect(getByText('Loading...')).toBeInTheDocument()
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 })
