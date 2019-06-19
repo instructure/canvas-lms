@@ -100,6 +100,12 @@ describe Api::V1::User do
         })
     end
 
+    it 'should only try to search on in region shards' do
+      @user = User.create!(:name => 'User')
+      expect(@user).to receive(:in_region_associated_shards).and_call_original
+      @test_api.user_json(@user, @admin, {}, [], Account.default)
+    end
+
     it 'should show SIS data to sub account admins' do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
@@ -234,7 +240,7 @@ describe Api::V1::User do
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2)
       @pseudonym = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default)
-      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false, root_account: Account.default).and_return(@pseudonym)
+      allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false, root_account: Account.default, in_region: true).and_return(@pseudonym)
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',

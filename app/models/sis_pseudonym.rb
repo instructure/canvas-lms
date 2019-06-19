@@ -17,22 +17,23 @@
 
 class SisPseudonym
   # type: :exact, :trusted, or :implicit
-  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil)
+  def self.for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
     raise ArgumentError("invalid root_account") if root_account && !root_account.root_account?
     raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
-    self.new(user, context, type, require_sis, include_deleted, root_account).pseudonym
+    self.new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region).pseudonym
   end
 
   attr_reader :user, :context, :type, :require_sis, :include_deleted
 
-  def initialize(user, context, type, require_sis, include_deleted, root_account)
+  def initialize(user, context, type, require_sis, include_deleted, root_account, in_region: false)
     @user = user
     @context = context
     @type = type
     @require_sis = require_sis
     @include_deleted = include_deleted
     @root_account = root_account
+    @in_region = in_region
   end
 
   def pseudonym
@@ -71,7 +72,7 @@ class SisPseudonym
       end
     end
 
-    shards = user.associated_shards
+    shards = @in_region ? user.in_region_associated_shards : user.associated_shards
     trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
     if type == :trusted
       # only search the shards with trusted accounts
