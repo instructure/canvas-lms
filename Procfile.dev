@@ -3,6 +3,7 @@ web: bundle exec thin start
 webpack: yarn run webpack
 worker: bundle exec script/delayed_job run
 echo: ruby echo_server.rb
+# css: yarn run build:css:watch
 
 # You can use Puma if you like
 # puma -C config/puma.rb

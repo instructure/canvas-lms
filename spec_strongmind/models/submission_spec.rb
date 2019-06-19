@@ -8,6 +8,60 @@ RSpec.describe Submission do
       allow(PipelineService).to receive(:publish)
     end
 
+    describe '#bust_context_module_cache' do
+      before do
+        @student    = student_in_course().user
+        @module1    = @course.context_modules.create!(name: "Module 1")
+        @assignment = @course.assignments.create!(title: "some assignment")
+        @assignment.publish
+        @assignment_tag = @module1.add_item(id: @assignment.id, type: 'assignment', title: 'Assignment: requires submission')
+        @submission = @assignment.submission_for_student(@student)
+      end
+
+      context 'when excused was changed' do
+        it 'enqueues a module touch' do
+          @submission.excused = !@submission.excused
+
+          expect(@submission).to receive(:touch_context_module)
+
+          @submission.save
+        end
+      end
+
+      context 'when excused WAS NOT changed' do
+        it 'does NOT enqueue a module touch' do
+          expect(@submission).not_to receive(:touch_context_module)
+
+          @submission.save
+        end
+      end
+    end
+
+    describe '#touch_context_module' do
+      before do
+        @student    = student_in_course().user
+        @module1    = @course.context_modules.create!(name: "Module 1")
+        @assignment = @course.assignments.create!(title: "some assignment")
+        @assignment.publish
+        @assignment_tag = @module1.add_item(id: @assignment.id, type: 'assignment', title: 'Assignment: requires submission')
+        @submission = @assignment.submission_for_student(@student)
+      end
+
+      context 'when excused was changed' do
+        it 'updates the updated_at timestamp with a touch' do
+          expect(@module1.created_at).to be <= Time.zone.now
+
+          new_now = Time.zone.now
+
+          expect {
+            @submission.touch_context_module
+          }.to change { @module1.reload.updated_at }
+
+          expect(@module1.updated_at).to be >= new_now
+        end
+      end
+    end
+
     describe '#send_submission_to_pipeline' do
       before do
         allow(SettingsService).to receive(:get_settings).and_return('enable_unit_grade_calculations' => false)

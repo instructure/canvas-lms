@@ -4,7 +4,7 @@ class EnrollmentSettingsController < ApplicationController
       params[:value] = ActiveRecord::Type::Boolean.new.deserialize(params[:value])
     end
     SettingsService.update_enrollment_setting(
-      id: params[:enrollment_id],
+      id: params[:enrollment_id]&.to_i,
       setting: params[:id],
       value: params[:value]
     )
@@ -13,7 +13,7 @@ class EnrollmentSettingsController < ApplicationController
 
   def index
     render json: SettingsService.get_enrollment_settings(
-      id: params[:enrollment_id]
+      id: params[:enrollment_id]&.to_i
     )
   end
 end

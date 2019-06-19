@@ -119,19 +119,19 @@ RSpec.describe AssignmentsService::Commands::DistributeDueDates do
 
     it 'distributes the assignments across workdays' do
       expect(assignment).to(
-        receive(:update).with(due_at: Time.parse('2018-11-27 23:59:59.999999999 +0000'))
+        receive(:update).with(due_at: Time.zone.parse('2018-11-27 23:59:59.999999999'))
       )
 
       expect(assignment2).to(
-        receive(:update).with(due_at: Time.parse('2018-11-27 23:59:59.999999999 +0000'))
+        receive(:update).with(due_at: Time.zone.parse('2018-11-27 23:59:59.999999999'))
       )
 
       expect(assignment3).to(
-        receive(:update).with(due_at: Time.parse('2018-11-27 23:59:59.999999999 +0000'))
+        receive(:update).with(due_at: Time.zone.parse('2018-11-27 23:59:59.999999999'))
       )
 
       expect(assignment4).to(
-        receive(:update).with(due_at: Time.parse('2018-11-28 23:59:59.999999999 +0000'))
+        receive(:update).with(due_at: Time.zone.parse('2018-11-28 23:59:59.999999999'))
       )
       subject.call
     end
@@ -159,7 +159,7 @@ RSpec.describe AssignmentsService::Commands::DistributeDueDates do
 
       it 'assigns the last assignment on the last day' do
         expect(assignment10).to(receive(:update)).with(due_at: nil)
-        expect(assignment10).to(receive(:update)).with(due_at: Time.parse('2019-11-29 23:59:59.999999999 +0000'))
+        expect(assignment10).to(receive(:update)).with(due_at: Time.zone.parse('2019-11-29 23:59:59.999999999'))
         dates = subject.call
         expect(dates.values.last).to eq 1
       end

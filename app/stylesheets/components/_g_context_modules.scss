@@ -443,6 +443,21 @@ $context_module_bg_color: #FFF;
       }
     }
   }
+  // StrongMind Added
+  &.excused_req {
+    .completion_requirement,
+    .excused {
+      display: block !important;
+    }
+
+    .requirement_type {
+      display: none !important;
+    }
+
+    .requirement_type.excused {
+      display: inline !important;
+    }
+  }
   &.min_score_requirement {
     .completion_requirement,
     .min_score_requirement {
