@@ -70,7 +70,7 @@ describe('FilePreview', () => {
   // TODO: replace this test when we get the no preview available SVG
   it('renders no preview available if the given file has no preview url', () => {
     const {getByText} = render(<FilePreview files={[files[1]]} />)
-    expect(getByText('No preview available for file')).toBeInTheDocument()
+    expect(getByText('Preview Unavailable')).toBeInTheDocument()
   })
 
   it('changes the preview when a different file icon is clicked', () => {
@@ -81,6 +81,6 @@ describe('FilePreview', () => {
     expect(secondFileIcon).not.toBeNull()
     fireEvent.click(secondFileIcon)
 
-    expect(getByText('No preview available for file')).toBeInTheDocument()
+    expect(getByText('Preview Unavailable')).toBeInTheDocument()
   })
 })

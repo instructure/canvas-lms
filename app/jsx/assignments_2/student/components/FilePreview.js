@@ -145,8 +145,8 @@ export default class FilePreview extends Component {
       borderLeft: `1px solid ${theme.variables.colors.borderMedium}`
     }
 
-    // TODO: replace this with appropriate SVG when available
-    if (!this.props.files[this.state.selectedFile].submissionPreviewUrl) {
+    const selectedFile = this.props.files[this.state.selectedFile]
+    if (!selectedFile.submissionPreviewUrl) {
       return (
         <div
           style={{
@@ -155,7 +155,8 @@ export default class FilePreview extends Component {
           }}
         >
           <div style={{display: 'block'}}>
-            <Text weight="bold">{I18n.t('No preview available for file')}</Text>
+            {this.renderUnavailablePreview(I18n.t('Preview Unavailable'))}
+            {selectedFile.displayName}
           </div>
         </div>
       )
@@ -163,14 +164,8 @@ export default class FilePreview extends Component {
 
     return (
       <div style={iframeContainerStyle} data-testid="assignments_2_submission_preview">
-        <ScreenReaderContent>
-          {this.props.files[this.state.selectedFile].displayName}
-        </ScreenReaderContent>
-        <iframe
-          src={this.props.files[this.state.selectedFile].submissionPreviewUrl}
-          title="preview"
-          style={iframeStyle}
-        />
+        <ScreenReaderContent>{selectedFile.displayName}</ScreenReaderContent>
+        <iframe src={selectedFile.submissionPreviewUrl} title="preview" style={iframeStyle} />
       </div>
     )
   }
