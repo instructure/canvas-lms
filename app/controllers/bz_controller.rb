@@ -996,12 +996,12 @@ class BzController < ApplicationController
               # no longer available
               # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
               linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
-              linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"]
+              linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
 
               linkedin_data.job_title = item["job-title"] = get_job_title(info["positions"])
               linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
               linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
-              linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"]
+              linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
               linkedin_data.specialties = item["specialties"] = nil # removed in V2
               linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
               # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
@@ -1134,6 +1134,7 @@ class BzController < ApplicationController
     #end
 
     def get_job_title(positionsNode)
+      return nil if positionsNode.nil?
       # positions is an object with items as properties, we need to find the one that does not have a endMonthYear as it its current
       positionsNode.each do |id, value|
         if value["endMonthYear"].nil?
@@ -1145,29 +1146,40 @@ class BzController < ApplicationController
 
     def current_positions(positionsNode)
       remainder = []
+      return remainder if positionsNode.nil?
       positionsNode.each do |k, v|
         if v["endMonthYear"].nil?
           remainder << v
         end
       end
 
-      remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
+      begin
+        remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
+      rescue
+        return []
+      end
     end
 
     def non_current_positions(positionsNode)
       remainder = []
+      return remainder if positionsNode.nil?
       positionsNode.each do |k, v|
         if !v["endMonthYear"].nil?
           remainder << v
         end
       end
 
-      remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
+      begin
+        remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
+      rescue
+        return []
+      end
     end
 
 
     def get_current_employer(currentPositionsNode)
       cp = current_positions(currentPositionsNode)
+      return nil if cp.length == 0
       current_employer_node = cp[-1]
       if current_employer_node
         return current_employer_node["companyName"]["localized"]["en_US"]
@@ -1178,37 +1190,47 @@ class BzController < ApplicationController
 
     def get_most_recent_school(educationsNode)
       most_recent = get_most_recent_school_node(educationsNode)
-      if most_recent
-        return most_recent.schoolName.localized.en_US
-      else
+      begin
+        return most_recent["schoolName"]["localized"]["en_US"]
+      rescue
         return nil
       end
     end
 
     def get_most_recent_school_node(educationsNode)
       most_recent = nil
+      return nil if educationsNode.nil?
       educationsNode.each do |k, v|
-        if most_recent.nil? || v["startMonthYear"]["year"] > most_recent["startMonthYear"]["year"] || (v["startMonthYear"]["year"] == most_recent["startMonthYear"]["year"] && v["startMonthYear"]["month"] > most_recent["startMonthYear"]["month"])
+        next if v["startMonthYear"].nil?
+        if most_recent.nil? || v["startMonthYear"]["year"] > most_recent["startMonthYear"]["year"] || (v["startMonthYear"]["year"] == most_recent["startMonthYear"]["year"] && v["startMonthYear"]["month"] && most_recent["startMonthYear"]["month"] && v["startMonthYear"]["month"] > most_recent["startMonthYear"]["month"])
           most_recent = v
         end
       end
       return most_recent
+    end
 
     def get_graduation_year(educationsNode)
-      node = get_most_recent_school_node
+      return nil if educationsNode.nil?
+      node = get_most_recent_school_node(educationsNode)
       if node.nil? || node["endMonthYear"].nil?
         return nil
       else
         return node["endMonthYear"]["year"]
+      end
     end
 
     def get_major(educationsNode)
-      node = get_most_recent_school_node
+      return nil if educationsNode.nil?
+      node = get_most_recent_school_node(educationsNode)
       if node.nil?
         return nil
       end
 
-      return node["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
+      begin
+        return node["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
+      rescue
+        return nil
+      end
     end
 
 
