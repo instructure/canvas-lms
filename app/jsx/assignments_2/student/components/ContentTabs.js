@@ -58,15 +58,19 @@ function currentSubmissionGrade(assignment, submission) {
         />
       </Text>
       <Text size="small">
-        <Flex justifyItems="end">
-          <FlexItem padding="0 xx-small 0 0">{I18n.t('Submitted')}</FlexItem>
-          <FlexItem>
-            <FriendlyDatetime
-              dateTime={submission.submittedAt}
-              format={I18n.t('#date.formats.full')}
-            />
-          </FlexItem>
-        </Flex>
+        {submission.submittedAt ? (
+          <Flex justifyItems="end">
+            <FlexItem padding="0 xx-small 0 0">{I18n.t('Submitted')}</FlexItem>
+            <FlexItem>
+              <FriendlyDatetime
+                dateTime={submission.submittedAt}
+                format={I18n.t('#date.formats.full')}
+              />
+            </FlexItem>
+          </Flex>
+        ) : (
+          I18n.t('Not submitted')
+        )}
       </Text>
     </div>
   )

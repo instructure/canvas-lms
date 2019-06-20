@@ -81,6 +81,20 @@ describe('ContentTabs', () => {
     expect(getByTestId('grade-display')).toBeInTheDocument()
   })
 
+  it('displays Not submitted if the submission has been graded but not submitted', () => {
+    const {getByText, queryByTestId} = render(
+      <MockedProvider>
+        <ContentTabs
+          assignment={mockAssignment()}
+          submission={mockSubmission({state: 'graded', submittedAt: null})}
+        />
+      </MockedProvider>
+    )
+
+    expect(queryByTestId('friendly-date-time')).not.toBeInTheDocument()
+    expect(getByText('Not submitted')).toBeInTheDocument()
+  })
+
   it('displays the submitted time and grade of the current submission if it has been graded', () => {
     const {getByTestId, getByText} = render(
       <MockedProvider>
