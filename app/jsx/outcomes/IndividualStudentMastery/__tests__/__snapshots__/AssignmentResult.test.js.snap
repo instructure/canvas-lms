@@ -16,53 +16,27 @@ exports[`renders the AlignmentResult component 1`] = `
     grow={false}
     shrink={false}
   >
-    <Link
+    <Button
       as="button"
-      disabled={false}
+      buttonRef={[Function]}
+      cursor="pointer"
+      fluidWidth={false}
       href="http://foo"
-      iconPlacement="start"
-      linkRef={[Function]}
-      variant="default"
+      icon={[Function]}
+      margin="0"
+      size="medium"
+      theme={
+        Object {
+          "fontWeight": "700",
+          "mediumHeight": "normal",
+          "mediumPadding": "0",
+        }
+      }
+      type="button"
+      variant="link"
     >
-      <Flex
-        alignItems="center"
-        as="span"
-        direction="row"
-        inline={false}
-        justifyItems="start"
-        visualDebug={false}
-        wrapItems={false}
-      >
-        <FlexItem
-          as="span"
-          grow={false}
-          shrink={false}
-        >
-          <Text
-            as="span"
-            letterSpacing="normal"
-            size="medium"
-          >
-            <IconQuiz />
-          </Text>
-        </FlexItem>
-        <FlexItem
-          as="span"
-          grow={false}
-          padding="0 x-small"
-          shrink={false}
-        >
-          <Text
-            as="span"
-            letterSpacing="normal"
-            size="medium"
-            weight="bold"
-          >
-            My assignment
-          </Text>
-        </FlexItem>
-      </Flex>
-    </Link>
+      My assignment
+    </Button>
   </FlexItem>
   <FlexItem
     as="span"
