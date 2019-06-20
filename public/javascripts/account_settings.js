@@ -63,6 +63,16 @@ import 'jqueryui/tabs'
     return date.text().split(" x")[0];
   }
 
+  function appendFiletype(filetype) {
+
+    if(filetype.indexOf('.') < 0) {
+      filetype = "." + filetype;
+    }
+
+    $('#filetypes').append('<dd class="filetype-badge ic-badge ic-badge--neutral">' +
+    filetype + ' <sup><a href="#" class="del-filetype">x</a></sup></dd>'); 
+  }
+
   var timereg = /[0-9][0-9]:[0-9][0-9][ ](am|pm)/gi;
 
   $(document).ready(function() {
@@ -95,9 +105,42 @@ import 'jqueryui/tabs'
       date.remove();
     });
 
+     $(document).on('click', '#add_new_filetypes_button', function(e) {
+      e.preventDefault();
+      var filetypes = $('.allowed_filetype_entry').val();
+
+      if (filetypes.indexOf(',') >= 0) {
+        var values = filetypes.split(',');
+        $.each(values, function(index, value) {
+          if($.inArray(value, ENV['FILETYPES']) == -1) {
+            appendFiletype(value);
+            ENV['FILETYPES'].push(value.replace(/\./g, "").trim());
+          }
+        });
+      } else {
+        if($.inArray(filetypes, ENV['FILETYPES']) == -1) {
+          appendFiletype(filetypes);
+          ENV['FILETYPES'].push(filetypes.replace(/\./g, "").trim());
+        }
+      }
+
+      $('#update_settings_hint').show('slow');
+      $(".allowed_filetype_entry").val('');
+    });
+
+    $(document).on('click', '.del-filetype', function(e) {
+      e.preventDefault();
+      var extension = $(this).parent().parent();
+      ENV['FILETYPES'] = ENV['FILETYPES'].filter(function(filetype) {
+        return filetype !== extension.attr('filetype');
+      });
+      extension.remove();
+    });
+
     $("#account_settings").submit(function() {
       var $this = $(this);
       $this.append("<input type='hidden' name='holidays' value='" + ENV['HOLIDAYS'].join(',') + "' />");
+      $this.append("<input type='hidden' name='allowed_filetypes' value='" + ENV['FILETYPES'].join(',') + "' />");
       var remove_ip_filters = true;
       $(".ip_filter .value").each(function() {
         $(this).removeAttr('name');
