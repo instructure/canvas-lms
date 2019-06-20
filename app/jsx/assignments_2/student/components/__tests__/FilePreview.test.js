@@ -62,6 +62,11 @@ describe('FilePreview', () => {
     )
   })
 
+  it('does not render the file icons if there is only one file', () => {
+    const {queryByTestId} = render(<FilePreview files={[files[0]]} />)
+    expect(queryByTestId('assignments_2_file_icons')).not.toBeInTheDocument()
+  })
+
   it('renders the file preview', () => {
     const {getByTestId} = render(<FilePreview files={files} />)
     expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()

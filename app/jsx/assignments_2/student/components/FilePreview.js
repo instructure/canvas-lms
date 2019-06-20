@@ -175,7 +175,9 @@ export default class FilePreview extends Component {
       return (
         <div style={{margin: '-0.75rem'}}>
           <Flex>
-            <FlexItem align="start">{this.renderFileIcons()}</FlexItem>
+            {this.props.files.length > 1 && (
+              <FlexItem align="start">{this.renderFileIcons()}</FlexItem>
+            )}
             <FlexItem shrink grow align="start">
               {this.renderFilePreview()}
             </FlexItem>
