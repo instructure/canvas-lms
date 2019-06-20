@@ -25,6 +25,7 @@ import da_K12 from "../locales/da-x-k12.json"
 import de from "../locales/de.json";
 import el from "../locales/el.json";
 import en_AU from "../locales/en_AU.json";
+import en_AU_Unimelb from "../locales/en-au-x-unimelb.json";
 import en_CY from "../locales/en_CY.json";
 import en_GB from "../locales/en_GB.json";
 import en_IE from "../locales/en_IE";
@@ -70,6 +71,7 @@ export default {
   "da-x-k12": da_K12,
   de,
   "en-AU": en_AU,
+  "en-AU-x-unimelb": en_AU_Unimelb,
   "en-GB": en_GB,
   "en-GB-x-lbs": en_IE,
   "en-GB-x-ukhe": en_CY,
