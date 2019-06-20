@@ -26,7 +26,6 @@ describe 'filter speed grader by student group' do
   include_context "in-process server selenium tests"
 
   before :once do
-    skip('unskip in first example to be implemented')
     # course with student groups
     course_with_teacher(
       course_name: "Filter Speedgrader Course",
@@ -36,8 +35,9 @@ describe 'filter speed grader by student group' do
       active_user: true
     )
     @course.enable_feature!(:new_gradebook)
+    @course.update!(filter_speed_grader_by_student_group: true)
 
-    @course.assignments.create!(
+    @assignment = @course.assignments.create!(
       title: 'filtering assignment',
       submission_types: 'online_text_entry',
       grading_type: 'points',
@@ -55,28 +55,21 @@ describe 'filter speed grader by student group' do
 
     @group1_students = @students[0,2]
     @group2_students = @students[2,2]
-
-    # TODO: enable filtering setting
   end
 
   context 'on assignments page' do
     before :each do
       user_session(@teacher)
-      AssignmentPage.visit(@course, @assignment)
-    end
-
-    it 'speedgrader link with correct href' do
-      skip('unskip in GRADE-2243')
-      # TODO: select group @category.groups.first from dropdown
-      # AssignmentPage.student_group_speedgrader_dropdown(@category.groups.first)
-      speedgrader_link_text = "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(AssignmentPage.speedgrader_link.attribute("href")).to include(speedgrader_link_text)
+      AssignmentPage.visit(@course.id, @assignment.id)
     end
 
     it 'disables speedgrader when no group selected' do
-      skip('Unskip in GRADE-2244')
-      # verify speecgrader link is disabled
       expect(AssignmentPage.speedgrader_link).to be_disabled
+    end
+
+    it 'does not disable speedgrader link when a group is selected' do
+      AssignmentPage.student_group_speedgrader_dropdown(@category.groups.first)
+      expect(AssignmentPage.speedgrader_link).not_to be_disabled
     end
   end
 

@@ -752,6 +752,84 @@ describe AssignmentsController do
         get 'show', params: {course_id: course.id, id: assignment.id}
       end
     end
+
+    describe "js_env" do
+      before :each do
+        user_session @teacher
+      end
+
+      it "includes filter_speed_grader_by_student_group in SETTINGS hash" do
+        get :show, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:SETTINGS]).to have_key :filter_speed_grader_by_student_group
+      end
+
+      context "when filter_speed_grader_by_student_group? is true" do
+        before :once do
+          @course.enable_feature!(:new_gradebook)
+          @course.update!(filter_speed_grader_by_student_group: true)
+        end
+
+        it "includes the course group categories" do
+          @course.group_categories.create!(name: "category")
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          group_categories_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+          expect(group_categories_ids).to eq @course.group_categories.map(&:id)
+        end
+
+        it "includes the gradebook settings student group id" do
+          @teacher.preferences[:gradebook_settings] = {
+            @course.id => {
+              'filter_rows_by' => {
+                'student_group_id' => '23'
+              }
+            }
+          }
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env][:selected_student_group_id]).to eq "23"
+        end
+      end
+
+      context "when filter_speed_grader_by_student_group? is false" do
+        it "does not include the course group categories" do
+          @course.group_categories.create!(name: "category")
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :group_categories
+        end
+
+        it "does not include the gradebook settings student group id" do
+          @teacher.preferences[:gradebook_settings] = {
+            @course.id => {
+              'filter_rows_by' => {
+                'student_group_id' => '23'
+              }
+            }
+          }
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :selected_student_group_id
+        end
+      end
+
+      describe "speed_grader_url" do
+        it "is included when user can view SpeedGrader and assignment is published" do
+          user_session @teacher
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).to have_key :speed_grader_url
+        end
+
+        it "is not included when user cannot view SpeedGrader" do
+          user_session @student
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :speed_grader_url
+        end
+
+        it "is not included when assignment is not published" do
+          @assignment.unpublish
+          user_session @teacher
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :speed_grader_url
+        end
+      end
+    end
   end
 
   describe "GET 'syllabus'" do

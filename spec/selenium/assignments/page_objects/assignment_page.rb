@@ -47,12 +47,13 @@ class AssignmentPage
       f('.title')
     end
 
-    def student_group_speedgrader_dropdown
-      # TODO: locator for new dropdown
+    def student_group_speedgrader_dropdown(group)
+      f('select').click
+      ff('option').find { |option| option.text == group.name }.click
     end
 
     def speedgrader_link
-      f('#assignment-speedgrader-link')
+      f('a.icon-speed-grader')
     end
   end
 end
