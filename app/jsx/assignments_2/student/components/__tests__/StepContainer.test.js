@@ -118,6 +118,28 @@ describe('the assignment is available', () => {
 
     expect(getByTestId('available-step-container')).toBeInTheDocument()
   })
+
+  it('will render the availaible state tracker if there are no attachments', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.submissionDraft = {_id: '3', attachments: []}
+    submission.state = 'unsubmitted'
+    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
+
+    expect(getByTestId('available-step-container')).toBeInTheDocument()
+  })
+
+  it('will render the availaible state tracker if there is an empty submission draft', () => {
+    const assignment = mockAssignment()
+    const submission = legacyMockSubmission()
+    assignment.lockInfo.isLocked = false
+    submission.submissionDraft = {}
+    submission.state = 'unsubmitted'
+    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
+
+    expect(getByTestId('available-step-container')).toBeInTheDocument()
+  })
 })
 
 describe('the assignment is uploaded', () => {
@@ -125,7 +147,7 @@ describe('the assignment is uploaded', () => {
     const assignment = mockAssignment()
     const submission = legacyMockSubmission()
     assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {_id: '3'}
+    submission.submissionDraft = {_id: '3', attachments: [{id: '4'}]}
     submission.state = 'unsubmitted'
     const {getByTestId, getByText} = render(
       <StepContainer assignment={assignment} submission={submission} />
@@ -138,7 +160,7 @@ describe('the assignment is uploaded', () => {
     const assignment = mockAssignment()
     const submission = legacyMockSubmission()
     assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {_id: '3'}
+    submission.submissionDraft = {_id: '3', attachments: [{id: '4'}]}
     submission.state = 'unsubmitted'
     const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
 

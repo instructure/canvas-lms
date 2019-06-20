@@ -171,10 +171,13 @@ function selectStepContainer(props, context) {
   } else if (submission.state === 'submitted') {
     return submittedStepContainer({isCollapsed, assignment, submission}, context)
   } else if (submission.submissionDraft) {
-    return uploadedStepContainer({isCollapsed}, context)
-  } else {
-    return availableStepContainer({isCollapsed}, context)
+    if (props.submission.submissionDraft.attachments) {
+      if (props.submission.submissionDraft.attachments.length) {
+        return uploadedStepContainer({isCollapsed}, context)
+      }
+    }
   }
+  return availableStepContainer({isCollapsed}, context)
 }
 
 function StepContainer(props) {
