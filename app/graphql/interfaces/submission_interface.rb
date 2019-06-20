@@ -66,7 +66,7 @@ module Interfaces::SubmissionInterface
       unless all_comments
         target_attempt = for_attempt || submission.attempt || 0
         if target_attempt <= 1
-          target_attempt = [0, 1] # Submission 0 and 1 share comments
+          target_attempt = [nil, 0, 1] # Submission 0 and 1 share comments
         end
         scope = scope.where(attempt: target_attempt)
       end

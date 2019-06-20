@@ -154,13 +154,14 @@ describe Types::SubmissionType do
       ).to eq [@comment1.id.to_s, @comment2.id.to_s]
     end
 
-    it 'will combine comments for attempt 0 and 1' do
+    it 'will combine comments for attempt nil, 0, and 1' do
       @comment0 = @submission.add_comment(author: @teacher, comment: 'test1', attempt: 0)
+      @commentNil = @submission.add_comment(author: @teacher, comment: 'test1', attempt: nil)
 
       (0..1).each do |i|
         expect(
           submission_type.resolve("commentsConnection(filter: {forAttempt: #{i}}) { nodes { _id }}")
-        ).to eq [@comment1.id.to_s, @comment0.id.to_s]
+        ).to eq [@comment1.id.to_s, @comment0.id.to_s, @commentNil.id.to_s]
       end
     end
 
