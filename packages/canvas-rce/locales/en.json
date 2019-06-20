@@ -185,6 +185,9 @@
   "describe_the_image_e65d2e32": {
     "message": "(Describe the image)"
   },
+  "directionality_ebcae6d0": {
+    "message": "directionality"
+  },
   "discussions_a5f96392": {
     "message": "Discussions",
     "description": "Title of Sidebar accordion tab containing links to discussions."
@@ -350,6 +353,9 @@
   "large_9c5e80e7": {
     "message": "Large"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "left to right"
+  },
   "link_7262adec": {
     "message": "Link",
     "description": "Fallback title attribute on an unnamed link inserted from the sidebar."
@@ -487,6 +493,9 @@
   },
   "rich_content_editor_2708ef21": {
     "message": "Rich Content Editor"
+  },
+  "right_to_left_ec223c81": {
+    "message": "right to left"
   },
   "save_11a80ec3": {
     "message": "Save"

@@ -311,6 +311,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ugyldig filtype"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Hurtigtastar"
+  },
   "large_9c5e80e7": {
     "message": "Stort"
   },
@@ -365,6 +368,9 @@
   "modules_c4325335": {
     "message": "Modular"
   },
+  "next_page_d2a39853": {
+    "message": "Neste side"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ingen alternativ tekst (dekorativt bilde)"
   },
@@ -373,6 +379,9 @@
   },
   "no_video_1ed00b26": {
     "message": "Ingen video"
+  },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Opne denne hurtigtastar-dialogen"
   },
   "options_3ab0ea65": {
     "message": "Alternativ"
@@ -406,6 +415,9 @@
   },
   "preview_a3f8f854": {
     "message": "Førehandsvisning"
+  },
+  "previous_page_928fc112": {
+    "message": "Førre side"
   },
   "published_c944a23d": {
     "message": "publisert"
