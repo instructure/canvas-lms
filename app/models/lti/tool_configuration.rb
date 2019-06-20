@@ -110,8 +110,10 @@ module Lti
     end
 
     def valid_configuration?
-      errors.add(:configuration, '"public_jwk" must be present') if configuration['public_jwk'].blank?
-      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration)
+      if configuration['public_jwk'].blank? && configuration['public_jwk_url'].blank?
+        errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
+      end
+      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration.compact)
       errors.add(:configuration, schema_errors) if schema_errors.present?
       return if errors[:configuration].present?
 

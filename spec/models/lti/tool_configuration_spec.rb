@@ -37,6 +37,11 @@ module Lti
     let(:tool_configuration) { described_class.new(settings: settings) }
     let(:developer_key) { DeveloperKey.create }
 
+    before do
+      settings[:public_jwk_url] = 'https://test.com'
+      settings
+    end
+
     describe 'validations' do
       subject { tool_configuration.save }
 

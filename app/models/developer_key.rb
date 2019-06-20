@@ -301,7 +301,7 @@ class DeveloperKey < ActiveRecord::Base
   def validate_lti_fields
     return unless self.is_lti_key?
     return if self.public_jwk.present? || self.public_jwk_url.present?
-    errors.add(:lti_key, "must have public jwk or public jwk url")
+    errors.add(:lti_key, "developer key must have public jwk or public jwk url")
   end
 
   def normalize_public_jwk_url
@@ -449,7 +449,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def set_require_scopes
     # Prevent RSA keys from having API access
-    self.require_scopes = true if public_jwk.present?
+    self.require_scopes = true if public_jwk.present? || public_jwk_url.present?
   end
 
   def validate_scopes!
