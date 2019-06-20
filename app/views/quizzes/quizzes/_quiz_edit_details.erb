@@ -80,7 +80,7 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
         <div class="control-group" id="quiz_points_possible" style="<%= hidden unless @quiz.graded_survey? %>">
           <%= label :quiz, :points_possible, :quiz_score, :en => "Score", :class => 'control-label' %>
             <div class="controls">
-              <%= text_field :quiz, :points_possible, :style => "width: 50px;" %> pts
+              <%= text_field :quiz, :points_possible, :style => "width: 50px;", :value => points_possible_display %> pts
               <div style="font-size: 0.8em;">
                 <%= t("students will automatically receive full credit once they take the survey") %>
               </div>
