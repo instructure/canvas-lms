@@ -24,6 +24,7 @@ import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldG
 import TextInput from '@instructure/ui-forms/lib/components/TextInput';
 import Select from '@instructure/ui-forms/lib/components/Select'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
+import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Grid from '@instructure/ui-layout/lib/components/Grid';
@@ -42,29 +43,44 @@ export default class RequiredValues extends React.Component {
   }
 
   isMissingValues = () => {
-    return ['target_link_uri', 'oidc_initiation_url', 'public_jwk', 'description', 'title']
-      .some(p => !this.state.toolConfiguration[p])
+    let isMissing = false
+    if (['target_link_uri', 'oidc_initiation_url', 'description', 'title'].some(p => !this.state.toolConfiguration[p])) {
+      isMissing = true
+    }
+    if (!this.state.toolConfiguration.public_jwk && !this.state.toolConfiguration.public_jwk_url) {
+      isMissing = true
+    }
+    return isMissing
   }
 
   generateToolConfigurationPart = () => {
-    const public_jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
+      if (this.state.toolConfiguration.public_jwk !== "") {
+        const public_jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
+        return { ...this.state.toolConfiguration, public_jwk }
+      }
+      return { ...this.state.toolConfiguration, public_jwk: null }
+  }
 
-    return { ...this.state.toolConfiguration, public_jwk }
+  hasJwk = () => {
+    return this.state.toolConfiguration.public_jwk
   }
 
   valid = () => {
     if (this.isMissingValues()) {
       this.props.flashError(I18n.t('Missing required fields. Please fill in all required fields.'))
       return false
-    }
-    try {
-      JSON.parse(this.state.toolConfiguration.public_jwk)
-      return true
-    } catch(e) {
-      if (e instanceof SyntaxError) {
-        this.props.flashError(I18n.t('Public JWK json is not valid. Please submit properly formatted json.'))
-        return false
+    } else if (this.hasJwk()) {
+      try {
+        JSON.parse(this.state.toolConfiguration.public_jwk)
+        return true
+      } catch(e) {
+        if (e instanceof SyntaxError) {
+          this.props.flashError(I18n.t('Public JWK json is not valid. Please submit properly formatted json.'))
+          return false
+        }
       }
+    } else {
+      return true
     }
   }
 
@@ -115,7 +131,7 @@ export default class RequiredValues extends React.Component {
           resize="vertical"
           autoGrow
           onChange={this.handlePublicJwkChange}
-          messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
+          messages={showMessages && !toolConfiguration.public_jwk && !toolConfiguration.public_jwk_url ? validationMessage : []}
         />
       )
     } else {
@@ -124,7 +140,7 @@ export default class RequiredValues extends React.Component {
           name="public_jwk_url"
           value={toolConfiguration.public_jwk_url}
           onChange={this.handlePublicJwkUrlChange}
-          messages={showMessages && !toolConfiguration.public_jwk_url ? validationMessage : []}
+          messages={showMessages && !toolConfiguration.public_jwk_url && !toolConfiguration.public_jwk ? validationMessage : []}
         />
       )
     }
