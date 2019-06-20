@@ -20,6 +20,7 @@ import {
   CREATE_SUBMISSION_COMMENT,
   CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
+  SUBMISSION_ATTACHMENTS_QUERY,
   SUBMISSION_COMMENT_QUERY
 } from './assignmentData'
 
@@ -90,24 +91,30 @@ export function mockMultipleAttachments() {
   return [
     {
       _id: '1',
+      id: '1',
       displayName: 'awesome-test-image1.png',
       mimeClass: 'data',
+      submissionPreviewUrl: 'https://some/awesome/preview1',
       thumbnailUrl: 'https://some/awesome/thumbnail1.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     },
     {
       _id: '2',
+      id: '2',
       displayName: 'awesome-test-image2.png',
       mimeClass: 'data',
+      submissionPreviewUrl: 'https://some/awesome/preview2',
       thumbnailUrl: 'https://some/awesome/thumbnail2.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     },
     {
       _id: '3',
+      id: '3',
       displayName: 'awesome-test-image3.png',
       mimeClass: 'data',
+      submissionPreviewUrl: 'https://some/awesome/preview3',
       thumbnailUrl: 'https://some/awesome/thumbnail3.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
@@ -150,6 +157,7 @@ export function singleAttachment(overrides = {}) {
     __typename: 'Attachment',
     _id: '20',
     displayName: 'lookatme.pdf',
+    id: '20',
     mimeClass: 'pdf',
     thumbnailUrl: 'https://some/awesome/thumbnail.jpg',
     url: 'https://some-awesome/url/goes/here',
@@ -333,12 +341,29 @@ export function submissionGraphqlMock() {
           })
         }
       }
+    },
+    {
+      request: {
+        query: SUBMISSION_ATTACHMENTS_QUERY,
+        variables: {
+          submissionID: mockSubmission().id
+        }
+      },
+      result: {
+        data: {
+          submission: {
+            attachments: mockMultipleAttachments(),
+            __typename: 'Submission'
+          }
+        }
+      }
     }
   ]
 }
 
 export function mockSubmission(overrides = {}) {
   return {
+    attachments: mockMultipleAttachments(),
     attempt: 1,
     commentsConnection: {
       __typename: 'CommentsConnection',

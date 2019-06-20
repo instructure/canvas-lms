@@ -19,12 +19,12 @@
 import errorShipUrl from '../SVG/ErrorShip.svg'
 import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_initial_query'
+import InitialAttachmentsQuery from './InitialAttachmentsQuery'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import {Query} from 'react-apollo'
 import React from 'react'
 import {string} from 'prop-types'
 import {STUDENT_VIEW_QUERY} from '../assignmentData'
-import SubmissionHistoriesQuery from './SubmissionHistoriesQuery'
 
 const InitialQuery = props => (
   <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
@@ -41,7 +41,7 @@ const InitialQuery = props => (
       }
 
       document.title = data.assignment.name
-      return <SubmissionHistoriesQuery initialQueryData={data} />
+      return <InitialAttachmentsQuery initialQueryData={data} />
     }}
   </Query>
 )

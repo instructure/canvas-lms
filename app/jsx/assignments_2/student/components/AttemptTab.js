@@ -22,17 +22,14 @@ import {
   CREATE_SUBMISSION,
   CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
-  SUBMISSION_ATTACHMENTS_QUERY,
   SUBMISSION_HISTORIES_QUERY,
   SubmissionShape
 } from '../assignmentData'
-import errorShipUrl from '../SVG/ErrorShip.svg'
 import FilePreview from './FilePreview'
 import FileUpload from './FileUpload'
-import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_content_upload_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
-import {Mutation, Query} from 'react-apollo'
+import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 
 export default class AttemptTab extends Component {
@@ -167,33 +164,13 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderFilePreview = () => {
-    return (
-      <Query
-        query={SUBMISSION_ATTACHMENTS_QUERY}
-        variables={{submissionId: this.props.submission.id}}
-      >
-        {({loading, error, data}) => {
-          if (loading) return <LoadingIndicator />
-          if (error) {
-            return (
-              <GenericErrorPage
-                imageUrl={errorShipUrl}
-                errorSubject={I18n.t('Assignments 2 Student submission preview query error')}
-                errorCategory={I18n.t('Assignments 2 Student Error Page')}
-              />
-            )
-          }
-          return <FilePreview files={data.submission.attachments} />
-        }}
-      </Query>
-    )
-  }
-
   renderFileAttempt = createSubmission => {
-    return this.props.submission.state === 'graded' || this.props.submission.state === 'submitted'
-      ? this.renderFilePreview()
-      : this.renderFileUpload(createSubmission)
+    return this.props.submission.state === 'graded' ||
+      this.props.submission.state === 'submitted' ? (
+      <FilePreview files={this.props.submission.attachments} />
+    ) : (
+      this.renderFileUpload(createSubmission)
+    )
   }
 
   renderSubmission = createSubmission => {

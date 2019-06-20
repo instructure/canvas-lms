@@ -19,6 +19,7 @@
 import {AttachmentShape} from '../assignmentData'
 import {getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
+import LoadingIndicator from '../../shared/LoadingIndicator'
 import previewUnavailable from '../SVG/PreviewUnavailable.svg'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
@@ -171,6 +172,10 @@ export default class FilePreview extends Component {
   }
 
   render() {
+    if (!this.props.files) {
+      return <LoadingIndicator />
+    }
+
     if (this.props.files.length) {
       return (
         <div style={{margin: '-0.75rem'}}>

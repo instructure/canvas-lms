@@ -63,9 +63,17 @@ function attachmentFields() {
   return `
     _id
     displayName
+    id
     mimeClass
     thumbnailUrl
     url
+  `
+}
+
+function attachmentFieldsWithPreviewURL() {
+  return `
+    ${attachmentFields()}
+    submissionPreviewUrl(submissionId: $submissionID)
   `
 }
 
@@ -110,6 +118,9 @@ function submissionHistoryFields() {
     }
     nodes {
       ${baseSubmissionFields()}
+      attachments {
+        ${attachmentFieldsWithPreviewURL()}
+      }
     }
   `
 }
@@ -250,15 +261,11 @@ export const SUBMISSION_HISTORIES_QUERY = gql`
 `
 
 export const SUBMISSION_ATTACHMENTS_QUERY = gql`
-  query GetSubmissionAttachments($submissionId: ID!) {
-    submission: node(id: $submissionId) {
+  query GetSubmissionAttachments($submissionID: ID!) {
+    submission: node(id: $submissionID) {
       ... on Submission {
         attachments {
-          displayName
-          id
-          mimeClass
-          submissionPreviewUrl(submissionId: $submissionId)
-          thumbnailUrl
+          ${attachmentFieldsWithPreviewURL()}
         }
       }
     }
