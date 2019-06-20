@@ -253,8 +253,13 @@ module Lti
               it 'sets the assignment submission type to external tool' do
                 expect(item.assignment.submission_types).to eq 'external_tool'
               end
+
               it 'sets the assignment external url' do
                 expect(item.assignment.external_tool_tag.url).to eq "http://www.google.com"
+              end
+
+              it 'sets the extension on return' do
+                expect(json[LineItem::AGS_EXT_SUBMISSION_TYPE][:external_tool_url]).to eq "http://www.google.com"
               end
             end
 
@@ -663,16 +668,25 @@ module Lti
           end
         end
 
-        xcontext 'when using the uncoupled model' do
+        context 'when using the uncoupled model' do
           let(:line_item) do
             line_item_model(
               course: course,
               tag: tag,
-              resource_id: resource_id
+              resource_id: resource_id,
+              client_id: developer_key.global_id
             )
           end
 
-          it_behaves_like 'the line item destroy endpoint'
+          it 'deletes the correct line item' do
+            send_request
+            expect(Lti::LineItem.active.find_by(id: line_item_id)).to be_nil
+          end
+
+          it 'responds with no content' do
+            send_request
+            expect(response).to be_no_content
+          end
         end
       end
     end

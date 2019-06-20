@@ -65,8 +65,7 @@ class Lti::LineItem < ApplicationRecord
             url: submission_type[:external_tool_url]
           }
 
-          # remove submission params from line item so it can save correctly
-          params = params.except(AGS_EXT_SUBMISSION_TYPE)
+          params = extract_extensions(params)
         else
           raise ActionController::BadRequest, "Invalid submission_type for new assignment: #{submission_type[:type]}"
         end
@@ -78,6 +77,13 @@ class Lti::LineItem < ApplicationRecord
       self.create!(opts)
     end
   end
+
+  def self.extract_extensions(params)
+    hsh = params.to_unsafe_h
+    hsh[:extensions] = { AGS_EXT_SUBMISSION_TYPE => hsh.delete(AGS_EXT_SUBMISSION_TYPE) }
+    hsh
+  end
+  private_class_method :extract_extensions
 
   private
 

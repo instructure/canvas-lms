@@ -55,6 +55,11 @@ module Lti
     #            "description": "The resource link id the Line Item is attached to",
     #            "example": "50",
     #            "type": "string"
+    #          },
+    #          "https://canvas.instructure.com/lti/submission_type": {
+    #            "description": "The extension that defines the submission_type of the line_item. Only returns if set through the line_item create endpoint.",
+    #            "example": "{\n\t\"type\":\"external_tool\",\n\t\"external_tool_url\":\"https://my.launch.url\",\n}",
+    #            "type": "string"
     #          }
     #       }
     #     }
@@ -122,6 +127,7 @@ module Lti
       #       "external_tool_url": "https://my.launch.url"
       #     }
       #   }
+      #
       # @returns LineItem
       def create
         new_line_item = LineItem.create_line_item!(
