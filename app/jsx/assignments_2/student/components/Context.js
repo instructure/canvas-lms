@@ -18,13 +18,18 @@
 
 import React from 'react'
 
-export const ButtonContextDefaults = {
+export const StudentViewContextDefaults = {
+  // Controls for moving back and forth between displayed submissions
   prevButtonEnabled: false,
   nextButtonEnabled: false,
   prevButtonAction: () => {},
-  nextButtonAction: () => {}
+  nextButtonAction: () => {},
+
+  // Used to display the most current grade in the header, regardless of the
+  // current attempt being displayed in the student view
+  latestSubmission: {}
 }
 
-const ButtonContext = React.createContext(ButtonContextDefaults)
+const StudentViewContext = React.createContext(StudentViewContextDefaults)
 
-export default ButtonContext
+export default StudentViewContext

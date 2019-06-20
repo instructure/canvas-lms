@@ -18,9 +18,9 @@
 import React from 'react'
 import {render} from 'react-testing-library'
 
-import ButtonContext from '../Context'
 import {legacyMockSubmission, mockAssignment} from '../../test-utils'
 import StepContainer from '../StepContainer'
+import StudentViewContext from '../Context'
 
 const unavailableSteps = ['Unavailable', 'Upload', 'Submit', 'Not Graded Yet']
 const availableSteps = ['Available', 'Upload', 'Submit', 'Not Graded Yet']
@@ -175,9 +175,9 @@ describe('the assignment is submitted', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'submitted'
     const {getByTestId, getByText} = render(
-      <ButtonContext.Provider value={{prevButtonEnabled: true}}>
+      <StudentViewContext.Provider value={{prevButtonEnabled: true}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).toContainElement(getByText('Previous'))
   })
@@ -188,9 +188,9 @@ describe('the assignment is submitted', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'submitted'
     const {getByTestId, queryByText} = render(
-      <ButtonContext.Provider value={{prevButtonEnabled: false}}>
+      <StudentViewContext.Provider value={{prevButtonEnabled: false}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Previous'))
   })
@@ -201,9 +201,9 @@ describe('the assignment is submitted', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'submitted'
     const {getByTestId, getByText} = render(
-      <ButtonContext.Provider value={{nextButtonEnabled: true}}>
+      <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).toContainElement(getByText('Next'))
   })
@@ -214,9 +214,9 @@ describe('the assignment is submitted', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'submitted'
     const {getByTestId, queryByText} = render(
-      <ButtonContext.Provider value={{nextButtonEnabled: false}}>
+      <StudentViewContext.Provider value={{nextButtonEnabled: false}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Next'))
   })
@@ -266,9 +266,9 @@ describe('the assignment is graded', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'graded'
     const {getByTestId, getByText} = render(
-      <ButtonContext.Provider value={{prevButtonEnabled: true}}>
+      <StudentViewContext.Provider value={{prevButtonEnabled: true}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).toContainElement(getByText('Previous'))
   })
@@ -279,9 +279,9 @@ describe('the assignment is graded', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'graded'
     const {getByTestId, queryByText} = render(
-      <ButtonContext.Provider value={{prevButtonEnabled: false}}>
+      <StudentViewContext.Provider value={{prevButtonEnabled: false}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Previous'))
   })
@@ -292,9 +292,9 @@ describe('the assignment is graded', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'graded'
     const {getByTestId, getByText} = render(
-      <ButtonContext.Provider value={{nextButtonEnabled: true}}>
+      <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).toContainElement(getByText('Next'))
   })
@@ -305,9 +305,9 @@ describe('the assignment is graded', () => {
     assignment.lockInfo.isLocked = false
     submission.state = 'graded'
     const {getByTestId, queryByText} = render(
-      <ButtonContext.Provider value={{nextButtonEnabled: false}}>
+      <StudentViewContext.Provider value={{nextButtonEnabled: false}}>
         <StepContainer assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Next'))
   })

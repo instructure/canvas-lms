@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ButtonContext from './Context'
 import {func} from 'prop-types'
 import {
   GetAssignmentEnvVariables,
@@ -25,6 +24,7 @@ import {
 } from '../assignmentData'
 import React from 'react'
 import StudentContent from './StudentContent'
+import StudentViewContext from './Context'
 
 /* Some helper functions for parsing various graphql query results */
 
@@ -201,17 +201,19 @@ class ViewManager extends React.Component {
   render() {
     const assignment = this.getAssignmentWithEnv()
     const submission = this.getDisplayedSubmission()
+
     return (
-      <ButtonContext.Provider
+      <StudentViewContext.Provider
         value={{
           prevButtonEnabled: this.hasPrevSubmission(),
           nextButtonEnabled: this.hasNextSubmission(),
           prevButtonAction: this.onPrevSubmission,
-          nextButtonAction: this.onNextSubmission
+          nextButtonAction: this.onNextSubmission,
+          latestSubmission: getInitialSubmission(this.props.initialQueryData)
         }}
       >
         <StudentContent assignment={assignment} submission={submission} />
-      </ButtonContext.Provider>
+      </StudentViewContext.Provider>
     )
   }
 }

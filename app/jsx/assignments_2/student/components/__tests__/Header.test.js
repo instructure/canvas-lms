@@ -19,6 +19,7 @@
 import Header from '../Header'
 import {legacyMockSubmission, mockAssignment} from '../../test-utils'
 import React from 'react'
+import StudentViewContext from '../Context'
 import {render} from 'react-testing-library'
 
 // TODO: is scroll threshold is always 150 in every case, why are we passing
@@ -151,4 +152,23 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', () => 
   )
 
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
+})
+
+it('will render the latest grade instead of the displayed submissions grade', () => {
+  const assignment = mockAssignment()
+  const displayedSubmission = legacyMockSubmission()
+  const latestSubmission = legacyMockSubmission()
+  displayedSubmission.grade = '131'
+  latestSubmission.grade = '147'
+  assignment.gradingType = 'points'
+  assignment.pointsPossible = 150
+
+  const {queryByText} = render(
+    <StudentViewContext.Provider value={{latestSubmission}}>
+      <Header scrollThreshold={150} assignment={assignment} submission={displayedSubmission} />
+    </StudentViewContext.Provider>
+  )
+
+  expect(queryByText('147/150 Points')).toBeInTheDocument()
+  expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })

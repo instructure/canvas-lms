@@ -18,11 +18,11 @@
 
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import {bool} from 'prop-types'
-import ButtonContext from './Context'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import StepItem from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
+import StudentViewContext from './Context'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 function renderCollapsedContainer(step) {
@@ -180,11 +180,11 @@ function selectStepContainer(props, context) {
 function StepContainer(props) {
   const {assignment, submission, isCollapsed, forceLockStatus} = props
   return (
-    <ButtonContext.Consumer>
+    <StudentViewContext.Consumer>
       {context =>
         selectStepContainer({assignment, submission, isCollapsed, forceLockStatus}, context)
       }
-    </ButtonContext.Consumer>
+    </StudentViewContext.Consumer>
   )
 }
 

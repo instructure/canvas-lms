@@ -28,6 +28,7 @@ import {number} from 'prop-types'
 import React from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import StepContainer from './StepContainer'
+import StudentViewContext from './Context'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 
 class Header extends React.Component {
@@ -84,6 +85,21 @@ class Header extends React.Component {
   }
   /* eslint-enable jsx-a11y/anchor-is-valid */
 
+  renderLatestGrade = () => (
+    <StudentViewContext.Consumer>
+      {context => {
+        const {latestSubmission} = context
+        return (
+          <GradeDisplay
+            gradingType={this.props.assignment.gradingType}
+            receivedGrade={latestSubmission ? latestSubmission.grade : null}
+            pointsPossible={this.props.assignment.pointsPossible}
+          />
+        )
+      }}
+    </StudentViewContext.Consumer>
+  )
+
   render() {
     return (
       <React.Fragment>
@@ -113,11 +129,7 @@ class Header extends React.Component {
               <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
             </FlexItem>
             <FlexItem grow align="start">
-              <GradeDisplay
-                gradingType={this.props.assignment.gradingType}
-                receivedGrade={this.props.submission ? this.props.submission.grade : null}
-                pointsPossible={this.props.assignment.pointsPossible}
-              />
+              {this.renderLatestGrade()}
               {this.renderFakeMostRecent()}
               {this.props.submission && (
                 <FlexItem as="div" align="end" textAlign="end">
