@@ -42,6 +42,11 @@ const files = [
 ]
 
 describe('FilePreview', () => {
+  it('renders a message if there are no files to display', () => {
+    const {getByText} = render(<FilePreview files={[]} />)
+    expect(getByText('No Submission')).toBeInTheDocument()
+  })
+
   it('renders the appropriate file icons', () => {
     const {container, getByTestId} = render(<FilePreview files={files} />)
     expect(getByTestId('assignments_2_file_icons')).toBeInTheDocument()

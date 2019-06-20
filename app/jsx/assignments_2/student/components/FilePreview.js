@@ -19,6 +19,7 @@
 import {AttachmentShape} from '../assignmentData'
 import {getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
+import previewUnavailable from '../SVG/PreviewUnavailable.svg'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 
@@ -112,6 +113,22 @@ export default class FilePreview extends Component {
     )
   }
 
+  renderUnavailablePreview(message) {
+    return (
+      <div style={{textAlign: 'center'}}>
+        <img alt={message} src={previewUnavailable} style={{width: '150px'}} />
+        <div
+          style={{
+            display: 'block',
+            padding: '20px'
+          }}
+        >
+          <Text size="large">{message}</Text>
+        </div>
+      </div>
+    )
+  }
+
   renderFilePreview = () => {
     const iframeContainerStyle = {
       maxWidth: '1366px',
@@ -159,15 +176,19 @@ export default class FilePreview extends Component {
   }
 
   render() {
-    return (
-      <div style={{margin: '-0.75rem'}}>
-        <Flex>
-          <FlexItem align="start">{this.renderFileIcons()}</FlexItem>
-          <FlexItem shrink grow align="start">
-            {this.renderFilePreview()}
-          </FlexItem>
-        </Flex>
-      </div>
-    )
+    if (this.props.files.length) {
+      return (
+        <div style={{margin: '-0.75rem'}}>
+          <Flex>
+            <FlexItem align="start">{this.renderFileIcons()}</FlexItem>
+            <FlexItem shrink grow align="start">
+              {this.renderFilePreview()}
+            </FlexItem>
+          </Flex>
+        </div>
+      )
+    } else {
+      return this.renderUnavailablePreview(I18n.t('No Submission'))
+    }
   }
 }
