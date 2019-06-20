@@ -1,4 +1,4 @@
-FROM instructure/node:8
+FROM instructure/node:10
 
 USER root
 RUN apt-get update \
