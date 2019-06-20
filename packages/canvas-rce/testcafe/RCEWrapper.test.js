@@ -231,3 +231,25 @@ test('show the kb shortcut modal various ways', async t => {
     .click(Selector('[data-testid="RCEStatusBar"] button').withText('View keyboard shortcuts'))
     .expect(shortcutmodal.visible).ok()
 })
+
+test('editor auto-resizes as content is added', async t => {
+  const paramargin = 12
+  const fontSize = 16
+  const height = await rceContainer.clientHeight
+  const parasFitInRce = Math.floor(height / (fontSize + paramargin))
+  let content = ''
+  // add 1 too many
+  for (let i = 0; i <= parasFitInRce; ++i) {
+    content += '<p>para</p>'
+  }
+
+  await t
+    .click(toggleButton)
+    .typeText(textarea, content)
+    .click(toggleButton)
+    .switchToMainWindow()
+
+  const newHeight = await rceContainer.clientHeight
+  await t
+    .expect(newHeight > height).ok()
+})

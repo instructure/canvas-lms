@@ -395,6 +395,15 @@ class RCEWrapper extends React.Component {
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
     editor.on('KeyDown', this.handleShortcutKeyShortcut) // keyUp puts the char in the editor
+
+    editor.on('Change', this.doAutoResize)
+  }
+
+  doAutoResize = (e) => {
+    const contentElm = this.iframe.contentDocument.documentElement
+    if (contentElm.scrollHeight > contentElm.clientHeight) {
+      this.onResize(e, {deltaY: contentElm.scrollHeight - contentElm.clientHeight})
+    }
   }
 
   onWordCountUpdate = e => {
@@ -555,6 +564,7 @@ class RCEWrapper extends React.Component {
         this.getTextarea().setAttribute('aria-hidden', true);
         this.mceInstance().show()
         this.mceInstance().focus()
+        this.doAutoResize()
       }
     }
   }
