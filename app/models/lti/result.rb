@@ -23,6 +23,8 @@ class Lti::Result < ApplicationRecord
   ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
   ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze
 
+  AGS_EXT_SUBMISSION_URL = 'https://canvas.instructure.com/lti/submission_url'.freeze
+
   self.record_timestamps = false
 
   validates :line_item, :user, presence: true
@@ -35,8 +37,19 @@ class Lti::Result < ApplicationRecord
   validates :grading_progress,
             inclusion: { in: GRADING_PROGRESS_TYPES },
             allow_nil: true
+  validate :validate_url_extension
 
   belongs_to :submission, inverse_of: :lti_result
   belongs_to :user, inverse_of: :lti_results
   belongs_to :line_item, inverse_of: :results, foreign_key: :lti_line_item_id, class_name: 'Lti::LineItem'
+
+  private
+
+  def validate_url_extension
+    return true unless extensions.key?(AGS_EXT_SUBMISSION_URL)
+    value, = CanvasHttp.validate_url(extensions[AGS_EXT_SUBMISSION_URL])
+    extensions[AGS_EXT_SUBMISSION_URL] = value
+  rescue URI::Error, ArgumentError
+    record.errors.add AGS_EXT_SUBMISSION_URL, 'is not a valid URL'
+  end
 end
