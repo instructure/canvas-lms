@@ -64,6 +64,10 @@ module RCENextPage
     f('#tinymce')
   end
 
+  def wiki_body_paragraph
+    f('#tinymce p')
+  end
+
   def wiki_body_anchor
     f('#tinymce p a')
   end
@@ -183,11 +187,11 @@ module RCENextPage
   end
 
   def list_toggle_button
-    # put side arrow to switch list locator here
+    f('[role="button"][title="Ordered and Unordered Lists"] .tox-split-button__chevron')
   end
 
   def bullet_list_button
-    # put bullet list button locator here
+    f('[role="menuitemcheckbox"][title="default bulleted unordered list"]')
   end
 
   def numbered_list_button
@@ -236,6 +240,18 @@ module RCENextPage
 
   def align_right_button
     # put align right button locator here
+  end
+
+  def directionality_button
+    f('[role="button"][title="directionality"]')
+  end
+
+  def directionality_toggle_button
+    f('[role="button"][title="directionality"] .tox-split-button__chevron')
+  end
+
+  def right_to_left_button
+    f('[role="menuitemcheckbox"][title="right to left"]')
   end
 
   def formatting_dropdown
@@ -450,6 +466,18 @@ module RCENextPage
 
   def click_align_right_button
     align_right_button.click
+  end
+
+  def click_directionality_button
+    directionality_button.click
+  end
+
+  def click_directionality_toggle_button
+    directionality_toggle_button.click
+  end
+
+  def click_right_to_left_option
+    right_to_left_button.click
   end
 
   def click_formatting_dropdown
