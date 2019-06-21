@@ -79,6 +79,9 @@ en-AU:
     select_calendars: "Select Calendars"
   EditGroupAssignmentView: 
     move_to: "Move To"
+  EditRubricPage: 
+    titles: 
+      find_outcomes: "Find Outcomes"
   EditorToggle: 
     done: 
       title: "Click to finish editing the rich text area"
@@ -120,6 +123,24 @@ en-AU:
   LongTextEditor: 
     cancel: Cancel
     save: Save
+  OutcomeContentBase: 
+    blank_error: "Cannot be blank"
+    confirm: 
+      delete: "Are you sure you want to delete?"
+    flash: 
+      addSuccess: "Creation successful"
+      deleteError: "Something went wrong. Unable to delete at this time."
+      deleteSuccess: "Deletion successful"
+      error: "An error occurred. Please refresh the page and try again."
+      updateSuccess: "Update successful"
+    length_error: "Must be 255 characters or less"
+  OutcomeView: 
+    length_error: "Must be 255 characters or less"
+    mastery_error: "Must be greater than or equal to 0"
+  OutcomesDirectoryView: 
+    flash: 
+      error: "An error occurred. Please refresh the page and try again."
+      updateSuccess: "Update successful"
   ResendInvitationsView: 
     error_sending_invitations: "Error sending invitation. Please try again."
     invitations_re_sent: "Invitations sent successfully"
@@ -1908,6 +1929,7 @@ en-AU:
   all_scopename_scopes_6c220783: "All %{scopeName} scopes"
   all_sections_daf11554: "All Sections"
   all_start_dates_must_be_before_the_end_date_d949eca9: "All start dates must be before the end date"
+  all_student_groups_f74cd6c3: "All Student Groups"
   all_students_have_taken_the_quiz_b558f8b4: "All Students have taken the quiz"
   all_students_have_taken_the_survey_494f9f42: "All Students have taken the survey"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "All submissions must have a selected grade."
@@ -2271,6 +2293,7 @@ en-AU:
   an_error_occurred_while_migrating_405ac0b5: "An error occurred while migrating."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "An error occurred while saving account proficiency ratings"
   an_error_occurred_while_saving_associations_bd66f3f4: "An error occurred while saving associations"
+  an_error_occurred_while_saving_the_assignment_post_94f1184e: "An error occurred while saving the assignment post policy"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "An error occurred while saving the course post policy"
   an_error_occurred_while_saving_your_settings_b503a31c: "An error occurred while saving your settings"
   an_error_occurred_while_starting_migration_8e6015e2: "An error occurred while starting migration"
@@ -2587,6 +2610,7 @@ en-AU:
   arrange_columns_by_due_date_888f2551: "Arrange Columns by Due Date"
   arrange_columns_by_due_date_f74f9e2d: "Arrange columns by due date"
   arrange_columns_by_points_48da9ba3: "Arrange columns by points"
+  artist_info_for_username_for_description_12d5d862: "Artist info for %{userName} for %{description}"
   as_of_a036fa2e: "As of"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
@@ -3464,6 +3488,8 @@ en-AU:
   attempt_1_7ba3c30f: "Attempt 1"
   attempt_1_grade_484b35e4: "Attempt 1: %{grade}"
   attempt_3dd42b18: attempt
+  attempt_attempt_d3911720: "Attempt %{attempt}"
+  attempt_attempt_grade_c01f45df: "Attempt %{attempt}: %{grade}"
   attempt_current_attempt_ef626179: "Attempt %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Attempt %{current_attempt} of %{max_attempts}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Attempt to detect an appropriate field separator in Gradebook exports based on the number format for your language."
@@ -3621,6 +3647,7 @@ en-AU:
   autodetect_field_separators_in_gradebook_exports_ed9a9d77: "Autodetect field separators in Gradebook Exports"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Automatically apply deduction to late submissions"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Automatically apply grade for missing submissions"
+  automatically_dff02416: Automatically
   automatically_post_grades_29a7eff5: "Automatically Post Grades"
   avaible_daec2e57: Available
   availability_dates_438d71e0: "Availability Dates"
@@ -3881,6 +3908,9 @@ en-AU:
       upload_failed: "Upload failed; please try again."
     messages: 
       uploading_button: "Uploading CSV File..."
+  bundles_quesiton_bank: 
+    titles: 
+      find_outcomes: "Find Outcomes"
   button: 
     submit_assignment: "Submit Assignment"
   buttons: 
@@ -3930,6 +3960,7 @@ en-AU:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: close
+  cache_cleared_successfully_9ab84d5a: "Cache cleared successfully"
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Calculation Method"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method must be one of the following: %{calc_methods}"
@@ -4569,6 +4600,7 @@ en-AU:
   choose_usage_rights_33683854: "Choose usage rights..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' is not a valid colour."
   clear_2084585f: Clear
+  clear_user_cache_ef079f7f: "Clear User Cache"
   click_for_more_details_on_this_outcome_8c018d2f: "Click for more details on this outcome."
   click_here_for_an_account_9536cb36: "Click Here for an Account"
   click_here_it_s_free_eeccb9cb: "Click Here. It's Free!"
@@ -6945,6 +6977,7 @@ en-AU:
   create_new_discussions_6ab69da2: "Create new discussions"
   create_new_e0946c49: "Create new"
   create_new_group_set_13b1f62a: "Create New Group Set"
+  create_new_submission_e6b7c18d: "Create New Submission"
   create_slots_71dbb2f8: "Create Slots"
   create_theme_based_on_40651ed3: "Create theme based on"
   create_theme_based_on_name_7b1bd318: "Create theme based on %{name}"
@@ -7338,6 +7371,7 @@ en-AU:
   delete_current_message_5da0221a: "Delete Current Message"
   delete_current_module_item_21fefc54: "Delete Current Module/Item"
   delete_custom_help_link_814f0509: "Delete custom help link"
+  delete_disabled_3196ce47: "Delete (Disabled)"
   delete_discussion_title_a28df8b6: "Delete discussion %{title}"
   delete_domain_5ba75b7c: "Delete domain"
   delete_domain_domain_c5b68f5: "Delete domain %{domain}"
@@ -8135,6 +8169,7 @@ en-AU:
   edit_criterion_description_5828919: "Edit criterion description"
   edit_current_message_da650d4c: "Edit Current Message"
   edit_developer_key_d8fa33c4: "Edit developer key"
+  edit_disabled_e6a5ea0a: "Edit (Disabled)"
   edit_discussion_settings_1bbb03d: "Edit Discussion Settings"
   edit_grading_period_e39af45d: "Edit grading period"
   edit_grading_period_set_c548f4df: "Edit Grading Period Set"
@@ -8668,6 +8703,7 @@ en-AU:
   epub_exports_3822c3f8: "ePub Exports"
   error_59293a2c: error
   error_98e81528: Error
+  error_associating_assignment_assignment_name_with__d92e9acf: "Error associating assignment \"%{assignment_name}\" with an LTI tool."
   error_deleting_name_reason_11f9d399: "Error deleting %{name}: %{reason}"
   error_duplicating_module_4b023042: "Error duplicating module"
   error_exporting_gradebook_msg_6ea31e2f: "Error exporting gradebook: %{msg}"
@@ -8689,6 +8725,7 @@ en-AU:
   error_saving_discussion_settings_3360661d: "Error saving discussion settings"
   error_sending_messages_13c874eb: "Error sending messages"
   error_sending_submission_comment_dc15d24f: "Error sending submission comment"
+  error_sending_submission_d32dc075: "Error sending submission"
   error_uploading_file_e2d31b56: "Error uploading file."
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Error while importing CSV. Please contact support. (Error report %{number})"
   errors: 
@@ -8801,6 +8838,7 @@ en-AU:
   export_to_quizzes_2_format_45b3ec25: "Export to Quizzes 2 format"
   exported_package_history_bfca44b9: "Exported Package History"
   exporting_b1eab154: Exporting
+  extend_due_date_20651e76: "Extend Due Date"
   external_apps_account_course_settings_c44af5ef: "External Apps (Account/Course Settings)"
   external_apps_course_settings_1f045644: "External Apps (Course Settings)"
   external_apps_f5490181: "External Apps"
@@ -8979,6 +9017,7 @@ en-AU:
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Failed, the report failed to generate a file. Please try again."
   failed_to_add_new_feed_ee1c5ea: "Failed to add new feed"
   failed_to_change_last_attended_date_1e340ba6: "Failed to change last attended date"
+  failed_to_clear_cache_7361ab: "Failed to clear cache"
   failed_to_close_discussion_for_comments_28603bca: "Failed to close discussion for comments"
   failed_to_create_new_role_e336e461: "Failed to create new role"
   failed_to_create_webhook_b766cf5c: "Failed to create webhook."
@@ -9061,6 +9100,8 @@ en-AU:
     new_quiz_statistics: "New Quiz Statistics Page"
     post_grades: "Post Marks to SIS"
     quiz_log_auditing: "Quiz Log Auditing"
+    quizzes: 
+      next: Quizzes.Next
     student_groups: "New Student Groups Page"
     student_outcome_gradebook: "Student Learning Mastery Markbook"
   features_2581da: Features
@@ -10090,12 +10131,17 @@ en-AU:
   grades_view_change_logs_6bc1b959: "Grades - view change logs"
   grades_visible_to_students_1584fa83: "Grades Visible to Students"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Grades were successfully published to the gradebook."
+  grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
+      \x20         Grades will be hidden by default. Any grades that have already posted will remain visible.\n\
+      \x20         Choose when to post grades for this assignment in the gradebook.\n\
+      \x20       "
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n\
       \x20           Grades will be hidden by default. Any grades that have already posted will remain visible.\n\
       \x20           Choose when to post grades for each assignment on each column in the gradebook.\n\
       \x20         "
   grades_will_be_made_visible_to_all_students_1cc4d67e: "Grades will be made visible to all students"
   grades_will_be_made_visible_to_students_with_grade_d83028d5: "Grades will be made visible to students with graded submissions"
+  grades_will_be_visible_to_students_as_soon_as_they_62805e34: "Grades will be visible to students as soon as they are entered."
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -11306,6 +11352,8 @@ en-AU:
   invalid_csv_file_2c076da5: "Invalid CSV File"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Invalid CSV file. Grades could not be updated."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Invalid csv file; the grades could not be updated."
+  invalid_custom_fields_c66dcdb6: "Invalid custom fields."
+  invalid_date_and_time_1a42d206: "Invalid date and time"
   invalid_date_or_datetime_for_field_b38fe386: "Invalid date or datetime for %{field}"
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Invalid date or invalid datetime for %{attr}"
   invalid_date_or_time_333acd43: "Invalid date or time"
@@ -12048,6 +12096,7 @@ en-AU:
   manage_your_course_details_664c335f: "Manage your course details"
   manual_configuration_b586fe54: "Manual Configuration"
   manual_entry_e4a4f99a: "Manual Entry"
+  manually_9de23e1f: Manually
   manually_mark_posts_as_read_afa5d035: "Manually mark posts as read"
   manually_post_grades_18248306: "Manually Post Grades"
   mark_as_done_6fa48d2f: "Mark as done."
@@ -14034,6 +14083,14 @@ en-AU:
   modal_dialog_add_to_course_aec33759: "Modal Dialog: Add to course"
   modal_dialog_header_source_16ec3ac1: "Modal dialog: %{header} %{source}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} is already located in %{newGroup}"
+  modelsOutcome: 
+    criteria: 
+      does_not_meet_expectations: "Does Not Meet Expectations"
+      exceeds_expectations: "Exceeds Expectations"
+      meets_expectations: "Meets Expectations"
+  modelsPageView: 
+    browsers: 
+      unrecognized: "Unrecognised Browser"
   modelsQuiz: 
     assignment_points_possible: 
       one: "1 pt"
@@ -14328,6 +14385,7 @@ en-AU:
   must_be_a_valid_number_59f0069: "Must be a valid number"
   must_be_after_start_date_95e251a3: "must be after start date"
   must_be_between_availability_dates_ceaca984: "must be between availability dates"
+  must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "must be logged in and registered to perform that action"
   must_be_on_or_after_end_date_e4dda631: "must be on or after end date"
   must_belong_to_a_root_account_f84323f6: "must belong to a root account"
   must_belong_to_an_active_course_9711934: "must belong to an active course"
@@ -14338,6 +14396,7 @@ en-AU:
   must_have_at_least_1_group_per_section_9809e708: "Must have at least 1 group per section"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Must have at least as many groups as sections to assign by section"
   must_have_at_least_one_placement_defined_1bc586c6: "Must have at least one placement defined."
+  must_have_at_least_one_redirect_uri_defined_bb236d38: "Must have at least one redirect_uri defined."
   must_mark_as_done_91cff799: "Must mark as done"
   must_mark_as_done_bf6cc563: "Must mark as done"
   must_mark_assignment_as_done_e3e4af88: "Must mark assignment as done"
@@ -14442,6 +14501,7 @@ en-AU:
   new_appointment_timeslots_are_available_for_signup_a3e3f964: "New appointment timeslots are available for signup"
   new_assignment_2a984756: "New Assignment"
   new_assignment_for_course_name_f71dd337: "New assignment for %{course_name}"
+  new_attempt_57eae3d9: "New Attempt"
   new_canvas_message_from_user_name_94cc720: "New Canvas message from %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "New comment by %{author_name} for %{assignment_title}, %{user_name}, %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "New comment: %{discussion_topic} by %{user_name}"
@@ -14514,6 +14574,7 @@ en-AU:
   no_assignment_name_adbb215b: "No Assignment Name"
   no_assignments_with_that_name_found_1d7be1: "No assignments with that name found"
   no_associated_terms_13bacefc: "No Associated Terms"
+  no_attachments_found_for_the_following_ids_ids_49c9192f: "No attachments found for the following ids: %{ids}"
   no_attributes_locked_611c5cc: "no attributes locked"
   no_broken_links_found_38d951e3: "No broken links found"
   no_cancel_installation_db8d12d7: "No, Cancel Installation"
@@ -15049,6 +15110,10 @@ en-AU:
   on_time_17ca5ad9: "On Time"
   on_time_percent_eebffe38: "On Time: %{percent}"
   on_whitelist_will_only_be_the_domains_which_have_b_c4c3a861: "On - Whitelist will only be the domains which have been added explicitly to this account."
+  once_a_grade_is_posted_manually_it_will_automatica_26aff290: "\n\
+      \x20             Once a grade is posted manually, it will automatically send new notifications and be visible to students.\n\
+      \x20             Future grade changes for posted grades will not need to be manually posted.\n\
+      \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Once a grade is posted manually, it will automatically send new notifications and be visible to students."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Once this feature is enabled, you will not be able to turn it off again.  Ensure you are ready to enable the Submissions Folder before proceeding."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Once you have submitted an answer, you will not be able to change it later. You will not be able to view the previous question."
@@ -15312,6 +15377,25 @@ en-AU:
         average_percent: "Avg Percent"
         latest_score: "Latest Score"
         outcome: Outcome
+  outcomesFindDialog: 
+    confirm: 
+      import_group: "Import group \"%{group}\" to group \"%{target}\"?"
+      import_outcome: "Import outcome \"%{outcome}\" to group \"%{target}\"?"
+    dont_import: "This group cannot be imported."
+    flash: 
+      importError: "An error occurred while importing. Please try again later."
+      importSuccess: "Import successful"
+    top_level: "%{context} Top Level"
+  outcomesFindDirectoryVew: 
+    account_standards: "Account Standards"
+    account_standards_description: "To the left you'll notice the standards your institution has created for you to use in your courses."
+    common_core: "Common Core Standards"
+    common_core_description: "To the left is the familiar outcomes folder structure for each grouping of the Common Core State Standards. This will allow you to effortlessly include any of the Common Core Standards for grading within your course."
+    state_standards: "State Standards"
+    state_standards_description: "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course."
+  outcomesSidebarView: 
+    titles: 
+      find_outcomes: "Find Outcomes"
   outcomes_and_rubrics_account_course_68d0bf1d: "Outcomes and Rubrics (Account/Course)"
   outcomes_and_rubrics_f893d141: "Outcomes and Rubrics"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New Outcome button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure."
@@ -15524,6 +15608,7 @@ en-AU:
   please_have_the_student_submit_the_file_again_dba514b7: "Please have the student submit the file again"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Please let them know which page you were viewing and link you clicked on."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Please let them know which page you were viewing and the link you clicked on."
+  please_log_in_to_view_this_content_eec6cd0: "Please Log in to view this content"
   please_provide_a_field_e5a7d0b3: "Please provide a %{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Please select a group set for this assignment"
   please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
@@ -15911,6 +15996,7 @@ en-AU:
       description: "You will need to register a [new app on Unsplash](%{unsplash_url})."
       labels: 
         access_key: "Access Key"
+        application_name: "Application Name"
     uuid_provisioner: 
       description: "This enables exporting UUIDs into Quiz.Next services."
       name: "UUID provisioner"
@@ -16055,6 +16141,7 @@ en-AU:
   post_grades_to_sis_97ece878: "Post Marks to SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "The \"Post Marks to SIS\" tickbox is enabled by default for assignments, graded discussions and quizzes."
   post_grades_tray_83f2fb2e: "Post grades tray"
+  post_or_hide_grades_2d1d7815: "Post or Hide Grades"
   post_policies_22f09fea: "Post Policies"
   post_to_961f8937: "Post to"
   post_types_93ff86d9: "Post types"
@@ -20165,7 +20252,7 @@ en-AU:
       aria_stop: "Hit \"Stop\" to end recording."
     edit_view_rubric: "View Rubric"
     group: Group
-    mic_blocked_message: "Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream"
+    mic_blocked_message: "Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone"
     mute_assignment: "Mute Assignment"
     no_submission_time: "no submission time"
     nodetect_message: "No speech was detected. You may need to adjust your microphone settings."
@@ -20317,6 +20404,8 @@ en-AU:
   student_details_49901ceb: "Student Details"
   student_extensions_d35a907: "Student Extensions"
   student_grades_4cbc59a1: "Student Grades"
+  student_group_filter_185fb085: "Student Group Filter"
+  student_groups_863201c1: "Student Groups"
   student_groups_desc: |-
       This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
       experience.
@@ -20494,6 +20583,7 @@ en-AU:
   submission_options_5184a65b: "Submission Options"
   submission_requirement_8ba1ee08: "Submission Requirement"
   submission_score_b7a291e8: "submission score"
+  submission_sent_3f0d2ee1: "Submission sent"
   submission_status_3079e730: "Submission status"
   submission_tray_429ac3df: "Submission tray"
   submission_type_a925fc5f: "Submission Type"
@@ -20522,6 +20612,8 @@ en-AU:
     gathering_files_progress: "Gathering Files (%{progress})..."
     notices: 
       submission_doesnt_count: "This assignment will no longer count towards your mark."
+    originality_score: 
+      see_vericite_results: "See VeriCite results"
     resubmitted_to_turnitin: "Successfully resubmitted to turnitin."
     see_attached_files: "See attached files"
     show: 
@@ -20648,6 +20740,7 @@ en-AU:
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Success! Grades have been posted for the selected sections of %{assignmentName}."
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Success! Grades have been posted to %{postedTo} for %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Success! The grades were published in the gradebook."
+  success_the_post_policy_for_name_has_been_updated_ea92283f: "Success! The post policy for %{name} has been updated."
   successfully_created_a_set_38374719: "Successfully created a set"
   successfully_deleted_discussion_title_a685f345: "Successfully deleted discussion %{title}"
   successfully_deleted_the_comment_a8bbe561: "Successfully deleted the comment"
@@ -21617,6 +21710,7 @@ en-AU:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "To moderate a quiz, Grades - edit​ must also be enabled."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "To moderate grades, Grades - Select final grade for moderation must also be enabled."
+  to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "To obtain a client ID, an account admin will need to generate an LTI developer key."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "To preview Theme Editor branding, you will need to *turn off High Contrast UI*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -22578,9 +22672,11 @@ en-AU:
   view_name_app_62a2ad8e: "View %{name} app"
   view_next_file_a8a4a885: "View next file"
   view_next_student_9fc72fef: "view next student"
+  view_next_submission_d2a429d: "View Next Submission"
   view_notifications_6aea09a2: "View Notifications"
   view_previous_file_b846db4f: "View previous file"
   view_previous_student_90000459: "view previous student"
+  view_previous_submission_2b57bb85: "View Previous Submission"
   view_prior_enrollments_9b519b25: "View Prior Enrolments"
   view_question_banks_188a9e0f: "View Question Banks"
   view_range_student_details_8116d68a: "View range student details"
@@ -22709,6 +22805,7 @@ en-AU:
       \x20           receive new notifications about or be able to see:\n\
       \x20         "
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:"
+  while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:"
   whitelist_count_max_26a270f: "Whitelist (%{count}/%{max})"
   whitelist_e88fd8ed: Whitelist
   whitelist_editing_is_disabled_when_security_settin_ab40cc90: "Whitelist editing is disabled when security settings are inherited from a parent account."
@@ -23032,6 +23129,7 @@ en-AU:
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "You must allow at least one appointment per participant."
   you_must_allow_at_least_one_appointment_per_time_s_76e22300: "You must allow at least one appointment per time slot."
   you_must_allow_at_least_one_group_to_attend_68531eab: "You must allow at least one group to attend"
+  you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "You must attach at least one file to this assignment"
   you_must_enter_a_date_f8eabfb1: "You must enter a date"
   you_must_have_a_student_or_section_selected_a99e45df: "You must have a student or section selected."
   you_must_input_a_section_b8d370fe: "You must input a section"
