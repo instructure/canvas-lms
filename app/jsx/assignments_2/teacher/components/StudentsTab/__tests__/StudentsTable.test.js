@@ -52,7 +52,7 @@ it('renders basic information', () => {
   const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink).toBeTruthy()
   expect(viewSubmissionLink.getAttribute('href')).toMatch(
-    /\/courses\/course-lid\/assignments\/assignment-lid\/submissions\/user_1/
+    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid&student_id=user_1&attempt=1/
   )
 })
 
@@ -98,7 +98,7 @@ it('displays multiple attempts', () => {
 
   const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink.getAttribute('href')).toMatch(
-    /\/courses\/course-lid\/assignments\/assignment-lid\/submissions\/user_1/
+    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid&student_id=user_1&attempt=1/
   )
 })
 

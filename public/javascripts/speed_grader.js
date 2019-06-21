@@ -1397,6 +1397,11 @@ EG = {
     }
     document.location.hash = ''
 
+    const attemptParam = utils.getParam('attempt')
+    if (attemptParam) {
+      EG.initialVersion = parseInt(attemptParam, 10) - 1
+    }
+
     // Check if this student ID "resolves" to a different one (e.g., it's an
     // invalid ID, or is in a group with someone else as a representative).
     const resolvedId = EG.resolveStudentId(initialStudentId)
@@ -2282,8 +2287,17 @@ EG = {
     const currentSubmission = this.currentStudent.submission
     if (currentSubmission && currentSubmission.workflow_state !== 'unsubmitted') {
       this.refreshSubmissionsToView()
-      const lastIndex = currentSubmission.submission_history.length - 1
-      $(`#submission_to_view option:eq(${lastIndex})`).attr('selected', 'selected')
+      let index = currentSubmission.submission_history.length - 1
+
+      if (EG.hasOwnProperty('initialVersion')) {
+        if (EG.initialVersion >= 0 && EG.initialVersion <= index) {
+          index = EG.initialVersion
+          currentSubmission.currentSelectedIndex = index
+        }
+        delete EG.initialVersion
+      }
+
+      $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
       $submission_details.show()
     } else {
       // there's no submission
