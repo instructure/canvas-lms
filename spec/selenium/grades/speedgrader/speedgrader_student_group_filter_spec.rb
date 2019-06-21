@@ -20,10 +20,12 @@ require_relative '../pages/speedgrader_page'
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_grade_detail_tray_page'
 require_relative '../pages/gradezilla_cells_page'
+require_relative '../setup/gradebook_setup'
 require_relative '../../assignments/page_objects/assignment_page'
 
 describe 'filter speed grader by student group' do
   include_context "in-process server selenium tests"
+  include GradebookSetup
 
   before :once do
     # course with student groups
@@ -55,6 +57,8 @@ describe 'filter speed grader by student group' do
 
     @group1_students = @students[0,2]
     @group2_students = @students[2,2]
+
+    @course.update!(filter_speed_grader_by_student_group: true)
   end
 
   context 'on assignments page' do
@@ -79,7 +83,8 @@ describe 'filter speed grader by student group' do
     end
 
     it 'speedgrader link from tray has correct href' do
-      skip('unskip in GRADE-2238')
+      show_student_groups_filter(@teacher)
+
       Gradezilla.visit(@course)
       # select group from gradebook
       Gradezilla.select_student_group(@category.groups.second)
@@ -90,7 +95,7 @@ describe 'filter speed grader by student group' do
     end
 
     it 'loads speedgrader when group selected' do
-      skip('unskip in GRADE-2238')
+      skip('Unskip in GRADE-2245')
       # select group from gradebook setting
       @teacher.preferences[:gradebook_settings] = {
         @course.id => {
@@ -102,17 +107,15 @@ describe 'filter speed grader by student group' do
       Speedgrader.visit(@course.id, @assignment.id)
       # verify
       Speedgrader.click_students_dropdown
-      expect(Speedgrader.fetch_student_names).to contain_exaclty(@group2_students)
+      expect(Speedgrader.fetch_student_names).to contain_exactly(@group2_students)
     end
 
     it 'disables speedgrader from tray' do
-      skip('unskip in GRADE-2239')
       Gradezilla.visit(@course)
       # verify link is disabled and message
       Gradezilla::Cells.open_tray(@group2_students.first, @assignment)
-      # expect(Gradezilla::GradeDetailTray.group_message).to contain_text("you must select a student group")
+      expect(Gradezilla::GradeDetailTray.group_message).to include_text("you must select a student group")
       expect(Gradezilla::GradeDetailTray.speedgrader_link).to be_disabled
     end
   end
-
 end
