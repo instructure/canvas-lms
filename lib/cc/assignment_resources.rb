@@ -166,13 +166,15 @@ module CC
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at, nil)
       if assignment.migration_id.present?
         max_attempts = SettingsService.get_settings(object: 'assignment', id: assignment.migration_id)['max_attempts'].to_i || false
+        module_exam = SettingsService.get_settings(object: 'assignment', id: assignment.migration_id)['module_exam']
       else
         max_attempts = false
+        module_exam = false
       end
 
-      if max_attempts
-        node.max_attempts max_attempts
-      end
+      node.max_attempts max_attempts if max_attempts
+      node.is_end_of_module_exam module_exam if module_exam
+
       if manifest && manifest.try(:user).present?
         node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end

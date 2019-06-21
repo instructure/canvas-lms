@@ -43,6 +43,18 @@ module CC::Importer::Canvas
               SettingsService.update_settings(update_settings)
           end
 
+          module_exam = get_node_val(meta_node, 'is_end_of_module_exam')
+
+          if module_exam == "true"
+            update_settings = {
+              id: mig_id,
+              setting: 'module_exam',
+              value: true,
+              object: 'assignment'
+            }
+              SettingsService.update_settings(update_settings)
+          end
+
           assignment = assignments.detect{|a| a['migration_id'] && a['migration_id'] == mig_id}
           unless assignment
             assignment = {'migration_id' => mig_id}.with_indifferent_access

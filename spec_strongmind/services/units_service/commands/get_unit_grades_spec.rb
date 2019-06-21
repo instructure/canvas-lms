@@ -43,7 +43,8 @@ RSpec.describe UnitsService::Commands::GetUnitGrades do
         units: [{
           score: 54,
           id: @context_module.id,
-          position: @context_module.position
+          position: @context_module.position,
+          excused: false
         }]
       )
     end
