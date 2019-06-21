@@ -1786,6 +1786,8 @@ nn:
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle innleveringar må ha ein karakter."
   all_terms_cd27b0fb: "Alle semester"
   all_timezones_5e8afa7b: "Alle tidssoner"
+  all_users_associated_with_this_course_6be8d492: "Alle brukera tilknytta dette emnet"
+  all_users_associated_with_this_institution_d29850be: "Alle brukera tilknytta institusjonen"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "All vekting må vere større eller lik 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
   allow_bb7ce9b1: Tillat
@@ -2986,6 +2988,7 @@ nn:
   assignments_1e02582c: Oppgåver
   assignments_2: 
     submission_attempts: Forsøk
+  assignments_2_e88d7a26: "Oppgåver 2"
   assignments_api: 
     invalid_date_time: "Ugyldig dato og klokkeslett for %{attribute}"
     invalid_submission_types: "Ugyldige innleveringstypar"
@@ -4717,6 +4720,7 @@ nn:
       restoring: gjenopprettar...
   context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
+    url_or_domain_no_valid: "Ukorrekt url for %{url}"
     url_or_domain_required: "Du må oppgi anten URL-en eller domenet."
   context_id_83fdfe0d: context_id
   context_level_56d88f5b: "(%{context} level)"
