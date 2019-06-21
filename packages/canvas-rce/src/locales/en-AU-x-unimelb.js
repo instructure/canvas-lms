@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/en-au-x-unimelb.json";
-import "../rce/languages/en_GB";
-formatMessage.addLocale({ "en-AU-x-unimelb": locale });
+import formatMessage from '../format-message'
+import locale from '../../locales/en-AU-x-unimelb.json'
+import '../rce/languages/en_GB'
+formatMessage.addLocale({'en-AU-x-unimelb': locale})
