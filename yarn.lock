@@ -894,10 +894,10 @@
     "@instructure/canvas-theme" "^6.2.0"
     "@instructure/ui-themeable" "^6.2.0"
 
-"@instructure/canvas-rce-old@4.1.3":
-  version "4.1.3"
-  resolved "https://registry.yarnpkg.com/@instructure/canvas-rce-old/-/canvas-rce-old-4.1.3.tgz#d55e34147c95f67f74286bc618cb1e7695350017"
-  integrity sha512-7FnOo1XyW6m+v9PuhucnYitygD6rI6y246dLSjgfQdLtAMwpofymmbbqJB+/qW10Ikg/FVNqJZIEs9StUhAXcw==
+"@instructure/canvas-rce-old@4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@instructure/canvas-rce-old/-/canvas-rce-old-4.1.4.tgz#5ebbedd948452433bc79f2b37d59ff891557fb70"
+  integrity sha512-myOvsW0/5rGOSoD4SQZhCt2nU/UliUSTkVX76C2UqwssFGDo1vPKY4s8SUW7Xl7MYveYHckUVL/qqvG2TmWhHQ==
   dependencies:
     "@instructure/ui-a11y" "^5"
     "@instructure/ui-buttons" "^5"
