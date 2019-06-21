@@ -19,7 +19,7 @@
 module SIS
   class UserImporter < BaseImporter
 
-    def process(messages)
+    def process(messages, login_only: false)
       start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger, messages)
       User.skip_updating_account_associations do
@@ -27,7 +27,7 @@ module SIS
           Pseudonym.process_as_sis(@sis_options) do
             yield importer
             while importer.any_left_to_process?
-              importer.process_batch
+              importer.process_batch(login_only: login_only)
             end
           end
         end
@@ -63,16 +63,20 @@ module SIS
       end
 
       # Pass a single instance of SIS::Models::User
-      def add_user(user)
-        @logger.debug("Processing User #{user.to_a.inspect}")
+      def add_user(user, login_only: false)
+        @logger.debug("Processing User #{(login_only ? user.login_array : user.to_a).inspect}")
 
         raise ImportError, "No user_id given for a user" if user.user_id.blank?
         raise ImportError, "No login_id given for user #{user.user_id}" if user.login_id.blank?
         raise ImportError, "Improper status for user #{user.user_id}" unless user.status =~ /\A(active|deleted)/i
         return if @batch.skip_deletes? && user.status =~ /deleted/i
 
+        if login_only && user.existing_user_id.blank? && user.existing_integration_id.blank? && user.existing_canvas_user_id.blank?
+          raise ImportError, I18n.t("No existing user provided for login with SIS ID %{user_id}", user_id: user.user_id)
+        end
+
         @batched_users << user
-        process_batch if @batched_users.size >= Setting.get("sis_user_batch_size", "100").to_i
+        process_batch(login_only: login_only) if @batched_users.size >= Setting.get("sis_user_batch_size", "100").to_i
       end
 
       def any_left_to_process?
@@ -109,11 +113,11 @@ module SIS
         end
       end
 
-      def process_batch
+      def process_batch(login_only: false)
         return unless any_left_to_process?
-        user_row = nil
         while !@batched_users.empty?
           user_row = @batched_users.shift
+          info = login_only ? user_row.login_row_info : user_row.row_info
           @logger.debug("Processing User #{user_row.inspect}")
 
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
@@ -124,17 +128,22 @@ module SIS
           pseudo ||= pseudo_by_login
 
           if pseudo_by_integration && status_is_active && pseudo_by_integration != pseudo
-            id_message = pseudo_by_integration.sis_user_id ? 'SIS ID' : 'Canvas ID'
+            id_message = pseudo_by_integration.sis_user_id ? I18n.t('SIS ID') : I18n.t('Canvas ID')
             user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
             message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
             next
           end
 
           if pseudo
+            if login_only
+              message = I18n.t("An existing Canvas user with the SIS ID %{user_id} or login of %{login} already exists, skipping", user_id: user_row.user_id, login: user_row.login_id)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+              next
+            end
             if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
               message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
               next
             end
             if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
@@ -142,7 +151,7 @@ module SIS
               id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
               message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
               next
             end
 
@@ -157,14 +166,36 @@ module SIS
               user.short_name = user_row.short_name if user_row.short_name.present?
             end
           else
-            user = nil
-            pseudo = Pseudonym.new
-            user = other_user(user_row, pseudo) if user_row.integration_id.present?
-            unless user
-              user = User.new
-              user.name = infer_user_name(user_row)
-              user.sortable_name = infer_sortable_name(user_row)
-              user.short_name = user_row.short_name if user_row.short_name.present?
+            if login_only
+              if user_row.root_account_id.present?
+                root_account = root_account_from_id(user_row.root_account_id)
+                next unless root_account
+              else
+                root_account = @root_account
+              end
+              pseudo = existing_login(user_row, root_account)
+              if pseudo.nil?
+                message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+                next
+              elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
+                message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+                next
+              else
+                user = pseudo.user
+                pseudo = Pseudonym.new
+              end
+            else
+              user = nil
+              pseudo = Pseudonym.new
+              user = other_user(user_row, pseudo) if user_row.integration_id.present?
+              unless user
+                user = User.new
+                user.name = infer_user_name(user_row)
+                user.sortable_name = infer_sortable_name(user_row)
+                user.short_name = user_row.short_name if user_row.short_name.present?
+              end
             end
           end
 
@@ -179,7 +210,7 @@ module SIS
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
               next
             end
 
@@ -201,7 +232,7 @@ module SIS
             end
             unless (pseudo.authentication_provider = @authentication_providers[user_row.authentication_provider_id])
               message = "unrecognized authentication provider #{user_row.authentication_provider_id} for #{user_row.user_id}, skipping"
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
               next
             end
           else
@@ -256,14 +287,14 @@ module SIS
               end
             end
           rescue ImportError
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
             next
           rescue => e
             # something broke
             error = Canvas::Errors.capture_exception(:sis_import, e)
             er = error[:error_report]
             message = generate_user_warning("Something broke with this user. Contact Support with ErrorReport id: #{er}", user_row.user_id, user_row.login_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, backtrace: e.backtrace, row_info: user_row.row_info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, backtrace: e.backtrace, row_info: info)
             next
           end
 
@@ -343,7 +374,7 @@ module SIS
             end
           elsif user_row.email.present? && EmailAddressValidator.valid?(user_row.email) == false
             message = "The email address associated with user '#{user_row.user_id}' is invalid (email: '#{user_row.email}')"
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
             next
           end
 
@@ -367,7 +398,19 @@ module SIS
         end
       end
 
+      def existing_login(user_row, root_account)
+        root_account.shard.activate do
+          login = nil
+          user_row.login_hash.each do |attr, value|
+            login ||= root_account.pseudonyms.active.where(attr => value).take
+          end
+          login
+        end
+      end
+
       def other_user(_user_row, _pseudo); end
+
+      def root_account_from_id(_root_account_sis_id); end
 
       def maybe_write_roll_back_data
         if @roll_back_data.count > 1000
