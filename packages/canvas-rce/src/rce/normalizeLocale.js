@@ -56,6 +56,7 @@ const recognized = [
   "el",
   "en",
   "en-AU",
+  "en-AU-x-unimelb",
   "en-GB",
   "en-GB-x-lbs",
   "en-GB-x-ukhe",
