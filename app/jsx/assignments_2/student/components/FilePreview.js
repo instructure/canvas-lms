@@ -26,6 +26,7 @@ import React, {Component} from 'react'
 
 import {Button} from '@instructure/ui-buttons/lib/components'
 import {Flex, FlexItem} from '@instructure/ui-layout'
+import IconDownload from '@instructure/ui-icons/lib/Line/IconDownload'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import theme from '@instructure/ui-themes/lib/canvas/base'
@@ -84,10 +85,7 @@ export default class FilePreview extends Component {
 
   renderFileIcons = () => {
     const iconsContainerStyle = {
-      padding: theme.variables.spacing.small,
-      borderRight: !this.props.files[this.state.selectedFile].submissionPreviewUrl
-        ? `1px solid ${theme.variables.colors.borderMedium}`
-        : ''
+      padding: theme.variables.spacing.small
     }
 
     const iconsStyle = {
@@ -121,7 +119,12 @@ export default class FilePreview extends Component {
         <div
           style={{
             display: 'block',
-            padding: '20px'
+            padding: `
+              ${theme.variables.spacing.large}
+              ${theme.variables.spacing.medium}
+              0
+              ${theme.variables.spacing.medium}
+            `
           }}
         >
           <Text size="large">{message}</Text>
@@ -152,12 +155,23 @@ export default class FilePreview extends Component {
         <div
           style={{
             textAlign: 'center',
-            padding: `${theme.variables.spacing.medium} 0 0 0`
+            padding: `${theme.variables.spacing.medium} 0 0 0`,
+            borderLeft: `1px solid ${theme.variables.colors.borderMedium}`
           }}
         >
           <div style={{display: 'block'}}>
             {this.renderUnavailablePreview(I18n.t('Preview Unavailable'))}
             {selectedFile.displayName}
+            <div style={{display: 'block'}}>
+              <Button
+                margin="medium auto"
+                icon={IconDownload}
+                href={selectedFile.url}
+                disabled={!selectedFile.url}
+              >
+                {I18n.t('Download')}
+              </Button>
+            </div>
           </div>
         </div>
       )

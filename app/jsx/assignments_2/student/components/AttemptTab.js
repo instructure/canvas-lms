@@ -167,7 +167,7 @@ export default class AttemptTab extends Component {
   renderFileAttempt = createSubmission => {
     return this.props.submission.state === 'graded' ||
       this.props.submission.state === 'submitted' ? (
-      <FilePreview files={this.props.submission.attachments} />
+      <FilePreview key={this.props.submission.attempt} files={this.props.submission.attachments} />
     ) : (
       this.renderFileUpload(createSubmission)
     )

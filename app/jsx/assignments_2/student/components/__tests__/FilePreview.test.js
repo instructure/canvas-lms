@@ -72,10 +72,15 @@ describe('FilePreview', () => {
     expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
   })
 
-  // TODO: replace this test when we get the no preview available SVG
   it('renders no preview available if the given file has no preview url', () => {
     const {getByText} = render(<FilePreview files={[files[1]]} />)
     expect(getByText('Preview Unavailable')).toBeInTheDocument()
+  })
+
+  it('renders a download button for files without canvadoc preview', () => {
+    const {container, getByText} = render(<FilePreview files={[files[1]]} />)
+    expect(getByText('Preview Unavailable')).toBeInTheDocument()
+    expect(container.querySelector('a[href="/url"]')).toBeInTheDocument()
   })
 
   it('changes the preview when a different file icon is clicked', () => {
