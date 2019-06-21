@@ -20,8 +20,9 @@ import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
-import {Img, Spinner} from '@instructure/ui-elements'
+import {Avatar, Img, Spinner, Text} from '@instructure/ui-elements'
 import {Pagination} from '@instructure/ui-pagination'
+import { Tooltip } from '@instructure/ui-overlays'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
 import {StyleSheet, css} from 'aphrodite'
@@ -103,6 +104,15 @@ const useUnsplashSearch = source => {
   return {...state, search}
 }
 
+function Attribution ({name, avatarUrl}) {
+  return (
+    <Flex>
+      <Flex.Item margin="xx-small"><Avatar name={name} src={avatarUrl} /></Flex.Item>
+      <Flex.Item margin="xx-small"><Text>{name}</Text></Flex.Item>
+    </Flex>
+  )
+}
+
 export default function UnsplashPanel({editor, source, imageUrl, setImageUrl}) {
   const [page, setPage] = useState(1)
   const [term, setTerm] = useState('')
@@ -165,6 +175,7 @@ export default function UnsplashPanel({editor, source, imageUrl, setImageUrl}) {
           >
             {results[page] &&
               results[page].map((resultImage, index) => (
+                <Tooltip key={resultImage.id} tip={<Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} />}>
                 <div
                   ref={c => (resultRefs[index] = c)}
                   key={resultImage.id}
@@ -214,6 +225,8 @@ export default function UnsplashPanel({editor, source, imageUrl, setImageUrl}) {
                     margin="xx-small"
                   />
                 </div>
+                </Tooltip>
+
               ))}
           </div>
           {totalPages > 1 && results && Object.keys(results).length > 0 && (

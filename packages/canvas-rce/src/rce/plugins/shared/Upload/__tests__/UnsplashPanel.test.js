@@ -363,5 +363,34 @@ describe('UnsplashPanel', () => {
     })
     expect(imageSelectors[11]).toHaveFocus()
   });
+
   it.todo('selects an image when pressing spacebar')
+
+  describe('Attribution', () => {
+    it('shows attribution when an image has focus', async () => {
+      // TODO: Make this test more robust and better. Probably a good
+      // candidate to move to test cafe once we have it working again
+      const fakeResults = getSampleUnsplashResults()
+      const fakeSource = {
+        searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
+      }
+      const {getByLabelText, getByRole, getAllByRole, getByText} = render(
+        <UnsplashPanel source={fakeSource} />
+      )
+      const selectBox = getByLabelText('Search Term')
+      act(() => {
+        userEvent.click(selectBox)
+        userEvent.type(selectBox, 'kittens')
+      })
+      await wait(() => getByRole('radio'))
+      const imageSelectors = getAllByRole('radio')
+      act(() => {
+        userEvent.click(imageSelectors[0])
+      })
+      expect(getByText('Raul Varzar')).toBeInTheDocument();
+    })
+  })
+
+
+
 })
