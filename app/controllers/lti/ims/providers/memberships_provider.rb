@@ -86,6 +86,21 @@ module Lti::Ims::Providers
       controller.params[:rlid]
     end
 
+    def resource_link
+      return nil unless rlid?
+      @resource_link ||= begin
+        rl = Lti::ResourceLink.find_by(resource_link_id: rlid)
+        # context here is a decorated context, we want the original
+        if rl.present? && rl.current_external_tool(Lti::Ims::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
+          raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+            "Tool does not have acess to rlid #{rlid}",
+            api_message: 'Tool does not have acess to rlid or rlid does not exist'
+          )
+        end
+        rl
+      end
+    end
+
     def rlid?
       rlid.present?
     end
@@ -113,7 +128,7 @@ module Lti::Ims::Providers
         return nil unless rlid?
         Assignment.active.for_course(course.id).
           joins(line_items: :resource_link).
-          where(lti_resource_links: { resource_link_id: rlid, context_external_tool_id: tool.id }).
+          where(lti_resource_links: { id: resource_link&.id }).
           distinct.
           take
       end
