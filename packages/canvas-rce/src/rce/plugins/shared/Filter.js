@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {func, string} from 'prop-types'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import formatMessage from '../../../format-message'
 import {Select} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -69,7 +69,7 @@ export default function Filter(props) {
 
       {contentType === 'files' && (
         <Flex margin="small none none none">
-          <FlexItem grow shrink margin="none xx-small none none">
+          <Flex.Item grow shrink margin="none xx-small none none">
             <Select
               label={
                 <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
@@ -93,9 +93,9 @@ export default function Filter(props) {
 
               <option value="all">{formatMessage('All')}</option>
             </Select>
-          </FlexItem>
+          </Flex.Item>
 
-          <FlexItem grow shrink margin="none none none xx-small">
+          <Flex.Item grow shrink margin="none none none xx-small">
             <Select
               label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
               onChange={(e, selection) => {
@@ -109,7 +109,7 @@ export default function Filter(props) {
 
               <option value="date_published">{formatMessage('Date Published')}</option>
             </Select>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       )}
     </View>

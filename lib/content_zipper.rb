@@ -141,7 +141,7 @@ class ContentZipper
 
       index = rewrite_eportfolio_richtext_entry(index, rich_text_attachments, entry, zip_attachment.user)
 
-      static_attachments += entry.attachments
+      static_attachments += entry.attachments.select {|x| x.grants_right?(zip_attachment.user, :download)}
       submissions += entry.submissions
     end
 
@@ -358,8 +358,8 @@ class ContentZipper
     if entry.content.is_a?(Array) && entry.content.present?
       entry.content.select { |c| c.is_a?(Hash) && c[:section_type] == "rich_text" }.each do |rt|
         rt[:content].gsub!(StaticAttachment::FILES_REGEX) do |match|
-          att = Attachment.find_by_id(Regexp.last_match(:obj_id))
-          if att.nil? || !att.grants_right?(user, :read)
+          att = Attachment.find_by(id: Regexp.last_match(:obj_id))
+          if att.nil? || !att.grants_right?(user, :download)
             match
           else
             sa = StaticAttachment.new(att, index)
@@ -436,7 +436,8 @@ class ContentZipper
   end
 
   def get_filename(users_name, submission)
-    filename = [users_name, submission.late? ? 'LATE' : nil, submission.user_id].compact.join('_')
+    id = @assignment.anonymize_students? ? "anon_#{submission.anonymous_id}" : submission.user_id
+    filename = [users_name, submission.late? ? 'LATE' : nil, id].compact.join('_')
     sanitize_file_name(filename)
   end
 
@@ -456,7 +457,7 @@ class ContentZipper
   end
 
   def sanitize_file_name(filename)
-    filename.gsub(/[^[[:word:]]]/, '').downcase
+    filename.gsub(/[^[[:word:]]]/, '')
   end
 
   def sanitize_attachment_filename(filename)
@@ -468,6 +469,6 @@ class ContentZipper
     # ids when teachers upload graded submissions
     user_name.gsub!(/_(\d+)_/, '\1')
     user_name.gsub!(/^(\d+)$/, '\1')
-    user_name
+    user_name.downcase
   end
 end

@@ -8,7 +8,7 @@ FROM instructure/ruby-passenger:2.4-xenial
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
-ENV YARN_VERSION 1.15.2-1
+ENV YARN_VERSION 1.16.0-1
 
 # Work around github.com/zertosh/v8-compile-cache/issues/2
 # This can be removed once yarn pushes a release including the fixed version
@@ -39,7 +39,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
 
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.16.1 \
+  && gem install bundler --no-document -v 1.17.3 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 # We will need sfnt2woff in order to build fonts
@@ -61,6 +61,7 @@ COPY packages     ${APP_HOME}packages
 COPY script       ${APP_HOME}script
 COPY package.json ${APP_HOME}
 COPY yarn.lock    ${APP_HOME}
+COPY babel.config.js ${APP_HOME}
 RUN find gems packages -type d ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 # Install deps as docker to avoid sadness w/ npm lifecycle hooks
@@ -97,5 +98,7 @@ RUN mkdir -p .yardoc \
   && find ${APP_HOME} /home/docker ! -user docker -print0 | xargs -0 chown -h docker:docker
 
 USER docker
+# update Gemfile.lock in cases where a lock file was pulled in during the `COPY . $APP_HOME` step
+RUN bundle lock --update
 # TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
 RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets

@@ -90,9 +90,9 @@ body {
 
 #footer {
   .footer-logo {
-    @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 114px, 10px);
+    @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 114px, 16px);
     display: inline-block;
-    height: 10px;
+    height: 16px;
     margin: direction-sides(0 20px 0 0);
     width: 114px;
   }

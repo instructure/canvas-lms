@@ -67,38 +67,38 @@ module AccountReports::ReportHelper
   end
 
   def term
-    if (term_id = (@account_report.has_parameter? "enrollment_term_id") || (@account_report.has_parameter? "enrollment_term"))
+    if (term_id = @account_report.value_for_param("enrollment_term_id") || @account_report.value_for_param("enrollment_term"))
       @term ||= api_find(root_account.enrollment_terms, term_id)
     end
   end
 
   def start_at
-    if @account_report.has_parameter? "start_at"
+    if @account_report.value_for_param("start_at")
       @start ||= account_time_parse(@account_report.parameters["start_at"])
     end
   end
 
   def end_at
-    if @account_report.has_parameter? "end_at"
+    if @account_report.value_for_param("end_at")
       @end ||= account_time_parse(@account_report.parameters["end_at"])
     end
   end
 
   def course
-    if (course_id = (@account_report.has_parameter? "course_id") || (@account_report.has_parameter? "course"))
+    if (course_id = @account_report.value_for_param("course_id") || @account_report.value_for_param("course"))
       @course ||= api_find(root_account.all_courses, course_id)
     end
   end
 
   def assignment_group
-    if (assignment_group_id = (@account_report.has_parameter? "assignment_group_id") ||
-      (@account_report.has_parameter? "assignment_group"))
+    if (assignment_group_id = @account_report.value_for_param("assignment_group_id") ||
+      @account_report.value_for_param("assignment_group"))
       @assignment_group = course.assignment_groups.find(assignment_group_id)
     end
   end
 
   def section
-    if section_id = (@account_report.has_parameter? "section_id")
+    if section_id = @account_report.value_for_param("section_id")
       @section ||= api_find(root_account.course_sections, section_id)
     end
   end
@@ -196,14 +196,13 @@ module AccountReports::ReportHelper
   end
 
   def loaded_pseudonym(pseudonyms, user, include_deleted: false, enrollment: nil)
-    context = root_account
     user_pseudonyms = pseudonyms[user.id] || []
     user.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
     if enrollment&.sis_pseudonym_id
       enrollment_pseudonym = user_pseudonyms.index_by(&:id)[enrollment.sis_pseudonym_id]
-      return enrollment_pseudonym if enrollment_pseudonym
+      return enrollment_pseudonym if enrollment_pseudonym && (enrollment_pseudonym.workflow_state != 'deleted' || include_deleted)
     end
-    SisPseudonym.for(user, context, type: :trusted, require_sis: false, include_deleted: include_deleted, root_account: root_account)
+    SisPseudonym.for(user, root_account, type: :trusted, require_sis: false, include_deleted: include_deleted, root_account: root_account)
   end
 
   def preload_logins_for_users(users, include_deleted: false)
@@ -234,7 +233,7 @@ module AccountReports::ReportHelper
   end
 
   def include_deleted_objects
-    if @account_report.has_parameter? "include_deleted"
+    if @account_report.value_for_param "include_deleted"
       @include_deleted = value_to_boolean(@account_report.parameters["include_deleted"])
 
       if @include_deleted
@@ -249,7 +248,7 @@ module AccountReports::ReportHelper
 
   def send_report(file = nil, account_report = @account_report)
     type = report_title(account_report)
-    if account_report.has_parameter? "extra_text"
+    if account_report.value_for_param "extra_text"
       options = account_report.parameters["extra_text"]
     end
     AccountReports.message_recipient(
@@ -362,15 +361,16 @@ module AccountReports::ReportHelper
       self.fail_with_error(e)
     ensure
       update_parallel_progress(account_report: @account_report,report_runner: report_runner)
-      if last_account_report_runner?(@account_report)
-        write_report headers do |csv|
-          @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each {|record| csv << record.row}
-        end
-        # total lines was used to track progress but was not accurate.
-        @account_report.update_attributes(total_lines: @account_report.current_line)
-        @account_report.delete_account_report_rows
-      end
+      compile_parallel_report(headers) if last_account_report_runner?(@account_report)
     end
+  end
+
+  def compile_parallel_report(headers)
+    @account_report.update_attributes(total_lines: @account_report.account_report_rows.count + 1)
+    write_report headers do |csv|
+      @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each { |record| csv << record.row }
+    end
+    @account_report.delete_account_report_rows
   end
 
   def fail_with_error(error)
@@ -461,7 +461,7 @@ module AccountReports::ReportHelper
   end
 
   def add_extra_text(text)
-    if @account_report.has_parameter?('extra_text')
+    if @account_report.value_for_param('extra_text')
       @account_report.parameters["extra_text"] << " #{text}"
     else
       @account_report.parameters["extra_text"] = text

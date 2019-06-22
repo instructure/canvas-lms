@@ -398,4 +398,13 @@ Canvas::Plugin.register('inst_fs', nil, {
   :settings => nil,
   :settings_partial => 'plugins/inst_fs_settings'
 })
+Canvas::Plugin.register('unsplash', nil, {
+  name: lambda{ t :name, 'Unsplash' },
+  description: lambda{ t :description, 'Unsplash image search service' },
+  author: 'Unsplash',
+  author_website: 'https://unsplash.com/documentation',
+  version: '1.0.0',
+  settings: { access_key: nil },
+  settings_partial: 'plugins/unsplash_settings'
+})
 require_dependency 'canvas/plugins/address_book'

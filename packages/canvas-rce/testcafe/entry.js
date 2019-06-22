@@ -19,7 +19,7 @@
 // import React from 'react'
 // import ReactDOM from 'react-dom'
 
-import '@instructure/ui-themes/lib/canvas'
+import '@instructure/canvas-theme'
 
 import {renderIntoDiv} from '../src'
 
@@ -27,8 +27,24 @@ renderIntoDiv(document.getElementById('content'), {
   textareaId: 'textarea',
   editorOptions: () => {
     return {
-      plugins:
-        'instructure-ui-icons, instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table, lists, instructure_condensed_buttons',
+      plugins: [
+        'autolink',
+        'media',
+        'paste',
+        'table',
+        'link',
+        'directionality',
+        'lists',
+        'wordcount',
+        'instructure-ui-icons',
+        'instructure_equation',
+        'instructure_image',
+        'instructure_equella',
+        'instructure_external_tools',
+        'instructure_record',
+        'instructure_links',
+        'instructure_condensed_buttons'
+      ],
       menubar: true
     }
   }

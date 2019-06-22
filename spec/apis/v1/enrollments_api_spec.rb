@@ -846,6 +846,21 @@ describe EnrollmentsApiController, type: :request do
           expect(response).not_to be_ok
         end
 
+        it "excludes soft-concluded courses when using state[]=invited or active" do
+          course0 = @course
+
+          course_with_student user: @student, enrollment_state: 'invited', active_course: true
+          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w(invited active))
+          expect(json.map { |e| e['course_id'] }).to match_array [course0.id, @course.id]
+
+          @course.start_at = 1.month.ago
+          @course.conclude_at = 1.week.ago
+          @course.restrict_enrollments_to_course_dates = true
+          @course.save!
+          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w(invited active))
+          expect(json.map { |e| e['course_id'] }).to match_array [course0.id]
+        end
+
         describe "grade summary" do
           let!(:grade_assignments) do
             first     = @course.assignments.create! due_at: 1.month.ago

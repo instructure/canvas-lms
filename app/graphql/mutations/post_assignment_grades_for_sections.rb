@@ -42,7 +42,7 @@ class Mutations::PostAssignmentGradesForSections < Mutations::BaseMutation
     unless assignment.grades_published?
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be posted by section before grades are published"
     end
-    raise GraphQL::ExecutionError, "Anonymous assignments cannot be posted by section" if assignment.anonymize_students?
+    raise GraphQL::ExecutionError, "Anonymous assignments cannot be posted by section" if assignment.anonymous_grading?
 
     if sections.empty? || sections.count != input[:section_ids].size
       raise GraphQL::ExecutionError, "Invalid section ids"

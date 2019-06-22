@@ -54,6 +54,21 @@ module Types
     field :_id, ID, 'legacy canvas id', method: :id, null: false
     global_id_field :id
 
+    field :attachments, [Types::FileType], null: true
+    def attachments
+      load_association(:attachment_associations).then do |associations|
+        Loaders::IDLoader.for(Attachment).load_many(associations.map(&:attachment_id))
+      end
+    end
+
+    field :submission_draft, Types::SubmissionDraftType, null: true
+    def submission_draft
+      load_association(:submission_drafts).then do |drafts|
+        # Submission.attempt can be in either 0 or nil which mean the same thing
+        drafts.select { |draft| draft.submission_attempt == (object.attempt || 0) }.first
+      end
+    end
+
     field :submission_histories_connection, SubmissionHistoryConnection, null: true, connection: true
     def submission_histories_connection
       # There is not a version saved for submission attempt zero, so we fake it

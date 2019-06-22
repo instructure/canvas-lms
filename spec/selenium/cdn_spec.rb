@@ -77,11 +77,13 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
     assert_tag('link', 'href', url)
   end
 
-  def check_asset(tag, asset_path)
-    revved_path = Canvas::Cdn::RevManifest.url_for(asset_path)
-    expect(revved_path).to be_present
+  def check_asset(tag, asset_path, skip_rev=false)
+    unless skip_rev
+      asset_path = Canvas::Cdn::RevManifest.url_for(asset_path)
+      expect(asset_path).to be_present
+    end
     attribute = (tag == 'link') ? 'href' : 'src'
-    url = "#{EXAMPLE_CDN_HOST}#{revved_path}"
+    url = "#{EXAMPLE_CDN_HOST}#{asset_path}"
     assert_tag(tag, attribute, url)
   end
 
@@ -93,14 +95,10 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
     ['images/favicon-yellow.ico', 'images/apple-touch-icon.png'].each { |i| check_asset('link', i) }
     optimized_js_flag = ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
     js_base_url = optimized_js_flag ? '/dist/webpack-production' : '/dist/webpack-dev'
-    expected_js_bundles = [
-      "#{js_base_url}/vendor.js",
-      '/timezone/Etc/UTC.js',
-      '/timezone/en_US.js',
-      "#{js_base_url}/appBootstrap.js",
-      "#{js_base_url}/common.js",
-      "#{js_base_url}/login.js"
-    ]
-    expected_js_bundles.each { |s| check_asset('script', s) }
+
+    check_asset('script', '/timezone/Etc/UTC.js')
+    check_asset('script', '/timezone/en_US.js')
+    Canvas::Cdn::RevManifest.all_webpack_chunks_for('main').each { |c| check_asset('script', "#{js_base_url}/#{c}", true) }
+    Canvas::Cdn::RevManifest.all_webpack_chunks_for('login').each { |c| check_asset('link', "#{js_base_url}/#{c}", true) }
   end
 end

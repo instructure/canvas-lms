@@ -88,11 +88,11 @@ export default class EntryCollectionView extends View
     @nestEntries()
 
   nestEntries: ->
+    directionToPad = if isRTL() then 'right' else 'left'
     $('.entry-content[data-should-position]').each ->
       $el    = $(this)
       level = $el.parents('li.entry').length
       offset = (level - 1) * 30
-      directionToPad = if isRTL(this) then 'right' else 'left'
       $el.css("padding-#{directionToPad}", offset).removeAttr('data-should-position')
       $el.find('.discussion-title').attr
         'role': 'heading'

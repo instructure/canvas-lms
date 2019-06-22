@@ -732,7 +732,7 @@ CanvasRails::Application.routes.draw do
   get 'grades_for_student' => 'users#grades_for_student'
 
   get 'login' => 'login#new'
-  get 'login/session_token' => 'login#session_token'
+  get 'login/session_token' => 'login#session_token', as: :login_session_token
   delete 'logout' => 'login#destroy'
   get 'logout' => 'login#logout_landing'
 
@@ -1607,6 +1607,11 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/developer_keys', action: :create
     end
 
+    scope(controller: :internet_image) do
+      get 'image_search', action: :image_search
+      post 'image_selection/:id', action: :image_selection
+    end
+
     scope(controller: :search) do
       get 'search/rubrics', action: 'rubrics', as: 'search_rubrics'
       get 'search/recipients', action: 'recipients', as: 'search_recipients'
@@ -2180,6 +2185,10 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/csp_settings/domains/batch_create", :action => :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
       get "accounts/:account_id/csp_log", action: :csp_log
+    end
+
+    scope(:controller => :context) do
+      post 'media_objects', action: 'create_media_object', as: :create_media_object
     end
   end
 

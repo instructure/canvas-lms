@@ -176,18 +176,17 @@ describe "assignments" do
         due_at = format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
-        #create assignment
+        # create assignment
         wait_for_new_page_load { f(".new_assignment").click }
         f('#assignment_name').send_keys(assignment_name)
         f('#assignment_points_possible').send_keys('10')
         ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
           f(element).click
         end
-        replace_content(f('.DueDateInput'), due_at)
-
+        f('.DueDateInput').send_keys(due_at)
 
         submit_assignment_form
-        #confirm all our settings were saved and are now displayed
+        # confirm all our settings were saved and are now displayed
         expect(f('h1.title')).to include_text(assignment_name)
         expect(f('#assignment_show .points_possible')).to include_text('10')
         expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')

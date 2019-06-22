@@ -25,10 +25,10 @@ import PresentationContent from '@instructure/ui-a11y/lib/components/Presentatio
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import View from '@instructure/ui-layout/lib/components/View'
-import DeveloperKeyScopesGroup from './ScopesGroup'
-import DeveloperKeyScopesMethod from './ScopesMethod'
+import ScopesGroup from './ScopesGroup'
+import ScopesMethod from './ScopesMethod'
 
-export default class DeveloperKeyScopesList extends React.Component {
+export default class ScopesList extends React.Component {
   constructor(props) {
     super(props)
     const formattedScopesArray = Object.keys(this.props.availableScopes).map(k => ({
@@ -137,7 +137,7 @@ export default class DeveloperKeyScopesList extends React.Component {
                       <Text size="medium" weight="bold">
                         {I18n.t('Read only')}
                       </Text>
-                      <DeveloperKeyScopesMethod method="get" margin="none small none small" />
+                      <ScopesMethod method="get" margin="none small none small" />
                     </PresentationContent>
                   </FlexItem>
                 </Flex>
@@ -155,7 +155,7 @@ export default class DeveloperKeyScopesList extends React.Component {
                         width="100%"
                         key={`${key}-scope-group`}
                       >
-                        <DeveloperKeyScopesGroup
+                        <ScopesGroup
                           scopes={this.props.availableScopes[key]}
                           name={key}
                           selectedScopes={this.state.selectedScopes}
@@ -175,7 +175,7 @@ export default class DeveloperKeyScopesList extends React.Component {
   }
 }
 
-DeveloperKeyScopesList.propTypes = {
+ScopesList.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   availableScopes: PropTypes.objectOf(
@@ -190,6 +190,6 @@ DeveloperKeyScopesList.propTypes = {
   selectedScopes: PropTypes.arrayOf(PropTypes.string)
 }
 
-DeveloperKeyScopesList.defaultProps = {
+ScopesList.defaultProps = {
   selectedScopes: []
 }

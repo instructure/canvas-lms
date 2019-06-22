@@ -11,7 +11,7 @@
     <h4><%= sort_by_content ? I18n.t("Course Content") : I18n.t("Course Modules") %></h4>
     <hr/>
     <% content.each do |resource| %>
-      <h3><a href="<%= "#{resource[:reference]}.xhtml" %>"><%= "#{resource[:title]}" %></a></h3>
+      <h3><a href="<%= "#{resource[:reference]}.xhtml" %>"><%= "#{HtmlTextHelper.escape_html(resource[:title])}" %></a></h3>
       <ol>
         <% resource[:resource_content].each do |resource_item| %>
           <li>

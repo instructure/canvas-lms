@@ -34,7 +34,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
 
     context = {
       assignment: {
-        anonymizeStudents: false,
+        anonymousGrading: false,
         gradesPublished: true,
         id: '2301',
         name: 'Math 1.1'
@@ -164,6 +164,15 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       await waitForTrayClosed()
       notOk(getTrayElement())
     })
+
+    test('calls optional onExited', async () => {
+      await show()
+      await waitForElement(getTrayElement)
+      getCloseIconButton().click()
+      await waitForTrayClosed()
+      const {callCount} = context.onExited
+      strictEqual(callCount, 1)
+    })
   })
 
   QUnit.module('"Specific Sections" toggle', hooks => {
@@ -199,6 +208,15 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       getCloseButton().click()
       await waitForTrayClosed()
       notOk(getTrayElement())
+    })
+
+    test('calls optional onExited', async () => {
+      await show()
+      await waitForElement(getTrayElement)
+      getCloseButton().click()
+      await waitForTrayClosed()
+      const {callCount} = context.onExited
+      strictEqual(callCount, 1)
     })
   })
 
@@ -357,7 +375,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       })
 
       test('is disabled when assignment is anonymously graded', async () => {
-        context.assignment.anonymizeStudents = true
+        context.assignment.anonymousGrading = true
         await show()
         strictEqual(getSectionToggleInput().disabled, true)
       })

@@ -64,13 +64,13 @@ class DueDateCacher
     self.executing_users.last
   end
 
-  INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
+  INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT.freeze
     CASE
-    WHEN grade IS NOT NULL OR excused IS TRUE THEN
+    WHEN submissions.grade IS NOT NULL OR submissions.excused IS TRUE THEN
       'graded'
-    WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
+    WHEN submissions.submission_type = 'online_quiz' AND submissions.quiz_submission_id IS NOT NULL THEN
       'pending_review'
-    WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
+    WHEN submissions.submission_type IS NOT NULL AND submissions.submitted_at IS NOT NULL THEN
       'submitted'
     ELSE
       'unsubmitted'
@@ -202,6 +202,7 @@ class DueDateCacher
             submission_scope.where(user_id: deletable_student_ids_chunk).
               update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
+          User.clear_cache_keys(deletable_student_ids, :submissions)
         end
       end
 
@@ -213,6 +214,7 @@ class DueDateCacher
             where(assignment_id: assignment_ids_slice, user_id: student_slice).
             update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         end
+        User.clear_cache_keys(student_slice, :submissions)
       end
 
       return if values.empty?
@@ -232,27 +234,6 @@ class DueDateCacher
 
         # Construct upsert statement to update existing Submissions or create them if needed.
         query = <<~SQL
-          UPDATE #{Submission.quoted_table_name}
-            SET
-              cached_due_date = vals.due_date::timestamptz,
-              grading_period_id = vals.grading_period_id::integer,
-              workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
-                #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
-              )),
-              anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
-              updated_at = now() AT TIME ZONE 'UTC'
-            FROM (VALUES #{batch_values.join(',')})
-              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id)
-            WHERE submissions.user_id = vals.student_id AND
-                  submissions.assignment_id = vals.assignment_id AND
-                  (
-                    (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR
-                    (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR
-                    (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
-                      (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
-                    )) OR
-                    (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id))
-                  );
           INSERT INTO #{Submission.quoted_table_name}
             (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, process_attempts,
             cached_due_date, grading_period_id, anonymous_id)
@@ -268,7 +249,22 @@ class DueDateCacher
             LEFT OUTER JOIN #{Submission.quoted_table_name} submissions
               ON submissions.assignment_id = assignments.id
               AND submissions.user_id = vals.student_id
-            WHERE submissions.id IS NULL;
+          ON CONFLICT (user_id, assignment_id)
+          DO UPDATE SET
+              cached_due_date = excluded.cached_due_date,
+              grading_period_id = excluded.grading_period_id,
+              workflow_state =  COALESCE(NULLIF(submissions.workflow_state, 'deleted'), (
+                  #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
+                )),
+              anonymous_id = COALESCE(submissions.anonymous_id, excluded.anonymous_id),
+              updated_at = excluded.updated_at
+            WHERE
+              (submissions.cached_due_date IS DISTINCT FROM excluded.cached_due_date) OR
+              (submissions.grading_period_id IS DISTINCT FROM excluded.grading_period_id) OR
+              (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
+                (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
+               )) OR
+              (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, excluded.anonymous_id))
         SQL
 
         Assignment.connection.execute(query)
@@ -280,6 +276,7 @@ class DueDateCacher
           previous_cached_dates: cached_due_dates_by_submission
         )
       end
+      User.clear_cache_keys(values.map{|v| v[1]}, :submissions)
     end
 
     if @update_grades

@@ -43,6 +43,7 @@ if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN)
   }).install()
 
   const setupRavenConsoleLoggingPlugin = require('../jsx/shared/helpers/setupRavenConsoleLoggingPlugin')
+    .default
   setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console'})
 }
 
@@ -67,7 +68,7 @@ if (ENV.use_high_contrast) {
   })
 }
 
-/*#__PURE__*/ if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
+/* #__PURE__ */ if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
   // This is for the `wait_for_ajax_requests` method in selenium
   window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__ = 0
   const send = XMLHttpRequest.prototype.send

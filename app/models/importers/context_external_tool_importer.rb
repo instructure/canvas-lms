@@ -66,6 +66,7 @@ module Importers
       item.not_selectable = hash[:not_selectable] if hash[:not_selectable]
       item.consumer_key ||= hash[:consumer_key] || 'fake'
       item.shared_secret ||= hash[:shared_secret] || 'fake'
+      item.developer_key_id ||= hash.dig(:settings, :client_id)
       item.settings = create_tool_settings(hash)
       if hash[:custom_fields].is_a? Hash
         item.settings[:custom_fields] ||= {}

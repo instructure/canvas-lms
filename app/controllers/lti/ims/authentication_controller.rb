@@ -138,11 +138,19 @@ module Lti
 
       def redirect_uri
         @redirect_uri ||= begin
-          requested_redirect_base = oidc_params[:redirect_uri].split('?').first
-
-          unless developer_key.redirect_uris.include? requested_redirect_base
-            reject! 'Invalid redirect_uri' and return
+          requested_redirect_base, requested_query_string = oidc_params[:redirect_uri].split('?')
+          is_valid = developer_key.redirect_uris.any? do |uri|
+            if uri.include? '?'
+              # Verify the required query params are present
+              required_params = CGI.parse(uri.split('?').last).to_a
+              requested_params = CGI.parse(requested_query_string).to_a
+              (required_params - requested_params).empty?
+            else
+              uri == requested_redirect_base
+            end
           end
+
+          reject! 'Invalid redirect_uri' and return unless is_valid
 
           oidc_params[:redirect_uri]
         end

@@ -148,6 +148,12 @@ QUnit.module('SubmissionTrayRadioInput', function(hooks) {
       strictEqual(numberInput().props().disabled, true)
     })
 
+    test('renders NumberInput when value is changed to "late"', function() {
+      wrapper = mountComponent({value: 'late', checked: false})
+      radioInput().simulate('change', {target: {checked: true}})
+      strictEqual(numberInput().length, 1)
+    })
+
     test('the text next to the input reads "Day(s)" if the late policy interval is "day"', function() {
       wrapper = mountComponent({value: 'late', checked: true})
       strictEqual(numberInputDescription(), 'Days lateDay(s)')

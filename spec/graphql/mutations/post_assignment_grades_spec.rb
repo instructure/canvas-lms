@@ -156,6 +156,7 @@ describe Mutations::PostAssignmentGrades do
 
   describe "graded_only" do
     let(:context) { { current_user: teacher } }
+    let(:post_submissions_job) { Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last }
     let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
 
     before(:each) do
@@ -164,30 +165,33 @@ describe Mutations::PostAssignmentGrades do
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
+    it "returns an error when assignment is anonymous and posting by graded only" do
+      assignment.update!(anonymous_grading: true)
+      result = execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
+      expected_error = "Anonymous assignments cannot be posted by graded only"
+      expect(result.dig("errors", 0, "message")).to eql expected_error
+    end
+
     it "posts the graded submissions if graded_only is true" do
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
-      post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
       post_submissions_job.invoke_job
       expect(@student1_submission.reload).to be_posted
     end
 
     it "does not post the ungraded submissions if graded_only is true" do
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
-      post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
       post_submissions_job.invoke_job
       expect(@student2_submission.reload).not_to be_posted
     end
 
     it "posts all the submissions if graded_only is false" do
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: false), context)
-      post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
       post_submissions_job.invoke_job
       expect(assignment.submissions).to all(be_posted)
     end
 
     it "posts all the submissions if graded_only is not present" do
       execute_query(mutation_str(assignment_id: assignment.id), context)
-      post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
       post_submissions_job.invoke_job
       expect(assignment.submissions).to all(be_posted)
     end

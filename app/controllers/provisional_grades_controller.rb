@@ -273,7 +273,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     # suspended when publishing grades to avoid multiple calls to the
     # GradeCalculator, so instead the call is made here.
     @context.recompute_student_scores(graded_users_ids)
-    @context.touch_admins_later # just in case nothing got published
+    @context.clear_todo_list_cache_later(:admins) # just in case nothing got published
     @assignment.updating_user = @current_user
     @assignment.update_attribute(:grades_published_at, Time.now.utc)
     render :json => { :message => "OK" }

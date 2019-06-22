@@ -451,7 +451,7 @@ tr:
         consortium_autocreate_web_of_trust: "Yeni hesaplar oluştururken otomatik olarak bir güven ağı oluştur"
         consortium_can_create_own_accounts: "Konsorsiyum yöneticileri yeni root hesaplar oluşturabilir"
         consortium_parent_account: "Konsorsiyum üst hesabı"
-        shard_per_account: "Her yeni root hesabı için yeni bir parça oluştur"
+        shard_per_account: "Her yeni kök hesabı için yeni bir parça oluştur"
       license: Lisans
       license_type: "Lisans Türü"
       new_account_domain_title: "Yeni Hesap Alan Adı"
@@ -5659,7 +5659,7 @@ tr:
       course_overrides_term: "Herhangi bir dönem hazır ayarının üzerine yazılacaktır."
       course_settings_title: "Ders Ayarları"
       deatils: 
-        move_course: "Bu ders için yeni bir root hesabı seçin. Dersi taşıdıktan sonra bu ders için yeni bir bölüm belirtmek isteyebilirsiniz."
+        move_course: "Bu ders için yeni bir kök hesabı seçin. Dersi taşıdıktan sonra bu ders için yeni bir bölüm belirtmek isteyebilirsiniz."
       drag_details: "Çoğu sayfanın etkisizleştirilmesi bu sayfayı ziyaret eden öğrencilerin dersin ana sayfasına yönlendirilmesine neden olacaktır."
       drag_to_hide: "Öğrencilerden gizlemek için öğeleri buraya sürükleyin."
       enrollment_count: 
@@ -5722,8 +5722,8 @@ tr:
         restrict_enrollments_to_course_dates: "Öğrenciler derse yalnızca bu tarihler arasında katılabilirler"
         restrict_student_future_view: "Başlangıç tarihinden önce öğrencilerin bu dersi görmesine izin verme"
         restrict_student_past_view: "Bitiş tarihinden sonra öğrencilerin bu dersi görmesine izin verme"
-        root_account: "Root Hesabı"
-        root_account_id: "Root Hesabı"
+        root_account: "Kök Hesabı"
+        root_account_id: "Kök Hesabı"
         show_announcements_on_home_page: "Canvas ana sayfasında en son duyuruları göster"
         sis_source_id: "ÖBS ID"
         start_at: Başlangıç
@@ -6574,7 +6574,7 @@ tr:
       sort_by_likes: "Beğenme durumuna göre sırala"
       topic_title: "Konu Başlığı"
       until: "Şu zamana kadar"
-      use_for_grading: Değerlendirildi
+      use_for_grading: Notlandırmalı
       users_must_post_before_seeing_replies: "Kullanıcılar cevapları görmeden önce gönderi yapmalıdırlar"
     entry: 
       authors_name: "Yazar adı"
@@ -6939,7 +6939,7 @@ tr:
     one: "Şunun için izinleri düzenle: %{itemName}"
     other: "%{count} öğe için izinleri düzenle"
   edit_quiz_ededddd8: "Kısa Sınavı Düzenle"
-  edit_rating_c2ac31e5: "Oyları düzenle"
+  edit_rating_c2ac31e5: "Dereceyi düzenle"
   edit_role_1e96ad20: "Rolü Düzenle"
   edit_rubric: 
     buttons: 
@@ -6960,7 +6960,7 @@ tr:
       read_only_rubric: "İzniniz olmadığı ya da birden fazla yerde kullanıldığı için bu yönergeyi düzenleyemezsiniz. Yapacağınız değişiklikler eski yönergeyi baz alan yeni bir yönerge oluşturacaktır. Devam etmek istiyor musunuz?"
     titles: 
       criterion_long_description: "Kriterin Uzun Açıklaması"
-      edit_rubric_rating: "Oyları Düzenle"
+      edit_rubric_rating: "Dereceyi Düzenle"
       find_existing_rubric: "Varolan Denetim Listesi Bul"
   edit_survey_b0d6890d: "Anketi Düzenle"
   edit_this_announcement_ae6e17b3: "Bu Duyuruyu Düzenle"
@@ -7056,6 +7056,7 @@ tr:
   ember_modules_description: "Ember'de yeniden yazılan Modüller. Harici konumlardan sürüklemeyi etkinleştirmek için gömülü sürükle bırak API'sini kullanır."
   enable_6f5d1328: Etkinleştir
   enable_and_lock_e6099cc2: "Aktif ve Kilitli"
+  enable_course_as_a_blueprint_course_8515ffd5: "Dersi şablon ders olarak etkinleştir."
   enable_dashboard_images_for_courses_5af458b0: "Dersler için Yönetim Paneli Görsellerini Etkinleştir"
   enable_feature_title_987d8e9a: "Şu özelliği etkinleştir: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Öğrencileri Not Defterinde sıralanmış isimleri ile listeleyin. Sıralanmış isimler varsayılan olarak 'Soy adı, Adı' şeklindedir fakat ayarlarda değiştirilebilir."
@@ -9050,6 +9051,7 @@ tr:
   html5_first_videos_description: |-
       Varsayılan olarak, Canvas videoları oynatmak için önce Flash'ı deneyecek. Önce HTML5'i
       kullanıp sonra Flash'a dönmek için bu seçeneği etkinleştirin.
+  html5_media_recorder_in_rce_bb59b78f: "Zengin Metin Editöründe HTML5 Medya Kaydedici"
   html_editor_fb2ab713: "HTML Düzenleyici"
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "*Kullanım şartları* ve **gizlilik politikasını** Kabul Ediyorum."
   i_cb2f5130: i
@@ -12335,6 +12337,7 @@ tr:
     confirm: 
       delete: "Silmek istediğinize emin misiniz?"
       import_group: "\"%{group}\" grubunu \"%{target}\" grubuna aktarsın mı ? "
+      import_outcome: "\"%{outcome}\" öğrenme çıktısı \"%{outcome}\" grubuna aktarılsın mı?"
     criteria: 
       does_not_meet_expectations: "Beklentileri Karşılamıyor"
       exceeds_expectations: "Beklentilerin Üstünde"
@@ -15279,6 +15282,8 @@ tr:
     enrollments_teachers: Öğretmenler
     student_groups: "Öğrenci Grupları"
   search_280d00bd: Ara
+  search_by_title_or_author_273a8f49: "Başlık veya yazara göre ara"
+  search_by_title_short_name_or_sis_id_fe84aa12: "Başlık, kısa ad ya da ÖBS ID'ye göre ara"
   search_by_user_dd3ad189: "Kullanıcıya göre ara"
   search_entries_or_author_63fb0a86: "Girdi ya da yazar arayın"
   search_for_files_7541fb28: "Dosyaları ara"
@@ -15369,6 +15374,7 @@ tr:
         current_enrollments: "Varolan Kayıtlar"
         decrosslist_section: "Bu Bölümü Çarpraz Listeden Kaldır"
   see_rubric_results_62a6447d: "Değerlendirme listesi sonuçlarına bak"
+  see_some_lti_tools_that_work_great_with_canvas_53e92091: "Canvas ile sorunsuz çalışan bazı Harici Araçlar"
   select_content: "İçerik Seçiniz"
   select_content_checkbox: 
     select_content_error: "Bir içerik seçeneği seçmelisiniz"

@@ -26,6 +26,7 @@ class GradebookUserIds
     @sort_by = settings[:sort_rows_by_setting_key] || "name"
     @selected_grading_period_id = settings.dig(:filter_columns_by, :grading_period_id)
     @selected_section_id = settings.dig(:filter_rows_by, :section_id)
+    @selected_student_group_id = settings.dig(:filter_rows_by, :student_group_id)
     @direction = settings[:sort_rows_by_direction] || "ascending"
   end
 
@@ -141,7 +142,14 @@ class GradebookUserIds
   end
 
   def students
-    User.left_joins(:enrollments).merge(student_enrollments_scope)
+    students = User.left_joins(:enrollments).merge(student_enrollments_scope)
+
+    if student_group_id.present?
+      students.joins(group_memberships: :group).
+        where(group_memberships: {group: student_group_id, workflow_state: :accepted})
+    else
+      students
+    end
   end
 
   def sort_by_scores(type = :total_grade, id = nil)
@@ -194,7 +202,12 @@ class GradebookUserIds
   end
 
   def section_id
-    return nil if @selected_section_id.nil? || @selected_section_id == "null" || @section_section_id == "0"
+    return nil if @selected_section_id.nil? || @selected_section_id == "null" || @selected_section_id == "0"
     @selected_section_id
+  end
+
+  def student_group_id
+    return nil if @selected_student_group_id.nil? || ["0", "null"].include?(@selected_student_group_id)
+    @selected_student_group_id
   end
 end

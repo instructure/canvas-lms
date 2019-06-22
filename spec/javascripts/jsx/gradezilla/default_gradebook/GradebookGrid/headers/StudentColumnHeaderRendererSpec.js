@@ -179,6 +179,23 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       strictEqual(component.props.sectionsEnabled, false)
     })
 
+    test('sets studentGroupsEnabled to true when student groups are present', () => {
+      gradebook.setStudentGroups([
+        {
+          groups: [{id: '1', name: 'Default Group 1'}, {id: '2', name: 'Default Group 2'}],
+          id: '1',
+          name: 'Default Group'
+        }
+      ])
+      render()
+      strictEqual(component.props.studentGroupsEnabled, true)
+    })
+
+    test('sets studentGroupsEnabled to false when student groups are not present', () => {
+      render()
+      strictEqual(component.props.studentGroupsEnabled, false)
+    })
+
     test('includes the selected enrollment filters', () => {
       gradebook.toggleEnrollmentFilter('concluded')
       render()

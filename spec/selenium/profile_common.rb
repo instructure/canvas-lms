@@ -60,6 +60,7 @@ shared_examples 'user settings page change pic window' do |context|
   include SharedExamplesCommon
 
   it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+    skip('ADMIN-2680')
     enable_avatars(true)
     get '/profile/settings'
 

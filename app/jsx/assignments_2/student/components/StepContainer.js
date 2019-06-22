@@ -16,17 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import {bool} from 'prop-types'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2_student_header_date_title'
-import {StudentAssignmentShape} from '../assignmentData'
-import Text from '@instructure/ui-elements/lib/components/Text'
-
 import React from 'react'
 import StepItem from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 function renderCollapsedContainer(step) {
   return (
@@ -34,6 +33,10 @@ function renderCollapsedContainer(step) {
       <Text weight="bold">{step}</Text>
     </div>
   )
+}
+
+function allowNextAttempt(assignment, submission) {
+  return assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts
 }
 
 function availableStepContainer(props) {
@@ -57,7 +60,7 @@ availableStepContainer.propTypes = {
 function unavailableStepContainer(props) {
   return (
     <div className="steps-container" data-testid="unavailable-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Unvailable'))}
+      {props.isCollapsed && renderCollapsedContainer(I18n.t('Unavailable'))}
       <Steps isCollapsed={props.isCollapsed}>
         <StepItem label={I18n.t('Unavailable')} status="unavailable" />
         <StepItem label={I18n.t('Upload')} />
@@ -69,6 +72,24 @@ function unavailableStepContainer(props) {
 }
 
 unavailableStepContainer.propTypes = {
+  isCollapsed: bool
+}
+
+function uploadedStepContainer(props) {
+  return (
+    <div className="steps-container" data-testid="uploaded-step-container">
+      {props.isCollapsed && renderCollapsedContainer(I18n.t('Uploaded'))}
+      <Steps isCollapsed={props.isCollapsed}>
+        <StepItem label={I18n.t('Available')} status="complete" />
+        <StepItem label={I18n.t('Uploaded')} status="complete" />
+        <StepItem label={I18n.t('Submit')} status="in-progress" />
+        <StepItem label={I18n.t('Not Graded Yet')} />
+      </Steps>
+    </div>
+  )
+}
+
+uploadedStepContainer.propTypes = {
   isCollapsed: bool
 }
 
@@ -86,7 +107,7 @@ function submittedStepContainer(props) {
               <FlexItem>
                 <FriendlyDatetime
                   format={I18n.t('#date.formats.full')}
-                  dateTime={props.assignment.submissionsConnection.nodes[0].submittedAt}
+                  dateTime={props.submission.submittedAt}
                 />
               </FlexItem>
             </Flex>
@@ -94,14 +115,18 @@ function submittedStepContainer(props) {
           status="complete"
         />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
+          <StepItem label={I18n.t('New Attempt')} status="button" />
+        ) : null}
       </Steps>
     </div>
   )
 }
 
 submittedStepContainer.propTypes = {
-  assignment: StudentAssignmentShape,
-  isCollapsed: bool
+  assignment: AssignmentShape,
+  isCollapsed: bool,
+  submission: SubmissionShape
 }
 
 function gradedStepContainer(props) {
@@ -118,7 +143,7 @@ function gradedStepContainer(props) {
               <FlexItem>
                 <FriendlyDatetime
                   format={I18n.t('#date.formats.full')}
-                  dateTime={props.assignment.submissionsConnection.nodes[0].submittedAt}
+                  dateTime={props.submission.submittedAt}
                 />
               </FlexItem>
             </Flex>
@@ -134,41 +159,50 @@ function gradedStepContainer(props) {
                   displaySize="small"
                   gradingType={props.assignment.gradingType}
                   pointsPossible={props.assignment.pointsPossible}
-                  receivedGrade={props.assignment.submissionsConnection.nodes[0].grade}
+                  receivedGrade={props.submission.grade}
                 />
               </FlexItem>
             </Flex>
           }
           status="complete"
         />
+        {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
+          <StepItem label={I18n.t('New Attempt')} status="button" />
+        ) : null}
       </Steps>
     </div>
   )
 }
 
+// TODO: We are calling this as a function, not through jsx. Lets make sure
+//       the propType validations properly that way. If not we need to remove
+//       these or actually using jsx to call them.
 gradedStepContainer.propTypes = {
-  assignment: StudentAssignmentShape,
-  isCollapsed: bool
+  assignment: AssignmentShape,
+  isCollapsed: bool,
+  submission: SubmissionShape
 }
 
 function StepContainer(props) {
-  const {assignment, isCollapsed, forceLockStatus} = props
-
-  // TODO: render the step-container based on the actual assignment data.
+  const {assignment, submission, isCollapsed, forceLockStatus} = props
   if (forceLockStatus || assignment.lockInfo.isLocked) {
     return unavailableStepContainer({isCollapsed})
-  } else if (assignment.submissionsConnection.nodes[0].state === 'graded') {
-    return gradedStepContainer({isCollapsed, assignment})
-  } else if (assignment.submissionsConnection.nodes[0].state === 'submitted') {
-    return submittedStepContainer({isCollapsed, assignment})
+  } else if (submission.state === 'graded') {
+    return gradedStepContainer({isCollapsed, assignment, submission})
+  } else if (submission.state === 'submitted') {
+    return submittedStepContainer({isCollapsed, assignment, submission})
+  } else if (submission.submissionDraft) {
+    return uploadedStepContainer({isCollapsed})
   } else {
     return availableStepContainer({isCollapsed})
   }
 }
 
 StepContainer.propTypes = {
-  assignment: StudentAssignmentShape,
-  forceLockStatus: bool
+  assignment: AssignmentShape,
+  forceLockStatus: bool,
+  isCollapsed: bool,
+  submission: SubmissionShape
 }
 
 export default React.memo(StepContainer)

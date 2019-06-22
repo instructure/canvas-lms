@@ -3924,7 +3924,7 @@ describe 'Submissions API', type: :request do
         it "returns upload_params" do
           upload_json = {
             "filename" => nil,
-            "content_type" => "unknown/unknown",
+            "content_type" => nil,
             "target_url" => "http://example.com/test"
           }
           expect(json_response['upload_params']).to eq upload_json

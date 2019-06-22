@@ -87,7 +87,6 @@ describe "reply attachment" do
   end
 
   it 'media attachment modal can be opened' do
-    Account.default.enable_feature!(:integrate_arc_rce)
     Discussion.visit(@course, @topic)
     Discussion.start_reply_with_media
     expect(Discussion.media_modal).to be_displayed

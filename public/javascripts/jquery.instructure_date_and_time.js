@@ -33,12 +33,24 @@ import 'jqueryui/datepicker'
   $.fudgeDateForProfileTimezone = function(date) {
     date = tz.parse(date);
     if (!date) return null;
-    // format true date into profile timezone without tz-info, then parse in
-    // browser timezone. then, as desired:
-    // output.toString('yyyy-MM-dd hh:mm:ss') == tz.format(input, '%Y-%m-%d %H:%M:%S')
-    var year = tz.format(date, '%Y');
+    let year = tz.format(date, '%Y');
     while (year.length < 4) year = "0" + year;
-    return Date.parse(tz.format(date, year + '-%m-%d %T'));
+
+    const formatted = tz.format(date, year + '-%m-%d %T')
+    let fudgedDate = new Date(formatted)
+
+    // In Safari, the return value from new Date(<string>) might be `Invalid Date`.
+    // this is because, according to this note on:
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#Timestamp_string
+    // "Support for RFC 2822 format strings is by convention only."
+    // So for those cases, we fall back on date.js's monkeypatched version of Date.parse,
+    // which is what this method has always historically used before the speed optimization of using new Date()
+    // eslint-disable-next-line no-restricted-globals
+    if (isNaN(fudgedDate)) { // checking for isNaN(<date>) is how you check for `Invalid Date`
+      fudgedDate = Date.parse(formatted)
+    }
+
+    return fudgedDate
   }
 
   $.unfudgeDateForProfileTimezone = function(date) {

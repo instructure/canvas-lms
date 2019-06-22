@@ -25,7 +25,7 @@ tinymce.create("tinymce.plugins.InstructureEquella", {
     ed.addCommand("instructureEquella", clickCallback.bind(this, ed, document));
 
     ed.ui.registry.addButton("instructure_equella", {
-      title: htmlEscape(
+      tooltip: htmlEscape(
         formatMessage({
           default: "Insert Equella Links",
           description: "Title for RCE button to insert links to Equella content"

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import tz from 'timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -34,6 +35,7 @@ export default class PostPolicies {
     this._gradebook = gradebook
 
     this._onGradesPostedOrHidden = this._onGradesPostedOrHidden.bind(this)
+    this._onAssignmentPostPolicyUpdated = this._onAssignmentPostPolicyUpdated.bind(this)
   }
 
   initialize() {
@@ -70,30 +72,46 @@ export default class PostPolicies {
 
     userIds.forEach(userId => {
       const submission = this._gradebook.getSubmission(userId, assignmentId)
-      submission.posted_at = postedAt
+      submission.posted_at = tz.parse(postedAt)
       this._gradebook.updateSubmission(submission)
     })
 
     this._gradebook.updateColumnHeaders([columnId])
   }
 
+  _onAssignmentPostPolicyUpdated({assignmentId, postManually}) {
+    const assignment = this._gradebook.getAssignment(assignmentId)
+    assignment.post_manually = postManually
+
+    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+    this._gradebook.updateColumnHeaders([columnId])
+  }
+
   showAssignmentPostingPolicyTray({assignmentId, onExited}) {
-    const {id, name, postManually} = this._gradebook.getAssignment(assignmentId)
+    const assignment = this._gradebook.getAssignment(assignmentId)
+    const {anonymous_grading, id, moderated_grading, name, post_manually} = assignment
 
     this._assignmentPolicyTray.show({
-      assignment: {id, name, postManually},
+      assignment: {
+        anonymousGrading: anonymous_grading,
+        id,
+        moderatedGrading: moderated_grading,
+        name,
+        postManually: post_manually
+      },
+      onAssignmentPostPolicyUpdated: this._onAssignmentPostPolicyUpdated,
       onExited
     })
   }
 
   showHideAssignmentGradesTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
-    const {anonymize_students, grades_published, id, name} = assignment
+    const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
 
     this._hideAssignmentGradesTray.show({
       assignment: {
-        anonymizeStudents: anonymize_students,
+        anonymousGrading: anonymous_grading,
         gradesPublished: grades_published,
         id,
         name
@@ -106,7 +124,7 @@ export default class PostPolicies {
 
   showPostAssignmentGradesTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
-    const {anonymize_students, grades_published, id, name} = assignment
+    const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
     const studentsWithVisibility = Object.values(
       this._gradebook.studentsThatCanSeeAssignment(assignment.id)
@@ -115,7 +133,7 @@ export default class PostPolicies {
 
     this._postAssignmentGradesTray.show({
       assignment: {
-        anonymizeStudents: anonymize_students,
+        anonymousGrading: anonymous_grading,
         gradesPublished: grades_published,
         id,
         name

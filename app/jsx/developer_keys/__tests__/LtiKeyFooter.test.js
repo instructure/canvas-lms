@@ -23,7 +23,7 @@ import LtiKeyFooter from '../LtiKeyFooter'
 function newProps(customizing = false) {
   return {
     onCancelClick: jest.fn(),
-    onSaveClick: jest.fn(),
+    onSaveClick: jest.fn().mockResolvedValue(),
     onAdvanceToCustomization: jest.fn(),
     customizing,
     dispatch: jest.fn(),

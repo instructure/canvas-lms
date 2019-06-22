@@ -22,7 +22,7 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!react_developer_keys'
-import DeveloperKeyScopesMethod from './ScopesMethod'
+import ScopesMethod from './ScopesMethod'
 
 const DeveloperKeyScope = props => {
   return (
@@ -44,7 +44,7 @@ const DeveloperKeyScope = props => {
           {props.scope.scope}
         </FlexItem>
         <FlexItem>
-          <DeveloperKeyScopesMethod method={props.scope.verb} />
+          <ScopesMethod method={props.scope.verb} />
         </FlexItem>
       </Flex>
     </View>

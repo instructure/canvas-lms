@@ -24,9 +24,7 @@
 %>
 
 <% unless editing_restricted?(@quiz, :content) %>
-  <% content_for :right_side do %>
-    <%= render :partial => "shared/wiki_sidebar" %>
-  <% end %>
+  <% content_for :right_side, render(:partial => 'shared/wiki_sidebar') %>
 <% end %>
 
 <h1 class="screenreader-only"><%= @quiz.quiz_title %></h1>

@@ -19,10 +19,13 @@
 import * as files from "./files";
 import * as images from "./images";
 import Bridge from "../../bridge";
-import { fileEmbed } from "../../common/mimeClass";
+import {fileEmbed} from "../../common/mimeClass";
+import K5Uploader from '@instructure/k5uploader'
 
 export const RECEIVE_FOLDER = "RECEIVE_FOLDER";
 export const FAIL_FOLDERS_LOAD = "FAIL_FOLDERS_LOAD";
+export const FAIL_MEDIA_UPLOAD = "FAIL_MEDIA_UPLOAD";
+export const MEDIA_UPLOAD_SUCCESS = "MEDIA_UPLOAD_SUCCESS";
 export const START_FILE_UPLOAD = "START_FILE_UPLOAD";
 export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
@@ -31,6 +34,8 @@ export const PROCESSED_FOLDER_BATCH = "PROCESSED_FOLDER_BATCH";
 export const QUOTA_EXCEEDED_UPLOAD = "QUOTA_EXCEEDED_UPLOAD";
 export const START_LOADING = "START_LOADING";
 export const STOP_LOADING = "STOP_LOADING";
+export const START_MEDIA_UPLOADING = "START_MEDIA_UPLOADING";
+export const STOP_MEDIA_UPLOADING = "STOP_MEDIA_UPLOADING";
 
 export function startLoading() {
   return { type: START_LOADING };
@@ -46,6 +51,14 @@ export function receiveFolder({ id, name, parentId }) {
 
 export function failFoldersLoad(error) {
   return { type: FAIL_FOLDERS_LOAD, error };
+}
+
+export function failMediaUpload(error) {
+  return { type: FAIL_MEDIA_UPLOAD, error };
+}
+
+export function mediaUploadSuccess() {
+  return { type: MEDIA_UPLOAD_SUCCESS };
 }
 
 export function startUpload(fileMetaProps) {
@@ -70,6 +83,29 @@ export function openOrCloseUploadForm() {
 
 export function processedFolderBatch({ folders }) {
   return { type: PROCESSED_FOLDER_BATCH, folders };
+}
+
+export function startMediaUploading(fileMetaProps) {
+  return { type: START_MEDIA_UPLOADING, payload: fileMetaProps }
+}
+
+export function stopMediaUploading() {
+  return { type: STOP_MEDIA_UPLOADING }
+}
+
+export function activateMediaUpload(fileMetaProps) {
+  return (dispatch) => {
+    dispatch(startMediaUploading(fileMetaProps))
+    Bridge.insertImagePlaceholder(fileMetaProps)
+  }
+}
+
+export function removePlaceholdersFor(name) {
+  return (dispatch) => {
+    dispatch(stopMediaUploading())
+    Bridge.removePlaceholders(name)
+  }
+
 }
 
 export function allUploadCompleteActions(results, fileMetaProps) {
@@ -141,8 +177,83 @@ export function fetchFolders(bookmark) {
   };
 }
 
+function generateUploadOptions(mediatypes, sessionData) {
+  const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
+  delete sessionDataCopy["kaltura_setting"]
+  return {
+    kaltura_session: sessionDataCopy,
+    allowedMediaTypes: mediatypes,
+    uploadUrl: sessionData.kaltura_setting.uploadUrl,
+    entryUrl: sessionData.kaltura_setting.entryUrl,
+    uiconfUrl: sessionData.kaltura_setting.uiconfUrl,
+    entryDefaults: {
+      partnerData: sessionData.kaltura_setting.partner_data
+    }
+  }
+}
+
+function addUploaderReadyEventListeners(uploader, file) {
+  uploader.addEventListener('K5.ready', () => {
+    uploader.uploadFile(file)
+  })
+}
+
+function addUploaderFileErrorEventListeners(uploader, dispatch) {
+  uploader.addEventListener('K5.fileError', (error) => {
+    dispatch(failMediaUpload(error));
+  })
+}
+
+function addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, context, source) {
+  uploader.addEventListener('K5.complete', (mediaServerMediaObject) => {
+    mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
+    mediaServerMediaObject.type= `${context.contextType}_${context.contextId}`
+    source.uploadMediaToCanvas(mediaServerMediaObject).then(() => {
+      var videoElement = editor.dom.add(editor.getBody(), 'div', { 'class': 'draggableTemplate' }, ' ');
+      editor.dom.add(videoElement, 'video', { 'width': '550', 'height': ' 426', 'controls': 'true','src': 'http://www.google.com'});
+      dispatch(mediaUploadSuccess());
+      dismiss()
+    }).catch((error)=> {
+      dispatch(failMediaUpload(error));
+    })
+  })
+}
+
+export function saveMediaRecording(file, editor, dismiss) {
+  return (dispatch, getState) => {
+    dispatch(startLoading());
+    const { source, contextId, contextType } = getState();
+    return source.mediaServerSession()
+    .then((mediaServerSession) => {
+      Bridge.setMediaServerSession(mediaServerSession)
+      const session = generateUploadOptions(['video', 'audio', 'webm', 'video/webm', 'audio/webm'], mediaServerSession)
+      const uploader = new K5Uploader(session)
+      addUploaderReadyEventListeners(uploader, file)
+      addUploaderFileErrorEventListeners(uploader, dispatch)
+      addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, {contextId, contextType}, source)
+      return uploader
+    })
+    .catch(error => {
+      dispatch(failMediaUpload(error));
+    })
+  }
+}
+
+export function createMediaServerSession() {
+  return (dispatch, getState) => {
+    const { source } = getState();
+    if(!Bridge.mediaServerSession) {
+      return source.mediaServerSession()
+      .then((data) => {
+        Bridge.setMediaServerSession(data)
+      })
+    }
+  }
+}
+
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
+    dispatch(activateMediaUpload(fileMetaProps))
     const { source, jwt, host, contextId, contextType } = getState();
     return source.fetchMediaFolder({ jwt, host, contextId, contextType })
     .then(({folders}) => {
@@ -242,6 +353,11 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       })
       .then(results => {
         return setAltText(fileMetaProps.altText, results);
+      })
+      .then(results => {
+        // This may or may not be necessary depending on the upload
+        dispatch(removePlaceholdersFor(fileMetaProps.name))
+        return results
       })
       .then(results => {
         return embedUploadResult(results, tabContext);

@@ -159,7 +159,7 @@ describe "dashboard" do
 
           Timecop.freeze(3.minutes.from_now) do
             @assignment.update_attribute(:grades_published_at, Time.now.utc)
-            @teacher.touch # would be done by the publishing endpoint
+            @teacher.clear_cache_key(:todo_list) # would be done by the publishing endpoint
 
             get "/"
             expect(f('.to-do-list')).to_not include_text("Moderate #{@assignment.title}")

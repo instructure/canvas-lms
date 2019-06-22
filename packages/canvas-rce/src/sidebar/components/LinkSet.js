@@ -23,7 +23,7 @@ import { renderLink as renderLinkHtml } from "../../rce/contentRendering";
 import dragHtml from "../dragHtml";
 import formatMessage from "../../format-message";
 import LoadMore from "../../common/components/LoadMore";
-import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
+import { ScreenReaderContent } from '@instructure/ui-a11y'
 import { StyleSheet, css } from "aphrodite";
 
 let nextId = 1;

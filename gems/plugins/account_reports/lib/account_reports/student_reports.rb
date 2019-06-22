@@ -63,14 +63,14 @@ module AccountReports
     end
 
     def include_enrollment_state
-      if @account_report.has_parameter? "include_enrollment_state"
+      if @account_report.value_for_param("include_enrollment_state")
         state = @account_report.parameters["include_enrollment_state"]
       end
       state
     end
 
     def enrollment_states
-      if @account_report.has_parameter? "enrollment_state"
+      if @account_report.value_for_param("enrollment_state")
         states = @account_report.parameters["enrollment_state"]
       end
       states = nil if Array(states).include?('all')

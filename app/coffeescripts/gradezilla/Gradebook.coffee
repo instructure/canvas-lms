@@ -77,6 +77,7 @@ import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconSettingsSolid from '@instructure/ui-icons/lib/Solid/IconSettings'
+import StudentGroupFilter from 'jsx/gradezilla/default_gradebook/components/StudentGroupFilter'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_date_and_time'
@@ -162,6 +163,7 @@ export default do ->
 
     filterRowsBy =
       sectionId: null
+      studentGroupId: null
 
     if settings.filter_rows_by?
       Object.assign(filterRowsBy, ConvertCase.camelize(settings.filter_rows_by))
@@ -238,6 +240,13 @@ export default do ->
 
   anonymousSpeedGraderAlertMountPoint = () ->
     document.querySelector("[data-component='AnonymousSpeedGraderAlert']")
+
+  formatStudentGroupsForFilter = (groupCategoryList) ->
+    groupCategoryList.map((category) => {
+      children: category.groups.sort((a, b) => a.id - b.id),
+      id: category.id,
+      name: category.name
+    })
 
   class Gradebook
     columnWidths =
@@ -363,6 +372,8 @@ export default do ->
             @gridDisplaySettings.selectedSecondaryInfo = 'section'
           else
             @gridDisplaySettings.selectedSecondaryInfo = 'none'
+
+      @setStudentGroups(@options.student_groups)
 
     bindGridEvents: =>
       @gradebookGrid.events.onColumnsReordered.subscribe (_event, columns) =>
@@ -1148,6 +1159,42 @@ export default do ->
     showSections: ->
       @sections_enabled
 
+    showStudentGroups: ->
+      @studentGroupsEnabled
+
+    updateStudentGroupFilterVisibility: ->
+      mountPoint = document.getElementById('student-group-filter-container')
+
+      if @showStudentGroups() and 'studentGroups' in @gridDisplaySettings.selectedViewOptionsFilters
+        groupCategoryList = Object.values(@studentGroupCategories).sort((a, b) => (a.id - b.id))
+
+        props =
+          items: formatStudentGroupsForFilter(groupCategoryList)
+          onSelect: @updateCurrentStudentGroup
+          selectedItemId: @getStudentGroupToShow()
+          disabled: !@contentLoadStates.studentsLoaded
+
+        @studentGroupFilterMenu = renderComponent(StudentGroupFilter, mountPoint, props)
+      else
+        @updateCurrentStudentGroup(null)
+        if @studentGroupFilterMenu
+          ReactDOM.unmountComponentAtNode(mountPoint)
+          @studentGroupFilterMenu = null
+
+    getStudentGroupToShow: () =>
+      groupId = @getFilterRowsBySetting('studentGroupId') || '0'
+
+      if groupId in Object.keys(@studentGroups) then groupId else '0'
+
+    updateCurrentStudentGroup: (groupId) =>
+      groupId = if groupId == '0' then null else groupId
+      if @getFilterRowsBySetting('studentGroupId') != groupId
+        @setFilterRowsBySetting('studentGroupId', groupId)
+        @saveSettings({}, =>
+          @updateStudentGroupFilterVisibility()
+          @reloadStudentData()
+        )
+
     assignmentGroupList: ->
       return [] unless @assignmentGroups
       Object.values(@assignmentGroups).sort((a, b) => (a.position - b.position))
@@ -1415,6 +1462,7 @@ export default do ->
       # available, whereas assignment groups and context modules are fetched via the DataLoader,
       # so we need to wait until they are loaded to set their filter visibility.
       @updateSectionFilterVisibility()
+      @updateStudentGroupFilterVisibility()
       @updateAssignmentGroupFilterVisibility() if @contentLoadStates.assignmentGroupsLoaded
       @updateGradingPeriodFilterVisibility()
       @updateModulesFilterVisibility() if @contentLoadStates.contextModulesLoaded
@@ -2055,7 +2103,7 @@ export default do ->
       not @isFilteringColumnsByGradingPeriod()
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
-    fieldsToIncludeWithAssignments: ['grades_published', 'module_ids', 'assignment_group_id']
+    fieldsToIncludeWithAssignments: ['grades_published', 'module_ids', 'post_manually', 'assignment_group_id']
 
     studentsParams: ->
       enrollmentStates = ['invited', 'active']
@@ -2289,6 +2337,7 @@ export default do ->
       onGradeSubmission: @gradeSubmission
       onRequestClose: @closeSubmissionTray
       pendingGradeInfo: @getPendingGradeInfo({ assignmentId, userId: studentId })
+      postPoliciesEnabled: @options.post_policies_enabled
       selectNextAssignment: => @loadTrayAssignment('next')
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
@@ -2611,6 +2660,7 @@ export default do ->
       filters.push('gradingPeriods') if @gradingPeriodSet?
       filters.push('modules') if @listContextModules().length > 0
       filters.push('sections') if @sections_enabled
+      filters.push('studentGroups') if @studentGroupsEnabled
       filters
 
     setSelectedViewOptionsFilters: (filters) =>
@@ -2688,6 +2738,13 @@ export default do ->
     setSections: (sections) =>
       @sections = _.indexBy(sections, 'id')
       @sections_enabled = sections.length > 1
+
+    setStudentGroups: (groupCategories) =>
+      @studentGroupCategories = _.indexBy(groupCategories.map(htmlEscape), 'id')
+
+      studentGroupList = _.flatten(_.pluck(groupCategories, 'groups')).map(htmlEscape)
+      @studentGroups = _.indexBy(studentGroupList, 'id')
+      @studentGroupsEnabled = studentGroupList.length > 0
 
     setAssignments: (assignmentMap) =>
       @assignments = assignmentMap

@@ -1688,6 +1688,7 @@ hu:
   anonymous_user: "Névtelen felhasználó"
   anonymous_user_d984b9ce: "Névtelen felhasználó"
   anonymously_graded_59149570: "Névtelenül értékelve"
+  anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "A névtelenül értékelt feladatokat nem lehet csoportos feladatként beállítani."
   another_assignment_name_369f8481: "Másik feladat név"
   another_configuration_is_currently_selected_select_95b394e: "Jelenleg egy másik konfiguráció van kiválasztva. Ennek a konfigurációnak a kiválasztásával a másik kiválasztása törlődni fog."
   answer_address_book_queries_through_76842372: "Címjegyzék lekérdezések válaszolása ezen keresztül"
@@ -1939,6 +1940,7 @@ hu:
   assignment_selection_6bff05c4: Feladatkiválasztás
   assignment_title_82b4422e: "Feladat címe:"
   assignment_title_8a707dd2: feladatcím
+  assignment_title_e3192978: "Feladat: %{title} "
   assignment_url_37c849c6: "feladat url-je"
   assignment_was_deleted_8320d26d: "Feladat törölve lett"
   assignment_weights_d4bcf9ab: "A feladat súlyozása"
@@ -2421,12 +2423,14 @@ hu:
   assignments_1e02582c: Feladatok
   assignments_2: 
     submission_attempts: Próbálkozások
+  assignments_2_e88d7a26: "Feladatok 2"
   assignments_api: 
     invalid_date_time: "Érvénytelen dátum a következő attribútumhoz: %{attribute} "
     invalid_submission_types: "Érvénytelen a beadás típusa"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Az ebben a csoportban lévő feladatokhoz nem tartoznak pontszámok, és nem fognak beszámítani a jegy számításába."
   assignments_list_fe3e54be: Feladatok
   assignments_settings_30613d0c: Feladatbeállítások
+  assignments_speedgrader_2fbd6df4: "Feladatok, Gyorsértékelő"
   associated_74756cc4: Hozzárendelve
   associated_account_course_id_d87a01c5: "Hozzárendelt fiók/kurzus azonosítója "
   associated_account_name_91854e37: "Hozzárendelt fiók neve"
@@ -3101,6 +3105,7 @@ hu:
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "alapesetben létrehozhat, átnevezhet és szerkeszthet kurzus oldalakat"
   can_interact_with_users_in_their_section_only_48cb8c43: "Csak a saját szekciójában lévő felhasználókkal léphet kapcsolatba"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Nem törölheti az illesztéseket az értékelőtábla hozzárendelés alapján. A hozzárendelések eltávolításához az elem értékelési táblájából kell eltávolítani a megfelelő sort"
+  can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "A névtelen értékelés és a csoportos feladat nem összeférhető beállítás."
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Nem végezhető el az összehasonlítás több mint egy ugyanolyan típusú fájllal"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Nem lehet visszavonni a publikálást, ha már vannak hallgatói munkák beadva"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Nem lehet visszavonni %{item_name} publikálását, ha már vannak hallgatói munkák beadva"
@@ -3133,6 +3138,7 @@ hu:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas-figyelmeztetés - Változás: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-figyelmeztetés - Meghívás: %{course} kurzusra %{role_type} szerepben"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas-figyelmeztetés - Meghívás: kurzus  %{role_type} szerepben"
+  canvas_alert_late_anonymous_submission_assignment__bf9a6452: "Canvas Értesítés -  Kései névtelen leadás: 1%{assignment_name}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas-figyelmeztetés - Határidőn túli beadás: %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "Canvas tulajdonságai"
   canvas_by_instructure_1490381: "Canvas az Instructure-től"
@@ -3203,6 +3209,7 @@ hu:
   choose_and_publish_980812cb: "Kiválasztás és publikálás"
   choose_assignment_b0132c5e: "-- Válasszon feladatot --"
   choose_assignment_group_9e7de13c: "Feladatcsoport kiválasztása"
+  choose_assignment_set_415f1b3: "Feladatcsoport beállítása"
   choose_attribute_to_add_866e128d: "Válasszon tulajdonságot a hozzáadáshoz"
   choose_course_home_page_d8642f9e: "Kurzus kezdőlapjának kiválasztása"
   choose_home_page_80cef4ee: "Kezdőlap kiválasztása"
@@ -7005,6 +7012,7 @@ hu:
       people: Résztvevők
   group_a8f5ed9c: Csoport
   group_assignment_7060989f: "Csoportos feladat"
+  group_assignments_can_t_be_anonymously_graded_2dd9be24: "A csoportos feladatokat nem lehet névtelenül értékelni."
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "A csoportos feladatok nem engedélyezhetők moderált feladatokhoz"
   group_categories: 
     notices: 
@@ -7408,6 +7416,7 @@ hu:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Ha már használt egy másik kurzusmenedzsment rendszert, bizonyára vannak ott olyan anyagai, amelyeket át szeretne mozgatni a Canvasba. Itt végigvezetjük ezen a folyamaton, hogy minél egyszerűbben migrálhassa a kívánt tartalmakat."
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Ha meg szeretné tartani a nem közzétett hozzászólásait, kérjük mentse őket, mielőtt elhagyja az oldalt. "
   ignore_assignment_738b3c99: "Feladat figyelmen kívül hagyása"
+  ignore_assignment_a4837cb3: "Ennek a feladatnak a figyelmen kívül hagyása: %{assignment}"
   ignore_name_55edc6fe: "%{name} figyelmen kívül hagyása"
   ignore_these_3940f6f5: "Ezeket hagyja figyelmen kívül "
   ignore_this_assignment_b7a71f80: "Feladat figyelmen kívül hagyása"
@@ -7746,6 +7755,7 @@ hu:
   left_group_group_name_aac4e813: "Elhagyta a következő csoportot: %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   let_students_see_the_correct_answers_dacc2faf: "A hallgatók láthassák a helyes válaszokat"
+  let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "A hallgatók láthassák a kvízkérdésekre adott válaszaikat (A helytelenül megválaszolt kérdéseket a hallgatók visszajelzésként megkapják, de a helyes válaszokat nem fogják látni)"
   letter_grade_29ff1938: "Betű alapú osztályzat"
   letter_grade_f00fedc4: "Betű alapú érdemjegy "
   lib: 
@@ -11016,6 +11026,8 @@ hu:
         consumer_secret: "Consumer Secret"
     vericite: 
       name: VeriCite
+    vericite_settings: 
+      default_assignment_settings: "**Alapértelmezett feladatbeállítások**"
     webct_scraper_settings: 
       description: |-
           Ha az intézmény nem használja a WEBCT "Tanulási modulokat" (beleértve a 4.0 verziót megelőző rendszereket), a kurzus migráció javítható azáltal, hogy a "Kurzustartalom" Canvas-modulként kerül importálásra, nem pedig "Tanulási modulként".
@@ -14559,7 +14571,9 @@ hu:
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Ez a feladat el lett dobva, nem lesz figyelembe véve a teljes számításban"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Ez a feladat kifogásolva lett, így nem lesz figyelembe véve a teljes számításban"
   this_assignment_is_overdue_a44bea3b: "Ez a feladat lejárt"
+  this_assignment_is_still_unpublished_a9185624: "A feladat még publikáltlan"
   this_assignment_is_unpublished_64c0f46c: "Ez a feladat nem publikált"
+  this_assignment_submission_is_my_own_original_work_e820ce4b: "Ez a feladatmegoldás saját, eredeti munkám."
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Ez a feladat többé nem számít be az osztályzatába."
   this_conference_may_be_recorded_f76deeeb: "Felvétel készülhet erről a konferenciáról."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "A kurzust jelenleg nem lehet hozzáadni a kurzusok menühöz."

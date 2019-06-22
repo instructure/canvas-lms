@@ -38,9 +38,9 @@
       <li>
         <a href="#"
            class="icon-reply-2 reply-btn Button Button--icon-action"
-           title="{{#t "reply"}}Reply{{/t}}"
+           title="{{#t}}Reply{{/t}}"
            data-tooltip>
-          <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
+          <span class="screenreader-only">{{#t}}Reply to {{{bodyHTML}}}{{/t}}</span>
         </a>
       </li>
       {{/unless}}
@@ -55,7 +55,7 @@
              data-tooltip>
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
+            <span class="screenreader-only">{{#t}}Message actions for {{{bodyHTML}}}{{/t}}</span>
           </a>
           <ul class="al-options">
             {{#unless cannot_reply}}

@@ -22,25 +22,25 @@ import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 export default function GroupsTray({groups, hasLoaded}) {
   return (
-    <View as="div" padding="medium">
+    <View as="div" padding="medium small">
       <Heading level="h3" as="h2">{I18n.t('Groups')}</Heading>
       <hr role="presentation"/>
-      <List variant="unstyled"  margin="small 0" itemSpacing="small">
+      <List variant="unstyled"  margin="small 0" itemSpacing="x-small">
         {hasLoaded ? (
           groups.map(group =>
             <ListItem key={group.id}>
-              <Link href={`/groups/${group.id}`}>{group.name}</Link>
+              <Button href={`/groups/${group.id}`}>{group.name}</Button>
             </ListItem>
           ).concat([
             <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
-              <Link href="/groups">{I18n.t('All Groups')}</Link>
+              <Button href="/groups">{I18n.t('All Groups')}</Button>
             </ListItem>
           ])
         ) : (

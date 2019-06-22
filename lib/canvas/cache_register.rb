@@ -27,7 +27,9 @@ module Canvas
     # (which is far less often than the many times per day users are currently being touched)
 
     ALLOWED_TYPES = {
-      'User' => %w{enrollments groups account_users},
+      'Account' => %w{account_chain role_overrides},
+      'Course' => %w{account_associations},
+      'User' => %w{enrollments groups account_users todo_list submissions},
       'Assignment' => %w{availability},
       'Quizzes::Quiz' => %w{availability}
     }.freeze
@@ -38,8 +40,10 @@ module Canvas
       @lua ||= ::Redis::Scripting::Module.new(nil, File.join(File.dirname(__FILE__), "cache_register"))
     end
 
-    def self.redis(base_key)
-       Canvas.redis.respond_to?(:node_for) ? Canvas.redis.node_for(base_key) : Canvas.redis
+    def self.redis(base_key, shard)
+      shard.activate do
+        Canvas.redis.respond_to?(:node_for) ? Canvas.redis.node_for(base_key) : Canvas.redis
+      end
     end
 
     def self.enabled?
@@ -83,12 +87,36 @@ module Canvas
           def clear_cache_keys(ids_or_records, *key_types)
             return unless key_types.all?{|type| valid_cache_key_type?(type)} && CacheRegister.enabled?
 
-            base_keys = Array(ids_or_records).map{|item| base_cache_register_key_for(item)}.compact
-            return unless base_keys.any?
-            base_keys.group_by{|key| CacheRegister.redis(key)}.each do |redis, node_base_keys|
-              node_base_keys.map{|k| key_types.map{|type| "#{k}/#{type}"}}.flatten.each_slice(1000) do |slice|
-                redis.del(*slice)
+            ::Shard.partition_by_shard(Array(ids_or_records)) do |sharded_ids_or_records|
+              base_keys = sharded_ids_or_records.map{|item| base_cache_register_key_for(item)}.compact
+              return unless base_keys.any?
+              base_keys.group_by{|key| CacheRegister.redis(key, ::Shard.current)}.each do |redis, node_base_keys|
+                node_base_keys.map{|k| key_types.map{|type| "#{k}/#{type}"}}.flatten.each_slice(1000) do |slice|
+                  redis.del(*slice)
+                end
               end
+            end
+          end
+
+          # can be used to find the cache for an object by id alone
+
+          # when calling directly, you should be prepared to handle a `nil` return value (and skip caching if so)
+          # in the case that CacheRegister is disabled/reverted, since this would be preferable to
+          # adding a possible N+1 trying to get the updated_at on the object
+          # as such, this should only be used for places where we're adding new cache blocks,
+          # and thus won't be terribly affected if the caching doesn't work
+          def cache_key_for_id(id, key_type, skip_check: false)
+            global_id = ::Shard.global_id_for(id)
+            return nil unless skip_check || (global_id && self.valid_cache_key_type?(key_type) && CacheRegister.enabled?)
+
+            base_key = self.base_cache_register_key_for(global_id)
+            redis = CacheRegister.redis(base_key, ::Shard.shard_for(global_id))
+            full_key = "#{base_key}/#{key_type}"
+            RequestCache.cache(full_key) do
+              now = Time.now.utc.to_s(self.cache_timestamp_format)
+              # try to get the timestamp for the type, set it to now if it doesn't exist
+              ts = CacheRegister.lua.run(:get_key, [full_key], [now], redis)
+              "#{self.model_name.cache_key}/#{global_id}-#{ts}"
             end
           end
         end
@@ -101,15 +129,7 @@ module Canvas
           return super() if key_type.nil? || self.new_record? ||
               !self.class.valid_cache_key_type?(key_type) || !CacheRegister.enabled?
 
-          base_key = self.class.base_cache_register_key_for(self)
-          redis = CacheRegister.redis(base_key)
-          full_key = "#{base_key}/#{key_type}"
-          RequestCache.cache(full_key) do
-            now = Time.now.utc.to_s(self.cache_timestamp_format)
-            # try to get the timestamp for the type, set it to now if it doesn't exist
-            ts = CacheRegister.lua.run(:get_key, [full_key], [now], redis)
-            "#{self.model_name.cache_key}/#{self.id}-#{ts}"
-          end
+          self.class.cache_key_for_id(self.global_id, key_type, skip_check: true)
         end
       end
 
@@ -141,19 +161,23 @@ module Canvas
           # NOTE: you won't be able to invalidate this directly using Rails.cache.delete
           # because of issues with the redis ring distribution (everything for batch_object is on the same node)
           # so you should just use clear_cache_key
-          def fetch_with_batched_keys(key, batch_object:, batched_keys:, **opts, &block)
+          def fetch_with_batched_keys(key, batch_object:, batched_keys:, skip_cache_if_disabled: false, **opts, &block)
             batched_keys = Array(batched_keys)
             if batch_object && !opts[:force] &&
                 defined?(::ActiveSupport::Cache::RedisStore) && self.is_a?(::ActiveSupport::Cache::RedisStore) && CacheRegister.enabled? &&
                 batched_keys.all?{|type| batch_object.class.valid_cache_key_type?(type)}
               fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
             else
-              if batch_object # just fall back to the usual after appending to the key if needed
-                key += (CacheRegister.enabled? ?
-                  "/#{batched_keys&.map{|bk| batch_object.cache_key(bk)}.join("/")}" :
-                  "/#{batch_object.cache_key}")
+              if skip_cache_if_disabled # use for new caches that we're not already using updated_at+touch for
+                yield
+              else
+                if batch_object # just fall back to the usual after appending to the key if needed
+                  key += (CacheRegister.enabled? ?
+                    "/#{batched_keys&.map{|bk| batch_object.cache_key(bk)}.join("/")}" :
+                    "/#{batch_object.cache_key}")
+                end
+                fetch(key, opts, &block)
               end
-              fetch(key, opts, &block)
             end
           end
 
@@ -167,7 +191,7 @@ module Canvas
             entry = nil
             frd_key = nil
             base_obj_key = batch_object.class.base_cache_register_key_for(batch_object)
-            redis = CacheRegister.redis(base_obj_key)
+            redis = CacheRegister.redis(base_obj_key, batch_object.shard)
 
             instrument(:read, name, options) do |payload|
               keys_to_batch = batched_keys.map{|type| "#{base_obj_key}/#{type}"}

@@ -67,6 +67,18 @@
   }
 }
 
+.button {
+  .step-item-label {
+    font-size: 0.875rem;
+  }
+  .step-item-pin {
+    border-color:#C1C8CD;
+    border-style: solid;
+    border-width: 2px;
+    background: #ffffff;
+  }
+}
+
 .in-progress {
   .step-item-label {
     font-weight: 700;

@@ -36,4 +36,9 @@ describe('fetchToolConfiguration', () => {
     install13Tool(clientId, createUrl)
     expect(axios.post).toHaveBeenCalledWith(createUrl, {client_id: clientId})
   })
+
+  it('post the client id and verify_uniqueness if true to the create url', () => {
+    install13Tool(clientId, createUrl, true)
+    expect(axios.post).toHaveBeenCalledWith(createUrl, {client_id: clientId, external_tool: { verify_uniqueness: true }})
+  })
 })

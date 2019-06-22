@@ -361,6 +361,8 @@ module Types
       argument :order_by, [SubmissionSearchOrderInputType], required: false
     end
     def submissions_connection(filter: nil, order_by: nil)
+      return nil if current_user.nil?
+
       filter = filter.to_h
       order_by ||= []
       filter[:states] ||= DEFAULT_SUBMISSION_STATES

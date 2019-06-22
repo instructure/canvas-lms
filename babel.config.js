@@ -17,19 +17,23 @@
  */
 
 module.exports = {
-  "presets": [
-    ["@instructure/ui-babel-preset", {
-      // this tells @babel/plugin-transform-runtime to not use ESModules in jest.
-      esModules: !process.env.JEST_WORKER_ID,
-      // this tells it to transform imports to commonJS in jest
-      node: !!process.env.JEST_WORKER_ID
-    }]
+  presets: [
+    [
+      '@instructure/ui-babel-preset',
+      {
+        esModules:
+          'USE_ES_MODULES' in process.env
+            ? process.env.USE_ES_MODULES !== 'false'
+            : !process.env.JEST_WORKER_ID,
+        node: !!process.env.JEST_WORKER_ID
+      }
+    ]
   ],
-  "env": {
-    "production": {
-      "plugins": [
-        "transform-react-remove-prop-types",
-        "@babel/plugin-transform-react-inline-elements"
+  env: {
+    production: {
+      plugins: [
+        'transform-react-remove-prop-types',
+        '@babel/plugin-transform-react-inline-elements'
       ]
     }
   }

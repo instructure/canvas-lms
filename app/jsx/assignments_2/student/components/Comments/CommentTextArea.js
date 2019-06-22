@@ -29,8 +29,9 @@ import {submissionCommentAttachmentsUpload} from '../../../../shared/upload_file
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 
 import {
+  AssignmentShape,
+  SubmissionShape,
   CREATE_SUBMISSION_COMMENT,
-  StudentAssignmentShape,
   SUBMISSION_COMMENT_QUERY
 } from '../../assignmentData'
 import {Mutation} from 'react-apollo'
@@ -39,7 +40,8 @@ const ALERT_TIMEOUT = 5000
 
 export default class CommentTextArea extends Component {
   static propTypes = {
-    assignment: StudentAssignmentShape
+    assignment: AssignmentShape,
+    submission: SubmissionShape
   }
 
   state = {
@@ -52,9 +54,7 @@ export default class CommentTextArea extends Component {
   queryVariables() {
     return {
       query: SUBMISSION_COMMENT_QUERY,
-      variables: {
-        submissionId: this.props.assignment.submissionsConnection.nodes[0].id.toString()
-      }
+      variables: {submissionId: this.props.submission.id}
     }
   }
 
@@ -114,7 +114,7 @@ export default class CommentTextArea extends Component {
 
       await createSubmissionComment({
         variables: {
-          id: this.props.assignment.submissionsConnection.nodes[0]._id,
+          id: this.props.submission._id,
           comment: this.state.commentText,
           fileIds: attachmentIds
         }

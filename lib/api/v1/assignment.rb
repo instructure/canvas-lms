@@ -364,6 +364,10 @@ module Api::V1::Assignment
       hash['planner_override'] = planner_override_json(override, user, session)
     end
 
+    if assignment.course.feature_enabled?(:post_policies)
+      hash['post_manually'] = assignment.post_manually?
+    end
+
     hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
     hash['anonymize_students'] = assignment.anonymize_students?
     hash

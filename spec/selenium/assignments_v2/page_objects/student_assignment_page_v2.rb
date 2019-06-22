@@ -15,13 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative '../../common'
+
 class StudentAssignmentPageV2
   class << self
     include SeleniumDependencies
 
     def visit(course, assignment)
-      course.enable_feature!(:assignments_2)
-      get "/courses/#{course}/assignments/#{assignment}?assignments_2=true"
+      get "/courses/#{course.id}/assignments/#{assignment.id}/?assignments_2=true"
+    end
+
+    def assignment_locked_image
+      f("img[alt='Assignment Locked']")
+    end
+
+    def lock_icon
+      f("svg[name='IconLock']")
+    end
+
+    def details_toggle_css
+      "button[data-test-id='assignments-2-assignment-toggle-details']"
     end
   end
 end

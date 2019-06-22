@@ -46,8 +46,11 @@ export default function(props, tinymce, MutationObserver) {
     editorOptions.content_css = props.editorOptions.content_css;
   }
 
-  // tell tinymce that we already loaded the skin
+  // tell tinymce that we're handling the skin
   editorOptions.skin = false;
+
+  // when tiny formats menuitems with a style attribute, don't let it set the color so they get properly themed
+  editorOptions.preview_styles = 'font-family font-size font-weight font-style text-decoration text-transform border border-radius outline text-shadow'
 
   // force tinyMCE to NOT use the "mobile" theme,
   // see: https://stackoverflow.com/questions/54579110/is-it-possible-to-disable-the-mobile-ui-features-in-tinymce-5

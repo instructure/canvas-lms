@@ -17,156 +17,84 @@
  */
 
 import React, {Fragment} from 'react'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import {any, arrayOf, bool, shape} from 'prop-types'
 
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import View from '@instructure/ui-layout/lib/components/View'
 
 import I18n from 'i18n!post_assignment_grades_tray'
 
-import PostTypes from './PostTypes'
-import SpecificSections from '../SpecificSections'
+import FormContent from './FormContent'
 
 export default function Layout({
-  assignment: {anonymizeStudents, gradesPublished},
+  assignment: {anonymousGrading, gradesPublished},
   dismiss,
+  onPostClick,
   postBySections,
   postBySectionsChanged,
   postType,
   postTypeChanged,
   postingGrades,
-  onPostClick,
-  sections,
   sectionSelectionChanged,
+  sections,
   selectedSectionIds,
   unpostedCount
 }) {
   const hasSections = sections.length > 0
-  const heading = (
-    <View as="div" margin="0 0 small" padding="0 medium">
-      <Heading as="h3" level="h4">
-        {I18n.t('Post Grades')}
-      </Heading>
-    </View>
-  )
-
-  if (postingGrades) {
-    return (
-      <Fragment>
-        {heading}
-
-        <View as="div" textAlign="center" padding="large">
-          <Spinner title={I18n.t('Posting grades')} size="large" />
-        </View>
-      </Fragment>
-    )
-  }
 
   return (
     <Fragment>
-      {heading}
-
-      {unpostedCount > 0 && (
-        <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
-          <Badge
-            count={unpostedCount}
-            countUntil={99}
-            margin="0 0 medium large"
-            placement="start center"
-            type="count"
-            variant="danger"
-          >
-            <View as="div" margin="0 0 0 small">
-              <Text margin="0 0 0 small">{I18n.t('Hidden')}</Text>
-            </View>
-          </Badge>
-        </div>
-      )}
-
-      <View as="div" margin="small 0" padding="0 medium">
-        <PostTypes
-          disabled={!gradesPublished}
-          defaultValue={postType}
-          postTypeChanged={postTypeChanged}
-        />
-      </View>
-
-      <View as="div" margin="0 medium" className="hr" />
-
-      {hasSections && anonymizeStudents && (
-        <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>{I18n.t('Anonymous assignments cannot be posted by section.')}</Text>
-        </View>
-      )}
-
-      {hasSections && (
-        <SpecificSections
-          checked={postBySections}
-          disabled={!gradesPublished || anonymizeStudents}
-          onCheck={event => {
-            postBySectionsChanged(event.target.checked)
-          }}
-          sections={sections}
-          sectionSelectionChanged={sectionSelectionChanged}
-          selectedSectionIds={selectedSectionIds}
-        />
-      )}
-
-      <View as="div" margin="0 medium" className="hr" />
-
       {!gradesPublished && (
-        <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>
-            {I18n.t(
-              'Posting grades is not allowed because grades have not been released for this assignment.'
-            )}
-          </Text>
-        </View>
+        <Alert margin="x-small" variant="warning">
+          {I18n.t(
+            'Posting grades is not allowed because grades have not been released for this assignment.'
+          )}
+        </Alert>
       )}
 
-      <View as="div" margin="medium 0 0" padding="0 medium">
-        <Flex justifyItems="end">
-          <FlexItem margin="0 small 0 0">
-            <Button disabled={!gradesPublished} onClick={dismiss}>
-              {I18n.t('Close')}
-            </Button>
-          </FlexItem>
+      {gradesPublished && hasSections && anonymousGrading && (
+        <Alert margin="x-small" variant="info">
+          {I18n.t('You can only post grades for everyone when the assignment is anonymous.')}
+        </Alert>
+      )}
 
-          <FlexItem>
-            <Button onClick={onPostClick} disabled={!gradesPublished} variant="primary">
-              {I18n.t('Post')}
-            </Button>
-          </FlexItem>
-        </Flex>
-      </View>
+      <FormFieldGroup
+        description={
+          <View as="div" margin="0" padding="0 medium">
+            <Heading as="h3" level="h4">
+              {I18n.t('Post Grades')}
+            </Heading>
+          </View>
+        }
+        label={I18n.t('Post Grades')}
+        disabled={!gradesPublished}
+      >
+        <FormContent
+          assignment={{anonymousGrading, gradesPublished}}
+          dismiss={dismiss}
+          onPostClick={onPostClick}
+          postBySections={postBySections}
+          postBySectionsChanged={postBySectionsChanged}
+          postType={postType}
+          postTypeChanged={postTypeChanged}
+          postingGrades={postingGrades}
+          sectionSelectionChanged={sectionSelectionChanged}
+          sections={sections}
+          selectedSectionIds={selectedSectionIds}
+          unpostedCount={unpostedCount}
+        />
+      </FormFieldGroup>
     </Fragment>
   )
 }
 
 Layout.propTypes = {
   assignment: shape({
-    anonymizeStudents: bool.isRequired,
+    anonymousGrading: bool.isRequired,
     gradesPublished: bool.isRequired
   }).isRequired,
-  dismiss: func.isRequired,
-  postBySections: bool.isRequired,
-  postBySectionsChanged: func.isRequired,
-  postingGrades: bool.isRequired,
-  postType: string.isRequired,
-  postTypeChanged: PostTypes.propTypes.postTypeChanged,
-  onPostClick: func.isRequired,
-  sections: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired
-    })
-  ).isRequired,
-  sectionSelectionChanged: SpecificSections.propTypes.sectionSelectionChanged,
-  selectedSectionIds: SpecificSections.propTypes.selectedSectionIds,
-  unpostedCount: number.isRequired
+  sections: arrayOf(any).isRequired,
+  ...FormContent.propTypes
 }

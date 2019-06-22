@@ -22,7 +22,7 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
-import {StudentAssignmentShape} from '../assignmentData'
+import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -30,7 +30,8 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 const Comments = lazy(() => import('./Comments'))
 
 ContentTabs.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: AssignmentShape,
+  submission: SubmissionShape
 }
 
 function ContentTabs(props) {
@@ -38,12 +39,12 @@ function ContentTabs(props) {
     <div data-testid="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
         <TabPanel title={I18n.t('Upload')}>
-          <ContentUploadTab assignment={props.assignment} />
+          <ContentUploadTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
           {!props.assignment.muted ? (
             <Suspense fallback={<LoadingIndicator />}>
-              <Comments assignment={props.assignment} />
+              <Comments assignment={props.assignment} submission={props.submission} />
             </Suspense>
           ) : (
             <SVGWithTextPlaceholder

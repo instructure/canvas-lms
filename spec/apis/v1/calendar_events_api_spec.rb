@@ -50,6 +50,39 @@ describe CalendarEventsApiController, type: :request do
       expect(json.first.slice('title', 'start_at', 'id')).to eql({'id' => e2.id, 'title' => '2', 'start_at' => '2012-01-08T12:00:00Z'})
     end
 
+    it 'should hide location attributes when user is not logged in a public course' do
+      @me = nil
+      @user = nil
+      @course.update_attributes(:is_public => true, :indexed => true)
+      @course.calendar_events.create(
+        :title => '2',
+        :start_at => '2012-01-08 12:00:00',
+        :location_address => 'test_address2',
+        :location_name => 'steven house'
+      )
+
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08'
+      })
+      expect(json.first.slice('location_address', 'location_name')).to eql({})
+    end
+
+    it 'should show location attributes when user logged in a public course' do
+      @course.update_attributes(:is_public => true, :indexed => true)
+      evt = @course.calendar_events.create(
+        :title => '2',
+        :start_at => '2012-01-08 12:00:00',
+        :location_address => 'test_address2',
+        :location_name => 'steven house'
+      )
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-08'
+      })
+      expect(json.first.slice('location_address', 'location_name')).to eql({'location_address' => evt.location_address, 'location_name' => evt.location_name})
+    end
+
     it 'orders result set by start_at' do
       e2 = @course.calendar_events.create(:title => 'second', :start_at => '2012-01-08 12:00:00')
       e1 = @course.calendar_events.create(:title => 'first', :start_at => '2012-01-07 12:00:00')

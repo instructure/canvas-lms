@@ -31,6 +31,21 @@ describe "RCE next tests" do
       stub_rcs_config
     end
 
+    def create_wiki_page_with_embedded_image(page_title)
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+      @course.wiki_pages.create!(title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}")
+    end
+
+    def click_embedded_image_for_options
+      in_frame tiny_rce_ifr_id do
+        f('img').click
+      end
+    end
+
     it "should click on sidebar wiki page to create link in body", ignore_js_errors: true do
       title = "test_page"
       unpublished = false
@@ -271,6 +286,35 @@ describe "RCE next tests" do
       end
     end
 
+    it "should open tray when clicking options button on existing image" do
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      expect(image_options_tray).to be_displayed
+    end
+
+    it "should change embedded image to link when selecting option" do
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      click_display_text_link_option
+      click_image_options_done_button
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body_anchor).not_to contain_css('src')
+      end
+    end
+
     it "should display assignment publish status in links accordion" do
       skip('Unskip in CORE-2619')
       title = "Assignment-Title"
@@ -307,6 +351,41 @@ describe "RCE next tests" do
       click_assignments_accordion
 
       expect(assignment_due_date).to eq date_string(due_at, :no_words)
+    end
+
+    it "should open a11y checker when clicking button in status bar" do
+      skip('Unskip in CORE-2638')
+      visit_front_page_edit(@course)
+
+      click_a11y_checker_button
+
+      expect(a11y_checker_tray).to be_displayed
+    end
+
+    it "should close the course links tray when pressing esc", ignore_js_errors: true do
+      skip('Unskip in CORE-2878')
+      visit_front_page_edit(@course)
+
+      click_links_toolbar_button
+      click_course_links
+      wait_for_tiny(edit_wiki_css)
+
+      driver.action.send_keys(:escape).perform # Press esc key
+
+      expect(tray_container).not_to be_displayed
+    end
+
+    it "should close the course images tray when pressing esc", ignore_js_errors: true do
+      skip('Unskip in CORE-2878')
+      visit_front_page_edit(@course)
+
+      click_images_toolbar_button
+      click_course_images
+      wait_for_tiny(edit_wiki_css)
+
+      driver.action.send_keys(:escape).perform # Press esc key
+
+      expect(tray_container).not_to be_displayed
     end
   end
 end

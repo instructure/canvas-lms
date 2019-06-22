@@ -18,17 +18,36 @@
 
 module Types
   class FileType < ApplicationObjectType
-    graphql_name "File"
+    include ApplicationHelper
+
+    graphql_name 'File'
 
     implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
+    implements Interfaces::TimestampInterface
+
+    # In the application_controller we use this logged_in_user to reflect either the
+    # masqueraded user or the actual user. For our purposes since we only want the
+    # current user, we can overwrite this here since we don't have access to the OG
+    # logged_in_user method.
+    def logged_in_user
+      @current_user
+    end
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
-    field :display_name, String, null: true
+    field :_id, ID, 'legacy canvas id', null: false, method: :id
+
     field :content_type, String, null: true
+
+    field :display_name, String, null: true
+
     field :mime_class, String, null: true
+
+    field :thumbnail_url, Types::UrlType, null: true
+    def thumbnail_url
+      return if object.locked_for?(current_user, check_policies: true)
+      authenticated_thumbnail_url(object)
+    end
 
     field :url, Types::UrlType, null: true
     def url

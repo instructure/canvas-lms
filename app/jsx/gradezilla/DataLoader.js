@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import cheaterDepaginate from '../shared/CheatDepaginator'
+import NaiveRequestDispatch from './default_gradebook/DataLoader/NaiveRequestDispatch'
 import StudentContentDataLoader from './default_gradebook/DataLoader/StudentContentDataLoader'
 
 function getStudentIds(courseId) {
@@ -30,25 +30,28 @@ function getGradingPeriodAssignments(courseId) {
   return $.ajaxJSON(url, 'GET', {})
 }
 
-function getAssignmentGroups(url, params) {
-  return cheaterDepaginate(url, params)
+function getAssignmentGroups(url, params, dispatch) {
+  return dispatch.getDepaginated(url, params)
 }
 
-function getContextModules(url) {
-  return cheaterDepaginate(url)
+function getContextModules(url, dispatch) {
+  return dispatch.getDepaginated(url)
 }
 
-function getCustomColumns(url) {
-  return cheaterDepaginate(url, {include_hidden: true})
+function getCustomColumns(url, dispatch) {
+  return dispatch.getDepaginated(url, {include_hidden: true})
 }
 
-function getDataForColumn(columnId, url, params, cb) {
+// This function is called from showNoteColumn in Gradebook.coffee
+// when the notes column is revealed. In that case dispatch won't
+// exist so we'll create a new Dispatcher for this request.
+function getDataForColumn(columnId, url, params, cb, dispatch = new NaiveRequestDispatch()) {
   const columnUrl = url.replace(/:id/, columnId)
   const augmentedCallback = data => cb(columnId, data)
-  return cheaterDepaginate(columnUrl, params, augmentedCallback)
+  return dispatch.getDepaginated(columnUrl, params, augmentedCallback)
 }
 
-function getCustomColumnData(options, customColumnsDfd, waitForDfds) {
+function getCustomColumnData(options, customColumnsDfd, waitForDfds, dispatch) {
   const url = options.customColumnDataURL
   const params = options.customColumnDataParams
   const cb = options.customColumnDataPageCb
@@ -59,13 +62,13 @@ function getCustomColumnData(options, customColumnsDfd, waitForDfds) {
     $.when(...waitForDfds).then(() => {
       if (options.customColumnIds) {
         const customColumnDataDfds = options.customColumnIds.map(columnId =>
-          getDataForColumn(columnId, url, params, cb)
+          getDataForColumn(columnId, url, params, cb, dispatch)
         )
         $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
       } else {
         customColumnsDfd.then(customColumns => {
           const customColumnDataDfds = customColumns.map(col =>
-            getDataForColumn(col.id, url, params, cb)
+            getDataForColumn(col.id, url, params, cb, dispatch)
           )
           $.when(...customColumnDataDfds).then(() => customColumnDataLoaded.resolve())
         })
@@ -77,9 +80,12 @@ function getCustomColumnData(options, customColumnsDfd, waitForDfds) {
 }
 
 function loadGradebookData(opts) {
+  const dispatch = new NaiveRequestDispatch()
+
   const gotAssignmentGroups = getAssignmentGroups(
     opts.assignmentGroupsURL,
-    opts.assignmentGroupsParams
+    opts.assignmentGroupsParams,
+    dispatch
   )
   if (opts.onlyLoadAssignmentGroups) {
     return {gotAssignmentGroups}
@@ -91,22 +97,25 @@ function loadGradebookData(opts) {
   if (opts.getGradingPeriodAssignments) {
     gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId)
   }
-  const gotCustomColumns = getCustomColumns(opts.customColumnsURL)
+  const gotCustomColumns = getCustomColumns(opts.customColumnsURL, dispatch)
 
-  const studentContentDataLoader = new StudentContentDataLoader({
-    courseId: opts.courseId,
-    gradebook: opts.gradebook,
-    loadedStudentIds: opts.loadedStudentIds,
-    onStudentsChunkLoaded: opts.studentsPageCb,
-    onSubmissionsChunkLoaded: opts.submissionsChunkCb,
-    studentsChunkSize: opts.perPage,
-    studentsParams: opts.studentsParams,
-    studentsUrl: opts.studentsURL,
-    submissionsChunkSize: opts.submissionsChunkSize,
-    submissionsUrl: opts.submissionsURL
-  })
+  const studentContentDataLoader = new StudentContentDataLoader(
+    {
+      courseId: opts.courseId,
+      gradebook: opts.gradebook,
+      loadedStudentIds: opts.loadedStudentIds,
+      onStudentsChunkLoaded: opts.studentsPageCb,
+      onSubmissionsChunkLoaded: opts.submissionsChunkCb,
+      studentsChunkSize: opts.perPage,
+      studentsParams: opts.studentsParams,
+      studentsUrl: opts.studentsURL,
+      submissionsChunkSize: opts.submissionsChunkSize,
+      submissionsUrl: opts.submissionsURL
+    },
+    dispatch
+  )
 
-  const gotContextModules = getContextModules(opts.contextModulesURL)
+  const gotContextModules = getContextModules(opts.contextModulesURL, dispatch)
 
   const gotStudents = $.Deferred()
   const gotSubmissions = $.Deferred()
@@ -119,7 +128,12 @@ function loadGradebookData(opts) {
     })
 
   // Custom Column Data will load only after custom columns and all submissions.
-  const gotCustomColumnData = getCustomColumnData(opts, gotCustomColumns, [gotSubmissions])
+  const gotCustomColumnData = getCustomColumnData(
+    opts,
+    gotCustomColumns,
+    [gotSubmissions],
+    dispatch
+  )
 
   return {
     gotAssignmentGroups,

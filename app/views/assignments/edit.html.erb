@@ -21,9 +21,7 @@
 <% else %>
   <% content_for :page_title, t("Edit Assignment") %>
 <% end %>
-<% content_for :right_side do %>
-  <%= render "shared/wiki_sidebar" %>
-<% end %>
+<% content_for :right_side, render(:partial => 'shared/wiki_sidebar') %>
 
 <%
   css_bundle :assignments, :assignments_edit, :tinymce

@@ -95,8 +95,14 @@
   "discussions_index_6c36ced": {
     "message": "Քննարկումների ցուցիչ"
   },
+  "done_54e3d4b6": {
+    "message": "Պատրաստ է"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ"
+  },
+  "embed_image_1080badc": {
+    "message": "Տեղադրել պատկերը"
   },
   "enter_search_terms_e397b1f0": {
     "message": "մուտքագրել որոնման պայմանները"
@@ -179,9 +185,6 @@
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Բեռնում է ավելի շատ արդյունքներ..."
-  },
   "media_af190855": {
     "message": "Մուլտիմեդիա"
   },
@@ -190,6 +193,9 @@
   },
   "no_results_940393cf": {
     "message": "No results."
+  },
+  "options_3ab0ea65": {
+    "message": "Պարամետրեր"
   },
   "pages_e5414c2c": {
     "message": "Էջեր"
@@ -203,6 +209,18 @@
   "quizzes_7e598f57": {
     "message": "Թեստեր"
   },
+  "record_7c9448b": {
+    "message": "Գրառում"
+  },
+  "recording_98da6bda": {
+    "message": "Ձայնագրում"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Ֆորմատավորված տեքստի խմբագիր"
+  },
+  "save_11a80ec3": {
+    "message": "Պահպանել"
+  },
   "search_280d00bd": {
     "message": "Որոնել"
   },
@@ -211,6 +229,12 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "size_b30e1077": {
+    "message": "Չափ"
+  },
+  "start_over_f7552aa9": {
+    "message": "Սկսել նորից"
   },
   "submit_a3cc6859": {
     "message": "Ուղարկել"
@@ -247,6 +271,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Օգտագործման իրավունք՝"
+  },
+  "video_player_b371005": {
+    "message": "Տեսաձայնագրության նվագարկիչ"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Ինչպե՞ս կցանկանայիք անվանել նոր էջը:"

@@ -262,38 +262,154 @@ class DeveloperKey < ActiveRecord::Base
     account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
   end
 
+  def disable_external_tools!(binding_account)
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :disable_tools_on_active_shard!,
+      binding_account
+    )
+  end
+
+  def enable_external_tools!(binding_account)
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :enable_tools_on_active_shard!,
+      binding_account
+    )
+  end
+
+  def restore_external_tools!(binding_account)
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :restore_tools_on_active_shard!,
+      binding_account
+    )
+  end
+
+  def update_external_tools!
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :update_tools_on_active_shard!,
+      account
+    )
+  end
+
   private
+
+  def manage_external_tools(enqueue_args, method, affected_account)
+    return if tool_configuration.blank?
+
+    if affected_account.blank? || affected_account.site_admin?
+      # Cleanup tools across all shards
+      Shard.with_each_shard do
+        send_later_enqueue_args(
+          method,
+          enqueue_args,
+          affected_account
+        )
+      end
+    else
+      send_later_enqueue_args(
+        method,
+        enqueue_args,
+        affected_account
+      )
+    end
+  end
+
+  def tool_management_enqueue_args
+    {
+      n_strand: ['developer_key_tool_management', account&.global_id || 'site_admin'],
+      priority: Delayed::LOW_PRIORITY
+    }
+  end
 
   def destroy_external_tools?
     saved_change_to_workflow_state? && workflow_state == 'deleted' && tool_configuration.present?
   end
 
   def destroy_external_tools!
-    enqueue_args = {
-      n_strand: ['destroy_dev_key_external_tools', account&.global_id || 'site_admin'],
-      priority: Delayed::HIGH_PRIORITY
-    }
+    manage_external_tools(
+      tool_management_enqueue_args,
+      :destroy_tools_from_active_shard!,
+      account
+    )
+  end
 
-    if site_admin?
-      # Cleanup tools across all shards
-      Shard.with_each_shard do
-        send_later_if_production_enqueue_args(
-          :destroy_tools_from_active_shard!,
-          enqueue_args
-        )
-      end
-    else
-      send_later_if_production_enqueue_args(
-        :destroy_tools_from_active_shard!,
-        enqueue_args
+  def destroy_tools_from_active_shard!(affected_account)
+    base_scope = ContextExternalTool.where.not(workflow_state: 'deleted')
+    tool_management_scope(base_scope, affected_account).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).destroy_all
+    end
+  end
+
+  def set_tool_workflow_state_on_active_shard!(state, scope, binding_account)
+    tool_management_scope(scope, binding_account).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).update(
+        workflow_state: state
       )
     end
   end
 
-  def destroy_tools_from_active_shard!
-    ContextExternalTool.active.where(developer_key: self).select(:id).find_in_batches do |tool_ids|
-      ContextExternalTool.where(id: tool_ids).destroy_all
+  def tool_management_scope(base_scope, affected_account)
+    if affected_account&.site_admin? || affected_account.blank?
+      return base_scope.where(developer_key: self)
     end
+
+    # Don't update tools in another root account on the same shard
+    base_scope.where(developer_key: self, root_account: affected_account)
+  end
+
+  def update_tools_on_active_shard!(account)
+    return if tool_configuration.blank?
+
+    base_scope = ContextExternalTool.where.not(workflow_state: 'deleted')
+    tool_management_scope(base_scope, account).select(:id).find_in_batches do |tool_ids|
+      ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
+        tool_configuration.new_external_tool(
+          tool.context,
+          existing_tool: tool
+        ).save
+      end
+    end
+  end
+
+  def restore_tools_on_active_shard!(_binding_account)
+    return if tool_configuration.blank?
+    Account.root_accounts.each do |root_account|
+      next if root_account.site_admin?
+
+      binding = DeveloperKeyAccountBinding.find_by(
+        developer_key: self,
+        account: root_account
+      )
+
+      return nil if binding.blank?
+
+      if binding.on?
+        enable_tools_on_active_shard!(root_account)
+      elsif binding.off?
+        disable_tools_on_active_shard!(root_account)
+      end
+    end
+  end
+
+  def disable_tools_on_active_shard!(binding_account)
+    return if tool_configuration.blank?
+    set_tool_workflow_state_on_active_shard!(
+      ContextExternalTool::DISABLED_STATE,
+      ContextExternalTool.active,
+      binding_account
+    )
+  end
+
+  def enable_tools_on_active_shard!(binding_account)
+    return if tool_configuration.blank?
+    set_tool_workflow_state_on_active_shard!(
+      tool_configuration.privacy_level,
+      ContextExternalTool.disabled,
+      binding_account
+    )
   end
 
   def validate_public_jwk

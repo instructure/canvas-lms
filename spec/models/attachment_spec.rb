@@ -356,6 +356,33 @@ describe Attachment do
         expect(@course.attachments.by_content_types(["%/%"]).pluck(:id)).to eq []
       end
     end
+
+    context "by_exclude_content_types" do
+      before :once do
+        course_model
+        @gif = attachment_model :context => @course, :content_type => 'image/gif'
+        @jpg = attachment_model :context => @course, :content_type => 'image/jpeg'
+        @txt = attachment_model :context => @course, :content_type => 'text/plain'
+        @pdf = attachment_model :context => @course, :content_type => 'application/pdf'
+      end
+
+      it "should match type" do
+        expect(@course.attachments.by_exclude_content_types(['image']).pluck(:id).sort).to eq [@txt.id, @pdf.id].sort
+      end
+
+      it "should match type/subtype" do
+        expect(@course.attachments.by_exclude_content_types(['image/gif']).pluck(:id).sort).to eq [@jpg.id, @txt.id, @pdf.id].sort
+        expect(@course.attachments.by_exclude_content_types(['image/gif', 'image/jpeg']).pluck(:id).sort).to eq [@txt.id, @pdf.id].sort
+      end
+
+      it "should escape sql and wildcards" do
+        @weird = attachment_model :context => @course, :content_type => "%/what's this"
+
+        expect(@course.attachments.by_exclude_content_types(['%']).pluck(:id).sort).to eq [@gif.id, @jpg.id, @txt.id, @pdf.id].sort
+        expect(@course.attachments.by_exclude_content_types(["%/what's this"]).pluck(:id).sort).to eq [@gif.id, @jpg.id, @txt.id, @pdf.id].sort
+        expect(@course.attachments.by_exclude_content_types(["%/%"]).pluck(:id).sort).to eq [@gif.id, @jpg.id, @txt.id, @pdf.id, @weird.id].sort
+      end
+    end
   end
 
   context "uploaded_data" do

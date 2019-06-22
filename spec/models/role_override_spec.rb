@@ -87,7 +87,6 @@ describe RoleOverride do
     ro.save!
 
     AdheresToPolicy::Cache.clear
-    RoleOverride.clear_cached_contexts
     c2 = Course.find(c2.id)
 
     expect(c2.grants_right?(u2, :moderate_forum)).to be_truthy
@@ -127,7 +126,6 @@ describe RoleOverride do
       expect(@fake_student.enrollments.first.has_permission_to?(permission.to_sym)).to be_falsey
 
       RoleOverride.manage_role_override(Account.default, student_role, permission, :override => true)
-      RoleOverride.clear_cached_contexts
 
       expect(@student.enrollments.first.has_permission_to?(permission.to_sym)).to be_truthy
       expect(@fake_student.enrollments.first.has_permission_to?(permission.to_sym)).to be_truthy
@@ -559,4 +557,77 @@ describe RoleOverride do
     end
   end
 
+  describe "caching" do
+    specs_require_cache(:redis_store)
+
+    it "should only calculate role overrides once for all courses across an account" do
+      enrollment1 = student_in_course(:active_all => true)
+      enrollment2 = student_in_course(:active_all => true)
+
+      expect(RoleOverride).to receive(:uncached_permission_for).once.and_call_original
+      [enrollment1, enrollment2].each do |e|
+        expect(Course.find(e.course_id).grants_right?(e.user, :read_forum)).to eq true
+      end
+    end
+
+    it "should only calculate role overrides once for multiple users with the same role in the same course" do
+      enrollment1 = student_in_course(:active_all => true)
+      enrollment2 = student_in_course(:active_all => true, :course => enrollment1.course)
+
+      expect(RoleOverride).to receive(:uncached_permission_for).once.and_call_original
+      [enrollment1, enrollment2].each do |e|
+        expect(Course.find(e.course_id).grants_right?(e.user, :read_forum)).to eq true
+      end
+    end
+
+    it "should cache correctly across separate roles" do
+      enrollment1 = student_in_course(:active_all => true)
+      enrollment2 = teacher_in_course(:active_all => true)
+
+      expect(RoleOverride).to receive(:uncached_permission_for).twice.and_call_original
+      [enrollment1, enrollment2].each do |e|
+        expect(Course.find(e.course_id).grants_right?(e.user, :read_forum)).to eq true
+      end
+    end
+
+    it "should cache correctly across separate accounts" do
+      enrollment1 = student_in_course(:active_all => true)
+      @account2 = Account.default.sub_accounts.create!
+      @account2.role_overrides.create!(:role => student_role, :permission => :read_forum, :enabled => false)
+      course2 = course_factory(:active_all => true, :account => @account2)
+      enrollment2 = student_in_course(:active_all => true, :course => course2)
+
+      expect(RoleOverride).to receive(:uncached_permission_for).twice.and_call_original
+      expect(enrollment1.course.grants_right?(enrollment1.user, :read_forum)).to eq true
+      expect(enrollment2.course.grants_right?(enrollment2.user, :read_forum)).to eq false
+    end
+
+    it "should uncache correctly when role overrides change upstream" do
+      expect(RoleOverride).to receive(:uncached_permission_for).twice.and_call_original
+      @sub_account = Account.default.sub_accounts.create!
+      course = course_factory(:active_all => true, :account => @sub_account)
+      student_in_course(:active_all => true, :course => course)
+
+      expect(course.grants_right?(@student, :read_forum)).to eq true
+      Account.default.role_overrides.create!(:role => student_role, :permission => :read_forum, :enabled => false)
+
+      @student.touch # clear the existing permissions cache
+      expect(Course.find(course.id).grants_right?(@student, :read_forum)).to eq false
+    end
+
+    it "should uncache correctly when the account chain changes" do
+      expect(RoleOverride).to receive(:uncached_permission_for).twice.and_call_original
+      @sub_account1 = Account.default.sub_accounts.create!
+      course = course_factory(:active_all => true, :account => @sub_account1)
+      student_in_course(:active_all => true, :course => course)
+      @sub_account2 = Account.default.sub_accounts.create!
+      @sub_account2.role_overrides.create!(:role => student_role, :permission => :read_forum, :enabled => false)
+
+      expect(course.grants_right?(@student, :read_forum)).to eq true
+
+      @sub_account1.update_attribute(:parent_account, @sub_account2)
+      @student.touch
+      expect(Course.find(course.id).grants_right?(@student, :read_forum)).to eq false
+    end
+  end
 end

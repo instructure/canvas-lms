@@ -19,10 +19,10 @@
 module Canvas::Oauth
   module GrantTypes
     class ClientCredentials < BaseType
-      def initialize(opts, host)
+      def initialize(opts, host, protocol = nil)
         raise Canvas::Oauth::InvalidRequestError, 'assertion method not supported for this grant_type' if basic_auth?(opts)
         raw_jwt = opts.fetch(:client_assertion)
-        @provider = Canvas::Oauth::ClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts))
+        @provider = Canvas::Oauth::ClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)
         @secret = @provider.key&.api_key
       end
 

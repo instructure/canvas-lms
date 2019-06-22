@@ -231,7 +231,7 @@ class AccountReportsController < ApplicationController
 
       available_reports.each do |key, value|
         last_run = @account.account_reports.active.where(report_type: key).most_recent.take
-        last_run = account_report_json(last_run, @current_user, session) if last_run
+        last_run = account_report_json(last_run, @current_user) if last_run
         report = {
           :title => value.title,
           :parameters => nil,
@@ -292,11 +292,11 @@ class AccountReportsController < ApplicationController
       raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
       parameters = params[:parameters]&.to_unsafe_h
       report = @account.account_reports.build(:user=>@current_user, :report_type=>params[:report], :parameters=>parameters)
-      report.workflow_state = :running
+      report.workflow_state = :created
       report.progress = 0
       report.save
       report.run_report
-      render :json => account_report_json(report, @current_user, session)
+      render :json => account_report_json(report, @current_user)
     end
   end
 
@@ -318,7 +318,7 @@ class AccountReportsController < ApplicationController
 
       reports = Api.paginate(type_scope.active.order('id DESC'), self, url_for({action: :index, controller: :account_reports}))
 
-      render :json => account_reports_json(reports, @current_user, session)
+      render :json => account_reports_json(reports, @current_user)
     end
   end
 
@@ -335,7 +335,7 @@ class AccountReportsController < ApplicationController
     if authorized_action(@context, @current_user, :read_reports)
 
       report = type_scope.active.find(params[:id])
-      render :json => account_report_json(report, @current_user, session)
+      render :json => account_report_json(report, @current_user)
     end
   end
 
@@ -355,7 +355,7 @@ class AccountReportsController < ApplicationController
 
       report.destroy
       if report.destroy
-        render :json => account_report_json(report, @current_user, session)
+        render :json => account_report_json(report, @current_user)
       else
         render :json => report.errors, :status => :bad_request
       end

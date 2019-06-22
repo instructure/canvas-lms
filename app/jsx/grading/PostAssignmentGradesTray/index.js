@@ -60,6 +60,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       postBySections: false,
       postType: EVERYONE,
       postingGrades: false,
+      onExited() {},
       open: false,
       selectedSectionIds: [],
       submissions: []

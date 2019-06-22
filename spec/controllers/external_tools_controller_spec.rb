@@ -1692,48 +1692,23 @@ describe ExternalToolsController do
       expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
     end
 
-  end
+    context 'with 1.3 tool' do
+      include_context 'lti_1_3_spec_helper'
 
-  describe 'lti 1.3' do
-    include_context 'lti_1_3_spec_helper'
-
-    let_once(:account) { Account.default }
-    let_once(:sub_account) { account_model(root_account: account) }
-    let_once(:course) { course_model account: sub_account }
-    let_once(:admin) { account_admin_user(account: account) }
-    let_once(:student) do
-      student_in_course
-      @student
-    end
-    let(:developer_key) { DeveloperKey.create!(account: account) }
-    let(:tool_configuration) do
-      Lti::ToolConfiguration.create!(
-        developer_key: developer_key,
-        settings: settings
-      )
-    end
-    let(:dev_key_id) { developer_key.id }
-
-    before do
-      user_session(admin)
-      tool_configuration
-    end
-
-    shared_examples_for 'basic devkey behavior' do
-      context 'when the user is an admin' do
-        it { is_expected.to have_http_status :success }
+      let(:params) { {:course_id => @course.id, id: tool.id} }
+      let(:tool) do
+        t = tool_configuration.new_external_tool(@course)
+        t.save!
+        t
       end
+      let(:account) { @course.account }
 
-      context 'when the user is not an admin' do
-        before { user_session(student) }
-
-        it { is_expected.to be_unauthorized }
-      end
-
-      context 'when the developer key does not exist' do
-        before { developer_key.destroy! }
-
-        it { is_expected.to be_not_found }
+      it 'redirects to session_token url with query params for lti 1.3 launch' do
+        get :generate_sessionless_launch, params: params
+        expect(response).to be_successful
+        json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+        return_to = CGI.parse(URI.parse(json['url']).query)['return_to']
+        expect(return_to.first).to eq("#{course_external_tools_url(@course)}/#{tool.id}")
       end
     end
   end

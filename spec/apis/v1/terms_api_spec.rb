@@ -226,6 +226,15 @@ describe TermsController, type: :request do
           { enrollment_term: { name: 'Term 2', sis_term_id: {:fail => true} } }, {}, {:expected_status => 400})
       end
 
+      it "rejects non unique sis ids" do
+        @account.enrollment_terms.create!(name: 'term', sis_source_id: 'sis1')
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+                        { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+                        { enrollment_term: { name: 'Term 2', sis_term_id: 'sis1' } }, {:expected_status => 400})
+
+        expect(json['errors']['sis_source_id'].first.values).to eq ["sis_source_id", "SIS ID \"sis1\" is already in use", "SIS ID \"sis1\" is already in use"]
+      end
+
       it "rejects sis_term_id without :manage_sis permission" do
         account_with_role_changes(account: @account, role_changes: { manage_sis: false })
         expect(@account.grants_right?(@user, :manage_sis)).to be_falsey
@@ -279,6 +288,15 @@ describe TermsController, type: :request do
       expect(@term1.name).to eq 'Term 2'
       expect(@term1.start_at.to_i).to eq start_at.to_i
       expect(@term1.end_at.to_i).to eq end_at.to_i
+    end
+
+    it "allows removing sis ids" do
+      term = @account.enrollment_terms.create!(name: 'term', sis_source_id: 'sis1')
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{term.id}",
+                      { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: term.to_param },
+                      { enrollment_term: { name: 'Term 2', sis_source_id: '' } })
+      expect(json['sis_term_id']).to be_nil
+      expect(term.reload.sis_source_id).to be_nil
     end
 
     it "requires valid dates" do

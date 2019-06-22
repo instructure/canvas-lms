@@ -21,12 +21,11 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import ReactCSSTransitionGroup from "react-transition-group/CSSTransitionGroup";
 import formatMessage from "../../format-message";
-import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
-import Select from "@instructure/ui-core/lib/components/Select";
-import Button from "@instructure/ui-buttons/lib/components/Button";
-import Alert from "@instructure/ui-alerts/lib/components/Alert";
-import IconAddSolid from "@instructure/ui-icons/lib/Solid/IconAdd";
-import IconMinimizeSolid from "@instructure/ui-icons/lib/Solid/IconMinimize";
+import { ScreenReaderContent } from '@instructure/ui-a11y'
+import { Select } from '@instructure/ui-forms'
+import { Button } from '@instructure/ui-buttons'
+import { Alert } from '@instructure/ui-alerts'
+import { IconAddSolid, IconMinimizeSolid } from '@instructure/ui-icons'
 import Loading from "../../common/components/Loading";
 import UsageRightsForm from "./UsageRightsForm";
 import AltTextForm from "./AltTextForm";

@@ -92,11 +92,14 @@
     display: inline-flex;
     align-items: center;
     flex-grow: 1;
+    max-width: 70%;
     h2 {
       margin: direction-sides(0 7px 0 5px);
       font-weight: bold;
       @include fontSize($ic-font-size--small);
       line-height: 18px;
+      text-overflow: ellipsis;
+      overflow: hidden;
       small {
         @include fontSize($ic-font-size--xsmall);
       }

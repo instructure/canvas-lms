@@ -467,20 +467,22 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns PageRevision
   def show_revision
-    if params.has_key?(:revision_id)
-      permission = :read_revisions
-      revision = @page.versions.where(number: params[:revision_id].to_i).first!
-    else
-      permission = :read
-      revision = @page.versions.current
-    end
-    if authorized_action(@page, @current_user, permission)
-      include_content = if params.has_key?(:summary)
-                          !value_to_boolean(params[:summary])
-                        else
-                          true
-                        end
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+    Shackles.activate(:slave) do
+      if params.has_key?(:revision_id)
+        permission = :read_revisions
+        revision = @page.versions.where(number: params[:revision_id].to_i).first!
+      else
+        permission = :read
+        revision = @page.versions.current
+      end
+      if authorized_action(@page, @current_user, permission)
+        include_content = if params.has_key?(:summary)
+                            !value_to_boolean(params[:summary])
+                          else
+                            true
+                          end
+        render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+      end
     end
   end
 

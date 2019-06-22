@@ -42,6 +42,32 @@ describe Importers::ContextExternalToolImporter do
     expect(tool.context).to eq @course.account
   end
 
+  context 'when importing LTI 1.3 tool' do
+    subject do
+      Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course.account,
+        migration
+      )
+    end
+
+    let(:course) { course_model }
+    let(:developer_key) { DeveloperKey.create!(account: course.account) }
+    let(:migration) { course.content_migrations.create! }
+    let(:settings) { {client_id: developer_key.global_id} }
+    let(:tool_hash) do
+      {
+        title: 'LTI 1.3 Tool',
+        url: 'http://www.example.com',
+        settings: settings
+      }
+    end
+
+    it 'sets the developer key id' do
+      expect(subject.developer_key).to eq developer_key
+    end
+  end
+
   context "combining imported external tools" do
     before :once do
       course_model

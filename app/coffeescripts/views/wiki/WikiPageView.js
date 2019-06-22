@@ -86,7 +86,7 @@ export default class WikiPageView extends Backbone.View {
           lock_info.context_module.id
         }/prerequisites/wiki_page_${this.model.get('page_id')}`
         $('<a id="module_prerequisites_lookup_link" style="display: none;">')
-          .attr('href', prerequisites_lookup)
+          .attr('x-canvaslms-trusted-url', prerequisites_lookup)
           .appendTo($('.lock_explanation'))
         INST.lookupPrerequisites()
       }

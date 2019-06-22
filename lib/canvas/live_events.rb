@@ -360,7 +360,7 @@ module Canvas::LiveEvents
       account_uuid: assoc.account.uuid,
       created_at: assoc.created_at,
       updated_at: assoc.updated_at,
-      is_admin: !(assoc.account.root_account.all_account_users_for(assoc.user).empty?),
+      is_admin: !(assoc.account.root_account.cached_all_account_users_for(assoc.user).empty?),
     })
   end
 

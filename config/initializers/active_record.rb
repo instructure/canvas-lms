@@ -1301,7 +1301,7 @@ ActiveRecord::Associations::HasOneAssociation.class_eval do
 end
 
 class ActiveRecord::Migration
-  VALID_TAGS = [:predeploy, :postdeploy, :cassandra]
+  VALID_TAGS = [:predeploy, :postdeploy, :cassandra, :dynamodb]
   # at least one of these tags is required
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 

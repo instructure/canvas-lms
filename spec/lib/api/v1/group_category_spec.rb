@@ -82,5 +82,26 @@ describe "Api::V1::GroupCategory" do
       end
     end
 
+    describe "groups within the category" do
+      let(:course) { Course.create! }
+      let(:category) { course.group_categories.create!(name: "category") }
+      let(:user) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
+
+      before(:each) do
+        category.create_groups(2)
+      end
+
+      it "are included when 'groups' is specified as an include key" do
+        json = CategoryHarness.new.group_category_json(category, user, nil, {include: ['groups']})
+        json_group_ids = json["groups"].map { |group| group["id"] }
+
+        expect(json_group_ids).to match_array(category.groups.pluck(:id))
+      end
+
+      it "are not included when 'groups' is not specified as an include key" do
+        json = CategoryHarness.new.group_category_json(category, user, nil)
+        expect(json).not_to have_key("groups")
+      end
+    end
   end
 end

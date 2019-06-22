@@ -1822,7 +1822,7 @@ describe Quizzes::Quiz do
     end
 
     context "show_correct_answers_last_attempt is true" do
-      let(:student) { student_in_course(course: @course, active_all: true) }
+      let(:student) { student_in_course(course: @course, active_all: true).user }
 
       it "shows the correct answers on last attempt completed" do
         quiz = @course.quizzes.create!({

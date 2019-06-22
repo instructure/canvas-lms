@@ -41,6 +41,225 @@ describe DeveloperKey do
     )
   end
 
+  describe 'external tool management' do
+    specs_require_sharding
+    include_context 'lti_1_3_spec_helper'
+
+    let(:developer_key) { @shard1.activate { DeveloperKey.create! } }
+    let(:shard_1_account) { @shard1.activate { account_model } }
+    let(:shard_1_tool) do
+      tool = nil
+      @shard1.activate do
+        tool = ContextExternalTool.create!(
+          name: 'shard 1 tool',
+          workflow_state: 'public',
+          developer_key: developer_key,
+          context: shard_1_account,
+          url: 'https://www.test.com',
+          consumer_key: 'key',
+          shared_secret: 'secret'
+        )
+        DeveloperKeyAccountBinding.create!(
+          developer_key: tool.developer_key,
+          account: shard_1_account,
+          workflow_state: 'on'
+        )
+      end
+      tool
+    end
+    let(:shard_2_account) { @shard2.activate { account_model } }
+    let(:shard_2_tool) do
+      tool = nil
+      @shard2.activate do
+        tool = ContextExternalTool.create!(
+          name: 'shard 2 tool',
+          workflow_state: 'public',
+          developer_key: developer_key,
+          context: shard_2_account,
+          url: 'https://www.test.com',
+          consumer_key: 'key',
+          shared_secret: 'secret'
+        )
+        DeveloperKeyAccountBinding.create!(
+          developer_key: tool.developer_key,
+          account: shard_2_account,
+          workflow_state: 'off'
+        )
+      end
+      tool
+    end
+
+    describe '#restore_external_tools!' do
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        shard_1_tool.update!(root_account: shard_1_account)
+        shard_2_tool.update!(root_account: shard_2_account)
+        subject
+      end
+
+      context 'when account is site admin' do
+        subject do
+          @shard1.activate do
+            developer_key.restore_external_tools!(account)
+            run_jobs
+          end
+        end
+
+        let(:account) { Account.site_admin }
+
+        it 'restores tools in non-disabled states' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'public'
+        end
+
+        it 'restores tools in disabled states' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+    end
+
+    describe '#disable_external_tools!' do
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        shard_1_tool
+        shard_2_tool
+        subject
+      end
+
+      context 'when account is site admin' do
+        subject do
+          @shard1.activate do
+            developer_key.disable_external_tools!(account)
+            run_jobs
+          end
+        end
+
+        let(:account) { Account.site_admin }
+
+        it 'disables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+        end
+
+        it 'disables tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+
+      context 'account is not site admin' do
+        subject do
+          @shard1.activate do
+            developer_key.disable_external_tools!(account)
+            run_jobs
+          end
+        end
+
+        let(:account) { shard_1_tool.root_account }
+
+        it 'disables associated tools on the active shard' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'disabled'
+        end
+
+        it 'does not disable tools on inactive shards' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'public'
+        end
+      end
+    end
+
+    describe '#enable_external_tools!' do
+      subject do
+        @shard1.activate do
+          developer_key.enable_external_tools!(account)
+          run_jobs
+        end
+      end
+
+      before do
+        developer_key
+        @shard1.activate { tool_configuration.update!(privacy_level: 'anonymous') }
+        shard_1_tool.update!(workflow_state: 'disabled')
+        shard_2_tool.update!(workflow_state: 'disabled')
+        subject
+      end
+
+      context 'account is site admin' do
+        let(:account) { Account.site_admin }
+
+        it 'enables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
+        end
+
+        it 'enables tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'anonymous'
+        end
+      end
+
+      context 'is_site_admin is false' do
+        let(:account) { shard_1_tool.root_account }
+
+        it 'enables tools on shard 1' do
+          expect(shard_1_tool.reload.workflow_state).to eq 'anonymous'
+        end
+
+        it 'does not enable tools on shard 2' do
+          expect(shard_2_tool.reload.workflow_state).to eq 'disabled'
+        end
+      end
+    end
+
+    describe '#update_external_tools!' do
+      subject do
+        @shard1.activate do
+          tool_configuration.settings['title'] = new_title
+          tool_configuration.save!
+          developer_key.update_external_tools!
+          run_jobs
+        end
+      end
+
+      let(:new_title) { 'New Title!' }
+
+      before do
+        developer_key
+        @shard1.activate { tool_configuration.update!(privacy_level: 'anonymous') }
+        shard_1_tool.update!(workflow_state: 'disabled')
+        shard_2_tool.update!(workflow_state: 'disabled')
+      end
+
+      context 'when site admin key' do
+        before do
+          developer_key.update!(account: nil)
+          subject
+          run_jobs
+        end
+
+        it 'updates tools on all shard 1' do
+          expect(shard_1_tool.reload.name).to eq new_title
+        end
+
+        it 'updates tools on shard 2' do
+          expect(shard_2_tool.reload.name).to eq new_title
+        end
+      end
+
+      context 'when non-site admin key' do
+        before do
+          developer_key.update!(account: shard_1_account)
+          subject
+          run_jobs
+        end
+
+        it 'updates tools on shard 1' do
+          expect(shard_1_tool.reload.name).to eq new_title
+        end
+
+        it 'does not update tools on shard 2' do
+          expect(shard_2_tool.reload.name).to eq 'shard 2 tool'
+        end
+      end
+    end
+  end
+
   describe 'usable_in_context?' do
     let(:account) { account_model }
     let(:developer_key) { DeveloperKey.create!(account: account) }
@@ -323,6 +542,7 @@ describe DeveloperKey do
 
           it 'destroys associated tools across all shards' do
             developer_key.destroy
+            run_jobs
             expect(subject).to be_empty
           end
 
@@ -340,6 +560,7 @@ describe DeveloperKey do
 
             it 'destroys associated tools across all shards' do
               developer_key.destroy
+              run_jobs
               expect(subject).to be_empty
             end
           end
@@ -373,6 +594,7 @@ describe DeveloperKey do
         context 'when developer key is an LTI key' do
           it 'destroys associated tools on the current shard' do
             developer_key.destroy
+            run_jobs
             expect(subject).to be_empty
           end
 
@@ -388,6 +610,7 @@ describe DeveloperKey do
 
             it 'destroys associated tools on the current shard' do
               developer_key.destroy
+              run_jobs
               expect(subject).to be_empty
             end
           end

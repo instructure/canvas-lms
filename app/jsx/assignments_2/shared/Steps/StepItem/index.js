@@ -19,15 +19,16 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
+import classNames from 'classnames'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import IconLock from '@instructure/ui-icons/lib/Solid/IconLock'
+import IconPlus from '@instructure/ui-icons/lib/Solid/IconPlus'
 import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
-import classNames from 'classnames'
 import px from '@instructure/ui-utils/lib/px'
 
 class StepItem extends Component {
   static propTypes = {
-    status: PropTypes.oneOf(['complete', 'in-progress', 'unavailable']),
+    status: PropTypes.oneOf(['button', 'complete', 'in-progress', 'unavailable']),
     label: PropTypes.oneOfType([PropTypes.func, PropTypes.string, PropTypes.element]).isRequired,
     icon: PropTypes.element,
     pinSize: PropTypes.string,
@@ -44,6 +45,8 @@ class StepItem extends Component {
       return <IconCheckMark color="primary-inverse" />
     } else if (!Icon && this.props.status === 'unavailable') {
       return <IconLock color="error" />
+    } else if (!Icon && this.props.status === 'button') {
+      return <IconPlus color="secondary" />
     } else if (typeof this.props.icon === 'function') {
       return <Icon />
     } else if (Icon) {
@@ -59,6 +62,7 @@ class StepItem extends Component {
         return Math.round(px(this.props.pinSize) / 1.5)
       case 'unavailable':
         return Math.round(px(this.props.pinSize) / 1.2)
+      case 'button':
       case 'in-progress':
         return px(this.props.pinSize)
       default:

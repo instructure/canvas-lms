@@ -98,8 +98,8 @@ module Lti
         it_behaves_like 'advantage services'
 
         before do
-          resource_link.context_external_tool.update!(developer_key: developer_key)
-          resource_link.line_items.create!(
+          resource_link.original_context_external_tool.update!(developer_key: developer_key)
+          resource_link.line_items.create(
             score_maximum: 1,
             label: 'Canvas Created',
             assignment: assignment
@@ -587,7 +587,7 @@ module Lti
 
           it 'deletes the correct line item' do
             send_request
-            expect(Lti::LineItem.find_by(id: line_item_id)).to be_nil
+            expect(Lti::LineItem.active.find_by(id: line_item_id)).to be_nil
           end
 
           it 'responds with no content' do

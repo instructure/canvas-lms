@@ -55,7 +55,8 @@ function getProps(gradebook, options) {
         gradebook.setSortRowsBySetting(columnId, 'sortable_name', 'descending')
       },
       settingKey: sortRowsBySetting.settingKey
-    }
+    },
+    studentGroupsEnabled: gradebook.showStudentGroups()
   }
 }
 

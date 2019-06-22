@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, shape} from 'prop-types'
+import {bool, shape, string} from 'prop-types'
 import I18n from 'i18n!gradezilla'
 import View from '@instructure/ui-layout/lib/components/View'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
@@ -33,6 +33,7 @@ export default class SubmissionStatus extends React.Component {
   static propTypes = {
     assignment: shape({
       muted: bool.isRequired,
+      postManually: bool.isRequired,
       published: bool.isRequired
     }).isRequired,
     isConcluded: bool.isRequired,
@@ -40,17 +41,40 @@ export default class SubmissionStatus extends React.Component {
     isInNoGradingPeriod: bool.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
     isNotCountedForScore: bool.isRequired,
+    postPoliciesEnabled: bool.isRequired,
     submission: shape({
       drop: bool,
-      excused: bool
+      gradedAt: string,
+      excused: bool,
+      postedAt: string
     }).isRequired
   }
 
   getStatusPills() {
-    const {assignment, submission} = this.props
+    const {assignment, postPoliciesEnabled, submission} = this.props
     const statusPillComponents = []
 
-    if (assignment.muted) {
+    if (postPoliciesEnabled) {
+      // Show the "hidden" pill if:
+      // - Manual posting is enabled and the submission is not posted (graded or not)
+      // - Auto-posting is enabled and the submission is graded but not posted
+      //   (this means it's been manually hidden)
+      const showPill =
+        submission &&
+        !submission.postedAt &&
+        (assignment.postManually || submission.gradedAt != null)
+
+      if (showPill) {
+        statusPillComponents.push(
+          <Pill
+            key="hidden-submission"
+            variant="warning"
+            text={I18n.t('Hidden')}
+            margin="0 0 x-small"
+          />
+        )
+      }
+    } else if (assignment.muted) {
       statusPillComponents.push(
         <Pill
           key="muted-assignment"

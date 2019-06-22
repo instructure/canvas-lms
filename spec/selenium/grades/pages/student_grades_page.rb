@@ -51,6 +51,10 @@ class StudentGradesPage
       f('#grading_period_select_menu')
     end
 
+    def hidden_eye_icon
+      fxpath("//*[@title='Hidden']")
+    end
+
     def select_period_by_name(name)
       click_option(grading_period_dropdown, name)
     end
@@ -99,7 +103,7 @@ class StudentGradesPage
       if assignment.grading_type == "letter_grade"
         assignment_row(assignment).find_element(css: '.assignment_score .score_value').text
       else
-        assignment_row(assignment).find_element(css: '.assignment_score .grade').text.split("\n")[1]
+        assignment_row(assignment).find_element(css: '.assignment_score .grade').text[/\d+/]
       end
     end
   end

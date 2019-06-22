@@ -23,6 +23,9 @@
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst: "
   },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Eitt bilde blir fortsatt opplasta, om du fortset vil bildet ikkje bli lagt til skikkelig"
+  },
   "announcement_list_da155734": {
     "message": "Kunngjeringsliste"
   },
@@ -116,6 +119,9 @@
   "copyright_holder_66ee111": {
     "message": "Rettshavar:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 words}\n    one {1 word}\n  other {# words}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Emnedokument"
   },
@@ -133,6 +139,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-lisens:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Gjeldande volumnivå"
+  },
+  "custom_6979cd81": {
+    "message": "Eigendefinert"
   },
   "date_added_ed5ad465": {
     "message": "Dato lagd til"
@@ -161,11 +173,20 @@
   "documents_81393201": {
     "message": "Dokument"
   },
+  "done_54e3d4b6": {
+    "message": "Fullført"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Dra og slipp, eller klikk for å hente fil frå disk"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Frist: Fleire datoar"
+  },
+  "due_when_7eed10c6": {
+    "message": "Frist: { when }"
+  },
+  "embed_image_1080badc": {
+    "message": "Sett inn bilde"
   },
   "enter_search_terms_e397b1f0": {
     "message": "oppgi søkeord"
@@ -173,14 +194,26 @@
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Legg inn alternativ tekst som skildrar bildet"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Vis og sjå { types }"
+  },
+  "external_links_3d9f074e": {
+    "message": "Eksterne lenker"
+  },
   "file_upload_form_4aaad554": {
     "message": "Filopplastingsdialog"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename } førehandsvising"
   },
   "files_c300e900": {
     "message": "Filer"
   },
   "files_index_af7c662b": {
     "message": "Filoversikt"
+  },
+  "finish_bc343002": {
+    "message": "Fullfør"
   },
   "folder_705fd2d7": {
     "message": "Mappe"
@@ -202,6 +235,9 @@
   },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
+  },
+  "image_options_tray_90a46006": {
+    "message": "Redigeringsmeny for bilde"
   },
   "image_upload_form_7b74079a": {
     "message": "Bildeopplastingsdialog"
@@ -257,11 +293,11 @@
   "loading_folders_8d4d5d5a": {
     "message": "Lastar mapper..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Lastar fleire resultat..."
-  },
   "media_af190855": {
     "message": "Media"
+  },
+  "mic_a7f3d311": {
+    "message": "Mic"
   },
   "modules_c4325335": {
     "message": "Modular"
@@ -269,20 +305,65 @@
   "no_results_940393cf": {
     "message": "Utan resultat. "
   },
+  "no_video_1ed00b26": {
+    "message": "Ingen video"
+  },
+  "options_3ab0ea65": {
+    "message": "Alternativ"
+  },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Ordna og uordna lister"
+  },
   "pages_e5414c2c": {
     "message": "Sider"
+  },
+  "paragraph_5e5ad8eb": {
+    "message": "Avsnitt"
+  },
+  "pause_12af3bb4": {
+    "message": "Pause"
   },
   "people_b4ebb13c": {
     "message": "Personar"
   },
+  "play_1a47eaa7": {
+    "message": "Spel av"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Vær god å gje Canvas tilgang til din mikrofon og ditt webkamera"
+  },
+  "posted_when_a578f5ab": {
+    "message": "Posta: { when }"
+  },
+  "preformatted_d0670862": {
+    "message": "Førehandsformatert"
+  },
+  "preview_a3f8f854": {
+    "message": "Førehandsvisning"
+  },
   "published_c944a23d": {
     "message": "publisert"
+  },
+  "published_when_302d8e23": {
+    "message": "Publisert: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Quizar"
   },
+  "record_7c9448b": {
+    "message": "Spel inn"
+  },
   "record_upload_media_5fdce166": {
     "message": "Ta opp / last opp media"
+  },
+  "recording_98da6bda": {
+    "message": "Opptak"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Redigeringsprogram for rikt innhald"
+  },
+  "save_11a80ec3": {
+    "message": "Lagre"
   },
   "search_280d00bd": {
     "message": "Søk"
@@ -295,6 +376,33 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vel ei mappe å laste opp fila til"
+  },
+  "size_b30e1077": {
+    "message": "Storleik"
+  },
+  "small_header_168fb9f9": {
+    "message": "Liten overskrift"
+  },
+  "something_went_wrong_89195131": {
+    "message": "Noko gjekk gale."
+  },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Noko gjekk gale med tilgangen til mikrofonen eller webkameraet ditt. "
+  },
+  "sort_by_e75f9e3e": {
+    "message": "Sorter etter"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "firkanta uordna liste"
+  },
+  "start_over_f7552aa9": {
+    "message": "Start på nytt"
+  },
+  "start_recording_9a65141a": {
+    "message": "Start opptak"
+  },
+  "subheader_2b87606d": {
+    "message": "Underoverskrift"
   },
   "submit_a3cc6859": {
     "message": "Send!"
@@ -314,6 +422,15 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Opplastinga har ein storleik som overskrid lagringskvoten. Ta kontakt med systemadministrator. "
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "Vert posta: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "Gjeremål: { when }"
+  },
+  "tray_839df38a": {
+    "message": "Sidemeny"
+  },
   "unpublished_dfd8801": {
     "message": "upublisert"
   },
@@ -329,16 +446,37 @@
   "upload_file_fd2361b8": {
     "message": "Last opp fil"
   },
+  "upload_image_6120b609": {
+    "message": "Last opp bilde"
+  },
+  "upload_media_ce31135a": {
+    "message": "Last opp media"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Last opp/Ta opp media"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "alfabetisk ordna liste i store bokstavar"
+  },
   "url_22a5f3b8": {
     "message": "URL-adresse"
   },
   "usage_right_ff96f3e2": {
     "message": "Bruksrett:"
   },
+  "video_player_b371005": {
+    "message": "Videoavspelar"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Sjå hurtigtastar"
+  },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Kva vil du kalle den nye sida? "
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki-startside"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Ditt webkamera kan allereie være i bruk"
   }
 }

@@ -129,7 +129,9 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   starting_cpu = Process.times()
 
   begin
-    block.call(worker, job)
+    RequestCache.enable do
+      block.call(worker, job)
+    end
   ensure
     ending_cpu = Process.times()
     ending_mem = Canvas.sample_memory()

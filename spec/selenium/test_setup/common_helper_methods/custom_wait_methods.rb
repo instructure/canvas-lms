@@ -121,7 +121,7 @@ module CustomWaitMethods
   end
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
-    frd_error = Selenium::WebDriver::Error::TimeOutError.new
+    frd_error = Selenium::WebDriver::Error::TimeoutError.new
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield

@@ -71,6 +71,7 @@ function getProps(column, gradebook, options) {
       muted: assignment.muted,
       name: assignment.name,
       pointsPossible: assignment.points_possible,
+      postManually: assignment.post_manually,
       published: assignment.published,
       submissionTypes: assignment.submission_types
     },

@@ -95,7 +95,7 @@ module Lti
         user: @user,
         expander: @expander,
         return_url: @return_url,
-        opts: @opts
+        opts: @opts.merge(option_overrides)
       )
     end
 
@@ -107,9 +107,15 @@ module Lti
           user: @user,
           expander: @expander,
           return_url: @return_url,
-          opts: @opts
+          opts: @opts.merge(option_overrides)
         )
       end
+    end
+
+    def option_overrides
+      {
+        target_link_uri: target_link_uri
+      }
     end
 
     def resource_type

@@ -70,8 +70,7 @@ describe('api actions', () => {
         fromMoment, getState: () => ({loading: {}}),
       });
       return moxiosWait(request => {
-        expect(request.config.url).toBe('/api/v1/planner/items');
-        expect(request.config.params.start_date).toBe(fromMoment.toISOString());
+        expect(request.config.url).toBe(`/api/v1/planner/items?start_date=${fromMoment.toISOString()}`);
       });
     });
 
@@ -91,9 +90,7 @@ describe('api actions', () => {
         fromMoment, intoThePast: true, getState: () => ({loading: {}}),
       });
       return moxiosWait(request => {
-        expect(request.config.url).toBe('/api/v1/planner/items');
-        expect(request.config.params.end_date).toBe(fromMoment.toISOString());
-        expect(request.config.params.order).toBe('desc');
+        expect(request.config.url).toBe(`/api/v1/planner/items?end_date=${fromMoment.toISOString()}&order=desc`);
       });
     });
 
@@ -144,9 +141,7 @@ describe('api actions', () => {
       const mockMoment = moment.tz('Asia/Tokyo').startOf('day');
       Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState);
       return moxiosWait(request => {
-        expect(request.config.params.filter).toBe('new_activity');
-        expect(request.config.params.start_date).toBe(mockMoment.subtract(6, 'months').toISOString());
-        expect(request.config.params.order).toBe('asc');
+        expect(request.url).toBe(`/api/v1/planner/items?start_date=${mockMoment.subtract(6, 'months').toISOString()}&filter=new_activity&order=asc`);
       });
     });
 

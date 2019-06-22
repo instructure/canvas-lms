@@ -20,6 +20,7 @@ require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla/settings'
 require_relative '../pages/student_grades_page'
 require_relative '../pages/gradezilla_cells_page'
+require_relative '../pages/gradezilla_grade_detail_tray_page'
 
 describe 'Gradezilla Post Policy' do
   include_context "in-process server selenium tests"
@@ -27,27 +28,49 @@ describe 'Gradezilla Post Policy' do
   before :once do
     preload_graphql_schema
     # course
-    course_with_teacher(
+    @course_with_auto_post = course_with_teacher(
       course_name: "Post Policy Course",
       active_course: true,
       active_enrollment: true,
       name: "Teacher Boss1",
       active_user: true
-    )
-    @course.enable_feature!(:new_gradebook)
-    @course.enable_feature!(:post_policies)
-    @course.post_policies.create!(post_manually: true)
+    ).course
+    @teacher1 = @teacher
+    @course_with_auto_post.enable_feature!(:new_gradebook)
+    @course_with_auto_post.enable_feature!(:post_policies)
+    @course_with_auto_post.post_policies.create!(post_manually: true)
+    # second course with post manually
+    @course_with_manual_post = course_with_teacher(
+      course_name: "Post Policy Course Manually",
+      active_course: true,
+      active_enrollment: true,
+      name: "Teacher Boss2",
+      active_user: true
+    ).course
+    @teacher2 = @teacher
+    @course_with_manual_post.enable_feature!(:new_gradebook)
+    @course_with_manual_post.enable_feature!(:post_policies)
+    @course_with_manual_post.post_policies.create!(post_manually: false)
 
     # sections
-    @section1 = @course.course_sections.first
-    @section2 = @course.course_sections.create!(:name => 'Section 2')
+    @section1 = @course_with_auto_post.course_sections.first
+    @section2 = @course_with_auto_post.course_sections.create!(:name => 'Section 2')
     # students
-    @students1 = create_users_in_course(@course, 2, return_type: :record, name_prefix: "Purple", section: @section1)
-    @students2 = create_users_in_course(@course, 2, return_type: :record, name_prefix: "Indigo", section: @section2)
-    @students = @students1.concat(@students2)
+    @section_one_students = create_users_in_course(@course_with_auto_post, 2, return_type: :record, name_prefix: "Purple", section: @section1)
+    @section_two_students = create_users_in_course(@course_with_auto_post, 2, return_type: :record, name_prefix: "Indigo", section: @section2)
+    @course_two_students = create_users_in_course(@course_with_manual_post, 2, return_type: :record, name_prefix: "Red")
+    @students = @section_one_students.dup
+    @students.concat(@section_two_students)
     # assignment
-    @assignment = @course.assignments.create!(
+    @auto_assignment = @course_with_auto_post.assignments.create!(
       title: 'post policy assignment',
+      submission_types: 'online_text_entry',
+      grading_type: 'points',
+      points_possible: 10
+    )
+
+    @manual_assignment = @course_with_manual_post.assignments.create!(
+      title: 'post policy assignment2',
       submission_types: 'online_text_entry',
       grading_type: 'points',
       points_possible: 10
@@ -55,119 +78,115 @@ describe 'Gradezilla Post Policy' do
   end
 
   before :each do
-    user_session(@teacher)
-    Gradezilla.visit(@course)
+    user_session(@teacher1)
+    Gradezilla.visit(@course_with_auto_post)
   end
 
   context do
     before :once do
-      @students.each do |student|
-        @assignment.grade_student(student, grade: 8, grader: @teacher)
-      end
+      @submissions = @students.map do |student|
+        @auto_assignment.grade_student(student, grade: 8, grader: @teacher1)
+      end.flatten
     end
 
     context 'when post everyone' do
       before :each do
-        skip('Unskip in GRADE-63')
-        manually_post_grades('Everyone')
+        Gradezilla.manually_post_grades(@auto_assignment, 'Everyone')
       end
 
       it 'post grades option disabled' do
-        skip('Unskip in GRADE-63')
-        GradezillaPage.click_assignment_header_menu(@assignment)
-        # TODO: expect post option to be disabled
+        Gradezilla.click_assignment_header_menu(@auto_assignment.id)
+        expect(Gradezilla.grades_posted_option).to be_disabled
       end
 
-      it 'students see grade', priority: '1', test_id: 3756679 do
-        @students.each do |student|
-          verify_student_grade_displayed(student, '8')
-        end
+      it 'students can see grade', priority: '1', test_id: 3756679 do
+        verify_grade_displayed_on_student_grade_page(@section_one_students.first, '8', @auto_assignment, @course_with_auto_post)
+        verify_grade_displayed_on_student_grade_page(@section_two_students.first, '8', @auto_assignment, @course_with_auto_post)
       end
     end
 
     context 'when post everyone for section' do
       before :each do
-        skip('Unskip in GRADE-63')
-        manually_post_grades('Everyone', @section2)
+        Gradezilla.manually_post_grades(@auto_assignment, 'Everyone', @section2)
       end
 
       it 'posts for section', priority: '1', test_id: 3756681 do
-        @students1.each do |student|
-          verify_student_grade_displayed(student, '8')
+        @section_two_students.each do |student|
+          verify_grade_displayed_on_student_grade_page(student, '8', @auto_assignment, @course_with_auto_post)
         end
       end
 
       it 'does not post for other section', priority: '1', test_id: 3756681 do
-        skip('Unskip in ticket to be created for student grades page')
-        # open submission tray, check for pill
-        Gradezilla::Cells.open_tray(@students2.first, @assignment)
-        expect(Gradezilla::GradeDetailTray.not_posted_pill).to be_displayed
-
-        # TODO: verify students not in section have eyeball icon
-        @students2.each do |student|
-          verify_student_grade_displayed(student, '')
-          # TODO: expect eyeball icon to be displayed
+        @section_one_students.each do |student|
+          user_session(student)
+          StudentGradesPage.visit_as_student(@course_with_auto_post)
+          expect(StudentGradesPage.hidden_eye_icon).to be_displayed
         end
       end
 
+      it 'hidden pill displayed in submission tray for other section', priority: '1', test_id: 3756681 do
+        Gradezilla::Cells.open_tray(@section_one_students.first, @auto_assignment)
+        expect(element_exists?(Gradezilla::GradeDetailTray.hidden_pill_locator, true)).to be_truthy
+      end
+
       it 'Post tray shows unposted count', priority: '1', test_id: 3756684 do
-        skip('Unskip in GRADE-63')
-        Gradezilla.click_post_grades(@assignment.id)
-        # TODO: expect unposted indicator to be displayed and show count 2
+        Gradezilla.click_post_grades(@auto_assignment.id)
+        expect(PostGradesTray.unposted_count).to eq "2"
       end
     end
 
     context 'when hide posted grades for everyone' do
+      before :once do
+        @auto_assignment.post_submissions(submission_ids: @submissions.pluck(:id))
+      end
+
       before :each do
-        skip('Unskip in GRADE-2142')
-        manually_post_grades('Everyone')
-        wait_for_ajaximations
-        Gradezilla.click_hide_grades(@assignment.id)
-        Gradezilla::HideGradesTray.hide_button.click
-        wait_for_ajaximations
+        Gradezilla.click_hide_grades(@auto_assignment.id)
+        HideGradesTray.hide_grades
       end
 
-      it 'header has HIDDEN', priority: '1', test_id: 3756682 do
-        skip('Unskip in GRADE-2142')
-        # TODO: expect header to have HIDDEN
+      it 'header has Hiddent icon', priority: '1', test_id: 3756682 do
+        expect(Gradezilla.assignment_hidden_eye_icon(@auto_assignment.id)).to be_displayed
       end
 
-      it 'student sees hidden icon', priority: '1', test_id: 3756682 do
-        @students.each do |student|
-          verify_student_grade_displayed(student, '')
-          # TODO: expect hidden icon to be displayed
-        end
+      it 'student can see hidden icon', priority: '1', test_id: 3756682 do
+        user_session(@section_one_students.second)
+        StudentGradesPage.visit_as_student(@course_with_auto_post)
+        expect(StudentGradesPage.hidden_eye_icon).to be_displayed
+
+        user_session(@section_two_students.second)
+        StudentGradesPage.visit_as_student(@course_with_auto_post)
+        expect(StudentGradesPage.hidden_eye_icon).to be_displayed
       end
 
       it 'hidden pill displayed in submission tray', priority: '1', test_id: 3756682 do
-        skip('Unskip in GRADE-2142')
-        Gradezilla::Cells.open_tray(@students2.first, @assignment)
-        expect(Gradezilla::GradeDetailTray.hidden_pill).to be_displayed
+        Gradezilla::Cells.open_tray(@section_two_students.first, @auto_assignment)
+        expect(element_exists?(Gradezilla::GradeDetailTray.hidden_pill_locator, true)).to be_truthy
       end
     end
 
     context 'when hide posted grades for section' do
-      before :each do
-        skip('Unskip in GRADE-2142')
-        manually_post_grades('Everyone')
-        wait_for_ajaximations
-        Gradezilla.click_hide_grades(@assignment.id)
-        Gradezilla::HideGradesTray.select_section(@section2)
-        Gradezilla::HideGradesTray.hide_button.click
-        wait_for_ajaximations
+      before :once do
+        @auto_assignment.post_submissions(submission_ids: @submissions.pluck(:id))
       end
 
-      it 'students in section have hidden grades', priority: '1', test_id: 3756683 do
-        skip('Unskip in GRADE-2142')
-        @students1.each do |student|
-          verify_student_grade_displayed(student, '')
-          # TODO: expect hidden icon to be displayed
+      before :each do
+        Gradezilla.click_hide_grades(@auto_assignment.id)
+        HideGradesTray.select_section(@section2.name)
+        HideGradesTray.hide_grades
+      end
+
+      it 'students in section have grades hidden', priority: '1', test_id: 3756683 do
+        @section_two_students.each do |student|
+          user_session(student)
+          StudentGradesPage.visit_as_student(@course_with_auto_post)
+          expect(StudentGradesPage.hidden_eye_icon).to be_displayed
         end
       end
 
-      it 'students in another section have grades posted', priority: '1', test_id: 3756683 do
-        @students2.each do |student|
-          verify_student_grade_displayed(student, '8')
+      it 'students in other section have grades posted', priority: '1', test_id: 3756683 do
+        @section_one_students.each do |student|
+          verify_grade_displayed_on_student_grade_page(student, '8', @auto_assignment, @course_with_auto_post)
         end
       end
     end
@@ -177,103 +196,87 @@ describe 'Gradezilla Post Policy' do
     before :once do
       @graded_students = [@students[0], @students[1], @students[2]]
       @graded_students.each do |student|
-        @assignment.grade_student(student, grade: 8, grader: @teacher)
+        @auto_assignment.grade_student(student, grade: 8, grader: @teacher1)
       end
     end
 
     before :each do
-      skip('Unskip in GRADE-63')
-      manually_post_grades('Graded')
+      Gradezilla.manually_post_grades(@auto_assignment, 'Graded')
     end
 
-    it 'posts for graded', priority: '1', test_id: 3756680 do
+    it 'graded students see grades', priority: '1', test_id: 3756680 do
       @graded_students.each do |student|
-        verify_student_grade_displayed(student, 8)
+        verify_grade_displayed_on_student_grade_page(student, "8", @auto_assignment, @course_with_auto_post)
       end
     end
 
     it 'does not post for ungraded', priority: '1', test_id: 3756680 do
-      skip('Unskip in ticket to be created for student grades page')
-      # TODO: verify ungraded students still have eyeball icon
-      verify_student_grade_displayed(@students[3], '')
-      # TODO: expect icon to be displayed
+      user_session(@students[3])
+      StudentGradesPage.visit_as_student(@course_with_auto_post)
+      expect(StudentGradesPage.hidden_eye_icon).to be_displayed
     end
   end
 
   context 'when post graded for section' do
     before :once do
-      @assignment.grade_student(@students2.first, grade: 8, grader: @teacher)
-      @students1.each do |student|
-        @assignment.grade_student(student, grade: 8, grader: @teacher)
+      @auto_assignment.grade_student(@section_two_students.first, grade: 8, grader: @teacher1)
+      @section_one_students.each do |student|
+        @auto_assignment.grade_student(student, grade: 8, grader: @teacher1)
       end
     end
 
     before :each do
-      skip('Unskip in GRADE-63')
-      manually_post_grades('Graded', @section2)
+      Gradezilla.manually_post_grades(@auto_assignment, 'Graded', @section2)
     end
 
     it 'posts graded for section', priority: '1', test_id: 3756681 do
-      verify_student_grade_displayed(@students2.first, '8')
+      verify_grade_displayed_on_student_grade_page(@section_two_students.first, '8', @auto_assignment, @course_with_auto_post)
     end
 
     it 'does not post ungraded for section', priority: '1', test_id: 3756681 do
-      skip('Unskip in ticket to be created for student grades page')
-      # TODO: verify students in section without grades have eyeball icon
-      verify_student_grade_displayed(@students2.second, '')
-      # TODO: expect eyeball icon to be displayed
+      user_session(@section_two_students.second)
+      StudentGradesPage.visit_as_student(@course_with_auto_post)
+      expect(StudentGradesPage.hidden_eye_icon).to be_displayed
     end
 
     it 'does not post graded for other section', priority: '1', test_id: 3756681 do
-      @students1.each do |student|
-        verify_student_grade_displayed(student, '')
+      @section_one_students.each do |student|
+        user_session(student)
+        StudentGradesPage.visit_as_student(@course_with_auto_post)
+        expect(StudentGradesPage.hidden_eye_icon).to be_displayed
       end
     end
   end
 
   context 'when Post Policy set to Automatically' do
     before :each do
-      skip('Unskip in GRADE-1995')
-      Gradezilla.settings_cog_select
-      Gradezilla::Settings.click_post_policy_tab
-      Gradezilla::PostingPolicies.select_automatically
-      Gradezilla::Settings.click_update_button
-      wait_for_ajaximations
-
-      Gradezilla::Cells.edit_grade(@students1.first, @assignment, '9')
+      user_session(@teacher2)
+      Gradezilla.visit(@course_with_manual_post)
+      Gradezilla::Cells.edit_grade(@course_two_students.first, @manual_assignment, '9')
     end
 
-    it 'grades are posted immediately', priority: '1', test_id: 3756687 do
-      verify_student_grade_displayed(@students1.first, '9')
+    it 'grades get posted immediately', priority: '1', test_id: 3756687 do
+      verify_grade_displayed_on_student_grade_page(@course_two_students.first, '9', @manual_assignment, @course_with_manual_post)
     end
   end
 
   context 'assignment level post policy automatically' do
     before :each do
-      skip('Unskip in GRADE-63')
-      Gradezilla.click_post_grades(@assignment.id)
+      Gradezilla.click_grade_posting_policy(@auto_assignment.id)
       Gradezilla::AssignmentPostingPolicy.post_policy_type_radio_button('Automatically').click
       Gradezilla::AssignmentPostingPolicy.save_button.click
 
-      Gradezilla::Cells.edit_grade(@students1.first, @assignment, '9')
+      Gradezilla::Cells.edit_grade(@section_one_students.first, @auto_assignment, '9')
     end
 
     it 'posts grade immediately', priority: '1', test_id: 3756685 do
-      verify_student_grade_displayed(@students1.first, '9')
+      verify_grade_displayed_on_student_grade_page(@section_one_students.first, '9', @auto_assignment, @course_with_auto_post)
     end
   end
 
-
-  def verify_student_grade_displayed(student, grade)
+  def verify_grade_displayed_on_student_grade_page(student, grade, assignment, course)
     user_session(student)
-    StudentGradesPage.visit_as_student(@course)
-    expect(StudentGradesPage.fetch_assignment_score(@assignment)).to eq grade
-  end
-
-  def manually_post_grades(type, section = nil)
-    Gradezilla.click_post_grades(@assignment.id)
-    Gradezilla::PostGradesTray.post_type_radio_button(type).click
-    Gradezilla::PostGradesTray.select_section(section.name) unless section.nil?
-    Gradezilla::PostGradesTray.post_button.click
+    StudentGradesPage.visit_as_student(course)
+    expect(StudentGradesPage.fetch_assignment_score(assignment)).to eq grade
   end
 end

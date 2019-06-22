@@ -503,7 +503,7 @@ describe Oauth2ProviderController do
 
     context 'client_credentials' do
       let(:grant_type) { 'client_credentials' }
-      let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host', protocol: 'https://') }
+      let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host') }
       let(:iat) { 1.minute.ago.to_i }
       let(:exp) { 10.minutes.from_now.to_i }
       let(:signing_key) { JSON::JWK.new(key.private_jwk) }
@@ -551,7 +551,7 @@ describe Oauth2ProviderController do
         end
 
         context 'with aud as an array' do
-          let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host', protocol: 'https://'), 'doesnotexist'] }
+          let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host'), 'doesnotexist'] }
 
           it { is_expected.to have_http_status 200 }
         end

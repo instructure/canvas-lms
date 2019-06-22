@@ -45,6 +45,14 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
     raise GraphQL::ExecutionError, 'not found' unless obj.grants_right?(current_user, session, perm)
   end
 
+  def validation_error(message)
+    {
+      errors: {
+        message: message
+      }
+    }
+  end
+
   private
 
   # returns validation errors in a consistent format (`Types::ValidationError`)

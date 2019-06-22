@@ -35,12 +35,17 @@ describe ContextExternalTool do
         shared_secret: 'secret',
         name: 'test tool',
         url: 'http://www.tool.com/launch',
-        developer_key: developer_key
+        developer_key: developer_key,
+        root_account: @root_account
       )
     end
 
     it 'allows setting the developer key' do
       expect(tool.developer_key).to eq developer_key
+    end
+
+    it 'allows setting the root account' do
+      expect(tool.root_account).to eq @root_account
     end
   end
 
@@ -833,6 +838,38 @@ describe ContextExternalTool do
       @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret', :domain => "google.com")
     end
 
+    context "setting the root account" do
+      let(:new_tool) do
+        context.context_external_tools.new(
+          name: 'test',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          domain: 'www.test.com'
+        )
+      end
+
+      shared_examples_for 'a tool that infers the root account' do
+        let(:context) { raise 'set "context" in examples' }
+
+        it 'sets the root account' do
+          expect { new_tool.save! }.to change { new_tool.root_account }.from(nil).to context.root_account
+        end
+      end
+
+
+      context 'when the context is a course' do
+        it_behaves_like 'a tool that infers the root account' do
+          let(:context) { course_model }
+        end
+      end
+
+      context 'when the context is an account' do
+        it_behaves_like 'a tool that infers the root account' do
+          let(:context) { account_model }
+        end
+      end
+    end
+
     it "should require valid configuration for user navigation settings" do
       tool = new_external_tool
       tool.settings = {:user_navigation => {:bob => 'asfd'}}
@@ -1335,7 +1372,7 @@ describe ContextExternalTool do
 
     it "should update the visibility cache if enrollments are updated or user is touched" do
       time = Time.now
-      enable_cache do
+      enable_cache(:redis_store) do
         Timecop.freeze(time) do
           course_with_student(:account => @account, :active_all => true)
           expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'
@@ -1351,7 +1388,7 @@ describe ContextExternalTool do
           # should not have affected the earlier cache
           expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'admins'
 
-          @user.touch
+          @user.clear_cache_key(:enrollments)
           expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'
         end
       end

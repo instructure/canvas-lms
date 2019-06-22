@@ -23,10 +23,12 @@ import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Modal from '../../shared/components/InstuiModal'
+import Modal, {ModalBody} from '../../shared/components/InstuiModal'
 import I18n from 'i18n!course_images'
 import Actions from '../actions'
 import CourseImagePicker from './CourseImagePicker'
+
+let overflow = ''
 
 export default class CourseImageSelector extends React.Component {
   state = this.props.store.getState()
@@ -37,7 +39,18 @@ export default class CourseImageSelector extends React.Component {
     this.setState({gettingImage: true})
   }
 
-  handleModalClose = () => this.props.store.dispatch(Actions.setModalVisibility(false))
+  handleModalOpen = () => {
+    overflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+  }
+
+  handleModalClose = () => {
+    document.body.style.overflow = overflow
+  }
+
+  handleModalDismiss = () => {
+    this.props.store.dispatch(Actions.setModalVisibility(false))
+  }
 
   changeImage = () => this.props.store.dispatch(Actions.setModalVisibility(true))
 
@@ -79,19 +92,25 @@ export default class CourseImageSelector extends React.Component {
           open={this.state.showModal}
           size="fullscreen"
           label={I18n.t('Choose Image')}
-          onDismiss={this.handleModalClose}
+          onDismiss={this.handleModalDismiss}
+          onEnter={this.handleModalOpen}
+          onExit={this.handleModalClose}
         >
-          <CourseImagePicker
-            courseId={this.props.courseId}
-            handleClose={this.handleModalClose}
-            handleFileUpload={(e, courseId) =>
-              this.props.store.dispatch(Actions.uploadFile(e, courseId))
-            }
-            handleFlickrUrlUpload={flickrUrl =>
-              this.props.store.dispatch(Actions.uploadFlickrUrl(flickrUrl, this.props.courseId))
-            }
-            uploadingImage={this.state.uploadingImage}
-          />
+          <ModalBody>
+            <CourseImagePicker
+              courseId={this.props.courseId}
+              handleClose={this.handleModalClose}
+              handleFileUpload={(e, courseId) =>
+                this.props.store.dispatch(Actions.uploadFile(e, courseId))
+              }
+              handleImageSearchUrlUpload={(imageUrl, confirmationId = null) =>
+                this.props.store.dispatch(
+                  Actions.uploadImageSearchUrl(imageUrl, this.props.courseId, confirmationId)
+                )
+              }
+              uploadingImage={this.state.uploadingImage}
+            />
+          </ModalBody>
         </Modal>
       </div>
     )

@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "ongeordende lijst omcirkelen"
   },
+  "clear_upload_34efa419": {
+    "message": "Upload wissen"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Op een bestand klikken om een link voor het downloaden van dat bestand in te voegen."
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "Samenwerkingen"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Inklappen om te verbergen { types }"
   },
   "computer_1d7dfa6f": {
     "message": "Computer"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "Documenten"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Slepen en neerzetten of klikken om je computer te doorzoeken"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Inleverdatum: Meerdere datums"
+  },
+  "due_when_7eed10c6": {
+    "message": "Inleverdatum: { when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "zoektermen invoeren"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Voer de alternatieve tekst voor deze afbeelding in"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "Uitklappen om te bekijken { types }"
+  },
   "external_links_3d9f074e": {
     "message": "Externe links"
   },
   "file_upload_form_4aaad554": {
     "message": "Formulier voor bestand uploaden"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename } preview"
   },
   "files_c300e900": {
     "message": "Bestanden"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "Wiskundige vergelijking invoeren"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "Ongeldig bestandstype"
+  },
   "link_7262adec": {
     "message": "Koppeling"
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Mappen laden..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Bezig met laden van meer resultaten..."
-  },
   "media_af190855": {
     "message": "Media"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "Geen resultaten."
+  },
+  "options_3ab0ea65": {
+    "message": "Opties"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Geordende en ongeordende lijsten"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "Personen"
   },
+  "posted_when_a578f5ab": {
+    "message": "Geplaatst: { when }"
+  },
   "preformatted_d0670862": {
     "message": "Voorgeformatteerd"
+  },
+  "published_c944a23d": {
+    "message": "gepubliceerd"
+  },
+  "published_when_302d8e23": {
+    "message": "Gepubliceerd: { when }"
   },
   "quizzes_7e598f57": {
     "message": "Toetsen"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Selecteer een map om je bestand te uploaden"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Afbeeldingsopties weergeven"
   },
   "small_header_168fb9f9": {
     "message": "Kleine koptekst"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Met deze upload wordt het quotum voor bestandsopslag overschreden. Neem contact op met je systeembeheerder."
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "Nog te plaatsen: { when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "To-do: { when }"
+  },
   "tray_839df38a": {
     "message": "Houder"
+  },
+  "unpublished_dfd8801": {
+    "message": "niet-gepubliceerd"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Een nieuwe afbeelding uploaden"
+  },
+  "upload_file_fd2361b8": {
+    "message": "Bestand uploaden"
   },
   "upload_image_6120b609": {
     "message": "Afbeelding uploaden"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "Gebruiksrecht:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Sneltoetsen bekijken"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Hoe wil je de nieuwe pagina noemen?"

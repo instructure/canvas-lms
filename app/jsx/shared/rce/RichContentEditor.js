@@ -18,7 +18,8 @@
 
 import serviceRCELoader from '../rce/serviceRCELoader'
 import {RCELOADED_EVENT_NAME, send, destroy, focus} from '../rce/RceCommandShim'
-import Sidebar from '../rce/Sidebar'
+const Sidebar = !ENV.use_rce_enhancements && require('../rce/Sidebar').default
+import deprecated from '../helpers/deprecated'
 import $ from 'jquery'
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
@@ -27,7 +28,7 @@ function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   const originalOnFocus = tinyMCEInitOptions.onFocus
 
   tinyMCEInitOptions.onFocus = (...args) => {
-    RichContentEditor.showSidebar()
+    if (!ENV.use_rce_enhancements) RichContentEditor.showSidebar()
     if (originalOnFocus instanceof Function) {
       originalOnFocus(...args)
     }
@@ -104,6 +105,8 @@ function freshNode(target) {
   return newTarget
 }
 
+const deprecationMsg = "with the new RCE you don't need to call this method, it is a no op since there is no sidebar"
+
 const RichContentEditor = {
   /**
    * start the remote module (if the feature flag is on) loading so that it's
@@ -123,9 +126,9 @@ const RichContentEditor = {
    *
    * @public
    */
-  initSidebar(subscriptions = {}) {
-    Sidebar.init(subscriptions)
-  },
+  initSidebar: deprecated(deprecationMsg, (subscriptions = {}) => {
+    if (!ENV.use_rce_enhancements) Sidebar.init(subscriptions)
+  }),
 
   /**
    * show the sidebar if it's around
@@ -133,9 +136,9 @@ const RichContentEditor = {
    * @public
    */
 
-  showSidebar() {
-    Sidebar.show()
-  },
+  showSidebar: deprecated(deprecationMsg, () => {
+    if (!ENV.use_rce_enhancements) Sidebar.show()
+  }),
 
   /**
    * hide the sidebar if it's around
@@ -143,9 +146,9 @@ const RichContentEditor = {
    * @public
    */
 
-  hideSidebar() {
-    Sidebar.hide()
-  },
+  hideSidebar: deprecated(deprecationMsg, () => {
+    if (!ENV.use_rce_enhancements) Sidebar.hide()
+  }),
 
   /**
    * load an editor into the target element with the given options. most
@@ -217,7 +220,7 @@ const RichContentEditor = {
     let $target = node2jquery(target)
     $target = this.freshNode($target)
     destroy($target)
-    Sidebar.hide()
+    if (!ENV.use_rce_enhancements) Sidebar.hide()
   },
 
   /**
@@ -230,7 +233,7 @@ const RichContentEditor = {
     let $target = node2jquery(target)
     $target = this.freshNode($target)
     focus($target)
-    Sidebar.show()
+    if (!ENV.use_rce_enhancements) Sidebar.show()
   },
 
   freshNode,

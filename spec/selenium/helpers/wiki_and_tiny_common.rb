@@ -225,6 +225,10 @@ module WikiAndTinyCommon
     get "/courses/#{course.id}/pages/front-page/edit"
   end
 
+  def visit_existing_wiki_edit(course, page_name)
+    get "/courses/#{course.id}/pages/#{page_name}/edit"
+  end
+
   def visit_new_announcement_page(course)
     get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
   end

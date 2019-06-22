@@ -64,8 +64,9 @@ class Attachment < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user
-  has_one :account_report
+  has_one :account_report, inverse_of: :attachment
   has_one :media_object
+  has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
   has_many :attachment_associations
   belongs_to :root_attachment, :class_name => 'Attachment'
@@ -1348,7 +1349,18 @@ class Attachment < ActiveRecord::Base
       AND (attachments.lock_at IS NULL OR attachments.lock_at>?)
       AND (attachments.unlock_at IS NULL OR attachments.unlock_at<?)", Time.now.utc, Time.now.utc)
   }
+
   scope :by_content_types, lambda { |types|
+    condition_sql = build_content_types_sql(types)
+    where(condition_sql)
+  }
+
+  scope :by_exclude_content_types, lambda { |types|
+    condition_sql = build_content_types_sql(types)
+    where.not(condition_sql)
+  }
+
+  def self.build_content_types_sql(types)
     clauses = []
     types.each do |type|
       if type.include? '/'
@@ -1358,8 +1370,7 @@ class Attachment < ActiveRecord::Base
       end
     end
     condition_sql = clauses.join(' OR ')
-    where(condition_sql)
-  }
+  end
 
   alias_method :destroy_permanently!, :destroy
   # file_state is like workflow_state, which was already taken

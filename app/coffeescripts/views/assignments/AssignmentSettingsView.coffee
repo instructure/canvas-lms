@@ -140,6 +140,5 @@ export default class AssignmentSettingsView extends DialogFormView
 
   toJSON: ->
     data = super
-    data.course
     data.canChangeWeights = @canChangeWeights()
     data

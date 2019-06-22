@@ -68,6 +68,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "丸い番号無しリスト"
   },
+  "clear_upload_34efa419": {
+    "message": "アップロードの消去"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "ファイルをクリックして、そのファイルにダウンロード リンクを挿入します。"
   },
@@ -97,6 +100,9 @@
   },
   "collaborations_5c56c15f": {
     "message": "共同作業"
+  },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "{ types } を非表示にするには破損する"
   },
   "computer_1d7dfa6f": {
     "message": "コンピュータ"
@@ -155,17 +161,32 @@
   "documents_81393201": {
     "message": "ドキュメント"
   },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "ドラッグアンドドロップまたはクリックしてコンピュータを参照"
+  },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "期限：複数の日付"
+  },
+  "due_when_7eed10c6": {
+    "message": "期限：{ when }"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "検索語を入力"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "この画像の代替テキストを入力する"
   },
+  "expand_to_see_types_f5d29352": {
+    "message": "{ types } を拡張して表示"
+  },
   "external_links_3d9f074e": {
     "message": "外部リンク"
   },
   "file_upload_form_4aaad554": {
     "message": "ファイルアップロードフォーム"
+  },
+  "filename_preview_ffaa1515": {
+    "message": "{ filename }をプレビュー"
   },
   "files_c300e900": {
     "message": "ファイル"
@@ -215,6 +236,9 @@
   "insert_math_equation_57c6e767": {
     "message": "数学数式を挿入"
   },
+  "invalid_file_type_881cc9b2": {
+    "message": "無効なファイル タイプです"
+  },
   "link_7262adec": {
     "message": "リンク"
   },
@@ -245,9 +269,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "フォルダを読み込み中..."
   },
-  "loading_more_results_def6df65": {
-    "message": "より多くの結果を読み込んでいます..."
-  },
   "media_af190855": {
     "message": "メディア"
   },
@@ -256,6 +277,9 @@
   },
   "no_results_940393cf": {
     "message": "結果がありません。"
+  },
+  "options_3ab0ea65": {
+    "message": "オプション"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "番号付きリストと番号無しリスト"
@@ -269,8 +293,17 @@
   "people_b4ebb13c": {
     "message": "メンバー"
   },
+  "posted_when_a578f5ab": {
+    "message": "投稿済み:{ when }"
+  },
   "preformatted_d0670862": {
     "message": "フォーマット済み"
+  },
+  "published_c944a23d": {
+    "message": "公開済み"
+  },
+  "published_when_302d8e23": {
+    "message": "公開済み:{ when }"
   },
   "quizzes_7e598f57": {
     "message": "クイズ"
@@ -289,6 +322,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "ファイルをアップロードするフォルダを選択"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "画像オプションを表示"
   },
   "small_header_168fb9f9": {
     "message": "小さいヘッダー"
@@ -329,8 +365,17 @@
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "この子芯は、ファイル保存の割り当てを超えています。システムアドミニストレータに報告してください。"
   },
+  "to_be_posted_when_d24bf7dc": {
+    "message": "投稿するには:{ when }"
+  },
+  "to_do_when_2783d78f": {
+    "message": "タスク：{ when }"
+  },
   "tray_839df38a": {
     "message": "トレイ"
+  },
+  "unpublished_dfd8801": {
+    "message": "未公開"
   },
   "unsplash_ee049fbf": {
     "message": "Unsplash"
@@ -343,6 +388,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "新しい画像をアップロードする"
+  },
+  "upload_file_fd2361b8": {
+    "message": "ファイルアップロード"
   },
   "upload_image_6120b609": {
     "message": "イメージのアップロード"
@@ -358,6 +406,9 @@
   },
   "usage_right_ff96f3e2": {
     "message": "使用権:"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "キーボードのショートカットを見る"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "新しいページの名前は何にしますか?"

@@ -16,22 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AssignmentShape, SubmissionShape, SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
 import CommentContent from './CommentContent'
 import CommentTextArea from './CommentTextArea'
 import ErrorBoundary from '../../../../shared/components/ErrorBoundary'
+import errorShipUrl from '../../SVG/ErrorShip.svg'
 import GenericErrorPage from '../../../../shared/components/GenericErrorPage/index'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
-import React from 'react'
-import errorShipUrl from '../../SVG/ErrorShip.svg'
 import {Query} from 'react-apollo'
-import {SUBMISSION_COMMENT_QUERY, StudentAssignmentShape} from '../../assignmentData'
+import React from 'react'
 
 function Comments(props) {
   return (
-    <Query
-      query={SUBMISSION_COMMENT_QUERY}
-      variables={{submissionId: props.assignment.submissionsConnection.nodes[0].id.toString()}}
-    >
+    <Query query={SUBMISSION_COMMENT_QUERY} variables={{submissionId: props.submission.id}}>
       {({loading, error, data}) => {
         if (loading) return <LoadingIndicator />
         if (error) {
@@ -53,7 +50,7 @@ function Comments(props) {
             }
           >
             <div data-testid="comments-container">
-              <CommentTextArea assignment={props.assignment} />
+              <CommentTextArea assignment={props.assignment} submission={props.submission} />
               <CommentContent comments={data.submissionComments.commentsConnection.nodes} />
             </div>
           </ErrorBoundary>
@@ -64,7 +61,8 @@ function Comments(props) {
 }
 
 Comments.propTypes = {
-  assignment: StudentAssignmentShape
+  assignment: AssignmentShape,
+  submission: SubmissionShape
 }
 
 export default React.memo(Comments)

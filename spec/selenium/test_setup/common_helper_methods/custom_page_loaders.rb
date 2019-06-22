@@ -43,6 +43,6 @@ module CustomPageLoaders
   end
 
   def refresh_page
-    expect_new_page_load { driver.navigate.refresh }
+    wait_for_new_page_load { driver.navigate.refresh }
   end
 end

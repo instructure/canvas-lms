@@ -33,7 +33,8 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
   let(:tool_configuration) do
     Lti::ToolConfiguration.create!(
       developer_key: developer_key,
-      settings: settings.merge(public_jwk: tool_config_public_jwk)
+      settings: settings.merge(public_jwk: tool_config_public_jwk),
+      privacy_level: 'public'
     )
   end
 

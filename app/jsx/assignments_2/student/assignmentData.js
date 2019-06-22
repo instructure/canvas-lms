@@ -52,6 +52,37 @@ export function GetAssignmentEnvVariables() {
   return {...defaults}
 }
 
+function attachmentFields() {
+  return `
+    _id
+    displayName
+    mimeClass
+    thumbnailUrl
+    url
+  `
+}
+
+function submissionFields() {
+  return `
+    _id
+    id
+    deductedPoints
+    enteredGrade
+    grade
+    gradingStatus
+    latePolicyStatus
+    state
+    submissionDraft {
+      _id
+      attachments {
+        ${attachmentFields()}
+      }
+    }
+    submissionStatus
+    submittedAt
+  `
+}
+
 function submissionCommentQueryParams() {
   return `
     _id
@@ -73,10 +104,7 @@ function submissionCommentQueryParams() {
       shortName
     }
     attachments {
-      _id
-      displayName
-      mimeClass
-      url
+      ${attachmentFields()}
     }`
 }
 
@@ -110,16 +138,7 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
-            _id
-            id
-            deductedPoints
-            enteredGrade
-            grade
-            gradingStatus
-            latePolicyStatus
-            state
-            submissionStatus
-            submittedAt
+            ${submissionFields()}
           }
         }
       }
@@ -151,11 +170,31 @@ export const CREATE_SUBMISSION_COMMENT = gql`
   }
 `
 
+export const CREATE_SUBMISSION = gql`
+  mutation CreateSubmission($id: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
+    createSubmission(input: {assignmentId: $id, submissionType: $type, fileIds: $fileIds}) {
+      submission {
+        ${submissionFields()}
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const AttachmentShape = shape({
   _id: string,
   displayName: string,
   mimeClass: string,
+  thumbnailUrl: string,
   url: string
+})
+
+export const SubmissionDraftShape = shape({
+  _id: string,
+  attachments: arrayOf(AttachmentShape)
 })
 
 export const MediaObjectShape = shape({
@@ -180,7 +219,7 @@ export const CommentShape = shape({
   updatedAt: string
 })
 
-export const StudentAssignmentShape = shape({
+export const AssignmentShape = shape({
   _id: string,
   description: string,
   dueAt: string,
@@ -200,7 +239,8 @@ export const StudentAssignmentShape = shape({
     moduleUrl: string.isRequired,
     currentUser: shape({
       display_name: string,
-      avatar_image_url: string
+      avatar_image_url: string,
+      id: string
     }),
     modulePrereq: shape({
       title: string.isRequired,
@@ -215,23 +255,21 @@ export const StudentAssignmentShape = shape({
       id: string.isRequired,
       name: string.isRequired
     }).isRequired
-  ).isRequired,
-  submissionsConnection: shape({
-    nodes: arrayOf(
-      shape({
-        commentsConnection: shape({
-          nodes: arrayOf(CommentShape)
-        }),
-        id: string,
-        deductedPoints: number,
-        enteredGrade: string,
-        grade: string,
-        gradingStatus: string,
-        latePolicyStatus: string,
-        state: string,
-        submissionStatus: string,
-        submittedAt: string
-      })
-    ).isRequired
-  })
+  ).isRequired
+})
+
+export const SubmissionShape = shape({
+  commentsConnection: shape({
+    nodes: arrayOf(CommentShape)
+  }),
+  id: string,
+  deductedPoints: number,
+  enteredGrade: string,
+  grade: string,
+  gradingStatus: string,
+  latePolicyStatus: string,
+  state: string,
+  submissionDraft: SubmissionDraftShape,
+  submissionStatus: string,
+  submittedAt: string
 })

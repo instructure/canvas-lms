@@ -17,6 +17,8 @@
 #
 
 class Lti::Result < ApplicationRecord
+  include Canvas::SoftDeletable
+
   GRADING_PROGRESS_TYPES = %w[FullyGraded Pending PendingManual Failed NotReady].freeze
   ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
   ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze

@@ -46,18 +46,19 @@ module Lti::Ims
     def serialize_membership(enrollment)
       # Inbound model is either an ActiveRecord Enrollment or GroupMembership, with delegations in place
       # to make them behave more or less the same for our purposes
-      expander = variable_expander(enrollment.user)
+      expander = variable_expander(enrollment)
       member(enrollment, expander).merge!(message(enrollment, expander))
     end
 
-    def variable_expander(user)
+    def variable_expander(enrollment)
       Lti::VariableExpander.new(
         page[:context].root_account,
         Lti::Ims::Providers::MembershipsProvider.unwrap(page[:context]),
         page[:controller],
         {
-          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(user),
+          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
+          enrollment: enrollment,
           variable_whitelist: %w(
             Person.name.full
             Person.name.display
@@ -85,15 +86,16 @@ module Lti::Ims
     end
 
     def member(enrollment, expander)
+      user = enrollment.user
       {
         status: 'Active',
-        name: (enrollment.user.name if page[:tool].include_name?),
-        picture: (enrollment.user.avatar_url if page[:tool].public?),
-        given_name: (enrollment.user.first_name if page[:tool].include_name?),
-        family_name: (enrollment.user.last_name if page[:tool].include_name?),
-        email: (enrollment.user.email if page[:tool].include_email?),
+        name: (user.name if page[:tool].include_name?),
+        picture: (user.avatar_url if page[:tool].public?),
+        given_name: (user.first_name if page[:tool].include_name?),
+        family_name: (user.last_name if page[:tool].include_name?),
+        email: (user.email if page[:tool].include_email?),
         lis_person_sourcedid: (member_sourced_id(expander) if page[:tool].include_name?),
-        user_id: enrollment.user.lti_id,
+        user_id: user.past_lti_ids.first&.user_lti_id || user.lti_id,
         roles: enrollment.lti_roles
       }.compact
     end

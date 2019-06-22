@@ -124,6 +124,7 @@ actions.saveLtiToolConfiguration = ({
     })
     .catch(error => {
       dispatch(actions.saveLtiToolConfigurationFailed(error))
+      dispatch(developerKeysActions.setEditingDeveloperKey(false))
       $.flashError(error.message)
       return error
     })
@@ -147,13 +148,14 @@ actions.ltiKeysUpdateCustomizationsSuccessful = payload => ({
 })
 
 actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS'
-actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKeyId, toolConfiguration, customFields, privacyLevel) => dispatch => {
+actions.ltiKeysUpdateCustomizations = (developerKey, disabled_placements, developerKeyId, toolConfiguration, customFields, privacyLevel) => dispatch => {
   dispatch(actions.ltiKeysUpdateCustomizationsStart())
   const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
   return axios
     .put(url, {
       developer_key: {
-        scopes
+        scopes: developerKey.scopes,
+        redirect_uris: developerKey.redirect_uris
       },
       tool_configuration: {
         custom_fields: customFields,

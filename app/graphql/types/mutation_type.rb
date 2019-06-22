@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class MutationFieldExtension < GraphQL::Schema::FieldExtension
+class PostgresTimeoutFieldExtension < GraphQL::Schema::FieldExtension
   def resolve(object:, arguments:, context:, **rest)
     GraphQLPostgresTimeout.wrap(context.query) do
       yield(object, arguments)
@@ -33,7 +33,7 @@ class Types::MutationType < Types::ApplicationObjectType
   # wraps all mutation fields with necessary
   # extensions (e.g. pg timeout)
   def self.field(*args, **kwargs)
-    super(*args, **kwargs, extensions: [MutationFieldExtension])
+    super(*args, **kwargs, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
   end
 
   field :create_group_in_set, mutation: Mutations::CreateGroupInSet
@@ -55,6 +55,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :update_assignment, mutation: Mutations::UpdateAssignment
   field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
+  field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
 
   # TODO: Remove the in active development string from here once this is more

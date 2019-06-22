@@ -490,25 +490,23 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
        jsUploader.onReady = mediaCommentReady
        jsUploader.addEntry = addEntry
 
-       if (ENV.ARC_RECORDING_FEATURE_ENABLED) {
          const getBrowser = require('jsx/shared/browserUtils').getBrowser
          const currentBrowser = getBrowser()
-         if (
-           (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
-           (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
-         ) {
-           import('jsx/media_recorder/renderRecorder').then(({default: renderCanvasMediaRecorder}) => {
-             let tryToRenderInterval
-             const renderFunc = () => {
-               const e = document.getElementById('record_media_tab')
-               if (e) {
-                 renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
-                 clearInterval(tryToRenderInterval)
-               }
+       if (
+         (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
+         (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
+       ) {
+         import('jsx/media_recorder/renderRecorder').then(({default: renderCanvasMediaRecorder}) => {
+           let tryToRenderInterval
+           const renderFunc = () => {
+             const e = document.getElementById('record_media_tab')
+             if (e) {
+               renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
+               clearInterval(tryToRenderInterval)
              }
-             tryToRenderInterval = setInterval(renderFunc, 10)
-           })
-        }
+           }
+           tryToRenderInterval = setInterval(renderFunc, 10)
+         })
       }
     }
 

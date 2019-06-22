@@ -192,5 +192,15 @@ describe 'editing a quiz' do
         expect(f('.question_name')).to include_text @custom_name
       end
     end
+    
+    it "does allow safe :redirect_to query param" do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit?return_to=#{course_assignments_url(@course)}"
+      expect(f('#quiz_edit_actions #cancel_button').attribute('href')).to eq(course_assignments_url(@course))
+    end
+
+    it "doesn't allow XSS via :redirect_to query param" do
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit?return_to=javascript%3Aalert(document.cookie)"
+      expect(f('#quiz_edit_actions #cancel_button').attribute('href')).to eq(course_quiz_url(@course, @quiz))
+    end
   end
 end

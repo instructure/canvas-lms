@@ -83,9 +83,7 @@ class AssignmentCreateEditPage
     end
 
     def add_number_of_graders(number)
-      grader_count_input.clear
-      grader_count_input.send_keys(number)
-      driver.action.send_keys(:enter).perform
+      replace_content(grader_count_input, number, tab_out: true)
     end
 
     def select_moderate_checkbox

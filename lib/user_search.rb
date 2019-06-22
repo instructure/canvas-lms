@@ -134,10 +134,17 @@ module UserSearch
       if enrollment_types.any?{ |et| !Enrollment.readable_types.keys.include?(et) }
         raise ArgumentError, 'Invalid Enrollment Type'
       end
-      if context.is_a?(Group) && context.context_type == "Course"
-        users = users.joins(:enrollments).where(:enrollments => {:course_id => context.context_id})
+
+      if context.is_a?(Account)
+        # for example, one user can have multiple teacher enrollments, but
+        # we only want one such a user record in results
+        users = users.joins(:enrollments).merge(Enrollment.active.where(type: enrollment_types)).distinct
+      else
+        if context.is_a?(Group) && context.context_type == "Course"
+          users = users.joins(:enrollments).where(:enrollments => {:course_id => context.context_id})
+        end
+        users = users.where(:enrollments => { :type => enrollment_types })
       end
-      users = users.where(:enrollments => { :type => enrollment_types })
     end
 
     if exclude_groups

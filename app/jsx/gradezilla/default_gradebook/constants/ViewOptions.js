@@ -22,7 +22,8 @@ export const filterLabels = {
   assignmentGroups: I18n.t('Assignment Groups'),
   gradingPeriods: I18n.t('Grading Periods'),
   modules: I18n.t('Modules'),
-  sections: I18n.t('Sections')
+  sections: I18n.t('Sections'),
+  studentGroups: I18n.t('Student Groups')
 }
 
 export default {

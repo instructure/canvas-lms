@@ -159,6 +159,33 @@ describe GradebookUserIds do
     end
   end
 
+  describe "filtering by student group" do
+    let_once(:category) do
+      category = @course.group_categories.create!(name: "whatever")
+      category.create_groups(2)
+
+      category.groups.first.add_user(@student1)
+      category.groups.second.add_user(@student2)
+      category
+    end
+    let_once(:group) { category.groups.first }
+
+    it "only returns students in the selected group when one is specified" do
+      @teacher.preferences[:gradebook_settings] = {
+        @course.id => {
+          filter_rows_by: {
+            student_group_id: group.id
+          }
+        }
+      }
+      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
+    end
+
+    it "returns students in all groups when no group is specified" do
+      expect(gradebook_user_ids.user_ids).to match_array(@course.students.pluck(:id))
+    end
+  end
+
   context 'with pg_collkey installed' do
     before do
       skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey

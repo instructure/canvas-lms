@@ -32,7 +32,7 @@ tinymce.create("tinymce.plugins.InstructureEquation", {
     );
 
     ed.ui.registry.addToggleButton("instructure_equation", {
-      title: htmlEscape(
+      tooltip: htmlEscape(
         formatMessage({
           default: "Insert Math Equation",
           description: "Title for RCE button to insert a math equation"

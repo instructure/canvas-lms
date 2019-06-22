@@ -1086,59 +1086,64 @@ class ExternalToolsController < ApplicationController
       end
     end
 
-    # generate the launch
-    opts = {
-        launch_url: launch_url,
-        resource_type: launch_type
-    }
+    if @tool.use_1_3?
+      context_path = "#{@context.is_a?(Account) ? account_external_tools_url(@context) : course_external_tools_url(@context)}/#{@tool.id}"
+      render :json => { id: @tool.id, name: @tool.name, url: "#{login_session_token_url}?return_to=#{CGI.escape(context_path)}" }
+    else
+      # generate the launch
+      opts = {
+          launch_url: launch_url,
+          resource_type: launch_type
+      }
 
-    case launch_type
-    when 'module_item'
-      opts[:link_code] = @tool.opaque_identifier_for(module_item)
-    when 'assessment'
-      opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
+      case launch_type
+      when 'module_item'
+        opts[:link_code] = @tool.opaque_identifier_for(module_item)
+      when 'assessment'
+        opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
+      end
+
+      opts[:overrides] = whitelisted_query_params if whitelisted_query_params.any?
+
+      adapter = Lti::LtiOutboundAdapter.new(
+        @tool,
+        @current_user,
+        @context
+      ).prepare_tool_launch(
+        url_for(@context),
+        variable_expander(assignment: options[:assignment], content_tag: module_item),
+        opts
+      )
+
+      launch_settings = {
+        'launch_url' => adapter.launch_url(post_only: @tool.settings['post_only']),
+        'tool_name' => @tool.name,
+        'analytics_id' => @tool.tool_id
+      }
+
+      launch_settings['tool_settings'] = if options[:assignment]
+                                          adapter.generate_post_payload_for_assignment(
+                                            options[:assignment],
+                                            lti_grade_passback_api_url(@tool),
+                                            blti_legacy_grade_passback_api_url(@tool),
+                                            lti_turnitin_outcomes_placement_url(@tool.id)
+                                          )
+                                        else
+                                          adapter.generate_post_payload
+                                        end
+
+      # store the launch settings and return to the user
+      verifier = cache_launch(launch_settings, @context, prefix: Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX)
+
+      uri = if @context.is_a?(Account)
+              URI(account_external_tools_sessionless_launch_url(@context))
+            else
+              URI(course_external_tools_sessionless_launch_url(@context))
+            end
+      uri.query = {:verifier => verifier}.to_query
+
+      render :json => {:id => @tool.id, :name => @tool.name, :url => uri.to_s}
     end
-
-    opts[:overrides] = whitelisted_query_params if whitelisted_query_params.any?
-
-    adapter = Lti::LtiOutboundAdapter.new(
-      @tool,
-      @current_user,
-      @context
-    ).prepare_tool_launch(
-      url_for(@context),
-      variable_expander(assignment: options[:assignment], content_tag: module_item),
-      opts
-    )
-
-    launch_settings = {
-      'launch_url' => adapter.launch_url(post_only: @tool.settings['post_only']),
-      'tool_name' => @tool.name,
-      'analytics_id' => @tool.tool_id
-    }
-
-    launch_settings['tool_settings'] = if options[:assignment]
-                                        adapter.generate_post_payload_for_assignment(
-                                          options[:assignment],
-                                          lti_grade_passback_api_url(@tool),
-                                          blti_legacy_grade_passback_api_url(@tool),
-                                          lti_turnitin_outcomes_placement_url(@tool.id)
-                                        )
-                                       else
-                                         adapter.generate_post_payload
-                                       end
-
-    # store the launch settings and return to the user
-    verifier = cache_launch(launch_settings, @context, prefix: Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX)
-
-    uri = if @context.is_a?(Account)
-            URI(account_external_tools_sessionless_launch_url(@context))
-          else
-            URI(course_external_tools_sessionless_launch_url(@context))
-          end
-    uri.query = {:verifier => verifier}.to_query
-
-    render :json => {:id => @tool.id, :name => @tool.name, :url => uri.to_s}
   end
 
   def set_tool_attributes(tool, params)

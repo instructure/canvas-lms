@@ -112,7 +112,7 @@ module SeleniumExtensions
             yield
           end
         end
-      rescue Selenium::WebDriver::Error::TimeOutError
+      rescue Selenium::WebDriver::Error::TimeoutError
         false
       end
 

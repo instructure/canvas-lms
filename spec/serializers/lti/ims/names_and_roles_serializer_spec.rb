@@ -82,6 +82,17 @@ describe Lti::Ims::NamesAndRolesSerializer do
       expect(json[:context]).to be_lti_membership_context
       expect(json[:members][0]).to be_lti_membership
     end
+
+    context 'with past lti ids' do
+      before do
+        UserPastLtiId.create!(user: user, context: course, user_lti_id: 'current_lti_key', user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+      end
+
+      it 'properly formats NRPS json' do
+        json = serialize
+        expect(json[:members][0][:user_id]).to eq 'current_lti_key'
+      end
+    end
   end
 
   shared_examples 'serializes message array if rlid param present' do

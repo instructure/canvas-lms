@@ -61,6 +61,7 @@ describe 'Account Reports API', type: :request do
                         {report: @report.report_type, controller: 'account_reports', action: 'create',
                          format: 'json', account_id: @admin.account.id.to_s})
       keys = %w(id progress parameters current_line status report created_at started_at ended_at file_url)
+      expect(report['status']).to eq 'created'
       expect(keys - report.keys).to be_empty
     end
 
@@ -103,6 +104,7 @@ describe 'Account Reports API', type: :request do
       expect(json['status']).to eq @report.workflow_state
       expect(json['progress']).to eq @report.progress
       expect(json['file_url']).to eq "http://www.example.com/accounts/#{@admin.account.id}/files/#{@report.attachment_id}/download"
+      expect(json['start_at']).to be_nil
       #test that attachment object is here, no need to test attachment json
       expect(json['attachment']['id']).to eq @report.attachment_id
       @report.parameters.each do |key, value|

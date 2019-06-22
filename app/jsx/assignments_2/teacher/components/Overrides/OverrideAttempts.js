@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {bool, oneOf} from 'prop-types'
+import {bool, oneOf, number} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {OverrideShape, requiredIfDetail} from '../../assignmentData'
+import {requiredIfDetail} from '../../assignmentData'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import {NumberInput} from '@instructure/ui-number-input'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
@@ -30,8 +30,8 @@ import NumberHelper from '../../../../shared/helpers/numberHelper'
 
 export default class OverrideAttempts extends React.Component {
   static propTypes = {
-    override: OverrideShape.isRequired,
-    onChangeOverride: requiredIfDetail,
+    allowedAttempts: number,
+    onChange: requiredIfDetail,
     variant: oneOf(['summary', 'detail']).isRequired,
     readOnly: bool
   }
@@ -40,18 +40,9 @@ export default class OverrideAttempts extends React.Component {
     readOnly: false
   }
 
-  // TODO: need the scoreToKeep data
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      scoreToKeep: 'most_recent' // TODO: need the data
-    }
-  }
-
   onChangeAttemptsAllowed = (_event, selection) => {
     const limit = selection.value === 'unlimited' ? null : 1
-    this.props.onChangeOverride('allowedAttempts', limit)
+    this.props.onChange('allowedAttempts', limit)
   }
 
   /* eslint-disable no-restricted-globals */
@@ -60,36 +51,32 @@ export default class OverrideAttempts extends React.Component {
     if (isNaN(value)) {
       return
     }
-    this.props.onChangeOverride('allowedAttempts', Math.trunc(value))
+    this.props.onChange('allowedAttempts', Math.trunc(value))
   }
 
   onIncrementAttemptLimit = _event => {
-    const value = NumberHelper.parse(this.props.override.allowedAttempts)
+    const value = NumberHelper.parse(this.props.allowedAttempts)
     if (isNaN(value)) {
       return
     }
-    this.props.onChangeOverride('allowedAttempts', value + 1)
+    this.props.onChange('allowedAttempts', value + 1)
   }
 
   onDecrementAttemptLimit = _event => {
-    const value = NumberHelper.parse(this.props.override.allowedAttempts)
+    const value = NumberHelper.parse(this.props.allowedAttempts)
     if (isNaN(value)) {
       return
     }
     if (value > 1) {
-      this.props.onChangeOverride('allowedAttempts', value - 1)
+      this.props.onChange('allowedAttempts', value - 1)
     }
   }
   /* eslint-enable no-restricted-globals */
 
-  onChangeScoreToKeep = (_event, selection) => {
-    this.setState({scoreToKeep: selection.value})
-  }
-
   renderLimit() {
-    const attempts = this.props.override.allowedAttempts === null ? 'unlimited' : 'limited'
+    const attempts = this.props.allowedAttempts === null ? 'unlimited' : 'limited'
     return (
-      <FlexItem data-testid="OverrideAttempts-Limit">
+      <FlexItem data-testid="OverrideAttempts-Limit" margin="0 small 0 0">
         <Select
           readOnly={this.props.readOnly}
           label={I18n.t('Attempts Allowed')}
@@ -105,12 +92,12 @@ export default class OverrideAttempts extends React.Component {
   }
 
   renderAttempts() {
-    if (this.props.override.allowedAttempts !== null) {
-      const limit = this.props.override.allowedAttempts
+    if (this.props.allowedAttempts !== null) {
+      const limit = this.props.allowedAttempts
       const label = I18n.t({one: 'Attempt', other: 'Attempts'}, {count: limit})
 
       return (
-        <FlexItem margin="0 small" data-testid="OverrideAttempts-Attempts">
+        <FlexItem margin="small 0 0" data-testid="OverrideAttempts-Attempts">
           <NumberInput
             readOnly={this.props.readOnly}
             inline
@@ -133,32 +120,13 @@ export default class OverrideAttempts extends React.Component {
     return null
   }
 
-  renderScoreToKeep() {
-    return (
-      <Select
-        inline
-        label={I18n.t('Score to keep')}
-        selectedOption={this.state.scoreToKeep}
-        onChange={this.onChangeScoreToKeep}
-        readOnly={this.props.readOnly}
-        allowEmpty={false}
-        data-testid="OverrideAttempts-ScoreToKeep"
-      >
-        <option value="average_score">{I18n.t('Average Score')}</option>
-        <option value="highest_score">{I18n.t('Highest Score')}</option>
-        <option value="most_recent">{I18n.t('Most Recent')}</option>
-      </Select>
-    )
-  }
-
   renderDetail() {
     return (
       <View display="block" margin="0 0 small 0" data-testid="OverrideAttempts-Detail">
-        <Flex alignItems="end" margin="0 0 small 0">
+        <Flex alignItems="end" margin="0 0 small 0" wrapItems>
           {this.renderLimit()}
           {this.renderAttempts()}
         </Flex>
-        {this.renderScoreToKeep()}
       </View>
     )
   }
@@ -166,11 +134,11 @@ export default class OverrideAttempts extends React.Component {
   renderSummary() {
     return (
       <Text data-testid="OverrideAttempts-Summary">
-        {this.props.override.allowedAttempts === null
+        {this.props.allowedAttempts === null
           ? I18n.t('Unlimited Attempts')
           : I18n.t(
               {one: '1 Attempt', other: '%{count} Attempts'},
-              {count: this.props.override.allowedAttempts}
+              {count: this.props.allowedAttempts}
             )}
       </Text>
     )

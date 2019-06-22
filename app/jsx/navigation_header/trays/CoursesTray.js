@@ -21,21 +21,21 @@ import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 export default function CoursesTray({courses, hasLoaded}) {
   return (
-    <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
+    <View as="div" padding="medium small">
+      <Heading level="h3" as="h2" margin="0 0 0 small">{I18n.t('Courses')}</Heading>
       <hr role="presentation"/>
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List variant="unstyled" margin="small 0" itemSpacing="x-small">
         {hasLoaded ? (
           courses.map(course =>
             <ListItem key={course.id}>
-              <Link href={`/courses/${course.id}`}>{course.name}</Link>
+              <Button variant="link" href={`/courses/${course.id}`}>{course.name}</Button>
               {course.enrollment_term_id > 1 &&
                 <Text as="div" size="x-small" weight="light">{course.term.name}</Text>
               }
@@ -43,7 +43,7 @@ export default function CoursesTray({courses, hasLoaded}) {
           ).concat([
             <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
-              <Link href="/courses">{I18n.t('All Courses')}</Link>
+              <Button variant="link" href="/courses">{I18n.t('All Courses')}</Button>
             </ListItem>
           ])
         ) : (
@@ -53,11 +53,13 @@ export default function CoursesTray({courses, hasLoaded}) {
         )}
       </List>
       <br />
-      <Text>
-        {I18n.t(
-          'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
-        )}
-      </Text>
+      <View as="div" padding="0 0 0 small">
+        <Text>
+          {I18n.t(
+            'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
+          )}
+        </Text>
+      </View>
     </View>
   )
 }

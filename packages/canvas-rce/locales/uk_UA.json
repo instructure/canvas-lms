@@ -92,6 +92,9 @@
   "creative_commons_license_725584ae": {
     "message": "Ліцензія Creative Commons:"
   },
+  "custom_6979cd81": {
+    "message": "Звичай"
+  },
   "decorative_image_fde98579": {
     "message": "Декоративне зображення"
   },
@@ -104,8 +107,14 @@
   "discussions_index_6c36ced": {
     "message": "Індекс обговорення"
   },
+  "done_54e3d4b6": {
+    "message": "Готово"
+  },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Очікується: Кілька дат"
+  },
+  "embed_image_1080badc": {
+    "message": "Вставити забраження"
   },
   "enter_search_terms_e397b1f0": {
     "message": "введіть умови пошуку"
@@ -197,9 +206,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Завантаження папок ..."
   },
-  "loading_more_results_def6df65": {
-    "message": "Завантажити більше результатів..."
-  },
   "media_af190855": {
     "message": "Носій інформації"
   },
@@ -208,6 +214,9 @@
   },
   "no_results_940393cf": {
     "message": "Результати відсутні."
+  },
+  "options_3ab0ea65": {
+    "message": "Параметри"
   },
   "pages_e5414c2c": {
     "message": "Сторінки"
@@ -221,8 +230,20 @@
   "quizzes_7e598f57": {
     "message": "Контрольні Роботи"
   },
+  "record_7c9448b": {
+    "message": "Записати"
+  },
   "record_upload_media_5fdce166": {
     "message": "Запис/завантаження медіа"
+  },
+  "recording_98da6bda": {
+    "message": "Запис"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Редактор збагаченого контенту"
+  },
+  "save_11a80ec3": {
+    "message": "Зберегти"
   },
   "search_280d00bd": {
     "message": "Пошук"
@@ -235,6 +256,12 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Виберіть теку, до якої завантажити ваш файл"
+  },
+  "size_b30e1077": {
+    "message": "Розмір"
+  },
+  "start_over_f7552aa9": {
+    "message": "Почати з початку"
   },
   "submit_a3cc6859": {
     "message": "Підтвердити"
@@ -266,11 +293,17 @@
   "upload_a_new_image_890df275": {
     "message": "Завантажити нове зображення"
   },
+  "upload_media_ce31135a": {
+    "message": "Завантажити медіа контент"
+  },
   "url_22a5f3b8": {
     "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Права використання:"
+  },
+  "video_player_b371005": {
+    "message": "Відеопрогравач"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Як би ви хотіли назвати нову сторінку?"

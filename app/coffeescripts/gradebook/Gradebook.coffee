@@ -842,6 +842,7 @@ export default class Gradebook
       )()
       @initHeaderDropMenus()
       originalStopFn = $headers.sortable 'option', 'stop'
+      gb = this
       (fixupStopCallback = ->
         $headers.sortable 'option', 'stop', (event, ui) ->
           # we need to set the items selector back to the default because slickgrid's 'stop'
@@ -850,7 +851,7 @@ export default class Gradebook
           $headers.sortable 'option', 'items', originalItemsSelector
           returnVal = originalStopFn.apply(this, arguments)
           makeOnlyAssignmentsSortable() # set it back
-          @initHeaderDropMenus()
+          gb.initHeaderDropMenus()
           fixupStopCallback() # originalStopFn re-creates sortable widget so we need to re-fix
           returnVal
       )()

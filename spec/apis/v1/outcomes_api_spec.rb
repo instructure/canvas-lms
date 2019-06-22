@@ -309,7 +309,7 @@ describe "Outcomes API", type: :request do
                      :action => 'show',
                      :id => @outcome.id.to_s,
                      :format => 'json')
-        json = controller.outcome_json(@outcome, @account_user, session, {assessed_outcomes: [@outcome]})
+        json = controller.outcome_json(@outcome, @account_user.user, session, {assessed_outcomes: [@outcome]})
         expect(json["assessed"]).to be true
       end
     end

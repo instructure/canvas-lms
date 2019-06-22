@@ -243,8 +243,8 @@ module CustomSeleniumActions
 
   # this is a smell; you should know what's on the page you're testing,
   # so conditionally doing stuff based on elements == :poop:
-  def element_exists?(selector)
-    disable_implicit_wait { f(selector) }
+  def element_exists?(selector, xpath = false)
+    disable_implicit_wait { xpath ? fxpath(selector) : f(selector) }
     true
   rescue Selenium::WebDriver::Error::NoSuchElementError
     false
@@ -285,7 +285,7 @@ module CustomSeleniumActions
     # cumbersome is because tinymce has it's actual interaction point down in
     # an iframe.
     src = %Q{
-      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('.mce-tinymce').find('iframe');
+      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('[role="application"]').find('iframe');
       var iframeDoc = $iframe[0].contentDocument;
       var domElement = iframeDoc.getElementsByTagName("body")[0];
       var selection = iframeDoc.getSelection();
@@ -441,7 +441,6 @@ module CustomSeleniumActions
 
   MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
   def replace_content(el, value, options = {})
-    # Removed the javascript select(), it was causing stale element exceptions
     # el.clear doesn't work with textboxes that have a pattern attribute that's why we have :backspace.
     # We are treating the chrome browser different because Selenium cannot send :command key to chrome on Mac.
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
@@ -454,8 +453,8 @@ module CustomSeleniumActions
       when :firefox, :safari, :internet_explorer
         keys = [[MODIFIER_KEY, "a"], :backspace]
       when :chrome
-        el.clear
-        keys = [:backspace]
+        driver.execute_script("arguments[0].select();", el)
+        keys = value.to_s.empty? ? [:backspace] : []
       end
       keys << value
       el.send_keys(*keys)
