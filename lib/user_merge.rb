@@ -39,7 +39,7 @@ class UserMerge
     # we also store records for the from_user on the target shard for a split
     from_user.associate_with_shard(target_user.shard, :shadow)
     target_user.shard.activate do
-      @merge_data = UserMergeData.create!(user: target_user, from_user: from_user)
+      @merge_data = UserMergeData.create!(user: target_user, from_user: from_user, workflow_state: 'merging')
 
       items = []
       if target_user.avatar_state == :none && from_user.avatar_state != :none
@@ -162,7 +162,8 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
-    @merge_data.update_attributes(workflow_state: 'active')
+    @merge_data.workflow_state = 'active'
+    @merge_data.save!
   rescue => e
     @merge_data&.update_attribute(:workflow_state, 'failed')
     @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message))
