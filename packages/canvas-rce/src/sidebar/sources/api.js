@@ -284,6 +284,13 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
+  pingbackUnsplash(id) {
+    let headers = headerFor(this.jwt)
+    let base = this.baseUri('unsplash/pingback')
+    let uri = `${base}?id=${id}`
+    return this.apiFetch(uri, headers, { skipParse: true })
+  }
+
   getFile(id) {
     let headers = headerFor(this.jwt)
     let base = this.baseUri('file')
@@ -292,14 +299,14 @@ class RceApiSource {
   }
 
   // @private
-  async apiFetch(uri, headers) {
+  async apiFetch(uri, headers, options) {
     if (!this.hasSession) {
       await this.getSession()
     }
-    return this.apiReallyFetch(uri, headers)
+    return this.apiReallyFetch(uri, headers, options)
   }
 
-  apiReallyFetch(uri, headers) {
+  apiReallyFetch(uri, headers, options = {}) {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, {headers})
       .then(response => {
@@ -313,7 +320,7 @@ class RceApiSource {
         }
       })
       .then(checkStatus)
-      .then(parseResponse)
+      .then(options.skipParse ? () => {} : parseResponse)
       .catch(throwConnectionError)
   }
 
