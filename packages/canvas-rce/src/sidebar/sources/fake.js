@@ -716,6 +716,10 @@ export function searchUnsplash(term) {
   })
 }
 
+export function pingbackUnsplash() {
+  return Promise.resolve("")
+}
+
 export function setUsageRights(id, usageRights) {
   const msg = "Setting the following usage rights for file (id: %s):";
   console.log(msg, id, usageRights); // eslint-disable-line no-console

@@ -104,6 +104,10 @@ describe('UploadFile', () => {
       insertContent (content) { fakeEditor.content += content },
       selection: { getEnd () {return fakeNode  }}
     }
+
+    beforeEach(() => {
+      fakeEditor.content = ''
+    })
     it('inserts image with url source when URL panel is selected', () => {
       handleSubmit(fakeEditor, 'images/*', 'URL', {fileUrl: 'http://fake/path'})
       expect(fakeEditor.content).toEqual('<img src="http://fake/path" />')
@@ -123,6 +127,28 @@ describe('UploadFile', () => {
         size: 3000,
         contentType: 'image/png',
         domObject: fakeFile
+      })
+    })
+
+    describe('Unsplash Panel Selected', () => {
+      const fakeUnsplashData = {
+        id: '123abc',
+        url: 'http://instructure.com/img'
+      }
+      it('calls source.pingbackUnsplash', () => {
+        const fakeSource = {
+          pingbackUnsplash: jest.fn()
+        }
+        handleSubmit(fakeEditor, 'images/*', 'UNSPLASH', { unsplashData : fakeUnsplashData }, {}, fakeSource)
+        expect(fakeSource.pingbackUnsplash).toHaveBeenCalledWith('123abc')
+      })
+
+      it('calls inserts an image tag with the proper URL', () => {
+        const fakeSource = {
+          pingbackUnsplash: () => {}
+        }
+        handleSubmit(fakeEditor, 'images/*', 'UNSPLASH', { unsplashData : fakeUnsplashData }, {}, fakeSource)
+        expect(fakeEditor.content).toEqual('<img src="http://instructure.com/img" />')
       })
     })
   })

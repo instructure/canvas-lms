@@ -216,7 +216,7 @@ describe('UnsplashPanel', () => {
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue({})
     }
-    const {getByLabelText} = render(<UnsplashPanel source={fakeSource} />)
+    const {getByLabelText} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
     const selectBox = getByLabelText('Search Term')
     act(() => {
       userEvent.type(selectBox, 'kittens')
@@ -229,7 +229,7 @@ describe('UnsplashPanel', () => {
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue(getSampleUnsplashResults())
     }
-    const {getByLabelText, getByRole} = render(<UnsplashPanel source={fakeSource} />)
+    const {getByLabelText, getByRole} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
     const selectBox = getByLabelText('Search Term')
     act(() => {
       userEvent.type(selectBox, 'kittens')
@@ -244,7 +244,7 @@ describe('UnsplashPanel', () => {
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue(getSampleUnsplashResults())
     }
-    const {getByLabelText, getByText} = render(<UnsplashPanel source={fakeSource} />)
+    const {getByLabelText, getByText} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
     const selectBox = getByLabelText('Search Term')
     act(() => {
       userEvent.type(selectBox, 'kittens')
@@ -262,7 +262,7 @@ describe('UnsplashPanel', () => {
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
-    const {getByLabelText, queryByText} = render(<UnsplashPanel source={fakeSource} />)
+    const {getByLabelText, queryByText} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}} />)
     const selectBox = getByLabelText('Search Term')
     act(() => {
       userEvent.type(selectBox, 'kittens')
@@ -278,7 +278,7 @@ describe('UnsplashPanel', () => {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
     const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} />
+      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
     )
     const selectBox = getByLabelText('Search Term')
     act(() => {
@@ -300,7 +300,7 @@ describe('UnsplashPanel', () => {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
     const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} />
+      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
     )
     const selectBox = getByLabelText('Search Term')
     act(() => {
@@ -322,7 +322,7 @@ describe('UnsplashPanel', () => {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
     const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} />
+      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
     )
     const selectBox = getByLabelText('Search Term')
     act(() => {
@@ -346,7 +346,7 @@ describe('UnsplashPanel', () => {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
     const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} />
+      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
     )
     const selectBox = getByLabelText('Search Term')
     act(() => {
@@ -364,7 +364,64 @@ describe('UnsplashPanel', () => {
     expect(imageSelectors[11]).toHaveFocus()
   });
 
-  it.todo('selects an image when pressing spacebar')
+  it('selects an image, calling setUnsplashData, when pressing spacebar', async () => {
+    const fakeResults = getSampleUnsplashResults()
+    const fakeSource = {
+      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
+    }
+    const fakeSetUnsplashData = jest.fn()
+    const {getByLabelText, getByRole, getAllByRole} = render(
+      <UnsplashPanel source={fakeSource} setUnsplashData={fakeSetUnsplashData}/>
+    )
+    const selectBox = getByLabelText('Search Term')
+    act(() => {
+      userEvent.click(selectBox)
+      userEvent.type(selectBox, 'kittens')
+    })
+    await wait(() => getByRole('radio'))
+    const imageSelectors = getAllByRole('radio')
+    act(() => {
+      // Get into the "radio" button images
+      userEvent.click(imageSelectors[0])
+    })
+    act(() => {
+      // Move to the second one
+      fireEvent.keyDown(imageSelectors[0], {keyCode: 40})
+    })
+    act(() => {
+      // Press space on the second one
+      fireEvent.keyDown(imageSelectors[1], {keyCode: 32})
+    })
+    expect(fakeSetUnsplashData).toHaveBeenCalledWith({
+      url: fakeResults.results[1].urls.link,
+      id: fakeResults.results[1].id
+    })
+  })
+
+  it('selects an image, calling setUnsplashData, when clicking an image', async () => {
+    const fakeResults = getSampleUnsplashResults()
+    const fakeSource = {
+      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
+    }
+    const fakeSetUnsplashData = jest.fn()
+    const {getByLabelText, getByRole, getAllByRole} = render(
+      <UnsplashPanel source={fakeSource} setUnsplashData={fakeSetUnsplashData}/>
+    )
+    const selectBox = getByLabelText('Search Term')
+    act(() => {
+      userEvent.click(selectBox)
+      userEvent.type(selectBox, 'kittens')
+    })
+    await wait(() => getByRole('radio'))
+    const imageSelectors = getAllByRole('radio')
+    act(() => {
+      userEvent.click(imageSelectors[3])
+    })
+    expect(fakeSetUnsplashData).toHaveBeenCalledWith({
+      url: fakeResults.results[3].urls.link,
+      id: fakeResults.results[3].id
+    })
+  })
 
   describe('Attribution', () => {
     it('shows attribution when an image has focus', async () => {
@@ -375,7 +432,7 @@ describe('UnsplashPanel', () => {
         searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
       }
       const {getByLabelText, getByRole, getAllByRole, getByText} = render(
-        <UnsplashPanel source={fakeSource} />
+        <UnsplashPanel source={fakeSource} setUnsplashData={() => {}} />
       )
       const selectBox = getByLabelText('Search Term')
       act(() => {
@@ -390,7 +447,4 @@ describe('UnsplashPanel', () => {
       expect(getByText('Raul Varzar')).toBeInTheDocument();
     })
   })
-
-
-
 })
