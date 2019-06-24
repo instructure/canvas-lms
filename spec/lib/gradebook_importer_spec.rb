@@ -1147,7 +1147,7 @@ describe GradebookImporter do
 
   describe "#translate_pass_fail" do
     let(:account) { Account.default }
-    let(:course) { Course.create account: account }
+    let(:course) { Course.create! account: account }
     let(:student) do
       student = User.create
       student
@@ -1209,6 +1209,118 @@ describe GradebookImporter do
       original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
       expect(original_grade).to eq ""
+    end
+  end
+
+  describe "importing submissions as excused from CSV" do
+    let(:account) { Account.default }
+    let(:course) { Course.create! account: account }
+    let(:student) { User.create! }
+    let(:teacher) do
+      teacher = User.create!
+      course.enroll_teacher(teacher).accept!
+      teacher
+    end
+    let(:assignment) do
+      course.assignments.create!(
+        name: "Assignment 1",
+        grading_type: "pass_fail",
+        points_possible: 10
+      )
+    end
+    let(:assignments) { [assignment] }
+    let(:students) { [student] }
+    let(:progress) { Progress.create! tag: "test", context: student }
+    let(:gradebook_upload) { GradebookUpload.create!(course: course, user: student, progress: progress) }
+    let(:importer) { GradebookImporter.new(gradebook_upload, "", student, progress) }
+
+    it "changes incomplete submission to excused when marked as 'EX' in CSV" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "incomplete"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes complete submission to excused when marked as 'EX' in CSV" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "complete"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes empty string grade to excused when marked as 'EX' in CSV" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => ""}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes 0 grade to complete when marked as positive" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "8", "original_grade" => "0"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first["grade"]
+
+      expect(grade).to eq "complete"
+    end
+
+    it "changes points assignment to excused when marked as 'EX' in CSV" do
+      course.assignments.create!(
+        name: "Assignment 2",
+        grading_type: "points",
+        points_possible: 10
+      )
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "8"}] }
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes incomplete submission to excused when marked as 'ex' in CSV" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "ex", "original_grade" => "incomplete"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes complete submission to excused when marked as 'eX' in CSV" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "eX", "original_grade" => "complete"}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes empty string grade to excused when marked as 'ex' in CSV" do
+      gradebook_importer_assignments = { student.id => [{ "grade" => "ex", "original_grade" => ""}] }
+      importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
+      grade = gradebook_importer_assignments.fetch(student.id).first['grade']
+
+      expect(grade).to eq "EX"
+    end
+
+    it "changes points assignment to excused when marked as 'Ex' in CSV" do
+      course.assignments.create!(
+        name: "Assignment 3",
+        grading_type: "points",
+        points_possible: 10
+      )
+      course.enroll_student(student, enrollment_state: "active")
+      upload = GradebookUpload.create!(course: course, user: teacher, progress: progress)
+      importer = new_gradebook_importer(
+        attachment_with_rows(
+          'Student;ID;Section;Assignment 3',
+          "A Student;#{student.id};Section 13;Ex",
+        ),
+        upload,
+        teacher,
+        progress
+      )
+      json = importer.as_json
+      expect(json[:students][0][:submissions][0]["grade"]).to eq "EX"
     end
   end
 
