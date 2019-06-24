@@ -177,8 +177,15 @@ class ApplicationController < ActionController::Base
       end
       if context
         current_user.enrollments.active.where(:course_id => context.id).each do |enrollment|
-          enrollment.course_section.students.active.each do |student|
-            res[student.id] = student.name
+          # FIXME: remove Test Student too
+
+          # the idea here is to find their main cohort, which by convention at Braven, will
+          # have (Tu) or (We) or something in the name. Searching for that to filter other
+          # sections for more administrative grouping.
+          if enrollment.course_section.name.include?("(")
+            enrollment.course_section.students.active.each do |student|
+              res[student.id] = student.name
+            end
           end
         end
       end
@@ -594,28 +601,30 @@ class ApplicationController < ActionController::Base
           if request.path.match(/\/courses\/1\/pages/)
             # handle pages
             url_name = request.path["/courses/1/pages/".length .. -1]
-            course_id = nil
+            course_id = 1
             # I want to keep the last one we see as that is likely the most recent course
             @current_user.enrollments.active.each do |enrollment|
-              course_id = enrollment.course.id if enrollment.course.wiki_pages.where(:url => url_name).any?
+              course_id = enrollment.course.id if enrollment.course.wiki_pages.where(:url => url_name).any? && enrollment.course.id > course_id
             end
 
-            replacement_url = "/courses/#{course_id}/pages/#{url_name}" if course_id
+            replacement_url = "/courses/#{course_id}/pages/#{url_name}" if course_id != 1
           elsif request.path.match(/\/courses\/1\/assignments/)
             # handle assignments
             old_assignment_id = request.path["/courses/1/assignments/".length .. -1]
             old_assignment = Assignment.find(old_assignment_id)
             assignment_id = nil
-            course_id = nil
+            course_id = 1
             # I want to keep the last one we see as that is likely the most recent course
             @current_user.enrollments.active.each do |enrollment|
               result = enrollment.course.assignments.where(:title => old_assignment.title)
               if result.any?
-                course_id = enrollment.course.id
-                assignment_id = result.first.id
+                if enrollment.course.id > course_id
+                  course_id = enrollment.course.id
+                  assignment_id = result.first.id
+                end
               end
             end
-            replacement_url = "/courses/#{course_id}/assignments/#{assignment_id}" if course_id
+            replacement_url = "/courses/#{course_id}/assignments/#{assignment_id}" if course_id != 1
           end
         end
 

@@ -914,7 +914,15 @@ class BzController < ApplicationController
 
     def perform
       csv = linked_in_export_guts
-      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "linkedin.csv" => csv).deliver
+
+      stringio = Zip::OutputStream.write_buffer(StringIO.new('')) do |zio|
+        zio.put_next_entry("linkedin.csv")
+        zio.write(csv)
+        sleep 1 # wtf?
+      end
+      stringio.rewind
+
+      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "linkedin.zip" => stringio.sysread).deliver
       # super
       csv
     end
@@ -942,7 +950,8 @@ class BzController < ApplicationController
 
             # See: https://developer.linkedin.com/docs/fields/full-profile
             fetched_li_data = true
-            request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
+            #request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
+            request = connection.get_request("/v2/me", service.token)
 
             # NOTE: The 'suggestions' field was causing this error, so we're not fetching it:
             # {"errorCode"=>0, "message"=>"Internal API server error", "requestId"=>"Y4175L15PK", "status"=>500, "timestamp"=>1490298963387}
@@ -956,17 +965,17 @@ class BzController < ApplicationController
               # TODO: if "message"=>"Unable to verify access token" we should unregister the user.  I reproduced this by registering a second
               # account with the same LinkedIn account.  It invalidated the first.
 
-              if info["message"] == "Internal API server error" # For certain LinkedIn accounts, requesting the job-bookmarks makes it fail. Try again without that.
-                Rails.logger.debug("### Retrying request without job-bookmarks parameter for user = #{u.name} - #{u.email}.")
-                fetched_li_data = true
-                request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,honors-awards)?format=json", service.token)
-                info = JSON.parse(request.body)
-                info["jobBookmarks"] = "ERROR FETCHING"
-                if info["errorCode"] == 0
-                  fetched_li_data = false
-                  Rails.logger.error("### Error exporting LinkedIn data (without jobs-bookmarks) for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
-                end
-              end
+              # if info["message"] == "Internal API server error" # For certain LinkedIn accounts, requesting the job-bookmarks makes it fail. Try again without that.
+                # Rails.logger.debug("### Retrying request without job-bookmarks parameter for user = #{u.name} - #{u.email}.")
+                # fetched_li_data = true
+                # request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,honors-awards)?format=json", service.token)
+                # info = JSON.parse(request.body)
+                # info["jobBookmarks"] = "ERROR FETCHING"
+                # if info["errorCode"] == 0
+                  # fetched_li_data = false
+                  # Rails.logger.error("### Error exporting LinkedIn data (without jobs-bookmarks) for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
+                # end
+              # end
             end
 
             if fetched_li_data
@@ -981,43 +990,51 @@ class BzController < ApplicationController
               end
 
               linkedin_data.linkedin_id = item["id"] = info["id"]
-              linkedin_data.first_name = item["first-name"] = info["firstName"]
-              linkedin_data.last_name = item["last-name"] = info["lastName"]
-              linkedin_data.maiden_name = item["maiden-name"] = info["maidenName"]
-              linkedin_data.email_address = item["email-address"] = info["emailAddress"]
-              linkedin_data.location = item["location"] = info["location"]["name"] unless info["location"].nil?
-              linkedin_data.industry = item["industry"] = info["industry"]
-              linkedin_data.job_title = item["job-title"] = get_job_title(info["threeCurrentPositions"])
-              linkedin_data.num_connections = item["num-connections"] = info["numConnections"]
-              linkedin_data.num_connections_capped = item["num-connections-capped"] = info["numConnectionsCapped"]
-              linkedin_data.summary = item["summary"] = info["summary"]
-              linkedin_data.specialties = item["specialties"] = info["specialties"]
-              linkedin_data.public_profile_url = item["public-profile-url"] = info["publicProfileUrl"]
+              linkedin_data.first_name = item["first-name"] = info["localizedFirstName"]
+              linkedin_data.last_name = item["last-name"] = info["localizedLastName"]
+              linkedin_data.maiden_name = item["maiden-name"] = info["localizedMaidenName"]
+              # no longer available
+              # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
+              linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
+              linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
+
+              linkedin_data.job_title = item["job-title"] = get_job_title(info["positions"])
+              linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
+              linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
+              linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
+              linkedin_data.specialties = item["specialties"] = nil # removed in V2
+              linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
               # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
               # which corresponds to 07/12/2016 2:26pm UTC
               # if we want to format the timestamp differently, use the strftime() method on the Time object
-              linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModifiedTimestamp"].to_f / 1000)
-              linkedin_data.associations = item["associations"] = info["associations"]
-              linkedin_data.interests = item["interests"] = info["interests"]
+              linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModified"].to_f / 1000)
+              linkedin_data.associations = item["associations"] = nil # remove in V2
+
+              linkedin_data.interests = item["interests"] = nil # removed in v2
               linkedin_data.publications = item["publications"] = info["publications"]
               linkedin_data.patents = item["patents"] = info["patents"]
               linkedin_data.languages = item["languages"] = info["languages"]
               linkedin_data.skills = item["skills"] = info["skills"]
               linkedin_data.certifications = item["certifications"] = info["certifications"]
               linkedin_data.educations = item["educations"] = info["educations"]
+              linkedin_data.courses = item["courses"] = info["courses"]
+              linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
+              # note there is also volunteeringInterests which gives a list of causes we might find interesting
+
               linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
               linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
               linkedin_data.major = item["major"] = get_major(info["educations"])
-              linkedin_data.courses = item["courses"] = info["courses"]
-              linkedin_data.volunteer = item["volunteer"] = info["volunteer"]
-              linkedin_data.three_current_positions = item["three-current-positions"] = info["threeCurrentPositions"]
-              linkedin_data.current_employer = item["current-employer"] = get_current_employer(info["threeCurrentPositions"])
-              linkedin_data.three_past_positions = item["three-past-positions"] = info["threePastPositions"]
-              linkedin_data.num_recommenders = item["num-recommenders"] = info["numRecommenders"]
-              linkedin_data.recommendations_received = item["recommendations-received"] = info["recommendationsReceived"]
-              linkedin_data.following = item["following"] = info["following"]
-              linkedin_data.job_bookmarks = item["job-bookmarks"] = info["jobBookmarks"]
-              linkedin_data.honors_awards = item["honors-awards"] = info["honorsAwards"]
+
+              linkedin_data.three_current_positions = item["three-current-positions"] = current_positions(info["positions"])
+              linkedin_data.current_employer = item["current-employer"] = get_current_employer(info["positions"])
+              linkedin_data.three_past_positions = item["three-past-positions"] = non_current_positions(info["positions"])
+
+              linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
+              linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
+              linkedin_data.following = item["following"] = nil # removed in V2
+              linkedin_data.job_bookmarks = item["job-bookmarks"] = nil # removed in V2
+
+              linkedin_data.honors_awards = item["honors-awards"] = info["honors"]
 
               items.push(item)
               linkedin_data.save
@@ -1116,75 +1133,104 @@ class BzController < ApplicationController
       #end
     #end
 
-    def get_job_title(threeCurrentPositionsNode)
-      # Example of threeCurrentPositions:
-      #   {
-      #     "_total"=>1,
-      #     "values"=>
-      #     [
-      #       {
-      #         "company"=>{"id"=>3863006, "industry"=>"Higher Education", "name"=>"Braven", "size"=>"11-50", "type"=>"Non Profit"},
-      #         "id"=>488965520,
-      #         "isCurrent"=>true,
-      #         "location"=>{"name"=>"New York City"},
-      #         "startDate"=>{"month"=>12, "year"=>2013},
-      #         "summary"=>"blah blah.",
-      #         "title"=>"CTO"
-      #       }
-      #     ]
-      #   }
-      job_title = threeCurrentPositionsNode["values"].find {|job| job['isCurrent']==true}['title'] unless threeCurrentPositionsNode["_total"]==0
-      return job_title
+    def get_job_title(positionsNode)
+      return nil if positionsNode.nil?
+      # positions is an object with items as properties, we need to find the one that does not have a endMonthYear as it its current
+      positionsNode.each do |id, value|
+        if value["endMonthYear"].nil?
+          return value["title"]["localized"]["en_US"]
+        end
+      end
+      return nil
     end
 
-    def get_current_employer(threeCurrentPositionsNode)
-      # See get_job_title() for example of threeCurrentPositionsNode
-      current_employer_node = threeCurrentPositionsNode["values"].find {|job| job['isCurrent']==true} unless threeCurrentPositionsNode["_total"]==0
-      current_employer_company_node = current_employer_node["company"] unless current_employer_node.nil?
-      current_employer = current_employer_company_node["name"] unless current_employer_company_node.nil?
-      return current_employer
+    def current_positions(positionsNode)
+      remainder = []
+      return remainder if positionsNode.nil?
+      positionsNode.each do |k, v|
+        if v["endMonthYear"].nil?
+          remainder << v
+        end
+      end
+
+      begin
+        remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
+      rescue
+        return []
+      end
+    end
+
+    def non_current_positions(positionsNode)
+      remainder = []
+      return remainder if positionsNode.nil?
+      positionsNode.each do |k, v|
+        if !v["endMonthYear"].nil?
+          remainder << v
+        end
+      end
+
+      begin
+        remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
+      rescue
+        return []
+      end
+    end
+
+
+    def get_current_employer(currentPositionsNode)
+      cp = current_positions(currentPositionsNode)
+      return nil if cp.length == 0
+      current_employer_node = cp[-1]
+      if current_employer_node
+        return current_employer_node["companyName"]["localized"]["en_US"]
+      else
+        return nil
+      end
     end
 
     def get_most_recent_school(educationsNode)
-      # Example of educationsNode: 
-      # {
-      #   "_total"=>2,
-      #   "values"=>[
-      #     {
-      #       "degree"=>"Bachelors",
-      #       "endDate"=>{"year"=>2006},
-      #       "fieldOfStudy"=>"Computer Science and Mathematics",
-      #       "grade"=>{},
-      #       "id"=>11029769,
-      #       "schoolName"=>"Boston University",
-      #       "startDate"=>{"year"=>2004}
-      #     },
-      #     {
-      #       "endDate"=>{"year"=>2004},
-      #       "fieldOfStudy"=>"Computer Science and Mathematics",
-      #       "grade"=>{},
-      #       "id"=>13485812,
-      #       "schoolName"=>"Rensselaer Polytechnic Institute",
-      #       "startDate"=>{"year"=>2002}
-      #     }
-      #   ]
-      # }
-      # Assumes that LinkedIn returns them in reverse chronological order
-      most_recent_school = educationsNode["values"][0]["schoolName"] unless educationsNode["_total"]==0
-     return most_recent_school
+      most_recent = get_most_recent_school_node(educationsNode)
+      begin
+        return most_recent["schoolName"]["localized"]["en_US"]
+      rescue
+        return nil
+      end
+    end
+
+    def get_most_recent_school_node(educationsNode)
+      most_recent = nil
+      return nil if educationsNode.nil?
+      educationsNode.each do |k, v|
+        next if v["startMonthYear"].nil?
+        if most_recent.nil? || v["startMonthYear"]["year"] > most_recent["startMonthYear"]["year"] || (v["startMonthYear"]["year"] == most_recent["startMonthYear"]["year"] && v["startMonthYear"]["month"] && most_recent["startMonthYear"]["month"] && v["startMonthYear"]["month"] > most_recent["startMonthYear"]["month"])
+          most_recent = v
+        end
+      end
+      return most_recent
     end
 
     def get_graduation_year(educationsNode)
-      # See get_most_recent_school() for an example of the educationsNode
-      graduation_year = educationsNode["values"][0]["endDate"] unless educationsNode["_total"]==0
-      graduation_year = graduation_year["year"] unless graduation_year.nil?
-      return graduation_year
+      return nil if educationsNode.nil?
+      node = get_most_recent_school_node(educationsNode)
+      if node.nil? || node["endMonthYear"].nil?
+        return nil
+      else
+        return node["endMonthYear"]["year"]
+      end
     end
 
     def get_major(educationsNode)
-      # See get_most_recent_school() for an example of the educationsNode
-      major = educationsNode["values"][0]["fieldOfStudy"] unless educationsNode["_total"]==0
-      return major
+      return nil if educationsNode.nil?
+      node = get_most_recent_school_node(educationsNode)
+      if node.nil?
+        return nil
+      end
+
+      begin
+        return node["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
+      rescue
+        return nil
+      end
     end
 
 
