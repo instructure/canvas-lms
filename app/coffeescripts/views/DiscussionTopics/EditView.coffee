@@ -40,6 +40,7 @@ import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
 import SisValidationHelper from '../../util/SisValidationHelper'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 import * as returnToHelper from '../../../jsx/shared/helpers/returnToHelper'
+import 'jqueryui/tabs'
 
 RichContentEditor.preloadRemoteModule()
 
