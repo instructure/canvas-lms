@@ -17,7 +17,6 @@
 #
 
 class GroupMembership < ActiveRecord::Base
-
   include Workflow
 
   belongs_to :group

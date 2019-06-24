@@ -1293,7 +1293,7 @@ describe Assignment do
         expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
 
         assignment = @course.assignments.create!(assignment_valid_attributes)
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(student_one.name)
@@ -1333,7 +1333,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(group_two.name)
         expect(representatives[1].name).to eql(group_one.name)
@@ -1364,7 +1364,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(student_one.name)
@@ -1402,7 +1402,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(group_two.name)
@@ -1444,7 +1444,7 @@ describe Assignment do
 
       expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
 
-      representatives = assignment.representatives(@teacher)
+      representatives = assignment.representatives(user: @teacher)
 
       expect(representatives[0].name).to eql(student_three.name)
       expect(representatives[1].name).to eql(student_one.name)

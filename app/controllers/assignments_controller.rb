@@ -247,7 +247,7 @@ class AssignmentsController < ApplicationController
 
     student_ids =
       if assignment.grade_as_group?
-        assignment.representatives(current_user).map(&:id)
+        assignment.representatives(user: current_user).map(&:id)
       else
         context.apply_enrollment_visibility(context.student_enrollments, current_user).pluck(:user_id)
       end

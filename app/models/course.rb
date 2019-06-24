@@ -2448,6 +2448,7 @@ class Course < ActiveRecord::Base
   end
 
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)
+  # returns a scope for enrollments
   def apply_enrollment_visibility(scope, user, section_ids=nil, include: [])
     include = Array(include)
     if section_ids

@@ -555,11 +555,84 @@ describe SpeedGrader::Assignment do
       end
     end
 
-    it "is not in group mode for non-group assignments" do
-      assignment = @course.assignments.create!
-      assignment.submit_homework(@student, {submission_type: 'online_text_entry', body: 'blah'})
-      json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      expect(json["GROUP_GRADING_MODE"]).to be false
+    context 'given an assignment' do
+      before(:once) do
+        @assignment = @course.assignments.create!
+      end
+
+      it "is not in group mode for non-group assignments" do
+        @assignment.submit_homework(@student, {submission_type: 'online_text_entry', body: 'blah'})
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json["GROUP_GRADING_MODE"]).to be false
+      end
+
+      context 'when a course has new gradeook and filter by student group enabled' do
+        before(:once) do
+          @course.enable_feature!(:new_gradebook)
+          @course.update!(filter_speed_grader_by_student_group: true)
+        end
+
+        context 'when no group filter is present' do
+          it 'returns all students' do
+            @teacher.preferences.deep_merge!(gradebook_settings: {
+              @course.id => {'filter_rows_by' => {'student_group_id' => nil}}
+            })
+            json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+            json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+            students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            StringifyIds.recursively_stringify_ids(students)
+            expect(json_students).to match_array(students)
+          end
+        end
+
+        context 'when the first group filter is present' do
+          let(:group) { @first_group }
+
+          before(:once) do
+            @teacher.preferences.deep_merge!(gradebook_settings: {
+              @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+            })
+          end
+
+          it 'returns only students that belong to the first group' do
+            json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+            json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+            group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            StringifyIds.recursively_stringify_ids(group_students)
+            expect(json_students).to match_array(group_students)
+          end
+
+          context 'when a student is removed from a group' do
+            let(:first_student) { group.users.first }
+
+            before { group.group_memberships.find_by!(user: first_student).destroy! }
+
+            it 'that student is no longer included' do
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              group_students = group.users.where.not(id: first_student).
+                as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+          end
+
+          context 'when the second group filter is present' do
+            let(:group) { @second_group }
+
+            it 'returns only students that belong to the second group' do
+              @teacher.preferences.deep_merge!(gradebook_settings: {
+                @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+              })
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+          end
+        end
+      end
     end
 
     context 'given a group assignment' do
@@ -606,7 +679,7 @@ describe SpeedGrader::Assignment do
         first_group_representative = @first_group.users.sample
         submission = @assignment.submission_for_student(first_group_representative)
         submission.update!(submission_type: 'online_upload')
-        expect(@assignment.representatives(@teacher)).to include first_group_representative
+        expect(@assignment.representatives(user: @teacher)).to include first_group_representative
       end
 
       it "prefers people who aren't excused when submission exists" do
@@ -618,19 +691,19 @@ describe SpeedGrader::Assignment do
         everyone_else.each do |user|
           @assignment.grade_student(user, excuse: true, grader: @teacher)
         end
-        expect(@assignment.representatives(@teacher)).to include first_group_representative
+        expect(@assignment.representatives(user: @teacher)).to include first_group_representative
       end
 
       it "includes users who aren't in a group" do
         student_in_course active_all: true
-        expect(@assignment.representatives(@teacher)).to include @student
+        expect(@assignment.representatives(user: @teacher)).to include @student
       end
 
       it "includes groups" do
         student_in_course active_all: true
         group = @group_category.groups.create!(context: @course)
         group.add_user(@student)
-        expect(@assignment.representatives(@teacher).map(&:name)).to include group.name
+        expect(@assignment.representatives(user: @teacher).map(&:name)).to include group.name
       end
 
       it "doesn't include deleted groups" do
@@ -638,7 +711,7 @@ describe SpeedGrader::Assignment do
         group = @group_category.groups.create!(context: @course)
         group.add_user(@student)
         group.destroy!
-        expect(@assignment.representatives(@teacher).map(&:name)).not_to include group.name
+        expect(@assignment.representatives(user: @teacher).map(&:name)).not_to include group.name
       end
 
       it 'prefers active users over other workflow states' do
@@ -646,7 +719,7 @@ describe SpeedGrader::Assignment do
         enrollments.first.deactivate
         enrollments.second.conclude
 
-        reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
+        reps = @assignment.representatives(user: @teacher, includes: %i[inactive completed])
         user = reps.find { |u| u.name == @first_group.name }
         expect(user).to eql(enrollments.third.user)
       end
@@ -657,7 +730,7 @@ describe SpeedGrader::Assignment do
         enrollments.second.deactivate
         enrollments.third.conclude
 
-        reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
+        reps = @assignment.representatives(user: @teacher, includes: %i[inactive completed])
         user = reps.find { |u| u.name == @first_group.name }
         expect(user).to eql(enrollments.second.user)
       end
@@ -666,7 +739,7 @@ describe SpeedGrader::Assignment do
         enrollments = @first_group.all_real_student_enrollments
         enrollments.each(&:conclude)
 
-        reps = @assignment.representatives(@teacher, includes: [:completed])
+        reps = @assignment.representatives(user: @teacher, includes: [:completed])
         user = reps.find { |u| u.name == @first_group.name }
         expect(user).to eql(enrollments.first.user)
       end
@@ -675,7 +748,7 @@ describe SpeedGrader::Assignment do
         enrollments = @first_group.all_real_student_enrollments
         enrollments.each(&:conclude)
 
-        reps = @assignment.representatives(@teacher, includes: [])
+        reps = @assignment.representatives(user: @teacher, includes: [])
         user = reps.find { |u| u.name == @first_group.name }
         expect(user).to be_nil
       end
@@ -684,7 +757,7 @@ describe SpeedGrader::Assignment do
         enrollments = @first_group.all_real_student_enrollments
         enrollments.each(&:deactivate)
 
-        reps = @assignment.representatives(@teacher, includes: [:inactive])
+        reps = @assignment.representatives(user: @teacher, includes: [:inactive])
         user = reps.find { |u| u.name == @first_group.name }
         expect(user).to eql(enrollments.first.user)
       end
@@ -693,7 +766,7 @@ describe SpeedGrader::Assignment do
         enrollments = @first_group.all_real_student_enrollments
         enrollments.each(&:deactivate)
 
-        reps = @assignment.representatives(@teacher, includes: [])
+        reps = @assignment.representatives(user: @teacher, includes: [])
         user = reps.find { |u| u.name == @first_group.name }
         expect(user).to be_nil
       end

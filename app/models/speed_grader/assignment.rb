@@ -73,7 +73,7 @@ module SpeedGrader
       # valid submission object, which means no inactive or concluded students
       # even if the user has elected to show them in gradebook
       includes = assignment.anonymize_students? ? [] : gradebook_includes(user: current_user, course: course)
-      students = assignment.representatives(current_user, includes: includes) do |rep, others|
+      students = assignment.representatives(user: current_user, includes: includes, group_id: group_id_filter) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
 
@@ -403,6 +403,11 @@ module SpeedGrader
           assignment: assignment,
           submissions: submissions
         )
+    end
+
+    def group_id_filter
+      return nil unless course.filter_speed_grader_by_student_group?
+      current_user.preferences.dig(:gradebook_settings, course.id, 'filter_rows_by', 'student_group_id')
     end
   end
 end
