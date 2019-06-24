@@ -59,6 +59,7 @@ export default function LinkOptionsDialog(props) {
 
   return (
     <Modal
+      data-testid="RCELinkOptionsDialog"
       as="form"
       label={label}
       onDismiss={props.onRequestClose}
@@ -86,6 +87,7 @@ export default function LinkOptionsDialog(props) {
         <View as="div" margin="small">
           <TextInput
             label={formatMessage('Text')}
+            name="linktext"
             onChange={handleTextChange}
             value={text}
           />
@@ -93,6 +95,7 @@ export default function LinkOptionsDialog(props) {
         <View as="div" margin="small">
           <TextInput
             label={formatMessage('Link')}
+            name="linklink"
             onChange={handleLinkChange}
             value={url}
           />

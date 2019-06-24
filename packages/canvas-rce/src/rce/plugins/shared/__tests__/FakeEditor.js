@@ -36,6 +36,17 @@ export default class FakeEditor {
         this._selectedNode = this.$container.appendChild($temp.firstChild)
       }
     }
+
+    this.dom = {
+      getParent: (el, selector) => {
+        const parent = el && el.parentElement
+        const grandparent = parent && parent.parentElement
+        if (grandparent && grandparent.querySelector(selector) === parent) {
+          return parent
+        }
+        return null
+      }
+    }
   }
 
   get $container() {

@@ -26,10 +26,11 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
 import {Tray} from '@instructure/ui-overlays'
 import formatMessage from '../../../../../format-message'
-
-const DISPLAY_AS_LINK = 'link'
-const DISPLAY_AS_EMBED = 'embed'
-const DISPLAY_AS_EMBED_DISABLED = 'embed-disabled'
+import {
+  DISPLAY_AS_LINK,
+  DISPLAY_AS_EMBED,
+  DISPLAY_AS_EMBED_DISABLED
+} from '../../../shared/ContentSelection'
 
 export default function LinkOptionsTray(props) {
   const {content} = props
@@ -70,6 +71,7 @@ export default function LinkOptionsTray(props) {
   }
   return (
     <Tray
+      data-testid="RCELinkOptionsTray"
       label={formatMessage('Link Options')}
       onDismiss={props.onRequestClose}
       onEntered={props.onEntered}

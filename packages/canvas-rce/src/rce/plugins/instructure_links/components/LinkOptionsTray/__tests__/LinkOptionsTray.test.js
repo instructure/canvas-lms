@@ -161,6 +161,17 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
           const [{embed}] = props.onSave.mock.calls[0]
           expect(embed.type).toEqual('scribd')
           expect(embed.autoOpenPreview).toBeTruthy()
+          expect(embed.disablePreview).toBeFalsy()
+        })
+
+        it('sets disablePreview if displayAs is "embed-disabled"', () => {
+          props.content.isPreviewable = true
+          tray.setDisablePreview(true)
+          tray.$doneButton.click()
+          const [{embed}] = props.onSave.mock.calls[0]
+          expect(embed.type).toEqual('scribd')
+          expect(embed.autoOpenPreview).toBeFalsy()
+          expect(embed.disablePreview).toBeTruthy()
         })
 
         it('includes the Link', () => {

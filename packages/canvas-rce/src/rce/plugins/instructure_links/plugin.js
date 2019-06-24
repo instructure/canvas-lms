@@ -37,10 +37,6 @@ const getLinkIfCursorOnAnchorElement = function (editor) {
          getAnchorElement(editor, editor.selection.getStart())
 }
 
-function isFileLink($element) {
-  return getContentFromElement($element).type === FILE_LINK_TYPE
-}
-
 const getAnchorElement = function (editor, node) {
   const link = node.nodeName.toLowerCase() === 'a' ? node : getLink(editor, node)
   return (link && link.href) ? link : null
@@ -138,6 +134,8 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
 
     const defaultFocusSelector = `.tox-pop__dialog button[aria-label="${buttonAriaLabel}"]`
     globalRegistry.addContextKeydownListener(ed, defaultFocusSelector)
+
+    const isFileLink = ($element) => getContentFromElement($element, ed).type === FILE_LINK_TYPE
 
     ed.ui.registry.addContextToolbar('instructure-link-toolbar', {
       items: 'instructure-link-options',

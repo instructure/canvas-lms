@@ -24,6 +24,10 @@ export const IMAGE_EMBED_TYPE = 'image-embed'
 export const VIDEO_EMBED_TYPE = 'video-embed'
 export const TEXT_TYPE = 'text'
 export const NONE_TYPE = 'none'
+export const DISPLAY_AS_LINK = 'link'
+export const DISPLAY_AS_EMBED = 'embed'
+export const DISPLAY_AS_EMBED_DISABLED = 'embed-disabled'
+
 
 function asImageEmbed($element) {
   const nodeName = $element.nodeName.toLowerCase()
@@ -34,6 +38,7 @@ function asImageEmbed($element) {
   const altText = $element.alt || ''
 
   return {
+    $element,
     altText,
     isDecorativeImage: altText === '' && $element.getAttribute('data-is-decorative') === 'true',
     type: IMAGE_EMBED_TYPE,
@@ -41,17 +46,31 @@ function asImageEmbed($element) {
   }
 }
 
-function asLink($element) {
-  const nodeName = $element.nodeName.toLowerCase()
-  if (nodeName !== 'a' || !$element.href) {
+function asLink($element, editor) {
+  if (!$element) {
+    return null
+  }
+
+  if ($element.nodeName.toLowerCase() !== 'a' && editor) {
+    // the user may have selected some text that is w/in a link
+    // but didn't include the <a>. Let's see if that's true
+    $element = editor.dom.getParent($element, 'a[href]')
+  }
+  if (!$element || $element.nodeName.toLowerCase() !== 'a' || !$element.href) {
     return null
   }
 
   const path = new URL($element.href).pathname
   const type = FILE_DOWNLOAD_PATH_REGEX.test(path) ? FILE_LINK_TYPE : LINK_TYPE
-  const displayAs = $element.classList.contains('auto_open') ? 'embed' : 'link'
+  let displayAs = DISPLAY_AS_LINK
+  if ($element.classList.contains('auto_open')) {
+    displayAs = DISPLAY_AS_EMBED
+  } else if ($element.classList.contains('inline_disabled')) {
+    displayAs = DISPLAY_AS_EMBED_DISABLED
+  }
 
   return {
+    $element,
     displayAs,
     text: $element.textContent,
     type,
@@ -74,25 +93,30 @@ function asVideoElement($element) {
   }
 
   return {
+    $element,
     type: VIDEO_EMBED_TYPE,
     id: $element.id.split("_")[2]
   }
 }
 
-function asText(editor) {
-  const text = editor && editor.selection.getContent()
+function asText($element, editor) {
+  const text = editor && editor.selection.getNode().textContent
   if (!text) {
     return null
   }
 
   return {
-    text: editor.selection.getContent(),
+    $element,
+    text,
     type: 'TEXT_TYPE'
   }
 }
 
-function asNone() {
-  return {type: NONE_TYPE}
+function asNone($element) {
+  return {
+    $element: $element || null,
+    type: NONE_TYPE
+  }
 }
 
 export function getContentFromElement($element, editor) {
@@ -100,8 +124,7 @@ export function getContentFromElement($element, editor) {
     return asNone()
   }
 
-  const content = asLink($element) || asImageEmbed($element) || asVideoElement($element) || asText(editor) || asNone()
-  content.$element = $element
+  const content = asLink($element, editor) || asImageEmbed($element) || asVideoElement($element) || asText($element, editor) || asNone($element)
   return content
 }
 

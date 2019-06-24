@@ -43,6 +43,9 @@ export default class LinkOptionsTrayDriver {
   get $previewCheckbox() {
     return queryHelpers.queryByAttribute('name', this.$element, 'auto-preview')
   }
+  get $disablePreviewCheckbox() {
+    return queryHelpers.queryByAttribute('name', this.$element, 'disable-preview')
+  }
   get $doneButton() {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
@@ -65,6 +68,12 @@ export default class LinkOptionsTrayDriver {
   }
   setAutoPreview(value) {
     const $input = this.$previewCheckbox
+    if ($input.checked !== value) {
+      $input.click()
+    }
+  }
+  setDisablePreview(value) {
+    const $input = this.$disablePreviewCheckbox
     if ($input.checked !== value) {
       $input.click()
     }
