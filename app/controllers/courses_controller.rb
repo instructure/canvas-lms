@@ -1394,8 +1394,8 @@ class CoursesController < ApplicationController
         I18n.t('Pairing Code'),
         I18n.t('Expires At'),
       ]
-      opcs = @context.users.preload(:observer_pairing_codes).map(&:observer_pairing_codes).flatten
-      opcs.each do |opc|
+      @context.students.each do |u|
+        opc = ObserverPairingCode.create(user: u, expires_at: 1.week.from_now, code: SecureRandom.hex(3))
         row = []
         row << opc.user.last_name
         row << opc.user.first_name
