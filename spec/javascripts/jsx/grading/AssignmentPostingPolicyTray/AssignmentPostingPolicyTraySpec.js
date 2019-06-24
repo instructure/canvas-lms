@@ -121,10 +121,29 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
       strictEqual(getInputByLabel('Automatically').disabled, true)
     })
 
-    test('disables the "Automatically" input for a moderated assignment', async () => {
-      context.assignment.moderatedGrading = true
-      await show()
-      strictEqual(getInputByLabel('Automatically').disabled, true)
+    QUnit.module('when the assignment is moderated', hooks => {
+      hooks.beforeEach(() => {
+        context.assignment.moderatedGrading = true
+      })
+
+      test('disables the "Automatically" input when grades are not published', async () => {
+        context.assignment.gradesPublished = false
+        await show()
+        strictEqual(getInputByLabel('Automatically').disabled, true)
+      })
+
+      test('enables the "Automatically" input when grades are published', async () => {
+        context.assignment.gradesPublished = true
+        await show()
+        strictEqual(getInputByLabel('Automatically').disabled, false)
+      })
+
+      test('always disables the "Automatically" input when the assignment is anonymous', async () => {
+        context.assignment.anonymousGrading = true
+        context.assignment.gradesPublished = true
+        await show()
+        strictEqual(getInputByLabel('Automatically').disabled, true)
+      })
     })
 
     test('enables the "Automatically" input if the assignment is not anonymous or moderated', async () => {
