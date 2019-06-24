@@ -19,14 +19,14 @@ import $ from 'jquery'
 import * as uploadFileModule from '../../../shared/upload_file'
 import {fireEvent, render, wait, waitForElement} from 'react-testing-library'
 import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from '../assignmentData'
-import InitialQuery from '../components/InitialQuery'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import {singleAttachment, submissionGraphqlMock} from '../test-utils'
+import SubmissionIDQuery from '../components/SubmissionIDQuery'
 
 let mocks
 
-describe('InitialQuery', () => {
+describe('SubmissionIDQuery', () => {
   beforeAll(() => {
     window.URL.createObjectURL = jest.fn()
     uploadFileModule.uploadFiles = jest.fn()
@@ -56,7 +56,7 @@ describe('InitialQuery', () => {
   it('renders normally', async () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks} removeTypename addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
     expect(
@@ -92,7 +92,7 @@ describe('InitialQuery', () => {
   it('renders loading', async () => {
     const {getByTitle} = render(
       <MockedProvider mocks={mocks} removeTypename addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -108,7 +108,7 @@ describe('InitialQuery', () => {
 
     const {container, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -128,7 +128,7 @@ describe('InitialQuery', () => {
 
     const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -148,7 +148,7 @@ describe('InitialQuery', () => {
 
     const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -167,7 +167,7 @@ describe('InitialQuery', () => {
     mocks[0].error = new Error('aw shucks')
     const {getByTestId, getByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -185,7 +185,7 @@ describe('InitialQuery', () => {
 
     const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -206,7 +206,7 @@ describe('InitialQuery', () => {
     mocks[1].error = new Error('aw shucks')
     const {getByTestId, getByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
-        <InitialQuery assignmentLid="22" />
+        <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
     )
 
@@ -235,7 +235,7 @@ describe('InitialQuery', () => {
     ]
     const {getByText} = render(
       <MockedProvider mocks={errorMock} removeTypename addTypename>
-        <InitialQuery assignmentLid="7" />
+        <SubmissionIDQuery assignmentLid="7" />
       </MockedProvider>
     )
 

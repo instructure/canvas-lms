@@ -19,15 +19,15 @@
 import errorShipUrl from '../SVG/ErrorShip.svg'
 import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_initial_query'
-import InitialAttachmentsQuery from './InitialAttachmentsQuery'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import {Query} from 'react-apollo'
 import React from 'react'
 import {string} from 'prop-types'
-import {STUDENT_VIEW_QUERY} from '../assignmentData'
+import StudentViewQUery from './StudentViewQuery'
+import {SUBMISSION_ID_QUERY} from '../assignmentData'
 
-const InitialQuery = props => (
-  <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
+const SubmissionIDQuery = props => (
+  <Query query={SUBMISSION_ID_QUERY} variables={{assignmentLid: props.assignmentLid}}>
     {({loading, error, data}) => {
       if (loading) return <LoadingIndicator />
       if (error) {
@@ -40,14 +40,18 @@ const InitialQuery = props => (
         )
       }
 
-      document.title = data.assignment.name
-      return <InitialAttachmentsQuery initialQueryData={data} />
+      return (
+        <StudentViewQUery
+          assignmentLid={props.assignmentLid}
+          submissionID={data.assignment.submissionsConnection.nodes[0].id}
+        />
+      )
     }}
   </Query>
 )
 
-InitialQuery.propTypes = {
+SubmissionIDQuery.propTypes = {
   assignmentLid: string.isRequired
 }
 
-export default InitialQuery
+export default SubmissionIDQuery

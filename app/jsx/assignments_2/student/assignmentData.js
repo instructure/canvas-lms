@@ -88,6 +88,9 @@ function submissionDraftFields() {
 
 function baseSubmissionFields() {
   return `
+    attachments {
+      ${attachmentFieldsWithPreviewURL()}
+    }
     attempt
     deductedPoints
     enteredGrade
@@ -118,9 +121,6 @@ function submissionHistoryFields() {
     }
     nodes {
       ${baseSubmissionFields()}
-      attachments {
-        ${attachmentFieldsWithPreviewURL()}
-      }
     }
   `
 }
@@ -150,8 +150,25 @@ function submissionCommentQueryParams() {
     }`
 }
 
+export const SUBMISSION_ID_QUERY = gql`
+  query GetAssignmentSubmissionID($assignmentLid: ID!) {
+    assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
+      ... on Assignment {
+        submissionsConnection(
+          last: 1
+          filter: {states: [unsubmitted, graded, pending_review, submitted]}
+        ) {
+          nodes {
+            id
+          }
+        }
+      }
+    }
+  }
+`
+
 export const STUDENT_VIEW_QUERY = gql`
-  query GetAssignment($assignmentLid: ID!) {
+  query GetAssignment($assignmentLid: ID!, $submissionID: ID!) {
     assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
       ... on Assignment {
         _id
@@ -223,8 +240,8 @@ export const CREATE_SUBMISSION_COMMENT = gql`
 `
 
 export const CREATE_SUBMISSION = gql`
-  mutation CreateSubmission($id: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
-    createSubmission(input: {assignmentId: $id, submissionType: $type, fileIds: $fileIds}) {
+  mutation CreateSubmission($assignmentLid: ID!, $submissionID: ID!, $type: OnlineSubmissionType!, $fileIds: [ID!]) {
+    createSubmission(input: {assignmentId: $assignmentLid, submissionType: $type, fileIds: $fileIds}) {
       submission {
         ${submissionFields()}
       }
@@ -254,18 +271,6 @@ export const SUBMISSION_HISTORIES_QUERY = gql`
       ... on Submission {
         submissionHistoriesConnection(before: $cursor, last: 5, filter: {includeCurrentSubmission: false}) {
           ${submissionHistoryFields()}
-        }
-      }
-    }
-  }
-`
-
-export const SUBMISSION_ATTACHMENTS_QUERY = gql`
-  query GetSubmissionAttachments($submissionID: ID!) {
-    submission: node(id: $submissionID) {
-      ... on Submission {
-        attachments {
-          ${attachmentFieldsWithPreviewURL()}
         }
       }
     }

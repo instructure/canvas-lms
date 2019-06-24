@@ -111,7 +111,9 @@ class ViewManager extends React.Component {
       }
     }
 
-    return null
+    return {
+      submissions: newAllSubmissions
+    }
   }
 
   getAssignmentWithEnv = () => {
