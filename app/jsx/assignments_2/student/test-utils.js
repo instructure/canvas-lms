@@ -20,8 +20,8 @@ import {
   CREATE_SUBMISSION_COMMENT,
   CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
-  SUBMISSION_ATTACHMENTS_QUERY,
-  SUBMISSION_COMMENT_QUERY
+  SUBMISSION_COMMENT_QUERY,
+  SUBMISSION_ID_QUERY
 } from './assignmentData'
 
 export function mockAssignment(overrides = {}) {
@@ -308,7 +308,8 @@ export function submissionGraphqlMock() {
       request: {
         query: CREATE_SUBMISSION,
         variables: {
-          id: '22',
+          assignmentLid: '22',
+          submissionID: mockSubmission().id,
           type: 'online_upload',
           fileIds: ['1']
         }
@@ -331,7 +332,8 @@ export function submissionGraphqlMock() {
       request: {
         query: STUDENT_VIEW_QUERY,
         variables: {
-          assignmentLid: '22'
+          assignmentLid: '22',
+          submissionID: mockSubmission().id
         }
       },
       result: {
@@ -344,16 +346,24 @@ export function submissionGraphqlMock() {
     },
     {
       request: {
-        query: SUBMISSION_ATTACHMENTS_QUERY,
+        query: SUBMISSION_ID_QUERY,
         variables: {
-          submissionID: mockSubmission().id
+          assignmentLid: '22'
         }
       },
       result: {
         data: {
-          submission: {
-            attachments: mockMultipleAttachments(),
-            __typename: 'Submission'
+          assignment: {
+            submissionsConnection: {
+              nodes: [
+                {
+                  id: mockSubmission().id,
+                  __typename: 'Submission'
+                }
+              ],
+              __typename: 'SubmissionConnection'
+            },
+            __typename: 'Assignment'
           }
         }
       }

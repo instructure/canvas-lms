@@ -164,7 +164,8 @@ export default class FileUpload extends Component {
 
     await this.props.createSubmission({
       variables: {
-        id: this.props.assignment._id,
+        assignmentLid: this.props.assignment._id,
+        submissionID: this.props.submission.id,
         type: 'online_upload', // TODO: update to enable different submission types
         fileIds: this.getDraftAttachments().map(file => file._id)
       }
