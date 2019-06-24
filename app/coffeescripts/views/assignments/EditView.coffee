@@ -751,7 +751,7 @@ export default class EditView extends ValidatedFormView
       isPeerReviewAssignment: !!@$peerReviewsBox.prop('checked')
       locale: ENV.LOCALE
       moderatedGradingEnabled: @assignment.moderatedGrading()
-      maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+      availableGradersCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
       onGraderCommentsVisibleToGradersChange: @handleGraderCommentsVisibleToGradersChanged
       onModeratedGradingChange: @handleModeratedGradingChanged
 
