@@ -1811,24 +1811,24 @@
     prop-types "^15"
 
 "@instructure/ui-pagination@6":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-6.2.0.tgz#fa66daa076a54c97882839b9086ff2f9677e4421"
-  integrity sha512-rKMPi2VXsnzOYuJERMPbMOG2jomPhxXjv3m8eaVKlKv/Sn5vPwj85Ngjcb3Uf/qR/vbjzO+3TPRlTSXinPA3Pw==
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-6.4.0.tgz#3c1758b5e54a876649b0e873185a54164d40c6cc"
+  integrity sha512-evryS/FNbzZEKxcdUFSKObwY2WILaCbJeY4lBYSnHbICBKt/Oe9hnZoc2TDAHk9ZLryHnalGeD3TAQVwkLv1CA==
   dependencies:
     "@babel/runtime" "^7"
-    "@instructure/ui-a11y" "^6.2.0"
-    "@instructure/ui-buttons" "^6.2.0"
-    "@instructure/ui-elements" "^6.2.0"
-    "@instructure/ui-icons" "^6.2.0"
-    "@instructure/ui-layout" "^6.2.0"
-    "@instructure/ui-overlays" "^6.2.0"
-    "@instructure/ui-portal" "^6.2.0"
-    "@instructure/ui-prop-types" "^6.2.0"
-    "@instructure/ui-react-utils" "^6.2.0"
-    "@instructure/ui-testable" "^6.2.0"
-    "@instructure/ui-themeable" "^6.2.0"
-    "@instructure/ui-utils" "^6.2.0"
-    "@instructure/uid" "^6.2.0"
+    "@instructure/ui-a11y" "^6.4.0"
+    "@instructure/ui-buttons" "^6.4.0"
+    "@instructure/ui-elements" "^6.4.0"
+    "@instructure/ui-icons" "^6.4.0"
+    "@instructure/ui-layout" "^6.4.0"
+    "@instructure/ui-overlays" "^6.4.0"
+    "@instructure/ui-portal" "^6.4.0"
+    "@instructure/ui-prop-types" "^6.4.0"
+    "@instructure/ui-react-utils" "^6.4.0"
+    "@instructure/ui-testable" "^6.4.0"
+    "@instructure/ui-themeable" "^6.4.0"
+    "@instructure/ui-utils" "^6.4.0"
+    "@instructure/uid" "^6.4.0"
     prop-types "^15"
 
 "@instructure/ui-pagination@^5", "@instructure/ui-pagination@^5.52.3":
