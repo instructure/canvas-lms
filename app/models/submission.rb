@@ -267,10 +267,12 @@ class Submission < ActiveRecord::Base
 
   scope :needs_grading, -> {
     all.primary_shard.activate do
-      joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id=enrollments.user_id")
-      .where(needs_grading_conditions)
-      .where(Enrollment.active_student_conditions)
-      .distinct
+      joins(:assignment).
+        joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id=enrollments.user_id
+                                                         AND assignments.context_id = enrollments.course_id").
+        where(needs_grading_conditions).
+        where(Enrollment.active_student_conditions).
+        distinct
     end
   }
 
@@ -397,7 +399,7 @@ class Submission < ActiveRecord::Base
     given do |user|
       user &&
         user.id == self.user_id &&
-        !self.assignment.muted?
+        self.posted?
     end
     can :read_grade
 
@@ -437,7 +439,7 @@ class Submission < ActiveRecord::Base
 
     given do |user|
       self.assignment &&
-        !self.assignment.muted? &&
+        self.posted? &&
         self.assignment.context &&
         user &&
         self.user &&
@@ -516,7 +518,7 @@ class Submission < ActiveRecord::Base
     # improves performance by checking permissions on the assignment before the submission
     return true if self.assignment.user_can_read_grades?(user, session)
 
-    return false if self.assignment.muted? # if you don't have manage rights from the assignment you can't read if it's muted
+    return false unless self.posted?
     return true if user && user.id == self.user_id # this is fast, so skip the policy cache check if possible
 
     self.grants_right?(user, session, :read_grade)
@@ -2444,7 +2446,11 @@ class Submission < ActiveRecord::Base
   end
 
   def posted?
-    posted_at.present?
+    if PostPolicy.feature_enabled?
+      posted_at.present?
+    else
+      !assignment.muted?
+    end
   end
 
   def assignment_muted_changed
@@ -2456,7 +2462,7 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_rubric_assessments_for(viewing_user)
-    return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    return [] unless posted? || grants_right?(viewing_user, :read_grade)
     return [] unless self.assignment.rubric_association
 
     filtered_assessments = self.rubric_assessments.select do |a|
@@ -2661,7 +2667,7 @@ class Submission < ActiveRecord::Base
     # where all submissions in a section are updated. In this case, we call
     # [un]post_submissions to follow the normal workflow, but skip updating the
     # posted_at date since that already happened.
-    return unless assignment.course.feature_enabled?(:post_policies)
+    return unless assignment.course.post_policies_enabled?
 
     previously_posted = posted_at_before_last_save.present?
     if posted? && !previously_posted

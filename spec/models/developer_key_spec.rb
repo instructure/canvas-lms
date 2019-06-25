@@ -41,6 +41,42 @@ describe DeveloperKey do
     )
   end
 
+  describe 'default values for is_lti_key' do
+    let(:public_jwk) do
+      key_hash = Lti::RSAKeyPair.new.public_jwk.to_h
+      key_hash['kty'] = key_hash['kty'].to_s
+      key_hash
+    end
+    let(:developer_key_with_jwk) { DeveloperKey.create!(public_jwk: public_jwk) }
+    let(:developer_key_with_url) { DeveloperKey.create!(public_jwk_url: "https://hello.world.com") }
+    let(:developer_key_with_key_and_url) { DeveloperKey.create!(public_jwk: public_jwk, public_jwk_url: "https://hello.world.com") }
+    let(:developer_key_none) { DeveloperKey.create! }
+
+    context 'when public jwk is present' do
+      it 'is_lti_key should return true' do
+        expect(developer_key_with_jwk.is_lti_key).to eq true
+      end
+    end
+
+    context 'when public jwk url is present' do
+      it 'is_lti_key should return true' do
+        expect(developer_key_with_url.is_lti_key).to eq true
+      end
+    end
+
+    context 'when public jwk url and public jwk is not present' do
+      it 'is_lti_key should return false' do
+        expect(developer_key_none.is_lti_key).to eq false
+      end
+    end
+
+    context 'when public jwk url and public jwk is present' do
+      it 'is_lti_key should return true' do
+        expect(developer_key_with_key_and_url.is_lti_key).to eq true
+      end
+    end
+  end
+
   describe 'external tool management' do
     specs_require_sharding
     include_context 'lti_1_3_spec_helper'
@@ -345,7 +381,7 @@ describe DeveloperKey do
 
       it { is_expected.to match_array [lti_site_admin_key] }
     end
-  end 
+  end
 
   describe "sets a default value" do
     it "when visible is not specified" do

@@ -165,7 +165,8 @@ describe ContextModuleProgression do
       let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
 
       before(:each) do
-        @course.enable_feature!(:post_policies)
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
         @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
         @submission = assignment.submit_homework(@user, body: "my homework")
       end
@@ -190,7 +191,7 @@ describe ContextModuleProgression do
       let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
 
       before(:each) do
-        @course.disable_feature!(:post_policies)
+        PostPolicy.disable_feature!
         @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
         @submission = assignment.submit_homework(@user, body: "my homework")
       end

@@ -48,6 +48,8 @@ describe LiveEvents::Client do
     allow(Aws::Kinesis::Client).to receive(:new).and_return(@kclient)
 
     @client = LiveEvents::Client.new
+    LiveEvents::AsyncWorker.any_instance.stub(:at_exit)
+    allow(LiveEvents.logger).to receive(:info)
   end
 
   RSpec::Matchers.define :a_live_events_payload do |payload|

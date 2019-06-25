@@ -61,5 +61,12 @@
                          'link' %>
       </li>
     <% end %>
+    <% if @context.root_account.self_registration? && @context.grants_right?(@current_user, :generate_observer_pairing_code) %>
+      <li role="presentation">
+      <%= sidebar_button course_observer_pairing_codes_url(@context),
+                         t('Export Pairing Codes'),
+                         'export' %>
+      </li>
+    <%end %>
   </ul>
 </div>

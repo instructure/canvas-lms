@@ -113,21 +113,22 @@ describe "people" do
 
   context "people as a teacher" do
 
-    before (:each) do
-      course_with_teacher_logged_in
-
+    before :once do
+      course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: 'Mrs. Commanderson'
       # add first student
       @student_1 = create_user('student@test.com')
 
       enroll_student(@student_1)
 
       # adding users for tests to work correctly
-      @test_teacher = create_user('teacher@test.com')
       @student_2 = create_user('student2@test.com')
       @test_ta = create_user('ta@test.com')
-      @test_observer = create_user('observer@test.com')
 
       enroll_ta(@test_ta)
+    end
+
+    before :each do
+      user_session @teacher
     end
 
     it "should have tabs" do
@@ -366,8 +367,12 @@ describe "people" do
 
   context "people as a TA" do
 
-    before (:each) do
-      course_with_ta_logged_in(:active_all => true)
+    before :once do
+      course_with_ta(:active_all => true)
+    end
+
+    before :each do
+      user_session @ta
     end
 
     it "should validate that the TA cannot delete / conclude or reset course" do
@@ -384,8 +389,12 @@ describe "people" do
 
   context "people as a student" do
 
-    before (:each) do
-      course_with_student_logged_in(:active_all => true)
+    before :once do
+      course_with_student(:active_all => true)
+    end
+
+    before :each do
+      user_session @student
     end
 
     it "should not link avatars to a user's profile page if profiles are disabled" do
@@ -399,9 +408,13 @@ describe "people" do
   end
 
   context "course with multiple sections", priority: "2" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before :once do
+      course_with_teacher active_course: true, active_user: true
       @section2 = @course.course_sections.create!(name: 'section2')
+    end
+
+    before :each do
+      user_session @teacher
     end
 
     it "should save add people form data" do
@@ -455,6 +468,22 @@ describe "people" do
      ff('.ui-button-text')[1].click
      wait_for_ajaximations
      expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
+    end
+
+    it "should edit a designer's sections" do
+      designer = create_user("student@example.com")
+      @course.enroll_designer(designer, :enrollment_state => "active")
+      get "/courses/#{@course.id}/users"
+      f(".DesignerEnrollment .icon-more").click
+      fln("Edit Sections").click
+      f(".token_input.browsable").click
+      section_input_element = driver.find_element(:name, "token_capture")
+      section_input_element.send_keys("section2")
+      f('.last.context').click
+      wait_for_ajaximations
+      ff('.ui-button-text')[1].click
+      wait_for_ajaximations
+      expect(ff(".DesignerEnrollment")[0]).to include_text("section2")
     end
 
     it "removes students linked to an observer" do
@@ -708,19 +737,55 @@ describe "people" do
     end
 
     context "student tray" do
-
-      before(:each) do
+      before :once do
         preload_graphql_schema
         @account = Account.default
         @account.enable_feature!(:student_context_cards)
         @student = create_user('student@test.com')
-        @course.enroll_student(@student, enrollment_state: :active)
+        @enrollment = @course.enroll_student(@student, enrollment_state: :active)
       end
 
       it "course people page should display student name in tray", priority: "1", test_id: 3022066 do
         get("/courses/#{@course.id}/users")
         f("a[data-student_id='#{@student.id}']").click
         expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("student@test.com")
+        expect(f('.StudentContextTray-Header')).to contain_css('i.icon-email')
+      end
+
+      it "should not display the message button if the student enrollment is inactive" do
+        @enrollment.deactivate
+        get("/courses/#{@course.id}/users")
+        f("a[data-student_id='#{@student.id}']").click
+        expect(f('.StudentContextTray-Header')).not_to contain_css('i.icon-email')
+      end
+
+      context "student context card tool placement" do
+        before :once do
+          @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @tool.student_context_card = {
+            :url => "http://www.example.com",
+            :text => "See data for this student or whatever",
+            :required_permissions => "view_all_grades,manage_grades"}
+          @tool.save!
+        end
+
+        it "should show a link to the tool" do
+          get("/courses/#{@course.id}/users")
+          f("a[data-student_id='#{@student.id}']").click
+
+          link = ff(".StudentContextTray-QuickLinks__Link a")[1]
+          expect(link).to include_text(@tool.label_for(:student_context_card))
+          expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=student_context_card&student_id=#{@student.id}"
+        end
+
+        it "should not show link if the user doesn't have the permissions specified by the tool" do
+          @course.account.role_overrides.create!(:permission => "manage_grades", :role => admin_role, :enabled => false)
+          get("/courses/#{@course.id}/users")
+          f("a[data-student_id='#{@student.id}']").click
+
+          link = ff(".StudentContextTray-QuickLinks__Link a")[1]
+          expect(link).to be_nil
+        end
       end
     end
   end

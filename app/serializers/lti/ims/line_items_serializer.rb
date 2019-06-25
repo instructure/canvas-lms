@@ -30,7 +30,7 @@ module Lti::Ims
         resourceId: @line_item.resource_id,
         tag: @line_item.tag,
         resourceLinkId: @line_item.resource_link&.resource_link_id
-      }.compact
+      }.merge(@line_item.extensions).compact
     end
   end
 end

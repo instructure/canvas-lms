@@ -84,7 +84,7 @@ describe "Gradezilla" do
       # make sure you can un-mute
       Gradezilla.toggle_assignment_muting(@second_assignment.id)
 
-      expect(Gradezilla.content_selector).not_to contain_css(".total-cell .icon-muted")
+      expect(Gradezilla.content_selector).not_to contain_css(".total-cell .icon-off")
       expect(@second_assignment.reload).not_to be_muted
     end
   end
@@ -191,7 +191,7 @@ describe "Gradezilla" do
     assignment.mute!
     Gradezilla.visit(@course)
 
-    expect(f("body")).not_to contain_css(".total-cell .icon-muted")
+    expect(f("body")).not_to contain_css(".total-cell .icon-off")
   end
 
   context "downloading and uploading submissions" do

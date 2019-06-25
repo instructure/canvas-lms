@@ -26,9 +26,12 @@ import ImageSearchItem from './ImageSearchItem'
 import SVGWrapper from './SVGWrapper'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import { TextInput } from '@instructure/ui-text-input'
+import { Button } from '@instructure/ui-buttons'
 import { IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine } from '@instructure/ui-icons'
-import { Link } from '@instructure/ui-elements'
+import { Text } from '@instructure/ui-elements'
 import { View, Flex, FlexItem } from '@instructure/ui-layout'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 const unsplashParams = {
   w: 262,
@@ -55,6 +58,18 @@ export default class ImageSearch extends React.Component {
     this.unsubscribe()
   }
 
+  componentDidUpdate() {
+    let toFocus
+    if (this.state.pageDirection === 'prev') {
+        toFocus = this._imageSearchControlPrev || this._imageSearchControlNext || this._imageSearchInput
+    } else if (this.state.pageDirection === 'next') {
+        toFocus = this._imageSearchControlNext || this._imageSearchControlPrev || this._imageSearchInput
+    }
+    if (toFocus) {
+      setTimeout(function() { toFocus.focus() }, 0)
+    }
+  }
+
   handleChange() {
     this.setState(ImageSearchStore.getState())
   }
@@ -65,7 +80,7 @@ export default class ImageSearch extends React.Component {
     if (event.target.value === '') {
       this.clearResults()
     } else {
-      this.search(event.target.value, 1)
+      this.search(event.target.value)
     }
   }
 
@@ -78,11 +93,55 @@ export default class ImageSearch extends React.Component {
   }
 
   loadNextPage = () => {
-    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.term, this.state.nextUrl))
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.nextUrl, 'next'))
   }
 
   loadPreviousPage = () => {
-    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.term, this.state.prevUrl))
+    ImageSearchStore.dispatch(ImageSearchActions.loadMore(this.state.prevUrl, 'prev'))
+  }
+
+  renderAlert() {
+    if (!this.state.alert) return null
+    const alert = (<Alert
+      screenReaderOnly
+      liveRegion={() => document.getElementById('flash_screenreader_holder')}
+    >
+      {I18n.t('%{count} images found for %{term}', {count: this.state.searchResults.length, term: this.state.searchTerm})}
+    </Alert>)
+    return alert
+  }
+
+  renderResults() {
+    if (this.state.searching) {
+      return (
+        <div className="ImageSearch__loading">
+          <Spinner title="Loading" />
+        </div>
+      )
+    } else if (!this.state.searching && this.state.searchResults.length) {
+      return (
+        <div className="ImageSearch__images">
+          {this.state.searchResults.map(photo => {
+            const photo_url = photo.raw_url + (photo.raw_url.includes('?') ? '&' : '?') + qs.stringify(unsplashParams)
+            return <ImageSearchItem
+              key={photo.id}
+              confirmationId={photo.id}
+              src={photo_url}
+              description={photo.alt || photo.description || this.state.searchTerm}
+              selectImage={this.props.selectImage}
+              userUrl={photo.user_url}
+              userName={photo.user}
+            />
+          })}
+        </div>
+      )
+    } else if (!this.state.searching && this.state.searchTerm && !this.state.searchResults.length && this.state.alert) {
+      return (
+        <div className="ImageSearch__images">
+          <Text>{I18n.t("No results found for %{searchTerm}", {searchTerm: this.state.searchTerm})}</Text>
+        </div>
+      )
+    }
   }
 
   renderPagination(photos) {
@@ -91,44 +150,41 @@ export default class ImageSearch extends React.Component {
     }
 
     return (
-      <Flex as="div" width="100%" justifyItems="center" margin="small 0 small">
-        <FlexItem margin="auto small auto small">
-          <Link
-            ref="imageSearchControlPrev"
+      <Flex as="div" width="100%" justifyItems="space-between" margin="small 0 small">
+        <FlexItem>
+          { this.state.prevUrl && <Button variant="link"
+            buttonRef={(e) => this._imageSearchControlPrev = e}
             onClick={this.loadPreviousPage}
             icon={IconArrowOpenStartLine}
-            disabled={!this.state.prevUrl}
           >
             {I18n.t('Previous Page')}
-          </Link>
+          </Button> }
         </FlexItem>
         <FlexItem>
-          <Link
-            ref="imageSearchControlNext"
+          { this.state.nextUrl && <Button variant="link"
+            buttonRef={(e) => this._imageSearchControlNext = e}
             onClick={this.loadNextPage}
-            icon={IconArrowOpenEndLine}
             iconPlacement="end"
-            disabled={!this.state.nextUrl}
           >
-            {I18n.t('Next Page')}
-          </Link>
+            {I18n.t('Next Page')}<View padding="0 0 0 x-small"><IconArrowOpenEndLine /></View>
+          </Button> }
         </FlexItem>
       </Flex>
     )
   }
 
   render() {
-    const photos = this.state.searchResults
-
     return (
       <div>
+        {this.renderAlert()}
         <View as="div" className="Unsplash__logo" textAlign="start" margin="medium 0 small">
           <SVGWrapper url="/images/unsplash_logo.svg" />
         </View>
         <View as="div" margin="small 0 small">
           <TextInput
+            inputRef={(e) => this._imageSearchInput = e}
             placeholder={I18n.t('Search')}
-            aria-label="Search"
+            label={<ScreenReaderContent>{I18n.t("Search")}</ScreenReaderContent>}
             value={this.state.searchTerm}
             type="search"
             layout="inline"
@@ -136,31 +192,8 @@ export default class ImageSearch extends React.Component {
             renderAfterInput={<IconSearchLine />}
           />
         </View>
-
-        {this.renderPagination(photos)}
-        {!this.state.searching ? (
-          <div className="ImageSearch__images">
-
-            {photos &&
-            photos.map(photo => {
-              const photo_url = photo.raw_url + (photo.raw_url.includes('?') ? '&' : '?') + qs.stringify(unsplashParams)
-              return <ImageSearchItem
-                key={photo.id}
-                confirmationId={photo.id}
-                src={photo_url}
-                description={photo.alt || photo.description || this.state.searchTerm}
-                selectImage={this.props.selectImage}
-                userUrl={photo.user_url}
-                userName={photo.user}
-              />
-            })}
-          </div>
-        ) : (
-          <div className="ImageSearch__loading">
-            <Spinner title="Loading" />
-          </div>
-        )}
-        {this.renderPagination(photos)}
+        {this.renderResults()}
+        {this.renderPagination(this.state.searchResults)}
       </div>
     )
   }

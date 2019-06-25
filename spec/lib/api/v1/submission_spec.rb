@@ -509,7 +509,8 @@ describe Api::V1::Submission do
         posted_at = Time.zone.now
         submission.update!(posted_at: posted_at)
 
-        assignment.course.enable_feature!(:post_policies)
+        assignment.course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
         expect(json.fetch('posted_at')).to eq posted_at
       end
 

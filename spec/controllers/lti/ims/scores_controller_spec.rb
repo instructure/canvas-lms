@@ -18,6 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/scores_controller"
 
 module Lti::Ims
@@ -67,6 +68,7 @@ module Lti::Ims
       let(:content_type) { 'application/vnd.ims.lis.v1.score+json' }
 
       it_behaves_like 'advantage services'
+      it_behaves_like 'lti services'
 
       context 'with valid params' do
         context 'when the lti_id userId is used' do
@@ -240,6 +242,18 @@ module Lti::Ims
             expect(result.submission.reload.score).to eq(result.reload.result_score * (line_item.score_maximum / 100))
           end
         end
+
+        context 'with submission_url' do
+          let(:params_overrides) { super().merge(Lti::Result::AGS_EXT_SUBMISSION_URL => 'http://www.instructure.com') }
+
+          it 'updates the submission and result url' do
+            result
+            send_request
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION_URL]).to eq('http://www.instructure.com')
+            expect(result.submission.url).to eq('http://www.instructure.com')
+          end
+        end
+
       end
 
       context 'with invalid params' do

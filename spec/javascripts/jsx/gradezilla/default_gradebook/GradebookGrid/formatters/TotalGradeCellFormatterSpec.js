@@ -141,14 +141,16 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
     })
   })
 
-  test('renders a warning when there are muted assignments', () => {
+  test('renders a warning when there are hidden assignments', () => {
     gradebook.listMutedAssignments.returns([{id: '2301'}])
-    ok(getTooltip().match(/^This grade differs .* some assignments are muted$/))
+    const expectedTooltip =
+      "This grade differs from the student's view of the grade because some assignment grades are not yet posted"
+    strictEqual(getTooltip(), expectedTooltip)
   })
 
-  test('renders a warning icon when there are muted assignments', () => {
+  test('renders a warning icon when there are hidden assignments', () => {
     gradebook.listMutedAssignments.returns([{id: '2301'}])
-    strictEqual(renderCell().querySelectorAll('i.icon-muted').length, 1)
+    strictEqual(renderCell().querySelectorAll('i.icon-off').length, 1)
   })
 
   test('renders a warning when there is an invalid assignment group', () => {

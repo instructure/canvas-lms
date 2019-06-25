@@ -54,14 +54,15 @@ describe Mutations::PostAssignmentGrades do
   end
 
   before(:each) do
-    course.enable_feature!(:post_policies)
+    course.enable_feature!(:new_gradebook)
+    PostPolicy.enable_feature!
   end
 
   context "when user has grade permission" do
     let(:context) { { current_user: teacher } }
 
     it "requires that the PostPolicy feature be enabled" do
-      course.disable_feature!(:post_policies)
+      PostPolicy.disable_feature!
       result = execute_query(mutation_str(assignment_id: assignment.id), context)
       expect(result.dig("errors", 0, "message")).to eql "Post Policies feature not enabled"
     end

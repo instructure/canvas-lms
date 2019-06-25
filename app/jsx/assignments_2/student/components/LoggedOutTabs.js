@@ -32,6 +32,7 @@ function LoggedOutTabs(props) {
   return (
     <div>
       <TabList defaultSelectedIndex={0} variant="minimal">
+        {/* Alwasy attempt 1, cause there is no submission for logged out users */}
         <TabPanel title={I18n.t('Attempt 1')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>

@@ -17,61 +17,31 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from 'react-testing-library'
 import StepItem from '../index'
-import $ from 'jquery'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
+it('should render', () => {
+  const {getByTestId} = render(<StepItem label={() => {}} />)
+  expect(getByTestId('step-item-step')).toBeInTheDocument()
 })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+it('should render complete status', () => {
+  const {container, getByTestId} = render(<StepItem status="complete" label="Test label" />)
+  const stepRender = getByTestId('step-item-step')
+
+  expect(stepRender).toContainElement(container.querySelector(`svg[name="IconCheckMark"]`))
 })
 
-it('should render', async () => {
-  ReactDOM.render(<StepItem label={() => {}} />, document.getElementById('fixtures'))
-  const component = $('.step-item-step')
-  expect(component).toHaveLength(1)
+it('should render unavailable status', () => {
+  const {container, getByTestId} = render(<StepItem status="unavailable" label="Test label" />)
+  const stepRender = getByTestId('step-item-step')
+
+  expect(stepRender).toContainElement(container.querySelector(`svg[name="IconLock"]`))
 })
 
-it('should render complete status', async () => {
-  ReactDOM.render(
-    <StepItem status="complete" label="Test label" />,
-    document.getElementById('fixtures')
+it('should render label correctly', () => {
+  const {getByText} = render(
+    <StepItem status="complete" label={status => `progress 2 ${status}`} />
   )
-  const component = $('.step-item-step')
-  expect(component.hasClass('complete')).toBeTruthy()
-})
-
-it('should render in-progress status', async () => {
-  ReactDOM.render(
-    <StepItem status="in-progress" label="Test label" />,
-    document.getElementById('fixtures')
-  )
-  const component = $('.step-item-step')
-  expect(component.hasClass('in-progress')).toBeTruthy()
-})
-
-it('should render unavailable status', async () => {
-  ReactDOM.render(
-    <StepItem status="unavailable" label="Test label" />,
-    document.getElementById('fixtures')
-  )
-  const component = $('.step-item-step')
-  expect(component.hasClass('unavailable')).toBeTruthy()
-})
-
-it('should render label correctly', async () => {
-  ReactDOM.render(
-    <StepItem status="complete" label={status => `progress 2 ${status}`} />,
-    document.getElementById('fixtures')
-  )
-  const component = $('.step-item-step')
-  expect(component.text()).toEqual('progress 2 complete')
+  expect(getByText('progress 2 complete')).toBeInTheDocument()
 })

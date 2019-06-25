@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
 
@@ -33,7 +34,8 @@ function getSubmission(student, assignmentId) {
     latePolicyStatus: submission.late_policy_status,
     postedAt: submission.posted_at,
     score: submission.score,
-    submittedAt: submission.submitted_at
+    submittedAt: submission.submitted_at,
+    workflowState: submission.workflow_state
   }
 }
 
@@ -109,7 +111,7 @@ function getProps(column, gradebook, options) {
 
     postGradesAction: {
       featureEnabled: gradebook.postPolicies != null,
-      hasGradesToPost: students.some(student => student.submission.postedAt == null),
+      hasGradesToPost: students.some(student => isHidden(student.submission)),
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})

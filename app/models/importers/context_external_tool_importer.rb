@@ -34,7 +34,7 @@ module Importers
         end
       end
       migration.imported_migration_items_by_class(ContextExternalTool).each do |tool|
-        if tool.consumer_key == 'fake' || tool.shared_secret == 'fake'
+        if (tool.consumer_key == 'fake' || tool.shared_secret == 'fake') && !tool.use_1_3?
           migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => tool.name))
         end
       end

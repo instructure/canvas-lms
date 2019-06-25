@@ -223,6 +223,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :conditional_release_js_env
 
+  def set_student_context_cards_js_env
+    if @domain_root_account.feature_enabled?(:student_context_cards)
+      js_env(
+        STUDENT_CONTEXT_CARDS_ENABLED: true,
+        student_context_card_tools: external_tools_display_hashes(:student_context_card)
+      )
+    end
+  end
+
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
     return [] if context.is_a?(Group)
 
@@ -230,7 +239,9 @@ class ApplicationController < ActionController::Base
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user}).to_a
 
-    tools.select!{|tool| ContextExternalTool.visible?(tool.extension_setting(type)['visibility'], @current_user, context, session)}
+    tools.select!{|tool|
+      tool.visible_with_permission_check?(type, @current_user, context, session)
+    }
 
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
@@ -238,7 +249,6 @@ class ApplicationController < ActionController::Base
   end
 
   def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
-
     url_params = {
       id: tool.id,
       launch_type: type
@@ -1747,7 +1757,7 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    if @current_user and @current_user.use_new_conversations?
+    if @current_user
       query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
         res << "#{k}=#{v}"
         res
@@ -2302,6 +2312,7 @@ class ApplicationController < ActionController::Base
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
         :new_quiz_url => context_url(@context, :context_quizzes_new_url),
+        :course_url => api_v1_course_url(@context),
         :sort_url => reorder_course_assignment_groups_url(@context),
         :assignment_sort_base_url => course_assignment_groups_url(@context),
         :context_modules_url => api_v1_course_context_modules_path(@context),
@@ -2399,10 +2410,13 @@ class ApplicationController < ActionController::Base
     end
 
     ctx[:user_id] = @current_user.global_id if @current_user
+    ctx[:time_zone] = @current_user.time_zone if @current_user
+    ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
+    ctx[:context_account_id] = Context.get_account_or_parent_account(@context)&.global_id if @context
 
     if @context_membership
       ctx[:context_role] =
@@ -2421,8 +2435,10 @@ class ApplicationController < ActionController::Base
     end
 
     ctx[:hostname] = request.host
+    ctx[:http_method] = request.method
     ctx[:user_agent] = request.headers['User-Agent']
     ctx[:client_ip] = request.remote_ip
+    ctx[:url] = request.url
     ctx[:producer] = 'canvas'
 
     StringifyIds.recursively_stringify_ids(ctx)

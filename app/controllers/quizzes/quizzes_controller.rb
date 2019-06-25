@@ -702,7 +702,7 @@ class Quizzes::QuizzesController < ApplicationController
       if params[:score_updated]
         js_env :SCORE_UPDATED => true
       end
-      js_env :GRADE_BY_QUESTION => @current_user.preferences[:enable_speedgrader_grade_by_question]
+      js_env :GRADE_BY_QUESTION => @current_user&.preferences&.dig(:enable_speedgrader_grade_by_question)
       if authorized_action(@submission, @current_user, :read)
         if @current_user && !@quiz.visible_to_user?(@current_user)
           flash[:notice] = t 'notices.submission_doesnt_count', "This quiz will no longer count towards your grade."

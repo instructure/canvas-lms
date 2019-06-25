@@ -328,6 +328,7 @@ describe "assignment groups" do
     fj('input[name="group_weight"]:visible').send_keys('50')
 
     fj('.create_group:visible').click
+    f('.ic-flash-success') # wait for element
     wait_for_ajaximations
 
     # setting weight for group 2

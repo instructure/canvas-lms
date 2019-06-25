@@ -36,6 +36,9 @@ describe("Sidebar initialState", () => {
       },
       initializeFlickr() {
         return {};
+      },
+      initializeDocuments() {
+        return {}
       }
     };
     apiSource = new RceApiSource();

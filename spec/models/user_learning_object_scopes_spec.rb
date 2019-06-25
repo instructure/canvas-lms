@@ -667,6 +667,13 @@ describe UserLearningObjectScopes do
       expect(@ta.assignments_needing_grading(scope_only: true)).not_to include assignment
     end
 
+    it 'should not count submissions for inactive students when they have active enrollments in other courses' do
+      @course1.enroll_student(@student_b).update_attribute(:workflow_state, 'inactive')
+      assignment = @course1.assignments.first
+      assignment.grade_student(@student_a, grade: "1", grader: @teacher)
+      expect(@teacher.assignments_needing_grading(scope_only: true)).not_to include assignment
+    end
+
     it "should limit the number of returned assignments" do
       assignment_ids = create_records(Assignment, Array.new(20) do |x|
         {
@@ -758,7 +765,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#assignments_needing_grading_count" do
+  context "#submissions_needing_grading_count" do
     before :once do
       course_with_teacher(active_all: true)
       @sectionb = @course.course_sections.create!(name: 'section B')
@@ -774,7 +781,7 @@ describe UserLearningObjectScopes do
         @assignment.submit_homework student, body: "submission for #{student.name}"
       end
 
-      expect(@teacher.assignments_needing_grading_count).to eq 2
+      expect(@teacher.submissions_needing_grading_count).to eq 2
     end
 
     it 'should not show counts for submissions that a grader can\'t see due to enrollment visibility' do
@@ -784,7 +791,7 @@ describe UserLearningObjectScopes do
         @assignment.submit_homework student, body: "submission for #{student.name}"
       end
 
-      expect(@teacher.assignments_needing_grading_count).to eq 1
+      expect(@teacher.submissions_needing_grading_count).to eq 1
     end
 
     it 'should not show counts for submissions in a section where the grader is enrolled but is not a grader' do
@@ -795,7 +802,7 @@ describe UserLearningObjectScopes do
         @assignment.submit_homework student, body: "submission for #{student.name}"
       end
 
-      expect(@teacher.assignments_needing_grading_count).to eq 1
+      expect(@teacher.submissions_needing_grading_count).to eq 1
     end
   end
 

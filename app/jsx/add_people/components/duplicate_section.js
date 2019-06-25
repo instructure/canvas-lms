@@ -25,7 +25,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 
   const CREATE_NEW = '__CREATE_NEW__';
   const SKIP = '__SKIP';
@@ -44,6 +44,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
       onSkipDuplicate: PropTypes.func.isRequired,
       inviteUsersURL: PropTypes.string
     };
+
     static defaultProps = {
       inviteUsersURL: undefined
     }
@@ -183,11 +184,13 @@ import Link from '@instructure/ui-elements/lib/components/Link'
                 />
               </th>
               <td colSpan="5" >
-                <Link
+                <Button
+                  variant="link"
                   onClick={this.onSelectNewForDuplicate}
+                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
                 >
                   {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
-                </Link>
+                </Button>
               </td>
             </tr>
           );
@@ -203,7 +206,13 @@ import Link from '@instructure/ui-elements/lib/components/Link'
             />
           </th>
           <td colSpan="5" >
-            <Link onClick={this.onSkipDuplicate}>{I18n.t('Don’t add this user for now.')}</Link>
+            <Button
+              onClick={this.onSkipDuplicate}
+              variant="link"
+              theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+            >
+              {I18n.t('Don’t add this user for now.')}
+            </Button>
           </td>
         </tr>
 

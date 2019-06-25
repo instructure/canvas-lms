@@ -81,7 +81,9 @@ describe Lti::PrivacyLevelExpander do
                              Person.email.primary
                              Person.name.given
                              Person.name.full
-                             Person.name.family)
+                             Person.name.family
+                             com.instructure.Editor.selection
+                             com.instructure.Editor.contents)
         expect(helper.supported_parameters).to match_array expected_params
       end
     end

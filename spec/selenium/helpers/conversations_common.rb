@@ -42,9 +42,6 @@ module ConversationsCommon
     term.save!
 
     @course.update_attributes! :enrollment_term => term
-
-    @user.watched_conversations_intro
-    @user.save
   end
 
   def conversation_elements

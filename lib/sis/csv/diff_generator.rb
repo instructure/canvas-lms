@@ -28,9 +28,9 @@ module SIS
       end
 
       def generate(previous_data_path, current_data_path)
-        previous_import = SIS::CSV::ImportRefactored.new(@root_account, files: [previous_data_path], batch: @batch, previous_diff_import: true)
+        previous_import = SIS::CSV::ImportRefactored.new(@root_account, files: [previous_data_path], batch: @batch, read_only: true, previous_diff_import: true)
         previous_csvs = previous_import.prepare
-        current_import = SIS::CSV::ImportRefactored.new(@root_account, files: [current_data_path], batch: @batch)
+        current_import = SIS::CSV::ImportRefactored.new(@root_account, files: [current_data_path], batch: @batch, read_only: true)
         current_csvs = current_import.prepare
 
         output_csvs = generate_csvs(previous_csvs, current_csvs)

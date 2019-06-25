@@ -97,7 +97,8 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments).
-        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at").
+        preload(:assignment)
 
       Rails.logger.debug "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
       submissions
@@ -965,6 +966,6 @@ class GradeCalculator
   def ignore_submission?(submission:, assignment:)
     return false unless @ignore_muted
 
-    @course.feature_enabled?(:post_policies) ? !submission.posted? : assignment.muted?
+    @course.post_policies_enabled? ? !submission.posted? : assignment.muted?
   end
 end

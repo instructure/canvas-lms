@@ -338,16 +338,21 @@ run `rake canvas:compile_assets` and then try migrations again.
     def initialize
       super <<-END
 
-If you did not make changes to assets, your node modules are probably out of date.
+Something has changed about the default variables or images used in the Theme Editor.
+If you are seeing this and _you_ did not make changes to either app/stylesheets/brandable_variables.json 
+or one of the images it references, it probably meeans your local setup is out of date. 
 
-try running the following ./script/nuke_node.sh
+First, make sure you run `rake db:migrate` 
+and then run `./script/nuke_node.sh`
 
-If this does not resolve the issue, you have probably made the changes to
-either app/stylesheets/brandable_variables.json or one of the images it
-references so you need to rename the db migrations that makes sure when this change is deployed it
+If that does not resolve the issue, it probably means you _did_ update one of those json variables
+in app/stylesheets/brandable_variables.json or one of the images it references so you need to rename 
+the db migrations that makes sure when this change is deployed or checked out by anyone else
 makes a new .css file for the css variables for each brand based on these new defaults.
 To do that, run this command and then restart your rails process. (for local dev, if you want the
-changes to show up in the ui, make sure you also run `rake db:migrate`).
+changes to show up in the ui, make sure you also run `rake db:migrate` afterwards).
+
+ONLY DO THIS IF YOU REALLY DID MEAN TO MAKE A CHANGE TO THE DEFAULT BRANDING STUFF:
 
 mv db/migrate/*_#{MIGRATION_NAME.underscore}_predeploy.rb \\
    db/migrate/#{BrandableCSS.migration_version}_#{MIGRATION_NAME.underscore}_predeploy.rb \\

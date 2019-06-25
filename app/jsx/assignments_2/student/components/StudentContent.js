@@ -28,11 +28,11 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
-function renderContentBaseOnAvailability(assignment, submission) {
+function renderContentBaseOnAvailability({assignment, submission}) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
-  } else if (assignment && assignment.lockInfo.isLocked) {
+  } else if (assignment.lockInfo.isLocked) {
     return <LockedAssignment assignment={assignment} />
   } else if (submission === null) {
     // NOTE: handles case where user is not logged in
@@ -57,11 +57,11 @@ function renderContentBaseOnAvailability(assignment, submission) {
 }
 
 function StudentContent(props) {
-  const {assignment, submission} = props
+  // TODO: Move the button provider up one level
   return (
     <div data-testid="assignments-2-student-view">
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-      {renderContentBaseOnAvailability(assignment, submission)}
+      <Header scrollThreshold={150} assignment={props.assignment} submission={props.submission} />
+      {renderContentBaseOnAvailability(props)}
     </div>
   )
 }
@@ -71,4 +71,4 @@ StudentContent.propTypes = {
   submission: SubmissionShape
 }
 
-export default React.memo(StudentContent)
+export default StudentContent

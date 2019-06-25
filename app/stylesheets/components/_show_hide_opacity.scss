@@ -67,3 +67,11 @@ $dimmedOpacity: 0.6;
   width: 1px;
   transform: translatez(0);
 }
+
+// Completely hide, but make available to screenreader so it can read it.  Used for external tools
+.screenreader-only-tool {
+  @extend .screenreader-only;
+  position: relative;
+  clip-path: inset(50%);
+  -webkit-clip-path: inset(50%);
+}

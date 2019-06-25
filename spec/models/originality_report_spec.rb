@@ -77,11 +77,34 @@ describe OriginalityReport do
     expect(subject.errors[:submission]).to eq ["can't be blank"]
   end
 
+  it 'sets the submission time' do
+    expect(subject.submission_time).to eq submission.submitted_at
+  end
+
   it 'can have an originality report attachment' do
     originality_attachemnt = attachment_model
     subject.originality_report_attachment = originality_attachemnt
     subject.save!
     expect(subject.originality_report_attachment).to eq originality_attachemnt
+  end
+  it 'can create multiple originality reports with the same originality_report_attachment_id' do
+    report = OriginalityReport.create!(
+      attachment: attachment,
+      originality_score: '1',
+      submission: submission,
+      workflow_state: 'pending'
+    )
+    report2 = OriginalityReport.create!(
+      attachment: attachment,
+      originality_score: '1',
+      submission: submission,
+      workflow_state: 'pending'
+    )
+    report.originality_report_attachment_id = 123
+    report2.originality_report_attachment_id = 123
+    report.save!
+    report2.save!
+    expect(report.originality_report_attachment_id).to eq report2.originality_report_attachment_id
   end
 
   it 'returns the state of the originality report' do
@@ -177,6 +200,20 @@ describe OriginalityReport do
     let(:attachment) { attachment_model }
     let(:submission) { submission_model }
 
+    context 'when "submission_time" is blank' do
+      let(:originality_report) do
+        o = OriginalityReport.create!(
+          submission: submission,
+          originality_score: 23
+        )
+        o.update_attribute(:submission_time, nil)
+        o
+      end
+      let(:subject) { originality_report.asset_key }
+
+      it { is_expected.to eq submission.asset_string }
+    end
+
     it 'returns the attachment asset string if attachment is present' do
       report = OriginalityReport.create!(
         submission: submission,
@@ -191,7 +228,7 @@ describe OriginalityReport do
         submission: submission,
         originality_score: 23
       )
-      expect(report.asset_key).to eq submission.asset_string
+      expect(report.asset_key).to eq "#{submission.asset_string}_#{submission.submitted_at.utc.iso8601}"
     end
   end
 
@@ -222,7 +259,7 @@ describe OriginalityReport do
   end
 
   describe '#state' do
-    let(:report) { OriginalityReport.new(workflow_state: 'pending') }
+    let(:report) { OriginalityReport.new(workflow_state: 'pending', submission: submission_model) }
 
     it "returns the workflow state unless it is 'scored'" do
       expect(report.state).to eq 'pending'
@@ -358,3 +395,4 @@ describe OriginalityReport do
     end
   end
 end
+

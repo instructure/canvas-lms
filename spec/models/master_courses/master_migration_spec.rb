@@ -1171,6 +1171,8 @@ describe MasterCourses::MasterMigration do
 
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
       @copy_to = course_factory
+      deleted_sub = MasterCourses::MasterTemplate.set_as_master_course(course_factory).add_child_course!(@copy_to)
+      deleted_sub.destroy
       sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.new

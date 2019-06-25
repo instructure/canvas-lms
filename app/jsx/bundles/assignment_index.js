@@ -33,6 +33,7 @@ const course = new Course({
   id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
   apply_assignment_group_weights: ENV.apply_assignment_group_weights
 })
+course.url = ENV.URLS.course_url
 
 const userIsAdmin = _.contains(ENV.current_user_roles, 'admin')
 

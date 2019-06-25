@@ -29,8 +29,9 @@ module Lti
           :verify_access_token,
           :verify_developer_key,
           :verify_tool,
-          :verify_tool_permissions,
-          :verify_tool_features
+          :verify_active_in_account,
+          :verify_1_3_enabled,
+          :verify_access_scope
         )
 
         def index

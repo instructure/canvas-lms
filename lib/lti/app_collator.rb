@@ -65,7 +65,8 @@ module Lti
         context_id: external_tool.context.id,
         reregistration_url: nil,
         has_update: nil,
-        lti_version: external_tool.use_1_3? ? '1.3' : '1.1'
+        lti_version: external_tool.use_1_3? ? '1.3' : '1.1',
+        deployment_id: external_tool.deployment_id
       }
     end
 

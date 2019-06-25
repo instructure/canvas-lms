@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Контроллер доступности"
+  },
   "add_8523c19b": {
     "message": "Добавить"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "Буквенный"
   },
+  "alt_text_611fb322": {
+    "message": "Альтернативный текст"
+  },
   "alternative_text_a834dcad": {
     "message": "Альтернативный текст:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Изображение все еще загружается – если вы продолжите, изображение не будет встроено надлежащим образом."
   },
   "announcement_list_da155734": {
     "message": "Список объявлений"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "заключить неупорядоченный список в круг"
   },
-  "clear_upload_34efa419": {
-    "message": "Очистить загрузку"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Щелкните любой файл для вставки ссылки на этот файл."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Правообладатель:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 слов}\n    one {1 слово}\n  other {# слов(-а)}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# элемент загружен}\n  other {# элементов (элемента) загружено}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Документы курса"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Лицензионное соглашение Creative Commons:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Уровень текущего объема"
+  },
+  "custom_6979cd81": {
+    "message": "Пользовательская"
   },
   "date_added_ed5ad465": {
     "message": "Дата добавления"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "нумерованный упорядоченный список по умолчанию"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Опишите изображение)"
+  },
   "discussions_a5f96392": {
     "message": "Обсуждения"
   },
   "discussions_index_6c36ced": {
     "message": "Индекс обсуждений"
   },
+  "display_options_315aba85": {
+    "message": "Опции отображения"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Показать текстовую ссылку (открывается в новой вкладке)"
+  },
   "documents_81393201": {
     "message": "Документы"
+  },
+  "done_54e3d4b6": {
+    "message": "Готово"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Перетащите или щелкните, чтобы просмотреть свой компьютер"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Срок: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Редактировать ссылку"
+  },
+  "embed_image_1080badc": {
+    "message": "Вставить изображение"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "введите критерии поиска"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Введите альтернативный текст для этого изображения"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Ошибка при загрузке видео-/аудиозаписи"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Развернуть для просмотра { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Внешние ссылки"
   },
+  "file_name_8fd421ff": {
+    "message": "Имя файла"
+  },
   "file_upload_form_4aaad554": {
     "message": "Форма отправки файла"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } предпросмотр"
   },
   "files_c300e900": {
     "message": "Файлы"
   },
   "files_index_af7c662b": {
     "message": "Индекс файлов"
+  },
+  "finish_bc343002": {
+    "message": "Закончить"
   },
   "folder_705fd2d7": {
     "message": "Папка"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Если вы не выберете права пользования сейчас, этот файл не будет опубликован после отправки."
   },
+  "image_options_5412d02c": {
+    "message": "Опции изображения"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Лоток опций изображения"
+  },
   "image_upload_form_7b74079a": {
     "message": "Форма отправки изображения"
-  },
-  "image_url_2aee2734": {
-    "message": "URL-адрес изображения"
   },
   "images_7ce26570": {
     "message": "Изображения"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Неверный тип файла"
   },
+  "large_9c5e80e7": {
+    "message": "Большой"
+  },
   "link_7262adec": {
     "message": "Ссылка"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Ссылки"
+  },
+  "load_more_35d33c7": {
+    "message": "Загрузить еще"
   },
   "load_more_results_460f49a9": {
     "message": "Загрузить больше результатов"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "Скачивание папок..."
   },
+  "loading_media_f3455841": {
+    "message": "Загрузка носителя"
+  },
   "media_af190855": {
     "message": "Мультимедиа"
+  },
+  "medium_5a8e9ead": {
+    "message": "Средний"
+  },
+  "mic_a7f3d311": {
+    "message": "Микрофон"
   },
   "modules_c4325335": {
     "message": "Модули"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Нет альтернативного текста (декоративное изображение)"
+  },
   "no_results_940393cf": {
     "message": "Нет результатов."
+  },
+  "no_video_1ed00b26": {
+    "message": "Видео отсутствует"
   },
   "options_3ab0ea65": {
     "message": "Опции"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Параграф"
   },
+  "pause_12af3bb4": {
+    "message": "Пауза"
+  },
   "people_b4ebb13c": {
     "message": "Пользователи"
+  },
+  "play_1a47eaa7": {
+    "message": "Воспроизвести"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Разрешите Canvas доступ к вашему микрофону и веб-камере."
   },
   "posted_when_a578f5ab": {
     "message": "Размещено: { when }"
   },
   "preformatted_d0670862": {
     "message": "Предварительно форматированный"
+  },
+  "preview_a3f8f854": {
+    "message": "ПРЕДПРОСМОТР"
   },
   "published_c944a23d": {
     "message": "опубликовано"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Контрольные работы"
   },
+  "record_7c9448b": {
+    "message": "Запись"
+  },
   "record_upload_media_5fdce166": {
     "message": "Записать / загрузить мультимедиа"
+  },
+  "recording_98da6bda": {
+    "message": "Запись"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Удалить ссылку"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Редактор форматированного текста"
+  },
+  "save_11a80ec3": {
+    "message": "Сохранить"
   },
   "search_280d00bd": {
     "message": "Поиск"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Показать варианты изображения"
   },
+  "size_b30e1077": {
+    "message": "Размер"
+  },
+  "small_b070434a": {
+    "message": "Маленький"
+  },
   "small_header_168fb9f9": {
     "message": "Маленький заголовок"
   },
   "something_went_wrong_89195131": {
     "message": "Возникла проблема."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Сбой при попытке доступа к вашему микрофону или веб-камере."
+  },
   "sort_by_e75f9e3e": {
     "message": "Сортировать по"
   },
   "square_unordered_list_b15ce93b": {
     "message": "заключить неупорядоченный список в квадрат"
+  },
+  "start_over_f7552aa9": {
+    "message": "Начать заново"
+  },
+  "start_recording_9a65141a": {
+    "message": "Запустить запись"
   },
   "subheader_2b87606d": {
     "message": "Подзаголовок"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Надпись сверху"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Перейти в редактор raw html"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Перейти в редактор форматированного текста"
   },
   "syllabus_f191f65b": {
     "message": "Содержание курса"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "не опубликовано"
   },
-  "unsplash_ee049fbf": {
-    "message": "Без образования брызг"
+  "untitled_16aa4f2b": {
+    "message": "Без названия"
   },
   "upload_8b403d05": {
     "message": "Загрузить"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Загрузить изображение"
   },
+  "upload_media_ce31135a": {
+    "message": "Загрузить медиа"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Загрузить/записать медиа"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "упорядоченный алфавитный список в верхнем регистре"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Право на использование:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Используется скринридерами для описания контента изображения"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Видео-/аудиозапись загружена"
+  },
+  "video_player_b371005": {
+    "message": "Видео-плеер"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Показать клавиши быстрого доступа"
+  },
+  "webcam_fe91b20f": {
+    "message": "Веб-камера"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Как назвать новую страницу?"
   },
   "wiki_home_9cd54d0": {
     "message": "Домашняя страница вики"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Ваша веб-камера может уже использоваться."
   }
 }

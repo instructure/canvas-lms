@@ -23,7 +23,6 @@ import I18n from 'i18n!discussions'
 import $ from 'jquery'
 import {each, extend, values} from 'underscore'
 import Backbone from 'Backbone'
-import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 import BackoffPoller from '../util/BackoffPoller'
 import walk from '../arr/walk'
 import erase from '../arr/erase'
@@ -45,31 +44,24 @@ export default class MaterializedDiscussionTopic extends Backbone.Model
     entry_ratings: {}
 
   url: ->
-    @get('root_url')
+    "#{@get 'root_url'}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1"
 
   fetch: (options = {}) ->
-    asJson(getPrefetchedXHR(@url())).then (data) =>
-      @set(@parse(data))
+    loader = new BackoffPoller @url(), (data, xhr) =>
+      return 'continue' if xhr.status is 503
+      return 'abort' if xhr.status isnt 200
+      @set(@parse(data, 200, xhr))
       options.success?(this, data)
-    , =>
-      # this is probably not needed anymore but if anything does go wrong with
-      # the fetch request we prefectch from rails, we can use this backoff
-      # poller to keep trying.
-      loader = new BackoffPoller @url(), (data, xhr) =>
-        return 'continue' if xhr.status is 503
-        return 'abort' if xhr.status isnt 200
-        @set(@parse(data, 200, xhr))
-        options.success?(this, data)
-        # TODO: handle options.error
-        'stop'
-      ,
-        handleErrors: true
-        initialDelay: false
-        # we'll abort after about 10 minutes
-        baseInterval: 2000
-        maxAttempts: 12
-        backoffFactor: 1.6
-      loader.start()
+      # TODO: handle options.error
+      'stop'
+    ,
+      handleErrors: true
+      initialDelay: false
+      # we'll abort after about 10 minutes
+      baseInterval: 2000
+      maxAttempts: 12
+      backoffFactor: 1.6
+    loader.start()
 
   markAllAsRead: ->
     $.ajaxJSON ENV.DISCUSSION.MARK_ALL_READ_URL, 'PUT', forced_read_state: false

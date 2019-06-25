@@ -54,7 +54,7 @@ module AccountReports
     # - student final score
     # - enrollment status
 
-    def grade_export()
+    def grade_export
       students = student_grade_scope
       students = add_term_scope(students, 'c')
 
@@ -62,6 +62,7 @@ module AccountReports
       headers << I18n.t('student name')
       headers << I18n.t('student id')
       headers << I18n.t('student sis')
+      headers << I18n.t('student integration id') if include_integration_id?
       headers << I18n.t('course')
       headers << I18n.t('course id')
       headers << I18n.t('course sis')
@@ -99,6 +100,7 @@ module AccountReports
               arr << student["user_name"]
               arr << student["user_id"]
               arr << p.sis_user_id
+              arr << p.integration_id if include_integration_id?
               arr << student["course_name"]
               arr << student["course_id"]
               arr << student["course_sis_id"]
@@ -119,6 +121,10 @@ module AccountReports
           end
         end
       end
+    end
+
+    def include_integration_id?
+      @include_integration_id ||= root_account.settings[:include_integration_ids_in_gradebook_exports] == true
     end
 
     def mgp_grade_export
@@ -151,6 +157,7 @@ module AccountReports
       headers << I18n.t('student name')
       headers << I18n.t('student id')
       headers << I18n.t('student sis')
+      headers << I18n.t('student integration id') if include_integration_id?
       headers << I18n.t('course')
       headers << I18n.t('course id')
       headers << I18n.t('course sis')
@@ -198,6 +205,7 @@ module AccountReports
                 arr << student["user_name"]
                 arr << student["user_id"]
                 arr << p.sis_user_id
+                arr << p.integration_id if include_integration_id?
                 arr << student["course_name"]
                 arr << student["course_id"]
                 arr << student["course_sis_id"]

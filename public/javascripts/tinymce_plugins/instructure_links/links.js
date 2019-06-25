@@ -20,6 +20,7 @@ import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import LinkableEditor from './linkable_editor'
 import {send} from 'jsx/shared/rce/RceCommandShim'
+import {findLinkForService, getUserServices} from '../../findLinkForService'
 import '../../jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
 import '../../jquery.instructure_misc_plugins'
@@ -149,7 +150,7 @@ import YouTubeApi from './youtube_api'
       .find(".auto_show_inline_content").attr('checked', false);
     if($box.length == 0) {
       var $box = $(document.createElement('div'));
-      $.getUserServices("BookmarkService", function(data) {
+      getUserServices("BookmarkService", function(data) {
         var $editor = $box.data('editor');
         var $services = $("<div style='text-align: left; margin-left: 20px;'/>");
         var service, $service;
@@ -166,7 +167,7 @@ import YouTubeApi from './youtube_api'
             $service.click(function(event) {
               event.preventDefault();
               $("#instructure_link_prompt").dialog('close');
-              $.findLinkForService($(this).data('service').service, function(data) {
+              findLinkForService($(this).data('service').service, function(data) {
                 $("#instructure_link_prompt").dialog('close');
                 send($editor, 'create_link', {
                   title: data.title,

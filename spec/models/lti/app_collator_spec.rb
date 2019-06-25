@@ -92,7 +92,8 @@ module Lti
                                     enabled: true,
                                     tool_configuration: nil,
                                     reregistration_url: nil,
-                                    lti_version: '1.1'
+                                    lti_version: '1.1',
+                                    deployment_id: external_tool.deployment_id
                                   })
       end
 
@@ -117,7 +118,8 @@ module Lti
                                     enabled: true,
                                     tool_configuration: nil,
                                     reregistration_url: nil,
-                                    lti_version: '1.3'
+                                    lti_version: '1.3',
+                                    deployment_id: external_tool.deployment_id
                                   })
       end
 

@@ -315,6 +315,41 @@ describe "RCE next tests" do
       end
     end
 
+    it "should add alt text to image using options tray" do
+      alt_text = "fear is the mindkiller"
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      alt_text_textbox.send_keys(alt_text)
+      click_image_options_done_button
+
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_image.attribute('alt')).to include alt_text
+      end
+    end
+
+    it "should make alt text blank when selecting decorative" do
+      page_title = "Page1"
+      create_wiki_page_with_embedded_image(page_title)
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      click_embedded_image_for_options
+      click_image_options_button
+
+      click_decorative_options_checkbox
+      click_image_options_done_button
+
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_image.attribute('alt')).to be_empty
+      end
+    end
+
     it "should display assignment publish status in links accordion" do
       skip('Unskip in CORE-2619')
       title = "Assignment-Title"
@@ -354,12 +389,19 @@ describe "RCE next tests" do
     end
 
     it "should open a11y checker when clicking button in status bar" do
-      skip('Unskip in CORE-2638')
       visit_front_page_edit(@course)
 
       click_a11y_checker_button
 
       expect(a11y_checker_tray).to be_displayed
+    end
+
+    it "should open keyboard shortcut modal when clicking button in status bar" do
+      visit_front_page_edit(@course)
+
+      click_visible_keyboard_shortcut_button
+
+      expect(keyboard_shortcut_modal).to be_displayed
     end
 
     it "should close the course links tray when pressing esc", ignore_js_errors: true do
@@ -386,6 +428,26 @@ describe "RCE next tests" do
       driver.action.send_keys(:escape).perform # Press esc key
 
       expect(tray_container).not_to be_displayed
+    end
+
+    it "should open upload image modal when clicking upload option" do
+      visit_front_page_edit(@course)
+
+      click_more_toolbar_button
+      click_images_toolbar_button
+      click_upload_image
+
+      expect(upload_image_modal).to be_displayed
+    end
+
+    it "should open upload media modal when clicking upload option" do
+      visit_front_page_edit(@course)
+
+      click_more_toolbar_button
+      click_media_toolbar_button
+      click_upload_media
+
+      expect(upload_media_modal).to be_displayed
     end
   end
 end

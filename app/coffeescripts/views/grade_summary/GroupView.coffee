@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!grade_summaryGroupView'
 import {View, Collection} from 'Backbone'
 import _ from 'underscore'
 import CollectionView from '../CollectionView'

@@ -42,6 +42,7 @@ const AssignmentAlert = props => {
         <Alert
           screenReaderOnly
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          onDismiss={onDismiss}
           timeout={ALERT_TIMEOUT}
         >
           {successMessage}

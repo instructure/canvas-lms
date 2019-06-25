@@ -218,38 +218,107 @@ describe "/submissions/show" do
         @submission.turnitin_data.delete(:provider)
         expect(html.css('.vericite_score_container_caret').size).to eq 0
       end
+
+      context "when post policies are not enabled" do
+        it "is not present when the assignment is muted" do
+          @assignment.mute!
+          expect(html.css('.vericite_score_container_caret').size).to eq 0
+        end
+      end
+
+      context "when post policies are enabled" do
+        before(:each) do
+          PostPolicy.enable_feature!
+        end
+
+        it "is present when the submission is posted" do
+          @submission.update!(posted_at: Time.zone.now)
+          expect(html.css('.vericite_score_container_caret').size).to eq 1
+        end
+
+        it "is not present when the submission is not posted" do
+          expect(html.css('.vericite_score_container_caret').size).to eq 0
+        end
+      end
+    end
+  end
+
+  describe "Grade" do
+    let(:html) { Nokogiri::HTML.fragment(response.body) }
+
+    before(:once) do
+      @course = Course.create!
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", active_all: true).user
+      @assignment = @course.assignments.create!
+      @submission = @assignment.submissions.find_by(user: @student)
+      @submission.update!(score: 23.0)
+    end
+
+    before(:each) do
+      assign(:assignment, @assignment)
+      assign(:context, @course)
+      assign(:current_user, @student)
+      assign(:submission, @submission)
+    end
+
+    context "when post policies are enabled" do
+      before(:each) do
+        PostPolicy.enable_feature!
+      end
+
+      it "displays a message when submission is unposted" do
+        render "submissions/show"
+        summary = html.css(".submission-details-header__grade-summary p").text
+        expect(summary).to eql "Grades are unavailable because the instructor is working on them."
+      end
+
+      it "does not display a message when submission is posted" do
+        @submission.update!(posted_at: Time.zone.now)
+        render "submissions/show"
+        expect(html.css(".submission-details-header__grade-summary p")).to be_empty
+      end
+
+      it "does not display the grade when submission is unposted" do
+        render "submissions/show"
+        expect(html.css(".entered_grade")).to be_empty
+      end
+
+      it "displays the grade when submission is posted and user can :read_grade" do
+        @submission.update!(posted_at: Time.zone.now)
+        render "submissions/show"
+        grade = html.css(".entered_grade").text
+        expect(grade).to include "23"
+      end
+    end
+
+    context "when post policies are not enabled" do
+      it "displays a message when assignment is muted" do
+        @assignment.mute!
+        render "submissions/show"
+        summary = html.css(".submission-details-header__grade-summary p").text
+        expect(summary).to eql "Grades are unavailable because the instructor is working on them."
+      end
+
+      it "does not display a message when assignment is unmuted" do
+        render "submissions/show"
+        expect(html.css(".submission-details-header__grade-summary p")).to be_empty
+      end
+
+      it "does not display the grade when assignment is muted" do
+        @assignment.mute!
+        render "submissions/show"
+        expect(html.css(".entered_grade")).to be_empty
+      end
+
+      it "displays the grade when assignment is unmuted and user can :read_grade" do
+        render "submissions/show"
+        grade = html.css(".entered_grade").text
+        expect(grade).to include "23"
+      end
     end
   end
 
   context 'comments sidebar' do
-    before :each do
-      course_with_teacher
-      assignment_model(course: @course)
-      @submission = @assignment.submit_homework(@user)
-      view_context(@course, @teacher)
-      assign(:assignment, @assignment)
-      assign(:submission, @submission)
-    end
-
-    it "renders if assignment is not muted" do
-      @assignment.muted = false
-      @assignment.anonymous_grading = true
-      render 'submissions/show'
-      html = Nokogiri::HTML.fragment(response.body)
-      styles = html.css('.submission-details-comments').attribute('style').value.split("\;").map(&:strip)
-      expect(styles).not_to include('display: none')
-    end
-
-    it "renders if assignment is muted but not anonymous or moderated" do
-      @assignment.muted = true
-      @assignment.anonymous_grading = false
-      @assignment.moderated_grading = false
-      render 'submissions/show'
-      html = Nokogiri::HTML.fragment(response.body)
-      styles = html.css('.submission-details-comments').attribute('style').value.split("\;").map(&:strip)
-      expect(styles).not_to include('display: none')
-    end
-
     describe 'non-owner comment visibility' do
       let(:student) { User.create! }
       let(:teacher) { User.create! }
@@ -286,14 +355,45 @@ describe "/submissions/show" do
         unmuted_submission.add_comment(author: teacher, comment: 'No, you did not')
       end
 
-      it 'shows all comments when a teacher is viewing' do
-        assign(:current_user, teacher)
-        assign(:assignment, muted_assignment)
-        assign(:submission, muted_submission)
+      context "when a teacher is viewing" do
+        before(:each) do
+          assign(:current_user, teacher)
+        end
 
-        render 'submissions/show'
+        it 'shows all comments when a teacher is viewing' do
+          assign(:assignment, muted_assignment)
+          assign(:submission, muted_submission)
 
-        expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+          render 'submissions/show'
+          expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+        end
+
+        context "when post policies are enabled" do
+          before(:each) do
+            PostPolicy.enable_feature!
+          end
+
+          it 'shows all comments if the submission is posted' do
+            unmuted_submission.update!(posted_at: Time.zone.now)
+            unmuted_submission.limit_comments(student)
+
+            assign(:assignment, unmuted_assignment)
+            assign(:submission, unmuted_submission)
+
+            render 'submissions/show'
+            expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+          end
+
+          it 'shows all comments even if the submission is unposted' do
+            unmuted_submission.limit_comments(student)
+
+            assign(:assignment, unmuted_assignment)
+            assign(:submission, unmuted_submission)
+
+            render 'submissions/show'
+            expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+          end
+        end
       end
 
       context 'when a student is viewing' do
@@ -301,24 +401,53 @@ describe "/submissions/show" do
           assign(:current_user, student)
         end
 
-        it 'shows all comments if the assignment is not muted' do
-          unmuted_submission.limit_comments(student)
+        context "when post policies are enabled" do
+          before(:each) do
+            PostPolicy.enable_feature!
+          end
 
-          assign(:assignment, unmuted_assignment)
-          assign(:submission, unmuted_submission)
+          it 'shows all comments if the submission is posted' do
+            unmuted_submission.update!(posted_at: Time.zone.now)
+            unmuted_submission.limit_comments(student)
 
-          render 'submissions/show'
-          expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+            assign(:assignment, unmuted_assignment)
+            assign(:submission, unmuted_submission)
+
+            render 'submissions/show'
+            expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+          end
+
+          it 'shows only non-hidden comments if the submission is unposted' do
+            unmuted_submission.limit_comments(student)
+
+            assign(:assignment, muted_assignment)
+            assign(:submission, muted_submission)
+
+            render 'submissions/show'
+            expect(comment_contents).to match_array ['I did a great job!']
+          end
         end
 
-        it 'shows only non-hidden comments if the assignment is muted' do
-          muted_submission.limit_comments(student)
+        context "when post policies are not enabled" do
+          it 'shows all comments if the assignment is not muted' do
+            unmuted_submission.limit_comments(student)
 
-          assign(:assignment, muted_assignment)
-          assign(:submission, muted_submission)
+            assign(:assignment, unmuted_assignment)
+            assign(:submission, unmuted_submission)
 
-          render 'submissions/show'
-          expect(comment_contents).to match_array ['I did a great job!']
+            render 'submissions/show'
+            expect(comment_contents).to match_array ['I did a great job!', 'No, you did not']
+          end
+
+          it 'shows only non-hidden comments if the assignment is muted' do
+            muted_submission.limit_comments(student)
+
+            assign(:assignment, muted_assignment)
+            assign(:submission, muted_submission)
+
+            render 'submissions/show'
+            expect(comment_contents).to match_array ['I did a great job!']
+          end
         end
 
         context "for a moderated assignment" do

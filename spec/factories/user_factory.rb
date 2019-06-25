@@ -110,7 +110,9 @@ module Factories
 
   def student_in_section(section, opts={})
     student = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)
+    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section,
+      :force_update => true,
+      :allow_multiple_enrollments => opts[:allow_multiple_enrollments])
     student.save!
     enrollment.workflow_state = 'active'
     enrollment.save!

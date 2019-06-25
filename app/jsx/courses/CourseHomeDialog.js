@@ -72,7 +72,7 @@ class CourseHomeDialog extends React.Component {
         <AccessibleContent>*</AccessibleContent>
         <ScreenReaderContent>
           <Link href={wikiUrl}>
-            {I18n.t('Front page must be set first')}
+            {I18n.t('Front Page must be set first')}
           </Link>
         </ScreenReaderContent>
       </span>
@@ -163,15 +163,17 @@ class CourseHomeDialog extends React.Component {
               null
             ) : (
               <div className="content-box-mini">
-              * <Link href={wikiUrl}>{I18n.t('Front page must be set first')}
-              </Link></div>
+              * <Button variant="link" href={wikiUrl} theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}>
+                {I18n.t('Front Page must be set first')}
+                </Button>
+              </div>
             )
           }
 
         </ModalBody>
 
         <ModalFooter>
-          <Button onClick={this.props.onRequestClose}>{I18n.t('Cancel')}</Button>&nbsp;
+          <Button onClick={this.props.onRequestClose} margin="0 x-small">{I18n.t('Cancel')}</Button>
           <Button
             onClick={this.onSubmit}
             disabled={this.props.isPublishing && this.state.selectedDefaultView === 'modules'}

@@ -424,7 +424,8 @@ describe GradeCalculator do
             # We assigned this above, but repeat it for the sake of clarity
             auto_assignment.grade_student(@user, grade: "5", grader: @teacher)
 
-            @course.enable_feature!(:post_policies)
+            @course.enable_feature!(:new_gradebook)
+            PostPolicy.enable_feature!
             manual_assignment.ensure_post_policy(post_manually: true)
             manual_assignment.grade_student(@user, grade: "10", grader: @teacher)
 

@@ -35,4 +35,22 @@ describe Qti::AssessmentTestConverter do
     expect(assess.parse_time_limit("60")).to eq 1
     expect(assess.parse_time_limit("3600")).to eq 60
   end
+
+  def test_section(select)
+    Nokogiri::XML(<<~SECTION).at_css('testPart')
+      <testPart identifier="BaseTestPart">
+      #{select && %Q{<selection select="#{select}">}}
+      </testPart>
+    SECTION
+  end
+
+  it "accepts a numeric pick count even if it's zero" do
+    assess = Qti::AssessmentTestConverter
+    expect(assess.parse_pick_count(test_section(' 1'))).to eq 1
+    expect(assess.parse_pick_count(test_section('0'))).to eq 0
+    expect(assess.parse_pick_count(test_section('-5'))).to eq nil
+    expect(assess.parse_pick_count(test_section(''))).to eq nil
+    expect(assess.parse_pick_count(test_section('puppies'))).to eq nil
+    expect(assess.parse_pick_count(test_section(nil))).to eq nil
+  end
 end

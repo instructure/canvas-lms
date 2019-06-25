@@ -883,6 +883,7 @@ class AccountsController < ApplicationController
             # these shouldn't get set for the site admin account
             params[:account][:settings].delete(:enable_alerts)
             params[:account][:settings].delete(:enable_eportfolios)
+            params[:account][:settings].delete(:include_integration_ids_in_gradebook_exports)
           end
         else
           # must have :manage_site_settings to update these
@@ -892,6 +893,7 @@ class AccountsController < ApplicationController
             :enable_eportfolios,
             :enable_profiles,
             :enable_turnitin,
+            :include_integration_ids_in_gradebook_exports,
             :show_scheduler,
             :global_includes,
             :gmail_domain
@@ -994,6 +996,7 @@ class AccountsController < ApplicationController
         LTI_13_TOOLS_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:lti_1_3),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
+        NEW_FEATURES_UI: @account.root_account.feature_enabled?(:new_features_ui),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
         },
@@ -1400,6 +1403,7 @@ class AccountsController < ApplicationController
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
                                    :google_docs_domain, :help_link_icon, :help_link_name,
+                                   :include_integration_ids_in_gradebook_exports,
                                    :include_students_in_global_survey, :license_type,
                                    {:lock_all_announcements => [:value, :locked]}.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,

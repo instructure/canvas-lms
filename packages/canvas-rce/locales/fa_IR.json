@@ -122,6 +122,9 @@
   "folder_705fd2d7": {
     "message": "پوشه"
   },
+  "generating_preview_45b53be0": {
+    "message": "در حال ایجاد پیش نمایش..."
+  },
   "grades_a61eba0a": {
     "message": "نمره ها"
   },
@@ -140,9 +143,6 @@
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
   },
-  "image_url_2aee2734": {
-    "message": "نشانی اینترنتی تصویر"
-  },
   "images_7ce26570": {
     "message": "تصاویر"
   },
@@ -160,6 +160,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "نوع فایل معتبر نیست"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "میانبرهای صفحه کلید"
   },
   "link_7262adec": {
     "message": "پیوند"
@@ -194,8 +197,14 @@
   "modules_c4325335": {
     "message": "ماژول ها"
   },
+  "next_page_d2a39853": {
+    "message": "صفحه بعد"
+  },
   "no_results_940393cf": {
     "message": "No results."
+  },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
   },
   "options_3ab0ea65": {
     "message": "گزینه ها"
@@ -205,6 +214,9 @@
   },
   "people_b4ebb13c": {
     "message": "افراد"
+  },
+  "previous_page_928fc112": {
+    "message": "صفحه قبل"
   },
   "published_c944a23d": {
     "message": "منتشر شده"

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import K5Uploader from '@instructure/k5uploader'
+
 /*eslint no-console: 0*/
 export default class Bridge {
   constructor() {
@@ -49,12 +51,25 @@ export default class Bridge {
     this.focusedEditor = editor;
   }
 
+  focusActiveEditor(skipFocus = false) {
+    this.getEditor().mceInstance().focus(skipFocus)
+  }
+
   get mediaServerSession() {
     return this._mediaServerSession;
   }
 
+  get mediaServerUploader() {
+    return this._mediaServerUploader
+  }
+
   setMediaServerSession(session) {
     this._mediaServerSession = session;
+    if (this._mediaServerUploader) {
+      this._mediaServerUploader.destroy()
+      this._mediaServerUploader = null
+    }
+    this._mediaServerUploader = new K5Uploader(session)
   }
 
   detachEditor(editor) {

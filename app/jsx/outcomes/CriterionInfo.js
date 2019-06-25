@@ -24,7 +24,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconQuestion from '@instructure/ui-icons/lib/Line/IconQuestion'
 import Modal, { ModalHeader, ModalBody } from '@instructure/ui-overlays/lib/components/Modal'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!outcomesCriterionInfo'
 
 const spiel = () => I18n.t(`
 Learning outcomes can be included in assignment rubrics as an easy way to assess

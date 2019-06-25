@@ -427,7 +427,8 @@ describe SpeedGrader::Assignment do
 
       context "when post policies are enabled" do
         before(:each) do
-          @course.enable_feature!(:post_policies)
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
         end
 
         it "includes the submission's posted-at date in the posted_at field" do
@@ -1448,7 +1449,10 @@ describe SpeedGrader::Assignment do
       OriginalityReport.create!(originality_score: '1', submission: submission)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       keys = json['submissions'].first['submission_history'].first['submission']['turnitin_data'].keys
-      expect(keys).to include submission.asset_string, attachment.asset_string
+      expect(keys).to include(
+        OriginalityReport.submission_asset_key(submission),
+        attachment.asset_string
+      )
     end
 
     it 'does not override "turnitin_data"' do
@@ -2774,7 +2778,8 @@ describe SpeedGrader::Assignment do
 
     context "when post policies are enabled" do
       before(:once) do
-        @course.enable_feature!(:post_policies)
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
       end
 
       it "sets post_manually to true in the response if the assignment is manually-posted" do

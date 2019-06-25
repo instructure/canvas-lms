@@ -20,25 +20,37 @@ import clickCallback from '../clickCallback'
 import {getByLabelText} from 'react-testing-library'
 
 describe('Instructure Image Plugin: clickCallback', () => {
+  let trayProps;
+  beforeEach(() => {
+      trayProps = {
+        source: {
+          initializeCollection () {},
+          initializeUpload () {},
+          initializeFlickr () {},
+          initializeImages() {},
+          initializeDocuments() {}
+        }
+      }
+  })
   afterEach(() => {
-    document.querySelector('.canvas-rce-image-upload').remove()
+    document.querySelector('.canvas-rce-upload-container').remove()
   })
 
-  it('adds the canvas-rce-image-upload element when opened', async () => {
-    await clickCallback({}, document)
-    expect(document.querySelector('.canvas-rce-image-upload')).toBeTruthy()
+  it('adds the canvas-rce-upload-container element when opened', async () => {
+    await clickCallback({}, document, trayProps)
+    expect(document.querySelector('.canvas-rce-upload-container')).toBeTruthy()
   })
 
-  it('does not add the canvas-rce-image-upload element when opened if it exists already', async () => {
+  it('does not add the canvas-rce-upload-container element when opened if it exists already', async () => {
     const container = document.createElement('div')
-    container.className = 'canvas-rce-image-upload'
+    container.className = 'canvas-rce-upload-container'
     document.body.appendChild(container)
-    await clickCallback({}, document)
-    expect(document.querySelectorAll('.canvas-rce-image-upload').length).toEqual(1)
+    await clickCallback({}, document, trayProps)
+    expect(document.querySelectorAll('.canvas-rce-upload-container').length).toEqual(1)
   })
 
   it('opens the UploadImage modal when called', async () => {
-    await clickCallback({}, document)
+    await clickCallback({}, document, trayProps)
     expect(
       getByLabelText(document, 'Upload Image', {
         selector: 'form'

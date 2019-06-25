@@ -201,6 +201,7 @@ describe "course copy" do
       replace_content(f("input[type=text][id=newStartDate]"), date)
       submit_form('#copy_course_form')
       run_jobs
+      raise "progress bar is still there after waiting" unless wait_for_no_such_element(timeout: 10) { f('.bar') }
       expect(f('div.progressStatus span')).to include_text 'Completed'
       get "/calendar#view_name=week"
       quick_jump_to_date(@date_to_use)

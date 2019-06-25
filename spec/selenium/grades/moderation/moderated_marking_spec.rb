@@ -188,7 +188,7 @@ describe 'Moderated Marking' do
       user_session(@student1)
 
       StudentGradesPage.visit_as_student(@moderated_course)
-      StudentGradesPage.comment_button.click
+      StudentGradesPage.comment_buttons.first.click
 
       expect(StudentGradesPage.comments(@moderated_assignment).count).to eq 1
       expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher 2'

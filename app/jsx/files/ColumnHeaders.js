@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!react_files'
 import React from 'react'
 import createReactClass from 'create-react-class';

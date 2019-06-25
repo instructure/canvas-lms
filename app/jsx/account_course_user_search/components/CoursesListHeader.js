@@ -18,36 +18,38 @@
 
 import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
 import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import React from 'react'
-import {string} from 'prop-types'
-import {pick} from 'lodash'
+import {string, func} from 'prop-types'
 import preventDefault from 'compiled/fn/preventDefault'
-import CoursesList from './CoursesList'
 
 export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   return (
-    <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
-      <Tooltip
-        as={Link}
-        tip={sort === id && order === 'asc' ? tipAsc : tipDesc}
+    <Tooltip tip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
+      <Button
+        variant="link"
         onClick={preventDefault(() => onChangeSort(id))}
+        theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
       >
         {label}
-        {sort === id ? order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp /> : ''}
-      </Tooltip>
-    </ApplyTheme>
+        {sort === id ? order === 'asc' ? <IconMiniArrowUp /> : <IconMiniArrowDown /> : ''}
+      </Button>
+    </Tooltip>
   )
 }
 
 CourseListHeader.propTypes = {
-  ...pick(CoursesList.propTypes, ['sort', 'order', 'onChangeSort']),
+  sort: string,
+  order: string,
+  onChangeSort: func.isRequired,
   id: string.isRequired,
   label: string.isRequired,
   tipDesc: string.isRequired,
   tipAsc: string.isRequired
 }
 
-CourseListHeader.defaultProps = pick(CoursesList.defaultProps, ['sort', 'order'])
+CourseListHeader.defaultProps = {
+  sort: 'sis_course_id',
+  order: 'asc'
+}

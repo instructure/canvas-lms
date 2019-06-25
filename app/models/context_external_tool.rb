@@ -137,6 +137,7 @@ class ContextExternalTool < ActiveRecord::Base
       :icon_url,
       :message_type,
       :prefer_sis_email,
+      :required_permissions,
       :selection_height,
       :selection_width,
       :text,
@@ -560,11 +561,15 @@ class ContextExternalTool < ActiveRecord::Base
       res.normalize!
       return true if res.to_s == standard_url
     end
-    if domain.present?
-      host = Addressable::URI.parse(url).normalize.host rescue nil
-      !!(host && ('.' + host).match(/\.#{domain}\z/))
-    end
   end
+
+  def matches_tool_domain?(url)
+    return false if domain.blank?
+    url = ContextExternalTool.standardize_url(url)
+    host = Addressable::URI.parse(url).normalize.host rescue nil
+    d = domain.gsub(/http[s]?\:\/\//, '')
+    !!(host && ('.' + host).match(/\.#{d}\z/))
+end
 
   def matches_domain?(url)
     url = ContextExternalTool.standardize_url(url)
@@ -676,7 +681,7 @@ class ContextExternalTool < ActiveRecord::Base
     res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url, false) && tool.id != exclude_tool_id }
     return res if res
 
-    res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_url?(url) && tool.id != exclude_tool_id }
+    res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_tool_domain?(url) && tool.id != exclude_tool_id }
     return res if res
 
     nil
@@ -793,6 +798,17 @@ class ContextExternalTool < ActiveRecord::Base
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
       Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)
+    end
+  end
+
+  def visible_with_permission_check?(launch_type, user, context, session=nil)
+    return false unless self.class.visible?(self.extension_setting(launch_type, 'visibility'), user, context, session)
+    if (required_permissions_str = self.extension_setting(launch_type, 'required_permissions'))
+      # if configured with a comma-separated string of permissions, will only show the link
+      # if all permissions are granted
+      required_permissions_str.split(",").map(&:to_sym).all?{|p| context&.grants_right?(user, session, p)}
+    else
+      true
     end
   end
 

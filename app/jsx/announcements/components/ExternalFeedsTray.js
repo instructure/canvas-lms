@@ -21,7 +21,6 @@ import React, {Component} from 'react'
 import {string} from 'prop-types'
 
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -58,9 +57,9 @@ export default class ExternalFeedsTray extends Component {
 
   renderHeader() {
     return (
-      <View margin="0 0 0 large" as="div" textAlign="start">
-        <Heading margin="small 0 0 small" level="h3" as="h3">
-          {I18n.t('External feeds')}
+      <View margin="0 0 0 medium" as="div" textAlign="start">
+        <Heading margin="small 0 0 0" level="h3" as="h3">
+          {I18n.t('External Feeds')}
         </Heading>
       </View>
     )
@@ -70,16 +69,18 @@ export default class ExternalFeedsTray extends Component {
     if (this.props.atomFeedUrl) {
       return (
         <View margin="medium" as="div" textAlign="start">
-          <Link
+          <Button
+            variant="link"
             id="rss-feed-link"
             linkRef={link => {
               this.rssFeedLink = link
             }}
             href={this.props.atomFeedUrl}
+            icon={IconRssLine}
+            theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
           >
-            <IconRssLine />
-            <View margin="0 0 0 x-small">{I18n.t('RSS Feed')}</View>
-          </Link>
+            {I18n.t('RSS Feed')}
+          </Button>
         </View>
       )
     }
@@ -117,16 +118,16 @@ export default class ExternalFeedsTray extends Component {
           onClick={() => this.setState({open: !this.state.open})}
           variant="link"
         >
-          {I18n.t('External feeds')}
+          {I18n.t('External Feeds')}
         </Button>
         <Tray
-          label={I18n.t('External feeds')}
+          label={I18n.t('External Feeds')}
           open={this.state.open}
           size="small"
           onDismiss={() => this.setState({open: false})}
           placement="end"
         >
-          <CloseButton placement="start" onClick={() => this.setState({open: false})}>
+          <CloseButton placement="end" onClick={() => this.setState({open: false})}>
             {I18n.t('Close')}
           </CloseButton>
           {this.renderTrayContent()}

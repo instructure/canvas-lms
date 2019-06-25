@@ -63,18 +63,18 @@ const ExternalToolsPlugin = {
     const ltiButtons = []
     for (let idx = 0; _INST.editorButtons && idx < _INST.editorButtons.length; idx++) {
       const current_button = _INST.editorButtons[idx]
+      // eslint-disable-next-line no-loop-func
+      const openDialog = () => dialog.open(current_button)
       if (ENV.use_rce_enhancements) {
         ltiButtons.push(ExternalToolsHelper.buttonConfig(current_button, ed))
+        ed.addCommand(`instructureExternalButton${current_button.id}`, openDialog)
       } else if (
         _INST.editorButtons.length > _INST.maxVisibleEditorButtons &&
         idx >= _INST.maxVisibleEditorButtons - 1
       ) {
         clumpedButtons.push(current_button)
       } else {
-        // eslint-disable-next-line no-loop-func
-        ed.addCommand(`instructureExternalButton${current_button.id}`, () => {
-          dialog.open(current_button)
-        })
+        ed.addCommand(`instructureExternalButton${current_button.id}`, openDialog)
         ed.addButton(
           `instructure_external_button_${current_button.id}`,
           ExternalToolsHelper.buttonConfig(current_button, ed)

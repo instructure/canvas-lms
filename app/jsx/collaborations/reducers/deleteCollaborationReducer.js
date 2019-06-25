@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import redux from 'redux'
 import ACTION_NAMES from '../actions/collaborationsActions'
   let initialState = {
     deleteCollaborationPending: false,

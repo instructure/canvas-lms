@@ -701,7 +701,7 @@ class DiscussionTopicsController < ApplicationController
                 # Can moderate any topic
                 :MODERATE         => user_can_moderate
               },
-              :ROOT_URL => "#{api_url.call('topic_view')}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
+              :ROOT_URL => api_url.call('topic_view'),
               :ENTRY_ROOT_URL => api_url.call('topic_entry_list'),
               :REPLY_URL => api_url.call('add_reply', ':entry_id'),
               :ROOT_REPLY_URL => api_url.call('add_entry'),
@@ -724,9 +724,6 @@ class DiscussionTopicsController < ApplicationController
               :ASSIGNMENT_ID => @topic.assignment_id,
               :IS_GROUP => @topic.group_category_id?,
             }
-            # will fire off the xhr for this as soon as the page comes back.
-            # see app/coffeescripts/models/Topic#fetch for where it is consumed
-            prefetch_xhr(env_hash[:ROOT_URL])
 
             env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
             if params[:hide_student_names]
@@ -756,9 +753,9 @@ class DiscussionTopicsController < ApplicationController
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-            js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
-              @domain_root_account.feature_enabled?(:student_context_cards) &&
-              @context.grants_right?(@current_user, session, :manage)
+            if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+              set_student_context_cards_js_env
+            end
 
             append_sis_data(js_hash)
             js_env(js_hash)

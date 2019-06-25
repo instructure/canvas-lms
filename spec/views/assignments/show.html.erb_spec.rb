@@ -53,14 +53,6 @@ describe "/assignments/show" do
           expect(response).not_to have_tag("a#toggle_assignments_2")
           expect(response).not_to have_tag("div#content")
         end
-
-        it "shows the old assignments page even with query parameter" do
-          allow(view).to receive(:params).and_return({assignments_2: "1"})
-          render 'assignments/show'
-          expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("div#content")
-          expect(response).not_to have_tag("a#toggle_assignments_2")
-        end
       end
 
       describe "with feature enabled" do
@@ -68,7 +60,7 @@ describe "/assignments/show" do
           Account.default.enable_feature! :assignments_2
         end
 
-        it "it shows old assignments with assignments_2 toggle button" do
+        it "it shows assignments_2 toggle button" do
           render 'assignments/show'
           expect(response).to have_tag("a#toggle_assignments_2")
           expect(response).to have_tag("div#assignment_show")
@@ -93,14 +85,6 @@ describe "/assignments/show" do
           expect(response).to have_tag("div#assignment_show")
           expect(response).not_to have_tag("a#toggle_content")
           expect(response).not_to have_tag("div#content")
-        end
-
-        it "shows the old assignments page even with query parameter" do
-          allow(view).to receive(:params).and_return({assignments_2: "1"})
-          render 'assignments/show'
-          expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("div#content")
-          expect(response).not_to have_tag("a#toggle_assignments_2")
         end
       end
 

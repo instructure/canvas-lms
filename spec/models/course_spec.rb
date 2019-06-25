@@ -1261,25 +1261,127 @@ describe Course do
     let_once(:course) { Course.create! }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:post_policies) }
+      before(:once) { course.enable_feature!(:new_gradebook) }
+      before(:once) { PostPolicy.enable_feature! }
 
       it "returns true if a policy with manual posting is attached to the course" do
-        course.post_policies.create!(post_manually: true)
+        course.default_post_policy.update!(post_manually: true)
         expect(course).to be_post_manually
       end
 
       it "returns false if a policy without manual posting is attached to the course" do
-        course.post_policies.create!(post_manually: false)
-        expect(course).not_to be_post_manually
-      end
-
-      it "returns false if no policy is attached to the course" do
+        course.default_post_policy.update!(post_manually: false)
         expect(course).not_to be_post_manually
       end
     end
 
     it "returns false when post policies are not enabled" do
       expect(course).not_to be_post_manually
+    end
+  end
+
+  describe "#apply_post_policy!" do
+    let_once(:course) { Course.create! }
+
+    context "when post policies are enabled" do
+      before(:once) { course.enable_feature!(:new_gradebook) }
+      before(:once) { PostPolicy.enable_feature! }
+
+      it "sets the post policy for the course" do
+        course.apply_post_policy!(post_manually: true)
+        expect(course.reload).to be_post_manually
+      end
+
+      it "explicitly sets a post policy for assignments without one" do
+        assignment = course.assignments.create!
+
+        course.apply_post_policy!(post_manually: true)
+        expect(assignment.reload.post_policy).to be_post_manually
+      end
+
+      it "updates the post policy for assignments with an existing-but-different policy" do
+        assignment = course.assignments.create!
+        assignment.ensure_post_policy(post_manually: false)
+
+        course.apply_post_policy!(post_manually: true)
+        expect(assignment.reload.post_policy).to be_post_manually
+      end
+
+      it "does not update assignments that have an equivalent post policy" do
+        assignment = course.assignments.create!
+        assignment.ensure_post_policy(post_manually: true)
+
+        expect {
+          course.apply_post_policy!(post_manually: true)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: assignment).updated_at
+        }
+      end
+
+      it "does not change the post policy for anonymous assignments" do
+        course.apply_post_policy!(post_manually: true)
+        anonymous_assignment = course.assignments.create!(anonymous_grading: true)
+
+        expect {
+          course.apply_post_policy!(post_manually: false)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: anonymous_assignment).post_manually
+        }
+      end
+
+      it "does not change the post policy for moderated assignments" do
+        course.apply_post_policy!(post_manually: true)
+        moderated_assignment = course.assignments.create!(
+          final_grader: course.enroll_teacher(User.create!, enrollment_state: :active).user,
+          grader_count: 2,
+          moderated_grading: true
+        )
+
+        expect {
+          course.apply_post_policy!(post_manually: false)
+        }.not_to change {
+          PostPolicy.find_by(assignment: moderated_assignment).post_manually
+        }
+      end
+    end
+  end
+
+  describe "post policy defaults" do
+    it "a post policy is created when a newly-created course is saved with no policy" do
+      course = Course.create!
+
+      aggregate_failures do
+        expect(course.default_post_policy).not_to be nil
+        expect(course.default_post_policy).not_to be_post_manually
+      end
+    end
+
+    it "a course retains its existing post policy when saved if one is set" do
+      course = Course.new
+      course.build_default_post_policy(assignment_id: nil, post_manually: true)
+
+      course.save!
+      expect(course.reload.default_post_policy).to be_post_manually
+    end
+  end
+
+  describe "#post_policies_enabled?" do
+    let_once(:course) { Course.create! }
+
+    it "returns true when both post policies and new gradebook are enabled" do
+      PostPolicy.enable_feature!
+      course.enable_feature!(:new_gradebook)
+      expect(course).to be_post_policies_enabled
+    end
+
+    it "returns false when post policies is enabled but new gradebook is not enabled" do
+      PostPolicy.enable_feature!
+      expect(course).not_to be_post_policies_enabled
+    end
+
+    it "returns false when post policies is not enabled" do
+      course.enable_feature!(:new_gradebook)
+      expect(course).not_to be_post_policies_enabled
     end
   end
 end
@@ -1839,46 +1941,66 @@ describe Course, "gradebook_to_csv" do
     expect(rows[1]["Current Score"]).to eq "90.00"
   end
 
-  it "should include sis ids if enabled" do
-    course_factory(active_all: true)
-    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
-    student_in_course(:user => @user1)
-    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
-    student_in_course(:user => @user2)
-    @user3 = user_factory(active_all: true, :name => 'JT')
-    student_in_course(:user => @user3)
-    @user1.pseudonym.sis_user_id = "SISUSERID"
-    @user1.pseudonym.save!
-    @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-    @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user1, grade: "10", grader: @teacher)
-    @assignment.grade_student(@user2, grade: "9", grader: @teacher)
-    @assignment.grade_student(@user3, grade: "9", grader: @teacher)
-    @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
-    @course.recompute_student_scores
-    @course.reload
+  describe 'sis_ids' do
+    before(:once) do
+      @account = Account.create!(name: "A new root")
+      course_factory(active_all: true, account: @account)
+      @user1 = user_with_managed_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com',
+                                           account: @account, sis_user_id: "SISUSERID", integration_id: 'int1')
+      student_in_course(:user => @user1)
+      @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', account: @account)
+      student_in_course(:user => @user2)
+      @user3 = user_factory(active_all: true, :name => 'JT')
+      student_in_course(:user => @user3)
+      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
+      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @assignment.grade_student(@user1, grade: "10", grader: @teacher)
+      @assignment.grade_student(@user2, grade: "9", grader: @teacher)
+      @assignment.grade_student(@user3, grade: "9", grader: @teacher)
+      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @course.recompute_student_scores
+      @course.reload
+    end
 
-    csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
-    expect(csv).not_to be_nil
-    rows = CSV.parse(csv)
-    expect(rows.length).to eq 5
-    expect(rows[0][1]).to eq 'ID'
-    expect(rows[0][2]).to eq 'SIS User ID'
-    expect(rows[0][3]).to eq 'SIS Login ID'
-    expect(rows[0][4]).to eq 'Section'
-    expect(rows[1][2]).to eq nil
-    expect(rows[1][3]).to eq nil
-    expect(rows[1][4]).to eq nil
-    expect(rows[1][-1]).to eq '(read only)'
-    expect(rows[2][1]).to eq @user1.id.to_s
-    expect(rows[2][2]).to eq 'SISUSERID'
-    expect(rows[2][3]).to eq @user1.pseudonym.unique_id
-    expect(rows[3][1]).to eq @user2.id.to_s
-    expect(rows[3][2]).to be_nil
-    expect(rows[3][3]).to eq @user2.pseudonym.unique_id
-    expect(rows[4][1]).to eq @user3.id.to_s
-    expect(rows[4][2]).to be_nil
-    expect(rows[4][3]).to be_nil
+    it "should include sis ids if enabled" do
+      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      expect(csv).not_to be_nil
+      rows = CSV.parse(csv)
+      expect(rows.length).to eq 5
+      expect(rows.first.length).to eq 19
+      expect(rows[0][1]).to eq 'ID'
+      expect(rows[0][2]).to eq 'SIS User ID'
+      expect(rows[0][3]).to eq 'SIS Login ID'
+      expect(rows[0][4]).to eq 'Section'
+      expect(rows[1][2]).to eq nil
+      expect(rows[1][3]).to eq nil
+      expect(rows[1][4]).to eq nil
+      expect(rows[1][-1]).to eq '(read only)'
+      expect(rows[2][1]).to eq @user1.id.to_s
+      expect(rows[2][2]).to eq 'SISUSERID'
+      expect(rows[2][3]).to eq @user1.pseudonym.unique_id
+      expect(rows[3][1]).to eq @user2.id.to_s
+      expect(rows[3][2]).to be_nil
+      expect(rows[3][3]).to eq @user2.pseudonym.unique_id
+      expect(rows[4][1]).to eq @user3.id.to_s
+      expect(rows[4][2]).to be_nil
+      expect(rows[4][3]).to be_nil
+    end
+
+    it "should include integration ids if enabled" do
+      @account.settings[:include_integration_ids_in_gradebook_exports] = true
+      @account.save!
+      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      rows = CSV.parse(csv)
+      expect(rows.first.length).to eq 20
+      expect(rows[0][1]).to eq 'ID'
+      expect(rows[0][2]).to eq 'SIS User ID'
+      expect(rows[0][3]).to eq 'SIS Login ID'
+      expect(rows[0][4]).to eq 'Integration ID'
+      expect(rows[2][1]).to eq @user1.id.to_s
+      expect(rows[2][2]).to eq 'SISUSERID'
+      expect(rows[2][4]).to eq 'int1'
+    end
   end
 
   it "should include primary domain if a trust exists" do
@@ -5552,7 +5674,7 @@ describe Course, "#show_total_grade_as_points?" do
     end
 
     it "should cache" do
-      expect_any_instantiation_of(@course).to receive(:account_users_for).once
+      expect_any_instantiation_of(@course).to receive(:account_users_for).once.and_return([])
       2.times { cached_account_users }
     end
 

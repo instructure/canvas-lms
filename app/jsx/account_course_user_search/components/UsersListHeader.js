@@ -18,11 +18,10 @@
 
 import React from 'react'
 import {string, func, shape} from 'prop-types'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
 import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import preventDefault from 'compiled/fn/preventDefault'
 
 export default function UsersListHeader(props) {
@@ -32,18 +31,18 @@ export default function UsersListHeader(props) {
 
   return (
     <th scope="col">
-      <ApplyTheme theme={{[Link.theme]: {fontWeight: 'bold'}}}>
-        <Tooltip
-          as={Link}
-          tip={sort === id && order === 'asc' ? tipAsc : tipDesc}
+      <Tooltip tip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
+        <Button
           onClick={preventDefault(() => {
             onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
           })}
+          variant="link"
+          theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
         >
           {label}
-          {sort === id ? order === 'asc' ? <IconMiniArrowDown /> : <IconMiniArrowUp /> : ''}
-        </Tooltip>
-      </ApplyTheme>
+          {sort === id ? order === 'asc' ? <IconMiniArrowUp /> : <IconMiniArrowDown /> : ''}
+        </Button>
+      </Tooltip>
     </th>
   )
 }

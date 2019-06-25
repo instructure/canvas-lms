@@ -23,7 +23,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Select from '@instructure/ui-forms/lib/components/Select'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import I18n from 'i18n!edit_rubric'
+import I18n from 'i18n!edit_rubricComments'
 
 import { assessmentShape } from './types'
 

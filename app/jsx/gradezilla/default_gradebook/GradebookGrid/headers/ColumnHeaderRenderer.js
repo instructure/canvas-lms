@@ -43,14 +43,20 @@ export default class ColumnHeaderRenderer {
           this.gradebook.setHeaderComponentRef(column.id, header)
         }
       }
-      this.factories[column.type].render(column, $container, gridSupport, options)
+      // The container to render into needs to be slick-column-name because
+      // overwriting slick-column-name can cause slick-resizable-handle to be
+      // ordered as the first child. This causes issues because React expects
+      // to unmount the component at the first child.
+      const $nameNode = $container.querySelector('.slick-column-name')
+      this.factories[column.type].render(column, $nameNode, gridSupport, options)
     }
   }
 
   destroyColumnHeader(column, $container, gridSupport) {
     if (this.factories[column.type]) {
       this.gradebook.removeHeaderComponentRef(column.id)
-      this.factories[column.type].destroy(column, $container, gridSupport)
+      const $nameNode = $container.querySelector('.slick-column-name')
+      this.factories[column.type].destroy(column, $nameNode, gridSupport)
     }
   }
 }

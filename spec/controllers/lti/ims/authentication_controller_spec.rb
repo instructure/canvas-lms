@@ -261,7 +261,7 @@ describe Lti::Ims::AuthenticationController do
         let(:login_hint) { 'not_the_correct_lti_id' }
 
         it_behaves_like 'non redirect_uri errors' do
-          let(:expected_message) { "The user is not logged in" }
+          let(:expected_message) { "Must have an active user session" }
           let(:expected_error) { "login_required" }
         end
       end

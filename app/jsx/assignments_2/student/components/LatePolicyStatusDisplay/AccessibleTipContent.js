@@ -23,10 +23,11 @@ import PropTypes from 'prop-types'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 
 function AccessibleTipContent(props) {
-  const {gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
+  const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
     <ScreenReaderContent data-test-id="late-policy-accessible-tip-content">
-      {I18n.t('Attempt 1: %{grade}', {
+      {I18n.t('Attempt %{attempt}: %{grade}', {
+        attempt,
         grade: GradeFormatHelper.formatGrade(originalGrade, {
           gradingType,
           pointsPossible,
@@ -49,6 +50,7 @@ function AccessibleTipContent(props) {
 }
 
 AccessibleTipContent.propTypes = {
+  attempt: PropTypes.number.isRequired,
   grade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,

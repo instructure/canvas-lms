@@ -17,15 +17,9 @@
  */
 
 import INST from './INST'
-import I18n from 'i18n!instructure_misc_helpers'
+import I18n from 'i18n!instructure'
 import $ from 'jquery'
-import _ from 'underscore'
 import htmlEscape from './str/htmlEscape'
-import TextHelper from 'compiled/str/TextHelper'
-import './jquery.ajaxJSON'
-import './jquery.instructure_forms'
-import 'jqueryui/dialog'
-import './vendor/jquery.scrollTo'
 
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
@@ -119,95 +113,6 @@ import './vendor/jquery.scrollTo'
     } else {
       return (Math.round(10.0 * bytes / factor / factor) / 10.0) + "MB";
     }
-  };
-
-  $.getUserServices = function(service_types, success, error) {
-    if(!$.isArray(service_types)) { service_types = [service_types]; }
-    var url = "/services?service_types=" + service_types.join(",");
-    $.ajaxJSON(url, 'GET', {}, function(data) {
-      if(success) { success(data); }
-    }, function(data) {
-      if(error) { error(data); }
-    });
-  };
-
-  var lastLookup; //used to keep track of diigo requests
-  $.findLinkForService = function(service_type, callback) {
-    var $dialog = $("#instructure_bookmark_search");
-    if( !$dialog.length ) {
-      $dialog = $("<div id='instructure_bookmark_search'/>");
-      $dialog.append("<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
-                       "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
-                       "<input type='text' class='query' style='width: 230px;'/>" +
-                       "<button class='btn search_button' type='submit'>" +
-                       htmlEscape(I18n.t('buttons.search', "Search")) + "</button></form>");
-      $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>");
-      $dialog.find("form").submit(function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var now = new Date();
-        if(service_type == 'diigo' && lastLookup && now - lastLookup < 15000) {
-          // let the user know we have to take things slow because of Diigo
-          setTimeout(function() {
-            $dialog.find("form").submit();
-          }, 15000 - (now - lastLookup));
-          $dialog.find(".results").empty()
-            .append(htmlEscape(I18n.t('status.diigo_search_throttling', "Diigo limits users to one search every ten seconds.  Please wait...")));
-          return;
-        }
-        $dialog.find(".results").empty().append(htmlEscape(I18n.t('status.searching', "Searching...")));
-        lastLookup = new Date();
-        var query = $dialog.find(".query").val();
-        var url = $.replaceTags($dialog.data('reference_url'), 'query', query);
-        $.ajaxJSON(url, 'GET', {}, function(data) {
-          $dialog.find(".results").empty();
-          if( !data.length ) {
-            $dialog.find(".results").append(htmlEscape(I18n.t('no_results_found', "No Results Found")));
-          }
-          for(var idx in data) {
-            data[idx].short_title = data[idx].title;
-            if(data[idx].title == data[idx].description) {
-              data[idx].short_title = TextHelper.truncateText(data[idx].description, {max: 30});
-            }
-            $("<div class='bookmark'/>")
-              .appendTo($dialog.find(".results"))
-              .append($('<a class="bookmark_link" style="font-weight: bold;"/>').attr({
-                  href: data[idx].url,
-                  title: data[idx].title
-                }).text(data[idx].short_title)
-              )
-              .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || I18n.t('no_description', "No description")));
-          }
-        }, function() {
-          $dialog.find(".results").empty()
-            .append(htmlEscape(I18n.t('errors.search_failed', "Search failed, please try again.")));
-        });
-      });
-      $dialog.delegate('.bookmark_link', 'click', function(event) {
-        event.preventDefault();
-        var url = $(this).attr('href');
-        var title = $(this).attr('title') || $(this).text();
-        $dialog.dialog('close');
-        callback({
-          url: url,
-          title: title
-        });
-      });
-    }
-    $dialog.find(".search_button").text(service_type == 'delicious' ? I18n.t('buttons.search_by_tag', "Search by Tag") : I18n.t('buttons.search', "Search"));
-    $dialog.find("form img").attr('src', '/images/' + service_type + '_small_icon.png');
-    var url = "/search/bookmarks?q=%7B%7B+query+%7D%7D&service_type=%7B%7B+service_type+%7D%7D";
-    url = $.replaceTags(url, 'service_type', service_type);
-    $dialog.data('reference_url', url);
-    $dialog.find(".results").empty().end()
-      .find(".query").val("");
-    $dialog.dialog({
-      title: I18n.t('titles.bookmark_search', "Bookmark Search: %{service_name}", {service_name: $.titleize(service_type)}),
-      open: function() {
-        $dialog.find("input:visible:first").focus().select();
-      },
-      width: 400
-    });
   };
 
   $.toSentence = function(array, options) {

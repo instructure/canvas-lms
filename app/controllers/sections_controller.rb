@@ -324,7 +324,7 @@ class SectionsController < ApplicationController
               :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
             })
           if @context.grants_right?(@current_user, session, :manage)
-            js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+            set_student_context_cards_js_env
           end
         end
         format.json { render :json => section_json(@section, @current_user, session, Array(params[:include])) }

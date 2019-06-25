@@ -15,35 +15,81 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../common"
-require_relative "../pages/speedgrader_page"
+require_relative '../../common'
+require_relative '../pages/speedgrader_page'
 require_relative '../pages/student_grades_page'
 
-describe 'SpeedGrader Post Policy' do
-  include_context "in-process server selenium tests"
+RSpec.shared_examples 'hidden student grade' do
+  it 'does not post for student in the other section', priority: '1' do
+    Speedgrader.select_student(student)
+    expect(Speedgrader.hidden_pill).to be_displayed
 
-  before(:all) { skip('GRADE-2192') }
+    user_session(student)
+    StudentGradesPage.visit_as_student(@course)
+    assignment_row = StudentGradesPage.assignment_row(@assignment)
+    aggregate_failures('eye icon is present, no grade is present and no comments are present') do
+      expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_present
+      expect(StudentGradesPage.fetch_assignment_score(@assignment)).to be_blank
+      expect(StudentGradesPage.comment_buttons).to be_blank
+      expect(assignment_row).not_to contain_css "#comments_thread_#{@assignment.id}"
+    end
+  end
+end
+
+RSpec.shared_examples 'ungraded student grade' do
+  it 'does not post for student in the other section', priority: '1' do
+    Speedgrader.select_student(student)
+    expect(Speedgrader.hidden_pill_container.text).not_to include 'HIDDEN'
+
+    user_session(student)
+    StudentGradesPage.visit_as_student(@course)
+    assignment_row = StudentGradesPage.assignment_row(@assignment)
+    aggregate_failures('eye icon is not present, no grade is present and no comments are present') do
+      expect(StudentGradesPage.hidden_eye_icon(scope: assignment_row)).to be_present
+      expect(StudentGradesPage.fetch_assignment_score(@assignment)).to be_blank
+      expect(StudentGradesPage.comment_buttons).to be_blank
+      expect(assignment_row).not_to contain_css "#comments_thread_#{@assignment.id}"
+    end
+  end
+end
+
+
+RSpec.shared_examples 'displayable student grade' do
+  it 'publishes grade and comments to student', priority: '1' do
+    user_session(student)
+    StudentGradesPage.visit_as_student(@course)
+    StudentGradesPage.comment_buttons.first.click
+    aggregate_failures('has grade and comment present') do
+      expect(StudentGradesPage.fetch_assignment_score(@assignment)).to eq submission.grade
+      expect(StudentGradesPage.comments(@assignment).first).to include_text submission_comment.comment
+    end
+  end
+end
+
+describe 'Speed Grader Post Policy' do
+  include_context 'in-process server selenium tests'
+
+  # rubocop:disable RSpec/BeforeAfterAll, Specs/NoBeforeAll
+  before(:all) { preload_graphql_schema }
+  # rubocop:enable RSpec/BeforeAfterAll, Specs/NoBeforeAll
 
   before :once do
-    # course
-    course_with_teacher(
-      course_name: "Post Policy Course",
-      active_course: true,
-      active_enrollment: true,
-      name: "Teacher Boss1",
-      active_user: true
-    )
+    @teacher = course_with_teacher(course_name: 'Post Policy Course', name: 'Teacher', active_all: true).user
+    @course = Course.find_by!(name: 'Post Policy Course')
     @course.enable_feature!(:new_gradebook)
-    # TODO: set post policy course setting to manual
+    PostPolicy.enable_feature!
+    @course.default_post_policy.update!(post_manually: true)
 
-    # sections
-    @section1 = @course.course_sections.first
-    @section2 = @course.course_sections.create!(:name => 'Section 2')
-    # students
-    @students1 = create_users_in_course(@course, 2, return_type: :record, name_prefix: "Purple", section: @section1)
-    @students2 = create_users_in_course(@course, 2, return_type: :record, name_prefix: "Indigo", section: @section2)
-    @students = @students1.concat(@students2)
-    # assignment
+    @first_section = @course.course_sections.first
+    @second_section = @course.course_sections.create!(name: 'Section 2')
+
+    @first_student = create_users_in_course(
+      @course, 1, return_type: :record, name_prefix: 'Purple', section: @first_section
+    ).first
+    @second_student = create_users_in_course(
+      @course, 1, return_type: :record, name_prefix: 'Indigo', section: @second_section
+    ).first
+
     @assignment = @course.assignments.create!(
       title: 'post policy assignment',
       submission_types: 'online_text_entry',
@@ -52,186 +98,165 @@ describe 'SpeedGrader Post Policy' do
     )
   end
 
-  before :each do
-    user_session(@teacher)
-    Speedgrader.visit(@course.id, @assignment.id)
-  end
-
-  context do
+  context 'given a submission for each student' do
     before :once do
-      @students.each do |student|
-        @assignment.grade_student(student, grade: 8, grader: @teacher)
-        @ssignment.update_submission(
-          student,
-          author: @teacher,
-          comment: 'Teacher Commented'
-        )
+      @assignment.grade_student(@first_student, grade: 1, grader: @teacher)
+      @first_submission = @assignment.submissions.find_by!(user: @first_student)
+      @first_submission_comment = @first_submission.submission_comments.create!(
+        comment: 'first teacher comment',
+        author: @teacher
+      )
+
+      @assignment.grade_student(@second_student, grade: 2, grader: @teacher)
+      @second_submission = @assignment.submissions.find_by!(user: @second_student)
+      @second_submission_comment = @second_submission.submission_comments.create!(
+        comment: 'second teacher comment',
+        author: @teacher
+      )
+    end
+
+    before do
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
+    end
+
+    context 'when posting for everyone' do
+      before do
+        # this would be faster if we only ran this one time but
+        # there's incompatabilities with :once and :all
+        Speedgrader.manually_post_grades(type: :everyone)
+      end
+
+      it 'disables the post grades option' do
+        Speedgrader.click_post_or_hide_grades_button
+        expect(Speedgrader.all_grades_posted_link).to be_aria_disabled
+      end
+
+      it_behaves_like 'displayable student grade' do
+        let(:student) { @first_student }
+        let(:submission) { @first_submission }
+        let(:submission_comment) { @first_submission_comment }
+      end
+
+      it_behaves_like 'displayable student grade' do
+        let(:student) { @second_student }
+        let(:submission) { @second_submission }
+        let(:submission_comment) { @second_submission_comment }
       end
     end
 
-    context 'when post everyone' do
-      before :each do
-        manually_post_grades('Everyone')
+    context 'when posting for everyone in a section' do
+      before do
+        Speedgrader.manually_post_grades(type: :everyone, sections: [@first_section])
       end
 
-      it 'post grades option disabled' do
-        # TODO: expect post option to be disabled for Speedgrader.post_grades
-        expect(Speedgrader.post_grades).to be_disabled
+      it_behaves_like 'displayable student grade' do
+        let(:student) { @first_student }
+        let(:submission) { @first_submission }
+        let(:submission_comment) { @first_submission_comment }
       end
 
-      it 'students see grade', priority: '1', test_id: 3757534 do
-        @students.each do |student|
-          verify_student_grade_comments_displayed(student, '8')
-        end
-      end
-    end
-
-    context 'when post everyone for section' do
-      before :each do
-        manually_post_grades('Everyone', @section2)
-      end
-
-      it 'posts for section', priority: '1', test_id: 3757535 do
-        @students1.each do |student|
-          verify_student_grade_comments_displayed(student, '8')
-        end
-      end
-
-      it 'does not post for other section', priority: '1', test_id: 3757535 do
-        expect(Speedgrader.hidden_pill).to be_displayed
-
-        # TODO: verify students not in section have eyeball icon
-        @students2.each do |student|
-          verify_student_grade_comments_displayed(student, '')
-          # TODO: expect eyeball icon to be displayed
-        end
+      it_behaves_like 'hidden student grade' do
+        let(:student) { @second_student }
       end
 
       it 'Post tray shows unposted count', priority: '1', test_id: 3757535 do
-        expect(Speedgrader.PostGradesTray.unposted_count).to eq '2'
-        # TODO: expect unposted indicator to be displayed and show count 2
+        Speedgrader.click_post_or_hide_grades_button
+        Speedgrader.click_post_link
+        expect(PostGradesTray.unposted_count).to eq '1'
       end
     end
 
     context 'when hide posted grades for everyone' do
-      before :each do
-        manually_post_grades('Everyone')
-        wait_for_ajaximations
-        Speedgrader.visit(@course.id, @assignment.id)
-        manually_hide_grades
-        wait_for_ajaximations
+      before do
+        Speedgrader.manually_post_grades(type: :everyone)
+        Speedgrader.manually_hide_grades
       end
 
-      it 'header has HIDDEN icon', priority: '1', test_id: 3757537 do
-        # TODO: expect header to have HIDDEN icon Speedgrader.grades_not_posted_icon
-      end
-
-      it 'student sees hidden icon', priority: '1', test_id: 3757537 do
-        @students.each do |student|
-          verify_student_grade_displayed(student, '')
-          # TODO: expect hidden icon to be displayed
-        end
+      it 'header has hidden icon', priority: '1', test_id: 3757537 do
+        expect(Speedgrader.grades_hidden_icon).to be_present
       end
 
       it 'hidden pill displayed in side panel', priority: '1', test_id: 3757537 do
         expect(Speedgrader.hidden_pill).to be_displayed
       end
+
+      it_behaves_like 'hidden student grade' do
+        let(:student) { @first_student }
+      end
+
+      it_behaves_like 'hidden student grade' do
+        let(:student) { @second_student }
+      end
     end
 
     context 'when hide posted grades for section' do
-      before :each do
-        manually_post_grades('Everyone')
-        wait_for_ajaximations
-        manually_hide_grades(@section2)
-        wait_for_ajaximations
+      before do
+        Speedgrader.manually_post_grades(type: :everyone)
+        Speedgrader.manually_hide_grades(sections: [@second_section])
       end
 
-      it 'students in section have hidden grades', priority: '1', test_id: 3756683 do
-        @students1.each do |student|
-          verify_student_grade_comments_displayed(student, '')
-          # TODO: expect hidden icon to be displayed
-        end
+      it_behaves_like 'displayable student grade' do
+        let(:student) { @first_student }
+        let(:submission) { @first_submission }
+        let(:submission_comment) { @first_submission_comment }
       end
 
-      it 'students in another section have grades posted', priority: '1', test_id: 3756683 do
-        @students2.each do |student|
-          verify_student_grade_comments_displayed(student, '8')
-        end
+      it_behaves_like 'hidden student grade' do
+        let(:student) { @second_student }
       end
     end
   end
 
   context 'when post for graded' do
     before :once do
-      @graded_students = [@students[0], @students[1], @students[2]]
-      @graded_students.each do |student|
-        @assignment.grade_student(student, grade: 8, grader: @teacher)
-      end
+      @assignment.grade_student(@first_student, grade: 8, grader: @teacher)
+      @first_submission = @assignment.submissions.find_by!(user: @first_student)
+      @first_submission_comment = @first_submission.submission_comments.create!(comment: 'first teacher comment', author: @teacher)
     end
 
-    before :each do
-      manually_post_grades('Graded')
+    before do
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
+      Speedgrader.manually_post_grades(type: :graded)
     end
 
-    it 'posts for graded', priority: '1', test_id: 3756680 do
-      @graded_students.each do |student|
-        verify_student_grade_comments_displayed(student, 8)
-      end
+    it_behaves_like 'displayable student grade' do
+      let(:student) { @first_student }
+      let(:submission) { @first_submission }
+      let(:submission_comment) { @first_submission_comment }
     end
 
-    it 'does not post for ungraded', priority: '1', test_id: 3756680 do
-      # TODO: verify ungraded students still have eyeball icon
-      verify_student_grade_comments_displayed(@students[3], '')
-      # TODO: expect icon to be displayed
+    it_behaves_like 'ungraded student grade' do
+      let(:student) { @second_student }
     end
   end
 
-  context 'when post graded for section' do
+  context 'when posting by graded and by section' do
     before :once do
-      @assignment.grade_student(@students2.first, grade: 8, grader: @teacher)
-      @students1.each do |student|
-        @assignment.grade_student(student, grade: 8, grader: @teacher)
-      end
+      @assignment.grade_student(@first_student, grade: 1, grader: @teacher)
+      @assignment.grade_student(@second_student, grade: 2, grader: @teacher)
+      @second_submission = @assignment.submissions.find_by!(user: @second_student)
+      @second_submission_comment = @second_submission.submission_comments.create!(
+        comment: 'second teacher comment',
+        author: @teacher
+      )
     end
 
-    before :each do
-      manually_post_grades('Graded', @section2)
+    before do
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
+      Speedgrader.manually_post_grades(type: :graded, sections: [@second_section])
     end
 
-    it 'posts graded for section', priority: '1', test_id: 3757539 do
-      verify_student_grade_comments_displayed(@students2.first, '8')
+    it_behaves_like 'hidden student grade' do
+      let(:student) { @first_student }
     end
 
-    it 'does not post ungraded for section', priority: '1', test_id: 3757539 do
-      # TODO: verify students in section without grades have eyeball icon
-      verify_student_grade_comments_displayed(@students2.second, '')
-      # TODO: expect eyeball icon to be displayed
+    it_behaves_like 'displayable student grade' do
+      let(:student) { @second_student }
+      let(:submission) { @second_submission }
+      let(:submission_comment) { @second_submission_comment }
     end
-
-    it 'does not post graded for other section', priority: '1', test_id: 3757539 do
-      @students1.each do |student|
-        verify_student_grade_comments_displayed(student, '')
-      end
-    end
-  end
-
-  def verify_student_grade_comments_displayed(student, grade)
-    user_session(student)
-    StudentGradesPage.visit_as_student(@course)
-    expect(StudentGradesPage.fetch_assignment_score(@assignment)).to eq grade
-    expect(StudentGradesPage.comments(@assignment).first).to include_text 'Teacher Commented' unless grade.eql? ''
-  end
-
-  def manually_post_grades(type, section = nil)
-    Speedgrader.click_post_link
-    Speedgrader.PostGradesTray.post_type_radio_button(type).click
-    Speedgrader.PostGradesTray.select_section(section.name) unless section.nil?
-    Speedgrader.PostGradesTray.post_button.click
-  end
-
-  def manually_hide_grades(section = nil)
-    Speedgrader.click_hide_link
-    Speedgrader.HideGradesTray.select_section(section.name) unless section.nil?
-    Speedgrader.HideGradesTray.hide_button.click
   end
 end

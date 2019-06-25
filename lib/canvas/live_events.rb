@@ -479,7 +479,7 @@ module Canvas::LiveEvents
       category: category,
       role: role,
       level: level
-    })
+    }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)))
   end
 
   def self.quiz_export_complete(content_export)

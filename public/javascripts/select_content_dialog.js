@@ -28,12 +28,13 @@ import { uploadFile } from 'jsx/shared/upload_file'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import SelectContent from './lti/select_content'
 import processSingleContentItem from 'jsx/deep_linking/processors/processSingleContentItem'
+import {findLinkForService, getUserServices} from './findLinkForService'
 import './jquery.instructure_date_and_time' /* datetime_field */
 import './jquery.ajaxJSON'
 import './jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
-import './jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */
+import './jquery.instructure_misc_helpers' /* replaceTags */
 import './jquery.instructure_misc_plugins' /* showIf */
 import './jquery.keycodes'
 import './jquery.loadingImg'
@@ -269,7 +270,7 @@ import './jquery.templateData'
       $dialog.find(".select_item_name").showIf(!options.no_name_input);
       if(allow_external_urls && !external_services) {
         var $services = $("#content_tag_services").empty();
-        $.getUserServices('BookmarkService', function(data) {
+        getUserServices('BookmarkService', function(data) {
           for(var idx in data) {
             var service = data[idx].user_service;
             var $service = $("<a href='#' class='bookmark_service no-hover'/>");
@@ -281,7 +282,7 @@ import './jquery.templateData'
             $service.append($img);
             $service.click(function(event) {
               event.preventDefault();
-              $.findLinkForService($(this).data('service').service, function(data) {
+              findLinkForService($(this).data('service').service, function(data) {
                 $("#content_tag_create_url").val(data.url);
                 $("#content_tag_create_title").val(data.title);
               });

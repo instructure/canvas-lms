@@ -45,6 +45,9 @@ class Discussion
     def visit(course, discussion)
       get("/courses/#{course.id}/discussion_topics/#{discussion.id}")
       wait_for_ajaximations
+      # if already visited and scrolled down, can cause flakey
+      # failures if not scrolled back up
+      scroll_page_to_top
     end
 
     def start_reply_with_media

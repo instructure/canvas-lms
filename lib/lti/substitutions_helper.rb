@@ -185,6 +185,10 @@ module Lti
       concluded_course_enrollments.size > 0 ? enrollments_to_lis_roles(concluded_course_enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
     end
 
+    def granted_permissions(permissions_to_check)
+      permissions_to_check.select{|p| @context.grants_right?(@user, p.to_sym) }.join(",")
+    end
+
     def current_canvas_roles
       roles = (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq
       roles = roles.map{|role| role == "AccountAdmin" ? "Account Admin" : role} # to maintain backwards compatibility
@@ -217,6 +221,10 @@ module Lti
 
     def section_ids
       course_enrollments.map(&:course_section_id).uniq.sort.join(',')
+    end
+
+    def section_restricted
+      @context.is_a?(Course) && @user && @context.visibility_limited_to_course_sections?(@user)
     end
 
     def section_sis_ids

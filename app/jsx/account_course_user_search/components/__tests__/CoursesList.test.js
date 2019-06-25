@@ -146,7 +146,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       subaccount: 'Sub-Account'
     },
     (label, columnID) => {
-      test(`sorting by ${columnID} asc puts down-arrow on ${label} only`, () => {
+      test(`sorting by ${columnID} asc puts up-arrow on ${label} only`, () => {
         const wrapper = mount(
           <CoursesList
             {...{
@@ -157,10 +157,10 @@ describe('Account Course User Search CoursesList Sorting', () => {
           />
         )
 
-        expect(wrapper.find('IconMiniArrowUp')).toHaveLength(0)
-        const downArrow = wrapper.find('IconMiniArrowDown')
-        expect(downArrow).toHaveLength(1)
-        const header = downArrow.closest('CourseListHeader')
+        expect(wrapper.find('IconMiniArrowDown')).toHaveLength(0)
+        const upArrow = wrapper.find('IconMiniArrowUp')
+        expect(upArrow).toHaveLength(1)
+        const header = upArrow.closest('CourseListHeader')
 
         const expectedTip =
           {
@@ -172,7 +172,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         expect(header.text()).toMatch(label)
       })
 
-      test(`sorting by ${columnID} desc puts up-arrow on ${label} only`, () => {
+      test(`sorting by ${columnID} desc puts down-arrow on ${label} only`, () => {
         const wrapper = mount(
           <CoursesList
             {...{
@@ -183,10 +183,10 @@ describe('Account Course User Search CoursesList Sorting', () => {
           />
         )
 
-        expect(wrapper.find('IconMiniArrowDown')).toHaveLength(0)
-        const upArrow = wrapper.find('IconMiniArrowUp')
-        expect(upArrow).toHaveLength(1)
-        const header = upArrow.closest('CourseListHeader')
+        expect(wrapper.find('IconMiniArrowUp')).toHaveLength(0)
+        const downArrow = wrapper.find('IconMiniArrowDown')
+        expect(downArrow).toHaveLength(1)
+        const header = downArrow.closest('CourseListHeader')
 
         const expectedTip =
           {

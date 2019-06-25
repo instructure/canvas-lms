@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!student_context_tray'
+import I18n from 'i18n!student_context_trayAvatar'
 import React from 'react'
 import PropTypes from 'prop-types'
 import InstUIAvatar from '@instructure/ui-elements/lib/components/Avatar'

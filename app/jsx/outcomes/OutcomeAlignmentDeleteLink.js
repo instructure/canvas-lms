@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!OutcomeAlignmentDeleteLink'
 import $ from 'jquery'
 
   class OutcomeAlignmentDeleteLink extends React.Component {

@@ -16,35 +16,82 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import AttemptTab from './AttemptTab'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
-import ContentUploadTab from './ContentUploadTab'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import FriendlyDatetime from '../../../shared/FriendlyDatetime'
+import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
+
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import GradeDisplay from './GradeDisplay'
+import {Img} from '@instructure/ui-elements'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-const Comments = lazy(() => import('./Comments'))
+const CommentsTab = lazy(() => import('./CommentsTab'))
 
 ContentTabs.propTypes = {
   assignment: AssignmentShape,
   submission: SubmissionShape
 }
 
+// We should revisit this after the InstructureCon demo to ensure this is
+// accessible and in a class.
+function currentSubmissionGrade(assignment, submission) {
+  const tabBarAlign = {
+    position: 'absolute',
+    right: '50px'
+  }
+
+  return (
+    <div style={tabBarAlign}>
+      <Text weight="bold">
+        <GradeDisplay
+          displaySize="medium"
+          gradingType={assignment.gradingType}
+          pointsPossible={assignment.pointsPossible}
+          receivedGrade={submission.grade}
+        />
+      </Text>
+      <Text size="small">
+        {submission.submittedAt ? (
+          <Flex justifyItems="end">
+            <FlexItem padding="0 xx-small 0 0">{I18n.t('Submitted')}</FlexItem>
+            <FlexItem>
+              <FriendlyDatetime
+                dateTime={submission.submittedAt}
+                format={I18n.t('#date.formats.full')}
+              />
+            </FlexItem>
+          </Flex>
+        ) : (
+          I18n.t('Not submitted')
+        )}
+      </Text>
+    </div>
+  )
+}
+
 function ContentTabs(props) {
   return (
     <div data-testid="assignment-2-student-content-tabs">
+      {props.submission.state === 'graded' || props.submission.state === 'submitted'
+        ? currentSubmissionGrade(props.assignment, props.submission)
+        : null}
       <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel title={I18n.t('Upload')}>
-          <ContentUploadTab assignment={props.assignment} submission={props.submission} />
+        <TabPanel
+          title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+        >
+          <AttemptTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
           {!props.assignment.muted ? (
             <Suspense fallback={<LoadingIndicator />}>
-              <Comments assignment={props.assignment} submission={props.submission} />
+              <CommentsTab assignment={props.assignment} submission={props.submission} />
             </Suspense>
           ) : (
             <SVGWithTextPlaceholder
@@ -56,11 +103,7 @@ function ContentTabs(props) {
           )}
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>
-          <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-            <FlexItem>
-              <Text>`TODO: Input Rubric Content Here...`</Text>
-            </FlexItem>
-          </Flex>
+          <Img src="/images/assignments2_rubric_student_static.png" />
         </TabPanel>
       </TabList>
     </div>

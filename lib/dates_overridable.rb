@@ -238,6 +238,7 @@ module DatesOverridable
   end
 
   def context_module_tag_info(user, context, user_is_admin: false, has_submission: )
+    return {} unless user
     self.association(:context).target ||= context
     tag_info = Rails.cache.fetch_with_batched_keys(
       ["context_module_tag_info2", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,

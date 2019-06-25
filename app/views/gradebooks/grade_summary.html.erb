@@ -27,8 +27,8 @@
 <%
   whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
 
-  hidden_text = @context.feature_enabled?(:post_policies) ? t("Hidden") : t("Muted")
-  hidden_icon_class = @context.feature_enabled?(:post_policies) ? "icon-off" : "icon-muted"
+  hidden_text = @context.post_policies_enabled? ? t("Hidden") : t("Muted")
+  hidden_icon_class = @context.post_policies_enabled? ? "icon-off" : "icon-muted"
 %>
 <div id="grade-summary-content" style="display: none;">
   <% content_for :right_side do %>
@@ -88,8 +88,8 @@
     </div>
 
     <div id="print-grades-button-container" class="ic-Action-header__Secondary">
-      <a id="print-grades-button" class="Button print-grades icon-printer" href="javascript:window.print()">
-        <%= t :print_grades, "Print" %>
+      <a role="button" id="print-grades-button" class="Button print-grades icon-printer" href="javascript:window.print()">
+        <%= t("Print Grades") %>
       </a>
     </div>
   </div>
@@ -217,7 +217,7 @@
                 <% if !assignment_presenter.posted_to_student? %>
                   <i class="<%= hidden_icon_class %>" title="<%= hidden_text %>"></i>
                 <% else %>
-                  <span class="screenreader-only" role="link">
+                  <span class="screenreader-only" role="button">
                     <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
                   </span>
                   <% if submission.try :pending_review? %>
@@ -288,6 +288,7 @@
             <% if assignment_presenter.has_comments? && assignment_presenter.posted_to_student? %>
               aria-expanded="false"
               aria-controls="comments_thread_<%= assignment.id %>"
+              role="button"
             <% else %>
               aria-hidden='true'
               role='presentation'
@@ -494,7 +495,7 @@
           </tr>
       <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
         <td colspan="6">
-          <% if assignment_presenter.has_comments? %>
+          <% if assignment_presenter.posted_to_student? && assignment_presenter.has_comments? %>
               <table class="score_details_table ic-Table ic-Table--condensed">
                 <thead>
                   <tr>

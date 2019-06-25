@@ -6,7 +6,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
 >
   <View
     debug={false}
-    display="auto"
+    display="block"
     overflowX="visible"
     overflowY="visible"
     padding="small"
@@ -15,63 +15,36 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(Link__cIcZl): Object {
-            "color": "#68777D",
+          Symbol(Button__eHiXd): Object {
+            "fontWeight": "700",
+            "linkColor": "#68777D",
           },
         }
       }
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="www.example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        icon={[Function]}
+        margin="0"
+        size="medium"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
-        <Flex
-          alignItems="center"
-          as="span"
-          direction="row"
-          inline={false}
-          justifyItems="start"
-          visualDebug={false}
-          wrapItems={false}
-        >
-          <FlexItem
-            as="span"
-            grow={false}
-            padding="0 0 0 small"
-            shrink={false}
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="medium"
-            >
-              <IconAssignment />
-            </Text>
-          </FlexItem>
-          <FlexItem
-            as="span"
-            grow={false}
-            padding="0 x-small"
-            shrink={false}
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="medium"
-              weight="bold"
-            >
-              example
-               (
-              Not yet assessed
-              )
-            </Text>
-          </FlexItem>
-        </Flex>
-      </Link>
+        example
+         (
+        Not yet assessed
+        )
+      </Button>
     </ApplyTheme>
   </View>
 </ListItem>

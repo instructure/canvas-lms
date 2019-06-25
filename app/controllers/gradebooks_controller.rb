@@ -128,7 +128,8 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency
+      outcome_proficiency: outcome_proficiency,
+      post_policies_enabled: @context.post_policies_enabled?
     }
 
     if @context.feature_enabled?(:final_grades_override)
@@ -324,7 +325,6 @@ class GradebooksController < ApplicationController
     last_exported_attachment = @last_exported_gradebook_csv.try(:attachment)
     grading_standard = @context.grading_standard_or_default
     {
-      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards),
       GRADEBOOK_OPTIONS: {
         api_max_per_page: per_page,
         chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
@@ -422,6 +422,7 @@ class GradebooksController < ApplicationController
   end
 
   def set_gradebook_env
+    set_student_context_cards_js_env
     env = old_gradebook_env
 
     if new_gradebook_enabled?
@@ -681,7 +682,7 @@ class GradebooksController < ApplicationController
 
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
-          env[:post_policies_enabled] = true if @context.feature_enabled?(:post_policies)
+          env[:post_policies_enabled] = true if @context.post_policies_enabled?
           env[:selected_student_group_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'student_group_id')
         end
 
@@ -853,9 +854,9 @@ class GradebooksController < ApplicationController
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
-      post_policies_enabled: @context.feature_enabled?(:post_policies)
+      post_policies_enabled: @context.post_policies_enabled?
     }
-    new_gradebook_options[:post_manually] = @context.post_manually? if @context.feature_enabled?(:post_policies)
+    new_gradebook_options[:post_manually] = @context.post_manually? if @context.post_policies_enabled?
 
     {GRADEBOOK_OPTIONS: new_gradebook_options}
   end

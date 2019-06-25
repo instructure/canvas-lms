@@ -18,6 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/results_controller"
 
 describe Lti::Ims::ResultsController do
@@ -55,6 +56,7 @@ describe Lti::Ims::ResultsController do
     end
 
     it_behaves_like 'advantage services'
+    it_behaves_like 'lti services'
 
     it 'returns a collection of results' do
       send_request
@@ -136,6 +138,7 @@ describe Lti::Ims::ResultsController do
     let(:action) { :show }
 
     it_behaves_like 'advantage services'
+    it_behaves_like 'lti services'
 
     it 'returns the result' do
       send_request

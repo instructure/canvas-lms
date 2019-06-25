@@ -17,6 +17,7 @@
 
 import I18n from 'i18n!turnitin'
 import {max, invert} from 'underscore'
+import originalityReportSubmissionKey from 'jsx/gradebook/shared/helpers/originalityReportSubmissionKey'
 
 export extractDataTurnitin = (submission) ->
   plagData = submission?.turnitin_data
@@ -31,7 +32,7 @@ export extractDataTurnitin = (submission) ->
       if turnitin = plagData?['attachment_' + attachment.id]
         data.items.push turnitin
   else if submission.submission_type is "online_text_entry"
-    if turnitin = plagData?['submission_' + submission.id]
+    if turnitin = (plagData?[originalityReportSubmissionKey(submission)] || plagData?['submission_' + submission.id])
       data.items.push turnitin
 
   return unless data.items.length
@@ -53,7 +54,8 @@ export extractDataForTurnitin = (submission, key, urlPrefix) ->
   return {} unless data and data[key] and (data[key].similarity_score? or data[key].status == 'pending')
   data = data[key]
   data.state = "#{data.state || 'no'}_score"
-  data.score = if data.similarity_score then "#{data.similarity_score}%" else ""
+  if data.similarity_score || data.similarity_score == 0
+    data.score = "#{data.similarity_score}%"
   data.reportUrl = "#{urlPrefix}/assignments/#{submission.assignment_id}/submissions/#{submission.user_id}/#{type}/#{key}"
   data.tooltip = I18n.t('tooltip.score', 'Similarity Score - See detailed report')
   data

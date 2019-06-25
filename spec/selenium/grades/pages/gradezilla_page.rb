@@ -156,7 +156,7 @@ module Gradezilla
   end
 
   def self.total_cell_mute_icon
-    f('.total-cell .icon-muted')
+    f('.total-cell .icon-off')
   end
 
   def self.total_cell_warning_icon

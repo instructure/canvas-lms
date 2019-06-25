@@ -547,6 +547,7 @@ describe ExternalToolsController, type: :request do
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
+    et.student_context_card = {:url=>"http://www.example.com/ims/lti/resource", :text => "context card link", display_type: 'full_width', visibility: 'admins'}
     if context.is_a? Course
       et.course_assignments_menu = { url: 'http://www.example.com/ims/lti/resource', text: 'course assignments menu' }
     end
@@ -731,6 +732,14 @@ describe ExternalToolsController, type: :request do
      "wiki_page_menu"=>
          {"text"=>"wiki page menu",
           "label"=>"wiki page menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+      "student_context_card"=>
+        {"text"=>"context card link",
+          "label"=>"context card link",
           "url"=>"http://www.example.com/ims/lti/resource",
           "visibility"=>'admins',
           "display_type"=>'full_width',

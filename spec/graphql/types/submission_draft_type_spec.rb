@@ -34,9 +34,6 @@ RSpec.describe Types::SubmissionDraftType do
         assignment(id: "#{@assignment.id}") {
           submissionsConnection(filter: {states: [unsubmitted, graded, pending_review, submitted]}) {
             nodes {
-              _id
-              attempt
-              state
               submissionDraft {
                 _id
                 attachments {
@@ -44,9 +41,6 @@ RSpec.describe Types::SubmissionDraftType do
                   displayName
                 }
                 submissionAttempt
-                submission {
-                  _id
-                }
               }
             }
           }
@@ -62,24 +56,9 @@ RSpec.describe Types::SubmissionDraftType do
     ).first['submissionDraft']
   end
 
-  it 'returns the associated submission' do
-    submission_draft = resolve_submission_draft
-    expect(submission_draft['submission']['_id']).to eq(@submission.id.to_s)
-  end
-
   it 'returns the submission attempt' do
     submission_draft = resolve_submission_draft
     expect(submission_draft['submissionAttempt']).to eq(@submission.attempt)
-  end
-
-  context 'the submission attempt is nil' do
-    it 'returns the draft for attempt 0' do
-      @submission.attempt = nil
-      @submission_draft.submission_attempt = 0
-
-      submission_draft = resolve_submission_draft
-      expect(submission_draft['submission']['_id']).to eq(@submission.id.to_s)
-    end
   end
 
   it 'returns the draft attachments' do

@@ -23,7 +23,6 @@ import ImageOptionsTray from '..'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
 
 describe('RCE "Images" Plugin > ImageOptionsTray', () => {
-  let component
   let props
   let tray
 

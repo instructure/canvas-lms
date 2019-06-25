@@ -580,7 +580,7 @@ class OutcomeResultsController < ApplicationController
   def users_for_outcome_context
     # this only works for courses; when other context types are added, this will
     # need to treat them differently.
-    apply_sort_order(@context.all_students)
+    apply_sort_order(@context.all_students).select("users.*, #{User.sortable_name_order_by_clause('users')}").distinct
   end
 
   def apply_sort_order(relation)

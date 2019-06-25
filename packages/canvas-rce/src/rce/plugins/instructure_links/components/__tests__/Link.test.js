@@ -45,8 +45,8 @@ describe('RCE "Links" Plugin > Link', () => {
       {type: 'modules', icon: 'IconModule'},
       {type: 'quizzes', icon: 'IconQuiz'},
       {type: 'announcements', icon: 'IconAnnouncement'},
-      {type: 'wikiPages', icon: 'IconQuestion'},
-      {type: 'navigation', icon: 'IconQuestion'},
+      {type: 'wikiPages', icon: 'IconDocument'},
+      {type: 'navigation', icon: 'IconBlank'},
     ]
 
     linkTypes.forEach(lt => {
@@ -57,12 +57,12 @@ describe('RCE "Links" Plugin > Link', () => {
           published: true
         }
         const {container, getByText} = renderComponent({type: lt.type, link})
-        
+
         expect(getByText(link.title)).toBeInTheDocument()
         expect(queryIconByName(container, 'IconPublish')).toBeInTheDocument()
         expect(queryIconByName(container, lt.icon)).toBeInTheDocument()
       })
-    
+
       it(`renders unpublished ${lt.type}`, () => {
         const link = {
           href: 'the_url',
@@ -70,7 +70,7 @@ describe('RCE "Links" Plugin > Link', () => {
           published: false
         }
         const {container, getByText} = renderComponent({type: lt.type, link})
-        
+
         expect(getByText(link.title)).toBeInTheDocument()
         expect(queryIconByName(container, 'IconUnpublished')).toBeInTheDocument()
         expect(queryIconByName(container, lt.icon)).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('RCE "Links" Plugin > Link', () => {
   describe('date variant', () => {
     const value = '2019-04-24T13:00:00Z'
     const formattedValue = formatMessage.date(Date.parse(value), 'long')
-  
+
     it('renders muliple due dates', () => {
       const link = {
         href: 'the_url',
@@ -173,13 +173,41 @@ describe('RCE "Links" Plugin > Link', () => {
       btn.click()
       expect(onClick).toHaveBeenCalled()
     })
-  })
 
-  it('only shows drag handle on hover', () => {
-    const {container, getByTestId} = renderComponent()
+    it('calls onClick on <Enter>', () => {
+      const onClick = jest.fn()
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true
+      }
+      const {getByText} = renderComponent({link, onClick})
 
-    expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
-    fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
-    expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
+      const btn = getByText(link.title)
+      fireEvent.keyDown(btn, {keyCode: 13})
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('calls onClick on <Space>', () => {
+      const onClick = jest.fn()
+      const link = {
+        href: 'the_url',
+        title: 'object title',
+        published: true
+      }
+      const {getByText} = renderComponent({link, onClick})
+
+      const btn = getByText(link.title)
+      fireEvent.keyDown(btn, {keyCode: 32})
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('only shows drag handle on hover', () => {
+      const {container, getByTestId} = renderComponent()
+
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
+      fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
+    })
   })
 })

@@ -28,6 +28,7 @@ import {number} from 'prop-types'
 import React from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import StepContainer from './StepContainer'
+import StudentViewContext from './Context'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 
 class Header extends React.Component {
@@ -71,6 +72,34 @@ class Header extends React.Component {
     )
   }
 
+  /* eslint-disable jsx-a11y/anchor-is-valid */
+  renderFakeMostRecent = () => {
+    // This field is only for use in the InstructureCon demo and will be replaced;
+    // <a> tags without href elements are inaccessible by keyboard and should not normally
+    // be used, this is a quick and dirty measure that will not persist to consumer use.
+    return (
+      <FlexItem as="div" align="end" textAlign="end">
+        Calculated by: <a>Most Recent</a>
+      </FlexItem>
+    )
+  }
+  /* eslint-enable jsx-a11y/anchor-is-valid */
+
+  renderLatestGrade = () => (
+    <StudentViewContext.Consumer>
+      {context => {
+        const {latestSubmission} = context
+        return (
+          <GradeDisplay
+            gradingType={this.props.assignment.gradingType}
+            receivedGrade={latestSubmission ? latestSubmission.grade : null}
+            pointsPossible={this.props.assignment.pointsPossible}
+          />
+        )
+      }}
+    </StudentViewContext.Consumer>
+  )
+
   render() {
     return (
       <React.Fragment>
@@ -100,17 +129,15 @@ class Header extends React.Component {
               <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
             </FlexItem>
             <FlexItem grow align="start">
-              <GradeDisplay
-                gradingType={this.props.assignment.gradingType}
-                receivedGrade={this.props.submission ? this.props.submission.grade : null}
-                pointsPossible={this.props.assignment.pointsPossible}
-              />
+              {this.renderLatestGrade()}
+              {this.renderFakeMostRecent()}
               {this.props.submission && (
                 <FlexItem as="div" align="end" textAlign="end">
                   <Flex direction="column">
                     {this.isSubmissionLate() && (
                       <FlexItem grow>
                         <LatePolicyStatusDisplay
+                          attempt={this.props.submission.attempt}
                           gradingType={this.props.assignment.gradingType}
                           pointsPossible={this.props.assignment.pointsPossible}
                           originalGrade={this.props.submission.enteredGrade}
@@ -129,7 +156,9 @@ class Header extends React.Component {
               )}
             </FlexItem>
           </Flex>
-          {!this.state.isSticky && <Attempt assignment={this.props.assignment} />}
+          {!this.state.isSticky && (
+            <Attempt assignment={this.props.assignment} submission={this.props.submission} />
+          )}
           <div className="assignment-pizza-header-outer">
             <div
               className="assignment-pizza-header-inner"

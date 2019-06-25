@@ -23,6 +23,7 @@ import files from "./files";
 import folders from "./folders";
 import rootFolderId from "./rootFolderId";
 import imagesReducer from "./images";
+import documentsReducer from "./documents";
 import upload from "./upload";
 import flickrReducer from "./flickr";
 import session from "./session";
@@ -42,6 +43,7 @@ export default combineReducers({
   folders,
   rootFolderId,
   images: imagesReducer,
+  documents: documentsReducer,
   upload,
   flickr: flickrReducer,
   session,

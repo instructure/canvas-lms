@@ -25,8 +25,17 @@ import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
 function getSubmission(student, assignmentId) {
-  const submission = student[`assignment_${assignmentId}`] || {posted_at: null}
-  return {postedAt: submission.posted_at}
+  const submission = student[`assignment_${assignmentId}`] || {
+    posted_at: null,
+    score: null,
+    workflow_state: null
+  }
+
+  return {
+    postedAt: submission.posted_at,
+    score: submission.score,
+    workflowState: submission.workflow_state
+  }
 }
 
 export default class PostPolicies {
@@ -68,15 +77,20 @@ export default class PostPolicies {
   }
 
   _onGradesPostedOrHidden({assignmentId, postedAt, userIds}) {
-    const columnId = this._gradebook.getAssignmentColumnId(assignmentId)
+    const assignment = this._gradebook.getAssignment(assignmentId)
+    const parsedPostedAt = tz.parse(postedAt)
 
     userIds.forEach(userId => {
       const submission = this._gradebook.getSubmission(userId, assignmentId)
-      submission.posted_at = tz.parse(postedAt)
+      submission.posted_at = parsedPostedAt
       this._gradebook.updateSubmission(submission)
     })
 
-    this._gradebook.updateColumnHeaders([columnId])
+    if (assignment.anonymous_grading) {
+      assignment.anonymize_students = !postedAt
+    }
+
+    this._gradebook.handleSubmissionPostedChange(assignment)
   }
 
   _onAssignmentPostPolicyUpdated({assignmentId, postManually}) {
@@ -122,7 +136,7 @@ export default class PostPolicies {
     })
   }
 
-  showPostAssignmentGradesTray({assignmentId, onExited}) {
+  showPostAssignmentGradesTray({assignmentId, onExited = () => {}}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
@@ -138,10 +152,21 @@ export default class PostPolicies {
         id,
         name
       },
-      onExited,
+      onExited: () => {
+        this._gradebook.postAssignmentGradesTrayOpenChanged({
+          assignmentId: assignment.id,
+          isOpen: false
+        })
+        onExited()
+      },
       sections,
       submissions,
       onPosted: this._onGradesPostedOrHidden
+    })
+
+    this._gradebook.postAssignmentGradesTrayOpenChanged({
+      assignmentId: assignment.id,
+      isOpen: true
     })
   }
 
@@ -149,7 +174,20 @@ export default class PostPolicies {
     return this._coursePostPolicy
   }
 
-  setCoursePostPolicy(policy) {
-    this._coursePostPolicy = policy
+  setCoursePostPolicy({postManually}) {
+    this._coursePostPolicy = {postManually}
+  }
+
+  setAssignmentPostPolicies({assignmentPostPoliciesById}) {
+    Object.entries(assignmentPostPoliciesById).forEach(([id, postPolicy]) => {
+      const assignment = this._gradebook.getAssignment(id)
+      if (assignment != null) {
+        assignment.post_manually = postPolicy.postManually
+      }
+    })
+
+    // The changed assignments may not all be visible, so update all column
+    // headers rather than worrying about which ones are or aren't shown
+    this._gradebook.updateColumnHeaders()
   }
 }

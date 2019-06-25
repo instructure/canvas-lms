@@ -58,7 +58,8 @@ describe Mutations::HideAssignmentGradesForSections do
   end
 
   before(:each) do
-    course.enable_feature!(:post_policies)
+    course.enable_feature!(:new_gradebook)
+    PostPolicy.enable_feature!
     @section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
     @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
   end
@@ -67,7 +68,7 @@ describe Mutations::HideAssignmentGradesForSections do
     let(:context) { { current_user: teacher } }
 
     it "requires that the PostPolicy feature be enabled" do
-      course.disable_feature!(:post_policies)
+      PostPolicy.disable_feature!
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
       expect(result.dig("errors", 0, "message")).to eql "Post Policies feature not enabled"
     end

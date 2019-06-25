@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 
 import TrayController, {CONTAINER_ID} from '../TrayController'
-import FakeEditor from './FakeEditor'
+import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
 
 describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {

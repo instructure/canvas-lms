@@ -48,6 +48,8 @@ module Api::V1::DeveloperKey
         hash['access_token_count'] = key.access_token_count
         hash['last_used_at'] = key.last_used_at
         hash['vendor_code'] = key.vendor_code
+        hash['public_jwk'] = key.public_jwk
+        hash['public_jwk_url'] = key.public_jwk_url
       end
 
       if account_binding.present?
@@ -59,7 +61,7 @@ module Api::V1::DeveloperKey
         hash['visible'] = key.visible
       end
       hash['tool_configuration'] = key.tool_configuration&.configuration if include_tool_config
-      hash['is_lti_key'] = key.public_jwk.present?
+      hash['is_lti_key'] = (key.is_lti_key.nil? ? key.public_jwk.present? : key.is_lti_key)
       hash['id'] = key.global_id
     end
   end

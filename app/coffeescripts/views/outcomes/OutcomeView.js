@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!OutcomeView'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import $ from 'jquery'
 import _ from 'underscore'

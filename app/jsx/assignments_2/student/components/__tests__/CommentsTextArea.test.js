@@ -27,8 +27,8 @@ import {fireEvent, render, waitForElement} from 'react-testing-library'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 
-import CommentTextArea from '../Comments/CommentTextArea'
-import Comments from '../Comments'
+import CommentTextArea from '../CommentsTab/CommentTextArea'
+import CommentsTab from '../CommentsTab'
 import * as uploadFileModule from '../../../../shared/upload_file'
 
 describe('CommentTextArea', () => {
@@ -229,7 +229,7 @@ describe('CommentTextArea', () => {
     const basicMock = commentGraphqlMock(mockedComments)
     const {container, getByPlaceholderText, getByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -262,7 +262,7 @@ describe('CommentTextArea', () => {
     const basicMock = commentGraphqlMock(mockedComments)
     const {getByPlaceholderText, getByText, queryAllByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -287,7 +287,7 @@ describe('CommentTextArea', () => {
 
     const {container, getByPlaceholderText, getByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={errorMock} addTypename>
-        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -319,7 +319,7 @@ describe('CommentTextArea', () => {
     const basicMock = commentGraphqlMock(mockedComments)
     const {container, getByPlaceholderText, getByText, queryAllByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
-        <Comments assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))

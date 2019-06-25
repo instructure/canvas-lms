@@ -264,7 +264,7 @@ class GroupsController < ApplicationController
         @group_user_type = "student"
         @allow_self_signup = true
         if @context.grants_right? @current_user, session, :read_as_admin
-          js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+          set_student_context_cards_js_env
         end
       end
 

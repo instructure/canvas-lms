@@ -20,11 +20,16 @@
   import _ from 'underscore'
 
   const imageSearchHandlers = {
+    UPDATE_SEARCH_TERM (state, action) {
+      state.searchTerm = action.term;
+      state.alert = null;
+      return state;
+    },
     START_IMAGE_SEARCH (state, action) {
       state.searching = true;
-      state.searchTerm = action.term;
       state.prevUrl = null;
-      state.nextUrl= null;
+      state.nextUrl = null;
+      state.pageDirection = null;
       return state;
     },
     RECEIVE_IMAGE_SEARCH_RESULTS (state, action) {
@@ -32,19 +37,25 @@
       state.prevUrl = action.results.prevUrl
       state.nextUrl = action.results.nextUrl
       state.searching = false;
+      state.alert = 'success';
+      state.pageDirection = action.pageDirection;
       return state;
     },
     CLEAR_IMAGE_SEARCH (state) {
       state.searchResults = [];
       state.searching = false;
       state.prevUrl = null;
-      state.nextUrl= null;
+      state.nextUrl = null;
       state.searchTerm = '';
+      state.alert = null;
+      state.pageDirection = null;
       return state;
     },
-    FAIL_IMAGE_SEARCH (state) {
+    FAIL_IMAGE_SEARCH (state, action) {
       state.searchResults = [];
       state.searching = false;
+      state.alert = 'failure';
+      state.pageDirection = action.pageDirection;
       return state;
     }
   };

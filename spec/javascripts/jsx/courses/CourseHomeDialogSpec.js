@@ -109,7 +109,7 @@ test('calls onRequestClose when cancel is clicked', () => {
       onRequestClose={onRequestClose}
     />
   )
-  const cancelBtn = dialog.find('Button').first()
+  const cancelBtn = dialog.find('Button').at(1)
   equal(cancelBtn.props().children, 'Cancel')
   cancelBtn.simulate('click')
   ok(onRequestClose.called)

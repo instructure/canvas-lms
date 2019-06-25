@@ -55,13 +55,21 @@ module Interfaces::SubmissionInterface
   end
 
   field :comments_connection, Types::SubmissionCommentType.connection_type, null: true do
-    argument :filter, Types::SubmissionCommentFilterInputType, required: false
+    argument :filter, Types::SubmissionCommentFilterInputType, required: false, default_value: {}
   end
-  def comments_connection(filter: nil)
-    filter ||= {}
+  def comments_connection(filter:)
+    filter = filter.to_h
+    all_comments, for_attempt = filter.values_at(:all_comments, :for_attempt)
+
     load_association(:assignment).then do
       scope = submission.comments_for(current_user).published
-      scope = scope.where(attempt: submission.attempt || 0) unless filter[:all_comments]
+      unless all_comments
+        target_attempt = for_attempt || submission.attempt || 0
+        if target_attempt <= 1
+          target_attempt = [nil, 0, 1] # Submission 0 and 1 share comments
+        end
+        scope = scope.where(attempt: target_attempt)
+      end
       scope
     end
   end
@@ -119,4 +127,17 @@ module Interfaces::SubmissionInterface
 
   field :grading_status, String, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
+
+  field :attachments, [Types::FileType], null: true
+  def attachments
+    Loaders::IDLoader.for(Attachment).load_many(object.attachment_ids_for_version)
+  end
+
+  field :submission_draft, Types::SubmissionDraftType, null: true
+  def submission_draft
+    load_association(:submission_drafts).then do |drafts|
+      # Submission.attempt can be in either 0 or nil which mean the same thing
+      drafts.select { |draft| draft.submission_attempt == (object.attempt || 0) }.first
+    end
+  end
 end

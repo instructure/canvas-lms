@@ -118,9 +118,19 @@ module SIS
 
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
           pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
+          pseudo_by_integration = nil
+          pseudo_by_integration = @root_account.pseudonyms.where(integration_id: user_row.integration_id.to_s).take if user_row.integration_id.present?
+          status_is_active = !(user_row.status =~ /\Adeleted/i)
           pseudo ||= pseudo_by_login
 
-          status_is_active = !(user_row.status =~ /\Adeleted/i)
+          if pseudo_by_integration && status_is_active && pseudo_by_integration != pseudo
+            id_message = pseudo_by_integration.sis_user_id ? 'SIS ID' : 'Canvas ID'
+            user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
+            message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
+            next
+          end
+
           if pseudo
             if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
               message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
@@ -147,10 +157,15 @@ module SIS
               user.short_name = user_row.short_name if user_row.short_name.present?
             end
           else
-            user = User.new
-            user.name = infer_user_name(user_row)
-            user.sortable_name = infer_sortable_name(user_row)
-            user.short_name = user_row.short_name if user_row.short_name.present?
+            user = nil
+            pseudo = Pseudonym.new
+            user = other_user(user_row, pseudo) if user_row.integration_id.present?
+            unless user
+              user = User.new
+              user.name = infer_user_name(user_row)
+              user.sortable_name = infer_sortable_name(user_row)
+              user.short_name = user_row.short_name if user_row.short_name.present?
+            end
           end
 
           # we just leave all users registered now
@@ -174,7 +189,6 @@ module SIS
             should_update_account_associations = remove_enrollments_if_last_login(user, user_row.user_id)
           end
 
-          pseudo ||= Pseudonym.new
           pseudo.unique_id = user_row.login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
           if user_row.authentication_provider_id.present?
             unless @authentication_providers.key?(user_row.authentication_provider_id)
@@ -194,15 +208,6 @@ module SIS
             pseudo.authentication_provider = nil
           end
           pseudo.sis_user_id = user_row.user_id
-          pseudo_by_integration = nil
-          pseudo_by_integration = @root_account.pseudonyms.where(integration_id: user_row.integration_id.to_s).take if user_row.integration_id.present?
-          if pseudo_by_integration && status_is_active && pseudo_by_integration != pseudo
-            id_message = pseudo_by_integration.sis_user_id ? 'SIS ID' : 'Canvas ID'
-            user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
-            message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
-            next
-          end
           pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
           pseudo.account = @root_account
           pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
@@ -361,6 +366,8 @@ module SIS
           @success_count += 1
         end
       end
+
+      def other_user(_user_row, _pseudo); end
 
       def maybe_write_roll_back_data
         if @roll_back_data.count > 1000

@@ -134,6 +134,9 @@
   "folder_705fd2d7": {
     "message": "תיקיה"
   },
+  "generating_preview_45b53be0": {
+    "message": "מכין תצוגה מקדימה..."
+  },
   "grades_a61eba0a": {
     "message": "הערכות"
   },
@@ -155,9 +158,6 @@
   "image_upload_form_7b74079a": {
     "message": "טופס להעלאת תמונה"
   },
-  "image_url_2aee2734": {
-    "message": "כתובת התמונה"
-  },
   "images_7ce26570": {
     "message": "תמונות"
   },
@@ -175,6 +175,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "סוג קובץ לא חוקי"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "קיצורי מקלדת"
   },
   "link_7262adec": {
     "message": "קישור"
@@ -211,6 +214,9 @@
   },
   "no_results_940393cf": {
     "message": "אין תוצאות"
+  },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "פתיחת חלון דיאלוג של מקשי קיצור"
   },
   "options_3ab0ea65": {
     "message": "אפשרויות"

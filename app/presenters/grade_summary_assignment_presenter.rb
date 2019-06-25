@@ -53,7 +53,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def posted_to_student?
-    assignment.course&.feature_enabled?(:post_policies) ? submission.posted? : !assignment.muted?
+    assignment.course&.post_policies_enabled? ? submission.posted? : !assignment.muted?
   end
 
   def graded?
@@ -202,6 +202,7 @@ class GradeSummaryAssignmentPresenter
       plag_data = submission.originality_data
     end
     t = if is_text_entry?
+          plag_data[OriginalityReport.submission_asset_key(submission)] ||
           plag_data[submission.asset_string]
         elsif is_online_upload? && file
           plag_data[file.asset_string]

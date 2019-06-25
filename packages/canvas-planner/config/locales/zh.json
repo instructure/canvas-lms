@@ -279,10 +279,10 @@
     "message": "页面"
   },
   "peer_review_74f26a13": {
-    "message": "同侪审阅"
+    "message": "同伴互评"
   },
   "peer_review_for_itemtitle_358cb413": {
-    "message": "{ itemTitle }同行评审"
+    "message": "{ itemTitle }同伴互评"
   },
   "points_bceb5005": {
     "message": "分值"

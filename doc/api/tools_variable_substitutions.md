@@ -882,6 +882,15 @@ Returns a comma separated list of section_id's that the user is enrolled in.
 ```
 42, 43
 ```
+## Canvas.course.sectionRestricted
+Returns true if the user can only view and interact with users in their own sections.
+
+**Availability**: *when launched from a course*  
+
+
+```
+true
+```
 ## Canvas.course.sectionSisSourceIds
 Returns a comma separated list of section sis_id's that the user is enrolled in.
 

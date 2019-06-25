@@ -828,6 +828,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'available'
         end
 
+        it 'has substitution for $Canvas.course.hideDistributionGraphs' do
+          course.hide_distribution_graphs = true
+          exp_hash = {test: '$Canvas.course.hideDistributionGraphs'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
         it 'has substitution for $CourseSection.sourcedId' do
           course.sis_source_id = 'course1'
           exp_hash = {test: '$CourseSection.sourcedId'}
@@ -980,6 +987,14 @@ module Lti
           exp_hash = {test: '$Canvas.course.sectionIds'}
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '5,6'
+        end
+
+        it 'has substitution for $Canvas.course.sectionRestricted' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:section_restricted).and_return(true)
+          exp_hash = {test: '$Canvas.course.sectionRestricted'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
         end
 
         it 'has substitution for $Canvas.course.sectionSisSourceIds' do
@@ -1574,6 +1589,24 @@ module Lti
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'url'
         end
+      end
+
+      it 'has substitution for $Canvas.membership.permissions' do
+        course_with_student(:active_all => true)
+        exp_hash = {test: '$Canvas.membership.permissions<moderate_forum,read_forum,create_forum>'}
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+
+        expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "read_forum,create_forum"
+      end
+
+      it 'substitutes $Canvas.membership.permissions inside substring' do
+        course_with_student(:active_all => true)
+        exp_hash = {test: 'string stuff: ${Canvas.membership.permissions<moderate_forum,create_forum,read_forum>}'}
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+
+        expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "string stuff: create_forum,read_forum"
       end
     end
   end

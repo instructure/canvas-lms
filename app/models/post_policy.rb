@@ -23,6 +23,22 @@ class PostPolicy < ActiveRecord::Base
 
   before_validation :set_course_from_assignment
 
+  # These methods allow callers to check whether Post Policies is enabled
+  # without needing to reference the specific setting every time. Note that, in
+  # addition to the setting, a course must also have New Gradebook enabled to
+  # have post policies be active.
+  def self.feature_enabled?
+    Setting.get("post_policies_enabled", false) == "true"
+  end
+
+  def self.enable_feature!
+    Setting.set("post_policies_enabled", true)
+  end
+
+  def self.disable_feature!
+    Setting.set("post_policies_enabled", false)
+  end
+
   private
   def set_course_from_assignment
     self.course_id = assignment.context_id if assignment.present? && course.blank?

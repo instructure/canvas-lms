@@ -139,10 +139,7 @@ describe "speed grader submissions" do
       submission2 = student_submission(username: "student2@example.com", body:'second student')
       student_3
 
-      submission1.submitted_at = 10.minutes.from_now
-      submission1.body = 'first student, second version'
-      submission1.with_versioning(explicit: true) { submission1.save }
-
+      update_submission(submission1, 'first student, second version')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
@@ -183,6 +180,31 @@ describe "speed grader submissions" do
       wait_for_ajaximations
 
       expect(f('#this_student_does_not_have_a_submission')).to be_displayed
+    end
+
+    it "can start on a specific submission attempt" do
+      submission1 = student_submission(username: "student1@example.com", body: 'first student, first version')
+      submission2 = student_submission(username: "student2@example.com", body: 'second student, first version')
+
+      update_submission(submission1, 'first student, second version')
+      update_submission(submission2, 'second student, second version')
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{submission1.user.id}&attempt=1"
+      wait_for_ajaximations
+
+      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+        wait_for_ajaximations
+        expect(f('#content')).to include_text('first student, first version')
+      end
+      expect(f('#submission_not_newest_notice')).to be_displayed
+
+      f(%Q{#students_selectmenu option[value="#{submission2.user.id}"]}).click
+
+      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+        wait_for_ajaximations
+        expect(f('#content')).to include_text('second student, second version')
+      end
+      expect(f('#submission_not_newest_notice')).not_to be_displayed
     end
 
     it "should leave the full rubric open when switching submissions", priority: "1", test_id: 283501 do

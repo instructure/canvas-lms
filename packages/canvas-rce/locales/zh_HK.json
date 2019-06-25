@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "可訪問性檢查器"
+  },
   "add_8523c19b": {
     "message": "添加"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "字母"
   },
+  "alt_text_611fb322": {
+    "message": "替代文字"
+  },
   "alternative_text_a834dcad": {
     "message": "替代文字："
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "影像仍在上傳中，如果您繼續將無法正確嵌入影像。"
   },
   "announcement_list_da155734": {
     "message": "公告清單"
@@ -30,7 +39,7 @@
     "message": "通告"
   },
   "assignments_1e02582c": {
-    "message": "任務"
+    "message": "作業"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -67,9 +76,6 @@
   },
   "circle_unordered_list_9e3a0763": {
     "message": "圓形無序清單"
-  },
-  "clear_upload_34efa419": {
-    "message": "清除上傳"
   },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "按一下任何文檔，以向該文檔中插入一個下載連結。"
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "版權持有人："
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 個字}\n    one {1 個字}\n  other {# 個字}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# 個項目已載入}\n  other {# 個項目已載入}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "課程文件"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "創意共享授權："
+  },
+  "current_volume_level_c55ab825": {
+    "message": "目前音量"
+  },
+  "custom_6979cd81": {
+    "message": "自訂"
   },
   "date_added_ed5ad465": {
     "message": "添加的日期"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "預設數字有序清單"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "（描述影像）"
+  },
   "discussions_a5f96392": {
     "message": "討論"
   },
   "discussions_index_6c36ced": {
     "message": "討論索引"
   },
+  "display_options_315aba85": {
+    "message": "顯示選項"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "顯示文字連結（在新標籤中開啟）"
+  },
   "documents_81393201": {
     "message": "文件"
+  },
+  "done_54e3d4b6": {
+    "message": "已完成"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "拖放或按一下以瀏覽您的電腦"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "截止日期：{ when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "編輯連結"
+  },
+  "embed_image_1080badc": {
+    "message": "嵌入影像"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "輸入搜索字詞"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "輸入此圖像的替代文字"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "上傳錄製的影片/音訊時發生錯誤"
   },
   "expand_to_see_types_f5d29352": {
     "message": "展開以查看 { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "外部連結"
   },
+  "file_name_8fd421ff": {
+    "message": "檔案名稱"
+  },
   "file_upload_form_4aaad554": {
     "message": "文檔上傳表單"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } 預覽"
   },
   "files_c300e900": {
     "message": "文檔"
   },
   "files_index_af7c662b": {
     "message": "文檔索引"
+  },
+  "finish_bc343002": {
+    "message": "完成"
   },
   "folder_705fd2d7": {
     "message": "文件夾"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "如果您現在不選擇使用權，那麼該文檔在其上傳之後將會撤銷發佈。"
   },
+  "image_options_5412d02c": {
+    "message": "影像選項"
+  },
+  "image_options_tray_90a46006": {
+    "message": "影像選項收集箱"
+  },
   "image_upload_form_7b74079a": {
     "message": "影像上傳表單"
-  },
-  "image_url_2aee2734": {
-    "message": "影像 URL"
   },
   "images_7ce26570": {
     "message": "影像"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "無效的檔案類型"
   },
+  "large_9c5e80e7": {
+    "message": "大"
+  },
   "link_7262adec": {
     "message": "連結"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "連結"
+  },
+  "load_more_35d33c7": {
+    "message": "載入更多"
   },
   "load_more_results_460f49a9": {
     "message": "載入更多結果"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "載入資料夾中..."
   },
+  "loading_media_f3455841": {
+    "message": "正在載入媒體"
+  },
   "media_af190855": {
     "message": "媒體"
+  },
+  "medium_5a8e9ead": {
+    "message": "中"
+  },
+  "mic_a7f3d311": {
+    "message": "麥克風"
   },
   "modules_c4325335": {
     "message": "單元"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "無替代文字（裝飾影像）"
+  },
   "no_results_940393cf": {
     "message": "無結果。"
+  },
+  "no_video_1ed00b26": {
+    "message": "沒有影片"
   },
   "options_3ab0ea65": {
     "message": "選項"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "段落"
   },
+  "pause_12af3bb4": {
+    "message": "暫停"
+  },
   "people_b4ebb13c": {
     "message": "人員"
+  },
+  "play_1a47eaa7": {
+    "message": "播放"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
   },
   "posted_when_a578f5ab": {
     "message": "已公佈：{ when }"
   },
   "preformatted_d0670862": {
     "message": "預先格式化的"
+  },
+  "preview_a3f8f854": {
+    "message": "預覽"
   },
   "published_c944a23d": {
     "message": "已發佈"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "測驗"
   },
+  "record_7c9448b": {
+    "message": "錄製"
+  },
   "record_upload_media_5fdce166": {
     "message": "錄製/上載媒體"
+  },
+  "recording_98da6bda": {
+    "message": "錄製"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "移除連結"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "多種格式的內容編輯器"
+  },
+  "save_11a80ec3": {
+    "message": "儲存"
   },
   "search_280d00bd": {
     "message": "搜索"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "顯示影像選項"
   },
+  "size_b30e1077": {
+    "message": "大小"
+  },
+  "small_b070434a": {
+    "message": "小"
+  },
   "small_header_168fb9f9": {
     "message": "小標題"
   },
   "something_went_wrong_89195131": {
     "message": "似乎出問題了。"
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "存取麥克風或網路攝影機時出現問題。"
+  },
   "sort_by_e75f9e3e": {
     "message": "排序依據"
   },
   "square_unordered_list_b15ce93b": {
     "message": "方形無序清單"
+  },
+  "start_over_f7552aa9": {
+    "message": "重新開始"
+  },
+  "start_recording_9a65141a": {
+    "message": "開始錄製"
   },
   "subheader_2b87606d": {
     "message": "子標題"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "上標"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "切換到原始 html 編輯器"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "切換到多種格式的文字編輯器"
   },
   "syllabus_f191f65b": {
     "message": "課程大綱"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "未發佈"
   },
-  "unsplash_ee049fbf": {
-    "message": "取消開頭顯示"
+  "untitled_16aa4f2b": {
+    "message": "無標題"
   },
   "upload_8b403d05": {
     "message": "上傳"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "上載圖像"
   },
+  "upload_media_ce31135a": {
+    "message": "上傳媒體"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "上傳/錄製媒體"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "大寫字母有序清單"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "使用權："
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "由螢幕讀取器使用以描述影像的內容"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "已上慱錄製的影片/音訊　"
+  },
+  "video_player_b371005": {
+    "message": "影片播放器"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "檢視鍵盤快速鍵"
+  },
+  "webcam_fe91b20f": {
+    "message": "網路攝影機"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "您想將新頁面稱為什麼？"
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki 首頁"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "您的網路攝影機可能已在使用中。"
   }
 }

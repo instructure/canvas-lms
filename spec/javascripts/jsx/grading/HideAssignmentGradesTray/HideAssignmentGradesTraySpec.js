@@ -323,6 +323,14 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
         strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
       })
 
+      test('does not render an alert if the tray is launched from SpeedGrader and assignment is anonymous', async () => {
+        context.containerName = 'SPEED_GRADER'
+        context.assignment.anonymousGrading = true
+        await show()
+        await clickHide()
+        strictEqual(showFlashAlertStub.callCount, 0)
+      })
+
       test('tray is closed after hiding is finished', async () => {
         await clickHide()
         notOk(getTrayElement())

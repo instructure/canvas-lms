@@ -196,6 +196,14 @@ describe GradebooksController do
       expect(order).to eq :due_at
     end
 
+    it "includes the post_policies_enabled in the ENV" do
+      @course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
+      user_session(@teacher)
+      get :grade_summary, params: { course_id: @course.id, id: @student.id }
+      expect(assigns[:js_env][:post_policies_enabled]).to be true
+    end
+
     it "includes the current grading period id in the ENV" do
       group = @course.root_account.grading_period_groups.create!
       period = group.grading_periods.create!(title: "GP", start_date: 3.months.ago, end_date: 3.months.from_now)
@@ -915,7 +923,7 @@ describe GradebooksController do
 
       it "sets post_policies_enabled to true when Post Policies are enabled" do
         @course.enable_feature!(:new_gradebook)
-        @course.enable_feature!(:post_policies)
+        PostPolicy.enable_feature!
         get :show, params: { course_id: @course.id }
         expect(gradebook_options[:post_policies_enabled]).to be(true)
       end
@@ -936,7 +944,7 @@ describe GradebooksController do
       describe "post_policies_enabled" do
         it "is set to true if New Gradebook is enabled and post policies are enabled" do
           @course.enable_feature!(:new_gradebook)
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
 
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_policies_enabled]).to be true
@@ -958,16 +966,16 @@ describe GradebooksController do
       describe "post_manually" do
         it "is set to true if post policies are enabled and the course is manually-posted" do
           @course.enable_feature!(:new_gradebook)
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
 
-          @course.post_policies.create!(post_manually: true)
+          @course.default_post_policy.update!(post_manually: true)
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be true
         end
 
         it "is set to false if post policies are enabled and the course is not manually-posted" do
           @course.enable_feature!(:new_gradebook)
-          @course.enable_feature!(:post_policies)
+          PostPolicy.enable_feature!
 
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be false
@@ -1250,7 +1258,7 @@ describe GradebooksController do
 
       it "doesn't enable context cards when feature is off" do
         get :show, params: {course_id: @course.id}
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq false
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
 
       it "enables context cards when feature is on" do
@@ -2127,7 +2135,8 @@ describe GradebooksController do
         before(:each) { @course.enable_feature!(:new_gradebook) }
 
         it "is set to true if the Post Policies feature is enabled" do
-          @course.enable_feature!(:post_policies)
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
 
           get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
           expect(assigns[:js_env][:post_policies_enabled]).to be true

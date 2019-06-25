@@ -35,13 +35,6 @@ function fetcher (params) {
   ).then(({data}) => data)
 }
 
-const DEFAULT_QUERY = `{
-  allCourses {
-    _id,
-    name
-  }
-}`
-
 export default class GraphiQLApp extends React.Component {
   constructor(props) {
     super(props)
@@ -54,7 +47,6 @@ export default class GraphiQLApp extends React.Component {
 
     this.state = {
       schema: null,
-      query: DEFAULT_QUERY,
       explorerIsOpen: explorerPaneOpen
     }
   }

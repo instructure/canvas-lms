@@ -115,11 +115,21 @@ pipeline {
           sh '''
             git config user.name $GERRIT_EVENT_ACCOUNT_NAME
             git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
-            git rebase --preserve-merges origin/$GERRIT_BRANCH
-            rebase_exit_code="$?"
-            if [ $rebase_exit_code != 0 ]; then
+
+            # this helps current build issues where cleanup is needed before proceeding.
+            # however the later git rebase --abort should be enough once this has
+            # been on jenkins for long enough to hit all nodes, maybe a couple days?
+            if [ -d .git/rebase-merge ]; then
+              echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
+              git rebase --abort
+            fi
+
+            # store exit_status inline to  ensures the script doesn't exit here on failures
+            git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
+            if [ $exit_status != 0 ]; then
               echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
               git rebase --abort
+              exit $exit_status
             fi
           '''
         }

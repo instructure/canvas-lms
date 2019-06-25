@@ -26,7 +26,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
 import Modal, { ModalHeader, ModalBody } from '@instructure/ui-overlays/lib/components/Modal'
-import I18n from 'i18n!edit_rubric'
+import I18n from 'i18n!edit_rubricCriterion'
 
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import { assessmentShape, criterionShape } from './types'

@@ -53,6 +53,11 @@ module Lti::Ims
   #            "description": "URL of the line item this belongs to",
   #            "example": "http://institution.canvas.com/api/lti/courses/5/line_items/2",
   #            "type": "string"
+  #          },
+  #          "https://canvas.instructure.com/lti/submission_url": {
+  #            "description": "Canvas extension showing the submission url. Only shows if sent in the scores submission and assignment is setup to accept submission urls.",
+  #            "example": "http://institution.canvas.com/api/lti/courses/5/line_items/2",
+  #            "type": "string"
   #          }
   #       }
   #     }

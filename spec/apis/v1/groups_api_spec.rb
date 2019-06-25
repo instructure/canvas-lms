@@ -408,6 +408,17 @@ describe "Groups API", type: :request do
     expect(json['sis_group_id']).to eq 'gsis1'
   end
 
+  it "should validate sis id uniqueness on group creation" do
+    @account = Account.default
+    account_admin_user(account: @account)
+    project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
+    project_groups.groups.create!(:sis_source_id => "gsis1", :context => @account)
+    json = api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
+      @category_path_options.merge(action: :create,
+        group_category_id: 'sis_group_category_id:gcsis1',
+        sis_group_id: 'gsis1'), {}, {}, {expected_status: 400})
+  end
+
   it "should not allow a non-admin to create a group in a account" do
     @account = Account.default
     project_groups = @account.group_categories.build

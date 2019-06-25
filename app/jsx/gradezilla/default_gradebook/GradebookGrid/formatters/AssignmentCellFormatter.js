@@ -22,6 +22,7 @@ import I18n from 'i18n!gradezilla'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
+import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 
 function getTurnitinState(submission) {
@@ -63,6 +64,11 @@ function formatGrade(submissionData, assignment, options) {
 
 function renderStartContainer(options) {
   let content = ''
+
+  if (options.showUnpostedIndicator) {
+    content += '<div class="Grid__GradeCell__UnpostedGrade"></div>'
+  }
+
   if (options.invalid) {
     content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
   }
@@ -125,9 +131,11 @@ export default class AssignmentCellFormatter {
         return gradebook.submissionStateMap.getSubmissionState(submission)
       }
     }
+
+    this.postPoliciesEnabled = gradebook.options.post_policies_enabled
   }
 
-  render = (row, cell, submission /* value */, _columnDef, student /* dataContext */) => {
+  render = (_row, _cell, submission /* value */, columnDef, student /* dataContext */) => {
     let submissionState
     if (submission) {
       submissionState = this.options.getSubmissionState(submission)
@@ -145,9 +153,14 @@ export default class AssignmentCellFormatter {
 
     const assignmentData = {
       id: assignment.id,
-      muted: assignment.muted,
       pointsPossible: assignment.points_possible,
       submissionTypes: assignment.submission_types
+    }
+
+    // Avoid setting muted styles in the cell when Post Policies are enabled,
+    // as the unposted indicator already serves the same function.
+    if (!this.postPoliciesEnabled) {
+      assignmentData.muted = assignment.muted
     }
 
     const submissionData = {
@@ -169,12 +182,16 @@ export default class AssignmentCellFormatter {
       submissionData.excused = pendingGradeInfo.excused
     }
 
+    const showUnpostedIndicator =
+      columnDef.postAssignmentGradesTrayOpenForAssignmentId && isHidden(submission)
+
     const options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),
       dimmed: student.isInactive || student.isConcluded || submissionState.locked,
       disabled: student.isConcluded || submissionState.locked,
       hidden: submissionState.hideGrade,
       invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
+      showUnpostedIndicator,
       turnitinState: getTurnitinState(submission)
     }
 

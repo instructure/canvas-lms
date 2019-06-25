@@ -18,171 +18,33 @@
 module Lti::Ims::Concerns
   module AdvantageServices
     extend ActiveSupport::Concern
+    include LtiServices
 
-    class AccessToken
-      def initialize(raw_jwt_str)
-        @raw_jwt_str = raw_jwt_str
-      end
-
-      def validate!(expected_audience)
-        validate_claims!(expected_audience)
-        self
-      rescue Canvas::Security::InvalidToken => e
-        case e.cause
-        when JSON::JWT::InvalidFormat
-          raise Lti::Ims::AdvantageErrors::MalformedAccessToken, e
-        when JSON::JWS::UnexpectedAlgorithm
-          raise Lti::Ims::AdvantageErrors::InvalidAccessTokenSignatureType, e
-        when JSON::JWS::VerificationFailed
-          raise Lti::Ims::AdvantageErrors::InvalidAccessTokenSignature, e
-        else
-          raise Lti::Ims::AdvantageErrors::InvalidAccessToken.new(e, api_message: 'Access token invalid - signature likely incorrect')
-        end
-      rescue JSON::JWT::Exception => e
-        raise Lti::Ims::AdvantageErrors::InvalidAccessToken, e
-      rescue Canvas::Security::TokenExpired => e
-        raise Lti::Ims::AdvantageErrors::InvalidAccessTokenClaims.new(e, api_message: 'Access token expired')
-      rescue Lti::Ims::AdvantageErrors::AdvantageServiceError
-        raise
-      rescue => e
-        raise Lti::Ims::AdvantageErrors::AdvantageServiceError, e
-      end
-
-      def validate_claims!(expected_audience)
-        validator = Canvas::Security::JwtValidator.new(
-          jwt: decoded_jwt,
-          expected_aud: expected_audience,
-          require_iss: true,
-          skip_jti_check: true
-        )
-
-        # In this case we know the error message can just be safely shunted into the API response (in other cases
-        # we're more wary about leaking impl details)
-        unless validator.valid?
-          raise Lti::Ims::AdvantageErrors::InvalidAccessTokenClaims.new(
-            nil,
-            api_message: "Invalid access token field/s: #{validator.error_message}"
-          )
-        end
-      end
-
-      def claim(name)
-        decoded_jwt[name]
-      end
-
-      def decoded_jwt
-        @_decoded_jwt = Canvas::Security.decode_jwt(@raw_jwt_str)
-      end
-    end
-
-    # factories for array matchers typically returned by #scopes_matcher
-    class_methods do
-      def all_of(*items)
-        -> (match_in) { items.present? && (items - match_in).blank? }
-      end
-
-      def any_of(*items)
-        -> (match_in) { items.present? && (items & match_in).present? }
-      end
-
-      def any
-        -> (_) { true }
-      end
-
-      def none
-        -> (_) { false }
-      end
-    end
-
-    # rubocop:disable Metrics/BlockLength
     included do
-      skip_before_action :load_user
-
       before_action(
-        :verify_access_token,
+        :verify_active_in_account,
         :verify_context,
-        :verify_developer_key,
-        :verify_tool,
-        :verify_tool_permissions,
-        :verify_tool_features,
+        :verify_tool
       )
 
-      def verify_access_token
-        if access_token.blank?
-          render_error("Missing access token", :unauthorized)
-        else
-          begin
-            access_token.validate!(expected_access_token_audience)
-          rescue Lti::Ims::AdvantageErrors::AdvantageClientError => e # otherwise it's a system error, so we want normal error trapping and rendering to kick in
-            handled_error(e)
-            render_error(e.api_message, e.status_code)
-          end
-        end
+      def verify_active_in_account
+        render_error("Invalid Developer Key", :unauthorized) unless active_binding_for_account?
       end
 
       def verify_context
         render_error("Context not found", :not_found) if context.blank?
       end
 
-      def verify_developer_key
-        unless developer_key&.active?
-          render_error("Unknown or inactive Developer Key", :unauthorized)
-          return
-        end
-        unless context&.account.present? && developer_key.binding_on_in_account?(context.account)
-          render_error("Invalid Developer Key", :unauthorized)
-          return
-        end
-      end
-
       def verify_tool
         render_error("Access Token not linked to a Tool associated with this Context", :unauthorized) if tool.blank?
       end
 
-      def verify_tool_permissions
-        render_error("Insufficient permissions", :unauthorized) unless tool_permissions_granted?
-      end
-
-      def verify_tool_features
-        render_error("LTI 1.3/Advantage features not enabled", :unauthorized) unless tool&.lti_1_3_enabled?
-      end
-
-      def access_token
-        @_access_token ||= begin
-          raw_jwt_str = AuthenticationMethods.access_token(request)
-          AccessToken.new(raw_jwt_str) if raw_jwt_str.present?
-        end
-      end
-
-      def expected_access_token_audience
-        Rails.application.routes.url_helpers.oauth2_token_url(host: host, protocol: protocol)
-      end
-
-      delegate :host, to: :request
-      delegate :protocol, to: :request
-
-      def access_token_scopes
-        @_access_token_scopes ||= (access_token&.claim('scopes')&.split(' ').presence || [])
-      end
-
-      def tool_permissions_granted?
-        scopes_matcher.call(access_token_scopes)
-      end
-
-      def scopes_matcher
-        raise 'Abstract method'
-      end
-
-      def developer_key
-        @_developer_key ||= access_token && begin
-          DeveloperKey.find_cached(access_token.claim('sub'))
-        rescue ActiveRecord::RecordNotFound
-          nil
-        end
-      end
-
       def context
         raise 'Abstract Method'
+      end
+
+      def active_binding_for_account?
+        developer_key.usable_in_context?(context)
       end
 
       def tool
@@ -192,27 +54,6 @@ module Lti::Ims::Concerns
           ContextExternalTool.all_tools_for(context).where(developer_key: developer_key).take
         end
       end
-
-      def render_error(message, status = :precondition_failed)
-        error_response = {
-          errors: {
-            type: status,
-            message: message
-          }
-        }
-        render json: error_response, status: status
-      end
-
-      def handled_error(e)
-        unless Rails.env.production?
-          # These are all 'handled errors' so don't typically warrant logging in production envs, but in lower envs it
-          # can be very handy to see exactly what went wrong. This specific log mechanism is nice, too, b/c it logs
-          # backtraces from nested errors.
-          logger.error(e.message)
-          ErrorReport.log_exception(nil, e)
-        end
-      end
     end
-    # rubocop:enable Metrics/BlockLength
   end
 end

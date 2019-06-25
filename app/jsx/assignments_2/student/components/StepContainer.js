@@ -18,18 +18,16 @@
 
 import {AssignmentShape, SubmissionShape} from '../assignmentData'
 import {bool} from 'prop-types'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import FriendlyDatetime from '../../../shared/FriendlyDatetime'
-import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import StepItem from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
+import StudentViewContext from './Context'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 function renderCollapsedContainer(step) {
   return (
-    <div className="steps-main-status-label">
+    <div className="steps-main-status-label" data-testid="collapsed-step-container">
       <Text weight="bold">{step}</Text>
     </div>
   )
@@ -39,15 +37,21 @@ function allowNextAttempt(assignment, submission) {
   return assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts
 }
 
-function availableStepContainer(props) {
+function availableStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="available-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Available'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {context.prevButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Previous')} status="button" />
+        ) : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Upload')} status="in-progress" />
         <StepItem label={I18n.t('Submit')} />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {context.nextButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Next')} status="button" />
+        ) : null}
       </Steps>
     </div>
   )
@@ -57,15 +61,21 @@ availableStepContainer.propTypes = {
   isCollapsed: bool
 }
 
-function unavailableStepContainer(props) {
+function unavailableStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="unavailable-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Unavailable'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {context.prevButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Previous')} status="button" />
+        ) : null}
         <StepItem label={I18n.t('Unavailable')} status="unavailable" />
         <StepItem label={I18n.t('Upload')} />
         <StepItem label={I18n.t('Submit')} />
         <StepItem label={I18n.t('Not Graded Yet')} />
+        {context.nextButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Next')} status="button" />
+        ) : null}
       </Steps>
     </div>
   )
@@ -75,11 +85,14 @@ unavailableStepContainer.propTypes = {
   isCollapsed: bool
 }
 
-function uploadedStepContainer(props) {
+function uploadedStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="uploaded-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Uploaded'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {context.prevButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Previous')} status="button" />
+        ) : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
         <StepItem label={I18n.t('Submit')} status="in-progress" />
@@ -93,30 +106,25 @@ uploadedStepContainer.propTypes = {
   isCollapsed: bool
 }
 
-function submittedStepContainer(props) {
+function submittedStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="submitted-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Submitted'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {context.prevButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Previous')} status="button" />
+        ) : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem
-          label={
-            <Flex direction="column">
-              <FlexItem>{I18n.t('Submitted')}</FlexItem>
-              <FlexItem>
-                <FriendlyDatetime
-                  format={I18n.t('#date.formats.full')}
-                  dateTime={props.submission.submittedAt}
-                />
-              </FlexItem>
-            </Flex>
-          }
-          status="complete"
-        />
+        <StepItem label={I18n.t('Submitted')} status="complete" />
         <StepItem label={I18n.t('Not Graded Yet')} />
-        {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
+        {allowNextAttempt(props.assignment, props.submission) &&
+        !context.nextButtonEnabled &&
+        !props.isCollapsed ? (
           <StepItem label={I18n.t('New Attempt')} status="button" />
+        ) : null}
+        {context.nextButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Next')} status="button" />
         ) : null}
       </Steps>
     </div>
@@ -129,48 +137,57 @@ submittedStepContainer.propTypes = {
   submission: SubmissionShape
 }
 
-function gradedStepContainer(props) {
+function gradedStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="graded-step-container">
       {props.isCollapsed && renderCollapsedContainer(I18n.t('Graded'))}
       <Steps isCollapsed={props.isCollapsed}>
+        {context.prevButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Previous')} status="button" />
+        ) : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem
-          label={
-            <Flex direction="column">
-              <FlexItem>{I18n.t('Submitted')}</FlexItem>
-              <FlexItem>
-                <FriendlyDatetime
-                  format={I18n.t('#date.formats.full')}
-                  dateTime={props.submission.submittedAt}
-                />
-              </FlexItem>
-            </Flex>
-          }
-          status="complete"
-        />
-        <StepItem
-          label={
-            <Flex direction="column">
-              <FlexItem>{I18n.t('Grade')}</FlexItem>
-              <FlexItem>
-                <GradeDisplay
-                  displaySize="small"
-                  gradingType={props.assignment.gradingType}
-                  pointsPossible={props.assignment.pointsPossible}
-                  receivedGrade={props.submission.grade}
-                />
-              </FlexItem>
-            </Flex>
-          }
-          status="complete"
-        />
-        {allowNextAttempt(props.assignment, props.submission) && !props.isCollapsed ? (
+        <StepItem label={I18n.t('Submitted')} status="complete" />
+        <StepItem label={I18n.t('Graded')} status="complete" />
+        {allowNextAttempt(props.assignment, props.submission) &&
+        !context.nextButtonEnabled &&
+        !props.isCollapsed ? (
           <StepItem label={I18n.t('New Attempt')} status="button" />
+        ) : null}
+        {context.nextButtonEnabled && !props.isCollapsed ? (
+          <StepItem label={I18n.t('Next')} status="button" />
         ) : null}
       </Steps>
     </div>
+  )
+}
+
+function selectStepContainer(props, context) {
+  const {assignment, submission, isCollapsed, forceLockStatus} = props
+  if (forceLockStatus || assignment.lockInfo.isLocked) {
+    return unavailableStepContainer({isCollapsed}, context)
+  } else if (submission.state === 'graded') {
+    return gradedStepContainer({isCollapsed, assignment, submission}, context)
+  } else if (submission.state === 'submitted') {
+    return submittedStepContainer({isCollapsed, assignment, submission}, context)
+  } else if (submission.submissionDraft) {
+    if (props.submission.submissionDraft.attachments) {
+      if (props.submission.submissionDraft.attachments.length) {
+        return uploadedStepContainer({isCollapsed}, context)
+      }
+    }
+  }
+  return availableStepContainer({isCollapsed}, context)
+}
+
+function StepContainer(props) {
+  const {assignment, submission, isCollapsed, forceLockStatus} = props
+  return (
+    <StudentViewContext.Consumer>
+      {context =>
+        selectStepContainer({assignment, submission, isCollapsed, forceLockStatus}, context)
+      }
+    </StudentViewContext.Consumer>
   )
 }
 
@@ -181,21 +198,6 @@ gradedStepContainer.propTypes = {
   assignment: AssignmentShape,
   isCollapsed: bool,
   submission: SubmissionShape
-}
-
-function StepContainer(props) {
-  const {assignment, submission, isCollapsed, forceLockStatus} = props
-  if (forceLockStatus || assignment.lockInfo.isLocked) {
-    return unavailableStepContainer({isCollapsed})
-  } else if (submission.state === 'graded') {
-    return gradedStepContainer({isCollapsed, assignment, submission})
-  } else if (submission.state === 'submitted') {
-    return submittedStepContainer({isCollapsed, assignment, submission})
-  } else if (submission.submissionDraft) {
-    return uploadedStepContainer({isCollapsed})
-  } else {
-    return availableStepContainer({isCollapsed})
-  }
 }
 
 StepContainer.propTypes = {

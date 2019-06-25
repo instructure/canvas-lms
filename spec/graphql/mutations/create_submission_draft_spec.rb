@@ -42,10 +42,6 @@ RSpec.describe Mutations::CreateSubmissionDraft do
         }) {
           submissionDraft {
             _id
-            submission {
-              _id
-              attempt
-            }
             submissionAttempt
             attachments {
               _id

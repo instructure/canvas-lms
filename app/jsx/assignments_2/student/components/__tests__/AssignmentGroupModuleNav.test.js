@@ -38,7 +38,7 @@ afterEach(() => {
 it('renders module and assignment group links correctly', () => {
   const assignment = mockAssignment({
     assignmentGroup: {name: 'Test assignmentGroup'},
-    modules: [{id: 1, name: 'Test Module'}],
+    modules: [{id: '1', name: 'Test Module'}],
     env: {
       assignmentUrl: 'testassignmentgrouplink',
       moduleUrl: 'testmodulelink'
@@ -56,7 +56,7 @@ it('renders module and assignment group links correctly', () => {
 
 it('renders module and assignment group text correctly', () => {
   const assignment = mockAssignment({
-    modules: [{id: 1, name: 'Test Module'}],
+    modules: [{id: '1', name: 'Test Module'}],
     assignmentGroup: {name: 'Test assignmentGroup'}
   })
   ReactDOM.render(
@@ -86,7 +86,7 @@ it('will not render module container if not present', () => {
 
 it('will not render assignment group container if not present', () => {
   const assignment = mockAssignment({
-    modules: [{id: 1, name: 'Test Module'}],
+    modules: [{id: '1', name: 'Test Module'}],
     assignmentGroup: null
   })
   ReactDOM.render(
@@ -113,7 +113,7 @@ it('will render nothing if null props provided', () => {
 
 it('renders multiple modules', () => {
   const assignment = mockAssignment({
-    modules: [{id: 1, name: 'Test Module 1'}, {id: 2, name: 'Test Module 2'}],
+    modules: [{id: '1', name: 'Test Module 1'}, {id: 2, name: 'Test Module 2'}],
     assignmentGroup: null
   })
   ReactDOM.render(
@@ -129,10 +129,10 @@ it('renders multiple modules', () => {
 it('limits the maximum number of modules rendered', () => {
   const assignment = mockAssignment({
     modules: [
-      {id: 1, name: 'Test Module 1'},
-      {id: 2, name: 'Test Module 2'},
-      {id: 3, name: 'Test Module 3'},
-      {id: 4, name: 'Test Module 4'}
+      {id: '1', name: 'Test Module 1'},
+      {id: '2', name: 'Test Module 2'},
+      {id: '3', name: 'Test Module 3'},
+      {id: '4', name: 'Test Module 4'}
     ],
     assignmentGroup: null
   })

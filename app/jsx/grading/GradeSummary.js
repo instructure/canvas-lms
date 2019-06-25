@@ -145,9 +145,17 @@ const GradeSummary = {
 
     $('#grade_entry').hide().appendTo($('body'))
 
+    const $grade = $assignment.find('.grade')
+
+    if (score.numericalValue == null) {
+      $grade.html($grade.data('originalValue'))
+    } else {
+      $grade.html(htmlEscape(score.formattedValue))
+    }
+
+    addTooltipElementForAssignment($assignment)
     const $assignmentScore = $assignment.find('.assignment_score')
     const $scoreTeaser = $assignmentScore.find('.score_teaser')
-    const $grade = $assignment.find('.grade')
 
     if (isChanged) {
       $assignmentScore.attr('title', '')
@@ -162,23 +170,14 @@ const GradeSummary = {
         setTimeout(() => { $assignment.find('.revert_score_link').focus() }, 0)
       }
     } else {
-      const tooltip = $assignment.data('muted') ?
-          I18n.t('Instructor is working on grades') :
-          I18n.t('Click to test a different score')
+      setTooltipForScore($assignment)
       $assignmentScore.attr('title', I18n.t('Click to test a different score'))
-      $scoreTeaser.text(tooltip)
       $grade.removeClass('changed')
       $assignment.find('.revert_score_link').remove()
 
       if (options.refocus) {
         setTimeout(() => { $assignment.find('.grade').focus() }, 0)
       }
-    }
-
-    if (score.numericalValue == null) {
-      $grade.html($grade.data('originalValue'))
-    } else {
-      $grade.html(htmlEscape(score.formattedValue))
     }
 
     if (!isChanged) {
@@ -191,29 +190,32 @@ const GradeSummary = {
   },
 
   onScoreRevert ($assignment, options) {
+    const $assignmentScore = $assignment.find('.assignment_score')
+    const $grade = $assignmentScore.find('.grade')
     const opts = { refocus: true, skipEval: false, ...options }
     const score = GradeSummary.getOriginalScore($assignment)
-    let tooltip
+    let title
 
     if ($assignment.data('muted')) {
-      tooltip = I18n.t('Instructor is working on grades')
+      if (ENV.post_policies_enabled) {
+        title = I18n.t('Hidden')
+        $grade.html('<i class="icon-off" aria-hidden="true"></i>')
+      } else {
+        title = I18n.t('Muted')
+        $grade.html('<i class="icon-muted muted_icon" aria-hidden="true"></i>')
+      }
     } else {
-      tooltip = I18n.t('Click to test a different score')
+      title = I18n.t('Click to test a different score')
+      $grade.text(score.formattedValue)
     }
 
-    const $assignmentScore = $assignment.find('.assignment_score')
+    setTooltipForScore($assignment)
+
     $assignment.find('.what_if_score').text(score.formattedValue)
-    $assignmentScore.attr('title', I18n.t('Click to test a different score'))
-    $assignmentScore.find('.score_teaser').text(tooltip)
-    $assignmentScore.find('.grade').removeClass('changed')
     $assignment.find('.revert_score_link').remove()
     $assignment.find('.score_value').text(score.formattedValue)
-
-    if ($assignment.data('muted')) {
-      $assignment.find('.grade').html('<i class="icon-muted muted_icon" aria-hidden="true"></i>')
-    } else {
-      $assignment.find('.grade').text(score.formattedValue)
-    }
+    $assignmentScore.attr('title', title)
+    $grade.removeClass('changed')
 
     const assignmentId = $assignment.getTemplateValue('assignment_id')
     GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue)
@@ -222,12 +224,46 @@ const GradeSummary = {
     }
 
     const $screenreaderLinkClone = $assignment.find('.grade').data('screenreader_link')
-    $assignment.find('.grade').prepend($screenreaderLinkClone)
+    $grade.prepend($screenreaderLinkClone)
 
     if (opts.refocus) {
       setTimeout(() => { $assignment.find('.grade').focus() }, 0)
     }
   }
+}
+
+function addTooltipElementForAssignment($assignment) {
+  const $grade = $assignment.find('.grade')
+  let $tooltipWrapRight
+  let $tooltipScoreTeaser
+
+  $tooltipWrapRight = $grade.find('.tooltip_wrap right')
+
+  if ($tooltipWrapRight.length === 0) {
+    $tooltipWrapRight = $('<span aria-hidden="true" class="tooltip_wrap right"></span>')
+    $grade.append($tooltipWrapRight)
+
+    $tooltipScoreTeaser = $tooltipWrapRight.find('.tooltip_text score_teaser')
+
+    if ($tooltipScoreTeaser.length === 0) {
+      $tooltipScoreTeaser = $('<span class="tooltip_text score_teaser"></span>')
+      $tooltipWrapRight.append($tooltipScoreTeaser)
+    }
+  }
+}
+
+function setTooltipForScore($assignment) {
+  let tooltipText
+
+  if ($assignment.data('muted')) {
+    tooltipText = I18n.t('Instructor is working on grades')
+  } else {
+    tooltipText = I18n.t('Click to test a different score')
+  }
+
+  addTooltipElementForAssignment($assignment)
+  const $tooltipScoreTeaser = $assignment.find('.tooltip_text.score_teaser')
+  $tooltipScoreTeaser.text(tooltipText)
 }
 
 function getGradingPeriodSet () {

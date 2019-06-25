@@ -44,7 +44,7 @@ describe "permissions index" do
     end
 
     it "updates the role to the new name after editing" do
-      PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty")
+      PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty") # TODO flakiness lies within
       expect{PermissionsIndex.role_name(@custom_student_role).text}.to become("A Better Kitty")
       expect{PermissionsIndex.edit_tray_header.text}.to become("Edit A Better Kitty")
     end

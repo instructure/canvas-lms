@@ -218,7 +218,6 @@ export default class CustomizationForm extends React.Component {
       <TextArea
         label={I18n.t('Custom Fields')}
         maxHeight="20rem"
-        width="50%"
         name="custom_fields"
         onChange={this.updateCustomFields}
         value={this.state.custom_fields}

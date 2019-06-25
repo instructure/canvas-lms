@@ -25,6 +25,7 @@ import {
   IconBulletListRomanLine,
   IconBulletListSquareLine,
   IconClearTextFormattingLine,
+  IconDocumentLine,
   IconImageLine,
   IconIndentLine,
   IconItalicLine,
@@ -58,6 +59,7 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     italic: IconItalicLine,
     link: IconLinkLine,
     video: IconAttachMediaLine,
+    document: IconDocumentLine,
 
     // if @instructure/ui-icons ever gets icons for these, lets use those. But until
     // then these are the same as the stock tinyMCE ones but with the viewbox

@@ -18,8 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!student_context_tray'
-import FriendlyDatetime from '../shared/FriendlyDatetime'
+import I18n from 'i18n!student_context_trayStudentContextTray'
 import Avatar from './Avatar'
 import LastActivity from './LastActivity'
 import MetricsList from './MetricsList'
@@ -58,11 +57,15 @@ export default class StudentContextTray extends React.Component {
       studentId: PropTypes.string.isRequired,
       returnFocusTo: PropTypes.func.isRequired,
       data: dataShape.isRequired,
+      externalTools: PropTypes.arrayOf(PropTypes.shape({
+        base_url: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired
+      })),
     }
 
-    static renderQuickLink (label, srLabel, url, showIf) {
+    static renderQuickLink (key, label, srLabel, url, showIf) {
       return showIf() ? (
-        <div className="StudentContextTray-QuickLinks__Link">
+        <div className="StudentContextTray-QuickLinks__Link" key={key}>
           <Button
             href={url}
             variant="ghost"
@@ -143,19 +146,31 @@ export default class StudentContextTray extends React.Component {
           className="StudentContextTray__Section StudentContextTray-QuickLinks"
         >
           {StudentContextTray.renderQuickLink(
+            'grades',
             I18n.t('Grades'),
             I18n.t('View grades for %{name}', { name: user.short_name }),
             `/courses/${this.props.courseId}/grades/${this.props.studentId}`,
+
             () =>
               course.permissions.manage_grades ||
               course.permissions.view_all_grades
           )}
           {StudentContextTray.renderQuickLink(
+            'analytics',
             I18n.t('Analytics'),
             I18n.t('View analytics for %{name}', { name: user.short_name }),
             `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
             () => course.permissions.view_analytics && user.analytics
           )}
+          {this.props.externalTools ? this.props.externalTools.map((tool, i) => {
+              return StudentContextTray.renderQuickLink(
+                `tool${i}`,
+                tool.title,
+                tool.title,
+                `${tool.base_url}&student_id=${this.props.studentId}`,
+                () => true
+              )
+            }) : null}
         </section>
       ) : null
     }
@@ -238,7 +253,7 @@ export default class StudentContextTray extends React.Component {
                           <LastActivity user={user} />
                         </Text>
                       </div>
-                      {course.permissions.send_messages ? (
+                      {course.permissions.send_messages && user.enrollments.some(e => e.state == 'active') ? (
                         <div className="StudentContextTray-Header__Actions">
                           <Button
                             ref={ (b) => this.messageStudentsButton = b }

@@ -18,6 +18,7 @@
 
 import axios from 'axios';
 import parseLinkHeader from "parse-link-header"
+import _ from 'lodash'
 
 let request
 
@@ -33,26 +34,30 @@ const once = (config = {}) => {
 
 const ImageSearchActions = {
 
-  startImageSearch(term) {
-    return { type: 'START_IMAGE_SEARCH', term }
+  updateSearchTerm(term) {
+    return { type: 'UPDATE_SEARCH_TERM', term }
   },
 
-  receiveImageSearchResults(originalResults) {
+  startImageSearch() {
+    return { type: 'START_IMAGE_SEARCH' }
+  },
+
+  receiveImageSearchResults(originalResults, pageDirection) {
     const results = Object.assign({}, originalResults)
     results.prevUrl = parseLinkHeader(results.headers.link).prev ?
       parseLinkHeader(results.headers.link).prev.url : null
     results.nextUrl = parseLinkHeader(results.headers.link).next ?
       parseLinkHeader(results.headers.link).next.url : null
-    return { type: 'RECEIVE_IMAGE_SEARCH_RESULTS', results }
+    return { type: 'RECEIVE_IMAGE_SEARCH_RESULTS', results, pageDirection }
   },
 
   clearImageSearch() {
-    this.cancelImageSearch();
+    this.searchApiGet(null)
     return { type: 'CLEAR_IMAGE_SEARCH' }
   },
 
-  failImageSearch(error) {
-    return { type: 'FAIL_IMAGE_SEARCH', error }
+  failImageSearch(error, pageDirection) {
+    return { type: 'FAIL_IMAGE_SEARCH', error, pageDirection }
   },
 
   cancelImageSearch() {
@@ -63,20 +68,22 @@ const ImageSearchActions = {
 
   search(term) {
     return (dispatch) => {
-      dispatch(this.startImageSearch(term))
-      this.searchApiGet(this.composeSearchUrl(term), dispatch)
+      dispatch(this.updateSearchTerm(term))
+      this.searchApiGet(this.composeSearchUrl(term), null, dispatch)
     }
   },
 
-  loadMore(term, url) {
+  loadMore(url, page_direction) {
     return (dispatch) => {
-      dispatch(this.startImageSearch(term))
-      this.searchApiGet(url, dispatch)
+      dispatch(this.startImageSearch())
+      this.searchApiGet(url, page_direction, dispatch)
     }
   },
 
-  searchApiGet(url, dispatch){
+  searchApiGet: _.debounce(function (url, pageDirection, dispatch=null) {
     this.cancelImageSearch();
+    if (url===null) return
+    dispatch(this.startImageSearch())
 
     const config = {
       method: "get",
@@ -85,15 +92,15 @@ const ImageSearchActions = {
     }
 
     once(config).then(response => {
-      dispatch(this.receiveImageSearchResults(response))
+      dispatch(this.receiveImageSearchResults(response, pageDirection))
     }).catch((error) => {
-      dispatch(this.failImageSearch(error))
+      dispatch(this.failImageSearch(error, pageDirection))
     })
-  },
+  }, 750),
 
   composeSearchUrl(term) {
     const per_page = '12';
-    return `/api/v1/image_search/?query=${term}&per_page=${per_page}`
+    return `/api/v1/image_search/?query=${term}&per_page=${per_page}&orientation=landscape`
   }
 }
 
