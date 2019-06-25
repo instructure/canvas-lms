@@ -71,8 +71,8 @@ export default class CourseImageSelector extends React.Component {
             <Menu
               trigger={
                 <div className="CourseImageSelector__Button">
-                  <Button size="small" variant="circle-primary">
-                    <IconMoreLine title={I18n.t('Course image settings')} />
+                  <Button size="small" variant="circle-primary" title={I18n.t('Course image settings')} aria-label={I18n.t('Course image settings')}>
+                    <IconMoreLine/>
                   </Button>
                 </div>
               }
