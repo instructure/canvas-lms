@@ -22,6 +22,7 @@ import $ from 'jquery'
 
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
 import TextInput from '@instructure/ui-forms/lib/components/TextInput';
+import Select from '@instructure/ui-forms/lib/components/Select'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
@@ -97,6 +98,38 @@ export default class RequiredValues extends React.Component {
     this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk_url: value}}))
   }
 
+  handleConfigTypeChange = (e, option) => {
+    this.setState({ jwkConfig: option.value })
+  }
+
+  configurationInput(option) {
+    const { toolConfiguration } = this.state;
+    const { showMessages } = this.props
+
+    if (option === 'public_jwk') {
+      return (
+        <TextArea
+          name="public_jwk"
+          value={toolConfiguration.public_jwk}
+          maxHeight="10rem"
+          resize="vertical"
+          autoGrow
+          onChange={this.handlePublicJwkChange}
+          messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
+        />
+      )
+    } else {
+      return (
+        <TextInput
+          name="public_jwk_url"
+          value={toolConfiguration.public_jwk_url}
+          onChange={this.handlePublicJwkUrlChange}
+          messages={showMessages && !toolConfiguration.public_jwk_url ? validationMessage : []}
+        />
+      )
+    }
+  }
+
   render() {
     const { toolConfiguration } = this.state;
     const { showMessages } = this.props
@@ -151,23 +184,15 @@ export default class RequiredValues extends React.Component {
             </GridCol>
           </GridRow>
         </Grid>
-        <TextArea
-          name="public_jwk"
-          value={toolConfiguration.public_jwk}
-          label={I18n.t("* Public JWK")}
-          maxHeight="10rem"
-          resize="vertical"
-          autoGrow
-          onChange={this.handlePublicJwkChange}
-          messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
-        />
-        <TextInput
-                name="public_jwk_url"
-                value={toolConfiguration.public_jwk_url}
-                label={I18n.t("* Public JWK URL")}
-                onChange={this.handlePublicJwkUrlChange}
-                messages={showMessages && !toolConfiguration.public_jwk_url ? validationMessage : []}
-              />
+        <Select
+          label={I18n.t("* JWK Method")}
+          onChange={this.handleConfigTypeChange}
+          selectedOption={toolConfiguration.public_jwk_url ? "public_jwk_url" : "public_jwk"}
+        >
+          <option key="public_jwk" value="public_jwk">{I18n.t('Public JWK')}</option>
+          <option key="public_jwk_url" value="public_jwk_url">{I18n.t('Public JWK URL')}</option>
+        </Select>
+        {this.configurationInput(this.state.jwkConfig)}
         <PresentationContent>
           <hr />
         </PresentationContent>
