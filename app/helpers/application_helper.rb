@@ -887,18 +887,10 @@ module ApplicationHelper
     end
   end
 
-  # for new courses, we use newui. for old ones, we use bz_custom
-  # the configuration value should always be to bz_custom, but at different
-  # locations for prod vs staging, etc.
+  # all courses now use bz_newui.css, so we just rename it here.
+  # the name change is kept for now for cross-repo compatibility
   def bz_css_choice(orig)
-    # this list of course IDs are our 2015, 2016, and Spring 2017 ones.  New UI was rolled out Fall 2017
-    # I don't mind hardcoding since we will always use the new
-    # style going forward, and thus this list will never change.
-    if @context && [25, 26, 28, 31, 32, 33, 11, 16, 17, 23, 24, 21, 22, 7, 35, 36, 37, 50, 51, 59, 60, 61].include?(@context.id)
-      orig.sub("bz_custom.css", "bz_oldui.css")
-    else
-      orig.sub("bz_custom.css", "bz_newui.css")
-    end
+    orig.sub("bz_custom.css", "bz_newui.css")
   end
 
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
