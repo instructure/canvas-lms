@@ -1647,7 +1647,9 @@ class Course < ActiveRecord::Base
     @account_users[user.global_id] ||= begin
       key = ['account_users_for_course_and_user', user.cache_key(:account_users), Account.cache_key_for_id(account_id, :account_chain)].cache_key
       Rails.cache.fetch_with_batched_keys(key, batch_object: self, batched_keys: :account_associations, skip_cache_if_disabled: true) do
-        account_users_for(user)
+        aus = account_users_for(user)
+        aus.each{|au| au.instance_variable_set(:@association_cache, {})}
+        aus
       end
     end
   end
