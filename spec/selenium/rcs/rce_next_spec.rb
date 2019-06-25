@@ -373,6 +373,24 @@ describe "RCE next tests" do
       expect(assignment_unpublished_status).to be_displayed
     end
 
+    it "should click on a document in sidebar to display in body" do
+      title = "text_file.txt"
+      @root_folder = Folder.root_folders(@course).first
+      @text_file = @root_folder.attachments.create!(:filename => 'text_file.txt',
+                                                    :context => @course) { |a| a.content_type = 'text/plain' }
+
+      visit_front_page_edit(@course)
+
+      click_document_toolbar_button
+      click_course_documents
+
+      click_document_link(title)
+
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include course_file_id_path(@text_file)
+      end
+    end
+
     it "should display assignment due date in links accordion" do
       skip('Unskip in CORE-2619')
       title = "Assignment-Title"
