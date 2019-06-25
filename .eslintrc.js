@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   env: {
     es6: true,
@@ -108,7 +110,7 @@ module.exports = {
     'notice/notice': [
       'error',
       {
-        templateFile: 'config/copyright-template.js',
+        templateFile: path.join(__dirname, 'config', 'copyright-template.js'),
         // purposely lenient so we don't automatically put our copyright notice on
         // top of something already copyrighted by someone else.
         mustMatch: 'Copyright '
