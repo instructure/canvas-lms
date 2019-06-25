@@ -65,13 +65,11 @@ describe "permissions index" do
     end
 
     it "opens the edit tray when you click an edit icon" do
-      skip('fix in COMMS-2082')
       PermissionsIndex.add_role("best role name ever")
       expect(PermissionsIndex.role_header).to include_text("Student\nbest role name ever\n")
     end
 
     it "focuses on newly created role when you close out all the things" do
-      skip('fix in COMMS-2082')
       role_name = "no this is the best role name ever"
       PermissionsIndex.add_role(role_name)
       PermissionsIndex.close_role_tray
@@ -128,7 +126,7 @@ describe "permissions index" do
     end
 
     it "permissions disables and locks on grid" do
-      skip('fix in COMMS-2082')
+      PermissionsIndex.visit(@account)
       permission_name = "read_announcements"
       PermissionsIndex.change_permission(permission_name, student_role.id, "disable_and_lock")
       r = RoleOverride.last
@@ -170,7 +168,6 @@ describe "permissions index" do
     end
 
     it "updates a permission when changed in the tray" do
-      skip('fix in COMMS-2082')
       PermissionsIndex.open_permission_tray(@permission_name)
       PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
       expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
@@ -187,7 +184,6 @@ describe "permissions index" do
     end
 
     it "filter based on role" do
-      skip('fix in COMMS-2082')
       role_name = "TA"
       PermissionsIndex.select_filter(role_name)
       expect(PermissionsIndex.role_link(role_name)).to be_displayed
