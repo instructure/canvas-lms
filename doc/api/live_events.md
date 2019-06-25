@@ -107,6 +107,51 @@ what's described in this document. Those fields are subject to change.
 | `workflow_state` | The state of the course. |
 
 
+#### `course_section_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `course_section_id` | The Canvas id of the created course section. |
+| `sis_source_id` | The SIS id of the section. |
+| `sis_batch_id` | The SIS Batch id of the section. |
+| `integration_id` | The integration id of the section. |
+| `course_id` | The Canvas id of the course that this section belongs to. |
+| `root_account_id` | Canvas id of the root account that this sections is in. |
+| `enrollment_term_id` | The Canvas term id that this section is in. |
+| `name` | The name of this section |
+| `default_section` | Boolean indicating whether this section is the default for the course. |
+| `accepting_enrollments` | Boolean indicating whether this section is accepting enrollemts. |
+| `can_manually_enroll` | Boolean indicating whether students can self-enroll in the section. |
+| `restrict_enrollments_to_section_dates` |  |
+| `start_at` | Section start date & time. |
+| `end_at` | Section end date & time. |
+| `workflow_state` | The state of the section. |
+| `nonxlist_course_id` | Canvas course id of the non-xlist course that this section belongs to. |
+| `stuck_sis_fields` |  |
+
+#### `course_section_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `course_section_id` | The Canvas id of the created course section. |
+| `sis_source_id` | The SIS id of the section. |
+| `sis_batch_id` | The SIS Batch id of the section. |
+| `integration_id` | The integration id of the section. |
+| `course_id` | The Canvas id of the course that this section belongs to. |
+| `root_account_id` | Canvas id of the root account that this sections is in. |
+| `enrollment_term_id` | The Canvas term id that this section is in. |
+| `name` | The name of this section |
+| `default_section` | Boolean indicating whether this section is the default for the course. |
+| `accepting_enrollments` | Boolean indicating whether this section is accepting enrollemts. |
+| `can_manually_enroll` | Boolean indicating whether students can self-enroll in the section. |
+| `restrict_enrollments_to_section_dates` |  |
+| `start_at` | Section start date & time. |
+| `end_at` | Section end date & time. |
+| `workflow_state` | The state of the section. |
+| `nonxlist_course_id` | Canvas course id of the non-xlist course that this section belongs to. |
+| `stuck_sis_fields` |  |
+
+
 #### `syllabus_updated`
 
 | Field | Description |
