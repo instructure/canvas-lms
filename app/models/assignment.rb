@@ -160,6 +160,10 @@ class Assignment < ActiveRecord::Base
     true
   end
 
+  # included to make it easier to work with api, which returns
+  # sis_source_id as sis_assignment_id.
+  alias_attribute :sis_assignment_id, :sis_source_id
+
   def positive_points_possible?
     return if self.points_possible.to_i >= 0
     return unless self.points_possible_changed?
@@ -489,7 +493,7 @@ class Assignment < ActiveRecord::Base
               :mute_if_changed_to_anonymous,
               :mute_if_changed_to_moderated
 
-  before_create :set_muted_if_post_policies_enabled
+  before_create :set_root_account_id, :set_muted_if_post_policies_enabled
 
   after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,
@@ -2550,14 +2554,6 @@ class Assignment < ActiveRecord::Base
 
   scope :unpublished, -> { where(:workflow_state => 'unpublished') }
   scope :published, -> { where(:workflow_state => 'published') }
-  scope :api_id, lambda { |api_id|
-    if api_id.start_with?('lti_context_id')
-      lti_context_id = api_id.split(':').last
-      find_by lti_context_id: lti_context_id
-    else
-      find api_id
-    end
-  }
 
   scope :duplicating_for_too_long, -> {
     where("workflow_state = 'duplicating' AND duplication_started_at < ?", 15.minutes.ago)
@@ -3337,5 +3333,9 @@ class Assignment < ActiveRecord::Base
     assignment.grader_names_visible_to_final_grader = true
     assignment.grader_comments_visible_to_graders = true
     assignment.graders_anonymous_to_graders = false
+  end
+
+  def set_root_account_id
+    self.root_account_id = root_account&.id
   end
 end

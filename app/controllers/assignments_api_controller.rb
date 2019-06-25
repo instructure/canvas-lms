@@ -825,8 +825,7 @@ class AssignmentsApiController < ApplicationController
   #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
-    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric).
-      api_id(params[:id])
+    @assignment = api_find(@context.active_assignments.preload(:assignment_group, :rubric_association, :rubric), params[:id])
     if authorized_action(@assignment, @current_user, :read)
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
@@ -1101,6 +1100,9 @@ class AssignmentsApiController < ApplicationController
   #   Settings to send along to turnitin. See Assignment object definition for
   #   format.
   #
+  # @argument assignment[sis_assignment_id]
+  #   The sis id of the Assignment
+  #
   # @argument assignment[integration_data]
   #   Data used for SIS integrations. Requires admin-level token with the "Manage SIS" permission. JSON string required.
   #
@@ -1229,7 +1231,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Assignment
   def update
-    @assignment = @context.active_assignments.api_id(params[:id])
+    @assignment = api_find(@context.active_assignments, params[:id])
     if authorized_action(@assignment, @current_user, :update)
       @assignment.content_being_saved_by(@current_user)
       @assignment.updating_user = @current_user

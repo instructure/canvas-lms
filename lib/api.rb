@@ -141,6 +141,12 @@ module Api
                         'id' => 'id' }.freeze,
           :is_not_scoped_to_account => ['id'].freeze,
           :scope => 'root_account_id' }.freeze,
+    'assignments' =>
+        { :lookups => { 'sis_assignment_id' => 'sis_source_id',
+                        'id' => 'id',
+                        'lti_context_id' => 'lti_context_id' }.freeze,
+          :is_not_scoped_to_account => ['id'].freeze,
+          :scope => 'root_account_id' }.freeze,
   }.freeze
 
   MAX_ID_LENGTH = (2**63 - 1).to_s.length

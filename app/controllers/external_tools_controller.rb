@@ -494,7 +494,7 @@ class ExternalToolsController < ApplicationController
     }
     opts = default_opts.merge(opts)
 
-    assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
+    assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
     expander = variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token])
 
     adapter = if tool.use_1_3?
@@ -587,7 +587,7 @@ class ExternalToolsController < ApplicationController
                                                              tool: tool,
                                                              secure_params: params[:secure_params])
 
-    assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id].present?
+    assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id].present?
 
     opts = {
       post_only: @tool.settings['post_only'].present?,
@@ -1042,7 +1042,7 @@ class ExternalToolsController < ApplicationController
       return render json: @context.errors, status: :bad_request
     end
 
-    assignment = @context.assignments.find(params[:assignment_id])
+    assignment = api_find(@context.assignments, params[:assignment_id])
 
     return unless authorized_action(assignment, @current_user, :read)
 

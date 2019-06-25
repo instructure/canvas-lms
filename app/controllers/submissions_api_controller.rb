@@ -230,7 +230,7 @@ class SubmissionsApiController < ApplicationController
   # @returns [Submission]
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @assignment = @context.assignments.active.find(params[:assignment_id])
+      @assignment = api_find(@context.assignments.active, params[:assignment_id])
       includes = Array.wrap(params[:include])
 
       student_ids = if value_to_boolean(params[:grouped])
@@ -574,7 +574,7 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"]
   #   Associations to include with the group.
   def show
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
     bulk_load_attachments_and_previews([@submission])
@@ -604,7 +604,7 @@ class SubmissionsApiController < ApplicationController
   # +online_upload+ assignment with these file ids.
   #
   def create_file
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     permission = @assignment.submission_types.include?("online_upload") ? :submit : :nothing
     submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
@@ -752,7 +752,7 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
 
     if params[:submission] && params[:submission][:posted_grade] && !params[:submission][:provisional] &&
         @assignment.moderated_grading && !@assignment.grades_published?
@@ -899,7 +899,7 @@ class SubmissionsApiController < ApplicationController
   #   allow_new_anonymous_id parameter is true
   def gradeable_students
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @assignment = @context.assignments.active.find(params[:assignment_id])
+      @assignment = api_find(@context.assignments.active, params[:assignment_id])
       includes = Array(params[:include])
 
       # When mobile supports new anonymous we can remove the allow_new flag
@@ -1042,7 +1042,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     assignment_ids = grade_data.keys
-    @assignments = @context.assignments.active.find(assignment_ids)
+    @assignments = api_find_all(@context.assignments.active, assignment_ids)
 
     unless @assignments.all?(&:published?) &&
            @context.grants_right?(@current_user, session, :manage_grades)
@@ -1104,7 +1104,7 @@ class SubmissionsApiController < ApplicationController
   #   }
   def submission_summary
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @assignment = @context.assignments.active.find(params[:assignment_id])
+      @assignment = api_find(@context.assignments.active, params[:assignment_id])
       student_ids = if should_group?
                       @assignment.representatives(user: @current_user).map(&:id)
                     else
@@ -1138,7 +1138,7 @@ class SubmissionsApiController < ApplicationController
   private
 
   def change_topic_read_state(new_state)
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submissions.find_or_create_by!(user: @user)
 

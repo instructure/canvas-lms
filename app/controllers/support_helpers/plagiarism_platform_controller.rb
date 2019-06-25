@@ -69,7 +69,7 @@ module SupportHelpers
     def resubmit_for_assignment
       run_fixer(
         SupportHelpers::AssignmentResubmission,
-        Assignment.find(params[:assignment_id])
+        api_find(Assignment, params[:assignment_id])
       )
     end
 

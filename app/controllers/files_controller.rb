@@ -1251,7 +1251,7 @@ class FilesController < ApplicationController
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).map(&:context).compact
     return true if submissions.any? { |submission| submission.grants_right?(user, session, :read) }
 
-    course = Assignment.find(params[:assignment_id]).course unless params[:assignment_id].nil?
+    course = api_find(Assignment, params[:assignment_id]).course unless params[:assignment_id].nil?
     return true if course&.grants_right?(user, session, :read)
 
     authorized_action(attachment, user, :read)

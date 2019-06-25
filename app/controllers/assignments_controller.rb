@@ -646,7 +646,7 @@ class AssignmentsController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   # @returns Assignment
   def destroy
-    @assignment = @context.assignments.active.api_id(params[:id])
+    @assignment = api_find(@context.assignments.active, params[:id])
     if authorized_action(@assignment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@assignment)
 
@@ -714,7 +714,7 @@ class AssignmentsController < ApplicationController
         :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
         :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
         :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-        :only_visible_to_overrides, :post_to_sis, :integration_id, :moderated_grading,
+        :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
         :omit_from_final_grade, :intra_group_peer_reviews,
         :allowed_extensions => strong_anything,
         :turnitin_settings => strong_anything,

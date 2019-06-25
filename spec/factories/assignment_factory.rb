@@ -58,13 +58,15 @@ module Factories
   end
 
   def create_assignments(course_ids, count_per_course = 1, fields = {})
+    account = Account.default
     course_ids = Array(course_ids)
     course_ids *= count_per_course
     records = course_ids.each_with_index.map do |id, i|
       {
         context_id: id, context_type: 'Course', context_code: "course_#{id}",
         title: "#{id}:#{i}", grading_type: "points", submission_types: "none",
-        workflow_state: 'published'
+        workflow_state: 'published',
+        root_account_id: account.id,
       }.merge(fields)
     end
     create_records(Assignment, records)

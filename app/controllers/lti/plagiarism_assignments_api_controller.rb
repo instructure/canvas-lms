@@ -106,9 +106,7 @@ module Lti
     end
 
     def assignment
-      @_assignment ||= Assignment.find_by(lti_context_id: params[:assignment_id]) || Assignment.find(params[:assignment_id])
-      raise ActiveRecord::RecordNotFound unless @_assignment
-      @_assignment
+      @_assignment ||= api_find(Assignment, params[:assignment_id])
     end
 
     def user

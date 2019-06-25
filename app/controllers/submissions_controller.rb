@@ -209,7 +209,7 @@ class SubmissionsController < SubmissionsBaseController
       @current_user
     end
 
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @submission_user)
 
     return unless authorized_action(@assignment, @submission_user, :submit)
@@ -301,7 +301,7 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def update
-    @assignment = @context.assignments.active.find(params.fetch(:assignment_id))
+    @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
     @user = @context.all_students.find(params.fetch(:id))
     @submission = @assignment.find_or_create_submission(@user)
 

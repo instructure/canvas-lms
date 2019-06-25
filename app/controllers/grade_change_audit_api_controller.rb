@@ -138,7 +138,7 @@ class GradeChangeAuditApiController < AuditorApiController
   def for_assignment
     return render_unauthorized_action unless admin_authorized?
 
-    @assignment = Assignment.active.find(params[:assignment_id])
+    @assignment = api_find(Assignment.active, params[:assignment_id])
     unless @assignment.context.root_account == @domain_root_account
       raise ActiveRecord::RecordNotFound, "Couldn't find assignment with API id '#{params[:assignment_id]}'"
     end
@@ -232,7 +232,7 @@ class GradeChangeAuditApiController < AuditorApiController
     return render_unauthorized_action unless course_authorized?(course)
 
     args = { course: course }
-    args[:assignment] = course.assignments.find(params[:assignment_id]) if params[:assignment_id]
+    args[:assignment] = api_find(course.assignments, params[:assignment_id]) if params[:assignment_id]
     args[:grader] = course.all_users.find(params[:grader_id]) if params[:grader_id]
     args[:student] = course.all_users.find(params[:student_id]) if params[:student_id]
 
@@ -306,7 +306,7 @@ class GradeChangeAuditApiController < AuditorApiController
 
   def anonymous_and_muted(events)
     assignment_ids = events.map { |event| event["attributes"].fetch("assignment_id") }.compact
-    assignments = Assignment.find(assignment_ids)
+    assignments = api_find_all(Assignment, assignment_ids)
     assignments_anonymous_and_muted = {}
 
     assignments.each do |assignment|
