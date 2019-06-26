@@ -39,7 +39,6 @@ describe LiveEvents::Client do
 
   before(:each) do
     stub_config
-    LiveEvents.logger = double()
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.stream_client = nil
     LiveEvents.clear_context!
