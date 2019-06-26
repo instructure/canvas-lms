@@ -38,7 +38,7 @@ const UnsplashPanel = React.lazy(() => import('./UnsplashPanel'))
 /**
  * Handles uploading data based on what type of data is submitted.
  */
-export const handleSubmit = (editor, accept, selectedPanel, uploadData, storeProps, afterInsert = () => {}) => {
+export const handleSubmit = (editor, accept, selectedPanel, uploadData, storeProps, source, afterInsert = () => {}) => {
   switch (selectedPanel) {
     case 'COMPUTER': {
       const {theFile} = uploadData
@@ -52,8 +52,12 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
       storeProps.startMediaUpload(isImage(theFile.type) ? 'images' : 'documents', fileMetaData)
       break;
     }
-    case 'UNSPLASH':
-      throw new Error('Not Implemented')
+    case 'UNSPLASH': {
+      const { unsplashData } = uploadData
+      source.pingbackUnsplash(unsplashData.id)
+      editor.insertContent(editor.dom.createHTML('img', {src: unsplashData.url}))
+      break;
+    }
     case 'URL': {
       const {fileUrl} = uploadData
       let editorHtml
@@ -78,7 +82,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
   const [fileUrl, setFileUrl] = useState('')
   const [selectedPanel, setSelectedPanel] = useState(panels[0])
-  const [unsplashUrl, setUnsplashUrl] = useState('');
+  const [unsplashData, setUnsplashData] = useState({id: null, url: null});
 
   trayProps = trayProps || Bridge.trayProps.get(editor)
 
@@ -117,8 +121,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                   <UnsplashPanel
                     editor={editor}
-                    unsplashUrl={unsplashUrl}
-                    setUnsplashUrl={setUnsplashUrl}
+                    setUnsplashData={setUnsplashData}
                     source={source}
                   />
                 </Suspense>
@@ -147,7 +150,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           onDismiss={onDismiss}
           onSubmit={e => {
             e.preventDefault()
-            onSubmit(editor, accept, selectedPanel, {fileUrl, theFile}, contentProps, onDismiss)
+            onSubmit(editor, accept, selectedPanel, {fileUrl, theFile, unsplashData}, contentProps, source, onDismiss)
           }}
           open
           shouldCloseOnDocumentClick

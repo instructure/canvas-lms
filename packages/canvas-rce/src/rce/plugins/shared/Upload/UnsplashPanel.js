@@ -22,7 +22,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
 import {Avatar, Img, Spinner, Text} from '@instructure/ui-elements'
 import {Pagination} from '@instructure/ui-pagination'
-import { Tooltip } from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-overlays'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
 import {StyleSheet, css} from 'aphrodite'
@@ -104,16 +104,20 @@ const useUnsplashSearch = source => {
   return {...state, search}
 }
 
-function Attribution ({name, avatarUrl}) {
+function Attribution({name, avatarUrl}) {
   return (
     <Flex>
-      <Flex.Item margin="xx-small"><Avatar name={name} src={avatarUrl} /></Flex.Item>
-      <Flex.Item margin="xx-small"><Text>{name}</Text></Flex.Item>
+      <Flex.Item margin="xx-small">
+        <Avatar name={name} src={avatarUrl} />
+      </Flex.Item>
+      <Flex.Item margin="xx-small">
+        <Text>{name}</Text>
+      </Flex.Item>
     </Flex>
   )
 }
 
-export default function UnsplashPanel({editor, source, imageUrl, setImageUrl}) {
+export default function UnsplashPanel({editor, source, setUnsplashData}) {
   const [page, setPage] = useState(1)
   const [term, setTerm] = useState('')
   const [selectedImage, setSelectedImage] = useState(null)
@@ -175,58 +179,74 @@ export default function UnsplashPanel({editor, source, imageUrl, setImageUrl}) {
           >
             {results[page] &&
               results[page].map((resultImage, index) => (
-                <Tooltip key={resultImage.id} tip={<Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} />}>
-                <div
-                  ref={c => (resultRefs[index] = c)}
+                <Tooltip
                   key={resultImage.id}
-                  className={css(styles.imageContainer)}
-                  role="radio"
-                  aria-checked={resultImage.id === selectedImage}
-                  tabIndex={index === focusedImageIndex ? 0 : -1}
-                  onClick={() => {
-                    setSelectedImage(resultImage.id)
-                    let newIndex = 0
-                    const selectedIndex = results[page].findIndex(
-                      result => result.id === resultImage.id
-                    )
-                    if (selectedIndex > 0) {
-                      newIndex = selectedIndex
-                    }
-                    setFocusedImageIndex(newIndex)
-                  }}
-                  onKeyDown={e => {
-                    switch (e.keyCode) {
-                      case 32: // Space
-                        setSelectedImage(resultImage.id)
-                        break
-                      case 38: // Up
-                        if (index - 1 < 0) {
-                          setFocusedImageIndex(results[page].length - 1)
-                        } else {
-                          setFocusedImageIndex(index - 1)
-                        }
-                        break
-                      case 40: // Down
-                        if (index + 1 >= results[page].length) {
-                          setFocusedImageIndex(0)
-                        } else {
-                          setFocusedImageIndex(index + 1)
-                        }
-                        break
-                      default:
-                        break
-                    }
-                  }}
+                  on={['click', 'hover', 'focus']}
+                  tip={
+                    <Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} />
+                  }
                 >
-                  <Img
-                    src={resultImage.urls.thumbnail}
-                    alt={resultImage.alt_text}
-                    height="10em"
-                    margin="xx-small"
-                  />
-                </div>
+                  <div
+                    ref={c => (resultRefs[index] = c)}
+                    key={resultImage.id}
+                    className={css(
+                      styles.imageContainer,
+                      resultImage.id === selectedImage && styles.imageContainerChecked
+                    )}
+                    role="radio"
+                    aria-checked={resultImage.id === selectedImage}
+                    tabIndex={index === focusedImageIndex ? 0 : -1}
+                    onClick={() => {
+                      setSelectedImage(resultImage.id)
+                      let newIndex = 0
+                      const selectedIndex = results[page].findIndex(
+                        result => result.id === resultImage.id
+                      )
+                      if (selectedIndex > 0) {
+                        newIndex = selectedIndex
+                      }
+                      setFocusedImageIndex(newIndex)
+                      setUnsplashData({
+                        id: resultImage.id,
+                        url: resultImage.urls.link
+                      })
+                    }}
+                    onKeyDown={e => {
+                      switch (e.keyCode) {
+                        case 32: // Space
+                          setSelectedImage(resultImage.id)
+                          setUnsplashData({
+                            id: resultImage.id,
+                            url: resultImage.urls.link
+                          })
+                          break
+                        case 38: // Up
+                          if (index - 1 < 0) {
+                            setFocusedImageIndex(results[page].length - 1)
+                          } else {
+                            setFocusedImageIndex(index - 1)
+                          }
+                          break
+                        case 40: // Down
+                          if (index + 1 >= results[page].length) {
+                            setFocusedImageIndex(0)
+                          } else {
+                            setFocusedImageIndex(index + 1)
+                          }
+                          break
+                        default:
+                          break
+                      }
+                    }}
+                  >
+                    <Img
+                      src={resultImage.urls.thumbnail}
+                      alt={resultImage.alt_text}
+                      height={resultImage.id === selectedImage ? '9.5em' : '10em'}
+                      margin={resultImage.id === selectedImage ? 'small' : 'xx-small'}
+                    />
+                  </div>
                 </Tooltip>
-
               ))}
           </div>
           {totalPages > 1 && results && Object.keys(results).length > 0 && (
@@ -254,7 +274,6 @@ export default function UnsplashPanel({editor, source, imageUrl, setImageUrl}) {
               </Flex.Item>
             </Flex>
           )}
-          <div>Current Selection is {selectedImage}</div>
         </>
       )}
     </>
@@ -281,6 +300,9 @@ export const styles = StyleSheet.create({
   imageContainer: {
     width: 'auto',
     height: '100%'
+  },
+  imageContainerChecked: {
+    border: '.25em solid black'
   },
   positionedText: {
     position: 'absolute',

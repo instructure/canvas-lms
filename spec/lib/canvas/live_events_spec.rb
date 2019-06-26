@@ -553,6 +553,23 @@ describe Canvas::LiveEvents do
 
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
     end
+
+    it "should include filename and display_name if asset is an attachment" do
+      attachment_model
+
+      expect_event('asset_accessed', {
+        asset_type: 'attachment',
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: 'files',
+        role: 'role',
+        level: 'participation',
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }).once
+
+      Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
+    end
   end
 
   describe '.assignment_created' do

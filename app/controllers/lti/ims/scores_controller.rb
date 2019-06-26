@@ -119,9 +119,6 @@ module Lti::Ims
     # @argument comment [String]
     #   Comment visible to the student about this score.
     #
-    # @argument https://canvas.instructure.com/lti/submission_url [String]
-    #   (EXTENSION) - The submission URL for this line item and user
-    #
     # @returns resultUrl [String]
     #   The url to the result that was created.
     #
@@ -133,8 +130,7 @@ module Lti::Ims
     #     "comment": "This is exceptional work.",
     #     "activityProgress": "Completed",
     #     "gradingProgress": "FullyGraded",
-    #     "userId": "5323497",
-    #     "https://canvas.instructure.com/lti/submission_url": "https://my.url"
+    #     "userId": "5323497"
     #   }
     def create
       update_or_create_result
