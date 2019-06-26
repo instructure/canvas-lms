@@ -17,45 +17,36 @@
 #
 
 module DataFixup::AddPostPoliciesToAssignments
-  def self.run(start_at, end_at)
-    # find_ids_in_ranges (which is used to call this function in the migration)
-    # defaults to a batch size of 1000, so we can fetch all of these in one go
-    courses_to_update = Course.where(id: start_at..end_at).
-      where("NOT EXISTS (?)", PostPolicy.where("course_id = courses.id AND assignment_id IS NULL")).
-      to_a
-
-    create_assignment_post_policies(courses: courses_to_update)
-    create_course_post_policies(courses: courses_to_update)
-  end
-
-  def self.create_assignment_post_policies(courses:)
-    # If an assignment already has a PostPolicy object, likely from a previous
-    # run of this data-fixup, we can assume it's in good order and skip it.
-    #
-    # For other assignments:
+  def self.set_submission_posted_at_dates(start_at, end_at)
+    # For all submissions:
     # - Set the posted_at time of the assignment's submissions to nil (if the
     #   assignment is muted) or to the submission's graded_at time
-    # - Create a post policy for the assignment:
-    #   - Muted assignments are considered manually posted
-    #   - Anonymous/moderated assignments are also manually posted
-    #   - All other assignments are automatically posted
-    Assignment.where(course: courses).
-      where("NOT EXISTS (?)", PostPolicy.where("assignment_id = #{Assignment.quoted_table_name}.id")).
-      find_in_batches do |assignment_batch|
+    Submission.joins(:assignment).where(id: start_at..end_at).
+      where("NOT EXISTS (?)", PostPolicy.where("assignment_id = assignments.id")).
+      find_ids_in_batches do |submission_ids|
 
-      ActiveRecord::Base.connection.exec_update <<~SQL
-        UPDATE #{Submission.quoted_table_name}
-        SET
-          posted_at = (CASE #{Assignment.quoted_table_name}.muted WHEN TRUE THEN NULL ELSE graded_at END),
-          updated_at = NOW()
-        FROM #{Assignment.quoted_table_name}
-        WHERE
-          #{Submission.quoted_table_name}.assignment_id = #{Assignment.quoted_table_name}.id AND
-          #{Submission.quoted_table_name}.assignment_id IN (#{assignment_batch.pluck(:id).join(', ')})
-      SQL
+      Submission.joins(:assignment).
+        where(id: submission_ids).
+        where(<<~SQL).
+          CASE assignments.muted
+            WHEN TRUE
+              THEN posted_at IS NOT NULL
+            ELSE
+              graded_at IS NOT NULL AND posted_at IS NULL OR graded_at IS NULL AND posted_at IS NOT NULL OR posted_at<>graded_at
+          END
+        SQL
+        update_all("posted_at = (CASE assignments.muted WHEN TRUE THEN NULL ELSE graded_at END), updated_at = NOW()")
+    end
+  end
 
-      created_at = Time.zone.now
-      assignment_post_policy_records = assignment_batch.map do |assignment|
+  def self.create_post_policies(start_at, end_at)
+    created_at = Time.zone.now
+
+    Assignment.where("NOT EXISTS (?)", PostPolicy.where("assignment_id = assignments.id")).
+      where(context_id: start_at..end_at).
+      find_in_batches do |assignments|
+
+      assignment_post_policy_records = assignments.map do |assignment|
         post_manually = assignment.muted? || assignment.anonymous_grading? || assignment.moderated_grading?
 
         {
@@ -68,21 +59,21 @@ module DataFixup::AddPostPoliciesToAssignments
       end
       PostPolicy.bulk_insert(assignment_post_policy_records)
     end
-  end
 
-  def self.create_course_post_policies(courses:)
-    # Course post policies default to automatic
-    created_at = Time.zone.now
-    course_post_policy_records = courses.map do |course|
-      {
-        assignment_id: nil,
-        course_id: course.id,
-        created_at: created_at,
-        post_manually: false,
-        updated_at: created_at
-      }
+    Course.where(id: start_at..end_at).
+      where("NOT EXISTS (?)", PostPolicy.where("course_id = courses.id AND assignment_id IS NULL")).
+      find_ids_in_batches do |course_ids|
+
+      course_post_policy_records = course_ids.map do |id|
+        {
+          assignment_id: nil,
+          course_id: id,
+          created_at: created_at,
+          post_manually: false,
+          updated_at: created_at
+        }
+      end
+      PostPolicy.bulk_insert(course_post_policy_records)
     end
-
-    PostPolicy.bulk_insert(course_post_policy_records)
   end
 end
