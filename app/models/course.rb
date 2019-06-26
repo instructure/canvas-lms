@@ -3325,10 +3325,9 @@ class Course < ActiveRecord::Base
   end
 
   def quiz_lti_tool
-    query = { tool_id: 'Quizzes 2' }
-    context_external_tools.active.find_by(query) ||
-      account.context_external_tools.active.find_by(query) ||
-        root_account.context_external_tools.active.find_by(query)
+    context_external_tools.active.quiz_lti.first ||
+      account.context_external_tools.active.quiz_lti.first ||
+        root_account.context_external_tools.active.quiz_lti.first
   end
 
   def find_or_create_progressions_for_user(user)
