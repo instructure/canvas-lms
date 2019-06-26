@@ -10,10 +10,51 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 - This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
 <div class="changelog"></div>
+## 2019-07-13
+### Additions
+| Basics | File |  |
+|----------------------|----------------------|--------------------------|
+| [GraphQL] |  | Added file |
+
+[GraphQL]: file.graphql.html
+
+<p></p>
+
+| External Tools | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Variable Substitutions] | Canvas.course.sectionRestricted | Added variable that corresponds with whether the user was enrolled with the restriction to only interact with users in their own section |
+
+[Variable Substitutions]: file.tools_variable_substitutions.html
+
+<p></p>
+
+| Resources | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Assignments API] | Assignment Object | Added posted_manually parameter |
+| [Submissions API] | Submissions Object | Added posted_at parameter |
+
+[Assignments API]: assignments.html
+[Submissions API]: submissions.html
+
+### Changes
+| Resources | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Assignments API] | Assignment Object | Muted parameter: Updated description for muted parameter regarding Old and New Gradebooks |
+| [Conversations API] | Create a Conversation Endpoint | Group_conversation parameter: updated description to indicate the value must be set to true if the number of recipients is over the set maximum (100) |
+
+[Assignments API]: assignments.html
+[Conversations API]: conversations.html
+
+### Removals
+| Resources | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Assignments API] | Create an Assignment Endpoint | Assignment[muted] parameter: deprecated for New Gradebook, to be removed 2020-01-18<br><br>This parameter may only still be used with the Old Gradebook |
+
+[Assignments API]: assignments.html
 
 ## 2019-06-22
 ### Additions
-| API Calls | Function |  |
+| Resources | Function |  |
 |----------------------|----------------------|--------------------------|
 | [Users API] | List Users in Account Endpoint | Added enrollment_type parameter |
 
@@ -22,31 +63,25 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 ## 2019-06-01
 ### Additions
-| API Calls | Function |  |
+| Resources | Function |  |
 |----------------------|----------------------|--------------------------|
-| [Files API] | Get uploaded media folder for user Endpoint | Added endpoint |
+| [Files API] | Get Uploaded Media Folder for User Endpoint | Added endpoint |
 | [Originality Report API] | Create an Originality Report<br><br>Edit an Originality Report | Added originality_report[error_message] parameter
+|                     | Originality Report Object | Returns Error_report |
 
 [Files API]: files.html
 [Originality Report API]: originality_reports.html
 
-<p></p>
-| API Responses | Function |  |
-|----------------------|----------------------|--------------------------|
-| [Originality Report API] | Originality Report Object | Returns Error_report |
-
-[Originality Report API]: originality_reports.html
-
 ### Removals
-| API Calls | Function |  |
+| Resources | Function |  |
 |----------------------|----------------------|--------------------------|
-| [Uploading Files API] | Uploading via POST Process | Step 3: Removed mention of POST requests in favor of GET requests for forward compatibility
+| [File Uploads] | Uploading via POST Process | Step 3: Deprecated POST requests in favor of GET requests for forward compatibility
 
-[Uploading Files API]: file.file_uploads.html
+[File Uploads]: file.file_uploads.html
 
 ## 2019-05-11
 ### Additions
-| API Calls | Function |  |
+| Resources | Function |  |
 |----------------------|----------------------|--------------------------|
 | [Assignments API] | Create an Assignment Endpoint<br><br>Edit an Assignment Endpoint | Added assignment [grader_count], assignment [final_grader_id], assignment [grader_comments_visible_to_graders], assignment [graders_anonymous_to_graders], assignment [graders_names_visible_to_final_grader], assignment [anonymous_grading] parameters
 |  [SIS Imports API]         | Import SIS Data Endpoint | Added diff_row_count_threshold parameter
@@ -54,14 +89,4 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 [Assignments API]: assignments.html
 [SIS Imports API]: sis_imports.html
-[Users API]: users.html
-
-## 2019-04-20
-### Additions
-| API Calls | Function |  |
-|----------------------|----------------------|--------------------------|
-| [Submissions API] | Grade or Comment on a Submission Endpoint | Rubric_assessment parameter: Added rubric_assessment[criterion_id][rating_id] sub-parameter<br><br>Added rating IDs to example rubric in description
-|  [Users API]         | Update User Settings Endpoint | Added hide_dashcard_color_overlays parameter
-
-[Submissions API]: submissions.html
 [Users API]: users.html
