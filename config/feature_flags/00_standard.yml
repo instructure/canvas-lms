@@ -416,7 +416,7 @@ restrict_students_from_annotating:
   applies_to: Course
   development: true
 rce_enhancements:
-  state: hidden
+  state: hidden_in_prod
   display_name: RCE Enhancements
   description: Allow switching to the enhanced RCE
   applies_to: Course
