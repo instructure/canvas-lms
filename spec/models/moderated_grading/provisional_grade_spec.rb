@@ -364,7 +364,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
       expect(prov_assmt.score).to eq 3
 
-      pg.send :publish_rubric_assessments!
+      pg.publish!
 
       real_assmt = sub.rubric_assessments.first
       expect(real_assmt.score).to eq 3
@@ -389,7 +389,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
 
       expect do
-        pg.send :publish_rubric_assessments!
+        pg.publish!
       end.to change { LearningOutcomeResult.count }.by(1)
     end
   end
