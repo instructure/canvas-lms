@@ -1287,7 +1287,7 @@ describe 'Submissions API', type: :request do
            "grade"=>"F",
            "entered_grade"=>"F",
            "grading_period_id" => nil,
-           "excused" => nil,
+           "excused" => false,
            "grader_id"=>@teacher.id,
            "graded_at"=>sub2.graded_at.as_json,
            "assignment_id" => a1.id,
