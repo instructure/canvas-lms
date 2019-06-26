@@ -480,8 +480,8 @@ a better user experience to provide both.)</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>The account identifier from accounts.csv, if none is specified the course will be attached to
-the root account</td>
+<td>The account identifier from accounts.csv. New courses will be attached to
+the root account if not specified here</td>
 </tr>
 <tr>
 <td>term_id</td>
