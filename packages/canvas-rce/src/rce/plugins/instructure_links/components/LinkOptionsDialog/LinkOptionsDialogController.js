@@ -59,6 +59,7 @@ export default class LinkOptionsDialogController {
     this._renderDialog()
   }
   _hasClosed = () => {
+    bridge.focusActiveEditor(false)
     this._isOpen = false
     this._editor.focus(false)
     this._editor = null

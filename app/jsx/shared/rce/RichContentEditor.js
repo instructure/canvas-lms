@@ -40,7 +40,7 @@ function loadServiceRCE(target, tinyMCEInitOptions, callback) {
     $textarea.data('remoteEditor', remoteEditor)
     $target.trigger(RCELOADED_EVENT_NAME, remoteEditor)
     if (callback) {
-      callback()
+      callback(remoteEditor)
     }
   })
 }
@@ -177,13 +177,13 @@ const RichContentEditor = {
     // avoid modifying the original options object provided
     tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
 
-    const callback = () => {
+    const callback = (rce) => {
       if (tinyMCEInitOptions.focus) {
         // call activateRCE once loaded
         this.activateRCE($target)
       }
       if (cb) {
-        cb()
+        cb(rce)
       }
     }
 

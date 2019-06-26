@@ -118,7 +118,9 @@ export default class EditableRichText extends React.Component {
       tinyOptions: {
         init_instance_callback: this.handleRCEInit,
         height: 300
-      }
+      },
+      onFocus: this.handleEditorFocus,
+      onBlur: this.handleEditorBlur
     })
   }
 
@@ -136,9 +138,6 @@ export default class EditableRichText extends React.Component {
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
 
-    this._tinyeditor.on('blur', this.handleEditorBlur)
-    this._tinyeditor.on('focus', this.handleEditorFocus)
-    this._tinyeditor.on('keydown', this.handleKey)
     document
       .getElementById('content')
       .querySelector('[id^="random_editor"]')
@@ -147,18 +146,9 @@ export default class EditableRichText extends React.Component {
   }
 
   handleEditorBlur = event => {
-    // Focus isn't managed well in the RCE, so a couple hacks
-    // 1. if the user clicked on a toolbar button that opened a dialog,
-    // the activeElement will be a child of the body, and not the our page
-    // 2. if focus is on the body, then we've left the editor altogether
-    if (
-      document.getElementById('content').contains(document.activeElement) ||
-      document.activeElement === document.body
-    ) {
-      if (this._textareaRef) {
-        const txt = RichContentEditor.callOnRCE(this._textareaRef, 'get_code')
-        this.setState({value: txt})
-      }
+    if (this._textareaRef) {
+      const txt = RichContentEditor.callOnRCE(this._textareaRef, 'get_code')
+      this.setState({value: txt})
       this._onBlurEditor(event)
     }
   }
@@ -173,14 +163,6 @@ export default class EditableRichText extends React.Component {
     this._tinyeditor.selection.collapse(false)
   }
 
-  handleKey = event => {
-    if (this.props.mode === 'edit' && event.key === 'Escape') {
-      event.preventDefault()
-      event.stopPropagation()
-      this.handleModeChange('view')
-    }
-  }
-
   textareaRef = el => {
     this._textareaRef = el
   }
@@ -189,9 +171,7 @@ export default class EditableRichText extends React.Component {
     this._onBlurEditor = onBlur
     this._editorRef = editorRef
     editorRef(this)
-    return (
-      <textarea style={{display: 'block'}} defaultValue={this.state.value} ref={this.textareaRef} />
-    )
+    return <textarea defaultValue={this.state.value} ref={this.textareaRef} />
   }
 
   // the Editable component thinks I'm the editor

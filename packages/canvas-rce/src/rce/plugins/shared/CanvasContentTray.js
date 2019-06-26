@@ -111,12 +111,21 @@ export default function CanvasContentTray(props) {
   }, [props.bridge])
 
   function handleDismissTray() {
+    props.onTrayClosing && props.onTrayClosing(true) // tell RCEWrapper we're closing
     setIsOpen(false)
+  }
+
+  function handleExitTray() {
+    props.onTrayClosing && props.onTrayClosing(true) // tell RCEWrapper we're closing
   }
 
   function handleCloseTray() {
     props.bridge.focusActiveEditor(false)
+    // increment a counter that's used a the key when rendering
+    // this gets us a new instance everytime, which is necessary
+    // to get the queries run so we have up to date data.
     setOpenCount(openCount + 1)
+    props.onTrayClosing && props.onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
   function renderLoading() {
@@ -127,6 +136,7 @@ export default function CanvasContentTray(props) {
     <StoreProvider {...props} key={openCount}>
       {contentProps => (
         <Tray
+          data-mce-component
           data-testid="CanvasContentTray"
           label={getTrayLabel(filterSettings)}
           open={isOpen}
@@ -137,6 +147,7 @@ export default function CanvasContentTray(props) {
           shouldCloseOnDocumentClick
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
+          onExit={handleExitTray}
         >
           <Flex direction="column" display="block" height="100vh" overflowY="hidden">
             <Flex.Item padding="medium" shadow="above">
@@ -193,6 +204,7 @@ export const trayProps = shape(trayPropsMap)
 
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
+  onTrayClosing: func, // called with true when the tray starts closing, false once closed
   ...trayPropsMap
 }
 

@@ -60,6 +60,7 @@ export default function LinkOptionsDialog(props) {
   return (
     <Modal
       data-testid="RCELinkOptionsDialog"
+      data-mce-component
       as="form"
       label={label}
       onDismiss={props.onRequestClose}

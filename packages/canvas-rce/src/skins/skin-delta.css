@@ -31,7 +31,15 @@
 .root {
   background-color: var(--canvasBackgroundColor)
 }
+
 :global {
+  /* not part of the skin, but necessary to properly size the RCE's textarea */
+  .rce-wrapper textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: auto;
+  }
+
   .tox,
   .tox *:not(svg) {
     color: inherit;

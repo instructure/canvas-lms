@@ -72,6 +72,7 @@ export default function LinkOptionsTray(props) {
   return (
     <Tray
       data-testid="RCELinkOptionsTray"
+      data-mce-component
       label={formatMessage('Link Options')}
       onDismiss={props.onRequestClose}
       onEntered={props.onEntered}

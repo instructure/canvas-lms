@@ -78,6 +78,7 @@ export default class LinkOptionsTrayController {
           this._isOpen = true
         }}
         onExited={() => {
+          bridge.focusActiveEditor(false)
           this._isOpen = false
         }}
         onSave={linkOptions => {

@@ -30,7 +30,8 @@ export default function indicate(region, margin = MARGIN) {
     width: region.width + 2 * margin + "px",
     height: region.height + 2 * margin + "px",
     left: region.left - margin + "px",
-    top: region.top - margin + "px"
+    top: region.top - margin + "px",
+    pointerEvents: 'none'   // so clicking in the indicator doesn't blur the RCE
   });
 
   // start hidden and animate a fade in
