@@ -272,11 +272,27 @@ va2VuIiwiaWF0IjoiMTQ4NTkwNzIwMCIsImV4cCI6IjE0ODU5MDc1MDAiLCJqdGkiOiIyOWY5MGMwNDd
     <tbody>
       <tr>
         <td class="mono">expire_sessions <span class="label optional"></span></td>
-        <td>Set this to '1' if you want to end all of the user's
-  Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.</td>
+        <td><p>Set this to '1' if you want to end all of the user's
+        Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.</p>
+
+        <p>Additionally, if the user logged in to Canvas via a delegated authentication provider,
+        and the provider supports Single Log Out functionality, the response will contain a 
+        forward_url key. If you are still in control of the user's browsing session, it is
+        recommended to then redirect them to this URL, in order to also log them out from
+        where their session originated. Beware that it is unlikely that control will be returned
+        to your application after this redirect.</p>
+        </td>
       </tr>
     </tbody>
   </table>
+
+  <h4>Example responses</h4>
+
+  <pre class="example_code">
+  {
+    "forward_url": "https://idp.school.edu/opaque_url"
+  }
+  </pre>
 </div>
 
 <a name="get-login-session-token"></a>
