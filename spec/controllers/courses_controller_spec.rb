@@ -576,7 +576,7 @@ describe CoursesController do
       expect(response).to be_successful
       expect(response.header['Content-Type']).to eql("text/csv")
       expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
-      expect(response.body.split(",")[-2]).to eql(ObserverPairingCode.last.code)
+      expect(response.body.split(",")[-2]).to include(ObserverPairingCode.last.code)
     end
 
     it "generates observer pairing codes only for students" do
@@ -586,10 +586,10 @@ describe CoursesController do
       get :observer_pairing_codes_csv, params: {course_id: @course.id}
       expect(response).to be_successful
       expect(response.header['Content-Type']).to eql("text/csv")
-      expect(response.body.include?(@student.name)).to be_truthy
+      expect(response.body).to include(@student.name)
       expect(response.body.include?(@teacher.name)).to be_falsey
       expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
-      expect(response.body.split(",")[-2]).to eql(ObserverPairingCode.last.code)
+      expect(response.body.split(",")[-2]).to include(ObserverPairingCode.last.code)
     end
   end
 
