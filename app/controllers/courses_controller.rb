@@ -1399,7 +1399,7 @@ class CoursesController < ApplicationController
         row = []
         row << opc.user.last_name
         row << opc.user.first_name
-        row << opc.code
+        row << '="' + opc.code + '"'
         row << opc.expires_at
         csv << row
       end

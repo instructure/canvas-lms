@@ -756,7 +756,7 @@ class GradeCalculator
     if never_drop_ids.present? || @ignore_muted
       cant_drop, submissions = submissions.partition do |submission|
         assignment = submission[:assignment]
-        ignore_submission?(submission: submission, assignment: assignment) || never_drop_ids.include?(assignment.id)
+        ignore_submission?(submission: submission[:submission], assignment: assignment) || never_drop_ids.include?(assignment.id)
       end
     end
 
@@ -966,6 +966,12 @@ class GradeCalculator
   def ignore_submission?(submission:, assignment:)
     return false unless @ignore_muted
 
-    @course.post_policies_enabled? ? !submission.posted? : assignment.muted?
+    if @course.post_policies_enabled?
+      # If we decided to ignore this submission earlier in this run (see
+      # create_group_sums), it will be nil, in which case keep ignoring it
+      submission.blank? || !submission.posted?
+    else
+      assignment.muted?
+    end
   end
 end

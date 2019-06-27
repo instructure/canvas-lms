@@ -46,7 +46,7 @@ export default class AttemptTab extends Component {
   updateSubmissionDraftCache = (cache, mutationResult) => {
     const {assignment} = cache.readQuery({
       query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id}
+      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id}
     })
 
     // TODO: if we remove all of the attachments from a draft we should set it back to null
