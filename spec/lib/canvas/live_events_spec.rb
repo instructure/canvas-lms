@@ -964,4 +964,59 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.discussion_topic_created(topic)
     end
   end
+
+  describe '.discussion_entry_submitted' do
+    context 'with non graded discussion' do
+      it 'should create a discussion entry created live event' do
+        course_with_student
+        topic = @course.discussion_topics.create!(
+          title: "test title",
+          message: "test body"
+        )
+        entry = topic.discussion_entries.create!(
+          message: "<p>This is a reply</p>",
+          user_id: @student.id
+        )
+
+        expect_event('discussion_entry_submitted', {
+          user_id: entry.global_user_id.to_s,
+          created_at: entry.created_at,
+          discussion_entry_id: entry.global_id.to_s,
+          discussion_topic_id: entry.global_discussion_topic_id.to_s,
+          text: entry.message
+        }).once
+
+        Canvas::LiveEvents.discussion_entry_submitted(entry, nil, nil)
+      end
+    end
+
+    context 'with graded discussion' do
+      it 'should include assignment and submission in created live event' do
+        course_with_student_submissions
+        assignment = @course.assignments.first
+        submission = assignment.submission_for_student_id(@student.id)
+        topic = @course.discussion_topics.create!(
+          title: "test title",
+          message: "test body",
+          assignment_id: assignment.id
+        )
+        entry = topic.discussion_entries.create!(
+          message: "<p>This is a reply</p>",
+          user_id: @student.id
+        )
+
+        expect_event('discussion_entry_submitted', {
+          assignment_id: assignment.global_id.to_s,
+          submission_id: submission.global_id.to_s,
+          user_id: entry.global_user_id.to_s,
+          created_at: entry.created_at,
+          discussion_entry_id: entry.global_id.to_s,
+          discussion_topic_id: entry.global_discussion_topic_id.to_s,
+          text: entry.message
+        }).once
+
+        Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.global_id, submission.global_id)
+      end
+    end
+  end
 end
