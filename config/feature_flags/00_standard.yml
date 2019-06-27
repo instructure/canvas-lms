@@ -263,23 +263,29 @@ force_rtl:
     to one that is normally RTL
   applies_to: User
   development: true
+enable_i18n_features_in_outcomes_exports:
+  state: hidden
+  display_name: Enable i18n features in outcomes exports
+  description: Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled
+    on or off for outcomes exports.
+  applies_to: RootAccount
 include_byte_order_mark_in_gradebook_exports:
   state: allowed
-  display_name: Include Byte-Order Mark in Gradebook Exports
-  description: Optionally include a byte-order mark in Gradebook exports so they can
+  display_name: Include Byte-Order Mark in compatible spreadsheet exports
+  description: Optionally include a byte-order mark in compatible spreadsheet exports so they can
     be imported into Excel for users in some locales.
   applies_to: User
 use_semi_colon_field_separators_in_gradebook_exports:
   state: allowed
-  display_name: Use semicolons to separate fields in Gradebook Exports
-  description: Use semicolons instead of commas to separate fields in Gradebook exports
+  display_name: Use semicolons to separate fields in compatible spreadsheet exports
+  description: Use semicolons instead of commas to separate fields in compatible spreadsheet exports
     so they can be imported into Excel for users in some locales.
   applies_to: User
   custom_transition_proc: use_semi_colon_field_separators_in_gradebook_exports_custom_transition_hook
 autodetect_field_separators_for_gradebook_exports:
   state: allowed
-  display_name: Autodetect field separators in Gradebook Exports
-  description: Attempt to detect an appropriate field separator in Gradebook exports
+  display_name: Autodetect field separators in compatible spreadsheet exports
+  description: Attempt to detect an appropriate field separator in compatible spreadsheet exports
     based on the number format for your language.
   applies_to: User
   custom_transition_proc: autodetect_field_separators_for_gradebook_exports_custom_transition_hook

@@ -19,6 +19,7 @@
 class GradebookExporter
   include GradebookSettingsHelpers
   include LocaleSelection
+  include CsvI18nHelpers
 
   # You may see a pattern in this file of things that look like `<< nil << nil`
   # to create 'buffer' cells for columns. Let's try to stop using that pattern
@@ -44,22 +45,11 @@ class GradebookExporter
       root_account: @course.root_account
     )
 
-    @options[:col_sep] ||= determine_column_separator
-    @options[:encoding] ||= I18n.t('csv.encoding', 'UTF-8')
-
-    # Wikipedia: Microsoft compilers and interpreters, and many pieces of software on Microsoft Windows such as
-    # Notepad treat the BOM as a required magic number rather than use heuristics. These tools add a BOM when saving
-    # text as UTF-8, and cannot interpret UTF-8 unless the BOM is present or the file contains only ASCII.
-    # https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
-    bom = include_bom?(@options[:encoding]) ? "\xEF\xBB\xBF" : ''
+    @options, bom = csv_i18n_settings(@user, @options)
     csv_data.prepend(bom)
   end
 
   private
-
-  def include_bom?(encoding)
-    encoding == 'UTF-8' && @user.feature_enabled?(:include_byte_order_mark_in_gradebook_exports)
-  end
 
   def buffer_column_headers(column_name)
     BUFFER_COLUMN_DEFINITIONS.fetch(column_name).dup
@@ -68,13 +58,6 @@ class GradebookExporter
   def buffer_columns(column_name, buffer_value=nil)
     column_count = BUFFER_COLUMN_DEFINITIONS.fetch(column_name).length
     Array.new(column_count, buffer_value)
-  end
-
-  def determine_column_separator
-    return ';' if @user.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
-    return ',' unless @user.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
-
-    I18n.t('number.format.separator', '.') == ',' ? ';' : ','
   end
 
   def csv_data
