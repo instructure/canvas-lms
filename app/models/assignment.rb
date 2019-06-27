@@ -1651,7 +1651,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def submission_for_student(user)
-    self.all_submissions.where(user_id: user.id).first_or_initialize
+    submission_for_student_id(user.id)
+  end
+
+  def submission_for_student_id(user_id)
+    self.all_submissions.where(user_id: user_id).first_or_initialize
   end
 
   def compute_grade_and_score(grade, score)
