@@ -145,7 +145,7 @@ class SubmissionsController < SubmissionsBaseController
   # All online turn-in submission types are supported in this API. However,
   # there are a few things that are not yet supported:
   #
-  # * Files can be submitted based on a file ID of a user or group file. However, there is no API yet for listing the user and group files, or uploading new files via the API. A file upload API is coming soon.
+  # * Files can be submitted based on a file ID of a user or group file or through the {api:SubmissionsApiController#create_file file upload API}. However, there is no API yet for listing the user and group files.
   # * Media comments can be submitted, however, there is no API yet for creating a media comment to submit.
   # * Integration with Google Docs is not yet supported.
   #
