@@ -505,11 +505,17 @@ class RCEWrapper extends React.Component {
       // things like table resizing and stuff.
       content_style: contentCSS,
 
-      toolbar: [
-        'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
-        'subscript | align bullist outdent indent directionality | ' +
-        'instructure_links instructure_image instructure_record instructure_documents | ' +
-        `removeformat table instructure_equation ${lti_tool_dropdown}`
+      toolbar: [{
+          name: formatMessage('Styles'), items: ['fontsizeselect', 'formatselect']
+        }, {
+          name: formatMessage('Formatting'), items: ['bold', 'italic', 'underline', 'forecolor', 'backcolor', 'superscript', 'subscript']
+        }, {
+          name: formatMessage('Alignment and Indentation'), items: ['align', 'bullist', 'outdent', 'indent', 'directionality']
+        }, {
+          name: formatMessage('Canvas Plugins'), items: ['instructure_links', 'instructure_image', 'instructure_record', 'instructure_documents']
+        }, {
+          name: formatMessage('Miscellaneous and LTI'), items: ['removeformat', 'table', 'instructure_equation', `${lti_tool_dropdown}`]
+        }
       ],
       contextmenu: '',  // show the browser's native context menu
 
