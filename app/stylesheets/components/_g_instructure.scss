@@ -1799,6 +1799,11 @@ form.user_content_post_form {
   width: 0;
 }
 
+.nav-icon {
+  @include ic-badge-maker(18px, $ic-content-background-color, $ic-color-dark);
+  float: direction(right);
+}
+
 .nav-badge {
   @include ic-badge-maker;
   float: direction(right);

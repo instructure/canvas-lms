@@ -73,7 +73,8 @@ module SectionTabHelper
   end
 
   def section_tab_tag(tab, context, active_tab)
-    concat(SectionTabTag.new(tab, context, active_tab).to_html)
+    tab_generator = @domain_root_account.try(:feature_enabled?, :a11y_left_menu) ? SectionTabTagNew : SectionTabTag
+    concat(tab_generator.new(tab, context, active_tab).to_html)
   end
 
   class AvailableSectionTabs
@@ -178,6 +179,74 @@ module SectionTabHelper
           class: 'screenreader-only'
         })
       end
+    end
+
+    def to_html
+      content_tag(:li, a_tag, {
+        class: li_classes
+      })
+    end
+  end
+
+  class SectionTabTagNew
+    include ActionView::Context
+    include ActionView::Helpers::TagHelper
+    include ActionView::Helpers::TextHelper
+
+    def initialize(tab, context, active_tab=nil)
+      @tab = SectionTabPresenter.new(tab, context)
+      @active_tab = active_tab
+    end
+
+    def a_classes
+      [ @tab.css_class.downcase.replace_whitespace('-') ].tap do |a|
+        a << 'active' if @tab.active?(@active_tab)
+      end
+    end
+
+    def a_title
+      if @tab.hide?
+        I18n.t('Disabled. Not visible to students')
+      elsif @tab.unused?
+        I18n.t('No content. Not visible to students')
+      else
+        @tab.label
+      end
+    end
+
+    def a_aria_label
+      return unless @tab.hide? || @tab.unused?
+      if @tab.hide?
+        I18n.t('%{label}. Disabled. Not visible to students', {label: @tab.label})
+      else
+        I18n.t('%{label}. No content. Not visible to students', {label: @tab.label})
+      end
+    end
+
+    def a_attributes
+      { href: @tab.path,
+        title: a_title,
+        'aria-label': a_aria_label,
+        class: a_classes }.tap do |h|
+          h[:target] = @tab.target if @tab.target?
+          h['data-tooltip'] = '' if @tab.hide? || @tab.unused?
+      end
+    end
+
+    def a_tag
+      content_tag(:a, a_attributes) do
+        concat(@tab.label)
+        concat(indicate_hidden)
+      end
+    end
+
+    def li_classes
+      ['section']
+    end
+
+    def indicate_hidden
+      return unless @tab.hide? || @tab.unused?
+      "<i class='nav-icon icon-off' aria-hidden='true' role='presentation'></i>".html_safe
     end
 
     def to_html
