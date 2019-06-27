@@ -21,6 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
+import wait from 'waait'
 import PublishCloud from 'jsx/shared/PublishCloud'
 import FilesystemObject from 'compiled/models/FilesystemObject'
 
@@ -51,9 +52,10 @@ test('model change event updates components state', function() {
   equal(this.publishCloud.state.published, true, 'changing models locked changes it to true')
 })
 
-test('clicking a published cloud opens restricted dialog', function() {
+test('clicking a published cloud opens restricted dialog', async function() {
   sandbox.stub(ReactDOM, 'render')
   Simulate.click(this.publishCloud.refs.publishCloud)
+  await wait(10)
   ok(ReactDOM.render.calledOnce, 'renders a component inside the dialog')
 })
 

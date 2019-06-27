@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!broccoli_cloud'
 import customPropTypes from '../modules/customPropTypes'
 import '../../jquery.rails_flash_notifications'
+import 'jquery.instructure_date_and_time' // $.datetimeString
 
 export default {
   displayName: 'PublishCloud',
