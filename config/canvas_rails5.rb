@@ -46,7 +46,7 @@ unless defined?(CANVAS_RAILS5_1)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS5_1 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'false')
+      CANVAS_RAILS5_1 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'true')
     rescue
       CANVAS_RAILS5_1 = true
     end
