@@ -5552,7 +5552,7 @@ describe Course, "#show_total_grade_as_points?" do
     end
 
     it "should cache" do
-      expect_any_instantiation_of(@course).to receive(:account_users_for).once
+      expect_any_instantiation_of(@course).to receive(:account_users_for).once.and_return([])
       2.times { cached_account_users }
     end
 

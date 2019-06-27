@@ -161,120 +161,118 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    Shackles.activate(:slave) do
-      if @quiz.deleted?
-        flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
-        redirect_to named_context_url(@context, :context_quizzes_url)
-        return
+    if @quiz.deleted?
+      flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
+      redirect_to named_context_url(@context, :context_quizzes_url)
+      return
+    end
+
+    if authorized_action(@quiz, @current_user, :read)
+      # optionally force auth even for public courses
+      return if value_to_boolean(params[:force_user]) && !force_user
+
+      if @current_user && !@quiz.visible_to_user?(@current_user)
+        if @current_user.quiz_submissions.where(quiz_id: @quiz).any?
+          flash[:notice] = t 'notices.submission_doesnt_count', "This quiz will no longer count towards your grade."
+        else
+          respond_to do |format|
+            flash[:error] = t "You do not have access to the requested quiz."
+            format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+          end
+          return
+        end
       end
 
-      if authorized_action(@quiz, @current_user, :read)
-        # optionally force auth even for public courses
-        return if value_to_boolean(params[:force_user]) && !force_user
+      @quiz = @quiz.overridden_for(@current_user)
+      add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
 
-        if @current_user && !@quiz.visible_to_user?(@current_user)
-          if @current_user.quiz_submissions.where(quiz_id: @quiz).any?
-            flash[:notice] = t 'notices.submission_doesnt_count', "This quiz will no longer count towards your grade."
-          else
-            respond_to do |format|
-              flash[:error] = t "You do not have access to the requested quiz."
-              format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
-            end
-            return
-          end
-        end
+      setup_headless
 
-        @quiz = @quiz.overridden_for(@current_user)
-        add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-
-        setup_headless
-
-        if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
-          return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
-        end
-
-        if @quiz.require_lockdown_browser? && refresh_ldb = value_to_boolean(params.delete(:refresh_ldb))
-          return render(:action => "refresh_quiz_after_popup")
-        end
-
-        @question_count = @quiz.question_count
-        if session[:quiz_id] == @quiz.id && !request.xhr?
-          session.delete(:quiz_id)
-        end
-        is_observer = @context_enrollment && @context_enrollment.observer?
-        @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true, :is_observer => is_observer)
-        @locked = @locked_reason && !can_preview?
-
-        @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
-        @sequence_asset = @context_module_tag.try(:content)
-        Shackles.activate(:master) do
-          @quiz.context_module_action(@current_user, :read) unless @locked && !@locked_reason[:can_view]
-        end
-
-        @assignment = @quiz.assignment
-        @assignment = @assignment.overridden_for(@current_user) if @assignment
-
-        @submission = get_submission
-
-        @just_graded = false
-        if @submission && @submission.needs_grading?(!!params[:take])
-          Shackles.activate(:master) do
-            Quizzes::SubmissionGrader.new(@submission).grade_submission(
-              finished_at: @submission.finished_at_fallback
-            )
-            @submission.reload
-            @just_graded = true
-          end
-        end
-        if @submission
-          upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
-          js_env :UPLOAD_URL => upload_url
-          js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless @quiz.muted?
-          if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
-            events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
-            js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
-          end
-        end
-
-        setup_attachments
-        submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
-        @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
-        @stored_params ||= {}
-        hash = {
-          ATTACHMENTS: Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
-          CONTEXT_ACTION_SOURCE: :quizzes,
-          COURSE_ID: @context.id,
-          LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
-          QUIZ: quiz_json(@quiz,@context,@current_user,session),
-          QUIZ_DETAILS_URL: course_quiz_managed_quiz_data_url(@context.id, @quiz.id),
-          QUIZZES_URL: course_quizzes_url(@context),
-          MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
-        }
-        append_sis_data(hash)
-        js_env(hash)
-        conditional_release_js_env(@quiz.assignment, includes: [:rule])
-
-        set_master_course_js_env_data(@quiz, @context)
-
-        @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
-        @can_take = can_take_quiz?
-        Shackles.activate(:master) do
-          if params[:take] && @can_take
-            return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
-            # allow starting the quiz via a GET request, but only when using a lockdown browser
-            if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
-              start_quiz!
-            else
-              take_quiz
-            end
-          else
-            @lock_results_if_needed = true
-
-            log_asset_access(@quiz, "quizzes", "quizzes")
-          end
-        end
-        @padless = true
+      if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
+        return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
       end
+
+      if @quiz.require_lockdown_browser? && refresh_ldb = value_to_boolean(params.delete(:refresh_ldb))
+        return render(:action => "refresh_quiz_after_popup")
+      end
+
+      @question_count = @quiz.question_count
+      if session[:quiz_id] == @quiz.id && !request.xhr?
+        session.delete(:quiz_id)
+      end
+      is_observer = @context_enrollment && @context_enrollment.observer?
+      @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true, :is_observer => is_observer)
+      @locked = @locked_reason && !can_preview?
+
+      @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
+      @sequence_asset = @context_module_tag.try(:content)
+      Shackles.activate(:master) do
+        @quiz.context_module_action(@current_user, :read) unless @locked && !@locked_reason[:can_view]
+      end
+
+      @assignment = @quiz.assignment
+      @assignment = @assignment.overridden_for(@current_user) if @assignment
+
+      @submission = get_submission
+
+      @just_graded = false
+      if @submission && @submission.needs_grading?(!!params[:take])
+        Shackles.activate(:master) do
+          Quizzes::SubmissionGrader.new(@submission).grade_submission(
+            finished_at: @submission.finished_at_fallback
+          )
+          @submission.reload
+          @just_graded = true
+        end
+      end
+      if @submission
+        upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
+        js_env :UPLOAD_URL => upload_url
+        js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless @quiz.muted?
+        if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
+          events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
+          js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
+        end
+      end
+
+      setup_attachments
+      submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
+      @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
+      @stored_params ||= {}
+      hash = {
+        ATTACHMENTS: Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
+        CONTEXT_ACTION_SOURCE: :quizzes,
+        COURSE_ID: @context.id,
+        LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
+        QUIZ: quiz_json(@quiz,@context,@current_user,session),
+        QUIZ_DETAILS_URL: course_quiz_managed_quiz_data_url(@context.id, @quiz.id),
+        QUIZZES_URL: course_quizzes_url(@context),
+        MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
+      }
+      append_sis_data(hash)
+      js_env(hash)
+      conditional_release_js_env(@quiz.assignment, includes: [:rule])
+
+      set_master_course_js_env_data(@quiz, @context)
+
+      @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
+      @can_take = can_take_quiz?
+      Shackles.activate(:master) do
+        if params[:take] && @can_take
+          return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
+          # allow starting the quiz via a GET request, but only when using a lockdown browser
+          if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
+            start_quiz!
+          else
+            take_quiz
+          end
+        else
+          @lock_results_if_needed = true
+
+          log_asset_access(@quiz, "quizzes", "quizzes")
+        end
+      end
+      @padless = true
     end
   end
 
