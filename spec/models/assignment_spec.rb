@@ -4262,6 +4262,15 @@ describe Assignment do
       expect(@assignment.participants.include?(@student1)).to be_falsey
     end
 
+    it 'excludes students with completed enrollments by date when not differentiated' do
+      @course.start_at = 2.days.ago
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @assignment.update_attribute(:only_visible_to_overrides, false)
+      expect(@assignment.participants(by_date: true).include?(@student1)).to be_falsey
+    end
+
     it 'excludes students without visibility' do
       expect(@assignment.participants.include?(@student2)).to be_falsey
     end
@@ -5794,7 +5803,7 @@ describe Assignment do
       comments, ignored = @assignment.generate_comments_from_files(
         zip.open.path,
         @teacher)
-      
+
       expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
       expect(ignored).to be_empty
     end

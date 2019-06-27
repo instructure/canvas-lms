@@ -1565,7 +1565,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def participants(opts={})
-    return context.participants(include_observers: opts[:include_observers], excluded_user_ids: opts[:excluded_user_ids]) unless differentiated_assignments_applies?
+    return context.participants(opts) unless differentiated_assignments_applies?
     participants_with_visibility(opts)
   end
 
