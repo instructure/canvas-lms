@@ -100,6 +100,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
     return (
       <Tray
         label={I18n.t('Grade posting policy tray')}
+        onDismiss={this.handleDismiss}
         onExited={onExited}
         open={this.state.open}
         placement="end"

@@ -182,6 +182,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
     return (
       <Tray
         label={I18n.t('Post grades tray')}
+        onDismiss={this.dismiss}
         onExited={onExited}
         open={open}
         placement="end"
