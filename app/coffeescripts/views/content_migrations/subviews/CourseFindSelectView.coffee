@@ -30,6 +30,10 @@ export default class CourseFindSelectView extends Backbone.View
   @optionProperty 'current_user_id', 'show_select'
   template: template
 
+  constructor: ->
+    @includeConcludedCourses = true
+    super
+
   els:
     '#courseSearchField'   : '$courseSearchField'
     '#courseSelect'        : '$courseSelect'

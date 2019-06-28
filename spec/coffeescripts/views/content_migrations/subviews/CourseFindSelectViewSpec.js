@@ -24,7 +24,7 @@ import assertions from 'helpers/assertions'
 QUnit.module('CourseFindSelectView: #setSourceCourseId', {
   setup() {
     fakeENV.setup()
-    this.url = '/users/101/manageable_courses'
+    this.urlPattern = /\/users\/101\/manageable_courses/
     this.server = sinon.fakeServer.create()
     this.courses = [
       {
@@ -58,7 +58,7 @@ QUnit.module('CourseFindSelectView: #setSourceCourseId', {
         enrollment_start: '2016-10-01T09:00:00Z'
       }
     ]
-    return this.server.respondWith('GET', this.url, [
+    return this.server.respondWith('GET', this.urlPattern, [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(this.courses)
