@@ -35,6 +35,11 @@ export function renderLink(data, contents) {
   linkAttrs.className = linkAttrs['class']
   delete linkAttrs['class']
 
+  // renderToStaticMarkup isn't happy with bool attributes
+  Object.keys(linkAttrs).forEach(attr => {
+    if (typeof linkAttrs[attr] === 'boolean') linkAttrs[attr] = linkAttrs[attr].toString()
+  })
+
   return renderToStaticMarkup(
     <a {...linkAttrs}>
       {children}

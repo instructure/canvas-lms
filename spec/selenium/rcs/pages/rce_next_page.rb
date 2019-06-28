@@ -271,7 +271,7 @@ module RCENextPage
   end
 
   def tray_container
-    f('[data-cid="Tray Portal"]')
+    f('[data-cid="Tray"]')
   end
 
   def display_text_link_option

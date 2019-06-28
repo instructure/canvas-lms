@@ -80,6 +80,10 @@ export default function Link(props) {
     dragHtml(e, renderLinkHtml(linkAttrs, linkAttrs.text));
   }
 
+  function handleDragEnd(e) {
+    document.body.click()
+  }
+
   function handleHover(e) {
     setIsHovering(e.type === 'mouseenter')
   }
@@ -94,6 +98,7 @@ export default function Link(props) {
       data-testid="instructure_links-Link"
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onMouseEnter={handleHover}
       onMouseLeave={handleHover}
       style={{position: 'relative'}}

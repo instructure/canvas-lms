@@ -134,7 +134,7 @@ export default function CanvasContentTray(props) {
           size="regular"
           shouldContainFocus
           shouldReturnFocus={false}
-          shouldCloseOnDocumentClick={false}
+          shouldCloseOnDocumentClick
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
         >
