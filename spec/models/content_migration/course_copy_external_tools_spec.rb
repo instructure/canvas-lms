@@ -202,5 +202,17 @@ describe ContentMigration do
       expect(tool.settings[:selection_width]).to eq 5000
       expect(tool.course_settings_sub_navigation[:message_type]).to eq "ContentItemSelectionResponse"
     end
+
+    it "should copy content_migration settings" do
+      @tool_from.settings[:content_migration] = {
+        "export_start_url" => "https://example.com/export",
+        "import_start_url" => "https://example.com/import"
+      }
+      @tool_from.save!
+
+      run_course_copy
+      tool = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
+      expect(tool.settings[:content_migration]).to eq @tool_from.settings[:content_migration]
+    end
   end
 end
