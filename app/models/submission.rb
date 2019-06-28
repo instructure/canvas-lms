@@ -285,6 +285,7 @@ class Submission < ActiveRecord::Base
   after_save :update_participation
 
   # StrongMind Added
+  after_commit -> { PipelineService.publish(self) }
   after_save :send_unit_grades_to_pipeline
 
   # StrongMind Added
