@@ -88,6 +88,21 @@ shared_examples_for "lti services" do
       expect(response).to have_http_status http_success_status
     end
 
+    context 'with site admin developer key' do
+      context 'when LTI 1.3 feature is allowed' do
+        let(:before_send_request) do
+          -> do
+            developer_key.update!(account: nil)
+            Account.site_admin.allow_feature!(:lti_1_3)
+          end
+        end
+
+        it 'returns 200 success' do
+          expect(response).to have_http_status http_success_status
+        end
+      end
+    end
+
     context 'with system failure during access token validation' do
       let(:jwt_validator) { instance_double(Canvas::Security::JwtValidator) }
       let(:before_send_request) do

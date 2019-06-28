@@ -106,7 +106,9 @@ module Lti::Ims::Concerns
       )
 
       def verify_1_3_enabled
-        return if developer_key.owner_account.feature_enabled?(:lti_1_3)
+        owner_account = developer_key.owner_account
+        return if owner_account.feature_enabled?(:lti_1_3) ||
+          (owner_account.site_admin? && owner_account.feature_allowed?(:lti_1_3))
         render_error("LTI 1.3/Advantage features not enabled", :unauthorized)
       end
 
