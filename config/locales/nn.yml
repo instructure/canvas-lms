@@ -2251,6 +2251,7 @@ nn:
       invalid_course_section: "Ugyldig emneområde"
       invalid_group_category: "Ugyldig gruppekategori"
       missing_group_category: "Gruppeavtalar må ha ein gruppekategori"
+  appointment_groups_bd225e60: Avtalegrupper
   appointments_dcb41d23: Avtalar
   approved_c3b285d4: Godkjent
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med presisjon %{precision}"
@@ -2408,6 +2409,7 @@ nn:
   assignment_does_not_exist_74178c34: "finn ikkje oppgåve"
   assignment_excused_eb6c08fa: "Fritak for oppgåva"
   assignment_extensions_cac06daa: Oppgåveutvidingar
+  assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Oppgåve vurdert: %{grade}på %{assignment_name}i%{course_code}"
   assignment_grades_have_already_been_published_ff2d84c6: "Karakterane på oppgåvene er allereie publiserte."
   assignment_group: 
     default_name: Oppgåver
@@ -5329,6 +5331,7 @@ nn:
   course_calendar_add_edit_delete_events_76b97c04: "Emnekalender - legg til / endre / slett hendingar"
   course_canvas_id_9e36b24c: "Canvas emne-ID"
   course_card_color_region_for_course_c356a69c: "Fargeområde for emnekort for %{course}"
+  course_card_image_5285f1bf: Emnekortbilde
   course_cards_6029a05c: Emnekort
   course_catalog_4cc7c8ce: Emnekatalog
   course_collaborations_dadb327e: Emnesamarbeid
@@ -5394,6 +5397,7 @@ nn:
   course_files_add_edit_delete_24678a2f: "Emnefilar - legg til / endre / slett"
   course_found_f5a40cd3: "Emne funne"
   course_found_not_deleted_a20f72f0: "Emne funne (ikkje sletta)"
+  course_grade_grade_in_course_code_9fa854db: "Vurdring i emne: %{grade}% i%{course_code}"
   course_grades_22adc27e: Emnekarakterar
   course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Vurderingskjema for emne kan slåast på/av i emneinnstillingar."
   course_groups_e8239a1e: Emnegrupper
@@ -6279,6 +6283,7 @@ nn:
   data_exports: dataeksport
   data_point_over_time_8d0a54cc: "%{data_point} over tid"
   data_set_identifier_data_set_id_c228b5df: "Datasett-ID: %{data_set_id}"
+  database_error_err_6393d244: "Databasefeil (%{err})"
   date: 
     abbr_day_names: 
       - sun
@@ -7605,6 +7610,7 @@ nn:
         body2: "Flott. Dersom du skal fullføre innleveringa, må du velje klassa du vill legge innleveringa til og endre sidenamnet. Etter at du har klikka på \"Legg til side\" går du til ei ny side der det er mogleg å redigere detaljar."
   eportfolios_f6dc4579: e-porteføljer
   epub_exporting_f5592ff2: EPUB-eksport
+  epub_exports_3822c3f8: "ePub eksport"
   error_59293a2c: feil
   error_98e81528: Feil
   error_deleting_name_reason_11f9d399: "Feil under sletting av %{name}: %{reason}"
@@ -7867,6 +7873,7 @@ nn:
   federated_attributes_5cbe6441: "Felles attributter"
   federated_attributes_are_information_sent_from_you_2116fb61: "Fellesattributter er informasjon som sendast frå den gjeldande autentiseringstenesta og som nyttast til å automatisk oppdatere korresponderande brukarinformasjon i Canvas kvar gong ein brukar loggar inn.  "
   feed_url_is_required_253fda4e: "Aktivitetsstrøm-URL er obligatorisk"
+  field_must_be_either_active_or_deleted_329a42a: "\"%{field}\"må være enten \"%{active}\" eller \"%{deleted}\""
   field_name_31fff38e: Feltnamn
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Send ei feilmelding med førespurnad om personleg hjelp, til brukarstøtteteamet."
   file_already_exists_bdc61895: "fila finst allereie"
@@ -7874,6 +7881,7 @@ nn:
   file_c851020d: Fil
   file_content_a99b5c6b: Filinnhald
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Får ikkje inkludert fila %{filename} i EPUB-dokumentet. Prøv anna ZIP-fil for tilgang."
+  file_has_no_data_213a4540: "Fila har ikkje innhald"
   file_has_no_outcomes_data_1517801f: "Fila har ingen data om læringsmål"
   file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Fillista er oppdatert"
@@ -8864,6 +8872,7 @@ nn:
       create_category_success: "Kategori er oppretta."
       delete_category_success: "Kategori er sletta"
       update_category_success: "Kategori er oppdatert."
+  group_categories_7a569a4d: Gruppekategorier
   group_categories_csv_21eb0566: "CSV-fil for gruppekategoriar"
   group_category: 
     cant_restrict_self_signup: "Kan ikkje avgrense sjølvregistrering då ei gruppe med medlemmar frå fleire seksjonar finst i kategorien"
@@ -9268,6 +9277,7 @@ nn:
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper kan ikkje ha storleiksgrense ved seksjonstildeling"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper må vere tomme ved seksjonstildeling"
   groups_navigation_menu_76b5acc6: "Meny for gruppenavigasjon"
+  groups_view_all_student_groups_39bd1b85: "Grupper - vis alle studentgrupper"
   groupweight_of_total_9579ae8c: "%{groupWeight}% av totalen"
   guatemala_502_ae25c68f: "Guatemala (+502)"
   handlebars_helpers: 
@@ -9905,6 +9915,7 @@ nn:
   late_policies_42bac80: "For sein-retningslinjer"
   late_policies_fd5dced6: "For sein-retningslinjer"
   late_policies_updated_2ecf9aff: "For sein-retningslinjer er oppdaterte"
+  late_policy_9d0e76b5: "For sein-retningslinjer"
   late_submission_deduction_interval_b9fca334: "Intervall for utrekning av for sein innlevering"
   late_submission_deduction_must_be_between_0_and_10_9cde872d: "Utrekning av for sein innlevering må vere mellom 0 og 100"
   late_submission_deduction_must_be_numeric_5b3f468e: "Utrekninga av for sein innlevering må vere numerisk"
@@ -10313,6 +10324,7 @@ nn:
   lti_2_reregistration_afabde25: "Ny registrering av LTI 2"
   lti_add_and_edit_a359d8da: "LTI legg til og rediger"
   lti_add_edit_delete_15905170: "LTI - legg til / rediger / slett"
+  lti_advantage_services_c1746cb4: "LTI Advantages-tenester"
   lti_key_14ad02b1: LTI-nøkkel
   lti_report_2b6193ab: LTI-rapport
   luxembourg_352_85f4124d: "Luxembourg (+352)"
@@ -10374,6 +10386,7 @@ nn:
   mastery_path_processing_f4471152: "Behandlar meistringssti"
   mastery_paths_breakdown_6e0b5fce: "Sjå meistringssti-detaljar"
   mastery_paths_cc4096c2: Meistringsstiar
+  mastery_points_f1672cc: meistringspoeng
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet reflekterer høgaste resultat i ei karaktersett oppgåve eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet reflekterer den siste karaktersette oppgåva eller quizen."
   matching_left_side_900f860b: "Samsvarer venstre side"
@@ -11103,6 +11116,9 @@ nn:
           link: "Klikk for å vise eksportar"
           subject: "Emneeksport er fullført: %{course}"
         subject: "Emneeksport er fullført: %{course}"
+    content_link_error: 
+      summary: 
+        subject: "Feil ved innhaldslenke - %{assignment_name}"
     content_locked: "Denne quizen er låst akkurat no."
     content_locked_at: "Innhaldet blei låst %{at}."
     content_locked_module: "Innhaldet er del av *%{module}*-modulen og er ikkje låst opp enno."
@@ -12127,6 +12143,7 @@ nn:
   missing_eaddacbd: MANGLAR
   missing_percent_94534638: "Manglar: %{percent}"
   missing_policies_4f195e0b: "Manglande retningslinjer"
+  missing_required_fields_fields_30e20799: "Manglar nødvendig område: %{fields}"
   missing_required_ratings_9b19e66: "Manglar nødvendig vurdering"
   missing_required_values_missing_values_f3be2ff8: "Manglar obligatoriske verdiar: %{missing_values}"
   missing_submission_ec204c33: "Manglar innlevering"
@@ -12984,6 +13001,7 @@ nn:
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser EPUB etter innhaldstype (standard er etter modul)."
   organize_your_course_content_c3c7ed03: "Organiser emneinnhaldet"
   originality_report_5d461681: Originalitetsrapport
+  originality_reports_1e36b935: Originalitetsrapport
   other_1c6d9c79: Anna
   other_carrier_45531207: "Annan operatør"
   other_ddacb37d: anna
@@ -12999,9 +13017,11 @@ nn:
   outcome_group_39fae76f: Læringsmålgruppe
   outcome_groups: 
     invalid_file: "Ugyldig fil for læringsmålgruppe"
+  outcome_groups_3bc3b150: Læringsmålgrupper
   outcome_groups_api: 
     account_group_description: "Læringsmålgruppe på kontonivå."
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Læringsmål \"%{guid}\" er allereie importert"
+  outcome_imports_c496a81f: "Import av læringsmål"
   outcome_path_mastery_points: "%{path} meistringspoeng"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
@@ -14170,6 +14190,7 @@ nn:
     upload_file_view: 
       choose_a_picture: "vel eit bilde"
       crop_instructions: "Du kan skjere til bildet ved å dra utsnittet med musepeikaren eller bruke piltastane for å flytte det. Bruk shift+piltastar for å endre storleik på utsnittet. Trykk så på Lagre-knappen nedanfor.  "
+  progress_9de4af8f: Framdrift
   progress_for_account_name_ef203250: "Framdrift for %{account_name}"
   progress_loading_bar_a26b8861: Framdriftsfelt
   project_groups_1fa0320b: Prosjektgrupper
@@ -14397,8 +14418,10 @@ nn:
   quiz_40ee61b1: quiz
   quiz_duplication_not_implemented_c1495585: "Duplikat for quiz er ikkje implementert"
   quiz_e0dcce8f: Quiz
+  quiz_extensions_d2550649: "Quiz utvidingar"
   quiz_failed_to_update_2b66fa4d: "Kan ikkje oppdatere quizen"
   quiz_ip_address_filters_49a75ec8: "IP-adressefilter for quizar"
+  quiz_ip_filters_685f7f63: "Quiz IP-filter"
   quiz_log_auditing: 
     buttons: 
       reload_events: "Laste inn på nytt"
@@ -14470,6 +14493,7 @@ nn:
   quiz_lti_plugin_a6256549: "LTI-programtillegg for quiz"
   quiz_menu_4fcd5e61: Quizmeny
   quiz_question_1da5198e: Quiz-spørsmål
+  quiz_question_groups_bd0bb222: "Quiz spørsmålsgrupper"
   quiz_questions_ecea3c40: Quiz-spørsmål
   quiz_reports: 
     cancel_generation: Avbryt
@@ -14535,6 +14559,9 @@ nn:
   quiz_statistics_e57611c2: Quiz-statistikk
   quiz_submission_dca0c013: Quizinnlevering
   quiz_submission_events_e8b69549: Quizinnleveringshendingar
+  quiz_submission_files_4a5579d1: "Quiz innleveringsfiler"
+  quiz_submission_questions_f25d1947: "Quiz innleveringsspørsmål"
+  quiz_submission_user_list_9d782163: "Quiz innlevering Brukerliste"
   quiz_submissions_75eaf377: Quizinnleveringar
   quiz_successfully_updated_ece5c63d: "Quizen er oppdatert"
   quiz_title_4b50ade9: Quiztittel
@@ -15823,6 +15850,7 @@ nn:
       account_roles: Kontoroller
       course_roles: Emneroller
       page_header_title: "Løyve for kontoar"
+  roles_730b879e: Roller
   rootFoldersFinder: 
     course_files: Emnefiler
     group_files: Gruppefiler
@@ -15925,6 +15953,7 @@ nn:
   save_theme_f706116e: "Lagre tema"
   save_this_comment_for_reuse_5eda0b70: "Lagre denne kommentarer for seinare bruk"
   saving_2521e616: Lagrar
+  saving_assignment_fb958949: "Lagrar oppgåve"
   saving_associations_989bd4da: "Lagrar forbindelsane"
   saving_associations_complete_e4b9634d: "Lagring av forbindelsane er ferdig"
   saving_associations_started_8ac85360: "Lagring av forbindelsane er starta"
@@ -16358,6 +16387,7 @@ nn:
   service_cloud_ticketing_connector_889e1b7b: "Koplingspunkt for Service Cloud Ticketing"
   services_api: 
     must_be_logged_in: "Du må vere pålogga for å bruke Kaltura."
+  services_ccd7bca0: Tenester
   set_as_default_email_address_bd3b9b8f: "Vel som standard e-postadresse"
   set_created_createdat_895e2243: "Sett oppretta %{createdAt}"
   set_default_email_address_400f70dc: "Vel standard e-postadresse"
@@ -17074,6 +17104,7 @@ nn:
         images: Bilde
         links: Lenker
       uploading_file: "Lastar opp *fil*..."
+  shared_brand_configs_e5d319d7: "Felles produktkonfigurasjonar"
   shared_secret_892c88f2: "Delt hemmelegheit"
   short_name_42f454a1: "Kort namn"
   short_name_ad9bf84f: "kort namn"
@@ -17184,6 +17215,8 @@ nn:
     errors: 
       invalid_content_type: "Ugyldig innhaldstype, krev UTF-8"
     sis_import_in_process_notice: "Ein SIS-import er allereie i gang."
+  sis_imports_d88db59e: "SIS importeringar"
+  sis_integration_ffd3705d: SIS-integrering
   sis_integration_settings_18c28506: "Innstillingar for SIS-integrasjon"
   sis_syncing_635bfb63: SIS-synkronisering
   site: 
@@ -17737,6 +17770,7 @@ nn:
     syllabus: Emneoversikt
     tab_location_error: "Faneplasseringa er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikkje behandlast"
+  tabs_5605547e: Faner
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
   take_a_picture_d582acf1: "Ta eit bilde"
   take_a_snapshot_now_5b622d85: "Ta eit augneblinksbilde no"
@@ -17851,6 +17885,7 @@ nn:
       sida og får ein e-post når nedlastinga
       er fullført.
   the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stabelsporing, om gjeldande"
+  the_field_field_is_required_56512820: "Feltet \"%{field}\" er obligatorisk"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet \"%{field}\" kan ikkje innehalde mellomrom"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "I kategorien Filer kan du dele forelesingsdokument, eksempeldokument, studiehjelp – alt studentane vil laste ned.  Opplasting og organisering av filene er enkelt i Canvas.  Vi  viser deg korleis du gjer det."
   the_following_content_is_partner_provided_ed1da756: "Følgande innhald er lagt til av partnar"
@@ -18831,6 +18866,7 @@ nn:
         student: Student
       journal_header: Faglærarprotokoll
       page_title: Faglærarprotokoll
+  user_observees_40cec795: Observatørar
   user_observer_csv_3592a9cf: "CSV-fil over observatørar"
   user_observers_454d4303: Observatørar
   user_option_links_66090987: Brukarval-lenker
@@ -19168,6 +19204,7 @@ nn:
   view_grades_for_name_45aeb2f2: "Vis karakterane til %{name}"
   view_grading_history_e64bb8fe: "Vis historikk for karaktersetjing"
   view_in_speedgrader_773b9d81: "Vis i SpeedGrader"
+  view_login_ids_for_users_142bbe7a: "Sjå påloggingsdetaljar for brukarar"
   view_longer_description_6b762087: "sjå ei lenger skildring"
   view_name_app_62a2ad8e: "Vis %{name}-app"
   view_next_file_a8a4a885: "Vis neste fil"
