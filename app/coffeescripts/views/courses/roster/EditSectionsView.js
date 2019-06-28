@@ -141,7 +141,7 @@ export default class EditSectionsView extends DialogBaseView {
           .val()
           .split('_')[1]
     )
-    const newSections = _.reject(sectionIds, i => _.include(currentIds, i))
+    const newSections = _.reject(sectionIds, i => _.includes(currentIds, i))
     const newEnrollments = []
     const deferreds = []
     // create new enrollments
@@ -171,7 +171,7 @@ export default class EditSectionsView extends DialogBaseView {
     // delete old section enrollments
     const sectionsToRemove = _.difference(currentIds, sectionIds)
     const enrollmentsToRemove = _.filter(this.model.sectionEditableEnrollments(), en =>
-      _.include(sectionsToRemove, en.course_section_id)
+      _.includes(sectionsToRemove, en.course_section_id)
     )
     for (let en of Array.from(enrollmentsToRemove)) {
       url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`

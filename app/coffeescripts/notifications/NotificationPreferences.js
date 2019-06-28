@@ -63,7 +63,7 @@ export default class NotificationPreferences {
       title: I18n.t('frequencies.title.never', 'Do not send me anything'),
     }]
 
-    this.limitedButtonData = [_.first(this.buttonData), _.last(this.buttonData)]
+    this.limitedButtonData = [_.head(this.buttonData), _.last(this.buttonData)]
 
     this.updateUrl = this.options.update_url
     this.channels = this.options.channels || []

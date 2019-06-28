@@ -338,7 +338,7 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  jsonData.studentMap = _.indexBy(jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
@@ -622,9 +622,9 @@ function setupHeader({showMuteButton = true}) {
     toAssignment(e) {
       e.preventDefault()
       const classes = e.target.getAttribute('class').split(' ')
-      if (_.contains(classes, 'prev')) {
+      if (classes.includes('prev')) {
         EG.prev()
-      } else if (_.contains(classes, 'next')) {
+      } else if (classes.includes('next')) {
         EG.next()
       }
     },
@@ -2170,7 +2170,7 @@ EG = {
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
     $enrollment_inactive_notice.showIf(
-      _.any(jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments, enrollment => {
+      _.some(jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments, enrollment => {
         if (enrollment.workflow_state === 'inactive') {
           $full_width_container.addClass('with_enrollment_notice')
           return true
@@ -2203,7 +2203,7 @@ EG = {
       return false
     }
 
-    return _.any(
+    return _.some(
       jsonData.studentMap[student].enrollments,
       enrollment => enrollment.workflow_state === 'completed'
     )
@@ -2365,7 +2365,7 @@ EG = {
   totalStudentCount() {
     if (sectionToShow) {
       return _.filter(jsonData.context.students, student =>
-        _.contains(student.section_ids, sectionToShow)
+        _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
       return jsonData.context.students.length
@@ -2531,9 +2531,7 @@ EG = {
 
       const currentStudentIDAsOfAjaxCall = this.currentStudent[anonymizableId]
       previewOptions = $.extend(previewOptions, {
-        ajax_valid: _.bind(function() {
-          return currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
-        }, this)
+        ajax_valid: () => currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
       })
       $iframe_holder.show().loadDocPreview(previewOptions)
     } else if (browserableCssClasses.test(attachment.mime_class)) {
@@ -2636,7 +2634,7 @@ EG = {
     const defaultOpts = {
       commentAttachmentBlank: $comment_attachment_blank
     }
-    const opts = _.extend({}, defaultOpts, incomingOpts)
+    const opts = {...defaultOpts, ...incomingOpts}
     const attachment = attachmentData.attachment ? attachmentData.attachment : attachmentData
     let attachmentElement = opts.commentAttachmentBlank.clone(true)
 
@@ -2760,7 +2758,7 @@ EG = {
       commentBlank: $comment_blank,
       commentAttachmentBlank: $comment_attachment_blank
     }
-    const opts = _.extend({}, defaultOpts, incomingOpts)
+    const opts = {...defaultOpts, ...incomingOpts}
     let commentElement = opts.commentBlank.clone(true)
 
     // Serialization seems to have changed... not sure if it's changed everywhere, though...
@@ -3554,7 +3552,7 @@ function getGradingPeriods() {
 
 function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
   const speedGraderJSON = speedGraderJsonResponse[0]
-  speedGraderJSON.gradingPeriods = _.indexBy(gradingPeriods, 'id')
+  speedGraderJSON.gradingPeriods = _.keyBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()
@@ -3649,7 +3647,7 @@ function setupSelectors() {
   fileIndex = 1
   gradeeLabel = studentLabel
   groupLabel = I18n.t('group', 'Group')
-  isAdmin = _.include(ENV.current_user_roles, 'admin')
+  isAdmin = _.includes(ENV.current_user_roles, 'admin')
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
   header = setupHeader({showMuteButton: !ENV.post_policies_enabled})

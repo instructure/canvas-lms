@@ -33,7 +33,6 @@
 // # back on /courses/1/x
 // userSettings.contextRemove 'specialIds'
 
-import _ from 'underscore'
 import $ from 'jquery'
 import 'jquery.instructure_misc_helpers'
 
@@ -44,7 +43,7 @@ const userSettings = {
 function addTokens (method, ...tokens) {
   return function (key, value) {
     const stringifiedValue = JSON.stringify(value)
-    const joinedTokens = _(tokens).map(token => userSettings.globalEnv[token]).join('_')
+    const joinedTokens = tokens.map(token => userSettings.globalEnv[token]).join('_')
     const res = localStorage[`${method}Item`](`_${joinedTokens}_${key}`, stringifiedValue)
     if (res === 'undefined') return undefined
     if (res) return JSON.parse(res)

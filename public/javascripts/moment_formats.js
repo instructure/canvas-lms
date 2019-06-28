@@ -141,7 +141,7 @@ const moment_formats = {
   },
 
   escapedUnlessi18nKey (string) {
-    const isKey = _.detect(_.keys(moment_formats.i18nToMomentHash), k => string.indexOf(k) > -1)
+    const isKey = _.find(_.keys(moment_formats.i18nToMomentHash), k => string.indexOf(k) > -1)
 
     return isKey ? string : `[${string}]`
   },

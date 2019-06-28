@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
-import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 import TextInput from '../../external_apps/components/TextInput'
@@ -56,7 +55,7 @@ export default class ConfigurationFormXml extends React.Component {
     this.setState({errors})
 
     let isValid = true
-    if (_.keys(errors).length > 0) {
+    if (Object.keys(errors).length > 0) {
       isValid = false
       $.screenReaderFlashError(
         I18n.t('There were errors with the form: %{errors}', {errors: formErrors.join(' ')})

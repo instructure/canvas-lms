@@ -196,7 +196,7 @@ export default class EditAppointmentGroupDetails {
     const slotLimit = parseInt(input.val())
     return this.helpIconShowIf(
       checkbox,
-      _.any(this.apptGroup.appointments, a => a.child_events_count > slotLimit)
+      _.some(this.apptGroup.appointments, a => a.child_events_count > slotLimit)
     )
   }
 
@@ -210,7 +210,7 @@ export default class EditAppointmentGroupDetails {
         apptCounts[e.user.id] += 1
       })
     })
-    return this.helpIconShowIf(checkbox, _.any(apptCounts, (count, userId) => count > apptLimit))
+    return this.helpIconShowIf(checkbox, _.some(apptCounts, (count, userId) => count > apptLimit))
   }
 
   // show/hide the help icon

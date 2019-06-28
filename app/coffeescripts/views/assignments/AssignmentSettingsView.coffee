@@ -63,7 +63,7 @@ export default class AssignmentSettingsView extends DialogFormView
     @addAssignmentGroups()
 
   canChangeWeights: ->
-    @userIsAdmin or !_.any @assignmentGroups.models, (ag) ->
+    @userIsAdmin or !_.some @assignmentGroups.models, (ag) ->
       ag.anyAssignmentInClosedGradingPeriod()
 
   submit: (event) ->

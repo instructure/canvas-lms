@@ -129,7 +129,7 @@ export default class Gradebook
       @submissionStateMap = new SubmissionStateMap
         hasGradingPeriods: @gradingPeriodSet?
         selectedGradingPeriodID: @gradingPeriodToShow
-        isAdmin: _.contains(ENV.current_user_roles, "admin")
+        isAdmin: _.includes(ENV.current_user_roles, "admin")
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
       @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
@@ -257,7 +257,7 @@ export default class Gradebook
 
     gradingPeriodIsActive: (gradingPeriodId) ->
       activePeriodIds = _.pluck(@gradingPeriods, 'id')
-      _.contains(activePeriodIds, gradingPeriodId)
+      _.includes(activePeriodIds, gradingPeriodId)
 
     getGradingPeriodToShow: () =>
       return null unless @gradingPeriodSet?
@@ -367,7 +367,7 @@ export default class Gradebook
 
     updateAssignmentEffectiveDueDates: (assignment) ->
       assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
-      assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
+      assignment.inClosedGradingPeriod = _.some(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
 
     rowIndex: 0
     addRow: (student) =>
@@ -375,9 +375,9 @@ export default class Gradebook
       student.computed_final_score ||= 0
       student.secondary_identifier = student.sis_login_id || student.login_id
 
-      student.isConcluded = _.all student.enrollments, (e) ->
+      student.isConcluded = _.every student.enrollments, (e) ->
         e.enrollment_state == 'completed'
-      student.isInactive = _.all student.enrollments, (e) ->
+      student.isInactive = _.every student.enrollments, (e) ->
         e.enrollment_state == 'inactive'
 
       if @sections_enabled
@@ -545,7 +545,7 @@ export default class Gradebook
       else
         propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
         pattern = new RegExp @userFilterTerm, 'i'
-        matched = _.any propertiesToMatch, (prop) ->
+        matched = _.some propertiesToMatch, (prop) ->
           student[prop]?.match pattern
 
       matchingSection and matchingFilter
@@ -1593,9 +1593,9 @@ export default class Gradebook
       @totalGradeWarning = null
 
       gradebookVisibleAssignments = _.reject @assignments, (assignment) ->
-        _.contains(assignment.submission_types, 'not_graded')
+        _.includes(assignment.submission_types, 'not_graded')
 
-      if _.any(gradebookVisibleAssignments, (a) -> a.muted)
+      if _.some(gradebookVisibleAssignments, (a) -> a.muted)
         @totalGradeWarning =
           warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
           icon: "icon-muted"

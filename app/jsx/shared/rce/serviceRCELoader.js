@@ -176,10 +176,10 @@ let loadingPromise
       let height = textarea.offsetHeight
 
       if (height){
-        tinyMCEInitOptions.tinyOptions = _.extend({},
-          {height: height},
-          (tinyMCEInitOptions.tinyOptions || {})
-        )
+        tinyMCEInitOptions.tinyOptions = {
+          height,
+          ...(tinyMCEInitOptions.tinyOptions || {})
+        }
       }
 
       return {

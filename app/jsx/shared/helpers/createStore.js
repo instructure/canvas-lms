@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import Backbone from 'Backbone'
 
   /**
@@ -53,12 +52,12 @@ import Backbone from 'Backbone'
    */
 
   function createStore(initialState) {
-    var events = _.extend({}, Backbone.Events);
+    var events = {...Backbone.Events};
     var state = initialState || {};
 
     return {
       setState (newState) {
-        _.extend(state, newState);
+        Object.assign(state, newState);
         this.emitChange();
       },
 

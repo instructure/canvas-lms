@@ -46,13 +46,14 @@ const exampleGradebookOptions = {
 QUnit.module('Gradebook')
 
 test('normalizes the grading period set from the env', function() {
-  const options = _.extend({}, exampleGradebookOptions, {
+  const options = {
+    ...exampleGradebookOptions,
     grading_period_set: {
       id: '1501',
       grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
       weighted: true
     }
-  })
+  }
   const {gradingPeriodSet} = new Gradebook(options)
   deepEqual(gradingPeriodSet.id, '1501')
   equal(gradingPeriodSet.gradingPeriods.length, 2)
@@ -262,8 +263,8 @@ QUnit.module('Gradebook#hideAggregateColumns', {
   gradebookStubs() {
     return {
       indexedOverrides: Gradebook.prototype.indexedOverrides,
-      indexedGradingPeriods: _.indexBy(this.gradingPeriods, 'id')
-    }
+      indexedGradingPeriods: _.keyBy(this.gradingPeriods, 'id')
+    };
   },
 
   setupThis(options) {
@@ -443,11 +444,11 @@ QUnit.module('Gradebook#fieldsToExcludeFromAssignments', {
 })
 
 test('includes "description" in the response', function() {
-  ok(_.contains(this.excludedFields, 'description'))
+  ok(this.excludedFields.includes('description'))
 })
 
 test('includes "needs_grading_count" in the response', function() {
-  ok(_.contains(this.excludedFields, 'needs_grading_count'))
+  ok(this.excludedFields.includes('needs_grading_count'))
 })
 
 QUnit.module('Gradebook#submissionsForStudent', {

@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import startApp from '../start_app'
-import _ from 'underscore'
 import Ember from 'ember'
 import fixtures from '../shared_ajax_fixtures'
 import $ from 'jquery'
@@ -71,7 +70,7 @@ test('secondary id says hidden', function() {
 test('view concluded enrollments', function() {
   let enrollments = this.controller.get('enrollments')
   ok(enrollments.content.length > 1)
-  _.each(enrollments.content, enrollment => ok(enrollment.workflow_state === undefined))
+  enrollments.content.forEach(enrollment => ok(enrollment.workflow_state === undefined))
 
   return click('#concluded_enrollments').then(() => {
     enrollments = this.controller.get('enrollments')

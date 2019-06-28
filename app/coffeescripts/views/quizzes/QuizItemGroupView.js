@@ -59,7 +59,7 @@ export default class ItemGroupView extends CollectionView {
   }
 
   matchingCount(term) {
-    return _.select(this.collection.models, m => {
+    return _.filter(this.collection.models, m => {
       return this.filter(m, term)
     }).length
   }

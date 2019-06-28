@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import EditorConfig from 'tinymce.config'
 import setupAndFocusTinyMCEConfig from 'setupAndFocusTinyMCEConfig'
 import INST from 'INST'
@@ -27,11 +26,11 @@ import INST from 'INST'
     // RichContentEditor takes care of the autofocus functionality at a higher level
     var autoFocus = undefined
 
-    return _.extend({},
-      editorConfig.defaultConfig(),
-      setupAndFocusTinyMCEConfig(tinymce, autoFocus, enableBookmarkingOverride),
-      (tinyMCEInitOptions.tinyOptions || {})
-    );
+    return {
+      ...editorConfig.defaultConfig(),
+      ...setupAndFocusTinyMCEConfig(tinymce, autoFocus, enableBookmarkingOverride),
+      ...(tinyMCEInitOptions.tinyOptions || {})
+    };
 
   };
 

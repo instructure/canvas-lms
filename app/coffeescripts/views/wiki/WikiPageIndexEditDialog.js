@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
 import I18n from 'i18n!pages'
 import DialogFormView from '../DialogFormView'
 import wrapperTemplate from 'jst/wiki/WikiPageIndexEditDialog'
@@ -44,7 +43,7 @@ export default class WikiPageIndexEditDialog extends DialogFormView {
 
   initialize(options = {}) {
     this.returnFocusTo = options.returnFocusTo
-    return super.initialize(_.extend({}, dialogDefaults, options))
+    return super.initialize({...dialogDefaults, ...options});
   }
 
   setupDialog() {

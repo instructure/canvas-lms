@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import IndexMenuActions from '../actions/IndexMenuActions'
 
   const {
@@ -35,30 +34,23 @@ import IndexMenuActions from '../actions/IndexMenuActions'
 
   const handlers = {
     [SET_MODAL_OPEN]: (state, action) => {
-      const newState = _.extend({}, state);
-      newState.modalIsOpen = action.payload;
-
+      const newState = {...state, modalIsOpen: action.payload}
       return newState;
     },
 
     [LAUNCH_TOOL]: (state, action) => {
-      const newState = _.extend({}, state);
-      newState.selectedTool = action.payload;
-      newState.modalIsOpen = true;
-
+      const newState = {...state, selectedTool: action.payload, modalIsOpen: true}
       return newState;
     },
 
     [SET_TOOLS]: (state, action) => {
-      const newState = _.extend({}, state);
-      newState.externalTools = action.payload;
+      const newState = {...state, externalTools: action.payload}
 
       return newState;
     },
 
     [SET_WEIGHTED]: (state, action) => {
-      const newState = _.extend({}, state);
-      newState.weighted = action.payload;
+      const newState = {...state, weighted: action.payload}
 
       return newState;
     },

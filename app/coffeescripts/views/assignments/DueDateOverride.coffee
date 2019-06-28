@@ -94,7 +94,7 @@ export default class DueDateOverrideView extends Backbone.View
     checkedRows = []
     for override in data.assignment_overrides
       # Don't validate duplicates
-      continue if _.contains(checkedRows, override.rowKey)
+      continue if _.includes(checkedRows, override.rowKey)
 
       dateValidator = new DateValidator({
         date_range: _.extend({}, ENV.VALID_DATE_RANGE)
@@ -102,7 +102,7 @@ export default class DueDateOverrideView extends Backbone.View
         forIndividualStudents: override.student_ids?.length
         hasGradingPeriods: @hasGradingPeriods
         gradingPeriods: @gradingPeriods
-        userIsAdmin: _.contains(ENV.current_user_roles, "admin"),
+        userIsAdmin: _.includes(ENV.current_user_roles, "admin"),
         postToSIS: @postToSIS(data)
       })
       rowErrors = dateValidator.validateDatetimes()
@@ -126,7 +126,7 @@ export default class DueDateOverrideView extends Backbone.View
       $inputWrapper = $('[data-row-identifier="'+identifier+'"]')[0]
       $nameInput = $($inputWrapper).find("input")
       $nameInput.removeAttr('data-error-type')
-      continue if _.contains(validRowKeys, rowKey)
+      continue if _.includes(validRowKeys, rowKey)
       errors = _.extend(errors, { blankOverrides: {message: blankOverrideMsg, element: $nameInput, showError: @showError} })
       $nameInput.attr('data-error-type', "blankOverrides")
     errors
@@ -148,7 +148,7 @@ export default class DueDateOverrideView extends Backbone.View
     invalidGroupOverrideMessage = I18n.t("You cannot assign to a group outside of the assignment's group set")
     for row in $('.Container__DueDateRow-item')
       rowKey = "#{$(row).attr('data-row-key')}"
-      continue unless _.contains(invalidGroupOverrideRowKeys, rowKey)
+      continue unless _.includes(invalidGroupOverrideRowKeys, rowKey)
       identifier = 'tokenInputFor' + rowKey
       $nameInput = $('[data-row-identifier="'+identifier+'"]').find("input")
       errors = _.extend(errors, { invalidGroupOverride: {message: invalidGroupOverrideMessage, element: $nameInput, showError: @showError} })

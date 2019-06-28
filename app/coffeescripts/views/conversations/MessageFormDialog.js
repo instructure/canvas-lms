@@ -303,7 +303,7 @@ export default class MessageFormDialog extends DialogBaseView {
         messages.filter(
           m =>
             new Date(m.get('created_at')) <= date &&
-            !_.find(participants, p => !_.contains(m.get('participating_user_ids'), p))
+            !_.find(participants, p => !_.includes(m.get('participating_user_ids'), p))
         )
       )
       const contextView = new ContextMessagesView({
@@ -396,7 +396,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   recipientIdsChanged(recipientIds) {
-    if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/)) {
+    if (_.isEmpty(recipientIds) || _.includes(recipientIds, /(teachers|tas|observers)$/)) {
       return this.toggleUserNote(false)
     } else {
       const canAddNotes = _.map(this.recipientView.tokenModels(), tokenModel =>

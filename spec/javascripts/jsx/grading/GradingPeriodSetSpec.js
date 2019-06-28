@@ -108,7 +108,7 @@ const props = {
 
 QUnit.module('GradingPeriodSet', {
   renderComponent(opts = {}) {
-    const attrs = _.extend({}, props, opts)
+    const attrs = {...props, ...opts}
     attrs.onDelete = sinon.stub()
     attrs.onEdit = sinon.stub()
     let component
@@ -200,7 +200,7 @@ test('deletes the set if the user confirms deletion', function() {
 
 QUnit.module('GradingPeriodSet "Edit Grading Period"', {
   renderComponent(opts = {}) {
-    const attrs = _.extend({}, props, opts)
+    const attrs = {...props, ...opts}
     let component
     attrs.ref = ref => {
       component = ref
@@ -273,7 +273,7 @@ test('"onCancel" re-enables set toggling', function() {
 
 QUnit.module('GradingPeriodSet "Edit Grading Period - onSave"', {
   renderComponent(opts = {}) {
-    const attrs = _.extend({}, props, opts)
+    const attrs = {...props, ...opts}
     let component
     attrs.ref = ref => {
       component = ref
@@ -560,13 +560,14 @@ test('does not save a grading period with closeDate before endDate', function() 
 QUnit.module('GradingPeriodSet "Add Grading Period"', {
   renderComponent(permissions = allPermissions, readOnly = false) {
     let component
-    const updatedProps = _.extend({}, props, {
-      permissions: _.extend({}, allPermissions, permissions),
+    const updatedProps = {
+      ...props,
+      permissions: {...allPermissions, ...permissions},
       readOnly,
       ref(ref) {
         component = ref
       }
-    })
+    }
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     return component
   },

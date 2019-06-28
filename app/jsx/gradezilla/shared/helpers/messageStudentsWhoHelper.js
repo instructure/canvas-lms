@@ -33,7 +33,7 @@ export function hasSubmission(assignment) {
   const submissionTypes = getSubmissionTypes(assignment)
   if (submissionTypes.length === 0) return false
 
-  return _.any(
+  return _.some(
     submissionTypes,
     submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
   )
@@ -112,7 +112,7 @@ const MessageStudentsWhoHelper = {
   },
 
   exists(value) {
-    return !_.isUndefined(value) && !_.isNull(value)
+    return value != null
   },
 
   scoreWithCutoff(student, cutoff) {

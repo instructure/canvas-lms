@@ -86,14 +86,14 @@ const MessageStudentsWhoHelper = {
     const submissionTypes = assignment.submission_types
     if (submissionTypes.length === 0) return false
 
-    return _.any(
+    return _.some(
       submissionTypes,
       submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
     )
   },
 
   exists(value) {
-    return !_.isUndefined(value) && !_.isNull(value)
+    return value != null
   },
 
   scoreWithCutoff(student, cutoff) {

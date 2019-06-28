@@ -57,7 +57,7 @@ class ApiProgressBar extends React.Component {
 
   componentWillUnmount() {
     ProgressStore.removeChangeListener(this.handleStoreChange)
-    if (!_.isNull(this.intervalID)) {
+    if (this.intervalID !== null) {
       clearInterval(this.intervalID)
       this.intervalID = null
     }
@@ -73,12 +73,12 @@ class ApiProgressBar extends React.Component {
 
   componentDidUpdate() {
     if (this.isComplete()) {
-      if (!_.isNull(this.intervalID)) {
+      if (this.intervalID !== null) {
         clearInterval(this.intervalID)
         this.intervalID = null
       }
 
-      if (!_.isUndefined(this.props.onComplete)) {
+      if (this.props.onComplete !== undefined) {
         this.props.onComplete()
       }
     }
@@ -99,12 +99,12 @@ class ApiProgressBar extends React.Component {
     }
   }
 
-  isComplete = () => _.contains(['completed', 'failed'], this.state.workflow_state)
+  isComplete = () => ['completed', 'failed'].includes(this.state.workflow_state)
 
-  isInProgress = () => _.contains(['queued', 'running'], this.state.workflow_state)
+  isInProgress = () => ['queued', 'running'].includes(this.state.workflow_state)
 
   poll = () => {
-    if (!_.isUndefined(this.props.progress_id)) {
+    if (this.props.progress_id !== undefined) {
       ProgressStore.get(this.props.progress_id)
     }
   }

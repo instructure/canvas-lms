@@ -17,7 +17,6 @@
 //
 
 import $ from 'jquery'
-import _ from 'underscore'
 import PaginatedView from '../views/PaginatedView'
 import 'jquery.disableWhileLoading'
 
@@ -322,7 +321,7 @@ export default class TokenSelectorList extends PaginatedView {
     const fn = `on${this.keyCodes[code]}Key`
     if (this[fn]) {
       return this[fn].call(this, e, $target) && e.preventDefault()
-    } else if (_.include([16, 17, 18, 92], code)) {
+    } else if ([16, 17, 18, 92].includes(code)) {
       // shift, control, alt, and command; do nothing
     } else {
       // focus input and pass to it

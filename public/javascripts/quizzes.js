@@ -3016,7 +3016,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           error_text = I18n.t('errors.no_possible_solution', "Please generate at least one possible solution");
         }
       } else if ($answers.length === 0 || $answers.filter(".correct_answer").length === 0) {
-        if ($answers.length === 0 && !_.contains(["essay_question", "file_upload_question", "text_only_question"], questionData.question_type)) {
+        if ($answers.length === 0 && !["essay_question", "file_upload_question", "text_only_question"].includes( questionData.question_type)) {
           error_text = I18n.t('errors.no_answer', "Please add at least one answer");
         } else if ($answers.filter(".correct_answer").length === 0 && (questionData.question_type == "multiple_choice_question" || questionData.question_type == "true_false_question" || questionData.question_tyep == "missing_word_question")) {
           error_text = I18n.t('errors.no_correct_answer', "Please choose a correct answer");

@@ -190,7 +190,7 @@ import Section from 'compiled/models/Section'
     findAdhoc(collection, idToRemove){
       return _.find(collection, (ov) =>{
         return !!ov.get("student_ids") &&
-          (idToRemove ? _.contains(ov.get("student_ids"), idToRemove) : true)
+          (idToRemove ? _.includes(ov.get("student_ids"), idToRemove) : true)
       })
     },
   }

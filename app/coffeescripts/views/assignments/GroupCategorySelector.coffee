@@ -111,7 +111,7 @@ export default class GroupCategorySelector extends Backbone.View
 
   toJSON: =>
     frozenAttributes = @parentModel.frozenAttributes?() || []
-    groupCategoryFrozen = _.include frozenAttributes, 'group_category_id'
+    groupCategoryFrozen = _.includes frozenAttributes, 'group_category_id'
     groupCategoryLocked = !@parentModel.canGroup()
 
     groupCategoryId: @parentModel.groupCategoryId()

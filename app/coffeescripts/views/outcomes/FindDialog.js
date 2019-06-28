@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!outcomesFindDialog'
 import $ from 'jquery'
-import _ from 'underscore'
 import OutcomeGroup from '../../models/OutcomeGroup'
 import Progress from '../../models/Progress'
 import DialogBaseView from '../DialogBaseView'
@@ -142,7 +141,7 @@ export default class FindDialog extends DialogBaseView {
           if (importedModel instanceof OutcomeGroup) {
             importedModel.set(response)
           } else {
-            importedModel.outcomeLink = _.extend({}, model.outcomeLink)
+            importedModel.outcomeLink = {...model.outcomeLink}
             importedModel.outcomeGroup = response.outcome_group
             importedModel.outcomeLink.url = response.url
             importedModel.set({

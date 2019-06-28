@@ -85,11 +85,11 @@ export default class RosterUserView extends Backbone.View {
       json.enrollments = _.reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
     }
 
-    json.canRemoveUsers = _.all(this.model.get('enrollments'), e => e.can_be_removed)
+    json.canRemoveUsers = _.every(this.model.get('enrollments'), e => e.can_be_removed)
     json.canResendInvitation = !json.isInactive
 
     if (json.canRemoveUsers && !ENV.course.concluded) {
-      json.canEditRoles = !_.any(
+      json.canEditRoles = !_.some(
         this.model.get('enrollments'),
         e => e.type === 'ObserverEnrollment' && e.associated_user_id
       )
@@ -100,7 +100,7 @@ export default class RosterUserView extends Backbone.View {
     json.canViewLoginIdColumn =
       ENV.permissions.manage_admin_users || ENV.permissions.manage_students
     json.canViewSisIdColumn = ENV.permissions.read_sis
-    json.canManage = _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
+    json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )
       ? ENV.permissions.manage_admin_users
@@ -131,7 +131,7 @@ export default class RosterUserView extends Backbone.View {
       const users = {}
       if (
         observerEnrollments.length >= 1 &&
-        _.all(observerEnrollments, enrollment => !enrollment.observed_user)
+        _.every(observerEnrollments, enrollment => !enrollment.observed_user)
       ) {
         users[''] = {name: I18n.t('nobody', 'nobody')}
       } else {

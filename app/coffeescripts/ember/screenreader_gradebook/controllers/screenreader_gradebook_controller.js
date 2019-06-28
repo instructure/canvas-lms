@@ -230,7 +230,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const submissionTypes = this.get('selectedAssignment.submission_types')
     const submissionTypesOnWhitelist = _.intersection(submissionTypes, whitelist)
 
-    return hasSubmittedSubmissions && _.any(submissionTypesOnWhitelist)
+    return hasSubmittedSubmissions && _.some(submissionTypesOnWhitelist)
   }.property('selectedAssignment'),
 
   hideStudentNames: false,
@@ -464,7 +464,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.observes('hideStudentNames'),
 
   setupSubmissionCallback: function() {
-    Ember.$.subscribe('submissions_updated', _.bind(this.updateSubmissionsFromExternal, this))
+    Ember.$.subscribe('submissions_updated', this.updateSubmissionsFromExternal.bind(this))
   }.on('init'),
 
   setupAssignmentWeightingScheme: function() {
@@ -755,7 +755,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     this.updateEffectiveDueDatesFromSubmissions(submissions)
     const assignmentIds = _.uniq(_.pluck(submissions, 'assignment_id'))
-    const assignmentMap = _.indexBy(this.get('assignmentsFromGroups.content'), 'id')
+    const assignmentMap = _.keyBy(this.get('assignmentsFromGroups.content'), 'id')
     assignmentIds.forEach(assignmentId => {
       const assignment = assignmentMap[assignmentId]
       if (assignment) {
@@ -850,7 +850,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.observes('showNotesColumn'),
 
   bindNotesSuccess: function() {
-    return (this.boundNotesSuccess = _.bind(this.onNotesUpdateSuccess, this))
+    return (this.boundNotesSuccess = this.onNotesUpdateSuccess.bind(this))
   }.on('init'),
 
   onNotesUpdateSuccess(col) {
@@ -1024,7 +1024,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   updateEffectiveDueDatesOnAssignment(assignment) {
     assignment.effectiveDueDates = this.get('effectiveDueDates.content')[assignment.id] || {}
-    return (assignment.inClosedGradingPeriod = _.any(
+    return (assignment.inClosedGradingPeriod = _.some(
       assignment.effectiveDueDates,
       date => date.in_closed_grading_period
     ))
@@ -1066,7 +1066,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     if (!assignment.only_visible_to_overrides) {
       return true
     }
-    return _.include(assignment.assignment_visibility, student_id)
+    return _.includes(assignment.assignment_visibility, student_id)
   },
 
   studentsThatCanSeeAssignment(assignment) {
@@ -1081,7 +1081,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   },
 
   checkForNoPointsWarning(ag) {
-    const pointsPossible = _.inject(ag.assignments, (sum, a) => sum + (a.points_possible || 0), 0)
+    const pointsPossible = _.reduce(ag.assignments, (sum, a) => sum + (a.points_possible || 0), 0)
     return pointsPossible === 0
   },
 
@@ -1183,7 +1183,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const map = new SubmissionStateMap({
       hasGradingPeriods: !!this.has_grading_periods,
       selectedGradingPeriodID: this.get('selectedGradingPeriod.id') || '0',
-      isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, 'admin')
+      isAdmin: ENV.current_user_roles && _.includes(ENV.current_user_roles, 'admin')
     })
     map.setup(this.get('students').toArray(), this.get('assignmentsFromGroups.content').toArray())
     this.set('submissionStateMap', map)
@@ -1281,7 +1281,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     // Calculate whether the current user is able to grade assignments given their role and the
     // result of the calculations above
-    if (ENV.current_user_roles != null && _.contains(ENV.current_user_roles, 'admin')) {
+    if (ENV.current_user_roles != null && _.includes(ENV.current_user_roles, 'admin')) {
       this.set('disableAssignmentGrading', false)
     } else {
       this.set('disableAssignmentGrading', assignment.inClosedGradingPeriod)

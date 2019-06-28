@@ -17,7 +17,6 @@
 //
 
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!contentview'
 import Backbone from 'Backbone'
 import Outcome from '../../models/Outcome'
@@ -63,11 +62,12 @@ export default class ContentView extends Backbone.View {
 
   // private
   _show(viewOpts) {
-    viewOpts = _.extend({}, viewOpts, {
+    viewOpts = {
+      ...viewOpts,
       readOnly: this.readOnly,
       setQuizMastery: this.setQuizMastery,
       useForScoring: this.useForScoring
-    })
+    }
     if (this.innerView != null) {
       this.innerView.remove()
     }

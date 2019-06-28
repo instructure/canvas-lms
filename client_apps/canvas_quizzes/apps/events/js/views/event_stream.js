@@ -80,7 +80,7 @@ define(function(require) {
         if(e.type != K.EVT_QUESTION_ANSWERED) {
           return true;
         }
-        return _.any(e.data, function(i) {
+        return _.some(e.data, function(i) {
           return (i.answer != null);
         });
       });

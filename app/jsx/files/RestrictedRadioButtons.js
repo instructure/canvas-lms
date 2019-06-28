@@ -137,7 +137,7 @@ class RestrictedRadioButtons extends React.Component {
 
   isPermissionChecked = option =>
     this.state.selectedOption === option.selectedOptionKey ||
-    _.contains(option.selectedOptionKey, this.state.selectedOption)
+    _.includes(option.selectedOptionKey, this.state.selectedOption)
 
   renderPermissionOptions = () =>
     this.permissionOptions.map((option, index) => (

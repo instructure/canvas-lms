@@ -109,7 +109,7 @@ export default class ValidatedFormView extends Backbone.View
         $(element).attr('data-error-type')
       )
       assignmentFieldErrors = _.chain(_.keys(errors))
-                              .reject((err) -> _.contains(dateOverrideErrors, err))
+                              .reject((err) -> _.includes(dateOverrideErrors, err))
                               .value()
       first_error = assignmentFieldErrors[0] || dateOverrideErrors[0]
       @findField(first_error).focus()

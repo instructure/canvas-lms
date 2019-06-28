@@ -260,7 +260,7 @@ export default Grid =
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
         return unless outcome and _.isNumber(score)
         [className, color, description] = Grid.View.masteryDetails(score, outcome)
-        return '' if shouldFilter and !_.include(Grid.filter, className)
+        return '' if shouldFilter and !_.includes(Grid.filter, className)
         cssColor = if color then "background-color:#{color};" else ''
         if hide_points
           cellTemplate(color: cssColor, className: className, description: description)

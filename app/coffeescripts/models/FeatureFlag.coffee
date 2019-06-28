@@ -45,7 +45,7 @@ export default class FeatureFlag extends Backbone.Model
     @state() == 'on'
 
   isOff: ->
-    _.include(['off', 'hidden'], @state()) or (!@currentContextIsAccount() and @isAllowed())
+    ['off', 'hidden'].includes(@state()) or (!@currentContextIsAccount() and @isAllowed())
 
   isHidden: ->
     @flag().hidden

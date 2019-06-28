@@ -529,7 +529,7 @@ export default class Calendar {
   activeContexts() {
     const allowedContexts =
       userSettings.get('checked_calendar_codes') || _.pluck(this.contexts, 'asset_string')
-    return _.filter(this.contexts, c => _.contains(allowedContexts, c.asset_string))
+    return _.filter(this.contexts, c => _.includes(allowedContexts, c.asset_string))
   }
 
   addEventClick(event, jsEvent, view) {
@@ -1140,7 +1140,7 @@ export default class Calendar {
     // if we want to do this, it needs to happen after @refetchEvents completes (asynchronously)
     // which may actually make the UI less responsive
     // courseEvents = @dataSource.getEventsFromCacheForContext range.start, range.end, @schedulerState.selectedCourse.asset_string
-    // return if _.any courseEvents, (event) ->
+    // return if _.some courseEvents, (event) ->
     //    event.isAppointmentGroupEvent() && event.calendarEvent.reserve_url &&
     //    !event.calendarEvent.reserved && event.calendarEvent.available_slots > 0
 

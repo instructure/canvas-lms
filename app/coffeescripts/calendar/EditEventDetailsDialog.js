@@ -107,7 +107,7 @@ export default class EditEventDetailsDialog {
 
       // don't even show the assignments tab if the user doesn't have
       // permission to create them
-      const can_create_assignments = _.any(
+      const can_create_assignments = _.some(
         this.event.allPossibleContexts,
         c => c.can_create_assignments
       )

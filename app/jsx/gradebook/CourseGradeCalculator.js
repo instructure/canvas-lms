@@ -159,7 +159,7 @@ function calculateWithGradingPeriods(
     return effectiveDueDates[assignmentId].grading_period_id
   })
 
-  const gradingPeriodsById = _.indexBy(gradingPeriods, 'id')
+  const gradingPeriodsById = _.keyBy(gradingPeriods, 'id')
   const gradingPeriodGradesByPeriodId = {}
   const periodBasedAssignmentGroupGrades = []
 
@@ -205,7 +205,7 @@ function calculateWithGradingPeriods(
   )
 
   return {
-    assignmentGroups: _.indexBy(allAssignmentGroupGrades, grade => grade.assignmentGroupId),
+    assignmentGroups: _.keyBy(allAssignmentGroupGrades, grade => grade.assignmentGroupId),
     gradingPeriods: gradingPeriodGradesByPeriodId,
     current: combineAssignmentGroupGrades(allAssignmentGroupGrades, false, options),
     final: combineAssignmentGroupGrades(allAssignmentGroupGrades, true, options),
@@ -219,7 +219,7 @@ function calculateWithoutGradingPeriods(submissions, assignmentGroups, options) 
   )
 
   return {
-    assignmentGroups: _.indexBy(assignmentGroupGrades, grade => grade.assignmentGroupId),
+    assignmentGroups: _.keyBy(assignmentGroupGrades, grade => grade.assignmentGroupId),
     current: combineAssignmentGroupGrades(assignmentGroupGrades, false, options),
     final: combineAssignmentGroupGrades(assignmentGroupGrades, true, options),
     scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'

@@ -39,8 +39,8 @@ const assignmentHelper = {
   compareByDueDate(a, b) {
     let aDate = getDueDateFromAssignment(a)
     let bDate = getDueDateFromAssignment(b)
-    const aDateIsNull = _.isNull(aDate)
-    const bDateIsNull = _.isNull(bDate)
+    const aDateIsNull = aDate === null
+    const bDateIsNull = bDate === null
     if (aDateIsNull && !bDateIsNull) {
       return 1
     }

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-
   let initialState = {
     listLTICollaboratorsPending: false,
     listLTICollaboratorsSuccessful: false,
@@ -47,7 +45,7 @@ import _ from 'underscore'
 
   const ltiCollaborators= (state = initialState, action) => {
     if (ltiCollaboratorsHandlers[action.type]) {
-      const newState = _.extend({}, state);
+      const newState = {...state};
       return ltiCollaboratorsHandlers[action.type](newState, action);
     } else {
       return state;

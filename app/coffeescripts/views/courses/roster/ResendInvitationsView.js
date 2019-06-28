@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!ResendInvitationsView'
 import {View} from 'Backbone'
 import template from 'jst/courses/roster/resendInvitations'
@@ -35,7 +34,7 @@ export default class ResendInvitationsView extends View {
   }
 
   toJSON() {
-    return _.extend({}, this.model.toJSON(), this)
+    return {...this.model.toJSON(), ...this}
   }
 
   attach() {

@@ -71,7 +71,7 @@ export default class PeerReviewsSelector extends Backbone.View
     peerReviewCount: @parentModel.peerReviewCount()
     peerReviewsAssignAt: @parentModel.peerReviewsAssignAt()
     frozenAttributes: frozenAttributes
-    peerReviewsFrozen: _.include(frozenAttributes, 'peer_reviews')
+    peerReviewsFrozen: _.includes(frozenAttributes, 'peer_reviews')
     nested: @nested
     prefix: 'assignment' if @nested
     hideAnonymousPeerReview: @hideAnonymousPeerReview

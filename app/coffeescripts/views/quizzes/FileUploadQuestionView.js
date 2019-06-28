@@ -19,7 +19,6 @@ import {View} from 'Backbone'
 import $ from 'jquery'
 import template from 'jst/quizzes/fileUploadQuestionState'
 import uploadedOrRemovedTemplate from 'jst/quizzes/fileUploadedOrRemoved'
-import _ from 'underscore'
 import 'jquery.instructure_forms'
 import 'jquery.disableWhileLoading'
 
@@ -70,7 +69,7 @@ export default class FileUploadQuestion extends View {
     // For now, remove the input rendered in ERB-land, and the template is
     // responsible for rendering a fallback to a regular input type=file
     const isIE = !!$.browser.msie
-    this.$fileUploadBox.html(template(_.extend({}, this.model.present(), {isIE})))
+    this.$fileUploadBox.html(template({...this.model.present(), isIE}))
     this.$fileUpload = this.$('.file-upload')
     return this
   }
@@ -86,7 +85,7 @@ export default class FileUploadQuestion extends View {
     this.render()
     this.$fileUploadBox
       .parent()
-      .append(uploadedOrRemovedTemplate(_.extend({}, this.model.present(), {fileUploaded: true})))
+      .append(uploadedOrRemovedTemplate({...this.model.present(), fileUploaded: true}))
     return this.trigger('attachmentManipulationComplete')
   }
 

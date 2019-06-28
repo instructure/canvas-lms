@@ -19,7 +19,6 @@ import I18n from 'i18n!grading_cell'
 import GRADEBOOK_TRANSLATIONS from '../../../gradebook/GradebookTranslations'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
-import _ from 'underscore'
 import Ember from 'ember'
 import $ from 'jquery'
 import 'jquery.ajaxJSON'
@@ -225,7 +224,7 @@ const GradingCellComponent = Ember.Component.extend({
   },
 
   bindSave: function() {
-    this.boundUpdateSuccess = _.bind(this.onUpdateSuccess, this)
+    this.boundUpdateSuccess = this.onUpdateSuccess.bind(this)
   }.on('init'),
 
   click(event) {

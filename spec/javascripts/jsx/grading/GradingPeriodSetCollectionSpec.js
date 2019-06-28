@@ -484,12 +484,12 @@ test('filterSetsBySelectedTerm filters to only show the set that the selected te
       exampleTerms,
       selectedTermID
     )
-    let expectedSets = _.where(exampleSets, {id: '2'})
+    let expectedSets = _.filter(exampleSets, {id: '2'})
     propEqual(filteredSets, expectedSets)
 
     selectedTermID = '4'
     filteredSets = collection.filterSetsBySelectedTerm(exampleSets, exampleTerms, selectedTermID)
-    expectedSets = _.where(exampleSets, {id: '1'})
+    expectedSets = _.filter(exampleSets, {id: '1'})
     propEqual(filteredSets, expectedSets)
   })
 })
@@ -699,7 +699,7 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set - onSave"', {
 })
 
 test('removes the "edit grading period set" form', function() {
-  const updatedSet = _.extend({}, exampleSet, {title: 'Updated Title'})
+  const updatedSet = {...exampleSet, title: 'Updated Title'}
   const success = Promise.resolve(updatedSet)
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(success)
   const collection = this.renderComponent()
@@ -711,7 +711,7 @@ test('removes the "edit grading period set" form', function() {
 })
 
 test('updates the given grading period set', function() {
-  const updatedSet = _.extend({}, exampleSet, {title: 'Updated Title'})
+  const updatedSet = {...exampleSet, title: 'Updated Title'}
   const success = Promise.resolve(updatedSet)
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(success)
   const collection = this.renderComponent()
@@ -723,7 +723,7 @@ test('updates the given grading period set', function() {
 })
 
 test('re-enables all grading period set actions', function() {
-  const updatedSet = _.extend({}, exampleSet, {title: 'Updated Title'})
+  const updatedSet = {...exampleSet, title: 'Updated Title'}
   const success = Promise.resolve(updatedSet)
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(success)
   const collection = this.renderComponent()

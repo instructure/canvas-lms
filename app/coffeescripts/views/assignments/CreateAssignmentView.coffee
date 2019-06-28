@@ -90,7 +90,7 @@ export default class CreateAssignmentView extends DialogFormView
 
     dataParams = {}
     _.each data, (value, key) ->
-      if _.contains(valid, key)
+      if _.includes(valid, key)
         dataParams[key] = value
 
     if dataParams.submission_types == 'online_quiz'
@@ -136,10 +136,10 @@ export default class CreateAssignmentView extends DialogFormView
     json
 
   currentUserIsAdmin: ->
-    _.contains(ENV.current_user_roles, "admin")
+    _.includes(ENV.current_user_roles, "admin")
 
   disableDueAt: ->
-    _.contains(@model.frozenAttributes(), "due_at") || @model.inClosedGradingPeriod()
+    _.includes(@model.frozenAttributes(), "due_at") || @model.inClosedGradingPeriod()
 
   openAgain: ->
     super
@@ -167,7 +167,7 @@ export default class CreateAssignmentView extends DialogFormView
     errors
 
   _validateTitle: (data, errors) ->
-    return errors if _.contains(@model.frozenAttributes(), "title")
+    return errors if _.includes(@model.frozenAttributes(), "title")
 
     post_to_sis = data.post_to_sis == '1'
     max_name_length = 256
@@ -192,7 +192,7 @@ export default class CreateAssignmentView extends DialogFormView
     errors
 
   _validatePointsPossible: (data, errors) =>
-    return errors if _.contains(@model.frozenAttributes(), "points_possible")
+    return errors if _.includes(@model.frozenAttributes(), "points_possible")
 
     if data.points_possible and isNaN(data.points_possible)
       errors["points_possible"] = [

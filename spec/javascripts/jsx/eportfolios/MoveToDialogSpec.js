@@ -28,11 +28,12 @@ let appRoot
 let applicationElement
 
 const mountDialog = (opts = {}) => {
-  opts = _.extend({}, {
+  opts = {
     header: 'This is a dialog',
     source: { label: 'foo', id: '0' },
-    destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }]
-  }, opts)
+    destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }],
+    ...opts
+  }
 
   const element = <MoveToDialog {...opts} />
   const dialog = ReactDOM.render(element, root)

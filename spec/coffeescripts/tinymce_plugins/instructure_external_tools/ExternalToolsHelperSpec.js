@@ -87,11 +87,11 @@ test('returns a hash of markup keys and attaches click handler to value', functi
   )
   const imageKey = _.chain(mapping)
     .keys()
-    .select(k => k.match(/img/))
+    .filter(k => k.match(/img/))
     .value()[0]
   const iconKey = _.chain(mapping)
     .keys()
-    .select(k => !k.match(/img/))
+    .filter(k => !k.match(/img/))
     .value()[0]
   const imageTag = imageKey.split('&nbsp')[0]
   const iconTag = iconKey.split('&nbsp')[0]
@@ -106,7 +106,7 @@ test('returns icon markup if canvas_icon_class in button', function() {
   const mapping = ExternalToolsHelper.clumpedButtonMapping(this.clumpedButtons, () => {})
   const iconKey = _.chain(mapping)
     .keys()
-    .select(k => !k.match(/img/))
+    .filter(k => !k.match(/img/))
     .value()[0]
   const iconTag = iconKey.split('&nbsp')[0]
   equal($(iconTag).prop('tagName'), 'I')
@@ -116,7 +116,7 @@ test('returns img markup if no canvas_icon_class', function() {
   const mapping = ExternalToolsHelper.clumpedButtonMapping(this.clumpedButtons, () => {})
   const imageKey = _.chain(mapping)
     .keys()
-    .select(k => k.match(/img/))
+    .filter(k => k.match(/img/))
     .value()[0]
   const imageTag = imageKey.split('&nbsp')[0]
   equal($(imageTag).prop('tagName'), 'IMG')

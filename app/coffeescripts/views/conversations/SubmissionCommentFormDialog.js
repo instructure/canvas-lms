@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!conversation_dialog'
 import $ from 'jquery'
-import _ from 'underscore'
 import 'Backbone'
 import DialogBaseView from '../DialogBaseView'
 import template from 'jst/conversations/SubmissionCommentFormDialog'
@@ -149,7 +148,7 @@ export default class SubmissionCommentFormDialog extends DialogBaseView {
           dfd.resolve()
           $.flashMessage(this.messages.flashSuccess)
           const message = new Message(
-            _.extend(this.model.attributes, {submission_comments: response.submission_comments}),
+            {...this.model.attributes, submission_comments: response.submission_comments},
             {parse: true}
           )
           return this.trigger('addMessage', message.get('messages')[0], response)

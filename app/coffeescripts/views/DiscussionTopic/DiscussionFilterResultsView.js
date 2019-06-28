@@ -26,11 +26,12 @@ import rEscape from '../../regexp/rEscape'
 export default class DiscussionFilterResultsView extends EntryCollectionView {
 
   static initClass() {
-    this.prototype.defaults = _.extend({}, EntryCollectionView.prototype.defaults, {
+    this.prototype.defaults = {
+      ...EntryCollectionView.prototype.defaults,
       descendants: 0,
       displayShowMore: true,
       threaded: true
-    })
+    }
   }
 
   initialize() {
