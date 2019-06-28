@@ -1056,6 +1056,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :terms_api) do
       get 'accounts/:account_id/terms', action: :index, as: 'enrollment_terms'
+      get 'accounts/:account_id/terms/:id', action: :show, as: 'enrollment_term'
     end
 
     scope(controller: :terms) do
