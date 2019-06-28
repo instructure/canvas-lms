@@ -430,6 +430,18 @@ by `asset_type` and `asset_id`.
 | `group_id` | The submissions’s group ID if the assignment is a group assignment. |
 
 
+#### `submission_comment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_comment_id` | The Canvas id of the new comment. |
+| `submission_id` | The Canvas id of the new submission. |
+| `user_id` | The Canvas id of the user who authored the comment. |
+| `created_at` | The timestamp when the comment was created. |
+| `attachment_ids` | Array of Canvas ids of attachments for this comment. |
+| `body` | The (possibly truncated) text of the comment. |
+
+
 #### `plagiarism_resubmit`
 
 | Field | Description |

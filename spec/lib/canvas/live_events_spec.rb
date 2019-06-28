@@ -499,6 +499,25 @@ describe Canvas::LiveEvents do
       end
     end
 
+
+    describe '.submission_comment_created' do
+      it 'should trigger a submission comment created live event' do
+        comment = submission.submission_comments.create!(
+          comment: "here is a comment",
+          submission_id: submission.id, author_id: @student.id
+        )
+        expect_event('submission_comment_created',{
+          user_id: comment.author_id.to_s,
+          created_at: comment.created_at,
+          submission_id: comment.submission_id.to_s,
+          body: comment.comment,
+          attachment_ids: [],
+          submission_comment_id: comment.id.to_s,
+        }).once
+        Canvas::LiveEvents.submission_comment_created(comment)
+      end
+    end
+
     describe '.plagiarism_resubmit' do
       it "should include the user_id and assignment_id" do
         expect_event('plagiarism_resubmit',

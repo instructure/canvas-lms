@@ -293,6 +293,18 @@ module Canvas::LiveEvents
     post_event_stringified('submission_updated', get_submission_data(submission))
   end
 
+  def self.submission_comment_created(comment)
+    payload = {
+      submission_comment_id: comment.id,
+      submission_id: comment.submission_id,
+      user_id: comment.author_id,
+      created_at: comment.created_at,
+      attachment_ids: comment.attachment_ids.blank? ? [] : comment.attachment_ids.split(','),
+      body: LiveEvents.truncate(comment.comment)
+    }
+    post_event_stringified('submission_comment_created', payload)
+  end
+
   def self.plagiarism_resubmit(submission)
     post_event_stringified('plagiarism_resubmit', get_submission_data(submission))
   end

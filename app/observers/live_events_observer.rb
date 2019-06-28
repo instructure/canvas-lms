@@ -30,6 +30,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :assignment,
           :assignment_group,
           :submission,
+          :submission_comment,
           :attachment,
           :user,
           :user_account_association,
