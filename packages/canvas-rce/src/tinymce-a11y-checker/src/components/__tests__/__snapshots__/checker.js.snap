@@ -5,6 +5,7 @@ exports[`render matches snapshot with errors 1`] = `
   <Tray
     border={false}
     contentRef={[Function]}
+    data-mce-component={true}
     defaultFocusElement={null}
     insertAt="bottom"
     label="Accessibility Checker"
@@ -452,6 +453,7 @@ exports[`render matches snapshot without errors 1`] = `
   <Tray
     border={false}
     contentRef={[Function]}
+    data-mce-component={true}
     defaultFocusElement={null}
     insertAt="bottom"
     label="Accessibility Checker"

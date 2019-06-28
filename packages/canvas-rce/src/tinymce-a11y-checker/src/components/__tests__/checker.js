@@ -1,6 +1,6 @@
 import React from "react"
 import Checker from "../checker"
-import { shallow } from "enzyme"
+import { shallow, mount } from "enzyme"
 import util from "util"
 
 const promisify = util.promisify
@@ -32,7 +32,9 @@ beforeEach(() => {
   fakeEditor = {
     getContainer: () => ({
       querySelector: () => fakeIframe
-    })
+    }),
+    on: jest.fn(),
+    focus: jest.fn()
   }
   child = node.appendChild(document.createElement("div"))
   child2 = node.appendChild(document.createElement("div"))
@@ -166,7 +168,7 @@ describe("check", () => {
   })
 
   test("does nothing if props.getBody() returns falsy", () => {
-    component = shallow(<Checker getBody={() => false} />)
+    component = shallow(<Checker getBody={() => false} editor={fakeEditor} />)
     instance = component.instance()
     const spy = jest.fn()
     instance.check(spy)
@@ -182,6 +184,35 @@ describe("check", () => {
         instance.check("123")
         jest.runAllTimers()
       }).not.toThrow()
+    })
+  })
+
+  describe("close", () => {
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => {
+      jest.useRealTimers()
+      jest.restoreAllMocks()
+      component.unmount()
+    })
+
+    it("calls editor.on('Remove') when mounted", () => {
+      component = mount(<Checker getBody={() => node} editor={fakeEditor} />)
+      instance = component.instance()
+      instance.check() // open it
+      jest.runAllTimers()
+      expect(fakeEditor.on).toHaveBeenCalled()
+      expect(fakeEditor.on.mock.calls[0][0]).toEqual("Remove")
+    })
+
+    it("calls focus on the editor on closing the tray", () => {
+      component = mount(<Checker getBody={() => node} editor={fakeEditor} />)
+      instance = component.instance()
+      instance.check() // opens it
+      jest.runAllTimers()
+      const closeButton = document.querySelector("[data-mce-component] button")
+      closeButton.click()
+      jest.runAllTimers()
+      expect(instance.props.editor.focus).toHaveBeenCalled()
     })
   })
 })
