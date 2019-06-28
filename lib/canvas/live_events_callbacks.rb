@@ -44,6 +44,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_group_created(obj)
     when Submission
       Canvas::LiveEvents.submission_created(obj)
+    when SubmissionComment
+      Canvas::LiveEvents.submission_comment_created(obj)
     when UserAccountAssociation
       Canvas::LiveEvents.user_account_association_created(obj)
     when Attachment
