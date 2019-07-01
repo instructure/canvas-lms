@@ -276,6 +276,9 @@
   }
   .tox .tox-dialog__body-nav-item {
     color: rgba(45, 59, 69, 0.6);
+    &:focus {
+      box-shadow: var(--canvasFocusBoxShadow);
+    }
   }
   .tox .tox-dialog__body-nav-item--active {
     border-bottom-color: var(--canvasBrandColor);
