@@ -641,10 +641,11 @@
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
     border-width: 0;
     margin-inline-start: -6px;
+    background-color: var(--canvasBackgroundColor);
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {
-    background: var(--tinySplitButtonChevronHoverBackground);
+    background-color: var(--tinySplitButtonChevronHoverBackground);
   }
 
   .tox .tox-tbtn:focus.tox-split-button__chevron {
