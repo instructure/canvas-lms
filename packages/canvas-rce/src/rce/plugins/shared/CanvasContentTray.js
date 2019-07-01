@@ -44,8 +44,8 @@ function getTrayLabel({contentType, contentSubtype}) {
   switch (contentSubtype) {
     case 'images':
       return formatMessage('Course Images')
-    case 'media':
-      return formatMessage('Course Media')
+    // case 'media':
+    //   return formatMessage('Course Media')
     case 'documents':
       return formatMessage('Course Documents')
     default:
@@ -57,7 +57,7 @@ const thePanels = {
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
-  media: React.lazy(() => import('./FakeComponent'))
+  // media: React.lazy(() => import('./FakeComponent'))
 }
 /**
  * @param {contentType, contentSubType} filterSettings: key to which panel is desired
@@ -78,7 +78,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   documents: {contentType: 'files', contentSubtype: 'documents', sortValue: 'date_added'},
   images: {contentType: 'files', contentSubtype: 'images', sortValue: 'date_added'},
   links: {contentType: 'links', contentSubtype: 'all', sortValue: 'date_added'},
-  media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
+  // media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
 }
 
 /**
