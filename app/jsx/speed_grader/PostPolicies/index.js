@@ -27,8 +27,10 @@ function submissionsPostedAtUpdater({submissionsMap, updateSubmission, afterUpda
   return function({postedAt, userIds}) {
     userIds.forEach(userId => {
       const submission = submissionsMap[userId]
-      submission.posted_at = postedAt
-      updateSubmission(submission)
+      if (submission != null) {
+        submission.posted_at = postedAt
+        updateSubmission(submission)
+      }
     })
     afterUpdateSubmission()
   }

@@ -707,7 +707,7 @@ export default do ->
 
     getSubmission: (studentId, assignmentId) =>
       student = @student(studentId)
-      student["assignment_#{assignmentId}"]
+      student?["assignment_#{assignmentId}"]
 
     updateEffectiveDueDatesFromSubmissions: (submissions) =>
       EffectiveDueDates.updateWithSubmissions(@effectiveDueDates, submissions, @gradingPeriodSet?.gradingPeriods)
