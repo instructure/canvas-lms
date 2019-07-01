@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Høgrejuster"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Justering og innrykk"
+  },
   "all_4321c3a1": {
     "message": "Alle"
   },
@@ -43,6 +46,9 @@
   },
   "assignments_1e02582c": {
     "message": "Oppgåver"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -188,6 +194,9 @@
   "directionality_ebcae6d0": {
     "message": "retningsgivande"
   },
+  "disable_in_line_preview_2a675175": {
+    "message": "Slå av integrert førehandsvising"
+  },
   "discussions_a5f96392": {
     "message": "Diskusjonar"
   },
@@ -287,6 +296,9 @@
   "folder_705fd2d7": {
     "message": "Mappe"
   },
+  "formatting_5b143aa8": {
+    "message": "Formatering"
+  },
   "generating_preview_45b53be0": {
     "message": "Genererer førehandsvising..."
   },
@@ -353,6 +365,9 @@
   "link_7262adec": {
     "message": "Lenke"
   },
+  "link_options_a16b758b": {
+    "message": "Lenkealternativ"
+  },
   "link_to_a_new_page_6c4ad034": {
     "message": "Lenke til ei ny side"
   },
@@ -397,6 +412,9 @@
   },
   "mic_a7f3d311": {
     "message": "Mic"
+  },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Diverse og LTI"
   },
   "modules_c4325335": {
     "message": "Modular"
@@ -509,6 +527,9 @@
   "show_image_options_1e2ecc6b": {
     "message": "Vis alternativ for bilde"
   },
+  "show_link_options_545338fd": {
+    "message": "Vis lenkealternativ"
+  },
   "show_video_options_6ed3721a": {
     "message": "Vis videoalternativ"
   },
@@ -538,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Start opptak"
+  },
+  "styles_2aa721ef": {
+    "message": "Stilar"
   },
   "subheader_2b87606d": {
     "message": "Underoverskrift"
