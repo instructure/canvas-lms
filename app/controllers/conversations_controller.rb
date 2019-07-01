@@ -404,6 +404,7 @@ class ConversationsController < ApplicationController
     shard.activate do
       if batch_private_messages || batch_group_messages
         mode = params[:mode] == 'async' ? :async : :sync
+        message.shard = shard
         batch = ConversationBatch.generate(message, @recipients, mode,
           subject: params[:subject], context_type: context_type,
           context_id: context_id, tags: @tags, group: batch_group_messages)
