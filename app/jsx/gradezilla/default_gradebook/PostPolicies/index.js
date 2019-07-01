@@ -82,8 +82,10 @@ export default class PostPolicies {
 
     userIds.forEach(userId => {
       const submission = this._gradebook.getSubmission(userId, assignmentId)
-      submission.posted_at = parsedPostedAt
-      this._gradebook.updateSubmission(submission)
+      if (submission != null) {
+        submission.posted_at = parsedPostedAt
+        this._gradebook.updateSubmission(submission)
+      }
     })
 
     if (assignment.anonymous_grading) {
