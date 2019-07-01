@@ -19,11 +19,7 @@
            class="icon-reply-2 reply-btn Button Button--icon-action"
            title="{{#t "reply"}}Reply{{/t}}"
            data-tooltip>
-           {{#if subject}}
-             <span class="screenreader-only">{{#t}}Reply to conversation {{subject}}{{/t}}</span>
-           {{else}}
-             <span class="screenreader-only">{{#t}}Reply to conversation{{/t}}</span>
-           {{/if}}
+          <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
         </a>
       </li>
       {{/unless}}
@@ -38,11 +34,7 @@
              data-tooltip>
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
-            {{#if subject}}
-              <span class="screenreader-only">{{#t}}Message actions for conversation {{subject}}{{/t}}</span>
-            {{else}}
-              <span class="screenreader-only">{{#t}}Message actions for conversation{{/t}}</span>
-            {{/if}}
+            <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
           </a>
           <ul class="al-options message-header-menu">
             {{#unless cannot_reply}}
