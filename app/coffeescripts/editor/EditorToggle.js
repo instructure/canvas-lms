@@ -143,7 +143,7 @@ class EditorToggle {
     if (this.options.switchViews) {
       this.switchViews.detach()
     }
-    this.infoIcon.detach()
+    if (!ENV.use_rce_enhancements) this.infoIcon.detach()
     this.done.detach()
     this.editing = false
     return this.trigger('display')
