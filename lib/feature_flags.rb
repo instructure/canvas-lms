@@ -70,11 +70,14 @@ module FeatureFlags
   # return the feature flag for the given feature that is defined on this object, if any.
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature)
+    return nil unless self.id
     RequestCache.cache("feature_flag", self, feature) do
       self.shard.activate do
         result = feature_flag_cache.fetch(feature_flag_cache_key(feature)) do
-          self.feature_flags.where(feature: feature.to_s).first
+          # keep have the context association unloaded in case we can't marshal it
+          FeatureFlag.where(feature: feature.to_s).polymorphic_where(:context => self).first
         end
+        result.context = self if result
         result
       end
     end

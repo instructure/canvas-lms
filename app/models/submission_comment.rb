@@ -49,7 +49,7 @@ class SubmissionComment < ActiveRecord::Base
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
   validates_each :attempt do |record, attr, value|
     next if value.nil?
-    if record.submission.attempt.nil? || value > record.submission.attempt
+    if value > (record.submission.attempt || 0)
       record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
     end
   end

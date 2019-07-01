@@ -172,5 +172,15 @@ describe "quizzes questions" do
       answer_exact.send_keys('0.000675', :tab)
       expect(answer_exact).to have_value('0.0007')
     end
+
+    it "should allow points with various delimiters", priority: "1", test_id: 209956 do
+      quiz = quiz_model(course: @course)
+      quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
+      open_quiz_edit_form
+
+      expect(f(".points_possible").text).to eq '50'
+      add_quiz_question('1234.5')
+      expect(f(".points_possible").text).to eq '1,284.5'
+    end
   end
 end

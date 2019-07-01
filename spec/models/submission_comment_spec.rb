@@ -648,6 +648,20 @@ This text has a http://www.google.com link in it...
       @comment4 = @submission.submission_comments.create!(valid_attributes.merge(attempt: nil))
     end
 
+    context 'when the submission attempt is nil' do
+      before(:once) do
+        @submission.update!(attempt: nil)
+      end
+
+      it 'raises an error if the submission_comment attempt is greater than 0' do
+        expect { @submission.submission_comments.create!(valid_attributes.merge(attempt: 1)) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it 'does not raise an error if the submission_comment attempt is equal to 0' do
+        expect { @submission.submission_comments.create!(valid_attributes.merge(attempt: 0)) }.not_to raise_error
+      end
+    end
+
     it 'can limit comments to the specific attempt' do
       expect(@submission.submission_comments.where(attempt: 1)).to eq [@comment1]
     end
@@ -660,14 +674,14 @@ This text has a http://www.google.com link in it...
       expect(@submission.submission_comments.where(attempt: nil)).to eq [@comment4]
     end
 
-    it 'cannot be present? if submisssion#attempt is nil' do
+    it 'cannot be present? if submission#attempt is nil' do
       @submission.update_column(:attempt, nil) # bypass infer_values callback
       @comment1.reload
       @comment1.attempt = 2
       expect(@comment1).not_to be_valid
     end
 
-    it 'cannot be larger then submisssion#attempt' do
+    it 'cannot be larger then submission#attempt' do
       @comment1.attempt = @submission.attempt + 1
       expect(@comment1).not_to be_valid
     end
