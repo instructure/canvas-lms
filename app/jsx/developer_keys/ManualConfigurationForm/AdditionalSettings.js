@@ -24,6 +24,8 @@ import View from '@instructure/ui-layout/lib/components/View'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
 import TextInput from '@instructure/ui-forms/lib/components/TextInput';
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
+import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import { ToggleDetails } from '@instructure/ui-toggle-details';
 
@@ -43,7 +45,7 @@ export default class AdditionalSettings extends React.Component {
     const extension = {
       platform: 'canvas.instructure.com',
       settings: {
-        ...(omitBy(omit(additionalSettings, ['domain', 'tool_id']), s => !s))
+        ...(omitBy(omit(additionalSettings, ['domain', 'tool_id', 'privacy_level']), s => !s))
       }
     }
     if (additionalSettings.domain) {
@@ -52,6 +54,7 @@ export default class AdditionalSettings extends React.Component {
     if (additionalSettings.tool_id) {
       extension.tool_id = additionalSettings.tool_id
     }
+    extension.privacy_level = additionalSettings.privacy_level || 'anonymous'
     return {
       extensions: [extension],
       custom_fields
@@ -85,6 +88,11 @@ export default class AdditionalSettings extends React.Component {
   handleSelectionHeightChange = e => {
     const value = e.target.value;
     this.setState(state => ({additionalSettings: {...state.additionalSettings, selection_height: parseInt(value, 10)}}))
+  }
+
+  handlePrivacyLevelChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({additionalSettings: {...state.additionalSettings, privacy_level: value}}))
   }
 
   handleSelectionWidthChange = e => {
@@ -163,6 +171,16 @@ export default class AdditionalSettings extends React.Component {
             value={custom_fields}
             onChange={this.handleCustomFieldsChange}
           />
+          <RadioInputGroup
+            name="privacy_level"
+            value={additionalSettings.privacy_level || 'anonymous'}
+            description={I18n.t('Privacy Level')}
+            variant="toggle"
+            onChange={this.handlePrivacyLevelChange}
+          >
+            <RadioInput label={I18n.t('Public')} value="public"/>
+            <RadioInput label={I18n.t('Private')} value="anonymous"/>
+          </RadioInputGroup>
         </View>
       </ToggleDetails>
     )
