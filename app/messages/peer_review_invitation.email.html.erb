@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset.asset.assignment, :submission], id: asset.asset.user_id) %>
+  <%= get_submission_link(asset, user) %>
 <% end %>
 
 <% define_content :subject do %>
