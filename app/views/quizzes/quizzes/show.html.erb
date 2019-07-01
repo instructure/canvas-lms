@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title(@quiz.quiz_title || @quiz.readable_type, @context.name) %><% end %>
+<% provide :page_title do %><%= join_title(@quiz.quiz_title || @quiz.readable_type, @context.name) %><% end %>
 
 <%
   # These titles are used in different elements/scopes below
@@ -38,7 +38,7 @@
 %>
 
 <% if @headers %>
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <div id="sidebar_content" class="rs-margin-bottom">
       <ul class="page-action-list" style="display:none;">
         <h2><%= t 'titles.related_items', "Related Items" %></h2>
@@ -115,6 +115,8 @@
       <% end %>
     <% end %>
   <% end %>
+<% else %>
+  <% provide_blank :right_side %>
 <% end %>
 
 <% js_bundle :quiz_show %>

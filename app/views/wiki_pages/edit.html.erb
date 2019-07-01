@@ -17,8 +17,8 @@
 %>
 
 <%
-  content_for :page_title, join_title(@page.title.to_s, @context.name)
-  content_for :right_side, render(:partial => "shared/wiki_sidebar")
+  provide :page_title, join_title(@page.title.to_s, @context.name)
+  provide :right_side, render(:partial => "shared/wiki_sidebar")
   css_bundle :tinymce
   js_bundle :wiki_page_edit
 %>

@@ -17,7 +17,7 @@
 %>
 
 <% add_crumb t('#crumbs.confirmation', "Confirmation") %>
-<% content_for :page_title, t('titles.confirm', 'Confirm Action') %>
+<% provide :page_title, t('titles.confirm', 'Confirm Action') %>
 
 <div style="margin: 10px auto; width: 600px;">
   <% if params[:event] == "delete" %>

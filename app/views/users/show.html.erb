@@ -19,9 +19,9 @@
 <%
   js_env ga_page_title: "User"
 %>
-<% content_for :page_title do %><%= @user.short_name %><% end %>
+<% provide :page_title do %><%= @user.short_name %><% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div>
     <a href="<%= message_user_path(@user, @context) %>" class="btn button-sidebar-wide">
       <i class="icon-email"></i>

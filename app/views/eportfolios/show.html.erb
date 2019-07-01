@@ -32,7 +32,7 @@
   <% end %>
 <% end %>
 
-<% content_for :left_side do %>
+<% provide :left_side do %>
   <div class="eportfolio-name">
     <h3><%= @portfolio.name %></h3>
     <% if @owner_url %>
@@ -44,7 +44,7 @@
   <%= render :partial => "eportfolios/section_list" %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div id="page_sidebar">
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
       <div class="rs-margin-bottom">

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
+<% provide :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
 <% css_bundle :dashboard %>
 <% js_bundle :dashboard %>
 <%  @active_tab = "home" %>
@@ -28,7 +28,7 @@
   <% end %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
 
   <% if can_do(@context, @current_user, :update) %>
     <div>

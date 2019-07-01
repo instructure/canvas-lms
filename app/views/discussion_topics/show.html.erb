@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, join_title( t(:topic, "Topic"), @topic.title)
+  provide :page_title, join_title( t(:topic, "Topic"), @topic.title)
   @discussion_presenter = DiscussionTopicPresenter.new(@topic, @current_user)
 %>
 
@@ -36,7 +36,7 @@
 <% end %>
 
 <% if (@headers || !@locked) && ((show_crs_graphs = can_do(@context, @current_user, :view_all_grades) && ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session)) || !@context.try(:feature_enabled?, :rce_enhancements)) %>
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <div id="sidebar_content" class="rs-margin-bottom">
       <% if show_crs_graphs %>
         <div id="crs-graphs"></div>
@@ -44,7 +44,10 @@
     </div>
     <%= render :partial => "shared/wiki_sidebar" %>
   <% end %>
+<% else %>
+  <% provide_blank :right_side %>
 <% end %>
+
 <% if !@headers %>
   <div style="width: 600px; margin: 10px auto;">
   <h2><%= @topic.title %></h2>

@@ -16,6 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, join_title(@quiz_submission.id, t(:page_title, "Event Log")) %>
+<% provide :page_title, join_title(@quiz_submission.id, t(:page_title, "Event Log")) %>
 <% css_bundle :quizzes, :canvas_quizzes %>
 <% js_bundle :quiz_submission_events %>

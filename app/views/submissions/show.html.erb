@@ -64,7 +64,7 @@
       **submission_owner_param
     }
   })
-  content_for :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
+  provide :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
   add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
   add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
   add_crumb(user_crumb_name)

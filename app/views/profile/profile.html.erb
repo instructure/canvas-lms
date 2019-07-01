@@ -22,7 +22,7 @@
   <%= join_title t("User Settings"), @user.name %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <% if @current_user.registered? %>
   <%= render :partial => "ways_to_contact" %>
   <div>

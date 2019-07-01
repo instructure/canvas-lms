@@ -24,7 +24,7 @@
   js_bundle :registration_confirmation
   @headers = false
   @body_classes << "full-width modal body--login-confirmation"
-  content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
+  provide :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
 %>
 
 <div id="modal-box" class="ic-Login-confirmation">

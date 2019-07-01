@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, "Calendar"
+  provide :page_title, "Calendar"
   js_env :CALENDAR => {
     :CONTEXTS => @contexts_json,
     :MANAGE_CONTEXTS => @manage_contexts,
@@ -46,7 +46,7 @@
   <%= auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")}) %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a href="#" class="screenreader-only skip-to-calendar"><%= t(:skip_to_calendar, "Skip to calendar") %></a>
 
   <div class="rs-section">

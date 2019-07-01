@@ -24,7 +24,7 @@
   end
   (@body_classes ||= []) << 'full-width'
 %>
-<% content_for :page_title, t("Access Denied") %>
+<% provide :page_title, t("Access Denied") %>
 
 <div class="ic-Error-page">
   <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">

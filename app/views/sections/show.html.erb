@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= @section.name %><% end %>
+<% provide :page_title do %><%= @section.name %><% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <% if can_do(@section, @current_user, :update) %>
     <a href="#" class="btn button-sidebar-wide edit_section_link"><i class="icon-edit"></i> <%= t('buttons.edit_section', 'Edit Section') %></a>
     <% if @section.nonxlist_course_id %>

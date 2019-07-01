@@ -17,7 +17,7 @@
 %>
 
 <% @active_tab = "terms" %>
-<% content_for :page_title do %><%= t :page_title, "%{account} Terms", :account => @context.name %><% end %>
+<% provide :page_title do %><%= t :page_title, "%{account} Terms", :account => @context.name %><% end %>
 
 <% js_bundle 'legacy/terms_index' %>
 <% css_bundle :terms %>

@@ -18,7 +18,7 @@
   add_crumb t(:settings_crumb, "Settings")
   js_bundle :account_settings
   css_bundle :account_settings, :reports, :tinymce
-  content_for :page_title, t(:page_title, "Account Settings")
+  provide :page_title, t(:page_title, "Account Settings")
   if can_do(@context, @current_user, :manage_storage_quotas)
     js_env :ACCOUNT => {
       'id' => @context.id,
@@ -30,7 +30,7 @@
     }
   end
 %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
 <h1 class='screenreader-only'><%= t(:page_header_title, "Account Settings") %></h1>

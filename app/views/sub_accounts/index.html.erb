@@ -17,7 +17,7 @@
 
   add_crumb t('titles.sub_accounts', "Sub-Accounts")
   @active_tab = "sub_accounts"
-  content_for :page_title, t('titles.sub_accounts', 'Sub-Accounts')
+  provide :page_title, t('titles.sub_accounts', 'Sub-Accounts')
   css_bundle :sub_accounts
   js_bundle :sub_accounts 
 %>
