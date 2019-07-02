@@ -243,14 +243,57 @@ module Lti::Ims
           end
         end
 
-        context 'with submission_url' do
-          let(:params_overrides) { super().merge(Lti::Result::AGS_EXT_SUBMISSION_URL => 'http://www.instructure.com') }
+        context 'with online_url' do
+          let(:params_overrides) {
+            super().merge(Lti::Result::AGS_EXT_SUBMISSION => {
+              submission_type: 'online_url',
+              submission_data: 'http://www.instructure.com'
+            })
+          }
 
           it 'updates the submission and result url' do
             result
             send_request
-            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION_URL]).to eq('http://www.instructure.com')
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION]['submission_type']).to eq('online_url')
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION]['submission_data']).to eq('http://www.instructure.com')
+            expect(result.submission.submission_type).to eq('online_url')
             expect(result.submission.url).to eq('http://www.instructure.com')
+          end
+        end
+
+        context 'with basic_lti_launch' do
+          let(:params_overrides) {
+            super().merge(Lti::Result::AGS_EXT_SUBMISSION => {
+              submission_type: 'basic_lti_launch',
+              submission_data: 'http://www.instructure.com/launch_url'
+            })
+          }
+
+          it 'updates the submission and result url' do
+            result
+            send_request
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION]['submission_type']).to eq('basic_lti_launch')
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION]['submission_data']).to eq('http://www.instructure.com/launch_url')
+            expect(result.submission.submission_type).to eq('basic_lti_launch')
+            expect(result.submission.url).to eq('http://www.instructure.com/launch_url')
+          end
+        end
+
+        context 'with online_text_entry' do
+          let(:params_overrides) {
+            super().merge(Lti::Result::AGS_EXT_SUBMISSION => {
+              submission_type: 'online_text_entry',
+              submission_data: '<p>Here is some text</p>'
+            })
+          }
+
+          it 'updates the submission and result body' do
+            result
+            send_request
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION]['submission_type']).to eq('online_text_entry')
+            expect(result.reload.extensions[Lti::Result::AGS_EXT_SUBMISSION]['submission_data']).to eq('<p>Here is some text</p>')
+            expect(result.submission.submission_type).to eq('online_text_entry')
+            expect(result.submission.body).to eq('<p>Here is some text</p>')
           end
         end
 
