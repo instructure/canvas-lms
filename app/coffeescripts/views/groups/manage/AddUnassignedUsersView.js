@@ -34,7 +34,7 @@ export default class AddUnassignedUsersView extends CollectionView {
   }
 
   attach() {
-    this.collection.on('add remove change reset', this.render)
+    this.collection.on('add remove change reset', this.render, this)
     this.collection.on('setParam deleteParam', this.checkParam, this)
   }
 

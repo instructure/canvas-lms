@@ -24,22 +24,6 @@ import 'jquery.instructure_forms'
 import 'jquery.disableWhileLoading'
 
 export default class FileUploadQuestion extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.checkForFileChange = this.checkForFileChange.bind(this)
-    this.openFileBrowser = this.openFileBrowser.bind(this)
-    this.render = this.render.bind(this)
-    this.removeFileStatusMessage = this.removeFileStatusMessage.bind(this)
-    this.processAttachment = this.processAttachment.bind(this)
-    this.deleteAttachment = this.deleteAttachment.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     // TODO: Handle quota errors?
@@ -68,7 +52,7 @@ export default class FileUploadQuestion extends View {
     if ((val = this.$fileUpload.val())) {
       this.removeFileStatusMessage()
       this.model.set('file', this.$fileUpload[0])
-      const dfrd = this.model.save(null, {success: this.processAttachment})
+      const dfrd = this.model.save(null, {success: this.processAttachment.bind(this)})
       return this.$fileUploadBox.disableWhileLoading(dfrd)
     }
   }

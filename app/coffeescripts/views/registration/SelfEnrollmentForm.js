@@ -23,25 +23,6 @@ import 'jquery.instructure_forms'
 import 'jquery.ajaxJSON'
 
 export default class SelfEnrollmentForm extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.changeAction = this.changeAction.bind(this)
-    this.beforeSubmit = this.beforeSubmit.bind(this)
-    this.success = this.success.bind(this)
-    this.normalizeData = this.normalizeData.bind(this)
-    this.errorFormatter = this.errorFormatter.bind(this)
-    this.enrollErrors = this.enrollErrors.bind(this)
-    this.enroll = this.enroll.bind(this)
-    this.logOut = this.logOut.bind(this)
-    this.logOutAndRefresh = this.logOutAndRefresh.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.events = {
@@ -58,9 +39,9 @@ export default class SelfEnrollmentForm extends Backbone.View {
       .find('input[type=hidden][name=initial_action]')
       .val()
     return this.$el.formSubmit({
-      beforeSubmit: this.beforeSubmit,
-      success: this.success,
-      errorFormatter: this.errorFormatter,
+      beforeSubmit: data => this.beforeSubmit(data),
+      success: data => this.success(data),
+      errorFormatter: errors => this.errorFormatter(errors),
       disableWhileLoading: 'spin_on_success'
     })
   }

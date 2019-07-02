@@ -39,7 +39,7 @@ export default class AssignToGroupMenu extends PopoverMenuView {
   }
 
   attach() {
-    return this.collection.on('change add remove reset', this.render)
+    return this.collection.on('change add remove reset', this.render, this)
   }
 
   setGroup(e) {

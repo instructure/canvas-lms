@@ -44,7 +44,7 @@ export default class GroupDetailView extends View {
   }
 
   attach() {
-    return this.model.on('change', this.render)
+    return this.model.on('change', this.render, this)
   }
 
   summary() {

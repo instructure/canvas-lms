@@ -41,7 +41,6 @@ class FlavorGrid {
     this.saveSelection = this.saveSelection.bind(this)
     this.restoreSelection = this.restoreSelection.bind(this)
     this.refresh = this.refresh.bind(this)
-    this.change_flavor = this.change_flavor.bind(this)
     this.options = options
     this.type_name = type_name
     this.grid_name = grid_name
@@ -138,18 +137,6 @@ class FlavorGrid {
 
 window.Jobs = class Jobs extends FlavorGrid {
   constructor(options, type_name = 'jobs', grid_name = '#jobs-grid') {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.show_search = this.show_search.bind(this)
-    this.change_flavor = this.change_flavor.bind(this)
-    this.attempts_formatter = this.attempts_formatter.bind(this)
-    this.load = this.load.bind(this)
-    this.id_formatter = this.id_formatter.bind(this)
     if (options.max_attempts) {
       Jobs.max_attempts = options.max_attempts
     }
@@ -243,7 +230,7 @@ window.Jobs = class Jobs extends FlavorGrid {
         name: I18n.t('columns.id', 'id'),
         field: 'id',
         width: 100,
-        formatter: this.id_formatter
+        formatter: this.id_formatter.bind(this)
       },
       {
         id: 'tag',
@@ -256,7 +243,7 @@ window.Jobs = class Jobs extends FlavorGrid {
         name: I18n.t('columns.attempt', 'attempt'),
         field: 'attempts',
         width: 65,
-        formatter: this.attempts_formatter
+        formatter: this.attempts_formatter.bind(this)
       },
       {
         id: 'priority',
@@ -376,14 +363,6 @@ window.Jobs = class Jobs extends FlavorGrid {
 
 class Workers extends Jobs {
   constructor(options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.runtime_formatter = this.runtime_formatter.bind(this)
     super(options, 'running', '#running-grid')
   }
 
@@ -423,7 +402,7 @@ class Workers extends Jobs {
       name: I18n.t('columns.runtime', 'runtime'),
       field: 'locked_at',
       width: 85,
-      formatter: this.runtime_formatter
+      formatter: this.runtime_formatter.bind(this)
     })
     for (const col of cols) {
       col.sortable = true

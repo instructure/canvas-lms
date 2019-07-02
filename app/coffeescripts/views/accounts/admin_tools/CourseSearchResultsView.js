@@ -65,8 +65,8 @@ export default class CourseSearchResultsView extends Backbone.View {
   // Bindings are applied here to make testing a little easier.
   // @api public
   applyBindings() {
-    this.model.on('doneSearching', this.resultsFound)
-    this.model.on('change', this.render)
+    this.model.on('doneSearching', this.resultsFound, this)
+    this.model.on('change', this.render, this)
     this.model.on('searching', () => {
       this.model.set('restored', false)
       return this.disableResults()

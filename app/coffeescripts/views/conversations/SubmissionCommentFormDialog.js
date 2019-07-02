@@ -30,18 +30,6 @@ import 'jquery.elastic'
 // reusable message composition dialog
 
 export default class SubmissionCommentFormDialog extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.resizeBody = this.resizeBody.bind(this)
-    this.handleBodyClick = this.handleBodyClick.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.template = template
@@ -144,7 +132,7 @@ export default class SubmissionCommentFormDialog extends DialogBaseView {
   initializeForm() {
     this.prepareTextarea(this.$el)
 
-    this.$fullDialog.on('click', '.message-body', this.handleBodyClick)
+    this.$fullDialog.on('click', '.message-body', e => this.handleBodyClick(e))
 
     return this.$form.formSubmit({
       intent: 'message',

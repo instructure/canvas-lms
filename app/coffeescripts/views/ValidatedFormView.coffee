@@ -92,7 +92,7 @@ export default class ValidatedFormView extends Backbone.View
     if _.keys(errors).length == 0
       disablingDfd = new $.Deferred()
       saveDfd = @saveFormData(data)
-      saveDfd.then(@onSaveSuccess, @onSaveFail)
+      saveDfd.then(@onSaveSuccess.bind(this), @onSaveFail.bind(this))
       saveDfd.fail =>
         disablingDfd.reject()
         @setFocusAfterError() if @setFocusAfterError

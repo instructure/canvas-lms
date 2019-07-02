@@ -29,18 +29,6 @@ import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 
 export default class EditSectionsView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.onNewToken = this.onNewToken.bind(this)
-    this.update = this.update.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.mixin(RosterDialogMixin)
@@ -68,7 +56,7 @@ export default class EditSectionsView extends DialogBaseView {
       contexts: ENV.CONTEXTS,
       placeholder: I18n.t('edit_sections_placeholder', 'Enter a section name'),
       title: I18n.t('edit_sections_title', 'Section name'),
-      onNewToken: this.onNewToken,
+      onNewToken: this.onNewToken.bind(this),
       added: (data, $token, newToken) => {
         return this.$('#user_sections').append($token)
       },

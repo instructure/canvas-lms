@@ -24,18 +24,6 @@ import linkToStudentsViewTemplate from 'jst/courses/roster/LinkToStudentsView'
 import 'jquery.disableWhileLoading'
 
 export default class LinkToStudentsView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.onNewToken = this.onNewToken.bind(this)
-    this.update = this.update.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.mixin(RosterDialogMixin)
@@ -56,7 +44,7 @@ export default class LinkToStudentsView extends DialogBaseView {
       contexts: ENV.CONTEXTS,
       placeholder: I18n.t('link_students_placeholder', 'Enter a student name'),
       change: tokens => (this.students = tokens),
-      onNewToken: this.onNewToken,
+      onNewToken: this.onNewToken.bind(this),
       selector: {
         baseData: {
           type: 'user',

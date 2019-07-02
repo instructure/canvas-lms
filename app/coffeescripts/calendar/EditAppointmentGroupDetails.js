@@ -352,7 +352,7 @@ export default class EditAppointmentGroupDetails {
     return this.form.disableWhileLoading(deferred)
   }
 
-  activate = () => ({})
+  activate() {}
 
   contextsChanged = (contextCodes, sectionCodes) => {
     // dropdown text

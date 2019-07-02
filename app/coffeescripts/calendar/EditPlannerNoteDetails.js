@@ -55,14 +55,6 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
       details: htmlEscape(event.description)
     })
 
-    this.onSaveFail = this.onSaveFail.bind(this)
-    this.onSaveSuccess = this.onSaveSuccess.bind(this)
-    this.getFormData = this.getFormData.bind(this)
-    this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
-    this.contextChange = this.contextChange.bind(this)
-    this.setContext = this.setContext.bind(this)
-    this.activate = this.activate.bind(this)
-
     this.event = event
     this.contextChangeCB = contextChangeCB
     this.closeCB = closeCB

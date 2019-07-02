@@ -55,7 +55,7 @@ export default class ResendInvitationsView extends View {
           I18n.t('error_sending_invitations', 'Error sending invitation. Please try again.')
         )
     )
-    return $.when(xhr).always(() => (this.sending = false), this.render)
+    return $.when(xhr).always(() => (this.sending = false), this.render.bind(this))
   }
 }
 ResendInvitationsView.initClass()

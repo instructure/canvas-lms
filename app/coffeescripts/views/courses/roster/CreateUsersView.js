@@ -23,17 +23,6 @@ import template from 'jst/courses/roster/createUsers'
 import wrapper from 'jst/EmptyDialogFormWrapper'
 
 export default class CreateUsersView extends DialogFormView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.toJSON = this.toJSON.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.optionProperty('rolesCollection')

@@ -30,21 +30,6 @@ import template from 'jst/quizzes/QuizItemView'
 import 'jquery.disableWhileLoading'
 
 export default class ItemView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.clickRow = this.clickRow.bind(this)
-    this.migrateQuizEnabled = this.migrateQuizEnabled.bind(this)
-    this.migrateQuiz = this.migrateQuiz.bind(this)
-    this.onDelete = this.onDelete.bind(this)
-    this.updatePublishState = this.updatePublishState.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.template = template
@@ -181,8 +166,8 @@ export default class ItemView extends Backbone.View {
   }
 
   observeModel() {
-    this.model.on('change:published', this.updatePublishState)
-    return this.model.on('change:loadingOverrides', this.render)
+    this.model.on('change:published', this.updatePublishState, this)
+    return this.model.on('change:loadingOverrides', this.render, this)
   }
 
   updatePublishState() {

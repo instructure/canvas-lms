@@ -32,10 +32,10 @@ export default class ToggleShowByView extends Backbone.View {
     super.initialize(...args)
     this.initialized = $.Deferred()
     this.course.on('change', () => this.initializeCache())
-    this.course.on('change', this.render)
+    this.course.on('change', this.render, this)
     this.assignmentGroups.once('change:submissions', () => this.initializeDateGroups())
     this.on('changed:showBy', () => this.setAssignmentGroups())
-    this.on('changed:showBy', this.render)
+    this.on('changed:showBy', this.render, this)
   }
 
   initializeCache() {

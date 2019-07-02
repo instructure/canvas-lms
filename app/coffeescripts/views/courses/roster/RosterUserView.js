@@ -33,19 +33,6 @@ let linkToStudentsDialog = null
 let invitationDialog = null
 
 export default class RosterUserView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.handleMenuEvent = this.handleMenuEvent.bind(this)
-    this.focus = this.focus.bind(this)
-    this.blur = this.blur.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.tagName = 'tr'

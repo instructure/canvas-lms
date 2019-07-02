@@ -362,7 +362,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this.header.on('submission-reply', this.onReply)
     this.compose.on('close', this.onCloseCompose)
     this.compose.on('addMessage', this.onAddMessage)
-    this.compose.on('addMessage', this.list.updateMessage)
+    this.compose.on('addMessage', this.list.updateMessage, this.list)
     this.compose.on('newConversations', this.onNewConversations)
     this.compose.on('submitting', this.onSubmit)
     this.submissionReply.on('addMessage', this.onSubmissionAddMessage)

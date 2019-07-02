@@ -26,19 +26,6 @@ import 'vendor/bootstrap/bootstrap-dropdown'
 import 'vendor/bootstrap-select/bootstrap-select'
 
 export default class CourseSelectionView extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.render = this.render.bind(this)
-    this.loadAll = this.loadAll.bind(this)
-    this.truncate_course = this.truncate_course.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.events = {change: 'onChange'}
@@ -54,14 +41,14 @@ export default class CourseSelectionView extends View {
     this.$el
       .selectpicker({useSubmenus: true})
       .next()
-      .on('mouseover', this.loadAll)
+      .on('mouseover', () => this.loadAll())
       .find('.dropdown-toggle')
-      .on('focus', this.loadAll)
-    this.options.courses.favorites.on('reset', this.render)
-    this.options.courses.all.on('reset', this.render)
-    this.options.courses.all.on('add', this.render)
-    this.options.courses.groups.on('reset', this.render)
-    this.options.courses.groups.on('add', this.render)
+      .on('focus', () => this.loadAll())
+    this.options.courses.favorites.on('reset', () => this.render())
+    this.options.courses.all.on('reset', () => this.render())
+    this.options.courses.all.on('add', () => this.render())
+    this.options.courses.groups.on('reset', () => this.render())
+    this.options.courses.groups.on('add', () => this.render())
     this.$picker = this.$el.next()
     return this.render()
   }
@@ -196,7 +183,7 @@ export default class CourseSelectionView extends View {
   }
 
   truncate_course_names(courses) {
-    return _.each(courses, this.truncate_course)
+    return _.each(courses, c => this.truncate_course(c))
   }
 
   truncate_course(course) {

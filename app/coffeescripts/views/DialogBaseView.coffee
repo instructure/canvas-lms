@@ -49,11 +49,11 @@ export default class DialogBaseView extends Backbone.View
       buttons: [
         text: I18n.t '#buttons.cancel', 'Cancel'
         'class' : 'cancel_button'
-        click: @cancel
+        click: (e) => @cancel(e)
       ,
         text: I18n.t '#buttons.update', 'Update'
         'class' : 'btn-primary'
-        click: @update
+        click: (e) => @update(e)
       ],
       _.result(this, 'dialogOptions')
     @dialog = $("<div id=\"#{ opts.id }\"></div>").appendTo('body').dialog opts

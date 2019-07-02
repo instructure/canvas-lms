@@ -22,19 +22,6 @@ import PaginatedView from '../views/PaginatedView'
 import 'jquery.disableWhileLoading'
 
 export default class TokenSelectorList extends PaginatedView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.render = this.render.bind(this)
-    this.addOne = this.addOne.bind(this)
-    this.showPaginationLoader = this.showPaginationLoader.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.tagName = 'div'
@@ -85,7 +72,7 @@ export default class TokenSelectorList extends PaginatedView {
       .on('click', this.selector.click)
 
     this.collection.on('beforeFetch', this.showPaginationLoader, this)
-    return this.collection.on('fetch', this.render)
+    return this.collection.on('fetch', this.render, this)
   }
 
   render() {
@@ -128,7 +115,7 @@ export default class TokenSelectorList extends PaginatedView {
         }
       }
     }
-    this.collection.each(this.addOne)
+    this.collection.each(this.addOne.bind(this))
     if (this.selectAllActive() || __guardMethod__(this.parent, 'hasClass', o => o.hasClass('on'))) {
       this.$body.find('li.toggleable').addClass('on')
     }

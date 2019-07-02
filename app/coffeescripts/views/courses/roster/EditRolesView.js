@@ -25,17 +25,6 @@ import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 
 export default class EditRolesView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.update = this.update.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.mixin(RosterDialogMixin)

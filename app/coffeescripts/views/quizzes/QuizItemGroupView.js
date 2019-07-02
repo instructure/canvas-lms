@@ -22,20 +22,6 @@ import template from 'jst/quizzes/QuizItemGroupView'
 import QuizItemView from './QuizItemView'
 
 export default class ItemGroupView extends CollectionView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.filterResults = this.filterResults.bind(this)
-    this.matchingCount = this.matchingCount.bind(this)
-    this.filter = this.filter.bind(this)
-    this.renderItem = this.renderItem.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.template = template
