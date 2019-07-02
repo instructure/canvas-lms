@@ -748,7 +748,7 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_column_size
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       unless @current_user.preferences.key?(:gradebook_column_size)
         @current_user.preferences[:gradebook_column_size] = {}
       end
@@ -760,7 +760,7 @@ class GradebooksController < ApplicationController
   end
 
   def save_gradebook_column_order
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       unless @current_user.preferences.key?(:gradebook_column_order)
         @current_user.preferences[:gradebook_column_order] = {}
       end
