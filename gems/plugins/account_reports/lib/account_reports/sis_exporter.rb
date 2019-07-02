@@ -63,13 +63,29 @@ module AccountReports
     end
 
     def users
+      headers = user_headers
+      users = user_query
+      users = user_query_options(users)
+
+      generate_and_run_report headers do |csv|
+        users.find_in_batches do |batch|
+          emails = emails_by_user_id(batch.map(&:user_id))
+
+          batch.each do |u|
+            csv << user_row(u, emails)
+          end
+        end
+      end
+    end
+
+    def user_headers
+      headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['user_id', 'integration_id', 'authentication_provider_id',
                    'login_id', 'password', 'first_name', 'last_name', 'full_name',
                    'sortable_name', 'short_name', 'email', 'status']
       else # provisioning_report
-        headers = []
         headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
         headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
         headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
@@ -84,7 +100,10 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('created_by_sis')
       end
+      headers
+    end
 
+    def user_query
       users = root_account.pseudonyms.except(:preload).joins(:user).select(
         "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
          pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
@@ -94,7 +113,9 @@ module AccountReports
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = pseudonyms.user_id)")
+    end
 
+    def user_query_options(users)
       users = users.where.not(sis_user_id: nil) if @sis_format
       users = users.where.not(pseudonyms: {sis_batch_id: nil}) if @created_by_sis
 
@@ -105,32 +126,26 @@ module AccountReports
       end
 
       users = add_user_sub_account_scope(users)
+    end
 
-      generate_and_run_report headers do |csv|
-        users.find_in_batches do |batch|
-          emails = emails_by_user_id(batch.map(&:user_id))
-
-          batch.each do |u|
-            row = []
-            row << u.user_id unless @sis_format
-            row << u.sis_user_id
-            row << u.integration_id
-            row << u.authentication_provider_id
-            row << u.unique_id
-            row << nil if @sis_format
-            name_parts = User.name_parts(u.sortable_name, likely_already_surname_first: true)
-            row << name_parts[0] || '' # first name
-            row << name_parts[1] || '' # last name
-            row << u.name
-            row << u.sortable_name
-            row << u.short_name
-            row << emails[u.user_id].try(:path)
-            row << u.workflow_state
-            row << u.sis_batch_id? unless @sis_format
-            csv << row
-          end
-        end
-      end
+    def user_row(u, emails)
+      row = []
+      row << u.user_id unless @sis_format
+      row << u.sis_user_id
+      row << u.integration_id
+      row << u.authentication_provider_id
+      row << u.unique_id
+      row << nil if @sis_format
+      name_parts = User.name_parts(u.sortable_name, likely_already_surname_first: true)
+      row << name_parts[0] || '' # first name
+      row << name_parts[1] || '' # last name
+      row << u.name
+      row << u.sortable_name
+      row << u.short_name
+      row << emails[u.user_id].try(:path)
+      row << u.workflow_state
+      row << u.sis_batch_id? unless @sis_format
+      row
     end
 
     def accounts
