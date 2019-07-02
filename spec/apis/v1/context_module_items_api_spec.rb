@@ -1128,7 +1128,6 @@ describe "Module Items API", type: :request do
     context 'differentiated_assignments' do
       before do
         @new_section = @course.course_sections.create!(name: "test section")
-        @student.enrollments.each(&:destroy_permanently!)
         student_in_section(@new_section, user: @student)
         @assignment.only_visible_to_overrides = true
         @assignment.save!

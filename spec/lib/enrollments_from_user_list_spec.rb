@@ -16,9 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require "spec_helper"
 
 describe EnrollmentsFromUserList do
+  def list_to_parse
+    %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>}
+  end
+
+  def list_to_parse_with_repeats
+    %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com, DAVID@example.com}
+  end
+
   before(:each) do
     course_model(:reusable => true)
     @el = UserList.new(list_to_parse)
@@ -74,15 +82,16 @@ describe EnrollmentsFromUserList do
       expect(@david_sr.reload.updated_at).to be > cutoff
       expect(@david_jr.reload.updated_at).to be < cutoff
     end
+
+    it "updates grades when enrolling users in a not previously enrolled section" do
+      original_enrollment = EnrollmentsFromUserList.process(UserList.new(list_to_parse), @course).first
+      student = original_enrollment.user
+      assignment = @course.assignments.create!
+      section = @course.course_sections.create!
+      assignment.grade_student(student, grader: @teacher, score: 100)
+      original_enrollment.destroy!
+      new_enrollment = EnrollmentsFromUserList.process([student.token], @course, course_section_id: section.id).first
+      expect(new_enrollment.scores.find_by(course_score: true).current_points).to be 100.0
+    end
   end
-
-end
-
-
-def list_to_parse
-  %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>}
-end
-
-def list_to_parse_with_repeats
-  %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com, DAVID@example.com}
 end

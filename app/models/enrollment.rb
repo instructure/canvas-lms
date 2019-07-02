@@ -453,7 +453,9 @@ class Enrollment < ActiveRecord::Base
 
   def update_cached_due_dates
     if @update_cached_due_dates
-      update_grades = being_restored?(to_state: 'active') || being_restored?(to_state: 'inactive')
+      update_grades = being_restored?(to_state: 'active') ||
+        being_restored?(to_state: 'inactive') ||
+        saved_change_to_id?
       DueDateCacher.recompute_users_for_course(user_id, course, nil, update_grades: update_grades)
     end
   end
