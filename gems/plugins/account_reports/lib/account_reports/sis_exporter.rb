@@ -228,14 +228,7 @@ module AccountReports
         headers << I18n.t('created_by_sis')
       end
       terms = root_account.enrollment_terms
-      terms = terms.where.not(sis_source_id: nil) if @sis_format
-      terms = terms.where.not(enrollment_terms: {sis_batch_id: nil}) if @created_by_sis
-
-      if @include_deleted
-        terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
-      else
-        terms = terms.where("workflow_state<>'deleted'")
-      end
+      terms = term_query_options(terms)
 
       generate_and_run_report headers do |csv|
         terms.find_each do |t|
@@ -250,6 +243,18 @@ module AccountReports
           csv << row
         end
       end
+    end
+
+    def term_query_options(terms)
+      terms = terms.where.not(sis_source_id: nil) if @sis_format
+      terms = terms.where.not(enrollment_terms: {sis_batch_id: nil}) if @created_by_sis
+
+      if @include_deleted
+        terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
+      else
+        terms = terms.where("workflow_state<>'deleted'")
+      end
+      terms
     end
 
     def courses
@@ -611,24 +616,7 @@ module AccountReports
                LEFT JOIN #{Course.quoted_table_name} ON courses.id = groups.context_id AND context_type='Course'
                LEFT JOIN #{GroupCategory.quoted_table_name} ON groups.group_category_id=group_categories.id")
 
-      groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
-      groups = groups.where.not(groups: {sis_batch_id: nil}) if @created_by_sis
-
-      if @include_deleted
-        groups.where!("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
-      else
-        groups.where!("groups.workflow_state<>'deleted'")
-      end
-
-      if account != root_account
-        groups.where!("(groups.context_type = 'Account'
-                         AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                           OR accounts.id = :account_id))
-                       OR (groups.context_type = 'Course'
-                         AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                           OR courses.account_id = :account_id))", { account_id: account.id })
-      end
-
+      groups = group_query_options(groups)
       generate_and_run_report headers do |csv|
         groups.find_each do |g|
           row = []
@@ -650,6 +638,26 @@ module AccountReports
           csv << row
         end
       end
+    end
+
+    def group_query_options(groups)
+      groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
+      groups = groups.where.not(groups: {sis_batch_id: nil}) if @created_by_sis
+      if @include_deleted
+        groups.where!("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
+      else
+        groups.where!("groups.workflow_state<>'deleted'")
+      end
+
+      if account != root_account
+        groups.where!("(groups.context_type = 'Account'
+                         AND (accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR accounts.id = :account_id))
+                       OR (groups.context_type = 'Course'
+                         AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                           OR courses.account_id = :account_id))", { account_id: account.id })
+      end
+      groups
     end
 
     def group_categories
@@ -687,12 +695,7 @@ module AccountReports
                    LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
                      AND group_categories.context_type = 'Course'")
         end
-        group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
-        if @sis_format
-          group_categories = group_categories.
-            select("group_categories.*, a.sis_source_id AS account_sis_id, c.sis_source_id AS course_sis_id").
-            where.not(sis_batch_id: nil)
-        end
+        group_categories = group_category_query_options(group_categories)
 
         generate_and_run_report headers do |csv|
           group_categories.order('group_categories.id ASC').find_each do |g|
@@ -713,6 +716,16 @@ module AccountReports
           end
         end
       end
+    end
+
+    def group_category_query_options(group_categories)
+      group_categories.where!('group_categories.deleted_at IS NULL') unless @include_deleted
+      if @sis_format
+        group_categories = group_categories.
+          select("group_categories.*, a.sis_source_id AS account_sis_id, c.sis_source_id AS course_sis_id").
+          where.not(sis_batch_id: nil)
+      end
+      group_categories
     end
 
     def group_membership
@@ -738,16 +751,7 @@ module AccountReports
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = group_memberships.user_id)")
 
-      gm = gm.where.not(group_memberships: {sis_batch_id: nil}) if @sis_format || @created_by_sis
-
-      if @include_deleted
-        gm.where!("(groups.workflow_state<>'deleted'
-                     AND group_memberships.workflow_state<>'deleted')
-                     OR
-                     (group_memberships.sis_batch_id IS NOT NULL)")
-      else
-        gm.where!("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
-      end
+      gm = group_membership_query_options(gm)
 
       if account != root_account
         gm = gm.joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id
@@ -784,6 +788,20 @@ module AccountReports
       end
     end
 
+    def group_membership_query_options(gm)
+      gm = gm.where.not(group_memberships: {sis_batch_id: nil}) if @sis_format || @created_by_sis
+
+      if @include_deleted
+        gm.where!("(groups.workflow_state<>'deleted'
+                     AND group_memberships.workflow_state<>'deleted')
+                     OR
+                     (group_memberships.sis_batch_id IS NOT NULL)")
+      else
+        gm.where!("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
+      end
+      gm
+    end
+
     def xlist
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
@@ -806,6 +824,23 @@ module AccountReports
                INNER JOIN #{Course.quoted_table_name} nxc ON course_sections.nonxlist_course_id = nxc.id").
         where("course_sections.nonxlist_course_id IS NOT NULL")
 
+      xl = xlist_query_options(xl)
+      generate_and_run_report headers do |csv|
+        xl.find_each do |x|
+          row = []
+          row << x.course_id unless @sis_format
+          row << x.course_sis_id
+          row << x.id unless @sis_format
+          row << x.sis_source_id
+          row << x.workflow_state
+          row << x.nonxlist_course_id unless @sis_format
+          row << x.nxc_sis_id unless @sis_format
+          csv << row
+        end
+      end
+    end
+
+    def xlist_query_options(xl)
       xl = xl.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
       xl = xl.where.not(courses: {sis_source_id: nil}, course_sections: {sis_source_id: nil}) if @sis_format
 
@@ -823,20 +858,6 @@ module AccountReports
 
       xl = add_course_sub_account_scope(xl)
       xl = add_term_scope(xl)
-
-      generate_and_run_report headers do |csv|
-        xl.find_each do |x|
-          row = []
-          row << x.course_id unless @sis_format
-          row << x.course_sis_id
-          row << x.id unless @sis_format
-          row << x.sis_source_id
-          row << x.workflow_state
-          row << x.nonxlist_course_id unless @sis_format
-          row << x.nxc_sis_id unless @sis_format
-          csv << row
-        end
-      end
     end
 
     def user_observers
@@ -864,15 +885,7 @@ module AccountReports
         where("p2.account_id=pseudonyms.account_id").
         where(:user_observers => {:root_account_id => root_account})
 
-      observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
-      observers = observers.active.where.not(user_observers: {workflow_state: 'deleted'}) unless @include_deleted
-
-      if account != root_account
-        observers = observers.
-          where("EXISTS (SELECT user_id FROM #{UserAccountAssociation.quoted_table_name} uaa
-                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)", account)
-      end
-
+      observers = user_observer_query_options(observers)
       generate_and_run_report headers do |csv|
         observers.find_each do |observer|
           row = []
@@ -885,6 +898,18 @@ module AccountReports
           csv << row
         end
       end
+    end
+
+    def user_observer_query_options(observers)
+      observers = observers.where.not(user_observers: {sis_batch_id: nil}) if @created_by_sis || @sis_format
+      observers = observers.active.where.not(user_observers: {workflow_state: 'deleted'}) unless @include_deleted
+
+      if account != root_account
+        observers = observers.
+          where("EXISTS (SELECT user_id FROM #{UserAccountAssociation.quoted_table_name} uaa
+                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)", account)
+      end
+      observers
     end
 
     def admins
@@ -919,9 +944,7 @@ module AccountReports
           where("account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
                  OR account_users.account_id= :account_id", {account_id: account.id})
 
-        admins = admins.where.not(account_users: {sis_batch_id: nil}) if @sis_format
-        admins = admins.where.not(account_users: {workflow_state: 'deleted'}) unless @include_deleted
-
+        admins = admin_query_options(admins)
         generate_and_run_report headers do |csv|
           admins.find_in_batches do |batch|
             users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
@@ -949,6 +972,12 @@ module AccountReports
           end
         end
       end
+    end
+
+    def admin_query_options(admins)
+      admins = admins.where.not(account_users: {sis_batch_id: nil}) if @sis_format
+      admins = admins.where.not(account_users: {workflow_state: 'deleted'}) unless @include_deleted
+      admins
     end
   end
 end
