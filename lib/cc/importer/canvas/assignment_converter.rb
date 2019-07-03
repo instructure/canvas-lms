@@ -45,7 +45,7 @@ module CC::Importer::Canvas
 
           module_exam = get_node_val(meta_node, 'is_end_of_module_exam')
 
-          if module_exam == "true"
+          if module_exam == "true" || html_path.end_with?("Final Exam.html")
             update_settings = {
               id: mig_id,
               setting: 'module_exam',
