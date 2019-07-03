@@ -603,6 +603,55 @@ describe Attachment do
       expect(purgatory.take.attachment_id).to eq a.id
     end
 
+    context "inst-fs" do
+      before :each do
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive(:app_host).and_return("https://somehost.example")
+      end
+
+      it "should only upload the replacement file to inst-fs once" do
+        instfs_uuid = "1234-abcd"
+        expect(InstFS).to receive(:direct_upload).
+          with(hash_including(file_name: File.basename(Attachment.file_removed_path))).
+          and_return(instfs_uuid).exactly(1).times
+        2.times do
+          expect(Attachment.file_removed_base_instfs_uuid).to eq instfs_uuid
+        end
+      end
+
+      it "should set the instfs_uuid to a duplicate of the replacement file" do
+        base_uuid = "base-id"
+        allow(Attachment).to receive(:file_removed_base_instfs_uuid).and_return(base_uuid)
+        dup_uuid = "duplicate-id"
+        expect(InstFS).to receive(:duplicate_file).with(base_uuid).and_return(dup_uuid)
+
+        att = attachment_model(instfs_uuid: "old-id")
+        expect(att).to receive(:send_to_purgatory) # stub these out for now - test separately
+        expect(att).to receive(:destroy_content)
+        att.destroy_content_and_replace
+        expect(att.instfs_uuid).to eq dup_uuid
+      end
+
+      it "should actually destroy the content" do
+        uuid = "old-id"
+        att = attachment_model(instfs_uuid: uuid)
+        expect(InstFS).to receive(:delete_file).with(uuid)
+        att.destroy_content
+      end
+
+      it "should duplicate the file for purgatory and restore from there" do
+        old_uuid = "old-id"
+        att = attachment_model(instfs_uuid: old_uuid)
+
+        purgatory_uuid = "purgatory-id"
+        expect(InstFS).to receive(:duplicate_file).with(old_uuid).and_return(purgatory_uuid)
+        purgatory = att.send_to_purgatory
+        expect(purgatory.new_instfs_uuid).to eq purgatory_uuid
+        att.resurrect_from_purgatory
+        expect(att.instfs_uuid).to eq purgatory_uuid
+      end
+    end
+
     shared_examples_for "purgatory" do
       it 'should save file in purgatory and then restore and back again' do
         a = attachment_model(uploaded_data: default_uploaded_data)
