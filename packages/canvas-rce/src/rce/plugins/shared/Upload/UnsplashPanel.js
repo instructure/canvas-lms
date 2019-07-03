@@ -20,12 +20,13 @@ import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
-import {Avatar, Img, Spinner, Text} from '@instructure/ui-elements'
+import {Avatar, Img, Spinner, Link} from '@instructure/ui-elements'
+import { ScreenReaderContent } from '@instructure/ui-a11y'
 import {Pagination} from '@instructure/ui-pagination'
-import {Tooltip} from '@instructure/ui-overlays'
+import { Button } from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
-import {StyleSheet, css} from 'aphrodite'
+import {StyleSheet, css} from '../../../../common/aphroditeExtensions'
 
 import UnsplashSVG from './UnsplashSVG'
 
@@ -104,20 +105,29 @@ const useUnsplashSearch = source => {
   return {...state, search}
 }
 
-function Attribution({name, avatarUrl}) {
+function Attribution({name, avatarUrl, profileUrl}) {
   return (
     <Flex>
       <Flex.Item margin="xx-small">
-        <Avatar name={name} src={avatarUrl} />
+        <Avatar name={name} src={avatarUrl} size="small" />
       </Flex.Item>
-      <Flex.Item margin="xx-small">
-        <Text>{name}</Text>
+      <Flex.Item margin="xx-small" shrink>
+        <Button
+          size="small"
+          variant="link-inverse"
+          href={profileUrl}
+          target="_blank"
+          rel="noopener"
+          fluidWidth
+        >
+          {name}
+        </Button>
       </Flex.Item>
     </Flex>
   )
 }
 
-export default function UnsplashPanel({editor, source, setUnsplashData}) {
+export default function UnsplashPanel({editor, source, setUnsplashData, brandColor}) {
   const [page, setPage] = useState(1)
   const [term, setTerm] = useState('')
   const [selectedImage, setSelectedImage] = useState(null)
@@ -164,89 +174,54 @@ export default function UnsplashPanel({editor, source, setUnsplashData}) {
         <>
           <div
             className={css(styles.container)}
-            role="radiogroup"
-            onBlur={e => {
-              if (!e.currentTarget.contains(e.relatedTarget)) {
-                let newIndex = 0
-                const selectedIndex = results[page].findIndex(result => result.id === selectedImage)
-                if (selectedIndex > 0) {
-                  newIndex = selectedIndex
-                }
-                setFocusedImageIndex(newIndex)
-                skipEffect.current = true
-              }
-            }}
+            data-testid="UnsplashResultsContainer"
           >
             {results[page] &&
               results[page].map((resultImage, index) => (
-                <Tooltip
+                <div
+                  className={css(hoverStyles.imageWrapper, styles.imageWrapper)}
                   key={resultImage.id}
-                  on={['click', 'hover', 'focus']}
-                  tip={
-                    <Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} />
-                  }
                 >
-                  <div
-                    ref={c => (resultRefs[index] = c)}
-                    key={resultImage.id}
-                    className={css(
-                      styles.imageContainer,
-                      resultImage.id === selectedImage && styles.imageContainerChecked
-                    )}
-                    role="radio"
-                    aria-checked={resultImage.id === selectedImage}
-                    tabIndex={index === focusedImageIndex ? 0 : -1}
+                  <Button
+                    variant="link"
+                    fluidWidth
+                    theme={{
+                      mediumPadding: '0'
+                    }}
                     onClick={() => {
                       setSelectedImage(resultImage.id)
-                      let newIndex = 0
-                      const selectedIndex = results[page].findIndex(
-                        result => result.id === resultImage.id
-                      )
-                      if (selectedIndex > 0) {
-                        newIndex = selectedIndex
-                      }
-                      setFocusedImageIndex(newIndex)
                       setUnsplashData({
                         id: resultImage.id,
                         url: resultImage.urls.link
                       })
                     }}
-                    onKeyDown={e => {
-                      switch (e.keyCode) {
-                        case 32: // Space
-                          setSelectedImage(resultImage.id)
-                          setUnsplashData({
-                            id: resultImage.id,
-                            url: resultImage.urls.link
-                          })
-                          break
-                        case 38: // Up
-                          if (index - 1 < 0) {
-                            setFocusedImageIndex(results[page].length - 1)
-                          } else {
-                            setFocusedImageIndex(index - 1)
-                          }
-                          break
-                        case 40: // Down
-                          if (index + 1 >= results[page].length) {
-                            setFocusedImageIndex(0)
-                          } else {
-                            setFocusedImageIndex(index + 1)
-                          }
-                          break
-                        default:
-                          break
-                      }
-                    }}
                   >
-                    <Img
-                      src={resultImage.urls.thumbnail}
-                      alt={resultImage.alt_text}
-                      height={resultImage.id === selectedImage ? '9.5em' : '10em'}
-                      margin={resultImage.id === selectedImage ? 'small' : 'xx-small'}
-                    />
+                    <div
+                      className={css(styles.imageContainer)}
+                      style={
+                          resultImage.id === selectedImage ? {
+                            border: `5px solid ${brandColor}`,
+                            padding: '2px'
+                          } : null}
+                      >
+                      {
+                        resultImage.id === selectedImage ?
+                        (<ScreenReaderContent>{formatMessage('Selected')}</ScreenReaderContent>) :
+                        null
+                      }
+                      <Img
+                        src={resultImage.urls.thumbnail}
+                        alt={resultImage.alt_text}
+                        constrain="contain"
+                        height="10em"
+                      />
+                    </div>
+                    </Button>
+                  <div className={css(styles.imageAttribution)}>
+                    <Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} profileUrl={resultImage.user.url} />
                   </div>
-                </Tooltip>
+
+                </div>
               ))}
           </div>
           {totalPages > 1 && results && Object.keys(results).length > 0 && (
@@ -297,12 +272,23 @@ export const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flexFlow: 'row wrap'
   },
-  imageContainer: {
-    width: 'auto',
-    height: '100%'
+  imageWrapper: {
+    position: 'relative',
+    margin: '12px',
+    'min-width': '200px'
   },
-  imageContainerChecked: {
-    border: '.25em solid black'
+  imageAttribution: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    'min-height': '8px',
+    opacity: 0,
+    'background-color': '#2d3b45',
+    'z-index': 99
+  },
+  imageContainer: {
+    'text-align': 'center'
   },
   positionedText: {
     position: 'absolute',
@@ -310,5 +296,16 @@ export const styles = StyleSheet.create({
     width: '100%',
     top: '0',
     left: '0'
+  }
+})
+
+export const hoverStyles = StyleSheet.create({
+  imageWrapper: {
+    [`#:hover ${css(styles.imageAttribution)}`] : {
+      opacity: 0.8
+    },
+    [`#:focus-within ${css(styles.imageAttribution)}`] : {
+      opacity: 0.8
+    },
   }
 })
