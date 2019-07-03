@@ -348,12 +348,24 @@ module AccountReports
     end
 
     def sections
+      headers = section_headers
+      sections = section_query
+      sections = section_query_options(sections)
+
+      generate_and_run_report headers do |csv|
+        sections.find_each do |s|
+          csv << section_row(s)
+        end
+      end
+    end
+
+    def section_headers
+      headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['section_id', 'course_id', 'integration_id', 'name', 'status',
                    'start_date', 'end_date']
       else
-        headers = []
         headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
         headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -367,13 +379,19 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
         headers << I18n.t('created_by_sis')
       end
+      headers
+    end
+
+    def section_query
       sections = root_account.course_sections.
         select("course_sections.*,
                 rc.sis_source_id AS course_sis_id,
                 ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id").
         joins("INNER JOIN #{Course.quoted_table_name} AS rc ON course_sections.course_id = rc.id
                INNER JOIN #{Account.quoted_table_name} AS ra ON rc.account_id = ra.id")
+    end
 
+    def section_query_options(sections)
       if @include_deleted
         sections.where!("course_sections.workflow_state<>'deleted'
                            OR
@@ -392,32 +410,30 @@ module AccountReports
       sections = sections.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
       sections = add_course_sub_account_scope(sections, 'rc')
       sections = add_term_scope(sections, 'rc')
+    end
 
-      generate_and_run_report headers do |csv|
-        sections.find_each do |s|
-          row = []
-          row << s.id unless @sis_format
-          row << s.sis_source_id
-          row << s.course_id unless @sis_format
-          row << s.course_sis_id
-          row << s.integration_id
-          row << s.name
-          row << s.workflow_state
-          if s.restrict_enrollments_to_section_dates
-            row << default_timezone_format(s.start_at)
-            row << default_timezone_format(s.end_at)
-          else
-            row << nil
-            row << nil
-          end
-          unless @sis_format
-            row << s.r_account_id
-            row << s.r_account_sis_id
-            row << s.sis_batch_id?
-          end
-          csv << row
-        end
+    def section_row(s)
+      row = []
+      row << s.id unless @sis_format
+      row << s.sis_source_id
+      row << s.course_id unless @sis_format
+      row << s.course_sis_id
+      row << s.integration_id
+      row << s.name
+      row << s.workflow_state
+      if s.restrict_enrollments_to_section_dates
+        row << default_timezone_format(s.start_at)
+        row << default_timezone_format(s.end_at)
+      else
+        row << nil
+        row << nil
       end
+      unless @sis_format
+        row << s.r_account_id
+        row << s.r_account_sis_id
+        row << s.sis_batch_id?
+      end
+      row
     end
 
     def enrollments
