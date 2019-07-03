@@ -53,7 +53,7 @@ module Canvas::Oauth
           ]
         }
       end
-      let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response.to_json) }
+      let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
 
       context 'when there is no public jwk' do
         before do

@@ -83,7 +83,7 @@ module Canvas::Oauth
 
     def get_jwk_from_url(jwt = nil)
       pub_jwk_from_url = HTTParty.get(key.public_jwk_url)
-      JSON::JWT.decode(jwt, JSON::JWK::Set.new(JSON.parse(pub_jwk_from_url.parsed_response)))
+      JSON::JWT.decode(jwt, JSON::JWK::Set.new(pub_jwk_from_url.parsed_response))
     rescue JSON::JWT::Exception => e
       errors << e
       raise JSON::JWS::VerificationFailed
