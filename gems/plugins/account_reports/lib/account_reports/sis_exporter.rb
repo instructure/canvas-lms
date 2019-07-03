@@ -149,11 +149,23 @@ module AccountReports
     end
 
     def accounts
+      headers = account_headers
+      accounts = account_query
+      accounts = account_query_options(accounts)
+
+      generate_and_run_report headers do |csv|
+        accounts.find_each do |a|
+          csv << account_row(a)
+        end
+      end
+    end
+
+    def account_headers
+      headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['account_id', 'parent_account_id', 'name', 'status']
       else
-        headers = []
         headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
         headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
         headers << I18n.t('#account_reports.report_header_canvas_parent_id', 'canvas_parent_id')
@@ -162,11 +174,17 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('created_by_sis')
       end
+      headers
+    end
+
+    def account_query
       accounts = root_account.all_accounts.
         select("accounts.*, pa.id AS parent_id,
                 pa.sis_source_id AS parent_sis_source_id").
         joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
+    end
 
+    def account_query_options(accounts)
       accounts = accounts.where.not(accounts: {sis_source_id: nil}) if @sis_format
       accounts = accounts.where.not(accounts: {sis_batch_id: nil}) if @created_by_sis
 
@@ -180,20 +198,19 @@ module AccountReports
         # this does not give the full tree pf sub accounts, just the direct children.
         accounts.where!(:accounts => {:parent_account_id => account})
       end
+      accounts
+    end
 
-      generate_and_run_report headers do |csv|
-        accounts.find_each do |a|
-          row = []
-          row << a.id unless @sis_format
-          row << a.sis_source_id
-          row << a.parent_id unless @sis_format
-          row << a.parent_sis_source_id
-          row << a.name
-          row << a.workflow_state
-          row << a.sis_batch_id? unless @sis_format
-          csv << row
-        end
-      end
+    def account_row(a)
+      row = []
+      row << a.id unless @sis_format
+      row << a.sis_source_id
+      row << a.parent_id unless @sis_format
+      row << a.parent_sis_source_id
+      row << a.name
+      row << a.workflow_state
+      row << a.sis_batch_id? unless @sis_format
+      row
     end
 
     def terms
