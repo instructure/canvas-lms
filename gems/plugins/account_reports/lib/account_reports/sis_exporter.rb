@@ -236,45 +236,9 @@ module AccountReports
     end
 
     def courses
-      if @sis_format
-        # headers are not translated on sis_export to maintain import compatibility
-        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
-                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
-                   'blueprint_course_id']
-      else
-        headers = []
-        headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
-        headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
-        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
-        headers << I18n.t('#account_reports.report_header_short__name', 'short_name')
-        headers << I18n.t('#account_reports.report_header_long__name', 'long_name')
-        headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
-        headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
-        headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
-        headers << I18n.t('#account_reports.report_header_term__id', 'term_id')
-        headers << I18n.t('#account_reports.report_header_status', 'status')
-        headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
-        headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
-        headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
-        headers << I18n.t('blueprint_course_id')
-        headers << I18n.t('created_by_sis')
-      end
-
-      courses = root_account.all_courses.preload(:account, :enrollment_term)
-      courses = courses.where.not(courses: {sis_source_id: nil}) if @sis_format
-      courses = courses.where.not(courses: {sis_batch_id: nil}) if @created_by_sis
-
-      if @include_deleted
-        courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
-                          OR courses.workflow_state<>'deleted'
-                          OR courses.sis_source_id IS NOT NULL", 120.days.ago)
-      else
-        courses.where!("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
-      end
-
-      courses = add_course_sub_account_scope(courses)
-      courses = add_term_scope(courses)
-
+      headers = course_headers
+      courses = course_query
+      courses = course_query_options(courses)
       course_state_sub = {'claimed' => 'unpublished', 'created' => 'unpublished',
                           'completed' => 'concluded', 'deleted' => 'deleted',
                           'available' => 'active'}
@@ -296,40 +260,91 @@ module AccountReports
           end
 
           batch.each do |c|
-            row = []
-            row << c.id unless @sis_format
-            row << c.sis_source_id
-            row << c.integration_id
-            row << c.course_code
-            row << c.name
-            row << c.account_id unless @sis_format
-            row << c.account.try(:sis_source_id)
-            row << c.enrollment_term_id unless @sis_format
-            row << c.enrollment_term.try(:sis_source_id)
-            # for sis import format 'claimed', 'created', and 'available' are all considered active
-            if @sis_format
-              if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-                row << c.workflow_state
-              else
-                row << 'active'
-              end
-            else
-              row << course_state_sub[c.workflow_state]
-            end
-            if c.restrict_enrollments_to_course_dates
-              row << default_timezone_format(c.start_at)
-              row << default_timezone_format(c.conclude_at)
-            else
-              row << nil
-              row << nil
-            end
-            row << c.course_format
-            row << blueprint_map[c.id]
-            row << c.sis_batch_id? unless @sis_format
-            csv << row
+            csv << course_row(c, course_state_sub, blueprint_map)
           end
         end
       end
+    end
+
+    def course_headers
+      headers = []
+      if @sis_format
+        # headers are not translated on sis_export to maintain import compatibility
+        headers = ['course_id', 'integration_id', 'short_name', 'long_name',
+                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
+                   'blueprint_course_id']
+      else
+        headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
+        headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+        headers << I18n.t('#account_reports.report_header_integration_id', 'integration_id')
+        headers << I18n.t('#account_reports.report_header_short__name', 'short_name')
+        headers << I18n.t('#account_reports.report_header_long__name', 'long_name')
+        headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
+        headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
+        headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
+        headers << I18n.t('#account_reports.report_header_term__id', 'term_id')
+        headers << I18n.t('#account_reports.report_header_status', 'status')
+        headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
+        headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
+        headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
+        headers << I18n.t('blueprint_course_id')
+        headers << I18n.t('created_by_sis')
+      end
+      headers
+    end
+
+    def course_query
+      courses = root_account.all_courses.preload(:account, :enrollment_term)
+    end
+
+    def course_query_options(courses)
+      courses = courses.where.not(courses: {sis_source_id: nil}) if @sis_format
+      courses = courses.where.not(courses: {sis_batch_id: nil}) if @created_by_sis
+
+      if @include_deleted
+        courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
+                          OR courses.workflow_state<>'deleted'
+                          OR courses.sis_source_id IS NOT NULL", 120.days.ago)
+      else
+        courses.where!("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
+      end
+
+      courses = add_course_sub_account_scope(courses)
+      courses = add_term_scope(courses)
+    end
+
+    def course_row(c, course_state_sub, blueprint_map)
+      row = []
+      row << c.id unless @sis_format
+      row << c.sis_source_id
+      row << c.integration_id
+      row << c.course_code
+      row << c.name
+      row << c.account_id unless @sis_format
+      row << c.account.try(:sis_source_id)
+      row << c.enrollment_term_id unless @sis_format
+      row << c.enrollment_term.try(:sis_source_id)
+      # for sis import format 'claimed', 'created', and 'available' are all considered active
+      if @sis_format
+        if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
+          row << c.workflow_state
+        else
+          row << 'active'
+        end
+      else
+        row << course_state_sub[c.workflow_state]
+      end
+      if c.restrict_enrollments_to_course_dates
+        row << default_timezone_format(c.start_at)
+        row << default_timezone_format(c.conclude_at)
+      else
+        row << nil
+        row << nil
+      end
+      row << c.course_format
+      row << blueprint_map[c.id]
+      row << c.sis_batch_id? unless @sis_format
+      row
     end
 
     def sections
