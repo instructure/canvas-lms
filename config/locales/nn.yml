@@ -18649,6 +18649,14 @@ nn:
   to_view_the_list_of_users_in_the_course_users_view_63e7f0c3: |-
       For å sjå deltakarlista for emnet må 'Personar - sjå liste' òg vere slått på.
       For å legge til brukarar via SIS-ID må 'Personar - legg til / fjern studentar frå emnet' og/eller 'Personar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar frå emna' òg vere slått på.
+  to_view_the_list_of_users_in_the_course_users_view_f5a54b37: |
+      For å sjå liste av personar i eit emne, må 'Personar - sjå liste' vere slått på.
+      For å sjå SIS-ID-ar, må 'SIS-data - les' vere slått på. For å legge til ein person til eit emne via SIS-ID, må 'SIS-data - administrer' òg vere slått på.
+      For å endre seksjon og emnerolle for ein student, må 'Personar - sjå liste' og 'Samtalar - send meldingar til individuelle emnemedlem' òg vere slått på.
+      For å melde personar av eit emne, må sida med brukardetaljar, vis emneliste og vis personliste òg vere slått på.
+      Gir brukar løyve til å sende emneinvitasjonar på nytt frå emnesida Personar.
+      Dersom kontoinnstillinga open registrering er slått på, kan personar med dette løyvet legge til studentar på eit emne frå personsida på emnet via e-postadresse dersom personen ikkje har ein Canvas-konto allereie.
+      For å knytte ein observatør til ein student, må 'Personar - administrer innloggingsdetaljar' og 'Samtalar - send til individuelle emnemedlem' vere slått på.
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "For å sjå fana med rapportar, må 'Emne - sjå bruksrapportar' òg vere slått på."
   to_view_user_page_views_users_view_list_must_also__f4246239: "For å sjå sidevisingar for brukar, må 'Personar - sjå liste' òg vere slått på."
   today_76e10f9c: "I dag"
