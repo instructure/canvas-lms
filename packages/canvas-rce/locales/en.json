@@ -157,9 +157,6 @@
   "course_links_b56959b9": {
     "message": "Course Links"
   },
-  "course_media_ec759ad": {
-    "message": "Course Media"
-  },
   "course_navigation_dd035109": {
     "message": "Course Navigation",
     "description": "Title of Sidebar accordion tab containing links to course pages."
@@ -236,6 +233,9 @@
   },
   "edit_link_7f53bebb": {
     "message": "Edit Link"
+  },
+  "editor_statusbar_26ac81fc": {
+    "message": "Editor Statusbar"
   },
   "embed_828fac4a": {
     "message": "Embed"
@@ -413,9 +413,6 @@
   },
   "loading_media_f3455841": {
     "message": "Loading media"
-  },
-  "media_af190855": {
-    "message": "Media"
   },
   "medium_5a8e9ead": {
     "message": "Medium"

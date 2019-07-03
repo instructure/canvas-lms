@@ -137,9 +137,6 @@
   "course_links_b56959b9": {
     "message": "Łącza kursu"
   },
-  "course_media_ec759ad": {
-    "message": "Multimedia kursu"
-  },
   "course_navigation_dd035109": {
     "message": "Nawigowanie po kursie"
   },
@@ -322,9 +319,6 @@
   },
   "loading_media_f3455841": {
     "message": "Wczytywanie danych"
-  },
-  "media_af190855": {
-    "message": "Multimedia"
   },
   "medium_5a8e9ead": {
     "message": "Średni"

@@ -137,9 +137,6 @@
   "course_links_b56959b9": {
     "message": "Tenglar námskeiðs"
   },
-  "course_media_ec759ad": {
-    "message": "Margmiðlunarefni námskeiðs"
-  },
   "course_navigation_dd035109": {
     "message": "Leiðarnet námskeiðs"
   },
@@ -322,9 +319,6 @@
   },
   "loading_media_f3455841": {
     "message": "Hleð inn margmiðlunarefni"
-  },
-  "media_af190855": {
-    "message": "Miðill"
   },
   "medium_5a8e9ead": {
     "message": "Meðal"

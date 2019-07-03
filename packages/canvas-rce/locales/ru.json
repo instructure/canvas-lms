@@ -137,9 +137,6 @@
   "course_links_b56959b9": {
     "message": "Ссылки курса"
   },
-  "course_media_ec759ad": {
-    "message": "Мультимедиа курса"
-  },
   "course_navigation_dd035109": {
     "message": "Навигация курса"
   },
@@ -322,9 +319,6 @@
   },
   "loading_media_f3455841": {
     "message": "Загрузка носителя"
-  },
-  "media_af190855": {
-    "message": "Мультимедиа"
   },
   "medium_5a8e9ead": {
     "message": "Средний"

@@ -155,9 +155,6 @@
   "course_links_b56959b9": {
     "message": "Emnelenker"
   },
-  "course_media_ec759ad": {
-    "message": "Emnemedier"
-  },
   "course_navigation_dd035109": {
     "message": "Emnenavigering"
   },
@@ -403,9 +400,6 @@
   },
   "loading_media_f3455841": {
     "message": "Lastar media."
-  },
-  "media_af190855": {
-    "message": "Media"
   },
   "medium_5a8e9ead": {
     "message": "Medium"
