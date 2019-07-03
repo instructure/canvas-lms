@@ -82,7 +82,6 @@ function shouldBeDisabled ({fileUrl, theFile, unsplashData}, selectedPanel) {
     case 'COMPUTER':
       return !theFile
     case 'UNSPLASH':
-      console.log('here')
       return !unsplashData.id || !unsplashData.url
     case 'URL':
       return !fileUrl
@@ -137,6 +136,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
                     editor={editor}
                     setUnsplashData={setUnsplashData}
                     source={source}
+                    brandColor={trayProps.brandColor}
                   />
                 </Suspense>
               </Tabs.Panel>

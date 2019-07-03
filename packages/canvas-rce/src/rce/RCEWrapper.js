@@ -493,7 +493,8 @@ class RCEWrapper extends React.Component {
       setup: editor => {
         addKebabIcon(editor)
         editorWrappers.set(editor, this);
-        Bridge.trayProps.set(editor, this.props.trayProps)
+        const trayPropsWithColor = {brandColor: this.theme.canvasBrandColor, ...this.props.trayProps}
+        Bridge.trayProps.set(editor, trayPropsWithColor)
         if (typeof setupCallback === "function") {
           setupCallback(editor);
         }
@@ -626,3 +627,4 @@ class RCEWrapper extends React.Component {
 }
 
 export default RCEWrapper
+
