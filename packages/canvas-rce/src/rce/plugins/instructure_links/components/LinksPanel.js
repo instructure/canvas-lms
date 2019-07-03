@@ -43,8 +43,6 @@ function LinksPanel(props) {
           {...collectionProps}
           collection="wikiPages"
           label={formatMessage('Pages')}
-          renderNewPageLink={!props.canCreatePages}
-          suppressRenderEmpty={!props.canCreatePages}
         />
       )}
 
