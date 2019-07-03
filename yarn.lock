@@ -1017,9 +1017,9 @@
     "@babel/runtime" "^7"
 
 "@instructure/media-capture@^5":
-  version "5.53.1"
-  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-5.53.1.tgz#25a07df88f8fa6849602d372ab09dc36968fa312"
-  integrity sha512-8a4M0+Jy9GRSJ1H6307gSBwyeVkUQB0oYGNqTYt4TcZ5nMcUDHEKPtK7R4B7YsQr9p+c7orycvVxvbMZ+DE8TA==
+  version "5.53.2"
+  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-5.53.2.tgz#9f25f82766c448f337454d3cd0390ef858205b9b"
+  integrity sha512-xXmXxUMcZKWb2IgbyCoNmtzvJR8b1jGkDelTi1gBHHbUl+vHeToYBBwnIA5GEHDP/JjtWajlWr2xzZNd2SBX6A==
   dependencies:
     "@babel/runtime" "^7"
     "@instructure/ui-a11y" "^5.52.0"
