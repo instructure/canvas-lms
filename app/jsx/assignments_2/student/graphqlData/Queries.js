@@ -19,6 +19,7 @@ import gql from 'graphql-tag'
 
 import {Assignment, AssignmentSubmissionsConnection} from './Assignment'
 import {ExternalTool} from './ExternalTool'
+import {Rubric} from './Rubric'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
 
@@ -33,6 +34,17 @@ export const EXTERNAL_TOOLS_QUERY = gql`
     }
   }
   ${ExternalTool.fragment}
+`
+
+export const RUBRIC_QUERY = gql`
+  query GetRubric($assignmentID: ID!) {
+    assignment(id: $assignmentID) {
+      rubric {
+        ...Rubric
+      }
+    }
+  }
+  ${Rubric.fragment}
 `
 
 export const STUDENT_VIEW_QUERY = gql`

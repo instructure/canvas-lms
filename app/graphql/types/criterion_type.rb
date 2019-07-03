@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,20 +17,14 @@
 #
 
 module Types
-  class RubricType < ApplicationObjectType
-    graphql_name 'Rubric'
+  class CriterionType < ApplicationObjectType
+    graphql_name 'Criterion'
 
-    global_id_field :id
-    field :_id, ID, 'legacy canvas id', method: :id, null: false
-    field :free_form_criterion_comments, Boolean, null: true
-
-    field :criteria, [CriterionType], null: false
-    def criteria
-      object.data
-    end
-
-    field :points_possible, Int, null: false
-    field :title, String, null: false
-    field :context_id, String, null: false
+    field :id, ID, null:false
+    field :criterion_use_range, Boolean, null: false
+    field :description, String, null: false
+    field :long_description, String, null: true
+    field :points, Int, null: false
+    field :ratings, [RatingType], null: false
   end
 end

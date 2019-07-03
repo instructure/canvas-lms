@@ -1034,6 +1034,15 @@ type CreateSubmissionPayload {
   submission: Submission
 }
 
+type Criterion {
+  criterionUseRange: Boolean!
+  description: String!
+  id: ID!
+  longDescription: String
+  points: Int!
+  ratings: [Rating!]!
+}
+
 """
 an ISO8601 formatted time string
 """
@@ -2189,13 +2198,24 @@ type Quiz implements ModuleItemInterface & Node & Timestamped {
   updatedAt: DateTime
 }
 
+type Rating {
+  description: String!
+  id: ID!
+  longDescription: String
+  points: Int!
+}
+
 type Rubric {
   """
   legacy canvas id
   """
   _id: ID!
+  contextId: String!
+  criteria: [Criterion!]!
   freeFormCriterionComments: Boolean
   id: ID!
+  pointsPossible: Int!
+  title: String!
 }
 
 type Section implements Node & Timestamped {

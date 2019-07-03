@@ -16,24 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {MockedProvider} from 'react-apollo/test-utils'
+import {mockQuery} from '../../mocks'
 import React from 'react'
 import {render} from '@testing-library/react'
-import {rubric} from '../RubricProps'
 import Rubric from '../../../../rubrics/Rubric'
+import {RUBRIC_QUERY} from '../../graphqlData/Queries'
+
+async function mockRubric(overrides = {}) {
+  const variables = {assignmentID: '1'}
+  const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
+  return result.data.assignment.rubric
+}
 
 describe('RubricTab', () => {
-  it('contains the rubric criteria heading', () => {
-    const {getByText} = render(<Rubric rubric={rubric} />)
+  it('contains the rubric criteria heading', async () => {
+    const rubric = await mockRubric({})
+    const {getByText} = render(
+      <MockedProvider>
+        <Rubric rubric={rubric} />
+      </MockedProvider>
+    )
     expect(getByText('Criteria')).toBeInTheDocument()
   })
 
-  it('contains the rubric ratings heading', () => {
-    const {getByText} = render(<Rubric rubric={rubric} />)
+  it('contains the rubric ratings heading', async () => {
+    const rubric = await mockRubric({})
+    const {getByText} = render(
+      <MockedProvider>
+        <Rubric rubric={rubric} />
+      </MockedProvider>
+    )
     expect(getByText('Ratings')).toBeInTheDocument()
   })
 
-  it('contains the rubric points heading', () => {
-    const {getByText} = render(<Rubric rubric={rubric} />)
+  it('contains the rubric points heading', async () => {
+    const rubric = await mockRubric({})
+    const {getByText} = render(
+      <MockedProvider>
+        <Rubric rubric={rubric} />
+      </MockedProvider>
+    )
     expect(getByText('Pts')).toBeInTheDocument()
   })
 })
