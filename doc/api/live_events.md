@@ -120,12 +120,27 @@ what's described in this document. Those fields are subject to change.
 
 | Field | Description |
 | ----- | ----------- |
+| `user_id` | The Canvas id of the user being that created the entry. |
+| `created_at` | The time at which this entry was created. |
 | `discussion_entry_id` | The Canvas id of the newly added entry. |
 | `parent_discussion_entry_id` | If this was a reply, the Canvas id of the parent entry. |
 | `parent_discussion_entry_author_id` | If this was a reply, the Canvas id of the parent entry author. |
 | `discussion_topic_id` | The Canvas id of the topic the entry was added to. |
 | `text` | The (possibly truncated) text of the post. |
 
+#### `discussion_entry_submitted`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user being that created the entry. |
+| `created_at` | The time at which this entry was created. |
+| `discussion_entry_id` | The Canvas id of the newly added entry. |
+| `parent_discussion_entry_id` | If this was a reply, the Canvas id of the parent entry. |
+| `parent_discussion_entry_author_id` | If this was a reply, the Canvas id of the parent entry author. |
+| `discussion_topic_id` | The Canvas id of the topic the entry was added to. |
+| `text` | The (possibly truncated) text of the post. |
+| `assignment_id` | The Canvas id of the assignment if the discussion topic is graded. |
+| `submission_id` | The Canvas id of the submission if the discussion topic is graded. |
 
 #### `discussion_topic_created`
 
@@ -413,6 +428,18 @@ by `asset_type` and `asset_id`.
 | `attempt` | This is the submission attempt number. |
 | `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 | `group_id` | The submissions’s group ID if the assignment is a group assignment. |
+
+
+#### `submission_comment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_comment_id` | The Canvas id of the new comment. |
+| `submission_id` | The Canvas id of the new submission. |
+| `user_id` | The Canvas id of the user who authored the comment. |
+| `created_at` | The timestamp when the comment was created. |
+| `attachment_ids` | Array of Canvas ids of attachments for this comment. |
+| `body` | The (possibly truncated) text of the comment. |
 
 
 #### `plagiarism_resubmit`
