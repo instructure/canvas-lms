@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {clone, setWith} from 'lodash'
 import React from 'react'
-import sinon from 'sinon'
-import { shallow } from 'enzyme'
-import _ from 'lodash'
 import Rubric from '../Rubric'
-import { rubric, assessments } from './fixtures'
+import {rubric, assessments} from './fixtures'
+import sinon from 'sinon'
+import {shallow} from 'enzyme'
 
 describe('the Rubric component', () => {
   it('renders as expected', () => {
@@ -44,7 +44,7 @@ describe('the Rubric component', () => {
     expect(modal).toMatchSnapshot()
   })
 
-  const setCloned = (object, path, value) => _.setWith(_.clone(object), path, value, _.clone)
+  const setCloned = (object, path, value) => setWith(clone(object), path, value, clone)
   it('hides the score total when needed', () => {
     const hidden = setCloned(assessments.points, 'rubric_association.hide_score_total', true)
     const modal = shallow(
@@ -107,7 +107,7 @@ describe('the Rubric component', () => {
           {...otherProps}
         />
       )
-      expect(el.find('th')).toHaveLength(expected ? 3 : 2)
+      expect(el.find('th')).toHaveLength(expected ? 4 : 3)
       expect(el.find('Criterion').at(0).prop('hasPointsColumn')).toBe(expected)
     }
 

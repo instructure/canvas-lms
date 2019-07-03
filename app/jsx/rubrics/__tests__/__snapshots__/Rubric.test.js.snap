@@ -10,12 +10,27 @@ exports[`the Rubric component hides the score total when needed 1`] = `
   }
 >
   <Table
-    caption="Point Rubric"
+    caption={
+      <ScreenReaderContent
+        as="span"
+      >
+        Point Rubric
+      </ScreenReaderContent>
+    }
     hover={false}
     layout="auto"
     size="medium"
   >
     <thead>
+      <tr>
+        <th
+          className="rubric-title"
+          colSpan="3"
+          scope="colgroup"
+        >
+          Point Rubric
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-criteria"
@@ -179,12 +194,27 @@ exports[`the Rubric component renders as expected 1`] = `
   }
 >
   <Table
-    caption="Point Rubric"
+    caption={
+      <ScreenReaderContent
+        as="span"
+      >
+        Point Rubric
+      </ScreenReaderContent>
+    }
     hover={false}
     layout="auto"
     size="medium"
   >
     <thead>
+      <tr>
+        <th
+          className="rubric-title"
+          colSpan="3"
+          scope="colgroup"
+        >
+          Point Rubric
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-criteria"
@@ -371,12 +401,27 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
   }
 >
   <Table
-    caption="Point Rubric"
+    caption={
+      <ScreenReaderContent
+        as="span"
+      >
+        Point Rubric
+      </ScreenReaderContent>
+    }
     hover={false}
     layout="auto"
     size="medium"
   >
     <thead>
+      <tr>
+        <th
+          className="rubric-title"
+          colSpan="3"
+          scope="colgroup"
+        >
+          Point Rubric
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-criteria"
@@ -532,12 +577,27 @@ exports[`the Rubric component updates the total score when an individual criteri
   }
 >
   <Table
-    caption="Point Rubric"
+    caption={
+      <ScreenReaderContent
+        as="span"
+      >
+        Point Rubric
+      </ScreenReaderContent>
+    }
     hover={false}
     layout="auto"
     size="medium"
   >
     <thead>
+      <tr>
+        <th
+          className="rubric-title"
+          colSpan="3"
+          scope="colgroup"
+        >
+          Point Rubric
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-criteria"

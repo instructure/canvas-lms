@@ -16,6 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  allowExtraCredit,
+  customRatings,
+  onAssessmentChange,
+  rubric,
+  rubricAssessment,
+  rubricAssociation,
+  isSummary,
+  flexWidth
+} from './RubricProps'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
@@ -24,12 +34,13 @@ import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
+import Rubric from '../../../rubrics/Rubric'
 import {Submission} from '../graphqlData/Submission'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import GradeDisplay from './GradeDisplay'
-import {Img} from '@instructure/ui-elements'
+import {img} from '@instructure/ui-elements'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
@@ -104,7 +115,22 @@ function ContentTabs(props) {
           )}
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>
-          <Img src="/images/assignments2_rubric_student_static.png" />
+          {props.submission.state !== 'graded' ? (
+            <Suspense fallback={<LoadingIndicator />}>
+              <Rubric
+                allowExtraCredit={allowExtraCredit}
+                customRatings={customRatings}
+                onAssessmentChange={onAssessmentChange}
+                rubric={rubric}
+                rubricAssessment={rubricAssessment}
+                rubricAssociation={rubricAssociation}
+                isSummary={isSummary}
+                flexWidth={flexWidth}
+              />
+            </Suspense>
+          ) : (
+            <img alt="" src="/images/assignments2_rubric_student_static.png" />
+          )}
         </TabPanel>
       </TabList>
     </div>
