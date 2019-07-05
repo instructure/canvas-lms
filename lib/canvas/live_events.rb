@@ -85,16 +85,14 @@ module Canvas::LiveEvents
 
   def self.get_discussion_entry_data(entry)
     payload = {
-      user_id:  entry.global_user_id,
+      user_id:  entry.user_id,
       created_at: entry.created_at,
-      discussion_entry_id: entry.global_id,
-      discussion_topic_id: entry.global_discussion_topic_id,
+      discussion_entry_id: entry.id,
+      discussion_topic_id: entry.discussion_topic_id,
       text: LiveEvents.truncate(entry.message)
     }
 
-    if entry.parent_id
-      payload[:parent_discussion_entry_id] = entry.global_parent_id
-    end
+    payload[:parent_discussion_entry_id] = entry.parent_id if entry.parent_id
     payload
   end
 

@@ -988,10 +988,10 @@ describe Canvas::LiveEvents do
         )
 
         expect_event('discussion_entry_submitted', {
-          user_id: entry.global_user_id.to_s,
+          user_id: entry.user_id.to_s,
           created_at: entry.created_at,
-          discussion_entry_id: entry.global_id.to_s,
-          discussion_topic_id: entry.global_discussion_topic_id.to_s,
+          discussion_entry_id: entry.id.to_s,
+          discussion_topic_id: entry.discussion_topic_id.to_s,
           text: entry.message
         }).once
 
@@ -1015,16 +1015,16 @@ describe Canvas::LiveEvents do
         )
 
         expect_event('discussion_entry_submitted', {
-          assignment_id: assignment.global_id.to_s,
-          submission_id: submission.global_id.to_s,
-          user_id: entry.global_user_id.to_s,
+          assignment_id: assignment.id.to_s,
+          submission_id: submission.id.to_s,
+          user_id: entry.user_id.to_s,
           created_at: entry.created_at,
-          discussion_entry_id: entry.global_id.to_s,
-          discussion_topic_id: entry.global_discussion_topic_id.to_s,
+          discussion_entry_id: entry.id.to_s,
+          discussion_topic_id: entry.discussion_topic_id.to_s,
           text: entry.message
         }).once
 
-        Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.global_id, submission.global_id)
+        Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.id, submission.id)
       end
     end
   end
