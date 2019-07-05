@@ -62,7 +62,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting)
         state_changes = []
         @logger.debug("Processing Course #{[course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name].inspect}")
 
@@ -71,6 +71,7 @@ module SIS
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished)/i
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
+        raise ImportError, "Invalid grade_passback_setting \"#{grade_passback_setting}\" for course #{course_id}" unless grade_passback_setting.blank? || grade_passback_setting =~ /\A(nightly_sync|not_set)/i
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         course = @root_account.all_courses.where(sis_source_id: course_id).take
@@ -174,6 +175,13 @@ module SIS
           if course_format != course.course_format
             course.settings_will_change!
             course.course_format = course_format
+          end
+        end
+
+        if grade_passback_setting
+          grade_passback_setting = nil if grade_passback_setting == 'not_set'
+          if grade_passback_setting != course.grade_passback_setting
+            course.grade_passback_setting = grade_passback_setting
           end
         end
 
