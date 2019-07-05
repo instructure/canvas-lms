@@ -636,6 +636,8 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment_ids[] if set, return only assignments specified
   # @argument order_by [String, "position"|"name"]
   #   Determines the order of the assignments. Defaults to "position".
+  # @argument post_to_sis [Boolean]
+  #   Return only assignments that have post_to_sis set or not set.
   # @returns [Assignment]
   def index
     error_or_array= get_assignments(@current_user)
@@ -725,6 +727,8 @@ class AssignmentsApiController < ApplicationController
         submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
+
+      scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis] && authorized_action(@context, user, :manage_assignments)
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api.max_per_page
