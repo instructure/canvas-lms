@@ -61,7 +61,9 @@ module Types
 
     field :assignment, AssignmentType, null: true
     def assignment
-      load_association(:assignment)
+      override.is_a? FakeOverride ?
+        override.assignment :
+        load_association(:assignment)
     end
 
     field :title, String, null: true
@@ -72,6 +74,8 @@ module Types
     def set
       if override.set_type == "ADHOC"
         override
+      elsif override.is_a?(FakeOverride)
+        nil
       else
         load_association(:set)
       end
@@ -81,5 +85,26 @@ module Types
     field :lock_at, DateTimeType, null: true
     field :unlock_at, DateTimeType, null: true
     field :all_day, Boolean, null: true
+
+    class FakeOverride
+      def initialize(assignment)
+        @assignment = assignment.without_overrides
+      end
+
+      attr_reader :assignment
+      delegate :due_at, :lock_at, :unlock_at, :all_day, to: :assignment
+
+      def id
+        0
+      end
+
+      def title
+        I18n.t "Everyone else"
+      end
+
+      def set_type
+        "Base"
+      end
+    end
   end
 end

@@ -340,14 +340,30 @@ module Types
        `AssignmentOverride` applies.",
       null: false
 
-    field :assignment_overrides, AssignmentOverrideType.connection_type,
-      null: true
-    def assignment_overrides
+    field :assignment_overrides, AssignmentOverrideType.connection_type, null: true do
+      argument :include_base_dates, Boolean, <<~DOC, required: false, default_value: false
+        When true, also includes an `AssignmentOverride` with the assignment's
+        default due date
+      DOC
+    end
+    def assignment_overrides(include_base_dates:)
+      load_association(:context).then do |course|
         # this is the assignment overrides index method of loading
         # overrides... there's also the totally different method found in
         # assignment_overrides_json. they may not return the same results?
         # ¯\_(ツ)_/¯
-        AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
+
+        # also now i'm including logic found in DatesOverridable to add the base
+        # dates... overrides are terrible
+        if include_base_dates &&
+            !assignment.differentiated_assignments_applies? &&
+            (overrides.empty? || course.user_has_been_admin?(current_user))
+          overrides << AssignmentOverrideType::FakeOverride.new(assignment)
+        end
+
+        overrides
+      end
     end
 
     field :group_set, GroupSetType, null: true
