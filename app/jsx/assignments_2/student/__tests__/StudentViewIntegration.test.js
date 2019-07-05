@@ -18,10 +18,10 @@
 import $ from 'jquery'
 import * as uploadFileModule from '../../../shared/upload_file'
 import {fireEvent, render, wait, waitForElement} from 'react-testing-library'
-import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from '../assignmentData'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import {singleAttachment, submissionGraphqlMock} from '../test-utils'
+import {STUDENT_VIEW_QUERY} from '../graphqlData/Queries'
 import SubmissionIDQuery from '../components/SubmissionIDQuery'
 
 let mocks
@@ -62,31 +62,6 @@ describe('SubmissionIDQuery', () => {
     expect(
       await waitForElement(() => getByTestId('assignments-2-student-view'))
     ).toBeInTheDocument()
-  })
-
-  it('renders default env correctly', async () => {
-    window.ENV = {}
-    const defaultEnv = GetAssignmentEnvVariables()
-
-    expect(defaultEnv).toEqual({
-      assignmentUrl: '',
-      courseId: null,
-      currentUser: null,
-      modulePrereq: null,
-      moduleUrl: ''
-    })
-  })
-
-  it('renders with env params set', async () => {
-    const env = GetAssignmentEnvVariables()
-
-    expect(env).toEqual({
-      assignmentUrl: 'http://localhost/tests/1/assignments',
-      courseId: '1',
-      currentUser: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
-      modulePrereq: null,
-      moduleUrl: 'http://localhost/tests/1/modules'
-    })
   })
 
   it('renders loading', async () => {

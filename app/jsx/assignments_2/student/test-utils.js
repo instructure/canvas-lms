@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {
-  CREATE_SUBMISSION,
-  CREATE_SUBMISSION_COMMENT,
-  CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
   SUBMISSION_COMMENT_QUERY,
   SUBMISSION_ID_QUERY
-} from './assignmentData'
+} from './graphqlData/Queries'
+import {
+  CREATE_SUBMISSION,
+  CREATE_SUBMISSION_COMMENT,
+  CREATE_SUBMISSION_DRAFT
+} from './graphqlData/Mutations'
 
 export function mockAssignment(overrides = {}) {
   return {

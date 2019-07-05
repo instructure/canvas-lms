@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!assignments_2'
@@ -44,7 +44,7 @@ function LockedAssignment(props) {
 }
 
 LockedAssignment.propTypes = {
-  assignment: AssignmentShape
+  assignment: Assignment.shape
 }
 
 export default React.memo(LockedAssignment)

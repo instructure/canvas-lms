@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!assignments_2_logged_out_tabs'
 import LoginActionPrompt from './LoginActionPrompt'
@@ -25,7 +25,7 @@ import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 LoggedOutTabs.propTypes = {
-  assignment: AssignmentShape
+  assignment: Assignment.shape
 }
 
 function LoggedOutTabs(props) {

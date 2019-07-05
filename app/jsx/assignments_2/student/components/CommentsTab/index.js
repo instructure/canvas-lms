@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {AssignmentShape, SubmissionShape, SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {Assignment} from '../../graphqlData/Assignment'
 import CommentContent from './CommentContent'
 import CommentTextArea from './CommentTextArea'
 import ErrorBoundary from '../../../../shared/components/ErrorBoundary'
@@ -25,6 +24,8 @@ import GenericErrorPage from '../../../../shared/components/GenericErrorPage/ind
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import {Query} from 'react-apollo'
 import React from 'react'
+import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
+import {Submission} from '../../graphqlData/Submission'
 
 function CommentsTab(props) {
   const queryVariables = {
@@ -72,8 +73,8 @@ function CommentsTab(props) {
 }
 
 CommentsTab.propTypes = {
-  assignment: AssignmentShape,
-  submission: SubmissionShape
+  assignment: Assignment.shape,
+  submission: Submission.shape
 }
 
 export default React.memo(CommentsTab)

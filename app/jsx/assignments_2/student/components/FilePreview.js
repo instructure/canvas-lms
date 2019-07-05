@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AttachmentShape} from '../assignmentData'
+import {SubmissionFile} from '../graphqlData/File'
 import {getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
@@ -34,7 +34,7 @@ import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 
 export default class FilePreview extends Component {
   static propTypes = {
-    files: PropTypes.arrayOf(AttachmentShape)
+    files: PropTypes.arrayOf(SubmissionFile.shape)
   }
 
   state = {

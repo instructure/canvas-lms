@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CREATE_SUBMISSION_COMMENT, SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
+import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {fireEvent, render, waitForElement} from 'react-testing-library'
 import {legacyMockSubmission, mockAssignment, mockComments} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'

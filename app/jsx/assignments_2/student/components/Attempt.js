@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
-
 import React from 'react'
+import {Submission} from '../graphqlData/Submission'
 import Text from '@instructure/ui-elements/lib/components/Text'
-
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
 
 export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1
@@ -44,8 +43,8 @@ function Attempt(props) {
 }
 
 Attempt.propTypes = {
-  assignment: AssignmentShape,
-  submission: SubmissionShape
+  assignment: Assignment.shape,
+  submission: Submission.shape
 }
 
 export default React.memo(Attempt)

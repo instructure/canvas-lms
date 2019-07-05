@@ -21,9 +21,9 @@ import I18n from 'i18n!assignments_2'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import React from 'react'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import {CommentShape} from '../../assignmentData'
 import {VideoPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
+import {SubmissionComment} from '../../graphqlData/SubmissionComment'
 
 function CommentRow(props) {
   const author = props.comment.author
@@ -92,7 +92,7 @@ function CommentRow(props) {
 }
 
 CommentRow.propTypes = {
-  comment: CommentShape.isRequired
+  comment: SubmissionComment.shape.isRequired
 }
 
 export default React.memo(CommentRow)

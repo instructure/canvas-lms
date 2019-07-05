@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import I18n from 'i18n!assignments_2'
-import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
-import {CommentShape} from '../../assignmentData'
+import I18n from 'i18n!assignments_2'
 import noComments from '../../SVG/NoComments.svg'
+import React from 'react'
+import {SubmissionComment} from '../../graphqlData/SubmissionComment'
+import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 
 function CommentContent(props) {
   return (
@@ -43,7 +43,7 @@ function CommentContent(props) {
 }
 
 CommentContent.propTypes = {
-  comments: arrayOf(CommentShape).isRequired
+  comments: arrayOf(SubmissionComment.shape).isRequired
 }
 
 export default React.memo(CommentContent)
