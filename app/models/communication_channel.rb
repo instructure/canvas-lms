@@ -49,9 +49,13 @@ class CommunicationChannel < ActiveRecord::Base
 
   # Constants for the different supported communication channels
   TYPE_EMAIL    = 'email'
-  TYPE_SMS      = 'sms'
-  TYPE_TWITTER  = 'twitter'
   TYPE_PUSH     = 'push'
+  TYPE_SMS      = 'sms'
+  TYPE_SLACK    = 'slack'
+  TYPE_TWITTER  = 'twitter'
+
+  VALID_TYPES = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_SLACK].freeze
+
 
   RETIRE_THRESHOLD = 1
 
@@ -208,7 +212,7 @@ class CommunicationChannel < ActiveRecord::Base
     p.whenever { |record|
       @send_confirmation and
       record.workflow_state == 'unconfirmed' and
-      self.path_type == TYPE_SMS and
+      (self.path_type == TYPE_SMS or self.path_type == TYPE_SLACK) and
       !self.user.creation_pending?
     }
     p.data { {
@@ -385,6 +389,7 @@ class CommunicationChannel < ActiveRecord::Base
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
     # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
+    rank_order << TYPE_SLACK if user.associated_root_accounts.any?{|a| a.settings[:encrypted_slack_key]}
     self.unretired.where('communication_channels.path_type IN (?)', rank_order).
       order(Arel.sql("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
@@ -455,8 +460,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
-    valid_types = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH]
-    self.path_type = TYPE_EMAIL unless valid_types.include?(path_type)
+    self.path_type = TYPE_EMAIL unless VALID_TYPES.include?(path_type)
     true
   end
   protected :assert_path_type

@@ -408,6 +408,14 @@ assignments_2:
   root_opt_in: true
   beta: true
   development: true
+slack_notifications:
+  state: hidden
+  display_name: Slack Notifications
+  description: The ability for users to receive notifications from slack
+  applies_to: RootAccount
+  root_opt_in: true
+  beta: true
+  development: true
 javascript_csp:
   state: hidden_in_prod
   display_name: Content Security Policy

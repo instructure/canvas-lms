@@ -306,6 +306,20 @@
 
         <%= render partial: 'additional_settings', locals: { f: f } %>
 
+        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) && @account.feature_enabled?(:slack_notifications)%>
+          <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
+          <fieldset>
+            <legend><%= t("Slack Api Key") %></legend>
+            <div class="dim-till-hover">
+              <span><%= t("Current Slack Api Key:") %></span>
+              <span id="current_slack_api_key"><%= slack_api_key.length > 4 ? "#{slack_api_key[0..3]}#{'*' * (slack_api_key.length - 4)}" : '****' %></span>
+            </div>
+            <%= f.fields_for :slack do |slack| %>
+              <%= slack.label :slack_api_key , t("New Slack Api Key") %>
+              <%= slack.text_field :slack_api_key, placeholder: t("New Slack Api Key"), value:''%>
+            <% end %>
+          </fieldset>
+        <% end %>
         <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
           <% TermsOfService.ensure_terms_for_account(@account) %>
           <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @account.terms_of_service_content&.content) %>

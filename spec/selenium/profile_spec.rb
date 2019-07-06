@@ -206,6 +206,21 @@ describe "profile" do
       expect(f('.other_channels .path')).to include_text(test_cell_number)
     end
 
+    it 'should add another contact method - slack' do
+      @user.account.enable_feature!(:slack_notifications)
+      test_slack_email = 'sburnett@instructure.com'
+      get '/profile/settings'
+      f('.add_contact_link').click
+      f('a[href="#register_slack_handle"]').click
+      f('#communication_channel_slack').send_keys(test_slack_email)
+      driver.action.send_keys(:tab).perform
+      register_form = f('#register_slack_handle')
+      submit_form(register_form)
+      wait_for_ajaximations
+      close_visible_dialog
+      expect(f('.other_channels .path')).to include_text(test_slack_email)
+    end
+
     it "should register a service" do
       get "/profile/settings"
       add_skype_service

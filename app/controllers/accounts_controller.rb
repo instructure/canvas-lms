@@ -828,10 +828,17 @@ class AccountsController < ApplicationController
     return update_api if api_request?
     if authorized_action(@account, @current_user, :manage_account_settings)
       respond_to do |format|
-
         if @account.root_account?
           terms_attrs = params[:account][:terms_of_service]
           @account.update_terms_of_service(terms_attrs) if terms_attrs.present?
+          if @account.feature_enabled?(:slack_notifications)
+            slack_api_key = params[:account].dig(:slack, :slack_api_key)
+            if slack_api_key.present?
+              encrypted_slack_key, salt = Canvas::Security.encrypt_password(slack_api_key.to_s, 'instructure_slack_encrypted_key')
+              @account.settings[:encrypted_slack_key] = encrypted_slack_key
+              @account.settings[:encrypted_slack_key_salt] = salt
+            end
+          end
         end
 
         custom_help_links = params[:account].delete :custom_help_links

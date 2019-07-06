@@ -38,6 +38,28 @@ describe "root account basic settings" do
     expect(Account.default.reload.settings[:enable_gravatar]).to eq false
   end
 
+  context 'editing slack API key' do
+    before :once do
+      account_admin_user(:account => Account.site_admin)
+      @account = Account.default
+    end
+
+    before :each do
+      user_session(@admin)
+      @admin.account.enable_feature!(:slack_notifications)
+    end
+
+    it 'should be able to update slack key' do
+      get "/accounts/#{@account.id}/settings"
+
+      slack_api_input = f('*[placeholder="New Slack Api Key"]')
+      set_value(slack_api_input, 'WHATEVER PEOPLE')
+      submit_form('#account_settings')
+      expect(f('#current_slack_api_key').text).to eq('WHAT***********')
+    end
+  end
+
+
   it "downloads reports" do
     course_with_admin_logged_in
     account.account_reports.create!(

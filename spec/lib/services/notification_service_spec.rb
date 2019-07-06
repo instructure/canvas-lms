@@ -58,6 +58,15 @@ module Services
         expect{@message.deliver}.not_to raise_error
       end
 
+      it 'processes slack message type' do
+        encrypted_slack_key, salt = Canvas::Security.encrypt_password('testkey'.to_s, 'instructure_slack_encrypted_key')
+        @account.settings[:encrypted_slack_key] = encrypted_slack_key
+        @account.settings[:encrypted_slack_key_salt] = salt
+        expect(@queue).to receive(:send_message).once
+        @message.path_type = "slack"
+        expect{@message.deliver}.not_to raise_error
+      end
+
       it "processes sms message type" do
         expect(@queue).to receive(:send_message).once
         @message.path_type = "sms"
@@ -79,6 +88,21 @@ module Services
         @message.path_type = "sms"
         @message.to = "+18015550100"
         expect{@message.deliver}.not_to raise_error
+      end
+
+      it 'expects slack to not call mailer create_message' do
+        encrypted_slack_key, salt = Canvas::Security.encrypt_password('testkey'.to_s, 'instructure_slack_encrypted_key')
+        @account.settings[:encrypted_slack_key] = encrypted_slack_key
+        @account.settings[:encrypted_slack_key_salt] = salt
+        expect(@queue).to receive(:send_message).once
+        expect(Mailer).to receive(:create_message).never
+        @message.path_type = "slack"
+        @message.to = "test@email.com"
+        expect{@message.deliver}.not_to raise_error
+      end
+
+      it 'expects slack to not enqueue without slack api token' do
+        expect(@queue).to receive(:send_message).never
       end
 
       it "processes push notification message type" do
