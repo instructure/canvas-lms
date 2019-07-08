@@ -20,7 +20,7 @@ group :test do
   gem 'rails-controller-testing', '1.0.2'
 
   gem 'gergich', '0.2.2', require: false
-  gem 'dotenv', '2.2.1', require: false
+  gem 'dotenv', '2.7.4', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
   gem 'simplecov', '0.15.1', require: false
