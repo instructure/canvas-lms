@@ -42,6 +42,7 @@ const TYPE_URL_MAP = {
   courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
   groups: '/api/v1/users/self/groups?include[]=can_access',
   accounts: '/api/v1/accounts',
+  profile: '/api/v1/users/self/tabs',
   help: '/help_links'
 }
 
@@ -57,6 +58,7 @@ export default class Navigation extends React.Component {
     accounts: [],
     courses: [],
     help: [],
+    profile: [],
     unread_count: 0,
     unread_count_attempts: 0,
     isTrayOpen: false,
@@ -68,7 +70,9 @@ export default class Navigation extends React.Component {
     groupsLoading: false,
     groupsAreLoaded: false,
     helpLoading: false,
-    helpAreLoaded: false
+    helpAreLoaded: false,
+    profileAreLoading: false,
+    profileAreLoaded: false
   }
 
   componentWillMount() {
@@ -287,9 +291,8 @@ export default class Navigation extends React.Component {
                 ? null
                 : window.ENV.current_user.avatar_image_url
             }
-            profileEnabled={window.ENV.SETTINGS.enable_profiles}
-            eportfoliosEnabled={window.ENV.SETTINGS.eportfolios_enabled}
-            closeTray={this.closeTray}
+            loaded={this.state.profileAreLoaded}
+            tabs={this.state.profile}
           />
         )
       case 'help':
