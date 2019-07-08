@@ -896,6 +896,7 @@ class GradebooksController < ApplicationController
     visible_sections = @context.sections_visible_to(@current_user)
 
     new_gradebook_options = {
+      additional_sort_options_enabled: @context.feature_enabled?(:new_gradebook_sort_options),
       colors: gradebook_settings.fetch(:colors, {}),
 
       course_settings: {

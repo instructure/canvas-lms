@@ -969,6 +969,30 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :grading_schemes
       end
 
+      describe "additional_sort_options_enabled" do
+        before(:once) { @course.root_account.allow_feature!(:new_gradebook_sort_options) }
+
+        context "for New Gradebook" do
+          before(:once) { @course.enable_feature!(:new_gradebook) }
+
+          it "is set to true when the new_gradebook_sort_options feature is enabled" do
+            @course.enable_feature!(:new_gradebook_sort_options)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:additional_sort_options_enabled]).to be true
+          end
+
+          it "is set to false when the new_gradebook_sort_options feature is not enabled" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:additional_sort_options_enabled]).to be false
+          end
+        end
+
+        it "is not included if New Gradebook is not enabled" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options).not_to have_key(:additional_sort_options_enabled)
+        end
+      end
+
       it "sets post_policies_enabled to true when Post Policies are enabled" do
         @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!

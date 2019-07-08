@@ -486,6 +486,16 @@ test('substitutes falsy args with empty string', () => {
   deepEqual(natcompare.strings.getCall(0).args, ['', ''])
 })
 
+test('returns 1 if nullsLast is true and only first item is null', function() {
+  const gradebook = createGradebook()
+  equal(gradebook.localeSort(null, 'fred', {nullsLast: true}), 1)
+})
+
+test('returns -1 if nullsLast is true and only second item is null', function() {
+  const gradebook = createGradebook()
+  equal(gradebook.localeSort('fred', null, {nullsLast: true}), -1)
+})
+
 QUnit.module('Gradebook#gradeSort by an assignment', {
   setup() {
     this.studentA = {

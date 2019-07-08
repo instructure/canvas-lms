@@ -33,6 +33,7 @@ export default class StudentColumnHeader extends ColumnHeader {
   static propTypes = {
     selectedPrimaryInfo: oneOf(studentRowHeaderConstants.primaryInfoKeys).isRequired,
     onSelectPrimaryInfo: func.isRequired,
+    includeAdditionalSortOptions: bool.isRequired,
     loginHandleName: string,
     sisName: string,
     selectedSecondaryInfo: oneOf(studentRowHeaderConstants.secondaryInfoKeys).isRequired,
@@ -43,6 +44,14 @@ export default class StudentColumnHeader extends ColumnHeader {
       direction: string.isRequired,
       disabled: bool.isRequired,
       isSortColumn: bool.isRequired,
+      // sort callbacks with additional sort options enabled
+      onSortByIntegrationId: func.isRequired,
+      onSortByLoginId: func.isRequired,
+      onSortBySisId: func.isRequired,
+      onSortBySortableName: func.isRequired,
+      onSortInAscendingOrder: func.isRequired,
+      onSortInDescendingOrder: func.isRequired,
+      // sort callbacks with additional sort options disabled
       onSortBySortableNameAscending: func.isRequired,
       onSortBySortableNameDescending: func.isRequired,
       settingKey: string.isRequired
@@ -123,18 +132,120 @@ export default class StudentColumnHeader extends ColumnHeader {
 
   render() {
     const {
+      includeAdditionalSortOptions,
       sortBySetting: {
         isSortColumn,
         settingKey,
         direction,
         disabled,
+        // sort functions with additional sort options enabled
+        onSortBySortableName,
+        onSortBySisId,
+        onSortByIntegrationId,
+        onSortByLoginId,
+        onSortInAscendingOrder,
+        onSortInDescendingOrder,
+        // sort functions with additional sort options disabled
         onSortBySortableNameAscending,
         onSortBySortableNameDescending
       }
     } = this.props
     const selectedSortSetting = isSortColumn && settingKey
+    const selectedSortDirection = isSortColumn && direction
     const menuShown = this.state.menuShown
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
+    const {secondaryInfoLabels} = studentRowHeaderConstants
+
+    let sortMenu
+    if (includeAdditionalSortOptions) {
+      sortMenu = (
+        <Menu
+          label={I18n.t('Sort by')}
+          contentRef={this.bindSortByMenuContent}
+          disabled={this.props.disabled}
+        >
+          <Menu.Group label={I18n.t('Type')}>
+            <Menu.Item
+              selected={selectedSortSetting === 'sortable_name'}
+              disabled={disabled}
+              onSelect={onSortBySortableName}
+            >
+              <span>{I18n.t('Name')}</span>
+            </Menu.Item>
+
+            <Menu.Item
+              selected={selectedSortSetting === 'sis_user_id'}
+              disabled={disabled}
+              onSelect={onSortBySisId}
+            >
+              <span>{secondaryInfoLabels.sis_id}</span>
+            </Menu.Item>
+
+            <Menu.Item
+              selected={selectedSortSetting === 'integration_id'}
+              disabled={disabled}
+              onSelect={onSortByIntegrationId}
+            >
+              <span>{secondaryInfoLabels.integration_id}</span>
+            </Menu.Item>
+
+            <Menu.Item
+              selected={selectedSortSetting === 'login_id'}
+              disabled={disabled}
+              onSelect={onSortByLoginId}
+            >
+              <span>{secondaryInfoLabels.login_id}</span>
+            </Menu.Item>
+          </Menu.Group>
+
+          <Menu.Group label={I18n.t('Order')}>
+            <Menu.Item
+              disabled={disabled}
+              key="ascending"
+              onSelect={onSortInAscendingOrder}
+              selected={selectedSortDirection === 'ascending'}
+            >
+              <span>{I18n.t('A–Z')}</span>
+            </Menu.Item>
+
+            <Menu.Item
+              disabled={disabled}
+              key="descending"
+              onSelect={onSortInDescendingOrder}
+              selected={selectedSortDirection === 'descending'}
+            >
+              <span>{I18n.t('Z–A')}</span>
+            </Menu.Item>
+          </Menu.Group>
+        </Menu>
+      )
+    } else {
+      sortMenu = (
+        <Menu
+          label={I18n.t('Sort by')}
+          contentRef={this.bindSortByMenuContent}
+          disabled={this.props.disabled}
+        >
+          <Menu.Group label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+            <Menu.Item
+              selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
+              disabled={disabled}
+              onSelect={onSortBySortableNameAscending}
+            >
+              <span>{I18n.t('A–Z')}</span>
+            </Menu.Item>
+
+            <Menu.Item
+              selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
+              disabled={disabled}
+              onSelect={onSortBySortableNameDescending}
+            >
+              <span>{I18n.t('Z–A')}</span>
+            </Menu.Item>
+          </Menu.Group>
+        </Menu>
+      )
+    }
 
     return (
       <div
@@ -172,35 +283,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                     onToggle={this.onToggle}
                     onDismiss={this.props.onMenuDismiss}
                   >
-                    <Menu
-                      label={I18n.t('Sort by')}
-                      contentRef={this.bindSortByMenuContent}
-                      disabled={this.props.disabled}
-                    >
-                      <Menu.Group
-                        label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
-                      >
-                        <Menu.Item
-                          selected={
-                            selectedSortSetting === 'sortable_name' && direction === 'ascending'
-                          }
-                          disabled={disabled}
-                          onSelect={onSortBySortableNameAscending}
-                        >
-                          <span>{I18n.t('A–Z')}</span>
-                        </Menu.Item>
-
-                        <Menu.Item
-                          selected={
-                            selectedSortSetting === 'sortable_name' && direction === 'descending'
-                          }
-                          disabled={disabled}
-                          onSelect={onSortBySortableNameDescending}
-                        >
-                          <span>{I18n.t('Z–A')}</span>
-                        </Menu.Item>
-                      </Menu.Group>
-                    </Menu>
+                    {sortMenu}
 
                     <Menu
                       label={I18n.t('Display as')}
