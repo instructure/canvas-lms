@@ -28,7 +28,7 @@ RSpec.describe AttachmentUploadStatus, type: :model do
     Rails.cache.clear
   end
 
-  it { is_expected.to belong_to(:attachment) }
+  it { is_expected.to belong_to(:attachment).required }
 
   it 'is valid' do
     expect(upload).to be_valid

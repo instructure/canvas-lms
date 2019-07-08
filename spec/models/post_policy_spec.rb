@@ -20,7 +20,7 @@ require_relative '../spec_helper'
 
 describe PostPolicy do
   describe "relationships" do
-    it { is_expected.to belong_to(:course).inverse_of(:post_policies) }
+    it { is_expected.to belong_to(:course).required.inverse_of(:post_policies) }
     it { is_expected.to validate_presence_of(:course) }
 
     it { is_expected.to belong_to(:assignment).inverse_of(:post_policy) }

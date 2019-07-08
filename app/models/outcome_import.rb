@@ -18,13 +18,11 @@
 
 class OutcomeImport < ApplicationRecord
   include Workflow
-  belongs_to :context, polymorphic: %i[account course]
+  belongs_to :context, polymorphic: %i[account course], required: true
   belongs_to :attachment
   belongs_to :user
   has_many :outcome_import_errors
 
-  validates :context_type, presence: true
-  validates :context_id, presence: true
   validates :workflow_state, presence: true
 
   workflow do

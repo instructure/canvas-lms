@@ -46,7 +46,7 @@ describe Score do
 
   subject_once(:score) { student.scores.create!(params) }
 
-  it { is_expected.to belong_to(:enrollment) }
+  it { is_expected.to belong_to(:enrollment).required }
   # shoulda-matchers will have an `optional` method in version 4. As a workaround,
   # I've used the validates_presence_of matcher on the line following the belong_to matcher
   it { is_expected.to belong_to(:grading_period) }

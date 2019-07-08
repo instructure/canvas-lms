@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe OutcomeProficiency, type: :model do
   describe 'associations' do
     it { is_expected.to have_many(:outcome_proficiency_ratings).dependent(:destroy).order('points DESC, id ASC').inverse_of(:outcome_proficiency) }
-    it { is_expected.to belong_to(:account).inverse_of(:outcome_proficiency) }
+    it { is_expected.to belong_to(:account).required.inverse_of(:outcome_proficiency) }
   end
 
   describe 'validations' do

@@ -24,15 +24,10 @@ describe OutcomeImport, type: :model do
   end
 
   describe 'associations' do
-    it { is_expected.to belong_to(:context) }
+    it { is_expected.to belong_to(:context).required }
     it { is_expected.to belong_to(:attachment) }
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_many(:outcome_import_errors) }
-  end
-
-  describe 'validations' do
-    it { is_expected.to validate_presence_of :context_type }
-    it { is_expected.to validate_presence_of :context_id }
   end
 
   def create_import
