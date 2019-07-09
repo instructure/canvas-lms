@@ -206,6 +206,14 @@ describe UserSearch do
             expect(results).to include(other_user)
           end
 
+          it 'sorts by sis id' do
+            User.find_by(name: 'Rose Tyler').pseudonyms.create!(unique_id: 'rose.tyler@example.com',
+              sis_user_id: '25rose', account_id: course.root_account_id)
+            User.find_by(name: 'Tyler Pickett').pseudonyms.create!(unique_id: 'tyler.pickett@example.com',
+              sis_user_id: '1tyler', account_id: course.root_account_id)
+            users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'sis_id')
+            expect(users.map(&:name)).to eq ['Tyler Pickett', 'Rose Tyler', 'Tyler Teacher']
+          end
         end
 
         describe 'searching on emails' do
@@ -245,6 +253,13 @@ describe UserSearch do
           it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
             user.communication_channels.create!(path: 'unconfirmed@example.com')
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
+          end
+
+          it 'sorts by email' do
+            User.find_by(name: 'Tyler Pickett').communication_channels.create!(path: '1tyler@example.com')
+            User.find_by(name: 'Tyler Teacher').communication_channels.create!(path: '25teacher@example.com')
+            users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'email')
+            expect(users.map(&:name)).to eq ['Tyler Pickett', 'Tyler Teacher', 'Rose Tyler']
           end
         end
 
