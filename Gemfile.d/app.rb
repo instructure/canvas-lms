@@ -58,7 +58,7 @@ gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.11', require: false
 gem 'bcrypt', '3.1.13'
-gem 'brotli', '0.2.0', require: false
+gem 'brotli', '0.2.3', require: false
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
