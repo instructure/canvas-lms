@@ -54,9 +54,9 @@ gem "aws-sdk-core", "3.59.0", require: false
 gem "aws-sdk-kms", "1.23.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
-gem 'barby', '0.6.5', require: false
+gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '0.10.1', require: false
-  gem 'chunky_png', '1.3.10', require: false
+  gem 'chunky_png', '1.3.11', require: false
 gem 'bcrypt', '3.1.11'
 gem 'brotli', '0.2.0', require: false
 gem 'canvas_connect', '0.3.11'
