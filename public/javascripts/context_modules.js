@@ -1513,8 +1513,15 @@ import 'compiled/jquery.rails_flash_notifications'
       $(event.currentTarget).siblings('.drag_and_drop_warning').hide();
     });
 
+    if (ENV['module_editing_disabled']) {
+      $(".edit_module_link").live('mouseover', function(event) {
+        $(this).prop('title', 'This feature is currently disabled.');
+      });
+    }
+
     $(".edit_module_link").live('click', function(event) {
       event.preventDefault();
+      if (ENV['module_editing_disabled']) { return }
       modules.editModule($(this).parents(".context_module"));
     });
 
