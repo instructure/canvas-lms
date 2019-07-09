@@ -225,10 +225,6 @@ describe FilesController do
         expect(response).to be_successful
       end
 
-      it "authorizes users on a remote shard for JSON data" do
-        get 'index', params: {:user_id => @user.global_id}, :format => :json
-        expect(response).to be_successful
-      end
     end
   end
 

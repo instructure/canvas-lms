@@ -26,8 +26,10 @@ body {
   background: $ic-color-light;
   font-weight: 300;
 
-  &:not(.is-inside-submission-frame):not(.embedded):not(.dashboard-is-planner) {
-    min-width: 768px;
+  @if not $use_responsive_layout {
+    &:not(.is-inside-submission-frame):not(.embedded):not(.dashboard-is-planner) {
+      min-width: 768px;
+    }
   }
 
   &.no-headers, &.embedded {
@@ -162,3 +164,11 @@ iframe.tool_launch {
     }
   }
 }
+
+@include mobile-only {
+  #left-side, #header, .ic-app-nav-toggle-and-crumbs{
+    display: none !important;
+  }
+}
+
+

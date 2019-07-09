@@ -32,8 +32,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  layout :application_layout
-
   attr_accessor :active_tab
   attr_reader :context
 
@@ -274,11 +272,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:responsive_layout)
   end
   helper_method :use_responsive_layout?
-
-  def application_layout
-    use_responsive_layout? ? "ic_layout" : "application"
-  end
-  private :application_layout
 
   def grading_periods?
     !!@context.try(:grading_periods?)

@@ -21,6 +21,7 @@ import $ from 'jquery'
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {func} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
@@ -55,6 +56,10 @@ const TYPE_FILTER_MAP = {
 const RESOURCE_COUNT = 10
 
 export default class Navigation extends React.Component {
+  static propTypes = {
+    onDataRecieved: func
+  }
+
   state = {
     groups: [],
     accounts: [],
@@ -155,6 +160,12 @@ export default class Navigation extends React.Component {
     this.loadResourcePage(url, type)
   }
 
+  ensureLoaded(type) {
+    if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
+      this.getResource(TYPE_URL_MAP[type], type)
+    }
+  }
+
   loadResourcePage(url, type, previousData = []) {
     $.getJSON(url, (data, __, xhr) => {
       const newData = previousData.concat(this.filterDataForType(data, type))
@@ -173,7 +184,7 @@ export default class Navigation extends React.Component {
         [type]: newData,
         [`${type}Loading`]: false,
         [`${type}AreLoaded`]: true
-      })
+      }, this.props.onDataRecieved)
     })
   }
 
@@ -224,6 +235,7 @@ export default class Navigation extends React.Component {
 
   updateUnreadCount(count) {
     count = parseInt(count, 10)
+    this.setState({unread_count: count}, this.props.onDataRecieved)
     ReactDOM.render(
       <React.Fragment>
         <ScreenReaderContent>
@@ -239,9 +251,10 @@ export default class Navigation extends React.Component {
       </React.Fragment>,
       this.unreadCountElement()
     )
-    if (this.unreadCountElement()) {
-      this.unreadCountElement().style.display = count > 0 ? '' : 'none'
-    }
+    const badgeElements = [this.unreadCountElement(), document.getElementById('mobileHeaderInboxUnreadBadge')]
+    badgeElements.forEach(el => {
+      if (el) el.style.display = count > 0 ? '' : 'none'
+    })
   }
 
   determineActiveLink() {
@@ -257,9 +270,7 @@ export default class Navigation extends React.Component {
 
   handleMenuClick(type) {
     // Make sure data is loaded up
-    if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
-      this.getResource(TYPE_URL_MAP[type], type)
-    }
+    this.ensureLoaded(type)
 
     if (this.state.isTrayOpen && this.state.activeItem === type) {
       this.closeTray()

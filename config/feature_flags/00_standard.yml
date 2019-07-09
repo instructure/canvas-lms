@@ -253,6 +253,7 @@ responsive_layout:
   description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount
   root_opt_in: true
+  beta: true
   development: true
 force_rtl:
   state: hidden

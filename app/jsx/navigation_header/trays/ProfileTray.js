@@ -25,10 +25,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-
-function readCookie(key) {
-  return (document.cookie.match(`(^|; )${encodeURIComponent(key)}=([^;]*)`) || 0)[2]
-}
+import LogoutButton from '../LogoutButton'
 
 function ProfileTab({id, html_url, label}) {
   return (
@@ -61,14 +58,7 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tab
         <Heading level="h3" as="h2">
           {userDisplayName}
         </Heading>
-        <form action="/logout" method="post">
-          <input name="utf8" value="✓" type="hidden" />
-          <input name="_method" value="delete" type="hidden" />
-          <input name="authenticity_token" value={readCookie('_csrf_token')} type="hidden" />
-          <Button type="submit" size="small" margin="medium 0">
-            {I18n.t('Logout')}
-          </Button>
-        </form>
+        <LogoutButton size="small" margin="medium 0" />
       </View>
       <hr role="presentation" />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
