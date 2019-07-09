@@ -127,7 +127,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
 gem 'inst_statsd', '2.1.4'
   gem 'statsd-ruby', '1.4.0', require: false
-  gem 'aroi', '0.0.6', require: false
+  gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '3.3.0'
 gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
