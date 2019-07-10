@@ -118,15 +118,9 @@ module FeatureFlags
 
     def self.quizzes_next_visible_on_hook(context)
       root_account = context.root_account
-      is_provisioned = Rails.env.development? || root_account.settings&.dig(:provision, 'lti').present?
-
-      if is_provisioned
-        FeatureFlag.where(
-          feature: 'quizzes_next',
-          context: root_account
-        ).first_or_create!(state: 'on') # if it's local or previously provisioned, FF is on
-      end
-      is_provisioned
+      # assume all Quizzes.Next provisions so far have been done through uuid_provisioner
+      #  so all provisioned accounts will have the FF in Canvas UI
+      root_account.settings&.dig(:provision, 'lti').present?
     end
 
     def self.conditional_release_after_state_change_hook(user, context, _old_state, new_state)
