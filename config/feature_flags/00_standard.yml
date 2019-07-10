@@ -453,3 +453,12 @@ analytics_2:
   applies_to: RootAccount
   display_name: New Course and User Analytics
   description: Show new analytics for course and user data
+new_gradebook_plagiarism_indicator:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Gradebook Plagiarism Indicator
+  description: Enables display of plagiarism reports and similarity scores in
+    the New Gradebook submission tray.
+  environments:
+    production:
+      state: disabled

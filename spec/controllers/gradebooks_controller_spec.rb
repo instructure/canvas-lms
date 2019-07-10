@@ -1027,6 +1027,19 @@ describe GradebooksController do
         expect(gradebook_options[:post_policies_enabled]).to be(false)
       end
 
+      it "sets show_similarity_score to true when the New Gradebook Plagiarism Indicator feature flag is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:show_similarity_score]).to be(true)
+      end
+
+      it "sets show_similarity_score to false when the New Gradebook Plagiarism Indicator feature flag is not enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:show_similarity_score]).to be(false)
+      end
+
       it 'includes api_max_per_page' do
         Setting.set('api_max_per_page', 50)
         get :show, params: {course_id: @course.id}

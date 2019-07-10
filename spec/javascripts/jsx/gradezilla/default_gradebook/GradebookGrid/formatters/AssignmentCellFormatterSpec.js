@@ -215,30 +215,83 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       ok($cell.classList.contains('grayed-out'), 'cell classes include "grayed-out"')
     })
 
-    test('includes the "turnitin" class when the submission has Turnitin data', () => {
-      submission.turnitin_data = {submission_2501: {state: 'acceptable'}}
-      ok(renderCell().classList.contains('turnitin'))
+    QUnit.module('when showing the updated similarity score', updatedPlagiarismHooks => {
+      updatedPlagiarismHooks.beforeEach(() => {
+        gradebook.options.show_similarity_score = true
+      })
+
+      QUnit.module('when the submission includes Turnitin data', turnitinHooks => {
+        let plagiarismEntry
+
+        turnitinHooks.beforeEach(() => {
+          plagiarismEntry = {status: 'scored'}
+          submission.turnitin_data = {submission_2501: plagiarismEntry}
+        })
+
+        test('includes a warning icon when plagiarism data is in an "error" state', () => {
+          plagiarismEntry.status = 'error'
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-warning'))
+        })
+
+        test('includes a clock icon when plagiarism data is awaiting processing', () => {
+          plagiarismEntry.status = 'pending'
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-clock'))
+        })
+
+        test('includes a solid circle when above 60% similarity', () => {
+          plagiarismEntry.similarity_score = 75
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-empty'))
+        })
+
+        test('includes a half-filled circle when between 20% and 60% similarity', () => {
+          plagiarismEntry.similarity_score = 45
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half'))
+        })
+
+        test('includes a checkmark icon when below 20% similarity', () => {
+          plagiarismEntry.similarity_score = 10
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-complete'))
+        })
+      })
+
+      QUnit.module('when the submission includes Vericite data', turnitinHooks => {
+        let plagiarismEntry
+
+        turnitinHooks.beforeEach(() => {
+          plagiarismEntry = {status: 'scored'}
+          submission.vericite_data = {provider: 'vericite', submission_2501: plagiarismEntry}
+        })
+
+        test('includes a warning icon when plagiarism data is in an "error" state', () => {
+          plagiarismEntry.status = 'error'
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-warning'))
+        })
+
+        test('includes a clock icon when plagiarism data is awaiting processing', () => {
+          plagiarismEntry.status = 'pending'
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-clock'))
+        })
+
+        test('includes a solid circle when above 60% similarity', () => {
+          plagiarismEntry.similarity_score = 75
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-empty'))
+        })
+
+        test('includes a half-filled circle when between 20% and 60% similarity', () => {
+          plagiarismEntry.similarity_score = 45
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half'))
+        })
+
+        test('includes a checkmark icon when below 20% similarity', () => {
+          plagiarismEntry.similarity_score = 10
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-complete'))
+        })
+      })
     })
 
-    test('renders the turnitin score when the submission has Turnitin data', () => {
-      submission.turnitin_data = {submission_2501: {state: 'acceptable'}}
-      strictEqual(
-        renderCell().querySelectorAll('.gradebook-cell-turnitin.acceptable-score').length,
-        1
-      )
-    })
-
-    test('includes the "turnitin" class when the submission has Vericite data', () => {
-      submission.vericite_data = {submission_2501: {state: 'acceptable'}}
-      ok(renderCell().classList.contains('turnitin'))
-    })
-
-    test('renders the turnitin score when the submission has Vericite data', () => {
-      submission.vericite_data = {submission_2501: {state: 'acceptable'}}
-      strictEqual(
-        renderCell().querySelectorAll('.gradebook-cell-turnitin.acceptable-score').length,
-        1
-      )
+    test('does not render an icon in the OriginalityScore area when updated display is not enabled', () => {
+      submission.turnitin_data = {submission_2501: {status: 'error'}}
+      notOk(renderCell().querySelector('.Grid__GradeCell__OriginalityScore'))
     })
 
     test('includes the "ungraded" class when the assignment is not graded', () => {

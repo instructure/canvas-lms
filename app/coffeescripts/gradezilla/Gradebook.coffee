@@ -2374,6 +2374,7 @@ export default do ->
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
       selectPreviousStudent: => @loadTrayStudent('previous')
+      showSimilarityScore: @options.show_similarity_score
       speedGraderEnabled: @options.speed_grader_enabled
       student:
         id: student.id
