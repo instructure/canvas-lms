@@ -196,7 +196,7 @@ module Importers
         migration.migration_settings[:imported_assets] = imported_asset_hash
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
-        ActiveRecord::Base.skip_touch_context(false)
+
         if course.changed?
           course.save!
         else
@@ -209,6 +209,8 @@ module Importers
       migration.trigger_live_events!
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
       migration.imported_migration_items
+    ensure
+      ActiveRecord::Base.skip_touch_context(false)
     end
 
     def self.adjust_dates(course, migration)
