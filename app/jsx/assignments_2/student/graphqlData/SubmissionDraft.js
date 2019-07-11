@@ -35,3 +35,9 @@ export const SubmissionDraft = {
     attachments: arrayOf(SubmissionDraftFile.shape)
   })
 }
+
+export const SubmissionDraftDefaultMocks = {
+  SubmissionDraft: () => ({
+    attachments: () => []
+  })
+}

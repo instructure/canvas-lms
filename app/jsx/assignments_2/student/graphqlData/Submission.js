@@ -17,7 +17,7 @@
  */
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
-import {SubmissionInterface} from './SubmissionInterface'
+import {SubmissionInterface, SubmissionInterfaceDefaultMocks} from './SubmissionInterface'
 
 export const Submission = {
   fragment: gql`
@@ -32,4 +32,36 @@ export const Submission = {
     ...SubmissionInterface.shape.propTypes,
     id: string.isRequired
   })
+}
+
+export const SubmissionDefaultMocks = {
+  Submission: () => ({
+    ...SubmissionInterfaceDefaultMocks.SubmissionInterface(),
+    id: '1'
+  })
+}
+
+export const SubmissionMocks = {
+  draftWithAttachment: {
+    submissionDraft: {
+      attachments: [{}]
+    }
+  },
+
+  graded: {
+    deductedPoints: 0,
+    enteredGrade: '8',
+    grade: '8',
+    gradingStatus: 'graded',
+    state: 'graded',
+    submissionStatus: 'submitted',
+    submittedAt: new Date().toISOString()
+  },
+
+  submitted: {
+    gradingStatus: 'needs_grading',
+    state: 'submitted',
+    submissionStatus: 'submitted',
+    submittedAt: new Date().toISOString()
+  }
 }

@@ -95,3 +95,18 @@ export const AssignmentSubmissionsConnection = {
     })
   })
 }
+
+export const AssignmentDefaultMocks = {
+  Assignment: () => ({
+    _id: '1',
+    allowedAttempts: null,
+    allowedExtensions: [],
+    gradingType: 'points',
+    muted: false,
+    pointsPossible: 10,
+    submissionsConnection: {
+      nodes: [{}] // only return one submission
+    },
+    submissionTypes: ['online_upload']
+  })
+}

@@ -51,3 +51,9 @@ export const SubmissionComment = {
     updatedAt: string
   })
 }
+
+export const SubmissionCommentDefaultMocks = {
+  SubmissionComment: () => ({
+    attachments: [{}]
+  })
+}

@@ -29,3 +29,9 @@ export const LockInfo = {
     isLocked: bool.isRequired
   })
 }
+
+export const LockInfoDefaultMocks = {
+  LockInfo: () => ({
+    isLocked: false
+  })
+}

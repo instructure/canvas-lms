@@ -57,3 +57,19 @@ export const SubmissionInterface = {
     submittedAt: string
   })
 }
+
+export const SubmissionInterfaceDefaultMocks = {
+  SubmissionInterface: () => ({
+    attachments: () => [],
+    attempt: 0,
+    deductedPoints: null,
+    enteredGrade: null,
+    grade: null,
+    gradingStatus: null,
+    latePolicyStatus: null,
+    state: 'unsubmitted',
+    submissionDraft: null,
+    submissionStatus: 'unsubmitted',
+    submittedAt: null
+  })
+}

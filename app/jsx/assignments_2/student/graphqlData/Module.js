@@ -31,3 +31,5 @@ export const Module = {
     name: string
   })
 }
+
+export const ModuleDefaultMocks = {}

@@ -31,3 +31,10 @@ export const Error = {
     message: string.isRequired
   })
 }
+
+export const ErrorDefaultMocks = {
+  ValidationError: () => ({
+    attribute: null,
+    message: ''
+  })
+}

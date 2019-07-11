@@ -31,3 +31,9 @@ export const SubmissionCommentAuthor = {
     shortName: string
   })
 }
+
+export const UserDefaultMocks = {
+  User: () => ({
+    shortName: 'Bob Dobbs'
+  })
+}
