@@ -446,7 +446,7 @@ class ContentZipper
     # they do not include submissions for group assignments for anyone
     # but the original submitter of the group submission
     attachment_ids = submission.attachment_ids.try(:split, ",")
-    Attachment.where(id: Array.wrap(attachment_ids))
+    submission.shard.activate { Attachment.where(id: Array.wrap(attachment_ids)) }
   end
 
   def get_user_name(students, submission)
