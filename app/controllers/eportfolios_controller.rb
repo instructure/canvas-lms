@@ -24,7 +24,6 @@ class EportfoliosController < ApplicationController
   before_action :require_user, :only => [:index, :user_index]
   before_action :reject_student_view_student
   before_action :verified_user_check, :only => [:index, :user_index, :create]
-  before_action :rce_js_env
   before_action :get_eportfolio, :except => [:index, :user_index, :create]
 
   def index
@@ -34,6 +33,7 @@ class EportfoliosController < ApplicationController
   def user_index
     @context = @current_user.profile
     return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
+    rce_js_env
     @active_tab = "eportfolios"
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
@@ -51,7 +51,10 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :new }
+          format.html {
+            rce_js_env
+            render :new
+          }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -65,6 +68,7 @@ class EportfoliosController < ApplicationController
       session[:permissions_key] = SecureRandom.uuid
     end
     if authorized_action(@portfolio, @current_user, :read)
+      rce_js_env
       @portfolio.ensure_defaults
       @category = @portfolio.eportfolio_categories.first
       @page = @category.eportfolio_entries.first
@@ -106,7 +110,10 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :edit }
+          format.html {
+            rce_js_env
+            render :edit
+          }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
