@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent, act} from 'react-testing-library'
+import userEvent from '@testing-library/user-event'
 import {UploadFile, handleSubmit} from '../UploadFile'
 
 describe('UploadFile', () => {
@@ -53,11 +54,24 @@ describe('UploadFile', () => {
   it('calls handleSubmit on submit', () => {
     const handleSubmit = jest.fn()
     const handleDismiss = () => {}
-    const {getByText} = render(
+    const {getByText, getByLabelText} = render(
       <UploadFile label="Test" editor={fakeEditor}  trayProps={trayProps} onDismiss={handleDismiss} onSubmit={handleSubmit} panels={['COMPUTER', 'URL']} />
     )
+    // We need to make sure that a file is present, or the submit button will be disabled.
+    const fakeFile = new File(['(⌐□_□)'], 'somename.png', {
+      type: 'image/png',
+    })
+    const fileInput = getByLabelText(/click to browse your computer/, { selector: 'input'})
+    Object.defineProperty(fileInput, 'files', {
+      value: [fakeFile]
+    })
+    act(() => {
+      fireEvent.change(fileInput)
+    })
     const submitBtn = getByText('Submit').closest('button')
-    fireEvent.click(submitBtn)
+    act(() => {
+      fireEvent.click(submitBtn)
+    })
     expect(handleSubmit).toHaveBeenCalled()
   })
 
@@ -149,6 +163,73 @@ describe('UploadFile', () => {
         }
         handleSubmit(fakeEditor, 'images/*', 'UNSPLASH', { unsplashData : fakeUnsplashData }, {}, fakeSource)
         expect(fakeEditor.content).toEqual('<img src="http://instructure.com/img" />')
+      })
+    })
+  })
+
+  describe('Disabled Submit', () => {
+    let renderReturnOptions;
+    let fakeOnSubmit;
+    beforeEach(() => {
+      fakeOnSubmit = jest.fn();
+      renderReturnOptions = render(
+        <UploadFile
+          label="Test"
+          editor={fakeEditor}
+          trayProps={trayProps}
+          onDismiss={() => {}}
+          onSubmit={fakeOnSubmit}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
+        />
+      )
+    })
+
+    describe('Computer Panel', () => {
+      it('disables the submit button when there is no file uploaded', () => {
+        const { getByText, getByLabelText } = renderReturnOptions;
+        const computerTab = getByLabelText('Computer')
+        act(() => {
+          userEvent.click(computerTab)
+        })
+        const submitBtn = getByText('Submit').closest('button')
+        expect(submitBtn).toBeDisabled()
+      });
+
+      it('does not allow Enter to submit the form when no file is uploaded', () => {
+        const { getByLabelText } = renderReturnOptions;
+        const computerTab = getByLabelText('Computer')
+        act(() => {
+          userEvent.click(computerTab)
+        })
+        const form = getByLabelText('Test')
+        act(() => {
+          fireEvent.keyDown(form, {keyCode: 13})
+        })
+        expect(fakeOnSubmit).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('Unsplash Panel', () => {
+      it('disables the submit button when there is no unsplash image chosen', () => {
+        const { getByText, getByLabelText } = renderReturnOptions;
+        const unsplashTab = getByLabelText('Unsplash')
+        act(() => {
+          userEvent.click(unsplashTab)
+        })
+        const submitBtn = getByText('Submit').closest('button')
+        expect(submitBtn).toBeDisabled()
+      })
+    })
+
+    describe('URL Panel', () => {
+      it('disables the submit button when there is no URL entered', () => {
+        const { getByText, getByLabelText } = renderReturnOptions;
+        const urlTab = getByLabelText('URL')
+        act(() => {
+          userEvent.click(urlTab)
+        })
+        const submitBtn = getByText('Submit').closest('button')
+        expect(submitBtn).toBeDisabled()
       })
     })
   })

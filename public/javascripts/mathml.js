@@ -29,7 +29,7 @@ export function loadMathJax (configFile, cb = null) {
   if (!isMathJaxLoaded()) {
     // signal local config to mathjax as it loads
     window.MathJax = localConfig;
-    $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=${configFile}`, cb);
+    $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=${configFile}`, cb);
   } else if (typeof cb === 'function') {
       // Make sure we always call the callback if it is loaded already and make sure we
       // also reprocess the page since chances are if we are requesting MathJax again,

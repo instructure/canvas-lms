@@ -77,6 +77,19 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
   afterInsert()
 }
 
+function shouldBeDisabled ({fileUrl, theFile, unsplashData}, selectedPanel) {
+  switch(selectedPanel) {
+    case 'COMPUTER':
+      return !theFile
+    case 'UNSPLASH':
+      return !unsplashData.id || !unsplashData.url
+    case 'URL':
+      return !fileUrl
+    default:
+      return false; // When in doubt, don't disable (but we shouldn't get here either)
+  }
+}
+
 export function UploadFile({accept, editor, label, panels, onDismiss, trayProps, onSubmit = handleSubmit}) {
   const [theFile, setFile] = useState(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
@@ -123,6 +136,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
                     editor={editor}
                     setUnsplashData={setUnsplashData}
                     source={source}
+                    brandColor={trayProps.brandColor}
                   />
                 </Suspense>
               </Tabs.Panel>
@@ -139,6 +153,8 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
     })
   }
 
+  const disabledSubmit = shouldBeDisabled({fileUrl, theFile, unsplashData}, selectedPanel)
+
   return (
     <StoreProvider {...trayProps}>
       {contentProps => (
@@ -150,6 +166,9 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           onDismiss={onDismiss}
           onSubmit={e => {
             e.preventDefault()
+            if (disabledSubmit) {
+              return false;
+            }
             onSubmit(editor, accept, selectedPanel, {fileUrl, theFile, unsplashData}, contentProps, source, onDismiss)
           }}
           open
@@ -168,7 +187,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" disabled={disabledSubmit}>
               {formatMessage('Submit')}
             </Button>
           </Modal.Footer>

@@ -229,13 +229,13 @@ describe('UnsplashPanel', () => {
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue(getSampleUnsplashResults())
     }
-    const {getByLabelText, getByRole} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
+    const {getByLabelText, getByTestId} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
     const selectBox = getByLabelText('Search Term')
     act(() => {
       userEvent.type(selectBox, 'kittens')
     })
-    await wait(() => getByRole('radiogroup'))
-    const resultsContainer = getByRole('radiogroup')
+    let resultsContainer;
+    await wait(() => {resultsContainer = getByTestId('UnsplashResultsContainer')})
     expect(resultsContainer.children).toHaveLength(12)
   })
 
@@ -272,139 +272,13 @@ describe('UnsplashPanel', () => {
     expect(nextPage).toBeNull()
   })
 
-  it('sends focus to the next result when pressing down', async () => {
-    const fakeResults = getSampleUnsplashResults()
-    const fakeSource = {
-      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
-    }
-    const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
-    )
-    const selectBox = getByLabelText('Search Term')
-    act(() => {
-      userEvent.click(selectBox)
-      userEvent.type(selectBox, 'kittens')
-    })
-    await wait(() => getByRole('radio'))
-    const imageSelectors = getAllByRole('radio')
-    act(() => {
-      userEvent.click(imageSelectors[0])
-      fireEvent.keyDown(imageSelectors[0], {keyCode: 40})
-    })
-    expect(imageSelectors[1]).toHaveFocus()
-  })
-
-  it('sends focus to the previous element when pressing up', async () => {
-    const fakeResults = getSampleUnsplashResults()
-    const fakeSource = {
-      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
-    }
-    const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
-    )
-    const selectBox = getByLabelText('Search Term')
-    act(() => {
-      userEvent.click(selectBox)
-      userEvent.type(selectBox, 'kittens')
-    })
-    await wait(() => getByRole('radio'))
-    const imageSelectors = getAllByRole('radio')
-    act(() => {
-      userEvent.click(imageSelectors[2])
-      fireEvent.keyDown(imageSelectors[2], {keyCode: 38})
-    })
-    expect(imageSelectors[1]).toHaveFocus()
-  })
-
-  it('sends focus to the first item when pressing down on the last item', async () => {
-    const fakeResults = getSampleUnsplashResults()
-    const fakeSource = {
-      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
-    }
-    const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
-    )
-    const selectBox = getByLabelText('Search Term')
-    act(() => {
-      userEvent.click(selectBox)
-      userEvent.type(selectBox, 'kittens')
-    })
-    await wait(() => getByRole('radio'))
-    const imageSelectors = getAllByRole('radio')
-    act(() => {
-      userEvent.click(imageSelectors[11])
-    })
-    act(() => {
-      fireEvent.keyDown(imageSelectors[11], {keyCode: 40})
-    })
-    expect(imageSelectors[0]).toHaveFocus()
-  })
-
-  it('sends focus to the last element when pressing up on the first item', async () => {
-    const fakeResults = getSampleUnsplashResults()
-    const fakeSource = {
-      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
-    }
-    const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>
-    )
-    const selectBox = getByLabelText('Search Term')
-    act(() => {
-      userEvent.click(selectBox)
-      userEvent.type(selectBox, 'kittens')
-    })
-    await wait(() => getByRole('radio'))
-    const imageSelectors = getAllByRole('radio')
-    act(() => {
-      userEvent.click(imageSelectors[0])
-    })
-    act(() => {
-      fireEvent.keyDown(imageSelectors[0], {keyCode: 38})
-    })
-    expect(imageSelectors[11]).toHaveFocus()
-  });
-
-  it('selects an image, calling setUnsplashData, when pressing spacebar', async () => {
-    const fakeResults = getSampleUnsplashResults()
-    const fakeSource = {
-      searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
-    }
-    const fakeSetUnsplashData = jest.fn()
-    const {getByLabelText, getByRole, getAllByRole} = render(
-      <UnsplashPanel source={fakeSource} setUnsplashData={fakeSetUnsplashData}/>
-    )
-    const selectBox = getByLabelText('Search Term')
-    act(() => {
-      userEvent.click(selectBox)
-      userEvent.type(selectBox, 'kittens')
-    })
-    await wait(() => getByRole('radio'))
-    const imageSelectors = getAllByRole('radio')
-    act(() => {
-      // Get into the "radio" button images
-      userEvent.click(imageSelectors[0])
-    })
-    act(() => {
-      // Move to the second one
-      fireEvent.keyDown(imageSelectors[0], {keyCode: 40})
-    })
-    act(() => {
-      // Press space on the second one
-      fireEvent.keyDown(imageSelectors[1], {keyCode: 32})
-    })
-    expect(fakeSetUnsplashData).toHaveBeenCalledWith({
-      url: fakeResults.results[1].urls.link,
-      id: fakeResults.results[1].id
-    })
-  })
-
   it('selects an image, calling setUnsplashData, when clicking an image', async () => {
     const fakeResults = getSampleUnsplashResults()
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
     const fakeSetUnsplashData = jest.fn()
-    const {getByLabelText, getByRole, getAllByRole} = render(
+    const {getByLabelText, getByAltText} = render(
       <UnsplashPanel source={fakeSource} setUnsplashData={fakeSetUnsplashData}/>
     )
     const selectBox = getByLabelText('Search Term')
@@ -412,26 +286,24 @@ describe('UnsplashPanel', () => {
       userEvent.click(selectBox)
       userEvent.type(selectBox, 'kittens')
     })
-    await wait(() => getByRole('radio'))
-    const imageSelectors = getAllByRole('radio')
+    let image;
+    await wait(() => image = getByAltText('selective focus photography brown cat lying over black cat'))
     act(() => {
-      userEvent.click(imageSelectors[3])
+      userEvent.click(image)
     })
     expect(fakeSetUnsplashData).toHaveBeenCalledWith({
-      url: fakeResults.results[3].urls.link,
-      id: fakeResults.results[3].id
+      url: fakeResults.results[0].urls.link,
+      id: fakeResults.results[0].id
     })
   })
 
   describe('Attribution', () => {
     it('shows attribution when an image has focus', async () => {
-      // TODO: Make this test more robust and better. Probably a good
-      // candidate to move to test cafe once we have it working again
       const fakeResults = getSampleUnsplashResults()
       const fakeSource = {
         searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
       }
-      const {getByLabelText, getByRole, getAllByRole, getByText} = render(
+      const {getByLabelText, getByAltText, getByText} = render(
         <UnsplashPanel source={fakeSource} setUnsplashData={() => {}} />
       )
       const selectBox = getByLabelText('Search Term')
@@ -439,10 +311,10 @@ describe('UnsplashPanel', () => {
         userEvent.click(selectBox)
         userEvent.type(selectBox, 'kittens')
       })
-      await wait(() => getByRole('radio'))
-      const imageSelectors = getAllByRole('radio')
+      let image;
+      await wait(() => image = getByAltText('selective focus photography brown cat lying over black cat'))
       act(() => {
-        userEvent.click(imageSelectors[0])
+        userEvent.click(image)
       })
       expect(getByText('Raul Varzar')).toBeInTheDocument();
     })
