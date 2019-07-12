@@ -11,7 +11,6 @@ role :db,  %w{deploy@172.31.3.79}
 
 set :branch, 'bz-staging'
 
-
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server definition into the

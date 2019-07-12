@@ -1176,7 +1176,6 @@ class BzController < ApplicationController
       end
     end
 
-
     def get_current_employer(currentPositionsNode)
       cp = current_positions(currentPositionsNode)
       return nil if cp.length == 0

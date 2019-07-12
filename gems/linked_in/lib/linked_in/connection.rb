@@ -38,12 +38,12 @@ module LinkedIn
     end
 
     def get_service_user_info(access_token)
-      body = get_request('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)', access_token).body
-      data = Nokogiri::XML(body)
-      Rails.logger.debug("### Registering LinkedIn service.  Data returned from LinkedIn API: id = #{data.css("id")[0].inspect}, first-name = #{data.css("first-name")[0].inspect}, public-profile-url = #{data.css("public-profile-url")[0].inspect}")
-      service_user_id = data.css("id")[0].content
-      service_user_name = data.css("first-name")[0].content + " " + data.css("last-name")[0].content
-      service_user_url = data.css("public-profile-url")[0].content unless data.css("public-profile-url")[0].nil? # Not sure what causes this, but sometimes its empty
+      body = get_request('/v2/me', access_token).body
+      data = JSON.parse(body)
+      Rails.logger.debug("### Registering LinkedIn service.  Data returned from LinkedIn API: ID #{data["id"]} and url name #{data["vanityName"]}")
+      service_user_id = data["id"]
+      service_user_name = "#{data["localizedFirstName"]} #{data["localizedLastName"]}"
+      service_user_url = "http://www.linkedin.com/in/#{data["vanityName"]}"
       return service_user_id, service_user_name, service_user_url
     end
 

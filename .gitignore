@@ -86,3 +86,10 @@ docker-compose.override.yml
 # Local Development only files
 *.dev
 .env
+
+
+# ignore JetBrains IDEs files
+.idea/*
+
+# ignore tmp files from emacs
+*~
