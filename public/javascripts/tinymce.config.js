@@ -75,8 +75,7 @@ export default class EditorConfig {
         instructure_embed: '/javascripts/tinymce_plugins/instructure_embed/plugin.js',
         instructure_equation: '/javascripts/tinymce_plugins/instructure_equation/plugin.js',
         instructure_external_tools: '/javascripts/tinymce_plugins/instructure_external_tools/plugin.js',
-        instructure_record: '/javascripts/tinymce_plugins/instructure_record/plugin.js',
-        instructure_documents: '/javascripts/tinymce_plugins/instructure_documents/plugin.js'
+        instructure_record: '/javascripts/tinymce_plugins/instructure_record/plugin.js'
       },
       language_load: false,
       convert_urls: false,
