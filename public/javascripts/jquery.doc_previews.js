@@ -102,6 +102,19 @@ define([
             opts.ready();
         });
       }
+      else if (opts.bz_annotation_url) {
+        var iframe = $('<iframe/>', {
+            src: opts.bz_annotation_url,
+            width: opts.width,
+            height: opts.height,
+            id: opts.id
+        });
+        iframe.appendTo($this);
+        iframe.load(function() {
+          if ($.isFunction(opts.ready))
+            opts.ready();
+        });
+      }
       else if (opts.canvadoc_session_url) {
         var iframe = $('<iframe/>', {
             src: opts.canvadoc_session_url,

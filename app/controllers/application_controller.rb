@@ -102,6 +102,7 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {})
+
     return {} unless request.format.html?
     # set some defaults
     unless @js_env
@@ -1085,7 +1086,19 @@ class ApplicationController < ActionController::Base
 
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
-      render "shared/terms_required", status: :unauthorized
+      session.delete(:require_terms)
+      if @current_user && @current_user.docusign_template_id.blank?
+        # if there's no docusign stuff set up for the user, automatically accept them
+        # to avoid a nonsense redirect and docusign error
+        @current_user.accept_terms
+        @current_user.save
+        redirect_to("/")
+      else
+        # but otherwise...
+        # we are going to use docusign instead of canvas' built in terms screen, hence the redirect here
+        redirect_to '/bz/docusign_for_user'
+      end
+      #render "shared/terms_required", status: :unauthorized
       false
     end
   end
