@@ -3688,8 +3688,8 @@ function teardownSettingsMenu() {
 function renderPostGradesMenu() {
   const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
-  const allowHidingGrades = submissions.some(submission => submission.posted_at != null)
-  const allowPostingGrades = submissions.some(submission => submission.posted_at == null)
+  const allowHidingGrades = submissions.some(submission => submission && submission.posted_at != null)
+  const allowPostingGrades = submissions.some(submission => submission && submission.posted_at == null)
 
   function onHideGrades() {
     EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
