@@ -1097,24 +1097,6 @@ describe AssignmentsApiController, type: :request do
       expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
       expect(uri.query).to include('assignment_id=')
     end
-
-    context 'assignments tab is disabled' do
-      before :once do
-        @course.tab_configuration = [{ :id => Course::TAB_ASSIGNMENTS, :hidden => true }]
-        @course.save!
-      end
-
-      it "allows teachers to use #index" do
-        json = api_get_assignments_index_from_course(@course)
-        expect(json).to eq([])
-      end
-
-      it "does not allow students to use #index" do
-        student_in_course :active_all => true
-        json = api_get_assignments_index_from_course(@course)
-        expect(json['message']).to eq 'That page has been disabled for this course'
-      end
-    end
   end
 
   describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
@@ -1127,7 +1109,7 @@ describe AssignmentsApiController, type: :request do
 
     it "returns assignments for authorized observer" do
       course_with_student_submissions(:active_all => true)
-      parent = user_with_pseudonym
+      parent = User.create!
       add_linked_observer(@student, parent)
       json = api_get_assignments_user_index(@student, @course, parent)
       expect(json[0]['course_id']).to eq @course.id
