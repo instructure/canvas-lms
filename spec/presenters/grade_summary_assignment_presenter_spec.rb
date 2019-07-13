@@ -237,31 +237,60 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  describe "#posted_to_student?" do
+  describe "#hide_grade_from_student?" do
     context "when post policies are enabled" do
       before(:each) { @course.enable_feature!(:new_gradebook) }
       before(:each) { PostPolicy.enable_feature! }
 
-      it "returns true when the student's submission is posted" do
-        @submission.update!(posted_at: Time.zone.now)
-        expect(presenter).to be_posted_to_student
+      context "when assignment posts manually" do
+        before(:each) do
+          @assignment.ensure_post_policy(post_manually: true)
+        end
+
+        it "returns false when the student's submission is posted" do
+          @submission.update!(posted_at: Time.zone.now)
+          expect(presenter).not_to be_hide_grade_from_student
+        end
+
+        it "returns true when the student's submission is not posted" do
+          @submission.update!(posted_at: nil)
+          expect(presenter).to be_hide_grade_from_student
+        end
       end
 
-      it "returns false when the student's submission is not posted" do
-        @submission.update!(posted_at: nil)
-        expect(presenter).not_to be_posted_to_student
+      context "when assignment posts automatically" do
+        before(:each) do
+          @assignment.ensure_post_policy(post_manually: false)
+        end
+
+        it "returns false when the student's submission is posted" do
+          @submission.update!(posted_at: Time.zone.now)
+          expect(presenter).not_to be_hide_grade_from_student
+        end
+
+        it "returns false when the student's submission is not posted" do
+          @submission.update!(posted_at: nil)
+          expect(presenter).not_to be_hide_grade_from_student
+        end
+
+        it "returns true when the student's submission is graded and not posted" do
+          @assignment.grade_student(@student, grader: @teacher, score: 5)
+          @submission.reload
+          @submission.update!(posted_at: nil)
+          expect(presenter).to be_hide_grade_from_student
+        end
       end
     end
 
     context "when post policies are not enabled" do
-      it "returns true when the assignment is unmuted" do
+      it "returns false when the assignment is unmuted" do
         @assignment.unmute!
-        expect(presenter).to be_posted_to_student
+        expect(presenter).not_to be_hide_grade_from_student
       end
 
-      it "returns false when the assignment is muted" do
+      it "returns true when the assignment is muted" do
         @assignment.mute!
-        expect(presenter).not_to be_posted_to_student
+        expect(presenter).to be_hide_grade_from_student
       end
     end
   end
