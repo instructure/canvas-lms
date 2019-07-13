@@ -151,7 +151,7 @@ class ContextModulesApiController < ApplicationController
   #
   # @returns [Module]
   def index
-    if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_MODULES)
+    if authorized_action(@context, @current_user, :read)
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@student || @current_user)
 
