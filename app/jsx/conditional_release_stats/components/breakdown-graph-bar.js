@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!cyoe_assignment_sidebar'
+import I18n from 'i18n!cyoe_assignment_sidebar_breakdown_graph_bar'
   const { string, number, func } = PropTypes
 
   class BreakdownGraph extends React.Component {

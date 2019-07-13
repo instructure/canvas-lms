@@ -91,8 +91,11 @@ describe "users" do
       page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => "#{"%03d" % i}") }
       get "/users/#{@student.id}"
       wait_for_ajaximations
+      scroll_page_to_bottom
       driver.execute_script("$('#pageviews').scrollTop($('#pageviews')[0].scrollHeight);")
-      wait_for_ajaximations
+      # wait for loading spinner to finish
+      wait_for(method: nil, timeout: 0.5) { f(".paginatedView-loading").displayed? }
+      wait_for_no_such_element { f(".paginatedView-loading") }
       expect(ff("#page_view_results tr").length).to eq page_views_count
     end
   end

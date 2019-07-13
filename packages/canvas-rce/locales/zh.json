@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "辅助功能检查器"
+  },
   "add_8523c19b": {
     "message": "添加"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "按字母顺序"
   },
+  "alt_text_611fb322": {
+    "message": "Alt 文本"
+  },
   "alternative_text_a834dcad": {
     "message": "替代文本："
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "图像仍在上传中，如果您继续，该图像将不会正确嵌入。"
   },
   "announcement_list_da155734": {
     "message": "公告列表"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "圆形无序列表"
   },
-  "clear_upload_34efa419": {
-    "message": "清除上传"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "单击任何文件以插入该文件的下载链接。"
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "版权持有者："
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 个字}\n    one {1 个字}\n  other {# 个字}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {已上传 # 项}\n  other {已上传 # 项}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "课程文件"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons 许可证："
+  },
+  "current_volume_level_c55ab825": {
+    "message": "当前音量"
+  },
+  "custom_6979cd81": {
+    "message": "自定义"
   },
   "date_added_ed5ad465": {
     "message": "按添加日期排序"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "默认数字有序列表"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "（图像说明）"
+  },
   "discussions_a5f96392": {
     "message": "讨论"
   },
   "discussions_index_6c36ced": {
     "message": "讨论索引"
   },
+  "display_options_315aba85": {
+    "message": "显示选项"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "显示文本链接（在新标签页中打开）"
+  },
   "documents_81393201": {
     "message": "文档"
+  },
+  "done_54e3d4b6": {
+    "message": "完成"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "拖放或点击以浏览计算机"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "到期：{ when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "编辑链接"
+  },
+  "embed_image_1080badc": {
+    "message": "嵌入图片"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "搜索搜索条件"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "为此图片输入替代文本"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "上传视频/音频录制文件时出错"
   },
   "expand_to_see_types_f5d29352": {
     "message": "展开以查看 { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "外部链接"
   },
+  "file_name_8fd421ff": {
+    "message": "文件名称"
+  },
   "file_upload_form_4aaad554": {
     "message": "文件上传窗体"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename }预览"
   },
   "files_c300e900": {
     "message": "文件"
   },
   "files_index_af7c662b": {
     "message": "文件索引"
+  },
+  "finish_bc343002": {
+    "message": "完成"
   },
   "folder_705fd2d7": {
     "message": "文件夹"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "如果您现在不选择使用权限，该文件在上传后不会被发布。"
   },
+  "image_options_5412d02c": {
+    "message": "图像选项"
+  },
+  "image_options_tray_90a46006": {
+    "message": "图像选项托盘"
+  },
   "image_upload_form_7b74079a": {
     "message": "图片上传窗体"
-  },
-  "image_url_2aee2734": {
-    "message": "图像 URL"
   },
   "images_7ce26570": {
     "message": "图像"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "无效的文件类型"
   },
+  "large_9c5e80e7": {
+    "message": "大"
+  },
   "link_7262adec": {
     "message": "链接"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "链接"
+  },
+  "load_more_35d33c7": {
+    "message": "加载更多"
   },
   "load_more_results_460f49a9": {
     "message": "加载更多结果"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "正在加载文件夹..."
   },
+  "loading_media_f3455841": {
+    "message": "正在加载媒体"
+  },
   "media_af190855": {
     "message": "媒体"
+  },
+  "medium_5a8e9ead": {
+    "message": "中等"
+  },
+  "mic_a7f3d311": {
+    "message": "麦克风"
   },
   "modules_c4325335": {
     "message": "单元"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "无 Alt 文字（装饰图像）"
+  },
   "no_results_940393cf": {
     "message": "无结果。"
+  },
+  "no_video_1ed00b26": {
+    "message": "无视频"
   },
   "options_3ab0ea65": {
     "message": "选项"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "段落"
   },
+  "pause_12af3bb4": {
+    "message": "暂停"
+  },
   "people_b4ebb13c": {
     "message": "人员"
+  },
+  "play_1a47eaa7": {
+    "message": "播放"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
   },
   "posted_when_a578f5ab": {
     "message": "发布日期：{ when }"
   },
   "preformatted_d0670862": {
     "message": "预定义格式"
+  },
+  "preview_a3f8f854": {
+    "message": "预览"
   },
   "published_c944a23d": {
     "message": "已发布"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "测验"
   },
+  "record_7c9448b": {
+    "message": "记录"
+  },
   "record_upload_media_5fdce166": {
     "message": "记录/上传媒体"
+  },
+  "recording_98da6bda": {
+    "message": "录制"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "删除链接"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "富内容编辑器"
+  },
+  "save_11a80ec3": {
+    "message": "保存"
   },
   "search_280d00bd": {
     "message": "搜索"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "显示图像选项"
   },
+  "size_b30e1077": {
+    "message": "大小"
+  },
+  "small_b070434a": {
+    "message": "小"
+  },
   "small_header_168fb9f9": {
     "message": "小标题"
   },
   "something_went_wrong_89195131": {
     "message": "出了些问题。"
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "访问您的麦克风或网络摄像头时出错。"
+  },
   "sort_by_e75f9e3e": {
     "message": "排序"
   },
   "square_unordered_list_b15ce93b": {
     "message": "方形无序列表"
+  },
+  "start_over_f7552aa9": {
+    "message": "重新开始"
+  },
+  "start_recording_9a65141a": {
+    "message": "开始录制"
   },
   "subheader_2b87606d": {
     "message": "子标题"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "上标"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "切换至原始 html 编辑器"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "切换至富文本编辑器"
   },
   "syllabus_f191f65b": {
     "message": "教学大纲"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "取消发布"
   },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
+  "untitled_16aa4f2b": {
+    "message": "无标题"
   },
   "upload_8b403d05": {
     "message": "上传"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "上传图像"
   },
+  "upload_media_ce31135a": {
+    "message": "上传媒体"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "上传/录制媒体"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "大写字母有序列表"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "使用权限："
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "屏幕阅读器用它来描述图像内容"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "视频/音频录制文件已上传"
+  },
+  "video_player_b371005": {
+    "message": "视频播放器"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "查看键盘快捷键"
+  },
+  "webcam_fe91b20f": {
+    "message": "网络摄像头"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "您想要新页面叫什么名字?"
   },
   "wiki_home_9cd54d0": {
     "message": "维基主页"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "您的网络摄像头可能正在使用中。"
   }
 }

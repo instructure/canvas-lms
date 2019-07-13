@@ -66,6 +66,7 @@ module Factories
     end
     opts[:account] = other_account
     pseudonym(user, opts)
+    @pseudonym.integration_id = opts[:integration_id] if opts[:integration_id]
     @pseudonym.sis_user_id = opts[:sis_user_id] || "U001"
     @pseudonym.save!
     @pseudonym

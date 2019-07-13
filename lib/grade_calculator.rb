@@ -97,7 +97,8 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments).
-        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state, submissions.posted_at").
+        preload(:assignment)
 
       Rails.logger.debug "GRADE CALCULATOR - submissions: #{submissions.size} - #{Time.zone.now.to_i}"
       submissions
@@ -755,7 +756,7 @@ class GradeCalculator
     if never_drop_ids.present? || @ignore_muted
       cant_drop, submissions = submissions.partition do |submission|
         assignment = submission[:assignment]
-        ignore_submission?(submission: submission, assignment: assignment) || never_drop_ids.include?(assignment.id)
+        ignore_submission?(submission: submission[:submission], assignment: assignment) || never_drop_ids.include?(assignment.id)
       end
     end
 
@@ -965,6 +966,12 @@ class GradeCalculator
   def ignore_submission?(submission:, assignment:)
     return false unless @ignore_muted
 
-    @course.feature_enabled?(:post_policies) ? !submission.posted? : assignment.muted?
+    if @course.post_policies_enabled?
+      # If we decided to ignore this submission earlier in this run (see
+      # create_group_sums), it will be nil, in which case keep ignoring it
+      submission.blank? || !submission.posted?
+    else
+      assignment.muted?
+    end
   end
 end

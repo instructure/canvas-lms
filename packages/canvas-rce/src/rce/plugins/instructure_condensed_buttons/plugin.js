@@ -20,12 +20,14 @@ import registerAlignmentButton from './ui/alignment-button'
 import registerIndentOutdentButton from './ui/indent-outdent-button'
 import registerListButton from './ui/list-button'
 import registerSubscriptSuperscriptButton from './ui/subscript-superscript-button'
+import registerDirectionalityButton from './ui/directionality-button'
 
 tinymce.PluginManager.add('instructure_condensed_buttons', function(editor) {
-  [
+  ;[
     registerAlignmentButton,
     registerIndentOutdentButton,
     registerListButton,
-    registerSubscriptSuperscriptButton
+    registerSubscriptSuperscriptButton,
+    registerDirectionalityButton
   ].forEach(register => register(editor))
 })

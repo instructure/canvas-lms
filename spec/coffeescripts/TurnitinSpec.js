@@ -80,6 +80,36 @@ QUnit.module('Turnitin', {
   }
 })
 
+test('uses the score when the score is 0', () => {
+  submissionWithReport.turnitin_data.attachment_103.similarity_score = 0
+
+  const tii_data = Turnitin.extractDataForTurnitin(
+    submissionWithReport,
+    'attachment_103',
+    '/courses/2'
+  )
+
+  equal(
+    tii_data.score,
+    '0%'
+  )
+})
+
+test('correctly finds text entry plagiarism data', () => {
+  submissionWithReport.turnitin_data = {
+    'submission_7_2016-11-29T22:29:44Z': {
+      similarity_score: 0.8,
+      state: 'acceptable',
+      report_url: 'http://www.instructure.com',
+      status: 'pending'
+    }
+  }
+  submissionWithReport.submission_type = 'online_text_entry'
+
+  const plagiarismData = Turnitin.extractDataTurnitin(submissionWithReport)
+  equal(plagiarismData.items.length, 1)
+})
+
 test('uses originality_report type in url if submission has an OriginalityReport', () => {
   const tii_data = Turnitin.extractDataForTurnitin(
     submissionWithReport,

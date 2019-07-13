@@ -20,6 +20,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
@@ -30,10 +31,12 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
+import originalityReportSubmissionKey from 'jsx/gradebook/shared/helpers/originalityReportSubmissionKey'
 import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
+import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
@@ -717,34 +720,42 @@ function unmountCommentTextArea() {
 
 function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
-  let icon = []
-  switch (attachment.upload_status) {
-    case 'pending':
-      icon = [<IconUpload />, I18n.t('Uploading Submission')]
-      break
-    case 'failed':
-      icon = [<IconWarning />, I18n.t('Submission Failed to Submit')]
-      break
-    case 'success':
-      break
-    default:
-      icon = [<IconCheckMarkIndeterminate />, I18n.t('No File Submitted')]
+  const iconAndTipMap = {
+    pending: {
+      icon: <IconUpload />,
+      tip: I18n.t('Uploading Submission')
+    },
+    failed: {
+      icon: <IconWarning />,
+      tip: I18n.t('Submission Failed to Submit')
+    },
+    default: {
+      icon: <IconCheckMarkIndeterminate />,
+      tip: I18n.t('No File Submitted')
+    }
   }
 
-  ReactDOM.render(<Tooltip tip={icon[1]}>{icon[0]}</Tooltip>, mountPoint)
+  if (attachment.upload_status === 'success') {
+    ReactDOM.unmountComponentAtNode(mountPoint)
+  } else {
+    const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
+    const tooltip = (
+      <Tooltip tip={tip} on={['click', 'hover', 'focus']}>
+        <Button variant="icon" icon={icon}>
+          <ScreenReaderContent>toggle tooltip</ScreenReaderContent>
+        </Button>
+      </Tooltip>
+    )
+    ReactDOM.render(tooltip, mountPoint)
+  }
 }
 
-function renderHiddenSubmissionPill({submission, postManually}) {
+function renderHiddenSubmissionPill(submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
-  // Show the "hidden" pill if:
-  // - Manual posting is enabled and the submission is not posted (graded or not)
-  // - Auto-posting is enabled and the submission is graded but not posted
-  //   (this means it's been manually hidden)
-  const showPill =
-    submission && submission.posted_at == null && (postManually || submission.graded_at != null)
-  if (showPill) {
+
+  if (isHidden(submission)) {
     ReactDOM.render(
-      <Pill variant="danger" text={I18n.t('Hidden')} margin="0 0 small" />,
+      <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
       mountPoint
     )
   } else {
@@ -1386,6 +1397,11 @@ EG = {
     }
     document.location.hash = ''
 
+    const attemptParam = utils.getParam('attempt')
+    if (attemptParam) {
+      EG.initialVersion = parseInt(attemptParam, 10) - 1
+    }
+
     // Check if this student ID "resolves" to a different one (e.g., it's an
     // invalid ID, or is in a group with someone else as a representative).
     const resolvedId = EG.resolveStudentId(initialStudentId)
@@ -2002,8 +2018,14 @@ EG = {
       var $turnitinScoreContainer = $grade_container.find('.turnitin_score_container').empty(),
         $turnitinInfoContainer = $grade_container.find('.turnitin_info_container').empty(),
         assetString = `submission_${submission.id}`,
+        turnitinAsset = null
+
+      if (turnitinEnabled && submission.turnitin_data) {
         turnitinAsset =
-          turnitinEnabled && submission.turnitin_data && submission.turnitin_data[assetString]
+          submission.turnitin_data[originalityReportSubmissionKey(submission)] ||
+          submission.turnitin_data[assetString]
+      }
+
       // There might be a previous submission that was text_entry, but the
       // current submission is an upload. The turnitin asset for the text
       // entry would still exist
@@ -2265,8 +2287,17 @@ EG = {
     const currentSubmission = this.currentStudent.submission
     if (currentSubmission && currentSubmission.workflow_state !== 'unsubmitted') {
       this.refreshSubmissionsToView()
-      const lastIndex = currentSubmission.submission_history.length - 1
-      $(`#submission_to_view option:eq(${lastIndex})`).attr('selected', 'selected')
+      let index = currentSubmission.submission_history.length - 1
+
+      if (EG.hasOwnProperty('initialVersion')) {
+        if (EG.initialVersion >= 0 && EG.initialVersion <= index) {
+          index = EG.initialVersion
+          currentSubmission.currentSelectedIndex = index
+        }
+        delete EG.initialVersion
+      }
+
+      $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
       $submission_details.show()
     } else {
       // there's no submission
@@ -3115,7 +3146,7 @@ EG = {
     }
 
     if (ENV.post_policies_enabled) {
-      renderHiddenSubmissionPill({submission, postManually: jsonData.post_manually})
+      renderHiddenSubmissionPill(submission)
     }
     EG.updateStatsInHeader()
   },

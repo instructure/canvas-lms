@@ -36,7 +36,7 @@ export default function ProfileTray({
   eportfoliosEnabled
 }) {
   return (
-    <View as="div" padding="medium small">
+    <View as="div" padding="medium">
       <View textAlign="center">
         <Avatar
           name={userDisplayName}
@@ -46,7 +46,7 @@ export default function ProfileTray({
           inline={false}
           margin="auto"
         />
-        <Heading level="h3" as="h2" margin="0 0 0 small">{userDisplayName}</Heading>
+        <Heading level="h3" as="h2">{userDisplayName}</Heading>
         <form action="/logout" method="post">
           <input name="utf8" value="✓" type="hidden" />
           <input name="_method" value="delete" type="hidden" />
@@ -55,25 +55,25 @@ export default function ProfileTray({
         </form>
       </View>
       <hr role="presentation"/>
-      <List variant="unstyled" margin="small 0" itemSpacing="x-small">
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
         {[
           profileEnabled && (
             <ListItem key="profile">
-              <Button variant="link" href="/profile">{I18n.t('Profile')}</Button>
+              <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href="/profile">{I18n.t('Profile')}</Button>
             </ListItem>
           ),
           <ListItem key="settings">
-            <Button variant="link" href="/profile/settings">{I18n.t('Settings')}</Button>
+            <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href="/profile/settings">{I18n.t('Settings')}</Button>
           </ListItem>,
           <ListItem key="notifications">
-            <Button variant="link" href="/profile/communication">{I18n.t('Notifications')}</Button>
+            <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href="/profile/communication">{I18n.t('Notifications')}</Button>
           </ListItem>,
           <ListItem key="files">
-            <Button variant="link" href="/files">{I18n.t('Files')}</Button>
+            <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href="/files">{I18n.t('Files')}</Button>
           </ListItem>,
           eportfoliosEnabled && (
             <ListItem key="eportfolios">
-              <Button variant="link" href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</Button>
+              <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</Button>
             </ListItem>
           )
         ].filter(Boolean)}

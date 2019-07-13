@@ -21,12 +21,8 @@ import {bool, string, func, oneOf} from 'prop-types'
 import apiUserContent from 'compiled/str/apiUserContent'
 
 import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
-import ArrowDown from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
-import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
 
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 
@@ -35,20 +31,17 @@ RichContentEditor.preloadRemoteModule()
 export default class EditableRichText extends React.Component {
   static propTypes = {
     mode: oneOf(['view', 'edit']).isRequired,
-    label: string.isRequired, // label for the rce when in edit mode
+    label: string.isRequired, // label for the input element when in edit mode
     value: string.isRequired, // the current text
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes
     placeholder: string, // the string to display when the text value is empty
-    readOnly: bool,
-    required: bool,
-    requiredMessage: string
+    readOnly: bool
   }
 
   static defaultProps = {
     placeholder: '',
-    readOnly: false,
-    required: false
+    readOnly: false
   }
 
   constructor(props) {
@@ -123,15 +116,14 @@ export default class EditableRichText extends React.Component {
       focus: false,
       manageParent: false,
       tinyOptions: {
-        init_instance_callback: this.handleRCEInit
+        init_instance_callback: this.handleRCEInit,
+        height: 300
       }
     })
   }
 
   unloadRCE() {
-    const editorIframe = document
-      .getElementById('assignments_2')
-      .querySelector('[id^="random_editor"]')
+    const editorIframe = document.getElementById('content').querySelector('[id^="random_editor"]')
     if (editorIframe) {
       editorIframe.removeEventListener('focus', this.handleEditorIframeFocus)
     }
@@ -148,7 +140,7 @@ export default class EditableRichText extends React.Component {
     this._tinyeditor.on('focus', this.handleEditorFocus)
     this._tinyeditor.on('keydown', this.handleKey)
     document
-      .getElementById('assignments_2')
+      .getElementById('content')
       .querySelector('[id^="random_editor"]')
       .addEventListener('focus', this.handleEditorIframeFocus)
     this._tinyeditor.focus()
@@ -160,7 +152,7 @@ export default class EditableRichText extends React.Component {
     // the activeElement will be a child of the body, and not the our page
     // 2. if focus is on the body, then we've left the editor altogether
     if (
-      document.getElementById('assignments_2').contains(document.activeElement) ||
+      document.getElementById('content').contains(document.activeElement) ||
       document.activeElement === document.body
     ) {
       if (this._textareaRef) {
@@ -198,11 +190,7 @@ export default class EditableRichText extends React.Component {
     this._editorRef = editorRef
     editorRef(this)
     return (
-      <textarea
-        style={{display: 'block', minHeight: '300px'}}
-        defaultValue={this.state.value}
-        ref={this.textareaRef}
-      />
+      <textarea style={{display: 'block'}} defaultValue={this.state.value} ref={this.textareaRef} />
     )
   }
 
@@ -213,16 +201,10 @@ export default class EditableRichText extends React.Component {
     }
   }
 
-  // mostly a copy of InPlaceEdit.renderDefaultEditButton,
-  // replacing the icon and making always visible in view mode
-  renderEditButton = buttonProps => {
-    if (!buttonProps.readOnly && this.props.mode === 'view') {
-      const props = omitProps(buttonProps, {}, ['isVisible', 'label'])
-      return (
-        <Button size="small" variant="icon" icon={ArrowDown} {...props}>
-          <ScreenReaderContent>{this.props.label}</ScreenReaderContent>
-        </Button>
-      )
+  renderEditButton = props => {
+    if (!this.props.readOnly) {
+      props.label = this.props.label
+      return InPlaceEdit.renderDefaultEditButton(props)
     }
     return null
   }
@@ -262,7 +244,7 @@ export default class EditableRichText extends React.Component {
         renderEditButton={this.renderEditButton}
         value={this.state.value}
         onChange={this.props.onChange}
-        editButtonPlacement="start"
+        editButtonPlacement="end"
         readOnly={this.props.readOnly}
         inline={false}
       />

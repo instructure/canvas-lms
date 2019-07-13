@@ -21,22 +21,23 @@ class Types::LegacyNodeType < Types::BaseEnum
 
   value "Assignment"
   value "AssignmentGroup"
-  value "Discussion"
   value "Course"
-  value "Section"
-  value "User"
+  value "Discussion"
   value "Enrollment"
+  value "File"
   value "GradingPeriod"
-  value 'MediaObject'
+  value "Group"
+  value "GroupSet"
+  value "MediaObject"
   value "Module"
   value "ModuleItem"
   value "Page"
   value "PostPolicy"
   value "Progress"
-  value "Group"
-  value "GroupSet"
-  value "File"
+  value "Section"
+  value "Submission"
   value "Term"
+  value "User"
 
 =begin
   # TODO: seems like we should be able to dynamically generate the types that

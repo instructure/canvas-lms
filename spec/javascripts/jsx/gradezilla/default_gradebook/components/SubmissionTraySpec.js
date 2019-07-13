@@ -314,7 +314,7 @@ QUnit.module('SubmissionTray', function(hooks) {
 
   test('passes along postPoliciesEnabled prop to SubmissionStatus', function() {
     defaultProps.postPoliciesEnabled = true
-    defaultProps.submission.gradedAt = new Date().toISOString()
+    defaultProps.submission.workflowState = 'graded'
     mountComponent()
     ok(content.textContent.includes('Hidden'))
   })

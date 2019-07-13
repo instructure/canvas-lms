@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "アクセシビリティチェッカー"
+  },
   "add_8523c19b": {
     "message": "追加"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "アルファベットで"
   },
+  "alt_text_611fb322": {
+    "message": "Alt テキスト"
+  },
   "alternative_text_a834dcad": {
     "message": "代替テキスト："
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "画像はまだアップロード中です。続行する場合、画像は適切に埋め込まれません。"
   },
   "announcement_list_da155734": {
     "message": "アナウンス リスト"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "丸い番号無しリスト"
   },
-  "clear_upload_34efa419": {
-    "message": "アップロードの消去"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "ファイルをクリックして、そのファイルにダウンロード リンクを挿入します。"
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "著作権保有者:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 語}\n    one {1 語}\n  other {# 語}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# アイテムを読込みました}\n  other {# アイテムを読込みました}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "コースドキュメント"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "クリエイティブ コモンズ ライセンス:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "現在の音量のレベル"
+  },
+  "custom_6979cd81": {
+    "message": "カスタム"
   },
   "date_added_ed5ad465": {
     "message": "追加された日付"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "デフォルトの番号順リスト"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(画像の説明)"
+  },
   "discussions_a5f96392": {
     "message": "ディスカッション"
   },
   "discussions_index_6c36ced": {
     "message": "ディスカッションのインデックス"
   },
+  "display_options_315aba85": {
+    "message": "オプションを表示する"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "テキストリンクを表示する (新しいタブが開きます)"
+  },
   "documents_81393201": {
     "message": "ドキュメント"
+  },
+  "done_54e3d4b6": {
+    "message": "完了"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "ドラッグアンドドロップまたはクリックしてコンピュータを参照"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "期限：{ when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "リンクの編集"
+  },
+  "embed_image_1080badc": {
+    "message": "画像の埋め込み"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "検索語を入力"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "この画像の代替テキストを入力する"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "映像/オーディオ録音のアップロード中にエラーが発生しました"
   },
   "expand_to_see_types_f5d29352": {
     "message": "{ types } を拡張して表示"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "外部リンク"
   },
+  "file_name_8fd421ff": {
+    "message": "ファイル名"
+  },
   "file_upload_form_4aaad554": {
     "message": "ファイルアップロードフォーム"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename }をプレビュー"
   },
   "files_c300e900": {
     "message": "ファイル"
   },
   "files_index_af7c662b": {
     "message": "ファイルのインデックス"
+  },
+  "finish_bc343002": {
+    "message": "フィニッシュ"
   },
   "folder_705fd2d7": {
     "message": "フォルダ"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "今すぐ使用権を選択しないと、このファイルはアップロード後に公開されません。"
   },
+  "image_options_5412d02c": {
+    "message": "画像オプション"
+  },
+  "image_options_tray_90a46006": {
+    "message": "画像オプショントレイ"
+  },
   "image_upload_form_7b74079a": {
     "message": "画像アップロードフォーム"
-  },
-  "image_url_2aee2734": {
-    "message": "画像 URL"
   },
   "images_7ce26570": {
     "message": "画像"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "無効なファイル タイプです"
   },
+  "large_9c5e80e7": {
+    "message": "大"
+  },
   "link_7262adec": {
     "message": "リンク"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "リンク"
+  },
+  "load_more_35d33c7": {
+    "message": "もっと読み込む"
   },
   "load_more_results_460f49a9": {
     "message": "さらに結果をロード"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "フォルダを読み込み中..."
   },
+  "loading_media_f3455841": {
+    "message": "メディアの読込み"
+  },
   "media_af190855": {
     "message": "メディア"
+  },
+  "medium_5a8e9ead": {
+    "message": "中"
+  },
+  "mic_a7f3d311": {
+    "message": "マイク"
   },
   "modules_c4325335": {
     "message": "モジュール"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "別のテキストはありません (装飾画像)"
+  },
   "no_results_940393cf": {
     "message": "結果がありません。"
+  },
+  "no_video_1ed00b26": {
+    "message": "ビデオなし"
   },
   "options_3ab0ea65": {
     "message": "オプション"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "段落"
   },
+  "pause_12af3bb4": {
+    "message": "一時停止"
+  },
   "people_b4ebb13c": {
     "message": "メンバー"
+  },
+  "play_1a47eaa7": {
+    "message": "再生"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Canvas があなたのマイクとウェブカメラにアクセスできるようにしてください。"
   },
   "posted_when_a578f5ab": {
     "message": "投稿済み:{ when }"
   },
   "preformatted_d0670862": {
     "message": "フォーマット済み"
+  },
+  "preview_a3f8f854": {
+    "message": "プレビュー"
   },
   "published_c944a23d": {
     "message": "公開済み"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "クイズ"
   },
+  "record_7c9448b": {
+    "message": "記録"
+  },
   "record_upload_media_5fdce166": {
     "message": "メディアの記録/アップロード"
+  },
+  "recording_98da6bda": {
+    "message": "記録"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "リンクの削除"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "リッチ コンテンツ エディタ"
+  },
+  "save_11a80ec3": {
+    "message": "保存"
   },
   "search_280d00bd": {
     "message": "検索"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "画像オプションを表示"
   },
+  "size_b30e1077": {
+    "message": "サイズ"
+  },
+  "small_b070434a": {
+    "message": "小"
+  },
   "small_header_168fb9f9": {
     "message": "小さいヘッダー"
   },
   "something_went_wrong_89195131": {
     "message": "なにかが失敗しました。"
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "マイクまたはウェブカムにアクセス中にエラーが生じました。"
+  },
   "sort_by_e75f9e3e": {
     "message": "分類する"
   },
   "square_unordered_list_b15ce93b": {
     "message": "四角い番号無しリスト"
+  },
+  "start_over_f7552aa9": {
+    "message": "最初からやり直し"
+  },
+  "start_recording_9a65141a": {
+    "message": "録画開始"
   },
   "subheader_2b87606d": {
     "message": "サブヘッダー"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "上付き"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "ロー html エディタに切り替える"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "リッチ テキスト エディタに切り替える"
   },
   "syllabus_f191f65b": {
     "message": "シラバス"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "未公開"
   },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
+  "untitled_16aa4f2b": {
+    "message": "無題"
   },
   "upload_8b403d05": {
     "message": "アップロード"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "イメージのアップロード"
   },
+  "upload_media_ce31135a": {
+    "message": "メディアを読み込む"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "メディアをアップロード/記録する"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "大文字のアルファベット順リスト"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "使用権:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "スクリーンリーダーが画像のコンテンツを説明するのに使用します"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "映像/オーディオ録音をアップロードしました"
+  },
+  "video_player_b371005": {
+    "message": "ビデオプレーヤー"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "キーボードのショートカットを見る"
+  },
+  "webcam_fe91b20f": {
+    "message": "ウェブカム"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "新しいページの名前は何にしますか?"
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki ホーム"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "あなたのウェブカメラは既に使用中かもしれません。"
   }
 }

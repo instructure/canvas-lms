@@ -19,6 +19,7 @@
 import Header from '../Header'
 import {legacyMockSubmission, mockAssignment} from '../../test-utils'
 import React from 'react'
+import StudentViewContext from '../Context'
 import {render} from 'react-testing-library'
 
 // TODO: is scroll threshold is always 150 in every case, why are we passing
@@ -88,6 +89,40 @@ it('displays element filler when scroll offset is in correct place', () => {
   expect(getByTestId('assignment-student-header-sticky')).toBeInTheDocument()
 })
 
+it('will render the uncollapsed step container when scroll offset is less than scroll threshold', () => {
+  const assignment = mockAssignment()
+  const submission = legacyMockSubmission()
+  assignment.lockInfo.isLocked = false
+  submission.state = 'submitted'
+
+  const {getByTestId, queryByTestId} = render(
+    <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+  )
+  const scrollEvent = new Event('scroll')
+
+  window.pageYOffset = 100
+  window.dispatchEvent(scrollEvent)
+
+  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
+  expect(queryByTestId('collapsed-step-container')).not.toBeInTheDocument()
+})
+
+it('will render the collapsed step container when scroll offset is greater than scroll threshold', () => {
+  const {getByTestId} = render(
+    <Header
+      scrollThreshold={150}
+      assignment={mockAssignment()}
+      submission={legacyMockSubmission()}
+    />
+  )
+  const scrollEvent = new Event('scroll')
+
+  window.pageYOffset = 200
+  window.dispatchEvent(scrollEvent)
+
+  expect(getByTestId('collapsed-step-container')).toBeInTheDocument()
+})
+
 it('will not render LatePolicyStatusDisplay if the submission is not late', () => {
   const submission = legacyMockSubmission()
   submission.latePolicyStatus = null
@@ -109,7 +144,7 @@ it('will render LatePolicyStatusDisplay if the submission status is late', () =>
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
 
-it('will render LatePolicyStatusDisplay if the latePolicyStatus is late status is late', () => {
+it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', () => {
   const submission = legacyMockSubmission()
   submission.submissionStatus = null
   const {getByTestId} = render(
@@ -119,129 +154,21 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late status i
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
 
-it('will render the unavailable state tracker if an assignment is not available', () => {
-  const {getByTestId} = render(
-    <Header
-      scrollThreshold={150}
-      assignment={mockAssignment()}
-      submission={legacyMockSubmission()}
-    />
-  )
-
-  expect(getByTestId('unavailable-step-container')).toBeInTheDocument()
-})
-
-it('will render the available state tracker if an assignment is available but not uploaded and not submitted', () => {
+it('will render the latest grade instead of the displayed submissions grade', () => {
   const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  submission.state = 'unsubmitted'
-  const {getByTestId} = render(
-    <Header scrollThreshold={150} assignment={assignment} submission={submission} />
+  const displayedSubmission = legacyMockSubmission()
+  const latestSubmission = legacyMockSubmission()
+  displayedSubmission.grade = '131'
+  latestSubmission.grade = '147'
+  assignment.gradingType = 'points'
+  assignment.pointsPossible = 150
+
+  const {queryByText} = render(
+    <StudentViewContext.Provider value={{latestSubmission}}>
+      <Header scrollThreshold={150} assignment={assignment} submission={displayedSubmission} />
+    </StudentViewContext.Provider>
   )
 
-  expect(getByTestId('available-step-container')).toBeInTheDocument()
-})
-
-describe('the assignment is submitted', () => {
-  it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).toBeInTheDocument()
-  })
-
-  it('will render the New Attempt button if more attempts are allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, getByText} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt button if more attempts are not allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.allowedAttempts = 1
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, queryByText} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
-  })
-})
-
-it('will render the uploaded state tracker if an assignment is uploaded but not submitted', () => {
-  const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  submission.submissionDraft = {_id: '3'}
-  submission.state = 'unsubmitted'
-  const {getByTestId} = render(
-    <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-  )
-
-  expect(getByTestId('uploaded-step-container')).toBeInTheDocument()
-})
-
-it('will render the submitted state tracker if an assignment is submitted but not graded', () => {
-  const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  submission.state = 'submitted'
-  const {getByTestId} = render(
-    <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-  )
-
-  expect(getByTestId('submitted-step-container')).toBeInTheDocument()
-})
-
-describe('the assignment is graded', () => {
-  it('will render the graded state tracker if an assignment is graded', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('graded-step-container')).toBeInTheDocument()
-  })
-
-  it('will render the New Attempt button if more attempts are allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, getByText} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('graded-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt button if more attempts are not allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.allowedAttempts = 1
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, queryByText} = render(
-      <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-    )
-
-    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('New Attempt'))
-  })
+  expect(queryByText('147/150 Points')).toBeInTheDocument()
+  expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })

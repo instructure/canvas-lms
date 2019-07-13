@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import _ from 'underscore'
 import React from 'react'
 import StudentContextTray from './StudentContextTray'
 import {createClient, ApolloProvider, Query, gql} from '../canvas-apollo'
@@ -66,6 +64,7 @@ const SCC_QUERY = gql`
         avatar_url: avatarUrl
         enrollments(courseId: $courseId) {
           last_activity_at: lastActivityAt
+          state
           section {
             name
           }

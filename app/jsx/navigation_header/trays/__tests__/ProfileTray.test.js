@@ -50,9 +50,9 @@ describe('MissingPeopleSection', () =>{
 
     expect(wrapper.find('Avatar').exists()).toBeTruthy()
 
-    expect(wrapper.find('ul li').map(n => n.text())).toEqual([
-      'Profile', 'Settings', 'Notifications', 'Files', 'ePortfolios'
-    ])
+    expect(wrapper.containsAllMatchingElements(
+      ['Profile', 'Settings', 'Notifications', 'Files', 'ePortfolios']
+    )).toBeTruthy()
   })
 
   it('renders the list without Profiles', () => {
@@ -66,9 +66,9 @@ describe('MissingPeopleSection', () =>{
       />
     )
 
-    expect(wrapper.find('ul li').map(n => n.text())).toEqual(
+    expect(wrapper.containsAllMatchingElements(
       ['Settings', 'Notifications', 'Files', 'ePortfolios']
-    )
+    )).toBeTruthy()
   })
 
   it('renders the list without ePortfolios', () => {
@@ -82,9 +82,8 @@ describe('MissingPeopleSection', () =>{
       />
     )
     expect(wrapper.find('Avatar').exists()).toBeTruthy()
-
-    expect(wrapper.find('ul li').map(n => n.text())).toEqual(
+    expect(wrapper.containsAllMatchingElements(
       ['Profile', 'Settings', 'Notifications', 'Files']
-    )
+    )).toBeTruthy()
   })
 })

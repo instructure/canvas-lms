@@ -20,7 +20,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import I18n from 'i18n!edit_rubric'
+import I18n from 'i18n!edit_rubricRubric'
 
 import Criterion from './Criterion'
 

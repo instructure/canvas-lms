@@ -36,7 +36,9 @@ event originated as part of a web request:
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | `user_id`    | String | The Canvas id of the currently logged in user. |
+| `developer_key_id`    | String | The id of the Developer Key used to create the access token for user. |
 | `real_user_id` | String | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
+| `time_zone` | String | Time zone of the currently logged in user. |
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
 | `root_account_uuid` | String | The Canvas uuid of the root account associated with the current user. |
@@ -45,13 +47,16 @@ event originated as part of a web request:
 | `context_type` | String | The type of context where the event happened. |
 | `context_id` | String | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `context_sis_source_id` | String | The Canvas SIS source id of the current context. |
+| `context_account_id` | String | The account id of the current context. This is the actual accound the context is attached to. |
 | `role` | String | The role of the current user in the current context.  |
 | `hostname` | String | The hostname of the current request |
+| `http_method` | String | The method of the request that triggered the event. |
 | `producer` | String | The name of the producer of an event. Will always be 'canvas' when an event is originating in canvas. |
 | `request_id` | String | The identifier for this request. |
 | `session_id` | String | The session identifier for this request. Can be used to correlate events in the same session for a user. |
 | `user_account_id` | String | The Canvas id of the account that the current user belongs to. |
 | `user_sis_id` | String | The SIS id of the user. |
+| `url` | String | The URL of the request that triggered the event. |
 
 For events originating as part of an asynchronous job, the following
 fields may be set:
@@ -115,12 +120,27 @@ what's described in this document. Those fields are subject to change.
 
 | Field | Description |
 | ----- | ----------- |
+| `user_id` | The Canvas id of the user being that created the entry. |
+| `created_at` | The time at which this entry was created. |
 | `discussion_entry_id` | The Canvas id of the newly added entry. |
 | `parent_discussion_entry_id` | If this was a reply, the Canvas id of the parent entry. |
 | `parent_discussion_entry_author_id` | If this was a reply, the Canvas id of the parent entry author. |
 | `discussion_topic_id` | The Canvas id of the topic the entry was added to. |
 | `text` | The (possibly truncated) text of the post. |
 
+#### `discussion_entry_submitted`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user being that created the entry. |
+| `created_at` | The time at which this entry was created. |
+| `discussion_entry_id` | The Canvas id of the newly added entry. |
+| `parent_discussion_entry_id` | If this was a reply, the Canvas id of the parent entry. |
+| `parent_discussion_entry_author_id` | If this was a reply, the Canvas id of the parent entry author. |
+| `discussion_topic_id` | The Canvas id of the topic the entry was added to. |
+| `text` | The (possibly truncated) text of the post. |
+| `assignment_id` | The Canvas id of the assignment if the discussion topic is graded. |
+| `submission_id` | The Canvas id of the submission if the discussion topic is graded. |
 
 #### `discussion_topic_created`
 
@@ -408,6 +428,18 @@ by `asset_type` and `asset_id`.
 | `attempt` | This is the submission attempt number. |
 | `lti_assignment_id` | The LTI assignment guid of the submission's assignment |
 | `group_id` | The submissions’s group ID if the assignment is a group assignment. |
+
+
+#### `submission_comment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_comment_id` | The Canvas id of the new comment. |
+| `submission_id` | The Canvas id of the new submission. |
+| `user_id` | The Canvas id of the user who authored the comment. |
+| `created_at` | The timestamp when the comment was created. |
+| `attachment_ids` | Array of Canvas ids of attachments for this comment. |
+| `body` | The (possibly truncated) text of the comment. |
 
 
 #### `plagiarism_resubmit`

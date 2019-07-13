@@ -543,6 +543,56 @@ describe CoursesController do
     end
   end
 
+  describe 'observer_pairing_codes' do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(course: @course, active_all: true)
+      @teacher.name = "teacher"
+      @teacher.save!
+    end
+
+    it "returns unauthorized if self registration is off" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: true, permission: :generate_observer_pairing_code)
+      ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized if role does not have permission" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: false, permission: :generate_observer_pairing_code)
+      @teacher.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_unauthorized
+    end
+
+    it "generates an observer pairing codes csv" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: true, permission: :generate_observer_pairing_code)
+      @teacher.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(response.header['Content-Type']).to eql("text/csv")
+      expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
+      expect(response.body.split(",")[-2]).to include(ObserverPairingCode.last.code)
+    end
+
+    it "generates observer pairing codes only for students" do
+      user_session(@teacher)
+      @course.root_account.root_account.role_overrides.create!(role: teacher_role, enabled: true, permission: :generate_observer_pairing_code)
+      @teacher.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      get :observer_pairing_codes_csv, params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(response.header['Content-Type']).to eql("text/csv")
+      expect(response.body).to include(@student.name)
+      expect(response.body.include?(@teacher.name)).to be_falsey
+      expect(response.body.split(",").last.strip).to eql(ObserverPairingCode.last.expires_at.to_s)
+      expect(response.body.split(",")[-2]).to include(ObserverPairingCode.last.code)
+    end
+  end
+
   describe "GET 'settings'" do
     before :once do
       course_with_teacher(active_all: true)
@@ -1981,7 +2031,9 @@ describe CoursesController do
 
   describe "POST 'unconclude'" do
     it "should unconclude the course" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_factory(:active_all => true)
+      account_admin_user(:active_all => true)
+      user_session(@admin)
       delete 'destroy', params: {:id => @course.id, :event => 'conclude'}
       expect(response).to be_redirect
       expect(@course.reload).to be_completed

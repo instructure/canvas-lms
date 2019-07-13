@@ -680,18 +680,6 @@ describe ConversationsController do
     end
   end
 
-  describe "POST 'toggle_new_conversations'" do
-    before :each do
-      course_with_student_logged_in(:active_all => true)
-    end
-
-    it "should not disable new conversations for a user anymore" do
-      post 'toggle_new_conversations'
-      @user.reload
-      expect(@user.use_new_conversations?).to be_truthy
-    end
-  end
-
   context "sharding" do
     specs_require_sharding
 

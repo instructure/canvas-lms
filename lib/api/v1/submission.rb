@@ -124,7 +124,7 @@ module Api::V1::Submission
     includes = Array.wrap(params[:include])
 
     json_fields = SUBMISSION_JSON_FIELDS
-    json_fields += ['posted_at'] if context.feature_enabled?(:post_policies)
+    json_fields += ['posted_at'] if context.post_policies_enabled?
     json_methods = SUBMISSION_JSON_METHODS.dup # dup because AR#to_json modifies the :methods param in-place
     other_fields = SUBMISSION_OTHER_FIELDS
 

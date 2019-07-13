@@ -45,9 +45,7 @@ CanvasRails::Application.routes.draw do
 
   get 'search/recipients' => 'search#recipients'
   post 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read'
-  post 'conversations/watched_intro' => 'conversations#watched_intro'
   get 'conversations/batches' => 'conversations#batches', as: :conversation_batches
-  post 'conversations/toggle_new_conversations' => 'conversations#toggle_new_conversations', as: :toggle_new_conversations
   resources :conversations, only: [:index, :show, :update, :create, :destroy] do
     post :add_recipients
     post :add_message
@@ -191,6 +189,7 @@ CanvasRails::Application.routes.draw do
     post 'self_unenrollment/:self_unenrollment' => 'courses#self_unenrollment', as: :self_unenrollment
     post :unconclude
     get :students
+    get 'observer_pairing_codes.csv', action: :observer_pairing_codes_csv, as: 'observer_pairing_codes'
     post :enrollment_invitation
     # this needs to come before the users concern, or users/:id will preempt it
     get 'users/prior' => 'context#prior_users', as: :prior_users
@@ -486,6 +485,7 @@ CanvasRails::Application.routes.draw do
   get 'media_objects/:id/redirect' => 'context#media_object_redirect', as: :media_object_redirect
   get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
   get 'media_objects/:media_object_id/info' => 'media_objects#show', as: :media_object_info
+  get 'media_objects_iframe/:id' => 'media_objects#iframe_media_player', as: :media_object_iframe
   get 'media_objects/:media_object_id/media_tracks/:id' => 'media_tracks#show', as: :show_media_tracks
   post 'media_objects/:media_object_id/media_tracks' => 'media_tracks#create', as: :create_media_tracks
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks
@@ -2251,7 +2251,7 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/users', action: :group_index, as: 'lti_user_group_index'
     end
 
-    scope(controller: 'lti/assignments_api') do
+    scope(controller: 'lti/plagiarism_assignments_api') do
       get 'assignments/:assignment_id', action: :show
     end
 
@@ -2324,6 +2324,11 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/ims/results') do
       get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
+    end
+
+    # Public JWK Service
+    scope(controller: 'lti/public_jwk') do
+      put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
     end
 
     # Names and Roles Provisioning (NRPS) v2 Service

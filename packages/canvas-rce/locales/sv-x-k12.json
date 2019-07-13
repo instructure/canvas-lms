@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Tillgänglighetskontrollör"
+  },
   "add_8523c19b": {
     "message": "Lägg till"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "Alfabetisk"
   },
+  "alt_text_611fb322": {
+    "message": "Alternativ text"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativ text:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "En bild laddas fortfarande upp, om du fortsätter kommer bilden inte att bäddas in korrekt."
   },
   "announcement_list_da155734": {
     "message": "Meddelandelista"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cirkelmarkera osorterad lista"
   },
-  "clear_upload_34efa419": {
-    "message": "Rensa uppladdning"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klicka på en fil för att lägga till en nedladdningslänk för den filen."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Upphovsrättshavare:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 ord}\n    one {1 ord}\n  other {# ord}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# Objekt laddat}\n  other {# objekt laddade}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Kursdokument"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Gemensam kreativitet licens:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Aktuell volymnivå"
+  },
+  "custom_6979cd81": {
+    "message": "Anpassa"
   },
   "date_added_ed5ad465": {
     "message": "Datum tillagt"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "numrera osorterad lista som standard"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Beskriv bilden)"
+  },
   "discussions_a5f96392": {
     "message": "Diskussioner"
   },
   "discussions_index_6c36ced": {
     "message": "Diskussionindex"
   },
+  "display_options_315aba85": {
+    "message": "Visa Alternativ"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Visa text (öppnas i en ny flik)"
+  },
   "documents_81393201": {
     "message": "Dokument"
+  },
+  "done_54e3d4b6": {
+    "message": "Färdig"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Dra och släpp, eller klicka för att söka i din dator"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Förfallodatum: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Redigera länk"
+  },
+  "embed_image_1080badc": {
+    "message": "Bädda in bild"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "uppge söktermer"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Ange alternativ text för den här bilden"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Ett fel inträffade när videon laddades upp/ljudet spelades in"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Expandera för att visa { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Externa länkar"
   },
+  "file_name_8fd421ff": {
+    "message": "Filnamn"
+  },
   "file_upload_form_4aaad554": {
     "message": "Fil uppladdningsformulär"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } förhandsgranskning"
   },
   "files_c300e900": {
     "message": "Filer"
   },
   "files_index_af7c662b": {
     "message": "Filindex"
+  },
+  "finish_bc343002": {
+    "message": "Avsluta"
   },
   "folder_705fd2d7": {
     "message": "Mapp"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Om du inte väljer användningsrättigheter nu kommer den här filen att publiceras efter att den har laddats upp."
   },
+  "image_options_5412d02c": {
+    "message": "Bildalternativ"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Bildalternativ-bricka"
+  },
   "image_upload_form_7b74079a": {
     "message": "Bild uppladdningsformulär"
-  },
-  "image_url_2aee2734": {
-    "message": "Bild URL"
   },
   "images_7ce26570": {
     "message": "Bilder"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ogiltig filtyp"
   },
+  "large_9c5e80e7": {
+    "message": "Stor"
+  },
   "link_7262adec": {
     "message": "Länk"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Länkar"
+  },
+  "load_more_35d33c7": {
+    "message": "Ladda fler"
   },
   "load_more_results_460f49a9": {
     "message": "Hämta fler resultat"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "Läser in mappar..."
   },
+  "loading_media_f3455841": {
+    "message": "Laddar media"
+  },
   "media_af190855": {
     "message": "Media"
+  },
+  "medium_5a8e9ead": {
+    "message": "Medium"
+  },
+  "mic_a7f3d311": {
+    "message": "Mic"
   },
   "modules_c4325335": {
     "message": "Moduler"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Ingen Alt-text (dekorativ bild)"
+  },
   "no_results_940393cf": {
     "message": "Inga resultat."
+  },
+  "no_video_1ed00b26": {
+    "message": "Ingen video"
   },
   "options_3ab0ea65": {
     "message": "Alternativ"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Paragraf"
   },
+  "pause_12af3bb4": {
+    "message": "Paus"
+  },
   "people_b4ebb13c": {
     "message": "Personer"
+  },
+  "play_1a47eaa7": {
+    "message": "Spela upp"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Ge Canvas åtkomst till din mikrofon och webbkamera."
   },
   "posted_when_a578f5ab": {
     "message": "Publicerad: { when }"
   },
   "preformatted_d0670862": {
     "message": "Förformaterade"
+  },
+  "preview_a3f8f854": {
+    "message": "FÖRHANDSGRANSKA"
   },
   "published_c944a23d": {
     "message": "publicerad"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Quizzes"
   },
+  "record_7c9448b": {
+    "message": "Spela in"
+  },
   "record_upload_media_5fdce166": {
     "message": "Spela in/ladda upp media"
+  },
+  "recording_98da6bda": {
+    "message": "Inspelning"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Ta bort länk"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Innehållsredigeraren"
+  },
+  "save_11a80ec3": {
+    "message": "Spara"
   },
   "search_280d00bd": {
     "message": "Sök"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Visa bildalternativ"
   },
+  "size_b30e1077": {
+    "message": "Storlek"
+  },
+  "small_b070434a": {
+    "message": "Liten"
+  },
   "small_header_168fb9f9": {
     "message": "Liten rubrik"
   },
   "something_went_wrong_89195131": {
     "message": "Någonting gick fel."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Det gick inte att komma åt din mikrofon eller webbkamera."
+  },
   "sort_by_e75f9e3e": {
     "message": "Sortera efter"
   },
   "square_unordered_list_b15ce93b": {
     "message": "fyrkantsmarkera osorterad lista"
+  },
+  "start_over_f7552aa9": {
+    "message": "Börja om"
+  },
+  "start_recording_9a65141a": {
+    "message": "Starta inspelning"
   },
   "subheader_2b87606d": {
     "message": "Underrubrik"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Övertext"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Växla till rå html-redigerare"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Växla till rich text editor (innehållsredigerare)"
   },
   "syllabus_f191f65b": {
     "message": "Kursöversikt"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "Avpublicerad"
   },
-  "unsplash_ee049fbf": {
-    "message": "Ångra stänk"
+  "untitled_16aa4f2b": {
+    "message": "Namnlös"
   },
   "upload_8b403d05": {
     "message": "Ladda upp"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Ladda upp bild"
   },
+  "upload_media_ce31135a": {
+    "message": "Ladda upp media"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Ladda upp/spela in media"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "markera alfabetisk sorterad lista med versaler"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Användarrättigheter:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Används av skärmläsare för att beskriva en bilds innehåll"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Video/ljudinspelning har laddats upp"
+  },
+  "video_player_b371005": {
+    "message": "Videospelare"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Visa tangentbordskommandon"
+  },
+  "webcam_fe91b20f": {
+    "message": "Webbkamera"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Vad vill du kalla den nya sidan?"
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki hem"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Din webbkamera kan vara i bruk redan."
   }
 }

@@ -223,6 +223,10 @@ $gradebook_cell_padding_top: 8px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    a {
+      color: var(--ic-link-color);
+    }
   }
 
   .Gradebook__ColumnHeaderContent {
@@ -591,12 +595,21 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
+.Grid__GradeCell__UnpostedGrade {
+  background-color: $ic-color-alert;
+  border-radius: 50%;
+  height: 0.4rem;
+  position: absolute;
+  width: 0.4rem;
+}
+
 .Grid__GradeCell__StartContainer,
 .Grid__GradeCell__EndContainer {
   display: flex;
   flex-basis: $cell-icon-width * 2;
   flex-grow: 1;
   flex-shrink: 1;
+  height: 100%;
   white-space: nowrap;
 }
 

@@ -103,12 +103,12 @@ $(function() {
 
   $external_content_info_alerts.on('focus', function(e) {
     $tool_content_wrapper.find('iframe').css('border', '2px solid #008EE2');
-    $(this).removeClass('screenreader-only');
+    $(this).removeClass('screenreader-only-tool');
   })
 
   $external_content_info_alerts.on('blur', function(e) {
     $tool_content_wrapper.find('iframe').css('border', 'none');
-    $(this).addClass('screenreader-only');
+    $(this).addClass('screenreader-only-tool');
   })
 
   if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {

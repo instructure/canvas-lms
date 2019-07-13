@@ -194,17 +194,15 @@ describe "outcome gradebook" do
           wait_for_ajax_requests
 
           # mean
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2.33'
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '2.67'
+          means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          expect(means).to contain_exactly("2.33", "2.67")
 
           f('#no_results_outcomes').click
           wait_for_ajax_requests
 
           # mean
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2.33'
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '2.67'
+          means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          expect(means).to contain_exactly("2.33", "2.67")
         end
 
         it "displays course mean and median" do
@@ -213,17 +211,15 @@ describe "outcome gradebook" do
           wait_for_ajax_requests
 
           # mean
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2.33'
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '2.67'
+          averages = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          expect(averages).to contain_exactly("2.33", "2.67")
 
           # median
           f('.al-trigger').click
           ff('.al-options .ui-menu-item').second.click
           wait_for_ajax_requests
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2'
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '3'
+          medians = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          expect(medians).to contain_exactly("2", "3")
 
           # switch to first section
           f('.section-select-button').click
@@ -234,9 +230,8 @@ describe "outcome gradebook" do
           wait_for_ajax_requests
 
           # median
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2.5'
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '2.5'
+          medians = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          expect(medians).to contain_exactly("2.5", "2.5")
 
           # switch to second section
           f('.section-select-button').click
@@ -248,9 +243,8 @@ describe "outcome gradebook" do
           refresh_page
 
           # should remain on second section, with mean
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2'
-          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '3'
+          means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          expect(means).to contain_exactly("2", "3")
         end
       end
 

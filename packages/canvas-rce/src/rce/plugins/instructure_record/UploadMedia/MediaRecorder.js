@@ -16,16 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert} from '@instructure/ui-alerts'
-import formatMessage from '../../../../format-message'
-import {Mask} from '@instructure/ui-overlays'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {MediaCaptureStrings} from './MediaCaptureStrings'
 import {object, func} from 'prop-types'
 import React from 'react'
-import {Spinner} from '@instructure/ui-elements'
-
-const ALERT_TIMEOUT = 5000
 
 export default class MediaRecorder extends React.Component {
   saveFile = (file) => {
@@ -35,28 +29,6 @@ export default class MediaRecorder extends React.Component {
   render() {
     return (
       <div>
-        {this.props.contentProps.upload.uploadingMediaStatus.loading && <Mask>
-          <Spinner renderTitle={formatMessage('Loading')} size="large" margin="0 0 0 medium" />
-        </Mask>}
-        {this.props.contentProps.upload.uploadingMediaStatus.error && (
-          <Alert
-            variant="error"
-            margin="small"
-            timeout={ALERT_TIMEOUT}
-            liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          >
-            {formatMessage('Error uploading video/audio recording')}
-          </Alert>
-        )}
-        {this.props.contentProps.upload.uploadingMediaStatus.uploaded && (
-          <Alert
-            screenReaderOnly
-            liveRegion={() => document.getElementById('flash_screenreader_holder')}
-            timeout={ALERT_TIMEOUT}
-          >
-            {formatMessage('Video/audio recording uploaded')}
-          </Alert>
-        )}
         {canUseMediaCapture() && (
           <MediaCapture
             translations={MediaCaptureStrings}

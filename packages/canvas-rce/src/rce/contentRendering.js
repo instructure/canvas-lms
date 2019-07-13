@@ -45,6 +45,10 @@ export function renderLink(link) {
   );
 }
 
+export function renderDoc(doc) {
+  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${doc.display_name || doc.filename}</a>`
+}
+
 export function renderLinkedImage(linkElem, image) {
   const linkHref = linkElem.getAttribute("href");
 

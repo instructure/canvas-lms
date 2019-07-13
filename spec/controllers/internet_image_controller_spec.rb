@@ -86,8 +86,8 @@ describe InternetImageController do
       begin
         WebMock::Config.instance.query_values_notation = :flat_array
         stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: {'Authorization': 'Client-ID key'})
-        get 'image_search', params: {"query" => 'cats', "per_page" => 18, "page" => 2}
-        expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").
+        get 'image_search', params: {"query" => 'cats', "per_page" => 18, "page" => 2, "orientation" => 'landscape'}
+        expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats&orientation=landscape").
           with(headers: {'Authorization': 'Client-ID key'}).once
       ensure
         WebMock::Config.instance.query_values_notation = :subscript

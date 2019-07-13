@@ -183,6 +183,13 @@ describe GradebookExporter do
           expect(header_row_length).to eq muted_row_length
         end
 
+        it "the length of the 'muted' row matches the length of the header row when integration_ids are passed" do
+          @exporter_options[:include_sis_id] = true
+          @course.root_account.settings[:include_integration_ids_in_gradebook_exports] = true
+          @course.root_account.save!
+          expect(header_row_length).to eq muted_row_length
+        end
+
         it "the length of the 'muted' row matches the length of the header row when include_sis_id " \
           "is true and the account is a trust account" do
           expect(@course.root_account).to receive(:trust_exists?).and_return(true)
@@ -193,7 +200,8 @@ describe GradebookExporter do
 
       context "when post policies are enabled" do
         before(:once) do
-          @course.enable_feature!(:post_policies)
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
         end
 
         let(:csv) do

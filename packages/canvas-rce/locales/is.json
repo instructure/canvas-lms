@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Athugun á aðgangi"
+  },
   "add_8523c19b": {
     "message": "Bæta við"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "Í stafrófsröð"
   },
+  "alt_text_611fb322": {
+    "message": "Annar texti"
+  },
   "alternative_text_a834dcad": {
     "message": "Valfrjáls texti:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Enn er verið að hlaða upp mynd, ef þú heldur áfram verður myndin ekki innfelld á réttan hátt."
   },
   "announcement_list_da155734": {
     "message": "Tilkynningalisti"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "gera hring utan um óraðaðan lista"
   },
-  "clear_upload_34efa419": {
-    "message": "Hreinsa upphleðslu"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Smelltu á hvaða skrá sem er til að setja inn tengil til að sækja skrána."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Handhafi höfundarréttar:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 orð}\n    one {1 orð}\n  other {# orð}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# atriði hlaðið inn}\n  other {# atriðum hlaðið inn}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Skjöl námskeiðs"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-leyfi:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Núverandi stig hljóðstyrks"
+  },
+  "custom_6979cd81": {
+    "message": "Sérsníða"
   },
   "date_added_ed5ad465": {
     "message": "Dagsetning bætt við"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "sjálfvalið áherslumerktur raðaður listi"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Lýstu myndinni)"
+  },
   "discussions_a5f96392": {
     "message": "Umræður"
   },
   "discussions_index_6c36ced": {
     "message": "Umræðuvísir"
   },
+  "display_options_315aba85": {
+    "message": "Sýningar valkostir"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Sýna textatengil (opnast í nýjum flipa)"
+  },
   "documents_81393201": {
     "message": "Skjöl"
+  },
+  "done_54e3d4b6": {
+    "message": "Lokið"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Dragðu og slepptu, eða smelltu til að vafra í tölvunni."
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Skil: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Breyta tengli"
+  },
+  "embed_image_1080badc": {
+    "message": "Fella inn mynd"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "slá inn leitarorð"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Settu inn þann texta sem þú kýst við þessa mynd"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Villa við upphleðslu myndbands-/hljóðupptöku"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Útvíkka til að sjá { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Ytri tenglar"
   },
+  "file_name_8fd421ff": {
+    "message": "Skráarheiti"
+  },
   "file_upload_form_4aaad554": {
     "message": "Form fyrir upphleðslu skráar"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } forskoða"
   },
   "files_c300e900": {
     "message": "Skrár"
   },
   "files_index_af7c662b": {
     "message": "Skráavísir"
+  },
+  "finish_bc343002": {
+    "message": "Ljúka"
   },
   "folder_705fd2d7": {
     "message": "Mappa"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Ef þú velur ekki notkunarréttindi núna verður þessi skrá óbirt eftir að henni hefur verið hlaðið upp."
   },
+  "image_options_5412d02c": {
+    "message": "Valkostir myndar"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Valkostir myndar bakki"
+  },
   "image_upload_form_7b74079a": {
     "message": "Form myndar í upphleðslu"
-  },
-  "image_url_2aee2734": {
-    "message": "Vefslóð myndar"
   },
   "images_7ce26570": {
     "message": "Myndir"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ógild skráartegund"
   },
+  "large_9c5e80e7": {
+    "message": "Stór"
+  },
   "link_7262adec": {
     "message": "Tengill "
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Tenglar"
+  },
+  "load_more_35d33c7": {
+    "message": "Hlaða meira"
   },
   "load_more_results_460f49a9": {
     "message": "Hlaða fleiri niðurstöðum"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "Hleð inn skrám..."
   },
+  "loading_media_f3455841": {
+    "message": "Hleð inn margmiðlunarefni"
+  },
   "media_af190855": {
     "message": "Miðill"
+  },
+  "medium_5a8e9ead": {
+    "message": "Meðal"
+  },
+  "mic_a7f3d311": {
+    "message": "Hljóðnemi"
   },
   "modules_c4325335": {
     "message": "Einingar"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Enginn annar texti (myndskreyting)"
+  },
   "no_results_940393cf": {
     "message": "Engar niðurstöður."
+  },
+  "no_video_1ed00b26": {
+    "message": "Ekkert myndband"
   },
   "options_3ab0ea65": {
     "message": "Valkostir"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Málsgrein"
   },
+  "pause_12af3bb4": {
+    "message": "Gera hlé"
+  },
   "people_b4ebb13c": {
     "message": "Fólk"
+  },
+  "play_1a47eaa7": {
+    "message": "Spila"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Leyfðu Canvas að fá aðgang að hljóðnemanum og vefmyndavélinni."
   },
   "posted_when_a578f5ab": {
     "message": "Birt: { when }"
   },
   "preformatted_d0670862": {
     "message": "Forsniðnir"
+  },
+  "preview_a3f8f854": {
+    "message": "FORSKOÐA"
   },
   "published_c944a23d": {
     "message": "birt"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Próf"
   },
+  "record_7c9448b": {
+    "message": "Upptaka"
+  },
   "record_upload_media_5fdce166": {
     "message": "Taka/hlaða upp margmiðlunarefni"
+  },
+  "recording_98da6bda": {
+    "message": "Upptaka"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Fjarlægja tengil"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Rich Content ritill"
+  },
+  "save_11a80ec3": {
+    "message": "Vista"
   },
   "search_280d00bd": {
     "message": "Leita"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Sýna valkosti myndar"
   },
+  "size_b30e1077": {
+    "message": "Stærð"
+  },
+  "small_b070434a": {
+    "message": "Lítil"
+  },
   "small_header_168fb9f9": {
     "message": "Lítill haus"
   },
   "something_went_wrong_89195131": {
     "message": "Eitthvað fór úrskeiðis."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Eitthvað misfórst við aðgang að hljóðnemanum eða vefmyndavélinni."
+  },
   "sort_by_e75f9e3e": {
     "message": "Raða eftir"
   },
   "square_unordered_list_b15ce93b": {
     "message": "gera ferning utan um óraðaðan lista"
+  },
+  "start_over_f7552aa9": {
+    "message": "Byrja aftur frá byrjun"
+  },
+  "start_recording_9a65141a": {
+    "message": "Hefja upptöku"
   },
   "subheader_2b87606d": {
     "message": "Undirhaus"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Yfirskrift"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Skipta yfir í hráan html ritil"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Skipta yfir í rtf ritil"
   },
   "syllabus_f191f65b": {
     "message": "Námsefni"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "óbirt"
   },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
+  "untitled_16aa4f2b": {
+    "message": "Án titils"
   },
   "upload_8b403d05": {
     "message": "Hlaða upp"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Hleð upp mynd"
   },
+  "upload_media_ce31135a": {
+    "message": "Hlaða upp miðli"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Hlaða/taka upp margmiðlunarefni"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "hástafa bókstafa raðaður listi"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Notkunarréttindi:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Notað af skjálesurum til að lýsa efni myndar"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Mynd-/hljóðupptöku hlaðið upp"
+  },
+  "video_player_b371005": {
+    "message": "Myndspilari"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Skoða flýtileiðir lyklaborð"
+  },
+  "webcam_fe91b20f": {
+    "message": "Vefmyndavél"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Hvað vilt þú nefna nýju síðuna?"
   },
   "wiki_home_9cd54d0": {
     "message": "Heimasíða wiki"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Verið getur að vefmyndavélin sé þegar í notkun."
   }
 }

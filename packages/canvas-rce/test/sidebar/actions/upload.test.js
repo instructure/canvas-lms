@@ -59,7 +59,7 @@ describe("Upload data actions", () => {
     },
 
     uploadMediaToCanvas() {
-      return Promise.resolve({});
+      return Promise.resolve({"media_object": {"media_id": 2}});
     },
 
     preflightUpload() {
@@ -596,7 +596,7 @@ describe("Upload data actions", () => {
 
     it('dispatches mediaUploadSuccess when K5.complete is dispatched', () => {
       let store = spiedStore(setupState());
-      return store.dispatch(actions.saveMediaRecording({}, {getBody: () =>{}, dom: {add: ()=>{}}}, ()=>{})).then( async (uploader) => {
+      return store.dispatch(actions.saveMediaRecording({}, {getBody: () =>{}, dom: {add: ()=>{}, setStyles: () => {}}}, ()=>{})).then( async (uploader) => {
         uploader.dispatchEvent("K5.complete", {data : "datatatatatatatat"}, uploader);
         await new Promise(setTimeout)
         sinon.assert.calledWith(store.spy, { type: 'MEDIA_UPLOAD_SUCCESS'})
@@ -606,7 +606,7 @@ describe("Upload data actions", () => {
     it('calls dismiss when upload to canvas has succeed during K5.complete is dispatched', () => {
       let store = spiedStore(setupState());
       const fakeDismissDispatch = sinon.spy();
-      return store.dispatch(actions.saveMediaRecording({}, {getBody: () =>{}, dom: {add: ()=>{}}}, fakeDismissDispatch)).then( async (uploader) => {
+      return store.dispatch(actions.saveMediaRecording({}, {getBody: () =>{}, dom: {add: ()=>{}, setStyles: () =>{}}}, fakeDismissDispatch)).then( async (uploader) => {
         uploader.dispatchEvent("K5.complete", {data : "datatatatatatatat"}, uploader);
         await new Promise(setTimeout)
         sinon.assert.calledOnce(fakeDismissDispatch);

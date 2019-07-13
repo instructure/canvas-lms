@@ -56,6 +56,15 @@ module Lti
           end
         end
 
+        context 'when the jti is being reused' do
+          let(:jti) { 'static value' }
+          let(:nonce_key) { "nonce::#{jti}" }
+
+          before {  Lti::Security.check_and_store_nonce(nonce_key, iat, 30.seconds) }
+
+          it { is_expected.to be_success }
+        end
+
         context 'when the aud is invalid' do
           let(:aud) { 'banana' }
 

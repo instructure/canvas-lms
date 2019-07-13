@@ -38,7 +38,7 @@ class ContextController < ApplicationController
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
-      render :json => @media_object
+      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
     end
   end
 
@@ -168,7 +168,7 @@ class ContextController < ApplicationController
         end
       end
       if @context.grants_right? @current_user, session, :read_as_admin
-        js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+        set_student_context_cards_js_env
       end
     elsif @context.is_a?(Group)
       if @context.grants_right?(@current_user, :read_as_admin)

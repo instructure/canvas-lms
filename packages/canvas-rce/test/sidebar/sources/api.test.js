@@ -508,4 +508,16 @@ describe('sources/api', () => {
       })
     })
   })
+
+  describe('pingbackUnsplash', () => {
+    it('sends the given id to the proper route', () => {
+      const expectedUrl = "/api/unsplash/pingback?id=123"
+      fetchMock.mock(expectedUrl, 200)
+      return apiSource.pingbackUnsplash(123).then(() => {
+        assert.ok(fetchMock.done())
+        assert.ok(fetchMock.lastUrl() === expectedUrl)
+        fetchMock.restore();
+      })
+    })
+  })
 })

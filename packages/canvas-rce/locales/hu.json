@@ -119,6 +119,9 @@
   "folder_705fd2d7": {
     "message": "Mappa"
   },
+  "generating_preview_45b53be0": {
+    "message": "Előnézet generálása... "
+  },
   "grades_a61eba0a": {
     "message": "Értékelések"
   },
@@ -137,9 +140,6 @@
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
   },
-  "image_url_2aee2734": {
-    "message": "Kép URL"
-  },
   "images_7ce26570": {
     "message": "Képek"
   },
@@ -157,6 +157,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "Érvénytelen fájltípus"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Billentyűparancsok"
   },
   "link_7262adec": {
     "message": "Hivatkozás"
@@ -191,6 +194,9 @@
   "modules_c4325335": {
     "message": "Modulok"
   },
+  "next_page_d2a39853": {
+    "message": "Következő oldal"
+  },
   "no_results_940393cf": {
     "message": "No results."
   },
@@ -202,6 +208,9 @@
   },
   "people_b4ebb13c": {
     "message": "Résztvevők"
+  },
+  "previous_page_928fc112": {
+    "message": "Előző oldal"
   },
   "published_c944a23d": {
     "message": "publikált"

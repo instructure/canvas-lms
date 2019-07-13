@@ -31,7 +31,6 @@ import preventDefault from 'compiled/fn/preventDefault'
 import 'media_comments'
 import 'reminders'
 import 'instructure'
-import 'page_views'
 import 'compiled/behaviors/authenticity_token'
 import 'compiled/behaviors/ujsLinks'
 import 'compiled/behaviors/admin-links'
@@ -41,6 +40,8 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'compiled/behaviors/broken-images'
 import 'LtiThumbnailLauncher'
+
+if (ENV.page_view_update_url) import('page_views')
 
 // preventDefault so we dont change the hash
 // this will make nested apps that use the hash happy

@@ -27,7 +27,7 @@ import createChainedFunction from '@instructure/ui-utils/lib/createChainedFuncti
 export default class EditableHeading extends React.Component {
   static propTypes = {
     mode: oneOf(['view', 'edit']).isRequired,
-    label: string.isRequired, // label for the input element when in edit moded
+    label: string.isRequired, // label for the input element when in edit mode
     value: string.isRequired, // the current text string
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes

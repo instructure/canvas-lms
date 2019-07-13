@@ -142,10 +142,27 @@ describe Types::SubmissionType do
       ).to eq [@comment2.id.to_s]
     end
 
+    it 'will show comments for a given attempt using the target_attempt argument' do
+      expect(
+        submission_type.resolve('commentsConnection(filter: {forAttempt: 1}) { nodes { _id }}')
+      ).to eq [@comment1.id.to_s]
+    end
+
     it 'will show alll comments for all attempts if all_comments is true' do
       expect(
         submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { _id }}')
       ).to eq [@comment1.id.to_s, @comment2.id.to_s]
+    end
+
+    it 'will combine comments for attempt nil, 0, and 1' do
+      @comment0 = @submission.add_comment(author: @teacher, comment: 'test1', attempt: 0)
+      @commentNil = @submission.add_comment(author: @teacher, comment: 'test1', attempt: nil)
+
+      (0..1).each do |i|
+        expect(
+          submission_type.resolve("commentsConnection(filter: {forAttempt: #{i}}) { nodes { _id }}")
+        ).to eq [@comment1.id.to_s, @comment0.id.to_s, @commentNil.id.to_s]
+      end
     end
 
     it 'will only return published drafts' do
@@ -163,60 +180,127 @@ describe Types::SubmissionType do
     end
   end
 
+  describe 'submission_drafts' do
+    it 'returns the draft for attempt 0 when the submission attempt is nil' do
+      @submission.update_columns(attempt: nil) # bypass #infer_details for test
+      SubmissionDraft.create!(submission: @submission, submission_attempt: 0)
+      expect(
+        submission_type.resolve('submissionDraft { submissionAttempt }')
+      ).to eq 0
+    end
+
+    it 'returns nil for a non current submission history that has a draft' do
+      assignment = @course.assignments.create! name: "asdf", points_possible: 10
+      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      SubmissionDraft.create!(submission: @submission1, submission_attempt: @submission1.attempt)
+      SubmissionDraft.create!(submission: @submission2, submission_attempt: @submission2.attempt)
+      resolver = GraphQLTypeTester.new(@submission2, current_user: @teacher)
+      expect(
+        resolver.resolve(
+          'submissionHistoriesConnection { nodes { submissionDraft { submissionAttempt }}}'
+        )
+      ).to eq [nil, @submission2.attempt]
+    end
+  end
+
+  describe 'attachments' do
+    before(:once) do
+      assignment = @course.assignments.create! name: "asdf", points_possible: 10
+      @attachment1 = attachment_model
+      @attachment2 = attachment_model
+      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission1.attachments = [@attachment1]
+      @submission1.save!
+      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @submission2.attachments = [@attachment2]
+      @submission2.save!
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission2, current_user: @teacher) }
+
+    it 'works for a submission' do
+      expect(submission_type.resolve('attachments { _id }')).to eq [@attachment2.id.to_s]
+    end
+
+    it 'works for a submission history' do
+      expect(
+        submission_type.resolve(
+          'submissionHistoriesConnection(first: 1) { nodes { attachments { _id }}}'
+        )
+      ).to eq [[@attachment1.id.to_s]]
+    end
+  end
+
   describe 'submission histories connection' do
     before(:once) do
-      # In the world code path that the initial submission takes, there is a bulk
-      # insert directly into the database, which causes no version to be saved
-      # for the zero submission. Delete the version_ids here to simulate that.
-      @submission.update!(version_ids: [])
+      assignment = @course.assignments.create! name: "asdf2", points_possible: 10
+      @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @submission3 = assignment.submit_homework(@student, body: 'Attempt 3')
     end
 
-    it 'works when there are no versions saved' do
+    let(:submission_history_type) { GraphQLTypeTester.new(@submission3, current_user: @teacher) }
+
+    it 'returns the submission histories' do
       expect(
-        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
-      ).to eq [0]
+        submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+      ).to eq [1, 2, 3]
     end
 
-    it 'includes the zero submission when there are versions' do
-      @submission.update!(attempt: 1)
+    it 'properly handles cursors for submission histories' do
       expect(
-        submission_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
-      ).to eq [1, 0]
+        submission_history_type.resolve('submissionHistoriesConnection { edges { cursor }}')
+      ).to eq ["MQ", "Mg", "Mw"]
     end
 
-    context 'custom pagination' do
-      before(:once) do
-        @submission.update!(attempt: 1)
+    context 'filter' do
+      describe 'states' do
+        before(:once) do
+          # Cannot use .first here, because versionable changes .first to .last :knife:
+          history_version = @submission3.versions[0]
+          history = YAML.load(history_version.yaml)
+          history['workflow_state'] = 'unsubmitted'
+          history_version.update!(yaml: history.to_yaml)
+        end
+
+        it 'does not filter by states by default' do
+          expect(
+            submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+          ).to eq [1, 2, 3]
+        end
+
+        it 'can be used to filter by workflow state' do
+          expect(
+            submission_history_type.resolve(
+              'submissionHistoriesConnection(filter: {states: [submitted]}) { nodes { attempt }}'
+            )
+          ).to eq [1, 2]
+        end
       end
 
-      it 'works for nodes' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { nodes { attempt }}')
-        ).to eq [1]
-      end
+      describe 'include_current_submission' do
+        it 'includes the current submission history by default' do
+          expect(
+            submission_history_type.resolve('submissionHistoriesConnection { nodes { attempt }}')
+          ).to eq [1, 2, 3]
+        end
 
-      it 'works for edges node' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { node { attempt }}}')
-        ).to eq [1]
-      end
+        it 'includes the current submission history when true' do
+          expect(
+            submission_history_type.resolve(
+              'submissionHistoriesConnection(filter: {includeCurrentSubmission: true}) { nodes { attempt }}'
+            )
+          ).to eq [1, 2, 3]
+        end
 
-      it 'works for edges cursor' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { edges { cursor }}')
-        ).to eq ["MQ"] # Base64 encoded 1, per the graphql gem impmenetation of array paginating
-      end
-
-      it 'works for pageInfo endCursor' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { endCursor }}')
-        ).to eq "MQ" # Base64 encoded 1, per the graphql gem impmenetation of array paginating
-      end
-
-      it 'works for pageInfo hasNextPage' do
-        expect(
-          submission_type.resolve('submissionHistoriesConnection(first: 1) { pageInfo { hasNextPage }}')
-        ).to eq true
+        it 'does not includes the current submission history when false' do
+          expect(
+            submission_history_type.resolve(
+              'submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) { nodes { attempt }}'
+            )
+          ).to eq [1, 2]
+        end
       end
     end
   end

@@ -18,7 +18,7 @@
 if CANVAS_RAILS5_1
   gem 'rails', '5.1.6.2'
 else
-  gem 'rails', '5.2.2.1'
+  gem 'rails', '5.2.3'
 end
     gem 'loofah', '2.2.3'
 

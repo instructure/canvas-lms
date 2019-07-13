@@ -60,5 +60,59 @@ module Types
       opts[:verifier] = object.uuid if context[:in_app]
       GraphQLHelpers::UrlHelpers.file_download_url(object, opts)
     end
+
+    field :submission_preview_url, Types::UrlType, null: true do
+      argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+    end
+    def submission_preview_url(submission_id:)
+      return if object.locked_for?(current_user, check_policies: true)
+
+      Loaders::IDLoader.for(Submission).load(submission_id).then do |submission|
+        next unless submission.grants_right?(current_user, session, :read)
+
+        # We are checking first to see if the attachment is associated with the given submission id
+        # to potentially avoid needing to load submission histories which is expensive.
+        if submission.attachment_ids_for_version.include?(object.id)
+          load_submission_associations(submission) do |course, assignment|
+            get_canvadoc_url(course, assignment, submission)
+          end
+        else
+          load_submission_history_associations(submission) do |course, assignment|
+            attachment_ids = submission.submission_history.map(&:attachment_ids_for_version).flatten
+            next unless attachment_ids.include?(object.id)
+            get_canvadoc_url(course, assignment, submission)
+          end
+        end
+      end
+    end
+
+    private
+
+    def load_submission_associations(submission)
+      Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+        Loaders::AssociationLoader.for(Assignment, :context).load(assignment).then do |course|
+          yield(course, assignment)
+        end
+      end
+    end
+
+    def load_submission_history_associations(submission)
+      load_submission_associations(submission) do |course, assignment|
+        Loaders::AssociationLoader.for(Submission, :versions).load(submission).then do
+          yield(course, assignment)
+        end
+      end
+    end
+
+    def get_canvadoc_url(course, assignment, submission)
+      opts = {
+        anonymous_instructor_annotations: course.grants_right?(current_user, :manage_grade) && assignment.anonymous_instructor_annotations,
+        moderated_grading_whitelist: submission.moderated_grading_whitelist,
+        submission_id: submission.id,
+        enable_annotations: true,
+        enrollment_type: CoursesHelper.user_type(course, current_user)
+      }
+      object.canvadoc_url(current_user, opts)
+    end
   end
 end

@@ -354,12 +354,14 @@ class GradebookImporter
       @sis_login_id_column = 2
       @student_columns += 1
     elsif row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
+      # Integration id might be after sis id and login id, ignore it.
+      i = row[4] =~ /Integration\s+ID/ ? 1 : 0
       @sis_user_id_column = 2
       @sis_login_id_column = 3
-      @student_columns += 2
-      if row[4] =~ /Root\s+Account/
-        @student_columns +=1
-        @root_account_column = 4
+      @student_columns += 2 + i
+      if row[4 + i] =~ /Root\s+Account/
+        @student_columns += 1
+        @root_account_column = 4 + i
       end
     end
 

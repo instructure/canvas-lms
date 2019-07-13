@@ -2347,6 +2347,21 @@ describe CalendarEventsApiController, type: :request do
       expect(response.body.match(/DTSTART:\s*#{expected_override_date_output}/)).not_to be_nil
     end
 
+    it "should have events for a merged student" do
+      old_code = @student.feed_code
+      new_user = user_model
+      UserMerge.from(@student).into(new_user)
+      raw_api_call(:get, "/feeds/calendars/#{old_code}.ics", {
+        :controller => 'calendar_events_api', :action => 'public_feed', :format => 'ics', :feed_code => old_code})
+      expect(response).to be_successful
+
+      expect(response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip)).to match_array ["assignment-override-#{@override.id}", "calendar-event-#{@event.id}", "calendar-event-#{@appointment.id}"]
+
+      # make sure the assignment actually has the override date
+      expected_override_date_output = @override.due_at.utc.iso8601.gsub(/[-:]/, '').gsub(/\d\dZ$/, '00Z')
+      expect(response.body.match(/DTSTART:\s*#{expected_override_date_output}/)).not_to be_nil
+    end
+
     it "should include the appointment details in the teachers export" do
       get "/feeds/calendars/#{@teacher.feed_code}.ics"
       expect(response).to be_successful

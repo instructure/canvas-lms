@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!OutcomesImporter'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'

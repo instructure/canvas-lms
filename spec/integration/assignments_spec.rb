@@ -321,3 +321,83 @@ describe "ratio of submissions graded" do
     end
   end
 end
+
+describe "assignments_2 feature flag and parameter" do
+  context "as a teacher" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment")
+    end
+
+    before :each do
+      user_session @teacher
+    end
+
+    describe "with feature disabled" do
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        html = Nokogiri::HTML(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("a#toggle_assignments_2")).not_to be
+      end
+    end
+
+    describe "with feature enabled" do
+      before :once do
+        Account.default.enable_feature! :assignments_2
+      end
+
+      it "it shows new assignments" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        html = Nokogiri::HTML(response.body)
+        expect(html.at_css('div#assignment_show')).not_to be
+      end
+
+      it "shows old assignments when explicitly requested" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
+        html = Nokogiri::HTML(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("a#toggle_assignments_2")).to be
+      end
+    end
+  end
+
+  describe "as a student" do
+    before :once do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(title: "some assignment")
+    end
+
+    before :each do
+      user_session @student
+    end
+
+    describe "with feature disabled" do
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        html = Nokogiri::HTML(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("a#toggle_assignments_2")).not_to be
+      end
+    end
+
+    describe "with feature enabled" do
+      before :once do
+        Account.default.enable_feature! :assignments_2
+      end
+
+      it "shows new assignments by default" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        html = Nokogiri::HTML(response.body)
+        expect(html.at_css('div#assignment_show')).not_to be
+      end
+
+      it "shows old assignments if requested" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
+        html = Nokogiri::HTML(response.body)
+        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("a#toggle_assignments_2")).to be
+      end
+    end
+  end
+end

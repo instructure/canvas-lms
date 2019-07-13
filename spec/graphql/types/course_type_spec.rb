@@ -349,13 +349,12 @@ describe Types::CourseType do
       let(:context) { { current_user: teacher } }
 
       it "returns the PostPolicy for the course" do
-        post_policy = course.post_policies.create!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("postPolicy { _id }").to_i).to eql post_policy.id
+        expect(resolver.resolve("postPolicy { _id }").to_i).to eql course.default_post_policy.id
       end
 
       it "returns null if there is no course-specific PostPolicy" do
-        course.post_policies.create!(assignment: assignment, post_manually: true)
+        course.default_post_policy.destroy
         resolver = GraphQLTypeTester.new(course, context)
         expect(resolver.resolve("postPolicy { _id }")).to be nil
       end
@@ -365,7 +364,7 @@ describe Types::CourseType do
       let(:context) { { current_user: student } }
 
       it "returns null in place of the PostPolicy" do
-        course.post_policies.create!(post_manually: true)
+        course.default_post_policy.update!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
         expect(resolver.resolve("postPolicy { _id }")).to be nil
       end
@@ -373,25 +372,20 @@ describe Types::CourseType do
   end
 
   describe "AssignmentPostPoliciesConnection" do
-    let(:assignment1) { course.assignments.create! }
-    let(:assignment2) { course.assignments.create! }
     let(:course) { Course.create!(workflow_state: "available") }
     let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
     let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
-
-    before(:each) do
-      course.post_policies.create!(post_manually: true)
-      @assignment1_post_policy = course.post_policies.create!(assignment: assignment1, post_manually: true)
-      @assignment2_post_policy = course.post_policies.create!(assignment: assignment2, post_manually: true)
-    end
 
     context "when user has manage_grades permission" do
       let(:context) { { current_user: teacher } }
 
       it "returns only the assignment PostPolicies for the course" do
+        assignment1 = course.assignments.create!
+        assignment2 = course.assignments.create!
+
         resolver = GraphQLTypeTester.new(course, context)
         ids = resolver.resolve("assignmentPostPolicies { nodes { _id } }").map(&:to_i)
-        expect(ids).to contain_exactly(@assignment1_post_policy.id, @assignment2_post_policy.id)
+        expect(ids).to contain_exactly(assignment1.post_policy.id, assignment2.post_policy.id)
       end
 
       it "returns null if there are no assignment PostPolicies" do

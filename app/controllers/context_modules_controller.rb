@@ -289,7 +289,6 @@ class ContextModulesController < ApplicationController
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
       info = {}
-      now = Time.now.utc.iso8601
 
       all_tags = Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).to_a }
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
@@ -308,11 +307,18 @@ class ContextModulesController < ApplicationController
         end
       end
 
-      submitted_assignment_ids = @current_user.submissions.shard(@context.shard).
-        having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id) if assignment_ids.any?
+      submitted_assignment_ids = if @current_user && assignment_ids.any?
+        assignments_key = Digest::MD5.hexdigest(assignment_ids.sort.join(","))
+        Rails.cache.fetch_with_batched_keys("submitted_assignment_ids/#{assignments_key}",
+            batch_object: @current_user, batched_keys: :submissions) do
+          @current_user.submissions.shard(@context.shard).
+            having_submission.where(:assignment_id => assignment_ids).pluck(:assignment_id)
+        end
+      end
       submitted_quiz_ids = @current_user.quiz_submissions.shard(@context.shard).
-        completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if quiz_ids.any?
-
+        completed.where(:quiz_id => quiz_ids).pluck(:quiz_id) if @current_user && quiz_ids.any?
+      submitted_assignment_ids ||=[]
+      submitted_quiz_ids ||=[]
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
           tag.assignment.context_module_tag_info(@current_user, @context,

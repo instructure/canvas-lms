@@ -21,6 +21,9 @@ require_relative '../sharding_spec_helper'
 describe GradeCalculator do
   before :each do
     course_with_student active_all: true
+
+    @course.enable_feature!(:new_gradebook)
+    PostPolicy.enable_feature!
   end
 
   context "computing grades" do
@@ -424,7 +427,6 @@ describe GradeCalculator do
             # We assigned this above, but repeat it for the sake of clarity
             auto_assignment.grade_student(@user, grade: "5", grader: @teacher)
 
-            @course.enable_feature!(:post_policies)
             manual_assignment.ensure_post_policy(post_manually: true)
             manual_assignment.grade_student(@user, grade: "10", grader: @teacher)
 
@@ -485,6 +487,7 @@ describe GradeCalculator do
 
         context "when post policies are not enabled" do
           before :each do
+            PostPolicy.disable_feature!
             @assignment2.mute!
           end
 
@@ -768,7 +771,7 @@ describe GradeCalculator do
       # should have same scores as previous spec despite having a grade
       nil_graded_assignment
 
-      @assignment_1.mute!
+      @assignment_1.post_policy.update!(post_manually: true)
       @assignment_1.grade_student(@user, grade: 500, grader: @teacher)
 
       @user.reload
@@ -940,7 +943,7 @@ describe GradeCalculator do
           )
         end
 
-        assignments[1].mute!
+        assignments.second.post_policy.update!(post_manually: true)
 
         @assignments.push(*assignments)
         assignment_group
@@ -965,6 +968,12 @@ describe GradeCalculator do
         # rubocop:disable Rails/SkipsModelValidations
         submission.update_column(:score, assignment_score_pair[1])
         # rubocop:enable Rails/SkipsModelValidations
+      end
+
+      # Make sure the world knows about the grades we surreptitiously assigned above
+      @assignments.reject { |assignment| assignment.post_policy.post_manually? }.each do |assignment|
+        # ...but, lest we kick off the calculator before we're ready, also do the posting surreptitiously
+        assignment.submissions.update_all(posted_at: Time.zone.now)
       end
 
       @dropped_assignments = [0, 3].map { |i| @assignments[i] }
@@ -1881,6 +1890,12 @@ describe GradeCalculator do
         next unless score # don't grade nil submissions
         a.grade_student @student, grade: score, grader: @teacher
       end
+
+      # This set of tests expects all submissions to be posted to the student
+      # (in the pre-post-policies world these assignments were all unmuted),
+      # even if we didn't issue a grade. Set them to posted but don't trigger a
+      # grade calculation.
+      Submission.where(user: @student).update_all(posted_at: Time.zone.now)
     end
 
     def check_grades(current, final, check_current: true, check_final: true)
@@ -2065,35 +2080,34 @@ describe GradeCalculator do
       check_grades(nil, nil)
     end
 
-    it "should support never_drop" do
-      set_default_grades
-      rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 3/38
-      @group.update_attribute(:rules, rules)
-      check_grades(63.32, 55.99)
+    describe "support for never_drop" do
+      it "supports never_drop (1)" do
+        set_default_grades
+        rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 3/38
+        @group.update_attribute(:rules, rules)
+        check_grades(63.32, 55.99)
+      end
 
-      Assignment.destroy_all
-      Submission.destroy_all
+      it "supports never_drop (2)" do
+        set_grades [[10,20], [5,10], [20,40], [0,100]]
+        rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 0/100
+        @group.update_attribute(:rules, rules)
+        check_grades(18.75, 18.75)
+      end
 
-      set_grades [[10,20], [5,10], [20,40], [0,100]]
-      rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 0/100
-      @group.update_attribute(:rules, rules)
-      check_grades(18.75, 18.75)
+      it "supports never_drop (3)" do
+        set_grades [[10,20], [5,10], [20,40], [100,100]]
+        rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 100/100
+        @group.update_attribute(:rules, rules)
+        check_grades(88.46, 88.46)
+      end
 
-      Assignment.destroy_all
-      Submission.destroy_all
-
-      set_grades [[10,20], [5,10], [20,40], [100,100]]
-      rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 100/100
-      @group.update_attribute(:rules, rules)
-      check_grades(88.46, 88.46)
-
-      Assignment.destroy_all
-      Submission.destroy_all
-
-      set_grades [[101.9,100], [105.65,100], [103.8,100], [0,0]]
-      rules = "drop_lowest:1\nnever_drop:#{@assignments[2].id}" # 103.8/100
-      @group.update_attribute(:rules, rules)
-      check_grades(104.73, 104.73)
+      it "supports never_drop (4)" do
+        set_grades [[101.9,100], [105.65,100], [103.8,100], [0,0]]
+        rules = "drop_lowest:1\nnever_drop:#{@assignments[2].id}" # 103.8/100
+        @group.update_attribute(:rules, rules)
+        check_grades(104.73, 104.73)
+      end
     end
 
     it "grade dropping should work even in ridiculous circumstances" do

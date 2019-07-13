@@ -1474,14 +1474,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def watched_conversations_intro?
-    preferences[:watched_conversations_intro] == true
-  end
-
-  def watched_conversations_intro(value=true)
-    preferences[:watched_conversations_intro] = value
-  end
-
   def send_scores_in_emails?(root_account)
     preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
   end
@@ -1532,10 +1524,6 @@ class User < ActiveRecord::Base
 
   def default_notifications_disabled?
     !!preferences[:default_notifications_disabled]
-  end
-
-  def use_new_conversations?
-    true
   end
 
   def uuid

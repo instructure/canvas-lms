@@ -1384,6 +1384,29 @@ class CoursesController < ApplicationController
     end
   end
 
+  def observer_pairing_codes_csv
+    get_context
+    return render_unauthorized_action unless @context.root_account.self_registration? && @context.grants_right?(@current_user, :generate_observer_pairing_code)
+    res = CSV.generate do |csv|
+      csv << [
+        I18n.t('Last Name'),
+        I18n.t('First Name'),
+        I18n.t('Pairing Code'),
+        I18n.t('Expires At'),
+      ]
+      @context.students.each do |u|
+        opc = ObserverPairingCode.create(user: u, expires_at: 1.week.from_now, code: SecureRandom.hex(3))
+        row = []
+        row << opc.user.last_name
+        row << opc.user.first_name
+        row << '="' + opc.code + '"'
+        row << opc.expires_at
+        csv << row
+      end
+    end
+    send_data res, type: 'text/csv', filename: "#{@context.course_code}_Pairing_Codes.csv"
+  end
+
   def update_nav
     get_context
     if authorized_action(@context, @current_user, :update)

@@ -73,19 +73,29 @@ module Canvas::LiveEvents
   end
 
   def self.discussion_entry_created(entry)
+    post_event_stringified('discussion_entry_created', get_discussion_entry_data(entry))
+  end
+
+  def self.discussion_entry_submitted(entry, assignment_id, submission_id)
+    payload = get_discussion_entry_data(entry)
+    payload[:assignment_id] = assignment_id unless assignment_id.nil?
+    payload[:submission_id] = submission_id unless submission_id.nil?
+    post_event_stringified('discussion_entry_submitted', payload)
+  end
+
+  def self.get_discussion_entry_data(entry)
     payload = {
+      user_id:  entry.global_user_id,
+      created_at: entry.created_at,
       discussion_entry_id: entry.global_id,
       discussion_topic_id: entry.global_discussion_topic_id,
       text: LiveEvents.truncate(entry.message)
     }
 
     if entry.parent_id
-      payload.merge!({
-        parent_discussion_entry_id: entry.global_parent_id
-      })
+      payload[:parent_discussion_entry_id] = entry.global_parent_id
     end
-
-    post_event_stringified('discussion_entry_created', payload)
+    payload
   end
 
   def self.discussion_topic_created(topic)
@@ -281,6 +291,18 @@ module Canvas::LiveEvents
 
   def self.submission_updated(submission)
     post_event_stringified('submission_updated', get_submission_data(submission))
+  end
+
+  def self.submission_comment_created(comment)
+    payload = {
+      submission_comment_id: comment.id,
+      submission_id: comment.submission_id,
+      user_id: comment.author_id,
+      created_at: comment.created_at,
+      attachment_ids: comment.attachment_ids.blank? ? [] : comment.attachment_ids.split(','),
+      body: LiveEvents.truncate(comment.comment)
+    }
+    post_event_stringified('submission_comment_created', payload)
   end
 
   def self.plagiarism_resubmit(submission)
@@ -479,7 +501,7 @@ module Canvas::LiveEvents
       category: category,
       role: role,
       level: level
-    })
+    }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)))
   end
 
   def self.quiz_export_complete(content_export)

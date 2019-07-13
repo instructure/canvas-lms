@@ -354,6 +354,25 @@ describe GradebookImporter do
       expect(hash[:students][0][:name]).to eql(@u1.name)
     end
 
+    it "ignores integration_id when present" do
+      course_model
+      student_in_course(name: "Some Name", active_all: true)
+      u1 = @user
+
+      uploaded_csv = CSV.generate do |csv|
+        csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Integration ID", "Section", "Assignment 1"]
+        csv << ["    Points Possible", "", "","", "", ""]
+        csv << ["", u1.id, "", "", "", "", 99]
+      end
+
+      importer_with_rows(uploaded_csv)
+      hash = @gi.as_json
+
+      expect(hash[:students][0][:id]).to eq u1.id
+      expect(hash[:students][0][:previous_id]).to eq u1.id
+      expect(hash[:students][0][:name]).to eql(u1.name)
+    end
+
     it "allows ids that look like numbers" do
       course_model
 

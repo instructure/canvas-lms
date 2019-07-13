@@ -25,6 +25,7 @@ import _ from 'underscore'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
 import htmlEscape from './str/htmlEscape'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
 import pluralize from './str/pluralize'
 import Handlebars from 'compiled/handlebars_helpers'
 import DueDateOverrideView from 'compiled/views/assignments/DueDateOverride'
@@ -540,7 +541,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $question.find(".multiple_answer_sets_holder").css('display', 'none');
       $question.find(".variable_definitions_holder").css('display', 'none').find("tbody").empty();
       $question.find(".formulas_holder").css('display', 'none').find(".formulas_list").empty();
-      $question.find('.question_points').text(question.points_possible);
+      $question.find('.question_points').text(I18n.n(question.points_possible));
       var details = quiz.answerTypeDetails(question.question_type);
       var answer_type = details.answer_type,
           question_type = details.question_type,
@@ -879,12 +880,12 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     calculatePointsPossible: function() {
       var tally = 0;
       $("#questions .question_holder:not(.group) .question:not(#question_new)").each(function() {
-        var val = parseFloat($(this).find(".question_points,.question_points.hidden").text());
+        var val = numberHelper.parse($(this).find(".question_points,.question_points.hidden").text());
         if (isNaN(val) || val < 0) { val = 0; }
         tally += val;
       });
       $("#questions .group_top:not(#group_top_new)").each(function(){
-        var val = parseFloat($(this).find(".question_points").text());
+        var val = numberHelper.parse($(this).find(".question_points").text());
         if (isNaN(val) || val < 0) { val = 0; }
         var pickCount = $(this).find(".pick_count").text() || 0;
         if (isNaN(pickCount)) { pickCount = 0; }
@@ -928,7 +929,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           $warning.hide();
         }
       });
-      $(".points_possible").text(this.calculatePointsPossible());
+      $(".points_possible").text(I18n.n(this.calculatePointsPossible()));
     },
 
     findContainerGroup: function($obj) {
@@ -947,20 +948,19 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     parseInput: function($input, type, precision = 10) {
       if ($input.val() == "") { return; }
 
-      var val = $input.val().replace(/,/g, '');
+      var val = numberHelper.parse($input.val())
 
       if (type == "int") {
         val = parseInt(val, 10);
         if (isNaN(val)) { val = 0; }
       } else if (type == "float") {
-        val = Math.round(parseFloat(val) * 100.0) / 100.0;
+        val = Math.round(val * 100.0) / 100.0;
         if (isNaN(val)) { val = 0.0; }
       } else if (type == "float_long") {
-        val = Math.round(parseFloat(val) * 10000.0) / 10000.0;
+        val = Math.round(val * 10000.0) / 10000.0;
         if (isNaN(val)) { val = 0.0; }
       } else if (type == "precision") {
         // Parse value and force NaN to 0
-        val = parseFloat(val)
         if (isNaN(val)) { val = 0.0; }
 
         if (val === 0) {
@@ -980,7 +980,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         }
       }
 
-      $input.val(val);
+      $input.val(I18n.n(val));
     },
 
     /*****
@@ -1051,7 +1051,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
     validatePoints: function() {
       var value  = $("input#quiz_points_possible").val();
-      var numVal = parseInt(value);
+      var numVal = numberHelper.parse(value);
 
       if (value && isNaN(numVal)) {
         $("input#quiz_points_possible").trigger("invalid:not_a_number");
@@ -1452,7 +1452,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         question.answer_tolerance = parseFloatOrPercentage($question.find(".answer_tolerance").text(), 10) || 0;
       }
       question.position = i;
-      question.question_points = parseFloat(question.question_points);
+      question.question_points = numberHelper.parse(question.question_points);
       if (isNaN(question.question_points) || question.question_points < 0) {
         question.question_points = 0;
       }
@@ -1846,8 +1846,10 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           $('html,body').scrollTo({top: offset.top, left:0});
           return false;
         }
-
         data['quiz[title]'] = quiz_title;
+
+        data['quiz[points_possible'] = numberHelper.parse($("input[name='quiz[points_possible]']").val());
+
         if (!lockedItems.content) {
           data['quiz[description]'] = RichContentEditor.callOnRCE($('#quiz_description'), 'get_code');
         }
@@ -2114,10 +2116,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $question.find(".matching_answer_incorrect_matches_list li").each(function() {
         matches.push($(this).text());
       });
-
       question.matching_answer_incorrect_matches = matches.join("\n");
-      question.question_points = parseFloat(question.question_points, 10);
-      if (isNaN(question.question_points) || question.question_points < 0) { question.question_points = 0; }
       var $form = $("#question_form_template").clone(true).attr('id', '');
       var $formQuestion = $form.find(".question");
       $formQuestion.addClass('initialLoad');
@@ -3004,6 +3003,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
 
+      questionData.question_points = numberHelper.parse(questionData.question_points);
       if (questionData.question_points && questionData.question_points < 0) {
         $form.find("input[name='question_points']").errorBox(I18n.t('question.positive_points', "Must be zero or greater"));
         return;
@@ -3052,7 +3052,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         return;
       }
       var question = $.extend({}, questionData);
-      question.points_possible = parseFloat(question.question_points);
+      question.points_possible = questionData.question_points;
       question.answers = [];
 
       $displayQuestion.find(".blank_id_select").empty();
@@ -3267,7 +3267,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $teaser.after($question);
         $teaser.remove();
         $question.show();
-        $question.find(".question_points").text(questionData.points_possible);
+        $question.find(".question_points").text(I18n.n(questionData.points_possible));
         quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
         $questionHeader.attr('tabindex', '0');
         $questionHeader.focus();

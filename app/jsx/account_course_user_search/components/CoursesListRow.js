@@ -164,7 +164,7 @@ export default class CoursesListRow extends React.Component {
         <th scope="row" style={{textAlign: 'center'}}>
           {isPublished ? (
             <span className="published-status published">
-              <IconPublish size="x-smll" />
+              <IconPublish size="x-small" />
               <ScreenReaderContent>{I18n.t('yes')}</ScreenReaderContent>
             </span>
           ) : (

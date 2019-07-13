@@ -26,6 +26,7 @@ import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
+import {SVGIcon} from '@instructure/ui-svg-images'
 import {
   IconDragHandleLine,
   IconAssignmentLine,
@@ -35,8 +36,16 @@ import {
   IconAnnouncementLine,
   IconPublishSolid,
   IconUnpublishedSolid,
-  IconQuestionLine
+  IconDocumentLine
 } from '@instructure/ui-icons'
+
+function IconBlank() {
+  return (
+    <SVGIcon name="IconBlank" viewBox="0 0 1920 1920">
+      <g role="presentation"></g>
+    </SVGIcon>
+  )
+}
 
 function getIcon(type) {
   switch(type) {
@@ -50,9 +59,12 @@ function getIcon(type) {
       return IconQuizLine
     case 'announcements':
       return IconAnnouncementLine
-    case 'wikiPages': // waiting on an answer from design
+    case 'wikiPages':
+      return IconDocumentLine
+    case 'navigation':
+      return IconBlank
     default:
-      return IconQuestionLine
+      return IconDocumentLine
   }
 }
 
@@ -94,6 +106,13 @@ export default function Link(props) {
     props.onClick(props.link);
   }
 
+  function handleLinkKey(e) {
+    // press the button on enter or space
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      handleLinkClick(e)
+    }
+  }
+
   function handleDragStart(e) {
     dragHtml(e, renderLinkHtml(props.link));
   }
@@ -123,29 +142,30 @@ export default function Link(props) {
         padding="x-small"
         aria-describedby={props.describedByID}
         onClick={handleLinkClick}
+        onKeyDown={handleLinkKey}
         elementRef={props.elementRef}
       >
         <div style={{pointerEvents: 'none'}}>
           <Flex>
             <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
-              {isHovering ? <IconDragHandleLine size="x-small"/> : null}
+              {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
             </Flex.Item>
-            <Flex.Item grow>
+            <Flex.Item grow shrink>
               <Flex>
                 <Flex.Item padding="0 x-small 0 0">
                   <Text color={color}>
-                    <Icon size="x-small"/>
+                    <Icon size="x-small" inline={false} />
                   </Text>
                 </Flex.Item>
-                <Flex.Item padding="0 x-small 0 0" grow textAlign="start">
+                <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
                   <View as="div" margin="0">{title}</View>
-                  {dateString ? (<View as="div" margin="xx-small 0 0 0">{dateString}</View>) : null}
+                  {dateString ? (<View as="div">{dateString}</View>) : null}
                 </Flex.Item>
                 {'published' in props.link && (
                   <Flex.Item>
                     <AccessibleContent alt={publishedMsg}>
                       <Text color={color}>
-                        {published ? <IconPublishSolid/> : <IconUnpublishedSolid/>}
+                        {published ? <IconPublishSolid inline={false}/> : <IconUnpublishedSolid inline={false} />}
                       </Text>
                     </AccessibleContent>
                   </Flex.Item>

@@ -39,7 +39,7 @@ module Lti::Ims
 
     it 'sets the Cache-control header' do
       get url
-      expect(response.headers['Cache-Control']).to eq 'max-age=864000'
+      expect(response.headers['Cache-Control']).to include 'max-age=864000'
     end
 
     it 'returns well-formed public key jwks' do

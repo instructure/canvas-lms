@@ -56,7 +56,7 @@ function getTrayLabel({contentType, contentSubtype}) {
 const thePanels = {
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
-  documents: React.lazy(() => import('./FakeComponent')),
+  documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
   media: React.lazy(() => import('./FakeComponent'))
 }
 /**
@@ -87,6 +87,8 @@ const FILTER_SETTINGS_BY_PLUGIN = {
  */
 export default function CanvasContentTray(props) {
   const [isOpen, setIsOpen] = useState(false)
+  const [openCount, setOpenCount] = useState(0)
+
 
   const [filterSettings, setFilterSettings] = useFilterSettings()
 
@@ -108,56 +110,62 @@ export default function CanvasContentTray(props) {
     }
   }, [props.bridge])
 
-  // called to close the tray
   function handleDismissTray() {
     setIsOpen(false)
   }
 
-  // called after the tray is closed
   function handleCloseTray() {
-    props.bridge.getEditor().mceInstance().focus(false)
+    props.bridge.focusActiveEditor(false)
+    setOpenCount(openCount + 1)
+  }
+
+  function renderLoading() {
+    return formatMessage('Loading')
   }
 
   return (
-    <Tray
-      label={getTrayLabel(filterSettings)}
-      open={isOpen}
-      placement="end"
-      shouldReturnFocus={false}
-      size="regular"
-      onDismiss={handleDismissTray}
-      onClose={handleCloseTray}
-    >
-      <Flex direction="column" display="block" height="100vh" overflowY="hidden">
-        <Flex.Item padding="medium" shadow="above">
-          <Flex margin="none none medium none">
-            <Flex.Item>
-              <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
-                {formatMessage('Close')}
-              </CloseButton>
+    <StoreProvider {...props} key={openCount}>
+      {contentProps => (
+        <Tray
+          data-testid="CanvasContentTray"
+          label={getTrayLabel(filterSettings)}
+          open={isOpen}
+          placement="end"
+          size="regular"
+          shouldContainFocus
+          shouldReturnFocus={false}
+          shouldCloseOnDocumentClick={false}
+          onDismiss={handleDismissTray}
+          onClose={handleCloseTray}
+        >
+          <Flex direction="column" display="block" height="100vh" overflowY="hidden">
+            <Flex.Item padding="medium" shadow="above">
+              <Flex margin="none none medium none">
+                <Flex.Item>
+                  <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
+                    {formatMessage('Close')}
+                  </CloseButton>
+                </Flex.Item>
+
+                <Flex.Item grow shrink>
+                  <Heading level="h2" margin="none none none medium">{formatMessage('Add')}</Heading>
+                </Flex.Item>
+              </Flex>
+
+              <Filter {...filterSettings} onChange={setFilterSettings} />
             </Flex.Item>
 
-            <Flex.Item grow shrink>
-              <Heading level="h2" margin="none none none medium">{formatMessage('Add')}</Heading>
+            <Flex.Item grow shrink margin="xx-small 0 0 0">
+              <ErrorBoundary>
+                    <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
+                      {renderContentComponent(filterSettings, contentProps)}
+                    </Suspense>
+              </ErrorBoundary>
             </Flex.Item>
           </Flex>
-
-          <Filter {...filterSettings} onChange={setFilterSettings} />
-        </Flex.Item>
-
-        <Flex.Item grow shrink>
-          <ErrorBoundary>
-            <StoreProvider {...props}>
-              {contentProps => (
-                <Suspense fallback={<Spinner renderTitle={() => formatMessage('Loading')} size="large" />}>
-                  {renderContentComponent(filterSettings, contentProps)}
-                </Suspense>
-              )}
-            </StoreProvider>
-          </ErrorBoundary>
-        </Flex.Item>
-      </Flex>
-    </Tray>
+        </Tray>
+      )}
+    </StoreProvider>
   )
 }
 

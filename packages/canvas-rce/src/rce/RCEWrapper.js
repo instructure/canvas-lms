@@ -33,10 +33,14 @@ import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar';
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
+import {isImage} from './plugins/shared/fileTypeUtils'
+import KeyboardShortcutModal from './KeyboardShortcutModal'
+
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
-const {template} = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
+const skinCSS = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css').template().replace(/tinymce__oxide--/g, "")
+const contentCSS = require('../../node_modules/tinymce/skins/ui/oxide/content.css').template().replace(/tinymce__oxide--/g, "")
 
 // If we ever get our jest tests configured so they can handle importing real esModules,
 // we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
@@ -57,7 +61,7 @@ function injectTinySkin() {
   style.setAttribute('data-skin', 'tiny oxide skin')
   style.appendChild(
     // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
-    document.createTextNode(template().replace(/tinymce__oxide--/g, ""))
+    document.createTextNode(skinCSS)
   );
   const beforeMe =
     document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
@@ -153,7 +157,8 @@ class RCEWrapper extends React.Component {
     this.state = {
       path: [],
       wordCount: 0,
-      isHtmlView: false
+      isHtmlView: false,
+      KBShortcutModalOpen: false
     }
   }
 
@@ -229,14 +234,22 @@ class RCEWrapper extends React.Component {
   }
 
   insertImagePlaceholder(fileMetaProps) {
-    const image = new Image();
-    image.src = fileMetaProps.domObject.preview
+    let width, height;
+    if (isImage(fileMetaProps.contentType)) {
+      const image = new Image();
+      image.src = fileMetaProps.domObject.preview
+      width = `${image.width}px`
+      height = `${image.height}px`
+    } else {
+      width = `${fileMetaProps.name.length}rem`
+      height = '1rem'
+    }
     const markup = `
     <img
       alt="${formatMessage('Loading...')}"
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="${fileMetaProps.name}"
-      style="width: ${image.width}px; height: ${image.height}px; border: solid 1px #8B969E;"
+      style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
     />`;
 
     this.insertCode(markup);
@@ -379,6 +392,18 @@ class RCEWrapper extends React.Component {
     if (tinyapp) {
       tinyapp.setAttribute('aria-label', formatMessage("Rich Content Editor"))
     }
+    // Probably should do this in tinymce.scss, but we only want it in new rce
+    this.getTextarea().style.resize = 'none'
+    editor.on('KeyDown', this.handleShortcutKeyShortcut) // keyUp puts the char in the editor
+
+    editor.on('Change', this.doAutoResize)
+  }
+
+  doAutoResize = (e) => {
+    const contentElm = this.iframe.contentDocument.documentElement
+    if (contentElm.scrollHeight > contentElm.clientHeight) {
+      this.onResize(e, {deltaY: contentElm.scrollHeight - contentElm.clientHeight})
+    }
   }
 
   onWordCountUpdate = e => {
@@ -403,15 +428,57 @@ class RCEWrapper extends React.Component {
     this.setState({path})
   }
 
+  onResize = (_e, coordinates) => {
+    const container = this.mceInstance().getContainer()
+    const currentContainerHeight = Number.parseInt(container.style.height, 10)
+    if (isNaN(currentContainerHeight)) return
+    const modifiedHeight = currentContainerHeight + coordinates.deltaY
+    const newHeight = `${modifiedHeight}px`
+    container.style.height = newHeight
+    this.getTextarea().style.height = newHeight
+    // play nice and send the same event that the silver theme would send
+    this.mceInstance().fire('ResizeEditor')
+  }
+
+  onA11yChecker = () => {
+    this.onTinyMCEInstance('openAccessibilityChecker')
+  }
+
+  handleShortcutKeyShortcut = (event) => {
+    if (event.altKey && (event.keyCode === 48 || event.keyCode === 119)) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.openKBShortcutModal()
+    }
+  }
+
+  openKBShortcutModal = () => {
+    this.setState({KBShortcutModalOpen: true})
+  }
+
+  closeKBShortcutModal = () => {
+    this.setState({KBShortcutModalOpen: false})
+  }
+
+  KBShortcutModalClosed = () => {
+    if(Bridge.activeEditor() === this) {
+      this.onTinyMCEInstance('mceFocus')
+    }
+  }
+
   componentWillUnmount() {
     if (!this._destroyCalled) {
       this.destroy();
     }
+    this._elementRef.removeEventListener('keyup', this.handleShortcutKeyShortcut, true)
   }
 
   wrapOptions(options = {}) {
     const setupCallback = options.setup;
-
+    options.toolbar = options.toolbar || []
+    const lti_tool_dropdown = options.toolbar.some(str => str.includes('lti_tool_dropdown')) ?
+      'lti_tool_dropdown' :
+      ''
     return {
       ...options,
 
@@ -426,23 +493,33 @@ class RCEWrapper extends React.Component {
       setup: editor => {
         addKebabIcon(editor)
         editorWrappers.set(editor, this);
-        Bridge.trayProps.set(editor, this.props.trayProps)
+        const trayPropsWithColor = {brandColor: this.theme.canvasBrandColor, ...this.props.trayProps}
+        Bridge.trayProps.set(editor, trayPropsWithColor)
         if (typeof setupCallback === "function") {
           setupCallback(editor);
         }
       },
 
+      // Consumers can, and should!, still pass a content_css prop so that the content
+      // in the editor matches the styles of the app it will be displayed in when saved.
+      // This is just so we inject the helper class names that tinyMCE uses for
+      // things like table resizing and stuff.
+      content_style: contentCSS,
+
       toolbar: [
         'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
-        'subscript | align bullist outdent indent | ' +
-        'instructure_links instructure_image instructure_record | ' +
-        'removeformat table instructure_equation' // instructure_equella'
+        'subscript | align bullist outdent indent directionality | ' +
+        'instructure_links instructure_image instructure_record instructure_documents | ' +
+        `removeformat table instructure_equation ${lti_tool_dropdown}` // instructure_equella
       ],
       contextmenu: '',  // show the browser's native context menu
 
       toolbar_drawer: 'floating',
-      target_list: false, // don't show the target list when creating/editing links
-      link_title: false   // don't show the title input when creating/editing links
+
+      // tiny's external link create/edit dialog config
+      target_list: false,  // don't show the target list when creating/editing links
+      link_title: false,   // don't show the title input when creating/editing links
+      default_link_target: '_blank'
     }
   }
 
@@ -472,6 +549,7 @@ class RCEWrapper extends React.Component {
 
   componentDidMount() {
     this.registerTextareaChange();
+    this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -487,6 +565,7 @@ class RCEWrapper extends React.Component {
         this.getTextarea().setAttribute('aria-hidden', true);
         this.mceInstance().show()
         this.mceInstance().focus()
+        this.doAutoResize()
       }
     }
   }
@@ -498,15 +577,14 @@ class RCEWrapper extends React.Component {
     return (
       <div ref={el => this._elementRef = el} className={styles.root}>
         <ShowOnFocusButton
-          buttonRef={ref => this.loadPriorButton = ref}
           buttonProps={{
             variant: 'link',
-            onClick: () => {alert('thataway')},
+            onClick: this.openKBShortcutModal,
             icon: IconKeyboardShortcutsLine,
             margin: 'xx-small'
           }}
-          >
-            {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
+        >
+          {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
         </ShowOnFocusButton>
         <Editor
           id={mceProps.textareaId}
@@ -527,11 +605,20 @@ class RCEWrapper extends React.Component {
           path={this.state.path}
           wordCount={this.state.wordCount}
           isHtmlView={this.state.isHtmlView}
+          onResize={this.onResize}
+          onKBShortcutModalOpen={this.openKBShortcutModal}
+          onA11yChecker={this.onA11yChecker}
         />
         <CanvasContentTray bridge={Bridge} {...trayProps} />
+        <KeyboardShortcutModal
+          onClose={this.KBShortcutModalClosed}
+          onDismiss={this.closeKBShortcutModal}
+          open={this.state.KBShortcutModalOpen}
+        />
       </div>
     );
   }
 }
 
 export default RCEWrapper
+

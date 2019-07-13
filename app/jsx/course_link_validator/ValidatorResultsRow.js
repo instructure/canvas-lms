@@ -21,6 +21,7 @@ import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import IconSettings from '@instructure/ui-icons/lib/Line/IconSettings'
 import IconSyllabus from '@instructure/ui-icons/lib/Line/IconSyllabus'
@@ -129,7 +130,13 @@ export default function ValidatorResultsRow(props) {
         </FlexItem>
         <FlexItem margin="none none none small">
           <Heading level="h3" as="h2">
-            <Link href={props.result.content_url}>{props.result.name}</Link>
+            <Button
+              variant="link"
+              href={props.result.content_url}
+              theme={{mediumPadding: '0', mediumHeight: '1.25rem'}}
+            >
+              {props.result.name}
+            </Button>
           </Heading>
           <Text size="x-small" transform="uppercase" lineHeight="condensed" letterSpacing="expanded">{label}</Text>
         </FlexItem>

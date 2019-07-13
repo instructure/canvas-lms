@@ -16,34 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionHistoryEdgeType < GraphQL::Types::Relay::BaseEdge
-  node_type(Types::SubmissionHistoryType)
-
-  def node
-    # Submission models or version ids for submission models can be handled here.
-    if object.node.is_a? Integer
-      Loaders::IDLoader.for(Version).load(object.node).then(&:model)
-    else
-      object.node
-    end
-  end
-end
-
-class SubmissionHistoryConnection < GraphQL::Types::Relay::BaseConnection
-  edge_type(SubmissionHistoryEdgeType)
-
-  def nodes
-    # Submission models or version ids for submission models can be handled here.
-    node_values = super
-    version_ids, submissions = node_values.partition { |n| n.is_a? Integer }
-    Loaders::IDLoader.for(Version).load_many(version_ids).then do |versions|
-      versions.map(&:model) + submissions
-    end
-  end
-end
-
-
 module Types
+  class SubmissionHistoryFilterInputType < Types::BaseInputObject
+    graphql_name 'SubmissionHistoryFilterInput'
+
+    argument :states, [SubmissionStateType], required: false,
+      default_value: DEFAULT_SUBMISSION_HISTORY_STATES
+
+    argument :include_current_submission, Boolean, <<~DESC, required: false, default_value: true
+      If the most current submission should be included in the submission
+      history results. Defaults to true.
+    DESC
+  end
+
   class SubmissionType < ApplicationObjectType
     graphql_name 'Submission'
 
@@ -54,45 +39,25 @@ module Types
     field :_id, ID, 'legacy canvas id', method: :id, null: false
     global_id_field :id
 
-    field :attachments, [Types::FileType], null: true
-    def attachments
-      load_association(:attachment_associations).then do |associations|
-        Loaders::IDLoader.for(Attachment).load_many(associations.map(&:attachment_id))
-      end
+    # NOTE: In most cases you shouldn't add new fields here, instead they should
+    #       be added to interfaces/submission_interface.rb so that they work for
+    #       both submissions and submission histories
+
+    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
+      argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
+    def submission_histories_connection(filter:)
+      filter = filter.to_h
+      states, include_current_submission = filter.values_at(:states, :include_current_submission)
 
-    field :submission_draft, Types::SubmissionDraftType, null: true
-    def submission_draft
-      load_association(:submission_drafts).then do |drafts|
-        # Submission.attempt can be in either 0 or nil which mean the same thing
-        drafts.select { |draft| draft.submission_attempt == (object.attempt || 0) }.first
+      Promise.all([
+        load_association(:versions),
+        load_association(:assignment)
+      ]).then do
+        histories = object.submission_history
+        histories.pop unless include_current_submission
+        histories.select{ |h| states.include?(h.workflow_state) }
       end
-    end
-
-    field :submission_histories_connection, SubmissionHistoryConnection, null: true, connection: true
-    def submission_histories_connection
-      # There is not a version saved for submission attempt zero, so we fake it
-      # here. If there are no versions, we are still on attempt zero and can use
-      # the current submission, otherwise we fudge it with a model that is not
-      # actually persisted to the database.
-      submission_zero = if object.version_ids.empty?
-        object
-      else
-        Submission.new(
-          id: object.id,
-          assignment_id: object.assignment_id,
-          user_id: object.user_id,
-          submission_type: object.submission_type,
-          workflow_state: 'unsubmitted',
-          created_at: object.created_at,
-          updated_at: object.created_at, # Don't use the current updated_at time
-          group_id: object.group_id,
-          attempt: 0,
-          context_code: object.context_code
-        )
-      end
-
-      object.version_ids + [submission_zero]
     end
   end
 end

@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Gwiriwr Hygyrchedd"
+  },
   "add_8523c19b": {
     "message": "Ychwanegu"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "Yn nhrefn yr wyddor"
   },
+  "alt_text_611fb322": {
+    "message": "Testun Amgen"
+  },
   "alternative_text_a834dcad": {
     "message": "Testun amgen:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Mae delwedd wrthi''n cael ei llwytho i fyny, os byddwch chi''n parhau ni fydd y ddelwedd yn cael ei phlannu''n gywir."
   },
   "announcement_list_da155734": {
     "message": "Rhestr Cyhoeddiadau"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "rhestr cylchoedd sydd ddim mewn trefn "
   },
-  "clear_upload_34efa419": {
-    "message": "Clirio Llwytho i fyny"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Cliciwch unrhyw ffeil i fewnosod dolen llwytho i lawr ar gyfer y ffeil honno."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Perchennog yr Hawlfraint:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 gair}\n    one {1 gair}\n  other {# gair}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# eitem wedi''i lwytho}\n  other {# eitem wedi''i lwytho}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Dogfennau Cwrs"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Trwydded Creative Commons:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Lefel Sain Bresennol"
+  },
+  "custom_6979cd81": {
+    "message": "Personol"
   },
   "date_added_ed5ad465": {
     "message": "Dyddiad Ychwanegu"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "rhestr ddiofyn o rifau sydd mewn trefn"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Disgrifio''r ddelwedd)"
+  },
   "discussions_a5f96392": {
     "message": "Trafodaeth"
   },
   "discussions_index_6c36ced": {
     "message": "Mynegai Trafodaethau"
   },
+  "display_options_315aba85": {
+    "message": "Dangos Opsiynau"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Dangos Dolen Testun (Yn agor mewn tab newydd)"
+  },
   "documents_81393201": {
     "message": "Dogfennau"
+  },
+  "done_54e3d4b6": {
+    "message": "Wedi gorffen"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Gallwch lusgo a gollwng, neu glicio i bori drwy’ch cyfrifiadur"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Erbyn: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Golygu Dolen"
+  },
+  "embed_image_1080badc": {
+    "message": "Plannu Delwedd"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "rhowch y termau chwilio"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Rhowch y testun amgen ar gyfer y ddelwedd hon"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Gwall wrth lwytho fideo/recordiad sain i fyny"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Ehangu i weld { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Dolenni Allanol"
   },
+  "file_name_8fd421ff": {
+    "message": "Enw’r Ffeil"
+  },
   "file_upload_form_4aaad554": {
     "message": "Ffurflen llwytho ffeiliau i fyny"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } - rhagolwg"
   },
   "files_c300e900": {
     "message": "Ffeiliau"
   },
   "files_index_af7c662b": {
     "message": "Mynegai Ffeiliau"
+  },
+  "finish_bc343002": {
+    "message": "Gorffen"
   },
   "folder_705fd2d7": {
     "message": "Ffolder"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Os na fyddwch chi’n dewis hawliau defnyddio yn awr, bydd y ffeil hon yn cael ei dad-gyhoeddi ar ôl iddi gael ei llwytho i fyny."
   },
+  "image_options_5412d02c": {
+    "message": "Opsiynau Delwedd"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Ardal Opsiynau Delwedd"
+  },
   "image_upload_form_7b74079a": {
     "message": "Ffurflen llwytho delweddau i fyny"
-  },
-  "image_url_2aee2734": {
-    "message": "URL Delwedd"
   },
   "images_7ce26570": {
     "message": "Delweddau"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Math o ffeil annilys"
   },
+  "large_9c5e80e7": {
+    "message": "Mawr"
+  },
   "link_7262adec": {
     "message": "Dolen"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Dolenni"
+  },
+  "load_more_35d33c7": {
+    "message": "Llwytho Mwy"
   },
   "load_more_results_460f49a9": {
     "message": "Llwytho mwy o ganlyniadau"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "Wrthi’n llwytho ffolderi..."
   },
+  "loading_media_f3455841": {
+    "message": "Llwytho cyfryngau"
+  },
   "media_af190855": {
     "message": "Cyfryngau"
+  },
+  "medium_5a8e9ead": {
+    "message": "Cyfrwng"
+  },
+  "mic_a7f3d311": {
+    "message": "Meicroffon"
   },
   "modules_c4325335": {
     "message": "Modiwlau"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Dim Testun Amgen (Delwedd Addurniadol)"
+  },
   "no_results_940393cf": {
     "message": "Dim canlyniadau."
+  },
+  "no_video_1ed00b26": {
+    "message": "Dim Fideo"
   },
   "options_3ab0ea65": {
     "message": "Opsiynau"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Paragraff"
   },
+  "pause_12af3bb4": {
+    "message": "Rhewi"
+  },
   "people_b4ebb13c": {
     "message": "Pobl"
+  },
+  "play_1a47eaa7": {
+    "message": "Chwarae"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Gadewch i Canvas gael mynediad at eich microffon a gwe-gamera."
   },
   "posted_when_a578f5ab": {
     "message": "Wedi postio: { when }"
   },
   "preformatted_d0670862": {
     "message": "Wedi''i fformatio’n barod"
+  },
+  "preview_a3f8f854": {
+    "message": "RHAGOLWG"
   },
   "published_c944a23d": {
     "message": "wedi cyhoeddi"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Cwisiau"
   },
+  "record_7c9448b": {
+    "message": "Recordio"
+  },
   "record_upload_media_5fdce166": {
     "message": "Recordio Cyfryngau/Llwytho Cyfryngau i Fyny"
+  },
+  "recording_98da6bda": {
+    "message": "Recordiad"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Tynnu Dolen"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Golygydd Cynnwys Cyfoethog"
+  },
+  "save_11a80ec3": {
+    "message": "Cadw"
   },
   "search_280d00bd": {
     "message": "Chwilio"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Dangos opsiynau delwedd"
   },
+  "size_b30e1077": {
+    "message": "Maint"
+  },
+  "small_b070434a": {
+    "message": "Bach"
+  },
   "small_header_168fb9f9": {
     "message": "Pennawd bach"
   },
   "something_went_wrong_89195131": {
     "message": "Aeth rhywbeth o’i le."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Aeth rhywbeth o’i le wrth gael mynediad at eich meicroffon neu we-gamera."
+  },
   "sort_by_e75f9e3e": {
     "message": "Trefnu yn ôl"
   },
   "square_unordered_list_b15ce93b": {
     "message": "rhestr sgwariau sydd ddim mewn trefn"
+  },
+  "start_over_f7552aa9": {
+    "message": "Dechrau eto"
+  },
+  "start_recording_9a65141a": {
+    "message": "Dechrau’r Recordiad"
   },
   "subheader_2b87606d": {
     "message": "Isbennawd"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Uwchysgrif"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Newid i olygydd html crai"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Newid i olygydd testun cyfoethog"
   },
   "syllabus_f191f65b": {
     "message": "Maes Llafur"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "heb gyhoeddi"
   },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
+  "untitled_16aa4f2b": {
+    "message": "Dideitl"
   },
   "upload_8b403d05": {
     "message": "Llwytho i fyny"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Llwytho Delwedd i Fyny"
   },
+  "upload_media_ce31135a": {
+    "message": "Llwytho Cyfryngau i fyny"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Llwytho i Fyny/Recordio Cyfryngau"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "rhestr mewn trefn, mewn priflythrennau, yn nhrefn yr wyddor"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Hawl Defnyddio:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Yn cael ei ddefnyddio gan ddarllenwyr sgrin i ddisgrifio cynnwys delwedd"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Wedi llwytho fideo/recordiad sain i fyny"
+  },
+  "video_player_b371005": {
+    "message": "Chwaraewr Fideo"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Gweld bysellau hwylus"
+  },
+  "webcam_fe91b20f": {
+    "message": "Gwe-gamera"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Beth hoffech chi alw’r dudalen newydd?"
   },
   "wiki_home_9cd54d0": {
     "message": "Hafan Wici"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Efallai bod eich gwe-gamera yn cael ei ddefnyddio’n barod."
   }
 }

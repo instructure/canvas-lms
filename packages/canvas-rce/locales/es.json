@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Verificador de accesibilidad"
+  },
   "add_8523c19b": {
     "message": "Agregar"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "Alfabético"
   },
+  "alt_text_611fb322": {
+    "message": "Texto alternativo"
+  },
   "alternative_text_a834dcad": {
     "message": "Texto alternativo:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Todavía se está cargando una imagen; si continúa, la imagen no se incorporará correctamente."
   },
   "announcement_list_da155734": {
     "message": "Lista de Anuncios"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "marque con un círculo la lista no ordenada"
   },
-  "clear_upload_34efa419": {
-    "message": "Despejar carga"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Hacer clic en cualquier archivo para insertar un enlace descargado para ese archivo."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Titular de los derechos de autor:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 palabras}\n    one {1 palabra}\n  other {# palabras}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# elemento cargado}\n  other {# elementos cargados}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Documentos del curso"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Nivel de volumen actual"
+  },
+  "custom_6979cd81": {
+    "message": "Personalizar"
   },
   "date_added_ed5ad465": {
     "message": "Fecha de agregado"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "lista numérica ordenada predeterminada"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Describir la imagen)"
+  },
   "discussions_a5f96392": {
     "message": "Foros"
   },
   "discussions_index_6c36ced": {
     "message": "Índice de Foros"
   },
+  "display_options_315aba85": {
+    "message": "Mostrar opciones"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Mostrar enlace de texto (se abre en una nueva pestaña)"
+  },
   "documents_81393201": {
     "message": "Documentos"
+  },
+  "done_54e3d4b6": {
+    "message": "Listo"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Arrastre y suelte, o haga clic para buscar en su computadora"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Fecha límite: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Editar enlace"
+  },
+  "embed_image_1080badc": {
+    "message": "Incorporar imagen"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "ingresar los términos de búsqueda"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Ingrese el texto alternativo para esta imagen"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Error al cargar grabación de video/audio"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Expandir para ver { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Enlaces externos"
   },
+  "file_name_8fd421ff": {
+    "message": "Nombre del archivo"
+  },
   "file_upload_form_4aaad554": {
     "message": "Formulario Cargar archivos"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "Vista previa de { filename }"
   },
   "files_c300e900": {
     "message": "Archivos"
   },
   "files_index_af7c662b": {
     "message": "Índice de Archivos"
+  },
+  "finish_bc343002": {
+    "message": "Terminar"
   },
   "folder_705fd2d7": {
     "message": "Carpeta"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Si no selecciona los derechos de uso en este momento, se cancelará la publicación de este archivo después de cargarlo."
   },
+  "image_options_5412d02c": {
+    "message": "Opciones de imagen"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Bandeja de opciones de imagen"
+  },
   "image_upload_form_7b74079a": {
     "message": "Formulario Cargar imágenes"
-  },
-  "image_url_2aee2734": {
-    "message": "URL de la imagen"
   },
   "images_7ce26570": {
     "message": "Imagenes"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Tipo de archivo inválido"
   },
+  "large_9c5e80e7": {
+    "message": "Grande"
+  },
   "link_7262adec": {
     "message": "Enlace"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Enlaces"
+  },
+  "load_more_35d33c7": {
+    "message": "Cargar más"
   },
   "load_more_results_460f49a9": {
     "message": "Cargar más resultados"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "CarCargando carpetas..."
   },
+  "loading_media_f3455841": {
+    "message": "Cargando archivo de medios"
+  },
   "media_af190855": {
     "message": "Contenido de medios"
+  },
+  "medium_5a8e9ead": {
+    "message": "Regular"
+  },
+  "mic_a7f3d311": {
+    "message": "Micrófono"
   },
   "modules_c4325335": {
     "message": "Módulos"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "No hay texto alternativo (imagen decorativa)"
+  },
   "no_results_940393cf": {
     "message": "No hay resultados."
+  },
+  "no_video_1ed00b26": {
+    "message": "No hay video"
   },
   "options_3ab0ea65": {
     "message": "Opciones"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Párrafo"
   },
+  "pause_12af3bb4": {
+    "message": "Pausar"
+  },
   "people_b4ebb13c": {
     "message": "Personas"
+  },
+  "play_1a47eaa7": {
+    "message": "Reproducir"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Permita que Canvas acceda a su micrófono y cámara web."
   },
   "posted_when_a578f5ab": {
     "message": "Publicado: { when }"
   },
   "preformatted_d0670862": {
     "message": "Previamente formateado"
+  },
+  "preview_a3f8f854": {
+    "message": "VISTA PREVIA"
   },
   "published_c944a23d": {
     "message": "publicado"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Evaluaciones"
   },
+  "record_7c9448b": {
+    "message": "Grabar"
+  },
   "record_upload_media_5fdce166": {
     "message": "Grabar/cargar medios"
+  },
+  "recording_98da6bda": {
+    "message": "Grabación"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Eliminar enlace"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Editor de contenido enriquecido"
+  },
+  "save_11a80ec3": {
+    "message": "Guardar"
   },
   "search_280d00bd": {
     "message": "Buscar"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Mostrar opciones de imágenes"
   },
+  "size_b30e1077": {
+    "message": "Tamaño"
+  },
+  "small_b070434a": {
+    "message": "Pequeño"
+  },
   "small_header_168fb9f9": {
     "message": "Encabezado pequeño"
   },
   "something_went_wrong_89195131": {
     "message": "Algo salió mal."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Algo salió mal al acceder al micrófono o cámara web."
+  },
   "sort_by_e75f9e3e": {
     "message": "Organizar según"
   },
   "square_unordered_list_b15ce93b": {
     "message": "lista cuadrada no ordenada"
+  },
+  "start_over_f7552aa9": {
+    "message": "Volver a empezar"
+  },
+  "start_recording_9a65141a": {
+    "message": "Comenzar grabación"
   },
   "subheader_2b87606d": {
     "message": "Subencabezado"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Superíndice"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Cambiar a editor de html sin procesar"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Cambiar a editor de texto enriquecido"
   },
   "syllabus_f191f65b": {
     "message": "Programa"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "no publicado"
   },
-  "unsplash_ee049fbf": {
-    "message": "No distribuir"
+  "untitled_16aa4f2b": {
+    "message": "Sin título"
   },
   "upload_8b403d05": {
     "message": "Cargar"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Cargar imagen"
   },
+  "upload_media_ce31135a": {
+    "message": "Cargar archivo de medios"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Cargar/grabar archivo de medios"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "lista ordenada alfabéticamente en mayúsculas"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Derecho de uso:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Utilizado por los lectores de pantalla para describir el contenido de una imagen"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Grabación de video/audio cargada"
+  },
+  "video_player_b371005": {
+    "message": "Reproductor de video"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Ver los accesos directos de teclado"
+  },
+  "webcam_fe91b20f": {
+    "message": "Cámara web"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "¿Cómo le gustaría llamar a la página nueva?"
   },
   "wiki_home_9cd54d0": {
     "message": "Página de Inicio de Wiki"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Es posible que su cámara web ya esté en uso."
   }
 }

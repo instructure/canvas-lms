@@ -89,23 +89,136 @@ QUnit.module('PostPolicyApi', () => {
         courseId: VALID_COURSE_ID,
         postManually: true
       })
-      deepEqual(result, {postManually: true})
+      strictEqual(result.postManually, true)
     })
 
     test('returns the first error if the response includes errors', async () => {
-      const result = await PostPolicyApi.setCoursePostPolicy({
+      PostPolicyApi.setCoursePostPolicy({
         courseId: ERROR_COURSE_ID,
         postManually: true
+      }).catch(error => {
+        strictEqual(error.message, 'oh no')
       })
-      deepEqual(result, {error: 'oh no'})
     })
 
     test('returns an error if the response provides neither a postPolicy object nor an error', async () => {
-      const result = await PostPolicyApi.setCoursePostPolicy({
+      PostPolicyApi.setCoursePostPolicy({
         courseId: BAD_RESPONSE_COURSE_ID,
         postManually: true
+      }).catch(error => {
+        strictEqual(error.message, 'no postPolicy or error provided in response')
       })
-      deepEqual(result, {error: 'no postPolicy or error provided in response'})
+    })
+  })
+
+  QUnit.module('.getAssignmentPostPolicies()', hooks => {
+    const VALID_COURSE_ID = 11
+    const NULL_ASSIGNMENT_POLICY_COURSE_ID = 12
+    const NO_COURSE_IN_RESPONSE_COURSE_ID = -7
+
+    hooks.beforeEach(() => {
+      MockCanvasClient.install([
+        {
+          request: {
+            query: PostPolicyApi.COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
+            variables: {courseId: VALID_COURSE_ID}
+          },
+
+          result: {
+            data: {
+              course: {
+                __typename: 'Course',
+                assignmentsConnection: {
+                  __typename: 'AssignmentsConnection',
+                  nodes: [
+                    {
+                      __typename: 'Assignment',
+                      _id: '1234',
+                      postPolicy: {
+                        __typename: 'PostPolicy',
+                        postManually: true
+                      }
+                    },
+                    {
+                      __typename: 'Assignment',
+                      _id: '4567',
+                      postPolicy: {
+                        __typename: 'PostPolicy',
+                        postManually: false
+                      }
+                    }
+                  ]
+                },
+                errors: []
+              }
+            }
+          }
+        },
+        {
+          request: {
+            query: PostPolicyApi.COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
+            variables: {courseId: NULL_ASSIGNMENT_POLICY_COURSE_ID}
+          },
+
+          result: {
+            data: {
+              course: {
+                __typename: 'Course',
+                assignmentsConnection: {
+                  __typename: 'AssignmentsConnection',
+                  nodes: [
+                    {
+                      __typename: 'Assignment',
+                      _id: '1234',
+                      postPolicy: null
+                    }
+                  ]
+                },
+                errors: []
+              }
+            }
+          }
+        },
+        {
+          request: {
+            query: PostPolicyApi.COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
+            variables: {courseId: NO_COURSE_IN_RESPONSE_COURSE_ID}
+          },
+
+          result: {
+            data: {
+              course: null
+            }
+          }
+        }
+      ])
+    })
+
+    hooks.afterEach(() => {
+      MockCanvasClient.uninstall()
+    })
+
+    test('returns a hash of post policies by assignment ID', async () => {
+      const result = await PostPolicyApi.getAssignmentPostPolicies({courseId: VALID_COURSE_ID})
+      deepEqual(result.assignmentPostPoliciesById, {
+        1234: {postManually: true},
+        4567: {postManually: false}
+      })
+    })
+
+    test('returns an error if no course object is found in the response', async () => {
+      PostPolicyApi.getAssignmentPostPolicies({
+        courseId: NO_COURSE_IN_RESPONSE_COURSE_ID
+      }).catch(error => {
+        strictEqual(error.message, 'no course provided in response')
+      })
+    })
+
+    test('omits assignments returned with a null post policy from the results', async () => {
+      const result = await PostPolicyApi.getAssignmentPostPolicies({
+        courseId: NULL_ASSIGNMENT_POLICY_COURSE_ID
+      })
+      deepEqual(result.assignmentPostPoliciesById, {})
     })
   })
 })

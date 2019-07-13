@@ -18,13 +18,11 @@
 
 import React from 'react'
 import { object } from 'prop-types'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividualStudentMasteryUnassessedAssignment'
 import _ from 'lodash'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
 import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
 import { ListItem } from '@instructure/ui-elements/lib/components/List'
@@ -33,21 +31,19 @@ const UnassessedAssignment = ({ assignment }) => {
   const { id, url, submission_types, title } = assignment
   return (
     <ListItem key={id}>
-      <View padding="small">
-        <ApplyTheme theme={{[Link.theme]: {color: '#68777D'}}}>
-          <Link href={ url }>
-            <Flex alignItems="center">
-              <FlexItem padding="0 0 0 small">
-                <Text size="medium">{
-                  _.includes(submission_types, 'online_quiz') ?
-                    <IconQuiz /> : <IconAssignment/>}
-                </Text>
-              </FlexItem>
-              <FlexItem padding="0 x-small">
-                <Text weight="bold">{ title } ({ I18n.t('Not yet assessed') })</Text>
-              </FlexItem>
-            </Flex>
-          </Link>
+      <View padding="small" display="block">
+        <ApplyTheme theme={{[Button.theme]: {linkColor: '#68777D', fontWeight: '700'}}}>
+          <Button
+            href={url}
+            variant="link"
+            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+            icon={
+              _.includes(submission_types, 'online_quiz') ?
+              IconQuiz : IconAssignment
+            }
+          >
+            {title} ({ I18n.t('Not yet assessed') })
+          </Button>
         </ApplyTheme>
       </View>
     </ListItem>

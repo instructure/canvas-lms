@@ -20,35 +20,53 @@ require_relative '../../common'
 module HideGradesTray
   extend SeleniumDependencies
 
+  def self.tray
+    f('[role=dialog][aria-label="Hide grades tray"]')
+  end
+
   def self.full_content
-    fj("h3:contains('Hide Grades')")
+    fj("h3:contains('Hide Grades')", tray)
   end
 
   def self.hide_button
-    fj("button:contains('Hide')")
+    fj('button:contains("Hide")', tray)
   end
 
   def self.specific_sections_toggle
-    fj("label:contains('Specific Sections')")
+    fj("label:contains('Specific Sections')", tray)
   end
 
-  def self.section_checkbox(section_name)
-    fj("label:contains(#{section_name})")
+  def self.section_checkbox(section_name:)
+    fj("label:contains(#{section_name})", tray)
+  end
+
+  def self.spinner
+    fj("svg:contains('Hiding grades')", tray)
+  end
+
+  def self.select_sections(sections:)
+    return if sections.empty?
+    specific_sections_toggle.click
+    sections.each do |section|
+      section_checkbox(section_name: section.name).click
+    end
   end
 
   def self.select_section(section_name)
     specific_sections_toggle.click
-    section_checkbox(section_name).click
-  end
-
-  def self.spinner
-    fxpath("//div[@data-cid='Spinner']")
+    section_checkbox(section_name: section_name).click
   end
 
   def self.hide_grades
     hide_button.click
-    spinner
-    run_jobs
-    wait_for_no_such_element { PostGradesTray.spinner }
+    spinner # wait for spinner to appear
+    # rubocop:disable Specs/NoWaitForNoSuchElement
+    raise "spinner still spinning after waiting" unless wait_for_no_such_element timeout: 8 do
+      # there's a small chance the job hasn't been queued
+      # yet so keep looking for jobs just in case
+      run_jobs
+      spinner
+    end
+    # rubocop:enable Specs/NoWaitForNoSuchElement
   end
 end

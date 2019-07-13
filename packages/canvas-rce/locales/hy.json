@@ -119,6 +119,9 @@
   "folder_705fd2d7": {
     "message": "Թղթապանակ"
   },
+  "generating_preview_45b53be0": {
+    "message": "Կարծիքը գեներացվում է ..."
+  },
   "grades_a61eba0a": {
     "message": "Գնահատականներ"
   },
@@ -137,9 +140,6 @@
   "image_upload_form_7b74079a": {
     "message": "Image Upload Form"
   },
-  "image_url_2aee2734": {
-    "message": "Պատկերի URL-հասցեն"
-  },
   "images_7ce26570": {
     "message": "Պատկերներ"
   },
@@ -157,6 +157,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "Ֆայլի անընդունելի տեսակ"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Արագ հասանելիության ստեղներ"
   },
   "link_7262adec": {
     "message": "Հղում"

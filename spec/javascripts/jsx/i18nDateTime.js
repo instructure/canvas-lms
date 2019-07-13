@@ -151,6 +151,7 @@ locales.forEach((locale) => {
       dates.forEach((date) => {
         const formattedDate = $.datepicker.formatDate(config.dateFormat, date, config)
         const formattedTime = $.timeString(date)
+
         const formatted = `${formattedDate} ${formattedTime}`
         assertFormattedParsesToDate(formatted, date)
       })

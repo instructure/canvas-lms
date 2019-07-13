@@ -38,6 +38,7 @@ class DeveloperKey < ActiveRecord::Base
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_create :set_visible
+  before_create :infer_key_type
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
   before_save :set_require_scopes
@@ -46,7 +47,7 @@ class DeveloperKey < ActiveRecord::Base
   after_update :destroy_external_tools!, if: :destroy_external_tools?
   after_create :create_default_account_binding
 
-  validates_as_url :redirect_uri, :oidc_initiation_url, allowed_schemes: nil
+  validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil
   validate :validate_redirect_uris
   validate :validate_public_jwk
 
@@ -295,6 +296,10 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   private
+
+  def infer_key_type
+    self.is_lti_key = self.public_jwk.present? || self.public_jwk_url.present?
+  end
 
   def manage_external_tools(enqueue_args, method, affected_account)
     return if tool_configuration.blank?

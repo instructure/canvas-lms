@@ -36,7 +36,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
     end
 
     verify_authorized_action!(assignment, :grade)
-    raise GraphQL::ExecutionError, "Post Policies feature not enabled" unless course.feature_enabled?(:post_policies)
+    raise GraphQL::ExecutionError, "Post Policies feature not enabled" unless course.post_policies_enabled?
 
     unless assignment.grades_published?
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be hidden by section before grades are published"

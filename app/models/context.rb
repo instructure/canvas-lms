@@ -302,6 +302,19 @@ module Context
     end
   end
 
+  def self.get_account_or_parent_account(context)
+    case context
+    when Account
+      context.root_account? ? context : context.parent_account
+    when Course
+      get_account(context.account)
+    when CourseSection
+      get_account(context.course)
+    when Group
+      get_account(context.context)
+    end
+  end
+
   def is_a_context?
     true
   end

@@ -32,6 +32,7 @@ import {
   postAssignmentGradesForSections,
   resolvePostAssignmentGradesStatus
 } from './Api'
+import {isHidden} from '../helpers/SubmissionHelper'
 import {showFlashAlert} from '../../shared/FlashAlert'
 
 function initialShowState() {
@@ -91,7 +92,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
   }
 
   async onPostClick() {
-    const {assignment, selectedSectionIds} = this.state
+    const {assignment, containerName, selectedSectionIds} = this.state
     const options = {gradedOnly: this.state.postType === GRADED}
     let postRequest
     let successMessage
@@ -128,10 +129,13 @@ export default class PostAssignmentGradesTray extends PureComponent {
       const postedSubmissionInfo = await resolvePostAssignmentGradesStatus(progress)
       this.dismiss()
       this.state.onPosted(postedSubmissionInfo)
-      showFlashAlert({
-        message: successMessage,
-        type: 'success'
-      })
+
+      if (!assignment.anonymousGrading || containerName !== 'SPEED_GRADER') {
+        showFlashAlert({
+          message: successMessage,
+          type: 'success'
+        })
+      }
     } catch (error) {
       showFlashAlert({
         message: I18n.t('There was a problem posting assignment grades.'),
@@ -158,6 +162,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
   render() {
     const {
       assignment,
+      containerName,
       onExited,
       open,
       postBySections,
@@ -167,11 +172,12 @@ export default class PostAssignmentGradesTray extends PureComponent {
       selectedSectionIds,
       submissions
     } = this.state
-    const unpostedCount = submissions.filter(submission => submission.postedAt == null).length
 
     if (!assignment) {
       return null
     }
+
+    const unpostedCount = submissions.filter(submission => isHidden(submission)).length
 
     return (
       <Tray
@@ -197,6 +203,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
         <Layout
           assignment={assignment}
           dismiss={this.dismiss}
+          containerName={containerName}
           onPostClick={this.onPostClick}
           postBySections={postBySections}
           postBySectionsChanged={this.postBySectionsChanged}

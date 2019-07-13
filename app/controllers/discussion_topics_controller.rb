@@ -753,9 +753,9 @@ class DiscussionTopicsController < ApplicationController
             end
             js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-            js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
-              @domain_root_account.feature_enabled?(:student_context_cards) &&
-              @context.grants_right?(@current_user, session, :manage)
+            if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+              set_student_context_cards_js_env
+            end
 
             append_sis_data(js_hash)
             js_env(js_hash)

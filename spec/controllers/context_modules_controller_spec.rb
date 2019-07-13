@@ -599,6 +599,14 @@ describe ContextModulesController do
                     "requirements_met"=>[],
                     "incomplete_requirements"=>[]}}])
       end
+
+      it "should not error on public course" do
+        assignment = @course.assignments.create!(title: 'hello')
+        @mod1.add_item(type: 'assignment', id: assignment.id)
+        get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+        expect(response.code).to eql '200'
+      end
+
     end
 
     before :once do

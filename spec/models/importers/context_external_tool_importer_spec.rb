@@ -66,6 +66,11 @@ describe Importers::ContextExternalToolImporter do
     it 'sets the developer key id' do
       expect(subject.developer_key).to eq developer_key
     end
+
+    it 'does not show LTI 1 warnings' do
+      subject
+      expect(migration.warnings).to be_empty
+    end
   end
 
   context "combining imported external tools" do

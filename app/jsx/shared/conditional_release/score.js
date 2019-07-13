@@ -17,7 +17,7 @@
  */
 
 import GradingTypes from './grading-types'
-import I18n from 'i18n!cyoe_assignment_sidebar'
+import I18n from 'i18n!cyoe_assignment_sidebar_score'
 import numberHelper from '../helpers/numberHelper'
 
   // stack overflow suggests this implementation

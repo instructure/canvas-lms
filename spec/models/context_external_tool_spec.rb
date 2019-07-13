@@ -426,6 +426,12 @@ describe ContextExternalTool do
       expect(@found_tool).to eql(@tool)
     end
 
+    it "should match on a domain with a scheme attached" do
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/is/cool", Course.find(@course.id))
+      expect(@found_tool).to eql(@tool)
+    end
+
     it "should not match on non-matching domains" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool2 = @course.context_external_tools.create!(:name => "a", :domain => "www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -619,6 +625,34 @@ describe ContextExternalTool do
         c1 = @course
         preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
+      end
+    end
+
+    context 'when multiple ContextExternalTools have domain/url conflict' do
+      before do
+        ContextExternalTool.create!(
+          context: @course,
+          consumer_key: 'key1',
+          shared_secret: 'secret1',
+          name: 'test faked tool',
+          url: 'http://nothing',
+          domain: 'www.tool.com',
+          tool_id: 'faked'
+        )
+
+        ContextExternalTool.create!(
+          context: @course,
+          consumer_key: 'key2',
+          shared_secret: 'secret2',
+          name: 'test tool',
+          url: 'http://www.tool.com/launch',
+          tool_id: 'real'
+        )
+      end
+
+      it 'picks up url in higher priority' do
+        tool = ContextExternalTool.find_external_tool('http://www.tool.com/launch?p1=2082', Course.find(@course.id))
+        expect(tool.tool_id).to eq('real')
       end
     end
   end

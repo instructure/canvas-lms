@@ -125,6 +125,9 @@
   "folder_705fd2d7": {
     "message": "Klasör"
   },
+  "generating_preview_45b53be0": {
+    "message": "Oluşturma önizlemesi..."
+  },
   "grades_a61eba0a": {
     "message": "Notlar"
   },
@@ -143,9 +146,6 @@
   "image_upload_form_7b74079a": {
     "message": "Görsel Yükleme Formu"
   },
-  "image_url_2aee2734": {
-    "message": "Görsel URL''si"
-  },
   "images_7ce26570": {
     "message": "Görseller"
   },
@@ -163,6 +163,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "Geçersiz dosya türü"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Klavye Kısayolları"
   },
   "link_7262adec": {
     "message": "Bağlantı"

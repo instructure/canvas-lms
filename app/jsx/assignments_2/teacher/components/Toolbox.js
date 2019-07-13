@@ -23,31 +23,11 @@ import I18n from 'i18n!assignments_2'
 
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-
-import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
-import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-
 import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentPoints from './Editables/AssignmentPoints'
-
-// let's use these helpers from the gradebook so we're consistent
-import {
-  hasSubmitted,
-  hasSubmission
-} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
-
-function assignmentIsNew(assignment) {
-  return !assignment.lid
-}
-
-function assignmentIsPublished(assignment) {
-  return assignment.state === 'published'
-}
 
 export default class Toolbox extends React.Component {
   static propTypes = {
@@ -56,28 +36,17 @@ export default class Toolbox extends React.Component {
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
     onSetWorkstate: func.isRequired,
-    onUnsubmittedClick: func,
     onDelete: func,
     readOnly: bool
   }
 
   static defaultProps = {
-    onUnsubmittedClick: () => {},
     onDelete: () => {},
     readOnly: false
   }
 
   state = {
     pointsMode: 'view'
-  }
-
-  submissions() {
-    // TODO: We will need to exhaust the submissions pagination for this to work correctly
-    return this.props.assignment.submissions.nodes
-  }
-
-  countSubmissions(fn) {
-    return this.submissions().reduce((memo, submission) => memo + (fn(submission) ? 1 : 0), 0)
   }
 
   // TODO: publish => save all pending edits, including state
@@ -112,53 +81,6 @@ export default class Toolbox extends React.Component {
     )
   }
 
-  renderSpeedGraderLink() {
-    const assignmentLid = this.props.assignment.lid
-    const courseLid = this.props.assignment.course.lid
-    const speedgraderLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}`
-    return (
-      <Link href={speedgraderLink} icon={<IconSpeedGrader />} iconPlacement="end" target="_blank">
-        <Text transform="uppercase" size="small" color="primary">
-          {I18n.t('%{number} to grade', {number: this.props.assignment.needsGradingCount})}
-        </Text>
-      </Link>
-    )
-  }
-
-  renderUnsubmittedButton() {
-    const unsubmittedCount = this.countSubmissions(submission => !hasSubmitted(submission))
-    return this.renderMessageStudentsWhoButton(
-      I18n.t('%{number} unsubmitted', {number: unsubmittedCount})
-    )
-  }
-
-  renderMessageStudentsWhoButton(text) {
-    return (
-      <Link icon={<IconEmail />} iconPlacement="end" onClick={this.props.onUnsubmittedClick}>
-        <Text transform="uppercase" size="small" color="primary">
-          {text}
-        </Text>
-      </Link>
-    )
-  }
-
-  renderSubmissionStats() {
-    if (assignmentIsNew(this.props.assignment) || !assignmentIsPublished(this.props.assignment)) {
-      return null
-    }
-
-    return [
-      <FlexItem key="to grade" padding="xx-small xx-small xxx-small">
-        {this.renderSpeedGraderLink({})}
-      </FlexItem>,
-      <FlexItem key="message students" padding="xx-small xx-small xxx-small">
-        {hasSubmission(this.props.assignment)
-          ? this.renderUnsubmittedButton()
-          : this.renderMessageStudentsWhoButton(I18n.t('Message Students'))}
-      </FlexItem>
-    ]
-  }
-
   renderPoints() {
     return (
       <AssignmentPoints
@@ -189,7 +111,6 @@ export default class Toolbox extends React.Component {
             {this.renderPublished()}
             {this.renderDelete()}
           </FlexItem>
-          {this.renderSubmissionStats()}
           <FlexItem padding="medium xx-small large" align="end">
             {this.renderPoints()}
           </FlexItem>

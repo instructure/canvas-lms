@@ -545,6 +545,37 @@ s2,test_1,section2,active},
       run_jobs
     end
 
+    it "should have correct counts for batch_mode" do
+      @term = @account.enrollment_terms.first
+      @term.update_attribute(:sis_source_id, 'term_1')
+      @previous_batch = @account.sis_batches.create!
+
+      process_csv_data(
+        [
+          %{user_id,login_id,status
+          user_1,user_1,active},
+          %{course_id,short_name,long_name,term_id,status
+          course_1,course_1,course_1,term_1,active},
+          %{section_id,course_id,name,status
+          section_1,course_1,section_1,active},
+          %{section_id,user_id,role,status
+          section_1,user_1,student,active}
+        ])
+
+      b = process_csv_data(
+        [
+          %{user_id,login_id,status},
+          %{course_id,short_name,long_name,term_id,status},
+          %{section_id,course_id,name,status},
+          %{section_id,user_id,role,status}
+        ], batch_mode: true, batch_mode_term: @term
+      )
+      expect(b.data[:counts][:batch_enrollments_deleted]).to eq 1
+      expect(b.data[:counts][:batch_sections_deleted]).to eq 1
+      expect(b.data[:counts][:batch_courses_deleted]).to eq 1
+    end
+
+
     it "should only do batch mode removals for supplied data types" do
       @term = @account.enrollment_terms.first
       @term.update_attribute(:sis_source_id, 'term_1')
@@ -814,6 +845,8 @@ test_4,TC 104,Test Course 104,,term1,active
 }], diffing_data_set_identifier: 'default')
 
       expect(batch.data[:diffed_against_sis_batch_id]).to eq b1.id
+      expect(batch.parallel_importers.count).to eq 1
+      expect(batch.parallel_importers.completed.count).to eq 1
       # test_1 should not have been toched by this last batch, since it was diff'd out
       expect(@account.courses.find_by_sis_source_id('test_1').sis_batch_id).to eq b1.id
       expect(@account.courses.find_by_sis_source_id('test_4').sis_batch_id).to eq batch.id

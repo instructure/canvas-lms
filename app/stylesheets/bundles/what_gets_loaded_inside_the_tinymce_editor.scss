@@ -35,7 +35,8 @@ td {
 }
 
 .mce-content-body {
-  margin: 11px;
+  box-sizing: border-box;
+  padding: 11px;
   td {
     padding: 2px;
     min-width: 20px;

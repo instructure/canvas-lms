@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import I18n from 'i18n!restrict_student_access'
-import $ from 'jquery'
 import classNames from 'classnames'
 import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
 import RestrictedRadioButtons from '../files/RestrictedRadioButtons'

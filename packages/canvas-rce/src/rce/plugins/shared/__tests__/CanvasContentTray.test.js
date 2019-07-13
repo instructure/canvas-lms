@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, wait} from 'react-testing-library'
+import {act, render, wait, waitForElementToBeRemoved} from 'react-testing-library'
 
 import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
@@ -51,7 +51,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
     throw new Error('not mounted')
   }
 
-  async function showTrayForPlugin(plugin) {
+    async function showTrayForPlugin(plugin) {
     act(() => {
       props.bridge.controller.showTrayForPlugin(plugin)
     })
@@ -83,6 +83,26 @@ describe('RCE Plugins > CanvasContentTray', () => {
     it('is labeled with "Course Documents" when using the "documents" content type', async () => {
       await showTrayForPlugin('documents')
       expect(getTrayLabel()).toEqual('Course Documents')
+    })
+  })
+
+  describe('focus', () => {
+    beforeEach(renderComponent)
+
+    it('is set on tinymce after tray closes', async () => {
+      const mockFocus = jest.fn()
+      props.bridge.focusActiveEditor = mockFocus
+
+      await showTrayForPlugin('links')
+      expect(component.getByTestId('CanvasContentTray')).toBeInTheDocument()
+
+      const closeBtn = component.getByText('Close')
+      closeBtn.click()
+      // immediatly after being asked to close, INSTUI Tray removes role='dialog' and
+      // adds aria-hidden='true', so the getTray() function above does not work
+      await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
+
+      expect(mockFocus).toHaveBeenCalledWith(false)
     })
   })
 })

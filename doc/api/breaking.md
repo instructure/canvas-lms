@@ -7,5 +7,10 @@ Instructure may deprecate API elements according to the timelines indicated in t
 
 <div class="changelog"></div>
 ## Removals
+### Posted Release: 2019-07-13
 
-No breaking API changes currently exist.
+| Resources | Function |              |  Removal Date |
+|----------------------|----------------------|--------------------------|--------------------|
+| [Assignments API] | Create an Assignment Endpoint | Assignment[muted] parameter: Deprecated for New Gradebook<br><br>This parameter may only still be used with the Old Gradebook | 2020-01-18 |
+
+[Assignments API]: assignments.html

@@ -54,8 +54,9 @@ module BasicLTI
       raise Errors::InvalidSourceId, 'Assignment is invalid' unless assignment
 
       tag = assignment.external_tool_tag
-      raise Errors::InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag && tool.
-          matches_url?(tag.url, false) && tool.workflow_state != 'deleted'
+      raise Errors::InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag &&
+        (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
+        tool.workflow_state != 'deleted'
     end
 
     def self.load!(sourcedid_string)

@@ -952,7 +952,7 @@ class UsersController < ApplicationController
   #   }
   def todo_item_count
     return render_unauthorized_action unless @current_user
-    grading = @current_user.assignments_needing_grading_count
+    grading = @current_user.submissions_needing_grading_count
     submitting = @current_user.assignments_needing_submitting(include_ungraded: true, scope_only: true, limit: nil).size
     if Array(params[:include]).include? 'ungraded_quizzes'
       submitting += @current_user.ungraded_quizzes(:needing_submitting => true, scope_only: true, limit: nil).size

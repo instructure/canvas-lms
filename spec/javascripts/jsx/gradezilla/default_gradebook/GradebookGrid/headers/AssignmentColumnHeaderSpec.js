@@ -77,6 +77,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       },
 
       hideGradesAction: {
+        hasGradesToHide: true,
         onSelect() {}
       },
 
@@ -88,6 +89,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       postGradesAction: {
         enabled: false,
         featureEnabled: false,
+        hasGradesToPost: true,
         onSelect() {}
       },
 
@@ -130,11 +132,13 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           id: '1001',
           isInactive: false,
           name: 'Adam Jones',
+          sortableName: 'Jones, Adam',
           submission: {
             excused: false,
             postedAt: null,
             score: 7,
-            submittedAt: null
+            submittedAt: null,
+            workflowState: 'graded'
           }
         },
 
@@ -142,11 +146,13 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           id: '1002',
           isInactive: false,
           name: 'Betty Ford',
+          sortableName: 'Ford, Betty',
           submission: {
             excused: false,
             postedAt: null,
             score: 8,
-            submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)')
+            submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)'),
+            workflowState: 'graded'
           }
         },
 
@@ -154,11 +160,13 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           id: '1003',
           isInactive: false,
           name: 'Charlie Xi',
+          sortableName: 'Xi, Charlie',
           submission: {
             excused: false,
             postedAt: null,
             score: null,
-            submittedAt: null
+            submittedAt: null,
+            workflowState: 'unsubmitted'
           }
         }
       ],
@@ -246,21 +254,23 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         })
       })
 
-      QUnit.module('when the assignment is manually-posted', () => {
-        test('displays an "eye" icon when no submissions are graded but unposted', () => {
+      QUnit.module('when the assignment is manually-posted', manualPostingHooks => {
+        manualPostingHooks.beforeEach(() => {
+          props.assignment.postManually = true
+        })
+
+        test('displays an "off" icon when no submissions are graded but unposted', () => {
           props.students.forEach(student => {
-            if (student.submission.score != null) {
+            if (student.submission.workflowState === 'graded') {
               student.submission.postedAt = new Date()
             }
           })
 
-          props.assignment.postManually = true
           mountComponent()
-          ok(getColumnHeaderIcon('IconEye'))
+          ok(getColumnHeaderIcon('IconOff'))
         })
 
         test('displays an "off" icon when at least one submission is graded but unposted', () => {
-          props.assignment.postManually = true
           mountComponent()
           ok(getColumnHeaderIcon('IconOff'))
         })
@@ -1087,10 +1097,10 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         strictEqual(getMenuItem($menuContent, 'Hide grades').getAttribute('aria-disabled'), null)
       })
 
-      test('has the text "All grades posted" when no submissions can be hidden', () => {
+      test('has the text "All grades hidden" when no submissions can be hidden', () => {
         props.hideGradesAction.hasGradesToHide = false
         mountAndOpenOptionsMenu()
-        ok(getMenuItem($menuContent, 'All grades posted'))
+        ok(getMenuItem($menuContent, 'All grades hidden'))
       })
 
       test('is disabled when no submissions can be hidden', () => {

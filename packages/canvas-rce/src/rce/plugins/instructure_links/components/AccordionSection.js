@@ -31,14 +31,14 @@ export default function AccordionSection({
   expanded,
   label
 }) {
-  const toggleLabel = expanded 
+  const toggleLabel = expanded
     ? formatMessage('Collapse to hide {types}', {types: label})
     : formatMessage('Expand to see {types}', {types: label})
   return (
     <View as="div" borderWidth="0 0 small 0" data-testid="instructure_links-AccordionSection">
       <ToggleGroup
         toggleLabel={toggleLabel}
-        summary={<Text>{label}</Text>}
+        summary={<View display="inline-block" padding="0 0 0 small"><Text weight="bold">{label}</Text></View>}
         expanded={expanded}
         onToggle={(_e, expanded) => onToggle(expanded ? collection : "")}
         border={false}

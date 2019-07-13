@@ -131,7 +131,7 @@ describe "Gradezilla - group weights" do
       Gradezilla.visit(@course)
       Gradezilla.toggle_assignment_muting(@assignment2.id)
 
-      expect(Gradezilla.content_selector).to contain_jqcss('.total-cell .icon-muted')
+      expect(Gradezilla.content_selector).to contain_jqcss('.total-cell .icon-off')
     end
 
     it 'should not display mute icon in total column if an assignment is unmuted' do
@@ -141,7 +141,7 @@ describe "Gradezilla - group weights" do
       Gradezilla.visit(@course)
       Gradezilla.toggle_assignment_muting(@assignment2.id)
 
-      expect(Gradezilla.content_selector).not_to contain_jqcss('.total-cell .icon-muted')
+      expect(Gradezilla.content_selector).not_to contain_jqcss('.total-cell .icon-off')
     end
   end
 end

@@ -55,7 +55,7 @@ it("pulls everyone else's dates from the assignment", () => {
   expect(getByText(due, {exact: false})).toBeInTheDocument()
 
   const unlock = `${tz.format(aUnlockAt, I18n.t('#date.formats.short'))}`
-  const lock = `to ${tz.format(aLockAt, I18n.t('#date.formats.full'))}`
+  const lock = `to ${tz.format(aLockAt, I18n.t('#date.formats.short'))}`
   expect(getByText(unlock)).toBeInTheDocument()
   expect(getByText(lock)).toBeInTheDocument()
 })

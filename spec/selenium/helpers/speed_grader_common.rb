@@ -100,4 +100,10 @@ module SpeedGraderCommon
   def comment_list
     ff('span.comment').map(&:text)
   end
+
+  def update_submission(submission, text)
+    submission.submitted_at = 10.minutes.from_now
+    submission.body = text
+    submission.with_versioning(explicit: true) { submission.save }
+  end
 end

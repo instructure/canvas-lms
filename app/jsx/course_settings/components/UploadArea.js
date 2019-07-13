@@ -18,8 +18,6 @@
 
 import React from 'react'
 import I18n from 'i18n!course_images'
-import classnames from 'classnames'
-import htmlEscape from 'str/htmlEscape'
 
 class UploadArea extends React.Component {
   constructor(props) {

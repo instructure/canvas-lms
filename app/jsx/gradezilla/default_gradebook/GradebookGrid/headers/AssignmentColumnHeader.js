@@ -19,7 +19,7 @@
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
 import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
-import IconEyeLine from '@instructure/ui-icons/lib/Line/IconEye'
+import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
 import IconOffSolid from '@instructure/ui-icons/lib/Solid/IconOff'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
@@ -33,6 +33,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import 'message_students'
 import I18n from 'i18n!gradezilla'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
 import ColumnHeader from './ColumnHeader'
 
@@ -142,7 +143,8 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           latePolicyStatus: string,
           postedAt: instanceOf(Date),
           score: number,
-          submittedAt: instanceOf(Date)
+          submittedAt: instanceOf(Date),
+          workflowState: string.isRequired
         }).isRequired
       })
     ).isRequired,
@@ -284,9 +286,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     return (
       <span className="assignment-name">
-        <Link ref={this.bindAssignmentLink} href={assignment.htmlUrl}>
+        <Button
+          size="small"
+          variant="link"
+          theme={{smallPadding: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
+          ref={this.bindAssignmentLink}
+          href={assignment.htmlUrl}
+        >
           {assignment.name}
-        </Link>
+        </Button>
       </span>
     )
   }
@@ -472,14 +480,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }
 
     const submissions = this.props.students.map(student => student.submission)
-    const postableSubmissionsPresent = submissions.some(
-      submission => submission.score != null && submission.postedAt == null
-    )
+    const postableSubmissionsPresent = submissions.some(isHidden)
 
     // Assignment is manually-posted and has no graded-but-unposted submissions
     // (i.e., no unposted submissions that are in a suitable state to post)
     if (this.props.assignment.postManually && !postableSubmissionsPresent) {
-      return <IconEyeLine size="x-small" />
+      return <IconOffLine size="x-small" />
     }
 
     // Assignment has at least one hidden submission that can be posted

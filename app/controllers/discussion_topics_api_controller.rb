@@ -688,6 +688,11 @@ class DiscussionTopicsApiController < ApplicationController
     if @entry.save
       @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
+
+      assignment_id = @topic.assignment_id
+      submission_id = assignment_id && @topic.assignment.submission_for_student_id(@entry.user_id)&.id
+      Canvas::LiveEvents.discussion_entry_submitted(@entry, assignment_id, submission_id)
+
       if has_attachment
         @attachment = create_attachment
         @attachment.handle_duplicates(:rename)

@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {instanceOf} from 'prop-types'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!ImportOutcomesModal'
 import Modal, { ModalBody } from '../shared/components/InstuiModal'
 import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'

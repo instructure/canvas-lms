@@ -56,7 +56,7 @@ function PointsDisplay(props) {
       </ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
         <FlexItem>
-          <Text transform="capitalize" size={displaySize} data-test-id="grade-display">
+          <Text transform="capitalize" size={displaySize} data-testid="grade-display">
             {GradeFormatHelper.formatGrade(receivedGrade, {
               gradingType,
               pointsPossible,

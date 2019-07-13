@@ -20,6 +20,7 @@
     searching: false,
     searchResults: [],
     searchTerm: '',
+    alert: null,
   };
 
 export default ImageSearchInitialState

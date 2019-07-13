@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ImmutablePropTypes from 'react-immutable-proptypes'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividualStudentMasteryOutcomeGroup'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
 import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGroup'

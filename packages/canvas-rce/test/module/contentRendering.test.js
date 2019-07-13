@@ -124,4 +124,31 @@ describe("contentRendering", () => {
       );
     });
   });
+
+  describe('renderDoc', () => {
+    it("renders the display name if available", () => {
+      const doc = {
+        href: "/some/path",
+        filename: "the_filename.txt",
+        display_name: 'the display name'
+      };
+      const rendered = contentRendering.renderDoc(doc)
+      assert.equal(
+        rendered,
+        '<a target="_blank" rel="noopener noreferrer" href="/some/path">the display name</a>'
+      );
+    });
+
+    it("renders the file name if there is no display_name", () => {
+      const doc = {
+        href: "/some/path",
+        filename: "the_filename.txt",
+      };
+      const rendered = contentRendering.renderDoc(doc)
+      assert.equal(
+        rendered,
+        '<a target="_blank" rel="noopener noreferrer" href="/some/path">the_filename.txt</a>'
+      );
+    });
+  })
 });

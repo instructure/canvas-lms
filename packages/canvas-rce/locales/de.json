@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Zugangskontrolle"
+  },
   "add_8523c19b": {
     "message": "Hinzufügen"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "In alphabetischer Reihenfolge"
   },
+  "alt_text_611fb322": {
+    "message": "Altern. Text"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativer Text:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Ein Bild wird gerade hochgeladen. Wenn Sie fortfahren, wird das Bild nicht korrekt eingebettet."
   },
   "announcement_list_da155734": {
     "message": "Ankündigungsliste"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "Ungeordnete Liste einkreisen"
   },
-  "clear_upload_34efa419": {
-    "message": "Upload löschen"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Um einen Downloadlink für eine Datei einzufügen, klicken Sie auf die entsprechende Datei."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Urheberrechtsinhaber:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 Worte}\n    one {1 Wort}\n  other {# Worte}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# Objekt geladen}\n  other {# Objekte geladen}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Kursunterlagen"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-Lizenz:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Aktuelle Lautstärke"
+  },
+  "custom_6979cd81": {
+    "message": "Angepasst"
   },
   "date_added_ed5ad465": {
     "message": "Datum hinzugefügt"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "Standardmäßig numerisch sortierte Liste"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Beschreiben Sie das Bild)"
+  },
   "discussions_a5f96392": {
     "message": "Diskussionen"
   },
   "discussions_index_6c36ced": {
     "message": "Diskussionenindex"
   },
+  "display_options_315aba85": {
+    "message": "Anzeigeoptionen"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
+  },
   "documents_81393201": {
     "message": "Dokumente"
+  },
+  "done_54e3d4b6": {
+    "message": "Fertig"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Drag-and-Drop oder klicken Sie, um Ihren Computer zu durchsuchen."
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Fällig: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Link bearbeiten"
+  },
+  "embed_image_1080badc": {
+    "message": "Bild einbetten"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "Suchbegriffe eingeben"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Alternativen Text für dieses Bild eingeben"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Fehler beim Hochladen der Video-/Audioaufnahme"
   },
   "expand_to_see_types_f5d29352": {
     "message": "{ types } erweitern"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Externe Links"
   },
+  "file_name_8fd421ff": {
+    "message": "Dateiname"
+  },
   "file_upload_form_4aaad554": {
     "message": "Datei hochladen (Formular)"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename }-Vorschau"
   },
   "files_c300e900": {
     "message": "Dateien"
   },
   "files_index_af7c662b": {
     "message": "Dateienindex"
+  },
+  "finish_bc343002": {
+    "message": "Beenden"
   },
   "folder_705fd2d7": {
     "message": "Ordner"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Wenn Sie jetzt keine Nutzungsrechte auswählen, wird diese Datei nach dem Hochladen nicht veröffentlicht."
   },
+  "image_options_5412d02c": {
+    "message": "Bildoptionen"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Fach für Bildoptionen"
+  },
   "image_upload_form_7b74079a": {
     "message": "Bild hochladen (Formular)"
-  },
-  "image_url_2aee2734": {
-    "message": "Bild-URL"
   },
   "images_7ce26570": {
     "message": "Bilder"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ungültiger Dateityp"
   },
+  "large_9c5e80e7": {
+    "message": "Groß"
+  },
   "link_7262adec": {
     "message": "Link"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Links"
+  },
+  "load_more_35d33c7": {
+    "message": "Mehr laden"
   },
   "load_more_results_460f49a9": {
     "message": "Weitere Ergebnisse laden"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "Ordner laden ..."
   },
+  "loading_media_f3455841": {
+    "message": "Laden von Medien"
+  },
   "media_af190855": {
     "message": "Medien"
+  },
+  "medium_5a8e9ead": {
+    "message": "Medium"
+  },
+  "mic_a7f3d311": {
+    "message": "Mikrofon"
   },
   "modules_c4325335": {
     "message": "Module"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Kein alternativer Text (Dekoratives Bild)"
+  },
   "no_results_940393cf": {
     "message": "Keine Ergebnisse."
+  },
+  "no_video_1ed00b26": {
+    "message": "Kein Video"
   },
   "options_3ab0ea65": {
     "message": "Optionen"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Absatz"
   },
+  "pause_12af3bb4": {
+    "message": "Pause"
+  },
   "people_b4ebb13c": {
     "message": "Personen"
+  },
+  "play_1a47eaa7": {
+    "message": "Abspielen"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Bitte erlauben Sie Canvas, auf Ihr Mikrofon und Ihre Webcam zuzugreifen."
   },
   "posted_when_a578f5ab": {
     "message": "Gepostet am: { when }"
   },
   "preformatted_d0670862": {
     "message": "Vorformatiert"
+  },
+  "preview_a3f8f854": {
+    "message": "VORSCHAU"
   },
   "published_c944a23d": {
     "message": "veröffentlicht"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Quizzes"
   },
+  "record_7c9448b": {
+    "message": "Aufnehmen"
+  },
   "record_upload_media_5fdce166": {
     "message": "Medien aufzeichnen/hochladen"
+  },
+  "recording_98da6bda": {
+    "message": "Aufzeichnung"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Link entfernen"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Rich-Content-Editor"
+  },
+  "save_11a80ec3": {
+    "message": "Speichern"
   },
   "search_280d00bd": {
     "message": "Suchen"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Bildoptionen anzeigen"
   },
+  "size_b30e1077": {
+    "message": "Größe"
+  },
+  "small_b070434a": {
+    "message": "Klein"
+  },
   "small_header_168fb9f9": {
     "message": "Kleine Überschrift"
   },
   "something_went_wrong_89195131": {
     "message": "Etwas ging schief."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Beim Zugriff auf Ihr Mikrofon oder Ihre Webcam ging etwas schief."
+  },
   "sort_by_e75f9e3e": {
     "message": "Sortieren nach"
   },
   "square_unordered_list_b15ce93b": {
     "message": "Ungeordnete Liste abgleichen"
+  },
+  "start_over_f7552aa9": {
+    "message": "Nochmal beginnen"
+  },
+  "start_recording_9a65141a": {
+    "message": "Aufzeichnung starten"
   },
   "subheader_2b87606d": {
     "message": "Unterüberschrift"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Hochgestellt"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Zum Raw-Html-Editor wechseln"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Zum Rich-Text-Editor wechseln"
   },
   "syllabus_f191f65b": {
     "message": "Kursplan"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "nicht veröffentlicht"
   },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
+  "untitled_16aa4f2b": {
+    "message": "Ohne Titel"
   },
   "upload_8b403d05": {
     "message": "Hochladen"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Bild hochladen"
   },
+  "upload_media_ce31135a": {
+    "message": "Medien hochladen"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Medien hochladen/aufzeichnen"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "Alphabetisch geordnete Liste in Großbuchstaben"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Nutzungsrecht:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Verwendet von einem Screen-Reader zur Beschreibung des Contents eines Bilds"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Video-/Audioaufzeichnung hochgeladen"
+  },
+  "video_player_b371005": {
+    "message": "Videoplayer"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Tastenkombinationen anzeigen"
+  },
+  "webcam_fe91b20f": {
+    "message": "Webcam"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Welchen Namen möchten Sie der neuen Seite geben?"
   },
   "wiki_home_9cd54d0": {
     "message": "Wikistartseite"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Ihre Webcam wird möglicherweise bereits benutzt."
   }
 }

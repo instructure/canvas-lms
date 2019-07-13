@@ -28,19 +28,19 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 
 export default function GroupsTray({groups, hasLoaded}) {
   return (
-    <View as="div" padding="medium small">
+    <View as="div" padding="medium">
       <Heading level="h3" as="h2">{I18n.t('Groups')}</Heading>
       <hr role="presentation"/>
-      <List variant="unstyled"  margin="small 0" itemSpacing="x-small">
+      <List variant="unstyled"  margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           groups.map(group =>
             <ListItem key={group.id}>
-              <Button href={`/groups/${group.id}`}>{group.name}</Button>
+              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/groups/${group.id}`}>{group.name}</Button>
             </ListItem>
           ).concat([
             <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
-              <Button href="/groups">{I18n.t('All Groups')}</Button>
+              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/groups">{I18n.t('All Groups')}</Button>
             </ListItem>
           ])
         ) : (

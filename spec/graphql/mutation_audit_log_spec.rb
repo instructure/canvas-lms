@@ -43,7 +43,8 @@ describe "GraphQL Mutation Audit Log" do
 
   it "creates a log for every item" do
     expect(AuditLogFieldExtension::Logger).to receive(:log).twice
-    @course.enable_feature! :post_policies
+    @course.enable_feature!(:new_gradebook)
+    PostPolicy.enable_feature!
 
     CanvasSchema.execute(<<~MUTATION, context: {current_user: @teacher})
       mutation {

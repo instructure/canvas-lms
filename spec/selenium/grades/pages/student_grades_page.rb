@@ -51,8 +51,8 @@ class StudentGradesPage
       f('#grading_period_select_menu')
     end
 
-    def hidden_eye_icon
-      fxpath("//*[@title='Hidden']")
+    def hidden_eye_icon(scope:)
+      fxpath("//*[@title='Hidden']", scope)
     end
 
     def select_period_by_name(name)
@@ -91,8 +91,8 @@ class StudentGradesPage
       f("#submission_#{assignment_id} .assignment_score .grade").text
     end
 
-    def comment_button
-      ffxpath('//a[@aria-label="Read comments"]').select(&:displayed?).first
+    def comment_buttons
+      ffxpath('//a[@aria-label="Read comments"]').select(&:displayed?)
     end
 
     def comments(assignment)

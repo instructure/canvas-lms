@@ -25,10 +25,11 @@ describe Mutations::SetCoursePostPolicy do
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-  def mutation_str(course_id: nil, override_assignment_post_policies: false, post_manually: nil)
+  before(:each) { PostPolicy.enable_feature! }
+
+  def mutation_str(course_id: nil, post_manually: nil)
     input_string = course_id ? "courseId: #{course_id}" : ""
     input_string += " postManually: #{post_manually}" if post_manually.present?
-    input_string += " overrideAssignmentPostPolicies: #{override_assignment_post_policies}"
 
     <<~GQL
       mutation {
@@ -37,9 +38,6 @@ describe Mutations::SetCoursePostPolicy do
         }) {
           postPolicy {
             course {
-              _id
-            }
-            assignment {
               _id
             }
             _id
@@ -92,22 +90,58 @@ describe Mutations::SetCoursePostPolicy do
       expect(result.dig("data", "setCoursePostPolicy", "postPolicy", "_id").to_i).to be policy.id
     end
 
-    it "does not destroy assignment post policies if the course post policy is not set to override" do
-      PostPolicy.create!(course: course, assignment: assignment, post_manually: false)
-      execute_query(
-        mutation_str(course_id: course.id, post_manually: true),
-        context
-      )
-      expect(course.post_policies.where.not(assignment: nil).count).to be 1
-    end
+    describe "updating the post policy of assignments in the course" do
+      let(:policy) { PostPolicy.create!(course: course, post_manually: false) }
+      let(:post_manually_mutation) { mutation_str(course_id: course.id, post_manually: true) }
 
-    it "destroys assignment post policies if the course post policy is set to override" do
-      PostPolicy.create!(course: course, assignment: assignment, post_manually: false)
-      execute_query(
-        mutation_str(course_id: course.id, override_assignment_post_policies: true, post_manually: true),
-        context
-      )
-      expect(course.post_policies.where.not(assignment: nil).count).to be 0
+      let(:assignment) { course.assignments.create! }
+      let(:anonymous_assignment) { course.assignments.create!(anonymous_grading: true) }
+      let(:moderated_assignment) do
+        course.assignments.create!(
+          final_grader: teacher,
+          grader_count: 2,
+          moderated_grading: true
+        )
+      end
+
+      it "explicitly sets a post policy for assignments without one" do
+        auto_assignment = course.assignments.create!
+        execute_query(post_manually_mutation, context)
+        expect(auto_assignment.reload.post_policy).to be_post_manually
+      end
+
+      it "updates the post policy for assignments with an existing-but-different policy" do
+        assignment.ensure_post_policy(post_manually: false)
+
+        execute_query(post_manually_mutation, context)
+        expect(assignment.reload.post_policy).to be_post_manually
+      end
+
+      it "does not update assignments that have an equivalent post policy" do
+        assignment.ensure_post_policy(post_manually: true)
+
+        expect {
+          execute_query(post_manually_mutation, context)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: assignment).updated_at
+        }
+      end
+
+      it "does not update anonymous assignments" do
+        expect {
+          execute_query(post_manually_mutation, context)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: anonymous_assignment).updated_at
+        }
+      end
+
+      it "does not update moderated assignments" do
+        expect {
+          execute_query(post_manually_mutation, context)
+        }.not_to change {
+          PostPolicy.find_by!(assignment: moderated_assignment).updated_at
+        }
+      end
     end
   end
 

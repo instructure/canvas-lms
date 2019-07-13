@@ -123,37 +123,38 @@ class GradebookExporter
 
     CSV.generate(@options.slice(:encoding, :col_sep)) do |csv|
       # First row
-      row = ["Student", "ID"]
-      row << "SIS User ID" if include_sis_id
-      row << "SIS Login ID"
-      row << "Root Account" if include_sis_id && include_root_account
-      row << "Section"
+      header = ["Student", "ID"]
+      header << "SIS User ID" if include_sis_id
+      header << "SIS Login ID"
+      header << "Integration ID" if include_sis_id && show_integration_id?
+      header << "Root Account" if include_sis_id && include_root_account
+      header << "Section"
 
       custom_gradebook_columns.each do |column|
-        row << column.title
+        header << column.title
       end
 
-      row.concat assignments.map(&:title_with_id)
+      header.concat assignments.map(&:title_with_id)
 
       if should_show_totals
         groups.each do |group|
           if include_points?
-            row << "#{group.name} Current Points" << "#{group.name} Final Points"
+            header << "#{group.name} Current Points" << "#{group.name} Final Points"
           end
-          row << "#{group.name} Current Score"
-          row << "#{group.name} Unposted Current Score"
-          row << "#{group.name} Final Score"
-          row << "#{group.name} Unposted Final Score"
+          header << "#{group.name} Current Score"
+          header << "#{group.name} Unposted Current Score"
+          header << "#{group.name} Final Score"
+          header << "#{group.name} Unposted Final Score"
         end
-        row << "Current Points" << "Final Points" if include_points?
-        row << "Current Score" << "Unposted Current Score" << "Final Score" << "Unposted Final Score"
-        row.concat(buffer_column_headers(:grading_standard)) if @course.grading_standard_enabled?
+        header << "Current Points" << "Final Points" if include_points?
+        header << "Current Score" << "Unposted Current Score" << "Final Score" << "Unposted Final Score"
+        header.concat(buffer_column_headers(:grading_standard)) if @course.grading_standard_enabled?
         if include_final_grade_override?
-          row.concat(buffer_column_headers(:override_score))
-          row.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
+          header.concat(buffer_column_headers(:override_score))
+          header.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
         end
       end
-      csv << row
+      csv << header
 
       group_filler_length = groups.size * column_count_per_group
 
@@ -162,6 +163,7 @@ class GradebookExporter
         row = [nil, nil, nil, nil]
         if include_sis_id
           row << nil
+          row << nil if show_integration_id?
           row << nil if include_root_account
         end
 
@@ -184,6 +186,9 @@ class GradebookExporter
           row.concat(buffer_columns(:override_score))
           row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
         end
+
+        lengths_match = header.length == row.length
+        raise "column lengths don't match" if !lengths_match && !Rails.env.production?
         csv << row
       end
 
@@ -191,6 +196,7 @@ class GradebookExporter
       row = ["    Points Possible", nil, nil, nil]
       if include_sis_id
         row << nil
+        row << nil if show_integration_id?
         row << nil if include_root_account
       end
 
@@ -213,6 +219,9 @@ class GradebookExporter
       end
 
       csv << row
+
+      lengths_match = header.length == row.length
+      raise "column lengths don't match" if !lengths_match && !Rails.env.production?
 
       # Rest of the Rows
       student_enrollments.each_slice(100) do |student_enrollments_batch|
@@ -253,9 +262,10 @@ class GradebookExporter
             end
           end
           row = [student_name(student), student.id]
-          pseudonym = SisPseudonym.for(student, student_enrollment, type: :implicit, require_sis: false)
-          row << pseudonym.try(:sis_user_id) if include_sis_id
-          row << pseudonym.try(:unique_id)
+          pseudonym = SisPseudonym.for(student, student_enrollment, type: :implicit, require_sis: false, root_account: @course.root_account)
+          row << pseudonym&.sis_user_id if include_sis_id
+          row << pseudonym&.unique_id
+          row << pseudonym&.integration_id if include_sis_id && show_integration_id?
           row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_sis_id && include_root_account
           row << student_sections
 
@@ -277,6 +287,10 @@ class GradebookExporter
         end
       end
     end
+  end
+
+  def show_integration_id?
+    @show_integration_id ||= @course.root_account.settings[:include_integration_ids_in_gradebook_exports] == true
   end
 
   def enrollments_for_csv(scope)
@@ -397,7 +411,7 @@ class GradebookExporter
   end
 
   def show_as_hidden?(assignment)
-    if @course.feature_enabled?(:post_policies)
+    if @course.post_policies_enabled?
       assignment.post_manually?
     else
       assignment.muted?
@@ -405,6 +419,6 @@ class GradebookExporter
   end
 
   def hidden_assignment_text
-    @course.feature_enabled?(:post_policies) ? "Manual Posting" : "Muted"
+    @course.post_policies_enabled? ? "Manual Posting" : "Muted"
   end
 end

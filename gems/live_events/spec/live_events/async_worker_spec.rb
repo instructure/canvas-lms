@@ -21,8 +21,9 @@ require 'spec_helper'
 describe LiveEvents::AsyncWorker do
   before(:each) do
     LiveEvents.max_queue_size = -> { 100 }
-    LiveEvents.logger = double()
     @worker = LiveEvents::AsyncWorker.new(false)
+    allow(LiveEvents.logger).to receive(:info)
+    allow(@worker).to receive(:at_exit)
   end
 
   describe "push" do
@@ -42,6 +43,17 @@ describe LiveEvents::AsyncWorker do
       5.times { expect(@worker.push -> {}).to be_truthy }
 
       expect(@worker.push -> {}).to be false
+    end
+  end
+
+  describe "exit handling" do
+
+    it "should drain the queue" do
+      fired = false
+      @worker.push -> { fired = true }
+      expect(@worker).to receive(:at_exit).and_yield
+      @worker.start!
+      expect(fired).to be true
     end
   end
 end

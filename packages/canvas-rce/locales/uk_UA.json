@@ -134,6 +134,9 @@
   "folder_705fd2d7": {
     "message": "Папка"
   },
+  "generating_preview_45b53be0": {
+    "message": "Генерується попередній перегляд..."
+  },
   "grades_a61eba0a": {
     "message": "Оцінки"
   },
@@ -155,9 +158,6 @@
   "image_upload_form_7b74079a": {
     "message": "Форма завантаження зображення"
   },
-  "image_url_2aee2734": {
-    "message": "Адреса зображення"
-  },
   "images_7ce26570": {
     "message": "Зображення"
   },
@@ -175,6 +175,9 @@
   },
   "invalid_file_type_881cc9b2": {
     "message": "Недійсний тип файлу"
+  },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Гарячі клавіши"
   },
   "link_7262adec": {
     "message": "Посилання"
@@ -212,8 +215,14 @@
   "modules_c4325335": {
     "message": "Розділи"
   },
+  "next_page_d2a39853": {
+    "message": "Наступна Сторінка"
+  },
   "no_results_940393cf": {
     "message": "Результати відсутні."
+  },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Вікрити діалогове вікно гарячих клавіш"
   },
   "options_3ab0ea65": {
     "message": "Параметри"
@@ -223,6 +232,9 @@
   },
   "people_b4ebb13c": {
     "message": "Люди"
+  },
+  "previous_page_928fc112": {
+    "message": "Попередня сторінка"
   },
   "published_c944a23d": {
     "message": "опубліковано"

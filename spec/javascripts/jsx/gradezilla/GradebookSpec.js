@@ -4927,6 +4927,38 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function(suiteHooks) {
       gradebook.updateEnterGradesAsSetting('2301', 'percent')
     })
   })
+
+  QUnit.module('#postAssignmentGradesTrayOpenChanged', hooks => {
+    let updateGridStub
+
+    hooks.beforeEach(() => {
+      const assignment = {id: '2301'}
+      const column = gradebook.buildAssignmentColumn(assignment)
+      gradebook.gridData.columns.definitions[column.id] = column
+      updateGridStub = sinon.stub(gradebook, 'updateGrid')
+    })
+
+    hooks.afterEach(() => {
+      updateGridStub.restore()
+    })
+
+    test('sets the column definition postAssignmentGradesTrayOpenForAssignmentId', () => {
+      gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
+      const columnId = gradebook.getAssignmentColumnId('2301')
+      const definition = gradebook.gridData.columns.definitions[columnId]
+      strictEqual(definition.postAssignmentGradesTrayOpenForAssignmentId, true)
+    })
+
+    test('calls updateGrid if a corresponding column is found', () => {
+      gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
+      strictEqual(updateGridStub.callCount, 1)
+    })
+
+    test('does not call updateGrid if a corresponding column is not found', () => {
+      gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2399', isOpen: true})
+      strictEqual(updateGridStub.callCount, 0)
+    })
+  })
 })
 
 QUnit.module('Gradebook Grading Schemes', suiteHooks => {
@@ -9076,7 +9108,7 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', hooks => {
   })
 })
 
-QUnit.module('Gradebook#handleAssignmentMutingChange', hooks => {
+QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
   let columnId
   let server
   let options
@@ -9105,14 +9137,14 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', hooks => {
 
   test('resets grading', () => {
     sinon.stub(gradebook, 'resetGrading')
-    gradebook.handleAssignmentMutingChange({id: '2301'})
+    gradebook.handleSubmissionPostedChange({id: '2301'})
     strictEqual(gradebook.resetGrading.callCount, 1)
     gradebook.resetGrading.restore()
   })
 
   test('when sorted by an anonymous assignment, gradebook changes sort', () => {
     gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
-    gradebook.handleAssignmentMutingChange({id: '2301', anonymize_students: true})
+    gradebook.handleSubmissionPostedChange({id: '2301', anonymize_students: true})
     deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
   })
 
@@ -9123,7 +9155,7 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', hooks => {
       'grade',
       'ascending'
     )
-    gradebook.handleAssignmentMutingChange({
+    gradebook.handleSubmissionPostedChange({
       id: '2301',
       anonymize_students: true,
       assignment_group_id: groupId
@@ -9133,21 +9165,21 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', hooks => {
 
   test('when sorted by total grade, gradebook changes sort', () => {
     gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending')
-    gradebook.handleAssignmentMutingChange({id: '2301', anonymize_students: true})
+    gradebook.handleSubmissionPostedChange({id: '2301', anonymize_students: true})
     deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
   })
 
   test('when assignment is not anonymous, gradebook does not change sort', () => {
     gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
     const sortSettings = gradebook.getSortRowsBySetting()
-    gradebook.handleAssignmentMutingChange({id: '2301', anonymize_students: false})
+    gradebook.handleSubmissionPostedChange({id: '2301', anonymize_students: false})
     deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
   })
 
   test('when gradebook is sorted by an unrelated column, gradebook does not change sort', () => {
     gradebook.setSortRowsBySetting(gradebook.getAssignmentColumnId('2222'), 'grade', 'ascending')
     const sortSettings = gradebook.getSortRowsBySetting()
-    gradebook.handleAssignmentMutingChange({id: '2301', anonymize_students: true})
+    gradebook.handleSubmissionPostedChange({id: '2301', anonymize_students: true})
     deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
   })
 })

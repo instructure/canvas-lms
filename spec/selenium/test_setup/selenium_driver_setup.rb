@@ -228,7 +228,7 @@ module SeleniumDriverSetup
 
     HEADLESS_DEFAULTS = {
       dimensions: "1920x1080x24",
-      reuse: false,
+      reuse: true,
       destroy_at_exit: true,
       video: {
         provider: :ffmpeg,
@@ -261,8 +261,8 @@ module SeleniumDriverSetup
       display = 20 + test_number
 
       self.headless = Headless.new(HEADLESS_DEFAULTS.merge({
-        display: display
-      }))
+                                                             display: display
+                                                           }))
       headless.start
       puts "Setting up DISPLAY=#{ENV['DISPLAY']}"
     end

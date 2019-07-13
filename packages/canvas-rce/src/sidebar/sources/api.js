@@ -128,8 +128,8 @@ class RceApiSource {
     return {
       files: [],
       bookmark: this.uriFor('documents', props),
-      hasMore: false,
-      isLoading: false
+      isLoading: false,
+      hasMore: true // there's always more when you haven't tried yet
     }
   }
 
@@ -188,6 +188,10 @@ class RceApiSource {
 
   fetchMediaFolder(props) {
     return this.fetchPage(this.uriFor('folders/media', props))
+  }
+
+  fetchMediaObjectIframe(mediaObjectId) {
+    return this.fetchPage(this.uriFor(`media_objects_iframe/${mediaObjectId}`))
   }
 
   fetchImages(props) {
@@ -273,6 +277,20 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
+  searchUnsplash(term, page) {
+    let headers = headerFor(this.jwt)
+    let base = this.baseUri('unsplash/search')
+    let uri = `${base}?term=${encodeURIComponent(term)}&page=${page}&per_page=12`
+    return this.apiFetch(uri, headers)
+  }
+
+  pingbackUnsplash(id) {
+    let headers = headerFor(this.jwt)
+    let base = this.baseUri('unsplash/pingback')
+    let uri = `${base}?id=${id}`
+    return this.apiFetch(uri, headers, { skipParse: true })
+  }
+
   getFile(id) {
     let headers = headerFor(this.jwt)
     let base = this.baseUri('file')
@@ -281,14 +299,14 @@ class RceApiSource {
   }
 
   // @private
-  async apiFetch(uri, headers) {
+  async apiFetch(uri, headers, options) {
     if (!this.hasSession) {
       await this.getSession()
     }
-    return this.apiReallyFetch(uri, headers)
+    return this.apiReallyFetch(uri, headers, options)
   }
 
-  apiReallyFetch(uri, headers) {
+  apiReallyFetch(uri, headers, options = {}) {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, {headers})
       .then(response => {
@@ -302,7 +320,7 @@ class RceApiSource {
         }
       })
       .then(checkStatus)
-      .then(parseResponse)
+      .then(options.skipParse ? () => {} : parseResponse)
       .catch(throwConnectionError)
   }
 
@@ -389,8 +407,7 @@ class RceApiSource {
     let {host, contextType, contextId} = props
     let extra = ''
     switch(endpoint) {
-      // eventually all could go thru /api/documents with the right content_types,
-      // but the UI has to be looking for files, not images, in the response
+      // images will eventually work, but it has to be looking for files, not images in the response
       // case 'images':
       //   extra = '&content_types=image'
       //   break;

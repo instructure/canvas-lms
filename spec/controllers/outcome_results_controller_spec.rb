@@ -315,10 +315,11 @@ describe OutcomeResultsController do
         end
 
         context 'with pagination' do
-          def expect_students_in_pagination(page, students, sort_order = 'asc')
-            get_rollups(sort_by: 'student', sort_order: sort_order, per_page: 1, page: page)
+          let(:json) { parse_response(response) }
+
+          def expect_students_in_pagination(page, students, sort_order = 'asc', include: nil)
+            get_rollups(sort_by: 'student', sort_order: sort_order, per_page: 1, page: page, include: include)
             expect(response).to be_success
-            json = parse_response(response)
             expect_user_order(json['rollups'], students)
           end
 
@@ -355,6 +356,38 @@ describe OutcomeResultsController do
 
             it 'return no student in fourth page' do
               expect_students_in_pagination(4, [], 'desc')
+            end
+          end
+
+          context 'with multiple enrollments' do
+            before do
+              @section1 = add_section 's1', course: outcome_course
+              @section2 = add_section 's2', course: outcome_course
+              student_in_section @section1, user: @student2, allow_multiple_enrollments: true
+              student_in_section @section2, user: @student2, allow_multiple_enrollments: true
+              student_in_section @section2, user: @student3, allow_multiple_enrollments: true
+            end
+
+            context 'should paginate by user, rather than by enrollment' do
+              it 'should return student1 on first page' do
+                expect_students_in_pagination(1, [@student1], include: ['users'])
+                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student1.id.to_s]
+              end
+
+              it 'should return student2 on second page' do
+                expect_students_in_pagination(2, [@student2, @student2, @student2], include: ['users'])
+                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student2.id.to_s]
+              end
+
+              it 'should return student3 on third page' do
+                expect_students_in_pagination(3, [@student3, @student3], include: ['users'])
+                expect(json['linked']['users'].map {|u| u['id']}).to eq [@student3.id.to_s]
+              end
+
+              it 'return no student in fourth page' do
+                expect_students_in_pagination(4, [], include: ['users'])
+                expect(json['linked']['users'].length).to be 0
+              end
             end
           end
         end

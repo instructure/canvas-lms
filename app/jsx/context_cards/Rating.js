@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!student_context_tray'
+import I18n from 'i18n!student_context_trayRating'
 import classnames from 'classnames'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import InstUIRating from '@instructure/ui-elements/lib/components/Rating'

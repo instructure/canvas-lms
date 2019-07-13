@@ -52,8 +52,15 @@
 
     :SUBMISSION => {
       assignment_id: @assignment.id,
-      # don't leak grades if assignment is muted
-      submission: @assignment.muted? ? {} : @submission.attributes.merge(entered_grade: @submission.entered_grade, entered_score: @submission.entered_score),
+      # don't leak grades if submission is not posted
+      submission: if @submission.posted?
+        @submission.attributes.merge(
+          entered_grade: @submission.entered_grade,
+          entered_score: @submission.entered_score
+        )
+      else
+        {}
+      end,
       **submission_owner_param
     }
   })
@@ -82,7 +89,7 @@
         <%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %>
       </h1>
       <div class="submission-details-header__grade-summary">
-        <% if @assignment.muted? %>
+        <% if !@submission.posted? %>
           <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
         <% elsif @submission.user_can_read_grade?(@current_user, session) %>
         <table class="grade-values">
@@ -142,7 +149,7 @@
           <% end %>
         <% end %>
         <% end %>
-        <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && !@assignment.muted? %>
+        <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && @submission.posted? %>
           <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
             <span class="turnitin_score_container">
               <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
@@ -293,7 +300,7 @@
           <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: <%= direction('right') %>; margin-<%= direction('right') %>:0 !important;"><%= image_tag("delete_circle.png", :alt => t('Delete')) %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless @submission.user_can_read_grade?(@current_user, session) %>
-              <% if @assignment.muted? %>
+              <% if !@submission.posted? %>
                 <i><%= t('only_see_your_own_comments_muted', "You may not see all comments right now because the assignment is currently being graded") %></i>
               <% else %>
                 <i><%= t('only_see_your_own_comments_peer', "As a peer reviewing student, you will only see comments written by you.") %></i>

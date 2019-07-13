@@ -1,4 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Toegankelijkheidscontrole"
+  },
   "add_8523c19b": {
     "message": "Toevoegen"
   },
@@ -20,8 +23,14 @@
   "alphabetical_55b5b4e0": {
     "message": "Alfabetische volgorde"
   },
+  "alt_text_611fb322": {
+    "message": "Alt tekst"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternatieve tekst:"
+  },
+  "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
+    "message": "Bezig met het uploaden van een afbeelding. Als je doorgaat, wordt de afbeelding niet goed ingebed."
   },
   "announcement_list_da155734": {
     "message": "Lijst met aankondiging"
@@ -68,9 +77,6 @@
   "circle_unordered_list_9e3a0763": {
     "message": "ongeordende lijst omcirkelen"
   },
-  "clear_upload_34efa419": {
-    "message": "Upload wissen"
-  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Op een bestand klikken om een link voor het downloaden van dat bestand in te voegen."
   },
@@ -116,6 +122,12 @@
   "copyright_holder_66ee111": {
     "message": "Houder van auteursrecht:"
   },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 woorden}\n    one {1 woord}\n  other {# woorden}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# item geladen}\n  other {# items geladen}\n}"
+  },
   "course_documents_104d76e0": {
     "message": "Cursusdocumenten"
   },
@@ -133,6 +145,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
+  },
+  "current_volume_level_c55ab825": {
+    "message": "Huidig volumeniveau"
+  },
+  "custom_6979cd81": {
+    "message": "Aangepast"
   },
   "date_added_ed5ad465": {
     "message": "Datum toegevoegd"
@@ -152,14 +170,26 @@
   "default_numerical_ordered_list_48dd3548": {
     "message": "standaard geordende numerieke lijst"
   },
+  "describe_the_image_e65d2e32": {
+    "message": "(Beschrijf de afbeelding)"
+  },
   "discussions_a5f96392": {
     "message": "Discussies"
   },
   "discussions_index_6c36ced": {
     "message": "Discussieoverzicht"
   },
+  "display_options_315aba85": {
+    "message": "Weergaveopties"
+  },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
+  },
   "documents_81393201": {
     "message": "Documenten"
+  },
+  "done_54e3d4b6": {
+    "message": "Gereed"
   },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Slepen en neerzetten of klikken om je computer te doorzoeken"
@@ -170,11 +200,20 @@
   "due_when_7eed10c6": {
     "message": "Inleverdatum: { when }"
   },
+  "edit_link_7f53bebb": {
+    "message": "Link bewerken"
+  },
+  "embed_image_1080badc": {
+    "message": "Afbeelding insluiten"
+  },
   "enter_search_terms_e397b1f0": {
     "message": "zoektermen invoeren"
   },
   "enter_the_alternative_text_for_this_image_88047c47": {
     "message": "Voer de alternatieve tekst voor deze afbeelding in"
+  },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Fout bij het uploaden van video/audio-opnames"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Uitklappen om te bekijken { types }"
@@ -182,17 +221,20 @@
   "external_links_3d9f074e": {
     "message": "Externe links"
   },
+  "file_name_8fd421ff": {
+    "message": "Bestandsnaam"
+  },
   "file_upload_form_4aaad554": {
     "message": "Formulier voor bestand uploaden"
-  },
-  "filename_preview_ffaa1515": {
-    "message": "{ filename } preview"
   },
   "files_c300e900": {
     "message": "Bestanden"
   },
   "files_index_af7c662b": {
     "message": "Bestandsoverzicht"
+  },
+  "finish_bc343002": {
+    "message": "Voltooien"
   },
   "folder_705fd2d7": {
     "message": "Map"
@@ -215,11 +257,14 @@
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Als je nu geen gebruiksrechten selecteert, wordt de publicatie van dit bestand ongedaan gemaakt nadat het is geüpload."
   },
+  "image_options_5412d02c": {
+    "message": "Beeldopties"
+  },
+  "image_options_tray_90a46006": {
+    "message": "Beeldoptiescel"
+  },
   "image_upload_form_7b74079a": {
     "message": "Formulier voor afbeelding uploaden"
-  },
-  "image_url_2aee2734": {
-    "message": "Afbeelding URL"
   },
   "images_7ce26570": {
     "message": "Afbeeldingen"
@@ -239,6 +284,9 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ongeldig bestandstype"
   },
+  "large_9c5e80e7": {
+    "message": "Groot"
+  },
   "link_7262adec": {
     "message": "Koppeling"
   },
@@ -253,6 +301,9 @@
   },
   "links_14b70841": {
     "message": "Koppelingen"
+  },
+  "load_more_35d33c7": {
+    "message": "Meer laden"
   },
   "load_more_results_460f49a9": {
     "message": "Meer resultaten laden"
@@ -269,14 +320,29 @@
   "loading_folders_8d4d5d5a": {
     "message": "Mappen laden..."
   },
+  "loading_media_f3455841": {
+    "message": "Laden van media"
+  },
   "media_af190855": {
     "message": "Media"
+  },
+  "medium_5a8e9ead": {
+    "message": "Medium"
+  },
+  "mic_a7f3d311": {
+    "message": "Mic"
   },
   "modules_c4325335": {
     "message": "Modules"
   },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Geen Alt-tekst (decoratieve afbeelding)"
+  },
   "no_results_940393cf": {
     "message": "Geen resultaten."
+  },
+  "no_video_1ed00b26": {
+    "message": "Geen video"
   },
   "options_3ab0ea65": {
     "message": "Opties"
@@ -290,14 +356,26 @@
   "paragraph_5e5ad8eb": {
     "message": "Alinea"
   },
+  "pause_12af3bb4": {
+    "message": "Onderbreken"
+  },
   "people_b4ebb13c": {
     "message": "Personen"
+  },
+  "play_1a47eaa7": {
+    "message": "Afspelen"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Geef Canvas toegang tot je microfoon en webcam."
   },
   "posted_when_a578f5ab": {
     "message": "Geplaatst: { when }"
   },
   "preformatted_d0670862": {
     "message": "Voorgeformatteerd"
+  },
+  "preview_a3f8f854": {
+    "message": "VOORBEELD"
   },
   "published_c944a23d": {
     "message": "gepubliceerd"
@@ -308,8 +386,23 @@
   "quizzes_7e598f57": {
     "message": "Toetsen"
   },
+  "record_7c9448b": {
+    "message": "Opnemen"
+  },
   "record_upload_media_5fdce166": {
     "message": "Media opnemen/uploaden"
+  },
+  "recording_98da6bda": {
+    "message": "Bezig met opnemen"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Link verwijderen"
+  },
+  "rich_content_editor_2708ef21": {
+    "message": "Rich Content Editor"
+  },
+  "save_11a80ec3": {
+    "message": "Opslaan"
   },
   "search_280d00bd": {
     "message": "Zoeken"
@@ -326,17 +419,32 @@
   "show_image_options_1e2ecc6b": {
     "message": "Afbeeldingsopties weergeven"
   },
+  "size_b30e1077": {
+    "message": "Grootte"
+  },
+  "small_b070434a": {
+    "message": "Klein"
+  },
   "small_header_168fb9f9": {
     "message": "Kleine koptekst"
   },
   "something_went_wrong_89195131": {
     "message": "Er is iets misgegaan."
   },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Er is iets misgegaan met de toegang tot je microfoon of webcam."
+  },
   "sort_by_e75f9e3e": {
     "message": "Sorteren op"
   },
   "square_unordered_list_b15ce93b": {
     "message": "vierkante ongeordende lijst"
+  },
+  "start_over_f7552aa9": {
+    "message": "Opnieuw starten"
+  },
+  "start_recording_9a65141a": {
+    "message": "Opname starten"
   },
   "subheader_2b87606d": {
     "message": "Subkoptekst"
@@ -349,6 +457,12 @@
   },
   "superscript_8cb349a2": {
     "message": "Superscript"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Overschakelen naar raw html editor"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Overschakelen naar rich text editor"
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
@@ -377,8 +491,8 @@
   "unpublished_dfd8801": {
     "message": "niet-gepubliceerd"
   },
-  "unsplash_ee049fbf": {
-    "message": "Unsplash"
+  "untitled_16aa4f2b": {
+    "message": "Zonder titel"
   },
   "upload_8b403d05": {
     "message": "Uploaden"
@@ -395,6 +509,12 @@
   "upload_image_6120b609": {
     "message": "Afbeelding uploaden"
   },
+  "upload_media_ce31135a": {
+    "message": "Media uploaden"
+  },
+  "upload_record_media_e4207d72": {
+    "message": "Media uploaden/opnemen"
+  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "geordende lijst op hoofdletters alfabet"
   },
@@ -407,13 +527,28 @@
   "usage_right_ff96f3e2": {
     "message": "Gebruiksrecht:"
   },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Gebruikt door schermlezers om de inhoud van een afbeelding te beschrijven"
+  },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Video-/audio-opname geüpload"
+  },
+  "video_player_b371005": {
+    "message": "Videospeler"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Sneltoetsen bekijken"
+  },
+  "webcam_fe91b20f": {
+    "message": "Webcam"
   },
   "what_would_you_like_to_call_the_new_page_d7e4488a": {
     "message": "Hoe wil je de nieuwe pagina noemen?"
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki Home"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Mogelijk is je webcam al in gebruik."
   }
 }

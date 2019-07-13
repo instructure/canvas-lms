@@ -120,10 +120,10 @@ describe "legacyNode" do
 
   context "PostPolicy" do
     before(:once) do
-      @course_post_policy = @course.post_policies.create!(post_manually: true)
+      @course.default_post_policy.update!(post_manually: true)
       @query = <<~GQL
         query {
-          postPolicy: legacyNode(type: PostPolicy, _id: "#{@course_post_policy.id}") {
+          postPolicy: legacyNode(type: PostPolicy, _id: "#{@course.default_post_policy.id}") {
             ... on PostPolicy {
               _id
             }
@@ -135,7 +135,7 @@ describe "legacyNode" do
     it "returns a PostPolicy for users with manage_grades permission" do
       expect(
         run_query(@query, @teacher)["data"]["postPolicy"]["_id"].to_i
-      ).to eql @course_post_policy.id
+      ).to eql @course.default_post_policy.id
     end
 
     it "returns null for users without manage_grades permission" do

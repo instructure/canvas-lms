@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividiualStudentMasteryAssignmentResult'
 import _ from 'lodash'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
 import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
@@ -39,16 +39,14 @@ const scoreFromPercent = (percent, outcome) => {
 }
 
 const renderLinkedResult = (name, url, isQuiz) => (
-  <Link href={ url }>
-    <Flex alignItems="center">
-      <FlexItem><Text size="medium">
-        {
-          isQuiz ? <IconQuiz /> : <IconAssignment />
-        }
-      </Text></FlexItem>
-      <FlexItem padding="0 x-small"><Text weight="bold">{ name }</Text></FlexItem>
-    </Flex>
-  </Link>
+  <Button
+    variant="link"
+    href={url}
+    theme={{mediumPadding: '0', mediumHeight: 'normal', fontWeight: '700'}}
+    icon={isQuiz ? IconQuiz : IconAssignment}
+  >
+    {name}
+  </Button>
 )
 
 const renderUnlinkedResult = (name) => (

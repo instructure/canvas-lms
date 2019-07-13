@@ -24,8 +24,6 @@ import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 
 let promiseToGetDashboardCards
 
-const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
-
 export default function loadCardDashboard() {
   const Box = getDroppableDashboardCardBox()
   const dashboardContainer = document.getElementById('DashboardCard_Container')
@@ -40,18 +38,38 @@ export default function loadCardDashboard() {
     )
   }
 
-  // Cache the fetched dashcards in sessionStorage so we can render instantly next
-  // time they come to their dashboard (while still fetching the most current data)
-  const cachedCards = sessionStorage.getItem(sessionStorageKey)
-  if (cachedCards) render(JSON.parse(cachedCards))
-
   if (!promiseToGetDashboardCards) {
+    let xhrHasReturned = false
+    let sessionStorageTimeout
+    const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
     const url = '/api/v1/dashboard/dashboard_cards'
     promiseToGetDashboardCards = asJson(getPrefetchedXHR(url)) || axios.get(url).then(({data}) => data)
+    promiseToGetDashboardCards.then(() => xhrHasReturned = true)
 
+    // Because we use prefetch_xhr to prefetch this xhr request from our rails erb, there is a 
+    // chance that the XHR to get the latest dashcard data has already come back before we get 
+    // to this point. So if the XHR is ready, there's no need to render twice, just render 
+    // once with the newest data.
+    // Otherwise, render with the cached stuff from session storage now, then render again
+    // when the xhr comes back with the latest data.
+    const promiseToGetCardsFromSessionStorage = new Promise(resolve => {
+      sessionStorageTimeout = setTimeout(() => {
+        const cachedCards = sessionStorage.getItem(sessionStorageKey)
+        if (cachedCards) resolve(JSON.parse(cachedCards))
+      }, 1)
+    })
+    Promise.race([promiseToGetDashboardCards, promiseToGetCardsFromSessionStorage]).then(dashboardCards => {
+      clearTimeout(sessionStorageTimeout)
+      render(dashboardCards)
+      if (!xhrHasReturned) promiseToGetDashboardCards.then(render)
+    })
+
+    // Cache the fetched dashcards in sessionStorage so we can render instantly next
+    // time they come to their dashboard (while still fetching the most current data)
     promiseToGetDashboardCards.then(dashboardCards =>
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )
+  } else {
+    promiseToGetDashboardCards.then(render)
   }
-  promiseToGetDashboardCards.then(render)
 }

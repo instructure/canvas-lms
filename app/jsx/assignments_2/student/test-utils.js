@@ -18,8 +18,10 @@
 import {
   CREATE_SUBMISSION,
   CREATE_SUBMISSION_COMMENT,
+  CREATE_SUBMISSION_DRAFT,
   STUDENT_VIEW_QUERY,
-  SUBMISSION_COMMENT_QUERY
+  SUBMISSION_COMMENT_QUERY,
+  SUBMISSION_ID_QUERY
 } from './assignmentData'
 
 export function mockAssignment(overrides = {}) {
@@ -89,24 +91,30 @@ export function mockMultipleAttachments() {
   return [
     {
       _id: '1',
+      id: '1',
       displayName: 'awesome-test-image1.png',
       mimeClass: 'data',
+      submissionPreviewUrl: 'https://some/awesome/preview1',
       thumbnailUrl: 'https://some/awesome/thumbnail1.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     },
     {
       _id: '2',
+      id: '2',
       displayName: 'awesome-test-image2.png',
       mimeClass: 'data',
+      submissionPreviewUrl: 'https://some/awesome/preview2',
       thumbnailUrl: 'https://some/awesome/thumbnail2.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
     },
     {
       _id: '3',
+      id: '3',
       displayName: 'awesome-test-image3.png',
       mimeClass: 'data',
+      submissionPreviewUrl: 'https://some/awesome/preview3',
       thumbnailUrl: 'https://some/awesome/thumbnail3.jpg',
       url: 'fake_url',
       __typename: 'Attachment'
@@ -149,6 +157,7 @@ export function singleAttachment(overrides = {}) {
     __typename: 'Attachment',
     _id: '20',
     displayName: 'lookatme.pdf',
+    id: '20',
     mimeClass: 'pdf',
     thumbnailUrl: 'https://some/awesome/thumbnail.jpg',
     url: 'https://some-awesome/url/goes/here',
@@ -162,6 +171,7 @@ export function commentGraphqlMock(comments) {
       request: {
         query: SUBMISSION_COMMENT_QUERY,
         variables: {
+          submissionAttempt: legacyMockSubmission().attempt,
           submissionId: legacyMockSubmission().id
         }
       },
@@ -175,7 +185,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: legacyMockSubmission()._id,
+          submissionAttempt: legacyMockSubmission().attempt,
+          id: legacyMockSubmission().id,
           comment: 'lion',
           fileIds: []
         }
@@ -205,7 +216,8 @@ export function commentGraphqlMock(comments) {
       request: {
         query: CREATE_SUBMISSION_COMMENT,
         variables: {
-          id: legacyMockSubmission()._id,
+          submissionAttempt: legacyMockSubmission().attempt,
+          id: legacyMockSubmission().id,
           comment: 'lion',
           fileIds: ['1', '2', '3']
         }
@@ -234,10 +246,30 @@ export function commentGraphqlMock(comments) {
   ]
 }
 
+export function mockSubmissionHistoriesConnection() {
+  const submissionHistory = mockSubmission()
+
+  return {
+    __typename: 'SubmissionHistoryConnection',
+    pageInfo: {
+      __typename: 'PageInfo',
+      hasPreviousPage: false,
+      startCursor: btoa('1')
+    },
+    edges: [
+      {
+        __typename: 'SubmissionHistoryEdge',
+        cursor: btoa('1'),
+        node: submissionHistory
+      }
+    ]
+  }
+}
+
 export function mockGraphqlQueryResults(overrides = {}) {
   const assignment = mockAssignment(overrides)
   assignment.submissionsConnection = {
-    nodes: [legacyMockSubmission()],
+    nodes: [mockSubmission()],
     __typename: 'SubmissionConnection'
   }
   return assignment
@@ -247,9 +279,37 @@ export function submissionGraphqlMock() {
   return [
     {
       request: {
+        query: CREATE_SUBMISSION_DRAFT,
+        variables: {
+          id: mockSubmission().id,
+          attempt: 1,
+          fileIds: ['1']
+        }
+      },
+      result: {
+        data: {
+          createSubmissionDraft: {
+            submissionDraft: {
+              __typename: 'SubmissionDraft',
+              _id: '22',
+              attachments: [singleAttachment({_id: '1'})]
+            },
+            errors: {
+              attribute: null,
+              message: null,
+              __typename: 'Errors'
+            },
+            __typename: 'CreateSubmissionDraftPayload'
+          }
+        }
+      }
+    },
+    {
+      request: {
         query: CREATE_SUBMISSION,
         variables: {
-          id: '22',
+          assignmentLid: '22',
+          submissionID: mockSubmission().id,
           type: 'online_upload',
           fileIds: ['1']
         }
@@ -272,15 +332,39 @@ export function submissionGraphqlMock() {
       request: {
         query: STUDENT_VIEW_QUERY,
         variables: {
-          assignmentLid: '22'
+          assignmentLid: '22',
+          submissionID: mockSubmission().id
         }
       },
       result: {
         data: {
           assignment: mockGraphqlQueryResults({
             lockInfo: {isLocked: false, __typename: 'LockInfo'}
-          }),
-          __typename: 'Assignment'
+          })
+        }
+      }
+    },
+    {
+      request: {
+        query: SUBMISSION_ID_QUERY,
+        variables: {
+          assignmentLid: '22'
+        }
+      },
+      result: {
+        data: {
+          assignment: {
+            submissionsConnection: {
+              nodes: [
+                {
+                  id: mockSubmission().id,
+                  __typename: 'Submission'
+                }
+              ],
+              __typename: 'SubmissionConnection'
+            },
+            __typename: 'Assignment'
+          }
         }
       }
     }
@@ -289,8 +373,8 @@ export function submissionGraphqlMock() {
 
 export function mockSubmission(overrides = {}) {
   return {
-    _id: '22',
-    id: btoa('Submisison-22'),
+    attachments: mockMultipleAttachments(),
+    attempt: 1,
     commentsConnection: {
       __typename: 'CommentsConnection',
       nodes: [
@@ -312,12 +396,27 @@ export function mockSubmission(overrides = {}) {
     enteredGrade: null,
     grade: null,
     gradingStatus: 'needs_grading',
+    id: btoa('Submission-22'),
     latePolicyStatus: null,
     state: 'submitted',
     submissionDraft: null,
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
     __typename: 'Submission',
+    ...overrides
+  }
+}
+
+export function mockSubmissionHistory() {
+  const submissionHistory = mockSubmission()
+  delete submissionHistory.id
+  return submissionHistory
+}
+
+export function mockSubmissionDraft(overrides = {}) {
+  return {
+    _id: '50',
+    attachments: [singleAttachment()],
     ...overrides
   }
 }
@@ -332,11 +431,10 @@ export function mockSubmission(overrides = {}) {
 //     function that has the same results as submission in the old mockAssignment.
 export function legacyMockSubmission() {
   const overrides = {
-    _id: '3',
-    id: btoa('Submission-3'),
     deductedPoints: 3,
     enteredGrade: '9',
     grade: '6',
+    id: btoa('Submission-3'),
     latePolicyStatus: 'late',
     submissionStatus: 'late',
     submittedAt: '2019-02-20T15:12:33-07:00',

@@ -33,7 +33,8 @@ module Factories
     params = base_line_item_params_with_resource_link(assignment, overrides).merge(
       overrides.except(:assignment, :course, :resource_link, :with_resource_link, :tool)
     )
-    params[:client_id] = DeveloperKey.create!.id unless assignment.external_tool? || overrides[:with_resource_link]
+    params[:client_id] = overrides[:client_id]
+    params[:client_id] ||= DeveloperKey.create!.id unless assignment.external_tool? || overrides[:with_resource_link]
     Lti::LineItem.create!(params)
   end
 

@@ -499,6 +499,25 @@ describe Canvas::LiveEvents do
       end
     end
 
+
+    describe '.submission_comment_created' do
+      it 'should trigger a submission comment created live event' do
+        comment = submission.submission_comments.create!(
+          comment: "here is a comment",
+          submission_id: submission.id, author_id: @student.id
+        )
+        expect_event('submission_comment_created',{
+          user_id: comment.author_id.to_s,
+          created_at: comment.created_at,
+          submission_id: comment.submission_id.to_s,
+          body: comment.comment,
+          attachment_ids: [],
+          submission_comment_id: comment.id.to_s,
+        }).once
+        Canvas::LiveEvents.submission_comment_created(comment)
+      end
+    end
+
     describe '.plagiarism_resubmit' do
       it "should include the user_id and assignment_id" do
         expect_event('plagiarism_resubmit',
@@ -552,6 +571,23 @@ describe Canvas::LiveEvents do
       }).once
 
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
+    end
+
+    it "should include filename and display_name if asset is an attachment" do
+      attachment_model
+
+      expect_event('asset_accessed', {
+        asset_type: 'attachment',
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: 'files',
+        role: 'role',
+        level: 'participation',
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }).once
+
+      Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
     end
   end
 
@@ -945,6 +981,61 @@ describe Canvas::LiveEvents do
       }).once
 
       Canvas::LiveEvents.discussion_topic_created(topic)
+    end
+  end
+
+  describe '.discussion_entry_submitted' do
+    context 'with non graded discussion' do
+      it 'should create a discussion entry created live event' do
+        course_with_student
+        topic = @course.discussion_topics.create!(
+          title: "test title",
+          message: "test body"
+        )
+        entry = topic.discussion_entries.create!(
+          message: "<p>This is a reply</p>",
+          user_id: @student.id
+        )
+
+        expect_event('discussion_entry_submitted', {
+          user_id: entry.global_user_id.to_s,
+          created_at: entry.created_at,
+          discussion_entry_id: entry.global_id.to_s,
+          discussion_topic_id: entry.global_discussion_topic_id.to_s,
+          text: entry.message
+        }).once
+
+        Canvas::LiveEvents.discussion_entry_submitted(entry, nil, nil)
+      end
+    end
+
+    context 'with graded discussion' do
+      it 'should include assignment and submission in created live event' do
+        course_with_student_submissions
+        assignment = @course.assignments.first
+        submission = assignment.submission_for_student_id(@student.id)
+        topic = @course.discussion_topics.create!(
+          title: "test title",
+          message: "test body",
+          assignment_id: assignment.id
+        )
+        entry = topic.discussion_entries.create!(
+          message: "<p>This is a reply</p>",
+          user_id: @student.id
+        )
+
+        expect_event('discussion_entry_submitted', {
+          assignment_id: assignment.global_id.to_s,
+          submission_id: submission.global_id.to_s,
+          user_id: entry.global_user_id.to_s,
+          created_at: entry.created_at,
+          discussion_entry_id: entry.global_id.to_s,
+          discussion_topic_id: entry.global_discussion_topic_id.to_s,
+          text: entry.message
+        }).once
+
+        Canvas::LiveEvents.discussion_entry_submitted(entry, assignment.global_id, submission.global_id)
+      end
     end
   end
 end

@@ -146,7 +146,7 @@ export default class TeacherView extends React.Component {
 
   isAssignmentValid = () => Object.keys(this.state.invalids).length === 0
 
-  handleUnsubmittedClick = () => {
+  handleMessageStudentsClick = () => {
     this.setState({messageStudentsWhoOpen: true})
   }
 
@@ -378,13 +378,13 @@ export default class TeacherView extends React.Component {
                     onValidate={this.validate}
                     invalidMessage={this.invalidMessage}
                     onSetWorkstate={newState => this.handleSetWorkstate(saveAssignment, newState)}
-                    onUnsubmittedClick={this.handleUnsubmittedClick}
                     onDelete={this.handleDeleteButtonPressed}
                     readOnly={this.props.readOnly}
                   />
                   <ContentTabs
                     assignment={assignment}
                     onChangeAssignment={this.handleChangeAssignment}
+                    onMessageStudentsClick={this.handleMessageStudentsClick}
                     onValidate={this.validate}
                     invalidMessage={this.invalidMessage}
                     readOnly={this.props.readOnly}

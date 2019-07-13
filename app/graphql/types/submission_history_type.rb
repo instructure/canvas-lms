@@ -28,5 +28,19 @@ module Types
 
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
+
+    field :root_id, ID, <<~DESC, method: :id, null: false
+      The canvas legacy id of the root submission this history belongs to
+    DESC
+
+    # Only the current (non-versionable) submission should return a submission
+    # draft, even if there are drafts for submission histories in the database
+    field :submission_draft, Types::SubmissionDraftType, null: true
+    def submission_draft
+      Loaders::IDLoader.for(Submission).load(object.id).then do |current_submission|
+        next nil if object.attempt != current_submission.attempt
+        super
+      end
+    end
   end
 end

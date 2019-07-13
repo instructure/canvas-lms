@@ -42,28 +42,30 @@ export default class OverrideSummary extends React.Component {
     return <Text weight="bold">{override.title}</Text>
   }
 
-  renderAttemptsAllowed(override) {
+  renderAttemptsAllowedAndSubmissionTypes(override) {
     const allowed = override.allowedAttempts
     const attempts = Number.isInteger(allowed) ? allowed : 1
-    return <Text>{I18n.t({one: '1 Attempt', other: '%{count} Attempts'}, {count: attempts})}</Text>
-  }
-
-  renderSubmissionTypesAndDueDate(override) {
     return (
       <Text>
+        <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
+        <div style={{display: 'inline-block', padding: '0 .5em'}}>|</div>
         <OverrideSubmissionTypes variant="summary" override={override} />
-        <Text>
-          <div style={{display: 'inline-block', padding: '0 .5em'}}>|</div>
-          {override.dueAt ? (
-            <FriendlyDatetime
-              prefix={I18n.t('Due: ')}
-              dateTime={override.dueAt}
-              format={I18n.t('#date.formats.full')}
-            />
-          ) : (
-            I18n.t('No Due Date')
-          )}
-        </Text>
+      </Text>
+    )
+  }
+
+  renderDueDate(override) {
+    return (
+      <Text color="secondary">
+        {override.dueAt ? (
+          <FriendlyDatetime
+            prefix={I18n.t('Due: ')}
+            dateTime={override.dueAt}
+            format={I18n.t('#date.formats.full')}
+          />
+        ) : (
+          I18n.t('No Due Date')
+        )}
       </Text>
     )
   }
@@ -75,7 +77,7 @@ export default class OverrideSummary extends React.Component {
     // both dates exist, manually add Available prefix
     if (override.unlockAt && override.lockAt) {
       return (
-        <Text>
+        <Text color="secondary">
           {I18n.t('Available ')}
           <AvailabilityDates assignment={override} formatStyle="short" />
         </Text>
@@ -84,7 +86,7 @@ export default class OverrideSummary extends React.Component {
     // only one date exists, AvailabilityDates will include the Available prefix
     if (override.unlockAt || override.lockAt) {
       return (
-        <Text>
+        <Text color="secondary">
           <AvailabilityDates assignment={override} formatStyle="short" />
         </Text>
       )
@@ -112,7 +114,7 @@ export default class OverrideSummary extends React.Component {
                   <OverrideAssignTo override={override} variant="summary" />
                 </View>
                 <View display="block">
-                  <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
+                  {this.renderAttemptsAllowedAndSubmissionTypes(override)}
                 </View>
               </View>
             )
@@ -120,7 +122,7 @@ export default class OverrideSummary extends React.Component {
             const rightColumn = (
               <View display="block">
                 <View display="block" margin="0 0 xxx-small">
-                  {this.renderSubmissionTypesAndDueDate(override)}
+                  {this.renderDueDate(override)}
                 </View>
                 <View display="block">{this.renderAvailability(override)}</View>
               </View>

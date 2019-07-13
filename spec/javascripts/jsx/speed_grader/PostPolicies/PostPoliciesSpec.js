@@ -18,6 +18,7 @@
 
 import {unmountComponentAtNode} from 'react-dom'
 import PostPolicies from '../../../../../app/jsx/speed_grader/PostPolicies'
+import SpeedGraderHelpers from '../../../../../public/javascripts/speed_grader_helpers'
 
 QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
   let $hideTrayMountPoint
@@ -28,7 +29,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
   function expectedAssignment() {
     return {
-      anonymizeStudents: false,
+      anonymousGrading: false,
       gradesPublished: true,
       id: '2301',
       name: 'Math 1.1'
@@ -135,7 +136,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       strictEqual(afterUpdateSubmission.callCount, 1)
     })
 
-    test('onHidden updates posted_at', () => {
+    test('onHidden updates posted_at when assignment anonymousGrading is false', () => {
       const submissionsMap = {
         '1': {posted_at: new Date().toISOString()}
       }
@@ -143,6 +144,31 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       const {onHidden} = hideGradesShowArgs()
       onHidden({postedAt: null, userIds: ['1']})
       strictEqual(submissionsMap['1'].posted_at, null)
+    })
+
+    test('onHidden does not reload the page when assignment anonymousGrading is false', () => {
+      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const submissionsMap = {
+        '1': {posted_at: new Date().toISOString()}
+      }
+      postPolicies.showHideAssignmentGradesTray({submissionsMap})
+      const {onHidden} = hideGradesShowArgs()
+      onHidden({postedAt: null, userIds: ['1']})
+      strictEqual(reloadStub.callCount, 0)
+      reloadStub.restore()
+    })
+
+    test('onHidden reloads the page when assignment anonymousGrading is true', () => {
+      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const submissionsMap = {
+        '1': {posted_at: new Date().toISOString()}
+      }
+      postPolicies._assignment.anonymousGrading = true
+      postPolicies.showHideAssignmentGradesTray({submissionsMap})
+      const {onHidden} = hideGradesShowArgs()
+      onHidden()
+      strictEqual(reloadStub.callCount, 1)
+      reloadStub.restore()
     })
   })
 
@@ -177,11 +203,15 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
         id: '93',
         assignment_id: '2301',
         posted_at: new Date().toISOString(),
-        user_id: '441'
+        score: 1.0,
+        user_id: '441',
+        workflow_state: 'graded'
       }
       postPolicies.showPostAssignmentGradesTray({submissions: [submission]})
       const {submissions} = postGradesShowArgs()
-      deepEqual(submissions, [submission])
+      deepEqual(submissions, [
+        {postedAt: submission.posted_at, score: 1.0, workflowState: submission.workflow_state}
+      ])
     })
 
     test('passes updateSubmission to "show"', () => {
@@ -198,7 +228,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       strictEqual(afterUpdateSubmission.callCount, 1)
     })
 
-    test('onPosted updates posted_at', () => {
+    test('onPosted updates posted_at when assignment anonymousGrading is false', () => {
       const submissionsMap = {
         '1': {posted_at: null}
       }
@@ -207,6 +237,32 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       const {onPosted} = postGradesShowArgs()
       onPosted({postedAt, userIds: ['1']})
       strictEqual(submissionsMap['1'].posted_at, postedAt)
+    })
+
+    test('onPosted does not reload the page when assignment anonymousGrading is false', () => {
+      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const submissionsMap = {
+        '1': {posted_at: null}
+      }
+      postPolicies.showPostAssignmentGradesTray({submissionsMap})
+      const postedAt = new Date().toISOString()
+      const {onPosted} = postGradesShowArgs()
+      onPosted({postedAt, userIds: ['1']})
+      strictEqual(reloadStub.callCount, 0)
+      reloadStub.restore()
+    })
+
+    test('onPosted reloads the page when assignment anonymousGrading is true', () => {
+      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const submissionsMap = {
+        '1': {posted_at: null}
+      }
+      postPolicies._assignment.anonymousGrading = true
+      postPolicies.showPostAssignmentGradesTray({submissionsMap})
+      const {onPosted} = postGradesShowArgs()
+      onPosted()
+      strictEqual(reloadStub.callCount, 1)
+      reloadStub.restore()
     })
   })
 })

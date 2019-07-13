@@ -22,6 +22,7 @@ class AccountNotification < ActiveRecord::Base
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
+  validates_length_of :subject, :maximum => maximum_string_length
   sanitize_field :message, CanvasSanitize::SANITIZE
 
   after_save :create_alert

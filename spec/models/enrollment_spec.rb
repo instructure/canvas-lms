@@ -2975,6 +2975,44 @@ describe Enrollment do
       expect(DueDateCacher).to receive(:recompute).never
       @enrollment.destroy
     end
+
+    context 'with mastery paths' do
+      before do
+        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
+        assignment_override_model(
+          assignment: @assignments.first,
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS
+        )
+        @override = assignment_override_model(assignment: @assignments.first)
+        @student_override = @override.assignment_override_students.create(user: @student)
+      end
+
+      it 'restores assignment override from mastery paths' do
+        @enrollment.destroy
+        expect(@override.reload.workflow_state).to eq 'deleted'
+        expect(@student_override.reload.workflow_state).to eq 'deleted'
+        @enrollment.enrollment_state.update(state:'invited')
+        @enrollment.update(workflow_state:'invited')
+        @enrollment.reload.accept!
+        expect(@override.reload.workflow_state).to eq 'active'
+        expect(@student_override.reload.workflow_state).to eq 'active'
+      end
+
+      it 'restores student assignment override from mastery paths' do
+        other_student = User.create!
+        @course.enroll_student(other_student, enrollment_state: :active)
+        @override.assignment_override_students.create!(user: other_student)
+        @enrollment.destroy
+        expect(@override.reload.workflow_state).to eq 'active'
+        expect(@student_override.reload.workflow_state).to eq 'deleted'
+        @enrollment.enrollment_state.update(state:'invited')
+        @enrollment.update(workflow_state:'invited')
+        @enrollment.reload.accept!
+        expect(@override.reload.workflow_state).to eq 'active'
+        expect(@student_override.reload.workflow_state).to eq 'active'
+      end
+    end
   end
 
   describe "#student_with_conditions?" do

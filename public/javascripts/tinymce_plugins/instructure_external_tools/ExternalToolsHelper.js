@@ -54,6 +54,7 @@ export default {
       classes: 'widget btn instructure_external_tool_button'
     }
     if (ENV.use_rce_enhancements) {
+      config.text = config.title
       config.onAction = () => editor.execCommand(`instructureExternalButton${button.id}`)
       config.type = 'menuitem'
     } else {

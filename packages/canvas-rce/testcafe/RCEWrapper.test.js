@@ -47,6 +47,25 @@ function labeledBy(text) {
   ))
 }
 
+test('edits in the textarea are reflected in the editor', async (t) => {
+  await t
+    .click(toggleButton)
+    .typeText(textarea, 'this is new content')
+    .click(toggleButton)
+    .switchToIframe(tinyIframe)
+    .expect(Selector('body').withText('this is new content').visible).ok()
+    .switchToMainWindow()
+
+  await t
+    .click(toggleButton)
+    .typeText(textarea, 'this is more content')
+    .click(toggleButton)
+    .switchToIframe(tinyIframe)
+    .expect(Selector('body').withText('this is new content').visible).ok()
+    .expect(Selector('body').withText('this is more content').visible).ok()
+    .switchToMainWindow()
+})
+
 test('shows the create links menu', async t => {
   await t
     .click(toggleButton)
@@ -93,8 +112,13 @@ test('can create a link', async t => {
     .click(linksButton)
     .click(externalLinksMenuItem)
     .expect(linkDialog.visible).ok()
+    .expect(labeledBy('URL').visible).ok()
 
-    await t.expect(labeledBy('URL').visible).ok()
+  await t
+    .typeText(labeledBy('URL'), 'https://instructure.com')
+    .click(Selector('button').withText('Save'))
+    .switchToIframe(tinyIframe)
+    .expect(Selector('a').withAttribute('href', 'https://instructure.com').withAttribute('target', '_blank').exists).ok()
 })
 
 test('can edit a link', async t => {
@@ -167,4 +191,65 @@ test('focus returns on dismissing tray', async t => {
 
     .switchToIframe(tinyIframe)
     .expect(focusedTag()).eql('BODY')
+})
+
+test('show the kb shortcut modal various ways', async t => {
+  const hiddenbutton = Selector('[data-testid="ShowOnFocusButton__sronly"]')
+  const kbshortcutbutton = Selector('button[data-testid="ShowOnFocusButton__button"]')
+  const shortcutmodal = Selector('[data-testid="RCE_KeyboardShortcutModal"]')
+  const focusKBSCBtn = ClientFunction(
+    () => kbshortcutbutton().focus(),
+    {dependencies: {kbshortcutbutton}}
+  )
+
+  await t
+    .expect(hiddenbutton.exists).ok()
+    .expect(kbshortcutbutton.exists).ok()
+
+  await focusKBSCBtn()
+
+  // open keyboard shortcut modal from the show-on-focus button
+  // close with escape
+  await t
+    .expect(hiddenbutton.exists).notOk()
+    .expect(kbshortcutbutton.visible).ok()
+    .click(kbshortcutbutton)
+    .expect(shortcutmodal.visible).ok()
+    .pressKey('esc')
+    .expect(shortcutmodal.exists).notOk()
+
+  // open modal using alt+0
+  // close with the close button
+  await t
+    .pressKey('alt+0')
+    .expect(shortcutmodal.visible).ok()
+    .click(Selector('button').withText('Close'))
+    .expect(shortcutmodal.exists).notOk()
+
+  // open modal from button in status bar
+  await t
+    .click(Selector('[data-testid="RCEStatusBar"] button').withText('View keyboard shortcuts'))
+    .expect(shortcutmodal.visible).ok()
+})
+
+test('editor auto-resizes as content is added', async t => {
+  const paramargin = 12
+  const fontSize = 16
+  const height = await rceContainer.clientHeight
+  const parasFitInRce = Math.floor(height / (fontSize + paramargin))
+  let content = ''
+  // add 1 too many
+  for (let i = 0; i <= parasFitInRce; ++i) {
+    content += '<p>para</p>'
+  }
+
+  await t
+    .click(toggleButton)
+    .typeText(textarea, content)
+    .click(toggleButton)
+    .switchToMainWindow()
+
+  const newHeight = await rceContainer.clientHeight
+  await t
+    .expect(newHeight > height).ok()
 })

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!outcomes'
+import I18n from 'i18n!IndividualStudentMasteryIndex'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
 import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'

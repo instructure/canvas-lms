@@ -25,7 +25,6 @@ import {bindActionCreators} from 'redux'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import View from '@instructure/ui-layout/lib/components/View'
 import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconXLine from '@instructure/ui-icons/lib/Line/IconX'
@@ -92,11 +91,15 @@ export default class RSSFeedList extends React.Component {
           >
             <GridRow>
               <GridCol>
-                <Link margin="0 small" href={url}>
-                  <Text size="small" margin="0 small 0">
-                    {display_name}
-                  </Text>
-                </Link>
+                <Button
+                  variant="link"
+                  margin="0 small"
+                  size="small"
+                  href={url}
+                  theme={{smallPadding: '0', smallHeight: '1rem'}}
+                >
+                  {display_name}
+                </Button>
                 <Text size="small" margin="0 small" color="secondary">
                   {this.renderPostAddedText(external_feed_entries_count)}
                 </Text>

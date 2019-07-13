@@ -49,7 +49,7 @@ class SubmissionComment < ActiveRecord::Base
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
   validates_each :attempt do |record, attr, value|
     next if value.nil?
-    if record.submission.attempt.nil? || value > record.submission.attempt
+    if value > (record.submission.attempt || 0)
       record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
     end
   end
@@ -206,7 +206,7 @@ class SubmissionComment < ActiveRecord::Base
     # The student who owns the submission can't see drafts or hidden comments (or,
     # generally, any instructor comments if the assignment is muted)
     if submission.user_id == user.id
-      return false if draft? || hidden? || assignment.muted?
+      return false if draft? || hidden? || !submission.posted?
 
       # Generally the student should see only non-provisional comments--but they should
       # also see provisional comments from the final grader if grades are published

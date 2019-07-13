@@ -60,6 +60,10 @@ module RCENextPage
     f('#rcs-LinkToNewPage-submit')
   end
 
+  def wiki_body
+    f('#tinymce')
+  end
+
   def wiki_body_anchor
     f('#tinymce p a')
   end
@@ -122,8 +126,20 @@ module RCENextPage
     possibly_hidden_toolbar_button('button[aria-label="Images"]')
   end
 
+  def media_toolbar_button
+    possibly_hidden_toolbar_button('button[aria-label="Record/Upload Media"]')
+  end
+
   def course_images
     f('[role="menuitem"][title="Course Images"]')
+  end
+
+  def upload_image_button
+    f('[role="menuitem"][title="Upload Image"]')
+  end
+
+  def upload_image_modal
+    f('[role="dialog"][aria-label="Upload Image"')
   end
 
   def image_options_button
@@ -132,6 +148,14 @@ module RCENextPage
 
   def image_options_tray
     f('[role="dialog"][aria-label="Image Options Tray"]')
+  end
+
+  def upload_media_button
+    f('[role="menuitem"][title="Upload/Record Media"]')
+  end
+
+  def upload_media_modal
+    f('[role="dialog"][aria-label="Upload Media"')
   end
 
   def rce_page_body_ifr_id
@@ -202,6 +226,26 @@ module RCENextPage
     # put align right button locator here
   end
 
+  def formatting_dropdown
+    f("button[aria-label='Blocks'")
+  end
+
+  def header_option
+    f('[role="menuitemcheckbox"][title="Header"]')
+  end
+
+  def subheader_option
+    f('[role="menuitemcheckbox"][title=" Subheader"]')
+  end
+
+  def small_header_option
+    f('[role="menuitemcheckbox"][title=" Small header"]')
+  end
+
+  def preformatted_option
+    f('[role="menuitemcheckbox"][title=" Preformatted"]')
+  end
+
   def rce_next_toolbar
     f(".tox-toolbar__primary")
   end
@@ -223,7 +267,23 @@ module RCENextPage
   end
 
   def image_options_done_button
-    fj('[data-cid="Portal Tray"] button:contains("Done")')
+    fj('[aria-label="Image Options Tray"] button:contains("Done")')
+  end
+
+  def visible_keyboard_shortcut_button
+    ffj('button:has([name="IconKeyboardShortcuts"])')[1]
+  end
+
+  def keyboard_shortcut_modal
+    f('[role="dialog"][aria-label="Keyboard Shortcuts"]')
+  end
+
+  def alt_text_textbox
+    f('textarea[aria-describedby="alt-text-label-tooltip"]')
+  end
+
+  def decorative_options_checkbox
+    f('[data-cid="Checkbox"]')
   end
 
   # ---------------------- Actions ----------------------
@@ -296,8 +356,22 @@ module RCENextPage
     images_toolbar_button.click
   end
 
+  def click_media_toolbar_button
+    media_toolbar_button.click
+  end
+
   def click_course_images
     course_images.click
+    wait_for_ajaximations
+  end
+
+  def click_upload_image
+    upload_image_button.click
+    wait_for_ajaximations
+  end
+
+  def click_upload_media
+    upload_media_button.click
     wait_for_ajaximations
   end
 
@@ -357,6 +431,26 @@ module RCENextPage
     align_right_button.click
   end
 
+  def click_formatting_dropdown
+    formatting_dropdown.click
+  end
+
+  def click_header_option
+    header_option.click
+  end
+
+  def click_subheader_option
+    subheader_option.click
+  end
+
+  def click_small_header_option
+    small_header_option.click
+  end
+
+  def click_preformatted_option
+    preformatted_option.click
+  end
+
   def click_editor_window
     editor_window.click
   end
@@ -379,5 +473,13 @@ module RCENextPage
 
   def click_image_options_done_button
     image_options_done_button.click
+  end
+
+  def click_visible_keyboard_shortcut_button
+    visible_keyboard_shortcut_button.click
+  end
+
+  def click_decorative_options_checkbox
+    decorative_options_checkbox.click
   end
 end

@@ -396,8 +396,8 @@ lti_1_3:
 assignments_2:
   state: hidden
   display_name: Assignments 2
-  description: Allow switching to the new assignments page
-  applies_to: RootAccount
+  description: Use the new assignments page
+  applies_to: Course
   root_opt_in: true
   beta: true
   development: true
@@ -415,19 +415,19 @@ restrict_students_from_annotating:
     apply to peer-reviewed assignments.
   applies_to: Course
   development: true
-post_policies:
-  state: hidden
-  display_name: Post Policies
-  description: |-
-    Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
-    posted and hidden manually.
-  applies_to: Course
-  development: true
 rce_enhancements:
-  state: hidden
+  state: hidden_in_prod
   display_name: RCE Enhancements
   description: Allow switching to the enhanced RCE
   applies_to: Course
   root_opt_in: true
   beta: true
+  development: true
+new_features_ui:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Feature Flags
+  description: This feature creates a SiteAdmin Release Flag tab to be able
+    to release features to users through the UI. It also reworks the UI for
+    the old Feature Options tabs.
   development: true

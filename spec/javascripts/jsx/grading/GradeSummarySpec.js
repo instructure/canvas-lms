@@ -38,7 +38,7 @@ function createAssignmentGroups() {
 }
 
 function createSubmissions() {
-  return [{assignment_id: '201', score: 10}, {assignment_id: '203', score: 15}]
+  return [{assignment_id: '201', score: 10}]
 }
 
 function createExampleGrades() {
@@ -108,14 +108,14 @@ function setPageHtmlFixture() {
       </div>
       <span id="aria-announcer"></span>
       <table id="grades_summary" class="editable">
-        <tr class="student_assignment editable">
+        <tr class="student_assignment editable" data-muted="false">
           <td class="assignment_score" title="Click to test a different score">
             <div class="score_holder">
               <span class="tooltip">
-                <span class="tooltip_wrap">
-                  <span class="tooltip_text score_teaser">Click to test a different score</span>
-                </span>
                 <span class="grade">
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text score_teaser">Click to test a different score</span>
+                  </span>
                   <span class="screenreader-only">Click to test a different score</span>
                 </span>
                 <span class="score_value">A</span>
@@ -126,6 +126,46 @@ function setPageHtmlFixture() {
                 <span class="what_if_score"></span>
                 <span class="assignment_id">201</span>
                 <span class="student_entered_score">7</span>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr class="student_assignment editable" data-muted="true">
+          <td class="assignment_score" title="Muted">
+            <div class="score_holder">
+              <span class="tooltip">
+                <span class="grade">
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text score_teaser">Instructor is working on grades</span>
+                  </span>
+                </span>
+                <span class="score_value"></span>
+              </span>
+              <span style="display: none;">
+                <span class="original_points"></span>
+                <span class="original_score"></span>
+                <span class="what_if_score"></span>
+                <span class="assignment_id">202</span>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr class="student_assignment editable" data-muted="true">
+          <td class="assignment_score" title="Muted">
+            <div class="score_holder">
+              <span class="tooltip">
+                <span class="grade">
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text score_teaser">Instructor is working on grades</span>
+                  </span>
+                </span>
+                <span class="score_value"></span>
+              </span>
+              <span style="display: none;">
+                <span class="original_points"></span>
+                <span class="original_score"></span>
+                <span class="what_if_score"></span>
+                <span class="assignment_id">203</span>
               </span>
             </div>
           </td>
@@ -1059,13 +1099,15 @@ test('adds the "changed" class to the .grade element', function() {
 
 test('sets the .grade element content to the updated score', function() {
   this.onScoreChange('5')
-  equal(this.$assignment.find('.grade').html(), '5')
+  const gradeText = this.$assignment.find('.grade').text()
+  ok(gradeText.includes('5'))
 })
 
 test('sets the .grade element content to the previous score when the updated score is falsy', function() {
   this.$assignment.find('.grade').data('originalValue', '10.0')
   this.onScoreChange('')
-  equal(this.$assignment.find('.grade').html(), '10')
+  const gradeText = this.$assignment.find('.grade').text()
+  ok(gradeText.includes('10'))
 })
 
 test('updates the score for the given assignment', function() {
@@ -1077,17 +1119,17 @@ test('updates the score for the given assignment', function() {
   equal(score, 5, 'the parsed score is used to update the assignment score')
 })
 
-QUnit.module('GradeSummary - Revert Score', {
-  setup() {
-    fullPageSetup()
-    this.$assignment = $fixtures.find('#grades_summary .student_assignment').first()
-    const $assignmentScore = this.$assignment.find('.assignment_score')
+QUnit.module('GradeSummary - Revert Score', hooks => {
+  let $assignment
+
+  function simulateWhatIfUse($assignmentToEdit) {
+    const $assignmentScore = $assignmentToEdit.find('.assignment_score')
+    const $grade = $assignmentToEdit.find('.grade')
     // reproduce the What-If setup from .onEditWhatIfScore
     const $screenreaderLinkClone = $assignmentScore.find('.screenreader-only').clone(true)
     $assignmentScore.find('.grade').data('screenreader_link', $screenreaderLinkClone)
     // reproduce the What-If setup from .onScoreChange
     const $scoreTeaser = $assignmentScore.find('.score_teaser')
-    const $grade = this.$assignment.find('.grade')
     $assignmentScore.attr('title', '')
     $scoreTeaser.text('This is a What-If score')
     const $revertScore = $('#revert_score_template')
@@ -1096,105 +1138,124 @@ QUnit.module('GradeSummary - Revert Score', {
       .show()
     $assignmentScore.find('.score_holder').append($revertScore)
     $grade.addClass('changed')
-    this.$assignment.find('.original_score').text('5')
-  },
-
-  onScoreRevert() {
-    GradeSummary.onScoreRevert(this.$assignment, {refocus: false, skipEval: false})
-  },
-
-  teardown() {
-    commonTeardown()
+    $assignment.find('.original_score').text('5')
   }
-})
 
-test('sets the .what_if_score text to the .original_score text', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.what_if_score').text(), '5')
-})
-
-test('sets the .assignment_score title to the "Click to test" message', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.assignment_score').attr('title'), 'Click to test a different score')
-})
-
-test('sets the .score_teaser text to the "Click to test" message when the assignment is not muted', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.score_teaser').text(), 'Click to test a different score')
-})
-
-test('sets the .score_teaser text to the "Instructor is working" message when the assignment is muted', function() {
-  this.$assignment.data('muted', true)
-  this.onScoreRevert()
-  equal(this.$assignment.find('.score_teaser').text(), 'Instructor is working on grades')
-})
-
-test('removes the "changed" class from the .grade element', function() {
-  this.onScoreRevert()
-  notOk(
-    this.$assignment.find('.assignment_score .grade').hasClass('changed'),
-    'changed class is not present'
-  )
-})
-
-test('removes the .revert_score_link element', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.revert_score_link').length, 0)
-})
-
-test('sets the .score_value text to the .original_score text', function() {
-  this.onScoreRevert()
-  equal(this.$assignment.find('.score_value').text(), '5')
-})
-
-test('sets the .grade html to the "muted assignment" indicator when the assignment is muted', function() {
-  this.$assignment.data('muted', true)
-  this.onScoreRevert()
-  equal(this.$assignment.find('.grade .muted_icon').length, 1)
-})
-
-test('sets the .grade text to .original_score when the assignment is not muted', function() {
-  this.onScoreRevert()
-  const $grade = this.$assignment.find('.grade')
-  $grade.children().remove() // remove all content except score text
-  equal($grade.text(), '5')
-})
-
-test('updates the score for the assignment', function() {
-  sandbox.stub(GradeSummary, 'updateScoreForAssignment')
-  this.onScoreRevert()
-  equal(GradeSummary.updateScoreForAssignment.callCount, 1)
-  const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args
-  equal(assignmentId, '201', 'first argument is the assignment id 201')
-  strictEqual(score, 10, 'second argument is the numerical score 10')
-})
-
-test('updates the score for the assignment with null when the .original_points is blank', function() {
-  this.$assignment.find('.original_points').text('')
-  sandbox.stub(GradeSummary, 'updateScoreForAssignment')
-  this.onScoreRevert()
-  const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1]
-  strictEqual(score, null)
-})
-
-test('updates the student grades after updating the assignment score', function() {
-  sandbox.stub(GradeSummary, 'updateScoreForAssignment')
-  sandbox.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
-    equal(
-      GradeSummary.updateScoreForAssignment.callCount,
-      1,
-      'updateScoreForAssignment is performed first'
-    )
+  hooks.beforeEach(() => {
+    fullPageSetup()
+    $assignment = $fixtures.find('#grades_summary .student_assignment').first()
+    simulateWhatIfUse($assignment)
   })
-  this.onScoreRevert()
-  equal(GradeSummary.updateStudentGrades.callCount, 1, 'updateStudentGrades is called once')
-})
 
-test('attaches a "Click to test" .screenreader-only element to the grade element', function() {
-  const $grade = $fixtures.find('.assignment_score .grade').first()
-  this.onScoreRevert()
-  equal($grade.find('.screenreader-only').length, 1)
-  equal($grade.find('.screenreader-only').text(), 'Click to test a different score')
+  hooks.afterEach(() => {
+    commonTeardown()
+  })
+
+  test('sets the .what_if_score text to the .original_score text', function() {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.what_if_score').text(), '5')
+  })
+
+  test('sets the .assignment_score title to the "Click to test" message', function() {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.assignment_score').attr('title'), 'Click to test a different score')
+  })
+
+  test('sets the .score_teaser text to the "Click to test" message when the assignment is not muted', function() {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_teaser').text(), 'Click to test a different score')
+  })
+
+  test('sets the .score_teaser text to the "Instructor is working" message when the assignment is muted', function() {
+    $assignment.data('muted', true)
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_teaser').text(), 'Instructor is working on grades')
+  })
+
+  test('removes the .revert_score_link element', function() {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.revert_score_link').length, 0)
+  })
+
+  test('sets the .score_value text to the .original_score text', function() {
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_value').text(), '5')
+  })
+
+  test('sets the .grade html to the "muted assignment" indicator when the assignment is muted', function() {
+    $assignment.data('muted', true)
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.grade .muted_icon').length, 1)
+  })
+
+  test('removes the "changed" class from the .grade element', function() {
+    GradeSummary.onScoreRevert($assignment)
+    notOk($assignment.find('.assignment_score .grade').hasClass('changed'))
+  })
+
+  test('sets the .grade text to .original_score when the assignment is not muted', function() {
+    GradeSummary.onScoreRevert($assignment)
+    const $grade = $assignment.find('.grade')
+    $grade.children().remove() // remove all content except score text
+    equal($grade.text(), '5')
+  })
+
+  test('updates the score for the assignment', function() {
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment')
+    GradeSummary.onScoreRevert($assignment)
+    equal(GradeSummary.updateScoreForAssignment.callCount, 1)
+    const [assignmentId, score] = GradeSummary.updateScoreForAssignment.getCall(0).args
+    equal(assignmentId, '201', 'first argument is the assignment id 201')
+    strictEqual(score, 10, 'second argument is the numerical score 10')
+  })
+
+  test('updates the score for the assignment with null when the .original_points is blank', function() {
+    $assignment.find('.original_points').text('')
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment')
+    GradeSummary.onScoreRevert($assignment)
+    const score = GradeSummary.updateScoreForAssignment.getCall(0).args[1]
+    strictEqual(score, null)
+  })
+
+  test('updates the student grades after updating the assignment score', function() {
+    sandbox.stub(GradeSummary, 'updateScoreForAssignment')
+    sandbox.stub(GradeSummary, 'updateStudentGrades').callsFake(() => {
+      equal(
+        GradeSummary.updateScoreForAssignment.callCount,
+        1,
+        'updateScoreForAssignment is performed first'
+      )
+    })
+    GradeSummary.onScoreRevert($assignment)
+    equal(GradeSummary.updateStudentGrades.callCount, 1, 'updateStudentGrades is called once')
+  })
+
+  test('attaches a "Click to test" .screenreader-only element to the grade element', function() {
+    const $grade = $fixtures.find('.assignment_score .grade').first()
+    GradeSummary.onScoreRevert($assignment)
+    equal($grade.find('.screenreader-only').length, 1)
+    equal($grade.find('.screenreader-only').text(), 'Click to test a different score')
+  })
+
+  QUnit.module('when post policies are enabled', postPoliciesEnabledHooks => {
+    postPoliciesEnabledHooks.beforeEach(() => {
+      ENV.post_policies_enabled = true
+    })
+
+    test('sets the title attribute to be "Hidden" when the submission is unposted', () => {
+      const $unpostedAssignment = $fixtures.find('#grades_summary .student_assignment').eq(1)
+      simulateWhatIfUse($unpostedAssignment)
+      GradeSummary.onScoreRevert($unpostedAssignment)
+      strictEqual($unpostedAssignment.find('.assignment_score').attr('title'), 'Hidden')
+    })
+
+    test('sets the unposted icon to icon-off when submission is unposted', () => {
+      const $unpostedAssignment = $fixtures.find('#grades_summary .student_assignment').eq(1)
+      simulateWhatIfUse($unpostedAssignment)
+      GradeSummary.onScoreRevert($unpostedAssignment)
+      strictEqual($unpostedAssignment.find('i.icon-off').length, 1)
+    })
+  })
 })
 
 QUnit.module('GradeSummary.updateScoreForAssignment', {
@@ -1219,10 +1280,10 @@ test('ignores submissions not having the given assignment id', function() {
 })
 
 test('adds a submission with the score when no submission matches the given assignment id', function() {
-  GradeSummary.updateScoreForAssignment('205', 30)
-  equal(ENV.submissions.length, 3, 'submission count has changed from 2 to 3')
-  deepEqual(_.map(ENV.submissions, 'assignment_id'), ['201', '203', '205'])
-  deepEqual(_.map(ENV.submissions, 'score'), [10, 15, 30])
+  GradeSummary.updateScoreForAssignment('203', 30)
+  equal(ENV.submissions.length, 2, 'submission count has changed from 1 to 2')
+  deepEqual(_.map(ENV.submissions, 'assignment_id'), ['201', '203'])
+  deepEqual(_.map(ENV.submissions, 'score'), [10, 30])
 })
 
 QUnit.module('GradeSummary.finalGradePointsPossibleText', {

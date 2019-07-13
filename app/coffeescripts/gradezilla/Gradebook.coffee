@@ -301,7 +301,7 @@ export default do ->
       else
         @postPolicies = null
 
-      $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
+      $.subscribe 'assignment_muting_toggled',        @handleSubmissionPostedChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
 
       # emitted by SectionMenuView; also subscribed in OutcomeGradebookView
@@ -939,7 +939,7 @@ export default do ->
 
     ## Course Content Event Handlers
 
-    handleAssignmentMutingChange: (assignment) =>
+    handleSubmissionPostedChange: (assignment) =>
       if assignment.anonymize_students
         anonymousColumnIds = [
           @getAssignmentColumnId(assignment.id),
@@ -2714,6 +2714,14 @@ export default do ->
         @gradebookGrid.gridSupport.columns.updateColumnHeaders([@getAssignmentColumnId(assignmentId)])
         @gradebookGrid.invalidate()
       )
+
+    postAssignmentGradesTrayOpenChanged: ({assignmentId, isOpen}) =>
+      columnId = @getAssignmentColumnId(assignmentId)
+      definition = @gridData.columns.definitions[columnId]
+      return unless definition && definition.type == 'assignment'
+
+      definition.postAssignmentGradesTrayOpenForAssignmentId = isOpen
+      @updateGrid()
 
     ## Course Settings Access Methods
 

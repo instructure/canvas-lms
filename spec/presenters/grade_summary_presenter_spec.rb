@@ -615,7 +615,8 @@ describe GradeSummaryPresenter do
     let_once(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:post_policies) }
+      before(:once) { course.enable_feature!(:new_gradebook) }
+      before(:once) { PostPolicy.enable_feature! }
 
       it "returns true if any of the student's submissions in the course is unposted" do
         assignment2.post_submissions

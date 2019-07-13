@@ -153,7 +153,7 @@ class AssignmentsController < ApplicationController
           PREREQS: assignment_prereqs
         })
 
-        if @context.root_account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2])
+        if @context.feature_enabled?(:assignments_2) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
             js_bundle :assignments_2_show_teacher
@@ -234,6 +234,7 @@ class AssignmentsController < ApplicationController
     css_bundle :assignment_grade_summary
     js_bundle :assignment_grade_summary
     js_env(show_moderate_env)
+    set_student_context_cards_js_env
 
     @page_title = @assignment.title
 
@@ -642,7 +643,6 @@ class AssignmentsController < ApplicationController
         id: @assignment.final_grader_id
       },
       GRADERS: moderation_graders_json(@assignment, @current_user, session),
-      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     }
   end
 

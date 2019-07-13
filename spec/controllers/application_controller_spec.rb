@@ -24,6 +24,8 @@ RSpec.describe ApplicationController do
     request_double = double(
       host_with_port: "www.example.com",
       host: "www.example.com",
+      url: "http://www.example.com",
+      method: "GET",
       headers: {},
       format: double(:html? => true),
       user_agent: nil,
@@ -1094,7 +1096,9 @@ describe ApplicationController do
         hostname: 'test.host',
         user_agent: 'Rails Testing',
         client_ip: '0.0.0.0',
-        producer: 'canvas'
+        producer: 'canvas',
+        url: 'http://test.host',
+        http_method: 'GET'
       }
     end
 
@@ -1103,12 +1107,12 @@ describe ApplicationController do
     end
 
     it 'stringifies the non-strings in the context attributes' do
-      current_user_attributes = { global_id: 12345 }
+      current_user_attributes = { global_id: 12345, time_zone: 'asdf' }
 
       current_user = double(current_user_attributes)
       controller.instance_variable_set(:@current_user, current_user)
       controller.send(:setup_live_events_context)
-      expect(LiveEvents.get_context).to eq({user_id: '12345'}.merge(non_conditional_values))
+      expect(LiveEvents.get_context).to eq({user_id: '12345', time_zone: 'asdf'}.merge(non_conditional_values))
     end
 
     it 'sets the "context_sis_source_id"' do
@@ -1145,13 +1149,15 @@ describe ApplicationController do
     context 'when a current_user exists' do
       let(:current_user_attributes) do
         {
-          global_id: 'user_global_id'
+          global_id: 'user_global_id',
+          time_zone: 'America/Denver'
         }
       end
 
       let(:expected_context_attributes) do
         {
-          user_id: 'user_global_id'
+          user_id: 'user_global_id',
+          time_zone: 'America/Denver'
         }.merge(non_conditional_values)
       end
 
@@ -1179,6 +1185,27 @@ describe ApplicationController do
       it 'sets the correct attributes on the LiveEvent context' do
         real_current_user = double(real_current_user_attributes)
         controller.instance_variable_set(:@real_current_user, real_current_user)
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+    end
+
+    context 'when an access_token exists' do
+      let(:real_access_token_attributes) do
+        {
+          developer_key: double(global_id: '1111')
+        }
+      end
+
+      let(:expected_context_attributes) do
+        {
+          developer_key_id: '1111'
+        }.merge(non_conditional_values)
+      end
+
+      it 'sets the correct attributes on the LiveEvent context' do
+        real_access_token = double(real_access_token_attributes)
+        controller.instance_variable_set(:@access_token, real_access_token)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
       end
@@ -1220,7 +1247,8 @@ describe ApplicationController do
       let(:expected_context_attributes) do
         {
           context_type: 'Class',
-          context_id: 'context_global_id'
+          context_id: 'context_global_id',
+          context_account_id: nil
         }.merge(non_conditional_values)
       end
 
@@ -1229,6 +1257,24 @@ describe ApplicationController do
         controller.instance_variable_set(:@context, canvas_context)
         controller.send(:setup_live_events_context)
         expect(LiveEvents.get_context).to eq(expected_context_attributes)
+      end
+
+      context 'when a course' do
+        let(:course) { course_model }
+        let(:expected_context_attributes) do
+          {
+            context_type: 'Course',
+            context_id: course.global_id.to_s,
+            context_account_id: course.account.global_id.to_s,
+            context_sis_source_id: nil
+          }.merge(non_conditional_values)
+        end
+
+        it 'sets the correct attributes on the LiveEvent context' do
+          controller.instance_variable_set(:@context, course)
+          controller.send(:setup_live_events_context)
+          expect(LiveEvents.get_context).to eq(expected_context_attributes)
+        end
       end
     end
 

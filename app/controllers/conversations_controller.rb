@@ -305,10 +305,6 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def toggle_new_conversations
-    redirect_to action: 'index'
-  end
-
   # @API Create a conversation
   # Create a new conversation with one or more recipients. If there is already
   # an existing private conversation with the given recipients, it will be
@@ -332,10 +328,10 @@ class ConversationsController < ApplicationController
   #   Forces a new message to be created, even if there is an existing private conversation.
   #
   # @argument group_conversation [Boolean]
-  #   Defaults to false. If true, this will be a group conversation (i.e. all
-  #   recipients may see all messages and replies). If false, individual private
-  #   conversations will be started with each recipient. Must be set false if the
-  #   number of recipients is over the set maximum (default is 100).
+  #   Defaults to false.  When false, individual private conversations will be
+  #   created with each recipient. If true, this will be a group conversation
+  #   (i.e. all recipients may see all messages and replies). Must be set true if
+  #   the number of recipients is over the set maximum (default is 100).
   #
   # @argument attachment_ids[] [String]
   #   An array of attachments ids. These must be files that have been previously
@@ -1060,14 +1056,6 @@ class ConversationsController < ApplicationController
     end
     content += "</div>"
     content
-  end
-
-  def watched_intro
-    unless @current_user.watched_conversations_intro?
-      @current_user.watched_conversations_intro
-      @current_user.save
-    end
-    render :json => {}
   end
 
   private

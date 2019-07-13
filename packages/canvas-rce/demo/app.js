@@ -35,13 +35,15 @@ function getProps(textareaId, state) {
     editorOptions: () => {
       return {
         directionality: state.dir,
-        height: "250px",
+        height: '250px',
         plugins:
-          "instructure-context-bindings, instructure-ui-icons, instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table, lists, instructure_condensed_buttons",
+          'instructure-context-bindings, instructure-embeds, instructure-ui-icons, instructure_equation, ' +
+          'instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, ' +
+          'instructure_links, table, lists, instructure_condensed_buttons, instructure_documents',
         // todo: add "instructure_embed" when the wiki sidebar work is done
         external_plugins: {},
         menubar: true
-      };
+      }
     },
 
     textareaClassName: "exampleClassOne",

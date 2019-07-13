@@ -31,6 +31,8 @@ module LiveEvents
   # queue for cases when the process is shutting down.
 
   class AsyncWorker
+    attr_reader :logger
+
     def initialize(start_thread = true)
       @queue = Queue.new
       @logger = LiveEvents.logger
@@ -52,12 +54,15 @@ module LiveEvents
     end
 
     def stop!
+      logger.info("Draining live events queue")
       @queue << :stop
       @thread.join
+      logger.info("Live events async worker stopped")
     end
 
     def start!
       @thread = Thread.new { self.run_thread }
+      at_exit { stop! }
     end
 
     def run_thread
@@ -69,7 +74,7 @@ module LiveEvents
         begin
           p.call
         rescue Exception => e
-          @logger.error("Exception making LiveEvents async call: #{e}")
+          logger.error("Exception making LiveEvents async call: #{e}")
         end
       end
     end

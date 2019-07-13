@@ -37,7 +37,8 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         anonymousGrading: false,
         gradesPublished: true,
         id: '2301',
-        name: 'Math 1.1'
+        name: 'Math 1.1',
+        postManually: false
       },
       onExited: sinon.spy(),
       onPosted: sinon.spy(),
@@ -205,7 +206,8 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     })
 
     test('is not shown when there are no sections', async () => {
-      await show({sections: []})
+      context.sections = []
+      await show()
       notOk(getLabel('Freshmen'))
     })
   })
@@ -235,25 +237,25 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
 
   QUnit.module('unposted summary', () => {
     QUnit.module('with unposted submissions', () => {
-      test('the number of unposted submissions is displayed', async () => {
+      test('graded submissions without a postedAt are counted', async () => {
         context.submissions = [
-          {postedAt: new Date().toISOString()},
-          {postedAt: null},
-          {postedAt: null}
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
+          {postedAt: null, score: 1, workflowState: 'graded'},
+          {postedAt: null, score: null, workflowState: 'unsubmitted'}
         ]
-        await show(context)
-        strictEqual(getUnpostedCount().textContent, '2')
+        await show()
+        strictEqual(getUnpostedCount().textContent, '1')
       })
     })
 
     QUnit.module('with no unposted submissions', unpostedSubmissionsHooks => {
       unpostedSubmissionsHooks.beforeEach(async () => {
         context.submissions = [
-          {postedAt: new Date().toISOString()},
-          {postedAt: new Date().toISOString()}
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'}
         ]
 
-        await show(context)
+        await show()
       })
 
       test('a summary of unposted submissions is not displayed', () => {
@@ -368,6 +370,14 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       test('tray is closed after posting is finished', async () => {
         await clickPost()
         notOk(getTrayElement())
+      })
+
+      test('does not render an alert if the tray is launched from SpeedGrader and assignment is anonymous', async () => {
+        context.containerName = 'SPEED_GRADER'
+        context.assignment.anonymousGrading = true
+        await show()
+        await clickPost()
+        strictEqual(showFlashAlertStub.callCount, 0)
       })
     })
 

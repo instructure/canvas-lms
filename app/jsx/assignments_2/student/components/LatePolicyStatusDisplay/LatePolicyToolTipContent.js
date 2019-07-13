@@ -24,10 +24,13 @@ import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatH
 import AccessibleTipContent from './AccessibleTipContent'
 
 function LatePolicyToolTipContent(props) {
-  const {gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
+  // TODO - At this point we really should just pass in the whole assignment and
+  //        submission into this component and let it grab the data itself.
+  const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
     <React.Fragment>
       <AccessibleTipContent
+        attempt={attempt}
         grade={grade}
         gradingType={gradingType}
         originalGrade={originalGrade}
@@ -43,7 +46,7 @@ function LatePolicyToolTipContent(props) {
         <FlexItem>
           <Flex>
             <FlexItem margin="0 small 0 0">
-              <Text size="small">{I18n.t('Attempt 1')}</Text>
+              <Text size="small">{I18n.t('Attempt %{attempt}', {attempt})}</Text>
             </FlexItem>
             <FlexItem grow textAlign="end">
               <Text size="small">
@@ -88,6 +91,7 @@ function LatePolicyToolTipContent(props) {
 }
 
 LatePolicyToolTipContent.propTypes = {
+  attempt: PropTypes.number.isRequired,
   grade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,

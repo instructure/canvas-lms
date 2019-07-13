@@ -20,23 +20,31 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import ImageSearch from 'jsx/shared/ImageSearch'
+import $ from 'jquery'
 
-QUnit.module('ImageSearch View');
+QUnit.module('ImageSearch View', {
+  setup: () => {
+    $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+  },
+  teardown: () => {
+    $('#flash_screenreader_holder').remove()
+  }
+});
 
 const getDummySearchResults = () => {
   const photos = [{
-    id: 1,
+    id: 'crazy_id_1',
     alt: 'alt desc for photo 1',
     description: "desc for photo 1",
     raw_url: "url1"
   },
   {
-    id: 2,
+    id: 'crazy_id_2',
     description: "desc for photo 2",
     raw_url: "url2"
   },
   {
-    id: 3,
+    id: 'crazy_id_3',
     description: null,
     raw_url: "url3"
   }];
@@ -92,7 +100,7 @@ test('it clears search results when input is cleared', () => {
   ok(called, 'clearResults was called');
 });
 
-test('it disables previous and next when there is only one page of results', assert => {
+test('it hides previous and next when there is only one page of results', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
@@ -102,15 +110,14 @@ test('it disables previous and next when there is only one page of results', ass
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: null}, () => {
     ok(
-      Boolean(imageSearch.refs.imageSearchControlNext.props.disabled &&
-        imageSearch.refs.imageSearchControlPrev.props.disabled),
-      'next and previous are disabled'
+      Boolean(!imageSearch._imageSearchControlNext && !imageSearch._imageSearchControlPrev),
+      'next and previous are not present'
     );
     done();
   });
 });
 
-test('it only enables next page when there is a next-page', assert => {
+test('it only renders next page when there is a next-page', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
@@ -120,15 +127,15 @@ test('it only enables next page when there is a next-page', assert => {
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
     ok(
-      Boolean(!imageSearch.refs.imageSearchControlNext.props.disabled &&
-        imageSearch.refs.imageSearchControlPrev.props.disabled),
-      'next button is enabled'
+      Boolean(imageSearch._imageSearchControlNext &&
+        !imageSearch._imageSearchControlPrev),
+      'next button is present'
     );
     done();
   });
 });
 
-test('it only enables previous when there is a previous-page', assert => {
+test('it only renders previous when there is a previous-page', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
     <ImageSearch />
@@ -138,9 +145,9 @@ test('it only enables previous when there is a previous-page', assert => {
 
   imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
     ok(
-      Boolean(imageSearch.refs.imageSearchControlNext.props.disabled &&
-        !imageSearch.refs.imageSearchControlPrev.props.disabled),
-      'previous button is enabled');
+      Boolean(!imageSearch._imageSearchControlNext &&
+        imageSearch._imageSearchControlPrev),
+      'previous button is present');
     done();
   });
 });
@@ -154,8 +161,8 @@ test('it enables next and previous when there are both next and previous pages',
   const searchResults = getDummySearchResults();
 
   image.setState({searchResults, prevUrl: "http://prev", nextUrl: "http://next"}, () => {
-    ok(Boolean(!image.refs.imageSearchControlNext.props.disabled && !image.refs.imageSearchControlPrev.props.disabled),
-      'next and previous are both enabled');
+    ok(Boolean(image._imageSearchControlNext && image._imageSearchControlPrev),
+      'next and previous are both present');
     done();
   });
 });
@@ -171,7 +178,7 @@ test('it loads next page of results when next is clicked', assert => {
   const searchResults = getDummySearchResults();
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
-    TestUtils.Simulate.click(ReactDOM.findDOMNode(imageSearch.refs.imageSearchControlNext));
+    TestUtils.Simulate.click(imageSearch._imageSearchControlNext);
     ok(called, 'clicking next triggered next results action');
     done();
   });
@@ -188,7 +195,7 @@ test('it loads previous page of results when previous is clicked', assert => {
   const searchResults = getDummySearchResults();
 
   imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
-    TestUtils.Simulate.click(ReactDOM.findDOMNode(imageSearch.refs.imageSearchControlPrev));
+    TestUtils.Simulate.click(imageSearch._imageSearchControlPrev);
     ok(called, 'clicking previous triggered previous results action');
     done();
   });
@@ -212,6 +219,22 @@ test('it renders search results', assert => {
   });
 });
 
+test('it shows text when no results found', assert => {
+  const done = assert.async()
+  const imageSearch = TestUtils.renderIntoDocument(
+    <ImageSearch />
+  );
+
+  imageSearch.setState({searchResults: [], searchTerm: 'lkjlkj', alert: 'failure'}, () => {
+    strictEqual(
+      TestUtils.findRenderedDOMComponentWithClass(imageSearch, 'ImageSearch__images').innerText,
+      'No results found for lkjlkj',
+      'rendered no search results'
+    );
+    done();
+  });
+});
+
 test('it shows appropriate alt text for results', assert => {
   const done = assert.async()
   const imageSearch = TestUtils.renderIntoDocument(
@@ -225,5 +248,21 @@ test('it shows appropriate alt text for results', assert => {
     strictEqual(images[1].alt, 'desc for photo 2')
     strictEqual(images[2].alt, 'cats')
     done()
+  })
+})
+
+test('it announces when search results are returned for screenreaders', assert => {
+  const done = assert.async()
+  const imageSearch = TestUtils.renderIntoDocument(
+    <ImageSearch />
+  )
+
+  const searchResults = getDummySearchResults()
+  imageSearch.setState({searchResults, searchTerm: 'cats', alert: 'success'}, () => {
+    const srElement = $('body').find('#flash_screenreader_holder')
+    setTimeout(() => {
+      strictEqual(srElement.text(), '3 images found for cats')
+      done()
+    })
   })
 })

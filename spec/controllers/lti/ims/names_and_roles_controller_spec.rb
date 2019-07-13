@@ -18,6 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/names_and_roles_controller.rb"
 require_dependency "lti/ims/providers/course_memberships_provider.rb"
 require_dependency "lti/ims/providers/group_memberships_provider.rb"
@@ -314,6 +315,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
 
     it_behaves_like 'advantage services'
+    it_behaves_like 'lti services'
 
     # Bunch of single-enrollment tests b/c they're just so much easier to
     # debug as compared to multi-enrollment tests
@@ -870,6 +872,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:unknown_context_id) { group_record && Group.maximum(:id) + 1 }
 
     it_behaves_like 'advantage services'
+    it_behaves_like 'lti services'
 
     context 'when a group has a single membership' do
       let(:group_record) { group_with_user(active_all: true, context: course).group }
