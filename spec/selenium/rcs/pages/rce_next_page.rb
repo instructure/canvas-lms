@@ -100,10 +100,6 @@ module RCENextPage
     fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
 
-  def document_link(title)
-    fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')")
-  end
-
   def assignment_published_status
     # add selector
   end
@@ -172,10 +168,6 @@ module RCENextPage
 
   def upload_document_button
     f('[role="menuitem"][title="Upload Document"]')
-  end
-
-  def course_documents
-    f('[role="menuitem"][title="Course Documents"]')
   end
 
   def upload_document_modal
@@ -380,10 +372,6 @@ module RCENextPage
     image_link(title).click
   end
 
-  def click_document_link(title)
-    document_link(title).click
-  end
-
   def click_links_toolbar_button
     links_toolbar_button.click
   end
@@ -421,11 +409,6 @@ module RCENextPage
 
   def click_upload_document
     upload_document_button.click
-    wait_for_ajaximations
-  end
-
-  def click_course_documents
-    course_documents.click
     wait_for_ajaximations
   end
 
