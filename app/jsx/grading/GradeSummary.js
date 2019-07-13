@@ -196,6 +196,10 @@ const GradeSummary = {
     const score = GradeSummary.getOriginalScore($assignment)
     let title
 
+    if (score.numericalValue == null) {
+      score.formattedValue = GradeSummary.parseScoreText(null).formattedValue
+    }
+
     if ($assignment.data('muted')) {
       if (ENV.post_policies_enabled) {
         title = I18n.t('Hidden')
