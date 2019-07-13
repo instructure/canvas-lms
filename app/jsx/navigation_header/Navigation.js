@@ -37,8 +37,6 @@ const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversa
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
 const UNREAD_COUNT_POLL_INTERVAL = 60000 // 60 seconds
-const UNREAD_COUNT_ALLOWED_AGE = UNREAD_COUNT_POLL_INTERVAL / 2
-const UNREAD_COUNT_SESSION_STORAGE_KEY = `unread_count_for_${window.ENV.current_user_id}`
 
 const TYPE_URL_MAP = {
   courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
@@ -60,6 +58,7 @@ export default class Navigation extends React.Component {
     courses: [],
     help: [],
     unread_count: 0,
+    unread_count_attempts: 0,
     isTrayOpen: false,
     type: null,
     coursesLoading: false,
@@ -114,23 +113,13 @@ export default class Navigation extends React.Component {
 
   componentDidMount() {
     if (
-      !this.unread_count_attempts &&
+      !this.state.unread_count_attempts &&
       window.ENV.current_user_id &&
       !window.ENV.current_user_disabled_inbox &&
-      this.unreadCountElement() &&
+      this.unreadCountElement().length &&
       !(window.ENV.current_user && window.ENV.current_user.fake_student)
     ) {
-      let msUntilIShouldStartPolling = 0
-      const saved = sessionStorage.getItem(UNREAD_COUNT_SESSION_STORAGE_KEY)
-      if (saved) {
-        const {updatedAt, unread_count} = JSON.parse(saved)
-        const millisecondsSinceLastUpdate = new Date() - updatedAt
-        if (millisecondsSinceLastUpdate < UNREAD_COUNT_ALLOWED_AGE) {
-          this.updateUnreadCount(unread_count)
-          msUntilIShouldStartPolling = UNREAD_COUNT_ALLOWED_AGE - millisecondsSinceLastUpdate
-        }
-      }
-      setTimeout(this.pollUnreadCount.bind(this), msUntilIShouldStartPolling)
+      this.pollUnreadCount()
     }
   }
 
@@ -181,36 +170,26 @@ export default class Navigation extends React.Component {
     return data
   }
 
-  async pollUnreadCount() {
-    this.unread_count_attempts = (this.unread_count_attempts || 0) + 1
-    if (this.unread_count_attempts > 5) return
-
-    // don't let this count against us in newRelic's SPA load time stats
-    const fetch = window.fetchIgnoredByNewRelic || window.fetch
-
-    try {
-      const {unread_count} = await (await fetch('/api/v1/conversations/unread_count', {
-        headers: {Accept: 'application/json'}
-      })).json()
-
-      sessionStorage.setItem(
-        UNREAD_COUNT_SESSION_STORAGE_KEY,
-        JSON.stringify({
-          updatedAt: +new Date(),
-          unread_count
-        })
-      )
-      this.updateUnreadCount(unread_count)
-    } catch (error) {
-      console.error('something went wrong updating unread count', error)
-    }
-    setTimeout(this.pollUnreadCount.bind(this), this.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL)
+  pollUnreadCount() {
+    this.setState({unread_count_attempts: this.state.unread_count_attempts + 1}, function() {
+      if (this.state.unread_count_attempts <= 5) {
+        $.ajax('/api/v1/conversations/unread_count')
+          .then(data => this.updateUnreadCount(data.unread_count))
+          .then(null, console.log.bind(console, 'something went wrong updating unread count'))
+          .always(() =>
+            setTimeout(
+              () => this.pollUnreadCount(),
+              this.state.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL
+            )
+          )
+      }
+    })
   }
 
   unreadCountElement() {
     return (
-      this._unreadCountElement ||
-      (this._unreadCountElement = $('#global_nav_conversations_link').find('.menu-item__badge')[0])
+      this.$unreadCount ||
+      (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
     )
   }
 
@@ -229,11 +208,9 @@ export default class Navigation extends React.Component {
         </ScreenReaderContent>
         <PresentationContent>{count}</PresentationContent>
       </React.Fragment>,
-      this.unreadCountElement()
+      this.unreadCountElement()[0]
     )
-    if (this.unreadCountElement()) {
-      this.unreadCountElement().style.display = count > 0 ? '' : 'none'
-    }
+    this.unreadCountElement().toggle(count > 0)
   }
 
   determineActiveLink() {
