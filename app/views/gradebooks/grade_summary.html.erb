@@ -148,7 +148,7 @@
          can_view_distribution = can_do(@context, @current_user, :read_as_admin) || !assignment_presenter.hide_distribution_graphs?
       %>
     <tr class="<%= assignment_presenter.classes %>"
-        data-muted="<%= !assignment_presenter.posted_to_student? %>"
+        data-muted="<%= assignment_presenter.hide_grade_from_student? %>"
         id="<%= "submission_" + assignment.id.to_s %>"
         <% if assignment_presenter.excused? %>
           <% excused_label = t "This assignment is excused and will not be considered in the total calculation" %>
@@ -202,7 +202,7 @@
                 <span class="tooltip_wrap right" aria-hidden="true">
                   <% if @presenter.editable? || assignment.special_class %>
                     <span class="tooltip_text score_teaser">
-                      <% if !assignment_presenter.posted_to_student? %>
+                      <% if assignment_presenter.hide_grade_from_student? %>
                         <%= t(:student_mute_notification, "Instructor is working on grades") %>
                       <% elsif submission.try :pending_review? %>
                         <%= t(:grading_in_progress, "Instructor is working on grades") %>
@@ -214,7 +214,7 @@
                     </span>
                   <% end %>
                 </span>
-                <% if !assignment_presenter.posted_to_student? %>
+                <% if assignment_presenter.hide_grade_from_student? %>
                   <i class="<%= hidden_icon_class %>" title="<%= hidden_text %>"></i>
                 <% else %>
                   <span class="screenreader-only" role="button">
@@ -267,7 +267,7 @@
           <a href="#"
               class="toggle_final_grade_info tooltip"
               aria-label="<%= t('This assignment does not count toward the final grade.') %>"
-            <% if assignment.omit_from_final_grade? && assignment_presenter.posted_to_student? %>
+            <% if assignment.omit_from_final_grade? && !assignment_presenter.hide_grade_from_student? %>
                 aria-expanded="false"
                 aria-controls="final_grade_info_<%= assignment.id %>"
             <% else %>
@@ -285,7 +285,7 @@
             class="toggle_comments_link tooltip"
             aria-label="<%= t('Read comments') %>"
             aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
-            <% if assignment_presenter.has_comments? && assignment_presenter.posted_to_student? %>
+            <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
               aria-expanded="false"
               aria-controls="comments_thread_<%= assignment.id %>"
               role="button"
@@ -495,7 +495,7 @@
           </tr>
       <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
         <td colspan="6">
-          <% if assignment_presenter.posted_to_student? && assignment_presenter.has_comments? %>
+          <% if !assignment_presenter.hide_grade_from_student? && assignment_presenter.has_comments? %>
               <table class="score_details_table ic-Table ic-Table--condensed">
                 <thead>
                   <tr>

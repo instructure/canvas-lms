@@ -1182,6 +1182,13 @@ QUnit.module('GradeSummary - Revert Score', hooks => {
     equal($assignment.find('.score_value').text(), '5')
   })
 
+  test('sets the .score value text to "-" when the submission was ungraded', function() {
+    $assignment.find('.original_points').text('')
+    $assignment.find('.original_score').text('')
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.score_value').text(), '-')
+  })
+
   test('sets the .grade html to the "muted assignment" indicator when the assignment is muted', function() {
     $assignment.data('muted', true)
     GradeSummary.onScoreRevert($assignment)

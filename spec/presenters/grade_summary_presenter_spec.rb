@@ -608,6 +608,7 @@ describe GradeSummaryPresenter do
   describe "#hidden_submissions?" do
     let_once(:course) { Course.create! }
     let_once(:student) { course.enroll_student(User.create!, enrollment_state: :active).user }
+    let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: :active).user }
 
     let_once(:assignment1) { course.assignments.create!(title: "a1") }
     let_once(:assignment2) { course.assignments.create!(title: "a2") }
@@ -615,15 +616,23 @@ describe GradeSummaryPresenter do
     let_once(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:new_gradebook) }
-      before(:once) { PostPolicy.enable_feature! }
+      before(:once) do
+        course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+        assignment1.ensure_post_policy(post_manually: true)
+        assignment2.ensure_post_policy(post_manually: false)
+      end
 
-      it "returns true if any of the student's submissions in the course is unposted" do
-        assignment2.post_submissions
+      it "returns true if any of the student's submissions in the course are graded and unposted" do
+        assignment1.grade_student(student, grader: teacher, score: 1)
 
         expect(presenter).to be_hidden_submissions
       end
-      
+
+      it "returns true if any of the student's submissions are unposted and assignment posts manually" do
+        expect(presenter).to be_hidden_submissions
+      end
+
       it "returns false if all of the student's submissions in the course are posted" do
         assignment1.post_submissions
         assignment2.post_submissions
