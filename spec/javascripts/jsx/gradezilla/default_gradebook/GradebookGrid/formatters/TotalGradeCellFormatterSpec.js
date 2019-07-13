@@ -38,7 +38,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
     })
     sinon.stub(gradebook, 'getTotalPointsPossible').returns(10)
     sinon.stub(gradebook, 'listInvalidAssignmentGroups').returns([])
-    sinon.stub(gradebook, 'listMutedAssignments').returns([])
+    sinon.stub(gradebook, 'listHiddenAssignments').returns([])
     sinon.stub(gradebook, 'saveSettings')
     formatter = new TotalGradeCellFormatter(gradebook)
 
@@ -48,7 +48,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   hooks.afterEach(() => {
     gradebook.getTotalPointsPossible.restore()
     gradebook.listInvalidAssignmentGroups.restore()
-    gradebook.listMutedAssignments.restore()
+    gradebook.listHiddenAssignments.restore()
     $fixture.remove()
   })
 
@@ -58,7 +58,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
       0, // cell
       grade, // value
       null, // column definition
-      null // dataContext
+      {id: '1001'} // student/dataContext
     )
     return $fixture
   }
@@ -142,14 +142,14 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   })
 
   test('renders a warning when there are hidden assignments', () => {
-    gradebook.listMutedAssignments.returns([{id: '2301'}])
+    gradebook.listHiddenAssignments.returns([{id: '2301'}])
     const expectedTooltip =
       "This grade differs from the student's view of the grade because some assignment grades are not yet posted"
     strictEqual(getTooltip(), expectedTooltip)
   })
 
   test('renders a warning icon when there are hidden assignments', () => {
-    gradebook.listMutedAssignments.returns([{id: '2301'}])
+    gradebook.listHiddenAssignments.returns([{id: '2301'}])
     strictEqual(renderCell().querySelectorAll('i.icon-off').length, 1)
   })
 
