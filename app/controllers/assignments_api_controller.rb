@@ -711,7 +711,7 @@ class AssignmentsApiController < ApplicationController
   end
 
   def get_assignments(user)
-    if authorized_action(@context, user, :read) && tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+    if authorized_action(@context, user, :read)
       scope = Assignments::ScopedToUser.new(@context, user).scope.
         eager_load(:assignment_group).
         preload(:rubric_association, :rubric).
