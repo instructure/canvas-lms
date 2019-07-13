@@ -4330,6 +4330,52 @@ test('has no effect when the grid has not been initialized', function() {
   ok(true, 'no error was thrown')
 })
 
+QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    const columns = [
+      {id: 'student', type: 'student'},
+      {id: 'assignment_232', type: 'assignment'},
+      {id: 'total_grade', type: 'total_grade'},
+      {id: 'assignment_group_12', type: 'assignment'}
+    ]
+    gradebook = createGradebook()
+    gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}]
+    sinon.stub(gradebook.courseContent.students, 'listStudentIds').returns(['1101', '1102'])
+
+    gradebook.gradebookGrid.grid = {
+      updateCell: sinon.stub(),
+      getColumns() {
+        return columns
+      }
+    }
+  })
+
+  test('makes exactly one update for each currently loaded student', () => {
+    gradebook.updateTotalGradeColumn()
+    strictEqual(gradebook.gradebookGrid.grid.updateCell.callCount, 2)
+  })
+
+  test('includes the row index of the student when updating', () => {
+    gradebook.updateTotalGradeColumn()
+    const rows = _.map(gradebook.gradebookGrid.grid.updateCell.args, args => args[0])
+    deepEqual(rows, [0, 1])
+  })
+
+  test('includes the index of the total_grade column when updating', () => {
+    gradebook.updateTotalGradeColumn()
+    const rows = _.map(gradebook.gradebookGrid.grid.updateCell.args, args => args[1])
+    deepEqual(rows, [2, 2])
+  })
+
+  test('has no effect when the grid has not been initialized', () => {
+    gradebook.gradebookGrid.grid = null
+    gradebook.updateTotalGradeColumn()
+    ok(true, 'no error was thrown')
+  })
+})
+
 QUnit.module('Gradebook Rows', function() {
   QUnit.module('#buildRows', function() {
     test('invalidates the grid', function() {
