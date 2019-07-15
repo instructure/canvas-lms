@@ -328,5 +328,31 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         subject.commit_history('url', '77', -1)
       end
     end
+
+    describe "submission posting" do
+      before(:each) do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+      end
+
+      it "posts the submission when the assignment is automatically posted" do
+        subject.commit_history('url', '77', -1)
+        expect(submission.reload).to be_posted
+      end
+
+      it "does not post the submission when the assignment is manually posted" do
+        assignment.ensure_post_policy(post_manually: true)
+
+        subject.commit_history('url', '77', -1)
+        expect(submission.reload).not_to be_posted
+      end
+
+      it "does not update the submission's posted_at date when it is already posted" do
+        submission.update!(posted_at: 1.day.ago)
+        expect {
+          subject.commit_history('url', '77', -1)
+        }.not_to change { submission.reload.posted_at }
+      end
+    end
   end
 end
