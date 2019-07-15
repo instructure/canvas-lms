@@ -18,6 +18,22 @@ class BeyondZConfiguration
     @config[:bitly_access_token]
   end
 
+  def self.docusign_host
+    @config[:docusign_host]
+  end
+
+  def self.docusign_api_key
+    @config[:docusign_api_key]
+  end
+
+  def self.docusign_api_secret
+    @config[:docusign_api_secret]
+  end
+
+  def self.docusign_return_url
+    @config[:docusign_return_url]
+  end
+
   def self.production?
     # This is the value of a setting we set on production
     # remember to edit this if we ever rebrand again so this

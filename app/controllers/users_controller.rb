@@ -1483,6 +1483,7 @@ class UsersController < ApplicationController
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
+    managed_attributes << :docusign_template_id # we need to set this from the join server, so being sure to allow it from the api too
 
     if @user.grants_right?(@current_user, :manage_user_details) || @current_user.id == @user.id
       managed_attributes.concat([:time_zone, :locale])

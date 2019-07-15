@@ -57,6 +57,14 @@ CanvasRails::Application.routes.draw do
   # Also a BZ addition: for managing the magic field schema
   resources :magic_field_schema
 
+  # docusign stuff
+  get 'bz/docusign_authorize' => 'bz#docusign_authorize'
+  get 'bz/docusign_redirect' => 'bz#docusign_redirect'
+
+  get 'bz/docusign_for_user' => 'bz#docusign_for_user'
+  get 'bz/docusign_user_redirect' => 'bz#docusign_user_redirect'
+  #
+
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
 

@@ -1824,6 +1824,22 @@ define([
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
           canvadoc_session_url: attachment.canvadoc_url
         }));
+      } else if (attachment.content_type == "application/pdf") {
+        // custom braven annotation load
+
+          var url = '/api/v1/files/'+previewOptions.attachment_id+'/public_url.json';
+          if (previewOptions.submission_id) {
+            url += '?' + $.param({ submission_id: previewOptions.submission_id });
+          }
+          $.ajaxJSON(url, 'GET', {}, function(data){
+            if (data && data.public_url) {
+              $.extend(previewOptions, data);
+
+              $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+                bz_annotation_url: "/bz/pdf_annotator?url=" + encodeURIComponent(data.public_url) + "&submission_id=" + previewOptions.submission_id
+              }));
+            }
+          });
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
 

@@ -1176,7 +1176,6 @@ class BzController < ApplicationController
       end
     end
 
-
     def get_current_employer(currentPositionsNode)
       cp = current_positions(currentPositionsNode)
       return nil if cp.length == 0
@@ -1433,4 +1432,201 @@ class BzController < ApplicationController
 
     redirect_to "/courses/#{@course.id}/dynamic_syllabus"
   end
+
+
+  # DOCUSIGN STUFF
+  def docusign_authorize
+    if @current_user.id != 1
+      raise Exception.new "log in as the admin account to do this setup task"
+    end
+
+    url = "https://#{BeyondZConfiguration.docusign_host}/oauth/auth?" +
+      "response_type=code&" +
+      "scope=signature%20extended&" +
+      "prompt=login&" + 
+      "client_id=#{BeyondZConfiguration.docusign_api_key}&" +
+      "redirect_uri=#{URI::encode(BeyondZConfiguration.docusign_return_url)}"
+
+    redirect_to url
+  end
+
+  # this is where docusign redirects TO after an auth
+  def docusign_redirect
+    if @current_user.id != 1
+      raise Exception.new "log in as the admin account to do this setup task"
+    end
+
+    code = params[:code]
+
+    url = URI.parse("https://#{BeyondZConfiguration.docusign_host}/oauth/token")
+
+    data = "grant_type=authorization_code&code=#{URI::encode(code)}"
+
+    headers = {}
+    headers["Content-Type"] = "application/x-www-form-urlencoded"
+    headers["Authorization"] = "Basic #{Base64.strict_encode64("#{BeyondZConfiguration.docusign_api_key}" + ":" + "#{BeyondZConfiguration.docusign_api_secret}")}"
+
+    account = Account.find(1)
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = data
+
+    response = http.request(request)
+    answer = JSON.parse(response.body)
+
+    access_token = answer["access_token"]
+    # and also time to get the user info and save that too
+
+    url = URI.parse("https://#{BeyondZConfiguration.docusign_host}/oauth/userinfo")
+    headers = {}
+    headers["Authorization"] = "Bearer #{access_token}"
+    request = Net::HTTP::Get.new(url.request_uri, headers)
+    response = http.request(request)
+    second_answer = JSON.parse(response.body)
+
+    # You will need the account_id and the base_uri claims of the user that your application is acting on behalf on to make calls to the DocuSign API. 
+    # it is under response.accounts[0]
+
+    # access_token, token_type, refresh_token, expires_in
+    # need to save that stuff for later
+
+    account.docusign_access_token = answer["access_token"]
+    account.docusign_refresh_token = answer["refresh_token"]
+    account.docusign_account_id = second_answer["accounts"][0]["account_id"]
+    account.docusign_base_uri = second_answer["accounts"][0]["base_uri"]
+    account.docusign_token_expiration = DateTime.now + answer["expires_in"].to_i.seconds
+
+    account.save
+
+    render :text => "Docusign Account ready!"
+
+  end
+
+  def docusign_for_user
+    doc = {}
+    doc["emailSubject"] = "Please sign this for Braven"
+    doc["compositeTemplates"] = [
+      {
+        "compositeTemplateId" => "1",
+        "serverTemplates" => [
+          {
+            "sequence" => "1",
+            "templateId" => @current_user.docusign_template_id
+
+          }
+        ],
+        "inlineTemplates" => [
+          {
+            "sequence" => "1",
+            "recipients" => {
+              "signers" => [
+                {
+                  "email" => @current_user.email,
+                  "name" => @current_user.name,
+                  "recipientId" => "1",
+                  "routingOrder" => "1",
+                  "roleName" => "signer",
+                  "clientUserId" => "portal_#{@current_user.id}"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+    doc["status"] = "sent"
+
+    account = Account.find(1)
+
+    if account.docusign_token_expiration < (DateTime.now + 1.days)
+      docusign_consume_refresh_token
+      account = Account.find(1)
+    end
+
+    url = URI.parse("#{account.docusign_base_uri}/restapi/v2/accounts/#{account.docusign_account_id}/envelopes")
+
+    data = doc.to_json
+
+    headers = {}
+    headers["Content-Type"] = "application/json"
+    headers["Authorization"] = "Bearer #{account.docusign_access_token}"
+
+    account = Account.find(1)
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = data
+
+    response = http.request(request)
+    answer = JSON.parse(response.body)
+
+    # now time to begin the signing process
+
+    envelope_id = answer["envelopeId"]
+
+    headers = {}
+    headers["Content-Type"] = "application/json"
+    headers["Authorization"] = "Bearer #{account.docusign_access_token}"
+
+    doc = {
+      "returnUrl" => "#{BeyondZConfiguration.docusign_return_url}",
+      "authenticationMethod" => "none",
+      "email" => @current_user.email,
+      "userName" => @current_user.name,
+      "clientUserId" => "portal_#{@current_user.id}"
+    }
+
+    url = URI.parse("#{account.docusign_base_uri}/restapi/v2/accounts/#{account.docusign_account_id}/envelopes/#{envelope_id}/views/recipient")
+
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = doc.to_json
+
+    response = http.request(request)
+    answer = JSON.parse(response.body)
+
+    redirect_to answer["url"]
+
+  end
+
+  def docusign_user_redirect
+    event = params[:event]
+
+    if event == 'signing_complete'
+      @current_user.accept_terms
+      @current_user.save
+      redirect_to("/")
+    else
+      render :text => "Sorry, but to access this system, you must sign the documentation. If you have concerns about it or believe you are seeing this message in error, please contact Braven."
+    end
+  end
+
+  def docusign_consume_refresh_token
+    account = Account.find(1)
+
+    url = URI.parse("https://#{BeyondZConfiguration.docusign_host}/oauth/token")
+
+    data = "grant_type=refresh_token&refresh_token=#{URI::encode(account.docusign_refresh_token)}"
+
+    headers = {}
+    headers["Content-Type"] = "application/x-www-form-urlencoded"
+    headers["Authorization"] = "Basic #{Base64.strict_encode64("#{BeyondZConfiguration.docusign_api_key}" + ":" + "#{BeyondZConfiguration.docusign_api_secret}")}"
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = data
+
+    response = http.request(request)
+    answer = JSON.parse(response.body)
+
+    account.docusign_access_token = answer["access_token"]
+    account.docusign_refresh_token = answer["refresh_token"]
+    account.docusign_token_expiration = DateTime.now + answer["expires_in"].to_i.seconds
+
+    account.save
+  end
+  # end docusign
 end

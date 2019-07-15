@@ -4,18 +4,30 @@ development:
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
   help_url: http://localhost
+  docusign_host: account-d.docusign.com
+  docusign_api_key: xxx-xxx-xxxx-xxxx
+  docusign_api_secret: xxx-xxx-xxxx-xxxx
+  docusign_return_url: https://portal.bebraven.org/bz/docusign_user_redirect
 
 test:
   base_url: https://test.bebraven.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
+  docusign_host: account-d.docusign.com
+  docusign_api_key: xxx-xxx-xxxx-xxxx
+  docusign_api_secret: xxx-xxx-xxxx-xxxx
+  docusign_return_url: https://portal.bebraven.org/bz/docusign_user_redirect
 
 staging:
   base_url: https://stagingjoin.bebraven.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
+  docusign_host: account-d.docusign.com
+  docusign_api_key: xxx-xxx-xxxx-xxxx
+  docusign_api_secret: xxx-xxx-xxxx-xxxx
+  docusign_return_url: https://portal.bebraven.org/bz/docusign_user_redirect
 
 production:
   google_analytics_account: UA-XXXXXXXX-1
@@ -24,4 +36,8 @@ production:
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
   help_url: https://help.bebraven.org
+  docusign_host: account.docusign.com
+  docusign_api_key: xxx-xxx-xxxx-xxxx
+  docusign_api_secret: xxx-xxx-xxxx-xxxx
+  docusign_return_url: https://portal.bebraven.org/bz/docusign_user_redirect
 
