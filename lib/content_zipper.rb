@@ -85,7 +85,7 @@ class ContentZipper
       # This neglects the complexity of group assignments
       students = User.where(id: submissions.pluck(:user_id)).index_by(&:id)
     else
-      students    = assignment.representatives(user).index_by(&:id)
+      students    = assignment.representatives(user: user).index_by(&:id)
       submissions = assignment.submissions.where(user_id: students.keys,
                                                  submission_type: downloadable_submissions)
     end
@@ -446,7 +446,7 @@ class ContentZipper
     # they do not include submissions for group assignments for anyone
     # but the original submitter of the group submission
     attachment_ids = submission.attachment_ids.try(:split, ",")
-    Attachment.where(id: Array.wrap(attachment_ids))
+    submission.shard.activate { Attachment.where(id: Array.wrap(attachment_ids)) }
   end
 
   def get_user_name(students, submission)

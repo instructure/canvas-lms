@@ -150,6 +150,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
     return (
       <Tray
         label={I18n.t('Hide grades tray')}
+        onDismiss={this.dismiss}
         onExited={onExited}
         open={this.state.open}
         placement="end"

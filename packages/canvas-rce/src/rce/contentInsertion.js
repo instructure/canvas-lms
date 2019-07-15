@@ -18,7 +18,6 @@
 
 import classnames from "classnames";
 import { renderLink, renderImage, renderLinkedImage } from "./contentRendering";
-import { cleanUrl } from "./contentInsertionUtils";
 import scroll from "../common/scroll";
 
 /*** generic content insertion ***/
@@ -136,35 +135,16 @@ export function existingContentToLinkIsImg(editor) {
   return !editor.isHidden() && selectionIsImg(editor);
 }
 
-function insertUndecoratedLink(editor, link) {
-  editor.focus();
-  if (existingContentToLink(editor, link)) {
-    if (!hasSelection(editor)) {
-      // editor.selection doesn't work so well in IE 11 so we handle that case
-      // here by setting our range to what it was prior to the insertion
-      editor.selection.setRng(link.selectionDetails.range);
-    }
-    // link selected content or update existing link containing selected
-    // content / cursor. given a non-empty selection outside any existing link,
-    // will wrap a new link around the selection. alternately, given a
-    // selection or cursor inside an existing link, will update that existing
-    // link. (the boundaries where a selection passes across link boundaries
-    // are a little weird, a tinymce bug afaik).
-    editor.execCommand("mceInsertLink", false, link);
-    return editor.selection.getNode();
-  } else {
-    // render html for a new link and insert it into the editor at the cursor
-    return insertContent(editor, renderLink(link));
-  }
-}
-
 function decorateLinkWithEmbed(link) {
+  const type = link.embed && link.embed.type
   link["class"] = classnames(link["class"], {
     instructure_file_link: true,
-    instructure_scribd_file: link.embed.type == "scribd",
-    instructure_image_thumbnail: link.embed.type == "image",
-    instructure_video_link: link.embed.type == "video",
-    instructure_audio_link: link.embed.type == "audio"
+    instructure_scribd_file: type == "scribd",
+    instructure_image_thumbnail: type == "image",
+    instructure_video_link: type == "video",
+    instructure_audio_link: type == "audio",
+    auto_open: link.embed && link.embed.autoOpenPreview,
+    inline_disabled: link.embed && link.embed.disablePreview
   });
 
   if (link.embed.type == "video" || link.embed.type == "audio") {
@@ -173,11 +153,64 @@ function decorateLinkWithEmbed(link) {
 }
 
 export function insertLink(editor, link) {
-  if (link.href) {
-    link.href = cleanUrl(link.href);
+  const linkAttrs = {...link}
+  if (linkAttrs.embed) {
+    decorateLinkWithEmbed(linkAttrs);
+    delete linkAttrs.embed
   }
-  if (link.embed) {
-    decorateLinkWithEmbed(link);
-  }
-  return insertUndecoratedLink(editor, link);
+  return insertUndecoratedLink(editor, linkAttrs);
 }
+
+// link edit/create logic copied from tinymce/plugins/link/plugin.js
+function insertUndecoratedLink(editor, linkAttrs) {
+  var selectedElm = editor.selection.getNode();
+  var anchorElm = getAnchorElement(editor, selectedElm);
+  if (linkAttrs.target === '_blank') {
+    linkAttrs.rel = 'noopener noreferrer'
+  }
+
+  if (anchorElm) {
+    editor.focus();
+    updateLink(editor, anchorElm, linkAttrs.text, linkAttrs);
+  } else {
+    createLink(editor, selectedElm, linkAttrs.text, linkAttrs);
+  }
+  return editor.selection.getEnd() // this will be the newly created or updated content
+}
+
+function getAnchorElement(editor, selectedElm) {
+  selectedElm = selectedElm || editor.selection.getNode();
+  if (isImageFigure(selectedElm)) {
+    return editor.dom.select('a[href]', selectedElm)[0];
+  } else {
+    return editor.dom.getParent(selectedElm, 'a[href]');
+  }
+};
+
+function isImageFigure(elm) {
+  return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className);
+};
+function updateLink(editor, anchorElm, text, linkAttrs) {
+  if (anchorElm.hasOwnProperty('innerText')) {
+    anchorElm.innerText = text;
+  } else {
+    anchorElm.textContent = text;
+  }
+  editor.dom.setAttribs(anchorElm, linkAttrs);
+  editor.selection.select(anchorElm);
+};
+function createLink(editor, selectedElm, text, linkAttrs) {
+  if (isImageFigure(selectedElm)) {
+    linkImageFigure(editor, selectedElm, linkAttrs);
+  } else {
+    insertContent(editor, renderLink(linkAttrs, text));
+  }
+};
+function linkImageFigure(editor, fig, attrs) {
+  var img = editor.dom.select('img', fig)[0];
+  if (img) {
+    var a = editor.dom.create('a', attrs);
+    img.parentNode.insertBefore(a, img);
+    a.appendChild(img);
+  }
+};

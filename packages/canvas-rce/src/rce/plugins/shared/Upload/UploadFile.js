@@ -159,6 +159,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
     <StoreProvider {...trayProps}>
       {contentProps => (
         <Modal
+          data-mce-component
           as="form"
           label={label}
           size="large"

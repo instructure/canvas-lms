@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import {func, instanceOf, shape} from 'prop-types'
 import {fileShape} from './propTypes'
+import classnames from 'classnames'
 
 import {StyleSheet, css} from "aphrodite";
 import {AccessibleContent} from '@instructure/ui-a11y'
@@ -31,9 +32,10 @@ import {
 } from '@instructure/ui-icons'
 
 import formatMessage from '../../../../format-message';
-import {renderDoc as renderDocHtml} from "../../../../rce/contentRendering";
+import {renderLink as renderLinkHtml} from "../../../../rce/contentRendering";
 import dragHtml from "../../../../sidebar/dragHtml";
 import {getIconFromType} from '../../shared/fileTypeUtils'
+import {isPreviewable} from '../../shared/Previewable'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
@@ -43,12 +45,27 @@ export default function Link(props) {
   let dateString = formatMessage.date(Date.parse(date), 'long')
   const publishedMsg = published ? formatMessage('published') : formatMessage('unpublished')
 
+  function linkAttrsFromDoc() {
+    const canPreview = isPreviewable(props.content_type)
+    const clazz = classnames('instructure_file_link', {
+      instructure_scribd_file: canPreview
+    })
+
+    const attrs = {
+      href: props.href,
+      target: '_blank',
+      class: clazz,
+      text: props.display_name || props.filename // because onClick only takes a single object
+    }
+    if (canPreview) {
+      attrs['data-canvas-previewable'] = true
+    }
+    return attrs
+  }
+
   function handleLinkClick(e) {
     e.preventDefault();
-    props.onClick({
-      title: props.display_name || props.filename,
-      href: props.href
-    });
+    props.onClick(linkAttrsFromDoc());
   }
 
   function handleLinkKey(e) {
@@ -59,7 +76,12 @@ export default function Link(props) {
   }
 
   function handleDragStart(e) {
-    dragHtml(e, renderDocHtml(props));
+    const linkAttrs = linkAttrsFromDoc()
+    dragHtml(e, renderLinkHtml(linkAttrs, linkAttrs.text));
+  }
+
+  function handleDragEnd(e) {
+    document.body.click()
   }
 
   function handleHover(e) {
@@ -76,6 +98,7 @@ export default function Link(props) {
       data-testid="instructure_links-Link"
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onMouseEnter={handleHover}
       onMouseLeave={handleHover}
       style={{position: 'relative'}}

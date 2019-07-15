@@ -918,27 +918,6 @@ describe "Modules API", type: :request do
               {:expected_status => 401}
       )
     end
-
-    context 'modules tab is disabled' do
-      before :once do
-        @course.tab_configuration = [{ :id => Course::TAB_MODULES, :hidden => true }]
-        @course.save!
-      end
-
-      it "allows teachers to use #index" do
-        teacher_in_course :active_all => true
-        api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/modules",
-                         {:controller => "context_modules_api", :action => "index", :format => "json",
-                          :course_id => @course.to_param}, {}, {}, {:expected_status => 200})
-      end
-
-      it "does not allow students to use #index" do
-        json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/modules",
-                         {:controller => "context_modules_api", :action => "index", :format => "json",
-                          :course_id => @course.to_param}, {}, {}, {:expected_status => 404})
-        expect(json['message']).to eq 'That page has been disabled for this course'
-      end
-    end
   end
 
   context "differentiated assignments" do

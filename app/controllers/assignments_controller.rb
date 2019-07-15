@@ -81,6 +81,21 @@ class AssignmentsController < ApplicationController
 
   def show
     Shackles.activate(:slave) do
+      if @context.feature_enabled?(:assignments_2) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+        unless can_do(@context, @current_user, :read_as_admin)
+          assignment_prereqs = context_module_sequence_items_by_asset_id(params[:id], "Assignment")
+          js_env({
+            ASSIGNMENT_ID: params[:id],
+            COURSE_ID: @context.id,
+            PREREQS: assignment_prereqs
+          })
+          css_bundle :assignments_2_student
+          js_bundle :assignments_2_show_student
+          render html: '', layout: true
+          return
+        end
+      end
+
       @assignment ||= @context.assignments.find(params[:id])
 
       if @assignment.deleted?
@@ -157,11 +172,7 @@ class AssignmentsController < ApplicationController
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
             js_bundle :assignments_2_show_teacher
-          else
-            css_bundle :assignments_2_student
-            js_bundle :assignments_2_show_student
           end
-
           render html: '', layout: true
           return
         end
@@ -247,7 +258,7 @@ class AssignmentsController < ApplicationController
 
     student_ids =
       if assignment.grade_as_group?
-        assignment.representatives(current_user).map(&:id)
+        assignment.representatives(user: current_user).map(&:id)
       else
         context.apply_enrollment_visibility(context.student_enrollments, current_user).pluck(:user_id)
       end

@@ -51,7 +51,7 @@ export default class DiscussionTopic extends Backbone.Model
   initialize: ->
     @participants = new ParticipantCollection
     @entries = new DiscussionEntriesCollection
-    @entries.url = => "#{_.result this, 'url'}/entries"
+    @entries.url = => "#{@baseUrlWithoutQuerystring()}/entries"
     @entries.participants = @participants
 
   parse: (json) ->
@@ -64,6 +64,10 @@ export default class DiscussionTopic extends Backbone.Model
     json.unpublishable = !json.published or json.can_unpublish
 
     json
+
+  baseUrlWithoutQuerystring: ->
+    baseUrl = _.result this, 'url'
+    baseUrl.split('?')[0]
 
   createAssignment: (attributes) ->
     assign = new Assignment(attributes)
@@ -83,14 +87,12 @@ export default class DiscussionTopic extends Backbone.Model
   disabledMessage: -> I18n.t 'cannot_unpublish_with_replies', "Can't unpublish if there are student replies"
 
   topicSubscribe: ->
-    baseUrl = _.result this, 'url'
     @set 'subscribed', true
-    $.ajaxJSON "#{baseUrl}/subscribed", 'PUT'
+    $.ajaxJSON "#{@baseUrlWithoutQuerystring()}/subscribed", 'PUT'
 
   topicUnsubscribe: ->
-    baseUrl = _.result this, 'url'
     @set 'subscribed', false
-    $.ajaxJSON "#{baseUrl}/subscribed", 'DELETE'
+    $.ajaxJSON "#{@baseUrlWithoutQuerystring()}/subscribed", 'DELETE'
 
   toJSON: ->
     json = super
@@ -133,8 +135,7 @@ export default class DiscussionTopic extends Backbone.Model
   # this is for getting the topic 'full view' from the api
   # see: https://<canvas>/doc/api/discussion_topics.html#method.discussion_topics_api.view
   fetchEntries: ->
-    baseUrl = _.result this, 'url'
-    $.get "#{baseUrl}/view", ({unread_entries, forced_entries, participants, view: entries}) =>
+    $.get "#{@baseUrlWithoutQuerystring()}/view", ({unread_entries, forced_entries, participants, view: entries}) =>
       @unreadEntries = unread_entries
       @forcedEntries = forced_entries
       @participants.reset participants

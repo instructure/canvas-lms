@@ -170,6 +170,16 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       strictEqual(reloadStub.callCount, 1)
       reloadStub.restore()
     })
+
+    test('onHidden ignores user IDs that do not match known students', () => {
+      const submissionsMap = {
+        '1': {posted_at: new Date().toISOString()}
+      }
+      postPolicies.showHideAssignmentGradesTray({submissionsMap})
+      const {onHidden} = hideGradesShowArgs()
+      onHidden({postedAt: null, userIds: ['1', '1111']})
+      ok('onHidden with nonexistent user should not throw an error')
+    })
   })
 
   QUnit.module('#showPostAssignmentGradesTray', hooks => {
@@ -263,6 +273,17 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       onPosted()
       strictEqual(reloadStub.callCount, 1)
       reloadStub.restore()
+    })
+
+    test('onPosted ignores user IDs that do not match known students', () => {
+      const submissionsMap = {
+        '1': {posted_at: null}
+      }
+      postPolicies.showPostAssignmentGradesTray({submissionsMap})
+      const postedAt = new Date().toISOString()
+      const {onPosted} = postGradesShowArgs()
+      onPosted({postedAt, userIds: ['1', '1111']})
+      ok('onPosted with nonexistent user should not throw an error')
     })
   })
 })

@@ -22,7 +22,9 @@ import $ from 'jquery'
 
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
 import TextInput from '@instructure/ui-forms/lib/components/TextInput';
+import Select from '@instructure/ui-forms/lib/components/Select'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
+import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Grid from '@instructure/ui-layout/lib/components/Grid';
@@ -41,29 +43,44 @@ export default class RequiredValues extends React.Component {
   }
 
   isMissingValues = () => {
-    return ['target_link_uri', 'oidc_initiation_url', 'public_jwk', 'description', 'title']
-      .some(p => !this.state.toolConfiguration[p])
+    let isMissing = false
+    if (['target_link_uri', 'oidc_initiation_url', 'description', 'title'].some(p => !this.state.toolConfiguration[p])) {
+      isMissing = true
+    }
+    if (!this.state.toolConfiguration.public_jwk && !this.state.toolConfiguration.public_jwk_url) {
+      isMissing = true
+    }
+    return isMissing
   }
 
   generateToolConfigurationPart = () => {
-    const public_jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
+      if (this.state.toolConfiguration.public_jwk !== "") {
+        const public_jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
+        return { ...this.state.toolConfiguration, public_jwk }
+      }
+      return { ...this.state.toolConfiguration, public_jwk: null }
+  }
 
-    return { ...this.state.toolConfiguration, public_jwk }
+  hasJwk = () => {
+    return this.state.toolConfiguration.public_jwk
   }
 
   valid = () => {
     if (this.isMissingValues()) {
       this.props.flashError(I18n.t('Missing required fields. Please fill in all required fields.'))
       return false
-    }
-    try {
-      JSON.parse(this.state.toolConfiguration.public_jwk)
-      return true
-    } catch(e) {
-      if (e instanceof SyntaxError) {
-        this.props.flashError(I18n.t('Public JWK json is not valid. Please submit properly formatted json.'))
-        return false
+    } else if (this.hasJwk()) {
+      try {
+        JSON.parse(this.state.toolConfiguration.public_jwk)
+        return true
+      } catch(e) {
+        if (e instanceof SyntaxError) {
+          this.props.flashError(I18n.t('Public JWK json is not valid. Please submit properly formatted json.'))
+          return false
+        }
       }
+    } else {
+      return true
     }
   }
 
@@ -90,6 +107,43 @@ export default class RequiredValues extends React.Component {
   handlePublicJwkChange = e => {
     const value = e.target.value;
     this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk: value}}))
+  }
+
+  handlePublicJwkUrlChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk_url: value}}))
+  }
+
+  handleConfigTypeChange = (e, option) => {
+    this.setState({ jwkConfig: option.value })
+  }
+
+  configurationInput(option) {
+    const { toolConfiguration } = this.state;
+    const { showMessages } = this.props
+
+    if (option === 'public_jwk') {
+      return (
+        <TextArea
+          name="public_jwk"
+          value={toolConfiguration.public_jwk}
+          maxHeight="10rem"
+          resize="vertical"
+          autoGrow
+          onChange={this.handlePublicJwkChange}
+          messages={showMessages && !toolConfiguration.public_jwk && !toolConfiguration.public_jwk_url ? validationMessage : []}
+        />
+      )
+    } else {
+      return (
+        <TextInput
+          name="public_jwk_url"
+          value={toolConfiguration.public_jwk_url}
+          onChange={this.handlePublicJwkUrlChange}
+          messages={showMessages && !toolConfiguration.public_jwk_url && !toolConfiguration.public_jwk ? validationMessage : []}
+        />
+      )
+    }
   }
 
   render() {
@@ -146,16 +200,15 @@ export default class RequiredValues extends React.Component {
             </GridCol>
           </GridRow>
         </Grid>
-        <TextArea
-          name="public_jwk"
-          value={toolConfiguration.public_jwk}
-          label={I18n.t("* Public JWK")}
-          maxHeight="10rem"
-          resize="vertical"
-          autoGrow
-          onChange={this.handlePublicJwkChange}
-          messages={showMessages && !toolConfiguration.public_jwk ? validationMessage : []}
-        />
+        <Select
+          label={I18n.t("* JWK Method")}
+          onChange={this.handleConfigTypeChange}
+          selectedOption={toolConfiguration.public_jwk_url ? "public_jwk_url" : "public_jwk"}
+        >
+          <option key="public_jwk" value="public_jwk">{I18n.t('Public JWK')}</option>
+          <option key="public_jwk_url" value="public_jwk_url">{I18n.t('Public JWK URL')}</option>
+        </Select>
+        {this.configurationInput(this.state.jwkConfig)}
         <PresentationContent>
           <hr />
         </PresentationContent>

@@ -18,7 +18,7 @@
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 import I18n from 'i18n!assignments_2'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import React from 'react'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import {CommentShape} from '../../assignmentData'
@@ -55,13 +55,15 @@ function CommentRow(props) {
           {props.comment.comment}
         </Text>
         {props.comment.attachments.map(attachment => (
-          <Link
+          <Button
+            variant="link"
             key={attachment._id}
             href={attachment.url}
             icon={getIconByType(attachment.mimeClass)}
+            theme={{mediumPadding: '0', mediumHeight: 'normal'}}
           >
             {attachment.displayName}
-          </Link>
+          </Button>
         ))}
         {mediaObject && (
           <VideoPlayer

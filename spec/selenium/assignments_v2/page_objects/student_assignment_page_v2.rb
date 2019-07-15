@@ -46,7 +46,7 @@ class StudentAssignmentPageV2
     end
 
     def assignment_group_link
-      f("a[data-test-id='assignmentgroup-link']")
+      f("a[data-testid='assignmentgroup-link']")
     end
 
     def due_date_css(due_at)
@@ -61,5 +61,25 @@ class StudentAssignmentPageV2
       f("div[data-testid='assignment-2-student-content-tabs']")
     end
 
+    def comment_container
+      f("div[data-testid='comments-container']")
+    end
+
+    def send_comment_button
+      fj('button:contains("Send Comment")')
+    end
+
+    def comments_tab
+      fj('[role="presentation"]:contains("Comments")')
+    end
+
+    def comment_text_area
+      f('textarea')
+    end
+
+    def leave_a_comment(comment)
+      replace_content(comment_text_area, comment)
+      send_comment_button.click
+    end
   end
 end

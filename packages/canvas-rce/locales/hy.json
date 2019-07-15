@@ -23,6 +23,9 @@
   "cancel_image_upload_2c771950": {
     "message": "Cancel image upload"
   },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas  միացվող մոդուլներ"
+  },
   "cc_attribution_f6de631f": {
     "message": "CC-ին պատկանելություն "
   },
@@ -187,9 +190,6 @@
   },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
-  },
-  "media_af190855": {
-    "message": "Մուլտիմեդիա"
   },
   "modules_c4325335": {
     "message": "Մոդուլներ"

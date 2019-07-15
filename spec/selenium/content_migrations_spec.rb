@@ -319,10 +319,11 @@ describe "content migrations", :non_parallel do
 
       select_migration_type
       wait_for_ajaximations
+      expect(f("#content")).to contain_css("option[value=\"#{new_course.id}\"]")
 
-      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
       f('#include_completed_courses').click
-      expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
     end
 
     it "should find courses in other accounts", priority: "1", test_id: 2890402 do

@@ -176,94 +176,119 @@ export default class FileUpload extends Component {
     }
   }
 
-  renderEmptyUpload() {
+  renderUploadBox() {
     return (
-      <div data-testid="empty-upload">
-        <Billboard
-          heading={I18n.t('Upload File')}
-          hero={DEFAULT_ICON}
-          message={
-            <Flex direction="column">
-              {this.props.assignment.allowedExtensions.length ? (
-                <FlexItem>
-                  {I18n.t('File permitted: %{fileTypes}', {
-                    fileTypes: this.props.assignment.allowedExtensions
-                      .map(ext => ext.toUpperCase())
-                      .join(', ')
-                  })}
-                </FlexItem>
-              ) : null}
-              <FlexItem padding="small 0 0">
-                <Text size="small">
-                  {I18n.t('Drag and drop, or click to browse your computer')}
-                </Text>
-              </FlexItem>
-            </Flex>
+      <div data-testid="upload-box">
+        <FileDrop
+          accept={
+            this.props.assignment.allowedExtensions.length
+              ? this.props.assignment.allowedExtensions
+              : ''
           }
+          allowMultiple
+          enablePreview
+          id="inputFileDrop"
+          data-testid="input-file-drop"
+          label={
+            <Billboard
+              heading={I18n.t('Upload File')}
+              hero={DEFAULT_ICON}
+              message={
+                <Flex direction="column">
+                  {this.props.assignment.allowedExtensions.length ? (
+                    <FlexItem>
+                      {I18n.t('File permitted: %{fileTypes}', {
+                        fileTypes: this.props.assignment.allowedExtensions
+                          .map(ext => ext.toUpperCase())
+                          .join(', ')
+                      })}
+                    </FlexItem>
+                  ) : null}
+                  <FlexItem padding="small 0 0">
+                    <Text size="small">
+                      {I18n.t('Drag and drop, or click to browse your computer')}
+                    </Text>
+                  </FlexItem>
+                </Flex>
+              }
+            />
+          }
+          messages={this.state.messages}
+          onDropAccepted={this.handleDropAccepted}
+          onDropRejected={this.handleDropRejected}
         />
       </div>
     )
   }
 
-  renderLoadingIndicator() {
+  renderUploadedFile(file) {
     return (
-      <GridRow>
-        <GridCol>
-          <LoadingIndicator />
-        </GridCol>
-      </GridRow>
+      <Billboard
+        heading={I18n.t('Uploaded')}
+        headingLevel="h3"
+        hero={
+          this.shouldDisplayThumbnail(file) ? (
+            <img
+              alt={I18n.t('%{filename} preview', {filename: file.displayName})}
+              height="75"
+              src={file.thumbnailUrl}
+              width="75"
+            />
+          ) : (
+            getIconByType(file.mimeClass)
+          )
+        }
+        message={
+          <div>
+            <span aria-hidden title={file.displayName}>
+              {this.ellideString(file.displayName)}
+            </span>
+            <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
+            <Button
+              icon={IconTrash}
+              id={file._id}
+              margin="0 0 0 x-small"
+              onClick={this.handleRemoveFile}
+              size="small"
+            >
+              <ScreenReaderContent>
+                {I18n.t('Remove %{filename}', {filename: file.displayName})}
+              </ScreenReaderContent>
+            </Button>
+          </div>
+        }
+      />
     )
   }
 
-  renderUploadedFiles() {
-    const fileRows = chunk(this.getDraftAttachments(), 3)
+  renderUploadBoxAndUploadedFiles() {
+    const files = this.getDraftAttachments()
+    // The first two uploaded files are rendered on the same row as the upload box
+    const firstFileRow = files.slice(0, 2)
+    // All uploaded files after the first two are rendered on rows below the upload
+    // box; thus, each row has three columns, with the first row having an upload box
+    // and two rendered files and all subsequent rows having three rendered files
+    const nextFileRows = files.length > 2 ? chunk(files.slice(2, files.length), 3) : []
     return (
       <div data-testid="non-empty-upload">
         <Grid>
-          {fileRows.map(row => (
+          <GridRow key={firstFileRow.map(file => file._id).join()}>
+            <GridCol width={4}>{this.renderUploadBox()}</GridCol>
+            {firstFileRow.map(file => (
+              <GridCol width={4} key={file._id} vAlign="bottom">
+                {this.renderUploadedFile(file)}
+              </GridCol>
+            ))}
+          </GridRow>
+          {nextFileRows.map(row => (
             <GridRow key={row.map(file => file._id).join()}>
               {row.map(file => (
-                <GridCol key={file._id} vAlign="bottom">
-                  <Billboard
-                    heading={I18n.t('Uploaded')}
-                    headingLevel="h3"
-                    hero={
-                      this.shouldDisplayThumbnail(file) ? (
-                        <img
-                          alt={I18n.t('%{filename} preview', {filename: file.displayName})}
-                          height="75"
-                          src={file.thumbnailUrl}
-                          width="75"
-                        />
-                      ) : (
-                        getIconByType(file.mimeClass)
-                      )
-                    }
-                    message={
-                      <div>
-                        <span aria-hidden title={file.displayName}>
-                          {this.ellideString(file.displayName)}
-                        </span>
-                        <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
-                        <Button
-                          icon={IconTrash}
-                          id={file._id}
-                          margin="0 0 0 x-small"
-                          onClick={this.handleRemoveFile}
-                          size="small"
-                        >
-                          <ScreenReaderContent>
-                            {I18n.t('Remove %{filename}', {filename: file.displayName})}
-                          </ScreenReaderContent>
-                        </Button>
-                      </div>
-                    }
-                  />
+                <GridCol width={4} key={file._id} vAlign="bottom">
+                  {this.renderUploadedFile(file)}
                 </GridCol>
               ))}
             </GridRow>
           ))}
-          {this.state.uploadingFiles && this.renderLoadingIndicator()}
         </Grid>
       </div>
     )
@@ -318,38 +343,24 @@ export default class FileUpload extends Component {
     )
   }
 
-  renderUploadBox() {
-    return (
-      <FileDrop
-        accept={
-          this.props.assignment.allowedExtensions.length
-            ? this.props.assignment.allowedExtensions
-            : ''
-        }
-        allowMultiple
-        enablePreview
-        id="inputFileDrop"
-        data-testid="inputFileDrop"
-        label={
-          this.getDraftAttachments().length || this.state.uploadingFiles
-            ? this.renderUploadedFiles()
-            : this.renderEmptyUpload()
-        }
-        messages={this.state.messages}
-        onDropAccepted={this.handleDropAccepted}
-        onDropRejected={this.handleDropRejected}
-      />
-    )
-  }
-
   render() {
     return (
-      <React.Fragment>
-        {this.state.uploadingFiles ? this.renderUploadedFiles() : this.renderUploadBox()}
+      <div data-testid="upload-pane">
+        {this.getDraftAttachments().length !== 0 ? (
+          this.renderUploadBoxAndUploadedFiles()
+        ) : (
+          <Grid>
+            <GridRow>
+              <GridCol width={4}>{this.renderUploadBox()}</GridCol>
+            </GridRow>
+          </Grid>
+        )}
+
         {this.getDraftAttachments().length !== 0 &&
           !this.state.uploadingFiles &&
           this.renderSubmitButton()}
-      </React.Fragment>
+        {this.state.uploadingFiles && <LoadingIndicator />}
+      </div>
     )
   }
 }

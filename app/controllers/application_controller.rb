@@ -773,7 +773,7 @@ class ApplicationController < ActionController::Base
           @context_membership = @context_enrollment
           check_for_readonly_enrollment_state
         elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
-          @context = api_find(Account, params[:account_id])
+          @context = api_find(Account.active, params[:account_id])
           params[:context_id] = @context.id
           params[:context_type] = "Account"
           @context_enrollment = @context.account_users.active.where(user_id: @current_user.id).first if @context && @current_user
@@ -1055,6 +1055,11 @@ class ApplicationController < ActionController::Base
       end
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
+    elsif pieces[0] == 'user'
+      @current_user = UserPastLtiId.where(user_uuid: pieces[1]).take&.user
+      @current_user ||= User.where(uuid: pieces[1]).first
+      @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid." unless @current_user
+      @context = @current_user
     else
       @context_type = pieces[0].classify
       if Context::CONTEXT_TYPES.include?(@context_type.to_sym)

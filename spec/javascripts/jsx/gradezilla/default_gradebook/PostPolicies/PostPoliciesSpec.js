@@ -226,6 +226,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         onHidden(postedOrHiddenInfo)
         strictEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
       })
+
+      test('ignores user IDs that do not match known students', () => {
+        postedOrHiddenInfo.userIds.push('9876')
+        postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+        const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+        onHidden(postedOrHiddenInfo)
+        ok('onHidden with nonexistent user should not throw an error')
+      })
     })
   })
 
@@ -377,6 +385,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         onPosted(postedOrHiddenInfo)
         deepEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
       })
+
+      test('ignores user IDs that do not match known students', () => {
+        postedOrHiddenInfo.userIds.push('9876')
+        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        onPosted(postedOrHiddenInfo)
+        ok('onPosted with nonexistent user should not throw an error')
+      })
     })
   })
 
@@ -433,6 +449,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(assignment.moderatedGrading, true)
+    })
+
+    test('passes the assignment grades-published status to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.gradesPublished, true)
     })
 
     test('passes the current manual-posting status of the assignment to the tray', () => {

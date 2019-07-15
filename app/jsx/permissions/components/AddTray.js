@@ -113,6 +113,7 @@ export default class AddTray extends Component {
     <Flex alignItems="center" margin="small">
       <FlexItem>
         <Button
+          id="close-add-role-tray-button"
           variant="icon"
           size="small"
           onClick={this.hideTray}

@@ -35,7 +35,7 @@ module SIS
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
       IMPORTERS = %i{change_sis_id account term abstract_course course section
-                     xlist user enrollment admin group_category group group_membership
+                     xlist user login enrollment admin group_category group group_membership
                      grade_publishing_results user_observer}.freeze
 
       HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w{password ssha_password}.freeze

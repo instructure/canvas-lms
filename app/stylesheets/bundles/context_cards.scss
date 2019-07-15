@@ -61,15 +61,7 @@
 }
 
 .StudentContextTray-Header__Name {
-  margin-top: 0.125rem;
   margin-bottom: $ic-sp * 0.75;
-}
-
-.StudentContextTray-Header__NameLink {
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .StudentContextTray-Header__CourseName {

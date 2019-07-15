@@ -56,6 +56,7 @@ export default class SubmissionCommentListItem extends React.Component {
 
   handleDeleteComment = () => {
     const message = I18n.t('Are you sure you want to delete this comment?')
+    // eslint-disable-next-line no-alert, no-restricted-globals
     if (confirm(message)) {
       this.props.deleteSubmissionComment(this.props.id)
     }
@@ -114,11 +115,14 @@ export default class SubmissionCommentListItem extends React.Component {
 
             <div>
               <div style={{margin: '0 0 0 0.375rem'}}>
-                <Text weight="bold" size="small" lineHeight="fit">
-                  <Link href={this.props.authorUrl}>
-                    {TextHelper.truncateText(this.props.author, {max: 22})}
-                  </Link>
-                </Text>
+                <Button
+                  href={this.props.authorUrl}
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                  margin="none none xxx-small"
+                >
+                  {TextHelper.truncateText(this.props.author, {max: 22})}
+                </Button>
               </div>
 
               <div style={{margin: '0 0 0 0.375rem'}}>

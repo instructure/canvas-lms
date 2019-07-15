@@ -88,12 +88,19 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
     }
 
     const {assignment, onExited, requestInProgress, selectedPostManually} = this.state
-    const allowAutomaticPosting = !(assignment.anonymousGrading || assignment.moderatedGrading)
+
+    // Anonymous assignments must always be manually posted, as must moderated
+    // assignments whose grades are not published yet
+    const allowAutomaticPosting = !(
+      assignment.anonymousGrading ||
+      (assignment.moderatedGrading && !assignment.gradesPublished)
+    )
     const allowSaving = assignment.postManually !== selectedPostManually && !requestInProgress
 
     return (
       <Tray
         label={I18n.t('Grade posting policy tray')}
+        onDismiss={this.handleDismiss}
         onExited={onExited}
         open={this.state.open}
         placement="end"

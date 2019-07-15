@@ -273,6 +273,159 @@ describe TabsController, type: :request do
       ]
     end
 
+    it 'should list navigation tabs for an account' do
+      account_admin_user(:active_all => true)
+      @account = @user.account
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/tabs",
+                      { :controller => 'tabs', :action => 'index', :account_id => @account.to_param, :format => 'json'})
+      expect(json).to eq [
+        {
+          "id" => "courses",
+          "html_url" => "/accounts/#{@account.id}",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}",
+          "type" => "internal",
+          "label" => "Courses",
+          "position"=>1,
+          "visibility"=>"public"
+        },
+        {
+          "id" => "users",
+          "label" => "People",
+          "html_url" => "/accounts/#{@account.id}/users",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/users",
+          "position"=>2,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "statistics",
+          "html_url" => "/accounts/#{@account.id}/statistics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/statistics",
+          "label" => "Statistics",
+          "position"=>3,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "permissions",
+          "html_url" => "/accounts/#{@account.id}/permissions",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/permissions",
+          "label" => "Permissions",
+          "position"=>4,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "outcomes",
+          "html_url" => "/accounts/#{@account.id}/outcomes",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/outcomes",
+          "label" => "Outcomes",
+          "position"=>5,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "rubrics",
+          "html_url" => "/accounts/#{@account.id}/rubrics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/rubrics",
+          "label" => "Rubrics",
+          "position"=>6,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "grading_standards",
+          "html_url" => "/accounts/#{@account.id}/grading_standards",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/grading_standards",
+          "label" => "Grading",
+          "position"=>7,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "question_banks",
+          "html_url" => "/accounts/#{@account.id}/question_banks",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/question_banks",
+          "label" => "Question Banks",
+          "position"=>8,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "sub_accounts",
+          "html_url" => "/accounts/#{@account.id}/sub_accounts",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/sub_accounts",
+          "label" => "Sub-Accounts",
+          "position"=>9,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "terms",
+          "html_url" => "/accounts/#{@account.id}/terms",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/terms",
+          "label" => "Terms",
+          "position"=>10,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "authentication",
+          "html_url" => "/accounts/#{@account.id}/authentication_providers",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/authentication_providers",
+          "label" => "Authentication",
+          "position"=>11,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "sis_import",
+          "html_url" => "/accounts/#{@account.id}/sis_import",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/sis_import",
+          "label" => "SIS Import",
+          "position"=>12,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "brand_configs",
+          "html_url" => "/accounts/#{@account.id}/brand_configs",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/brand_configs",
+          "label" => "Themes",
+          "position"=>13,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "developer_keys",
+          "html_url" => "/accounts/#{@account.id}/developer_keys",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/developer_keys",
+          "label" => "Developer Keys",
+          "position"=>14,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "admin_tools",
+          "html_url" => "/accounts/#{@account.id}/admin_tools",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/admin_tools",
+          "label" => "Admin Tools",
+          "position"=>15,
+          "visibility"=>"public",
+          "type" => "internal"
+        },
+        {
+          "id" => "settings",
+          "html_url" => "/accounts/#{@account.id}/settings",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/settings",
+          "label" => "Settings",
+          "position"=>16,
+          "visibility"=>"admins",
+          "type" => "internal"
+        }
+      ]
+    end
+
     it "doesn't include hidden tabs for student" do
       course_with_student(active_all: true)
       tab_ids = [

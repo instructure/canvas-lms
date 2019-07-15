@@ -45,14 +45,14 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.5.2', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-dynamodb", "1.5.0"
-gem "aws-sdk-kinesis", '1.6.0', require: false
-gem "aws-sdk-s3", '1.19.0', require: false
-gem "aws-sdk-sns", '1.5.0', require: false
-gem "aws-sdk-sqs", '1.6.0', require: false
-gem "aws-sdk-core", "3.27.0", require: false
-gem "aws-sdk-kms", "1.9.0", require: false
-gem "aws-sigv4", "1.0.3", require: false
+gem "aws-sdk-dynamodb", "1.32.0"
+gem "aws-sdk-kinesis", '1.17.0', require: false
+gem "aws-sdk-s3", '1.43.0', require: false
+gem "aws-sdk-sns", '1.17.0', require: false
+gem "aws-sdk-sqs", '1.17.0', require: false
+gem "aws-sdk-core", "3.56.0", require: false
+gem "aws-sdk-kms", "1.22.0", require: false
+gem "aws-sigv4", "1.1.0", require: false
 
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
@@ -62,12 +62,12 @@ gem 'brotli', '0.2.0', require: false
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.15.5'
+gem 'inst-jobs', '0.15.6'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
 gem 'switchman-inst-jobs', '1.3.3'
 gem 'inst-jobs-autoscaling', '1.0.5'
-  gem 'aws-sdk-autoscaling', '1.5.0', require: false
+  gem 'aws-sdk-autoscaling', '1.24.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
 # check https://github.com/ffi/ffi/issues/621 for resolution prior to bumping version
 gem 'ffi', '1.9.18', require: false
@@ -134,7 +134,7 @@ gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.9.3'
+gem 'graphql', '1.9.6'
 gem 'graphql-batch', '0.3.9'
 
 gem 'prawn-rails', '1.2.0'

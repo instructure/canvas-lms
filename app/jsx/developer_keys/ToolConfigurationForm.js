@@ -120,7 +120,6 @@ export default class ToolConfigurationForm extends React.Component {
         </Heading>
         <Select
           label="Method"
-          assistiveText={I18n.t('3 options available. Use arrow keys to navigate options.')}
           onChange={this.handleConfigTypeChange}
           selectedOption={this.props.configurationMethod}
         >

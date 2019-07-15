@@ -26,6 +26,9 @@
   "cancel_image_upload_2c771950": {
     "message": "Відмінити завантаження зображення"
   },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas Модулі"
+  },
   "cc_attribution_f6de631f": {
     "message": "CC Атрибуція"
   },
@@ -209,9 +212,6 @@
   "loading_folders_8d4d5d5a": {
     "message": "Завантаження папок ..."
   },
-  "media_af190855": {
-    "message": "Носій інформації"
-  },
   "modules_c4325335": {
     "message": "Розділи"
   },
@@ -268,6 +268,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Виберіть теку, до якої завантажити ваш файл"
+  },
+  "selected_274ce24f": {
+    "message": "Обраний"
   },
   "size_b30e1077": {
     "message": "Розмір"

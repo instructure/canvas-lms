@@ -22,7 +22,6 @@ module Lti
 
     belongs_to :developer_key
 
-    before_validation :store_configuration_from_url, only: :create
     before_save :normalize_configuration
 
     after_update :update_external_tools!, if: :update_external_tools?
@@ -55,34 +54,52 @@ module Lti
     end
 
     def self.create_tool_config_and_key!(account, tool_configuration_params)
-      self.transaction do
-        dk = DeveloperKey.create!(account: (account.site_admin? ? nil : account))
-        settings = tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
+      settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
+                  retrieve_and_extract_configuration(tool_configuration_params[:settings_url])
+                 elsif tool_configuration_params[:settings].present?
+                   tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
+                 end
 
-        if settings.present?
-          self.create!(
-            developer_key: dk,
-            configuration: settings.deep_merge(
-              'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-            ),
-            disabled_placements: tool_configuration_params[:disabled_placements]
-          )
-        else
-          # Creating config via URL
-          t = self.create!(
-            developer_key: dk,
-            configuration_url: tool_configuration_params[:settings_url],
-            disabled_placements: tool_configuration_params[:disabled_placements]
-          )
-          t.update! configuration: t.configuration.deep_merge(
+      raise_error(:configuration, "Configuration must be present") if settings.blank?
+      self.transaction do
+        dk = DeveloperKey.create!(
+          account: (account.site_admin? ? nil : account),
+          is_lti_key: true,
+          public_jwk_url: settings[:public_jwk_url],
+          public_jwk: settings[:public_jwk]
+        )
+        self.create!(
+          developer_key: dk,
+          configuration: settings.deep_merge(
             'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-            )
-          t
-        end
+          ),
+          configuration_url: tool_configuration_params[:settings_url],
+          disabled_placements: tool_configuration_params[:disabled_placements]
+        )
       end
     end
 
     private
+
+    def self.retrieve_and_extract_configuration(url)
+
+      response = CC::Importer::BLTIConverter.new.fetch(url)
+
+      raise_error(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
+      raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
+
+      JSON.parse(response.body).with_indifferent_access
+    rescue Timeout::Error
+      raise_error(:configuration_url, 'Could not retrieve settings, the server response timed out.')
+    end
+    private_class_method :retrieve_and_extract_configuration
+
+    def self.raise_error(type, message)
+      tool_config_obj = self.new
+      tool_config_obj.errors.add(type, message)
+      raise ActiveRecord::RecordInvalid, tool_config_obj
+    end
+    private_class_method :raise_error
 
     def update_external_tools?
       saved_change_to_settings?
@@ -93,8 +110,10 @@ module Lti
     end
 
     def valid_configuration?
-      errors.add(:configuration, '"public_jwk" must be present') if configuration['public_jwk'].blank?
-      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration)
+      if configuration['public_jwk'].blank? && configuration['public_jwk_url'].blank?
+        errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
+      end
+      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration.compact)
       errors.add(:configuration, schema_errors) if schema_errors.present?
       return if errors[:configuration].present?
 
@@ -130,22 +149,6 @@ module Lti
         extension['settings'][p['placement']] = p
       end
       extension
-    end
-
-    def store_configuration_from_url
-      return if configuration_url.blank? || configuration.present?
-
-      response = CC::Importer::BLTIConverter.new.fetch(configuration_url)
-
-      errors.add(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
-      return if errors[:configuration_url].present?
-
-      errors.add(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
-      return if errors[:configuration_url].present?
-
-      self.settings = JSON.parse(response.body)
-    rescue Timeout::Error
-      errors.add(:configuration_url, 'Could not retrieve settings, the server response timed out.')
     end
 
     def normalize_configuration

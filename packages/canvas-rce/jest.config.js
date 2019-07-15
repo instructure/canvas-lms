@@ -27,11 +27,15 @@ module.exports = {
   ],
   setupFilesAfterEnv: ['<rootDir>/jest/jest-setup-framework.js'],
   testPathIgnorePatterns: [
-    "<rootDir>/node_modues",
+    "<rootDir>/node_modules",
     "<rootDir>/lib",
     "<rootDir>/canvas"
   ],
   testMatch: [
     '**/__tests__/**/?(*.)(spec|test).js'
   ],
+  modulePathIgnorePatterns: [
+    "<rootDir>/lib",
+    "<rootDir>/canvas"
+  ]
 }

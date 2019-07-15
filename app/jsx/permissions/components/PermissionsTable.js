@@ -24,7 +24,7 @@ import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import 'compiled/jquery.rails_flash_notifications'
 
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -124,23 +124,17 @@ export default class PermissionsTable extends Component {
                 className="ic-permissions__header-content ic-permissions__header-content-col"
                 id={`ic-permissions__role-header-for-role-${role.id}`}
               >
-                <Tooltip
-                  as={Link}
-                  tip={role.label}
-                  onClick={() => this.openRoleTray(role)}
-                  id={`role_${role.id}`}
-                  onFocus={this.fixScrollHeader}
-                >
-                  <div
-                    style={{
-                      width: '140px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
+                <Tooltip tip={role.label}>
+                  <Button
+                    id={`role_${role.id}`}
+                    variant="link"
+                    onClick={() => this.openRoleTray(role)}
+                    onFocus={this.fixScrollHeader}
+                    size="small"
+                    theme={{smallPadding: '0', smallHeight: 'normal'}}
                   >
-                    <Text size="small">{role.label}</Text>
-                  </div>
+                    {role.label}
+                  </Button>
                 </Tooltip>
               </div>
             </div>
@@ -162,14 +156,16 @@ export default class PermissionsTable extends Component {
               {this.state.expanded[perm.permission_name] ? 'v' : '>'}
             </button>
             */}
-            <View margin="small">
-              <Link
-                as="button"
+            <View maxWidth="17rem" as="div" padding="small">
+              <Button
+                variant="link"
                 onClick={() => this.props.setAndOpenPermissionTray(perm)}
                 id={`permission_${perm.permission_name}`}
+                theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                fluidWidth
               >
-                <Text>{perm.label}</Text>
-              </Link>
+                {perm.label}
+              </Button>
             </View>
           </div>
         </div>
@@ -231,10 +227,7 @@ export default class PermissionsTable extends Component {
 
   render() {
     return (
-      <div
-        className="ic-permissions__table-container"
-        ref={c => (this.contentWrapper = c)}
-      >
+      <div className="ic-permissions__table-container" ref={c => (this.contentWrapper = c)}>
         {this.renderTable()}
       </div>
     )

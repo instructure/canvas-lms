@@ -20,7 +20,6 @@ import assert from "assert";
 import jsdomify from "jsdomify";
 import sinon from "sinon";
 import Bridge from "../../src/bridge";
-import ReactDOM from "react-dom";
 import * as indicateModule from "../../src/common/indicate";
 import * as contentInsertion from "../../src/rce/contentInsertion";
 import RCEWrapper from "../../src/rce/RCEWrapper";
@@ -551,22 +550,19 @@ describe("RCEWrapper", () => {
 
     it("calls Bridge.focusEditor with editor", () => {
       const editor = createBasicElement();
-      editor.onFocus();
+      editor.handleFocus();
       sinon.assert.calledWith(Bridge.focusEditor, editor);
     });
 
     it("calls props.onFocus with editor if exists", () => {
       const editor = createBasicElement({ onFocus: sinon.spy() });
-      editor.onFocus();
+      editor.handleFocus();
       sinon.assert.calledWith(editor.props.onFocus, editor);
     });
   });
 
   describe("onRemove", () => {
-    let domNode;
-
     beforeEach(() => {
-      domNode = {};
       sinon.stub(Bridge, "detachEditor");
     });
 

@@ -15,16 +15,25 @@ exports[`renders the base component correctly 1`] = `
     <div
       className="Opportunity-styles__title"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://www.non_default_url.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="medium"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         this is a description about the opportunity
-      </Link>
+      </Button>
     </div>
   </div>
   <div
@@ -110,16 +119,25 @@ exports[`renders the base component correctly with 0 points 1`] = `
     <div
       className="Opportunity-styles__title"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://www.non_default_url.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="medium"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         this is a description about the opportunity
-      </Link>
+      </Button>
     </div>
   </div>
   <div
@@ -205,16 +223,25 @@ exports[`renders the base component correctly without points 1`] = `
     <div
       className="Opportunity-styles__title"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://www.non_default_url.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="medium"
+        theme={
+          Object {
+            "mediumHeight": "normal",
+            "mediumPadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         this is a description about the opportunity
-      </Link>
+      </Button>
     </div>
   </div>
   <div

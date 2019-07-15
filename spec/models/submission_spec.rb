@@ -3116,6 +3116,21 @@ describe Submission do
 
         expect(Submission.missing).to be_empty
       end
+
+      it 'includes missing quiz_lti assignments' do
+        @course.context_external_tools.create!(
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
+        )
+        @assignment.quiz_lti!
+        @assignment.due_at = 1.day.ago(@now)
+        @assignment.save!
+
+        expect(Submission.missing).to include @submission
+      end
     end
 
     context "submitted" do
@@ -3274,6 +3289,22 @@ describe Submission do
       @submission.update_columns(submission_type: nil)
 
       expect(@submission).not_to be_missing
+    end
+
+    it 'returns true for missing quiz_lti submissions' do
+        @course.context_external_tools.create!(
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
+        )
+
+        @another_assignment.quiz_lti!
+        @another_assignment.save!
+
+        @another_submission.reload
+        expect(@another_submission).to be_missing
     end
   end
 

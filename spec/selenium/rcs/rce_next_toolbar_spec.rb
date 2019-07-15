@@ -39,28 +39,29 @@ describe "RCE Next toolbar features" do
       @course.wiki_pages.create!(title: page_title, body: "<p>The sleeper must awaken.</p>")
     end
 
-    it "should add bullet lists", priority: "1", test_id: 307623 do
-      skip('Unskip in CORE-2636')
-      wysiwyg_state_setup(@course)
+    it "should add bullet lists" do
+      rce_wysiwyg_state_setup(@course)
 
+      click_list_toggle_button
       click_bullet_list_button
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(ff('#tinymce li').length).to eq 3
       end
     end
 
-    it "should remove bullet lists", priority: "1", test_id: 535894 do
-      skip('Unskip in CORE-2636')
+    it "should remove bullet lists" do
       text = "<ul><li>1</li><li>2</li><li>3</li></ul>"
-      wysiwyg_state_setup(@course, text, html: true)
+      rce_wysiwyg_state_setup(@course, text, html: true)
 
       # editor window needs focus in chrome to enable bullet list button
       click_editor_window if driver.browser == :chrome
+
+      click_list_toggle_button
       click_bullet_list_button
 
-      in_frame wiki_page_body_ifr_id do
-        expect(f("#tinymce")).not_to contain_css('li')
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body).not_to contain_css('li')
       end
     end
 
@@ -71,7 +72,7 @@ describe "RCE Next toolbar features" do
       click_list_toggle_button
       click_numbered_list_button
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(ff('#tinymce li').length).to eq 3
       end
     end
@@ -86,7 +87,7 @@ describe "RCE Next toolbar features" do
       click_list_toggle_button
       click_numbered_list_button
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('li')
       end
     end
@@ -134,7 +135,7 @@ describe "RCE Next toolbar features" do
 
       click_superscript_button
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(f('#tinymce sup')).to be_displayed
       end
     end
@@ -147,7 +148,7 @@ describe "RCE Next toolbar features" do
       wysiwyg_state_setup(@course, text, html: true)
       shift_click_button(superscript_button)
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('sup')
       end
     end
@@ -159,7 +160,7 @@ describe "RCE Next toolbar features" do
       click_super_toggle_button
       click_subscript_button
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(f('#tinymce sub')).to be_displayed
       end
     end
@@ -173,7 +174,7 @@ describe "RCE Next toolbar features" do
       click_super_toggle_button
       shift_click_button(subscript_button)
 
-      in_frame wiki_page_body_ifr_id do
+      in_frame rce_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('sub')
       end
     end
@@ -230,6 +231,42 @@ describe "RCE Next toolbar features" do
 
       click_align_toggle_button
       click_align_right_button
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should change text to right-to-left in the rce" do
+      rce_wysiwyg_state_setup(@course, text = "rtl")
+      click_directionality_toggle_button
+      click_right_to_left_option
+      in_frame rce_page_body_ifr_id do
+        expect(f('#tinymce p').attribute('dir')).to eq text
+      end
+    end
+
+    it "should remove right-to-left from text in the rce" do
+      skip('Unskip in CORE-3049')
+      text = "<p dir=\"rtl\">This is my text</p>"
+      wysiwyg_state_setup(@course, text, html: true)
+      click_directionality_toggle_button
+      click_right_to_left_option
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should change text to left-to-right in the rce" do
+      skip('Unskip in CORE-3049')
+      wysiwyg_state_setup(@course, text = "ltr")
+      click_directionality_toggle_button
+      click_right_to_left_option
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_page_body).attribute('dir').to eq text
+      end
+    end
+
+    it "should remove left-to-right from text in the rce" do
+      skip('Unskip in CORE-3049')
+      text = "<p dir=\"ltr\">This is my text</p>"
+      wysiwyg_state_setup(@course, text, html: true)
+      click_directionality_button
       validate_wiki_style_attrib_empty("p")
     end
 

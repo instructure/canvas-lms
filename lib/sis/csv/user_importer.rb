@@ -21,7 +21,8 @@ module SIS
     class UserImporter < CSVBaseImporter
 
       def self.user_csv?(row)
-        row.include?('user_id') && row.include?('login_id')
+        login_csv = (row & %w{existing_user_id existing_integration_id existing_canvas_user_id}.freeze).empty?
+        row.include?('user_id') && row.include?('login_id') && login_csv
       end
 
       def self.identifying_fields

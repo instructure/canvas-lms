@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "Nadomestno besedilo:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Pri ustvarjanju predogleda datoteke je prišlo do napake"
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "Slika se še vedno nalaga. Če nadaljujete, slika ne bo pravilno vdelana."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "Naloge"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Samodejno odpri v predogledu v vrstici. (Predogled se prikaže šele po shranjevanju)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "nerazvrščeni seznam s krogi"
   },
+  "clear_selected_file_82388e50": {
+    "message": "Počisti izbrano datoteko."
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Kliknite katero koli datoteko, da vstavite povezavo za prenos te datoteke."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Kliknite, da vstavite povezavo k temu elementu."
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Zapri meni ali pogovorno okno Prav tako vas vrne v območje urejevalnika"
   },
   "close_d634289d": {
     "message": "Zapri"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "Povezave predmeta"
   },
-  "course_media_ec759ad": {
-    "message": "Mediji predmeta"
-  },
   "course_navigation_dd035109": {
     "message": "Navigacija po predmetu"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(Opiši sliko)"
   },
+  "directionality_ebcae6d0": {
+    "message": "usmerjenost"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "Onemogoči predogled v vrstici."
+  },
   "discussions_a5f96392": {
     "message": "Razprave"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "Dokončano"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "Datoteko povlecite sem"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Za brskanje po računalniku povlecite in spustite ali kliknite"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Ravnanje ob vlečenju. Za spremembo velikosti uporabite puščici gor in dol"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Rok: Več datumov"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "Uredi povezavo"
   },
+  "embed_828fac4a": {
+    "message": "Vdelaj"
+  },
   "embed_image_1080badc": {
     "message": "Vdelaj sliko"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "Vrstica z možnostmi vdelave"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Predogled vdelave"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "Vdelaj kodo videoposnetka"
   },
   "enter_search_terms_e397b1f0": {
     "message": "vnos iskalnih besed"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "Obrazec za nalaganje datoteke"
   },
+  "file_url_c12b64be": {
+    "message": "URL datoteke"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "Ikona datoteke { filename }"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "Predogled slike { filename }"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "Predogled besedila { filename }"
+  },
   "files_c300e900": {
     "message": "Datoteke"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "Dokončaj"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Osredotoči na pojavno orodno vrstico v priročnem meniju"
+  },
   "folder_705fd2d7": {
     "message": "Mapa"
+  },
+  "generating_preview_45b53be0": {
+    "message": "Generiranje predogleda ..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Pojdi v menijsko vrstico urejevalnika"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Pojdi orodno vrstico urejevalnika"
   },
   "grades_a61eba0a": {
     "message": "Ocene"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "Neveljavna vrsta datoteke"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Bližnjice"
+  },
   "large_9c5e80e7": {
     "message": "Velika"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "iz leve proti desni"
+  },
   "link_7262adec": {
     "message": "Povezava"
+  },
+  "link_options_a16b758b": {
+    "message": "Možnosti povezave"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "Povezava na novo stran"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "Nalaganje ni uspelo ..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "Nalaganje ni uspelo."
+  },
   "loading_folders_8d4d5d5a": {
     "message": "Nalaganje map ..."
   },
   "loading_media_f3455841": {
     "message": "Nalagam medij"
-  },
-  "media_af190855": {
-    "message": "Mediji"
   },
   "medium_5a8e9ead": {
     "message": "Srednja"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "Moduli"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Navigirajte skozi meni ali orodno vrstico"
+  },
+  "next_page_d2a39853": {
+    "message": "Naslednja stran"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Brez nadomestnega besedila (dekorativna slika)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "Ni videoposnetek"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Odpri to pogovorno okno z bližnjicami"
+  },
   "options_3ab0ea65": {
     "message": "Možnosti"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Urejeni in neurejeni seznami"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Druge bližnjice urejevalnike je mogoče najti na"
   },
   "pages_e5414c2c": {
     "message": "Strani"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "PREDOGLED"
   },
+  "previous_page_928fc112": {
+    "message": "Prejšnja stran"
+  },
   "published_c944a23d": {
     "message": "objavljeno"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "Urejevalnik"
   },
+  "right_to_left_ec223c81": {
+    "message": "z desne proti levi"
+  },
   "save_11a80ec3": {
     "message": "Shrani"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Preišči storitev Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "Iskalni izraz"
+  },
   "select_a_file_53ba40ac": {
     "message": "Izberi datoteko"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Izberite mapo za nalaganje datoteke vanjo."
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Prikaži možnosti vdelave"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Prikaži možnosti slike"
+  },
+  "show_link_options_545338fd": {
+    "message": "Prikaži povezave na slike"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Prikaži možnosti videoposnetka"
   },
   "size_b30e1077": {
     "message": "Velikost"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "Učni načrt"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "ZAVIHEK/puščične tipke"
+  },
+  "text_7f4593da": {
+    "message": "Besedilo"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Gradivo je dostopno javnosti."
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "Naloži novo sliko"
   },
+  "upload_document_253f0478": {
+    "message": "Naloži dokument"
+  },
   "upload_file_fd2361b8": {
     "message": "Naloži datoteko"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "Videoposnetek/zvočni posnetek je naložen"
+  },
+  "video_options_24ef6e5d": {
+    "message": "Možnosti videoposnetka"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "Vrstica z možnostmi videoposnetka"
   },
   "video_player_b371005": {
     "message": "Predvajalnik videoposnetkov"

@@ -1195,6 +1195,15 @@ module ApplicationHelper
     super(attachment, uuid || attachment.uuid, url_options)
   end
 
+  def prefetch_assignment_external_tools
+    content_tag(:div, id: 'assignment_external_tools') do
+      prefetch_xhr(api_v1_course_launch_definitions_path(
+        @context,
+        'placements[]' => 'assignment_view'
+      ))
+    end
+  end
+
   if CANVAS_RAILS5_1
     # this is for rails 5.1. it can be deleted when we upgrade to RAILS_5.2. rails 5.2 includes a preload_link_tag method
     def preload_link_tag(source, options = {})

@@ -291,6 +291,21 @@ describe CC::BasicLTILinks do
 
       end
 
+      context "content migrations" do
+        it "adds content migrations settings" do
+          tool.settings[:content_migration] = {
+            export_start_url: "https://example.com/export",
+            import_start_url: "https://example.com/import"
+          }
+          subject.create_blti_link(tool, lti_doc)
+          xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+          cm_xpath = '//blti:extensions/lticm:options[@name="content_migration"]'
+          export_xpath = "#{cm_xpath}/lticm:property[@name=\"export_start_url\"]"
+          import_xpath = "#{cm_xpath}/lticm:property[@name=\"import_start_url\"]"
+          expect(xml_doc.at_xpath(export_xpath).text).to eq tool.settings[:content_migration][:export_start_url]
+          expect(xml_doc.at_xpath(import_xpath).text).to eq tool.settings[:content_migration][:import_start_url]
+        end
+      end
     end
   end
 end

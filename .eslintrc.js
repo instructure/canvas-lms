@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   env: {
     es6: true,
@@ -27,11 +29,25 @@ module.exports = {
     tinyMCE: true,
     tinymce: true
   },
-  plugins: ['promise', 'import', 'notice', 'jest', 'prettier', 'jsx-a11y', 'lodash', 'react'],
+  plugins: [
+    'promise',
+    'import',
+    'notice',
+    'jest',
+    'prettier',
+    'jsx-a11y',
+    'lodash',
+    'react',
+    'react-hooks'
+  ],
   rules: {
     // These deal with prettier and will eventually be removed
     'prettier/prettier': 'off',
     'no-cond-assign': ['error', 'except-parens'],
+
+    // enable the react-hooks rules
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
 
     // These come from our extended configurations, but we don't care about them
     camelcase: 'off', // because we have a ton of `const $user_name = $('#user_name')`
@@ -108,7 +124,7 @@ module.exports = {
     'notice/notice': [
       'error',
       {
-        templateFile: 'config/copyright-template.js',
+        templateFile: path.join(__dirname, 'config', 'copyright-template.js'),
         // purposely lenient so we don't automatically put our copyright notice on
         // top of something already copyrighted by someone else.
         mustMatch: 'Copyright '

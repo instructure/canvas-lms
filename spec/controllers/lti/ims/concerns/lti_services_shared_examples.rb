@@ -88,6 +88,21 @@ shared_examples_for "lti services" do
       expect(response).to have_http_status http_success_status
     end
 
+    context 'with site admin developer key' do
+      context 'when LTI 1.3 feature is allowed' do
+        let(:before_send_request) do
+          -> do
+            developer_key.update!(account: nil)
+            Account.site_admin.allow_feature!(:lti_1_3)
+          end
+        end
+
+        it 'returns 200 success' do
+          expect(response).to have_http_status http_success_status
+        end
+      end
+    end
+
     context 'with system failure during access token validation' do
       let(:jwt_validator) { instance_double(Canvas::Security::JwtValidator) }
       let(:before_send_request) do
@@ -186,12 +201,21 @@ shared_examples_for "lti services" do
       end
     end
 
-    context 'with invalid access token issuance timestamp (\'iat\')' do
+    context 'with access token issuance timestamp in the future (\'iat\')' do
       let(:access_token_jwt_hash) { super().merge(iat: (Time.zone.now.to_i + 1.hour.to_i)) }
 
       it 'returns 401 unauthorized and complains about an invalid iat field' do
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid access token field/s: the \'iat\' must not be in the future')
+      end
+    end
+
+    context 'whith access token issuance timestamp more than an hour old' do
+      let(:access_token_jwt_hash) { super().merge(iat: (Time.zone.now.to_i - 2.hours.to_i)) }
+
+      it 'returns 401 unauthorized and complains about an invalid iat field' do
+        expect(response).to have_http_status :unauthorized
+        expect(json).to be_lti_advantage_error_response_body('unauthorized', "Invalid access token field/s: the 'iat' must be less than 3600 seconds old")
       end
     end
 

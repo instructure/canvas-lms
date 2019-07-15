@@ -41,7 +41,7 @@ module Lti::Ims::Providers
     def rlid_users_scope
       scope = base_users_scope
       if assignment? && !nonsense_role_filter?
-        scope = scope.where(correlated_assignment_submissions('group_memberships.user_id').exists)
+        scope = scope.where(correlated_assignment_submissions('group_memberships.user_id').arel.exists)
       end
       apply_role_filter(scope)
     end

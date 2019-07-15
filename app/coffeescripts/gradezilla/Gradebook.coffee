@@ -74,6 +74,7 @@ import assignmentHelper from 'jsx/gradezilla/shared/helpers/assignmentHelper'
 import TextMeasure from 'jsx/gradezilla/shared/helpers/TextMeasure'
 import * as GradeInputHelper from 'jsx/grading/helpers/GradeInputHelper'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
+import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconSettingsSolid from '@instructure/ui-icons/lib/Solid/IconSettings'
@@ -473,6 +474,15 @@ export default do ->
 
       @postPolicies?.initialize()
 
+      # With post policies, the "total grade" column needs to be re-rendered
+      # after loading students and submissions so we can indicate there are
+      # hidden submissions
+      $.when(
+        dataLoader.gotStudents,
+        dataLoader.gotSubmissions
+      ).then () =>
+        @updateTotalGradeColumn() if @options.post_policies_enabled?
+
       @renderedGrid = $.when(
         dataLoader.gotStudentIds,
         dataLoader.gotContextModules,
@@ -546,6 +556,15 @@ export default do ->
         @setSubmissionsLoaded(true)
         @updateColumnHeaders()
         @renderFilters()
+
+      # With post policies, the "total grade" column needs to be re-rendered
+      # after loading students and submissions so we can indicate there are
+      # hidden submissions
+      $.when(
+        dataLoader.gotStudents,
+        dataLoader.gotSubmissions
+      ).then () =>
+        @updateTotalGradeColumn() if @options.post_policies_enabled?
 
     loadOverridesForSIS: ->
       return unless @options.post_grades_feature
@@ -688,7 +707,7 @@ export default do ->
 
     getSubmission: (studentId, assignmentId) =>
       student = @student(studentId)
-      student["assignment_#{assignmentId}"]
+      student?["assignment_#{assignmentId}"]
 
     updateEffectiveDueDatesFromSubmissions: (submissions) =>
       EffectiveDueDates.updateWithSubmissions(@effectiveDueDates, submissions, @gradingPeriodSet?.gradingPeriods)
@@ -2068,8 +2087,18 @@ export default do ->
     listInvalidAssignmentGroups: =>
       @filteredContentInfo.invalidAssignmentGroups
 
-    listMutedAssignments: =>
-      @filteredContentInfo.mutedAssignments
+    listHiddenAssignments: (studentId) =>
+      if @options.post_policies_enabled
+        return [] unless @contentLoadStates.submissionsLoaded && @contentLoadStates.assignmentsLoaded
+        Object.values(@assignments).filter((assignment) =>
+          submission = @getSubmission(studentId, assignment.id)
+          # Ignore anonymous assignments when deciding whether to show the
+          # "hidden" icon, as including them could reveal which students have
+          # and have not been graded
+          submission? && isHidden(submission) && !assignment.anonymize_students
+        )
+      else
+        @filteredContentInfo.mutedAssignments
 
     getTotalPointsPossible: =>
       @filteredContentInfo.totalPointsPossible
@@ -2159,6 +2188,15 @@ export default do ->
         @gradebookGrid.invalidateRow(rowIndex) if rowIndex?
 
       @gradebookGrid.render()
+
+      null # skip building an unused array return value
+
+    updateTotalGradeColumn: =>
+      return unless @gradebookGrid.grid?
+      columnIndex = @gradebookGrid.grid.getColumns().findIndex((column) => column.type == 'total_grade')
+      return if columnIndex == -1
+      for rowIndex in @listRowIndicesForStudentIds(@courseContent.students.listStudentIds())
+        @gradebookGrid.grid.updateCell(rowIndex, columnIndex) if rowIndex?
 
       null # skip building an unused array return value
 

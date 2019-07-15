@@ -1019,6 +1019,7 @@ describe "context modules" do
       f(".permissions-dialog-form [type='submit']").click
       wait_for_ajaximations
       expect(@file.reload).to be_published
+      expect(f("[data-id='#{@file.id}'] > button.published-status")[:title]).to eq("Published")
     end
 
     it "should show the file publish button on course home" do

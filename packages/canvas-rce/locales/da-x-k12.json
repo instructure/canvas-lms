@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Der opstod en fejl under generering af filforhåndsvisning"
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "Et billede er stadig ved at blive uploadet. Hvis du fortsætter, bliver billedet ikke integreret korrekt."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "Opgaver"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Åbn automatisk en in-line forhåndsvisning. (Forhåndsvisning vises kun, når filen er blevet gemt)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cirkel usorteret liste"
   },
+  "clear_selected_file_82388e50": {
+    "message": "Ryd valgt fil"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klik på en vilkårlig fil for at indsætte et download-link til den pågældende fil."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klik for at indsætte et link i dette element."
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Luk en menu eller dialog. Sender dig også tilbage til redigeringsområdet"
   },
   "close_d634289d": {
     "message": "Luk"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "Faglinks"
   },
-  "course_media_ec759ad": {
-    "message": "Fagmedier"
-  },
   "course_navigation_dd035109": {
     "message": "Fagnavigation"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(Beskriv billedet)"
   },
+  "directionality_ebcae6d0": {
+    "message": "retningsbestemthed"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "Deaktiver in-line forhåndsvisning."
+  },
   "discussions_a5f96392": {
     "message": "Diskussioner"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "Udført"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "Træk en fil her hen"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Træk og slip eller klik for at browse din computer"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Træk i håndtaget. Brug op- og ned-pilene til at ændre størrelse"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Forfalder: Flere datoer"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "Rediger link"
   },
+  "embed_828fac4a": {
+    "message": "Indlejre"
+  },
   "embed_image_1080badc": {
     "message": "Integrer billede"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "Bakke til indlejringsindstillinger"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Indlejr forhåndsvisning"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "Indlejr videokode"
   },
   "enter_search_terms_e397b1f0": {
     "message": "indtast søgetermer"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "Upload-formular til filer"
   },
+  "file_url_c12b64be": {
+    "message": "Fil-URL"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "{ filename } filikon"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "{ filename } billedets forhåndsvisning"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "{ filename } tekstens forhåndsvisning"
+  },
   "files_c300e900": {
     "message": "Filer"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "Færdig"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Fokusér popup-kontekstværktøjslinjen"
+  },
   "folder_705fd2d7": {
     "message": "mappe"
+  },
+  "generating_preview_45b53be0": {
+    "message": "Genererer forhåndsvisning ..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Gå til redigerings-menulinjen"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Gå til redigerings-værktøjslinjen"
   },
   "grades_a61eba0a": {
     "message": "Vurderinger"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ugyldig filtype"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Genvejstaster"
+  },
   "large_9c5e80e7": {
     "message": "Stor"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "venstre til højre"
+  },
   "link_7262adec": {
     "message": "Link"
+  },
+  "link_options_a16b758b": {
+    "message": "Link-muligheder"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "Link til en ny side"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "Indlæsning mislykkedes ..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "Indlæsning mislykkedes."
+  },
   "loading_folders_8d4d5d5a": {
     "message": "Indlæser mapper ..."
   },
   "loading_media_f3455841": {
     "message": "Indlæsning af medier"
-  },
-  "media_af190855": {
-    "message": "Medier"
   },
   "medium_5a8e9ead": {
     "message": "Medium"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "Forløb"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Naviger gennem menuen eller værktøjslinjen"
+  },
+  "next_page_d2a39853": {
+    "message": "Næste side"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ingen alt-tekst (dekorativt billede)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "Ingen video"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Åbn dialogen for denne genvejstast"
+  },
   "options_3ab0ea65": {
     "message": "Muligheder"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Sorterede og usorterede lister"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Andre redigeringsgenveje kan findes på"
   },
   "pages_e5414c2c": {
     "message": "Sider"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "FORHÅNDSVISNING"
   },
+  "previous_page_928fc112": {
+    "message": "Forrige side"
+  },
   "published_c944a23d": {
     "message": "Offentliggjort"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "Rich Content Editor"
   },
+  "right_to_left_ec223c81": {
+    "message": "højre til venstre"
+  },
   "save_11a80ec3": {
     "message": "Gem"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Søg Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "Søgeord"
+  },
   "select_a_file_53ba40ac": {
     "message": "Vælg en fil"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vælg en mappe at uploade din fil til"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Vis indlejringsindstillinger"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Vis billedindstillinger"
+  },
+  "show_link_options_545338fd": {
+    "message": "Vis linkindstillinger"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Vis videoindstillinger"
   },
   "size_b30e1077": {
     "message": "Størrelse"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "Fagplan"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "TAB / pile"
+  },
+  "text_7f4593da": {
+    "message": "Tekst"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialer er på det offentlige domæne"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "Upload et nyt billede"
   },
+  "upload_document_253f0478": {
+    "message": "Upload dokument"
+  },
   "upload_file_fd2361b8": {
     "message": "Overfør fil"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "Video- / lydoptagelse uploadet"
+  },
+  "video_options_24ef6e5d": {
+    "message": "Videoindstillinger"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "Bakke for videoindstillinger"
   },
   "video_player_b371005": {
     "message": "Videoafspiller"

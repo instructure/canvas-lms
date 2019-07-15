@@ -44,13 +44,13 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
             onAction: () => ed.execCommand("instructureRecord"),
           },
 
-          {
-            type: 'menuitem',
-            text: formatMessage('Course Media'), // This item needs to be adjusted to be user/context aware, i.e. Use Media
-            onAction() {
-              ed.focus(true) // activate the editor without changing focus
-            }
-          }
+          // {
+          //   type: 'menuitem',
+          //   text: formatMessage('Course Media'), // This item needs to be adjusted to be user/context aware, i.e. Use Media
+          //   onAction() {
+          //     ed.focus(true) // activate the editor without changing focus
+          //   }
+          // }
         ]
         callback(items);
       }

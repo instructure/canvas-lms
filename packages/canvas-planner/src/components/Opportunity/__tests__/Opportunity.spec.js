@@ -47,10 +47,10 @@ it('renders the base component correctly', () => {
 it('calls the onClick prop when dismissed is clicked', () => {
   let tempProps = defaultProps();
   tempProps.dismiss = jest.fn();
-  const wrapper = shallow(
+  const wrapper = mount(
     <Opportunity {...tempProps}/>
   );
-  wrapper.find('Button').simulate('click');
+  wrapper.find('button').simulate('click');
   expect(tempProps.dismiss).toHaveBeenCalled();
 });
 
@@ -99,9 +99,10 @@ it('registers itself as animatable', () => {
   expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, ['2']);
 });
 
+
 it('renders no close icon if dismissed', () => {
   const props = defaultProps({plannerOverride: {dismissed: true}});
-  const wrapper = shallow(<Opportunity {...props} />);
-  expect(wrapper.find('Button').length).toEqual(0)
+  const wrapper = mount(<Opportunity {...props} />);
+  expect(wrapper.find('button').length).toEqual(0)
 })
 

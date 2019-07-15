@@ -24,7 +24,6 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import View from '@instructure/ui-layout/lib/components/View'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -290,7 +289,13 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextStudent}
                 rightArrowDescription={I18n.t('Next student')}
               >
-                <Link href={this.props.student.gradesUrl}>{name}</Link>
+                <Button
+                  href={this.props.student.gradesUrl}
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                >
+                  {name}
+                </Button>
               </Carousel>
 
               <View as="div" margin="small 0" className="hr" />
@@ -305,7 +310,13 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextAssignment}
                 rightArrowDescription={I18n.t('Next assignment')}
               >
-                <Link href={this.props.assignment.htmlUrl}>{this.props.assignment.name}</Link>
+                <Button
+                  href={this.props.assignment.htmlUrl}
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                >
+                  {this.props.assignment.name}
+                </Button>
               </Carousel>
 
               {this.props.speedGraderEnabled && this.renderSpeedGraderLink(speedGraderProps)}

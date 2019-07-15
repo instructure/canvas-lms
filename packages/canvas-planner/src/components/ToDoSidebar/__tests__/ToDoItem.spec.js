@@ -126,13 +126,13 @@ xit('renders out the due date in the proper format', () => {
   expect(info.text()).toMatch('Jul 16 at  2:00am');
 });
 
-it('renders the title as a Link when given an href prop', () => {
+it('renders the title as an a tag when given an href prop', () => {
   const wrapper = mount(
     <ToDoItem {...getDefaultProps({ html_url: '/some_example_url' })} />
   );
-  const link = wrapper.find('.ToDoSidebarItem__Title').find('Link');
-  expect(link.exists()).toBe(true);
-  expect(link.text()).toBe('Introduction to Board Games');
+  const titleLink = wrapper.find('.ToDoSidebarItem__Title');
+  expect(titleLink.exists()).toBe(true);
+  expect(titleLink.containsAllMatchingElements(['Introduction to Board Games'])).toBeTruthy();
 });
 
 it('renders out the title as a Text when not given an href prop', () => {

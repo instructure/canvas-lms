@@ -28,6 +28,7 @@ export default function KeyboardShortcutModal(props) {
   return (
     <Modal
       data-testid="RCE_KeyboardShortcutModal"
+      data-mce-component
       label={formatMessage('Keyboard Shortcuts')}
       open={props.open}
       shouldCloseOnDocumentClick

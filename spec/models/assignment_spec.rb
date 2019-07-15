@@ -1293,7 +1293,7 @@ describe Assignment do
         expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
 
         assignment = @course.assignments.create!(assignment_valid_attributes)
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(student_one.name)
@@ -1333,7 +1333,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(group_two.name)
         expect(representatives[1].name).to eql(group_one.name)
@@ -1364,7 +1364,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(student_one.name)
@@ -1402,7 +1402,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(group_two.name)
@@ -1444,7 +1444,7 @@ describe Assignment do
 
       expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
 
-      representatives = assignment.representatives(@teacher)
+      representatives = assignment.representatives(user: @teacher)
 
       expect(representatives[0].name).to eql(student_three.name)
       expect(representatives[1].name).to eql(student_one.name)
@@ -4262,6 +4262,15 @@ describe Assignment do
       expect(@assignment.participants.include?(@student1)).to be_falsey
     end
 
+    it 'excludes students with completed enrollments by date when not differentiated' do
+      @course.start_at = 2.days.ago
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @assignment.update_attribute(:only_visible_to_overrides, false)
+      expect(@assignment.participants(by_date: true).include?(@student1)).to be_falsey
+    end
+
     it 'excludes students without visibility' do
       expect(@assignment.participants.include?(@student2)).to be_falsey
     end
@@ -5794,7 +5803,7 @@ describe Assignment do
       comments, ignored = @assignment.generate_comments_from_files(
         zip.open.path,
         @teacher)
-      
+
       expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
       expect(ignored).to be_empty
     end

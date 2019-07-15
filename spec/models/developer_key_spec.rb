@@ -47,33 +47,18 @@ describe DeveloperKey do
       key_hash['kty'] = key_hash['kty'].to_s
       key_hash
     end
-    let(:developer_key_with_jwk) { DeveloperKey.create!(public_jwk: public_jwk) }
-    let(:developer_key_with_url) { DeveloperKey.create!(public_jwk_url: "https://hello.world.com") }
-    let(:developer_key_with_key_and_url) { DeveloperKey.create!(public_jwk: public_jwk, public_jwk_url: "https://hello.world.com") }
-    let(:developer_key_none) { DeveloperKey.create! }
+    let(:public_jwk_url) { "https://hello.world.com" }
 
-    context 'when public jwk is present' do
-      it 'is_lti_key should return true' do
-        expect(developer_key_with_jwk.is_lti_key).to eq true
-      end
+    it 'throws error if public jwk and public jwk are absent' do
+      expect { DeveloperKey.create!(is_lti_key: true) }.to raise_error ActiveRecord::RecordInvalid
     end
 
-    context 'when public jwk url is present' do
-      it 'is_lti_key should return true' do
-        expect(developer_key_with_url.is_lti_key).to eq true
-      end
+    it 'validates when public jwk is present' do
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk: public_jwk) }.to_not raise_error
     end
 
-    context 'when public jwk url and public jwk is not present' do
-      it 'is_lti_key should return false' do
-        expect(developer_key_none.is_lti_key).to eq false
-      end
-    end
-
-    context 'when public jwk url and public jwk is present' do
-      it 'is_lti_key should return true' do
-        expect(developer_key_with_key_and_url.is_lti_key).to eq true
-      end
+    it 'validates when public jwk url is present' do
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url: public_jwk_url) }.to_not raise_error
     end
   end
 

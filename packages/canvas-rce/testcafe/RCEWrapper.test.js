@@ -31,20 +31,12 @@ const externalLinksMenuItem = Selector('[role="menuitem"]').withText("External L
 const courseLinksMenuItem = Selector('[role="menuitem"]').withText("Course Links")
 const editLinkMenuItem = Selector('[role="menuitem"]').withText("Edit Link")
 const removeLinkMenuItem = Selector('[role="menuitem"]').withText("Remove Link")
-const linkDialog = Selector('.tox-dialog__title').withText('Insert/Edit Link')
+const linkDialog = Selector('[data-testid="RCELinkOptionsDialog"]')
 const selectword = Selector('#selectword')
 const linksTraySelector = '[role="dialog"][aria-label="Course Links"]'
 
-// given a DOM with
-// <label for="someid">some label text</label><input id="someid"/>
-// labeledBy("some label text") returns a Selector will find the input
-function labeledBy(text) {
-  return Selector(new Function(
-    `
-    const targetid = document.evaluate('//label[text()="${text}"]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.getAttribute('for')
-    return document.getElementById(targetid)
-    `
-  ))
+function named(name) {
+  return Selector(`[name="${name}"]`)
 }
 
 test('edits in the textarea are reflected in the editor', async (t) => {
@@ -98,7 +90,7 @@ test('shows the edit links menu', async t => {
     .expect(removeLinkMenuItem.visible).ok()
 })
 
-test('can create a link', async t => {
+test('can create an external link', async t => {
   await t
     .click(toggleButton)
     .typeText(textarea, '<div>this is <span id="selectword">selected</span> text</div>')
@@ -112,16 +104,16 @@ test('can create a link', async t => {
     .click(linksButton)
     .click(externalLinksMenuItem)
     .expect(linkDialog.visible).ok()
-    .expect(labeledBy('URL').visible).ok()
+    .expect(named('linklink').visible).ok()
 
   await t
-    .typeText(labeledBy('URL'), 'https://instructure.com')
-    .click(Selector('button').withText('Save'))
+    .typeText(named('linklink'), 'https://instructure.com')
+    .click(Selector('button').withText('Done'))
     .switchToIframe(tinyIframe)
     .expect(Selector('a').withAttribute('href', 'https://instructure.com').withAttribute('target', '_blank').exists).ok()
 })
 
-test('can edit a link', async t => {
+test('can edit an external link', async t => {
   await t
     .click(toggleButton)
     .typeText(textarea, '<div>this is <a href="http://example.com"><span id="selectword">selected</span></a> text</div>')
@@ -141,8 +133,8 @@ test('can edit a link', async t => {
     .click(editLinkMenuItem)
     .expect(linkDialog.visible).ok()
 
-    await t.expect(labeledBy('URL').value).eql('http://example.com')
-    await t.expect(labeledBy('Text to display').value).eql('selected')
+  await t.expect(named('linklink').value).eql('http://example.com')
+  await t.expect(named('linktext').value).eql('selected')
 })
 
 test('can remove a link', async t => {

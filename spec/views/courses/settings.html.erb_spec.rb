@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/settings.html.erb" do
-  before do
+  before :once do
     @subaccount = Account.default.sub_accounts.create!(:name => 'subaccount')
     course_with_teacher(:active_all => true, :account => @subaccount)
     @course.sis_source_id = "so_special_sis_id"
@@ -112,6 +112,50 @@ describe "courses/settings.html.erb" do
       it "should not show quota input box" do
         render
         expect(response).not_to have_tag "input#course_storage_quota_mb"
+      end
+    end
+  end
+
+  describe "Large Course settings" do
+    before :once do
+      @course.enable_feature!(:new_gradebook)
+    end
+
+    before :each do
+      view_context(@course, @teacher)
+    end
+
+    it "does not render when new gradebook is not enabled" do
+      @course.disable_feature!(:new_gradebook)
+      render
+      expect(response).not_to have_tag("label[for=course_large_course]")
+    end
+
+    it "has a Large Course label" do
+      render
+      expect(response).to have_tag("label[for=course_large_course]")
+    end
+
+    describe "filter SpeedGrader by student group" do
+      it "has a checkbox" do
+        render
+        expect(response).to have_tag "input#course_filter_speed_grader_by_student_group[type=checkbox]"
+      end
+
+      it "has a label describing it" do
+        render
+        expect(response).to have_tag("label[for=course_filter_speed_grader_by_student_group]")
+      end
+
+      it "checkbox is checked when filter_speed_grader_by_student_group is true" do
+        @course.update!(filter_speed_grader_by_student_group: true)
+        render
+        expect(response).to have_tag "input#course_filter_speed_grader_by_student_group[type=checkbox][checked=checked]"
+      end
+
+      it "checkbox is not checked when filter_speed_grader_by_student_group is false" do
+        render
+        expect(response).not_to have_tag "input#course_filter_speed_grader_by_student_group[type=checkbox][checked=checked]"
       end
     end
   end

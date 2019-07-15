@@ -20,6 +20,9 @@
   "cancel_image_upload_2c771950": {
     "message": "Cancel image upload"
   },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas 플러그 인"
+  },
   "cc_attribution_f6de631f": {
     "message": "CC 유형"
   },
@@ -166,9 +169,6 @@
   },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
-  },
-  "media_af190855": {
-    "message": "미디어"
   },
   "modules_c4325335": {
     "message": "모듈"

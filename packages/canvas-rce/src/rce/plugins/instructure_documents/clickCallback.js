@@ -29,7 +29,10 @@ export default function(ed, document) {
       document.body.appendChild(container)
     }
 
-    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
+    const handleDismiss = () => {
+      ReactDOM.unmountComponentAtNode(container)
+      ed.focus()
+    }
 
     // acccept=undefined -> can upload anything
     ReactDOM.render(

@@ -26,6 +26,9 @@
   "cancel_image_upload_2c771950": {
     "message": "ביטול העלאת תמונה"
   },
+  "canvas_plugins_705a5016": {
+    "message": "תופסי קנבס"
+  },
   "cc_attribution_f6de631f": {
     "message": "הרשאה שימוש עם קרדיט למחבר"
   },
@@ -206,9 +209,6 @@
   "loading_failed_b3524381": {
     "message": "טעינה נכשלה..."
   },
-  "media_af190855": {
-    "message": "מדיה"
-  },
   "modules_c4325335": {
     "message": "מודולים"
   },
@@ -256,6 +256,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "בחירת תיקיה להעלאת הקובץ שלך"
+  },
+  "selected_274ce24f": {
+    "message": "נבחר"
   },
   "size_b30e1077": {
     "message": "גודל"

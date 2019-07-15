@@ -46,5 +46,13 @@ class AssignmentPage
     def title
       f('.title')
     end
+
+    def student_group_speedgrader_dropdown
+      # TODO: locator for new dropdown
+    end
+
+    def speedgrader_link
+      f('#assignment-speedgrader-link')
+    end
   end
 end

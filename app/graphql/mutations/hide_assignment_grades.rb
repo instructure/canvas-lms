@@ -39,7 +39,8 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be hidden before grades are published"
     end
 
-    submission_ids = assignment.submissions.active.pluck(:id)
+    submissions_scope = assignment.submissions.active.joins(user: :enrollments)
+    submissions_scope = course.apply_enrollment_visibility(submissions_scope, current_user)
     progress = course.progresses.new(tag: "hide_assignment_grades")
 
     if progress.save
@@ -48,7 +49,7 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
         :hide_submissions,
         {preserve_method_args: true},
         progress: progress,
-        submission_ids: submission_ids
+        submission_ids: submissions_scope.pluck(:id)
       )
       return {assignment: assignment, progress: progress}
     else

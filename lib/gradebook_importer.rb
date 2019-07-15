@@ -202,7 +202,6 @@ class GradebookImporter
     end
 
     translate_pass_fail(@assignments, @students, @gradebook_importer_assignments)
-
     unless @missing_student
       # weed out assignments with no changes
       indexes_to_delete = []
@@ -285,13 +284,16 @@ class GradebookImporter
       next unless assignment.grading_type == "pass_fail"
       students.each do |student|
         submission = gradebook_importer_assignments.fetch(student.id)[idx]
-        if submission['grade'].present?
+        if submission['grade'].present? && (submission['grade'].to_s.casecmp('EX') != 0)
           gradebook_importer_assignments.fetch(student.id)[idx]['grade'] = assignment.score_to_grade(submission['grade'], \
             submission['grade'])
         end
-        if submission['original_grade'].present?
-          gradebook_importer_assignments.fetch(student.id)[idx]['original_grade'] = assignment.score_to_grade(submission['original_grade'],
+        if submission['original_grade'].present? && (submission['original_grade'] != 'EX')
+          gradebook_importer_assignments.fetch(student.id)[idx]['original_grade'] = assignment.score_to_grade(submission['original_grade'],\
             submission['original_grade'])
+        end
+        if submission['grade'].to_s.casecmp('EX') == 0
+          submission['grade'] = 'EX'
         end
       end
     end
@@ -678,6 +680,10 @@ class GradebookImporter
     return true if submission['original_grade'].blank? && submission['grade'].blank?
 
     return false unless submission['original_grade'].present? && submission['grade'].present?
+
+    if (submission['grade'].to_s.casecmp('EX') == 0) || (submission['original_grade'].casecmp('EX') == 0)
+      return false
+    end
 
     # The exporter exports scores rounded to two decimal places (which is also
     # the maximum level of precision shown in the gradebook), so 123.456 will

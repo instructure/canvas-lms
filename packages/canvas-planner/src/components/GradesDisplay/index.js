@@ -25,7 +25,7 @@ import ErrorAlert from '../ErrorAlert';
 
 import View from '@instructure/ui-layout/lib/components/View';
 import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Link from '@instructure/ui-elements/lib/components/Link';
+import Button from '@instructure/ui-buttons/lib/components/Button';
 import Spinner from '@instructure/ui-elements/lib/components/Spinner';
 import Text from '@instructure/ui-elements/lib/components/Text';
 
@@ -85,11 +85,16 @@ export class GradesDisplay extends React.Component {
         margin="0 0 large 0"
       >
         <div className={styles.course} style={courseNameStyles}>
-          <Link href={`${course.href}/grades`}>
-            <Text color="primary" size="small" transform="uppercase">
+          <Button
+            variant="link"
+            size="small"
+            theme={{smallPadding: '0', smallHeight: 'normal'}}
+            href={`${course.href}/grades`}
+          >
+            <Text transform="uppercase">
               {course.shortName}
             </Text>
-          </Link>
+          </Button>
         </div>
         <Text as="div" size="large" weight="light">{this.scoreString(course.score)}</Text>
       </View>;

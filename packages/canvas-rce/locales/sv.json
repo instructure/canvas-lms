@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "Alternativ text:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Ett fel inträffade när förhandsgranskning av filen genererades."
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "En bild laddas fortfarande upp, om du fortsätter kommer bilden inte att bäddas in korrekt."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "Uppgifter"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Öppna automatiskt en i-rad-förhandsgranskning (Förhandsgranskningar visas endast efter att de sparats)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cirkelmarkera osorterad lista"
   },
+  "clear_selected_file_82388e50": {
+    "message": "Rensa vald fil"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Klicka på en fil för att lägga till en nedladdningslänk för den filen."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klicka för att infoga en länk till detta föremål."
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Avsluta en meny eller dialogruta Tar dig tillbaka till redigerar-området"
   },
   "close_d634289d": {
     "message": "Stäng"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "Kurslänkar"
   },
-  "course_media_ec759ad": {
-    "message": "Kursmedia"
-  },
   "course_navigation_dd035109": {
     "message": "Kursnavigering"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(Beskriv bilden)"
   },
+  "directionality_ebcae6d0": {
+    "message": "Riktning"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "Avaktivera förhandsgranskning på raden "
+  },
   "discussions_a5f96392": {
     "message": "Diskussioner"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "Färdig"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "Dra en fil hit"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Dra och släpp, eller klicka för att söka i din dator"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Dra handtag. Använd upp- och ned-pilarna för att ändra storlek"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Förfallodatum: Flera datum"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "Redigera länk"
   },
+  "embed_828fac4a": {
+    "message": "Bädda in"
+  },
   "embed_image_1080badc": {
     "message": "Bädda in bild"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "Bädda in alternativ-bricka"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Bädda in förhandsgranskning"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "Bädda in videokod"
   },
   "enter_search_terms_e397b1f0": {
     "message": "uppge söktermer"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "Fil uppladdningsformulär"
   },
+  "file_url_c12b64be": {
+    "message": "Fil-URL"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "{ filename } filikon"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "{ filename } förhandsgranskning av bild"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "{ filename } förhandsgranskning av text"
+  },
   "files_c300e900": {
     "message": "Filer"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "Avsluta"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Fokusera på verktygsfältet popupkontext"
+  },
   "folder_705fd2d7": {
     "message": "Mapp"
+  },
+  "generating_preview_45b53be0": {
+    "message": "Genererar omdöme..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Gå till redigerarens menyfält"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Gå till redigerarens verktygsfält"
   },
   "grades_a61eba0a": {
     "message": "Betyg"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ogiltig filtyp"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Kortkommandon"
+  },
   "large_9c5e80e7": {
     "message": "Stor"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "vänster till höger"
+  },
   "link_7262adec": {
     "message": "Länk"
+  },
+  "link_options_a16b758b": {
+    "message": "Länkalternativ"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "Länka till en ny sida"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "Laddning misslyckades..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "Laddning misslyckades"
+  },
   "loading_folders_8d4d5d5a": {
     "message": "Läser in mappar..."
   },
   "loading_media_f3455841": {
     "message": "Laddar media"
-  },
-  "media_af190855": {
-    "message": "Media"
   },
   "medium_5a8e9ead": {
     "message": "Medium"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "Moduler"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Navigera via menyn eller verktygsfältet"
+  },
+  "next_page_d2a39853": {
+    "message": "Nästa sida"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ingen Alt-text (dekorativ bild)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "Ingen video"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Öppna detta tangentbords genvägsdialog"
+  },
   "options_3ab0ea65": {
     "message": "Alternativ"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Sorterade och osorterade listor"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Andra genvägar till redigeraren kan hittas på"
   },
   "pages_e5414c2c": {
     "message": "Sidor"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "FÖRHANDSGRANSKA"
   },
+  "previous_page_928fc112": {
+    "message": "Föregående sida"
+  },
   "published_c944a23d": {
     "message": "publicerad"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "Innehållsredigeraren"
   },
+  "right_to_left_ec223c81": {
+    "message": "höger till vänster"
+  },
   "save_11a80ec3": {
     "message": "Spara"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Sök Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "Sök term"
+  },
   "select_a_file_53ba40ac": {
     "message": "Välj en fil"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Välj en mapp att ladda upp din fil till"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Visa inbäddade alternativ"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Visa bildalternativ"
+  },
+  "show_link_options_545338fd": {
+    "message": "Visa länkalternativ"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Visa videoalternativ"
   },
   "size_b30e1077": {
     "message": "Storlek"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "Kursöversikt"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "FLIK/Pilar"
+  },
+  "text_7f4593da": {
+    "message": "Text"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet är i den offentliga domänen"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "Ladda upp en ny bild"
   },
+  "upload_document_253f0478": {
+    "message": "Ladda upp dokument"
+  },
   "upload_file_fd2361b8": {
     "message": "Ladda upp fil"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "Video/ljudinspelning har laddats upp"
+  },
+  "video_options_24ef6e5d": {
+    "message": "Videoalternativ"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "Videoalternativ-bricka"
   },
   "video_player_b371005": {
     "message": "Videospelare"

@@ -23,6 +23,9 @@
   "cancel_image_upload_2c771950": {
     "message": "Ακύρωση μεταφόρτωσης εικόνας"
   },
+  "canvas_plugins_705a5016": {
+    "message": "Προσθήκες του Canvas"
+  },
   "cc_attribution_f6de631f": {
     "message": "Αναφορά Δημιουργού CC"
   },
@@ -187,9 +190,6 @@
   },
   "loading_failed_b3524381": {
     "message": "Η Φόρτωση Απέτυχε"
-  },
-  "media_af190855": {
-    "message": "Δεδομένα"
   },
   "modules_c4325335": {
     "message": "Ενότητες"

@@ -157,23 +157,17 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def update_artifact
-    if self.artifact_type == 'Submission' && self.artifact
-      Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)
-      if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
-        if self.rubric_association.association_object.grants_right?(self.assessor, nil, :grade)
-          group, _students = self.rubric_association.association_object.group_students(self.artifact.student)
-          Submission.find(self.artifact.id).update_column(:group_id, group.id) if group && !self.artifact.group
-          # TODO: this should go through assignment.grade_student to
-          # handle group assignments.
-          self.artifact.workflow_state = 'graded'
-          self.artifact.graded_anonymously = true if @graded_anonymously_set
-          self.artifact.update_attributes(:score => self.score, :graded_at => Time.now, :grade_matches_current_submission => true, :grader => self.assessor)
-        end
-      end
-    elsif self.artifact_type == 'ModeratedGrading::ProvisionalGrade' && self.artifact
-      if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
-        self.artifact.update_attributes(:score => self.score)
-      end
+    return unless artifact.present? && rubric_association&.use_for_grading? && artifact.score != score
+
+    case artifact_type
+    when "Submission"
+      assignment = rubric_association.association_object
+      return unless assignment.grants_right?(assessor, :grade)
+
+      assignment.grade_student(artifact.student, score: score, grader: assessor, graded_anonymously: @graded_anonymously_set)
+      artifact.reload
+    when "ModeratedGrading::ProvisionalGrade"
+      artifact.update!(score: score)
     end
   end
   protected :update_artifact

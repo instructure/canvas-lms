@@ -39,7 +39,7 @@ describe SpeedGrader::Assignment do
     end
 
     context "add students to the group" do
-      let(:category) { @course.group_categories.create! name: "Assignment Groups" }
+      let(:category) { @course.group_categories.create! name: "Group Set" }
       let(:assignment) do
         @course.assignments.create!(
           group_category_id: category.id,
@@ -544,156 +544,232 @@ describe SpeedGrader::Assignment do
 
   context "group assignments" do
     before :once do
-      course_with_teacher(active_all: true)
-      @gc = @course.group_categories.create! name: "Assignment Groups"
-      @groups = [1, 2].map { |i| @gc.groups.create! name: "Group #{i}", context: @course }
+      @teacher = course_with_teacher(active_all: true).user
+      @group_category = @course.group_categories.create!(name: 'Group Set')
+      @first_group = @group_category.groups.create!(name: 'Group 1', context: @course)
+      @second_group = @group_category.groups.create!(name: 'Group 2', context: @course)
+      @groups = [@first_group, @second_group]
       students = create_users_in_course(@course, 6, return_type: :record)
-      students.each_with_index { |s, i| @groups[i % @groups.size].add_user(s) }
-      @assignment = @course.assignments.create!(
-        group_category_id: @gc.id,
-        grade_group_students_individually: false,
-        submission_types: %w(text_entry)
-      )
-    end
-
-    it "is not in group mode for non-group assignments" do
-      assignment_model(course: @course)
-      @assignment.submit_homework(@user, {submission_type: 'online_text_entry', body: 'blah'})
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      expect(json["GROUP_GRADING_MODE"]).not_to be_truthy
-    end
-
-    it "sorts student view students last" do
-      test_student = @course.student_view_student
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
-    end
-
-    it 'returns "groups" instead of students' do
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-      @groups.each do |group|
-        j = json["context"]["students"].find { |g| g["name"] == group.name }
-        expect(group.users.map { |u| u.id.to_s }).to include j["id"]
+      students.each_with_index do |student, index|
+        @groups.fetch(index % @groups.size).add_user(student)
       end
-      expect(json["GROUP_GRADING_MODE"]).to be_truthy
     end
 
-    it 'chooses the student with turnitin data to represent' do
-      turnitin_submissions = @groups.map do |group|
-        rep = group.users.sample
-        turnitin_submission = @assignment.grade_student(rep, grade: 10, grader: @teacher)[0]
-        turnitin_submission.update_attribute :turnitin_data, {blah: 1}
-        turnitin_submission
+    context 'given an assignment' do
+      before(:once) do
+        @assignment = @course.assignments.create!
       end
 
-      @assignment.update_attribute :turnitin_enabled, true
-      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-
-      expect(json["submissions"].map do |s|
-        s["id"]
-      end.sort).to eq turnitin_submissions.map { |t| t.id.to_s }.sort
-    end
-
-    it 'prefers people with submissions' do
-      g1, = @groups
-      @assignment.grade_student(g1.users.first, score: 10, grader: @teacher)
-      g1rep = g1.users.sample
-      s = @assignment.submission_for_student(g1rep)
-      s.update_attribute :submission_type, 'online_upload'
-      expect(@assignment.representatives(@teacher)).to include g1rep
-    end
-
-    it "prefers people who aren't excused when submission exists" do
-      g1, = @groups
-      g1rep, *others = g1.users.to_a.shuffle
-      @assignment.submit_homework(g1rep, {
-        submission_type: 'online_text_entry',
-        body: 'hi'
-      })
-      others.each do |u|
-        @assignment.grade_student(u, excuse: true, grader: @teacher)
+      it "is not in group mode for non-group assignments" do
+        @assignment.submit_homework(@student, {submission_type: 'online_text_entry', body: 'blah'})
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json["GROUP_GRADING_MODE"]).to be false
       end
-      expect(@assignment.representatives(@teacher)).to include g1rep
+
+      context 'when a course has new gradeook and filter by student group enabled' do
+        before(:once) do
+          @course.enable_feature!(:new_gradebook)
+          @course.update!(filter_speed_grader_by_student_group: true)
+        end
+
+        context 'when no group filter is present' do
+          it 'returns all students' do
+            @teacher.preferences.deep_merge!(gradebook_settings: {
+              @course.id => {'filter_rows_by' => {'student_group_id' => nil}}
+            })
+            json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+            json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+            students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            StringifyIds.recursively_stringify_ids(students)
+            expect(json_students).to match_array(students)
+          end
+        end
+
+        context 'when the first group filter is present' do
+          let(:group) { @first_group }
+
+          before(:once) do
+            @teacher.preferences.deep_merge!(gradebook_settings: {
+              @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+            })
+          end
+
+          it 'returns only students that belong to the first group' do
+            json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+            json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+            group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+            StringifyIds.recursively_stringify_ids(group_students)
+            expect(json_students).to match_array(group_students)
+          end
+
+          context 'when a student is removed from a group' do
+            let(:first_student) { group.users.first }
+
+            before { group.group_memberships.find_by!(user: first_student).destroy! }
+
+            it 'that student is no longer included' do
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              group_students = group.users.where.not(id: first_student).
+                as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+          end
+
+          context 'when the second group filter is present' do
+            let(:group) { @second_group }
+
+            it 'returns only students that belong to the second group' do
+              @teacher.preferences.deep_merge!(gradebook_settings: {
+                @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+              })
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              group_students = group.users.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(group_students)
+              expect(json_students).to match_array(group_students)
+            end
+          end
+        end
+      end
     end
 
-    it "includes users who aren't in a group" do
-      student_in_course active_all: true
-      expect(@assignment.representatives(@teacher).last).to eq @student
-    end
+    context 'given a group assignment' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          group_category_id: @group_category.id,
+          grade_group_students_individually: false,
+          submission_types: %w(text_entry)
+        )
+      end
 
-    it "doesn't include deleted groups" do
-      student_in_course active_all: true
-      deleted_group = @gc.groups.create! name: "DELETE ME", context: @course
-      deleted_group.add_user(@student)
-      rep_names = @assignment.representatives(@teacher).map(&:name)
-      expect(rep_names).to include "DELETE ME"
+      it "sorts student view students last" do
+        test_student = @course.student_view_student
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json[:context][:students].last[:id]).to eq(test_student.id.to_s)
+      end
 
-      deleted_group.destroy!
-      rep_names = @assignment.representatives(@teacher).map(&:name)
-      expect(rep_names).not_to include "DELETE ME"
-    end
+      it 'returns "groups" instead of students' do
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        @groups.each do |group|
+          j = json["context"]["students"].find { |g| g["name"] == group.name }
+          expect(group.users.map { |u| u.id.to_s }).to include j["id"]
+        end
+        expect(json["GROUP_GRADING_MODE"]).to be_truthy
+      end
 
-    it 'prefers active users over other workflow states' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments[0].deactivate
-      enrollments[1].conclude
+      it 'chooses the student with turnitin data to represent' do
+        @assignment.update!(turnitin_enabled: true)
+        submissions = @groups.map do |group|
+          rep = group.users.sample
+          @assignment.grade_student(rep, grade: 10, grader: @teacher).first.tap do |submission|
+            submission.update!(turnitin_data: {blah: 1})
+          end
+        end
 
-      reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[2].user_id)
-    end
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        json_submission_ids = json["submissions"].map {|s| s.fetch('id')}
+        submission_ids = submissions.map { |t| t.id.to_s }
+        expect(json_submission_ids).to match_array(submission_ids)
+      end
 
-    it 'prefers inactive users when no active users are present' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments[0].conclude
-      enrollments[1].deactivate
-      enrollments[2].conclude
+      it 'prefers people with submissions' do
+        @assignment.grade_student(@first_group.users.first, score: 10, grader: @teacher)
+        first_group_representative = @first_group.users.sample
+        submission = @assignment.submission_for_student(first_group_representative)
+        submission.update!(submission_type: 'online_upload')
+        expect(@assignment.representatives(user: @teacher)).to include first_group_representative
+      end
 
-      reps = @assignment.representatives(@teacher, includes: %i[inactive completed])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[1].user_id)
-    end
+      it "prefers people who aren't excused when submission exists" do
+        first_group_representative, *everyone_else = @first_group.users.to_a.shuffle
+        @assignment.submit_homework(first_group_representative, {
+          submission_type: 'online_text_entry',
+          body: 'hi'
+        })
+        everyone_else.each do |user|
+          @assignment.grade_student(user, excuse: true, grader: @teacher)
+        end
+        expect(@assignment.representatives(user: @teacher)).to include first_group_representative
+      end
 
-    it 'includes concluded students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:conclude)
+      it "includes users who aren't in a group" do
+        student_in_course active_all: true
+        expect(@assignment.representatives(user: @teacher)).to include @student
+      end
 
-      reps = @assignment.representatives(@teacher, includes: [:completed])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[0].user_id)
-    end
+      it "includes groups" do
+        student_in_course active_all: true
+        group = @group_category.groups.create!(context: @course)
+        group.add_user(@student)
+        expect(@assignment.representatives(user: @teacher).map(&:name)).to include group.name
+      end
 
-    it 'does not include concluded students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:conclude)
+      it "doesn't include deleted groups" do
+        student_in_course active_all: true
+        group = @group_category.groups.create!(context: @course)
+        group.add_user(@student)
+        group.destroy!
+        expect(@assignment.representatives(user: @teacher).map(&:name)).not_to include group.name
+      end
 
-      reps = @assignment.representatives(@teacher, includes: [])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user).to be_nil
-    end
+      it 'prefers active users over other workflow states' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.first.deactivate
+        enrollments.second.conclude
 
-    it 'includes inactive students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:deactivate)
+        reps = @assignment.representatives(user: @teacher, includes: %i[inactive completed])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to eql(enrollments.third.user)
+      end
 
-      reps = @assignment.representatives(@teacher, includes: [:inactive])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user.id).to eql(enrollments[0].user_id)
-    end
+      it 'prefers inactive users when no active users are present' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.first.conclude
+        enrollments.second.deactivate
+        enrollments.third.conclude
 
-    it 'does not include inactive students when included' do
-      group = @groups.first
-      enrollments = group.all_real_student_enrollments
-      enrollments.each(&:deactivate)
+        reps = @assignment.representatives(user: @teacher, includes: %i[inactive completed])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to eql(enrollments.second.user)
+      end
 
-      reps = @assignment.representatives(@teacher, includes: [])
-      user = reps.select { |u| u.name == group.name }.first
-      expect(user).to be_nil
+      it 'includes concluded students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:conclude)
+
+        reps = @assignment.representatives(user: @teacher, includes: [:completed])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to eql(enrollments.first.user)
+      end
+
+      it 'does not include concluded students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:conclude)
+
+        reps = @assignment.representatives(user: @teacher, includes: [])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to be_nil
+      end
+
+      it 'includes inactive students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:deactivate)
+
+        reps = @assignment.representatives(user: @teacher, includes: [:inactive])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to eql(enrollments.first.user)
+      end
+
+      it 'does not include inactive students when included' do
+        enrollments = @first_group.all_real_student_enrollments
+        enrollments.each(&:deactivate)
+
+        reps = @assignment.representatives(user: @teacher, includes: [])
+        user = reps.find { |u| u.name == @first_group.name }
+        expect(user).to be_nil
+      end
     end
   end
 

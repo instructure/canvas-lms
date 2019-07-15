@@ -53,7 +53,8 @@ module Lti::Ims::Concerns
           jwt: decoded_jwt,
           expected_aud: expected_audience,
           require_iss: true,
-          skip_jti_check: true
+          skip_jti_check: true,
+          max_iat_age: Setting.get('oauth2_jwt_iat_ago_in_seconds', 60.minutes.to_s).to_i.seconds
         )
 
         # In this case we know the error message can just be safely shunted into the API response (in other cases
@@ -106,7 +107,9 @@ module Lti::Ims::Concerns
       )
 
       def verify_1_3_enabled
-        return if developer_key.owner_account.feature_enabled?(:lti_1_3)
+        owner_account = developer_key.owner_account
+        return if owner_account.feature_enabled?(:lti_1_3) ||
+          (owner_account.site_admin? && owner_account.feature_allowed?(:lti_1_3))
         render_error("LTI 1.3/Advantage features not enabled", :unauthorized)
       end
 

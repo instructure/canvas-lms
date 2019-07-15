@@ -23,6 +23,7 @@ import ReactDOM from 'react-dom'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
 import iframeAllowances from '../external_apps/lib/iframeAllowances'
+import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 
 class AssignmentExternalTools extends React.Component {
   constructor(props) {
@@ -61,30 +62,17 @@ class AssignmentExternalTools extends React.Component {
     return null;
   }
 
-  getTools() {
-    const self = this;
-    const toolsUrl = this.getDefinitionsUrl();
-    const data = {
-      'placements[]': this.props.placement
-    };
+  async getTools() {
+    const url = encodeURI(`${this.getDefinitionsUrl()}?placements[]=${this.props.placement}`)
 
-    $.ajax({
-      type: 'GET',
-      url: toolsUrl,
-      data,
-      success: $.proxy(function(data) {
-        const tool_data = data
-        for (let i = 0; i < data.length; i++) {
-          tool_data[i].launch = this.getLaunch(data[i]);
-        }
-        this.setState({
-          tools: tool_data
-        });
-      }, self),
-      error(_xhr) {
-        $.flashError(I18n.t('Error retrieving assignment external tools'));
-      }
-    });
+    try {
+      const request = getPrefetchedXHR(url) || fetch(url, {headers: {Accept: 'application/json'}})
+      const tools = await asJson(request)
+      tools.forEach(t => (t.launch = this.getLaunch(t)))
+      this.setState({tools})
+    } catch (e) {
+      $.flashError(I18n.t('Error retrieving assignment external tools'))
+    }
   }
 
   getDefinitionsUrl() {

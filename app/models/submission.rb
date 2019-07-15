@@ -170,7 +170,10 @@ class Submission < ActiveRecord::Base
           -- submission is not submitted and
           AND submission_type IS NULL
           -- we expect a digital submission
-          and assignments.submission_types NOT IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+          AND NOT (
+            cached_quiz_lti IS NOT TRUE AND
+            assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+          )
           AND assignments.submission_types IS NOT NULL
         )
       )
@@ -2204,7 +2207,7 @@ class Submission < ActiveRecord::Base
       return false if submitted_at.present?
       return false unless past_due?
 
-      assignment.expects_submission?
+      cached_quiz_lti? || assignment.expects_submission?
     end
     alias missing missing?
 

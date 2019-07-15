@@ -43,10 +43,14 @@ module BrokenLinkHelper
     course_id = url.match(/\/courses\/(\d+)/)&.[](1)&.to_i
     return :course_mismatch if course_id && course_id != course.id
     link_obj = Context.find_asset_by_url(url)
-    return :missing_item unless link_obj
+    return response_code_type unless link_obj
     course_validator = CourseLinkValidator.new(course)
-    course_validator.check_object_status(url, object: link_obj)
+    course_validator.check_object_status(url, object: link_obj) || response_code_type
   rescue => e
     :missing_item
+  end
+
+  def response_code_type
+    (response.status == 401 || response.status == 403) ? :inaccessible : :missing_item
   end
 end

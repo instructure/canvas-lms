@@ -186,7 +186,7 @@ export default function StatusBar(props) {
         {renderPath()}
       </Flex.Item>
 
-      <Flex.Item role="toolbar">
+      <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
         {renderIconButtons()}
         <div className={css(styles.separator)} />
         {renderWordCount()}

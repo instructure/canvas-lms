@@ -1017,9 +1017,9 @@
     "@babel/runtime" "^7"
 
 "@instructure/media-capture@^5":
-  version "5.53.1"
-  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-5.53.1.tgz#25a07df88f8fa6849602d372ab09dc36968fa312"
-  integrity sha512-8a4M0+Jy9GRSJ1H6307gSBwyeVkUQB0oYGNqTYt4TcZ5nMcUDHEKPtK7R4B7YsQr9p+c7orycvVxvbMZ+DE8TA==
+  version "5.53.2"
+  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-5.53.2.tgz#9f25f82766c448f337454d3cd0390ef858205b9b"
+  integrity sha512-xXmXxUMcZKWb2IgbyCoNmtzvJR8b1jGkDelTi1gBHHbUl+vHeToYBBwnIA5GEHDP/JjtWajlWr2xzZNd2SBX6A==
   dependencies:
     "@babel/runtime" "^7"
     "@instructure/ui-a11y" "^5.52.0"
@@ -1811,24 +1811,24 @@
     prop-types "^15"
 
 "@instructure/ui-pagination@6":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-6.2.0.tgz#fa66daa076a54c97882839b9086ff2f9677e4421"
-  integrity sha512-rKMPi2VXsnzOYuJERMPbMOG2jomPhxXjv3m8eaVKlKv/Sn5vPwj85Ngjcb3Uf/qR/vbjzO+3TPRlTSXinPA3Pw==
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-6.4.0.tgz#3c1758b5e54a876649b0e873185a54164d40c6cc"
+  integrity sha512-evryS/FNbzZEKxcdUFSKObwY2WILaCbJeY4lBYSnHbICBKt/Oe9hnZoc2TDAHk9ZLryHnalGeD3TAQVwkLv1CA==
   dependencies:
     "@babel/runtime" "^7"
-    "@instructure/ui-a11y" "^6.2.0"
-    "@instructure/ui-buttons" "^6.2.0"
-    "@instructure/ui-elements" "^6.2.0"
-    "@instructure/ui-icons" "^6.2.0"
-    "@instructure/ui-layout" "^6.2.0"
-    "@instructure/ui-overlays" "^6.2.0"
-    "@instructure/ui-portal" "^6.2.0"
-    "@instructure/ui-prop-types" "^6.2.0"
-    "@instructure/ui-react-utils" "^6.2.0"
-    "@instructure/ui-testable" "^6.2.0"
-    "@instructure/ui-themeable" "^6.2.0"
-    "@instructure/ui-utils" "^6.2.0"
-    "@instructure/uid" "^6.2.0"
+    "@instructure/ui-a11y" "^6.4.0"
+    "@instructure/ui-buttons" "^6.4.0"
+    "@instructure/ui-elements" "^6.4.0"
+    "@instructure/ui-icons" "^6.4.0"
+    "@instructure/ui-layout" "^6.4.0"
+    "@instructure/ui-overlays" "^6.4.0"
+    "@instructure/ui-portal" "^6.4.0"
+    "@instructure/ui-prop-types" "^6.4.0"
+    "@instructure/ui-react-utils" "^6.4.0"
+    "@instructure/ui-testable" "^6.4.0"
+    "@instructure/ui-themeable" "^6.4.0"
+    "@instructure/ui-utils" "^6.4.0"
+    "@instructure/uid" "^6.4.0"
     prop-types "^15"
 
 "@instructure/ui-pagination@^5", "@instructure/ui-pagination@^5.52.3":
@@ -5896,11 +5896,6 @@ concurrently@^4, concurrently@^4.1.0:
     tree-kill "^1.1.0"
     yargs "^12.0.1"
 
-confusing-browser-globals@^1.0.6:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/confusing-browser-globals/-/confusing-browser-globals-1.0.7.tgz#5ae852bd541a910e7ffb2dbb864a2d21a36ad29b"
-  integrity sha512-cgHI1azax5ATrZ8rJ+ODDML9Fvu67PimB6aNxBrc/QwSaDaM9eTfIEUHx3bBLJJ82ioSb+/5zfsMCCEJax3ByQ==
-
 connect-history-api-fallback@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/connect-history-api-fallback/-/connect-history-api-fallback-1.6.0.tgz#8b32089359308d111115d81cad3fceab888f97bc"
@@ -7522,13 +7517,6 @@ eslint-config-prettier@^4:
   dependencies:
     get-stdin "^6.0.0"
 
-eslint-config-react-app@^3:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/eslint-config-react-app/-/eslint-config-react-app-3.0.8.tgz#6f606828ba30bafee7d744c41cd07a3fea8f3035"
-  integrity sha512-Ovi6Bva67OjXrom9Y/SLJRkrGqKhMAL0XCH8BizPhjEVEhYczl2ZKiNZI2CuqO5/CJwAfMwRXAVGY0KToWr1aA==
-  dependencies:
-    confusing-browser-globals "^1.0.6"
-
 eslint-import-resolver-node@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.3.2.tgz#58f15fb839b8d0576ca980413476aab2472db66a"
@@ -7639,6 +7627,11 @@ eslint-plugin-qunit@^4:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-qunit/-/eslint-plugin-qunit-4.0.0.tgz#5945ba3434bfe8879bea195192e906701051cf01"
   integrity sha512-+0i2xcYryUoLawi47Lp0iJKzkP931G5GXwIOq1KBKQc2pknV1VPjfE6b4mI2mR2RnL7WRoS30YjwC9SjQgJDXQ==
+
+eslint-plugin-react-hooks@^1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-1.6.1.tgz#3c66a5515ea3e0a221ffc5d4e75c971c217b1a4c"
+  integrity sha512-wHhmGJyVuijnYIJXZJHDUF2WM+rJYTjulUTqF9k61d3BTk8etydz+M4dXUVH7M76ZRS85rqBTCx0Es/lLsrjnA==
 
 eslint-plugin-react@^7:
   version "7.13.0"
@@ -16188,7 +16181,7 @@ react@0.14.9:
     envify "^3.0.0"
     fbjs "^0.6.1"
 
-"react@^0.14.7 || ^15 || 16", "react@^0.14.8 || ^15.0.0 || ^16", "react@^0.14.9 || ^15 || ^16", "react@^15 || ^16", react@^16.6.0:
+"react@^0.14.7 || ^15 || 16", "react@^0.14.8 || ^15.0.0 || ^16", "react@^0.14.9 || ^15 || ^16", "react@^15 || ^16", react@^16.8.0:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
   integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==
@@ -16928,9 +16921,9 @@ resolve@1.1.7, resolve@~1.1.0:
   integrity sha1-IDEU2CrSxe2ejgQRs5ModeiJ6Xs=
 
 resolve@^1.1.6, resolve@^1.1.7, resolve@^1.10.0, resolve@^1.10.1, resolve@^1.3.2, resolve@^1.5.0, resolve@^1.8.1:
-  version "1.11.0"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.11.0.tgz#4014870ba296176b86343d50b60f3b50609ce232"
-  integrity sha512-WL2pBDjqT6pGUNSUzMw00o4T7If+z4H2x3Gz893WoUQ5KW8Vr9txp00ykiP16VBaZF5+j/OcXJHZ9+PCvdiDKw==
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.11.1.tgz#ea10d8110376982fef578df8fc30b9ac30a07a3e"
+  integrity sha512-vIpgF6wfuJOZI7KKKSP+HmiKggadPQAdsp5HiC1mvqnfp0gF1vdwgBWZIdrVft9pgqoMFQN+R7BSWZiBxx+BBw==
   dependencies:
     path-parse "^1.0.6"
 
@@ -18763,9 +18756,9 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   integrity sha1-9PrTM0R7wLB9TcjpIJ2POaisd+g=
 
 tinymce-a11y-checker@^2:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-2.1.1.tgz#9cc43e87943e83318324ce08af30463a610cc0fc"
-  integrity sha512-CzhgSYvGq5W75drXJ57eKg1o2IP0HGN1BgiU8Z5etdvzVnPx7myI1aT/lPehNPVmDZZmPPtDNcSphiG21Va4yQ==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-2.2.0.tgz#8ac8ad0fa298b2c24ad025ca3345199ce18486f3"
+  integrity sha512-0GSXRNZa8zhj/f1S0DGRNRPnhJ7SDg5rMRqTlSrKOb9El6eR8JxokE/jc2OPLtlCioJMhre6KUUiV8G0tlWAAQ==
   dependencies:
     "@instructure/ui-buttons" "^5"
     "@instructure/ui-core" "^5"
@@ -19108,9 +19101,9 @@ typescript@^3.3.3:
   integrity sha512-YycBxUb49UUhdNMU5aJ7z5Ej2XGmaIBL0x34vZ82fn3hGvD+bgrMrVDpatgz2f7YxUMJxMkbWxJZeAvDxVe7Vw==
 
 ua-parser-js@^0.7.18, ua-parser-js@^0.7.9:
-  version "0.7.19"
-  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.19.tgz#94151be4c0a7fb1d001af7022fdaca4642659e4b"
-  integrity sha512-T3PVJ6uz8i0HzPxOF9SWzWAlfN/DavlpQqepn22xgve/5QecC+XMCAtmUNnY7C9StehaV6exjUCI801lOI7QlQ==
+  version "0.7.20"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.20.tgz#7527178b82f6a62a0f243d1f94fd30e3e3c21098"
+  integrity sha512-8OaIKfzL5cpx8eCMAhhvTlft8GYF8b2eQr6JkCyVdrgjcytyOmPCXrqXFcUnhonRpLlh5yxEZVohm6mzaowUOw==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
