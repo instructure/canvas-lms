@@ -226,6 +226,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         onHidden(postedOrHiddenInfo)
         strictEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
       })
+
+      test('ignores user IDs that do not match known students', () => {
+        postedOrHiddenInfo.userIds.push('9876')
+        postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+        const [{onHidden}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+        onHidden(postedOrHiddenInfo)
+        ok('onHidden with nonexistent user should not throw an error')
+      })
     })
   })
 
@@ -376,6 +384,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
         onPosted(postedOrHiddenInfo)
         deepEqual(gradebook.getSubmission('1101', '2301').posted_at, postedOrHiddenInfo.postedAt)
+      })
+
+      test('ignores user IDs that do not match known students', () => {
+        postedOrHiddenInfo.userIds.push('9876')
+        postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+        const [{onPosted}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+        onPosted(postedOrHiddenInfo)
+        ok('onPosted with nonexistent user should not throw an error')
       })
     })
   })

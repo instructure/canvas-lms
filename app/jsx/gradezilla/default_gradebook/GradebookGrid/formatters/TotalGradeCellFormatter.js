@@ -127,8 +127,8 @@ export default class TotalGradeCellFormatter {
       listInvalidAssignmentGroups() {
         return gradebook.listInvalidAssignmentGroups()
       },
-      listHiddenAssignments() {
-        return gradebook.listMutedAssignments()
+      listHiddenAssignments(studentId) {
+        return gradebook.listHiddenAssignments(studentId)
       },
       shouldShowPoints() {
         return gradebook.options.show_total_grade_as_points
@@ -136,7 +136,7 @@ export default class TotalGradeCellFormatter {
     }
   }
 
-  render = (_row, _cell, grade /* value */, _columnDef, _dataContext) => {
+  render = (_row, _cell, grade /* value */, _columnDef, student /* dataContext */) => {
     if (grade == null) {
       return ''
     }
@@ -153,7 +153,7 @@ export default class TotalGradeCellFormatter {
     }
 
     let warning
-    if (this.options.listHiddenAssignments().length > 0) {
+    if (this.options.listHiddenAssignments(student.id).length > 0) {
       warning = buildHiddenAssignmentsWarning()
     }
 

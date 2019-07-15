@@ -272,7 +272,11 @@ describe "/gradebooks/grade_summary" do
         PostPolicy.enable_feature!
       end
 
-      context "when a submission is unposted" do
+      context "when submission is hidden" do
+        before(:once) do
+          assignment.ensure_post_policy(post_manually: true)
+        end
+
         it "displays the 'hidden' icon" do
           render "gradebooks/grade_summary"
           expect(response).to have_tag(".assignment_score i[@class='icon-off']")
@@ -284,11 +288,15 @@ describe "/gradebooks/grade_summary" do
         end
       end
 
-      it "does not display the 'hidden' icon when a submission is posted" do
-        assignment.post_submissions
+      context "when submission is not hidden" do
+        before(:once) do
+          assignment.ensure_post_policy(post_manually: false)
+        end
 
-        render "gradebooks/grade_summary"
-        expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
+        it "does not display the 'hidden' icon" do
+          render "gradebooks/grade_summary"
+          expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
+        end
       end
     end
 
@@ -324,7 +332,7 @@ describe "/gradebooks/grade_summary" do
       view_context(course, student)
       assign(:presenter, GradeSummaryPresenter.new(course, student, nil))
     end
-     
+
     context "when comments exist" do
       before (:each) do
         submission = assignment.submission_for_student(student)
