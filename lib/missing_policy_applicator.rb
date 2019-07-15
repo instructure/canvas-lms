@@ -54,6 +54,7 @@ class MissingPolicyApplicator
         score: score,
         grade: grade,
         graded_at: now,
+        posted_at: assignment.post_manually? ? nil : now,
         published_score: score,
         published_grade: grade,
         grade_matches_current_submission: true,
