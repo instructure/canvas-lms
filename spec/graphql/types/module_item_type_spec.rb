@@ -145,5 +145,13 @@ describe Types::ModuleItemType do
       )
       verify_module_item_works(module_item)
     end
+
+    it "works for sub headings" do
+      module_item = module1.add_item({type: 'SubHeader', title: "WHOA!"}, nil, position: 1)
+      expect(
+        GraphQLTypeTester.new(module_item, current_user: @teacher).
+           resolve("content { ... on SubHeader { title } }")
+      ).to eq module_item.title
+    end
   end
 end

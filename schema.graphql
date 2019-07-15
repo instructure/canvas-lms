@@ -2106,6 +2106,11 @@ type StudentSummaryAnalytics {
   tardinessBreakdown: TardinessBreakdown
 }
 
+type SubHeader implements ModuleItemInterface {
+  modules: [Module!]
+  title: String
+}
+
 type Submission implements Node & SubmissionInterface & Timestamped {
   """
   legacy canvas id
