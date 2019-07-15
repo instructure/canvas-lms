@@ -128,6 +128,7 @@ module BasicLTI
       submission.graded_at = submission.submitted_at
       submission.grade_matches_current_submission = true
       submission.grader_id = grader_id
+      submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?
       clear_cache
       submission.url = launch_url
       submission.save!
