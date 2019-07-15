@@ -54,7 +54,7 @@ services:
       - "${DYNAMODB_PORT}:8000"
 
   canvasrceapi:
-    image: instructure/canvas-rce-api
+    image: starlord.inscloudgate.net/jeremyp/canvas-rce-api_web
     environment:
       ECOSYSTEM_KEY: "astringthatisactually32byteslong"
       ECOSYSTEM_SECRET: "astringthatisactually32byteslong"
