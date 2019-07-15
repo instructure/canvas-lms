@@ -136,3 +136,7 @@ export default th =
     truncateAt or= max - ellipsis.length # first word > max, so we cut it
 
     string.substring(0, truncateAt) + ellipsis
+
+  plainText: (message) ->
+    # remove all html tags from the message returning only the text
+    message.replace(/(<([^>]+)>)/ig, '');
