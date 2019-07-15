@@ -128,7 +128,8 @@ describe ExternalToolsController do
           "iss",
           "login_hint",
           "target_link_uri",
-          "lti_message_hint"
+          "lti_message_hint",
+          "canvas_region"
         ]
       end
 

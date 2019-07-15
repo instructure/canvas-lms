@@ -71,7 +71,8 @@ module Lti
         iss: Canvas::Security.config['lti_iss'],
         login_hint: Lti::Asset.opaque_identifier_for(@user),
         target_link_uri: target_link_uri,
-        lti_message_hint: message_hint
+        lti_message_hint: message_hint,
+        canvas_region: @context.shard.database_server.config[:region] || 'not_configured'
       ).as_json
     end
 
