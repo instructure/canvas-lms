@@ -80,7 +80,7 @@ export function ltiMessageHandler(e) {
               message.height = window.innerHeight;
               message.width = window.innerWidth;
               message.offset = $('.tool_content_wrapper').offset();
-              let strMessage = JSON.stringify(message);
+              const strMessage = JSON.stringify(message);
 
               iframe.contentWindow.postMessage(strMessage, '*');
           }
