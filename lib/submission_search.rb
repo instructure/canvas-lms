@@ -75,6 +75,10 @@ class SubmissionSearch
       search_scope = search_scope.where("submissions.score > ?", @options[:scored_more_than])
     end
 
+    if @options[:late].present?
+      search_scope = @options[:late] ? search_scope.late : search_scope.not_late
+    end
+
     search_scope
   end
 

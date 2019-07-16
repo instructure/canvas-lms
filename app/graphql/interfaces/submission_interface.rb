@@ -127,6 +127,10 @@ module Interfaces::SubmissionInterface
 
   field :grading_status, String, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
+  field :late, Boolean, method: :late?, null: true
+  field :missing, Boolean, method: :missing?, null: true
+  field :grade_matches_current_submission, Boolean,
+    'was the grade given on the current submission (resubmission)', null: true
 
   field :attachments, [Types::FileType], null: true
   def attachments

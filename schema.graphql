@@ -2169,10 +2169,17 @@ type Submission implements Node & SubmissionInterface & Timestamped {
   """
   excused: Boolean
   grade: String
+
+  """
+  was the grade given on the current submission (resubmission)
+  """
+  gradeMatchesCurrentSubmission: Boolean
   gradedAt: DateTime
   gradingStatus: String
   id: ID!
+  late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
   postedAt: DateTime
   score: Float
   state: SubmissionState!
@@ -2365,9 +2372,16 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   """
   excused: Boolean
   grade: String
+
+  """
+  was the grade given on the current submission (resubmission)
+  """
+  gradeMatchesCurrentSubmission: Boolean
   gradedAt: DateTime
   gradingStatus: String
+  late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
   postedAt: DateTime
 
   """
@@ -2477,9 +2491,16 @@ interface SubmissionInterface {
   """
   excused: Boolean
   grade: String
+
+  """
+  was the grade given on the current submission (resubmission)
+  """
+  gradeMatchesCurrentSubmission: Boolean
   gradedAt: DateTime
   gradingStatus: String
+  late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
   postedAt: DateTime
   score: Float
   state: SubmissionState!
@@ -2501,6 +2522,11 @@ enum SubmissionOrderField {
 
 input SubmissionSearchFilterInput {
   enrollmentTypes: [EnrollmentType!]
+
+  """
+  Limit results to submissions that are late
+  """
+  late: Boolean
 
   """
   Limit results to submissions that scored below the specified value

@@ -304,4 +304,50 @@ describe Types::SubmissionType do
       end
     end
   end
+
+  describe 'late' do
+    before(:once) do
+      assignment = @course.assignments.create!(name: "late assignment", points_possible: 10, due_at: 2.hours.ago)
+      @submission1 = assignment.submit_homework(@student, body: 'late', submitted_at: 1.hour.ago)
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it 'returns late' do
+      expect(submission_type.resolve("late")).to eq true
+    end
+  end
+
+  describe 'missing' do
+    before(:once) do
+      assignment = @course.assignments.create!(
+        name: "missing assignment",
+        points_possible: 10,
+        due_at: 1.hour.ago,
+        submission_types: ['online_text_entry']
+      )
+      @submission1 = Submission.where(assignment_id: assignment.id, user_id: @student.id).first
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it 'returns missing' do
+      expect(submission_type.resolve("missing")).to eq true
+    end
+  end
+
+  describe 'gradeMatchesCurrentSubmission' do
+    before(:once) do
+      assignment = @course.assignments.create!(name: "assignment", points_possible: 10)
+      assignment.submit_homework(@student, body: 'asdf')
+      assignment.grade_student(@student, score: 8, grader: @teacher)
+      @submission1 = assignment.submit_homework(@student, body: 'asdf')
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it 'returns gradeMatchesCurrentSubmission' do
+      expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
+    end
+  end
 end
