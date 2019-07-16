@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if @quiz.assignment && @quiz.assignment.muted? %>
-  <%= render(:partial => "muted") %>
-<% else %>
+<% if @submission.posted? || @submission.was_preview? %>
   <%= render(:partial => "quiz_submission") %>
+<% else %>
+  <%= render(:partial => "muted") %>
 <% end %>

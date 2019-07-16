@@ -228,7 +228,7 @@ class Quizzes::QuizzesController < ApplicationController
       if @submission
         upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
-        js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless @quiz.muted?
+        js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless hide_quiz?
         if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
           events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
           js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
@@ -692,7 +692,7 @@ class Quizzes::QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
       end
-      if @quiz.muted? && !@quiz.grants_right?(@current_user, session, :review_grades)
+      if hide_quiz? && !@quiz.grants_right?(@current_user, session, :review_grades)
         flash[:notice] = t('notices.cant_view_submission_while_muted', "You cannot view the quiz history while the quiz is muted.")
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
@@ -764,7 +764,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = get_submission
       @versions   = @submission ? get_versions : []
 
-      if @versions.size > 0 && !@quiz.muted?
+      if @versions.size > 0 && !hide_quiz?
         render :layout => false
       else
         head :ok
@@ -1029,5 +1029,9 @@ class Quizzes::QuizzesController < ApplicationController
                assignment_id: quiz.assignment_id, assignment_version: quiz.assignment&.version_number }
     prepared_batch[:overrides_to_create].each { |override| override.assign_attributes(params) }
     prepared_batch[:overrides_to_update].each { |override| override.assign_attributes(params) }
+  end
+
+  def hide_quiz?
+    !@submission.posted?
   end
 end
