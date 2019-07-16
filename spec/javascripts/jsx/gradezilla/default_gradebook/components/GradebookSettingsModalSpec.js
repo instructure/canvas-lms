@@ -275,6 +275,16 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       await waitForModalClosed()
       notOk(getModalElement())
     })
+
+    test('resets the selected post policy to the actual value', async () => {
+      props.postPolicies.setCoursePostPolicy({postManually: true})
+      await mountOpenLoadAndSelectTab('Grade Posting Policy')
+      getAutomaticallyPostGradesOption().click()
+      component.close()
+      await waitForModalClosed()
+      await mountOpenLoadAndSelectTab('Grade Posting Policy')
+      strictEqual(getManuallyPostGradesOption().checked, true)
+    })
   })
 
   QUnit.module('upon opening', () => {
