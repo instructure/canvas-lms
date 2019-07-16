@@ -23,13 +23,13 @@ import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
-import React, {lazy, Suspense} from 'react'
+import React, {lazy, Suspense, useState} from 'react'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import GradeDisplay from './GradeDisplay'
 import {Img} from '@instructure/ui-elements'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
+import {Tabs} from '@instructure/ui-tabs'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
@@ -77,18 +77,24 @@ function currentSubmissionGrade(assignment, submission) {
 }
 
 function ContentTabs(props) {
+  const {selectedTabIndex, setSelectedTabIndex} = useState(0)
+
+  function handleTabChange(event, {index}) {
+    setSelectedTabIndex(index)
+  }
   return (
     <div data-testid="assignment-2-student-content-tabs">
       {props.submission.state === 'graded' || props.submission.state === 'submitted'
         ? currentSubmissionGrade(props.assignment, props.submission)
         : null}
-      <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel
+      <Tabs onRequestTabChange={handleTabChange} variant="default">
+        <Tabs.Panel
           title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+          selected={selectedTabIndex === 0}
         >
           <AttemptTab assignment={props.assignment} submission={props.submission} />
-        </TabPanel>
-        <TabPanel title={I18n.t('Comments')}>
+        </Tabs.Panel>
+        <Tabs.Panel title={I18n.t('Comments')} selected={selectedTabIndex === 1}>
           {!props.assignment.muted ? (
             <Suspense fallback={<LoadingIndicator />}>
               <CommentsTab assignment={props.assignment} submission={props.submission} />
@@ -101,11 +107,11 @@ function ContentTabs(props) {
               url={ClosedDiscussionSVG}
             />
           )}
-        </TabPanel>
-        <TabPanel title={I18n.t('Rubric')}>
+        </Tabs.Panel>
+        <Tabs.Panel title={I18n.t('Rubric')} selected={selectedTabIndex === 2}>
           <Img src="/images/assignments2_rubric_student_static.png" />
-        </TabPanel>
-      </TabList>
+        </Tabs.Panel>
+      </Tabs>
     </div>
   )
 }
