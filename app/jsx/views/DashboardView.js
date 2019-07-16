@@ -137,7 +137,7 @@ export default class DashboardView extends View {
     if (items.length) {
       parent.find('.count').text(items.length)
     } else {
-      parent.remove()
+      parent[0].remove()
     }
     return this.setShowMoreLink($(event.target).closest('.stream-category'))
   }
