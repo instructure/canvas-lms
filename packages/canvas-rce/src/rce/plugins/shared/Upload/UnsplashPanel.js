@@ -251,32 +251,32 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
                 </div>
               ))}
           </div>
-          {totalPages > 1 && results && Object.keys(results).length > 0 && (
-            <Flex as="div" width="100%" justifyItems="center" margin="small 0 small">
-              <Flex.Item margin="auto small auto small">
-                <Pagination
-                  as="nav"
-                  variant="compact"
-                  labelNext={formatMessage('Next Page')}
-                  labelPrev={formatMessage('Previous Page')}
-                >
-                  {Array.from(Array(totalPages)).map((_v, i) => (
-                    <Pagination.Page
-                      key={i}
-                      onClick={() => {
-                        setPage(i + 1)
-                        search(term, i + 1)
-                      }}
-                      current={i + 1 === page}
-                    >
-                      {i + 1}
-                    </Pagination.Page>
-                  ))}
-                </Pagination>
-              </Flex.Item>
-            </Flex>
-          )}
         </>
+      )}
+      {totalPages > 1 && results && Object.keys(results).length > 0 && (
+        <Flex as="div" width="100%" justifyItems="center" margin="small 0 small">
+          <Flex.Item margin="auto small auto small">
+            <Pagination
+              as="nav"
+              variant="compact"
+              labelNext={formatMessage('Next Page')}
+              labelPrev={formatMessage('Previous Page')}
+            >
+              {Array.from(Array(totalPages)).map((_v, i) => (
+                <Pagination.Page
+                  key={i}
+                  onClick={() => {
+                    setPage(i + 1)
+                    search(term, i + 1)
+                  }}
+                  current={i + 1 === page}
+                >
+                  {i + 1}
+                </Pagination.Page>
+              ))}
+            </Pagination>
+          </Flex.Item>
+        </Flex>
       )}
     </>
   )
