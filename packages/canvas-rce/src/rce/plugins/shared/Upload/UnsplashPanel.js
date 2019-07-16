@@ -20,9 +20,11 @@ import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
-import {Avatar, Img, Spinner, Link} from '@instructure/ui-elements'
+import {Avatar, Img, Spinner} from '@instructure/ui-elements'
 import { ScreenReaderContent } from '@instructure/ui-a11y'
+import { Alert } from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
+import { View } from '@instructure/ui-layout'
 import { Button } from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
@@ -33,19 +35,21 @@ import UnsplashSVG from './UnsplashSVG'
 const unsplashFetchReducer = (state, action) => {
   switch (action.type) {
     case 'FETCH':
-      return {...state, loading: true}
+      return {...state, loading: true, hasLoaded: false}
     case 'FETCH_SUCCESS':
       return {
         ...state,
         loading: false,
+        hasLoaded: true,
         totalPages: action.payload.total_pages,
+        totalResults: action.payload.total_results,
         results: {
           ...state.results,
           ...{[state.searchPage]: action.payload.results}
         }
       }
     case 'FETCH_FAILURE':
-      return {...state, loading: false, error: true}
+      return {...state, loading: false, error: true, hasLoaded: true}
     case 'SET_SEARCH_DATA': {
       const newState = {...state, ...action.payload}
       if (state.searchTerm !== action.payload.searchTerm) {
@@ -72,23 +76,26 @@ const useUnsplashSearch = source => {
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch({type: 'FETCH'})
-      source
-        .searchUnsplash(state.searchTerm, state.searchPage)
-        .then(results => {
-          dispatch({type: 'FETCH_SUCCESS', payload: results})
-        })
-        .catch(() => {
-          dispatch({type: 'FETCH_FAILURE'})
-        })
-    }
+
+        dispatch({type: 'FETCH'})
+        source
+          .searchUnsplash(state.searchTerm, state.searchPage)
+          .then(results => {
+            dispatch({type: 'FETCH_SUCCESS', payload: results})
+          })
+          .catch(() => {
+            dispatch({type: 'FETCH_FAILURE'})
+          })
+      }
     if (effectFirstRun.current) {
       effectFirstRun.current = false
       return
     } else if (state.results[state.searchPage]) {
       return // It's already in cache
     } else {
-      fetchData()
+      if (state.searchTerm.length > 0) {
+        fetchData()
+      }
     }
   }, [state.searchTerm, state.searchPage])
 
@@ -127,12 +134,29 @@ function Attribution({name, avatarUrl, profileUrl}) {
   )
 }
 
-export default function UnsplashPanel({editor, source, setUnsplashData, brandColor}) {
+function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
+  if (hasLoaded && results[page] && term.length >= 1) {
+    if (totalResults < 1) {
+      return (
+        <Alert variant="info" transition="none" liveRegion={liveRegion}>
+          {formatMessage('No results found for {term}.', {term})}
+        </Alert>
+      )
+    }
+    return (
+      <Alert variant="info" transition="none" screenReaderOnly={true} liveRegion={liveRegion}>
+        {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', { totalResults, numDisplayed: results[page].length })}
+      </Alert>
+    )
+  }
+}
+
+export default function UnsplashPanel({editor, source, setUnsplashData, brandColor, liveRegion}) {
   const [page, setPage] = useState(1)
   const [term, setTerm] = useState('')
   const [selectedImage, setSelectedImage] = useState(null)
   const [focusedImageIndex, setFocusedImageIndex] = useState(0)
-  const {totalPages, results, loading, search} = useUnsplashSearch(source)
+  const {totalPages, totalResults, results, loading, search, hasLoaded} = useUnsplashSearch(source)
 
   const debouncedSearch = useCallback(debounce(search, 250), [])
 
@@ -172,6 +196,9 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
         />
       ) : (
         <>
+          <View margin="small">
+            {renderAlert(term, hasLoaded, totalResults, results, page, liveRegion)}
+          </View>
           <div
             className={css(styles.container)}
             data-testid="UnsplashResultsContainer"
@@ -270,7 +297,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap',
-    flexFlow: 'row wrap'
+    flexFlow: 'row wrap',
+    width: '100%'
   },
   imageWrapper: {
     position: 'relative',

@@ -38,7 +38,8 @@ function getTrayProps() {
     host: ENV.RICH_CONTENT_APP_HOST,
     jwt: ENV.JWT,
     refreshToken: refreshToken(ENV.JWT),
-    themeUrl: ENV.active_brand_config_json_url
+    themeUrl: ENV.active_brand_config_json_url,
+    liveRegion: () => document.getElementById('flash_screenreader_holder')
   }
 }
 

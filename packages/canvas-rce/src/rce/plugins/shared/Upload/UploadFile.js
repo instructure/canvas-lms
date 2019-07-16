@@ -137,6 +137,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
                     setUnsplashData={setUnsplashData}
                     source={source}
                     brandColor={trayProps.brandColor}
+                    liveRegion={trayProps.liveRegion}
                   />
                 </Suspense>
               </Tabs.Panel>
@@ -174,6 +175,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           }}
           open
           shouldCloseOnDocumentClick
+          liveRegion={trayProps.liveRegion}
         >
           <Modal.Header>
             <CloseButton onClick={onDismiss} offset="small" placement="end">
