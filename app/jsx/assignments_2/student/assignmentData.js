@@ -172,19 +172,15 @@ export const STUDENT_VIEW_QUERY = gql`
     assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
       ... on Assignment {
         _id
-        description
-        dueAt
-        lockAt
-        name
-        muted
-        pointsPossible
-        unlockAt
-        gradingType
         allowedAttempts
         allowedExtensions
         assignmentGroup {
           name
         }
+        description
+        dueAt
+        gradingType
+        lockAt
         lockInfo {
           isLocked
         }
@@ -192,6 +188,9 @@ export const STUDENT_VIEW_QUERY = gql`
           id
           name
         }
+        muted
+        name
+        pointsPossible
         submissionsConnection(
           last: 1
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
@@ -200,6 +199,8 @@ export const STUDENT_VIEW_QUERY = gql`
             ${submissionFields()}
           }
         }
+        submissionTypes
+        unlockAt
       }
     }
   }

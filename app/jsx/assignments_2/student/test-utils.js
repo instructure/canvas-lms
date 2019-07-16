@@ -37,6 +37,7 @@ export function mockAssignment(overrides = {}) {
     gradingType: 'points',
     allowedAttempts: null,
     allowedExtensions: [],
+    submissionTypes: ['online_upload'],
     assignmentGroup: {
       name: 'Assignments',
       __typename: 'AssignmentGroup'

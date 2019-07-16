@@ -31,6 +31,7 @@ import I18n from 'i18n!assignments_2_content_upload_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
+import TextEntry from './TextEntry'
 
 export default class AttemptTab extends Component {
   static propTypes = {
@@ -173,6 +174,18 @@ export default class AttemptTab extends Component {
     )
   }
 
+  renderSubmissionByType = createSubmission => {
+    // TODO: we need to ensure we handle multiple submission types eventually
+    switch (this.props.assignment.submissionTypes[0]) {
+      case 'online_text_entry':
+        return <TextEntry />
+      case 'online_upload':
+      default:
+        // TODO: we should probably figure out what the default case should actually be
+        return this.renderFileAttempt(createSubmission)
+    }
+  }
+
   renderSubmission = createSubmission => {
     switch (this.state.submissionState) {
       case 'error':
@@ -184,7 +197,7 @@ export default class AttemptTab extends Component {
         return (
           <React.Fragment>
             {this.renderSubmissionAlert()}
-            {this.renderFileAttempt(createSubmission)}
+            {this.renderSubmissionByType(createSubmission)}
           </React.Fragment>
         )
     }
