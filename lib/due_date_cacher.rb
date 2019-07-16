@@ -149,15 +149,6 @@ class DueDateCacher
       Set.new
     end
 
-    # We only care about quiz LTIs, so we'll only snag those. In fact,
-    # we only care if the assignment *is* a quiz, LTI, so we'll just
-    # keep a set of those assignment ids.
-    @quiz_lti_assignments =
-      ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id").
-        merge(ContextExternalTool.quiz_lti).
-        where(context_type: 'Assignment', context_id: @assignment_ids).
-        where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
-
     @user_ids = Array(user_ids)
     @update_grades = update_grades
     @original_caller = original_caller
@@ -183,7 +174,7 @@ class DueDateCacher
 
         create_moderation_selections_for_assignment(assignment_id, student_due_dates.keys, @user_ids)
 
-        quiz_lti = @quiz_lti_assignments.include?(assignment_id)
+        quiz_lti = quiz_lti_assignments.include?(assignment_id)
 
         students_without_priors.each do |student_id|
           submission_info = student_due_dates[student_id]
@@ -399,5 +390,16 @@ class DueDateCacher
   def record_due_date_changed_events?
     # Only audit if we have a user and at least one auditable assignment
     @record_due_date_changed_events ||= @executing_user_id.present? && @assignments_auditable_by_id.present?
+  end
+
+  def quiz_lti_assignments
+    # We only care about quiz LTIs, so we'll only snag those. In fact,
+    # we only care if the assignment *is* a quiz, LTI, so we'll just
+    # keep a set of those assignment ids.
+    @quiz_lti_assignments ||=
+      ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id").
+        merge(ContextExternalTool.quiz_lti).
+        where(context_type: 'Assignment', context_id: @assignment_ids).
+        where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
   end
 end
