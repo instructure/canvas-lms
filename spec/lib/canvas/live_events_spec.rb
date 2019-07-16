@@ -1030,4 +1030,76 @@ describe Canvas::LiveEvents do
       end
     end
   end
+
+  describe '.learning_outcome_result' do
+    let_once :quiz do
+      quiz_model(assignment: assignment_model)
+    end
+
+    let :result do
+      create_and_associate_lor(quiz)
+    end
+
+    def create_and_associate_lor(association_object, associated_asset = nil)
+      assignment_model
+      outcome = @course.created_learning_outcomes.create!(title: 'outcome')
+
+      LearningOutcomeResult.new(
+        alignment: ContentTag.create!({
+          title: 'content',
+          context: @course,
+          learning_outcome: outcome
+        })
+      ).tap do |lor|
+        lor.association_object = association_object
+        lor.context = @course
+        lor.associated_asset = associated_asset || association_object
+        lor.save!
+      end
+    end
+
+    context 'created' do
+      it 'should include result in created live event' do
+        expect_event('learning_outcome_result_created', {
+          learning_outcome_id: result.learning_outcome_id.to_s,
+          mastery: result.learning_outcome_id,
+          score: result.score,
+          created_at: result.created_at,
+          attempt: result.attempt,
+          possible: result.possible,
+          original_score: result.original_score,
+          original_possible: result.original_possible,
+          original_mastery: result.original_mastery,
+          assessed_at: result.assessed_at,
+          title: result.title,
+          percent: result.percent
+        }).once
+
+        Canvas::LiveEvents.learning_outcome_result_created(result)
+      end
+    end
+
+    context 'updated' do
+      it 'should include result in updated live event' do
+        result.update!(attempt: 1)
+        expect_event('learning_outcome_result_updated', {
+          learning_outcome_id: result.learning_outcome_id.to_s,
+          mastery: result.learning_outcome_id,
+          score: result.score,
+          created_at: result.created_at,
+          updated_at: result.updated_at,
+          attempt: result.attempt,
+          possible: result.possible,
+          original_score: result.original_score,
+          original_possible: result.original_possible,
+          original_mastery: result.original_mastery,
+          assessed_at: result.assessed_at,
+          title: result.title,
+          percent: result.percent
+        }).once
+
+        Canvas::LiveEvents.learning_outcome_result_updated(result)
+      end
+    end
+  end
 end

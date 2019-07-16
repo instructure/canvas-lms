@@ -62,6 +62,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.module_created(obj)
     when ContentTag
       Canvas::LiveEvents.module_item_created(obj) if obj.tag_type == "context_module"
+    when LearningOutcomeResult
+      Canvas::LiveEvents.learning_outcome_result_created(obj)
     end
   end
 
@@ -132,6 +134,8 @@ module Canvas::LiveEventsCallbacks
       end
     when ContentTag
       Canvas::LiveEvents.module_item_updated(obj) if obj.tag_type == "context_module"
+    when LearningOutcomeResult
+      Canvas::LiveEvents.learning_outcome_result_updated(obj)
     end
   end
 

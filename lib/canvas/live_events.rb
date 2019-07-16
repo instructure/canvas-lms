@@ -613,4 +613,29 @@ module Canvas::LiveEvents
       course: { id: course.id, name: course.name }
     }
   end
+
+  def self.get_learning_outcome_data(result)
+    {
+      learning_outcome_id: result.learning_outcome_id,
+      mastery: result.learning_outcome_id,
+      score: result.score,
+      created_at: result.created_at,
+      attempt: result.attempt,
+      possible: result.possible,
+      original_score: result.original_score,
+      original_possible: result.original_possible,
+      original_mastery: result.original_mastery,
+      assessed_at: result.assessed_at,
+      title: result.title,
+      percent: result.percent
+    }
+  end
+
+  def self.learning_outcome_result_updated(result)
+    post_event_stringified('learning_outcome_result_updated', get_learning_outcome_data(result).merge(updated_at: result.updated_at))
+  end
+
+  def self.learning_outcome_result_created(result)
+    post_event_stringified('learning_outcome_result_created', get_learning_outcome_data(result))
+  end
 end
