@@ -1811,4 +1811,18 @@ describe Quizzes::QuizSubmission do
       expect(quiz_submission.excused?).to eq nil
     end
   end
+
+  describe "#posted?" do
+    before(:each) { quiz_with_graded_submission([]) }
+
+    it "returns true if the underlying submission is posted" do
+      allow(@quiz_submission.submission).to receive(:posted?).and_return(true)
+      expect(@quiz_submission).to be_posted
+    end
+
+    it "returns false if the underlying submission is not posted" do
+      allow(@quiz_submission.submission).to receive(:posted?).and_return(false)
+      expect(@quiz_submission).not_to be_posted
+    end
+  end
 end

@@ -884,4 +884,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     check_time = attributes['finished_at'] - 60.seconds
     check_time > due_at
   end
+
+  def posted?
+    !!submission&.posted?
+  end
 end
