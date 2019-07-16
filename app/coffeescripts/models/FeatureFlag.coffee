@@ -99,10 +99,10 @@ export default class FeatureFlag extends Backbone.Model
 
   toJSON: ->
     _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
-      isOff: @isOff(), isOn: @isOn(), isSiteAdmin: @isSiteAdmin() && !@isOn() && !@isLocked(),
+      isOff: @isOff(), isOn: @isOn()
       currentContextIsAccount: @isContext('account'),
       threeState: @currentContextIsAccount() && !@transitionLocked('allowed'),
-      disableOn: @isLocked() || @isSiteAdmin() || @transitionLocked('on'),
+      disableOn: @isLocked() || @transitionLocked('on'),
       disableAllow: @isLocked() || @transitionLocked('allowed'),
       disableOff: @isLocked() || @transitionLocked('off'),
       disableToggle: @isLocked() || @transitionLocked('on') || @transitionLocked('off'))
