@@ -17,23 +17,20 @@
 #
 
 module Types
-  class MediaSourceType < ApplicationObjectType
-    graphql_name 'MediaSource'
+  class MediaTrackType < ApplicationObjectType
+    graphql_name 'MediaTrack'
 
-    field :bitrate, String, null: true
+    field :kind, String, null: true
 
-    field :content_type, String, null: true
+    field :locale, String, null: true
 
-    field :file_ext, String, hash_key: :fileExt, null: true
+    field :content, String, null: false
 
-    field :height, String, null: true
+    field :media_object, Types::MediaObjectType, null: true
+    def media_object
+      Loaders::MediaObjectLoader.load(object.media_object_id)
+    end
 
-    field :is_original, String, hash_key: :isOriginal, null: true
-
-    field :size, String, null: true
-
-    field :url, Types::UrlType, null: true
-
-    field :width, String, null: true
+    field :webvtt_content, String, null: true
   end
 end

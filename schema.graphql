@@ -1474,6 +1474,7 @@ type MediaObject implements Node {
   canAddCaptions: Boolean
   id: ID!
   mediaSources: [MediaSource!]
+  mediaTracks: [MediaTrack!]
   mediaType: MediaType
   title: String
 }
@@ -1487,6 +1488,14 @@ type MediaSource {
   size: String
   url: URL
   width: String
+}
+
+type MediaTrack {
+  content: String!
+  kind: String
+  locale: String
+  mediaObject: MediaObject
+  webvttContent: String
 }
 
 enum MediaType {
