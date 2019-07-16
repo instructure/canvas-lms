@@ -20,7 +20,7 @@ module Lti
   class PrivacyLevelExpander
     EMAIL_ONLY = %w(Person.email.primary).freeze
     INLCUDE_NAME = %w(Person.name.given Person.name.full Person.name.family).freeze
-    PUBLIC = %w(Person.sourcedId CourseOffering.sourcedId com.instructure.Editor.selection com.instructure.Editor.contents).
+    PUBLIC = %w(Person.sourcedId CourseOffering.sourcedId).
       concat(EMAIL_ONLY).
       concat(INLCUDE_NAME).
       freeze

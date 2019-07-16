@@ -284,5 +284,31 @@ describe MissingPolicyApplicator do
 
       expect(submission.reload.grade_matches_current_submission).to be true
     end
+
+    describe "posting submissions" do
+      let(:assignment) { @course.assignments.first }
+      let(:submission) { assignment.submissions.first }
+
+      before(:each) do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+
+        late_policy_missing_enabled
+        create_recent_assignment
+        submission.update_columns(score: nil, grade: nil)
+      end
+
+      it "posts affected submissions if the assignment is automatically posted" do
+        applicator.apply_missing_deductions
+        expect(submission.reload).to be_posted
+      end
+
+      it "sets posted_at to nil for submissions if the assignment is manually posted" do
+        submission.update!(posted_at: Time.zone.now)
+        assignment.post_policy.update!(post_manually: true)
+        applicator.apply_missing_deductions
+        expect(submission.reload).not_to be_posted
+      end
+    end
   end
 end
