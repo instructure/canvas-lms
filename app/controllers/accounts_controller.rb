@@ -951,8 +951,8 @@ class AccountsController < ApplicationController
   end
 
   def reports_tab
-    @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
-    if @available_reports
+    if authorized_action(@account, @current_user, :read_reports)
+      @available_reports = AccountReport.available_reports
       @root_account = @account.root_account
       @account.shard.activate do
         scope = @account.account_reports.active.where("report_type=name").most_recent
@@ -966,8 +966,8 @@ class AccountsController < ApplicationController
           order("report_types.name").
           index_by(&:report_type)
       end
+      render :layout => false
     end
-    render :layout => false
   end
 
   def settings
