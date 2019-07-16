@@ -422,6 +422,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.user_id = self.user_id
       @assignment_submission.submission_type = "online_quiz"
       @assignment_submission.saved_by = :quiz_submission
+
+      unless @assignment_submission.posted? || @assignment_submission.assignment.post_manually?
+        @assignment_submission.posted_at = @assignment_submission.graded_at
+      end
     end
   end
 

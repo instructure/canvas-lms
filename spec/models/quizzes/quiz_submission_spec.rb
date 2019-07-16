@@ -729,31 +729,64 @@ describe Quizzes::QuizSubmission do
     end
 
     context "update_assignment_submission" do
-      before(:once) do
+      let(:quiz) do
+        quiz = @course.quizzes.create!
+        quiz.generate_quiz_data
+        quiz.update!(
+          published_at: Time.zone.now,
+          workflow_state: "available",
+          scoring_policy: "keep_highest",
+          due_at: 5.days.from_now
+        )
+        quiz
+      end
+      let(:assignment) { quiz.assignment }
+      let(:quiz_submission) { quiz.generate_submission(@user, false) }
+      let(:submission) { quiz_submission.submission }
+
+      def save_quiz_submission
+        quiz_submission.workflow_state = "complete"
+        quiz_submission.save!
+        quiz_submission.score = 5
+        quiz_submission.fudge_points = 0
+        quiz_submission.kept_score = 5
+        quiz_submission.with_versioning(true, &:save!)
+      end
+
+      before(:each) do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+
         student_in_course
-        @quiz.generate_quiz_data
-        @quiz.published_at = Time.now
-        @quiz.workflow_state = 'available'
-        @quiz.scoring_policy = "keep_highest"
-        @quiz.due_at = 5.days.from_now
-        @quiz.save!
-        @assignment = @quiz.assignment
-        @quiz_sub = @quiz.generate_submission @user, false
-        @quiz_sub.workflow_state = "complete"
-        @quiz_sub.save!
-        @quiz_sub.score = 5
-        @quiz_sub.fudge_points = 0
-        @quiz_sub.kept_score = 5
-        @quiz_sub.with_versioning(true, &:save!)
-        @submission = @quiz_sub.submission
       end
 
       it "should sync the score" do
-        expect(@submission.score).to eql(5.0)
+        save_quiz_submission
+        expect(submission.score).to be 5.0
       end
 
       it "should not set graded_at to be in the future" do
-        expect(@submission.graded_at.to_i).to be <= Time.zone.now.to_i
+        save_quiz_submission
+        expect(submission.graded_at.to_i).to be <= Time.zone.now.to_i
+      end
+
+      it "posts the submission if the assignment is automatically posted" do
+        save_quiz_submission
+        expect(submission).to be_posted
+      end
+
+      it "does not post the submission if the assignment is manually posted" do
+        assignment.post_policy.update!(post_manually: true)
+        save_quiz_submission
+        expect(submission).not_to be_posted
+      end
+
+      it "does not update the posted_at date of already-posted submissions" do
+        submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          save_quiz_submission
+        }.not_to change { submission.reload.posted_at }
       end
     end
 
