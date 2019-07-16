@@ -19,6 +19,7 @@
 import React from 'react'
 import {
   IconAttachMediaLine,
+  IconCodeLine,
   IconDocumentLine,
   IconFolderLine,
   IconFolderLockedLine,
@@ -34,10 +35,13 @@ export const DEFAULT_ICON = <IconPaperclipLine />
 
 export const ICON_TYPES = {
   audio: <IconAttachMediaLine />,
+  code: <IconCodeLine />,
   doc: <IconDocumentLine />,
   file: <IconPaperclipLine />,
+  flash: <IconPaperclipLine />,
   folder: <IconFolderLine />,
   'folder-locked': <IconFolderLockedLine />,
+  html: <IconCodeLine />,
   image: <IconImageLine />,
   pdf: <IconPdfLine />,
   ppt: <IconMsPptLine />,
