@@ -96,6 +96,7 @@ export default class FileUploadQuestion extends View {
     event.preventDefault()
     this.$attachmentID.val('').trigger('change')
     this.$fileUploadBox.removeClass('file-upload-box-with-file')
+    this.$fileUpload.val(null)
     const oldModel = this.model.present()
     this.model.clear()
     this.removeFileStatusMessage()
