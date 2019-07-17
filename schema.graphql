@@ -43,7 +43,7 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
 
     """
     When true, also includes an `AssignmentOverride` with the assignment's
-    default due date
+    default due/availability dates
     """
     includeBaseDates: Boolean = false
 

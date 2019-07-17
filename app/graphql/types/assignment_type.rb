@@ -343,7 +343,7 @@ module Types
     field :assignment_overrides, AssignmentOverrideType.connection_type, null: true do
       argument :include_base_dates, Boolean, <<~DOC, required: false, default_value: false
         When true, also includes an `AssignmentOverride` with the assignment's
-        default due date
+        default due/availability dates
       DOC
     end
     def assignment_overrides(include_base_dates:)
