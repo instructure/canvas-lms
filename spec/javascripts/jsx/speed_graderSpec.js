@@ -1834,8 +1834,8 @@ QUnit.module('SpeedGrader', suiteHooks => {
         post_policies_enabled: true,
         show_help_menu_item: false
       })
-      postedSubmission = {posted_at: new Date().toISOString(), user_id: '1101'}
-      unpostedSubmission = {posted_at: null, user_id: '1102'}
+      postedSubmission = {posted_at: new Date().toISOString(), score: 10, user_id: '1101', workflow_state: 'graded'}
+      unpostedSubmission = {posted_at: null, score: 10, user_id: '1102', workflow_state: 'graded'}
 
       SpeedGrader.setup()
       window.jsonData = {
@@ -3061,10 +3061,11 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
     const alphaSubmission = {
       ...alpha,
       grade_matches_current_submission: true,
-      workflow_state: 'active',
+      workflow_state: 'graded',
       submitted_at: new Date().toISOString(),
       posted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      score: 10,
       grade: 'A',
       assignment_id: '456',
       versioned_attachments: [
@@ -3080,7 +3081,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
     alphaSubmission.submission_history = [{...alphaSubmission}]
     const omegaSubmission = {
       ...alphaSubmission,
-      ...omega
+      ...omega,
+      workflow_state: 'submitted',
+      score: null,
+      grade: null
     }
     omegaSubmission.submission_history = [{...omegaSubmission}]
     const windowJsonData = {
@@ -3424,7 +3428,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           SpeedGrader.EG.jsonReady()
           const entries = []
           fixtures.querySelectorAll('option').forEach(el => entries.push(el.innerText.trim()))
-          deepEqual(entries, ['Student 1 – graded', 'Student 2 – graded'])
+          deepEqual(entries, ['Student 1 – graded', 'Student 2 – not graded'])
         })
 
         test('Students are sorted by anonymous id when out of order in the select menu', () => {
@@ -3580,6 +3584,21 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
 
             const [SpeedGraderPostGradesMenu] = findRenderCall()
             strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGrades, false)
+          })
+
+          test('passes the hasGrades prop as true if any submissions are graded', () => {
+            SpeedGrader.EG.jsonReady()
+            const [SpeedGraderPostGradesMenu] = findRenderCall()
+            strictEqual(SpeedGraderPostGradesMenu.props.hasGrades, true)
+          })
+
+          test('passes the hasGrades prop as false if no submissions are graded', () => {
+            const alphaSubmissionScore = alphaSubmission.score
+            alphaSubmission.score = null
+            SpeedGrader.EG.jsonReady()
+            const [SpeedGraderPostGradesMenu] = findRenderCall()
+            strictEqual(SpeedGraderPostGradesMenu.props.hasGrades, false)
+            alphaSubmission.score = alphaSubmissionScore
           })
         })
 

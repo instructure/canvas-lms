@@ -36,7 +36,7 @@ import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
-import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
+import {isGraded, isHidden} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
@@ -3691,8 +3691,12 @@ function teardownSettingsMenu() {
 function renderPostGradesMenu() {
   const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
-  const allowHidingGrades = submissions.some(submission => submission && submission.posted_at != null)
-  const allowPostingGrades = submissions.some(submission => submission && submission.posted_at == null)
+
+  const hasGrades = submissions.some(isGraded)
+  const allowHidingGrades = submissions.some(
+    submission => submission && submission.posted_at != null
+  )
+  const allowPostingGrades = submissions.some(submission => submission && isHidden(submission))
 
   function onHideGrades() {
     EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
@@ -3705,6 +3709,7 @@ function renderPostGradesMenu() {
   const props = {
     allowHidingGrades,
     allowPostingGrades,
+    hasGrades,
     onHideGrades,
     onPostGrades
   }

@@ -35,23 +35,23 @@ export default function SpeedGraderPostGradesMenu(props) {
 
   return (
     <Menu placement="bottom end" trigger={menuTrigger}>
-      {props.allowPostingGrades ? (
+      {props.allowPostingGrades && props.hasGrades ? (
         <MenuItem name="postGrades" onSelect={props.onPostGrades}>
           <Text>{I18n.t('Post Grades')}</Text>
         </MenuItem>
       ) : (
         <MenuItem name="postGrades" disabled>
-          <Text>{I18n.t('All Grades Posted')}</Text>
+          <Text>{props.hasGrades ? I18n.t('All Grades Posted') : I18n.t('No Grades to Post')}</Text>
         </MenuItem>
       )}
 
-      {props.allowHidingGrades ? (
+      {props.allowHidingGrades && props.hasGrades ? (
         <MenuItem name="hideGrades" onSelect={props.onHideGrades}>
           <Text>{I18n.t('Hide Grades')}</Text>
         </MenuItem>
       ) : (
         <MenuItem name="hideGrades" disabled>
-          <Text>{I18n.t('All Grades Hidden')}</Text>
+          <Text>{props.hasGrades ? I18n.t('All Grades Hidden') : I18n.t('No Grades to Hide')}</Text>
         </MenuItem>
       )}
     </Menu>
@@ -61,6 +61,7 @@ export default function SpeedGraderPostGradesMenu(props) {
 SpeedGraderPostGradesMenu.propTypes = {
   allowHidingGrades: bool.isRequired,
   allowPostingGrades: bool.isRequired,
+  hasGrades: bool.isRequired,
   onHideGrades: func.isRequired,
   onPostGrades: func.isRequired
 }

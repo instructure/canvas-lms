@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
+import {isGraded, isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
 
@@ -61,6 +61,8 @@ function getProps(column, gradebook, options) {
     submission: getSubmission(student, assignmentId)
   }))
 
+  const hasGrades = students.some(student => isGraded(student.submission))
+
   return {
     ref: options.ref,
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
@@ -101,6 +103,7 @@ function getProps(column, gradebook, options) {
     },
 
     hideGradesAction: {
+      hasGrades,
       hasGradesToHide: students.some(student => student.submission.postedAt != null),
       onSelect(onExited) {
         if (gradebook.postPolicies) {
@@ -111,6 +114,7 @@ function getProps(column, gradebook, options) {
 
     postGradesAction: {
       featureEnabled: gradebook.postPolicies != null,
+      hasGrades,
       hasGradesToPost: students.some(student => isHidden(student.submission)),
       onSelect(onExited) {
         if (gradebook.postPolicies) {

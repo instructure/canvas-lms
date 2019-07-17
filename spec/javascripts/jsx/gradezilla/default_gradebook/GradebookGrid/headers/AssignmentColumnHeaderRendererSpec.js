@@ -362,6 +362,20 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
           strictEqual(component.props.postGradesAction.featureEnabled, true)
         })
 
+        test('sets hasGrades to true if at least one graded submission is graded', () => {
+          submission.workflow_state = 'graded'
+          submission.score = 1
+          gradebook.gotChunkOfStudents([student])
+          render()
+          strictEqual(component.props.postGradesAction.hasGrades, true)
+        })
+
+        test('sets hasGrades to false if no submissions are graded', () => {
+          gradebook.gotChunkOfStudents([student])
+          render()
+          strictEqual(component.props.postGradesAction.hasGrades, false)
+        })
+
         test('sets hasGradesToPost to true if at least one graded submission has no posted_at date', () => {
           submission.workflow_state = 'graded'
           submission.score = 1
@@ -420,6 +434,20 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
         submission.posted_at = new Date('Wed Oct 1 1997')
 
         sinon.stub(gradebook.postPolicies, 'showHideAssignmentGradesTray')
+      })
+
+      test('sets hasGrades to true if at least one graded submission is graded', () => {
+        submission.workflow_state = 'graded'
+        submission.score = 1
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.hideGradesAction.hasGrades, true)
+      })
+
+      test('sets hasGrades to false if no submissions are graded', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.hideGradesAction.hasGrades, false)
       })
 
       test('sets hasGradesToHide to true if at least one submission has a posted_at date', () => {

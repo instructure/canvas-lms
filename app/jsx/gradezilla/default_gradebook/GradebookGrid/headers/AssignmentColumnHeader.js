@@ -23,7 +23,6 @@ import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
 import IconOffSolid from '@instructure/ui-icons/lib/Solid/IconOff'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Link from '@instructure/ui-elements/lib/components/Link'
 import Menu, {
   MenuItem,
   MenuItemGroup,
@@ -81,6 +80,26 @@ SecondaryDetailLine.propTypes = {
     published: bool.isRequired
   }).isRequired,
   postPoliciesEnabled: bool.isRequired
+}
+
+function labelForPostGradesAction(postGradesAction) {
+  if (!postGradesAction.hasGrades) {
+    return I18n.t('No grades to post')
+  } else if (postGradesAction.hasGradesToPost) {
+    return I18n.t('Post grades')
+  }
+
+  return I18n.t('All grades posted')
+}
+
+function labelForHideGradesAction(hideGradesAction) {
+  if (!hideGradesAction.hasGrades) {
+    return I18n.t('No grades to hide')
+  } else if (hideGradesAction.hasGradesToHide) {
+    return I18n.t('Hide grades')
+  }
+
+  return I18n.t('All grades hidden')
 }
 
 export default class AssignmentColumnHeader extends ColumnHeader {
@@ -396,12 +415,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
         {this.props.postGradesAction.featureEnabled ? (
           <MenuItem
-            disabled={!this.props.postGradesAction.hasGradesToPost}
+            disabled={
+              !this.props.postGradesAction.hasGradesToPost || !this.props.postGradesAction.hasGrades
+            }
             onSelect={this.postGrades}
           >
-            {this.props.postGradesAction.hasGradesToPost
-              ? I18n.t('Post grades')
-              : I18n.t('All grades posted')}
+            {labelForPostGradesAction(this.props.postGradesAction)}
           </MenuItem>
         ) : (
           <MenuItem
@@ -418,12 +437,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
         {this.props.postGradesAction.featureEnabled && (
           <MenuItem
-            disabled={!this.props.hideGradesAction.hasGradesToHide}
+            disabled={
+              !this.props.hideGradesAction.hasGradesToHide || !this.props.hideGradesAction.hasGrades
+            }
             onSelect={this.hideGrades}
           >
-            {this.props.hideGradesAction.hasGradesToHide
-              ? I18n.t('Hide grades')
-              : I18n.t('All grades hidden')}
+            {labelForHideGradesAction(this.props.hideGradesAction)}
           </MenuItem>
         )}
 
