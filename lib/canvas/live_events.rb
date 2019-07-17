@@ -606,6 +606,10 @@ module Canvas::LiveEvents
     post_event_stringified('course_completed', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
   end
 
+  def self.course_progress(context_module_progression)
+    post_event_stringified('course_progress', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
+  end
+
   def self.get_course_completed_data(course, user)
     {
       progress: CourseProgress.new(course, user, read_only: true).to_json,

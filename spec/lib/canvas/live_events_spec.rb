@@ -949,6 +949,26 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.course_progress' do
+    it 'should trigger a course progress live event' do
+      course = course_model
+      user = user_model
+      context_module = course.context_modules.create!
+      # context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: 'completed')
+      context_module_progression = context_module.context_module_progressions.create!(user_id: user.id, workflow_state: 'started')
+
+      expected_event_body = {
+        progress: CourseProgress.new(course, user, read_only: true).to_json,
+        user: { id: user.id.to_s, name: user.name, email: user.email },
+        course: { id: course.id.to_s, name: course.name }
+      }
+
+      expect_event('course_progress', expected_event_body).once
+
+      Canvas::LiveEvents.course_progress(context_module_progression)
+    end
+  end
+
   describe '.discussion_topic_created' do
     it 'should trigger a discussion topic created live event' do
       course = course_model
