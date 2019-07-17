@@ -55,7 +55,7 @@ export default class AttemptTab extends Component {
 
     cache.writeQuery({
       query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id},
+      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id},
       data: {assignment}
     })
   }
@@ -122,7 +122,7 @@ export default class AttemptTab extends Component {
 
       if (this.state.submissionState === 'error') {
         errorMessage = I18n.t('Error sending submission')
-      } else if (this.state.uploadState === 'success') {
+      } else if (this.state.submissionState === 'success') {
         successMessage = I18n.t('Submission sent')
       }
 

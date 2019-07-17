@@ -57,15 +57,18 @@ function createHttpLink() {
   })
 }
 
-function createClient(opts = {}) {
-  const cache = new InMemoryCache({
+function createCache() {
+  return new InMemoryCache({
     addTypename: true,
     dataIdFromObject: object => object.id || null,
     fragmentMatcher: new IntrospectionFragmentMatcher({
       introspectionQueryResultData
     })
   })
+}
 
+function createClient(opts = {}) {
+  const cache = createCache()
   const defaults = opts.defaults || {}
   const resolvers = opts.resolvers || {}
   const stateLink = withClientState({
@@ -87,4 +90,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {createClient, gql, ApolloProvider, Query}
+export {createClient, gql, ApolloProvider, Query, createCache}

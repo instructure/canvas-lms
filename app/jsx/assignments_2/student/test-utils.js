@@ -15,16 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {
-  STUDENT_VIEW_QUERY,
-  SUBMISSION_COMMENT_QUERY,
-  SUBMISSION_ID_QUERY
-} from './graphqlData/Queries'
-import {
-  CREATE_SUBMISSION,
-  CREATE_SUBMISSION_COMMENT,
-  CREATE_SUBMISSION_DRAFT
-} from './graphqlData/Mutations'
+import {CREATE_SUBMISSION_COMMENT} from './graphqlData/Mutations'
+import {SUBMISSION_COMMENT_QUERY} from './graphqlData/Queries'
 
 export function mockAssignment(overrides = {}) {
   return {
@@ -276,102 +268,6 @@ export function mockGraphqlQueryResults(overrides = {}) {
     __typename: 'SubmissionConnection'
   }
   return assignment
-}
-
-export function submissionGraphqlMock() {
-  return [
-    {
-      request: {
-        query: CREATE_SUBMISSION_DRAFT,
-        variables: {
-          id: mockSubmission().id,
-          attempt: 1,
-          fileIds: ['1']
-        }
-      },
-      result: {
-        data: {
-          createSubmissionDraft: {
-            submissionDraft: {
-              __typename: 'SubmissionDraft',
-              _id: '22',
-              attachments: [singleAttachment({_id: '1'})]
-            },
-            errors: {
-              attribute: null,
-              message: null,
-              __typename: 'Errors'
-            },
-            __typename: 'CreateSubmissionDraftPayload'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: CREATE_SUBMISSION,
-        variables: {
-          assignmentLid: '22',
-          submissionID: mockSubmission().id,
-          type: 'online_upload',
-          fileIds: ['1']
-        }
-      },
-      result: {
-        data: {
-          createSubmission: {
-            submission: mockSubmission(),
-            errors: {
-              attribute: null,
-              message: null,
-              __typename: 'Errors'
-            },
-            __typename: 'CreateSubmissionPayload'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: STUDENT_VIEW_QUERY,
-        variables: {
-          assignmentLid: '22',
-          submissionID: mockSubmission().id
-        }
-      },
-      result: {
-        data: {
-          assignment: mockGraphqlQueryResults({
-            lockInfo: {isLocked: false, __typename: 'LockInfo'}
-          })
-        }
-      }
-    },
-    {
-      request: {
-        query: SUBMISSION_ID_QUERY,
-        variables: {
-          assignmentLid: '22'
-        }
-      },
-      result: {
-        data: {
-          assignment: {
-            submissionsConnection: {
-              nodes: [
-                {
-                  id: mockSubmission().id,
-                  __typename: 'Submission'
-                }
-              ],
-              __typename: 'SubmissionConnection'
-            },
-            __typename: 'Assignment'
-          }
-        }
-      }
-    }
-  ]
 }
 
 export function mockSubmission(overrides = {}) {
