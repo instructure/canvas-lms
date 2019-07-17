@@ -2033,6 +2033,7 @@ class Submission < ActiveRecord::Base
     if self.new_record?
       self.save!
     elsif comment_causes_posting?(author: opts[:author], draft: opts[:draft], provisional: opts[:provisional])
+      opts[:hidden] = false
       update!(posted_at: Time.zone.now)
     else
       self.touch
@@ -2446,6 +2447,11 @@ class Submission < ActiveRecord::Base
 
   def muted_assignment?
     self.assignment.muted?
+  end
+
+  def hide_grade_from_student?
+    return muted_assignment? unless PostPolicy.feature_enabled?
+    assignment.post_manually? ? posted_at.blank? : (graded? && !posted?)
   end
 
   def posted?
