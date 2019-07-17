@@ -57,7 +57,7 @@ class Assignment < ActiveRecord::Base
     anonymous_instructor_annotations
   ].freeze
 
-  attr_accessor :previous_id, :copying, :user_submitted
+  attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress
   attr_reader :assignment_changed
   attr_writer :updating_user
 
@@ -921,7 +921,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_submittable
-    return true if self.deleted?
+    # If we're updating the assignment's muted status as part of posting
+    # grades, don't bother doing this
+    return true if self.deleted? || grade_posting_in_progress
     if self.submission_types == "online_quiz" && @saved_by != :quiz
       quiz = Quizzes::Quiz.where(assignment_id: self).first || self.context.quizzes.build
       quiz.assignment_id = self.id
