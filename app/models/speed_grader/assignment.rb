@@ -51,12 +51,13 @@ module SpeedGrader
       enrollment_json_fields = %i(course_section_id workflow_state user_id)
 
       res = assignment.as_json(
-        :include => {
-          :context => { :only => :id },
-          :rubric_association => { :except => {} }
-        },
+        :include => [
+          {:context => { :only => :id }},
+          :rubric_association
+        ],
         :include_root => false
       )
+      res['context']['concluded'] = assignment.context.concluded?
       res['anonymize_students'] = assignment.anonymize_students?
       res['anonymize_graders'] = !assignment.can_view_other_grader_identities?(current_user)
       res['post_manually'] = assignment.post_manually? if course.post_policies_enabled?

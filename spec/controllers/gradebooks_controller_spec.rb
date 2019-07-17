@@ -1,4 +1,3 @@
-# encoding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../sharding_spec_helper'
 
 describe GradebooksController do
   before :once do
@@ -2104,6 +2103,16 @@ describe GradebooksController do
         @assignment.update!(moderated_grading: true, grader_count: 2, muted: true)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env[:can_view_audit_trail]).to be false
+      end
+
+      it 'includes MANAGE_GRADES' do
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:MANAGE_GRADES)).to be true
+      end
+
+      it 'includes READ_AS_ADMIN' do
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:READ_AS_ADMIN)).to be true
       end
     end
 

@@ -3146,7 +3146,9 @@ EG = {
     }
 
     if (ENV.post_policies_enabled) {
-      renderHiddenSubmissionPill(submission)
+      if (ENV.MANAGE_GRADES || (jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
+        renderHiddenSubmissionPill(submission)
+      }
     }
     EG.updateStatsInHeader()
   },
