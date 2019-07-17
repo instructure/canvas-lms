@@ -52,7 +52,7 @@ export default class LinkOptionsDialogController {
   }
   _applyLinkOptions(linkOptions) {
     this._dismissDialog()
-    bridge.insertLink(linkOptions)
+    bridge.insertLink(linkOptions, false)
   }
   _dismissDialog = () => {
     this._shouldOpen = false

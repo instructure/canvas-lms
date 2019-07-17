@@ -147,7 +147,7 @@ export function embedUploadResult(results, selectedTabType) {
       href: results.url,
       embed: embedData,
       target: '_blank'
-    });
+    }, false);
   }
   return results;
 }
