@@ -30,7 +30,11 @@ if settings.present?
     config.logger = Rails.logger
     config.silence_ready = true
     config.dsn = settings[:dsn]
-    config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
+    config.tags = settings.fetch(:tags, {}).merge(
+      'canvas_revision' => Canvas.revision,
+      'canvas_domain' => ENV['CANVAS_DOMAIN'],
+      'node_id' => ENV['NODE']
+     )
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
