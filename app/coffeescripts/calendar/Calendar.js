@@ -284,6 +284,10 @@ export default class Calendar {
         viewRender: this.viewRender,
         windowResize: this.windowResize,
         drop: this.drop,
+        // on mobile phones tell it to let the contentHeight be "auto"
+        // so it doesn't force you to scroll up and down just to see all the
+        // dates on the calendar
+        [window.innerWidth < 450 && 'contentHeight']: 'auto',
 
         dragRevertDuration: 0,
         dragAppendTo: {month: '#calendar-drag-and-drop-container'},

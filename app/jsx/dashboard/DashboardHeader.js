@@ -187,7 +187,7 @@ class DashboardHeader extends React.Component {
   render () {
     return (
       <div className={classnames(this.props.responsiveSize, "ic-Dashboard-header__layout")}>
-        <h1 className="ic-Dashboard-header__title">{I18n.t('Dashboard')}</h1>
+        <h1 className="ic-Dashboard-header__title"><span className="hidden-phone">{I18n.t('Dashboard')}</span></h1>
         <div className="ic-Dashboard-header__actions">
           {this.props.planner_enabled && (
             <div

@@ -278,10 +278,11 @@ export default class FilePreview extends React.PureComponent {
                       className="ef-file-preview-header-download ef-file-preview-button"
                     >
                       <i className="icon-download" />
-                      {` ${I18n.t('Download')}`}
+                      <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
                     </a>
                   )}
                 <button
+                  type="button"
                   className={showInfoPanelClasses}
                   ref={e => this.infoButton = e}
                   onClick={this.toggle('showInfoPanel')}
@@ -289,16 +290,17 @@ export default class FilePreview extends React.PureComponent {
                   {/* Wrap content in a div because firefox doesn't support display: flex on buttons */}
                   <div>
                     <i className="icon-info" />
-                    {` ${I18n.t('Info')}`}
+                    <span className="hidden-phone">{` ${I18n.t('Info')}`}</span>
                   </div>
                 </button>
                 <button
+                  type="button"
                   onClick={preventDefault(this.closeModal)}
                   ref={e => this.closeButton = e}
                   className="ef-file-preview-header-close ef-file-preview-button"
                 >
                   <i className="icon-end" />
-                  {` ${I18n.t('Close')}`}
+                  <span className="hidden-phone">{` ${I18n.t('Close')}`}</span>
                 </button>
               </div>
             </div>

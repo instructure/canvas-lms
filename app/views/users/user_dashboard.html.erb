@@ -51,7 +51,7 @@
   <%= render :partial => 'shared/dashboard_messages' %>
 
   <div id="dashboard_header_container" class="ic-Dashboard-header">
-    <h1 class="ic-Dashboard-header__title"><%= t "Dashboard" %></h1>
+    <h1 class="ic-Dashboard-header__title hidden-phone"><%= t "Dashboard" %></h1>
   </div>
   <% if planner_enabled? %>
     <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
