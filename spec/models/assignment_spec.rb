@@ -316,6 +316,38 @@ describe Assignment do
         end
       end
     end
+
+    describe "#update_submittable" do
+      before(:each) do
+        Timecop.freeze(1.day.ago) do
+          assignment_quiz([], course: @course)
+        end
+      end
+
+      let(:assignment) { @assignment }
+      let(:quiz) { @quiz }
+
+      context "for an assignment with an associated quiz" do
+        it "updates the quiz when the assignment is updated normally" do
+          expect {
+            assignment.update!(title: "a new and even better title")
+          }.to change { quiz.reload.updated_at }
+        end
+
+        context "when post policies are enabled" do
+          before(:each) do
+            @course.enable_feature!(:new_gradebook)
+            PostPolicy.enable_feature!
+          end
+
+          it "does not attempt to update the quiz when posting/hiding changes the assignment's muted status" do
+            expect {
+              assignment.hide_submissions(submission_ids: assignment.submissions.pluck(:id))
+            }.not_to change { quiz.reload.updated_at }
+          end
+        end
+      end
+    end
   end
 
   describe "scope: expects_submissions" do
