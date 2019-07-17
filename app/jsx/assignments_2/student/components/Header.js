@@ -39,6 +39,10 @@ class Header extends React.Component {
     submission: Submission.shape
   }
 
+  static defaultProps = {
+    scrollThreshold: 150
+  }
+
   state = {
     isSticky: false,
     nonStickyHeaderheight: 0

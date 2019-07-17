@@ -122,7 +122,7 @@ export async function mockAssignment(overrides = []) {
         ...Assignment
       }
     }
-    ${Assignment.assignment.fragment}
+    ${Assignment.fragment}
   `
   const result = await mockQuery(query, overrides)
   const assignment = result.data.assignment
@@ -147,7 +147,7 @@ export async function mockSubmission(overrides = []) {
         }
       }
     }
-    ${Submission.submission.fragment}
+    ${Submission.fragment}
   `
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
