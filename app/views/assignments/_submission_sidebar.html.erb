@@ -84,7 +84,7 @@
     <% end %>
 
     <div class="module">
-      <% if @current_user_submission.grade && !@assignment.muted? %>
+      <% if @current_user_submission.grade && !@current_user_submission.hide_grade_from_student? %>
         <% if @current_user_submission.excused? %>
           <span><%= t "This assignment has been excused." %></span>
         <% else %>
@@ -119,7 +119,7 @@
     <% end %>
 
     <div class="comments module">
-      <% if @assignment.muted? %>
+      <% if @current_user_submission.hide_grade_from_student? %>
         <p><%= t 'You may not see all comments right now because the assignment is currently being graded.' %></p>
       <% else %>
         <h3><%= t 'titles.comments', "Comments:" %> </h3>

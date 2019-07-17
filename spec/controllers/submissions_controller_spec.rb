@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require 'spec_helper'
 
 describe SubmissionsController do
   it_behaves_like 'a submission update action', :submissions

@@ -1916,9 +1916,6 @@ class Assignment < ActiveRecord::Base
       submissions: []
     }
 
-    # Only teachers (those who can manage grades) can have hidden comments
-    opts[:hidden] = muted? && self.context.grants_right?(opts[:author], :manage_grades) unless opts.key?(:hidden)
-
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
@@ -1954,6 +1951,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def save_comment_to_submission(submission, group, opts, uuid = nil)
+    # Only teachers (those who can manage grades) can have hidden comments
+    unless opts.key?(:hidden)
+      opts[:hidden] = submission.hide_grade_from_student? && self.context.grants_right?(opts[:author], :manage_grades)
+    end
     submission.group = group
     submission.save! if submission.changed?
     opts[:group_comment_id] = uuid if group && uuid

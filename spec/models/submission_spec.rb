@@ -4639,6 +4639,26 @@ describe Submission do
       expect(comment.attempt).to eq 3
     end
 
+    it "sets comment hidden to false if comment causes posting" do
+      PostPolicy.enable_feature!
+      @course.enable_feature!(:new_gradebook)
+      @assignment.ensure_post_policy(post_manually: false)
+      @assignment.grade_student(@student, grader: @teacher, score: 5)
+      @submission.update!(posted_at: nil)
+      comment = @submission.add_comment(author: @teacher, comment: 'a comment!', hidden: true)
+      expect(comment).not_to be_hidden
+    end
+
+    it "does not set comment hidden to false if comment does not cause posting" do
+      PostPolicy.enable_feature!
+      @course.enable_feature!(:new_gradebook)
+      @assignment.ensure_post_policy(post_manually: true)
+      @assignment.grade_student(@student, grader: @teacher, score: 5)
+      @submission.update!(posted_at: nil)
+      comment = @submission.add_comment(author: @teacher, comment: 'a comment!', hidden: true)
+      expect(comment).to be_hidden
+    end
+
     describe 'audit event logging' do
       let(:course) { Course.create! }
       let(:assignment) { course.assignments.create!(title: 'ok', anonymous_grading: true) }
@@ -6437,6 +6457,67 @@ describe Submission do
         expect(@submission.submission_drafts).to eq []
         expect(SubmissionDraft.count).to be 0
         expect(SubmissionDraftAttachment.count).to be 0
+      end
+    end
+  end
+
+  describe "#hide_grade_from_student?" do
+    context "when Post Policies are enabled" do
+      let_once(:course) { Course.create! }
+      let_once(:student) { User.create! }
+      let_once(:teacher) { User.create! }
+      let(:assignment) { course.assignments.create! }
+      let(:submission) { assignment.submissions.find_by(user: student) }
+
+      before(:once) do
+        course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+        course.enroll_student(student)
+        course.enroll_teacher(teacher)
+      end
+
+      it "returns true when submission is unposted and assignment posts manually" do
+        assignment.ensure_post_policy(post_manually: true)
+        expect(submission).to be_hide_grade_from_student
+      end
+
+      it "returns false when submission is posted and assignment posts manually" do
+        assignment.ensure_post_policy(post_manually: true)
+        submission.update!(posted_at: Time.zone.now)
+        expect(submission).not_to be_hide_grade_from_student
+      end
+
+      it "returns false when submission is unposted and assignment posts automatically" do
+        assignment.ensure_post_policy(post_manually: false)
+        expect(submission).not_to be_hide_grade_from_student
+      end
+
+      it "returns false when submission is posted and assignment posts automatically" do
+        assignment.ensure_post_policy(post_manually: false)
+        submission.update!(posted_at: Time.zone.now)
+        expect(submission).not_to be_hide_grade_from_student
+      end
+    end
+
+    context "when Post Policies are not enabled" do
+      let_once(:course) { Course.create! }
+      let_once(:student) { User.create! }
+      let_once(:teacher) { User.create! }
+      let(:assignment) { course.assignments.create! }
+      let(:submission) { assignment.submissions.find_by(user: student) }
+
+      before(:once) do
+        course.enroll_student(student)
+        course.enroll_teacher(teacher)
+      end
+
+      it "returns true when assignment is muted" do
+        assignment.mute!
+        expect(submission).to be_hide_grade_from_student
+      end
+
+      it "returns false when assignment is not muted" do
+        expect(submission).not_to be_hide_grade_from_student
       end
     end
   end
