@@ -24,17 +24,17 @@ import {
   NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
   STARTED
 } from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
-import PostButton from 'jsx/assignments/GradeSummary/components/PostButton'
+import ReleaseButton from 'jsx/assignments/GradeSummary/components/ReleaseButton'
 
-QUnit.module('GradeSummary PostButton', suiteHooks => {
+QUnit.module('GradeSummary ReleaseButton', suiteHooks => {
   let props
   let wrapper
 
   suiteHooks.beforeEach(() => {
     props = {
-      gradesPublished: false,
+      gradesReleased: false,
       onClick: sinon.spy(),
-      publishGradesStatus: null
+      releaseGradesStatus: null
     }
   })
 
@@ -43,14 +43,14 @@ QUnit.module('GradeSummary PostButton', suiteHooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<PostButton {...props} />)
+    wrapper = mount(<ReleaseButton {...props} />)
   }
 
-  QUnit.module('when grades have not been published', contextHooks => {
+  QUnit.module('when grades have not been released', contextHooks => {
     contextHooks.beforeEach(mountComponent)
 
-    test('is labeled with "Post"', () => {
-      equal(wrapper.find('button').text(), 'Post')
+    test('is labeled with "Release Grades"', () => {
+      equal(wrapper.find('button').text(), 'Release Grades')
     })
 
     test('is not read-only', () => {
@@ -63,17 +63,17 @@ QUnit.module('GradeSummary PostButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when grades are being published', contextHooks => {
+  QUnit.module('when grades are being released', contextHooks => {
     contextHooks.beforeEach(() => {
-      props.publishGradesStatus = STARTED
+      props.releaseGradesStatus = STARTED
       mountComponent()
     })
 
-    test('is labeled with "Posting Grades"', () => {
+    test('is labeled with "Releasing Grades"', () => {
       // The Spinner in the button duplicates the label. Assert that the label
       // includes the expected text, but is not exactly equal.
       const label = wrapper.find('button').text()
-      ok(label.match(/Posting Grades/))
+      ok(label.match(/Releasing Grades/))
     })
 
     test('is read-only', () => {
@@ -86,17 +86,17 @@ QUnit.module('GradeSummary PostButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when grades have been published', contextHooks => {
+  QUnit.module('when grades have been released', contextHooks => {
     contextHooks.beforeEach(() => {
-      props.gradesPublished = true
+      props.gradesReleased = true
       mountComponent()
     })
 
-    test('is labeled with "Grades Posted"', () => {
+    test('is labeled with "Grades Released"', () => {
       // The Icon in the button duplicates the label. Assert that the label
       // includes the expected text, but is not exactly equal.
       const label = wrapper.find('button').text()
-      ok(label.match(/Grades Posted/))
+      ok(label.match(/Grades Released/))
     })
 
     test('is read-only', () => {
@@ -109,14 +109,14 @@ QUnit.module('GradeSummary PostButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when grade publishing failed', contextHooks => {
+  QUnit.module('when grade releasing failed', contextHooks => {
     contextHooks.beforeEach(() => {
-      props.publishGradesStatus = FAILURE
+      props.releaseGradesStatus = FAILURE
       mountComponent()
     })
 
-    test('is labeled with "Post"', () => {
-      equal(wrapper.find('button').text(), 'Post')
+    test('is labeled with "Release Grades"', () => {
+      equal(wrapper.find('button').text(), 'Release Grades')
     })
 
     test('is not read-only', () => {
@@ -129,14 +129,14 @@ QUnit.module('GradeSummary PostButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when grade publishing failed for missing grade selections', contextHooks => {
+  QUnit.module('when grade releasing failed for missing grade selections', contextHooks => {
     contextHooks.beforeEach(() => {
-      props.publishGradesStatus = NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE
+      props.releaseGradesStatus = NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE
       mountComponent()
     })
 
-    test('is labeled with "Post"', () => {
-      equal(wrapper.find('button').text(), 'Post')
+    test('is labeled with "Release Grades"', () => {
+      equal(wrapper.find('button').text(), 'Release Grades')
     })
 
     test('is not read-only', () => {

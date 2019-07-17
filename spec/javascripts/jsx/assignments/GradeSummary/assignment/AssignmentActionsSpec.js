@@ -44,7 +44,7 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
     })
   })
 
-  QUnit.module('.publishGrades()', hooks => {
+  QUnit.module('.releaseGrades()', hooks => {
     let args
     let rejectPromise
     let resolvePromise
@@ -61,33 +61,33 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
         }
       }
 
-      sinon.stub(AssignmentApi, 'publishGrades').callsFake((courseId, assignmentId) => {
+      sinon.stub(AssignmentApi, 'releaseGrades').callsFake((courseId, assignmentId) => {
         args = {courseId, assignmentId}
         return fakePromise
       })
 
-      store.dispatch(AssignmentActions.publishGrades())
+      store.dispatch(AssignmentActions.releaseGrades())
     })
 
     hooks.afterEach(() => {
       args = null
-      AssignmentApi.publishGrades.restore()
+      AssignmentApi.releaseGrades.restore()
     })
 
-    test('sets the "publish grades" status to "started"', () => {
-      const {publishGradesStatus} = store.getState().assignment
-      equal(publishGradesStatus, AssignmentActions.STARTED)
+    test('sets the "release grades" status to "started"', () => {
+      const {releaseGradesStatus} = store.getState().assignment
+      equal(releaseGradesStatus, AssignmentActions.STARTED)
     })
 
-    test('publishes grades through the api', () => {
-      strictEqual(AssignmentApi.publishGrades.callCount, 1)
+    test('releases grades through the api', () => {
+      strictEqual(AssignmentApi.releaseGrades.callCount, 1)
     })
 
-    test('includes the course id when publishing through the api', () => {
+    test('includes the course id when releasing through the api', () => {
       strictEqual(args.courseId, '1201')
     })
 
-    test('includes the assignment id when publishing through the api', () => {
+    test('includes the assignment id when releasing through the api', () => {
       strictEqual(args.assignmentId, '2301')
     })
 
@@ -97,28 +97,28 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
       strictEqual(assignment.gradesPublished, true)
     })
 
-    test('sets the "publish grades" status to "success" when the request succeeds', () => {
+    test('sets the "release grades" status to "success" when the request succeeds', () => {
       resolvePromise()
-      const {publishGradesStatus} = store.getState().assignment
-      equal(publishGradesStatus, AssignmentActions.SUCCESS)
+      const {releaseGradesStatus} = store.getState().assignment
+      equal(releaseGradesStatus, AssignmentActions.SUCCESS)
     })
 
-    test('sets the "publish grades" status to "already published" when grades were already published', () => {
+    test('sets the "release grades" status to "already released" when grades were already released', () => {
       rejectPromise({response: {status: 400}})
-      const {publishGradesStatus} = store.getState().assignment
-      equal(publishGradesStatus, AssignmentActions.GRADES_ALREADY_PUBLISHED)
+      const {releaseGradesStatus} = store.getState().assignment
+      equal(releaseGradesStatus, AssignmentActions.GRADES_ALREADY_RELEASED)
     })
 
-    test('sets the "publish grades" status to "not all selected" when a submission has no selected grade', () => {
+    test('sets the "release grades" status to "not all selected" when a submission has no selected grade', () => {
       rejectPromise({response: {status: 422}})
-      const {publishGradesStatus} = store.getState().assignment
-      equal(publishGradesStatus, AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE)
+      const {releaseGradesStatus} = store.getState().assignment
+      equal(releaseGradesStatus, AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE)
     })
 
-    test('sets the "publish grades" status to "failure" when any other failure occurs', () => {
+    test('sets the "release grades" status to "failure" when any other failure occurs', () => {
       rejectPromise({response: {status: 500}})
-      const {publishGradesStatus} = store.getState().assignment
-      equal(publishGradesStatus, AssignmentActions.FAILURE)
+      const {releaseGradesStatus} = store.getState().assignment
+      equal(releaseGradesStatus, AssignmentActions.FAILURE)
     })
   })
 
@@ -157,15 +157,15 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
       equal(unmuteAssignmentStatus, AssignmentActions.STARTED)
     })
 
-    test('publishes grades through the api', () => {
+    test('releases grades through the api', () => {
       strictEqual(AssignmentApi.unmuteAssignment.callCount, 1)
     })
 
-    test('includes the course id when publishing through the api', () => {
+    test('includes the course id when releasing through the api', () => {
       strictEqual(args.courseId, '1201')
     })
 
-    test('includes the assignment id when publishing through the api', () => {
+    test('includes the assignment id when releasing through the api', () => {
       strictEqual(args.assignmentId, '2301')
     })
 

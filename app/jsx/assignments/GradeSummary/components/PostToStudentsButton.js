@@ -17,31 +17,21 @@
  */
 
 import React from 'react'
-import {bool, func, oneOf} from 'prop-types'
+import {bool, func, oneOf, shape} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import I18n from 'i18n!assignment_grade_summary'
 
-import {
-  FAILURE,
-  GRADES_ALREADY_PUBLISHED,
-  NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
-  STARTED,
-  SUCCESS
-} from '../assignment/AssignmentActions'
+import {FAILURE, STARTED, SUCCESS} from '../assignment/AssignmentActions'
 
 function readyButton(props) {
-  return (
-    <Button {...props} variant="primary">
-      {I18n.t('Post')}
-    </Button>
-  )
+  return <Button {...props}>{I18n.t('Post to Students')}</Button>
 }
 
 function startedButton(props) {
-  const title = I18n.t('Grades Posting')
+  const title = I18n.t('Posting to Students')
 
   return (
     <Button {...props} variant="light">
@@ -53,44 +43,43 @@ function startedButton(props) {
 function successButton(props) {
   return (
     <Button {...props} icon={IconCheckMark} variant="light">
-      {I18n.t('Grades Posted')}
+      {I18n.t('Grades Posted to Students')}
     </Button>
   )
 }
 
-export default function PostButton(props) {
-  const {gradesPublished, onClick, publishGradesStatus, ...otherProps} = props
-  const canClick = !(gradesPublished || [STARTED, SUCCESS].includes(publishGradesStatus))
+export default function PostToStudentsButton(props) {
+  const {assignment, onClick, unmuteAssignmentStatus, ...otherProps} = props
+  const unmutable = assignment.gradesPublished && assignment.muted
+  const canClick = ![STARTED, SUCCESS].includes(unmuteAssignmentStatus)
 
   const buttonProps = {
     ...otherProps,
-    'aria-readonly': !canClick,
-    onClick: canClick ? onClick : null
+    'aria-readonly': !assignment.gradesPublished ? null : !assignment.muted || !canClick,
+    disabled: assignment.gradesPublished ? null : true,
+    onClick: unmutable && canClick ? onClick : null
   }
 
-  if (gradesPublished) {
+  if (!assignment.muted) {
     return successButton(buttonProps)
   }
 
-  if (publishGradesStatus === STARTED) {
+  if (unmuteAssignmentStatus === STARTED) {
     return startedButton(buttonProps)
   }
 
   return readyButton(buttonProps)
 }
 
-PostButton.propTypes = {
-  gradesPublished: bool.isRequired,
+PostToStudentsButton.propTypes = {
+  assignment: shape({
+    gradesPublished: bool.isRequired,
+    muted: bool.isRequired
+  }).isRequired,
   onClick: func.isRequired,
-  publishGradesStatus: oneOf([
-    FAILURE,
-    GRADES_ALREADY_PUBLISHED,
-    NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
-    STARTED,
-    SUCCESS
-  ])
+  unmuteAssignmentStatus: oneOf([FAILURE, STARTED, SUCCESS])
 }
 
-PostButton.defaultProps = {
-  publishGradesStatus: null
+PostToStudentsButton.defaultProps = {
+  unmuteAssignmentStatus: null
 }
