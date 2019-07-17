@@ -2114,6 +2114,16 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_bundle
 
+  def add_body_class(*args)
+    @body_classes ||= []
+    raise "call add_body_class for #{args} in the controller when using streaming templates" if @streaming_template && (args - @body_classes).any?
+    @body_classes += args
+  end
+  helper_method :add_body_class
+
+  def body_classes; @body_classes ||= []; end
+  helper_method :body_classes
+
   def get_course_from_section
     if params[:section_id]
       @section = api_find(CourseSection, params.delete(:section_id))

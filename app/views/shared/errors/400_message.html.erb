@@ -22,7 +22,7 @@
       instance_variable_set(name, nil)
     end
   end
-  (@body_classes ||= []) << 'full-width'
+  add_body_class 'full-width'
 %>
 <% provide :page_title, t('title', 'Page Error') %>
 

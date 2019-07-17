@@ -109,6 +109,7 @@ class ContextModulesController < ApplicationController
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
+      add_body_class('padless-content')
     end
   end
 

@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% @body_classes << 'assessing' if @body_classes %>
-<% content_for :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
 
 <% content_for :meta_tags do %>
   <% if params[:persist_headless] %>
@@ -25,6 +23,8 @@
     <% js_env :MOBILE_UI => true %>
   <% end %>
 <% end %>
+<% add_body_class 'assessing' %>
+<% provide :page_title do %><%= join_title @quiz.readable_type, @quiz.quiz_title %><% end %>
 
 <% provide :right_side do %>
   <%= render "take_quiz_right_side" %>

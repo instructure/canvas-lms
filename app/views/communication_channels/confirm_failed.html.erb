@@ -19,7 +19,7 @@
 <%
   css_bundle :login_confirm
   @headers = false
-  @body_classes << "full-width modal body--login-confirmation"
+  add_body_class "full-width modal body--login-confirmation"
 
   provide :page_title, t(:page_title, "Registration Confirmation Failed")
 %>

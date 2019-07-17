@@ -23,7 +23,7 @@
     end
   end
   exception ||= nil
-  (@body_classes ||= []) << 'full-width'
+  add_body_class 'full-width'
 %>
 <% provide :page_title, t('title', 'Page Error') %>
 

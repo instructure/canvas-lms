@@ -22,7 +22,7 @@
   js_bundle :dashboard
 
   if show_planner?
-    @body_classes << "dashboard-is-planner"
+    add_body_class "dashboard-is-planner"
 
     # fire off these `fetch` requests now so they are ready sooner
     six_months_ago = Time.now.utc.at_beginning_of_day.months_ago(6).iso8601(3)

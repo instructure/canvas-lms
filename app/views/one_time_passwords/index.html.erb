@@ -1,8 +1,8 @@
 <%
   css_bundle :otp_login
   @headers = false
-  @body_classes << "full-width modal body--login-confirmation"
-  content_for :page_title, t("Multi-factor Authentication Backup Codes")
+  add_body_class "full-width modal body--login-confirmation"
+  provide :page_title, t("Multi-factor Authentication Backup Codes")
 %>
 
 <% content_for :meta_tags do %>

@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
+  provide :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   css_bundle :course_settings
   js_bundle :course_settings
   @active_tab = "settings"
@@ -36,7 +36,7 @@
   master_course = blueprint_subscription&.master_template&.course
 %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <%= render :partial => 'settings_sidebar', :locals => { :blueprint_subscription => blueprint_subscription } %>
 <% end %>
 
