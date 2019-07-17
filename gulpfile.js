@@ -73,11 +73,6 @@ gulp.task('rev', () => {
         follow: true // follow symlinks, so it picks up on images inside plugins and stuff
       }),
       gulp.src([
-        // on the mobile login screen, we don't load any of our webpack js bundles. but if they
-        // have a custom js file, we do load a raw copy of jquery for their custom js to use.
-        // See `include_account_js` in mobile_auth.html.erb
-        'node_modules/jquery/jquery.js',
-
         'node_modules/tinymce/skins/lightgray/**/*',
       ], {
         base: '.'
