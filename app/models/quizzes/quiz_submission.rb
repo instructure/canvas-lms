@@ -886,6 +886,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def posted?
-    !!submission&.posted?
+    # Ungraded surveys and practice quizzes will not have associated Assignment
+    # or Submission objects, and so results should always be shown to the student.
+    quiz.ungraded? || !!submission&.posted?
   end
 end
