@@ -402,7 +402,7 @@ class Submission < ActiveRecord::Base
     given do |user|
       user &&
         user.id == self.user_id &&
-        self.posted?
+        !self.hide_grade_from_student?
     end
     can :read_grade
 
@@ -521,7 +521,7 @@ class Submission < ActiveRecord::Base
     # improves performance by checking permissions on the assignment before the submission
     return true if self.assignment.user_can_read_grades?(user, session)
 
-    return false unless self.posted?
+    return false if self.hide_grade_from_student?
     return true if user && user.id == self.user_id # this is fast, so skip the policy cache check if possible
 
     self.grants_right?(user, session, :read_grade)
