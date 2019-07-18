@@ -321,6 +321,24 @@ describe "/submissions/show" do
           render "submissions/show"
           expect(html.css(".entered_grade").text).to include "23"
         end
+
+        context "when the viewing user is a teacher" do
+          let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: "active").user }
+
+          before(:each) do
+            assign(:current_user, teacher)
+          end
+
+          it "displays the current grade even when the submission is not posted" do
+            render "submissions/show"
+            expect(html.css(".grading_box").attr("value").value).to include("23")
+          end
+
+          it "displays the grade input fields even when the submission is not posted" do
+            render "submissions/show"
+            expect(html.css(".grade-values")).to be_present
+          end
+        end
       end
     end
 
