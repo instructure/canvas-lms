@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {Tabs} from '@instructure/ui-tabs'
+import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 import StudentsSearcher from './StudentsTab/StudentsSearcher'
@@ -40,15 +40,9 @@ ContentTabs.defaultProps = {
 
 export default function ContentTabs(props) {
   const {assignment} = props
-  const {selectedTabIndex, setSelectedTabIndex} = useState(0)
-
-  function handleTabChange(event, {index}) {
-    setSelectedTabIndex(index)
-  }
-
   return (
-    <Tabs onRequestTabChange={handleTabChange} variant="default">
-      <Tabs.Panel title="Details" selected={selectedTabIndex === 0}>
+    <TabList defaultSelectedIndex={0} variant="minimal">
+      <TabPanel title="Details">
         <Details
           assignment={assignment}
           onChangeAssignment={props.onChangeAssignment}
@@ -56,23 +50,23 @@ export default function ContentTabs(props) {
           invalidMessage={props.invalidMessage}
           readOnly={props.readOnly}
         />
-      </Tabs.Panel>
-      <Tabs.Panel title={I18n.t('Grading')} selected={selectedTabIndex === 1}>
+      </TabPanel>
+      <TabPanel title={I18n.t('Grading')}>
         <div style={{width: '680px'}}>
           <Img src="/images/assignments2_grading_static.png" />
         </div>
-      </Tabs.Panel>
-      <Tabs.Panel title={I18n.t('Rubric')} selected={selectedTabIndex === 2}>
+      </TabPanel>
+      <TabPanel title={I18n.t('Rubric')}>
         <div style={{width: '730px'}}>
           <Img src="/images/assignments2_rubric_static.png" />
         </div>
-      </Tabs.Panel>
-      <Tabs.Panel title={I18n.t('Students')} selected={selectedTabIndex === 3}>
+      </TabPanel>
+      <TabPanel title={I18n.t('Students')}>
         <StudentsSearcher
           onMessageStudentsClick={props.onMessageStudentsClick}
           assignment={assignment}
         />
-      </Tabs.Panel>
-    </Tabs>
+      </TabPanel>
+    </TabList>
   )
 }
