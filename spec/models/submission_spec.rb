@@ -1760,16 +1760,30 @@ describe Submission do
 
       context "when post policies feature is enabled" do
         before(:once) do
+          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
-        it "user can read their own grade when their submission is posted" do
+        it "returns true when their submission is posted and assignment manually posts" do
+          @assignment.ensure_post_policy(post_manually: true)
           @submission.update!(posted_at: Time.zone.now)
           expect(@submission.grants_right?(@student, :read_grade)).to be true
         end
 
-        it "user cannot read their own grade when their submission is not posted" do
+        it "returns false when their submission is not posted and assignment manually posts" do
+          @assignment.ensure_post_policy(post_manually: true)
           expect(@submission.grants_right?(@student, :read_grade)).to be false
+        end
+
+        it "returns true when their submission is posted and assignment automatically posts" do
+          @assignment.ensure_post_policy(post_manually: false)
+          @submission.update!(posted_at: Time.zone.now)
+          expect(@submission.grants_right?(@student, :read_grade)).to be true
+        end
+
+        it "returns true when their submission is not posted and assignment automatically posts" do
+          @assignment.ensure_post_policy(post_manually: false)
+          expect(@submission.grants_right?(@student, :read_grade)).to be true
         end
       end
 
@@ -2042,16 +2056,30 @@ describe Submission do
 
     context "when post policies feature is enabled" do
       before(:once) do
+        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
-      it "user can read their own grade when their submission is posted" do
+      it "returns true when their submission is posted and assignment manually posts" do
+        @assignment.ensure_post_policy(post_manually: true)
         @submission.update!(posted_at: Time.zone.now)
         expect(@submission.user_can_read_grade?(@student)).to be true
       end
 
-      it "user cannot read their own grade when their submission is not posted" do
+      it "returns false when their submission is not posted and assignment manually posts" do
+        @assignment.ensure_post_policy(post_manually: true)
         expect(@submission.user_can_read_grade?(@student)).to be false
+      end
+
+      it "returns true when their submission is posted and assignment automatically posts" do
+        @assignment.ensure_post_policy(post_manually: false)
+        @submission.update!(posted_at: Time.zone.now)
+        expect(@submission.user_can_read_grade?(@student)).to be true
+      end
+
+      it "returns true when their submission is not posted and assignment automatically posts" do
+        @assignment.ensure_post_policy(post_manually: false)
+        expect(@submission.user_can_read_grade?(@student)).to be true
       end
     end
 
@@ -4547,10 +4575,12 @@ describe Submission do
 
     context "when post policies are enabled" do
       before(:each) do
+        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
       it "returns empty if submission is unposted and user cannot :read_grade" do
+        @assignment.ensure_post_policy(post_manually: true)
         @viewing_user = @student
         expect(subject).to be_empty
       end

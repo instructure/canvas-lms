@@ -43,7 +43,7 @@ module Canvadocs
       opts = canvadocs_default_options_for_user(user)
       return opts if submissions.empty?
 
-      if submissions.any? { |s| s.grants_right? user, :read_grade }
+      if submissions.any? { |s| s.user_can_read_grade?(user) }
         opts.delete :user_filter
       end
 
