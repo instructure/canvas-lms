@@ -194,6 +194,14 @@ module Types
       end
     end
 
+    field :external_tools_connection, ExternalToolType.connection_type, null: true do
+      argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
+    end
+    def external_tools_connection(filter:)
+      scope = ContextExternalTool.all_tools_for(course, {placements: filter.placement})
+      filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
+    end
+
     field :term, TermType, null: true
     def term
       load_association(:enrollment_term)

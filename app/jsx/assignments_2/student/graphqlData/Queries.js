@@ -18,8 +18,24 @@
 import gql from 'graphql-tag'
 
 import {Assignment, AssignmentSubmissionsConnection} from './Assignment'
+import {ExternalTool} from './ExternalTool'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
+
+export const EXTERNAL_TOOLS_QUERY = gql`
+  query ExternalTools($courseID: ID!) {
+    course: legacyNode(_id: $courseID, type: Course) {
+      ... on Course {
+        externalToolsConnection(filter: {placement: homework_submission, state: public}) {
+          nodes {
+            ...ExternalTool
+          }
+        }
+      }
+    }
+  }
+  ${ExternalTool.fragment}
+`
 
 export const STUDENT_VIEW_QUERY = gql`
   query GetAssignment($assignmentLid: ID!, $submissionID: ID!) {

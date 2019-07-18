@@ -25,6 +25,7 @@ import schemaString from '../../../../schema.graphql'
 import {Assignment, AssignmentDefaultMocks} from './graphqlData/Assignment'
 import {AssignmentGroupDefaultMocks} from './graphqlData/AssignmentGroup'
 import {ErrorDefaultMocks} from './graphqlData/Error'
+import {ExternalToolDefaultMocks} from './graphqlData/ExternalTool'
 import {FileDefaultMocks} from './graphqlData/File'
 import {LockInfoDefaultMocks} from './graphqlData/LockInfo'
 import {MediaObjectDefaultMocks} from './graphqlData/MediaObject'
@@ -47,6 +48,7 @@ function defaultMocks() {
     ...AssignmentDefaultMocks,
     ...AssignmentGroupDefaultMocks,
     ...ErrorDefaultMocks,
+    ...ExternalToolDefaultMocks,
     ...FileDefaultMocks,
     ...LockInfoDefaultMocks,
     ...MediaObjectDefaultMocks,
