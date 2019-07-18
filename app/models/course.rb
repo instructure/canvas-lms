@@ -2949,6 +2949,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_final_grade_override, boolean: false, default: false
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :allow_student_forum_attachments, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true

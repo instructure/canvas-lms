@@ -3588,7 +3588,7 @@ describe CoursesController, type: :request do
         expect(json).to eq({
           'allow_final_grade_override' => false,
           'allow_student_discussion_topics' => true,
-          'allow_student_forum_attachments' => false,
+          'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
@@ -3682,7 +3682,7 @@ describe CoursesController, type: :request do
         expect(json).to eq({
           'allow_final_grade_override' => false,
           'allow_student_discussion_topics' => true,
-          'allow_student_forum_attachments' => false,
+          'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
