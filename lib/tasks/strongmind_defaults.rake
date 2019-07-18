@@ -25,7 +25,7 @@ namespace :strongmind_defaults do
 
   desc "create dynamo db tables"
   task :create_dynamo_db_tables => :environment do
-    ['assignment', 'user', 'enrollment', 'student_assignment'].each do |obj|
+    ['assignment', 'user', 'enrollment', 'student_assignment', 'course', 'assignment'].each do |obj|
       begin
         SettingsService.update_settings(id: '1', setting: 'initialize', value: '1', object: obj)
       rescue
@@ -34,6 +34,21 @@ namespace :strongmind_defaults do
       end
       puts "Created default tables"
     end
+  end
+
+  desc "create school setting defaults"
+  task :create_school_settings => :environment do
+    SettingsService.update_settings(id: '1', setting: 'lti_keep_highest_score', value: true, object: "school")
+    SettingsService.update_settings(id: '1', setting: 'pipeline_sqs_url', value: "https://sqs.us-west-2.amazonaws.com/448312246740/production-pipeline-queue", object: "school")
+    SettingsService.update_settings(id: '1', setting: 'publish_page_views', value: true, object: "school")
+    SettingsService.update_settings(
+        id: '1',
+        setting: 'allowed_filetypes',
+        value: ".txt,.gif,.ppt,.pptx,.png,.zip,.m4v,.dot,.m4a,.csv,.jpeg,.jpg,.xlsx,.xls,.ods,.pdf,.mp4,.ogg,.rtf,.docx",
+        object: "school"
+      )
+    settings =  SettingsService.get_settings(object: "school", id: 1);
+    puts "set default school settings: #{settings}"
   end
 
   desc "Set site admin name"
