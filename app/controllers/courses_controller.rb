@@ -2401,7 +2401,7 @@ class CoursesController < ApplicationController
 
     params[:course] ||= {}
     params_for_update = course_params
-    params[:course][:event] = :offer if params[:offer].present?
+    params[:course][:event] = :offer if value_to_boolean(params[:offer])
 
     if params[:course][:event] && params[:course].keys.size == 1
       if authorized_action(@course, @current_user, :change_course_state) && verified_user_check

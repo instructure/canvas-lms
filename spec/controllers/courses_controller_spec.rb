@@ -1594,6 +1594,14 @@ describe CoursesController do
       put 'update', params: {:id => @course.id, :offer => true}
     end
 
+    it "should not publish when offer is false" do
+      @course.claim!
+      expect(Auditors::Course).to receive(:record_published).never
+      user_session(@teacher)
+      put 'update', params: {:id => @course.id, :offer => "false"}
+      expect(@course.reload).to be_claimed
+    end
+
     it "should not log published event if course was already published" do
       expect(Auditors::Course).to receive(:record_published).never
       user_session(@teacher)
