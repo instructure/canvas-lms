@@ -764,6 +764,8 @@ class DiscussionTopicsController < ApplicationController
             js_env(js_hash)
             set_master_course_js_env_data(@topic, @context)
             conditional_release_js_env(@topic.assignment, includes: [:rule])
+            js_bundle :discussion
+            css_bundle :tinymce, :discussions, :learning_outcomes
           end
         end
       end

@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-  <% js_bundle :navigation_header %>
   <header id="header" class="ic-app-header no-print <%= 'no-user' unless @current_user %>">
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
       <div role="region" class="ic-app-header__main-navigation" aria-label="<%= t('Global Navigation') %>">

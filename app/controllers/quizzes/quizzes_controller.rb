@@ -270,6 +270,8 @@ class Quizzes::QuizzesController < ApplicationController
           @lock_results_if_needed = true
 
           log_asset_access(@quiz, "quizzes", "quizzes")
+          js_bundle :quiz_show
+          css_bundle :quizzes, :learning_outcomes
         end
       end
       @padless = true

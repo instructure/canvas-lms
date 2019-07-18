@@ -62,6 +62,9 @@ class GradebooksController < ApplicationController
 
     add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url,
                                                          @presenter.student_id))
+
+    js_bundle :grade_summary, :rubric_assessment
+    css_bundle :grade_summary
     gp_id = nil
     if grading_periods?
       @grading_periods = active_grading_periods_json

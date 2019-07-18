@@ -119,9 +119,6 @@
   <% provide_blank :right_side %>
 <% end %>
 
-<% js_bundle :quiz_show %>
-<% css_bundle :quizzes, :learning_outcomes %>
-
 <div id="quiz_show">
   <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
   <div class="header-bar">

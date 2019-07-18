@@ -52,10 +52,6 @@
   <div style="width: 600px; margin: 10px auto;">
   <h2><%= @topic.title %></h2>
 <% end %>
-<%
-  js_bundle :discussion
-  css_bundle :tinymce, :discussions, :learning_outcomes
-%>
 
 <% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
   <div id="discussion-managebar" class="toolbarView">
