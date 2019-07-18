@@ -21,8 +21,8 @@
 
 <% css_bundle :quizzes %>
 <% js_bundle :question_banks %>
-<% content_for :stylesheets do %>
-  <style>
+
+<style>
   .question_bank {
     padding-bottom: 10px;
   }
@@ -50,8 +50,7 @@
     padding-<%= direction('left') %>: 20px;
     font-size: 0.8em;
   }
-  </style>
-<% end %>
+</style>
 
 <% provide :right_side do %>
   <% if !@context.is_a?(User) && @context.grants_right?(@current_user, session, :manage_assignments) %>

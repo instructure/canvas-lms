@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-<%
-  content_for :right_side, render(:partial => "assignment_sidebar")
-%>
-<% content_for :stylesheets do %>
-  <style>
-    #right-side-wrapper {
-      height: 100%;
-    }
-  </style>
-<% end %>
+
+<style>
+  #right-side-wrapper {
+    height: 100%;
+  }
+</style>
+
+<% provide :page_title, @assignment.title %>
+<% provide_blank :auto_discovery %>
+<% provide :right_side, render(:partial => "assignment_sidebar") %>
 
 <% if @locked && !@locked[:can_view] %>
   <% js_bundle :module_sequence_footer %>

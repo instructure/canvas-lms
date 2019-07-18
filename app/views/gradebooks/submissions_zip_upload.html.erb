@@ -42,7 +42,6 @@
   </a>
 <% end %>
 
-<% content_for :stylesheets do %>
 <style>
 #student_list {
   list-style-type: none;
@@ -78,7 +77,6 @@
   background-position: 3px 6px;
 }
 </style>
-<% end %>
 
 <h2><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %></h2>
 <h3 style="margin-top: 5px;"><%= t('headers.attached_files', "Attached files to the following user submissions") %></h3>

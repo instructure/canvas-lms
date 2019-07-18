@@ -34,7 +34,7 @@
 
 <% js_bundle :edit_rubric %>
 <% css_bundle :learning_outcomes %>
-<% content_for :stylesheets do %>
+
   <style>
     #rubrics .find_rubric_link {
       display: none;
@@ -46,7 +46,7 @@
       height: 100%;
     }
   </style>
-<% end %>
+
 <% js_bundle 'legacy/rubrics_show' %>
 <h1><%= @actual_rubric.title %></h1>
 <div id="rubrics" class="raw_listing">

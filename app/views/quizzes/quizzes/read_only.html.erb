@@ -55,7 +55,7 @@
     <% end %>
   <% end %>
 </div>
-<% content_for :stylesheets do %>
+
 <style>
 #questions .question_holder .display_question .move {
   display: none;
@@ -68,7 +68,6 @@
 }
 
 </style>
-<% end %>
 
 <%= render :partial => "question_teaser", :object => nil, :locals => {:editing => true } %>
 <%= render :partial => "display_question", :object => nil, :locals => {:editing => true } %>

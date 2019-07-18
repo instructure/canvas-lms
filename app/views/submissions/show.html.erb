@@ -70,13 +70,12 @@
   add_crumb(user_crumb_name)
   @active_tab = "assignments"
 %>
-<% content_for :stylesheets do %>
+
   <style>
     .rubric {
       max-width: 600px;
     }
   </style>
-<% end %>
 
 <% if @assignment.omit_from_final_grade %>
   <div class="alert alert-info omit-from-final-warning">

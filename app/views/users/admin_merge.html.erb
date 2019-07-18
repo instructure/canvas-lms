@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t('titles.merge_users', 'Merge User Accounts') %><% end %>
-<% content_for :stylesheets do %>
+<% provide :page_title do %><%= t('titles.merge_users', 'Merge User Accounts') %><% end %>
+
 <style>
 .merge_results {
   border-collapse: collapse;
@@ -45,7 +45,7 @@
   padding-<%= direction('right') %>: 10px;
 }
 </style>
-<% end %>
+
 <div style="margin-top: 10px;">
   <% if @other_user %>
     <h1><%= t('titles.really_merge', 'Really Merge User Accounts?') %></h1>

@@ -34,20 +34,19 @@
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
 <h1 class='screenreader-only'><%= t(:page_header_title, "Account Settings") %></h1>
-<% content_for :stylesheets do %>
-  <style type="text/css" media="screen">
-    fieldset {
-      margin: 2em 0;
-    }
-    fieldset.nested {
-      margin-top: 0;
-      margin-<%= direction('left') %>: 20px;
-    }
-    legend{
-      font-size: 1.1em;
-    }
-  </style>
-<% end %>
+
+<style type="text/css" media="screen">
+  fieldset {
+    margin: 2em 0;
+  }
+  fieldset.nested {
+    margin-top: 0;
+    margin-<%= direction('left') %>: 20px;
+  }
+  legend{
+    font-size: 1.1em;
+  }
+</style>
 
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>

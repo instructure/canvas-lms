@@ -37,7 +37,7 @@
     </ul>
   </div>
 <% end %>
-<% content_for :stylesheets do %>
+
 <style>
 .service_types {
   font-size: 1.2em;
@@ -78,7 +78,7 @@
   padding-<%= direction('right') %>: 5px;
 }
 </style>
-<% end %>
+
 <h1><%= t('headings.registered_services', %{Registered Services}) %></h1>
 <a href="<%= settings_profile_path %>" class="profile_url" style="display: none;">&nbsp;</a>
 <p>

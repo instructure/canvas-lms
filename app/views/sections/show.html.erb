@@ -33,7 +33,6 @@
   <a href="<%= context_url(@context, :context_settings_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
 <% end %>
 
-<% content_for :stylesheets do %>
 <style>
 #course_form .course_form {
   display: none;
@@ -120,7 +119,7 @@ h3 .tally {
   text-align: <%= direction('left') %>;
 }
 </style>
-<% end %>
+
 <%= form_for @section, :url => context_url(@context, :context_section_url, @section), :html => {:id => "edit_section_form", :style => "display: none;"} do |f| %>
 <table class="formtable">
   <tr>

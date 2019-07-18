@@ -40,7 +40,6 @@
   </div>
 <% end %>
 
-<% content_for :stylesheets do %>
 <style>
 #outcomes th {
   background-color: #444;
@@ -80,7 +79,7 @@
   text-align: <%= direction('left') %>;
 }
 </style>
-<% end %>
+
 <% js_bundle 'legacy/user_outcome_results' %>
 
 <h1 class="screenreader-only"><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %></h1>

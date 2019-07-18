@@ -50,7 +50,7 @@
     </div>
   <% end %>
   <h2><%= @user.short_name %></h2>
-<% content_for :stylesheets do %>
+
 <style type="text/css" media="screen">
   #user-info-fieldsets{
     margin-bottom: 2em;
@@ -63,7 +63,6 @@
     line-height: 1.0em;
   }
 </style>
-<% end %>
 
 <% css_bundle :roster_user, :context_list, :pairing_code %>
 

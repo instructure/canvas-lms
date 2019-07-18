@@ -28,7 +28,7 @@
 <% js_bundle :edit_rubric %>
 <% css_bundle :learning_outcomes %>
 <% css_bundle :proficiency_table %>
-<% content_for :stylesheets do %>
+
   <style>
     #rubrics .find_rubric_link {
       display: none;
@@ -37,7 +37,7 @@
       height: 100%;
     }
   </style>
-<% end %>
+
 <% js_bundle 'legacy/rubrics_index' %>
 <h1>
   <% case @context.class.to_s %>
