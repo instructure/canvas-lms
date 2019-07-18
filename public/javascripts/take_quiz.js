@@ -506,7 +506,6 @@ import 'compiled/behaviors/quiz_selectmenu'
       .delegate(":checkbox,:radio", 'change', function(event) {
         var $answer = $(this).parents(".answer");
         if (lastAnswerSelected == $answer[0]) {
-          $answer.find(":checkbox,:radio").blur();
           quizSubmission.updateSubmission();
         }
       })
