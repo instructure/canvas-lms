@@ -121,7 +121,7 @@ import 'jqueryui/sortable'
 
             var val = +calcCmd.computeValue(formula_text).toPrecision(precision);
             var rounder = Math.pow(10, parseInt(finds.round.val(), 10) || 0) || 1;
-            res = "= " + stripZeros((Math.round(val * rounder) / rounder).toPrecision(precision));
+            res = "= " + stripZeros(I18n.n((Math.round(val * rounder) / rounder).toPrecision(precision)));
           } catch(e) {
             res = e.toString();
           }
