@@ -1913,9 +1913,21 @@ test('shows an error when the gateway times out', function() {
   sandbox.stub(SpeedGrader.EG, 'domReady')
   ENV.assignment_title = 'Assignment Title'
   SpeedGrader.setup()
-  const message =
-    'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "Assignment Title" to load SpeedGrader.'
+  const message = [
+    'Something went wrong. Please try refreshing the page. If the problem persists, you can try',
+    'loading a single student group in SpeedGrader by using the Large Course setting.'
+  ].join(' ')
   strictEqual($('#speed_grader_timeout_alert').text(), message)
+  SpeedGrader.teardown()
+})
+
+test('links to the course settings page', () => {
+  sandbox.stub(SpeedGrader.EG, 'domReady')
+  ENV.assignment_title = 'Assignment Title'
+  SpeedGrader.setup()
+  const $link = $('#speed_grader_timeout_alert a')
+  const url = new URL($link[0].href)
+  strictEqual(url.pathname, '/courses/29/settings')
   SpeedGrader.teardown()
 })
 

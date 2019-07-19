@@ -44,9 +44,7 @@ import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
 import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
 import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import View from '@instructure/ui-layout/lib/components/View'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
@@ -3558,18 +3556,25 @@ function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
   EG.setInitiallyLoadedStudent()
 }
 
+function buildAlertMessage() {
+  const alertMessage = I18n.t(
+    'Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.',
+    {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]}
+  )
+  return {__html: alertMessage.string}
+}
+
 function speedGraderJSONErrorFn(data, _xhr, _textStatus, _errorThrown) {
   if (data.status === 504) {
     const alertProps = {
       variant: 'error',
       dismissible: false
     }
-    const alertMessage = I18n.t(
-      'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "%{assignmentTitle}" to load SpeedGrader.',
-      {assignmentTitle: ENV.assignment_title}
-    )
+
     ReactDOM.render(
-      <Alert {...alertProps}>{alertMessage}</Alert>,
+      <Alert {...alertProps}>
+        <span dangerouslySetInnerHTML={buildAlertMessage()} />
+      </Alert>,
       document.getElementById('speed_grader_timeout_alert')
     )
   }
