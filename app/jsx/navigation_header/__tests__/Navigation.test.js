@@ -19,15 +19,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Navigation from 'jsx/navigation_header/Navigation'
 
-$(document.body).append('<div id="holder">')
-const componentHolder = document.getElementById('holder')
-
-const renderComponent = () => ReactDOM.render(<Navigation />, componentHolder)
-
-let $inbox_data
 describe('GlobalNavigation', () => {
+  let componentHolder, $inbox_data
+
+  function renderComponent() {
+    ReactDOM.render(<Navigation />, componentHolder)
+  }
+
   beforeEach(() => {
     fetch.resetMocks()
+
+    componentHolder = document.createElement('div')
+    document.body.appendChild(componentHolder)
     // Need to setup the global nav stuff we are testing
     $inbox_data = $(`
     <a
@@ -46,7 +49,7 @@ describe('GlobalNavigation', () => {
 
   afterEach(() => {
     ReactDOM.unmountComponentAtNode(componentHolder)
-    $('#holder').remove()
+    componentHolder.remove()
     $inbox_data.remove()
   })
 
