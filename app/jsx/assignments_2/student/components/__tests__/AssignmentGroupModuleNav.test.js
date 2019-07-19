@@ -19,7 +19,7 @@
 import AssignmentGroupModuleNav from '../AssignmentGroupModuleNav'
 import {mockAssignment} from '../../test-utils'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 describe('AssignmentGroupModuleNav', () => {
   it('renders module and assignment group links correctly', () => {

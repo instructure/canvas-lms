@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import EditableRichText from '../EditableRichText'
 
 it('renders the value in view mode', () => {
@@ -82,7 +82,7 @@ it('shows the placeholder when value is all whitespace', () => {
 })
 
 it('shows the content and not the placeholder when value is all whitespace and readOnly=true', () => {
-  const {getByText, queryByText} = render(
+  const {getAllByText, queryByText} = render(
     <EditableRichText
       mode="view"
       value="<p>&nbsp;</p>"
@@ -95,6 +95,6 @@ it('shows the content and not the placeholder when value is all whitespace and r
   )
   expect(queryByText('the placeholder')).toBeNull()
   expect(
-    getByText((_content, element) => /<p>&nbsp;<\/p>/.test(element.innerHTML))
+    getAllByText((_content, element) => /<p>&nbsp;<\/p>/.test(element.innerHTML))[0]
   ).toBeInTheDocument()
 })

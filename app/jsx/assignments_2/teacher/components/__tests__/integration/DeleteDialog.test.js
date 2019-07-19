@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, wait, waitForElement} from 'react-testing-library'
+import {fireEvent, wait, waitForElement} from '@testing-library/react'
 import {mockAssignment, itBehavesLikeADialog, saveAssignmentResult} from '../../../test-utils'
 import {renderTeacherView} from './integration-utils'
 
@@ -54,13 +54,13 @@ describe('assignments 2 delete dialog', () => {
 
   it('reports errors', async () => {
     const assignment = mockAssignment()
-    const {getByTestId, getByText} = await openDeleteDialog(assignment, [
+    const {getByTestId, getAllByText} = await openDeleteDialog(assignment, [
       saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}, 'well rats')
     ])
     const reallyDeleteButton = await waitForElement(() =>
       getByTestId('delete-dialog-confirm-button')
     )
     fireEvent.click(reallyDeleteButton)
-    expect(await waitForElement(() => getByText(/unable to delete/i))).toBeInTheDocument()
+    expect(await waitForElement(() => getAllByText(/unable to delete/i)[0])).toBeInTheDocument()
   })
 })

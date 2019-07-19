@@ -17,7 +17,7 @@
  */
 import $ from 'jquery'
 import * as uploadFileModule from '../../../shared/upload_file'
-import {fireEvent, render, wait, waitForElement} from 'react-testing-library'
+import {fireEvent, render, wait, waitForElement} from '@testing-library/react'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 import {singleAttachment, submissionGraphqlMock} from '../test-utils'
@@ -81,7 +81,7 @@ describe('SubmissionIDQuery', () => {
   it('displays uploaded files', async () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
-    const {container, getByText} = render(
+    const {container, getAllByText} = render(
       <MockedProvider mocks={mocks} addTypename>
         <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
@@ -94,7 +94,7 @@ describe('SubmissionIDQuery', () => {
     uploadFiles(fileInput, [file])
 
     expect(
-      await waitForElement(() => getByText(singleAttachment().displayName))
+      await waitForElement(() => getAllByText(singleAttachment().displayName)[0])
     ).toBeInTheDocument()
   })
 
@@ -121,7 +121,7 @@ describe('SubmissionIDQuery', () => {
       {type: 'throw', value: 'Error uploading file to Canvas API'}
     ]
 
-    const {getByTestId, getByText} = render(
+    const {getByTestId, getAllByText} = render(
       <MockedProvider mocks={mocks} addTypename>
         <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
@@ -132,7 +132,7 @@ describe('SubmissionIDQuery', () => {
     uploadFiles(fileInput, [file])
 
     await wait(() => {
-      expect(getByText('Error updating submission draft')).toBeInTheDocument()
+      expect(getAllByText('Error updating submission draft')[0]).toBeInTheDocument()
     })
   })
 
@@ -140,7 +140,7 @@ describe('SubmissionIDQuery', () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     mocks[0].error = new Error('aw shucks')
-    const {getByTestId, getByText} = render(
+    const {getByTestId, getAllByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
         <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
@@ -151,7 +151,7 @@ describe('SubmissionIDQuery', () => {
     uploadFiles(fileInput, [file])
 
     await wait(() => {
-      expect(getByText('Error updating submission draft')).toBeInTheDocument()
+      expect(getAllByText('Error updating submission draft')[0]).toBeInTheDocument()
     })
   })
 
@@ -179,7 +179,7 @@ describe('SubmissionIDQuery', () => {
     uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
 
     mocks[1].error = new Error('aw shucks')
-    const {getByTestId, getByText} = render(
+    const {getByTestId, getAllByText} = render(
       <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={mocks} addTypename>
         <SubmissionIDQuery assignmentLid="22" />
       </MockedProvider>
@@ -192,7 +192,7 @@ describe('SubmissionIDQuery', () => {
     const submitButton = await waitForElement(() => getByTestId('submit-button'))
     fireEvent.click(submitButton)
     await wait(() => {
-      expect(getByText('Error sending submission')).toBeInTheDocument()
+      expect(getAllByText('Error sending submission')[0]).toBeInTheDocument()
     })
   })
 

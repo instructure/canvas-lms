@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {waitForElement} from 'react-testing-library'
+import {waitForElement} from '@testing-library/react'
 import {mockAssignment} from '../../test-utils'
 import {renderTeacherQuery} from './integration/integration-utils'
 
 describe('TeacherQuery', () => {
   it('renders a loading spinner and then the assignment with data from the query', async () => {
     const assignment = mockAssignment()
-    const {getByText, getByTitle} = renderTeacherQuery(assignment)
+    const {getAllByText, getByTitle} = renderTeacherQuery(assignment)
     expect(getByTitle('Loading...')).toBeInTheDocument()
-    expect(await waitForElement(() => getByText(assignment.name))).toBeInTheDocument()
+    expect(await waitForElement(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
   })
 
   /* eslint-disable jest/no-disabled-tests */

@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import EditableNumber from '../EditableNumber'
 
 describe('EditableNumber', () => {
   it('renders the value in view mode', () => {
-    const {getByText} = render(
+    const {getByText, getAllByText} = render(
       <EditableNumber
         mode="view"
         onChange={() => {}}
@@ -31,7 +31,7 @@ describe('EditableNumber', () => {
         value="17"
       />
     )
-    expect(getByText('17')).toBeInTheDocument()
+    expect(getAllByText('17')[0]).toBeInTheDocument()
     expect(getByText('Pick a number')).toBeInTheDocument()
   })
 

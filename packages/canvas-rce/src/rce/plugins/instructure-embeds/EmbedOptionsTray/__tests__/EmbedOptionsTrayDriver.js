@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByText, fireEvent, queryByLabelText} from 'dom-testing-library'
+import {getAllByText, fireEvent, queryByLabelText} from '@testing-library/dom'
 
 export default class EmbedOptionsTrayDriver {
   static find() {
@@ -44,7 +44,7 @@ export default class EmbedOptionsTrayDriver {
   }
 
   get $displayAsField() {
-    return getByText(this.$element, 'Display Options').closest('fieldset')
+    return getAllByText(this.$element, 'Display Options')[0].closest('fieldset')
   }
 
   get $doneButton() {

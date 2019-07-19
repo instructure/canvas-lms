@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import AssignmentName from '../AssignmentName'
 import AssignmentFieldValidator from '../../../AssignentFieldValidator'
 
@@ -45,9 +45,9 @@ function renderAssignmentName(props) {
 
 describe('AssignmentName', () => {
   it('renders the value in view mode', () => {
-    const {getByText} = renderAssignmentName()
+    const {getAllByText} = renderAssignmentName()
 
-    expect(getByText('the name')).toBeInTheDocument()
+    expect(getAllByText('the name')[0]).toBeInTheDocument()
   })
 
   it('renders the value in edit mode', () => {

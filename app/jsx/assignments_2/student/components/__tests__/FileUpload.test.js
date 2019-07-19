@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import FileUpload from '../FileUpload'
-import {fireEvent, render} from 'react-testing-library'
+import {fireEvent, render} from '@testing-library/react'
 import {
   mockAssignment,
   mockSubmission,
@@ -66,7 +66,7 @@ describe('FileUpload', () => {
   })
 
   it('renders the submission draft files if there are any', async () => {
-    const {getByTestId, getByText} = render(
+    const {getByTestId, getAllByText} = render(
       <MockedProvider>
         <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
@@ -74,7 +74,7 @@ describe('FileUpload', () => {
     const uploadRender = getByTestId('non-empty-upload')
 
     mockedSubmission.submissionDraft.attachments.forEach(attachment => {
-      expect(uploadRender).toContainElement(getByText(attachment.displayName))
+      expect(uploadRender).toContainElement(getAllByText(attachment.displayName)[0])
     })
   })
 
@@ -169,13 +169,13 @@ describe('FileUpload', () => {
   it('does not ellide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
     mockedSubmission.submissionDraft.attachments[0].displayName = filename
-    const {getByText} = render(
+    const {getAllByText} = render(
       <MockedProvider>
         <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
       </MockedProvider>
     )
 
-    expect(getByText(filename)).toBeInTheDocument()
+    expect(getAllByText(filename)[0]).toBeInTheDocument()
   })
 
   it('displays allowed extensions in the upload box', async () => {

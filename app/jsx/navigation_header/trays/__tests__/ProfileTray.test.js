@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, cleanup} from 'react-testing-library'
+import {render, cleanup} from '@testing-library/react'
 import ProfileTray from '../ProfileTray'
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='

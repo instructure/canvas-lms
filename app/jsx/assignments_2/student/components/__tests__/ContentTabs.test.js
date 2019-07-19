@@ -20,7 +20,7 @@ import ContentTabs from '../ContentTabs'
 import {mockAssignment, mockSubmission} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 describe('ContentTabs', () => {
   it('renders the content tabs', () => {
@@ -33,7 +33,7 @@ describe('ContentTabs', () => {
   })
 
   it('renders the tabs in the correct order', () => {
-    const {getAllByRole, getByText} = render(
+    const {getAllByRole, getByText, getAllByText} = render(
       <MockedProvider>
         <ContentTabs assignment={mockAssignment()} submission={mockSubmission()} />
       </MockedProvider>
@@ -42,8 +42,8 @@ describe('ContentTabs', () => {
 
     expect(tabs).toHaveLength(3)
     expect(tabs[0]).toContainElement(getByText('Attempt 1'))
-    expect(tabs[1]).toContainElement(getByText('Comments'))
-    expect(tabs[2]).toContainElement(getByText('Rubric'))
+    expect(tabs[1]).toContainElement(getAllByText('Comments')[0])
+    expect(tabs[2]).toContainElement(getAllByText('Rubric')[0])
   })
 
   it('titles the attempt tab as Attempt 1 on a brand new submission', () => {

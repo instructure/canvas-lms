@@ -17,7 +17,7 @@
  */
 
 import sinon from 'sinon'
-import {wait} from 'react-testing-library'
+import {wait} from '@testing-library/react'
 
 import GradeOverride from '../../../../grading/entities/GradeOverride'
 import GradeOverrideInfo from '../../../../grading/GradeEntry/GradeOverrideInfo'

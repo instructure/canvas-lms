@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import {UploadMedia} from '../index'
 import EmbedPanel from '../EmbedPanel'
 
 describe('UploadMedia', () => {
   it('calls onDismiss prop when closing', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<UploadMedia editor={{}} onDismiss={handleDismiss} />)
+    const {getAllByText} = render(<UploadMedia editor={{}} onDismiss={handleDismiss} />)
 
-    const closeBtn = getByText('Close')
+    const closeBtn = getAllByText('Close')[0]
     fireEvent.click(closeBtn)
     expect(handleDismiss).toHaveBeenCalled()
   })

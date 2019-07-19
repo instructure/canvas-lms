@@ -18,7 +18,7 @@
 
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
-import {fireEvent, render, waitForElement} from 'react-testing-library'
+import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {legacyMockSubmission, mockAssignment, mockComments} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'

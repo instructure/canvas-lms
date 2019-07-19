@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import OverrideAttempts from '../OverrideAttempts'
 

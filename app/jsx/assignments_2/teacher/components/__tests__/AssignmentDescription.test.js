@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import apiUserContent from 'compiled/str/apiUserContent'
 import AssignmentDescription from '../AssignmentDescription'
 

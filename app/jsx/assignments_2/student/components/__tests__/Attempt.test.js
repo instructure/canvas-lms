@@ -18,7 +18,7 @@
 import Attempt from '../Attempt'
 import {mockAssignment, mockSubmission} from '../../test-utils'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 describe('unlimited attempts', () => {
   it('renders correctly', () => {

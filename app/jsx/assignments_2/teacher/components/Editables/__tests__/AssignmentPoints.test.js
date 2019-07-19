@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import AssignmentPoints from '../AssignmentPoints'
 import AssignmentFieldValidator from '../../../AssignentFieldValidator'
 
@@ -45,9 +45,9 @@ function renderAssignmentPoints(props) {
 
 describe('AssignmentPoints', () => {
   it('renders the value in view mode', () => {
-    const {getByText} = renderAssignmentPoints()
+    const {getAllByText} = renderAssignmentPoints()
 
-    expect(getByText('1432')).toBeInTheDocument()
+    expect(getAllByText('1432')[0]).toBeInTheDocument()
   })
 
   it('renders the value in edit mode', () => {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitForDomChange} from 'react-testing-library'
+import {render, waitForDomChange} from '@testing-library/react'
 import SelectableText from '../SelectableText'
 
 const options = [

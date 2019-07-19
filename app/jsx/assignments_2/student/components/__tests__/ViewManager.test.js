@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, wait} from 'react-testing-library'
+import {fireEvent, render, wait} from '@testing-library/react'
 import {mockGraphqlQueryResults, mockSubmissionHistory} from '../../test-utils'
 import React from 'react'
 import ViewManager from '../ViewManager'

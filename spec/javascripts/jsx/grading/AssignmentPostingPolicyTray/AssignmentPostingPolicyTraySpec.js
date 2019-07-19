@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {waitForElement, wait} from 'react-testing-library'
+import {waitForElement, wait} from '@testing-library/react'
 
 import AssignmentPostingPolicyTray from 'jsx/grading/AssignmentPostingPolicyTray'
 import * as Api from 'jsx/grading/AssignmentPostingPolicyTray/Api'

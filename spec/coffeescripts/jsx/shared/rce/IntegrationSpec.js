@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {wait} from 'dom-testing-library'
+import {wait} from '@testing-library/dom'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import RCELoader from 'jsx/shared/rce/serviceRCELoader'
 import $ from 'jquery'

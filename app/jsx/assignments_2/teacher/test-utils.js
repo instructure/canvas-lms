@@ -17,7 +17,7 @@
  */
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
-import {fireEvent, wait, waitForElement} from 'react-testing-library'
+import {fireEvent, wait, waitForElement} from '@testing-library/react'
 import {SAVE_ASSIGNMENT} from './assignmentData'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.

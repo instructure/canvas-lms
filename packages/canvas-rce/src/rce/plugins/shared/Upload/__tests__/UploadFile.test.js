@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from 'react-testing-library'
+import {render, fireEvent, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {UploadFile, handleSubmit} from '../UploadFile'
 
@@ -42,11 +42,11 @@ describe('UploadFile', () => {
   })
   it('calls onDismiss prop when closing', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(
+    const {getAllByText} = render(
       <UploadFile label="Test" editor={fakeEditor} trayProps={trayProps} onDismiss={handleDismiss} panels={['COMPUTER', 'URL']} />
     )
 
-    const closeBtn = getByText('Close')
+    const closeBtn = getAllByText('Close')[0]
     fireEvent.click(closeBtn)
     expect(handleDismiss).toHaveBeenCalled()
   })

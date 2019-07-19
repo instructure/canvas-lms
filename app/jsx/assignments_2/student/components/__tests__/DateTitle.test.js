@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 
 import {mockAssignment} from '../../test-utils'
 import DateTitle from '../DateTitle'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')

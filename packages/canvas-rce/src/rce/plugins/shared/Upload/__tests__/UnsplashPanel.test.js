@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, wait} from 'react-testing-library'
+import {render, fireEvent, act, wait} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UnsplashPanel from '../UnsplashPanel'
 
@@ -244,13 +244,13 @@ describe('UnsplashPanel', () => {
     const fakeSource = {
       searchUnsplash: jest.fn().mockResolvedValue(getSampleUnsplashResults())
     }
-    const {getByLabelText, getByText} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
+    const {getByLabelText, getAllByText} = render(<UnsplashPanel source={fakeSource} setUnsplashData={() => {}}/>)
     const selectBox = getByLabelText('Search Term')
     act(() => {
       userEvent.type(selectBox, 'kittens')
     })
     let nextPage
-    await wait(() => (nextPage = getByText('Next Page')))
+    await wait(() => (nextPage = getAllByText('Next Page')[0]))
     expect(nextPage).toBeVisible()
 
   }

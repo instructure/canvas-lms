@@ -28,7 +28,7 @@ import {
   singleComment
 } from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
-import {render, waitForElement, fireEvent} from 'react-testing-library'
+import {render, waitForElement, fireEvent} from '@testing-library/react'
 
 describe('CommentsTab', () => {
   beforeAll(() => {

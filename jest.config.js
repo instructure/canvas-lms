@@ -45,8 +45,8 @@ module.exports = {
     '<rootDir>/jest/jest-setup.js'
   ],
   setupFilesAfterEnv: [
-    'react-testing-library/cleanup-after-each',
-    'jest-dom/extend-expect',
+    '@testing-library/react/cleanup-after-each',
+    '@testing-library/jest-dom/extend-expect',
     './app/jsx/__tests__/ValidatedApolloCleanup'
   ],
   testMatch: [

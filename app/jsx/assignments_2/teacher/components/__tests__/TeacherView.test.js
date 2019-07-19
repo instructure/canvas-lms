@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, waitForElement} from 'react-testing-library'
+import {fireEvent, waitForElement} from '@testing-library/react'
 import {
   mockAssignment,
   findInputForLabel,
@@ -33,13 +33,15 @@ describe('TeacherView', () => {
   describe('basic TeacherView stuff', () => {
     it('shows the assignment', async () => {
       const assignment = mockAssignment()
-      const {getByText} = await renderTeacherView(assignment)
-      expect(await waitForElement(() => getByText(assignment.name))).toBeInTheDocument()
+      const {getByText, getAllByText} = await renderTeacherView(assignment)
+      expect(await waitForElement(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
       expect(
-        await waitForElement(() => getByText(`${assignment.pointsPossible}`))
+        await waitForElement(() => getAllByText(`${assignment.pointsPossible}`)[0])
       ).toBeInTheDocument()
       expect(await waitForElement(() => getByText('Everyone'))).toBeInTheDocument()
-      expect(await waitForElement(() => getByText('Due:', {exact: false}))).toBeInTheDocument()
+      expect(
+        await waitForElement(() => getAllByText('Due:', {exact: false})[0])
+      ).toBeInTheDocument()
       expect(await waitForElement(() => getByText('Available', {exact: false}))).toBeInTheDocument()
     })
   })
@@ -108,9 +110,13 @@ describe('TeacherView', () => {
 
     it('resets assignment on Cancel', async () => {
       const assignment = mockAssignment({name: 'old name'})
-      const {getByText, getByDisplayValue, getByTestId} = await renderTeacherView(assignment, [], {
-        readOnly: false
-      })
+      const {getByText, getAllByText, getByDisplayValue, getByTestId} = await renderTeacherView(
+        assignment,
+        [],
+        {
+          readOnly: false
+        }
+      )
 
       // put name into edit
       const editNameBtn = closest(getByText('Edit assignment name'), 'button')
@@ -128,14 +134,18 @@ describe('TeacherView', () => {
 
       expect(await waitForNoElement(() => getByText('new name'))).toBe(true)
       expect(await waitForNoElement(() => getByTestId('TeacherFooter'))).toBe(true)
-      expect(getByText('old name')).toBeInTheDocument()
+      expect(getAllByText('old name')[0]).toBeInTheDocument()
     })
 
     it('aborts save if there is an invalid field in the assignment', async () => {
       const assignment = mockAssignment({name: 'old name'})
-      const {getByText, getByDisplayValue, getByTestId} = await renderTeacherView(assignment, [], {
-        readOnly: false
-      })
+      const {getByText, getAllByText, getByDisplayValue, getByTestId} = await renderTeacherView(
+        assignment,
+        [],
+        {
+          readOnly: false
+        }
+      )
 
       // put name into edit
       const editNameBtn = closest(getByText('Edit assignment name'), 'button')
@@ -151,13 +161,13 @@ describe('TeacherView', () => {
       const saveBtn = closest(getByText('Save'), 'button')
       saveBtn.click()
 
-      expect(getByText('You cannot save while there are errors')).toBeInTheDocument()
+      expect(getAllByText('You cannot save while there are errors')[0]).toBeInTheDocument()
     })
 
     it('bypasses update if new value == old', async () => {
       // this spec is here to exercise 1 line of code
       const assignment = mockAssignment({name: 'old name'})
-      const {getByText, getByDisplayValue, queryByTestId} = await renderTeacherView(
+      const {getByText, getAllByText, getByDisplayValue, queryByTestId} = await renderTeacherView(
         assignment,
         [],
         {
@@ -173,7 +183,7 @@ describe('TeacherView', () => {
       const nameInput = getByDisplayValue('old name')
       fireEvent.keyDown(nameInput, {key: 'Escape', code: 27})
 
-      expect(getByText('old name')).toBeInTheDocument()
+      expect(getAllByText('old name')[0]).toBeInTheDocument()
       // assignment is not dirty -> no footer
       expect(queryByTestId('TeacherFooter')).toBeNull()
     })

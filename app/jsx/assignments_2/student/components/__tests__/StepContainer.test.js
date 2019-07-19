@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 import {legacyMockSubmission, mockAssignment} from '../../test-utils'
 import StepContainer from '../StepContainer'
@@ -49,11 +49,11 @@ it('will render collapsed label if steps is collapsed', () => {
   const submission = legacyMockSubmission()
   assignment.lockInfo.isLocked = false
   submission.state = 'submitted'
-  const {getByText, getByTestId} = render(
+  const {getAllByText, getByTestId} = render(
     <StepContainer assignment={assignment} submission={submission} isCollapsed />
   )
 
-  expect(getByTestId('collapsed-step-container')).toContainElement(getByText('Submitted'))
+  expect(getByTestId('collapsed-step-container')).toContainElement(getAllByText('Submitted')[0])
 })
 
 it('will not render collapsed label if steps is not collapsed', () => {

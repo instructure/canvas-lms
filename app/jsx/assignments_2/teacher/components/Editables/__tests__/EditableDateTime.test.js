@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import {toLocaleString, browserTimeZone} from '@instructure/ui-i18n/lib/DateTime'
 import moment from 'moment'
 
@@ -57,14 +57,14 @@ describe('EditableDateTime', () => {
 
   it('renders in edit mode', () => {
     const value = '2019-04-11T13:00:00-05:00'
-    const {getByText, getByLabelText} = renderEditableDateTime({mode: 'edit', value})
+    const {getAllByText, getByLabelText} = renderEditableDateTime({mode: 'edit', value})
 
     const dtstring = toLocaleString(value, locale, timeZone, 'LLL')
     const datestr = toLocaleString(value, locale, timeZone, 'LL')
     const timestr = toLocaleString(value, locale, timeZone, 'LT')
     expect(getByLabelText('Date').value).toBe(datestr)
     expect(getByLabelText('Time').value).toBe(timestr)
-    expect(getByText(dtstring)).toBeInTheDocument()
+    expect(getAllByText(dtstring)[0]).toBeInTheDocument()
   })
 
   it('exits edit mode and reverts to previous value on Escape', () => {

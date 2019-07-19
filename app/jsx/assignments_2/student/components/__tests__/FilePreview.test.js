@@ -17,7 +17,7 @@
  */
 
 import FilePreview from '../FilePreview'
-import {fireEvent, render} from 'react-testing-library'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 
 const files = [

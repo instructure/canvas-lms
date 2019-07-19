@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import LinkSet from '../LinkSet'
 
 function renderComponent(props) {

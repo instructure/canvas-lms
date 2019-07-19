@@ -20,7 +20,7 @@ import React from 'react'
 // I18n and tz needed to replicate what FriendlyDatetime does in formatting
 import I18n from 'i18n!assignments_2'
 import tz from 'timezone'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import OverrideSummary from '../OverrideSummary'
 
@@ -37,17 +37,17 @@ describe('OverrideSummary', () => {
       submissionTypes: ['online_upload', 'online_url'],
       allowedAttempts: 1
     })
-    const {getByText, getByTestId} = render(<OverrideSummary override={override} />)
+    const {getAllByText, getByTestId} = render(<OverrideSummary override={override} />)
     expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
     expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
 
     const due = `Due: ${tz.format(dueAt, I18n.t('#date.formats.full'))}`
-    expect(getByText(due)).toBeInTheDocument()
+    expect(getAllByText(due)[0]).toBeInTheDocument()
 
     const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
     const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.short'))}`
-    expect(getByText(unlock)).toBeInTheDocument()
-    expect(getByText(lock)).toBeInTheDocument()
+    expect(getAllByText(unlock)[0]).toBeInTheDocument()
+    expect(getAllByText(lock)[0]).toBeInTheDocument()
 
     expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
   })
@@ -81,10 +81,10 @@ describe('OverrideSummary', () => {
       submissionTypes: ['online_upload', 'online_url'],
       allowedAttempts: 1
     })
-    const {getByText} = render(<OverrideSummary override={override} />)
+    const {getAllByText} = render(<OverrideSummary override={override} />)
 
     const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
-    expect(getByText(`Available after ${unlock}`)).toBeInTheDocument()
+    expect(getAllByText(`Available after ${unlock}`)[0]).toBeInTheDocument()
   })
 
   it('renders with only lock date', () => {
@@ -99,9 +99,9 @@ describe('OverrideSummary', () => {
       submissionTypes: ['online_upload', 'online_url'],
       allowedAttempts: 1
     })
-    const {getByText} = render(<OverrideSummary override={override} />)
+    const {getAllByText} = render(<OverrideSummary override={override} />)
 
     const lock = `${tz.format(lockAt, I18n.t('#date.formats.short'))}`
-    expect(getByText(`Available until ${lock}`)).toBeInTheDocument()
+    expect(getAllByText(`Available until ${lock}`)[0]).toBeInTheDocument()
   })
 })

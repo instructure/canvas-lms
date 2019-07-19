@@ -20,7 +20,7 @@ import Header from '../Header'
 import {legacyMockSubmission, mockAssignment} from '../../test-utils'
 import React from 'react'
 import StudentViewContext from '../Context'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 // TODO: is scroll threshold is always 150 in every case, why are we passing
 //       that down as a prop instead of just having it be a constant in the
@@ -163,12 +163,12 @@ it('will render the latest grade instead of the displayed submissions grade', ()
   assignment.gradingType = 'points'
   assignment.pointsPossible = 150
 
-  const {queryByText} = render(
+  const {queryByText, queryAllByText} = render(
     <StudentViewContext.Provider value={{latestSubmission}}>
       <Header scrollThreshold={150} assignment={assignment} submission={displayedSubmission} />
     </StudentViewContext.Provider>
   )
 
-  expect(queryByText('147/150 Points')).toBeInTheDocument()
+  expect(queryAllByText('147/150 Points')[0]).toBeInTheDocument()
   expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })

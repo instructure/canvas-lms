@@ -17,7 +17,7 @@
  */
 
 import React, {useRef} from 'react'
-import {fireEvent, render} from 'react-testing-library'
+import {fireEvent, render} from '@testing-library/react'
 
 import {buildImage} from '../../../../../sidebar/sources/fake'
 import ImageList from '..'
