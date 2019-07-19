@@ -10,6 +10,37 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 - This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
 <div class="changelog"></div>
+## 2019-07-31
+### Additions
+| OAuth2 | File |     |
+|----------------------|----------------------|--------------------------|
+| [OAuth2 Overview] | Description | Added link to LTI Advantage documentation and section for accessing LTI Advantage Services |
+
+[OAuth2 Overview]: file.oauth.html
+
+<p></p>
+
+| Resources | Function |     |
+|----------------------|----------------------|--------------------------|
+| [Assignments API] | List Assignments Endpoint | Added post_to_sis parameter |
+
+[Assignments API]: assignments.html
+
+<p></p>
+
+| SIS | File |  |
+|----------------------|----------------------|--------------------------|
+| [SIS CSV Format] | Logins.csv | Added file |
+
+[SIS CSV Format]: file.sis_csv.html
+
+### Changes
+| SIS | File |  |
+|----------------------|----------------------|--------------------------|
+| [SIS CSV Format] | Courses.csv | Clarified description for account_id to specify that new courses will be attached to the root account if not specified |
+
+[SIS CSV Format]: file.sis_csv.html
+
 ## 2019-07-13
 ### Additions
 | Basics | File |  |
@@ -78,15 +109,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 | [File Uploads] | Uploading via POST Process | Step 3: Deprecated POST requests in favor of GET requests for forward compatibility
 
 [File Uploads]: file.file_uploads.html
-
-## 2019-05-11
-### Additions
-| Resources | Function |  |
-|----------------------|----------------------|--------------------------|
-| [Assignments API] | Create an Assignment Endpoint<br><br>Edit an Assignment Endpoint | Added assignment [grader_count], assignment [final_grader_id], assignment [grader_comments_visible_to_graders], assignment [graders_anonymous_to_graders], assignment [graders_names_visible_to_final_grader], assignment [anonymous_grading] parameters
-|  [SIS Imports API]         | Import SIS Data Endpoint | Added diff_row_count_threshold parameter
-|  [Users API]         | Merge User Into Another User Endpoint | Added user merge details and caveats for behaviors relating to avatars, terms of use, communication channels, enrollments, submissions, access tokens, conversations, favorites, and LTI tools
-
-[Assignments API]: assignments.html
-[SIS Imports API]: sis_imports.html
-[Users API]: users.html
