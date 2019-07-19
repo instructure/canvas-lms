@@ -297,6 +297,22 @@ module Lti::Ims
           end
         end
 
+        context 'when previously graded and score not given' do
+          let(:result) { lti_result_model line_item: line_item, user: user, result_score: 100, result_maximum: 200 }
+          let(:params_overrides) { super().except(:scoreGiven, :scoreMaximum) }
+
+          it 'clears the score' do
+            expect(result.submission.score).to eq(100)
+            expect(result.result_score).to eq(100)
+            expect(result.result_maximum).to eq(200)
+            send_request
+            expect(result.reload.result_score).to be_nil
+            expect(result.reload.result_maximum).to be_nil
+            expect(result.submission.reload.score).to be_nil
+          end
+        end
+
+
       end
 
       context 'with invalid params' do

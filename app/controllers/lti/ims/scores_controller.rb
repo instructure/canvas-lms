@@ -165,7 +165,6 @@ module Lti::Ims
             k.to_s.underscore
         end.except(:timestamp, :user_id, :score_given, :score_maximum).to_unsafe_h
         update_params[:extensions] = extract_extensions(update_params)
-        return update_params if ignore_score?
         update_params.merge(result_score: params[:scoreGiven], result_maximum: params[:scoreMaximum])
       end
     end
@@ -198,7 +197,7 @@ module Lti::Ims
     end
 
     def score_submission
-      return unless line_item.assignment_line_item? && (!ignore_score? || ags_extension?)
+      return unless line_item.assignment_line_item?
 
       submission = if new_submission?
         line_item.assignment.submit_homework(user)
@@ -206,14 +205,16 @@ module Lti::Ims
         line_item.assignment.find_or_create_submission(user)
       end
 
-      unless ignore_score?
+      if ignore_score?
+        submission.score = nil
+      else
         submission = line_item.assignment.grade_student(
           user,
           {score: submission_score, grader_id: -tool.id}
         ).first
       end
 
-      unless submission_type.nil? || !SCORE_SUBMISSION_TYPES.include?(submission_type)
+      if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
         submission.submission_type = submission_type
         case submission_type
         when 'none'
@@ -266,10 +267,6 @@ module Lti::Ims
 
     def result_url
       lti_result_show_url(course_id: context.id, line_item_id: line_item.id, id: result.id)
-    end
-
-    def ags_extension?
-      scores_params[:extensions].key?(Lti::Result::AGS_EXT_SUBMISSION)
     end
 
     def submission_type
