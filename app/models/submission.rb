@@ -2679,10 +2679,19 @@ class Submission < ActiveRecord::Base
     return unless assignment.course.post_policies_enabled?
 
     previously_posted = posted_at_before_last_save.present?
+
+    # If this submission is part of an assignment associated with a quiz, the
+    # quiz object might be in a modified/readonly state (due to trying to load
+    # a copy with override dates for this particular student) depending on what
+    # path we took to get here. To avoid a ReadOnlyRecord error, do the actual
+    # posting/hiding on a separate copy of the assignment, then reload our copy
+    # of the assignment to make sure we pick up any changes to the muted status.
     if posted? && !previously_posted
-      assignment.post_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      Assignment.find(assignment_id).post_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      assignment.reload
     elsif !posted? && previously_posted
-      assignment.hide_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      Assignment.find(assignment_id).hide_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      assignment.reload
     end
   end
 end
