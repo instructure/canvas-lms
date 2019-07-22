@@ -132,7 +132,7 @@ module Interfaces::SubmissionInterface
     end
   end
 
-  field :grading_status, String, null: true
+  field :grading_status, Types::SubmissionGradingStatusType, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
   field :late, Boolean, method: :late?, null: true
   field :missing, Boolean, method: :missing?, null: true

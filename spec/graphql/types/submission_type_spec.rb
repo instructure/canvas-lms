@@ -118,7 +118,7 @@ describe Types::SubmissionType do
     end
   end
 
-  describe "submission and grading status" do
+  describe "submissionStatus" do
     before do
       quiz_with_submission
       @quiz_assignment = @quiz.assignment
@@ -127,14 +127,12 @@ describe Types::SubmissionType do
 
     let(:submission_type_quiz) { GraphQLTypeTester.new(@quiz_submission, current_user: @teacher) }
 
-    it "should contain submissionStatus and gradingStatus fields" do
+    it "should contain submissionStatus field" do
       expect(submission_type.resolve("submissionStatus")).to eq "unsubmitted"
-      expect(submission_type.resolve("gradingStatus")).to eq "graded"
     end
 
     it "should preload quiz type assignments" do
       expect(submission_type_quiz.resolve("submissionStatus")).to eq "submitted"
-      expect(submission_type_quiz.resolve("gradingStatus")).to eq "graded"
     end
   end
 
