@@ -1764,9 +1764,13 @@ form.user_content_post_form {
       vertical-align: middle;
       margin-#{direction(right)}: 10px;
     }
-    b {
+    b, div {
       line-height: 28px;
       vertical-align: middle;
+    }
+    i.icon-x {
+      padding-bottom: 3px;
+      margin: 0px;
     }
   }
   .fixed_warning {
