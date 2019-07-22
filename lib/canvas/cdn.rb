@@ -42,7 +42,7 @@ module Canvas
       def add_brotli_to_host_if_supported(request)
         # there is a /br/ folder on the s3 bucket that has evertying we publish,
         # but encoded as brotli instead of gzip
-        "#{config.host}#{'/br' if config.host && supports_brotli?(request)}"
+        "#{config.host}#{'/br' if config.host && config.enabled && supports_brotli?(request)}"
       end
 
       def supports_brotli?(request)
