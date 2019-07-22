@@ -38,7 +38,7 @@ async function createGraphqlMocks(overrides = {}) {
     },
     {
       query: CREATE_SUBMISSION_DRAFT,
-      variables: {id: '1', attempt: 0, fileIds: ['1']}
+      variables: {id: '1', attempt: 1, fileIds: ['1']}
     }
   ]
 

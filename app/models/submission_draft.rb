@@ -27,10 +27,10 @@ class SubmissionDraft < ActiveRecord::Base
   validate :submission_attempt_matches_submission
 
   def submission_attempt_matches_submission
-    root_submission_attempt = self.submission&.attempt || 0
+    current_submission_attempt = self.submission&.attempt || 0
     this_submission_attempt = self.submission_attempt || 0
-    if this_submission_attempt > root_submission_attempt
-      err = 'submission draft attempt cannot be larger then the submission attempt'
+    if this_submission_attempt > (current_submission_attempt + 1)
+      err = 'submission draft cannot be more then one attempt ahead of the current submission'
       errors.add(:submission_draft_attempt, err)
     end
   end

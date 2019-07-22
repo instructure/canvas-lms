@@ -24,7 +24,7 @@ RSpec.describe Types::SubmissionDraftType do
     @submission = submission_model
     @submission_draft = SubmissionDraft.create!(
       submission: @submission,
-      submission_attempt: @submission.attempt
+      submission_attempt: @submission.attempt + 1
     )
   end
 
@@ -58,7 +58,7 @@ RSpec.describe Types::SubmissionDraftType do
 
   it 'returns the submission attempt' do
     submission_draft = resolve_submission_draft
-    expect(submission_draft['submissionAttempt']).to eq(@submission.attempt)
+    expect(submission_draft['submissionAttempt']).to eq(@submission.attempt + 1)
   end
 
   it 'returns the draft attachments' do

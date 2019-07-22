@@ -84,7 +84,7 @@ export default class FileUpload extends Component {
         await this.props.createSubmissionDraft({
           variables: {
             id: this.props.submission.id,
-            attempt: this.props.submission.attempt,
+            attempt: this.props.submission.attempt + 1,
             fileIds: this.getDraftAttachments()
               .map(file => file._id)
               .concat(newFiles.map(file => file.id))

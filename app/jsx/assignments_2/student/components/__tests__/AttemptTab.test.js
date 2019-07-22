@@ -171,7 +171,7 @@ describe('Uploading a file', () => {
   }
 
   const createGraphqlMocks = async () => {
-    const variables = {id: '1', attempt: 0, fileIds: ['1']}
+    const variables = {id: '1', attempt: 1, fileIds: ['1']}
     const mockedResults = await mockQuery(CREATE_SUBMISSION_DRAFT, {}, variables)
     return [
       {
