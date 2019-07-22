@@ -227,7 +227,13 @@ export default class GradebookSettingsModal extends React.Component {
   }
 
   close = () => {
-    this.setState({isOpen: false}, () => {
+    const state = {isOpen: false}
+
+    if (this.props.postPolicies) {
+      state.coursePostPolicy = this.props.postPolicies.coursePostPolicy
+    }
+
+    this.setState(state, () => {
       const latePolicy = {changes: {}, data: undefined, validationErrors: {}}
       // need to reset the latePolicy state _after_ the modal is closed, otherwise
       // the spinner will be visible for a brief moment before the modal closes.
