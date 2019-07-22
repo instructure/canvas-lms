@@ -38,7 +38,8 @@ export default class RequiredValues extends React.Component {
     super(props);
     const public_jwk = JSON.stringify(this.props.toolConfiguration.public_jwk || {}, null, 4)
     this.state = {
-      toolConfiguration: {...this.props.toolConfiguration, public_jwk}
+      toolConfiguration: {...this.props.toolConfiguration, public_jwk},
+      jwkConfig: this.props.toolConfiguration.public_jwk_url ? 'public_jwk_url' : 'public_jwk'
     }
   }
 
