@@ -6574,30 +6574,15 @@ describe Submission do
     describe "#handle_posted_at_changed" do
       context "when posting an individual submission" do
         context "when post policies are enabled" do
-          it "calls post_submissions on the assignment with the posted submission" do
-            expect(@assignment).to receive(:post_submissions).with(hash_including(submission_ids: [submission.id]))
+          it "unmutes the assignment if all submissions are now posted" do
             submission.update!(posted_at: Time.zone.now)
+            expect(@assignment.reload).not_to be_muted
           end
 
-          it "refrains from re-updating the timestamp of the posted submission" do
-            expect(@assignment).to receive(:post_submissions).with(hash_including(skip_updating_timestamp: true))
+          it "does not unmute the assignment if some submissions remain unposted" do
+            @course.enroll_student(User.create!, enrollment_state: "active")
             submission.update!(posted_at: Time.zone.now)
-          end
-
-          it "does not call post_submissions if the submission was already posted" do
-            submission.update!(posted_at: 1.day.ago)
-
-            expect(@assignment).not_to receive(:post_submissions)
-            submission.update!(posted_at: Time.zone.now)
-          end
-        end
-
-        context "when post policies are disabled" do
-          before(:each) { PostPolicy.disable_feature! }
-
-          it "does not call post_submissions on the assignment" do
-            expect(@assignment).not_to receive(:post_submissions)
-            submission.update!(posted_at: Time.zone.now)
+            expect(@assignment.reload).to be_muted
           end
         end
       end
@@ -6606,30 +6591,11 @@ describe Submission do
         before(:each) { submission.update!(posted_at: 1.day.ago) }
 
         context "when post policies are enabled" do
-          it "calls post_submissions on the assignment with the posted submission" do
-            expect(@assignment).to receive(:hide_submissions).with(hash_including(submission_ids: [submission.id]))
-            submission.update!(posted_at: nil)
-          end
+          it "mutes an unmuted assignment when a submission is hidden" do
+            @assignment.post_submissions
 
-          it "refrains from re-updating the timestamp of the posted submission" do
-            expect(@assignment).to receive(:hide_submissions).with(hash_including(skip_updating_timestamp: true))
             submission.update!(posted_at: nil)
-          end
-
-          it "does not call hide_submissions if the submission was already posted" do
-            submission.update!(posted_at: nil)
-
-            expect(@assignment).not_to receive(:hide_submissions)
-            submission.update!(posted_at: nil)
-          end
-        end
-
-        context "when post policies are disabled" do
-          before(:each) { PostPolicy.disable_feature! }
-
-          it "does not call post_submissions on the assignment" do
-            expect(@assignment).not_to receive(:hide_submissions)
-            submission.update!(posted_at: nil)
+            expect(@assignment.reload).to be_muted
           end
         end
       end
