@@ -237,6 +237,18 @@ describe('FileUpload', () => {
     expect(getAllByText(filename)[0]).toBeInTheDocument()
   })
 
+  it('displays the more options button in the upload box', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId, getByText} = render(
+      <MockedProvider>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const emptyRender = getByTestId('upload-box')
+
+    expect(emptyRender).toContainElement(getByText('More Options'))
+  })
+
   it('displays allowed extensions in the upload box', async () => {
     const props = await makeProps({
       Assignment: () => ({allowedExtensions: ['jpg, png']})

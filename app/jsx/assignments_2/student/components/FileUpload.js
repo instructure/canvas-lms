@@ -207,6 +207,9 @@ export default class FileUpload extends Component {
                     <Text size="small">
                       {I18n.t('Drag and drop, or click to browse your computer')}
                     </Text>
+                    <div style={{display: 'block'}}>
+                      <Button margin="medium">{I18n.t('More Options')}</Button>
+                    </div>
                   </FlexItem>
                 </Flex>
               }
