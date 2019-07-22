@@ -170,13 +170,18 @@ describe Types::CourseType do
       ].sort
     end
 
-
     it "doesn't let students see other student's submissions" do
       expect(
         course_type.resolve(<<~GQL, current_user: @student2)
           submissionsConnection(
             studentIds: ["#{@student1.id}", "#{@student2.id}"],
           ) { edges { node { _id } } }
+        GQL
+      ).to eq [@student2a1_submission.id.to_s]
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @student2)
+          submissionsConnection { nodes { _id } }
         GQL
       ).to eq [@student2a1_submission.id.to_s]
     end

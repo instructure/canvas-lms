@@ -723,7 +723,7 @@ type Course implements AssignmentsConnectionInterface & Node & Timestamped {
     """
     Only return submissions for the given students.
     """
-    studentIds: [ID!]!
+    studentIds: [ID!]
   ): SubmissionConnection
   term: Term
   updatedAt: DateTime
