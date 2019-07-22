@@ -58,19 +58,6 @@ QUnit.module('MoveToDialog', {
   }
 })
 
-test('includes all destinations in select', () => {
-  const dialog = mountDialog()
-  const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
-  ok( options.find((opt) => (opt.label === 'bar')) )
-  ok( options.find((opt) => (opt.label === 'baz')) )
-})
-
-test('includes "at the bottom" in select', () => {
-  const dialog = mountDialog()
-  const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
-  ok( options.find((opt) => (opt.label === '-- At the bottom --')) )
-})
-
 test('calls onMove with a destination id when selected', (assert) => {
   const done = assert.async()
   const dialog = mountDialog({
