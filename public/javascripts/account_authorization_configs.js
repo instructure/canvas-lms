@@ -27,18 +27,17 @@ import './jquery.instructure_forms' /* formSubmit */
 import './jquery.keycodes'
 import './jquery.loadingImg'
 
-const Picker = React.createFactory(AuthTypePicker)
 const selectorNode = document.getElementById('add-authentication-provider')
 const authTypeOptions = JSON.parse(selectorNode.getAttribute('data-options'))
 authTypeOptions.unshift({
   name: I18n.t('Choose an authentication service'),
   value: 'default'
 })
-const authTypePicker = Picker({
-  authTypes: authTypeOptions,
-  onChange: authenticationProviders.changedAuthType
-})
-ReactDOM.render(authTypePicker, selectorNode)
+
+ReactDOM.render(
+  <AuthTypePicker authTypes={authTypeOptions} onChange={authenticationProviders.changedAuthType} />,
+  selectorNode
+)
 
 $('.parent_reg_warning').click(function() {
   let msg
