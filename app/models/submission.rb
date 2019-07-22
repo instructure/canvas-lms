@@ -399,7 +399,7 @@ class Submission < ActiveRecord::Base
     given do |user|
       user &&
         user.id == self.user_id &&
-        self.posted?
+        !self.hide_grade_from_student?
     end
     can :read_grade
 
@@ -518,7 +518,7 @@ class Submission < ActiveRecord::Base
     # improves performance by checking permissions on the assignment before the submission
     return true if self.assignment.user_can_read_grades?(user, session)
 
-    return false unless self.posted?
+    return false if self.hide_grade_from_student?
     return true if user && user.id == self.user_id # this is fast, so skip the policy cache check if possible
 
     self.grants_right?(user, session, :read_grade)
@@ -2030,6 +2030,7 @@ class Submission < ActiveRecord::Base
     if self.new_record?
       self.save!
     elsif comment_causes_posting?(author: opts[:author], draft: opts[:draft], provisional: opts[:provisional])
+      opts[:hidden] = false
       update!(posted_at: Time.zone.now)
     else
       self.touch
@@ -2445,6 +2446,11 @@ class Submission < ActiveRecord::Base
     self.assignment.muted?
   end
 
+  def hide_grade_from_student?
+    return muted_assignment? unless PostPolicy.feature_enabled?
+    assignment.post_manually? ? posted_at.blank? : (graded? && !posted?)
+  end
+
   def posted?
     if PostPolicy.feature_enabled?
       posted_at.present?
@@ -2670,10 +2676,19 @@ class Submission < ActiveRecord::Base
     return unless assignment.course.post_policies_enabled?
 
     previously_posted = posted_at_before_last_save.present?
+
+    # If this submission is part of an assignment associated with a quiz, the
+    # quiz object might be in a modified/readonly state (due to trying to load
+    # a copy with override dates for this particular student) depending on what
+    # path we took to get here. To avoid a ReadOnlyRecord error, do the actual
+    # posting/hiding on a separate copy of the assignment, then reload our copy
+    # of the assignment to make sure we pick up any changes to the muted status.
     if posted? && !previously_posted
-      assignment.post_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      Assignment.find(assignment_id).post_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      assignment.reload
     elsif !posted? && previously_posted
-      assignment.hide_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      Assignment.find(assignment_id).hide_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+      assignment.reload
     end
   end
 end

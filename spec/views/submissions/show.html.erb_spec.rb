@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require "spec_helper"
+require_relative "../views_helper"
 require_relative '../../selenium/helpers/groups_common'
 
 describe "/submissions/show" do
@@ -263,31 +263,82 @@ describe "/submissions/show" do
 
     context "when post policies are enabled" do
       before(:each) do
+        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
-      it "displays a message when submission is unposted" do
-        render "submissions/show"
-        summary = html.css(".submission-details-header__grade-summary p").text
-        expect(summary).to eql "Grades are unavailable because the instructor is working on them."
+      context "when assignment posts automatically" do
+        before(:each) do
+          @assignment.ensure_post_policy(post_manually: false)
+        end
+
+        it "does not display a message when submission is unposted and assignment posts automatically" do
+          render "submissions/show"
+          summary = html.css(".submission-details-header__grade-summary p").text
+          expect(summary).not_to include "Grades are unavailable because the instructor is working on them."
+        end
+
+        it "does not display a message when submission is posted and assignment posts automatically" do
+          @submission.update!(posted_at: Time.zone.now)
+          render "submissions/show"
+          summary = html.css(".submission-details-header__grade-summary p").text
+          expect(summary).not_to include "Grades are unavailable because the instructor is working on them."
+        end
+
+        it "displays the grade when submission is posted and user can :read_grade" do
+          @submission.update!(posted_at: Time.zone.now)
+          render "submissions/show"
+          grade = html.css(".entered_grade").text
+          expect(grade).to include "23"
+        end
       end
 
-      it "does not display a message when submission is posted" do
-        @submission.update!(posted_at: Time.zone.now)
-        render "submissions/show"
-        expect(html.css(".submission-details-header__grade-summary p")).to be_empty
-      end
+      context "when assignment posts manually" do
+        before(:each) do
+          @assignment.ensure_post_policy(post_manually: true)
+        end
 
-      it "does not display the grade when submission is unposted" do
-        render "submissions/show"
-        expect(html.css(".entered_grade")).to be_empty
-      end
+        it "displays a message when submission is unposted" do
+          render "submissions/show"
+          summary = html.css(".submission-details-header__grade-summary p").text
+          expect(summary).to eql "Grades are unavailable because the instructor is working on them."
+        end
 
-      it "displays the grade when submission is posted and user can :read_grade" do
-        @submission.update!(posted_at: Time.zone.now)
-        render "submissions/show"
-        grade = html.css(".entered_grade").text
-        expect(grade).to include "23"
+        it "does not display a message when submission is posted" do
+          @submission.update!(posted_at: Time.zone.now)
+          render "submissions/show"
+          summary = html.css(".submission-details-header__grade-summary p").text
+          expect(summary).not_to include "Grades are unavailable because the instructor is working on them."
+        end
+
+        it "does not display the grade when submission is unposted" do
+          render "submissions/show"
+          expect(html.css(".entered_grade")).to be_empty
+        end
+
+        it "displays the grade when submission is posted" do
+          @submission.update!(posted_at: Time.zone.now)
+          render "submissions/show"
+          expect(html.css(".entered_grade").text).to include "23"
+        end
+
+        context "when the viewing user is a teacher" do
+          let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: "active").user }
+
+          before(:each) do
+            assign(:current_user, teacher)
+          end
+
+          it "displays the current grade even when the submission is not posted" do
+            render "submissions/show"
+            expect(html.css(".grading_box").attr("value").value).to include("23")
+          end
+
+          it "displays the grade input fields even when the submission is not posted" do
+            render "submissions/show"
+            expect(html.css(".grade-values")).to be_present
+          end
+        end
       end
     end
 
