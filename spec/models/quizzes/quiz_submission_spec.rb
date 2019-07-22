@@ -1811,4 +1811,28 @@ describe Quizzes::QuizSubmission do
       expect(quiz_submission.excused?).to eq nil
     end
   end
+
+  describe "#posted?" do
+    context "when this submission's quiz is a graded quiz" do
+      before(:each) { quiz_with_graded_submission([]) }
+
+      it "returns true if the underlying submission is posted" do
+        allow(@quiz_submission.submission).to receive(:posted?).and_return(true)
+        expect(@quiz_submission).to be_posted
+      end
+
+      it "returns false if the underlying submission is not posted" do
+        allow(@quiz_submission.submission).to receive(:posted?).and_return(false)
+        expect(@quiz_submission).not_to be_posted
+      end
+    end
+
+    it "always returns true when the associated quiz will not be graded" do
+      student_in_course
+      quiz = @course.quizzes.create!(title: "You shall digest the venom of your spleen", quiz_type: "survey")
+      quiz_submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(@student)
+
+      expect(quiz_submission).to be_posted
+    end
+  end
 end

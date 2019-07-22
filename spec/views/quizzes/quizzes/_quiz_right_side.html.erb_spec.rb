@@ -27,5 +27,36 @@ describe "/quizzes/quizzes/_quiz_right_side" do
     render :partial => "quizzes/quizzes/quiz_right_side"
     expect(response).not_to be_nil
   end
+
+  context "when post policies is enabled" do
+    before(:each) do
+      course_with_student
+      view_context
+      @course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
+
+      quiz_with_graded_submission([], user: @student, course: @course)
+    end
+
+    let(:quiz) { @quiz }
+    let(:quiz_submission) { @quiz_submission }
+    let(:assignment) { @assignment }
+
+    it "displays the current score if the submission is posted" do
+      assign(:quiz, quiz)
+      assign(:submission, quiz_submission)
+      render partial: "quizzes/quizzes/quiz_right_side"
+      expect(response).to include "Current Score"
+    end
+
+    it "does not display the current score if the submission is not posted" do
+      quiz_submission.submission.update!(posted_at: nil)
+      assign(:quiz, quiz)
+      assign(:submission, quiz_submission)
+
+      render partial: "quizzes/quizzes/quiz_right_side"
+      expect(response).not_to include "Current Score"
+    end
+  end
 end
 

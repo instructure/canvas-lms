@@ -884,4 +884,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     check_time = attributes['finished_at'] - 60.seconds
     check_time > due_at
   end
+
+  def posted?
+    # Ungraded surveys and practice quizzes will not have associated Assignment
+    # or Submission objects, and so results should always be shown to the student.
+    quiz.ungraded? || !!submission&.posted?
+  end
 end

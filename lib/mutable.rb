@@ -128,6 +128,14 @@ module Mutable
     # With post policies active, an assignment is considered "muted" if it has any
     # unposted submissions.
     has_unposted_submissions = submissions.active.unposted.exists?
-    update!(muted: has_unposted_submissions) if muted? != has_unposted_submissions
+
+    if muted? != has_unposted_submissions
+      # Set grade_posting_in_progress so we don't attempt to save changes to
+      # this assignment's associated quiz/discussion topic/whatever in the
+      # process of muting
+      self.grade_posting_in_progress = true
+      update!(muted: has_unposted_submissions)
+      self.grade_posting_in_progress = false
+    end
   end
 end
