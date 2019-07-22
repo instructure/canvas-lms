@@ -2004,6 +2004,22 @@
     keycode "^2"
     prop-types "^15"
 
+"@instructure/ui-options@^6.8.1":
+  version "6.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-options/-/ui-options-6.8.1.tgz#c212f0c4819c146b095fe9b9f1e350399c45606b"
+  integrity sha512-KrT7S8wIrZXeyjHfMJu/dzR8EzKqirHCvT550Cltse57/JR1tZcM8fm0ZUwV+buUWE4HwmbYKZR/6OzVR3gong==
+  dependencies:
+    "@babel/runtime" "^7"
+    "@instructure/ui-icons" "^6.8.1"
+    "@instructure/ui-layout" "^6.8.1"
+    "@instructure/ui-prop-types" "^6.8.1"
+    "@instructure/ui-react-utils" "^6.8.1"
+    "@instructure/ui-testable" "^6.8.1"
+    "@instructure/ui-themeable" "^6.8.1"
+    classnames "^2"
+    prop-types "^15"
+    react "^15 || ^16"
+
 "@instructure/ui-overlays@^5", "@instructure/ui-overlays@^5.52.0", "@instructure/ui-overlays@^5.52.3":
   version "5.52.3"
   resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.52.3.tgz#1a1c863abc2de2b787cd9f0101b2c956d4694b80"
@@ -2189,6 +2205,47 @@
     "@instructure/ui-dom-utils" "^6.8.1"
     "@instructure/ui-utils" "^6.8.1"
     prop-types "^15"
+
+"@instructure/ui-select@^6.8.1":
+  version "6.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-select/-/ui-select-6.8.1.tgz#0ad5086afdbadd9dde6723774c447400e5a90b74"
+  integrity sha512-b0af6oatUGrgFLUoL8T02Xdq/eLr2p3/S1lVHr0Vr2IR54ZBEi+lJ0sleAtksdhEGqb1Hkvu1ozoLDSsImUj5Q==
+  dependencies:
+    "@babel/runtime" "^7"
+    "@instructure/ui-dom-utils" "^6.8.1"
+    "@instructure/ui-elements" "^6.8.1"
+    "@instructure/ui-form-field" "^6.8.1"
+    "@instructure/ui-icons" "^6.8.1"
+    "@instructure/ui-layout" "^6.8.1"
+    "@instructure/ui-options" "^6.8.1"
+    "@instructure/ui-overlays" "^6.8.1"
+    "@instructure/ui-prop-types" "^6.8.1"
+    "@instructure/ui-react-utils" "^6.8.1"
+    "@instructure/ui-selectable" "^6.8.1"
+    "@instructure/ui-testable" "^6.8.1"
+    "@instructure/ui-text-input" "^6.8.1"
+    "@instructure/ui-themeable" "^6.8.1"
+    "@instructure/ui-utils" "^6.8.1"
+    "@instructure/uid" "^6.8.1"
+    classnames "^2"
+    prop-types "^15"
+    react "^15 || ^16"
+
+"@instructure/ui-selectable@^6.8.1":
+  version "6.8.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-selectable/-/ui-selectable-6.8.1.tgz#ba2813cfac1efe39d6f8fc7f2ded250d01fd39e8"
+  integrity sha512-WtlQihh/UiUt+4GjkHKEYN+muAMG8gFexb1kzellPb4C3dHl0fSfjxO4JlRQW4GWqUyDJeCjYjwemmYpPn2+ZQ==
+  dependencies:
+    "@babel/runtime" "^7"
+    "@instructure/console" "^6.8.1"
+    "@instructure/ui-dom-utils" "^6.8.1"
+    "@instructure/ui-testable" "^6.8.1"
+    "@instructure/ui-themeable" "^6.8.1"
+    "@instructure/ui-utils" "^6.8.1"
+    "@instructure/uid" "^6.8.1"
+    keycode "^2"
+    prop-types "^15"
+    react "^15 || ^16"
 
 "@instructure/ui-stylesheet@^5.52.3":
   version "5.52.3"
@@ -11676,7 +11733,7 @@ iterall@^1.1.3, iterall@^1.2.2:
   resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.2.2.tgz#92d70deb8028e0c39ff3164fdbf4d8b088130cd7"
   integrity sha512-yynBb1g+RFUPY64fTrFv7nsjRrENBQJaX2UL+2Szc9REFrSNm1rpSXHGzhmAy7a9uv3vlvgBlXnf9RqmPH1/DA==
 
-jasmine-core@^2.2.0:
+jasmine-core@2.6.4, jasmine-core@^2.2.0:
   version "2.6.4"
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.6.4.tgz#dec926cd0a9fa287fb6db5c755fa487e74cecac5"
   integrity sha1-3skmzQqfoof7bbXHVfpIfnTOysU=
@@ -14290,7 +14347,7 @@ node-releases@^1.1.25:
   dependencies:
     semver "^5.3.0"
 
-node-sass@^4.5.0, node-sass@^4.7.2:
+node-sass@4.7.2, node-sass@^4.5.0, node-sass@^4.7.2:
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.7.2.tgz#9366778ba1469eb01438a9e8592f4262bcb6794e"
   integrity sha512-CaV+wLqZ7//Jdom5aUFCpGNoECd7BbNhjuwdsX/LkXBrHl8eb1Wjw4HvWqcFvhr5KuNgAk8i/myf/MQ1YYeroA==

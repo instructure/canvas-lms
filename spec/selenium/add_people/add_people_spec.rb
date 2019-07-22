@@ -122,7 +122,7 @@ describe "add_people" do
                                              :enabled => false
       get "/courses/#{@course.id}/users"
       f('#addUsers').click
-      expect(ff('#peoplesearch_select_role option').map(&:text)).not_to include 'Student'
+      expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
     end
 
     # CNVS-34781
@@ -150,6 +150,28 @@ describe "add_people" do
       f('label[for="limit_privileges_to_course_section"]').click
       expect(f('#limit_privileges_to_course_section')).to be_selected
 
+    end
+
+    # tests that INSTUI fixed a bug in Select that would close the Modal
+    # when the user uses 'esc' to close the options dropdown
+    it "should not close the modal on 'escape'ing from role Select options", ignore_js_errors: true do
+      get "/courses/#{@course.id}/users"
+
+      # open the add people modal dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
+
+      # expand the roles
+      roleselect = f('#peoplesearch_select_role')
+      roleselect.click
+      option_list_id = roleselect.attribute('aria-controls')
+      expect(f('body')).to contain_css("##{option_list_id}")
+
+      optionList = f("##{option_list_id}")
+      roleselect.send_keys(:escape)
+      expect(f('body')).not_to contain_css("##{option_list_id}")
+
+      expect(f(".addpeople")).to be_displayed # still
     end
 
   end
