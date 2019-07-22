@@ -83,30 +83,46 @@ describe QuizzesHelper do
     end
   end
 
+  context 'render_number' do
+    it 'should render numbers' do
+      expect(render_number(1)).to eq '1'
+      expect(render_number(100)).to eq '100'
+      expect(render_number(1.123)).to eq '1.123'
+      expect(render_number(1000.45)).to eq '1,000.45'
+      expect(render_number(1000.45966)).to eq '1,000.45966'
+      expect(render_number('100')).to eq '100'
+      expect(render_number('1.43')).to eq '1.43'
+    end
+
+    it 'should remove trailing zeros' do
+      expect(render_number(1.20000000)).to eq '1.2'
+      expect(render_number(0.10340000)).to eq '0.1034'
+    end
+
+    it 'should remove trailing zeros and decimal point' do
+      expect(render_number(0.00000000)).to eq '0'
+      expect(render_number(1.00000000)).to eq '1'
+      expect(render_number(100.0)).to eq '100'
+    end
+
+    it 'should render percentages' do
+      expect(render_number('1234.456%')).to eq '1,234.456%'
+    end
+  end
+
   context 'render_score' do
     it 'should render nil scores' do
       expect(render_score(nil)).to eq '_'
     end
 
-    it 'should render non-nil scores' do
-      expect(render_score(1)).to eq '1'
-      expect(render_score(100)).to eq '100'
-      expect(render_score(1.123)).to eq '1.12'
-      expect(render_score(1000.45166)).to eq '1,000.45'
+    it 'should render with default precision' do
       expect(render_score(1000.45966)).to eq '1,000.46'
-      expect(render_score('100')).to eq '100'
-      expect(render_score('1.43')).to eq '1.43'
+      expect(render_score('12.3456')).to eq '12.35'
     end
 
-    it 'should remove trailing zeros' do
-      expect(render_score(1.20000000)).to eq '1.2'
-      expect(render_score(0.10340000, 5)).to eq '0.1034'
-    end
-
-    it 'should remove trailing zeros and decimal point' do
-      expect(render_score(0.00000000)).to eq '0'
-      expect(render_score(1.00000000)).to eq '1'
-      expect(render_score(100.0)).to eq '100'
+    it 'should support higher precision' do
+      expect(render_score(1234.4567, 3)).to eq '1,234.457'
+      expect(render_score(0.12345000, 4)).to eq '0.1235'
     end
   end
 

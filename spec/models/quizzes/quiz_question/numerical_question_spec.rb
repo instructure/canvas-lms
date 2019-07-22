@@ -35,6 +35,18 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
   end
 
+  describe '#i18n_decimal' do
+    it 'works in english' do
+      expect(question.i18n_decimal('1234.56')).to eq BigDecimal('1234.56')
+      expect(question.i18n_decimal('1,234.56')).to eq BigDecimal('1234.56')
+    end
+    it 'works in french' do
+      I18n.locale = 'fr'
+      expect(question.i18n_decimal('1 234,56')).to eq BigDecimal('1234.56')
+      expect(question.i18n_decimal('1234,56')).to eq BigDecimal('1234.56')
+    end
+  end
+
   describe "#correct_answer_parts" do
     let(:question_id)     { 1 }
     let(:points_possible) { 100 }

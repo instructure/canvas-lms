@@ -190,11 +190,11 @@ class Quizzes::QuizQuestionBuilder
       if q[:answers].first
         q[:answers].first[:variables].each do |variable|
           re = Regexp.new("\\[#{variable[:name]}\\]")
-          text = text.gsub(re, TextHelper.round_if_whole(variable[:value]).to_s)
+          text = text.gsub(re, I18n.n(TextHelper.round_if_whole(variable[:value]).to_s))
         end
       end
       q[:question_text] = text
-    end # case q[:question_type]
+    end
 
     q[:name] = q[:question_name] = question_name
     q

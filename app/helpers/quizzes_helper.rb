@@ -62,11 +62,19 @@ module QuizzesHelper
     quiz.available? && can_publish(quiz)
   end
 
+  def render_number(num)
+    if num.to_s =~ /%/
+      I18n.n(round_if_whole(num.delete('%'))) + '%'
+    else
+      I18n.n(round_if_whole(num))
+    end
+  end
+
   def render_score(score, precision=2)
     if score.nil?
       '_'
     else
-      I18n.n(round_if_whole(score.to_f.round(precision)))
+      render_number(score.to_f.round(precision))
     end
   end
 
