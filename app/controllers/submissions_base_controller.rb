@@ -101,7 +101,7 @@ class SubmissionsBaseController < ApplicationController
           :commenter => @current_user,
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
-          :hidden => @assignment.muted? && admin_in_context,
+          :hidden => @submission.hide_grade_from_student? && admin_in_context,
           :provisional => provisional,
           :final => params[:submission][:final],
           :draft_comment => Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
