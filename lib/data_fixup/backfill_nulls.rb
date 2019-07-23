@@ -30,7 +30,7 @@ module DataFixup
     #   If a hash, it's column to default value. If an array or a single symbol, it's just
     #   the column(s), and the default_value is passed separately, and applied to all of
     #   the columns.
-    def self.run(klass, fields, default_value: false, batch_size: 1000, sleep_interval_per_batch: nil)
+    def self.run(klass, fields, default_value: false, batch_size: 1000)
       if fields.is_a?(Array)
         fields = fields.map { |f| [f, default_value] }.to_h
       elsif fields.is_a?(Hash)
@@ -50,6 +50,7 @@ module DataFixup
 
       klass.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|
         scope.where(id: start_id..end_id).update_all(updates)
+        sleep_interval_per_batch = Setting.get("sleep_interval_per_backfill_nulls_batch", nil).presence&.to_f
         sleep(sleep_interval_per_batch) if sleep_interval_per_batch
       end
     end
