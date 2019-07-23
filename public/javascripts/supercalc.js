@@ -114,14 +114,12 @@ import 'jqueryui/sortable'
           $entryBox.val(formula_text);
           var res = null;
           try {
-            // precision 15 to strip floating point error
-            var precision = 15;
-            // regex strips extra 0s from toPrecision output
-            var stripZeros = function(str){return str.replace(/(?:(\.[0-9]*[^0e])|\.)0*(e.*)?$/,"$1$2")};
-
-            var val = +calcCmd.computeValue(formula_text).toPrecision(precision);
+            var val = calcCmd.computeValue(formula_text);
             var rounder = Math.pow(10, parseInt(finds.round.val(), 10) || 0) || 1;
-            res = "= " + stripZeros(I18n.n((Math.round(val * rounder) / rounder).toPrecision(precision)));
+            res = "= " + I18n.n(
+              (Math.round(val * rounder) / rounder),
+              {precision: 5, strip_insignificant_zeros: true}
+            );
           } catch(e) {
             res = e.toString();
           }
