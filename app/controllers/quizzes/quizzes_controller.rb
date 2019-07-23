@@ -358,6 +358,8 @@ class Quizzes::QuizzesController < ApplicationController
       conditional_release_js_env(@quiz.assignment)
       set_master_course_js_env_data(@quiz, @context)
 
+      js_bundle :quizzes_bundle
+      css_bundle :quizzes, :tinymce
       render :new
     end
   end
@@ -736,6 +738,7 @@ class Quizzes::QuizzesController < ApplicationController
         if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
           return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
         end
+        js_bundle :quiz_history
       end
     end
   end

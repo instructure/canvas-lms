@@ -43,6 +43,8 @@ class SubmissionsBaseController < ApplicationController
           outcome_proficiency: outcome_proficiency
         })
 
+        js_bundle :submissions
+        css_bundle :submission
         render 'submissions/show'
       end
       format.json do

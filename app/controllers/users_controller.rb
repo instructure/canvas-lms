@@ -576,6 +576,9 @@ class UsersController < ApplicationController
       content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
     end
 
+    css_bundle :dashboard
+    js_bundle :dashboard
+    add_body_class "dashboard-is-planner" if show_planner?
   end
 
   def dashboard_stream_items

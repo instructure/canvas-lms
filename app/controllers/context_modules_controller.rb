@@ -110,6 +110,8 @@ class ContextModulesController < ApplicationController
         session[:module_progressions_initialized] = true
       end
       add_body_class('padless-content')
+      js_bundle :context_modules
+      css_bundle :content_next, :context_modules2
     end
   end
 

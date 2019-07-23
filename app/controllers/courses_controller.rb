@@ -497,6 +497,8 @@ class CoursesController < ApplicationController
             end
           end
           @visible_groups = @current_user.visible_groups
+          css_bundle :context_list, :course_list
+          js_bundle :course_list
 
           if @current_user
             content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")})
@@ -1882,6 +1884,29 @@ class CoursesController < ApplicationController
         unless @context.grants_right?(@current_user, session, :manage_content)
           @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
         end
+
+        css_bundle :dashboard
+        css_bundle :react_todo_sidebar if planner_enabled?
+        case @course_home_view
+        when 'wiki'
+          js_bundle :wiki_page_show
+          css_bundle :wiki_page, :tinymce
+        when 'modules'
+          js_bundle :context_modules
+          css_bundle :content_next, :context_modules2
+        when 'assignments'
+          js_bundle :assignment_index
+          css_bundle :new_assignments
+          add_body_class('hide-content-while-scripts-not-loaded', 'with_item_groups')
+        when 'syllabus'
+          js_bundle :syllabus
+          css_bundle :syllabus, :tinymce
+        else
+          js_bundle :dashboard
+        end
+
+        js_bundle :course, 'legacy/courses_show'
+        css_bundle :course_show
 
         if @context_enrollment
           content_for_head helpers.auto_discovery_link_tag(:atom, feeds_course_format_path(@context_enrollment.feed_code, :atom), {:title => t("Course Atom Feed")})

@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t('titles.courses', 'Courses') %>
+<% provide :page_title, t('titles.courses', 'Courses') %>
 
 
-<% css_bundle :context_list, :course_list %>
-<% js_bundle :course_list %>
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = true %>
   <div class="header-bar">

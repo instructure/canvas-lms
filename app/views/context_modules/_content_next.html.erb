@@ -25,8 +25,6 @@
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
   })
-  js_bundle :context_modules
-  css_bundle :content_next
 %>
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>

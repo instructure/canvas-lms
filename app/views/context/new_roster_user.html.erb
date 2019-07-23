@@ -86,9 +86,6 @@
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
 <% end %>
 
-<% js_bundle :user_name %>
-<% css_bundle :roster_user, :pairing_code %>
-
 <%= render :partial => 'shared/profile' %>
 
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
@@ -174,4 +171,3 @@
 </div>
 <% end %>
 
-<% js_bundle 'legacy/context_roster_user' %>

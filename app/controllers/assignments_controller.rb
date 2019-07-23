@@ -238,6 +238,14 @@ class AssignmentsController < ApplicationController
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
 
+        @show_locked_page = @locked && !@locked[:can_view]
+        if @show_locked_page
+          js_bundle :module_sequence_footer
+        else
+          css_bundle :assignments
+          js_bundle :assignment_show
+        end
+
         render locals: {
           eula_url: tool_eula_url,
           show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)

@@ -15,12 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  js_bundle :quizzes_bundle, :question_bank
-  css_bundle :quizzes, :learning_outcomes, :tinymce, :question_bank
-  provide :page_title, @bank.title
-%>
 <% provide :right_side do %>
   <div class="rs-margin-bottom">
     <% if can_do(@bank, @current_user, :manage) %>

@@ -125,9 +125,6 @@
   </div>
 <% end %>
 
-<% js_bundle :user_name %>
-<% css_bundle :roster_user, :pairing_code %>
-
 <h1><%= @user.name %></h1>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
 <% can_manage_admins = can_do(@context, @current_user, :manage_admin_users) %>
@@ -235,4 +232,3 @@
 <% end %>
 <% end %>
 
-<% js_bundle 'legacy/context_roster_user' %>
