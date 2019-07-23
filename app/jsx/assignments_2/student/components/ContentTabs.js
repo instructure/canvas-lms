@@ -90,7 +90,7 @@ function ContentTabs(props) {
           <AttemptTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
-          {!props.assignment.muted ? (
+          {props.submission.posted ? (
             <Suspense fallback={<LoadingIndicator />}>
               <CommentsTab assignment={props.assignment} submission={props.submission} />
             </Suspense>

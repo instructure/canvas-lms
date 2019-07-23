@@ -39,6 +39,16 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("_id", current_user: other_student)).to be_nil
   end
 
+  describe "posted" do
+    it "returns the posted status of the submission" do
+      PostPolicy.enable_feature!
+      @submission.update!(posted_at: nil)
+      expect(submission_type.resolve("posted")).to eq false
+      @submission.update!(posted_at: Time.zone.now)
+      expect(submission_type.resolve("posted")).to eq true
+    end
+  end
+
   describe "posted_at" do
     it "returns the posted_at of the submission" do
       now = Time.zone.now.change(usec: 0)

@@ -20,7 +20,7 @@ import ContentTabs from '../ContentTabs'
 import {mockAssignmentAndSubmission} from '../../mocks'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
 describe('ContentTabs', () => {
@@ -134,5 +134,23 @@ describe('ContentTabs', () => {
     expect(queryByText('Submitted')).toBeNull()
     expect(queryByTestId('friendly-date-time')).toBeNull()
     expect(queryByTestId('grade-display')).toBeNull()
+  })
+
+  it('displays the correct message if the submission grade has not been posted', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({posted: false})
+    })
+
+    const {getAllByText, getByText} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+    fireEvent.click(getAllByText('Comments')[0])
+    expect(
+      getByText(
+        'You may not see all comments right now because the assignment is currently being graded.'
+      )
+    ).toBeInTheDocument()
   })
 })

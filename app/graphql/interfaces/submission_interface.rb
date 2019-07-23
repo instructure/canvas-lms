@@ -112,6 +112,7 @@ module Interfaces::SubmissionInterface
   field :submitted_at, Types::DateTimeType, null: true
   field :graded_at, Types::DateTimeType, null: true
   field :posted_at, Types::DateTimeType, null: true
+  field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
   field :submission_status, String, null: true

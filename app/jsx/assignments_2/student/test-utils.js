@@ -297,6 +297,7 @@ export function mockSubmission(overrides = {}) {
     gradingStatus: 'needs_grading',
     id: btoa('Submission-22'),
     latePolicyStatus: null,
+    posted: true,
     state: 'submitted',
     submissionDraft: null,
     submissionStatus: 'submitted',

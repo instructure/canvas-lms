@@ -2372,6 +2372,7 @@ type Submission implements Node & SubmissionInterface & Timestamped {
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
   missing: Boolean
+  posted: Boolean!
   postedAt: DateTime
   score: Float
   state: SubmissionState!
@@ -2574,6 +2575,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
   missing: Boolean
+  posted: Boolean!
   postedAt: DateTime
 
   """
@@ -2693,6 +2695,7 @@ interface SubmissionInterface {
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
   missing: Boolean
+  posted: Boolean!
   postedAt: DateTime
   score: Float
   state: SubmissionState!

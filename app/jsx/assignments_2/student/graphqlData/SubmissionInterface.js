@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, number, shape, string} from 'prop-types'
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
 import {SubmissionDraft} from './SubmissionDraft'
 import {SubmissionFile} from './File'
@@ -32,6 +32,7 @@ export const SubmissionInterface = {
       grade
       gradingStatus
       latePolicyStatus
+      posted
       state
       submissionDraft {
         ...SubmissionDraft
@@ -51,6 +52,7 @@ export const SubmissionInterface = {
     grade: string,
     gradingStatus: string,
     latePolicyStatus: string,
+    posted: bool.isRequired,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
@@ -67,6 +69,7 @@ export const SubmissionInterfaceDefaultMocks = {
     grade: null,
     gradingStatus: null,
     latePolicyStatus: null,
+    posted: true,
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',
