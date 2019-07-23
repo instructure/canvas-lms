@@ -481,7 +481,7 @@ module Canvas::LiveEvents
       student_sis_id: sis_pseudonym&.sis_user_id,
       user_id: submission.global_user_id,
       grading_complete: submission.graded?,
-      muted: submission.muted_assignment?
+      muted: !submission.posted?
     }, amended_context(submission.assignment.context))
   end
 

@@ -422,14 +422,42 @@ describe Canvas::LiveEvents do
         course_with_student_submissions
       end
 
-      let(:submission) { @course.assignments.first.submissions.first }
+      let(:assignment) { @course.assignments.first }
+      let(:submission) { assignment.submissions.first }
 
-      it "is true when assignment is muted" do
-        submission.assignment.mute!
-        expect_event('grade_change', hash_including(
-          muted: true
-        ), course_context)
-        Canvas::LiveEvents.grade_changed(submission)
+      context "with post policies enabled" do
+        before(:each) do
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+
+          assignment.hide_submissions
+        end
+
+        it "is not called when a grade is changed for a submission that is not posted" do
+          expect_event('grade_change', hash_including(
+            muted: true
+          ), course_context)
+          Canvas::LiveEvents.grade_changed(submission)
+        end
+
+        it "is false when the grade is changed for a submission that is posted" do
+          assignment.post_submissions
+
+          expect_event('grade_change', hash_including(
+            muted: false
+          ), course_context)
+          Canvas::LiveEvents.grade_changed(submission)
+        end
+      end
+
+      context "with post policies disabled" do
+        it "is true when assignment is muted" do
+          submission.assignment.mute!
+          expect_event('grade_change', hash_including(
+            muted: true
+          ), course_context)
+          Canvas::LiveEvents.grade_changed(submission)
+        end
       end
     end
   end
