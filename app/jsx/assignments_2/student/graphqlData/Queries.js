@@ -24,12 +24,10 @@ import {SubmissionHistory} from './SubmissionHistory'
 
 export const EXTERNAL_TOOLS_QUERY = gql`
   query ExternalTools($courseID: ID!) {
-    course: legacyNode(_id: $courseID, type: Course) {
-      ... on Course {
-        externalToolsConnection(filter: {placement: homework_submission, state: public}) {
-          nodes {
-            ...ExternalTool
-          }
+    course(id: $courseID) {
+      externalToolsConnection(filter: {placement: homework_submission, state: public}) {
+        nodes {
+          ...ExternalTool
         }
       }
     }

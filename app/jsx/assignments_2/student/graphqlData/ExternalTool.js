@@ -16,71 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import gql from 'graphql-tag'
-import {number, shape, string} from 'prop-types'
+import {shape, string} from 'prop-types'
 
 export const ExternalTool = {
   fragment: gql`
     fragment ExternalTool on ExternalTool {
       _id
-      createdAt
       description
       name
-      settings {
-        homeworkSubmission {
-          canvasIconClass
-          iconUrl
-          messageType
-          text
-          url
-        }
-        iconUrl
-        selectionHeight
-        selectionWidth
-        text
-      }
-      state
-      updatedAt
-      url
     }
   `,
 
   shape: shape({
     _id: string,
-    createdAt: string,
     description: string,
-    name: string,
-    settings: shape({
-      homeworkSubmission: shape({
-        canvasIconClass: string,
-        iconUrl: string,
-        messageType: string,
-        text: string,
-        url: string
-      }),
-      iconUrl: string,
-      selectionHeight: number,
-      selectionWidth: number,
-      text: string
-    }),
-    state: string,
-    updatedAt: string,
-    url: string
+    name: string
   })
 }
 
 export const ExternalToolDefaultMocks = {
   ExternalTool: () => ({
     _id: '1',
-    name: 'external tool',
-    settings: {
-      homeworkSubmission: {
-        canvasIconClass: 'icon-lti',
-        iconUrl: 'http://lti.com/icon.png',
-        messageType: 'ContentItemSelectionRequest',
-        text: 'homework_submission Text',
-        url: 'http://lti.com/messages/content-item'
-      }
-    },
-    state: 'public'
+    name: 'external tool'
   })
 }

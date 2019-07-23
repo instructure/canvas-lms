@@ -22,6 +22,7 @@ import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIcon
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
+import MoreOptions from './MoreOptions'
 import React, {Component} from 'react'
 import {Submission} from '../graphqlData/Submission'
 import {uploadFiles} from '../../../shared/upload_file'
@@ -207,9 +208,10 @@ export default class FileUpload extends Component {
                     <Text size="small">
                       {I18n.t('Drag and drop, or click to browse your computer')}
                     </Text>
-                    <div style={{display: 'block'}}>
-                      <Button margin="medium">{I18n.t('More Options')}</Button>
-                    </div>
+                    <MoreOptions
+                      assignmentID={this.props.assignment._id}
+                      courseID={this.props.assignment.env.courseId}
+                    />
                   </FlexItem>
                 </Flex>
               }
