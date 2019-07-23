@@ -23,7 +23,6 @@
 </style>
 
 <% provide :page_title, @assignment.title %>
-<% provide_blank :auto_discovery %>
 <% provide :right_side, render(:partial => "assignment_sidebar") %>
 
 <% if @locked && !@locked[:can_view] %>

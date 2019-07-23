@@ -34,12 +34,6 @@
   <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable') %>
 <% end %>
 
-<% content_for :auto_discovery do %>
-  <% if @current_user %>
-      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")}) %>
-  <% end %>
-<% end %>
-
 <% provide :right_side do %>
   <% unless show_planner? %>
     <div class="placeholder"></div>

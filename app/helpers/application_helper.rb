@@ -860,6 +860,10 @@ module ApplicationHelper
     end
   end
 
+  def content_for_head(string)
+    (@content_for_head ||= []) << string
+  end
+
   def include_custom_meta_tags
     add_csp_for_root
     js_env(csp: csp_iframe_attribute) if csp_enforced?

@@ -42,10 +42,6 @@
 %>
 <h1 class="screenreader-only"><%= t(:page_title_header, "Calendar") %></h1>
 
-<% content_for :auto_discovery do %>
-  <%= auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")}) %>
-<% end %>
-
 <% provide :right_side do %>
   <a href="#" class="screenreader-only skip-to-calendar"><%= t(:skip_to_calendar, "Skip to calendar") %></a>
 

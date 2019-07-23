@@ -31,7 +31,6 @@
   <script>window.fetchIgnoredByNewRelic = window.fetch</script><%= browser_performance_monitor_embed %>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
-  <%= yield :auto_discovery %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
   <%= yield :head %>
   <%=
@@ -90,5 +89,8 @@
   <%= include_head_js %>
   <% @xhrs_to_prefetch_from_controller&.each do |args| %>
     <%= prefetch_xhr(*args) %>
+  <% end %>
+  <% @content_for_head&.each do |string| %>
+    <%= string %>
   <% end %>
 </head>

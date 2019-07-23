@@ -20,13 +20,6 @@
 <% css_bundle :course_show %>
 <% @active_tab ||= "home" %>
 <h1 class='screenreader-only'><%= @context.name %></h1>
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context_enrollment.feed_code, :atom), {:title => t("Course Atom Feed")}) %>
-  <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context.feed_code, :atom), {:title => t("Course Atom Feed")}) %>
-  <% end %>
-<% end %>
 
 <% provide :right_side do %>
   <div id="course_show_secondary">

@@ -420,6 +420,17 @@ class DiscussionTopicsController < ApplicationController
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
+
+        add_body_class 'hide-content-while-scripts-not-loaded'
+        @page_title = join_title(t('#titles.discussions', "Discussions"), @context.name)
+
+        feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
+
+        js_bundle :discussion_topics_index_v2
+        css_bundle :discussions_index
+
+        render html: '', layout: true
       end
       format.json do
         if @context.grants_right?(@current_user, session, :moderate_forum)
@@ -769,6 +780,19 @@ class DiscussionTopicsController < ApplicationController
             conditional_release_js_env(@topic.assignment, includes: [:rule])
             js_bundle :discussion
             css_bundle :tinymce, :discussions, :learning_outcomes
+
+            if @context_enrollment
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              if @topic.podcast_enabled
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+              end
+            elsif @context.available?
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              if @topic.podcast_enabled
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+              end
+            end
+
           end
         end
       end

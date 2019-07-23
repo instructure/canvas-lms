@@ -18,11 +18,6 @@
 
 <% content_for :page_title, t('titles.courses', 'Courses') %>
 
-<% content_for :auto_discovery do %>
-  <% if @current_user %>
-    <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")}) %>
-  <% end %>
-<% end %>
 
 <% css_bundle :context_list, :course_list %>
 <% js_bundle :course_list %>

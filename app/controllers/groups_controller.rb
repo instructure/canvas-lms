@@ -393,6 +393,13 @@ class GroupsController < ApplicationController
           set_badge_counts_for(@group, @current_user)
           @home_page = @group.wiki.front_page
         end
+
+        if @context_membership
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")})
+        elsif @context.available?
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")})
+        end
+
       end
       format.json do
         if authorized_action(@group, @current_user, :read)
