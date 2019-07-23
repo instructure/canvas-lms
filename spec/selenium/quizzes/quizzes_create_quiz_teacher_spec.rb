@@ -30,6 +30,7 @@ describe 'creating a quiz' do
 
   context 'as a teacher' do
     before(:each) do
+      stub_rcs_config
       course_with_teacher_logged_in(course_name: 'Test Course', active_all: true)
     end
 
@@ -136,7 +137,8 @@ describe 'creating a quiz' do
     end
 
     it 'inserts files using the rich content editor', priority: "1", test_id: 132545 do
-      txt_files = ['some test file', 'b_file.txt']
+      filename = "b_file.txt"
+      txt_files = ['some test file', filename]
       txt_files.map do |text_file|
         file = @course.attachments.create!(display_name: text_file, uploaded_data: default_uploaded_data)
         file.context = @course
@@ -144,7 +146,7 @@ describe 'creating a quiz' do
       end
       @quiz = course_quiz
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      insert_file_from_rce(:quiz)
+      insert_file_from_rce(:quiz, filename)
       expect(fln('b_file.txt')).to be_displayed
     end
   end

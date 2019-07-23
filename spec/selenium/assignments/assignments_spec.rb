@@ -95,6 +95,7 @@ describe "assignments" do
     end
 
     it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
+      stub_rcs_config
       @assignment = @course.assignments.create(name: 'Test Assignment')
       file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
       file.context = @course
