@@ -135,7 +135,7 @@ gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
 gem 'graphql', '1.9.7'
-gem 'graphql-batch', '0.3.9'
+gem 'graphql-batch', '0.4.1'
 
 gem 'prawn-rails', '1.2.0'
 
