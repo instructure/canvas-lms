@@ -95,7 +95,7 @@ QUnit.module('"Announcement Filter" select', () => {
     const props = makeProps()
     props.searchAnnouncements = spy
     const wrapper = shallow(<IndexHeader {...props} />)
-    const onChange = wrapper.find('Select').prop('onChange')
+    const onChange = wrapper.find('select').prop('onChange')
     onChange({target: {value: 'unread'}})
     strictEqual(spy.callCount, 1)
   })
@@ -105,7 +105,7 @@ QUnit.module('"Announcement Filter" select', () => {
     const props = makeProps()
     props.searchAnnouncements = spy
     const wrapper = shallow(<IndexHeader {...props} />)
-    const onChange = wrapper.find('Select').prop('onChange')
+    const onChange = wrapper.find('select').prop('onChange')
     onChange({target: {value: 'unread'}})
     const searchOptions = spy.lastCall.args[0]
     deepEqual(searchOptions, {filter: 'unread'})
