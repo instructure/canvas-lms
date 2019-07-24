@@ -47,11 +47,7 @@ export default class AttemptTab extends Component {
       variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id}
     })
 
-    // TODO: if we remove all of the attachments from a draft we should set it back to null
-    // we will need to update this to account for other submission types when we implement them.
-    const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft.attachments.length
-      ? mutationResult.data.createSubmissionDraft.submissionDraft
-      : null
+    const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
 
     cache.writeQuery({

@@ -88,6 +88,42 @@ function currentSubmissionGrade(assignment, submission) {
   )
 }
 
+function renderCommentsTab({assignment, submission}) {
+  // Case where this is backed by a submission draft, not a real submission, so
+  // we can't actually save comments.
+  if (submission.state === 'unsubmitted' && submission.attempt > 1) {
+    // TODO: Get design/product to get an updated SVG or something for this: COMMS-2255
+    return (
+      <SVGWithTextPlaceholder
+        text={I18n.t('You cannot leave leave comments until you submit the assignment')}
+        url={ClosedDiscussionSVG}
+      />
+    )
+  }
+
+  if (!submission.posted) {
+    return (
+      <SVGWithTextPlaceholder
+        text={I18n.t(
+          'You may not see all comments right now because the assignment is currently being graded.'
+        )}
+        url={ClosedDiscussionSVG}
+      />
+    )
+  }
+
+  return (
+    <Suspense fallback={<LoadingIndicator />}>
+      <CommentsTab assignment={assignment} submission={submission} />
+    </Suspense>
+  )
+}
+
+renderCommentsTab.propTypes = {
+  assignment: Assignment.shape,
+  submission: Submission.shape
+}
+
 function ContentTabs(props) {
   return (
     <div data-testid="assignment-2-student-content-tabs">
@@ -114,18 +150,7 @@ function ContentTabs(props) {
             </span>
           }
         >
-          {props.submission.posted ? (
-            <Suspense fallback={<LoadingIndicator />}>
-              <CommentsTab assignment={props.assignment} submission={props.submission} />
-            </Suspense>
-          ) : (
-            <SVGWithTextPlaceholder
-              text={I18n.t(
-                'You may not see all comments right now because the assignment is currently being graded.'
-              )}
-              url={ClosedDiscussionSVG}
-            />
-          )}
+          {renderCommentsTab(props)}
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>
           {props.submission.state !== 'graded' ? (

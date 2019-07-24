@@ -153,4 +153,25 @@ describe('ContentTabs', () => {
       )
     ).toBeInTheDocument()
   })
+
+  it('does not let you create comments if a dummy submission is being displayed', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({
+        attempt: 2,
+        state: 'unsubmitted'
+      })
+    })
+
+    const {getAllByText, queryByTestId, getByText} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+    fireEvent.click(getAllByText('Comments')[0])
+
+    expect(queryByTestId('assignments_2_comment_attachment')).not.toBeInTheDocument()
+    expect(
+      getByText('You cannot leave leave comments until you submit the assignment')
+    ).toBeInTheDocument()
+  })
 })
