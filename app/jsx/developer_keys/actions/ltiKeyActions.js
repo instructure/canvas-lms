@@ -115,6 +115,7 @@ actions.saveLtiToolConfiguration = ({
     })
     .then(response => {
       const newKey = response.data.developer_key
+      newKey.tool_configuration = response.data.tool_configuration.settings
       dispatch(actions.saveLtiToolConfigurationSuccessful())
       dispatch(actions.setLtiToolConfiguration(response.data.tool_configuration.settings))
       dispatch(actions.ltiKeysSetCustomizing(true))
