@@ -72,11 +72,24 @@ module BroadcastPolicies
       user_has_visibility?
     end
 
+    def should_dispatch_assignment_unmuted?
+      # This is no longer handled by the assignment in the Post Policies era,
+      # as subsets of submissions can be posted at a time. Re-using an existing
+      # Notification while hotfixing, but eventually this deserves its own
+      # submission posted Notification.
+      return false unless assignment.course.post_policies_enabled? &&
+        assignment.post_manually? &&
+        submission.grade_posting_in_progress
+
+      submission.reload
+      posted_recently?
+    end
+
     private
     def broadcasting_grades?
       course.available? &&
       !course.concluded? &&
-      !assignment.muted? &&
+      submission.posted? &&
       assignment.published? &&
       submission.quiz_submission_id.nil? &&
       user_active_or_invited?
@@ -109,6 +122,10 @@ module BroadcastPolicies
 
     def graded_recently?
       submission.assignment_graded_in_the_last_hour?
+    end
+
+    def posted_recently?
+      submission.posted_at.present? && submission.posted_at > 1.hour.ago
     end
 
     def user_has_visibility?

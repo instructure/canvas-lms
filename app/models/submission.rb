@@ -1774,6 +1774,13 @@ class Submission < ActiveRecord::Base
         should_dispatch_submission_grade_changed?
     }
 
+    p.dispatch :assignment_unmuted
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
+    p.whenever { |submission|
+      BroadcastPolicies::SubmissionPolicy.new(submission).
+        should_dispatch_assignment_unmuted?
+    }
+
   end
 
   def assignment_graded_in_the_last_hour?

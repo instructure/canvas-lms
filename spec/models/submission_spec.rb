@@ -1492,6 +1492,42 @@ describe Submission do
 
         expect(submission.messages_sent.keys).to eq ['Group Assignment Submitted Late']
       end
+
+      context "Assignment Unmuted" do
+        let(:submission) { @assignment.submissions.find_by!(user: @student) }
+
+        before(:once) do
+          @assignment_unmuted_notification = Notification.create!(name: "Assignment Unmuted")
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+          @student.update!(email: "fakeemail@example.com")
+          @student.email_channel.update!(workflow_state: :active)
+        end
+
+        it "sends a notification when a submission is posted and assignment posts manually" do
+          @assignment.ensure_post_policy(post_manually: true)
+
+          expect {
+            @assignment.post_submissions(submission_ids: [submission.id])
+          }.to change {
+            DelayedMessage.where(
+              communication_channel: @student.email_channel,
+              notification: @assignment_unmuted_notification
+            ).count
+          }.by(1)
+        end
+
+        it "does not send a notification when a submission is posted and assignment posts automatically" do
+          expect {
+            @assignment.grade_student(@student, grader: @teacher, score: 10)
+          }.not_to change {
+            DelayedMessage.where(
+              communication_channel: @student.email_channel,
+              notification: @assignment_unmuted_notification
+            ).count
+          }
+        end
+      end
     end
 
     context "Submission Graded" do
@@ -4606,7 +4642,7 @@ describe Submission do
 
     context "when post policies are enabled" do
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
+        @assignment.course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
