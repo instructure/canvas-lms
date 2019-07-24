@@ -1022,11 +1022,14 @@ class AccountsController < ApplicationController
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
-    if authentication_logging || grade_change_logging || course_logging
+    mutation_logging = @account.feature_enabled?(:mutation_audit_log) &&
+      @account.grants_right?(@current_user, :manage_account_settings)
+    if authentication_logging || grade_change_logging || course_logging || mutation_logging
       logging = {
         authentication: authentication_logging,
         grade_change: grade_change_logging,
-        course: course_logging
+        course: course_logging,
+        mutation: mutation_logging,
       }
     end
     logging ||= false
