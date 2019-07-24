@@ -155,7 +155,7 @@ export default class NewCourseModal extends React.Component {
                   </CanvasSelect.Option>
                 ))}
                 {terms.loading && (
-                  <CanvasSelect.Option isDisabled>
+                  <CanvasSelect.Option key="loading" id="loading" value="loading" isDisabled>
                     {I18n.t('Loading more terms...')}
                   </CanvasSelect.Option>
                 )}
