@@ -398,7 +398,7 @@ describe Quizzes::QuizzesController do
         user_session(@student)
         course_quiz(true)
 
-        @course.enable_feature!(:new_gradebook)
+        @quiz.assignment.course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 

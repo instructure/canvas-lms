@@ -31,7 +31,6 @@ module BroadcastPolicies
     let(:assignment) do
       double("Assignment").tap do |a|
         allow(a).to receive(:context).and_return(course)
-        allow(a).to receive(:muted?).and_return(false)
         allow(a).to receive(:published?).and_return(true)
         allow(a).to receive(:context_id).and_return(course.id)
       end
@@ -58,6 +57,7 @@ module BroadcastPolicies
         allow(s).to receive(:submitted_at).and_return(submission_time)
         allow(s).to receive(:has_submission?).and_return(true)
         allow(s).to receive(:late?).and_return(false)
+        allow(s).to receive(:posted?).and_return(true)
         allow(s).to receive(:quiz_submission_id).and_return(nil)
         allow(s).to receive(:user).and_return(user)
         allow(s).to receive(:context).and_return(course)
@@ -164,7 +164,7 @@ module BroadcastPolicies
         expect(policy.should_dispatch_submission_graded?).to be_truthy
       end
 
-      specify { wont_send_when{ allow(assignment).to receive(:muted?).and_return true }}
+      specify { wont_send_when{ allow(submission).to receive(:posted?).and_return false }}
       specify { wont_send_when{ allow(course).to receive(:available?).and_return false}}
       specify { wont_send_when{ allow(submission).to receive(:quiz_submission_id).and_return double }}
       specify { wont_send_when{ allow(assignment).to receive(:published?).and_return false}}
@@ -190,7 +190,7 @@ module BroadcastPolicies
         expect(policy.should_dispatch_submission_grade_changed?).to be_truthy
       end
 
-      specify { wont_send_when{ allow(assignment).to receive(:muted?).and_return true }}
+      specify { wont_send_when{ allow(submission).to receive(:posted?).and_return false }}
       specify { wont_send_when{ allow(submission).to receive(:graded_at).and_return nil }}
       specify { wont_send_when{ allow(submission).to receive(:quiz_submission_id).and_return double }}
       specify { wont_send_when{ allow(course).to receive(:available?).and_return false }}
@@ -199,5 +199,48 @@ module BroadcastPolicies
       specify { wont_send_when{ allow(policy).to receive(:user_has_visibility?).and_return(false)}}
     end
 
+    describe "#should_dispatch_assignment_unmuted?" do
+      let_once(:course) { Course.create! }
+      let(:assignment) { course.assignments.create! }
+      let(:policy) { SubmissionPolicy.new(submission) }
+      let(:submission) { assignment.submissions.find_by(user: student) }
+      let_once(:student) { User.create! }
+
+      before(:once) do
+        course.enroll_student(student)
+        course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+      end
+
+      before(:each) do
+        assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "returns true when the submission is being posted and the assignment posts manually" do
+        submission.update!(posted_at: Time.zone.now)
+        submission.grade_posting_in_progress = true
+        expect(policy.should_dispatch_assignment_unmuted?).to be true
+      end
+
+      it "returns false when the submission is being posted and the assignment posts automatically" do
+        assignment.ensure_post_policy(post_manually: false)
+        submission.update!(posted_at: Time.zone.now)
+        submission.grade_posting_in_progress = true
+        expect(policy.should_dispatch_assignment_unmuted?).to be false
+      end
+
+      it "returns false when Post Policies are not enabled" do
+        course.disable_feature!(:new_gradebook)
+        submission.update!(posted_at: Time.zone.now)
+        submission.grade_posting_in_progress = true
+        expect(policy.should_dispatch_assignment_unmuted?).to be false
+      end
+
+      it "returns false when the submission was posted longer than an hour ago" do
+        submission.update!(posted_at: 2.hours.ago)
+        submission.grade_posting_in_progress = true
+        expect(policy.should_dispatch_assignment_unmuted?).to be false
+      end
+    end
   end
 end

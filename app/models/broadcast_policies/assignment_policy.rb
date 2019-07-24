@@ -49,6 +49,8 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_unmuted?
+      # This is handled by individual submissions in the Post Policies era.
+      return false if assignment.context.post_policies_enabled?
       context_sendable? &&
         assignment.recently_unmuted
     end

@@ -136,7 +136,7 @@ describe Canvadocs::Session do
 
     it "includes a user_filter if the user cannot read grades" do
       PostPolicy.enable_feature!
-      @course.enable_feature!(:new_gradebook)
+      @assignment.course.enable_feature!(:new_gradebook)
       @assignment.ensure_post_policy(post_manually: true)
       permissions = canvadoc_permissions_for_user(@student, true)
       expect(permissions).to have_key(:user_filter)

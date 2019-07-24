@@ -4474,21 +4474,39 @@ describe Assignment do
     end
 
     context "assignment unmuted" do
+      let(:assignment) { @course.assignments.create! }
+
       before :once do
-        Notification.create(:name => 'Assignment Unmuted')
+        @assignment_unmuted_notification = Notification.create(name: "Assignment Unmuted")
+        @student.update!(email: "fakeemail@example.com")
+        @student.email_channel.update!(workflow_state: :active)
       end
 
       it "should create a message when an assignment is unmuted" do
-        assignment_model(:course => @course)
-        @assignment.broadcast_unmute_event
-        expect(@assignment.messages_sent).to be_include('Assignment Unmuted')
+        assignment.mute!
+
+        expect {
+          assignment.unmute!
+        }.to change {
+          DelayedMessage.where(
+            communication_channel: @student.email_channel,
+            notification: @assignment_unmuted_notification
+          ).count
+        }.by(1)
       end
 
       it "should not create a message in an unpublished course" do
-        course_factory
-        assignment_model(:course => @course)
-        @assignment.broadcast_unmute_event
-        expect(@assignment.messages_sent).not_to be_include('Assignment Unmuted')
+        @course.update!(workflow_state: "created")
+        assignment.mute!
+
+        expect {
+          assignment.unmute!
+        }.not_to change {
+          DelayedMessage.where(
+            communication_channel: @student.email_channel,
+            notification: @assignment_unmuted_notification
+          ).count
+        }
       end
     end
 
@@ -7230,6 +7248,11 @@ describe Assignment do
         }.not_to change {
           assignment.submission_for_student(student1).posted_at
         }
+      end
+
+      it "calls broadcast_notifications for submissions" do
+        expect(Submission.broadcast_policy_list).to receive(:broadcast).with(student1_submission)
+        assignment.post_submissions(submission_ids: [student1_submission.id])
       end
 
       context "when given a Progress" do

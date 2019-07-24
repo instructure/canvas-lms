@@ -1,8 +1,12 @@
+<%
+  assignment = asset.is_a?(Assignment) ? asset : asset.assignment
+%>
+
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
+  <%= polymorphic_url([assignment.context, assignment]) %>
 <% end %>
-  
+
 <% define_content :subject do %>
-  <%= t :subject, "Grades and comments released for: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
+  <%= t :subject, "Grades and comments released for: %{title}, %{course}", :title => assignment.title, :course => assignment.context.name %>
 <% end %>
 
