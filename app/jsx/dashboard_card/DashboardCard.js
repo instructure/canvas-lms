@@ -19,9 +19,13 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
+import axios from 'axios'
+
 import DashboardCardAction from './DashboardCardAction'
 import CourseActivitySummaryStore from './CourseActivitySummaryStore'
 import DashboardCardMenu from './DashboardCardMenu'
+import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
+import {showFlashError} from '../shared/FlashAlert'
 
 export default class DashboardCard extends Component {
   // ===============
@@ -42,9 +46,11 @@ export default class DashboardCard extends Component {
     handleColorChange: PropTypes.func,
     hideColorOverlays: PropTypes.bool,
     isDragging: PropTypes.bool,
+    isFavorited: PropTypes.bool,
     connectDragSource: PropTypes.func,
     connectDropTarget: PropTypes.func,
     moveCard: PropTypes.func,
+    onConfirmUnfavorite: PropTypes.func,
     totalCards: PropTypes.number,
     position: PropTypes.oneOfType([PropTypes.number, PropTypes.func])
   }
@@ -71,6 +77,8 @@ export default class DashboardCard extends Component {
       nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id),
       ...CourseActivitySummaryStore.getStateForCourse(props.id)
     }
+
+    this.removeCourseFromFavorites = this.removeCourseFromFavorites.bind(this)
   }
 
   // ===============
@@ -141,6 +149,16 @@ export default class DashboardCard extends Component {
     }
   }
 
+  handleUnfavorite = () => {
+    const modalProps = {
+      courseId: this.props.id,
+      courseName: this.props.originalName,
+      onConfirm: this.removeCourseFromFavorites,
+      onClose: this.handleClose,
+      onEntered: this.handleEntered
+    }
+    showConfirmUnfavorite(modalProps)
+  }
   // ===============
   //    HELPERS
   // ===============
@@ -183,6 +201,20 @@ export default class DashboardCard extends Component {
       canMoveToBeginning: !isFirstCard,
       canMoveToEnd: !isLastCard
     }
+  }
+
+  removeCourseFromFavorites() {
+    const url = `/api/v1/users/self/favorites/courses/${this.props.id}`
+    axios
+      .delete(url)
+      .then(response => {
+        if (response.status === 200) {
+          this.props.onConfirmUnfavorite(this.props.id)
+        }
+      })
+      .catch(() =>
+        showFlashError(I18n.t('We were unable to remove this course from your favorites.'))
+      )
   }
 
   // ===============
@@ -257,6 +289,8 @@ export default class DashboardCard extends Component {
           currentColor={this.props.backgroundColor}
           nicknameInfo={this.state.nicknameInfo}
           assetString={this.props.assetString}
+          onUnfavorite={this.handleUnfavorite}
+          isFavorited={this.props.isFavorited}
           {...reorderingProps}
           trigger={
             <button

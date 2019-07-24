@@ -18,9 +18,11 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
 import MovementUtils from './MovementUtils'
+import {showNoFavoritesAlert} from './ConfirmUnfavoriteCourseModal'
 
 export default class DashboardCardBox extends React.Component {
   static propTypes = {
@@ -33,6 +35,12 @@ export default class DashboardCardBox extends React.Component {
     courseCards: [],
     hideColorOverlays: false,
     connectDropTarget: el => el
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.handleRerenderCards = this.handleRerenderCards.bind(this)
   }
 
   componentWillMount() {
@@ -78,7 +86,7 @@ export default class DashboardCardBox extends React.Component {
     let newCards = this.state.courseCards.slice()
     newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0])
     newCards = newCards.map((card, index) => {
-      const newCard = Object.assign({}, card)
+      const newCard = {...card}
       newCard.position = index
       return newCard
     })
@@ -90,6 +98,23 @@ export default class DashboardCardBox extends React.Component {
         MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id)
         if (typeof cb === 'function') {
           cb()
+        }
+      }
+    )
+  }
+
+  handleRerenderCards(courseId) {
+    const cardIndex = this.state.courseCards.findIndex(card => card.id === courseId)
+    const newCards = this.state.courseCards.slice()
+    newCards[cardIndex].isFavorited = false
+    newCards.splice(cardIndex, 1)
+    this.setState(
+      {
+        courseCards: newCards
+      },
+      () => {
+        if (newCards.length === 0) {
+          showNoFavoritesAlert()
         }
       }
     )
@@ -115,10 +140,12 @@ export default class DashboardCardBox extends React.Component {
           handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
           image={card.image}
           hideColorOverlays={this.props.hideColorOverlays}
+          onConfirmUnfavorite={this.handleRerenderCards}
           position={position}
           currentIndex={index}
           moveCard={this.moveCard}
           totalCards={this.state.courseCards.length}
+          isFavorited={card.isFavorited}
         />
       )
     })
