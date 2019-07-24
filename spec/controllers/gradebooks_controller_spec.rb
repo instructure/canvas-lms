@@ -2203,6 +2203,99 @@ describe GradebooksController do
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env[:final_grader_id]).to eql @teacher.id
       end
+
+      describe "student group filtering" do
+        before(:each) do
+          @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+
+          group_category.create_groups(2)
+          group1.add_user(@student)
+        end
+
+        let(:group_category) { @course.group_categories.create!(name: "a group category") }
+        let(:group1) { group_category.groups.first }
+
+        context "when the SpeedGrader student group filter is enabled for the course" do
+          before(:each) do
+            @course.enable_feature!(:new_gradebook)
+            @course.update!(filter_speed_grader_by_student_group: true)
+          end
+
+          it "sets filter_speed_grader_by_student_group to true" do
+            get :speed_grader, params: {course_id: @course, assignment_id: @assignment}
+            expect(js_env[:filter_speed_grader_by_student_group]).to be true
+          end
+
+          context "when loading a student causes a new group to be selected" do
+            it "updates the viewing user's preferences for the course with the new group" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: @student}
+              @teacher.reload
+
+              saved_group_id = @teacher.preferences.dig(:gradebook_settings, @course.id, "filter_rows_by", "student_group_id")
+              expect(saved_group_id).to eq group1.id.to_s
+            end
+
+            it "sets selected_student_group to the group's JSON representation" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: @student}
+              expect(js_env.dig(:selected_student_group, "id")).to eq group1.id
+            end
+
+            it "sets student_group_reason_for_change to the supplied change reason" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: @student}
+              expect(js_env[:student_group_reason_for_change]).to eq :no_group_selected
+            end
+          end
+
+          context "when the selected group stays the same" do
+            before(:each) do
+              @teacher.preferences[:gradebook_settings] = {@course.id => {"filter_rows_by" => {"student_group_id" => group1.id}}}
+            end
+
+            it "sets selected_student_group to the selected group's JSON representation" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: @student}
+              expect(js_env.dig(:selected_student_group, "id")).to eq group1.id
+            end
+
+            it "does not set a value for student_group_reason_for_change" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: @student}
+              expect(js_env).not_to include(:student_group_reason_for_change)
+            end
+          end
+
+          context "when the selected group is cleared due to loading a student not in any group" do
+            let(:groupless_student) { @course.enroll_student(User.create!, enrollment_state: :active).user }
+
+            before(:each) do
+              @teacher.preferences[:gradebook_settings] = {@course.id => {"filter_rows_by" => {"student_group_id" => group1.id}}}
+            end
+
+            it "clears the selected group from the viewing user's preferences for the course" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: groupless_student}
+              @teacher.reload
+
+              saved_group_id = @teacher.preferences.dig(:gradebook_settings, @course.id, "filter_rows_by", "student_group_id")
+              expect(saved_group_id).to be nil
+            end
+
+            it "does not set selected_student_group" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: groupless_student}
+              expect(js_env).not_to include(:selected_student_group)
+            end
+
+            it "sets student_group_reason_for_change to the supplied change reason" do
+              get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: groupless_student}
+              expect(js_env[:student_group_reason_for_change]).to eq :student_in_no_groups
+            end
+          end
+        end
+
+        context "when the SpeedGrader student group filter is not enabled for the course" do
+          it "does not set filter_speed_grader_by_student_group" do
+            get :speed_grader, params: {course_id: @course, assignment_id: @assignment}
+            expect(js_env).not_to include(:filter_speed_grader_by_student_group)
+          end
+        end
+      end
     end
 
     it 'sets disable_unmute_assignment to false if the assignment is not muted' do

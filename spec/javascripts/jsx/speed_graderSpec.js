@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom'
 import _ from 'underscore'
 
 import SpeedGrader from 'speed_grader'
+import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
 import SpeedGraderHelpers from 'speed_grader_helpers'
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache'
 import fakeENV from 'helpers/fakeENV'
@@ -3820,6 +3821,39 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
             SpeedGrader.EG.jsonReady()
             strictEqual(history.back.callCount, 1)
           })
+        })
+      })
+
+      QUnit.module('student group change alert', hooks => {
+        let changeAlertStub
+
+        hooks.beforeEach(() => {
+          fakeENV.setup({
+            ...ENV,
+            selected_student_group: {name: 'Some Group or Other'},
+            student_group_reason_for_change: 'student_not_in_selected_group',
+          })
+
+          changeAlertStub = sandbox.stub(SpeedGraderAlerts, 'showStudentGroupChangeAlert')
+        })
+
+        hooks.afterEach(() => {
+          changeAlertStub.restore()
+        })
+
+        test('always calls showStudentGroupChangeAlert during setup', () => {
+          SpeedGrader.EG.jsonReady()
+          strictEqual(changeAlertStub.callCount, 1)
+        })
+
+        test('passes the value of ENV.selected_student_group as selectedStudentGroup', () => {
+          SpeedGrader.EG.jsonReady()
+          deepEqual(changeAlertStub.firstCall.args[0].selectedStudentGroup, {name: 'Some Group or Other'})
+        })
+
+        test('passes the value of ENV.student_group_reason_for_change as reasonForChange', () => {
+          SpeedGrader.EG.jsonReady()
+          strictEqual(changeAlertStub.firstCall.args[0].reasonForChange, 'student_not_in_selected_group')
         })
       })
     })

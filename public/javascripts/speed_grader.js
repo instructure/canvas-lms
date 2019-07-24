@@ -68,6 +68,7 @@ import SpeedgraderHelpers, {
   setupIsAnonymous,
   setupIsModerated
 } from './speed_grader_helpers'
+import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
 import turnitinInfoTemplate from 'jst/_turnitinInfo'
 import turnitinScoreTemplate from 'jst/_turnitinScore'
 import vericiteInfoTemplate from 'jst/_vericiteInfo'
@@ -1388,6 +1389,13 @@ EG = {
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+
+      if (ENV.student_group_reason_for_change != null) {
+        SpeedGraderAlerts.showStudentGroupChangeAlert({
+          selectedStudentGroup: ENV.selected_student_group,
+          reasonForChange: ENV.student_group_reason_for_change
+        })
+      }
       setupPostPolicies()
     }
   },
