@@ -31,13 +31,13 @@ gem 'rails-observers', '0.1.5'
 gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.5'
 
-gem 'encrypted_cookie_store-instructure', '1.2.8', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.13.2'
+gem 'switchman', '1.14.3'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -65,7 +65,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.15.8'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.3.3'
+gem 'switchman-inst-jobs', '1.3.4'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.25.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
@@ -93,7 +93,7 @@ gem 'jwt', '1.5.6', require: false
 gem 'json-jwt', '1.9.4', require: false
 gem 'twilio-ruby', '5.7.2', require: false
 
-gem 'mail', '2.7.0', require: false
+gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.0', require: false
 gem 'marginalia', '1.5.0', require: false
 gem 'mime-types', '3.2.2'
@@ -113,13 +113,13 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
-gem 'saml2', '3.0.7'
+gem 'saml2', '3.0.8'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.2', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.1', require: false
-gem 'shackles', '1.4.1'
+gem 'shackles', '1.4.2'
 
 gem 'browser', '2.5.3', require: false
 
