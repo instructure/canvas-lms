@@ -338,7 +338,7 @@ describe('UnsplashPanel', () => {
       searchUnsplash: jest.fn().mockResolvedValue(fakeResults)
     }
     const fakeSetUnsplashData = jest.fn()
-    const {getByText, getByLabelText} = render(
+    const {getAllByText, getByLabelText} = render(
       <UnsplashPanel liveRegion={() => document.getElementById('flash_screenreader_holder')} source={fakeSource} setUnsplashData={fakeSetUnsplashData}/>
     )
     const selectBox = getByLabelText('Search Term')
@@ -346,7 +346,7 @@ describe('UnsplashPanel', () => {
       userEvent.click(selectBox)
       userEvent.type(selectBox, 'kittens')
     })
-    await wait(() => (getByText('Next Page')))
+    await wait(() => (getAllByText('Next Page')[0]))
     expect(liveRegion.textContent.trim()).toBe('2321 results found, 12 results currently displayed')
   })
 
