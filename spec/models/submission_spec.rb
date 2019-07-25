@@ -2720,17 +2720,15 @@ describe Submission do
   end
 
   describe "'view_turnitin_report' right" do
-    let(:teacher) do
-      user = User.create
-      @context.enroll_teacher(user)
-      user
-    end
+    subject { @submission }
+
+    let(:teacher) { @teacher }
+    let(:student) { @student }
 
     before :once do
       @assignment.update!(submission_types: "online_upload,online_text_entry")
-
-      @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
-      @submission.turnitin_data = {
+      @submission = @assignment.submit_homework(student, {body: "hello there", submission_type: 'online_text_entry'})
+      @submission.update!(turnitin_data: {
         "submission_#{@submission.id}" => {
           web_overlap: 92,
           error: true,
@@ -2740,8 +2738,7 @@ describe Submission do
           student_overlap: 90,
           similarity_score: 92
         }
-      }
-      @submission.save!
+      })
     end
 
     it "is available when the plagiarism report is from turnitin" do
@@ -2756,6 +2753,55 @@ describe Submission do
     it "is not available when the plagiarism report is from vericite" do
       @submission.turnitin_data[:provider] = 'vericite'
       expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    context 'when post policies are enabled' do
+      before do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+      end
+
+      it { expect(@submission).to be_grants_right(student, nil, :view_turnitin_report) }
+
+      context 'when originality report visibility is after_grading' do
+        before do
+          @assignment.update!(
+            turnitin_settings: @assignment.turnitin_settings.merge(originality_report_visibility: 'after_grading')
+          )
+        end
+
+        it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
+
+        context 'when the submission is graded' do
+          subject(:submission) { @assignment.grade_student(student, grade: 10, grader: teacher).first }
+
+          it { is_expected.to be_grants_right(student, nil, :view_turnitin_report) }
+        end
+      end
+
+      context 'when originality report visibility is after_due_date' do
+        before do
+          @assignment.update!(
+            turnitin_settings: @assignment.turnitin_settings.merge(originality_report_visibility: 'after_due_date')
+          )
+        end
+
+        it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
+
+        context 'when assignment.due_date is in the past' do
+          before { @assignment.update!(due_at: 1.day.ago) }
+          it { is_expected.to be_grants_right(student, nil, :view_turnitin_report) }
+        end
+      end
+
+      context 'when originality report visibility is never' do
+        before do
+          @assignment.update!(
+            turnitin_settings: @assignment.turnitin_settings.merge(originality_report_visibility: 'never')
+          )
+        end
+        it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
+      end
     end
   end
 
@@ -6559,82 +6605,69 @@ describe Submission do
   end
 
   describe "#hide_grade_from_student?" do
-    context "when Post Policies are enabled" do
-      let_once(:course) { Course.create! }
-      let_once(:student) { User.create! }
-      let_once(:teacher) { User.create! }
-      let(:assignment) { course.assignments.create! }
-      let(:submission) { assignment.submissions.find_by(user: student) }
+    subject(:submission) { assignment.submissions.find_by!(user: student) }
 
-      before(:once) do
-        course.enable_feature!(:new_gradebook)
-        PostPolicy.enable_feature!
-        course.enroll_student(student)
-        course.enroll_teacher(teacher)
-      end
+    let(:course) { @course }
+    let(:assignment) { @assignment }
+    let(:teacher) { @teacher }
+    let(:student) { @student }
 
-      it "returns true when submission is unposted and assignment posts manually" do
-        assignment.ensure_post_policy(post_manually: true)
-        expect(submission).to be_hide_grade_from_student
-      end
-
-      it "returns false when submission is posted and assignment posts manually" do
-        assignment.ensure_post_policy(post_manually: true)
-        submission.update!(posted_at: Time.zone.now)
-        expect(submission).not_to be_hide_grade_from_student
-      end
-
-      it "returns false when submission is unposted and assignment posts automatically" do
-        assignment.ensure_post_policy(post_manually: false)
-        expect(submission).not_to be_hide_grade_from_student
-      end
-
-      it "returns false when submission is posted and assignment posts automatically" do
-        assignment.ensure_post_policy(post_manually: false)
-        submission.update!(posted_at: Time.zone.now)
-        expect(submission).not_to be_hide_grade_from_student
-      end
+    before do
+      course.enroll_student(student)
+      course.enroll_teacher(teacher)
     end
 
-    context "when Post Policies are not enabled" do
-      let_once(:course) { Course.create! }
-      let_once(:student) { User.create! }
-      let_once(:teacher) { User.create! }
-      let(:assignment) { course.assignments.create! }
-      let(:submission) { assignment.submissions.find_by(user: student) }
+    it { is_expected.not_to be_hide_grade_from_student }
 
-      before(:once) do
-        course.enroll_student(student)
-        course.enroll_teacher(teacher)
+    context 'when assignment is muted' do
+      before { assignment.mute! }
+      it { is_expected.to be_hide_grade_from_student }
+    end
+
+    context "when Post Policies are enabled" do
+      before do
+        course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
       end
 
-      it "returns true when assignment is muted" do
-        assignment.mute!
-        expect(submission).to be_hide_grade_from_student
+      context 'when assignment posts manually' do
+        before { assignment.ensure_post_policy(post_manually: true) }
+
+        it { is_expected.to be_hide_grade_from_student }
+        it { is_expected.not_to be_hide_grade_from_student(for_plagiarism: true) }
+
+        context 'when a submissions is posted' do
+          before { submission.update!(posted_at: Time.zone.now) }
+          it { is_expected.not_to be_hide_grade_from_student }
+        end
       end
 
-      it "returns false when assignment is not muted" do
-        expect(submission).not_to be_hide_grade_from_student
+      context 'when assignment posts automatically' do
+        before { assignment.ensure_post_policy(post_manually: false) }
+        it { is_expected.not_to be_hide_grade_from_student }
+
+        context 'when submission is posted' do
+          before { submission.update!(posted_at: Time.zone.now) }
+          it { is_expected.not_to be_hide_grade_from_student }
+        end
       end
     end
   end
 
   describe "posting and unposting" do
-    before(:each) do
+    subject(:submission) { @assignment.submissions.first }
+
+    before do
       @assignment.course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
     end
 
-    let(:submission) { @assignment.submissions.first }
-
     describe "#posted?" do
+      it { is_expected.not_to be_posted }
+
       it "returns true if the submission's posted_at date is not nil" do
         submission.update!(posted_at: Time.zone.now)
         expect(submission).to be_posted
-      end
-
-      it "returns false if the submission's posted_at date is nil" do
-        expect(submission).not_to be_posted
       end
     end
 

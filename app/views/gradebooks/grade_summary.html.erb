@@ -333,7 +333,7 @@
             <i class="icon-rubric"></i>
           </a>
           <% if assignment_presenter.show_submission_details? %>
-            <% if @presenter.turnitin_enabled? || assignment_presenter.originality_report? %>
+            <% if @presenter.turnitin_enabled? || assignment_presenter.originality_report? || assignment_presenter.turnitin %>
               <%
                 turnitin = nil
                 url = '#'
