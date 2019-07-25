@@ -138,127 +138,231 @@ describe "/gradebooks/grade_summary" do
 
   describe "plagiarism info" do
     let(:course) { Course.create! }
-    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:site_admin) { site_admin_user }
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:attachment) { attachment_model(context: student, content_type: 'text/plain') }
+    let(:state) { 'acceptable' }
 
-    let(:assignment) do
-      course.assignments.create!(
-        title: 'hi',
-        submission_types: 'online_text_entry',
-        anonymous_grading: true
-      )
+    before { assign(:context, course) }
+
+    context "when there is no turnitin_data" do
+      context "when an assignment is not anonymous" do
+        let(:assignment) { course.assignments.create!(submission_types: 'online_upload') }
+
+        before { assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment]) }
+
+        context "when viewed by the submitting student" do
+          let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+          before do
+            assign(:presenter, presenter)
+            assign(:current_user, student)
+            render "gradebooks/grade_summary"
+          end
+
+          it "does not show turnitin plagiarism image" do
+            expect(response).not_to have_tag("img[src*=turnitin_#{state}_score][alt='See Turnitin results']")
+          end
+
+          it "does not show turnitin plagiarism tooltip" do
+            expect(response).not_to have_tag('.tooltip_text:contains("See Turnitin results")')
+          end
+        end
+      end
     end
 
-    before(:each) do
-      assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello')
-      assign(:context, course)
-    end
-
-    context "for an anonymous assignment viewed by a teacher" do
-      let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
-
-      before(:each) do
-        assign(:presenter, presenter)
-        assign(:current_user, teacher)
+    context "when turnitin_data is present" do
+      let(:turnitin_data) do
+        {
+          "attachment_#{attachment.id}" => {
+            similarity_score: 1.0,
+            web_overlap: 5.0,
+            publication_overlap: 0.0,
+            student_overlap: 0.0,
+            state: state
+          }
+        }
       end
 
-      context "when the assignment uses Turnitin" do
-        before(:each) do
-          allow(presenter).to receive(:turnitin_enabled?).and_return(true)
-        end
+      let(:assignment) { course.assignments.create!(submission_types: 'online_upload') }
 
-        it "does not show plagiarism info when students are anonymized" do
+      before do
+        submission = assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment])
+        submission.update_attribute :turnitin_data, turnitin_data
+      end
+
+      context "when viewed by the submitting student" do
+        let(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+        before do
+          assign(:presenter, presenter)
+          assign(:current_user, student)
           render "gradebooks/grade_summary"
-          expect(response).not_to have_tag("a[@title='Similarity score -- more information']")
         end
 
-        it "shows plagiarism info when students are not anonymized" do
-          assignment.unmute!
+        it "shows turnitin plagiarism image" do
+          expect(response).to have_tag("img[src*=turnitin_#{state}_score][alt='See Turnitin results']")
+        end
+
+        it "shows turnitin plagiarism tooltip" do
+          expect(response).to have_tag('.tooltip_text:contains("See Turnitin results")')
+        end
+      end
+
+      context "when viewed by a teacher" do
+        let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
+
+        before do
+          assign(:presenter, presenter)
+          assign(:current_user, teacher)
+          render "gradebooks/grade_summary"
+        end
+
+        it "shows turnitin plagiarism image" do
+          expect(response).to have_tag("img[src*=turnitin_#{state}_score][alt='See Turnitin results']")
+        end
+
+        it "shows turnitin plagiarism tooltip" do
+          expect(response).to have_tag('.tooltip_text:contains("See Turnitin results")')
+        end
+      end
+
+      context "when viewed by an admin" do
+        let(:presenter) { GradeSummaryPresenter.new(course, site_admin, student.id) }
+
+        before do
+          assign(:presenter, presenter)
+          assign(:current_user, site_admin)
+          render "gradebooks/grade_summary"
+        end
+
+        it "shows turnitin plagiarism image" do
+          expect(response).to have_tag("img[src*=turnitin_#{state}_score][alt='See Turnitin results']")
+        end
+
+        it "shows turnitin plagiarism tooltip" do
+          expect(response).to have_tag('.tooltip_text:contains("See Turnitin results")')
+        end
+      end
+    end
+
+    context "when an assignment is anonymous" do
+      let(:assignment) do
+        course.assignments.create!(title: 'hi', submission_types: 'online_upload', anonymous_grading: true)
+      end
+
+      before { assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello') }
+
+      context "when viewed by a teacher" do
+        let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
+
+        before do
+          assign(:presenter, presenter)
+          assign(:current_user, teacher)
+        end
+
+        it "calls turnitin_enabled? and returns false" do
+          expect(presenter).to receive(:turnitin_enabled?).and_return(false)
+          render "gradebooks/grade_summary"
+        end
+
+        context "when the assignment uses Turnitin" do
+          before { allow(presenter).to receive(:turnitin_enabled?).and_return(true) }
+
+          it "does not show plagiarism info when students are anonymized" do
+            render "gradebooks/grade_summary"
+            expect(response).not_to have_tag("a[@title='Similarity score -- more information']")
+          end
+
+          it "shows plagiarism info when students are not anonymized" do
+            assignment.unmute!
+
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag("a[@title='Similarity score -- more information']")
+          end
+        end
+
+        context "when the submission has an associated originality report" do
+          before do
+            assignment.submission_for_student(student).originality_reports.create!(
+              workflow_state: 'scored',
+              originality_score: 88
+            )
+          end
+
+          it "does not show plagiarism info when students are anonymized" do
+            render "gradebooks/grade_summary"
+            expect(response).not_to have_tag("a[@title='Originality Report']")
+          end
+
+          it "shows plagiarism info when students are not anonymized" do
+            assignment.unmute!
+
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag("a[@title='Originality Report']")
+          end
+        end
+
+        context "when the assignment uses Vericite" do
+          before { allow(presenter).to receive(:vericite_enabled?).and_return(true) }
+
+          it "does not show plagiarism info when students are anonymized" do
+            render "gradebooks/grade_summary"
+            expect(response).not_to have_tag("a[@title='VeriCite similarity score -- more information']")
+          end
+
+          it "shows plagiarism info when students are not anonymized" do
+            assignment.unmute!
+
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag("a[@title='VeriCite similarity score -- more information']")
+          end
+        end
+      end
+
+      context "for an anonymized assignment viewed by a site administrator" do
+        let(:site_admin) { site_admin_user }
+        let(:presenter) { GradeSummaryPresenter.new(course, site_admin, student.id) }
+
+        before do
+          assign(:presenter, presenter)
+          assign(:current_user, site_admin)
+        end
+
+        it "always shows plagiarism info when the assignment uses Turnitin" do
+          allow(presenter).to receive(:turnitin_enabled?).and_return(true)
 
           render "gradebooks/grade_summary"
           expect(response).to have_tag("a[@title='Similarity score -- more information']")
         end
-      end
 
-      context "when the submission has an associated originality report" do
-        before(:each) do
+        it "always shows plagiarism info when the submission has an originality report" do
           assignment.submission_for_student(student).originality_reports.create!(
             workflow_state: 'scored',
             originality_score: 88
           )
-        end
-
-        it "does not show plagiarism info when students are anonymized" do
-          render "gradebooks/grade_summary"
-          expect(response).not_to have_tag("a[@title='Originality Report']")
-        end
-
-        it "shows plagiarism info when students are not anonymized" do
-          assignment.unmute!
 
           render "gradebooks/grade_summary"
           expect(response).to have_tag("a[@title='Originality Report']")
         end
-      end
 
-      context "when the assignment uses Vericite" do
-        before(:each) do
+        it "always shows plagiarism info when the assignment uses Vericite" do
           allow(presenter).to receive(:vericite_enabled?).and_return(true)
-        end
-
-        it "does not show plagiarism info when students are anonymized" do
-          render "gradebooks/grade_summary"
-          expect(response).not_to have_tag("a[@title='VeriCite similarity score -- more information']")
-        end
-
-        it "shows plagiarism info when students are not anonymized" do
-          assignment.unmute!
 
           render "gradebooks/grade_summary"
           expect(response).to have_tag("a[@title='VeriCite similarity score -- more information']")
         end
       end
     end
-
-    context "for an anonymized assignment viewed by a site administrator" do
-      let(:site_admin) { site_admin_user }
-      let(:presenter) { GradeSummaryPresenter.new(course, site_admin, student.id) }
-
-      before(:each) do
-        assign(:presenter, presenter)
-        assign(:current_user, site_admin)
-      end
-
-      it "always shows plagiarism info when the assignment uses Turnitin" do
-        allow(presenter).to receive(:turnitin_enabled?).and_return(true)
-
-        render "gradebooks/grade_summary"
-        expect(response).to have_tag("a[@title='Similarity score -- more information']")
-      end
-
-      it "always shows plagiarism info when the submission has an originality report" do
-        assignment.submission_for_student(student).originality_reports.create!(
-          workflow_state: 'scored',
-          originality_score: 88
-        )
-
-        render "gradebooks/grade_summary"
-        expect(response).to have_tag("a[@title='Originality Report']")
-      end
-
-      it "always shows plagiarism info when the assignment uses Vericite" do
-        allow(presenter).to receive(:vericite_enabled?).and_return(true)
-
-        render "gradebooks/grade_summary"
-        expect(response).to have_tag("a[@title='VeriCite similarity score -- more information']")
-      end
-    end
   end
 
   describe "hidden indicator" do
     let_once(:course) { Course.create! }
-    let_once(:student) { course.enroll_student(User.create!(name: "Fred"), active_all: true).user }
+    let_once(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let_once(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
     let_once(:assignment) { course.assignments.create!(title: 'hi') }
+    let_once(:submission) { assignment.submissions.find_by!(user: student) }
 
     before(:once) do
       assign(:presenter, GradeSummaryPresenter.new(course, student, student.id))
@@ -272,7 +376,7 @@ describe "/gradebooks/grade_summary" do
         PostPolicy.enable_feature!
       end
 
-      context "when submission is hidden" do
+      context "when post policy is set to manual" do
         before(:once) do
           assignment.ensure_post_policy(post_manually: true)
         end
@@ -286,16 +390,52 @@ describe "/gradebooks/grade_summary" do
           render "gradebooks/grade_summary"
           expect(response).to have_tag(".assignment_score i[@title='Hidden']")
         end
+
+        context "when submissions are posted" do
+          before { assignment.post_submissions(submission_ids: submission.id) }
+
+          it "does not add the 'Hidden' title to the icon" do
+            render "gradebooks/grade_summary"
+            expect(response).not_to have_tag(".assignment_score i[@title='Hidden']")
+          end
+
+          it "does not display the 'hidden' icon" do
+            render "gradebooks/grade_summary"
+            expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
+          end
+        end
       end
 
-      context "when submission is not hidden" do
+      context "when post policy is set to automatic" do
         before(:once) do
           assignment.ensure_post_policy(post_manually: false)
+        end
+
+        it "does not add the 'Hidden' title to the icon" do
+          render "gradebooks/grade_summary"
+          expect(response).not_to have_tag(".assignment_score i[@title='Hidden']")
         end
 
         it "does not display the 'hidden' icon" do
           render "gradebooks/grade_summary"
           expect(response).not_to have_tag(".assignment_score i[@class='icon-off']")
+        end
+
+        context "when submissions are graded and unposted" do
+          before do
+            assignment.grade_student(student, score: 10, grader: teacher)
+            assignment.hide_submissions(submission_ids: submission.id)
+          end
+
+          it "adds the 'Hidden' title to the icon" do
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag(".assignment_score i[@title='Hidden']")
+          end
+
+          it "displays the 'hidden' icon" do
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag(".assignment_score i[@class='icon-off']")
+          end
         end
       end
     end
