@@ -155,7 +155,8 @@ module ConditionalRelease
       end
 
       trigger_submission = trigger_assignment.submission_for_student(student)
-      if trigger_submission.blank? || !trigger_submission.graded? || trigger_assignment.muted?
+      submission_hidden = context.post_policies_enabled? ? !trigger_submission&.posted? : trigger_assignment.muted?
+      if trigger_submission.blank? || !trigger_submission.graded? || submission_hidden
         return { code: '400', body: { message: 'invalid submission state' } }
       end
 
@@ -291,13 +292,18 @@ module ConditionalRelease
         return [] unless student.present?
         Rails.cache.fetch(submissions_cache_key(student), force: force) do
           keys = [:id, :assignment_id, :score, "assignments.points_possible"]
-          context.submissions.
+          submissions = context.submissions.
             for_user(student).
             in_workflow_state(:graded).
-            where(assignments: {muted: false}).
-            eager_load(:assignment).
-            pluck(*keys).
-            map do |values|
+            eager_load(:assignment)
+
+          submissions = if context.post_policies_enabled?
+            submissions.posted
+          else
+            submissions.where(assignments: {muted: false})
+          end
+
+          submissions.pluck(*keys).map do |values|
             submission = Hash[keys.zip(values)]
             submission[:points_possible] = submission.delete("assignments.points_possible")
             submission

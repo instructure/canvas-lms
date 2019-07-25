@@ -433,7 +433,7 @@ module AccountReports::ReportHelper
           report = self.instance_variable_get(:@account_report).reload
           updates = {}
           updates[:current_line] = lineno
-          updates[:progress] = (lineno.to_f / report.total_lines * 100).to_i if report.total_lines
+          updates[:progress] = (lineno.to_f / (report.total_lines + 1) * 100).to_i if report.total_lines
           report.update_attributes(updates)
           if report.workflow_state == 'deleted'
             report.workflow_state = 'aborted'
