@@ -44,4 +44,24 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       # check_file would be good to do here but the src on the file in the wiki body is messed up
     end
   end
+
+  context "wiki sidebar files and locking/hiding" do
+    before(:each) do
+      stub_rcs_config
+      course_with_teacher(:active_all => true, :name => 'wiki course')
+      @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
+      @course.enroll_student(@student).accept
+      user_session(@student)
+      @root_folder = Folder.root_folders(@course).first
+      @sub_folder = @root_folder.sub_folders.create!(:name => "visible subfolder", :context => @course)
+    end
+
+    it "should not show files tab if root folder is locked", ignore_js_errors: true do
+      @root_folder.locked = true
+      @root_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).not_to contain_jqcss('[role="presentation"]:contains("Files")')
+    end
+  end
 end
