@@ -974,6 +974,98 @@ describe "Accounts API", type: :request do
       end
     end
 
+    describe "?starts_before" do
+      before :once do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :start_at => 2.days.ago))
+        end
+
+        @c2.start_at = 1.week.ago
+        @c2.save!
+
+        term = @c3.root_account.enrollment_terms.create! :start_at => 3.days.ago.change(:usec => 0)
+        @c3.start_at = nil
+        @c3.enrollment_term = term
+        @c3.save!
+
+        @c4.start_at = nil
+        @c4.save!
+
+        @user = @me
+      end
+
+      it "should not apply if not specified" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api',
+                           :account_id => @a1.to_param, :format => 'json' })
+        expect(json.collect{|row| row['name']}).to eql ['c1', 'c2', 'c3', 'c4']
+      end
+
+      it "should filter inclusively and include null values" do
+        date = @c3.enrollment_term.start_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?starts_before=#{date.iso8601}",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :starts_before => date.iso8601 })
+        expect(json.collect{|row| row['name']}).to eql ['c2', 'c3', 'c4']
+      end
+
+      it "should filter and sort without asploding" do
+        date = @c3.enrollment_term.start_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?starts_before=#{date.iso8601}&sort=course_name&order=desc",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :starts_before => date.iso8601,
+                          :sort => 'course_name', :order => 'desc' })
+        expect(json.collect{|row| row['name']}).to eql ['c4', 'c3', 'c2']
+      end
+    end
+
+    describe "?ends_after" do
+      before :once do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :conclude_at => 2.days.from_now))
+        end
+
+        @c2.conclude_at = 1.week.from_now
+        @c2.save!
+
+        term = @c3.root_account.enrollment_terms.create! :end_at => 3.days.from_now.change(:usec => 0)
+        @c3.conclude_at = nil
+        @c3.enrollment_term = term
+        @c3.save!
+
+        @c4.conclude_at = nil
+        @c4.save!
+
+        @user = @me
+      end
+
+      it "should not apply if not specified" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api',
+                           :account_id => @a1.to_param, :format => 'json' })
+        expect(json.collect{|row| row['name']}).to eql ['c1', 'c2', 'c3', 'c4']
+      end
+
+      it "should filter inclusively and include null values" do
+        date = @c3.enrollment_term.end_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?ends_after=#{date.iso8601}",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :ends_after => date.iso8601 })
+        expect(json.collect{|row| row['name']}).to eql ['c2', 'c3', 'c4']
+      end
+
+      it "should filter and sort without asploding" do
+        date = @c3.enrollment_term.end_at
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?ends_after=#{date.iso8601}&sort=course_name&order=desc",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :ends_after => date.iso8601,
+                          :sort => 'course_name', :order => 'desc' })
+        expect(json.collect{|row| row['name']}).to eql ['c4', 'c3', 'c2']
+      end
+    end
+
     describe "?by_teachers" do
       before :once do
         @me = @user
