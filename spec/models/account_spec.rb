@@ -1721,7 +1721,7 @@ describe Account do
   end
 
   context "fancy redis caching" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     describe "cached_account_users_for" do
       before :each do

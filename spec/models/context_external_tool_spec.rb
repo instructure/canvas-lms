@@ -1406,7 +1406,7 @@ describe ContextExternalTool do
 
     it "should update the visibility cache if enrollments are updated or user is touched" do
       time = Time.now
-      enable_cache(:redis_store) do
+      enable_cache(:redis_cache_store) do
         Timecop.freeze(time) do
           course_with_student(:account => @account, :active_all => true)
           expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'

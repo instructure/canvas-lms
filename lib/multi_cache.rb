@@ -21,11 +21,12 @@ class MultiCache < ActiveSupport::Cache::Store
     @multi_cache ||= begin
       ha_cache_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: ApplicationController.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
       if (ha_cache_config[:cache_store])
+        ha_cache_config[:url] = ha_cache_config[:servers] if ha_cache_config[:servers]
         store = ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)
         store.options.delete(:namespace)
         store
-      elsif defined?(ActiveSupport::Cache::RedisStore) && Rails.cache.is_a?(ActiveSupport::Cache::RedisStore) &&
-          defined?(Redis::DistributedStore) && (store = Rails.cache.instance_variable_get(:@data)).is_a?(Redis::DistributedStore)
+      elsif defined?(ActiveSupport::Cache::RedisCacheStore) && Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore) &&
+          defined?(Redis::Distributed) && (store = Rails.cache.redis).is_a?(Redis::Distributed)
         store.instance_variable_get(:@multi_cache) || store.instance_variable_set(:@multi_cache, MultiCache.new(store.ring.nodes))
       else
         Rails.cache

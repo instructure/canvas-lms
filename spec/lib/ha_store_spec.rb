@@ -22,7 +22,7 @@ describe ActiveSupport::Cache::HaStore do
     skip unless Canvas.redis_enabled?
   end
 
-  let(:store) { ActiveSupport::Cache::HaStore.new(Canvas.redis.id, expires_in: 5.minutes, race_condition_ttl: 7.days, consul_event: 'invalidate') }
+  let(:store) { ActiveSupport::Cache::HaStore.new(url: Canvas.redis.id, expires_in: 5.minutes.to_i, race_condition_ttl: 7.days.to_i, consul_event: 'invalidate') }
 
   describe "#fetch" do
     it "locks for a new key" do

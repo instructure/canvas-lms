@@ -1555,7 +1555,7 @@ describe User do
 
       it "should properly update when using new redis cache keys" do
         skip("requires redis") unless Canvas.redis_enabled?
-        enable_cache(:redis_store) do
+        enable_cache(:redis_cache_store) do
           user = User.create!
           course1 = Account.default.courses.create!(:workflow_state => "available")
           e1 = course1.enroll_student(user, :enrollment_state => "active")

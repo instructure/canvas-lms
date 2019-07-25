@@ -621,7 +621,7 @@ RSpec.configure do |config|
 
   def specs_require_cache(new_cache=:memory_store)
     before :each do
-      skip "redis required" if new_cache == :redis_store && !Canvas.redis_enabled?
+      skip "redis required" if new_cache == :redis_cache_store && !Canvas.redis_enabled?
       new_cache = ActiveSupport::Cache.lookup_store(new_cache)
       allow(Rails).to receive(:cache).and_return(new_cache)
       allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)

@@ -6714,7 +6714,7 @@ describe Submission do
   end
 
   context "caching" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     def check_cache_clear
       key = @student.cache_key(:submissions)

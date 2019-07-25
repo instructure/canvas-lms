@@ -135,10 +135,12 @@ module Canvas::Redis
       failure_val = case last_command
                     when 'keys', 'hmget'
                       []
+                    when 'scan'
+                      ["0", []]
                     when 'del'
                       0
                     end
-      if (last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX')))
+      if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
         failure_val = :failure
       end
 
@@ -281,20 +283,19 @@ module Canvas::Redis
     ].freeze
   end
 
-  module DistributedStore
+  module Distributed
     def initialize(addresses, options = { })
-      _extend_namespace options
-      @ring = options[:ring] || Canvas::HashRing.new([], options[:replicas], options[:digest])
-
-      addresses.each do |address|
-        @ring.add_node(::Redis::Store.new _merge_options(address, options))
-      end
+      options[:ring] ||= Canvas::HashRing.new([], options[:replicas], options[:digest])
+      super
     end
   end
 
   def self.patch
+    Bundler.require 'redis'
+    require 'redis/distributed'
+
     Redis::Client.prepend(Client)
-    Redis::DistributedStore.prepend(DistributedStore)
+    Redis::Distributed.prepend(Distributed)
     Redis.send(:remove_const, :BoolifySet)
     Redis.const_set(:BoolifySet, BoolifySet)
   end

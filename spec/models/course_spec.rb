@@ -5703,7 +5703,7 @@ describe Course, "#show_total_grade_as_points?" do
   end
 
   context "cached_account_users_for" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     before :once do
       @course = Course.create!

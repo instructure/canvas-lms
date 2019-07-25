@@ -164,7 +164,7 @@ module Canvas
           def fetch_with_batched_keys(key, batch_object:, batched_keys:, skip_cache_if_disabled: false, **opts, &block)
             batched_keys = Array(batched_keys)
             if batch_object && !opts[:force] &&
-                defined?(::ActiveSupport::Cache::RedisStore) && self.is_a?(::ActiveSupport::Cache::RedisStore) && CacheRegister.enabled? &&
+                defined?(::ActiveSupport::Cache::RedisCacheStore) && self.is_a?(::ActiveSupport::Cache::RedisCacheStore) && CacheRegister.enabled? &&
                 batched_keys.all?{|type| batch_object.class.valid_cache_key_type?(type)}
               fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
             else
