@@ -75,6 +75,7 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
+  after_action :add_csp_for_root
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
 
@@ -2521,5 +2522,10 @@ class ApplicationController < ActionController::Base
       }
     })
     render html: '', layout: true
+  end
+
+  def can_stream_template?
+    Setting.get("disable_template_streaming_all", "false") != "true" &&
+      Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
   end
 end

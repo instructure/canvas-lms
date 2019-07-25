@@ -1086,6 +1086,7 @@ describe ApplicationHelper do
       end
 
       it "doesn't set the CSP report only header if not configured" do
+        helper.add_csp_for_root
         helper.include_custom_meta_tags
         expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
         expect(headers).to_not have_key('Content-Security-Policy')
@@ -1095,6 +1096,7 @@ describe ApplicationHelper do
       it "sets the CSP full header when active" do
         account.enable_csp!
 
+        helper.add_csp_for_root
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test"
         expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
@@ -1103,6 +1105,7 @@ describe ApplicationHelper do
 
       it "includes the report URI" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
+        helper.add_csp_for_root
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy-Report-Only']).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/"
       end
@@ -1110,6 +1113,7 @@ describe ApplicationHelper do
       it "includes the report URI when active" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
         account.enable_csp!
+        helper.add_csp_for_root
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/"
       end

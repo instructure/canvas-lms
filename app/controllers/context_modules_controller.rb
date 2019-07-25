@@ -105,7 +105,8 @@ class ContextModulesController < ApplicationController
 
       set_tutorial_js_env
 
-      if @is_student && tab_enabled?(@context.class::TAB_MODULES)
+      if @is_student
+        return unless tab_enabled?(@context.class::TAB_MODULES)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end

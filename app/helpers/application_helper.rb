@@ -864,8 +864,12 @@ module ApplicationHelper
     (@content_for_head ||= []) << string
   end
 
+  def add_meta_tag(tag)
+    @meta_tags ||= []
+    @meta_tags << tag
+  end
+
   def include_custom_meta_tags
-    add_csp_for_root
     js_env(csp: csp_iframe_attribute) if csp_enforced?
 
     output = []
@@ -895,7 +899,7 @@ module ApplicationHelper
           # search for an attachment association
           aas = attachment.attachment_associations.where(context_type: 'Submission').preload(:context).to_a
           ActiveRecord::Associations::Preloader.new.preload(aas.map(&:submission), assignment: :context)
-          courses = aas.map { |aa| aa.submission.assignment.course }.uniq
+          courses = aas.map { |aa| aa&.submission&.assignment&.course }.uniq
           if courses.length == 1
             @csp_context_is_submission = true
             courses.first
@@ -951,6 +955,7 @@ module ApplicationHelper
   end
 
   def add_csp_for_root
+    return unless request.format.html? || request.format == "*/*"
     return unless csp_enabled?
     return if csp_report_uri.empty? && !csp_enforced?
 

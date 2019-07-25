@@ -64,7 +64,7 @@ class EportfolioEntriesController < ApplicationController
       end
       @category = @page.eportfolio_category
       eportfolio_page_attributes
-      render "eportfolios/show"
+      render "eportfolios/show", stream: can_stream_template?
     end
   end
 

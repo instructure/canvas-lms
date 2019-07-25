@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
+<% provide :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
 <% js_env({ SECTION_COUNT_IDX: @page.content_sections.count }) %>
 
 <% provide :left_side do %>

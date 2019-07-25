@@ -944,6 +944,10 @@ class Quizzes::QuizzesController < ApplicationController
     js_env IS_PREVIEW: true if @submission.preview?
 
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
+    if params[:persist_headless]
+      add_meta_tag(:name => "viewport", :id => "vp", :content => "initial-scale=1.0,user-scalable=yes,width=device-width")
+      js_env :MOBILE_UI => true
+    end
     render :take_quiz
   end
 
@@ -963,8 +967,8 @@ class Quizzes::QuizzesController < ApplicationController
                                             access_code: params[:access_code])
 
     if params[:take]
-      reason = can_take.declined_reason_renders
-      render reason if reason
+      @declined_reason = can_take.declined_reason_renders
+      render @declined_reason if @declined_reason
       can_take.eligible?
     else
       can_take.potentially_eligible?

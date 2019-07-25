@@ -22,6 +22,7 @@ class OneTimePasswordsController < ApplicationController
   def index
     @current_user.generate_one_time_passwords
     @otps = @current_user.one_time_passwords
+    add_meta_tag(:name => "viewport", :id => "vp", :content => "initial-scale=1.0,user-scalable=yes,width=device-width")
   end
 
   def destroy_all
