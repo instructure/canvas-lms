@@ -1866,6 +1866,7 @@ class CoursesController < ApplicationController
           add_crumb(t('#crumbs.modules', "Modules"))
           load_modules
         when 'syllabus'
+          set_active_tab "syllabus"
           rce_js_env
           add_crumb(t('#crumbs.syllabus', "Syllabus"))
           @groups = @context.assignment_groups.active.order(
@@ -1923,6 +1924,9 @@ class CoursesController < ApplicationController
         elsif @context.available?
           content_for_head helpers.auto_discovery_link_tag(:atom, feeds_course_format_path(@context.feed_code, :atom), {:title => t("Course Atom Feed")})
         end
+
+        set_active_tab "home" unless get_active_tab
+        render stream: can_stream_template?
       elsif @context.indexed && @context.available?
         render :description
       else

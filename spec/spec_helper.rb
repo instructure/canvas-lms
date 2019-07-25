@@ -86,6 +86,9 @@ end
 ActionController::Base.set_callback(:process_action, :around,
   ->(_r, block) { SpecTransactionWrapper.wrap_block_in_transaction(block) })
 
+ActionController::Base.set_callback(:process_action, :before,
+  ->(_r) { @streaming_template = false })
+
 module RSpec::Core::Hooks
 class AfterContextHook < Hook
   def run(example)

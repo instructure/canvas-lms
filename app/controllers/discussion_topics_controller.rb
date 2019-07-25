@@ -793,6 +793,7 @@ class DiscussionTopicsController < ApplicationController
               end
             end
 
+            render stream: can_stream_template?
           end
         end
       end

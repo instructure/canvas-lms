@@ -114,6 +114,7 @@ class ContextModulesController < ApplicationController
       add_body_class('padless-content')
       js_bundle :context_modules
       css_bundle :content_next, :context_modules2
+      render stream: can_stream_template?
     end
   end
 

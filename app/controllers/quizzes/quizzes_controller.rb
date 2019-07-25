@@ -273,6 +273,7 @@ class Quizzes::QuizzesController < ApplicationController
           log_asset_access(@quiz, "quizzes", "quizzes")
           js_bundle :quiz_show
           css_bundle :quizzes, :learning_outcomes
+          render stream: can_stream_template? unless @declined_reason
         end
       end
       @padless = true
@@ -361,7 +362,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       js_bundle :quizzes_bundle
       css_bundle :quizzes, :tinymce
-      render :new
+      render :new, stream: can_stream_template?
     end
   end
 
@@ -741,6 +742,7 @@ class Quizzes::QuizzesController < ApplicationController
         end
         js_bundle :quiz_history
         @google_analytics_page_title = @quiz.survey? ? "User's Survey History" : "User's Quiz History"
+        render stream: can_stream_template?
       end
     end
   end
