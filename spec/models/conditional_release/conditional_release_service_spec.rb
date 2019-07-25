@@ -341,6 +341,20 @@ describe ConditionalRelease::Service do
       response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
       expect(response[:code]).to eq '400'
     end
+
+    context "when post policies are enabled" do
+      before(:each) do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+      end
+
+      it "fails for assignments for which the student's submission is not posted" do
+        @assignment.hide_submissions
+        expect(CanvasHttp).to receive(:post).never
+        response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+        expect(response[:code]).to eq '400'
+      end
+    end
   end
 
   describe 'active_rules' do
@@ -687,6 +701,37 @@ describe ConditionalRelease::Service do
           @submission.assignment.unmute!
           expect_request_rules(@submission)
           Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      context "when post policies are enabled" do
+        before(:each) do
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+
+          graded_submission_model(course: @course, user: @student)
+
+          # Add a second student so we have a meaningful distinction between
+          # assignment muted and submission posted
+          @course.enroll_student(User.create!, enrollment_state: :active)
+          @submission.assignment.hide_submissions
+        end
+
+        it "includes assignments with submissions that have been posted to the student" do
+          enable_cache do
+            @submission.assignment.post_submissions(submission_ids: [@submission.id])
+            expect_request_rules(@submission)
+            Service.rules_for(@course, @student, [], nil)
+          end
+        end
+
+        it "excludes assignments with submissions that have not been posted to the student" do
+          enable_cache do
+            @submission.assignment.post_submissions
+            @submission.assignment.hide_submissions(submission_ids: [@submission.id])
+            expect_request_rules([])
+            Service.rules_for(@course, @student, [], nil)
+          end
         end
       end
     end
