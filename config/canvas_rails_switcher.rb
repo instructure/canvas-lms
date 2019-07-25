@@ -15,14 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# You can enable the Rails 5.1 support by either defining a
-# CANVAS_RAILS5_1=1 env var, creating an empty RAILS5_1 file in the canvas config dir,
-# or setting `private/canvas/rails5.1` to `true` in a locally accessible consul
-unless defined?(CANVAS_RAILS5_1)
-  if ENV['CANVAS_RAILS5_2']
-    CANVAS_RAILS5_1 = ENV['CANVAS_RAILS5_2'] == '0'
-  elsif File.exist?(File.expand_path("../RAILS5_2", __FILE__))
-    CANVAS_RAILS5_1 = false
+# You can enable the Rails 6.0 support by either defining a
+# CANVAS_RAILS6_0=1 env var, creating an empty RAILS6_0 file in the canvas config dir,
+# or setting `private/canvas/rails6.0` to `true` in a locally accessible consul
+unless defined?(CANVAS_RAILS5_2)
+  CANVAS_RAILS5_1 = false
+
+  if ENV['CANVAS_RAILS6_0']
+    CANVAS_RAILS5_2 = ENV['CANVAS_RAILS6_0'] == '0'
+  elsif File.exist?(File.expand_path("../RAILS6_0", __FILE__))
+    CANVAS_RAILS5_2 = false
   else
     begin
       # have to do the consul communication without any gems, because
@@ -35,9 +37,9 @@ unless defined?(CANVAS_RAILS5_1)
       environment = YAML.load(File.read(File.expand_path("../consul.yml", __FILE__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
 
       keys = [
-        ["private/canvas", environment, $canvas_cluster, "rails5.2"].compact.join("/"),
-        ["private/canvas", environment, "rails5.2"].compact.join("/"),
-        ["global/private/canvas", environment, "rails5.2"].compact.join("/")
+        ["private/canvas", environment, $canvas_cluster, "rails6.0"].compact.join("/"),
+        ["private/canvas", environment, "rails6.0"].compact.join("/"),
+        ["global/private/canvas", environment, "rails6.0"].compact.join("/")
       ].uniq
 
       result = nil
@@ -46,9 +48,9 @@ unless defined?(CANVAS_RAILS5_1)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS5_1 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'true')
+      CANVAS_RAILS5_2 = !(result && Base64.decode64(JSON.load(result.body).first['Value']) == 'true')
     rescue
-      CANVAS_RAILS5_1 = true
+      CANVAS_RAILS5_2 = true
     end
   end
 end

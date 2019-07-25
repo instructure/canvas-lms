@@ -15,12 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if CANVAS_RAILS5_1
-  gem 'rails', '5.1.6.2'
-else
-  gem 'rails', '5.2.3'
-end
-    gem 'loofah', '2.2.3'
+gem 'rails', '5.2.3'
+  gem 'loofah', '2.2.3'
 
 gem 'rack', '2.0.6'
 
@@ -74,11 +70,7 @@ gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.16.1'
-if CANVAS_RAILS5_1
-  gem 'i18n', '0.9.5'
-else
-  gem 'i18n', '1.0.0'
-end
+gem 'i18n', '1.0.0'
 gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false

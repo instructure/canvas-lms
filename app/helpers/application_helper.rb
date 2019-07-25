@@ -1220,18 +1220,6 @@ module ApplicationHelper
     end
   end
 
-  if CANVAS_RAILS5_1
-    # this is for rails 5.1. it can be deleted when we upgrade to RAILS_5.2. rails 5.2 includes a preload_link_tag method
-    def preload_link_tag(source, options = {})
-      tag.link({
-        rel: "preload",
-        href: asset_path(source),
-        as: "script",
-        type: "text/javascript"
-      }.merge(options.symbolize_keys))
-    end
-  end
-
   def browser_performance_monitor_embed
     # stub
   end
