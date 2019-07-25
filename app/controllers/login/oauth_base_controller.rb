@@ -84,7 +84,9 @@ class Login::OauthBaseController < ApplicationController
 
     if pseudonym
       # Successful login and we have a user
-      @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
+      @domain_root_account.pseudonyms.scoping do
+        PseudonymSession.create!(pseudonym, false)
+      end
       session[:login_aac] = @aac.global_id
 
       successful_login(pseudonym.user, pseudonym)

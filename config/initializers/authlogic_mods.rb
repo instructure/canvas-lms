@@ -49,4 +49,4 @@ module IgnoreSlaveErrors
     end
   end
 end
-Authlogic::Session::Callbacks.prepend(IgnoreSlaveErrors)
+Authlogic::Session::Base.prepend(IgnoreSlaveErrors)

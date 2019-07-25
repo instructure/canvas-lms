@@ -61,9 +61,11 @@ class Login::CanvasController < ApplicationController
     params[:pseudonym_session][:unique_id].try(:strip!)
 
     # Try to use authlogic's built-in login approach first
-    @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session].permit(:unique_id, :password, :remember_me).to_h)
-    @pseudonym_session.remote_ip = request.remote_ip
-    found = @pseudonym_session.save
+    found = @domain_root_account.pseudonyms.scoping do
+      @pseudonym_session = PseudonymSession.new(params[:pseudonym_session].permit(:unique_id, :password, :remember_me).to_h)
+      @pseudonym_session.remote_ip = request.remote_ip
+      @pseudonym_session.save
+    end
 
     # look for LDAP pseudonyms where we get the unique_id back from LDAP, or if we're doing JIT provisioning
     if !found && !@pseudonym_session.attempted_record

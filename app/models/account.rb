@@ -28,7 +28,7 @@ class Account < ActiveRecord::Base
   include BrandConfigHelpers
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
-  authenticates_many :pseudonym_sessions
+
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
