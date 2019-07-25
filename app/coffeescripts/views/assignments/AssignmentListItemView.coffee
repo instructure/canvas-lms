@@ -59,6 +59,8 @@ export default class AssignmentListItemView extends Backbone.View
   events:
     'click .delete_assignment': 'onDelete'
     'click .duplicate_assignment': 'onDuplicate'
+    'click .send_assignment_to': 'onSendAssignmentTo'
+    'click .copy_assignment_to': 'onCopyAssignmentTo'
     'click .tooltip_link': preventDefault ->
     'keydown': 'handleKeys'
     'mousedown': 'stopMoveIfProtected'
@@ -212,6 +214,8 @@ export default class AssignmentListItemView extends Backbone.View
     data.cyoe = CyoeHelper.getItemData(data.id, @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment))
     data.return_to = encodeURIComponent window.location.pathname
 
+    data.DIRECT_SHARE_ENABLED = !!ENV.DIRECT_SHARE_ENABLED
+
     if data.canManage
       data.spanWidth      = 'span3'
       data.alignTextClass = ''
@@ -287,6 +291,15 @@ export default class AssignmentListItemView extends Backbone.View
       id = @model.attributes.assignment_group_id
       @delete()
       @focusOnGroupByID(id)
+
+  onSendAssignmentTo: (e) =>
+    e.preventDefault()
+    console.log("Send assignment #{@model.get('id')} to another user")
+
+
+  onCopyAssignmentTo: (e) =>
+    e.preventDefault()
+    console.log("Copy assignment #{@model.get('id')} to another course")
 
   onUnlockAssignment: (e) =>
     e.preventDefault()
