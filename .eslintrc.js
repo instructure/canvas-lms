@@ -111,7 +111,12 @@ module.exports = {
 
     // These are things we care about
     'react/jsx-filename-extension': ['error', {extensions: ['.js']}],
-    'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+    'no-unused-vars': ['error', {
+      argsIgnorePattern: '^_',
+
+      // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
+      ignoreRestSiblings: true
+    }],
     'eslint-comments/no-unused-disable': 'error',
     'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
     'import/no-commonjs': 'off', // This is overridden where it counts
