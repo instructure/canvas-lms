@@ -25,7 +25,7 @@ COPY ./config/canvas_rails4_2.rb /app/config/
 
 COPY . /app
 
-# Having trouble getting Heroku to work with bundler v1.11.2, so I upgraded it to v1.15.2 elsewhere.
+# Having trouble getting Heroku to work with bundler v1.11.2, so I upgraded it to v1.12.5 elsewhere.
 #RUN gem uninstall -x --all --ignore-dependencies -i/usr/local/lib/ruby/gems/2.1.0 bundler
 #RUN gem install bundler -v 1.11.2
 
