@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -33,18 +34,28 @@ module Types
     end
   end
 
+  class EveryoneElseType < ApplicationObjectType
+    description "Represents everyone an override does not apply to"
+
+    field :title, String, null: false
+    def title
+      I18n.t "Everyone else"
+    end
+  end
+
   class AssignmentOverrideSetUnion < BaseUnion
     graphql_name "AssignmentOverrideSet"
 
     description "Objects that can be assigned overridden dates"
 
-    possible_types SectionType, GroupType, AdhocStudentsType
+    possible_types SectionType, GroupType, AdhocStudentsType, EveryoneElseType
 
     def self.resolve_type(obj, _)
       case obj
       when CourseSection then SectionType
       when Group then GroupType
       when AssignmentOverride then AdhocStudentsType
+      when AssignmentOverrideType::FakeOverride then EveryoneElseType
       end
     end
   end
@@ -72,10 +83,8 @@ module Types
       "This object specifies what students this override applies to",
       null: true
     def set
-      if override.set_type == "ADHOC"
+      if override.set_type == "ADHOC" || override.is_a?(FakeOverride)
         override
-      elsif override.is_a?(FakeOverride)
-        nil
       else
         load_association(:set)
       end

@@ -415,7 +415,7 @@ type AssignmentOverrideEdge {
 """
 Objects that can be assigned overridden dates
 """
-union AssignmentOverrideSet = AdhocStudents | Group | Section
+union AssignmentOverrideSet = AdhocStudents | EveryoneElse | Group | Section
 
 input AssignmentPeerReviewsUpdate {
   anonymousReviews: Boolean
@@ -1073,6 +1073,13 @@ enum EnrollmentWorkflowState {
   inactive
   invited
   rejected
+}
+
+"""
+Represents everyone an override does not apply to
+"""
+type EveryoneElse {
+  title: String!
 }
 
 type ExternalTool implements ModuleItemInterface & Timestamped {

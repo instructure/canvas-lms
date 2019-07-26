@@ -439,6 +439,14 @@ describe Types::AssignmentType do
           assignment_type.resolve("assignmentOverrides(includeBaseDates: true) { nodes { dueAt } }",
                                   current_user: teacher)
         ).to include @base_due.iso8601
+
+        expect(
+          assignment_type.resolve(<<~GQL, current_user: teacher)
+            assignmentOverrides(includeBaseDates: true) { nodes {
+              set { __typename }
+            } }
+          GQL
+        ).to include "EveryoneElse"
       end
 
       it "returns base dates for students who don't have an applicable override" do

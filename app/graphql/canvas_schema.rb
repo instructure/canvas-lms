@@ -80,5 +80,6 @@ class CanvasSchema < GraphQL::Schema
 
   orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
                 Types::ExternalToolType, Types::ModuleExternalToolType,
-                Types::ProgressType, Types::ModuleSubHeaderType]
+                Types::ProgressType, Types::ModuleSubHeaderType,
+                Types::EveryoneElseType]
 end

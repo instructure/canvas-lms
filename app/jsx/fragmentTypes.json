@@ -223,6 +223,9 @@
           },
           {
             "name": "AdhocStudents"
+          },
+          {
+            "name": "EveryoneElse"
           }
         ]
       },
