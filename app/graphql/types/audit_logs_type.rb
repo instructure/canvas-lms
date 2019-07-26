@@ -32,7 +32,8 @@ module Types
       DynamoQuery.new(dynamo, "graphql_mutations",
                       partition_key: "object_id",
                       value: "#{context[:domain_root_account].global_id}-#{asset_string}",
-                      sort_key: "mutation_id")
+                      sort_key: "mutation_id",
+                      scan_index_forward: false)
     end
   end
 end

@@ -34,12 +34,13 @@
 class DynamoQuery
   attr_reader :partition_key, :sort_key
 
-  def initialize(db, table, partition_key:, value:, sort_key:)
+  def initialize(db, table, partition_key:, value:, sort_key:, scan_index_forward: true)
     @db = db
     @table = table
     @partition_key = partition_key
     @partition_value = value
     @sort_key = sort_key
+    @scan_index_forward = scan_index_forward
     @key_condition_expression = "#{partition_key} = :id"
     @expression_attribute_values = {":id" => value}
   end
@@ -85,6 +86,7 @@ class DynamoQuery
       table_name: @table,
       key_condition_expression: @key_condition_expression,
       expression_attribute_values: @expression_attribute_values,
+      scan_index_forward: @scan_index_forward,
     }
     params[:limit] = @limit if @limit
     params[:exclusive_start_key] = @exclusive_start_key if @exclusive_start_key

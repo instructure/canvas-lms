@@ -92,7 +92,7 @@ describe Types::MutationLogType do
 
   it "logs the real user id when masquerading" do
     result = audit_log_query({assetString: @asset_string}, current_user: @admin).
-      dig("data", "auditLogs", "mutationLogs", "nodes", 1)
+      dig("data", "auditLogs", "mutationLogs", "nodes", 0)
 
     expect(result["user"]["_id"]).to eq @teacher.id.to_s
     expect(result["realUser"]["_id"]).to eq @admin.id.to_s
