@@ -36,12 +36,15 @@ preload_app!
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 
-# TODO: figure out if we want this
-before_fork do
-  require 'puma_worker_killer'
-
-  PumaWorkerKiller.enable_rolling_restart # Default is every 6 hours
-end
+# Does a rolling restart of the worker processes to keep memory low. This gem is more of a bandaid than anything
+# else. It basically makes sure memory leaks don't cause the process to get bloated, but if there are memory leaks
+# we should fix the root cause.
+# NOTE: commented out for now. Want to see if we have issues with memory usage creeping up before we enable.
+#before_fork do
+#  require 'puma_worker_killer'
+#
+#  PumaWorkerKiller.enable_rolling_restart # Default is every 6 hours
+#end
 
 # We prob want this, commented out now as part of getting a Proof Of Concept going
 #on_worker_boot do
