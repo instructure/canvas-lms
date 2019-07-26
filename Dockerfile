@@ -18,6 +18,11 @@ RUN  apt-get update -qq \
   && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/* 
 
+# Blow away the existing bundler. We're going to install our own verion and make sure it's the only one.
+RUN gem uninstall -x -i /usr/local/lib/ruby/gems/2.1.0 bundler
+RUN gem uninstall -x -i /usr/local/lib/ruby/gems/2.1.0 rubygems-update
+RUN gem install bundler -v 1.15.2
+
 RUN mkdir /app
 WORKDIR /app
 
@@ -26,6 +31,10 @@ COPY Gemfile.lock /app/
 COPY Gemfile.d /app/Gemfile.d
 COPY gems /app/gems
 COPY config/canvas_rails4_2.rb /app/config/
+
+RUN bundle config bin /usr/local/bin/bundle
+RUN bundle config path /app/vendor/bundle/ruby/2.1.0/
+RUN bundle config gemfile /app/Gemfile
 
 RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4 --verbose
 
