@@ -11,6 +11,7 @@ RUN  apt-get update -qq \
        libxmlsec1-dev \
        unzip \
        fontforge \
+       vim \
   && npm cache clean -f \
   && npm install -g n \
   && n 0.12.14 \
@@ -20,18 +21,21 @@ RUN  apt-get update -qq \
 RUN mkdir /app
 WORKDIR /app
 
-COPY Gemfile* /app/
-COPY ./config/canvas_rails4_2.rb /app/config/
+COPY Gemfile /app/
+COPY Gemfile.lock /app/
+COPY Gemfile.d /app/Gemfile.d
+COPY gems /app/gems
+COPY config/canvas_rails4_2.rb /app/config/
 
+RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4 --verbose
+
+# Do this after bundle install b/c if we do it before, then any changes cause bundle install to run again.
+# Note: in .dockerignore we exclude vendor/bundle so the host values in there (maybe from a manual build) 
+# don't get copied in. Only the fresh built ones are inside the container.
 COPY . /app
-
-# Having trouble getting Heroku to work with bundler v1.11.2, so I upgraded it to v1.12.5 elsewhere.
-#RUN gem uninstall -x --all --ignore-dependencies -i/usr/local/lib/ruby/gems/2.1.0 bundler
-#RUN gem install bundler -v 1.11.2
-
-RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4
 
 # TODO: uncomment me. This is just to get the Proof Of Concept going
 #RUN rake canvas:compile_assets
 
 #CMD ["rails", "s", "-p", "3001", "-b", "0.0.0.0"]
+#CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
