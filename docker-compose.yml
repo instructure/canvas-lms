@@ -1,3 +1,4 @@
+#Note: this file is used to bring up a development environment. For staging and production environments, see heroku.yml
 version: "3"
 services:
 
@@ -10,7 +11,7 @@ services:
     environment:
       POSTGRES_USER: canvas
       POSTGRES_DB: canvas
-  
+
   canvasredis:
     image: redis:2.6
     networks:
@@ -19,18 +20,16 @@ services:
   canvasweb:
     build:
       context: .
-    command: /app/docker-compose/scripts/run.sh
+    command: /app/docker-compose/scripts/docker_compose_run.sh
     ports:
       - "3000:3000"
     networks:
       - frontend
+    environment:
+      RACK_ENV: development
     depends_on:
       - canvasdb
       - canvasredis
-    environment:
-      RACK_ENV: development
-      VIRTUAL_HOST: .canvas.docker
-
 networks:
   frontend:
 
