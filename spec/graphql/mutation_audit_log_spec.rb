@@ -103,7 +103,7 @@ describe AuditLogFieldExtension::Logger do
 
   it "generates a unique mutation_id for each entry" do
     logger = AuditLogFieldExtension::Logger.new(mutation, {request_id: "REQUEST_ID"}, {input: {}})
-    timestamp = logger.instance_variable_get(:@timestamp)
+    timestamp = logger.instance_variable_get(:@timestamp).to_f
     expect(logger.mutation_id).to eq "#{timestamp}-REQUEST_ID-#1"
     expect(logger.mutation_id).to eq "#{timestamp}-REQUEST_ID-#2"
   end

@@ -37,7 +37,12 @@ describe Types::MutationLogType do
   end
 
   def make_log_entry(ctx = {})
-    CanvasSchema.execute(<<~MUTATION, context: ctx.reverse_merge({current_user: @teacher}))
+    ctx = {
+      request_id: SecureRandom.uuid,
+      current_user: @teacher,
+    }.merge(ctx)
+
+    CanvasSchema.execute(<<~MUTATION, context: ctx)
       mutation {
         updateAssignment(input: {id: "#{@assignment.id}"}) {
           assignment { name }

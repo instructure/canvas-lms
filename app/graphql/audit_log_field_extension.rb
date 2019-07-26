@@ -25,7 +25,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
 
       @dynamo = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
       @sequence = 0
-      @timestamp = Time.now.iso8601
+      @timestamp = Time.now
       @ttl = 90.days.from_now.to_i
     end
 
@@ -36,6 +36,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
           # TODO: this is where you redirect
           "object_id" => log_entry_id(entry, field_name),
           "mutation_id" => mutation_id,
+          "timestamp" => @timestamp.iso8601,
           "expires" => @ttl,
           "mutation_name" => @mutation.graphql_name,
           "current_user_id" => @context[:current_user]&.global_id&.to_s,
@@ -95,7 +96,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     # should i also break the request_id / timestamp out into
     # their own attributes?
     def mutation_id
-      "#{@timestamp}-#{@context[:request_id]}-##{@sequence += 1}"
+      "#{@timestamp.to_f}-#{@context[:request_id]}-##{@sequence += 1}"
     end
 
     private
