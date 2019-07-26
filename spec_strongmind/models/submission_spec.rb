@@ -68,14 +68,14 @@ RSpec.describe Submission do
       end
 
       it 'publishes on create' do
-        expect(PipelineService).to receive(:publish).with an_instance_of(Submission)
+        expect(PipelineService::V2).to receive(:publish).with an_instance_of(Submission)
 
         submission_model
       end
 
       it 'publishes on save' do
         @submission = submission_model
-        expect(PipelineService).to receive(:publish).with an_instance_of(Submission)
+        expect(PipelineService::V2).to receive(:publish).with an_instance_of(Submission)
 
         @submission.save
       end
