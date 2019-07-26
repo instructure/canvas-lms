@@ -18,8 +18,16 @@
 
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageIndexItemView from 'compiled/views/wiki/WikiPageIndexItemView'
+import fakeENV from 'helpers/fakeENV'
 
-QUnit.module('WikiPageIndexItemView')
+QUnit.module('WikiPageIndexItemView', {
+  setup() {
+    fakeENV.setup()
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
 
 test('model.view maintained by item view', () => {
   const model = new WikiPage()
@@ -53,6 +61,23 @@ test('delegate useAsFrontPage to the model', function() {
   const stub = sandbox.stub(model, 'setFrontPage')
   view.useAsFrontPage()
   ok(stub.calledOnce)
+})
+
+test('only shows direct share menu items if enabled', () => {
+  const view = new WikiPageIndexItemView({
+    model: new WikiPage(),
+    collectionHasTodoDate: () => {},
+    WIKI_RIGHTS: {read: true, manage: true},
+    CAN: {MANAGE: true}
+  })
+  view.render()
+  strictEqual(view.$('.send-wiki-page-to').length, 0)
+  strictEqual(view.$('.copy-wiki-page-to').length, 0)
+
+  ENV.DIRECT_SHARE_ENABLED = true
+  view.render()
+  ok(view.$('.send-wiki-page-to').length)
+  ok(view.$('.copy-wiki-page-to').length)
 })
 
 QUnit.module('WikiPageIndexItemView:JSON')
