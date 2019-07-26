@@ -68,36 +68,36 @@ GIT
       activemodel (>= 3.2)
 
 PATH
-  remote: ../gems/activesupport-suspend_callbacks
+  remote: gems/activesupport-suspend_callbacks
   specs:
     activesupport-suspend_callbacks (0.0.1)
       activesupport (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/acts_as_list
+  remote: gems/acts_as_list
   specs:
     acts_as_list (0.0.1)
       rails (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/adheres_to_policy
+  remote: gems/adheres_to_policy
   specs:
     adheres_to_policy (0.0.1)
       rails (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/attachment_fu
+  remote: gems/attachment_fu
   specs:
     attachment_fu (1.0.0)
       rails (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/autoextend
+  remote: gems/autoextend
   specs:
     autoextend (1.0.0)
 
 PATH
-  remote: ../gems/bookmarked_collection
+  remote: gems/bookmarked_collection
   specs:
     bookmarked_collection (1.0.0)
       folio-pagination (= 0.0.11)
@@ -107,47 +107,47 @@ PATH
       will_paginate (= 3.0.7)
 
 PATH
-  remote: ../gems/broadcast_policy
+  remote: gems/broadcast_policy
   specs:
     broadcast_policy (1.0.0)
       activesupport
       after_transaction_commit
 
 PATH
-  remote: ../gems/canvas_breach_mitigation
+  remote: gems/canvas_breach_mitigation
   specs:
     canvas_breach_mitigation (0.0.1)
 
 PATH
-  remote: ../gems/canvas_cassandra
+  remote: gems/canvas_cassandra
   specs:
     canvas_cassandra (0.0.1)
       cassandra-cql (= 1.2.2)
 
 PATH
-  remote: ../gems/canvas_color
+  remote: gems/canvas_color
   specs:
     canvas_color (0.0.1)
 
 PATH
-  remote: ../gems/canvas_crummy
+  remote: gems/canvas_crummy
   specs:
     canvas_crummy (0.0.1)
 
 PATH
-  remote: ../gems/canvas_ext
+  remote: gems/canvas_ext
   specs:
     canvas_ext (1.0.0)
       activesupport (>= 3.2, < 4.3)
       tzinfo
 
 PATH
-  remote: ../gems/canvas_http
+  remote: gems/canvas_http
   specs:
     canvas_http (1.0.0)
 
 PATH
-  remote: ../gems/canvas_kaltura
+  remote: gems/canvas_kaltura
   specs:
     canvas_kaltura (1.0.0)
       canvas_http
@@ -157,87 +157,87 @@ PATH
       nokogiri
 
 PATH
-  remote: ../gems/canvas_mimetype_fu
+  remote: gems/canvas_mimetype_fu
   specs:
     canvas_mimetype_fu (0.0.1)
 
 PATH
-  remote: ../gems/canvas_panda_pub
+  remote: gems/canvas_panda_pub
   specs:
     canvas_panda_pub (1.0.0)
       canvas_http
       jwt
 
 PATH
-  remote: ../gems/canvas_partman
+  remote: gems/canvas_partman
   specs:
     canvas_partman (2.0.0)
       activerecord (>= 3.2, < 4.3)
       pg (~> 0.17)
 
 PATH
-  remote: ../gems/canvas_quiz_statistics
+  remote: gems/canvas_quiz_statistics
   specs:
     canvas_quiz_statistics (0.1.0)
       activesupport
       html_text_helper
 
 PATH
-  remote: ../gems/canvas_sanitize
+  remote: gems/canvas_sanitize
   specs:
     canvas_sanitize (0.0.1)
       sanitize (= 2.1.0)
 
 PATH
-  remote: ../gems/canvas_slug
+  remote: gems/canvas_slug
   specs:
     canvas_slug (0.0.1)
 
 PATH
-  remote: ../gems/canvas_sort
+  remote: gems/canvas_sort
   specs:
     canvas_sort (1.0.0)
 
 PATH
-  remote: ../gems/canvas_stringex
+  remote: gems/canvas_stringex
   specs:
     canvas_stringex (0.0.1)
       rails (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/canvas_text_helper
+  remote: gems/canvas_text_helper
   specs:
     canvas_text_helper (0.0.1)
       i18n
 
 PATH
-  remote: ../gems/canvas_time
+  remote: gems/canvas_time
   specs:
     canvas_time (1.0.0)
       activesupport (>= 3.2, < 4.3)
       tzinfo
 
 PATH
-  remote: ../gems/canvas_unzip
+  remote: gems/canvas_unzip
   specs:
     canvas_unzip (0.0.1)
       canvas_mimetype_fu
       rubyzip (= 1.1.1)
 
 PATH
-  remote: ../gems/csv_diff
+  remote: gems/csv_diff
   specs:
     csv_diff (1.0.0)
       sqlite3
 
 PATH
-  remote: ../gems/diigo
+  remote: gems/diigo
   specs:
     diigo (1.0.0)
       nokogiri
 
 PATH
-  remote: ../gems/event_stream
+  remote: gems/event_stream
   specs:
     event_stream (0.0.1)
       bookmarked_collection
@@ -249,21 +249,21 @@ PATH
       rails (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/google_drive
+  remote: gems/google_drive
   specs:
     google_drive (1.0.0)
       google-api-client (= 0.8.2)
       rails (>= 3.2, < 4.3)
 
 PATH
-  remote: ../gems/handlebars_tasks
+  remote: gems/handlebars_tasks
   specs:
     handlebars_tasks (0.0.1)
       execjs (= 1.4.0)
       i18n_extraction
 
 PATH
-  remote: ../gems/html_text_helper
+  remote: gems/html_text_helper
   specs:
     html_text_helper (0.0.1)
       activesupport (>= 3.2, < 4.3)
@@ -273,7 +273,7 @@ PATH
       sanitize (~> 2.1.0)
 
 PATH
-  remote: ../gems/i18n_extraction
+  remote: gems/i18n_extraction
   specs:
     i18n_extraction (0.0.1)
       activesupport (>= 3.2, < 4.3)
@@ -282,7 +282,7 @@ PATH
       sexp_processor (~> 4.2)
 
 PATH
-  remote: ../gems/i18n_tasks
+  remote: gems/i18n_tasks
   specs:
     i18n_tasks (0.0.1)
       activesupport (>= 3.2, < 4.3)
@@ -293,7 +293,7 @@ PATH
       ya2yaml (>= 0.30)
 
 PATH
-  remote: ../gems/incoming_mail_processor
+  remote: gems/incoming_mail_processor
   specs:
     incoming_mail_processor (0.0.1)
       activesupport (>= 3.2, < 4.3)
@@ -304,20 +304,20 @@ PATH
       utf8_cleaner
 
 PATH
-  remote: ../gems/json_token
+  remote: gems/json_token
   specs:
     json_token (0.0.1)
       json (~> 1.8)
 
 PATH
-  remote: ../gems/linked_in
+  remote: gems/linked_in
   specs:
     linked_in (1.0.0)
       nokogiri
       oauth-instructure (= 0.4.10)
 
 PATH
-  remote: ../gems/live_events
+  remote: gems/live_events
   specs:
     live_events (1.0.0)
       activesupport
@@ -325,34 +325,34 @@ PATH
       canvas_statsd
 
 PATH
-  remote: ../gems/lti_outbound
+  remote: gems/lti_outbound
   specs:
     lti_outbound (0.0.1)
       i18n (~> 0.7.0)
       oauth-instructure (= 0.4.10)
 
 PATH
-  remote: ../gems/multipart
+  remote: gems/multipart
   specs:
     multipart (0.0.1)
       canvas_slug
       mime-types (= 1.17.2)
 
 PATH
-  remote: ../gems/paginated_collection
+  remote: gems/paginated_collection
   specs:
     paginated_collection (1.0.0)
       folio-pagination (= 0.0.11)
       will_paginate (= 3.0.7)
 
 PATH
-  remote: ../gems/rubocop-canvas
+  remote: gems/rubocop-canvas
   specs:
     rubocop-canvas (1.0.0)
       rubocop (= 0.35.1)
 
 PATH
-  remote: ../gems/selinimum
+  remote: gems/selinimum
   specs:
     selinimum (0.0.1)
       activerecord (>= 3.2, < 4.3)
@@ -361,26 +361,26 @@ PATH
       globby (>= 0.1.2)
 
 PATH
-  remote: ../gems/stringify_ids
+  remote: gems/stringify_ids
   specs:
     stringify_ids (1.0.0)
 
 PATH
-  remote: ../gems/twitter
+  remote: gems/twitter
   specs:
     twitter (1.0.0)
       html_text_helper
       oauth-instructure
 
 PATH
-  remote: ../gems/utf8_cleaner
+  remote: gems/utf8_cleaner
   specs:
     utf8_cleaner (0.0.1)
       iconv (~> 1.0)
       syck (~> 1.0)
 
 PATH
-  remote: ../gems/workflow
+  remote: gems/workflow
   specs:
     workflow (0.0.1)
       rails (>= 3.2, < 4.3)
