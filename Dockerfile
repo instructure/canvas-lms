@@ -37,11 +37,8 @@ COPY Gemfile.d /app/Gemfile.d
 COPY gems /app/gems
 COPY config/canvas_rails4_2.rb /app/config/
 
-#RUN bundle config bin /usr/local/bin/bundle
-#RUN bundle config path /app/vendor/bundle/ruby/2.1.0/
-#RUN bundle config gemfile /app/Gemfile
-
-RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4 --verbose
+#RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4 --verbose
+RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4
 
 ## Do this after bundle install b/c if we do it before, then any changes cause bundle install to run again.
 ## Note: in .dockerignore we exclude vendor/bundle so the host values in there (maybe from a manual build) 
