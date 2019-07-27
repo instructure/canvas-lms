@@ -2,10 +2,6 @@
 # As a PoC, clone the staging RDS database and try pointing this app at it using: heroku config:set DATABASE_URL=<scheme>://<username>:<password>@<host>
 # Reference the DATABASE_URL in config/database.yml? Right now, that file doesn't exist. Generally, we need to add the configs into heroku.
 # If i check it into src control... will that impact the currect env? I don't think so, but need to check how capistrano would deal if those files were checked in.
-#
-# Runtime config vars, addons, etc
-setup:
-  config:
 
 # Note that config values in here are only available at Build time, not runtime. Use setup: section for runtime vars.
 build:
