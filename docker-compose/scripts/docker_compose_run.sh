@@ -27,17 +27,17 @@ fi
 
 cp -a /app/docker-compose/config/* /app/config/
 
-# TODO: uncomment me. still haven't gotten to the point where the database stuff is going
 # Not sure exactly why I need this, but after stopping and starting the container it dies with
 # an error saying i have to run this.  So just do it.
-#bundle exec rake db:reset_encryption_key_hash
+bundle exec rake db:reset_encryption_key_hash
 
-#TODO: check if everything is setup and if not run this automatically. This stuff takes awhile and we only want to do it once.
-# Esp compile_assets.
+# TODO: check if everything is setup and skip this step if so.
+bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
+
+#TODO: check if everything is setup and if not run this automatically. This stuff takes awhile and we only want to do it once, or if necessary.
 #echo ""
 #echo "Note: If this is the first time you're starting this container, you may have to run the following:"
 #echo ""
-#echo "    bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup"
 #echo "    bundle exec rake canvas:compile_assets"
 
 echo "Starting the rails app using puma"
