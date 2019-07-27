@@ -14,16 +14,16 @@ RUN apt-get -qqy remove ruby ruby-dev ruby1.9.1 ruby1.9.1-dev libruby1.9.1 \
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && apt-get install -qqy \
       libsqlite3-dev \
-#       nodejs \
+       nodejs \
 #       postgresql-client \
        libxmlsec1-dev \
-#       unzip \
-#       fontforge \
+       unzip \
+       fontforge \
        vim \
-#  && npm cache clean -f \
-#  && npm install -g n \
-#  && n 0.12.14 \
-#  && npm install -g gulp \
+  && npm cache clean -f \
+  && npm install -g n \
+  && n 0.12.14 \
+  && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/* 
 
 RUN gem install bundler -v 1.15.2

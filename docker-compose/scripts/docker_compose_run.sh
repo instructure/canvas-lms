@@ -18,13 +18,12 @@ else
   echo "Ok!"
 fi
 
-# TODO: uncomment me once i get npm going
-#echo "Checking if npm is installed"
-#if ! npm -v &> /dev/null; then
-#  echo "npm -v FAILED / ERROR. Make sure the npm install worked in the Docker container build."
-#else
-#  echo "Ok!"
-#fi
+echo "Checking if npm is installed"
+if ! npm -v &> /dev/null; then
+  echo "npm -v FAILED / ERROR. Make sure the npm install worked in the Docker container build."
+else
+  echo "Ok!"
+fi
 
 cp -a /app/docker-compose/config/* /app/config/
 
