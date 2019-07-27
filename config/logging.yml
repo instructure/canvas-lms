@@ -16,7 +16,7 @@ production:
   # Unable to load application: NameError: wrong constant name <%= ENV['LOG_LEVEL'] %>
   # <date> app[web.1]: /app/config/application.rb:62:in `const_get': wrong constant name <%= ENV['LOG_LEVEL'] %> (NameError)
   logger: syslog
-    app_ident: canvas-lms
+  app_ident: canvas-lms
   facilities:
-   - user
+    - user
 #  - local3
