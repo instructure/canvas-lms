@@ -7,6 +7,9 @@ FROM heroku/cedar:14
 # See: https://devcenter.heroku.com/articles/build-docker-images-heroku-yml#setting-build-time-environment-variables
 ARG RAILS_ENV=development
 
+# Make `heroku ps:exec` work. See: https://stackoverflow.com/questions/46652928/shell-into-a-docker-container-running-on-a-heroku-dyno-how
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
 RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get -qqy remove ruby ruby-dev ruby1.9.1 ruby1.9.1-dev libruby1.9.1 \
   && apt-get -qqy autoremove \
