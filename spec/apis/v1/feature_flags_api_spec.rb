@@ -64,7 +64,6 @@ describe "Feature Flags API", type: :request do
                 "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
           {"feature"=>"course_feature",
            "applies_to"=>"Course",
-           "development"=>true,
            "release_notes_url"=>"http://example.com",
            "display_name"=>"not localized",
            "description"=>"srsly",

@@ -8,7 +8,9 @@ anonymous_moderated_marking:
   applies_to: Account
   root_opt_in: true
   beta: true
-  development: true
+  environments:
+    production:
+      state: disabled
 anonymous_marking:
   state: allowed
   display_name: Anonymous Grading
