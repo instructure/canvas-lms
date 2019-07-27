@@ -7,6 +7,8 @@
 setup:
   config:
     RAILS_ENV: production
+    LOG_LEVEL: info
+    DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
 
 # Note that config values in here are only available at Build time, not runtime. Use setup: section for runtime vars.
 build:
@@ -14,5 +16,7 @@ build:
     web: Dockerfile
   config:
     RAILS_ENV: production
+    LOG_LEVEL: debug
+    DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
 run:
   web: bundle exec puma -C config/puma.rb
