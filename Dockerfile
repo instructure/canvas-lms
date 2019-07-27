@@ -3,6 +3,10 @@
 # of node and native built gems). 
 FROM heroku/cedar:14
 
+# Required for Docker heroku.yml builds to change it. 
+# See: https://devcenter.heroku.com/articles/build-docker-images-heroku-yml#setting-build-time-environment-variables
+ARG RAILS_ENV=development
+
 RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash -
 RUN apt-get -qqy remove ruby ruby-dev ruby1.9.1 ruby1.9.1-dev libruby1.9.1 \
   && apt-get -qqy autoremove \
