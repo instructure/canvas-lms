@@ -1158,7 +1158,7 @@ DEPENDENCIES
   yard-appendix (>= 0.1.8)
 
 RUBY VERSION
-   ruby 2.1.9p490
+   ruby 2.1.9p495
 
 BUNDLED WITH
-   1.12.5
+   1.15.2
