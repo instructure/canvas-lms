@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Align right"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Alignment and Indentation"
+  },
   "all_4321c3a1": {
     "message": "All"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "Cancel image upload"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas Plugins"
   },
   "cc_attribution_f6de631f": {
     "message": "CC attribution"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "Edit Link"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "Editor Statusbar"
+  },
   "embed_828fac4a": {
     "message": "Embed"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "Folder"
+  },
+  "formatting_5b143aa8": {
+    "message": "Formatting"
   },
   "generating_preview_45b53be0": {
     "message": "Generating preview..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "Mic"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Miscellaneous and LTI"
+  },
   "modules_c4325335": {
     "message": "Units"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "selected_274ce24f": {
+    "message": "Selected"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "Show embed options"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Start recording"
+  },
+  "styles_2aa721ef": {
+    "message": "Styles"
   },
   "subheader_2b87606d": {
     "message": "Subheader"

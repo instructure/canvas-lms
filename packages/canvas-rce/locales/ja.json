@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "右揃え"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "調節と書き出し"
+  },
   "all_4321c3a1": {
     "message": "すべて"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "画像のアップロードをキャンセルする"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas プラグイン"
   },
   "cc_attribution_f6de631f": {
     "message": "CC 属性"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "リンクの編集"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "エディタ ステータスバー"
+  },
   "embed_828fac4a": {
     "message": "埋め込み"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "フォルダ"
+  },
+  "formatting_5b143aa8": {
+    "message": "フォーマット"
   },
   "generating_preview_45b53be0": {
     "message": "プレビュー中..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "マイク"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "その他と LTI"
+  },
   "modules_c4325335": {
     "message": "モジュール"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "ファイルをアップロードするフォルダを選択"
   },
+  "selected_274ce24f": {
+    "message": "選択されました"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "埋め込みオプションを表示する"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "録画開始"
+  },
+  "styles_2aa721ef": {
+    "message": "スタイル"
   },
   "subheader_2b87606d": {
     "message": "サブヘッダー"

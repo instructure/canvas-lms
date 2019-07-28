@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Aliyen adwat"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Aliyman ak Retrè"
+  },
   "all_4321c3a1": {
     "message": "Tout"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "Anile transfè imaj"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Plugins Canvas"
   },
   "cc_attribution_f6de631f": {
     "message": "Atribisyon CC"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "Chanje Lyen"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "Editè Ba Estati"
+  },
   "embed_828fac4a": {
     "message": "Entegre"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "Dosye"
+  },
+  "formatting_5b143aa8": {
+    "message": "Fòmataj"
   },
   "generating_preview_45b53be0": {
     "message": "Jenerasyon apèsi..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "Mikwo"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Divès ak LTI"
+  },
   "modules_c4325335": {
     "message": "Modil"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleksyone yon dosye pou transfere fichye ou a ladan li"
   },
+  "selected_274ce24f": {
+    "message": "Chwazi"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "Afiche opsyon entegrasyon"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Kòmanse Anrejistre"
+  },
+  "styles_2aa721ef": {
+    "message": "Stil"
   },
   "subheader_2b87606d": {
     "message": "Sou antèt"
