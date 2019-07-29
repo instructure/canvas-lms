@@ -28,6 +28,13 @@ module Types
 
     field :mutation_name, String, null: false
 
+    field :timestamp, DateTimeType, null: true
+    def timestamp
+      object["timestamp"] && Time.zone.iso8601(object["timestamp"])
+    rescue ArgumentError
+      nil
+    end
+
     field :user, UserType, null: true
     def user
       Loaders::IDLoader.for(User).load(object["current_user_id"])

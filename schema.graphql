@@ -1806,6 +1806,7 @@ type MutationLog {
   this field returns the "real" (logged-in) user.
   """
   realUser: User
+  timestamp: DateTime
   user: User
 }
 

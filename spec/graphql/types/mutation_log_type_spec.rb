@@ -61,6 +61,7 @@ describe Types::MutationLogType do
             nodes {
               assetString
               mutationId
+              timestamp
               user { _id }
               realUser { _id }
               params
@@ -86,6 +87,7 @@ describe Types::MutationLogType do
     result = audit_log_query({assetString: @asset_string}, current_user: @admin).
       dig("data", "auditLogs", "mutationLogs", "nodes", 0)
     expect(result["assetString"]).to eq @asset_string
+    expect(result["timestamp"]).not_to be_nil
     expect(result["user"]["_id"]).to eq @teacher.id.to_s
     expect(result["params"]).to eq("id" => @assignment.id.to_s)
   end
