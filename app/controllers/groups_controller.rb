@@ -255,12 +255,12 @@ class GroupsController < ApplicationController
     unless api_request?
       if @context.is_a?(Account)
         user_crumb = t('#crumbs.users', "Users")
-        @active_tab = "users"
+        set_active_tab "users"
         @group_user_type = "user"
         @allow_self_signup = false
       else
         user_crumb = t('#crumbs.people', "People")
-        @active_tab = "people"
+        set_active_tab "people"
         @group_user_type = "student"
         @allow_self_signup = true
         if @context.grants_right? @current_user, session, :read_as_admin

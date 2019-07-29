@@ -18,7 +18,7 @@
 
 <% provide :page_title, t('titles.registered_services', 'Registered Services') %>
 <% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
-  @active_tab="people"
+  set_active_tab "people"
   add_crumb(t('#crumbs.registered_services', 'Registered Services'), context_url(@context, :context_user_services_url)) %>
 <% provide :right_side do %>
   <div class="rs-margin-bottom">

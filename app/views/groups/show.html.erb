@@ -19,7 +19,7 @@
 <% provide :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
 <% css_bundle :dashboard %>
 <% js_bundle :dashboard %>
-<%  @active_tab = "home" %>
+<%  set_active_tab "home" %>
 
 <% provide :right_side do %>
 

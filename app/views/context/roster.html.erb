@@ -17,7 +17,7 @@
 %>
 
 <%
-  @active_tab = 'people'
+  set_active_tab 'people'
   add_crumb t('People'), context_url(@context, :context_users_url)
 
   translated_title = @context.is_a?(Course) ? t('Course Roster') : t('Group Roster')

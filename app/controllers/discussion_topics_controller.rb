@@ -367,7 +367,7 @@ class DiscussionTopicsController < ApplicationController
       format.html do
         log_asset_access([ "topics", @context ], 'topics', 'other')
 
-        @active_tab = 'discussions'
+        set_active_tab 'discussions'
         add_crumb(t('#crumbs.discussions', 'Discussions'),
                   named_context_url(@context, :context_discussion_topics_url))
 
@@ -1061,10 +1061,10 @@ class DiscussionTopicsController < ApplicationController
 
   def add_discussion_or_announcement_crumb
     if  @topic.is_a? Announcement
-      @active_tab = "announcements"
+      set_active_tab "announcements"
       add_crumb t('#crumbs.announcements', "Announcements"), named_context_url(@context, :context_announcements_url)
     else
-      @active_tab = "discussions"
+      set_active_tab "discussions"
       add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
     end
   end

@@ -1864,7 +1864,7 @@ class CoursesController < ApplicationController
           ).to_a
           @syllabus_body = syllabus_user_content
         else
-          @active_tab = "home"
+          set_active_tab "home"
           if @context.grants_right?(@current_user, session, :manage_groups)
             @contexts += @context.groups
           else

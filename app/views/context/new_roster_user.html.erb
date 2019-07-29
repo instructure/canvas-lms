@@ -22,7 +22,7 @@
 <%
   add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
   add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
-  @active_tab="people"
+  set_active_tab "people"
 %>
 <% provide :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% @active_tab = "terms" %>
+<% set_active_tab "terms" %>
 <% provide :page_title do %><%= t :page_title, "%{account} Terms", :account => @context.name %><% end %>
 
 <% js_bundle 'legacy/terms_index' %>

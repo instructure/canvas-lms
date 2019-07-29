@@ -158,7 +158,7 @@ class ProfileController < ApplicationController
     end
 
     @user ||= @current_user
-    @active_tab = "profile"
+    set_active_tab "profile"
     @context = @user.profile if @user == @current_user
 
     @user_data = profile_data(
@@ -203,7 +203,7 @@ class ProfileController < ApplicationController
     @pseudonyms = @user.pseudonyms.active
     @password_pseudonyms = @pseudonyms.select{|p| !p.managed_password? }
     @context = @user.profile
-    @active_tab = "profile_settings"
+    set_active_tab "profile_settings"
     js_env :enable_gravatar => @domain_root_account&.enable_gravatar?
     respond_to do |format|
       format.html do
@@ -223,7 +223,7 @@ class ProfileController < ApplicationController
     @user = @current_user
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
-    @active_tab = 'notifications'
+    set_active_tab 'notifications'
 
 
     # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
@@ -458,7 +458,7 @@ class ProfileController < ApplicationController
       js_env(AUTH_TYPE: @domain_root_account.parent_auth_type)
     end
     @user ||= @current_user
-    @active_tab = 'observees'
+    set_active_tab 'observees'
     @context = @user.profile if @user == @current_user
 
     add_crumb(@user.short_name, profile_path)

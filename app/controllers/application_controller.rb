@@ -2117,6 +2117,17 @@ class ApplicationController < ActionController::Base
   def body_classes; @body_classes ||= []; end
   helper_method :body_classes
 
+  def set_active_tab(active_tab)
+    raise "call set_active_tab for #{active_tab.inspect} in the controller when using streaming templates" if @streaming_template && @active_tab != active_tab
+    @active_tab = active_tab
+  end
+  helper_method :set_active_tab
+
+  def get_active_tab
+    @active_tab
+  end
+  helper_method :get_active_tab
+
   def get_course_from_section
     if params[:section_id]
       @section = api_find(CourseSection, params.delete(:section_id))

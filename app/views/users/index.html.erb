@@ -17,7 +17,7 @@
 %>
 
 <% add_crumb t('crumbs.users', "Users") %>
-<% @active_tab = "users" %>
+<% set_active_tab "users" %>
 <% if @query %>
   <% js_env ga_page_title: "User Search Results" %>
 <% end %>

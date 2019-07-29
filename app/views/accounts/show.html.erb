@@ -18,7 +18,7 @@
 
 <% provide :page_title do %><%= @account.name %><% end %>
 <%
-  @active_tab = "courses"
+  set_active_tab "courses"
   add_crumb t(:courses_crumb, "Courses"), account_path(@account)
 %>
 <% provide :right_side do %>

@@ -19,7 +19,7 @@
 <% provide :page_title, t('titles.access_report', 'Access Report') %>
 <% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
   add_crumb(@user.name, context_url(@context, :context_user_url, @user))
-  @active_tab="people"
+  set_active_tab "people"
   add_crumb(t('#crumbs.access_report', "Access Report"))
   css_bundle :roster_user_usage
 %>

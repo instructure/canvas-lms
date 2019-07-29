@@ -34,7 +34,7 @@ class EportfoliosController < ApplicationController
     @context = @current_user.profile
     return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
     rce_js_env
-    @active_tab = "eportfolios"
+    set_active_tab "eportfolios"
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.order(:updated_at).to_a

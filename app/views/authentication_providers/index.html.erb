@@ -17,7 +17,7 @@
 %>
 
 <% add_crumb t(:page_title, "Authentication Settings") %>
-<% @active_tab = "authentication" %>
+<% set_active_tab "authentication" %>
 <%- css_bundle(:federated_attributes) %>
 <% provide :page_title do %>
   <%= t(:page_title, "Authentication Settings")%>

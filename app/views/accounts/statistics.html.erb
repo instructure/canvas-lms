@@ -18,7 +18,7 @@
 
 <%
   provide :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
-  @active_tab = "statistics"
+  set_active_tab "statistics"
   css_bundle :statistics
   js_bundle :account_statistics
 %>

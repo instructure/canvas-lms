@@ -20,7 +20,7 @@
   provide :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   css_bundle :course_settings
   js_bundle :course_settings
-  @active_tab = "settings"
+  set_active_tab "settings"
 
   can_manage = can_do(@context, @current_user, :manage)
 
