@@ -14,7 +14,7 @@ class BzController < ApplicationController
   # magic field dump / for cohorts uses an access token instead
   # and courses_for_email is unauthenticated since it isn't really sensitive
   # user_retained_data_batch is sensitive, but it can also be done via access_token
-  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information, :user_retained_data_batch]
+  before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information, :user_retained_data_batch, :prepare_qualtrics_links]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
   # this is meant to be used for requests from external services like LL kits
@@ -1445,7 +1445,7 @@ class BzController < ApplicationController
       "scope=signature%20extended&" +
       "prompt=login&" + 
       "client_id=#{BeyondZConfiguration.docusign_api_key}&" +
-      "redirect_uri=#{URI::encode(BeyondZConfiguration.docusign_return_url)}"
+      "redirect_uri=#{URI::encode(BeyondZConfiguration.docusign_return_url.sub('docusign_user_redirect', 'docusign_redirect'))}"
 
     redirect_to url
   end
@@ -1629,4 +1629,203 @@ class BzController < ApplicationController
     account.save
   end
   # end docusign
+
+  # qualtrics
+  def prepare_qualtrics_links
+    # this is meant to be called from the join server's sync to lms, so it does the
+    # access token for permission check
+
+    if false
+    access_token = AccessToken.authenticate(params[:access_token])
+    if access_token.nil?
+      render :json => "Access denied"
+      return
+    end
+
+    requesting_user = access_token.user
+    if requesting_user.id != 1
+      render :json => "Not admin"
+      return
+    end
+    end
+
+    course_id = params[:course_id]
+
+    if course_id.blank?
+      render :json => "no course id"
+      return
+    end
+
+    course = Course.find(course_id)
+
+    # I need to go through all the students in the course and if they don't already have
+    # a qualtrics link, go ahead and make one for them via a qualtrics mailing list.
+
+    # the survey ids...
+    preaccel_id = params[:preaccel_id]
+    postaccel_id = params[:postaccel_id]
+
+    if preaccel_id.blank? && postaccel_id.blank?
+      render :json => "no survey id"
+      return
+    end
+
+    preaccel_students = []
+    postaccel_students = []
+
+    course.students.active.each do |student|
+      unless preaccel_id.blank?
+        r = RetainedData.get_for_course(course_id, student.id, "qualtrics_link_preaccelerator_survey")
+        if r.nil?
+          preaccel_students << student
+        end
+      end
+
+      unless postaccel_id.blank?
+        r = RetainedData.get_for_course(course_id, student.id, "qualtrics_link_postaccelerator_survey")
+        if r.nil?
+          postaccel_students << student
+        end
+      end
+    end
+
+    all_new_students = preaccel_students | postaccel_students
+
+    if all_new_students.empty?
+      render :json => "no new students"
+      return
+    end
+
+
+    # create the list for this sync
+    # see: https://api.qualtrics.com/reference#create-mailing-lists
+    data = {}
+    data["libraryId"] = BeyondZConfiguration.qualtrics_library_id
+    data["name"] = "#{course.course_code} via sync #{DateTime.now}"
+ 
+    url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
+
+    headers = {}
+    headers["Content-Type"] = "application/json"
+    headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = data.to_json
+
+    response = http.request(request)
+    obj = JSON.parse(response.body)
+
+    if obj["meta"]["httpStatus"] != '200 - OK'
+      raise Exception.new response.body
+    end
+    Rails.logger.info response.body
+
+    mailing_list_id = obj["result"]["id"]
+
+    # add the necessary students to this list
+    # see: https://api.qualtrics.com/reference#create-contacts-import
+
+    sync = {}
+    sync["contacts"] = []
+    all_new_students.each do |student|
+      s = {}
+      s["unsubscribed"] = 0
+      s["firstName"] = student.first_name
+      s["lastName"] = student.last_name
+      s["email"] = student.email
+      s["language"] = "EN"
+      sync["contacts"] << s
+    end
+
+ 
+    url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists/#{mailing_list_id}/contactimports")
+
+    headers = {}
+    headers["Content-Type"] = "application/json"
+    headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = sync.to_json
+
+    response = http.request(request)
+    obj = JSON.parse(response.body)
+    if obj["meta"]["httpStatus"] != '200 - OK'
+      raise Exception.new response.body
+    end
+
+      Rails.logger.info response.body
+
+    # now create the links for the people...
+    # see https://api.qualtrics.com/reference#distribution-create-1
+    # (if it doesn't jump, go to "Generate Distribution Links" header)
+
+    do_qualtrics_list(course_id, http, mailing_list_id, preaccel_students, preaccel_id, "qualtrics_link_preaccelerator_survey", "Pre-accelerator")
+    do_qualtrics_list(course_id, http, mailing_list_id, postaccel_students, postaccel_id, "qualtrics_link_postaccelerator_survey", "Post-accelerator")
+
+    render :json => "success"
+  end
+
+  def do_qualtrics_list(course_id, http, mailing_list_id, students_list, survey_id, magic_field_name, distrib_name)
+    if students_list.any?
+      create_command = {}
+      create_command["surveyId"] = survey_id
+      create_command["description"] = "#{distrib_name} distribution from sync #{DateTime.now}"
+      create_command["action"] = "CreateDistribution"
+      create_command["mailingListId"] = mailing_list_id
+
+   
+      url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/distributions")
+
+      headers = {}
+      headers["Content-Type"] = "application/json"
+      headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+
+      request = Net::HTTP::Post.new(url.request_uri, headers)
+      request.body = create_command.to_json
+
+      response = http.request(request)
+      obj = JSON.parse(response.body)
+
+      if obj["meta"]["httpStatus"] != '200 - OK'
+        raise Exception.new response.body
+      end
+
+      Rails.logger.info response.body
+
+      create_id = obj["result"]["id"]
+ 
+      url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/distributions/#{create_id}/links?surveyId=" + survey_id)
+
+      headers = {}
+      headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+      request = Net::HTTP::Get.new(url.request_uri, headers)
+
+      response = http.request(request)
+      obj = JSON.parse(response.body)
+
+      if obj["meta"]["httpStatus"] != '200 - OK'
+        raise Exception.new response.body
+      end
+
+      Rails.logger.info response.body
+
+      obj["result"]["elements"].each do |contact|
+        students_list.each do |student|
+          if student.email == contact["email"]
+            r = RetainedData.get_for_course(course_id, student.id, magic_field_name)
+            if r.nil?
+              r = RetainedData.new
+              r.user_id = student.id
+              r.name = magic_field_name
+            end
+            r.value = contact["link"]
+            r.save
+          end
+        end
+      end
+    end
+  end
+  # end qualtrics
 end

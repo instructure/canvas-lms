@@ -33,7 +33,7 @@ if existing.any?
     if !found_ta
       warnings << "<strong>#{row.section_name} TA</strong> cannot be found on Portal, please double check TA name, email, and phone number"
     end
-    if likely_lcs[row.section_name] && likely_lcs[row.section_name].email.downcase != row.lc_email.downcase
+    if likely_lcs[row.section_name] && !likely_lcs[row.section_name].email.nil? && !row.lc_email.nil? && likely_lcs[row.section_name].email.downcase != row.lc_email.downcase
       warnings << "<strong>#{row.section_name} LC</strong> cannot be found on Portal, please double check LC name, email, and phone number"
     end
 %>
