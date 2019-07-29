@@ -55,10 +55,10 @@ pipeline {
   }
 
   stages {
-    stage('Debug') {
+    stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-          sh 'printenv | sort'
+        sh 'printenv | sort'
         }
       }
     }
@@ -72,7 +72,7 @@ pipeline {
               sh '''
                 gerrit_message="\u2615 $JOB_BASE_NAME build started.\nTag: canvas-lms:$NAME\n$BUILD_URL"
                 ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-                  hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
+                hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
               '''
             })
 
@@ -132,22 +132,62 @@ pipeline {
       }
     }
 
-    stage('Smoke Test') {
+    stage('Publish Patchset Image') {
       steps {
-        timeout(time: 10) {
-          sh 'build/new-jenkins/smoke-test.sh'
+        timeout(time: 5) {
+          // always push the patchset tag otherwise when a later
+          // patchset is merged this patchset tag is overwritten
+          sh 'docker push $PATCHSET_TAG'
         }
       }
     }
 
-    stage('Publish Image') {
+    stage('Parallel Run Tests') {
+      parallel {
+        stage('Selenium Chrome') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'selenium-chrome',
+              propagate: false,
+              parameters: [
+                string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+                string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+                string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
+                string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
+                string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
+                string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
+                string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}")
+              ]
+            )
+          }
+        }
+
+        stage('Vendored Gems') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'vendored-gems',
+              propagate: false,
+              parameters: [
+                string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+                string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+                string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
+                string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
+                string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
+                string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
+                string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}")
+              ]
+            )
+          }
+        }
+      }
+    }
+
+    stage('Publish Merged Image') {
       steps {
         timeout(time: 5) {
           script {
-            // always push the patchset tag otherwise when a later
-            // patchset is merged this patchset tag is overwritten
-            sh 'docker push $PATCHSET_TAG'
-
             if (env.GERRIT_EVENT_TYPE == 'change-merged') {
               sh '''
                 docker tag $PATCHSET_TAG $MERGE_TAG
@@ -187,7 +227,7 @@ pipeline {
 
     cleanup {
       script {
-        sh 'docker-compose down --volumes --rmi local'
+        sh 'docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all'
       }
     }
   }
