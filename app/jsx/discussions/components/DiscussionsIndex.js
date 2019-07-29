@@ -29,6 +29,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import {
   ConnectedDiscussionsContainer,
   DroppableConnectedDiscussionsContainer
@@ -57,11 +58,16 @@ export default class DiscussionsIndex extends Component {
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
     getDiscussions: func.isRequired,
+    setCopyToOpen: func.isRequired,
+    setSendToOpen: func.isRequired,
     hasLoadedDiscussions: bool.isRequired,
     isLoadingDiscussions: bool.isRequired,
     permissions: propTypes.permissions.isRequired,
     pinnedDiscussions: discussionList.isRequired,
-    unpinnedDiscussions: discussionList.isRequired
+    unpinnedDiscussions: discussionList.isRequired,
+    copyToOpen: bool.isRequired,
+    sendToOpen: bool.isRequired,
+    DIRECT_SHARE_ENABLED: bool.isRequired
   }
 
   state = {
@@ -237,6 +243,24 @@ export default class DiscussionsIndex extends Component {
             defaultOpen
             selectedCount={1}
           />
+        )}
+        {this.props.DIRECT_SHARE_ENABLED && (
+          <Tray
+            open={this.props.copyToOpen}
+            label={I18n.t('Copy To...')}
+            onDismiss={() => this.props.setCopyToOpen(false)}
+          >
+            <Heading>{I18n.t('Copy To...')}</Heading>
+          </Tray>
+        )}
+        {this.props.DIRECT_SHARE_ENABLED && (
+          <Tray
+            open={this.props.sendToOpen}
+            label={I18n.t('Send To...')}
+            onDismiss={() => this.props.setSendToOpen(false)}
+          >
+            <Heading>{I18n.t('Send To...')}</Heading>
+          </Tray>
         )}{' '}
       </View>
     )
@@ -252,8 +276,8 @@ export default class DiscussionsIndex extends Component {
         {this.props.isLoadingDiscussions
           ? this.renderSpinner(I18n.t('Loading Discussions'))
           : this.props.permissions.moderate
-            ? this.renderTeacherView()
-            : this.renderStudentView()}
+          ? this.renderTeacherView()
+          : this.renderStudentView()}
       </div>
     )
   }
@@ -274,7 +298,10 @@ const connectState = (state, ownProps) => {
     contextType: state.contextType,
     permissions: state.permissions,
     pinnedDiscussions: pinnedDiscussionIds.map(id => allDiscussions[id]),
-    unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id])
+    unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id]),
+    copyToOpen: state.copyToOpen,
+    sendToOpen: state.sendToOpen,
+    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
   }
   return Object.assign({}, ownProps, fromPagination, fromState)
 }
@@ -284,7 +311,9 @@ const connectActions = dispatch =>
       'arrangePinnedDiscussions',
       'deleteDiscussion',
       'deleteFocusDone',
-      'getDiscussions'
+      'getDiscussions',
+      'setCopyToOpen',
+      'setSendToOpen'
     ]),
     dispatch
   )

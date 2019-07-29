@@ -28,7 +28,8 @@ const app = createDiscussionsIndex(root, {
   discussionTopicMenuTools: ENV.discussion_topic_menu_tools,
   contextCodes: [ENV.context_asset_string],
   currentUserId: ENV.current_user.id,
+  DIRECT_SHARE_ENABLED: ENV.DIRECT_SHARE_ENABLED,
   contextType,
-  contextId,
+  contextId
 })
 app.render()
