@@ -49,6 +49,7 @@ export const SubmissionMocks = {
   },
 
   graded: {
+    attempt: 1,
     deductedPoints: 0,
     enteredGrade: '8',
     grade: '8',
@@ -59,6 +60,7 @@ export const SubmissionMocks = {
   },
 
   submitted: {
+    attempt: 1,
     gradingStatus: 'needs_grading',
     state: 'submitted',
     submissionStatus: 'submitted',

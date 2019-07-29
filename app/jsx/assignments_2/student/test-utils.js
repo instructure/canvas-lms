@@ -18,6 +18,14 @@
 import {CREATE_SUBMISSION_COMMENT} from './graphqlData/Mutations'
 import {SUBMISSION_COMMENT_QUERY} from './graphqlData/Queries'
 
+/*
+ * !!! THIS FILE IS DEPRECIATED !!!
+ *
+ * Use the mocks.js file for your testing needs
+ *
+ * !!! THIS FILE IS DEPRECIATED !!!
+ */
+
 export function mockAssignment(overrides = {}) {
   return {
     _id: '22',
@@ -115,21 +123,6 @@ export function mockMultipleAttachments() {
       __typename: 'Attachment'
     }
   ]
-}
-
-export function singleMediaObject(overrides = {}) {
-  return {
-    __typename: 'MediaObject',
-    id: '9',
-    title: 'video media comment',
-    mediaType: 'video/mp4',
-    mediaSources: {
-      __typename: 'MediaSource',
-      src: 'www.blah.com',
-      type: 'video/mp4'
-    },
-    ...overrides
-  }
 }
 
 export function singleComment(overrides = {}) {
@@ -241,35 +234,6 @@ export function commentGraphqlMock(comments) {
   ]
 }
 
-export function mockSubmissionHistoriesConnection() {
-  const submissionHistory = mockSubmission()
-
-  return {
-    __typename: 'SubmissionHistoryConnection',
-    pageInfo: {
-      __typename: 'PageInfo',
-      hasPreviousPage: false,
-      startCursor: btoa('1')
-    },
-    edges: [
-      {
-        __typename: 'SubmissionHistoryEdge',
-        cursor: btoa('1'),
-        node: submissionHistory
-      }
-    ]
-  }
-}
-
-export function mockGraphqlQueryResults(overrides = {}) {
-  const assignment = mockAssignment(overrides)
-  assignment.submissionsConnection = {
-    nodes: [mockSubmission()],
-    __typename: 'SubmissionConnection'
-  }
-  return assignment
-}
-
 export function mockSubmission(overrides = {}) {
   return {
     attachments: mockMultipleAttachments(),
@@ -303,20 +267,6 @@ export function mockSubmission(overrides = {}) {
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
     __typename: 'Submission',
-    ...overrides
-  }
-}
-
-export function mockSubmissionHistory() {
-  const submissionHistory = mockSubmission()
-  delete submissionHistory.id
-  return submissionHistory
-}
-
-export function mockSubmissionDraft(overrides = {}) {
-  return {
-    _id: '50',
-    attachments: [singleAttachment()],
     ...overrides
   }
 }
