@@ -75,7 +75,7 @@ class Enrollment::BatchStateUpdater
     updates = {workflow_state: 'deleted', updated_at: Time.now.utc}
     updates[:sis_batch_id] = sis_batch.id if sis_batch
     Enrollment.where(id: batch).update_all(updates)
-    EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil)
+    EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil, updated_at: Time.now.utc)
     Score.where(enrollment_id: batch).order(:id).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
     data
   end

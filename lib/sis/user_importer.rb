@@ -426,7 +426,7 @@ module SIS
           where.not(workflow_state: 'deleted').select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
         if enrollments.any?
           Enrollment.where(id: enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-          EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
+          EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)
           e_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: enrollments, updated_state: 'deleted')
           @roll_back_data.push(*e_data) if e_data
         end
@@ -437,7 +437,7 @@ module SIS
           observer_enrollments = observers.map{|o| student_enrollments.map{|se| se.linked_enrollment_for(o) }}.flatten.compact
           if observer_enrollments.any?
             Enrollment.where(id: observer_enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-            EnrollmentState.where(enrollment_id: observer_enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
+            EnrollmentState.where(enrollment_id: observer_enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)
             oe_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: observer_enrollments, updated_state: 'deleted')
             @roll_back_data.push(*oe_data) if oe_data
           end
