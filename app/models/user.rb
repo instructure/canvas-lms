@@ -56,6 +56,7 @@ class User < ActiveRecord::Base
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
   has_many :ignores
   has_many :planner_notes, :dependent => :destroy
+  has_many :viewed_submission_comments, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
 
