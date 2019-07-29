@@ -2521,8 +2521,10 @@ type SubmissionEdge {
 }
 
 input SubmissionFilterInput {
+  gradedSince: DateTime
   sectionIds: [ID!]
   states: [SubmissionState!] = [submitted, pending_review, graded]
+  submittedSince: DateTime
 }
 
 type SubmissionHistory implements SubmissionInterface & Timestamped {

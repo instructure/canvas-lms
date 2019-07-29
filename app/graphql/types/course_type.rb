@@ -159,11 +159,20 @@ module Types
         allowed_user_ids &= student_ids.map(&:to_i)
       end
 
+      filter ||= {}
+
       submissions = Submission.active.joins(:assignment).where(
         user_id: allowed_user_ids,
         assignment_id: course.assignments.published,
-        workflow_state: (filter || {})[:states] || DEFAULT_SUBMISSION_STATES
+        workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
       )
+
+      if filter[:submitted_since]
+        submissions = submissions.where("submitted_at > ?", filter[:submitted_since])
+      end
+      if filter[:graded_since]
+        submissions = submissions.where("graded_at > ?", filter[:graded_since])
+      end
 
       (order_by || []).each { |order|
         direction = order[:direction] == 'descending' ? "DESC NULLS LAST" : "ASC"
