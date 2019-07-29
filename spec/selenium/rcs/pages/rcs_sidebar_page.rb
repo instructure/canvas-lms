@@ -104,6 +104,14 @@ module RCSSidebarPage
     ff('#right-side li')
   end
 
+  def sidebar_images
+    ff("#right-side [role='button']")
+  end
+
+  def sidebar_image_tag
+    f('#right-side a img')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
