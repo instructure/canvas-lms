@@ -363,21 +363,21 @@ encrypted_sourcedids:
 quizzes_next:
   state: allowed
   display_name:
-    features.quizzes.next: Quizzes.Next
-  description: Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.
+    features.quizzes.next: New Quizzes
+  description: Create assessments with New Quizzes and migrate existing Canvas Quizzes.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
 quizzes_next_submission_history:
   state: 'on'
-  display_name: Quizzes.Next submission history
-  description: If enabled, submission history for Quizzes.Next quizzes is dealt with
+  display_name: New Quizzes submission history
+  description: If enabled, submission history for New Quizzes quizzes is dealt with
     separately.
   applies_to: RootAccount
   root_opt_in: true
 import_to_quizzes_next:
   state: allowed
-  display_name: Quizzes.Next Importing
-  description: Allow importing of QTI and Common Cartridge into Quizzes.Next.
+  display_name: New Quizzes Importing
+  description: Allow importing of QTI and Common Cartridge into New Quizzes.
   applies_to: RootAccount
   root_opt_in: true
 common_cartridge_page_conversion:
