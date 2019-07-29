@@ -68,6 +68,11 @@ GIT
       activemodel (>= 3.2)
 
 PATH
+  remote: gems
+  specs:
+    autoextend (1.0.0)
+
+PATH
   remote: gems/activesupport-suspend_callbacks
   specs:
     activesupport-suspend_callbacks (0.0.1)
@@ -418,11 +423,6 @@ PATH
   specs:
     workflow (0.0.1)
       rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems
-  specs:
-    autoextend (1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -1146,6 +1146,3 @@ DEPENDENCIES
   yajl-ruby (= 1.1.0)
   yard (= 0.8.7.6)
   yard-appendix (>= 0.1.8)
-
-BUNDLED WITH
-   1.11.2

@@ -34,6 +34,18 @@ class BeyondZConfiguration
     @config[:docusign_return_url]
   end
 
+  def self.qualtrics_library_id
+    @config[:qualtrics_library_id]
+  end
+
+  def self.qualtrics_api_token
+    @config[:qualtrics_api_token]
+  end
+
+  def self.qualtrics_host
+    @config[:qualtrics_host]
+  end
+
   def self.production?
     # This is the value of a setting we set on production
     # remember to edit this if we ever rebrand again so this

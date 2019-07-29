@@ -44,6 +44,9 @@ CanvasRails::Application.routes.draw do
   post 'bz/linked_in_export' => 'bz#do_linked_in_export'
   get 'bz/linked_in_export_oauth_success' => 'bz#linked_in_export_oauth_success'
 
+  post 'bz/prepare_qualtrics_links' => 'bz#prepare_qualtrics_links'
+  get 'bz/prepare_qualtrics_links' => 'bz#prepare_qualtrics_links'
+
   get 'bz/accessibility_mapper' => 'bz#accessibility_mapper'
   post 'bz/accessibility_mapper' => 'bz#save_html_changes'
   get 'bz/full_module_view' => 'bz#full_module_view'
