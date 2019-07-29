@@ -22,18 +22,18 @@ import Select from '@instructure/ui-core/lib/components/Select'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradezilla'
 
-function renderItem(item) {
+function renderItem(item, selectedItemId, disabled) {
   return (
-    <option key={item.id} value={item.id}>
+    <option disabled={disabled && selectedItemId !== item.id} key={item.id} value={item.id}>
       {item.name}
     </option>
   )
 }
 
-function renderItemAndChildren(item) {
+function renderItemAndChildren(item, selectedItemId, disabled) {
   return (
     <optgroup label={item.name} key={`group_${item.id}`}>
-      {item.children.map(child => renderItem(child))}
+      {item.children.map(child => renderItem(child, selectedItemId, disabled))}
     </optgroup>
   )
 }
@@ -67,25 +67,30 @@ class GradebookFilter extends React.Component {
   }
 
   onChange = event => {
-    this.props.onSelect(event.target.value)
+    if (!this.props.disabled) {
+      this.props.onSelect(event.target.value)
+    }
   }
 
   render() {
+    const {disabled, selectedItemId} = this.props
+    const allItemsDisabled = disabled && selectedItemId !== '0'
+
     return (
       <Select
+        inline
         label={<ScreenReaderContent>{this.props.filterLabel}</ScreenReaderContent>}
         onChange={this.onChange}
         value={this.props.selectedItemId}
-        disabled={this.props.disabled}
-        inline
       >
-        <option key="0" value="0">
+        <option disabled={allItemsDisabled} key="0" value="0">
           {this.props.allItemsLabel}
         </option>
 
-        {this.props.items.map(item =>
-          item.children ? renderItemAndChildren(item) : renderItem(item)
-        )}
+        {this.props.items.map(item => {
+          const renderFn = item.children ? renderItemAndChildren : renderItem
+          return renderFn(item, selectedItemId, disabled)
+        })}
       </Select>
     )
   }
