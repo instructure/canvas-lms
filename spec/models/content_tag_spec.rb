@@ -701,15 +701,17 @@ describe ContentTag do
       course_with_teacher(active_all: true)
     end
 
-    it "runs the due date cacher when saved if the content is Quizzes 2" do
-      tool = @course.context_external_tools.create!(
+    let(:tool) do
+      @course.context_external_tools.create!(
         name: 'Quizzes.Next',
         consumer_key: 'test_key',
         shared_secret: 'test_secret',
         tool_id: 'Quizzes 2',
         url: 'http://example.com/launch'
       )
+    end
 
+    it "runs the due date cacher when saved if the content is Quizzes 2" do
       assignment = @course.assignments.create!(title: "some assignment", submission_types: 'external_tool')
 
       expect(DueDateCacher).to receive(:recompute).with(assignment)
@@ -717,8 +719,14 @@ describe ContentTag do
       ContentTag.create!(content: tool, url: tool.url, context: assignment)
     end
 
+    it "does not run the due date cacher when saved if the content is Quizzes 2 but the context is a course" do
+      expect(DueDateCacher).to_not receive(:recompute)
+
+      ContentTag.create!(content: tool, url: tool.url, context: @course)
+    end
+
     it "does not run the due date cacher when saved for general content" do
-      tool = @course.context_external_tools.create!(
+      not_quizzes_tool = @course.context_external_tools.create!(
         name: 'Not Quizzes.Next',
         consumer_key: 'test_key',
         shared_secret: 'test_secret',
@@ -730,7 +738,7 @@ describe ContentTag do
 
       expect(DueDateCacher).to_not receive(:recompute).with(assignment)
 
-      ContentTag.create!(content: tool, url: tool.url, context: assignment)
+      ContentTag.create!(content: not_quizzes_tool, url: not_quizzes_tool.url, context: assignment)
     end
   end
 
