@@ -307,6 +307,35 @@ describe Course do
         expect(migration.workflow_state).not_to eq('imported')
       end
     end
+
+    describe "default_post_policy" do
+      let(:migration) do
+        build_migration(@course, {}, all_course_settings: true)
+      end
+
+      it "sets the course to manually-posted when default_post_policy['post_manually'] is true" do
+        import_data = {"course": {"default_post_policy": {"post_manually": true}}}.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+
+        expect(@course.default_post_policy).to be_post_manually
+      end
+
+      it "sets the course to auto-posted when default_post_policy['post_manually'] is false" do
+        @course.default_post_policy.update!(post_manually: true)
+        import_data = {"course": {"default_post_policy": {"post_manually": false}}}.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+
+        expect(@course.default_post_policy).not_to be_post_manually
+      end
+
+      it "does not update the course's post policy when default_post_policy['post_manually'] is missing" do
+        @course.default_post_policy.update!(post_manually: true)
+        import_data = {"course": {}}.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+
+        expect(@course.default_post_policy).to be_post_manually
+      end
+    end
   end
 
   describe "shift_date_options" do

@@ -509,4 +509,52 @@ describe "Importing assignments" do
 
   end
 
+  describe "post_policy" do
+    let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
+    let(:course) { Course.create! }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_hash) do
+      {
+        "migration_id" => migration_id,
+        "post_policy" => {"post_manually" => false}
+      }.with_indifferent_access
+    end
+
+    let(:imported_assignment) do
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      course.assignments.find_by(migration_id: migration_id)
+    end
+
+    before(:each) do
+      course.enable_feature!(:anonymous_marking)
+      course.enable_feature!(:moderated_grading)
+    end
+
+    it "sets the assignment to manually-posted if post_policy['post_manually'] is true" do
+      assignment_hash[:post_policy][:post_manually] = true
+      expect(imported_assignment.post_policy).to be_post_manually
+    end
+
+    it "sets the assignment to manually-posted if the assignment is anonymous" do
+      assignment_hash.delete(:post_policy)
+      assignment_hash[:anonymous_grading] = true
+      expect(imported_assignment.post_policy).to be_post_manually
+    end
+
+    it "sets the assignment to manually-posted if the assignment is moderated" do
+      assignment_hash.delete(:post_policy)
+      assignment_hash[:moderated_grading] = true
+      assignment_hash[:grader_count] = 2
+      expect(imported_assignment.post_policy).to be_post_manually
+    end
+
+    it "sets the assignment to auto-posted if post_policy['post_manually'] is false and not anonymous or moderated" do
+      expect(imported_assignment.post_policy).not_to be_post_manually
+    end
+
+    it "does not update the assignment's post policy if no post_policy element is present and not anonymous or moderated" do
+      assignment_hash.delete(:post_policy)
+      expect(imported_assignment.post_policy).not_to be_post_manually
+    end
+  end
 end
