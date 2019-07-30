@@ -591,6 +591,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def run_due_date_cacher_for_quizzes_next(force: false)
+    # Quizzes next should ideally only ever be attached to an
+    # assignment.  Let's ignore any other contexts.
+    return unless context_type == "Assignment"
     DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != 'deleted')
   end
 end
