@@ -412,6 +412,12 @@ module Importers
         end
       end
 
+      # Ensure anonymous and moderated assignments always start out manually
+      # posted, even if the moderated assignment in the old course was switched
+      # to automatically post after it had grades published
+      post_manually = hash.dig(:post_policy, :post_manually) || item.anonymous_grading || item.moderated_grading
+      item.post_policy.update!(post_manually: !!post_manually)
+
       item
     end
   end

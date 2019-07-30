@@ -132,6 +132,7 @@
           </xs:simpleType>
         </xs:element>
         <xs:element name="root_account_uuid" type="xs:string" minOccurs="0"/>
+        <xs:element name="default_post_policy" type="postPolicyType" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>
@@ -234,6 +235,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="post_policy" type="postPolicyType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="identifier" type="xs:ID" use="required"/>
   </xs:complexType>
@@ -474,6 +476,12 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="postPolicyType">
+    <xs:all>
+      <xs:element name="post_manually" type="xs:boolean" minOccurs="1"/>
+    </xs:all>
   </xs:complexType>
 
   <xs:element name="learningOutcomes" type="learningOutcomesType"/>
