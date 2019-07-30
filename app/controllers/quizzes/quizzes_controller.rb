@@ -133,7 +133,8 @@ class Quizzes::QuizzesController < ApplicationController
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
-              @context.quiz_lti_tool.present?
+              @context.quiz_lti_tool.present?,
+          DIRECT_SHARE_ENABLED: can_manage && @domain_root_account&.feature_enabled?(:direct_share)
         },
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
         :SIS_NAME => sis_name,

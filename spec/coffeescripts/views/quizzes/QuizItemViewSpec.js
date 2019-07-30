@@ -55,7 +55,8 @@ const createView = function(quiz, options = {}) {
 
   ENV.FLAGS = {
     post_to_sis_enabled: options.post_to_sis,
-    migrate_quiz_enabled: options.migrate_quiz_enabled
+    migrate_quiz_enabled: options.migrate_quiz_enabled,
+    DIRECT_SHARE_ENABLED: options.DIRECT_SHARE_ENABLED || false
   }
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
@@ -416,4 +417,18 @@ test('renders mastery paths link for quiz if quiz has is released by a rule', fu
   })
   const view = createView(quiz)
   equal(view.$('.mastery-path-icon').length, 1)
+})
+
+test('does not render direct share menu items when not DIRECT_SHARE_ENABLED', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz)
+  equal(view.$('.quiz-copy-to').length, 0)
+  equal(view.$('.quiz-send-to').length, 0)
+})
+
+test('renders direct share menu items when DIRECT_SHARE_ENABLED', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+  equal(view.$('.quiz-copy-to').length, 1)
+  equal(view.$('.quiz-send-to').length, 1)
 })
