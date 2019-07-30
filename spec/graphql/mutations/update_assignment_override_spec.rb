@@ -369,8 +369,7 @@ describe Mutations::UpdateAssignment do
         }
       ]
     GQL
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "invalid due_at \"2018:02-28T17:02:00Z-05:00\""
+    expect(result.dig('errors', 1, 'extensions', 'code')).to eq "argumentLiteralsIncompatible"
   end
 
 end
