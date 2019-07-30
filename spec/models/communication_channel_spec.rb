@@ -611,4 +611,52 @@ describe CommunicationChannel do
       cc.send_otp!('123456')
     end
   end
+
+  describe '#user_can_have_more_channels?' do
+    before(:each) do
+      @domain_root_account = Account.default
+      @user = User.create!
+    end
+
+    subject { CommunicationChannel.user_can_have_more_channels?(@user, @domain_root_account) }
+
+    it 'returns true if :max_communication_channels settings is not set' do
+      expect(subject).to be_truthy
+    end
+
+    describe 'when :max_communication_channels is set' do
+      before(:each) do
+        @domain_root_account.settings[:max_communication_channels] = 2
+        @domain_root_account.save!
+      end
+
+      it 'returns true if the current number of CCs is less then the setting' do
+        @user.communication_channels.create!(:path => 'cc1@test.com')
+        expect(subject).to be_truthy
+      end
+
+      describe 'when there are more CCs then the setting' do
+        before(:each) do
+          @cc1 = @user.communication_channels.create!(:path => 'cc1@test.com')
+          @cc2 = @user.communication_channels.create!(:path => 'cc2@test.com')
+        end
+
+        it 'returns false if the CCs are active' do
+          expect(subject).to be_falsey
+        end
+
+        it 'returns false if the CCs are retired and were recently created' do
+          @cc1.destroy!
+          @cc2.destroy!
+          expect(subject).to be_falsey
+        end
+
+        it 'returns true if the CCs are retired and not recently created' do
+          @cc1.update_columns(created_at: 1.day.ago)
+          @cc1.destroy!
+          expect(subject).to be_truthy
+        end
+      end
+    end
+  end
 end
