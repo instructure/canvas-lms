@@ -212,8 +212,17 @@ class AssignmentsController < ApplicationController
         env[:SETTINGS][:filter_speed_grader_by_student_group] = @context.filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
-          env[:group_categories] = group_categories_json(@context.group_categories, @current_user, session, {include: ['groups']})
-          env[:selected_student_group_id] = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+          eligible_categories = @context.group_categories
+          eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
+          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
+
+          selected_group_id = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+          # If this is a group assignment and we had previously filtered by a
+          # group that isn't part of this assignment's group set, behave as if
+          # no group is selected.
+          if selected_group_id.present? && Group.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
+            env[:selected_student_group_id] = selected_group_id
+          end
         end
 
         if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?

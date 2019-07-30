@@ -749,25 +749,58 @@ describe AssignmentsController do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @course.enable_feature!(:new_gradebook)
           @course.update!(filter_speed_grader_by_student_group: true)
+
+          category = @course.group_categories.create!(name: "category")
+          category.create_groups(2)
         end
 
-        it "includes the course group categories" do
-          @course.group_categories.create!(name: "category")
+        it "includes all group categories for the course if the assignment does not belong to a specific category" do
           get :show, params: {course_id: @course.id, id: @assignment.id}
-          group_categories_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
-          expect(group_categories_ids).to eq @course.group_categories.map(&:id)
+          group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+          expect(group_category_ids).to eq @course.group_categories.map(&:id)
         end
 
-        it "includes the gradebook settings student group id" do
+        it "includes only the relevant group category if the assignment belongs to a specific category" do
+          assignment_category = @course.group_categories.create!(name: "special category")
+          @assignment.update!(group_category: assignment_category)
+
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+          expect(group_category_ids).to contain_exactly(assignment_category.id)
+        end
+
+        it "includes the gradebook settings student group id if the group is valid for this assignment" do
+          first_group_id = @course.groups.first.id.to_s
           @teacher.preferences[:gradebook_settings] = {
             @course.id => {
               'filter_rows_by' => {
-                'student_group_id' => '23'
+                'student_group_id' => first_group_id
               }
             }
           }
           get :show, params: {course_id: @course.id, id: @assignment.id}
-          expect(assigns[:js_env][:selected_student_group_id]).to eq "23"
+          expect(assigns[:js_env][:selected_student_group_id]).to eq first_group_id
+        end
+
+        it "does not set selected_student_group_id if the selected group is not eligible for this assignment" do
+          @teacher.preferences[:gradebook_settings] = {
+            @course.id => {
+              'filter_rows_by' => {
+                'student_group_id' => @course.groups.first.id.to_s
+              }
+            }
+          }
+
+          assignment_category = @course.group_categories.create!(name: "special category")
+          @assignment.update!(group_category: assignment_category)
+
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to include(:selected_student_group_id)
+        end
+
+        it "does not set selected_student_group_id if no group is selected" do
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to include(:selected_student_group_id)
         end
       end
 
