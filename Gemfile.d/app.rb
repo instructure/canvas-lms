@@ -45,12 +45,12 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.5.2', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-dynamodb", "1.33.0"
+gem "aws-sdk-dynamodb", "1.34.0"
 gem "aws-sdk-kinesis", '1.18.0', require: false
 gem "aws-sdk-s3", '1.45.0', require: false
 gem "aws-sdk-sns", '1.18.0', require: false
 gem "aws-sdk-sqs", '1.18.0', require: false
-gem "aws-sdk-core", "3.59.0", require: false
+gem "aws-sdk-core", "3.61.1", require: false
 gem "aws-sdk-kms", "1.23.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
