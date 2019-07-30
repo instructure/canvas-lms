@@ -68,6 +68,23 @@ describe CommunicationChannelsController do
       post 'create', params: {:user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' }}
       expect(response).not_to be_successful
     end
+
+    it 'should prevent CC from being created if at the maximum number of CCs allowed' do
+      domain_root_account = Account.default
+      domain_root_account.settings[:max_communication_channels] = 1
+      @user.communication_channels.create!(:path => 'cc@test.com')
+      user_session(@user)
+      post 'create', params: {
+        :user_id => @user.id,
+        :communication_channel => {
+          :address => 'cc2@test.com', :type => 'email'
+        }
+      }
+      expect(response).not_to be_successful
+      expect(
+        JSON.parse(response.body)['errors']['type']
+      ).to eq 'Maximum number of communication channels reached'
+    end
   end
 
   describe "GET 'confirm'" do
