@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
+import {render, fireEvent, act, waitForElement, prettyDOM} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {UploadFile, handleSubmit} from '../UploadFile'
 
@@ -105,6 +105,96 @@ describe('UploadFile', () => {
       expect(getByLabelText('Computer')).toBeInTheDocument()
       expect(queryByLabelText('URL')).not.toBeInTheDocument()
     })
+  })
+
+  describe('tab navigation', () => {
+    it('shows the Unsplash panel when the tab is clicked', async () => {
+      const { getByText, getByLabelText } = render(
+        <UploadFile
+          label="Test"
+          editor={fakeEditor}
+          trayProps={trayProps}
+          onDismiss={() => {}}
+          onSubmit={() => {}}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
+        />
+      )
+
+      const unsplashTab = getByText('Unsplash')
+      act(() => {
+        userEvent.click(unsplashTab)
+      })
+      const searchInput = await waitForElement(() => getByLabelText('Search Term'))
+      expect(searchInput).toBeVisible();
+    })
+
+    it('shows the URL panel when the tab is clicked', async () => {
+      const { getByText, getByLabelText } = render(
+        <UploadFile
+          label="Test"
+          editor={fakeEditor}
+          trayProps={trayProps}
+          onDismiss={() => {}}
+          onSubmit={() => {}}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
+        />
+      )
+
+      const urlTab = getByText('URL')
+      act(() => {
+        userEvent.click(urlTab)
+      })
+      const urlInput = await waitForElement(() => getByLabelText('URL'))
+      expect(urlInput).toBeVisible();
+    })
+
+    it('shows the computer panel when the tab is clicked', async () => {
+      const { getByText } = render(
+        <UploadFile
+          label="Test"
+          editor={fakeEditor}
+          trayProps={trayProps}
+          onDismiss={() => {}}
+          onSubmit={() => {}}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
+        />
+      )
+
+      const computerTab = getByText('Computer')
+      act(() => {
+        userEvent.click(computerTab)
+      })
+      const fileDrop = await waitForElement(() => getByText(/browse your computer/))
+      expect(fileDrop).toBeVisible();
+    })
+
+    it('navigates from one tab to another', async () => {
+      const { getByText, getByLabelText } = render(
+        <UploadFile
+          label="Test"
+          editor={fakeEditor}
+          trayProps={trayProps}
+          onDismiss={() => {}}
+          onSubmit={() => {}}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
+        />
+      )
+
+      const urlTab = getByText('URL')
+      act(() => {
+        userEvent.click(urlTab)
+      })
+      await waitForElement(() => getByLabelText('URL'))
+
+      const unsplashTab = getByText('Unsplash')
+      act(() => {
+        userEvent.click(unsplashTab)
+      })
+      const searchBox = await waitForElement(() => getByLabelText('Search Term'))
+      expect(searchBox).toBeVisible();
+    })
+
+
   })
 
   describe('handleSubmit', () => {

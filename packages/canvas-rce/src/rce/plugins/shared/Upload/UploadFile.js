@@ -114,7 +114,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
       switch(panel) {
         case 'COMPUTER':
           return (
-            <Tabs.Panel key={panel} title={formatMessage('Computer')}>
+            <Tabs.Panel key={panel} renderTitle={function () { return formatMessage('Computer')}} selected={selectedPanel === 'COMPUTER'}>
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                 <ComputerPanel
                   editor={editor}
@@ -130,7 +130,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           )
         case 'UNSPLASH':
           return (
-            <Tabs.Panel key={panel} title='Unsplash'>
+            <Tabs.Panel key={panel} renderTitle={function () { return 'Unsplash'}} selected={selectedPanel === 'UNSPLASH'}>
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                   <UnsplashPanel
                     editor={editor}
@@ -144,7 +144,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           )
         case 'URL':
           return (
-            <Tabs.Panel key={panel} title={formatMessage('URL')}>
+            <Tabs.Panel key={panel} renderTitle={function () { return formatMessage('URL')}} selected={selectedPanel === 'URL'}>
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                 <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} />
               </Suspense>
@@ -184,7 +184,9 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
             <Heading>{label}</Heading>
           </Modal.Header>
           <Modal.Body>
-            <Tabs focus size="large" selectedIndex={panels.indexOf(selectedPanel)} onChange={newIndex => setSelectedPanel(panels[newIndex])}>
+          <Tabs
+              onRequestTabChange={(event, { index }) => setSelectedPanel(panels[index])}
+            >
               {renderTabs()}
             </Tabs>
           </Modal.Body>
