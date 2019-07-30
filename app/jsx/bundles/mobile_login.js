@@ -18,10 +18,13 @@
 
 import I18n from 'i18n!pseudonyms_mobile_login'
 import signupDialog from 'compiled/registration/signupDialog'
+import ready from '@instructure/ready'
 
 const eventToBindTo = 'click'
+ready(() => {
 setupForgotPassword()
 setupParentSignup()
+})
 
 function setupParentSignup () {
   const element = document.querySelector('#coenrollment_link a')

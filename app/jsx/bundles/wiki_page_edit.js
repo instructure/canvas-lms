@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageEditView from 'compiled/views/wiki/WikiPageEditView'
 import LockManager from '../blueprint_courses/apps/LockManager'
@@ -41,6 +42,8 @@ const wikiPageEditView = new WikiPageEditView({
   PAGE_RIGHTS: ENV.PAGE_RIGHTS,
   lockedItems,
 })
+
+ready(() => {
 $('#content').append(wikiPageEditView.$el)
 
 wikiPageEditView.on('cancel', () => {
@@ -54,3 +57,4 @@ wikiPageEditView.on('cancel', () => {
 })
 
 wikiPageEditView.render()
+})

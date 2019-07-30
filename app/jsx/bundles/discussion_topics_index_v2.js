@@ -17,7 +17,9 @@
  */
 
 import createDiscussionsIndex from 'jsx/discussions'
+import ready from '@instructure/ready'
 
+ready(() => {
 const [contextType, contextId] = ENV.context_asset_string.split('_')
 
 const root = document.querySelector('#content')
@@ -33,3 +35,4 @@ const app = createDiscussionsIndex(root, {
   contextId
 })
 app.render()
+})

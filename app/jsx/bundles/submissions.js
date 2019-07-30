@@ -18,6 +18,9 @@
 
 import { setup } from 'submissions';
 import StatusPill from '../grading/StatusPill';
+import ready from '@instructure/ready'
 
+ready(() => {
 setup()
 StatusPill.renderPills()
+})

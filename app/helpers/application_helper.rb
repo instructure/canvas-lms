@@ -197,7 +197,17 @@ module ApplicationHelper
       paths.each { |url| concat preload_link_tag(javascript_path(url)) }
       chunk_urls.each { |url| concat preload_link_tag(url) }
 
-      concat javascript_include_tag(*(paths + chunk_urls), defer: true)
+      # this is how you execute scripts in order, in a way that doesn’t block rendering,
+      # and without having to use 'defer' to wait until the whole DOM is loaded.
+      # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
+      concat javascript_tag "
+        ;#{(paths + chunk_urls).map{ |url| javascript_path(url)}}.forEach(function(src) {
+          var s = document.createElement('script')
+          s.src = src
+          s.async = false
+          document.head.appendChild(s)
+        });
+      "
       concat include_js_bundles
     end
   end

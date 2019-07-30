@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ready from '@instructure/ready'
 import I18n from 'i18n!roster_publicjs'
 import { Model } from 'Backbone'
 import CreateUserList from 'compiled/models/CreateUserList'
@@ -118,5 +119,5 @@ users.once('reset', () =>
 )
 
 app.render()
-app.$el.appendTo($('#content'))
+ready(() => app.$el.appendTo($('#content')))
 users.fetch()

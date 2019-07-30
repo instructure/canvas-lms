@@ -22,6 +22,7 @@ import './appBootstrap'
 
 // true modules that we use in this file
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import Backbone from 'Backbone'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {isMathMLOnPage, loadMathJax} from 'mathml'
@@ -81,7 +82,7 @@ if (!supportsCSSVars) {
   })
 }
 
-$(() => {
+ready(() => {
   // This is in a setTimeout to have it run on the next time through the event loop
   // so that the code that actually renders the user_content runs first,
   // because it has to be rendered before we can check if isMathMLOnPage

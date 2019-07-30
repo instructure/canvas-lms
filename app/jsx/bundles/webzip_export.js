@@ -17,8 +17,11 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import WebZipExportApp from '../webzip_export/App'
 
+ready(() => {
 ReactDOM.render(<WebZipExportApp />, $('#course-webzip-export-app')[0])
+})

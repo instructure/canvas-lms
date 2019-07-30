@@ -35,6 +35,7 @@ import EntriesView from 'compiled/views/DiscussionTopic/EntriesView'
 import SectionsTooltip from 'jsx/shared/SectionsTooltip'
 import 'compiled/jquery/sticky'
 import DiscussionTopicKeyboardShortcutModal from '../discussion_topics/DiscussionTopicKeyboardShortcutModal'
+import ready from '@instructure/ready'
 
 
 import('rubricEditBinding')
@@ -61,6 +62,7 @@ const entries = new EntryCollection(null)
 
 const filterModel = new DiscussionFilterState()
 
+ready(() => {
 const discussionTopicToolbarView = new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
 ReactDOM.render(
@@ -276,3 +278,4 @@ if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
     CyoeStats.init(graphsRoot, detailsParent)
   })
 }
+})

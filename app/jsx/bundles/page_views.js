@@ -19,7 +19,9 @@
 import $ from 'jquery'
 import PageViewCollection from 'compiled/collections/PageViewCollection'
 import PageViewView from 'compiled/views/contexts/PageViewView'
+import ready from '@instructure/ready'
 
+ready(() => {
 const $container = $('#pageviews')
 const $table = $container.find('table')
 const userId = $table.attr('data-user-id')
@@ -41,3 +43,4 @@ pageViews.on('reset', pageViewsView.render, pageViewsView)
   // Fetch page views
 const fetchParams = {per_page: 100}
 pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))
+})

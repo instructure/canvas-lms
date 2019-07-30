@@ -83,6 +83,13 @@
   <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
 
   <% js_bundle :navigation_header unless @headers == false %>
+
+  <% js_env(active_context_tab: get_active_tab) %>
+  <script>
+    INST = <%= raw(inst_env.to_json) %>;
+    ENV = <%= raw(render_js_env) %>;
+  </script>
+
   <%= include_head_js %>
   <% @xhrs_to_prefetch_from_controller&.each do |args| %>
     <%= prefetch_xhr(*args) %>
