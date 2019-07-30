@@ -216,7 +216,8 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
                       setSelectedImage(resultImage.id)
                       setUnsplashData({
                         id: resultImage.id,
-                        url: resultImage.urls.link
+                        url: resultImage.urls.link,
+                        alt: resultImage.alt_text
                       })
                     }}
                   >

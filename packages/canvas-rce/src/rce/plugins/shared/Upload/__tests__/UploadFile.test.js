@@ -204,7 +204,13 @@ describe('UploadFile', () => {
     };
     const fakeEditor = {
       content: '',
-      dom: {createHTML: (tag, {src}) => `<img src="${src}" />`},
+      dom: {createHTML: (tag, {src, alt}) => {
+        if (alt) {
+          return `<img src="${src}" alt="${alt}" />`
+        } else {
+          return `<img src="${src}" />`
+        }
+      }},
       insertContent (content) { fakeEditor.content += content },
       selection: { getEnd () {return fakeNode  }}
     }
@@ -237,7 +243,8 @@ describe('UploadFile', () => {
     describe('Unsplash Panel Selected', () => {
       const fakeUnsplashData = {
         id: '123abc',
-        url: 'http://instructure.com/img'
+        url: 'http://instructure.com/img',
+        alt: 'fake'
       }
       it('calls source.pingbackUnsplash', () => {
         const fakeSource = {
@@ -247,12 +254,12 @@ describe('UploadFile', () => {
         expect(fakeSource.pingbackUnsplash).toHaveBeenCalledWith('123abc')
       })
 
-      it('calls inserts an image tag with the proper URL', () => {
+      it('inserts an image tag with the proper URL and alt attributes', () => {
         const fakeSource = {
           pingbackUnsplash: () => {}
         }
         handleSubmit(fakeEditor, 'images/*', 'UNSPLASH', { unsplashData : fakeUnsplashData }, {}, fakeSource)
-        expect(fakeEditor.content).toEqual('<img src="http://instructure.com/img" />')
+        expect(fakeEditor.content).toEqual('<img src="http://instructure.com/img" alt="fake" />')
       })
     })
   })
