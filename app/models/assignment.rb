@@ -2401,10 +2401,6 @@ class Assignment < ActiveRecord::Base
     self.peer_reviews
   end
 
-  def self.percent_considered_graded
-    0.5
-  end
-
   scope :include_submitted_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
