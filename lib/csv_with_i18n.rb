@@ -14,9 +14,25 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-module CsvI18nHelpers
+class CsvWithI18n < CSV
 
-  def csv_i18n_settings(user, options = {})
+  BYTE_ORDER_MARK = "\xEF\xBB\xBF".freeze
+
+  def initialize(data, **options)
+    @include_bom = options.delete(:include_bom)
+    super(data, options)
+    raise 'include_bom and write_headers cannot both be true' if self.write_headers? && @include_bom
+  end
+
+  def <<(row)
+    if @include_bom && !@bom_written
+      @io.write(BYTE_ORDER_MARK)
+      @bom_written = true
+    end
+    super(row)
+  end
+
+  def self.csv_i18n_settings(user, options = {})
     options[:col_sep] ||= determine_column_separator(user)
     options[:encoding] ||= I18n.t('csv.encoding', 'UTF-8')
 
@@ -24,20 +40,20 @@ module CsvI18nHelpers
     # Notepad treat the BOM as a required magic number rather than use heuristics. These tools add a BOM when saving
     # text as UTF-8, and cannot interpret UTF-8 unless the BOM is present or the file contains only ASCII.
     # https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
-    bom = include_bom?(user, options[:encoding]) ? "\xEF\xBB\xBF" : ''
+    options[:include_bom] = include_bom?(user, options[:encoding])
 
-    [options, bom]
+    options
   end
 
-  private
-
-  def include_bom?(user, encoding)
+  def self.include_bom?(user, encoding)
     encoding == 'UTF-8' && user.feature_enabled?(:include_byte_order_mark_in_gradebook_exports)
   end
+  private_class_method :include_bom?
 
-  def determine_column_separator(user)
+  def self.determine_column_separator(user)
     return ';' if user.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
     return ',' unless user.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
     I18n.t('number.format.separator', '.') == ',' ? ';' : ','
   end
+  private_class_method :determine_column_separator
 end
