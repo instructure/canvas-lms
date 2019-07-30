@@ -296,8 +296,9 @@ module AccountReports
       header_keys = headers.keys
       header_names = headers.values
       host = root_account.domain
+      enable_i18n_features = @account_report.account.feature_enabled?(:enable_i18n_features_in_outcomes_exports)
 
-      write_report header_names do |csv|
+      write_report header_names, enable_i18n_features do |csv|
         total = scope.length
         Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
         scope.each do |row|
