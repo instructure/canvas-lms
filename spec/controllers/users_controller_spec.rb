@@ -101,7 +101,8 @@ describe UsersController do
           "login_hint",
           "target_link_uri",
           "lti_message_hint",
-          "canvas_region"
+          "canvas_region",
+          "client_id"
         ]
       end
 

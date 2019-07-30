@@ -117,7 +117,8 @@ describe Lti::LtiAdvantageAdapter do
         "login_hint",
         "target_link_uri",
         "lti_message_hint",
-        "canvas_region"
+        "canvas_region",
+        "client_id"
       ]
     end
 
@@ -135,6 +136,10 @@ describe Lti::LtiAdvantageAdapter do
 
     it 'sets the domain in the message hint' do
       expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_domain']).to eq 'test.com'
+    end
+
+    it 'sets the client_id to the developer key global id' do
+      expect(login_message['client_id']).to eq tool.global_developer_key_id
     end
 
     context 'when the DB has a region configured' do
