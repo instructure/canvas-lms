@@ -282,6 +282,10 @@ module CC
           AssignmentResources.create_tool_setting_node(tool_setting, node)
         end
       end
+
+      if assignment.post_policy.present?
+        node.post_policy { |policy| policy.post_manually(assignment.post_policy.post_manually?) }
+      end
     end
 
   end
