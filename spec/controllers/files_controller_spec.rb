@@ -1339,6 +1339,7 @@ describe FilesController do
               tap(&:start).
               tap(&:save!)
           end
+
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
@@ -1352,9 +1353,19 @@ describe FilesController do
             allow(homework_service).to receive(:queue_email)
           end
 
-          it 'should submit the attachment' do
+          it 'should submit the attachment if the submit_assignment flag is not provided' do
             expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
             request
+          end
+
+          it 'should submit the attachment if the submit_assignment param is set to true' do
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
+            post "api_capture", params: progress_params.merge(submit_assignment: true)
+          end
+
+          it 'should not submit the attachment if the submit_assignment param is set to false' do
+            expect(homework_service).not_to receive(:submit)
+            post "api_capture", params: progress_params.merge(submit_assignment: false)
           end
 
           it 'should save the eula_agreement_timestamp' do

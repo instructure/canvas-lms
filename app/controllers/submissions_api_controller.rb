@@ -606,6 +606,7 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     permission = @assignment.submission_types.include?("online_upload") ? :submit : :nothing
+    submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
     # rationale for allowing other user ids at all: eventually, you'll be able
     # to use this api for uploading an attachment to a submission comment.
     # teachers will be able to do that for any submission they can grade, so
@@ -616,7 +617,8 @@ class SubmissionsApiController < ApplicationController
         @user, request,
         check_quota: false, # we don't check quota when uploading a file for assignment submission
         folder: @user.submissions_folder(@context), # organize attachment into the course submissions folder
-        assignment: @assignment
+        assignment: @assignment,
+        submit_assignment: submit_assignment
       )
     end
   end

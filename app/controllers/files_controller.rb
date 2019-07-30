@@ -897,9 +897,10 @@ class FilesController < ApplicationController
 
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
+      submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
 
-      # If the attachment is for an Assignment's upload_via_url, submit it
-      if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment)
+      # If the attachment is for an Assignment's upload_via_url and the submit_assignment flag is set, submit it
+      if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment) && submit_assignment
         homework_service = Services::SubmitHomeworkService.new(@attachment, progress)
 
         begin

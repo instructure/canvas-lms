@@ -4029,6 +4029,13 @@ describe 'Submissions API', type: :request do
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::SubmitWorker.name
         end
+
+        it 'should enqueue the copy job when the submit_assignment parameter is false' do
+          preflight(url: 'http://example.com/test', filename: 'test.txt', submit_assignment: false)
+          JSON.parse(response.body)
+          job = Delayed::Job.order(:id).last
+          expect(job.handler).to include Services::SubmitHomeworkService::CopyWorker.name
+        end
       end
     end
 

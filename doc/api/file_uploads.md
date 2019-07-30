@@ -163,11 +163,13 @@ public HTTP or HTTPS URL from which to retrieve the file.
 ### Step 1a: Posting the file URL to Canvas
 
 The first step is the same as with the "Uploading via POST" flow above,
-with the addition of one new parameter:
+with the addition of a few new parameters:
 
 <dl>
   <dt>url</dt>
   <dd>The full URL to the file to be uploaded. This URL must be publicly accessible.</dd>
+  <dt>submit_assignment</dt>
+  <dd>A boolean to indicate whether or not to automatically submit the assignment the file is associated with if it is associated with an assignment. Defaults to true.</dd>
 </dl>
 
 Example Request:
