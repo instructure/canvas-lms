@@ -170,19 +170,36 @@ describe GradebookUserIds do
     end
     let_once(:group) { category.groups.first }
 
-    it "only returns students in the selected group when one is specified" do
-      @teacher.preferences[:gradebook_settings] = {
-        @course.id => {
-          filter_rows_by: {
-            student_group_id: group.id
+    context "when a group is specified" do
+      before(:once) do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.id => {
+            filter_rows_by: {
+              student_group_id: group.id
+            }
           }
         }
-      }
-      expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
+      end
+
+      it "only returns students in the selected group" do
+        expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
+      end
+
+      it "only returns students in the selected group when sorting by total_grade" do
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
+        expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
+      end
     end
 
-    it "returns students in all groups when no group is specified" do
-      expect(gradebook_user_ids.user_ids).to match_array(@course.students.pluck(:id))
+    context "when no group is specified" do
+      it "returns students in all groups" do
+        expect(gradebook_user_ids.user_ids).to match_array(@course.students.pluck(:id))
+      end
+
+      it "returns students in all groups when sorting by total_grade" do
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
+        expect(gradebook_user_ids.user_ids).to match_array(@course.students.pluck(:id))
+      end
     end
   end
 
