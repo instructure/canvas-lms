@@ -72,4 +72,13 @@ namespace :strongmind do
     PageView.connection.truncate(PageView.table_name)
   end
 
+  desc "Enable Course Snapshot"
+  task :enable_course_snapshot => :environment do
+    SettingsService.update_settings(
+      id: '1',
+      setting: 'enable_course_snapshot',
+      value: true,
+      object: "school"
+    )
+  end
 end
