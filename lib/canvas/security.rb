@@ -189,13 +189,13 @@ module Canvas::Security
   #
   # Raises Canvas::Security::TokenExpired if the token has expired, and
   # Canvas::Security::InvalidToken if the token is otherwise invalid.
-  def self.decode_jwt(token, keys = [])
+  def self.decode_jwt(token, keys = [], ignore_expiration: false)
     keys += encryption_keys
 
     keys.each do |key|
       begin
         body = JSON::JWT.decode(token, key)
-        verify_jwt(body)
+        verify_jwt(body, ignore_expiration: ignore_expiration)
         return body.with_indifferent_access
       rescue JSON::JWS::VerificationFailed
         # Keep looping, to try all the keys. If none succeed,

@@ -191,6 +191,32 @@ describe FilesController do
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
 
+  it "falls back to try to get another verifier if we get an expired one for some reason" do
+    course_with_teacher_logged_in(:active_all => true, :user => @user)
+    host!("test.host")
+    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
+
+    # create an old sf_verifier
+    old_time = 1.hour.ago
+    Timecop.freeze(old_time) do
+      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: {:inline => '1'}
+      expect(response).to be_redirect
+      @files_domain_location = response['Location']
+      uri = URI.parse(@files_domain_location)
+      @qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+    end
+
+    allow_any_instance_of(ApplicationController).to receive(:files_domain?).and_return(true)
+    expect{ Users::AccessVerifier.validate(@qs) }.to raise_exception(Canvas::Security::TokenExpired)
+    get @files_domain_location # try to use the expired verifier anyway because durr
+
+    expect(response).to be_redirect
+    # go back to original url but with an extra param
+    expected_url = "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?inline=1&fallback_ts=#{old_time.to_i}"
+    expect(response['Location']).to eq expected_url
+  end
+
   it "logs user access with safefiles" do
     course_with_teacher_logged_in(:active_all => true, :user => @user)
     host!("test.host")
