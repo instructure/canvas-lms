@@ -977,6 +977,11 @@ class AccountsController < ApplicationController
     end
   end
 
+  def terms_of_service_custom_content
+    TermsOfService.ensure_terms_for_account(@domain_root_account)
+    render plain: @domain_root_account.terms_of_service.terms_of_service_content&.content
+  end
+
   def settings
     if authorized_action(@account, @current_user, :read)
       load_course_right_side
