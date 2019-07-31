@@ -42,26 +42,25 @@ describe Oauth2ProviderController do
     context 'with invalid scopes' do
       let(:dev_key) { DeveloperKey.create! redirect_uri: 'https://example.com', require_scopes: true, scopes: [] }
 
-      it 'renders 400' do
+      it 'renders 302' do
         get :auth, params: {
           client_id: dev_key.id,
-          redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+          redirect_uri: dev_key.redirect_uri,
           response_type: 'code',
           scope: 'not|valid'
         }
-        assert_status(400)
-        expect(response.body).to match /A requested scope is invalid/
-        expect(response.body).to include 'not|valid'
+        assert_status(302)
+        expect(response.body).to include 'invalid_scope'
       end
 
-      it 'renders 400 when scopes empty' do
+      it 'renders 302 when scopes empty' do
         get :auth, params: {
           client_id: dev_key.id,
-          redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+          redirect_uri: dev_key.redirect_uri,
           response_type: 'code'
         }
-        assert_status(400)
-        expect(response.body).to match /A requested scope is invalid/
+        assert_status(302)
+        expect(response.body).to include 'invalid_scope'
       end
     end
 
@@ -302,7 +301,12 @@ describe Oauth2ProviderController do
     let(:client_id) { key.id }
     let(:client_secret) { key.api_key }
     let(:base_params) do
-      {client_id: client_id, client_secret: client_secret, grant_type: grant_type}
+      {
+        client_id: client_id,
+        client_secret: client_secret,
+        grant_type: grant_type,
+        redirect_uri: 'https://example.com'
+      }
     end
 
     shared_examples_for 'common oauth2 token checks' do
@@ -322,25 +326,30 @@ describe Oauth2ProviderController do
         context 'key is inactive' do
           let(:client_id) { inactive_key.id }
 
-          it { is_expected.to have_http_status(401) }
+          it 'validate that invalid_client is in response' do
+            subject
+            expect(subject).to redirect_to('https://example.com?error=invalid_client&error_description=unknown+client')
+          end
+
+          it { is_expected.to have_http_status(302) }
         end
 
         context 'key is missing' do
           let(:client_id) { nil }
 
-          it { is_expected.to have_http_status(401) }
+          it { is_expected.to have_http_status(302) }
         end
 
         context 'key is not found' do
           let(:client_id) { 0 }
 
-          it { is_expected.to have_http_status(401) }
+          it { is_expected.to have_http_status(302) }
         end
 
         context 'key is not an integer' do
           let(:client_id) { 'a' }
 
-          it { is_expected.to have_http_status(401) }
+          it { is_expected.to have_http_status(302) }
         end
       end
 
@@ -350,7 +359,7 @@ describe Oauth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            is_expected.to have_http_status(401)
+            is_expected.to have_http_status(302)
           end
         end
 
@@ -359,7 +368,7 @@ describe Oauth2ProviderController do
 
           it do
             skip 'not valid for this grant_type' if grant_type == 'client_credentials'
-            is_expected.to have_http_status(401)
+            is_expected.to have_http_status(302)
           end
         end
       end
@@ -387,13 +396,15 @@ describe Oauth2ProviderController do
         context 'unsupported grant_type' do
           let(:grant_type) { 'urn:unsupported' }
 
-          it { is_expected.to have_http_status(400) }
+          it 'expect redirect with error in query' do
+            expect(subject).to redirect_to('https://example.com?error=unsupported_grant_type&error_description=The+grant_type+you+requested+is+not+currently+supported')
+          end
         end
 
         context 'missing grant_type' do
           let(:grant_type) { nil }
 
-          it { is_expected.to have_http_status(400) }
+          it { is_expected.to have_http_status(302) }
         end
       end
     end
@@ -420,22 +431,20 @@ describe Oauth2ProviderController do
         let(:success_token_keys) { %w(access_token refresh_token user expires_in token_type) }
       end
 
-      it 'renders a 400 if a code is not provided for an authorization_code grant' do
+      it 'renders a 302 if a code is not provided for an authorization_code grant' do
         post :token, params: base_params
 
-        assert_status(400)
+        assert_status(302)
       end
 
-      it 'renders a 400 if the provided code does not match a token' do
+      it 'redirects and has error invalid grant in query' do
         post :token, params: base_params.merge(:code => "NotALegitCode")
-        assert_status(400)
-        expect(response.body).to match /authorization_code not found/
+        expect(subject).to redirect_to('https://example.com?error=invalid_grant&error_description=authorization_code+not+found')
       end
 
-      it 'renders a 400 if the provided code is for the wrong key' do
+      it 'renders a 302 if the provided code is for the wrong key' do
         post :token, params: base_params.merge(client_id: other_key.id.to_s, client_secret: other_key.api_key, code: valid_code)
-        assert_status(400)
-        expect(response.body).to match(/incorrect client/)
+        expect(subject).to redirect_to('https://example.com?error=invalid_grant&error_description=incorrect+client')
       end
 
       it 'default grant_type to authorization_code if none is supplied and code is present' do
@@ -473,7 +482,7 @@ describe Oauth2ProviderController do
 
       it 'should not generate a new access_token with an invalid refresh_token' do
         post :token, params: base_params.merge(refresh_token: refresh_token + 'ASDF')
-        assert_status(400)
+        assert_status(302)
       end
 
       it 'should generate a new access_token' do
@@ -484,8 +493,8 @@ describe Oauth2ProviderController do
 
       it 'errors with a mismatched client id and refresh_token' do
         post :token, params: base_params.merge(client_id: other_key.id, client_secret: other_key.api_key, refresh_token: refresh_token)
-        assert_status(400)
-        expect(response.body).to match(/incorrect client/)
+        assert_status(302)
+        expect(response.body).to include 'invalid_grant'
       end
 
       it 'should be able to regenerate access_token multiple times' do
@@ -523,6 +532,7 @@ describe Oauth2ProviderController do
         {
           client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
           client_assertion: jws,
+          redirect_uri: 'https://example.com',
           scope: TokenScopes::USER_INFO_SCOPE[:scope]
         }
       end
@@ -548,7 +558,9 @@ describe Oauth2ProviderController do
         context 'with bad aud' do
           let(:aud) { 'doesnotexist' }
 
-          it { is_expected.to have_http_status 400 }
+          it 'validate that invalid_request is in response' do
+            expect(subject).to redirect_to('https://example.com?error=invalid_request&error_description=the+%27aud%27+is+invalid')
+          end
         end
 
         context 'with aud as an array' do
@@ -560,7 +572,7 @@ describe Oauth2ProviderController do
         context 'with bad exp' do
           let(:exp) { 1.minute.ago.to_i }
 
-          it { is_expected.to have_http_status 400 }
+          it { is_expected.to have_http_status 302 }
         end
 
         context 'with iat in the future by a small amount' do
@@ -577,12 +589,12 @@ describe Oauth2ProviderController do
         context 'with bad iat' do
           let(:iat) { 1.minute.from_now.to_i }
 
-          it { is_expected.to have_http_status 400 }
+          it { is_expected.to have_http_status 302 }
 
           context 'with iat too far in future' do
             let(:iat) { 6.minutes.from_now.to_i }
 
-            it { is_expected.to have_http_status 400 }
+            it { is_expected.to have_http_status 302 }
           end
         end
 
@@ -593,15 +605,18 @@ describe Oauth2ProviderController do
             other_key.save!
           end
 
-          it { is_expected.to have_http_status 400 }
+          it { is_expected.to have_http_status 302 }
         end
 
         context 'with missing assertion' do
           Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS.each do |assertion|
-            it "returns 400 when #{assertion} missing" do
+            let(:request_url) { 'https://example.com?error=invalid_request&error_description=the+following+assertions+are+missing%3A+' }
+            let(:client_url) { 'https://example.com?error=invalid_client&error_description=unknown+client' }
+
+            it "returns 302 when #{assertion} missing" do
               jwt.delete assertion.to_sym
-              expected = assertion != 'sub' ? 400 : 401
-              expect(subject).to have_http_status expected
+              expected = assertion != 'sub' ? request_url + assertion : client_url
+              expect(subject).to redirect_to(expected)
             end
           end
         end

@@ -88,7 +88,20 @@ module Canvas::Oauth
       error_map[:http_status] || 400
     end
 
+    def redirect_uri(url)
+      append_error(url)
+    end
+
     private
+
+    def append_error(redirect)
+      uri = URI.parse(redirect)
+      error_query = URI.decode_www_form(String(uri.query)) << ["error", to_render_data.with_indifferent_access.dig('json', 'error')]
+      uri.query = URI.encode_www_form(error_query)
+      error_description_query = URI.decode_www_form(String(uri.query)) << ["error_description", to_render_data.with_indifferent_access.dig('json', 'error_description')]
+      uri.query = URI.encode_www_form(error_description_query)
+      uri.to_s
+    end
 
     def error_map
       ERROR_MAP[@message]
