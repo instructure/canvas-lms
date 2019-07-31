@@ -47,6 +47,8 @@ CanvasRails::Application.routes.draw do
   post 'bz/prepare_qualtrics_links' => 'bz#prepare_qualtrics_links'
   get 'bz/prepare_qualtrics_links' => 'bz#prepare_qualtrics_links'
 
+  get '/bz/pdf_annotator' => 'bz#pdf_annotator'
+
   get 'bz/accessibility_mapper' => 'bz#accessibility_mapper'
   post 'bz/accessibility_mapper' => 'bz#save_html_changes'
   get 'bz/full_module_view' => 'bz#full_module_view'
