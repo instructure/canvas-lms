@@ -257,7 +257,7 @@ RSpec.describe ApplicationController do
 
     before :each do
       # safe_domain_file_url wants to use request.protocol
-      allow(controller).to receive(:request).and_return(double("request", :protocol => '', :host_with_port => ''))
+      allow(controller).to receive(:request).and_return(double("request", :protocol => '', :host_with_port => '', :url => ''))
 
       @common_params = { :only_path => true }
     end
