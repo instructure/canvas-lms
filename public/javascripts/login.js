@@ -21,7 +21,6 @@ import $ from 'jquery'
 import htmlEscape from './str/htmlEscape'
 import signupDialog from 'compiled/registration/signupDialog'
 import './jquery.fancyplaceholder' /* fancyPlaceholder */
-import './jquery.google-analytics' /* trackPage, trackPageview */
 import './jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import './jquery.loadingImg'
 import 'compiled/jquery.rails_flash_notifications'
@@ -31,9 +30,6 @@ import 'compiled/jquery.rails_flash_notifications'
     var template = $(this).data('template');
     var path = $(this).data('path');
     signupDialog(template, I18n.t("parent_signup", "Parent Signup"), path);
-  });
-  $("#register_link").click(function(){
-    $.trackPageview("/clicked_register_on_login_form");
   });
 
   $(".field-with-fancyplaceholder input").fancyPlaceholder();

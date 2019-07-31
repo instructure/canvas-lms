@@ -145,9 +145,6 @@ class Login::CanvasController < ApplicationController
     if mobile_device?
       @login_handle_name = @domain_root_account.login_handle_name_with_inference
       @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
-      js_env(
-        GOOGLE_ANALYTICS_KEY: Setting.get('google_analytics_key', nil),
-      )
       render :mobile_login, layout: 'mobile_auth', status: status
     else
       @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }

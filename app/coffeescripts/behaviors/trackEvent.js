@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import 'jquery.google-analytics'
+import {trackEvent} from 'jquery.google-analytics'
 
 // #
 // Track click events to google analytics with HTML
@@ -29,5 +29,5 @@ import 'jquery.google-analytics'
 //   >click here</a>
 $('body').on('click', '[data-track-category]', function () {
   const {trackCategory, trackLabel, trackAction, trackValue} = $(this).data()
-  $.trackEvent(trackCategory, trackAction, trackLabel, trackValue)
+  trackEvent(trackCategory, trackAction, trackLabel, trackValue)
 })

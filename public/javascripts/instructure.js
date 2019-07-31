@@ -29,7 +29,7 @@ import './instructure_helper'
 import 'jqueryui/draggable'
 import './jquery.ajaxJSON'
 import './jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */
-import './jquery.google-analytics' /* trackEvent */
+import {trackEvent} from 'jquery.google-analytics'
 import './jquery.instructure_date_and_time' /* datetimeString, dateString, fudgeDateForProfileTimezone */
 import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
@@ -89,16 +89,16 @@ function handleYoutubeLink () {
       $video.find(".hide_youtube_embed_link").click(preventDefault(() => {
         $video.remove()
         $after.show()
-        $.trackEvent('hide_embedded_content', 'hide_you_tube')
+        trackEvent('hide_embedded_content', 'hide_you_tube')
       }))
       $(this).after($video).hide()
     }))
-    $.trackEvent('show_embedded_content', 'show_you_tube')
+    trackEvent('show_embedded_content', 'show_you_tube')
     $link.addClass('youtubed').after($after)
   }
 }
 
-  $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
+  trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
 
   var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs';
@@ -363,7 +363,7 @@ function handleYoutubeLink () {
                 $link.show();
                 $link.focus();
                 $div.remove();
-                $.trackEvent('hide_embedded_content', 'hide_file_preview');
+                trackEvent('hide_embedded_content', 'hide_file_preview');
               });
             $div.prepend($minimizeLink);
             if (Object.prototype.hasOwnProperty.call(event, "originalEvent")) {
@@ -371,7 +371,7 @@ function handleYoutubeLink () {
               // If it was triggered by our auto_open stuff it shouldn't focus here.
               $minimizeLink.focus();
             }
-            $.trackEvent('show_embedded_content', 'show_file_preview');
+            trackEvent('show_embedded_content', 'show_file_preview');
           }
         }, function() {
           $link.loadingImage('remove').hide();
@@ -510,7 +510,7 @@ function handleYoutubeLink () {
         $.flashMessage('Message Sent!');
         $(document).triggerHandler('user_content_change');
         if(location.pathname === '/') {
-          $.trackEvent('dashboard_comment', 'create');
+          trackEvent('dashboard_comment', 'create');
         }
       },
       error: function(data) {
@@ -563,7 +563,7 @@ function handleYoutubeLink () {
         $(document).triggerHandler('user_content_change');
         $(this).remove();
         if(location.href.match(/dashboard/)) {
-          $.trackEvent('dashboard_comment', 'create');
+          trackEvent('dashboard_comment', 'create');
         }
       },
       error: function(data) {

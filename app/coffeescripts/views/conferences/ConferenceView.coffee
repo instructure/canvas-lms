@@ -92,8 +92,6 @@ export default class ConferenceView extends View
     , 100)
 
   external: (e) ->
-    # TODO: kill this if it's not in use anywhere
-    $.trackEvent('Conference', 'External URL')
     e.preventDefault()
     loading_text = I18n.t('loading_urls_message', "Loading, please wait...")
     $self = $(e.currentTarget)

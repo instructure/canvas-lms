@@ -15,16 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  js_env ga_page_title: "Register Email"
-%>
 <%
   css_bundle :login_confirm
   js_bundle :registration_confirmation
   @headers = false
   add_body_class "full-width modal body--login-confirmation"
-  provide :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
+  provide :page_title, t("Register Email")
 %>
 
 <div id="modal-box" class="ic-Login-confirmation">

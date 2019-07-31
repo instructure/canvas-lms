@@ -70,7 +70,6 @@ class Oauth2ProviderController < ApplicationController
       @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
 
       if mobile_device?
-        js_env :GOOGLE_ANALYTICS_KEY => Setting.get('google_analytics_key', nil)
         render :layout => 'mobile_auth', :action => 'confirm_mobile'
       end
     else

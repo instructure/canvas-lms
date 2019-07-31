@@ -739,6 +739,7 @@ class Quizzes::QuizzesController < ApplicationController
           return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
         end
         js_bundle :quiz_history
+        @google_analytics_page_title = @quiz.survey? ? "User's Survey History" : "User's Quiz History"
       end
     end
   end
