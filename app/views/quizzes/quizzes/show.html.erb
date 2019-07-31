@@ -226,7 +226,7 @@
             <% end %>
 
             <% if can_do(@quiz, @current_user, :grade) && can_do(@context, @current_user, :send_messages) && @quiz.available? && !@quiz.anonymous_submissions? && @quiz.graded? %>
-              <% message_students_who_title = t('links.message_students_who', "Message Students Who...") %>
+              <% message_students_who_title = t("Message Students Who...") %>
               <li role="presentation">
                 <a href="#" class="message_students_link" tabindex="-1" role="menuitem">
                   <i class="icon-email"><span class="screenreader-only"><%= message_students_who_title %></span></i> <%= message_students_who_title %>
