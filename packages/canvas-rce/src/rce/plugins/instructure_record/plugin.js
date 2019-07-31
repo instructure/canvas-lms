@@ -21,7 +21,6 @@ import clickCallback from "./clickCallback";
 import formatMessage from "../../../format-message";
 import TrayController from './VideoOptionsTray/TrayController'
 import {getContentFromElement, VIDEO_EMBED_TYPE} from '../shared/ContentSelection'
-import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
 
 const trayController = new TrayController()
 
@@ -67,16 +66,9 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
         trayController.showTrayForEditor(ed)
       },
 
-      onSetup() {
-        globalRegistry.bindToolbarToEditor(ed, buttonAriaLabel)
-      },
-
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
     });
-
-    const defaultFocusSelector = `.tox-pop__dialog button[aria-label="${buttonAriaLabel}"]`
-    globalRegistry.addContextKeydownListener(ed, defaultFocusSelector)
 
     function isVideoElement($el) {
       return getContentFromElement($el).type === VIDEO_EMBED_TYPE

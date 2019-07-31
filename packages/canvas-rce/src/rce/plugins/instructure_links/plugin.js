@@ -19,7 +19,6 @@
 import formatMessage from "../../../format-message"
 import clickCallback from "./clickCallback"
 import bridge from '../../../bridge'
-import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
 import {getContentFromElement, FILE_LINK_TYPE} from '../shared/ContentSelection'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 
@@ -124,16 +123,9 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
         trayController.showTrayForEditor(ed)
       },
 
-      onSetup(/* buttonApi */) {
-        globalRegistry.bindToolbarToEditor(ed, buttonAriaLabel)
-      },
-
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
     })
-
-    const defaultFocusSelector = `.tox-pop__dialog button[aria-label="${buttonAriaLabel}"]`
-    globalRegistry.addContextKeydownListener(ed, defaultFocusSelector)
 
     const isFileLink = ($element) => getContentFromElement($element, ed).type === FILE_LINK_TYPE
 

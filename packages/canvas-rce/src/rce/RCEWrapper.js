@@ -91,27 +91,11 @@ function focusFirstMenuButton(el) {
   $firstMenu && $firstMenu.focus()
 }
 
-function initKeyboardShortcuts(el, editor) {
-  // hide the menubar
-  showMenubar(el, false)
-
-  // when typed w/in the editor's edit area
-  editor.addShortcut('Alt+F9', '', () => {
-    showMenubar(el, true)
-  })
-  // when typed somewhere else w/in RCEWrapper
-  el.addEventListener('keyup', e => {
-    if (e.altKey && e.code === 'F9') {
-      showMenubar(el, true)
-    }
-  })
-
-  // toolbar help
-  el.addEventListener('keyup', e => {
-    if (e.altKey && e.code === 'F10') {
-      focusToolbar(el)
-    }
-  })
+function focusContextToolbar() {
+  const $focusable = document.querySelector('.tox-tinymce-aux .tox-toolbar button')
+  if ($focusable) {
+    $focusable.focus()
+  }
 }
 
 @themeable(theme, styles)
@@ -467,9 +451,46 @@ class RCEWrapper extends React.Component {
     return this[methodName](...args);
   }
 
+  initKeyboardShortcuts(el, editor) {
+    // hide the menubar
+    showMenubar(el, false)
+
+    // when typed w/in the editor's edit area
+    editor.addShortcut('Alt+F9', '', () => {
+      showMenubar(el, true)
+    })
+    // when typed somewhere else w/in RCEWrapper
+    el.addEventListener('keydown', e => {
+      if (e.altKey && e.code === 'F9') {
+        event.preventDefault()
+        event.stopPropagation()
+        showMenubar(el, true)
+      }
+    })
+
+    // toolbar help
+    el.addEventListener('keydown', e => {
+      if (e.altKey && e.code === 'F10') {
+        event.preventDefault()
+        event.stopPropagation()
+        focusToolbar(el)
+      }
+    })
+
+    editor.on('keydown', this.handleShortcutKeyShortcut)
+    editor.on('keydown', event => {
+      // Alt+F7 is used to "enter into" the context's popover.
+      if (event.keyCode === 118 && event.altKey) {
+        event.preventDefault()
+        event.stopPropagation()
+        focusContextToolbar()
+      }
+    })
+  }
+
   onInit(_e, editor) {
     editor.rceWrapper = this;
-    initKeyboardShortcuts(this._elementRef, editor)
+    this.initKeyboardShortcuts(this._elementRef, editor)
     if(document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
@@ -481,8 +502,6 @@ class RCEWrapper extends React.Component {
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
-    editor.on('KeyDown', this.handleShortcutKeyShortcut) // keyUp puts the char in the editor
-
     editor.on('Change', this.doAutoResize)
   }
 
@@ -517,6 +536,7 @@ class RCEWrapper extends React.Component {
 
   onResize = (_e, coordinates) => {
     const container = this.mceInstance().getContainer()
+    if (!container) return
     const currentContainerHeight = Number.parseInt(container.style.height, 10)
     if (isNaN(currentContainerHeight)) return
     const modifiedHeight = currentContainerHeight + coordinates.deltaY
