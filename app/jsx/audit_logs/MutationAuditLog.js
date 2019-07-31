@@ -60,9 +60,9 @@ const User = ({user, realUser}) =>
     : user.name
 
 const MUTATION_LOG_QUERY = gql`
-  query searchMutationLog($assetString: String!) {
+  query searchMutationLog($assetString: String!, $first: Int!, $after: String) {
     auditLogs {
-      mutationLogs(assetString: $assetString) {
+      mutationLogs(assetString: $assetString, first: $first, after: $after) {
         nodes {
           assetString
           mutationId
@@ -78,25 +78,41 @@ const MUTATION_LOG_QUERY = gql`
           }
           params
         }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
       }
     }
   }
 `
+const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
+  <tr>
+    <td colSpan={4}>
+      {hasNextPage ? (
+        <Button onClick={onClick}>{I18n.t('Load more')}</Button>
+      ) : (
+        I18n.t('No more results')
+      )}
+    </td>
+  </tr>
+)
 
-const AuditLogResults = ({assetString}) => {
+const AuditLogResults = ({assetString, pageSize}) => {
   if (!assetString) return null
 
   return (
-    <Query query={MUTATION_LOG_QUERY} variables={{assetString}}>
-      {({loading, error, data}) => {
+    <Query query={MUTATION_LOG_QUERY} variables={{assetString, first: pageSize}}>
+      {({loading, error, data, fetchMore}) => {
         if (error) {
-          return <p>{I18n.t("Something went wrong.")}</p>
+          return <p>{I18n.t('Something went wrong.')}</p>
         }
         if (loading || !data) {
           return <Spinner title={I18n.t('Loading...')} />
         }
 
-        const logEntries = data.auditLogs.mutationLogs.nodes
+        const {nodes: logEntries, pageInfo} = data.auditLogs.mutationLogs
+
         if (logEntries.length) {
           return (
             <Table
@@ -117,9 +133,7 @@ const AuditLogResults = ({assetString}) => {
               <tbody>
                 {logEntries.map(logEntry => (
                   <tr key={logEntry.mutationId}>
-                    <td>
-                      {logEntry.timestamp}
-                    </td>
+                    <td>{logEntry.timestamp}</td>
                     <td>{logEntry.mutationName}</td>
                     <td>
                       <User user={logEntry.user} realUser={logEntry.realUser} />
@@ -127,6 +141,29 @@ const AuditLogResults = ({assetString}) => {
                     <td>...{/* TODO */}</td>
                   </tr>
                 ))}
+                <LoadMoreButton
+                  pageInfo={data.auditLogs.mutationLogs.pageInfo}
+                  onClick={() => {
+                    return fetchMore({
+                      variables: {assetString, first: pageSize, after: pageInfo.endCursor},
+                      updateQuery: (prevData, {fetchMoreResult: newData}) => {
+                        return {
+                          auditLogs: {
+                            __typename: prevData.auditLogs.__typename,
+                            mutationLogs: {
+                              __typename: prevData.auditLogs.mutationLogs.__typename,
+                              nodes: [
+                                ...prevData.auditLogs.mutationLogs.nodes,
+                                ...newData.auditLogs.mutationLogs.nodes
+                              ],
+                              pageInfo: newData.auditLogs.mutationLogs.pageInfo
+                            }
+                          }
+                        }
+                      }
+                    })
+                  }}
+                />
               </tbody>
             </Table>
           )
@@ -149,7 +186,7 @@ const AuditLogApp = () => {
 
       <AuditLogForm onSubmit={({assetString}) => setAssetString(assetString)} />
 
-      <AuditLogResults assetString={assetString} />
+      <AuditLogResults assetString={assetString} pageSize={250} />
     </ApolloProvider>
   )
 }

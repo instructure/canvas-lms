@@ -52,7 +52,8 @@ describe('AuditLogResults', () => {
       request: {
         query: MUTATION_LOG_QUERY,
         variables: {
-          assetString: 'user_123'
+          assetString: 'user_123',
+          first: 1
         }
       },
       result: {
@@ -75,6 +76,11 @@ describe('AuditLogResults', () => {
                   __typename: 'MutationLog'
                 }
               ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor1',
+                __typename: 'PageInfo'
+              },
               __typename: 'MutationLogConnection'
             },
             __typename: 'AuditLogs'
@@ -86,7 +92,49 @@ describe('AuditLogResults', () => {
       request: {
         query: MUTATION_LOG_QUERY,
         variables: {
-          assetString: 'user_456'
+          assetString: 'user_123',
+          first: 1,
+          after: 'cursor1'
+        }
+      },
+      result: {
+        data: {
+          auditLogs: {
+            mutationLogs: {
+              nodes: [
+                {
+                  assetString: 'user_123',
+                  mutationId: 'ZXCVZXCV',
+                  mutationName: 'FooBarBaz',
+                  timestamp: new Date().toISOString(),
+                  user: {
+                    _id: '2',
+                    name: 'Doctor',
+                    __typename: 'User'
+                  },
+                  realUser: null,
+                  params: {},
+                  __typename: 'MutationLog'
+                }
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'cursor2',
+                __typename: 'PageInfo'
+              },
+              __typename: 'MutationLogConnection'
+            },
+            __typename: 'AuditLogs'
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: MUTATION_LOG_QUERY,
+        variables: {
+          assetString: 'user_456',
+          first: 100
         }
       },
       result: {
@@ -94,6 +142,11 @@ describe('AuditLogResults', () => {
           auditLogs: {
             mutationLogs: {
               nodes: [],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'endCursor',
+                __typename: 'PageInfo'
+              },
               __typename: 'MutationLogConnection'
             },
             __typename: 'AuditLogs'
@@ -105,7 +158,8 @@ describe('AuditLogResults', () => {
       request: {
         query: MUTATION_LOG_QUERY,
         variables: {
-          assetString: 'error_1'
+          assetString: 'error_1',
+          first: 100,
         }
       },
       error: new Error('uh oh')
@@ -115,7 +169,7 @@ describe('AuditLogResults', () => {
   it('renders', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <AuditLogResults assetString="user_123" />
+        <AuditLogResults assetString="user_123" pageSize={1} />
       </MockedProvider>
     )
 
@@ -126,10 +180,24 @@ describe('AuditLogResults', () => {
     expect(await waitForElement(() => getByText('Professor'))).toBeInTheDocument()
   })
 
+  it('paginates', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <AuditLogResults assetString="user_123" pageSize={1} />
+      </MockedProvider>
+    )
+    const loadMoreButton = await waitForElement(() => getByText(/load more/i))
+    expect(loadMoreButton).toBeInTheDocument()
+
+    fireEvent.click(loadMoreButton)
+    expect(await waitForElement(() => getByText("Doctor"))).toBeInTheDocument()
+    expect(getByText(/No more/)).toBeInTheDocument()
+  })
+
   it('says when there are no results', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <AuditLogResults assetString="user_456" />
+        <AuditLogResults assetString="user_456" pageSize={100} />
       </MockedProvider>
     )
 
@@ -139,7 +207,7 @@ describe('AuditLogResults', () => {
   it('handles errors', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <AuditLogResults assetString="error_1" />
+        <AuditLogResults assetString="error_1" pageSize={100} />
       </MockedProvider>
     )
 
