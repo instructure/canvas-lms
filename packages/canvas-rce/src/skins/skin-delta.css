@@ -598,8 +598,10 @@
   .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
     border-style: none;
   }
-  .tox-toolbar .tox-toolbar__group::after,
-  .tox-toolbar-overlord .tox-toolbar__group::after {
+  .tox-toolbar .tox-toolbar__group::after, /* regular toolbar */
+  .tox-toolbar-overlord .tox-toolbar__group::after, /* wrapping toolbar */
+  .tox-toolbar__overflow .tox-toolbar__group::after, /* floating toolbar */
+  .tox-tinymce-aux .tox-toolbar .tox-toolbar__group::after { /* popup toolbar */
     content: "";
     display: inline-block;
     box-sizing: border-box;
@@ -608,13 +610,12 @@
     height: 24px;
   }
   .tox-toolbar .tox-toolbar__group:last-child::after,
-  .tox-toolbar-overlord .tox-toolbar__group:last-child::after {
+  .tox-toolbar-overlord .tox-toolbar__group:last-child::after,
+  .tox-toolbar__overflow .tox-toolbar__group:last-child::after,
+  .tox-tinymce-aux .tox-toolbar .tox-toolbar__group:last-child::after {
     border-inline-end-width: 0;
     padding-inline-start: 0;
-  }
-
-  .tox-pop__dialog .tox-toolbar__group::after {
-    display: none; /* not in a popup, like the link toolbar */
+    width: 0;
   }
 
   .tox .tox-tbtn--bespoke .tox-tbtn__select-label {
