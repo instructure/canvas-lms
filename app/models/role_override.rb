@@ -147,6 +147,23 @@ class RoleOverride < ActiveRecord::Base
        :true_for => %w(AccountAdmin),
        :available_to => %w(AccountAdmin AccountMembership),
      },
+    :manage_course_visibility => {
+      :label => lambda { t("Change course visibility") },
+      :label_v2 => lambda { t("Courses - change visibility") },
+      :available_to => [
+        'AccountAdmin',
+        'AccountMembership',
+        'TeacherEnrollment',
+        'TaEnrollment',
+        'DesignerEnrollment'
+      ],
+      :true_for => [
+        'AccountAdmin',
+        'TeacherEnrollment',
+        'TaEnrollment',
+        'DesignerEnrollment'
+      ]
+    },
      :manage_developer_keys => {
        :label => lambda { t('permissions.manage_developer_keys', "Manage developer keys") },
        :label_v2 => lambda { t("Developer Keys - manage ") },

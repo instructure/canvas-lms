@@ -2480,6 +2480,9 @@ class CoursesController < ApplicationController
       if params_for_update.has_key?(:syllabus_body)
         params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
       end
+      unless @course.grants_right?(@current_user, :manage_course_visibility)
+        params_for_update.delete(:indexed)
+      end
 
       account_id = params[:course].delete :account_id
       if account_id && @course.account.grants_right?(@current_user, session, :manage_courses)
@@ -2658,7 +2661,7 @@ class CoursesController < ApplicationController
 
       @course.attributes = params_for_update
 
-      if params[:course][:course_visibility].present?
+      if params[:course][:course_visibility].present? && @course.grants_right?(@current_user, :manage_course_visibility)
         visibility_configuration(params[:course])
       end
 

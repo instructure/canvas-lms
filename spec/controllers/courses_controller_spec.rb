@@ -2848,4 +2848,75 @@ describe CoursesController do
       expect(json.map{|user| user['name']}).to include('less privileged account admin')
     end
   end
+
+  describe 'POST update' do
+    it 'allows an admin to change visibility' do
+      admin = account_admin_user
+      course = Course.create!
+      user_session(admin)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).to eq true
+      expect(course.indexed).to eq true
+
+    end
+
+    it 'allows the teacher to change visibility' do
+      course = Course.create!
+      teacher = teacher_in_course(course: course, active_all: true).user
+      user_session(teacher)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).to eq true
+      expect(course.indexed).to eq true
+    end
+
+    it 'does not allow a teacher without the permission to change visibility' do
+      course = Course.create!
+      teacher = teacher_in_course(course: course, active_all: true).user
+      course.account.role_overrides.create!(role: Role.get_built_in_role('TeacherEnrollment'), permission: 'manage_course_visibility', enabled: false)
+      user_session(teacher)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).not_to eq true
+      expect(course.indexed).not_to eq true
+    end
+
+    it 'does not allow an account admin without the permission to change visibility' do
+      admin = account_admin_user_with_role_changes(:role_changes => {'manage_course_visibility' => false})
+      course = Course.create!
+      user_session(admin)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).not_to eq true
+      expect(course.indexed).not_to eq true
+    end
+
+    it 'allows a site admin to change visibility even if account admins cannot' do
+      site_admin = site_admin_user
+      account = Account.create(name: 'fake-o')
+      account_with_role_changes(:account => account, :role_changes => { 'manage_course_visibility' => false })
+      course = course_factory(:account => account)
+      user_session(site_admin)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).to eq true
+      expect(course.indexed).to eq true
+    end
+  end
 end
