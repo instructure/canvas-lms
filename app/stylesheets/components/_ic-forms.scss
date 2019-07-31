@@ -1427,30 +1427,6 @@ select.ic-Input {
 
 }
 
-// HACK - whole thing can be removed once IE11/Win7 support is dropped
-@include breakpoint(tablet) {
-  _:-ms-input-placeholder, :root  {
-    .ic-Form-group.ic-Form-group--horizontal {
-
-      > .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
-        .ic-Form-help-text {
-          padding-#{direction(left)}: $ic-horizontal-form-offset + $ic-sp*2;
-        }
-      }
-
-      > .ic-Fieldset--radio-checkbox {
-        padding-#{direction(left)}: $ic-horizontal-form-offset + $ic-sp*2;
-
-        .ic-Legend {
-          width: $ic-horizontal-form-offset;
-        }
-      }
-
-    }
-
-  }
-}
-
 @mixin form-message-variant($color) {
   .ic-Form-message__Layout {
     background: $color;
