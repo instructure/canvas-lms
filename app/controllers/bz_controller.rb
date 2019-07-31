@@ -17,6 +17,43 @@ class BzController < ApplicationController
   before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information, :user_retained_data_batch, :prepare_qualtrics_links]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
 
+
+
+
+  # I need to add the coordinates info to the comment model and use
+  # that in here and a custom function to add it or something.
+  def pdf_annotator
+    # basically just for dev
+    url = params[:url]
+    matches = url.scan(/\/users\/[1-9]+\/files\/([1-9]+)\/download/)
+    if matches.any?
+      id = matches.first[0]
+      if Attachment.local_storage?
+        data = File.read(Attachment.find(id).full_filename)
+      else
+        url = Attachment.find(id).download_url
+        url = URI.parse(params[:url])
+        data = Net::HTTP.get(url)
+      end
+    else
+      raise Exception.new "no such file"
+    end
+
+    submission = Submission.find(params[:submission_id])
+
+    comments_html = ''
+
+    image_data = nil
+
+    IO::popen('convert -append - png:-', 'r+') do |io|
+      io.write(data)
+      io.close_write
+      image_data = io.read
+    end
+
+    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" /><div id="commentary"><textarea></textarea><button type="button">Save</button></div></div><script>var authtoken="'+form_authenticity_token+'";</script><script src="/bz_annotator.js"></script></body></html>';
+  end
+
   # this is meant to be used for requests from external services like LL kits
   # to see what courses the user is in. SSO just gives email, and server side, there
   # isn't an authentication token, so we just want to give back numbers for the email
@@ -1767,6 +1804,26 @@ class BzController < ApplicationController
     render :json => "success"
   end
 
+  def fetch_qualtrics_links(http, create_id, survey_id) 
+    url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/distributions/#{create_id}/links?surveyId=" + survey_id)
+
+    headers = {}
+    headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+    request = Net::HTTP::Get.new(url.request_uri, headers)
+
+    response = http.request(request)
+    obj = JSON.parse(response.body)
+
+    if obj["meta"]["httpStatus"] != '200 - OK'
+      raise Exception.new response.body
+    end
+
+    Rails.logger.info response.body
+
+    obj
+  end
+
+
   def do_qualtrics_list(course_id, http, mailing_list_id, students_list, survey_id, magic_field_name, distrib_name)
     if students_list.any?
       create_command = {}
@@ -1795,37 +1852,56 @@ class BzController < ApplicationController
       Rails.logger.info response.body
 
       create_id = obj["result"]["id"]
- 
-      url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/distributions/#{create_id}/links?surveyId=" + survey_id)
 
-      headers = {}
-      headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
-      request = Net::HTTP::Get.new(url.request_uri, headers)
+      obj = fetch_qualtrics_links(http, create_id, survey_id)
 
-      response = http.request(request)
-      obj = JSON.parse(response.body)
-
-      if obj["meta"]["httpStatus"] != '200 - OK'
-        raise Exception.new response.body
+      tries = 0
+      while tries < 10 && obj["result"]["elements"].empty?
+        tries += 1
+        sleep(tries * 2) # sleep longer and longer so we don't over-poll
+        obj = fetch_qualtrics_links(http, create_id, survey_id)
       end
 
-      Rails.logger.info response.body
+      handle_qualtrics_page(obj, students_list, course_id, magic_field_name)
 
-      obj["result"]["elements"].each do |contact|
-        students_list.each do |student|
-          if student.email == contact["email"]
-            r = RetainedData.get_for_course(course_id, student.id, magic_field_name)
-            if r.nil?
-              r = RetainedData.new
-              r.user_id = student.id
-              r.name = magic_field_name
-            end
-            r.value = contact["link"]
-            r.save
+      while !obj["result"]["nextPage"].blank?
+        Rails.logger.info "next page " + obj["result"]["nextPage"]
+        url = URI.parse(obj["result"]["nextPage"])
+
+        headers = {}
+        headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+        request = Net::HTTP::Get.new(url.request_uri, headers)
+
+        response = http.request(request)
+        obj = JSON.parse(response.body)
+
+        if obj["meta"]["httpStatus"] != '200 - OK'
+          raise Exception.new response.body
+        end
+
+        Rails.logger.info response.body
+
+        handle_qualtrics_page(obj, students_list, course_id, magic_field_name)
+      end
+    end
+  end
+
+  def handle_qualtrics_page(obj, students_list, course_id, magic_field_name)
+    obj["result"]["elements"].each do |contact|
+      students_list.each do |student|
+        if student.email == contact["email"]
+          r = RetainedData.get_for_course(course_id, student.id, magic_field_name)
+          if r.nil?
+            r = RetainedData.new
+            r.user_id = student.id
+            r.name = magic_field_name
           end
+          r.value = contact["link"]
+          r.save
         end
       end
     end
   end
+
   # end qualtrics
 end
