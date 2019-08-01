@@ -160,6 +160,22 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @template.reload
       expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
     end
+
+    it "should be able to add and remove courses by sis_source_id" do
+      existing_child = course_factory(:sis_source_id => "bleep")
+      existing_sub = @template.add_child_course!(existing_child)
+
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = subaccount1.sub_accounts.create!
+      c1 = course_factory(:account => subaccount1, :sis_source_id => "beep")
+      c2 = course_factory(:account => subaccount2, :sis_source_id => "beep2")
+
+      api_call(:put, @url, @params, {:course_ids_to_add => ["sis_course_id:#{c1.sis_source_id}", "sis_course_id:#{c2.sis_source_id}"],
+        :course_ids_to_remove => "sis_course_id:#{existing_child.sis_source_id}"})
+
+      @template.reload
+      expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
+    end
   end
 
   describe "#queue_migration" do
