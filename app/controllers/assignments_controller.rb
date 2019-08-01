@@ -215,7 +215,7 @@ class AssignmentsController < ApplicationController
           SIMILARITY_PLEDGE: @similarity_pledge
         })
 
-        env[:SETTINGS][:filter_speed_grader_by_student_group] = @context.filter_speed_grader_by_student_group?
+        env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
           eligible_categories = @context.group_categories
@@ -748,5 +748,12 @@ class AssignmentsController < ApplicationController
     @context.feature_enabled?(:quizzes_next) &&
       quiz_lti_tool.present? &&
       quiz_lti_tool.url != 'http://void.url.inseng.net'
+  end
+
+  def filter_speed_grader_by_student_group?
+    # Group assignments only need to filter if they show individual students
+    return false if @assignment.group_category? && !@assignment.grade_group_students_individually?
+
+    @context.filter_speed_grader_by_student_group?
   end
 end

@@ -2376,7 +2376,7 @@ export default do ->
       onRequestClose: @closeSubmissionTray
       pendingGradeInfo: @getPendingGradeInfo({ assignmentId, userId: studentId })
       postPoliciesEnabled: @options.post_policies_enabled
-      requireStudentGroupForSpeedGrader: @requireStudentGroupForSpeedGrader()
+      requireStudentGroupForSpeedGrader: @requireStudentGroupForSpeedGrader(assignment)
       selectNextAssignment: => @loadTrayAssignment('next')
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
@@ -3050,7 +3050,10 @@ export default do ->
       # React throws an error if we try to unmount while the event is being handled
       @delayedCall 0, => ReactDOM.unmountComponentAtNode(anonymousSpeedGraderAlertMountPoint())
 
-    requireStudentGroupForSpeedGrader: =>
+    requireStudentGroupForSpeedGrader: (assignment) =>
+      # Assignments that grade by group (not by student) don't require a group selection
+      return false if assignment.group_category_id? && !assignment.grade_group_students_individually
+
       @options.course_settings.filter_speed_grader_by_student_group && @getStudentGroupToShow() == '0'
 
     destroy: =>

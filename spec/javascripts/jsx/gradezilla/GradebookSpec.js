@@ -6787,12 +6787,33 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
       gradebook.setStudentGroups(studentGroups)
     })
 
-    test('is true when filter_speed_grader_by_student_group is enabled and no group is selected', () => {
-      gradebook.options.course_settings.filter_speed_grader_by_student_group = true
-      gradebook.setSubmissionTrayState(true, '1101', '2301')
-      const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
-      strictEqual(props.requireStudentGroupForSpeedGrader, true)
-    })
+    QUnit.module(
+      'when filter_speed_grader_by_student_group is enabled and no group is selected',
+      noGroupSelectedHooks => {
+        noGroupSelectedHooks.beforeEach(() => {
+          gradebook.options.course_settings.filter_speed_grader_by_student_group = true
+          gradebook.setSubmissionTrayState(true, '1101', '2301')
+        })
+
+        test('is true when the current assignment is not a group assignment', () => {
+          const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+          strictEqual(props.requireStudentGroupForSpeedGrader, true)
+        })
+
+        test('is true when the current assignment is a group assignment and grades students individually', () => {
+          gradebook.getAssignment('2301').group_category_id = '1'
+          gradebook.getAssignment('2301').grade_group_students_individually = true
+          const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+          strictEqual(props.requireStudentGroupForSpeedGrader, true)
+        })
+
+        test('is false when the current assignment is a group assignment but does not grade individually', () => {
+          gradebook.getAssignment('2301').group_category_id = '1'
+          const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+          strictEqual(props.requireStudentGroupForSpeedGrader, false)
+        })
+      }
+    )
 
     test('is false when filter_speed_grader_by_student_group is enabled and a group is selected', () => {
       gradebook.options.course_settings.filter_speed_grader_by_student_group = true
