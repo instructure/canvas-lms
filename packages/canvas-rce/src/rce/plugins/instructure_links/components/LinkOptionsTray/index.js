@@ -106,7 +106,7 @@ export default function LinkOptionsTray(props) {
               <Flex direction="column">
                 <Flex.Item padding="small">
                   <TextInput
-                    label={formatMessage('Text')}
+                    renderLabel={() =>formatMessage('Text')}
                     onChange={handleTextChange}
                     value={text}
                   />
@@ -114,7 +114,7 @@ export default function LinkOptionsTray(props) {
 
                 <Flex.Item padding="small">
                   <TextInput
-                    label={formatMessage('Link')}
+                    renderLabel={() =>formatMessage('Link')}
                     onChange={handleLinkChange}
                     value={url}
                   />

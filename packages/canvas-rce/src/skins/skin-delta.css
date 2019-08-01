@@ -595,7 +595,9 @@
   }
   .tox .tox-toolbar .tox-toolbar__group,
   .tox .tox-toolbar-overlord .tox-toolbar__group,
-  .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
+  .tox-toolbar__overflow .tox-toolbar__group,
+  .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type),
+  .tox[dir=rtl] .tox-toolbar__group:not(:last-of-type) {
     border-style: none;
   }
   .tox-toolbar .tox-toolbar__group::after, /* regular toolbar */
