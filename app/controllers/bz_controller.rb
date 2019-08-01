@@ -15,7 +15,7 @@ class BzController < ApplicationController
   # and courses_for_email is unauthenticated since it isn't really sensitive
   # user_retained_data_batch is sensitive, but it can also be done via access_token
   before_filter :require_user, :except => [:magic_field_dump, :courses_for_email, :magic_fields_for_cohort, :course_cohort_information, :user_retained_data_batch, :prepare_qualtrics_links]
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch]
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch, :prepare_qualtrics_links]
 
 
 
@@ -1672,7 +1672,6 @@ class BzController < ApplicationController
     # this is meant to be called from the join server's sync to lms, so it does the
     # access token for permission check
 
-    if false
     access_token = AccessToken.authenticate(params[:access_token])
     if access_token.nil?
       render :json => "Access denied"
@@ -1683,7 +1682,6 @@ class BzController < ApplicationController
     if requesting_user.id != 1
       render :json => "Not admin"
       return
-    end
     end
 
     course_id = params[:course_id]
