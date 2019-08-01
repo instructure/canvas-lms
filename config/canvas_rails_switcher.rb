@@ -19,8 +19,6 @@
 # CANVAS_RAILS6_0=1 env var, creating an empty RAILS6_0 file in the canvas config dir,
 # or setting `private/canvas/rails6.0` to `true` in a locally accessible consul
 unless defined?(CANVAS_RAILS5_2)
-  CANVAS_RAILS5_1 = false
-
   if ENV['CANVAS_RAILS6_0']
     CANVAS_RAILS5_2 = ENV['CANVAS_RAILS6_0'] == '0'
   elsif File.exist?(File.expand_path("../RAILS6_0", __FILE__))
@@ -39,7 +37,9 @@ unless defined?(CANVAS_RAILS5_2)
       keys = [
         ["private/canvas", environment, $canvas_cluster, "rails6.0"].compact.join("/"),
         ["private/canvas", environment, "rails6.0"].compact.join("/"),
-        ["global/private/canvas", environment, "rails6.0"].compact.join("/")
+        ["private/canvas", "rails6.0"].compact.join("/"),
+        ["global/private/canvas", environment, "rails6.0"].compact.join("/"),
+        ["global/private/canvas", "rails6.0"].compact.join("/")
       ].uniq
 
       result = nil
