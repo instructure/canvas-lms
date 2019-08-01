@@ -12,4 +12,4 @@
 #
 # closes/fixes/refs TICKET-XYZ
 #
-# flag: none (if there is a feature flag, use the name here)
+# flag = none (if there is a feature flag, use the name here)
