@@ -55,6 +55,7 @@
       class="ig-header-title collapse_module_link ellipsis"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
       aria-expanded="true"
+      aria-label="<%= context_module.try_rescue(:name) || nbsp %> <%= t('toggle module visibility') %>"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
       <i class="icon-mini-arrow-down"></i>
@@ -67,6 +68,7 @@
       class="ig-header-title expand_module_link ellipsis"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
       aria-expanded="false"
+      aria-label="<%= context_module.try_rescue(:name) || nbsp %> <%= t('toggle module visibility') %>"
       title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
       <i class="icon-mini-arrow-right"></i>
