@@ -56,7 +56,15 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   """
   when this assignment is due
   """
-  dueAt: DateTime
+  dueAt(
+    """
+    When true, return the overridden dates.
+
+    Not all roles have permission to view un-overridden dates (in which
+    case the overridden dates will be returned)
+    """
+    applyOverrides: Boolean = true
+  ): DateTime
   dueDateRequired: Boolean
   expectsExternalSubmission: Boolean
   expectsSubmission: Boolean
@@ -77,9 +85,17 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   inClosedGradingPeriod: Boolean
 
   """
-  the lock date (assignment is locked after this date).
+  the lock date (assignment is locked after this date)
   """
-  lockAt: DateTime
+  lockAt(
+    """
+    When true, return the overridden dates.
+
+    Not all roles have permission to view un-overridden dates (in which
+    case the overridden dates will be returned)
+    """
+    applyOverrides: Boolean = true
+  ): DateTime
   lockInfo: LockInfo
   moderatedGrading: ModeratedGrading
   modules: [Module!]
@@ -152,7 +168,15 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   """
   the unlock date (assignment is unlocked after this date)
   """
-  unlockAt: DateTime
+  unlockAt(
+    """
+    When true, return the overridden dates.
+
+    Not all roles have permission to view un-overridden dates (in which
+    case the overridden dates will be returned)
+    """
+    applyOverrides: Boolean = true
+  ): DateTime
   updatedAt: DateTime
 }
 
