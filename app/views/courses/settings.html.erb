@@ -321,7 +321,7 @@
         </td>
       <% end %>
       </tr>
-      <% if @context.feature_enabled?(:new_gradebook) %>
+      <% if @context.feature_enabled?(:new_gradebook) && @context.root_account.feature_enabled?(:filter_speed_grader_by_student_group) %>
         <tr>
           <td class="form-label">
             <label for="course_large_course"><%= t("Large Course:") %></label>

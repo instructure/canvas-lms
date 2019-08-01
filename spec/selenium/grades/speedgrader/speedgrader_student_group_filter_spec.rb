@@ -36,6 +36,8 @@ describe 'filter speed grader by student group' do
       active_user: true
     )
     @course.enable_feature!(:new_gradebook)
+    @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+    @course.update!(filter_speed_grader_by_student_group: true)
 
     @course.assignments.create!(
       title: 'filtering assignment',

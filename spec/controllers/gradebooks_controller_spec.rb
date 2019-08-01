@@ -805,6 +805,7 @@ describe GradebooksController do
         describe "filter_speed_grader_by_student_group" do
           before :once do
             @course.enable_feature!(:new_gradebook)
+            @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           end
 
           it "sets filter_speed_grader_by_student_group to true when filter_speed_grader_by_student_group? is true" do

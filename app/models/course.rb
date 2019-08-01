@@ -3369,7 +3369,8 @@ class Course < ActiveRecord::Base
   end
 
   def filter_speed_grader_by_student_group?
-    filter_speed_grader_by_student_group && feature_enabled?(:new_gradebook)
+    return false unless root_account.feature_enabled?(:filter_speed_grader_by_student_group) && feature_enabled?(:new_gradebook)
+    filter_speed_grader_by_student_group
   end
 
   def moderators

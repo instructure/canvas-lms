@@ -569,6 +569,7 @@ describe SpeedGrader::Assignment do
       context 'when a course has new gradeook and filter by student group enabled' do
         before(:once) do
           @course.enable_feature!(:new_gradebook)
+          @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @course.update!(filter_speed_grader_by_student_group: true)
         end
 
@@ -940,6 +941,9 @@ describe SpeedGrader::Assignment do
 
       context "when quizzes_next_submission_history FF is turned off" do
         before do
+          allow(@assignment.root_account).
+            to receive(:feature_enabled?).
+            with(:filter_speed_grader_by_student_group).and_return(false)
           allow(@assignment.root_account).
             to receive(:feature_enabled?).
             with(:quizzes_next_submission_history).and_return(false)
