@@ -51,6 +51,7 @@ describe Oauth2ProviderController do
         }
         assert_status(400)
         expect(response.body).to match /A requested scope is invalid/
+        expect(response.body).to include 'not|valid'
       end
 
       it 'renders 400 when scopes empty' do
@@ -691,17 +692,36 @@ describe Oauth2ProviderController do
 
     it "deletes the token" do
       delete :destroy, params: {access_token: token.full_token}
+      expect(JSON.parse(response.body)).to eq({})
       expect(AccessToken.not_deleted.exists?(token.id)).to be(false)
     end
 
-    it "doesn't need a cope to delete the token" do
+    it "doesn't need a scope to delete the token" do
       key.require_scopes = true
       key.save!
       delete :destroy, params: {access_token: token.full_token}
       expect(AccessToken.not_deleted.exists?(token.id)).to be(false)
     end
 
+    context "with a web session" do
+      let_once(:ap) { Account.default.canvas_authentication_provider }
 
+      before do
+        allow_any_instantiation_of(ap).to receive(:user_logout_redirect).and_return("somewhere")
+      end
+
+      let(:session) { { login_aac: ap.global_id } }
+
+      it "includes forward URL when possible" do
+        delete :destroy, params: {access_token: token.full_token, expire_sessions: true}, session: session
+        expect(JSON.parse(response.body)).to eq({ "forward_url" => "somewhere" })
+      end
+
+      it "does not include forward URL when not ending sessions" do
+        delete :destroy, params: { access_token: token.full_token }, session: session
+        expect(JSON.parse(response.body)).to eq({})
+      end
+    end
   end
 
 end

@@ -105,6 +105,7 @@ export default function ImageOptionsTray(props) {
 
   return (
     <Tray
+      data-mce-component
       label={formatMessage('Image Options Tray')}
       onDismiss={onRequestClose}
       onEntered={props.onEntered}

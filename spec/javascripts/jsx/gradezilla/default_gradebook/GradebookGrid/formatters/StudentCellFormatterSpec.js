@@ -153,6 +153,13 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
       strictEqual(renderCell().querySelector('.secondary-info'), null)
     })
 
+    test('ignores section IDs referencing sections not loaded in the gradebook', () => {
+      student.sections.push('9005')
+      gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
+      renderCell()
+      ok('nonexistent section should not cause error')
+    })
+
     test('renders the student login id when secondary info is "login_in"', () => {
       gradebook.setSelectedSecondaryInfo('login_id', true) // skipRedraw
       equal(renderCell().querySelector('.secondary-info').innerText, student.login_id)

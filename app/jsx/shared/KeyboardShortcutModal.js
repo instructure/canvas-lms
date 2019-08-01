@@ -63,6 +63,7 @@ export default class KeyboardShortcutModal extends React.Component {
   render() {
     return (
       <Modal
+        data-canvas-component
         open={this.state.isOpen}
         label={I18n.t('Keyboard Shortcuts')}
         onDismiss={this.closeModal}

@@ -48,6 +48,8 @@ function getProps(textareaId, state) {
 
     textareaClassName: "exampleClassOne",
     textareaId,
+    onFocus: () => console.log("rce focused"), // eslint-disable-line no-console
+    onBlur: () => console.log("rce blurred"),  // eslint-disable-line no-console
 
     trayProps: {
       canUploadFiles: true,

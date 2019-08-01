@@ -29,7 +29,7 @@ module Exporters
             # they do not include submissions for group assignments for anyone
             # but the original submitter of the group submission
             attachment_ids = submission.attachment_ids.try(:split, ",")
-            attachments = attachment_ids.present? ? Attachment.where(id: attachment_ids) : []
+            attachments = attachment_ids.present? ? main_sub.shard.activate { Attachment.where(id: attachment_ids) } : []
             attachments.each do |attachment|
               # TODO handle missing attachments
               path = File.join(base_path, attachment.display_name)

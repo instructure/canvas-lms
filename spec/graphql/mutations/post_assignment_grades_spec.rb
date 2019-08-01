@@ -138,6 +138,29 @@ describe Mutations::PostAssignmentGrades do
         progress = Progress.find(result.dig("data", "postAssignmentGrades", "progress", "_id"))
         expect(progress.results[:user_ids]).to match_array [student.id]
       end
+
+      context "when the poster has limited visibility" do
+        let(:secret_student) { User.create! }
+        let(:secret_section) { course.course_sections.create! }
+
+        before(:each) do
+          Enrollment.limit_privileges_to_course_section!(course, teacher, true)
+          course.enroll_student(secret_student, enrollment_state: "active", section: secret_section)
+        end
+
+        it "only posts grades for students that the user can see" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          post_submissions_job.invoke_job
+          expect(assignment.submission_for_student(secret_student).posted_at).to be nil
+        end
+
+        it "stores only the user ids of affected students on the Progress object" do
+          result = execute_query(mutation_str(assignment_id: assignment.id), context)
+          post_submissions_job.invoke_job
+          progress = Progress.find(result.dig("data", "postAssignmentGrades", "progress", "_id"))
+          expect(progress.results[:user_ids]).to match_array [student.id]
+        end
+      end
     end
   end
 

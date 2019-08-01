@@ -151,7 +151,7 @@ export default class GradeSelect extends Component {
       }
     }
 
-    let selectedOption = options.find(option => option.gradeInfo.selected)
+    var selectedOption = options.find(option => option.gradeInfo.selected)
     if (!selectedOption) {
       selectedOption = {gradeInfo: {}, label: '–', value: NO_SELECTION}
       options.unshift(selectedOption)

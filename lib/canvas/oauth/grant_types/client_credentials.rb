@@ -34,7 +34,7 @@ module Canvas::Oauth
 
       def validate_type
         raise Canvas::Oauth::InvalidRequestError, @provider.error_message unless @provider.valid?
-        raise Canvas::Oauth::RequestError, :invalid_scope unless @provider.valid_scopes?
+        raise Canvas::Oauth::InvalidScopeError, @provider.missing_scopes unless @provider.valid_scopes?
       end
 
       def generate_token

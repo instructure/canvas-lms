@@ -87,8 +87,8 @@ test("links the author's name to the author's url", function() {
   this.wrapper = this.mountComponent()
   strictEqual(
     this.wrapper
-      .find('Link')
-      .at(1)
+      .find('Button')
+      .at(0)
       .prop('href'),
     this.defaultProps().authorUrl
   )
@@ -154,7 +154,7 @@ test('the comment timestamp includes the year if it does not match the current y
   this.wrapper = this.mountComponent({createdAt: new Date('Jan 8, 2003')})
   const dateText = this.wrapper
     .find('Text')
-    .at(1)
+    .at(0)
     .text()
   strictEqual(dateText.includes(', 2003'), true)
 })
@@ -163,7 +163,7 @@ test('the comment timestamp excludes the year if it matches the current year', f
   this.wrapper = this.mountComponent()
   const dateText = this.wrapper
     .find('Text')
-    .at(1)
+    .at(0)
     .text()
   const year = this.wrapper.instance().props.createdAt.getFullYear()
   strictEqual(dateText.includes(`, ${year}`), false)
@@ -177,7 +177,7 @@ test('uses the edited_at for the timestamp, if one exists', function() {
 
   const dateText = this.wrapper
     .find('Text')
-    .at(1)
+    .at(0)
     .text()
   strictEqual(dateText.includes('Feb 12'), true)
 })
@@ -190,7 +190,7 @@ test("starts with the text '(Edited)' if the comment has an edited_at", function
 
   const dateText = this.wrapper
     .find('Text')
-    .at(1)
+    .at(0)
     .text()
   strictEqual(/^\(Edited\)/.test(dateText), true)
 })
@@ -200,7 +200,7 @@ test('uses the created_at for the timestamp if edited_at is null', function() {
 
   const dateText = this.wrapper
     .find('Text')
-    .at(1)
+    .at(0)
     .text()
   strictEqual(dateText.includes('Jan 8'), true)
 })
@@ -210,7 +210,7 @@ test("does not start with the text '(Edited)' if the comment has a null edited_a
 
   const dateText = this.wrapper
     .find('Text')
-    .at(1)
+    .at(0)
     .text()
   strictEqual(/^\(Edited\)/.test(dateText), false)
 })

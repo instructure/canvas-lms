@@ -35,16 +35,25 @@ exports[`renders 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}
@@ -230,16 +239,25 @@ exports[`renders with allDay 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}
@@ -425,16 +443,25 @@ exports[`renders with only the startTime 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}
@@ -620,16 +647,25 @@ exports[`renders with user displayName for calendar 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}
@@ -815,16 +851,25 @@ exports[`renders without address 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}
@@ -985,16 +1030,25 @@ exports[`renders without details 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}
@@ -1161,16 +1215,25 @@ exports[`renders without location 1`] = `
       ellipsis={false}
       level="h2"
     >
-      <Link
+      <Button
         as="button"
-        disabled={false}
+        buttonRef={[Function]}
+        cursor="pointer"
+        fluidWidth={false}
         href="http://example.com"
-        iconPlacement="start"
-        linkRef={[Function]}
-        variant="default"
+        margin="0"
+        size="large"
+        theme={
+          Object {
+            "largeHeight": "normal",
+            "largePadding": "0",
+          }
+        }
+        type="button"
+        variant="link"
       >
         event title
-      </Link>
+      </Button>
     </Heading>
     <CloseButton
       buttonRef={[Function]}

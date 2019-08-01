@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "Kuputuhi rerekē:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "He hapa i puta i te wā o te hanga ana i te kōnae arokite."
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "Kei te tikiake tonu he āhua, ki te haere tonu koe kaore e tika te whakauru i te āhua."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "Ngā whakataunga"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Aunoa huaki he arokite i roto i te raina ( Arokite whakātu anake i muri o te tiaki)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "Porohitatia te rārangi kore"
   },
+  "clear_selected_file_82388e50": {
+    "message": "Whakawātea kōnae kua tīpakohia"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Pāwhiri tētahi kōnae ki te kōkuhu i tētahi hononga tikiake mo taua kōnae."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Pawhiritia ki te kōkuhu i te hono ki tēnei tūemi"
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Kati he tāhua kōrero rānei Ka whakahoki anō ki te wāhi etita"
   },
   "close_d634289d": {
     "message": "Katia"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "Ngā Akoranga Hononga"
   },
-  "course_media_ec759ad": {
-    "message": "Akoranga Pāpāho"
-  },
   "course_navigation_dd035109": {
     "message": "Whakaterenga Akoranga "
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(Whakāhuatia te āhua)"
   },
+  "directionality_ebcae6d0": {
+    "message": "hangai tōtika"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "Monoki i roto i te raina arokite"
+  },
   "discussions_a5f96392": {
     "message": "Ngā Kōrerorero"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "Kua mahia"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "Tō he Kōnae i konei"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Tōia me te taka, pāwhiri rānei ki te tirotiro tō rorohiko"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Tō kakau Whakamahi ngā pere runga raro ki te whakarerekē"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "E tika ana: Rā Maha"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "Whakatika hononga"
   },
+  "embed_828fac4a": {
+    "message": "Whakauru"
+  },
   "embed_image_1080badc": {
     "message": "Tāmau Āhua"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "Whakauru Kōwhiri Pereki"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Whakauru Arokite"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "Whakauru Ataata Waehere"
   },
   "enter_search_terms_e397b1f0": {
     "message": "tomo ngā kupu rapu"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "Kōnae Tukuake Pukapuka"
   },
+  "file_url_c12b64be": {
+    "message": "Kōnae URL"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "{ filename } kōnae icon"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "{ filename }āhua arokite"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "{ filename }kuputuhi arokite"
+  },
   "files_c300e900": {
     "message": "Kōnae"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "Mutu"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Arotahi te pakūake ihirangi paeutauta"
+  },
   "folder_705fd2d7": {
     "message": "kōpaki"
+  },
+  "generating_preview_45b53be0": {
+    "message": "Hanga arokite ana ..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Haere ki te tahua papa o te etita"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Haere ki te paeutauta o te etita"
   },
   "grades_a61eba0a": {
     "message": "Ngā Kōeke"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "Muhu kōnae momo"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Pokatata papapātuhi"
+  },
   "large_9c5e80e7": {
     "message": "Nui"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "maui ki te matau"
+  },
   "link_7262adec": {
     "message": "hono"
+  },
+  "link_options_a16b758b": {
+    "message": "Hono Kōwhiringa"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "Hono ki te Whārangi Hōu"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "I rahua te uta"
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "I hapa te utaina"
+  },
   "loading_folders_8d4d5d5a": {
     "message": "E uta ana i ngā kōpaki..."
   },
   "loading_media_f3455841": {
     "message": "Uta ana pāpāho"
-  },
-  "media_af190855": {
-    "message": "pāpāho"
   },
   "medium_5a8e9ead": {
     "message": "kauwaka"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "kōwae"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Whakatere i roto i te tahua paeutauta rānei"
+  },
+  "next_page_d2a39853": {
+    "message": "Whārangi haere ake nei"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Kaore Alt Kuputuhi(Āhua Whakapaipai)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "Kaore Ataata"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Huaki tēnei pokatata papapātuhi kōrero"
+  },
   "options_3ab0ea65": {
     "message": "Ngā kōwhiringa"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Rārangi kua rārangitia me te kore rārangi"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Ētahi atu etita pokatata i kitea ai"
   },
   "pages_e5414c2c": {
     "message": "Ngā whārangi"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "AROKITE"
   },
+  "previous_page_928fc112": {
+    "message": "Te whārangi o muri nei"
+  },
   "published_c944a23d": {
     "message": "whakaputaina"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "Ētita Ihirangi Whai Rawa"
   },
+  "right_to_left_ec223c81": {
+    "message": "matau ki te maui"
+  },
   "save_11a80ec3": {
     "message": "Tiaki"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Rapu Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "Rapu tau"
+  },
   "select_a_file_53ba40ac": {
     "message": "Tīpako he kōnae"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Tīpakohia he kōpaki hei tukuake i tō konae ki roto"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Whakātu whakauru kōwhiri"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Whakātu wāhanga āhua"
+  },
+  "show_link_options_545338fd": {
+    "message": "Whakātu Hono Kōwhiringa"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Whakātu ataata kōwhiringa"
   },
   "size_b30e1077": {
     "message": "Rahi"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "Marautanga"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "TAB/ngā pere"
+  },
+  "text_7f4593da": {
+    "message": "Kuputuhi"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Ko te rauemi kei roto i te rohe tūmatanui"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "Tukuake i te āhua hou"
   },
+  "upload_document_253f0478": {
+    "message": "Tikiake tuhinga"
+  },
   "upload_file_fd2361b8": {
     "message": "Tukuake kōnae"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "Kua tukuatutia ataata/orooro hopukanga"
+  },
+  "video_options_24ef6e5d": {
+    "message": "Ataata Kōwhiringa"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "Ataata Kōwhiringa Pereki"
   },
   "video_player_b371005": {
     "message": "Kaitākaro Ataata"

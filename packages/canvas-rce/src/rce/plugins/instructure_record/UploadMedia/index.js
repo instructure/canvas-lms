@@ -132,7 +132,7 @@ export function UploadMedia(props) {
           size="medium"
           onDismiss={props.onDismiss}
           open
-          shouldCloseOnDocumentClick
+          shouldCloseOnDocumentClick={false}
         >
           <Modal.Header>
             <CloseButton onClick={props.onDismiss} offset="medium" placement="end">

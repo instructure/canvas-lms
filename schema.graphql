@@ -2599,6 +2599,7 @@ type Term implements Node {
   endAt: DateTime
   id: ID!
   name: String
+  sisTermId: ID
   startAt: DateTime
 }
 

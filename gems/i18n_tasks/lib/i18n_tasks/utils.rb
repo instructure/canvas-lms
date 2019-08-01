@@ -25,7 +25,9 @@ module I18nTasks
         // you probably shouldn't edit it directly
         import mergeI18nTranslations from 'mergeI18nTranslations';
 
-        mergeI18nTranslations(#{translations.to_ordered.to_json});
+        // we use JSON.parse here instead of just loading it as a javascript object literal
+        // because according to https://v8.dev/blog/cost-of-javascript-2019#json that is faster
+        mergeI18nTranslations(JSON.parse(#{translations.to_ordered.to_json.inspect}));
       TRANSLATIONS
     end
   end

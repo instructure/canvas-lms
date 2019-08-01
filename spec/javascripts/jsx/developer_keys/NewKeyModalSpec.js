@@ -34,7 +34,9 @@ const fakeActions = {
   ltiKeysSetDisabledPlacements: () => {},
   ltiKeysSetEnabledScopes: () => {},
   ltiKeysSetPrivacyLevel: () => {},
-  setLtiConfigurationMethod: () => {}
+  setLtiConfigurationMethod: () => {},
+  resetLtiState: () => {},
+  developerKeysModalClose: () => {}
 }
 
 const developerKey = {
@@ -180,9 +182,7 @@ test('it sends the contents of the form saving', () => {
   const createOrEditSpy = sinon.spy()
   const dispatchSpy = sinon.stub().resolves()
 
-  const fakeActions = {
-    createOrEditDeveloperKey: createOrEditSpy
-  }
+  const mergedFakeActions = Object.assign({}, fakeActions, { createOrEditDeveloperKey: createOrEditSpy })
   const fakeStore = {
     dispatch: dispatchSpy
   }
@@ -197,7 +197,7 @@ test('it sends the contents of the form saving', () => {
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
+      actions={mergedFakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
       selectedScopes={selectedScopes}
@@ -228,9 +228,7 @@ test('sends form content without scopes and require_scopes set to false when not
   const createOrEditSpy = sinon.spy()
   const dispatchSpy = sinon.stub().resolves()
 
-  const fakeActions = {
-    createOrEditDeveloperKey: createOrEditSpy
-  }
+  const mergedFakeActions = Object.assign({}, fakeActions, { createOrEditDeveloperKey: createOrEditSpy })
   const fakeStore = {
     dispatch: dispatchSpy
   }
@@ -243,7 +241,7 @@ test('sends form content without scopes and require_scopes set to false when not
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
+      actions={mergedFakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
       selectedScopes={selectedScopes}
@@ -273,7 +271,7 @@ test('sends form content without scopes and require_scopes set to false when not
 test('it adds each selected scope to the form data', () => {
   const createOrEditSpy = sinon.spy()
   const dispatchSpy = sinon.stub().resolves()
-  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const mergedFakeActions = Object.assign({}, fakeActions, { createOrEditDeveloperKey: createOrEditSpy })
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
   const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
@@ -285,7 +283,7 @@ test('it adds each selected scope to the form data', () => {
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
+      actions={mergedFakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
       selectedScopes={selectedScopes}
@@ -303,7 +301,7 @@ test('it adds each selected scope to the form data', () => {
 test('it removes testClusterOnly from the form data if it is undefined', () => {
   const createOrEditSpy = sinon.spy()
   const dispatchSpy = sinon.stub().resolves()
-  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const mergedFakeActions = Object.assign({}, fakeActions, { createOrEditDeveloperKey: createOrEditSpy })
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
   delete developerKey2.test_cluster_only
@@ -316,7 +314,7 @@ test('it removes testClusterOnly from the form data if it is undefined', () => {
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
+      actions={mergedFakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
       selectedScopes={selectedScopes}
@@ -335,7 +333,7 @@ test('flashes an error if no scopes are selected', () => {
   const flashStub = sinon.stub($, 'flashError')
   const createOrEditSpy = sinon.spy()
   const dispatchSpy = sinon.stub().resolves()
-  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const mergedFakeActions = Object.assign({}, fakeActions, { createOrEditDeveloperKey: createOrEditSpy })
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: [] })
   const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
@@ -347,7 +345,7 @@ test('flashes an error if no scopes are selected', () => {
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
+      actions={mergedFakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
       selectedScopes={[]}
@@ -445,7 +443,7 @@ test('flashes an error if redirect_uris is empty', () => {
   const flashStub = sinon.stub($, 'flashError')
   const createOrEditSpy = sinon.spy()
   const dispatchSpy = sinon.stub().resolves()
-  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const mergedFakeActions = Object.assign({}, fakeActions, { createOrEditDeveloperKey: createOrEditSpy })
   const fakeStore = { dispatch: dispatchSpy }
   const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: [], redirect_uris: '' })
   const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
@@ -457,7 +455,7 @@ test('flashes an error if redirect_uris is empty', () => {
       closeModal={() => {}}
       createOrEditDeveloperKeyState={editDeveloperKeyState2}
       listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
+      actions={mergedFakeActions}
       store={fakeStore}
       mountNode={modalMountNode}
       selectedScopes={[]}

@@ -44,8 +44,8 @@ function getTrayLabel({contentType, contentSubtype}) {
   switch (contentSubtype) {
     case 'images':
       return formatMessage('Course Images')
-    case 'media':
-      return formatMessage('Course Media')
+    // case 'media':
+    //   return formatMessage('Course Media')
     case 'documents':
       return formatMessage('Course Documents')
     default:
@@ -57,7 +57,7 @@ const thePanels = {
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
-  media: React.lazy(() => import('./FakeComponent'))
+  // media: React.lazy(() => import('./FakeComponent'))
 }
 /**
  * @param {contentType, contentSubType} filterSettings: key to which panel is desired
@@ -78,7 +78,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   documents: {contentType: 'files', contentSubtype: 'documents', sortValue: 'date_added'},
   images: {contentType: 'files', contentSubtype: 'images', sortValue: 'date_added'},
   links: {contentType: 'links', contentSubtype: 'all', sortValue: 'date_added'},
-  media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
+  // media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
 }
 
 /**
@@ -111,12 +111,21 @@ export default function CanvasContentTray(props) {
   }, [props.bridge])
 
   function handleDismissTray() {
+    props.onTrayClosing && props.onTrayClosing(true) // tell RCEWrapper we're closing
     setIsOpen(false)
+  }
+
+  function handleExitTray() {
+    props.onTrayClosing && props.onTrayClosing(true) // tell RCEWrapper we're closing
   }
 
   function handleCloseTray() {
     props.bridge.focusActiveEditor(false)
+    // increment a counter that's used a the key when rendering
+    // this gets us a new instance everytime, which is necessary
+    // to get the queries run so we have up to date data.
     setOpenCount(openCount + 1)
+    props.onTrayClosing && props.onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
   function renderLoading() {
@@ -127,6 +136,7 @@ export default function CanvasContentTray(props) {
     <StoreProvider {...props} key={openCount}>
       {contentProps => (
         <Tray
+          data-mce-component
           data-testid="CanvasContentTray"
           label={getTrayLabel(filterSettings)}
           open={isOpen}
@@ -134,9 +144,10 @@ export default function CanvasContentTray(props) {
           size="regular"
           shouldContainFocus
           shouldReturnFocus={false}
-          shouldCloseOnDocumentClick={false}
+          shouldCloseOnDocumentClick
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
+          onExit={handleExitTray}
         >
           <Flex direction="column" display="block" height="100vh" overflowY="hidden">
             <Flex.Item padding="medium" shadow="above">
@@ -193,6 +204,7 @@ export const trayProps = shape(trayPropsMap)
 
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
+  onTrayClosing: func, // called with true when the tray starts closing, false once closed
   ...trayPropsMap
 }
 

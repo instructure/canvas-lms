@@ -66,6 +66,10 @@ module Gradezilla
       f("#final-grade-value").text
     end
 
+    def group_message
+      # TODO: locator for the student group message text
+    end
+
     def self.speedgrader_link
       fj("a:contains('SpeedGrader')")
     end

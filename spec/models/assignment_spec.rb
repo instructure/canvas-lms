@@ -1325,7 +1325,7 @@ describe Assignment do
         expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
 
         assignment = @course.assignments.create!(assignment_valid_attributes)
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(student_one.name)
@@ -1365,7 +1365,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(group_two.name)
         expect(representatives[1].name).to eql(group_one.name)
@@ -1396,7 +1396,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(student_one.name)
@@ -1434,7 +1434,7 @@ describe Assignment do
 
         expect(Canvas::ICU).to receive(:collate_by).and_call_original
 
-        representatives = assignment.representatives(@teacher)
+        representatives = assignment.representatives(user: @teacher)
 
         expect(representatives[0].name).to eql(student_three.name)
         expect(representatives[1].name).to eql(group_two.name)
@@ -1476,7 +1476,7 @@ describe Assignment do
 
       expect(User).to receive(:best_unicode_collation_key).with('sortable_name').and_call_original
 
-      representatives = assignment.representatives(@teacher)
+      representatives = assignment.representatives(user: @teacher)
 
       expect(representatives[0].name).to eql(student_three.name)
       expect(representatives[1].name).to eql(student_one.name)
@@ -4294,6 +4294,15 @@ describe Assignment do
       expect(@assignment.participants.include?(@student1)).to be_falsey
     end
 
+    it 'excludes students with completed enrollments by date when not differentiated' do
+      @course.start_at = 2.days.ago
+      @course.conclude_at = 1.day.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @assignment.update_attribute(:only_visible_to_overrides, false)
+      expect(@assignment.participants(by_date: true).include?(@student1)).to be_falsey
+    end
+
     it 'excludes students without visibility' do
       expect(@assignment.participants.include?(@student2)).to be_falsey
     end
@@ -4465,21 +4474,39 @@ describe Assignment do
     end
 
     context "assignment unmuted" do
+      let(:assignment) { @course.assignments.create! }
+
       before :once do
-        Notification.create(:name => 'Assignment Unmuted')
+        @assignment_unmuted_notification = Notification.create(name: "Assignment Unmuted")
+        @student.update!(email: "fakeemail@example.com")
+        @student.email_channel.update!(workflow_state: :active)
       end
 
       it "should create a message when an assignment is unmuted" do
-        assignment_model(:course => @course)
-        @assignment.broadcast_unmute_event
-        expect(@assignment.messages_sent).to be_include('Assignment Unmuted')
+        assignment.mute!
+
+        expect {
+          assignment.unmute!
+        }.to change {
+          DelayedMessage.where(
+            communication_channel: @student.email_channel,
+            notification: @assignment_unmuted_notification
+          ).count
+        }.by(1)
       end
 
       it "should not create a message in an unpublished course" do
-        course_factory
-        assignment_model(:course => @course)
-        @assignment.broadcast_unmute_event
-        expect(@assignment.messages_sent).not_to be_include('Assignment Unmuted')
+        @course.update!(workflow_state: "created")
+        assignment.mute!
+
+        expect {
+          assignment.unmute!
+        }.not_to change {
+          DelayedMessage.where(
+            communication_channel: @student.email_channel,
+            notification: @assignment_unmuted_notification
+          ).count
+        }
       end
     end
 
@@ -5826,7 +5853,7 @@ describe Assignment do
       comments, ignored = @assignment.generate_comments_from_files(
         zip.open.path,
         @teacher)
-      
+
       expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
       expect(ignored).to be_empty
     end
@@ -7207,6 +7234,11 @@ describe Assignment do
         }.not_to change {
           assignment.submission_for_student(student1).posted_at
         }
+      end
+
+      it "calls broadcast_notifications for submissions" do
+        expect(Submission.broadcast_policy_list).to receive(:broadcast).with(student1_submission)
+        assignment.post_submissions(submission_ids: [student1_submission.id])
       end
 
       context "when given a Progress" do

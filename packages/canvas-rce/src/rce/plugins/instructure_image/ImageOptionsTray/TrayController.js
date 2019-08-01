@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import bridge from '../../../../bridge'
 import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
@@ -106,6 +107,7 @@ export default class TrayController {
           this._isOpen = true
         }}
         onExited={() => {
+          bridge.focusActiveEditor(false)
           this._isOpen = false
         }}
         onSave={imageOptions => {

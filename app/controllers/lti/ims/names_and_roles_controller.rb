@@ -18,7 +18,7 @@
 # rubocop:disable Metrics/LineLength
 module Lti::Ims
   # @API Names and Role
-
+  #
   # API for IMS Names and Role Provisioning Service version 2 .
   #
   # Official specification: https://www.imsglobal.org/spec/lti-nrps/v2p0

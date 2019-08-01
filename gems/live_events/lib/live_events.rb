@@ -20,7 +20,8 @@ require 'inst_statsd'
 
 module LiveEvents
   class << self
-    attr_accessor :logger, :cache, :statsd, :stream_client
+    attr_accessor :logger, :cache, :statsd
+    attr_reader :stream_client
 
     # rubocop:disable Style/TrivialAccessors
     def settings=(settings)
@@ -58,9 +59,9 @@ module LiveEvents
 
     # Post an event for the current account.
     def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil) # rubocop:disable Rails/SmartTimeZone
-      if (config = LiveEvents::Client.config)
+      if (LiveEvents::Client.config)
         context ||= Thread.current[:live_events_ctx]
-        LiveEvents::Client.new(config, @stream_client).post_event(event_name, payload, time, context, partition_key)
+        client.post_event(event_name, payload, time, context, partition_key)
       end
     end
 
@@ -76,11 +77,36 @@ module LiveEvents
           logger.warn "Starting new LiveEvents worker thread due to fork."
         end
 
-        @worker = LiveEvents::AsyncWorker.new
+        @worker = LiveEvents::AsyncWorker.new(stream_client: client.stream_client, stream_name: client.stream_name)
         @launched_pid = Process.pid
       end
 
       @worker
+    end
+
+    def stream_client=(s_client)
+      @old_stream_client = @stream_client
+      @stream_client = s_client
+    end
+
+    private
+
+    def client
+      if @client && !new_client?
+        @client
+      else
+        @client = LiveEvents::Client.new(LiveEvents::Client.config, @stream_client, @stream_client&.stream_name)
+      end
+    end
+
+    def new_client?
+      return true if @old_stream_client != @stream_client
+      @config ||= LiveEvents::Client.config
+      if @config != LiveEvents::Client.config
+        @config = LiveEvents::Client.config
+        true
+      end
+      false
     end
   end
 end

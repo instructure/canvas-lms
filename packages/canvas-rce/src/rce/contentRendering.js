@@ -18,29 +18,31 @@
 
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import {cleanUrl} from './contentInsertionUtils';
 import formatMessage from "../format-message";
 
-export function renderLink(link) {
-  const href = link.href || link.url;
-  const title =
-    link.title ||
-    formatMessage({
-      default: "Link",
-      description:
-        "Fallback title attribute on an unnamed link inserted from the sidebar."
-    });
-  const previewAlt = link["data-preview-alt"];
-  const contents = link.contents || title;
+export function renderLink(data, contents) {
+  const linkAttrs = {...data}
+  linkAttrs.href = linkAttrs.href || linkAttrs.url;
+  delete linkAttrs.url
+  if (linkAttrs.href) {
+    linkAttrs.href = cleanUrl(linkAttrs.href);
+  }
+  linkAttrs.title = linkAttrs.title || formatMessage("Link");
+  const children = contents || linkAttrs.text || linkAttrs.title;
+  delete linkAttrs.selectionDetails
+  delete linkAttrs.text
+  linkAttrs.className = linkAttrs['class']
+  delete linkAttrs['class']
+
+  // renderToStaticMarkup isn't happy with bool attributes
+  Object.keys(linkAttrs).forEach(attr => {
+    if (typeof linkAttrs[attr] === 'boolean') linkAttrs[attr] = linkAttrs[attr].toString()
+  })
 
   return renderToStaticMarkup(
-    <a
-      href={href}
-      title={title}
-      data-preview-alt={previewAlt}
-      className={link["class"]}
-      id={link["id"]}
-    >
-      {contents}
+    <a {...linkAttrs}>
+      {children}
     </a>
   );
 }
@@ -71,7 +73,7 @@ export function constructJSXImageElement(image, opts = {}) {
   }
   if (image.link && !opts.doNotLink) {
     ret = (
-      <a href={image.link} target="_blank">
+      <a href={image.link} target="_blank" rel="noopener noreferrer">
         {ret}
       </a>
     );

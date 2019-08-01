@@ -350,6 +350,10 @@ class Speedgrader
       students_dropdown_button.click
     end
 
+    def fetch_student_names
+      ff('li', student_dropdown_menu).map(&:text)
+    end
+
     def click_next_or_prev_student(direction_string)
       if direction_string.equal?(:next)
         next_student.click

@@ -1,4 +1,3 @@
-# encoding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../sharding_spec_helper'
 
 describe GradebooksController do
   before :once do
@@ -803,6 +802,24 @@ describe GradebooksController do
       describe "course_settings" do
         let(:course_settings) { gradebook_options.fetch(:course_settings) }
 
+        describe "filter_speed_grader_by_student_group" do
+          before :once do
+            @course.enable_feature!(:new_gradebook)
+          end
+
+          it "sets filter_speed_grader_by_student_group to true when filter_speed_grader_by_student_group? is true" do
+            @course.update!(filter_speed_grader_by_student_group: true)
+            get :show, params: { course_id: @course.id }
+            expect(course_settings.fetch(:filter_speed_grader_by_student_group)).to be true
+          end
+
+          it "sets filter_speed_grader_by_student_group to false when filter_speed_grader_by_student_group? is false" do
+            @course.update!(filter_speed_grader_by_student_group: false)
+            get :show, params: { course_id: @course.id }
+            expect(course_settings.fetch(:filter_speed_grader_by_student_group)).to be false
+          end
+        end
+
         describe "allow_final_grade_override" do
           before :once do
             @course.enable_feature!(:new_gradebook)
@@ -1104,6 +1121,26 @@ describe GradebooksController do
             get :show, params: {course_id: @course.id}
             expect(graded_late_submissions_exist).to be false
           end
+        end
+      end
+
+      describe "sections" do
+        before(:each) do
+          @course.course_sections.create!
+          Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+        end
+
+        let(:returned_section_ids) { gradebook_options.fetch(:sections).pluck(:id) }
+
+        it "only includes course sections visible to the user when new gradebook is enabled" do
+          @course.enable_feature!(:new_gradebook)
+          get :show, params: {course_id: @course.id}
+          expect(returned_section_ids).to contain_exactly(@course.default_section.id)
+        end
+
+        it "includes all course sections when new gradebook is disabled" do
+          get :show, params: {course_id: @course.id}
+          expect(returned_section_ids).to match_array(@course.course_sections.pluck(:id))
         end
       end
     end
@@ -2066,6 +2103,16 @@ describe GradebooksController do
         @assignment.update!(moderated_grading: true, grader_count: 2, muted: true)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env[:can_view_audit_trail]).to be false
+      end
+
+      it 'includes MANAGE_GRADES' do
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:MANAGE_GRADES)).to be true
+      end
+
+      it 'includes READ_AS_ADMIN' do
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:READ_AS_ADMIN)).to be true
       end
     end
 

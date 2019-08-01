@@ -112,7 +112,10 @@ module Lti
 
       AssignmentConfigurationToolLookup.send_later_enqueue_args(
         :recreate_missing_subscriptions,
-        { n_strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND },
+        {
+          n_strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND,
+          priority: Delayed::HIGH_PRIORITY
+        },
         tool_proxy.context,
         self
       )

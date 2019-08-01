@@ -480,8 +480,8 @@ a better user experience to provide both.)</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>The account identifier from accounts.csv, if none is specified the course will be attached to
-the root account</td>
+<td>The account identifier from accounts.csv. New courses will be attached to
+the root account if not specified here</td>
 </tr>
 <tr>
 <td>term_id</td>
@@ -1091,6 +1091,135 @@ E411208,13aa3,CustomAdmin,active
 </pre>
 
 &#42; role or role_id is required.
+
+logins.csv
+---------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>user_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference users in the enrollments table.
+This identifier must not change for the user, and must be globally unique. In the user interface,
+ this is called the SIS ID.</td>
+</tr>
+<tr>
+<td>integration_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>A secondary unique identifier useful for more complex SIS integrations.
+This identifier must not change for the user, and must be globally unique.</td>
+</tr>
+<tr>
+<td>login_id</td>
+<td>text</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name that a user will use to
+login to Instructure. If you have an authentication service configured (like
+LDAP), this will be their username from the remote system.</td>
+</tr>
+<tr>
+<td>password</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td><p>If the account is configured to use LDAP or an SSO protocol then
+this should not be set. Otherwise this is the password that will be used to
+login to Canvas along with the 'login_id' above.</p>
+<p>Setting the password will in most cases log the user out of Canvas. If
+the user has managed to change their password in Canvas they will not be
+affected by this.  This latter case would happen if your institution
+transitioned from using Canvas authentication to a SSO solution.
+For this reason it is important to not set this if you are using LDAP or an
+SSO protocol.</p>
+</td>
+</tr>
+<tr>
+<td>ssha_password</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>Instead of a plain-text password, you can pass a pre-hashed password using
+the SSHA password generation scheme in this field. While better than passing
+a plain text password, you should still encourage users to change their
+password after logging in for the first time.</td>
+</tr>
+<tr>
+<td>authentication_provider_id</td>
+<td>text or integer</td>
+<td></td>
+<td></td>
+<td>
+<p>The authentication provider this login is associated with. Logins
+associated with a specific provider can only be used with that provider.
+Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+them, or unassociated logins. New providers will only search for logins
+explicitly associated with them. This can be the integer ID of the
+provider, or the type of the provider (in which case, it will find the
+first matching provider).</p>
+</td>
+<tr>
+<td>existing_user_id</td>
+<td>text</td>
+<td></td>
+<td>✓&#42;</td>
+<td>The User sis id from users.csv, required to identify a user.</td>
+</tr>
+<tr>
+<td>existing_integration_id</td>
+<td>text</td>
+<td></td>
+<td>✓&#42;</td>
+<td>The User integration_id from users.csv, required to identify a user.</td>
+</tr>
+<tr>
+<td>existing_canvas_user_id</td>
+<td>text</td>
+<td></td>
+<td>✓&#42;</td>
+<td>The canvas id for a user, required to identify a user.</td>
+</tr>
+<tr>
+<td>root_account</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The domain of the account to search for the user.</td>
+</tr>
+<tr>
+<td>email</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The email address of the user. This might be the same as login_id, but should
+still be provided.</td>
+</tr>
+</table>
+
+&#42; One of existing_user_id or existing_integration_id or
+existing_canvas_user_id is required.
+
+logins.csv is optional. Logins can only be added to existing users. Logins can
+be removed using the users.csv.
+
+Sample:
+
+<pre>user_id,login_id,authentication_provider_id,password,existing_canvas_user_id,email
+01103,bsmith01,,,Bob,Smith,Bobby Smith,98,bob.smith@myschool.edu
+13834,jdoe03,google,,John,Doe,,92,john.doe@myschool.edu
+13aa3,psue01,7,,Peggy,Sue,,93,peggy.sue@myschool.edu
+</pre>
 
 change_sis_id.csv
 ----------

@@ -452,11 +452,11 @@ class SisBatch < ActiveRecord::Base
 
   def stat_active_state(type)
     case type
-    when GroupMembership
+    when 'GroupMembership'
       'accepted'
-    when Group
+    when 'Group'
       'available'
-    when Course
+    when 'Course'
       ['claimed', 'created', 'available']
     else
       'active'
@@ -465,7 +465,7 @@ class SisBatch < ActiveRecord::Base
 
   def stat_deleted_state(type)
     case type
-    when CommunicationChannel
+    when 'CommunicationChannel'
       'retired'
     else
       'deleted'
@@ -474,11 +474,11 @@ class SisBatch < ActiveRecord::Base
 
   def stat_restored_from(type)
     case type
-    when CommunicationChannel
+    when 'CommunicationChannel'
       ['retired', 'unconfirmed']
-    when Course
+    when 'Course'
       ['completed', 'deleted']
-    when Enrollment
+    when 'Enrollment'
       ['inactive', 'completed', 'rejected', 'deleted']
     else
       'deleted'

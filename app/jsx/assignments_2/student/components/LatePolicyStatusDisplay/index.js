@@ -19,7 +19,8 @@ import I18n from 'i18n!assignments_2_thing'
 import PropTypes from 'prop-types'
 import React from 'react'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import LatePolicyToolTipContent from './LatePolicyToolTipContent'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
@@ -30,33 +31,42 @@ function LatePolicyStatusDisplay(props) {
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
     <div data-testid="late-policy-container">
-      <Text size="medium">{I18n.t('Late Policy:')}</Text>
-      <Tooltip
-        tip={
-          <LatePolicyToolTipContent
-            attempt={attempt}
-            grade={grade}
-            gradingType={gradingType}
-            originalGrade={originalGrade}
-            pointsDeducted={pointsDeducted}
-            pointsPossible={pointsPossible}
-          />
-        }
-        as={Link}
-        on={['hover', 'focus']}
-        placement="start"
-        href="#"
-      >
-        <ScreenReaderContent>
-          {I18n.t(
-            {one: 'Late Policy: minus 1 Point', other: 'Late Policy: minus %{count} Points'},
-            {count: props.pointsDeducted}
-          )}
-        </ScreenReaderContent>
-        <Text aria-hidden="true" size="medium">
-          {I18n.t({one: '-1 Point', other: '-%{count} Points'}, {count: props.pointsDeducted})}
-        </Text>
-      </Tooltip>
+      <Flex justifyItems="end">
+        <FlexItem padding="none xxx-small none none">
+          <Text size="medium">{I18n.t('Late Policy:')}</Text>
+        </FlexItem>
+        <FlexItem>
+          <Tooltip
+            tip={
+              <LatePolicyToolTipContent
+                attempt={attempt}
+                grade={grade}
+                gradingType={gradingType}
+                originalGrade={originalGrade}
+                pointsDeducted={pointsDeducted}
+                pointsPossible={pointsPossible}
+              />
+            }
+            on={['hover', 'focus']}
+            placement="start"
+          >
+            <Button href="#" variant="link" theme={{mediumPadding: '0', mediumHeight: 'normal'}}>
+              <ScreenReaderContent>
+                {I18n.t(
+                  {one: 'Late Policy: minus 1 Point', other: 'Late Policy: minus %{count} Points'},
+                  {count: props.pointsDeducted}
+                )}
+              </ScreenReaderContent>
+              <Text aria-hidden="true" size="medium">
+                {I18n.t(
+                  {one: '-1 Point', other: '-%{count} Points'},
+                  {count: props.pointsDeducted}
+                )}
+              </Text>
+            </Button>
+          </Tooltip>
+        </FlexItem>
+      </Flex>
     </div>
   )
 }

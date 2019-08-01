@@ -25,7 +25,7 @@ import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatH
 function AccessibleTipContent(props) {
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
-    <ScreenReaderContent data-test-id="late-policy-accessible-tip-content">
+    <ScreenReaderContent data-testid="late-policy-accessible-tip-content">
       {I18n.t('Attempt %{attempt}: %{grade}', {
         attempt,
         grade: GradeFormatHelper.formatGrade(originalGrade, {

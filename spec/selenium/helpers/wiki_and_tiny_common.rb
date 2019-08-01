@@ -301,4 +301,25 @@ module WikiAndTinyCommon
       select_all_wiki
     end
   end
+
+  def rce_wysiwyg_state_setup(course, text = "1\n2\n3", html: false)
+    visit_front_page_edit(course)
+    wait_for_tiny(edit_wiki_css)
+
+    if html
+      f('button[title="Switch to raw html editor"]').click
+      in_frame tiny_rce_ifr_id do
+        tinyrce_element = f("body")
+        tinyrce_element.send_keys(text)
+      end
+      f('button[title="Switch to rich text editor"]').click
+    else
+      in_frame tiny_rce_ifr_id do
+        tinyrce_element = f("body")
+        tinyrce_element.click
+        tinyrce_element.send_keys(text)
+      end
+    end
+    select_all_wiki
+  end
 end

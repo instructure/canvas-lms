@@ -105,15 +105,16 @@ export default class PostPolicies {
 
   showAssignmentPostingPolicyTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
-    const {anonymous_grading, id, moderated_grading, name, post_manually} = assignment
+    const {id, name} = assignment
 
     this._assignmentPolicyTray.show({
       assignment: {
-        anonymousGrading: anonymous_grading,
+        anonymousGrading: assignment.anonymous_grading,
+        gradesPublished: assignment.grades_published,
         id,
-        moderatedGrading: moderated_grading,
+        moderatedGrading: assignment.moderated_grading,
         name,
-        postManually: post_manually
+        postManually: assignment.post_manually
       },
       onAssignmentPostPolicyUpdated: this._onAssignmentPostPolicyUpdated,
       onExited

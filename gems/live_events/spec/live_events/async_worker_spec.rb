@@ -19,42 +19,86 @@
 require 'spec_helper'
 
 describe LiveEvents::AsyncWorker do
+  let(:put_records_return) { [] }
+  let(:stream_client) { double(stream_name: stream_name) }
+  let(:stream_name) { 'stream_name_x' }
+  let(:event_name) { 'event_name' }
+  let(:event) do
+    {
+      event_name: event_name,
+      event_time: Time.now.utc.iso8601(3),
+      attributes: attributes,
+      body: payload
+    }
+  end
+  let(:partition_key) { SecureRandom.uuid }
+  let(:payload) do
+    {
+      event: 1234
+    }
+  end
+  let(:attributes) do
+    {
+      event_name: 'event1'
+    }
+  end
+
+  class LELogger
+    def info(data)
+      data
+    end
+
+    def error(data)
+      data
+    end
+  end
+
   before(:each) do
     LiveEvents.max_queue_size = -> { 100 }
-    @worker = LiveEvents::AsyncWorker.new(false)
-    allow(LiveEvents.logger).to receive(:info)
+    LiveEvents.logger = LELogger.new
+    @worker = LiveEvents::AsyncWorker.new(false, stream_client: stream_client, stream_name: stream_name)
     allow(@worker).to receive(:at_exit)
   end
 
   describe "push" do
     it "should execute stuff pushed on the queue" do
-      fired = false
+      results_double = double
+      results = OpenStruct.new(records: results_double)
+      expect(results_double).to receive(:each_with_index).and_return([])
+      allow(stream_client).to receive(:put_records).and_return(results)
 
-      @worker.push -> { fired = true }
+      @worker.push event, partition_key
 
       @worker.start!
       @worker.stop!
+    end
 
-      expect(fired).to be true
+    it "should batch write" do
+      results_double = double
+      results = OpenStruct.new(records: results_double)
+      expect(results_double).to receive(:each_with_index).and_return([])
+      allow(stream_client).to receive(:put_records).once.and_return(results)
+      @worker.start!
+
+      4.times { @worker.push event, partition_key }
+
+      @worker.stop!
     end
 
     it "should reject items when queue is full" do
       LiveEvents.max_queue_size = -> { 5 }
-      5.times { expect(@worker.push -> {}).to be_truthy }
+      5.times { expect(@worker.push(event, partition_key)).to be_truthy }
 
-      expect(@worker.push -> {}).to be false
+      expect(@worker.push(event, partition_key)).to be false
     end
   end
 
   describe "exit handling" do
-
     it "should drain the queue" do
-      fired = false
-      @worker.push -> { fired = true }
+      @worker.push(event, partition_key)
       expect(@worker).to receive(:at_exit).and_yield
       @worker.start!
-      expect(fired).to be true
+      @worker.send(:at_exit)
     end
   end
 end
-

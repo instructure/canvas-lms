@@ -2345,7 +2345,7 @@ class Course < ActiveRecord::Base
       :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_total_grade_as_points, :allow_final_grade_override,
-      :open_enrollment,
+      :open_enrollment, :filter_speed_grader_by_student_group,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
@@ -2448,6 +2448,7 @@ class Course < ActiveRecord::Base
   end
 
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)
+  # returns a scope for enrollments
   def apply_enrollment_visibility(scope, user, section_ids=nil, include: [])
     include = Array(include)
     if section_ids
@@ -2949,6 +2950,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
+  add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
@@ -3324,10 +3326,9 @@ class Course < ActiveRecord::Base
   end
 
   def quiz_lti_tool
-    query = { tool_id: 'Quizzes 2' }
-    context_external_tools.active.find_by(query) ||
-      account.context_external_tools.active.find_by(query) ||
-        root_account.context_external_tools.active.find_by(query)
+    context_external_tools.active.quiz_lti.first ||
+      account.context_external_tools.active.quiz_lti.first ||
+        root_account.context_external_tools.active.quiz_lti.first
   end
 
   def find_or_create_progressions_for_user(user)
@@ -3365,6 +3366,10 @@ class Course < ActiveRecord::Base
 
   def allow_final_grade_override?
     feature_enabled?(:final_grades_override) && allow_final_grade_override == "true"
+  end
+
+  def filter_speed_grader_by_student_group?
+    filter_speed_grader_by_student_group && feature_enabled?(:new_gradebook)
   end
 
   def moderators

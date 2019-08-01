@@ -18,8 +18,6 @@
 require File.expand_path('../../../spec_helper', File.dirname(__FILE__))
 require_dependency "canvas/oauth/client_credentials_provider"
 
-RSA_KEY_PAIR = Lti::RSAKeyPair.new
-
 module Canvas::Oauth
   describe ClientCredentialsProvider do
     let(:provider) { described_class.new jws, 'example.com' }
@@ -27,7 +25,8 @@ module Canvas::Oauth
     let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
     let(:iat) { 1.minute.ago.to_i }
     let(:exp) { 10.minutes.from_now.to_i }
-    let(:signing_key) { JSON::JWK.new(RSA_KEY_PAIR.to_jwk) }
+    let(:rsa_key_pair) { Lti::RSAKeyPair.new }
+    let(:signing_key) { JSON::JWK.new(rsa_key_pair.to_jwk) }
     let(:jwt) do
       {
         iss: 'someiss',
@@ -39,9 +38,81 @@ module Canvas::Oauth
       }
     end
     let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
-    let_once(:dev_key) { DeveloperKey.create! public_jwk: RSA_KEY_PAIR.public_jwk }
+    let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
 
     before { Rails.application.routes.default_url_options[:host] = 'example.com' }
+
+    describe 'using public jwk url' do
+      subject { provider.valid? }
+
+      let(:url) { "https://get.public.jwk" }
+      let(:public_jwk_url_response) do
+        {
+          keys: [
+            rsa_key_pair.public_jwk
+          ]
+        }
+      end
+      let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
+
+      context 'when there is no public jwk' do
+        before do
+          dev_key.update!(public_jwk: nil, public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq true
+        end
+      end
+
+      context 'when there is a public jwk' do
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq true
+        end
+      end
+
+      context 'when an empty object is returned' do
+        let(:public_jwk_url_response) { {} }
+
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq false
+        end
+      end
+
+      context 'when the url is not valid giving a 404' do
+        let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
+
+        before do
+          dev_key.update!(public_jwk_url: url)
+        end
+
+        let(:public_jwk_url_response) do
+          {
+            success?: false, code: '404'
+          }
+        end
+
+        it do
+          expected_url_called(url, :get, stubbed_response)
+          is_expected.to eq false
+        end
+      end
+
+      def expected_url_called(url, type, response)
+        expect(HTTParty).to receive(type).with(url).and_return(response)
+      end
+    end
 
     describe 'generate_token' do
       subject { provider.generate_token }

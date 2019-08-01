@@ -130,5 +130,27 @@ describe BrokenLinkHelper, type: :controller do
       attachment_model(context: @course).update_attributes(file_state: 'deleted')
       expect(error_type(@course, "/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :deleted
     end
+
+    it "should return :inaccessible for group links the user doesn't have access to" do
+      group_category(context: @course)
+      group(group_category: @group_category, context: @course)
+      wiki_page_model(context: @group)
+      response.status = 401
+      expect(error_type(@course, "/groups/#{@group.id}/pages/#{@page.url}")).to eq :inaccessible
+      response.status = 403
+      expect(error_type(@course, "/groups/#{@group.id}/pages/#{@page.url}")).to eq :inaccessible
+    end
+
+    it "should return :missing_item when the user got a 404 and the URL is valid in Canvas" do
+      group_category(context: @course)
+      group(group_category: @group_category, context: @course)
+      wiki_page_model(context: @group)
+      response.status = 404
+      expect(error_type(@course, "/groups/#{@group.id}/pages/#{@page.url}")).to eq :missing_item
+    end
+
+    it "should return :missing_item when the user got to a route that doesn't exist in Canvas" do
+      expect(error_type(@course, "/yo")).to eq :missing_item
+    end
   end
 end

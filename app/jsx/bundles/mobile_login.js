@@ -20,10 +20,8 @@ import I18n from 'i18n!pseudonyms_mobile_login'
 import signupDialog from 'compiled/registration/signupDialog'
 
 const eventToBindTo = ('ontouchstart' in window) ? 'touchstart' : 'click'
-document.addEventListener('DOMContentLoaded', () => {
-  setupForgotPassword()
-  setupParentSignup()
-})
+setupForgotPassword()
+setupParentSignup()
 
 function setupParentSignup () {
   const element = document.querySelector('#coenrollment_link a')

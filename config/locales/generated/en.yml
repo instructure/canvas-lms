@@ -3045,11 +3045,14 @@ en:
       no_subject: No subject
       reply: Reply
       more_options: More options
+      message_actions: Message actions
       reply_all: Reply all
       forward: Forward
       delete: Delete
     message_item:
+      reply: Reply
       more_options: More options
+      message_actions: Message actions
       reply_all: Reply all
       forward: Forward
       delete: Delete
@@ -5470,6 +5473,7 @@ en:
         multiple_attempts: Multiple Attempts
         score_to_keep: Score to Keep
         attempts: Attempts
+        unlimited: Unlimited
         view_responses: View Responses
         show_correct_answers: Show Correct Answers
         code: Access Code
@@ -8725,7 +8729,24 @@ en:
   final_letter_grade_80dccec1: Final Letter Grade
   enrollment_state_ac62019b: Enrollment State
   enrollment_role_f5d985a7: Enrollment Role
+  student_submissions_910da1b3: Student Submissions
+  the_term_to_report_on_5f586e7c: The term to report on
+  the_beginning_date_for_submissions_9d890f3b: The beginning date for submissions
+  the_end_date_for_submissions_66168efa: The end date for submissions
+  include_unsubmitted_and_deleted_submissions_101225c7: Include unsubmitted and deleted submissions
   include_unpublished_assignments_83ebbaec: Include Unpublished Assignments
+  teacher_engagement_report_ec03613d: Teacher Engagement Report
+  student_engagement_report_bf958028: Student Engagement Report
+  either_course_or_student_c42bb055: Either 'course' or 'student'
+  the_course_to_report_on_defaults_to_canvas_id_unle_9e1d8f79: The course to report on; defaults to Canvas id unless specified as SIS in course_id_type
+  set_value_to_sis_if_using_sis_id_default_search_is_ab3d05f2: set value to 'SIS' if using sis id, default search is Canvas id
+  the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: The student to report on; defaults to Canvas id unless specified as SIS in student_id_type
+  the_term_to_report_on_needed_for_report_type_stude_623bffbc: The term to report on (needed for report_type student only)
+  ilumno_grade_export_251bc4b5: Ilumno Grade Export
+  the_beginning_date_for_the_courses_to_report_on_9c224177: The beginning date for the courses to report on
+  the_beginning_date_range_for_the_courses_to_report_82353138: The beginning date range for the courses to report on
+  the_ending_date_for_the_courses_to_report_on_1c417d5e: The ending date for the courses to report on
+  the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: The ending date range for the courses to report on
   orbis_report_header_canvas_course_id: course id
   orbis_report_header_course_sis_id: course sis id
   orbis_report_header_course_name: course name
@@ -8949,6 +8970,7 @@ en:
   liveassessments_92d9edc0: LiveAssessments
   logins_9aee0cbe: Logins
   modules_c4325335: Modules
+  names_and_role_ebff0149: Names and Role
   notification_preferences_cf47083d: Notification Preferences
   originality_reports_1e36b935: Originality Reports
   outcome_groups_3bc3b150: Outcome Groups
@@ -10738,9 +10760,15 @@ en:
   invalid_utf_8_13c76a6: Invalid UTF-8
   couldn_t_find_canvas_csv_import_headers_487f1b6c: Couldn't find Canvas CSV import headers
   skipping_unknown_file_type_cd1086ee: Skipping unknown file type
+  no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: No existing user provided for login with SIS ID %{user_id}
+  sis_id_4495a887: SIS ID
+  canvas_id_f42f6ad: Canvas ID
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping
+  an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: An existing Canvas user with the SIS ID %{user_id} or login of %{login} already exists, skipping
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping
+  could_not_find_the_existing_user_for_login_with_si_6968e3e6: Could not find the existing user for login with SIS ID %{user_id}, skipping
+  an_existing_user_does_not_match_existing_user_ids__156c7a52: An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: Cannot set the due date to a date within a closed grading period
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: Cannot change the due date when due in a closed grading period
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: Cannot change the due date to a date within a closed grading period
@@ -10783,6 +10811,7 @@ en:
   students_are_attempting_to_access_unpublished_cont_be329862: Students are attempting to access unpublished content, %{bad_link}, in %{asset_link}.
   students_are_clicking_on_bad_link_to_content_that__d9c51d0d: Students are clicking on %{bad_link} to content that has been removed in %{asset_link}.
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: In %{asset_link}, students are clicking %{bad_link} to content in a different course.
+  in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: In %{asset_link}, students are clicking %{bad_link} to content they cannot access.
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course.
   to_check_for_other_broken_links_visit_validator_li_e350c852: To check for other broken links, visit %{validator_link}
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: To check for other broken links, visit the %{validator_link}
@@ -10790,6 +10819,7 @@ en:
   canvas_alert_students_are_attempting_to_access_unp_be207cdc: Canvas Alert - Students are attempting to access unpublished content, %{bad_link}, in %{asset_link}.
   canvas_alert_students_are_clicking_on_bad_link_to__d5e1e282: Canvas Alert - Students are clicking on %{bad_link} to content that has been removed in %{asset_link}.
   canvas_alert_in_asset_link_students_are_clicking_b_da080154: Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content in a different course.
+  canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content they cannot access.
   canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course.
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}, you just sent a message in Canvas."
   user_name_you_just_sent_a_message_in_canvas_do_not_7c7bc1c6: "%{user_name}, you just sent a message in Canvas - Do not reply"
@@ -11424,6 +11454,8 @@ en:
   changing_course_dates_may_override_term_availabili_d92b10de: Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates.
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: When selected, the course is in a read-only state outside these dates.
   when_selected_the_course_is_inaccessible_outside_c_af595406: When selected, the course is inaccessible outside course dates. If the course dates are blank, these start and end dates apply to the term dates.
+  large_course_db3d58b: 'Large Course:'
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: Launch SpeedGrader Filtered by Student Group
   creative_commons_licenses_7d557d9a: Creative Commons Licenses
   course_visibility_options_ca8ab3a8: Course Visibility Options
   syllabus_visibility_options_a81ef419: Syllabus Visibility Options
@@ -12270,6 +12302,10 @@ en:
   course_implemented_apps_fa658f5a: Course Implemented Apps
   include_unpublished_courses_7a0e7aab: Include Unpublished Courses
   course_canvas_id_9e36b24c: Course Canvas ID
+  this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
+    This is a report of all students enrolled in a course in a given term that
+    have submitted an assignment. This report contains one row per student
+      submission.
   include_unsubmitted_deleted_submissions_99fc2aad: Include Unsubmitted & Deleted Submissions
   course_sis_id_sis_id_or_canvas_id_4d323f5c: 'Course SIS ID (SIS_ID:####) OR Canvas ID: (###)'
   start_dates_8f1c22a8: 'Start Dates:'
@@ -12278,12 +12314,15 @@ en:
   end_dates_249d8dbb: 'End Dates:'
   end_date_from_cdd9d90: 'End Date From:'
   end_date_to_8b17929d: 'End Date To:'
+  this_report_shows_the_student_final_grade_results__5a508b55: This report shows the student final grade results for all students in a given term. The resulting CSV file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook.
+  this_report_displays_student_engagement_activity_c1d96b5c: This report displays student engagement activity.
   alumno_88c80e37: Alumno
   curso_f0ee9b5: Curso
   id_del_curso_4ef15337: ID del Curso
   sis_del_curso_bf9d61ae: SIS del Curso
   id_del_alumno_bc4bcf8a: ID del Alumno
   sis_del_alumno_716babc5: SIS del Alumno
+  this_report_displays_teacher_engagement_activity_f_5888d45b: This report displays teacher engagement activity for each teacher enrollment.
   demos:
     demos_add:
       labels:
@@ -13195,6 +13234,7 @@ en:
       courses: 'Courses: %{course_count}'
       sections: 'Sections: %{section_count}'
       users: 'Users: %{user_count}'
+      logins: 'Logins: %{login_count}'
       enrollments: 'Enrollments: %{enrollment_count}'
       crosslists: 'Crosslists: %{crosslist_count}'
       admins: 'Admins: %{admin_count}'
@@ -14712,7 +14752,6 @@ en:
   search_term_must_be_at_least_num_characters_669098ed: Search term must be at least %{num} characters
   click_to_sort_by_name_ascending_739c011e: Click to sort by name ascending
   click_to_sort_by_name_descending_b6262093: Click to sort by name descending
-  sis_id_4495a887: SIS ID
   click_to_sort_by_sis_id_ascending_832c870: Click to sort by SIS ID ascending
   click_to_sort_by_sis_id_descending_2d611236: Click to sort by SIS ID descending
   click_to_sort_by_term_ascending_c3ef1eb7: Click to sort by term ascending
@@ -15022,9 +15061,6 @@ en:
   ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
   ungraded_147a0dce: ungraded
   points_e63de520: " Points"
-  assignments_2_student_submission_preview_query_err_877af754: Assignments 2 Student submission preview query error
-  assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
-  assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
   attempt_attempt_grade_c01f45df: 'Attempt %{attempt}: %{grade}'
   late_penalty_minus_count_points_810572fe:
     one: 'Late Penalty: minus 1 Point'
@@ -15053,6 +15089,8 @@ en:
   not_graded_yet_82f63c67: Not Graded Yet
   unavailable_46d2c344: Unavailable
   new_attempt_57eae3d9: New Attempt
+  assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
+  assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
   failed_to_laod_more_submissions_990aacee: Failed to laod more submissions
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
@@ -15643,6 +15681,9 @@ en:
   text_7f4593da: Text
   selection_height_9d57ec24: Selection Height
   selection_width_183acd79: Selection Width
+  privacy_level_f0ec09a3: Privacy Level
+  public_a749f507: Public
+  private_3883d133: Private
   placement_values_c0a2cf56: Placement Values
   this_placement_requires_deep_link_support_by_the_v_702d554f: This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality
   request_values_89976f2c: Request Values
@@ -15659,7 +15700,8 @@ en:
   description_61f4296: "* Description"
   target_link_uri_bbed67d1: "* Target Link URI"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect Initiation Url"
-  public_jwk_44d1e8a9: "* Public JWK"
+  jwk_method_6d5d0c84: "* JWK Method"
+  public_jwk_url_b5564c1d: Public JWK URL
   lti_advantage_services_c1746cb4: LTI Advantage Services
   services_must_be_supported_by_the_tool_in_order_to_1f194a36: Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.
   check_services_to_enable_8877c451: Check Services to enable
@@ -15689,10 +15731,7 @@ en:
   api_key_eeeb2167: API Key
   lti_key_14ad02b1: LTI Key
   other_options_d25f199c: Other Options
-  privacy_level_f0ec09a3: Privacy Level
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: A Public privacy level will send the launching user's personally identifying information to the tool provider. Setting this to Private may adversely affect tools that depend on that information.
-  private_3883d133: Private
-  public_a749f507: Public
   disable_scope_6ba4e4d4: Disable scope
   enable_scope_ac28b832: Enable scope
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: Clicking the checkbox will cause scopes table to disappear below
@@ -15712,7 +15751,6 @@ en:
   paste_json_26ad8050: Paste JSON
   enter_url_e8bb8a33: Enter URL
   configure_ecb97e30: Configure
-  3_options_available_use_arrow_keys_to_navigate_opt_d8cf9db6: 3 options available. Use arrow keys to navigate options.
   next_message_780bcf24: Next Message
   previous_message_8804f87e: Previous Message
   edit_current_message_da650d4c: Edit Current Message
@@ -18031,12 +18069,6 @@ en:
   starred_no_subject_click_to_unstar_bff04bce: Starred "(No subject)", Click to unstar.
   not_starred_no_subject_click_to_star_adfefe93: '''Not starred "(No Subject)", Click to star.'
   open_message_d7b12975: Open Message
-  reply_to_conversation_subject_4b2e6fe7: Reply to conversation %{subject}
-  reply_to_conversation_f1aa0d4: Reply to conversation
-  message_actions_for_conversation_subject_fdb54c88: Message actions for conversation %{subject}
-  message_actions_for_conversation_d29b26cc: Message actions for conversation
-  reply_to_bodyhtml_7a27da28: Reply to %{bodyHTML}
-  message_actions_for_bodyhtml_bae2de92: Message actions for %{bodyHTML}
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: This attachment has been unpublished by the author.
   calendar_event_89aadc1c: Calendar Event
   due_by_c263dc10: due by

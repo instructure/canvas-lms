@@ -39,7 +39,7 @@ function LatePolicyToolTipContent(props) {
       />
       <Flex
         aria-hidden="true"
-        data-test-id="late-policy-tip-content"
+        data-testid="late-policy-tip-content"
         margin="x-small"
         direction="column"
       >

@@ -1323,6 +1323,9 @@ class CoursesController < ApplicationController
   # @argument allow_student_organized_groups [Boolean]
   #   Let students organize their own groups
   #
+  # @argument filter_speed_grader_by_student_group [Boolean]
+  #   Filter SpeedGrader to only the selected student group
+  #
   # @argument hide_final_grades [Boolean]
   #   Hide totals in student grades summary
   #
@@ -1360,6 +1363,7 @@ class CoursesController < ApplicationController
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
+      :filter_speed_grader_by_student_group,
       :show_total_grade_as_points,
       :allow_student_organized_groups,
       :hide_final_grades,
@@ -3155,7 +3159,7 @@ class CoursesController < ApplicationController
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus,
       :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
-      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override
+      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group
     )
   end
 end

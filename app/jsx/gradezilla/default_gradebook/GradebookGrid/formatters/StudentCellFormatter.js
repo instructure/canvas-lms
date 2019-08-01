@@ -22,7 +22,9 @@ import 'jquery.instructure_misc_helpers' // $.toSentence
 
 function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
-    const sectionNames = student.sections.map(sectionId => options.getSection(sectionId).name)
+    const sectionNames = student.sections
+      .filter(options.isVisibleSection)
+      .map(sectionId => options.getSection(sectionId).name)
     return $.toSentence(sectionNames.sort())
   }
 
@@ -96,6 +98,9 @@ export default class StudentCellFormatter {
       },
       getSelectedSecondaryInfo() {
         return gradebook.getSelectedSecondaryInfo()
+      },
+      isVisibleSection(sectionId) {
+        return gradebook.sections[sectionId] != null
       },
       shouldShowSections() {
         return gradebook.showSections()

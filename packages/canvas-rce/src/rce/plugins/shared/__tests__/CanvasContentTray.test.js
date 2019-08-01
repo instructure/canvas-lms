@@ -75,7 +75,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       expect(getTrayLabel()).toEqual('Course Images')
     })
 
-    it('is labeled with "Course Media" when using the "media" content type', async () => {
+    it.skip('is labeled with "Course Media" when using the "media" content type', async () => {
       await showTrayForPlugin('media')
       expect(getTrayLabel()).toEqual('Course Media')
     })

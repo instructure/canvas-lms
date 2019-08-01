@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "Alternatieve tekst:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Er is een fout opgetreden tijdens het genereren van het bestandsvoorbeeld"
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "Bezig met het uploaden van een afbeelding. Als je doorgaat, wordt de afbeelding niet goed ingebed."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "Opdrachten"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Wordt automatisch geopend in een in-line voorbeeld. (Voorbeeld wordt pas na het opslaan weergegeven)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "ongeordende lijst omcirkelen"
   },
+  "clear_selected_file_82388e50": {
+    "message": "Verwijder geselecteerd bestand"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Op een bestand klikken om een link voor het downloaden van dat bestand in te voegen."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klik om een koppeling in dit item in te voegen"
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Sluit een menu of dialoogvenster. Hierdoor keert u bovendien terug naar het editorgebied"
   },
   "close_d634289d": {
     "message": "Sluiten"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "Cursuslinks"
   },
-  "course_media_ec759ad": {
-    "message": "Cursusmedia"
-  },
   "course_navigation_dd035109": {
     "message": "Cursusnavigatie"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(Beschrijf de afbeelding)"
   },
+  "directionality_ebcae6d0": {
+    "message": "richting"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "In-line voorbeeld uitschakelen."
+  },
   "discussions_a5f96392": {
     "message": "Discussies"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "Gereed"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "Sleep een bestand hierheen"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Slepen en neerzetten of klikken om je computer te doorzoeken"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Sleep de handgreep. Gebruik de pijltoetsen-omhoog en -omlaag om de grootte te wijzigen"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Inleverdatum: Meerdere datums"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "Link bewerken"
   },
+  "embed_828fac4a": {
+    "message": "Insluiten"
+  },
   "embed_image_1080badc": {
     "message": "Afbeelding insluiten"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "Optiegebied insluiten"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Voorbeeld insluiten"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "Videocode insluiten"
   },
   "enter_search_terms_e397b1f0": {
     "message": "zoektermen invoeren"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "Formulier voor bestand uploaden"
   },
+  "file_url_c12b64be": {
+    "message": "Bestands-URL"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "{ filename } bestandspictogram"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "{ filename } afbeeldingsvoorbeeld"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "{ filename } tekstvoorbeeld"
+  },
   "files_c300e900": {
     "message": "Bestanden"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "Voltooien"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Focus op de popup-contextwerkbalk"
+  },
   "folder_705fd2d7": {
     "message": "Map"
+  },
+  "generating_preview_45b53be0": {
+    "message": "Bezig met genereren van voorbeeld..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Ga naar de werkbalk van de editor"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Ga naar de werkbalk van de editor"
   },
   "grades_a61eba0a": {
     "message": "Cijfers"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "Ongeldig bestandstype"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Sneltoetsen"
+  },
   "large_9c5e80e7": {
     "message": "Groot"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "links naar rechts"
+  },
   "link_7262adec": {
     "message": "Koppeling"
+  },
+  "link_options_a16b758b": {
+    "message": "Linkopties"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "Koppelen aan een nieuwe pagina"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "Laden mislukt..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "Laden mislukt."
+  },
   "loading_folders_8d4d5d5a": {
     "message": "Mappen laden..."
   },
   "loading_media_f3455841": {
     "message": "Laden van media"
-  },
-  "media_af190855": {
-    "message": "Media"
   },
   "medium_5a8e9ead": {
     "message": "Medium"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "Modules"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Navigeer door het menu of de werkbalk"
+  },
+  "next_page_d2a39853": {
+    "message": "Volgende pagina"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Geen Alt-tekst (decoratieve afbeelding)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "Geen video"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Open dit dialoogvenster met sneltoetsen"
+  },
   "options_3ab0ea65": {
     "message": "Opties"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Geordende en ongeordende lijsten"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Andere editorsnelkoppelingen zijn te vinden op"
   },
   "pages_e5414c2c": {
     "message": "Pagina''s"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "VOORBEELD"
   },
+  "previous_page_928fc112": {
+    "message": "Vorige pagina"
+  },
   "published_c944a23d": {
     "message": "gepubliceerd"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "Rich Content Editor"
   },
+  "right_to_left_ec223c81": {
+    "message": "rechts naar links"
+  },
   "save_11a80ec3": {
     "message": "Opslaan"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Zoeken in Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "Zoekterm"
+  },
   "select_a_file_53ba40ac": {
     "message": "Selecteer een bestand"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Selecteer een map om je bestand te uploaden"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Ingesloten opties weergeven"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Afbeeldingsopties weergeven"
+  },
+  "show_link_options_545338fd": {
+    "message": "Linkopties weergeven"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Video-opties weergeven"
   },
   "size_b30e1077": {
     "message": "Grootte"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "Syllabus"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "TAB/pijlen"
+  },
+  "text_7f4593da": {
+    "message": "Tekst"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Het materiaal bevindt zich in het openbaar domein"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "Een nieuwe afbeelding uploaden"
   },
+  "upload_document_253f0478": {
+    "message": "Document uploaden"
+  },
   "upload_file_fd2361b8": {
     "message": "Bestand uploaden"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "Video-/audio-opname geüpload"
+  },
+  "video_options_24ef6e5d": {
+    "message": "Video-opties"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "Gebied met video-opties"
   },
   "video_player_b371005": {
     "message": "Videospeler"

@@ -23,6 +23,9 @@
   "cancel_image_upload_2c771950": {
     "message": "Cancel image upload"
   },
+  "canvas_plugins_705a5016": {
+    "message": "افزونه های کانواس"
+  },
   "cc_attribution_f6de631f": {
     "message": "ارجاع کریتیو کامنز"
   },
@@ -191,9 +194,6 @@
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
-  "media_af190855": {
-    "message": "رسانه"
-  },
   "modules_c4325335": {
     "message": "ماژول ها"
   },
@@ -244,6 +244,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "selected_274ce24f": {
+    "message": "انتخاب شده"
   },
   "size_b30e1077": {
     "message": "اندازه"

@@ -34,6 +34,10 @@ export default function Image({focusRef, image, onClick}) {
     dragHtml(event, renderImageHtml(image))
   }
 
+  function handleDragEnd() {
+    document.body.click()
+  }
+
   function handleImageClick(event) {
     event.preventDefault()
     onClick(image)
@@ -67,6 +71,7 @@ export default function Image({focusRef, image, onClick}) {
           height="6rem"
           inline={false}
           onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
           src={image.thumbnail_url}
           title={imgTitle}
           width="6rem"

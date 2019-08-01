@@ -327,8 +327,8 @@ export const AssignmentShape = shape({
   allowedAttempts: number,
   allowedExtensions: arrayOf(string),
   assignmentGroup: shape({
-    name: string.isRequired
-  }).isRequired,
+    name: string
+  }),
   env: shape({
     assignmentUrl: string.isRequired,
     moduleUrl: string.isRequired,

@@ -23,6 +23,8 @@ require 'active_support/core_ext/object/blank'
 
 module LiveEvents
   class Client
+    attr_reader :stream_name, :stream_client
+
     def self.config
       res = LiveEvents.settings
       return nil unless res && !res['kinesis_stream_name'].blank? &&
@@ -31,10 +33,10 @@ module LiveEvents
       res.dup
     end
 
-    def initialize(config = nil, stream_client = nil)
+    def initialize(config = nil, aws_stream_client = nil, aws_stream_name = nil)
       config ||= LiveEvents::Client.config
-      @stream_client = stream_client || Aws::Kinesis::Client.new(Client.aws_config(config))
-      @stream_name = config['kinesis_stream_name']
+      @stream_client = aws_stream_client || Aws::Kinesis::Client.new(Client.aws_config(config))
+      @stream_name = aws_stream_name || config['kinesis_stream_name']
     end
 
     def self.aws_config(plugin_config)
@@ -79,22 +81,7 @@ module LiveEvents
       # let it be the user_id when that's available.
       partition_key ||= (ctx["user_id"] && ctx["user_id"].try(:to_s)) || rand(1000).to_s
 
-      event_json = event.to_json
-
-      job = proc do
-        begin
-          @stream_client.put_record(stream_name: @stream_name,
-                              data: event_json,
-                              partition_key: partition_key)
-
-          LiveEvents&.statsd&.increment("#{statsd_prefix}.sends")
-        rescue => e
-          LiveEvents.logger.error("Error posting event #{e} event: #{event_json}")
-          LiveEvents&.statsd&.increment("#{statsd_prefix}.send_errors")
-        end
-      end
-
-      unless LiveEvents.worker.push(job)
+      unless LiveEvents.worker.push(event, partition_key)
         LiveEvents.logger.error("Error queueing job for worker event: #{event_json}")
         LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors")
       end

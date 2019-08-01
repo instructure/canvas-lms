@@ -25,7 +25,7 @@ describe "accounts/_sis_batch_counts.html.erb" do
     data = {counts: {xlists: 2, enrollments: 3, courses: 5, users: 6, terms: 6,
                      group_memberships: 7, group_categories: 2, groups: 8,
                      sections: 9, accounts: 10, admins: 1, user_observers: 3,
-                     change_sis_ids: 3}}
+                     change_sis_ids: 3, logins: 0}}
     report = double()
     expect(report).to receive(:data).and_return(data)
     render :partial => 'accounts/sis_batch_counts', :object => report

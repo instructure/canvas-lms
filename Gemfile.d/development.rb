@@ -16,14 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :development do
-  gem 'letter_opener', '1.6.0'
-  gem 'spring', '2.0.2'
+  gem 'letter_opener', '1.7.0'
+  gem 'spring', '2.1.0'
   gem 'spring-commands-rspec', '1.0.4'
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '11.0.0', platform: :mri
+    gem 'byebug', '11.0.1', platform: :mri
   end
 end

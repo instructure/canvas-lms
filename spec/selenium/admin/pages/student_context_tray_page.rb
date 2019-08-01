@@ -30,7 +30,7 @@ module StudentContextTray
     end
 
     def student_name_link
-      f(".StudentContextTray-Header__NameLink a")
+      f(".StudentContextTray-Header__Name a")
     end
 
     def todo_tray_course_selector

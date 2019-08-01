@@ -1017,6 +1017,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :tabs) do
+      get "accounts/:account_id/tabs", action: :index, as: 'account_tabs'
       get "courses/:course_id/tabs", action: :index, as: 'course_tabs'
       get "groups/:group_id/tabs", action: :index, as: 'group_tabs'
       put "courses/:course_id/tabs/:tab_id", action: :update
@@ -1056,6 +1057,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :terms_api) do
       get 'accounts/:account_id/terms', action: :index, as: 'enrollment_terms'
+      get 'accounts/:account_id/terms/:id', action: :show, as: 'enrollment_term'
     end
 
     scope(controller: :terms) do

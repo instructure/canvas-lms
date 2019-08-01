@@ -24,6 +24,7 @@ module BroadcastPolicies
       ctx = double()
       allow(ctx).to receive(:available?).and_return(true)
       allow(ctx).to receive(:concluded?).and_return(false)
+      allow(ctx).to receive(:post_policies_enabled?).and_return(false)
       ctx
     }
     let(:assignment) do
@@ -123,6 +124,11 @@ module BroadcastPolicies
 
       it 'is true when the dependent inputs are true' do
         expect(policy.should_dispatch_assignment_unmuted?).to be_truthy
+      end
+
+      it "returns false when post policies are enabled" do
+        allow(context).to receive(:post_policies_enabled?).and_return true
+        expect(policy.should_dispatch_assignment_unmuted?).to be false
       end
 
       def wont_send_when

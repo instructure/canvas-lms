@@ -132,7 +132,7 @@ describe('SubmissionIDQuery', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
+    const fileInput = await waitForElement(() => getByTestId('input-file-drop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
@@ -152,7 +152,7 @@ describe('SubmissionIDQuery', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
+    const fileInput = await waitForElement(() => getByTestId('input-file-drop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
@@ -171,7 +171,7 @@ describe('SubmissionIDQuery', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
+    const fileInput = await waitForElement(() => getByTestId('input-file-drop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
@@ -189,7 +189,7 @@ describe('SubmissionIDQuery', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
+    const fileInput = await waitForElement(() => getByTestId('input-file-drop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 
@@ -210,7 +210,7 @@ describe('SubmissionIDQuery', () => {
       </MockedProvider>
     )
 
-    const fileInput = await waitForElement(() => getByTestId('inputFileDrop'))
+    const fileInput = await waitForElement(() => getByTestId('input-file-drop'))
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
     uploadFiles(fileInput, [file])
 

@@ -449,5 +449,34 @@ describe "RCE next tests" do
 
       expect(upload_media_modal).to be_displayed
     end
+
+    it "should open upload document modal when clicking upload option" do
+      skip('Causing flakiness - CORE-3186')
+      visit_front_page_edit(@course)
+
+      click_more_toolbar_button
+      click_document_toolbar_button
+      click_upload_document
+
+      expect(upload_document_modal).to be_displayed
+    end
+
+    it "should close sidebar after drag and drop" do
+      skip("kills many selenium tests. Address in CORE-3147")
+      title = "Assignment-Title"
+      @assignment = @course.assignments.create!(:name => title)
+
+      visit_front_page_edit(@course)
+
+      click_links_toolbar_button
+      click_course_links
+      click_assignments_accordion
+
+      source = course_item_link(title)
+      dest = f('iframe.tox-edit-area__iframe')
+      driver.action.drag_and_drop(source, dest).perform
+
+      expect(f('body')).not_to contain_css('[data-testid="CanvasContentTray"]')
+    end
   end
 end

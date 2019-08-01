@@ -10,6 +10,8 @@
   <% display_text = I18n.t("Canvas Alert - Students are clicking on %{bad_link} to content that has been removed in %{asset_link}.", bad_link: bad_link, asset_link: asset_link) %>
 <% elsif data.error_type == :course_mismatch %>
   <% display_text = I18n.t("Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content in a different course.", bad_link: bad_link, asset_link: asset_link) %>
+<% elsif data.error_type == :inaccessible %>
+  <% display_text = I18n.t("Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content they cannot access.", bad_link: bad_link, asset_link: asset_link) %>
 <% else %>
   <% display_text = I18n.t("Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course.", bad_link: bad_link, asset_link: asset_link) %>
 <% end %>

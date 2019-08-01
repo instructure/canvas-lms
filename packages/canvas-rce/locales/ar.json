@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "نص بديل:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "حدث خطأ أثناء إنشاء معاينة للملف"
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "لا يزال يتم تحميل صورة، إذا استمرت مشكلة عدم تضمين الصورة بشكل سليم."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "المهام"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "قائمة دائرية غير المرتبة"
   },
+  "clear_selected_file_82388e50": {
+    "message": "مسح الملف المحدد"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "انقر فوق أي ملف لإدراج ارتباط تنزيل يؤدي إلى ذلك الملف."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "انقر لإدراج ارتباط إلى هذا العنصر."
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
   },
   "close_d634289d": {
     "message": "إغلاق"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "روابط المساق"
   },
-  "course_media_ec759ad": {
-    "message": "وسائط المساق"
-  },
   "course_navigation_dd035109": {
     "message": "التنقل عبر المساق"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(وصف الصورة)"
   },
+  "directionality_ebcae6d0": {
+    "message": "الاتجاهية"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "تعطيل المعاينة الداخلية."
+  },
   "discussions_a5f96392": {
     "message": "المناقشات"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "تم"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "إفلات ملف هنا"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "إفلات المؤشر. استخدم سهمي لأعلى ولأسفل لضبط الحجم"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "تاريخ الاستحقاق: تواريخ متعددة"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "تحرير الارتباط"
   },
+  "embed_828fac4a": {
+    "message": "تضمين"
+  },
   "embed_image_1080badc": {
     "message": "تضمين صورة"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "علبة خيارات التضمين"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "معاينة التضمين"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "رمز تضمين الفيديو"
   },
   "enter_search_terms_e397b1f0": {
     "message": "إدخال كلمات البحث"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "نموذج تحميل ملف"
   },
+  "file_url_c12b64be": {
+    "message": "عنوان URL للملف"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "أيقونة الملف { filename }"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "معاينة الصورة { filename }"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "معاينة النص { filename }"
+  },
   "files_c300e900": {
     "message": "الملفات"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "إنهاء"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "التركيز على شريط أدوات مساق النافذة المنبثقة"
+  },
   "folder_705fd2d7": {
     "message": "مجلد"
+  },
+  "generating_preview_45b53be0": {
+    "message": "جارٍ إنشاء المعاينة..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "الانتقال إلى شريط القوائم الخاص بالمحرر"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "الانتقال إلى شريط الأدوات الخاص بالمحرر"
   },
   "grades_a61eba0a": {
     "message": "الدرجات"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "نوع ملف غير صالح"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "اختصارات لوحة المفاتيح"
+  },
   "large_9c5e80e7": {
     "message": "كبير"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "من اليسار لليمين"
+  },
   "link_7262adec": {
     "message": "ارتباط"
+  },
+  "link_options_a16b758b": {
+    "message": "خيارات الارتباط"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "ارتباط إلى صفحة جديدة"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "فشل التحميل..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "فشل التحميل."
+  },
   "loading_folders_8d4d5d5a": {
     "message": "جارٍ تحميل المجلدات..."
   },
   "loading_media_f3455841": {
     "message": "جارٍ تحميل الوسائط"
-  },
-  "media_af190855": {
-    "message": "الوسائط"
   },
   "medium_5a8e9ead": {
     "message": "متوسط"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "الوحدات"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "تنقل من خلال القائمة أو شريط الأدوات"
+  },
+  "next_page_d2a39853": {
+    "message": "الصفحة التالية"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "لا يوجد نص بديل (صورة زينة)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "لا يوجد مقطع فيديو"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
+  },
   "options_3ab0ea65": {
     "message": "خيارات"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "القوائم المرتبة وغير المرتبة"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "يمكن العثور على اختصارات أخرى للمحرر على"
   },
   "pages_e5414c2c": {
     "message": "الصفحات"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "معاينة"
   },
+  "previous_page_928fc112": {
+    "message": "الصفحة السابقة"
+  },
   "published_c944a23d": {
     "message": "تم النشر"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "محرر محتوى"
   },
+  "right_to_left_ec223c81": {
+    "message": "من اليمين لليسار"
+  },
   "save_11a80ec3": {
     "message": "حفظ"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "البحث في Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "مصطلح البحث"
+  },
   "select_a_file_53ba40ac": {
     "message": "تحديد ملف"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "حدد مجلدًا لتحميل ملفك عليه"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "إظهار خيارات التضمين"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "إظهار خيارات الصورة"
+  },
+  "show_link_options_545338fd": {
+    "message": "إظهار خيارات الارتباطات"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "إظهار خيارات الفيديو"
   },
   "size_b30e1077": {
     "message": "الحجم"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "المناهج"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "ضغط/أسهم"
+  },
+  "text_7f4593da": {
+    "message": "نص"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "توجد المادة في المجال العام"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "تحميل صورة جديدة"
   },
+  "upload_document_253f0478": {
+    "message": "تحميل المستند"
+  },
   "upload_file_fd2361b8": {
     "message": "تحميل ملف"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "تم تحميل تسجيل الفيديو/الصوت"
+  },
+  "video_options_24ef6e5d": {
+    "message": "خيارات الفيديو"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "علبة خيارات الفيديو"
   },
   "video_player_b371005": {
     "message": "مشغل الفيديو"

@@ -114,7 +114,11 @@ export default function Link(props) {
   }
 
   function handleDragStart(e) {
-    dragHtml(e, renderLinkHtml(props.link));
+    dragHtml(e, renderLinkHtml(props.link, props.link.title));
+  }
+
+  function handleDragEnd(e) {
+    document.body.click() // closes the tray
   }
 
   function handleHover(e) {
@@ -126,6 +130,7 @@ export default function Link(props) {
       data-testid="instructure_links-Link"
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onMouseEnter={handleHover}
       onMouseLeave={handleHover}
       style={{position: 'relative'}}

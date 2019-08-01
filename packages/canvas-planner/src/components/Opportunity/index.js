@@ -22,7 +22,6 @@ import formatMessage from '../../format-message';
 import moment from 'moment-timezone';
 import { getFullDateAndTime } from '../../utilities/dateUtils';
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import Link from '@instructure/ui-elements/lib/components/Link';
 import Pill from '@instructure/ui-elements/lib/components/Pill';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
@@ -140,7 +139,14 @@ export class Opportunity extends Component {
             {this.props.courseName}
           </div>
           <div className={styles.title}>
-            <Link href={this.props.url} ref={this.linkRef}>{this.props.opportunityTitle}</Link>
+            <Button
+              variant="link"
+              theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+              href={this.props.url}
+              buttonRef={this.linkRef}
+              >
+                {this.props.opportunityTitle}
+              </Button>
           </div>
         </div>
         <div className={styles.footer}>

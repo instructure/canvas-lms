@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "Testo alternativo:"
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Si è verificato un errore durante la generazione dell’anteprima file"
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "Un’immagine è ancora in fase di caricamento; se continui, l’immagine non sarà incorporata in maniera corretta."
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "Compiti"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "cerchia elenco non ordinato"
   },
+  "clear_selected_file_82388e50": {
+    "message": "Cancella file selezionato"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "Fai clic su un file per inserire un link di download per il file."
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Fai clic per inserire un link a questo elemento."
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Chiudere un menu o una finestra di dialogo. Consente anche di tornare all’area dell’editor"
   },
   "close_d634289d": {
     "message": "Chiudi"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "Link al corso"
   },
-  "course_media_ec759ad": {
-    "message": "File multimediali del corso"
-  },
   "course_navigation_dd035109": {
     "message": "Esplorazione corso"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(Descrivi l’immagine)"
   },
+  "directionality_ebcae6d0": {
+    "message": "direzionalità"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "Disattivare l’anteprima in linea."
+  },
   "discussions_a5f96392": {
     "message": "Discussioni"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "Fatto"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "Trascina un file qui"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Trascina la selezione o fai clic per cercare nel tuo computer"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Trascinare la maniglia. Usa frecce su e giù per ridimensionare"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "Scadenza: Più date"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "Modifica collegamento"
   },
+  "embed_828fac4a": {
+    "message": "Incorpora"
+  },
   "embed_image_1080badc": {
     "message": "Incorpora immagine"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "Incorpora barra delle opzioni"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "Incorpora anteprima"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "Incorpora codice video"
   },
   "enter_search_terms_e397b1f0": {
     "message": "inserisci i termini di ricerca"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "Modulo caricamento file"
   },
+  "file_url_c12b64be": {
+    "message": "URL file"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "Icona file { filename }"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "Anteprima immagine { filename }"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "Anteprima testo { filename }"
+  },
   "files_c300e900": {
     "message": "File"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "Termina"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Focalizza barra degli strumenti di contesto a comparsa"
+  },
   "folder_705fd2d7": {
     "message": "Cartella"
+  },
+  "generating_preview_45b53be0": {
+    "message": "Generazione anteprima in corso..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Vai alla barra dei menu dell''editor"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Vai alla barra degli strumenti dell''editor"
   },
   "grades_a61eba0a": {
     "message": "Voti"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "Tipo file non valido"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "Scelte rapide da tastiera"
+  },
   "large_9c5e80e7": {
     "message": "Grande"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "da sinistra a destra"
+  },
   "link_7262adec": {
     "message": "Link"
+  },
+  "link_options_a16b758b": {
+    "message": "Opzioni link"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "Collega a una nuova pagina"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "Caricamento non riuscito..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "Caricamento non riuscito."
+  },
   "loading_folders_8d4d5d5a": {
     "message": "Caricamento cartelle in corso..."
   },
   "loading_media_f3455841": {
     "message": "Caricamento contenuti multimediali"
-  },
-  "media_af190855": {
-    "message": "Elementi multimediali"
   },
   "medium_5a8e9ead": {
     "message": "Medio"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "Moduli"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Naviga attraverso il menu o la barra degli strumenti"
+  },
+  "next_page_d2a39853": {
+    "message": "Pagina successiva"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Nessun testo alternativo (Immagine decorativa)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "Nessun video"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Apri questa finestra di dialogo delle scelte rapide da tastiera"
+  },
   "options_3ab0ea65": {
     "message": "Opzioni"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Elenchi ordinati e non ordinati"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Altre scorciatoie dell’editor possono essere trovate in"
   },
   "pages_e5414c2c": {
     "message": "Pagine"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "ANTEPRIMA"
   },
+  "previous_page_928fc112": {
+    "message": "Pagina precedente"
+  },
   "published_c944a23d": {
     "message": "pubblicato"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "Editor di contenuti avanzati"
   },
+  "right_to_left_ec223c81": {
+    "message": "da destra a sinistra"
+  },
   "save_11a80ec3": {
     "message": "Salva"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Cerca in Flickr"
   },
+  "search_term_b2d2235": {
+    "message": "Cerca termine"
+  },
   "select_a_file_53ba40ac": {
     "message": "Seleziona un file"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleziona una cartella in cui caricare il file"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "Mostra opzioni Incorpora"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "Mostra opzioni immagine"
+  },
+  "show_link_options_545338fd": {
+    "message": "Mostra opzioni link"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Mostra opzioni video"
   },
   "size_b30e1077": {
     "message": "Dimensioni"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "Piano di studio"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "TAB/Frecce"
+  },
+  "text_7f4593da": {
+    "message": "Testo"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Il materiale è nel dominio pubblico"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "Carica una nuova immagine"
   },
+  "upload_document_253f0478": {
+    "message": "Carica documento"
+  },
   "upload_file_fd2361b8": {
     "message": "Carica File"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "Registrazione video/audio caricata"
+  },
+  "video_options_24ef6e5d": {
+    "message": "Opzioni video"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "Barra delle opzioni video"
   },
   "video_player_b371005": {
     "message": "Lettore video"

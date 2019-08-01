@@ -451,6 +451,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(assignment.moderatedGrading, true)
     })
 
+    test('passes the assignment grades-published status to the tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.gradesPublished, true)
+    })
+
     test('passes the current manual-posting status of the assignment to the tray', () => {
       postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args

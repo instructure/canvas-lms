@@ -31,7 +31,15 @@
 .root {
   background-color: var(--canvasBackgroundColor)
 }
+
 :global {
+  /* not part of the skin, but necessary to properly size the RCE's textarea */
+  .rce-wrapper textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: auto;
+  }
+
   .tox,
   .tox *:not(svg) {
     color: inherit;
@@ -276,6 +284,9 @@
   }
   .tox .tox-dialog__body-nav-item {
     color: rgba(45, 59, 69, 0.6);
+    &:focus {
+      box-shadow: var(--canvasFocusBoxShadow);
+    }
   }
   .tox .tox-dialog__body-nav-item--active {
     border-bottom-color: var(--canvasBrandColor);
@@ -641,10 +652,11 @@
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
     border-width: 0;
     margin-inline-start: -6px;
+    background-color: var(--canvasBackgroundColor);
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {
-    background: var(--tinySplitButtonChevronHoverBackground);
+    background-color: var(--tinySplitButtonChevronHoverBackground);
   }
 
   .tox .tox-tbtn:focus.tox-split-button__chevron {

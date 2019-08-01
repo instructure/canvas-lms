@@ -79,14 +79,22 @@ exports[`does not render end time if the same as start time 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -96,14 +104,7 @@ exports[`does not render end time if the same as start time 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
             <CalendarEventModal
               allDay={false}
@@ -124,7 +125,7 @@ exports[`does not render end time if the same as start time 1`] = `
               timeZone="America/Denver"
               title="This Assignment is about awesome stuff"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -238,14 +239,22 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -255,16 +264,9 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -406,14 +408,22 @@ exports[`renders Announcement correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -423,16 +433,9 @@ exports[`renders Announcement correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -572,14 +575,22 @@ exports[`renders Announcement correctly with just date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -589,16 +600,9 @@ exports[`renders Announcement correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -712,14 +716,22 @@ exports[`renders Announcement correctly with just points 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -729,16 +741,9 @@ exports[`renders Announcement correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -878,14 +883,22 @@ exports[`renders Announcement correctly without right side content 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -895,16 +908,9 @@ exports[`renders Announcement correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Announcement
-              </Text>
+              I am an Announcement
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1018,14 +1024,22 @@ exports[`renders Assignment correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://www.non_default_url.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1035,16 +1049,9 @@ exports[`renders Assignment correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1184,14 +1191,22 @@ exports[`renders Assignment correctly with just date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1201,16 +1216,9 @@ exports[`renders Assignment correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1324,14 +1332,22 @@ exports[`renders Assignment correctly with just points 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1341,16 +1357,9 @@ exports[`renders Assignment correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1490,14 +1499,22 @@ exports[`renders Assignment correctly without right side content 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1507,16 +1524,9 @@ exports[`renders Assignment correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am an Assignment
-              </Text>
+              I am an Assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1630,14 +1640,22 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1647,14 +1665,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
             <CalendarEventModal
               allDay={true}
@@ -1674,7 +1685,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
               timeZone="America/Denver"
               title="I am a Calendar Event"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1788,14 +1799,22 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1805,14 +1824,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
             <CalendarEventModal
               allDay={false}
@@ -1832,7 +1844,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
               timeZone="America/Denver"
               title="I am a Calendar Event"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -1972,14 +1984,22 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -1989,14 +2009,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
             <CalendarEventModal
               allDay={false}
@@ -2016,7 +2029,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
               timeZone="America/Denver"
               title="I am a Calendar Event"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -2130,14 +2143,22 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -2147,14 +2168,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
             <CalendarEventModal
               allDay={false}
@@ -2175,7 +2189,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
               timeZone="America/Denver"
               title="I am a Calendar Event"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -2289,14 +2303,22 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -2306,14 +2328,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Calendar Event
-              </Text>
+              I am a Calendar Event
             </PresentationContent>
             <CalendarEventModal
               allDay={false}
@@ -2333,7 +2348,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
               timeZone="America/Denver"
               title="I am a Calendar Event"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -2447,14 +2462,22 @@ exports[`renders Discussion correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -2464,16 +2487,9 @@ exports[`renders Discussion correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -2613,14 +2629,22 @@ exports[`renders Discussion correctly with just date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -2630,16 +2654,9 @@ exports[`renders Discussion correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -2753,14 +2770,22 @@ exports[`renders Discussion correctly with just points 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -2770,16 +2795,9 @@ exports[`renders Discussion correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -2919,14 +2937,22 @@ exports[`renders Discussion correctly without right side content 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -2936,16 +2962,9 @@ exports[`renders Discussion correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Discussion
-              </Text>
+              I am a Discussion
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -3059,14 +3078,22 @@ exports[`renders Note correctly with Group 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="/groups/9/pages/this-is-an-account-level-group-page"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -3076,16 +3103,9 @@ exports[`renders Note correctly with Group 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                this is an account-level group page
-              </Text>
+              this is an account-level group page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -3206,14 +3226,22 @@ exports[`renders Note correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -3223,16 +3251,9 @@ exports[`renders Note correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Note
-              </Text>
+              I am a Note
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -3386,14 +3407,22 @@ exports[`renders Note correctly without Course 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -3403,16 +3432,9 @@ exports[`renders Note correctly without Course 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Note
-              </Text>
+              I am a Note
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -3559,14 +3581,22 @@ exports[`renders Page correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -3576,16 +3606,9 @@ exports[`renders Page correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -3725,14 +3748,22 @@ exports[`renders Page correctly with just date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -3742,16 +3773,9 @@ exports[`renders Page correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -3865,14 +3889,22 @@ exports[`renders Page correctly with just points 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -3882,16 +3914,9 @@ exports[`renders Page correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4031,14 +4056,22 @@ exports[`renders Page correctly without right side content 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4048,16 +4081,9 @@ exports[`renders Page correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Page
-              </Text>
+              I am a Page
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4171,14 +4197,22 @@ exports[`renders Quiz correctly with everything 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4188,16 +4222,9 @@ exports[`renders Quiz correctly with everything 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4337,14 +4364,22 @@ exports[`renders Quiz correctly with just date 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4354,16 +4389,9 @@ exports[`renders Quiz correctly with just date 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4477,14 +4505,22 @@ exports[`renders Quiz correctly with just points 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4494,16 +4530,9 @@ exports[`renders Quiz correctly with just points 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4643,14 +4672,22 @@ exports[`renders Quiz correctly without right side content 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4660,16 +4697,9 @@ exports[`renders Quiz correctly without right side content 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                I am a Quiz
-              </Text>
+              I am a Quiz
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4783,14 +4813,22 @@ exports[`renders assignment peer reviews correctly 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4800,16 +4838,9 @@ exports[`renders assignment peer reviews correctly 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                some reviewable assignment
-              </Text>
+              some reviewable assignment
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -4923,14 +4954,22 @@ exports[`renders correctly 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -4940,16 +4979,9 @@ exports[`renders correctly 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -5089,14 +5121,22 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -5106,16 +5146,9 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -5256,14 +5289,22 @@ exports[`renders feedback if available 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -5273,16 +5314,9 @@ exports[`renders feedback if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -5424,14 +5458,22 @@ exports[`renders media feedback if available 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -5441,16 +5483,9 @@ exports[`renders media feedback if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -5592,14 +5627,22 @@ exports[`renders the end time if available 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
-            iconPlacement="start"
-            linkRef={[Function]}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
+            margin="0"
             onClick={[Function]}
-            variant="default"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -5609,14 +5652,7 @@ exports[`renders the end time if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
             <CalendarEventModal
               allDay={false}
@@ -5637,7 +5673,7 @@ exports[`renders the end time if available 1`] = `
               timeZone="America/Denver"
               title="This Assignment is about awesome stuff"
             />
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -5751,14 +5787,22 @@ exports[`renders the location if available 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -5768,16 +5812,9 @@ exports[`renders the location if available 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
+              This Assignment is about awesome stuff
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div
@@ -5910,14 +5947,22 @@ exports[`renders user-created Todo correctly 1`] = `
             }
           }
         >
-          <Link
+          <Button
             as="button"
-            disabled={false}
-            ellipsis={true}
+            buttonRef={[Function]}
+            cursor="pointer"
+            fluidWidth={false}
             href="http://example.com"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
+            margin="0"
+            size="medium"
+            theme={
+              Object {
+                "mediumHeight": "normal",
+                "mediumPadding": "0",
+              }
+            }
+            type="button"
+            variant="link"
           >
             <ScreenReaderContent
               as="span"
@@ -5927,16 +5972,9 @@ exports[`renders user-created Todo correctly 1`] = `
             <PresentationContent
               as="span"
             >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                do that one thing
-              </Text>
+              do that one thing
             </PresentationContent>
-          </Link>
+          </Button>
         </div>
       </div>
       <div

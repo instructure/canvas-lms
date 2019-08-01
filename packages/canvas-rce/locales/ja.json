@@ -29,6 +29,9 @@
   "alternative_text_a834dcad": {
     "message": "代替テキスト："
   },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "ファイルプレビューの作成中にエラーが発生しました"
+  },
   "an_image_is_still_being_uploaded_if_you_continue_t_7d494bac": {
     "message": "画像はまだアップロード中です。続行する場合、画像は適切に埋め込まれません。"
   },
@@ -40,6 +43,9 @@
   },
   "assignments_1e02582c": {
     "message": "課題"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "インラインプレビューが自動的に開きます。(プレビューが表示されるのは保存後のみです)"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -77,6 +83,9 @@
   "circle_unordered_list_9e3a0763": {
     "message": "丸い番号無しリスト"
   },
+  "clear_selected_file_82388e50": {
+    "message": "選択したファイルを消去する"
+  },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
     "message": "ファイルをクリックして、そのファイルにダウンロード リンクを挿入します。"
   },
@@ -97,6 +106,9 @@
   },
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "クリックするとこのアイテムへのリンクが挿入されます。"
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "メニューまたはダイアログを閉じます。またエディタエリアに戻ります"
   },
   "close_d634289d": {
     "message": "閉じる"
@@ -137,9 +149,6 @@
   "course_links_b56959b9": {
     "message": "コースリンク"
   },
-  "course_media_ec759ad": {
-    "message": "コースメディア"
-  },
   "course_navigation_dd035109": {
     "message": "コース ナビゲーション"
   },
@@ -173,6 +182,12 @@
   "describe_the_image_e65d2e32": {
     "message": "(画像の説明)"
   },
+  "directionality_ebcae6d0": {
+    "message": "方向"
+  },
+  "disable_in_line_preview_2a675175": {
+    "message": "インラインプレビューを無効にします。"
+  },
   "discussions_a5f96392": {
     "message": "ディスカッション"
   },
@@ -191,8 +206,14 @@
   "done_54e3d4b6": {
     "message": "完了"
   },
+  "drag_a_file_here_39357b48": {
+    "message": "ファイルをここにドラッグする"
+  },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "ドラッグアンドドロップまたはクリックしてコンピュータを参照"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "ハンドルをドラッグします。上下矢印を使用してサイズを変更する"
   },
   "due_multiple_dates_cc0ee3f5": {
     "message": "期限：複数の日付"
@@ -203,8 +224,20 @@
   "edit_link_7f53bebb": {
     "message": "リンクの編集"
   },
+  "embed_828fac4a": {
+    "message": "埋め込み"
+  },
   "embed_image_1080badc": {
     "message": "画像の埋め込み"
+  },
+  "embed_options_tray_901cfd19": {
+    "message": "オプショントレイの埋め込み"
+  },
+  "embed_preview_2d741e1f": {
+    "message": "プレビューの埋め込み"
+  },
+  "embed_video_code_703e10f2": {
+    "message": "ビデオコードの埋め込み"
   },
   "enter_search_terms_e397b1f0": {
     "message": "検索語を入力"
@@ -227,6 +260,18 @@
   "file_upload_form_4aaad554": {
     "message": "ファイルアップロードフォーム"
   },
+  "file_url_c12b64be": {
+    "message": "ファイル URL"
+  },
+  "filename_file_icon_602eb5de": {
+    "message": "{ filename } ファイルアイコン"
+  },
+  "filename_image_preview_6cef8f26": {
+    "message": "{ filename } 画像プレビュー"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "{ filename } テキストプレビュー"
+  },
   "files_c300e900": {
     "message": "ファイル"
   },
@@ -236,8 +281,20 @@
   "finish_bc343002": {
     "message": "フィニッシュ"
   },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "ポップアップコンテキストツールバーに注目する"
+  },
   "folder_705fd2d7": {
     "message": "フォルダ"
+  },
+  "generating_preview_45b53be0": {
+    "message": "プレビュー中..."
+  },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "エディタのメニューバーに移動する"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "エディタのツールバーに移動する"
   },
   "grades_a61eba0a": {
     "message": "成績"
@@ -284,11 +341,20 @@
   "invalid_file_type_881cc9b2": {
     "message": "無効なファイル タイプです"
   },
+  "keyboard_shortcuts_ed1844bd": {
+    "message": "キーボード ショートカット"
+  },
   "large_9c5e80e7": {
     "message": "大"
   },
+  "left_to_right_d6da6d7e": {
+    "message": "左から右"
+  },
   "link_7262adec": {
     "message": "リンク"
+  },
+  "link_options_a16b758b": {
+    "message": "リンクオプション"
   },
   "link_to_a_new_page_6c4ad034": {
     "message": "新しいページへのリンク"
@@ -317,14 +383,14 @@
   "loading_failed_b3524381": {
     "message": "読み込みに失敗しました..."
   },
+  "loading_failed_e6a9d8ef": {
+    "message": "読込みに失敗しました。"
+  },
   "loading_folders_8d4d5d5a": {
     "message": "フォルダを読み込み中..."
   },
   "loading_media_f3455841": {
     "message": "メディアの読込み"
-  },
-  "media_af190855": {
-    "message": "メディア"
   },
   "medium_5a8e9ead": {
     "message": "中"
@@ -335,6 +401,12 @@
   "modules_c4325335": {
     "message": "モジュール"
   },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "メニューまたはツールバーを移動する"
+  },
+  "next_page_d2a39853": {
+    "message": "次のページ"
+  },
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "別のテキストはありません (装飾画像)"
   },
@@ -344,11 +416,17 @@
   "no_video_1ed00b26": {
     "message": "ビデオなし"
   },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "このキーボードショートカットダイアログを開く"
+  },
   "options_3ab0ea65": {
     "message": "オプション"
   },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "番号付きリストと番号無しリスト"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "他のエディタショートカットは下記をご覧ください"
   },
   "pages_e5414c2c": {
     "message": "ページ"
@@ -377,6 +455,9 @@
   "preview_a3f8f854": {
     "message": "プレビュー"
   },
+  "previous_page_928fc112": {
+    "message": "前のページ"
+  },
   "published_c944a23d": {
     "message": "公開済み"
   },
@@ -401,6 +482,9 @@
   "rich_content_editor_2708ef21": {
     "message": "リッチ コンテンツ エディタ"
   },
+  "right_to_left_ec223c81": {
+    "message": "右から左"
+  },
   "save_11a80ec3": {
     "message": "保存"
   },
@@ -410,14 +494,26 @@
   "search_flickr_6884b518": {
     "message": "Flickr を検索"
   },
+  "search_term_b2d2235": {
+    "message": "検索用語"
+  },
   "select_a_file_53ba40ac": {
     "message": "ファイルを選択"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "ファイルをアップロードするフォルダを選択"
   },
+  "show_embed_options_ef8d7ef": {
+    "message": "埋め込みオプションを表示する"
+  },
   "show_image_options_1e2ecc6b": {
     "message": "画像オプションを表示"
+  },
+  "show_link_options_545338fd": {
+    "message": "リンクオプションを表示する"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "ビデオオプションを表示する"
   },
   "size_b30e1077": {
     "message": "サイズ"
@@ -467,6 +563,12 @@
   "syllabus_f191f65b": {
     "message": "シラバス"
   },
+  "tab_arrows_4cf5abfc": {
+    "message": "TAB/矢印"
+  },
+  "text_7f4593da": {
+    "message": "テキスト"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "この資料はパブリック ドメインです"
   },
@@ -503,6 +605,9 @@
   "upload_a_new_image_890df275": {
     "message": "新しい画像をアップロードする"
   },
+  "upload_document_253f0478": {
+    "message": "ドキュメントをアップロードする"
+  },
   "upload_file_fd2361b8": {
     "message": "ファイルアップロード"
   },
@@ -532,6 +637,12 @@
   },
   "video_audio_recording_uploaded_6af5d378": {
     "message": "映像/オーディオ録音をアップロードしました"
+  },
+  "video_options_24ef6e5d": {
+    "message": "ビデオオプション"
+  },
+  "video_options_tray_3b9809a5": {
+    "message": "ビデオオプショントレイ"
   },
   "video_player_b371005": {
     "message": "ビデオプレーヤー"

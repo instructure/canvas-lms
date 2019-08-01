@@ -36,6 +36,7 @@ import theme from '../skins/theme'
 import {isImage} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 
+const ASYNC_FOCUS_TIMEOUT = 250
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
@@ -126,6 +127,7 @@ class RCEWrapper extends React.Component {
     handleUnmount: PropTypes.func,
     language: PropTypes.string,
     onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
     textareaId: PropTypes.string,
@@ -158,7 +160,8 @@ class RCEWrapper extends React.Component {
       path: [],
       wordCount: 0,
       isHtmlView: false,
-      KBShortcutModalOpen: false
+      KBShortcutModalOpen: false,
+      focused: false
     }
   }
 
@@ -185,6 +188,14 @@ class RCEWrapper extends React.Component {
   }
 
   indicateEditor(element) {
+    if (document.querySelector('[role="dialog"][data-mce-component]')) {
+      // there is a modal open, which zeros out the vertical scroll
+      // so the indicator is in the wrong place.  Give it a chance to close
+      window.setTimeout(() => {
+        this.indicateEditor(element)
+      }, 100)
+      return
+    }
     const editor = this.mceInstance();
     if (this.indicator) {
       this.indicator(editor, element);
@@ -350,25 +361,101 @@ class RCEWrapper extends React.Component {
     return document.getElementById(`${this.props.textareaId}_ifr`)
   }
 
-  onFocus() {
-    Bridge.focusEditor(this);
-
-    this.props.onFocus && this.props.onFocus(this);
+  // these focus and blur event handlers work together so that RCEWrapper
+  // can report focus and blur events from the RCE at-large
+  get focused() {
+    return this.state.focused
   }
 
-  reallyOnFocus() {
+  handleFocus() {
+    if (!this.state.focused) {
+      this.setState({focused: true})
+      Bridge.focusEditor(this);
+      this.props.onFocus && this.props.onFocus(this);
+    }
+  }
+
+  contentTrayClosing = false
+  handleContentTrayClosing = isClosing => {
+    this.contentTrayClosing = isClosing
+  }
+
+  blurTimer = 0
+  handleBlur(event) {
+    if (this.blurTimer) return
+
+    if (this.state.focused) {
+      // because the old active element fires blur before the next element gets focus
+      // we often need a moment to see if focus comes back
+      event && event.persist && event.persist()
+      this.blurTimer = window.setTimeout(() => {
+        this.blurTimer = 0
+        if (this.contentTrayClosing) {
+          // the CanvasContentTray is in the process of closing
+          // wait until it finishes
+          return
+        }
+
+        if (this._elementRef && this._elementRef.contains(document.activeElement)) {
+          // focus is still somewhere w/in me
+          return
+        }
+
+        if (document.activeElement.getAttribute('class').includes('tox-')) {
+          // if a toolbar button has focus, then the user clicks on the "more" button
+          // focus jumps to the body, then eventually to the popped pup toolbar. This
+          // catches that case, but could also fail to blur an rce if the user clicked from
+          // one rce on the page to another.  I think this is the lesser of the 2 evils
+          return
+        }
+
+        if (event && event.relatedTarget && event.relatedTarget.getAttribute('class').includes('tox-')) {
+          // a tinymce popup has focus
+          return
+        }
+
+        const popup = document.querySelector('[data-mce-component]')
+        if (popup && popup.contains(document.activeElement)) {
+          // one of our popups has focus
+          return
+        }
+        this.setState({focused: false})
+        this.props.onBlur && this.props.onBlur(event)
+      }, ASYNC_FOCUS_TIMEOUT)
+    }
+  }
+
+  handleFocusRCE = event => {
+    if (this._elementRef && !this._elementRef.contains(event.relatedTarget)) {
+      this.handleFocus(event)
+    }
+  }
+
+  handleBlurRCE = event => {
+    if (event.relatedTarget === null) {
+      // focus might be moving to tinymce
+      this.handleBlur(event)
+    }
+
+    if (!this._elementRef.contains(event.relatedTarget)) {
+      this.handleBlur(event)
+    }
+  }
+
+  handleFocusEditor() {
     // use .active to put a focus ring around the content area
     // when the editor has focus. This isn't perfect, but it's
     // what we've got for now.
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
-    this.onFocus()
+    this.handleFocus()
   }
 
-  onBlur() {
+  handleBlurEditor() {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.remove('active')
+    this.handleBlur(event)
   }
 
   call(methodName, ...args) {
@@ -441,7 +528,7 @@ class RCEWrapper extends React.Component {
   }
 
   onA11yChecker = () => {
-    this.onTinyMCEInstance('openAccessibilityChecker')
+    this.onTinyMCEInstance('openAccessibilityChecker', {'data-canvas-component': true})
   }
 
   handleShortcutKeyShortcut = (event) => {
@@ -462,11 +549,12 @@ class RCEWrapper extends React.Component {
 
   KBShortcutModalClosed = () => {
     if(Bridge.activeEditor() === this) {
-      this.onTinyMCEInstance('mceFocus')
+      Bridge.focusActiveEditor(false)
     }
   }
 
   componentWillUnmount() {
+    window.clearTimeout(this.blurTimer)
     if (!this._destroyCalled) {
       this.destroy();
     }
@@ -506,11 +594,17 @@ class RCEWrapper extends React.Component {
       // things like table resizing and stuff.
       content_style: contentCSS,
 
-      toolbar: [
-        'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
-        'subscript | align bullist outdent indent directionality | ' +
-        'instructure_links instructure_image instructure_record instructure_documents | ' +
-        `removeformat table instructure_equation ${lti_tool_dropdown}` // instructure_equella
+      toolbar: [{
+          name: formatMessage('Styles'), items: ['fontsizeselect', 'formatselect']
+        }, {
+          name: formatMessage('Formatting'), items: ['bold', 'italic', 'underline', 'forecolor', 'backcolor', 'superscript', 'subscript']
+        }, {
+          name: formatMessage('Alignment and Indentation'), items: ['align', 'bullist', 'outdent', 'indent', 'directionality']
+        }, {
+          name: formatMessage('Canvas Plugins'), items: ['instructure_links', 'instructure_image', 'instructure_record', 'instructure_documents']
+        }, {
+          name: formatMessage('Miscellaneous and LTI'), items: ['removeformat', 'table', 'instructure_equation', `${lti_tool_dropdown}`]
+        }
       ],
       contextmenu: '',  // show the browser's native context menu
 
@@ -541,7 +635,9 @@ class RCEWrapper extends React.Component {
       this.unhandleTextareaChange();
       el.addEventListener("change", this.handleTextareaChange);
       if (this.props.textareaClassName) {
-        el.classList.add(this.props.textareaClassName)
+        // split the string on whitespace because classList doesn't let you add multiple
+        // space seperated classes at a time but does let you add an array of them
+        el.classList.add(...this.props.textareaClassName.split(/\s+/))
       }
       this._textareaEl = el;
     }
@@ -550,6 +646,8 @@ class RCEWrapper extends React.Component {
   componentDidMount() {
     this.registerTextareaChange();
     this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
+    // give the textarea its initial size
+    this.onResize(null, {deltaY: 0})
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -575,7 +673,12 @@ class RCEWrapper extends React.Component {
     mceProps.editorOptions.statusbar = false
 
     return (
-      <div ref={el => this._elementRef = el} className={styles.root}>
+      <div
+        className={`${styles.root} rce-wrapper`}
+        ref={el => this._elementRef = el}
+        onFocus={this.handleFocusRCE}
+        onBlur={this.handleBlurRCE}
+      >
         <ShowOnFocusButton
           buttonProps={{
             variant: 'link',
@@ -592,12 +695,12 @@ class RCEWrapper extends React.Component {
           init={this.wrapOptions(mceProps.editorOptions)}
           initialValue={mceProps.defaultContent}
           onInit={this.onInit.bind(this)}
-          onClick={this.onFocus.bind(this)}
-          onKeypress={this.onFocus.bind(this)}
-          onActivate={this.onFocus.bind(this)}
+          onClick={this.handleFocusEditor.bind(this)}
+          onKeypress={this.handleFocusEditor.bind(this)}
+          onActivate={this.handleFocusEditor.bind(this)}
           onRemove={this.onRemove.bind(this)}
-          onFocus={this.reallyOnFocus.bind(this)}
-          onBlur={this.onBlur.bind(this)}
+          onFocus={this.handleFocusEditor.bind(this)}
+          onBlur={this.handleBlurEditor.bind(this)}
           onNodeChange={this.onNodeChange}
         />
         <StatusBar
@@ -609,7 +712,7 @@ class RCEWrapper extends React.Component {
           onKBShortcutModalOpen={this.openKBShortcutModal}
           onA11yChecker={this.onA11yChecker}
         />
-        <CanvasContentTray bridge={Bridge} {...trayProps} />
+        <CanvasContentTray bridge={Bridge} onTrayClosing={this.handleContentTrayClosing} {...trayProps} />
         <KeyboardShortcutModal
           onClose={this.KBShortcutModalClosed}
           onDismiss={this.closeKBShortcutModal}

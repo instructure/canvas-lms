@@ -188,6 +188,7 @@ let loadingPromise
         language: ENV.LOCALE,
         mirroredAttrs: this._attrsToMirror(textarea),
         onFocus: tinyMCEInitOptions.onFocus,
+        onBlur: tinyMCEInitOptions.onBlur,
         textareaClassName: textarea.className,
         textareaId: textarea.id,
         trayProps: getTrayProps()

@@ -45,6 +45,8 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
     end
 
     submissions_scope = input[:graded_only] ? assignment.submissions.graded : assignment.submissions
+    submissions_scope = course.apply_enrollment_visibility(submissions_scope.joins(user: :enrollments), current_user)
+
     submission_ids = submissions_scope.pluck(:id)
     progress = course.progresses.new(tag: "post_assignment_grades")
 

@@ -21,6 +21,7 @@
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t("log_in_to_canvas", "Log In To Canvas") %></title>
+  <%= browser_performance_monitor_embed %>
   <meta name="HandheldFriendly" content="True">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -91,6 +92,7 @@
     g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
     s.parentNode.insertBefore(g,s)}(document,"script"));
   </script>
-  <%= include_account_js(raw: true) %>
+  <%= include_js_bundles %>
+  <%= include_account_js %>
 </body>
 </html>

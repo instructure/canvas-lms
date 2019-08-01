@@ -650,6 +650,8 @@ class GradebooksController < ApplicationController
         @outer_frame = true
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
+          MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
+          READ_AS_ADMIN: @context.grants_right?(@current_user, session, :read_as_admin),
           CONTEXT_ACTION_SOURCE: :speed_grader,
           can_view_audit_trail: @assignment.can_view_audit_trail?(@current_user),
           settings_url: speed_grader_settings_course_gradebook_path,
@@ -748,7 +750,7 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_column_size
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       unless @current_user.preferences.key?(:gradebook_column_size)
         @current_user.preferences[:gradebook_column_size] = {}
       end
@@ -760,7 +762,7 @@ class GradebooksController < ApplicationController
   end
 
   def save_gradebook_column_order
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       unless @current_user.preferences.key?(:gradebook_column_order)
         @current_user.preferences[:gradebook_column_order] = {}
       end
@@ -841,11 +843,14 @@ class GradebooksController < ApplicationController
       value_to_boolean(user_preference)
     end
 
+    visible_sections = @context.sections_visible_to(@current_user)
+
     new_gradebook_options = {
       colors: gradebook_settings.fetch(:colors, {}),
 
       course_settings: {
-        allow_final_grade_override: allow_final_grade_override
+        allow_final_grade_override: allow_final_grade_override,
+        filter_speed_grader_by_student_group: @context.filter_speed_grader_by_student_group?
       },
 
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
@@ -854,7 +859,8 @@ class GradebooksController < ApplicationController
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
-      post_policies_enabled: @context.post_policies_enabled?
+      post_policies_enabled: @context.post_policies_enabled?,
+      sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true)
     }
     new_gradebook_options[:post_manually] = @context.post_manually? if @context.post_policies_enabled?
 

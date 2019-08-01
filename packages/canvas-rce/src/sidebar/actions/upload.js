@@ -21,6 +21,7 @@ import * as images from "./images";
 import Bridge from "../../bridge";
 import {fileEmbed} from "../../common/mimeClass";
 import {VIDEO_SIZE_OPTIONS} from '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
+import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
@@ -141,9 +142,11 @@ export function embedUploadResult(results, selectedTabType) {
     Bridge.insertImage(results);
   } else {
     Bridge.insertLink({
+      'data-canvas-previewable': isPreviewable(results['content-type']),
       title: results.display_name,
       href: results.url,
-      embed: embedData
+      embed: embedData,
+      target: '_blank'
     });
   }
   return results;

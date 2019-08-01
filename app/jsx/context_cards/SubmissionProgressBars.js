@@ -29,7 +29,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
 function scoreInPoints(score, pointsPossible) {
   const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
   const formattedPointsPossible = I18n.n(pointsPossible, {precision: 2, strip_insignificant_zeros: true})
-  return formattedScore + '/' + formattedPointsPossible
+  return `${formattedScore  }/${  formattedPointsPossible}`
 }
 
 
@@ -98,7 +98,7 @@ function scoreInPoints(score, pointsPossible) {
       return (
         <div>
           <span className='screenreader-only'>
-            {I18n.t("%{grade}", {grade: grade})}
+            {I18n.t("%{grade}", {grade})}
           </span>
           <i className={iconClass}></i>
         </div>
@@ -119,23 +119,27 @@ function scoreInPoints(score, pointsPossible) {
                 <div key={submission.id} className="StudentContextTray-Progress__Bar">
                   <Tooltip
                     tip={submission.assignment.name}
-                    as={Link}
-                    href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
                     placement="top"
                   >
-                    <Progress
-                      size="small"
-                      successColor={false}
-                      label={I18n.t('Grade')}
-                      valueMax={submission.assignment.points_possible}
-                      valueNow={submission.score || 0}
-                      formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
-                      formatDisplayedValue={() => (
-                        <Text size="x-small" color="secondary">
-                          {SubmissionProgressBars.displayGrade(submission)}
-                        </Text>
-                      )}
-                    />
+                    <Link
+                      href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
+                      theme={{textDecoration: 'none'}}
+                      display="block"
+                    >
+                      <Progress
+                        size="small"
+                        successColor={false}
+                        label={I18n.t('Grade')}
+                        valueMax={submission.assignment.points_possible}
+                        valueNow={submission.score || 0}
+                        formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
+                        formatDisplayedValue={() => (
+                          <Text size="x-small" color="secondary">
+                            {SubmissionProgressBars.displayGrade(submission)}
+                          </Text>
+                        )}
+                      />
+                    </Link>
                   </Tooltip>
                 </div>
               )

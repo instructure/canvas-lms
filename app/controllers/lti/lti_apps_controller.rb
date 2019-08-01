@@ -52,7 +52,11 @@ module Lti
             named_context_url(@context, :api_v1_context_launch_definitions_url, include_host: true),
             pagination_args
           )
-          format.json { render :json => AppLaunchCollator.launch_definitions(launch_defs, placements) }
+          format.json do
+            cancel_cache_buster
+            expires_in 10.minutes
+            render :json => AppLaunchCollator.launch_definitions(launch_defs, placements)
+          end
         end
       end
     end

@@ -1230,7 +1230,7 @@ class UsersController < ApplicationController
       if authorized_action(@user, @current_user, :read_full_profile)
         add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
-        @group_memberships = @user.current_group_memberships
+        @group_memberships = @user.cached_current_group_memberships_by_date
 
         # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
         # maybe should just look at the first enrollment and check if it's cached to decide if we should include

@@ -19,42 +19,59 @@
 import formatMessage from "../../../format-message"
 import clickCallback from "./clickCallback"
 import bridge from '../../../bridge'
+import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
+import {getContentFromElement, FILE_LINK_TYPE} from '../shared/ContentSelection'
+import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
+
+const trayController = new LinkOptionsTrayController()
 
 const PLUGIN_KEY = 'links'
+const CREATE_LINK = 'create'
+const EDIT_LINK = 'edit'
+
+const getLink = function (editor, elm) {
+  return editor.dom.getParent(elm, 'a[href]');
+}
+const getLinkIfCursorOnAnchorElement = function (editor) {
+  return getAnchorElement(editor, editor.selection.getNode()) ||
+         getAnchorElement(editor, editor.selection.getStart())
+}
+
+const getAnchorElement = function (editor, node) {
+  const link = node.nodeName.toLowerCase() === 'a' ? node : getLink(editor, node)
+  return (link && link.href) ? link : null
+};
 
 tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
   init(ed) {
-    const getLink = function (editor, elm) {
-      return editor.dom.getParent(elm, 'a[href]');
-    }
-    const isCursorOnAnchorElement = function () {
-      return isAnchorElement(ed.selection.getNode()) || isAnchorElement(ed.selection.getStart())
-    }
-
-    const isAnchorElement = function (node) {
-      const link = node.nodeName.toLowerCase() === 'a' ? node : getLink(ed, node)
-      return link && link.href
-    };
-
     // Register commands
     ed.addCommand(
-      "instructureLinks",
-      clickCallback.bind(this, ed, document)
+      "instructureLinkCreate",
+      clickCallback.bind(this, ed, CREATE_LINK)
     );
+    ed.addCommand(
+      "instructureLinkEdit",
+      clickCallback.bind(this, ed, EDIT_LINK)
+    )
 
-    // Register button
+    // Register toolbar button
     ed.ui.registry.addMenuButton("instructure_links", {
       tooltip: formatMessage('Links'),
       icon: "link",
       fetch(callback) {
         let items
-        if (isCursorOnAnchorElement()) {
+        const link = getLinkIfCursorOnAnchorElement(ed)
+        if (link) {
           items = [
             {
               type: 'menuitem',
               text: formatMessage('Edit Link'),
               onAction: () => {
-                ed.execCommand('mceLink')
+                if (isFileLink(link)) {
+                  trayController.showTrayForEditor(ed)
+                } else {
+                  ed.execCommand('instructureLinkEdit')
+                }
               }
             },
             {
@@ -71,7 +88,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
               type: 'menuitem',
               text: formatMessage('External Links'),
               onAction: () => {
-                ed.execCommand('mceLink');
+                ed.execCommand('instructureLinkCreate');
               }
             },
             {
@@ -88,7 +105,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
       },
       onSetup: function(api) {
         function handleNodeChange(e) {
-          api.setActive(isAnchorElement(e.element))
+          api.setActive(!!getAnchorElement(ed, e.element))
         }
 
         ed.on('NodeChange', handleNodeChange)
@@ -98,6 +115,34 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
         }
       }
     });
+
+    // the context toolbar button
+    const buttonAriaLabel = formatMessage('Show link options')
+    ed.ui.registry.addButton('instructure-link-options', {
+      onAction(/* buttonApi */) {
+        // show the tray
+        trayController.showTrayForEditor(ed)
+      },
+
+      onSetup(/* buttonApi */) {
+        globalRegistry.bindToolbarToEditor(ed, buttonAriaLabel)
+      },
+
+      text: formatMessage('Options'),
+      tooltip: buttonAriaLabel
+    })
+
+    const defaultFocusSelector = `.tox-pop__dialog button[aria-label="${buttonAriaLabel}"]`
+    globalRegistry.addContextKeydownListener(ed, defaultFocusSelector)
+
+    const isFileLink = ($element) => getContentFromElement($element, ed).type === FILE_LINK_TYPE
+
+    ed.ui.registry.addContextToolbar('instructure-link-toolbar', {
+      items: 'instructure-link-options',
+      position: 'node',
+      predicate: isFileLink,
+      scope: 'node'
+    })
   }
 });
 
