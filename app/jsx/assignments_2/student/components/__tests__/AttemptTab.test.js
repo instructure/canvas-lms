@@ -72,22 +72,6 @@ describe('ContentTabs', () => {
       expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
   })
-
-  describe('the submission type is online_text_entry', () => {
-    it('renders the text entry tab', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: () => ({submissionTypes: ['online_text_entry']})
-      })
-
-      const {getByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} />
-        </MockedProvider>
-      )
-
-      expect(getByTestId('text-entry')).toBeInTheDocument()
-    })
-  })
 })
 
 describe('Submitting an assignment', () => {
@@ -262,5 +246,58 @@ describe('Uploading a file', () => {
       </MockedProvider>
     )
     expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
+  })
+
+  describe('the submission type is online_text_entry', () => {
+    it('renders the text entry tab', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry']})
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+
+      expect(getByTestId('text-entry')).toBeInTheDocument()
+    })
+
+    it('opens the RCE when the Start Entry button is clicked', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry']})
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+
+      const startButton = getByTestId('start-text-entry')
+      fireEvent.click(startButton)
+
+      expect(await waitForElement(() => getByTestId('text-editor'))).toBeInTheDocument()
+    })
+
+    it('returns to the initial state when the Cancel button is clicked with the RCE open', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry']})
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+
+      const startButton = getByTestId('start-text-entry')
+      fireEvent.click(startButton)
+
+      expect(await waitForElement(() => getByTestId('cancel-text-entry'))).toBeInTheDocument()
+      fireEvent.click(getByTestId('cancel-text-entry'))
+
+      expect(await waitForElement(() => getByTestId('text-entry'))).toBeInTheDocument()
+    })
   })
 })

@@ -37,6 +37,7 @@ export default class AttemptTab extends Component {
 
   state = {
     submissionState: null,
+    textValue: null,
     uploadState: null
   }
 
@@ -94,6 +95,10 @@ export default class AttemptTab extends Component {
 
   updateSubmissionState = state => {
     this.setState({submissionState: state})
+  }
+
+  updateText = newValue => {
+    this.setState({textValue: newValue})
   }
 
   renderUploadAlert() {
@@ -174,7 +179,7 @@ export default class AttemptTab extends Component {
     // TODO: we need to ensure we handle multiple submission types eventually
     switch (this.props.assignment.submissionTypes[0]) {
       case 'online_text_entry':
-        return <TextEntry />
+        return <TextEntry changeText={this.updateText} value={this.state.textValue} />
       case 'online_upload':
       default:
         // TODO: we should probably figure out what the default case should actually be

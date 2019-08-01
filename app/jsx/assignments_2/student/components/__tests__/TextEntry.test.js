@@ -21,9 +21,33 @@ import {render} from '@testing-library/react'
 import TextEntry from '../TextEntry'
 
 describe('TextEntry', () => {
-  it('renders a Start Entry item', () => {
-    const {getByText} = render(<TextEntry />)
+  describe('when the value prop is null', () => {
+    it('renders a Start Entry item', () => {
+      const {getByText} = render(<TextEntry value={null} />)
 
-    expect(getByText('Start Entry')).toBeInTheDocument()
+      expect(getByText('Start Entry')).toBeInTheDocument()
+    })
+  })
+
+  describe('when the value prop is not null', () => {
+    it('renders the RCE when the initial value is not null', () => {
+      const {getByTestId} = render(<TextEntry value="something" />)
+
+      expect(getByTestId('text-editor')).toBeInTheDocument()
+    })
+
+    it('renders the Cancel button when the RCE is loaded', () => {
+      const {getByTestId, getByText} = render(<TextEntry value="sometext" />)
+      const cancelButton = getByTestId('cancel-text-entry')
+
+      expect(cancelButton).toContainElement(getByText('Cancel'))
+    })
+
+    it('renders the Save button when the RCE is loaded', () => {
+      const {getByTestId, getByText} = render(<TextEntry value="sometext" />)
+      const saveButton = getByTestId('save-text-entry')
+
+      expect(saveButton).toContainElement(getByText('Save'))
+    })
   })
 })
