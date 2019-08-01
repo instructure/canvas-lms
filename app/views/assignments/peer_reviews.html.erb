@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
+<% provide :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
 <%- css_bundle(:assignments_peer_review) %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='btn button-sidebar-wide'>
     <i class="icon-arrow-left"></i>
     <%= t 'links.back_to_assignment', "Back to Assignment" %>

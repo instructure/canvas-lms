@@ -1521,7 +1521,7 @@ QUnit.module('EditView#validateGraderCount', (hooks) => {
     strictEqual(Object.keys(errors).length, 0)
   })
 
-  test('returns no errors if moderated grading is turned on and grader count is greater than max grader count', () => {
+  test('returns no errors if moderated grading is turned on and grader count is greater than available grader count', () => {
     const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '8' })
     strictEqual(Object.keys(errors).length, 0)
   })
@@ -1612,9 +1612,9 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
       strictEqual(props().availableModerators, availableModerators)
     })
 
-    test('passes max grader count in the ENV as a prop to the component', () => {
+    test('passes available graders count in the ENV as a prop to the component', () => {
       view.renderModeratedGradingFormFieldGroup()
-      strictEqual(props().maxGraderCount, ENV.MODERATED_GRADING_MAX_GRADER_COUNT)
+      strictEqual(props().availableGradersCount, ENV.MODERATED_GRADING_MAX_GRADER_COUNT)
     })
 
     test('passes locale in the ENV as a prop to the component', () => {

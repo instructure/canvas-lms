@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, join_title(t(:page_title, "Web Conferences"), @context.name)
+  provide :page_title, join_title(t(:page_title, "Web Conferences"), @context.name)
   js_bundle :conferences
   css_bundle :conferences
 %>

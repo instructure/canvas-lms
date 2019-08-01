@@ -20,9 +20,9 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 import {FAILURE, STARTED} from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
-import DisplayToStudentsButton from 'jsx/assignments/GradeSummary/components/DisplayToStudentsButton'
+import PostToStudentsButton from 'jsx/assignments/GradeSummary/components/PostToStudentsButton'
 
-QUnit.module('GradeSummary DisplayToStudentsButton', suiteHooks => {
+QUnit.module('GradeSummary PostToStudentsButton', suiteHooks => {
   let props
   let wrapper
 
@@ -42,17 +42,17 @@ QUnit.module('GradeSummary DisplayToStudentsButton', suiteHooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<DisplayToStudentsButton {...props} />)
+    wrapper = mount(<PostToStudentsButton {...props} />)
   }
 
-  QUnit.module('when grades have not been published', contextHooks => {
+  QUnit.module('when grades have not been released', contextHooks => {
     contextHooks.beforeEach(() => {
       props.assignment.gradesPublished = false
       mountComponent()
     })
 
-    test('is labeled with "Display to Students"', () => {
-      equal(wrapper.find('button').text(), 'Display to Students')
+    test('is labeled with "Post to Students"', () => {
+      equal(wrapper.find('button').text(), 'Post to Students')
     })
 
     test('is disabled', () => {
@@ -65,11 +65,11 @@ QUnit.module('GradeSummary DisplayToStudentsButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when grades are not yet displayed to students', contextHooks => {
+  QUnit.module('when grades are not yet posted to students', contextHooks => {
     contextHooks.beforeEach(mountComponent)
 
-    test('is labeled with "Display to Students"', () => {
-      equal(wrapper.find('button').text(), 'Display to Students')
+    test('is labeled with "Post to Students"', () => {
+      equal(wrapper.find('button').text(), 'Post to Students')
     })
 
     test('is not read-only', () => {
@@ -82,17 +82,17 @@ QUnit.module('GradeSummary DisplayToStudentsButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when grades are being displayed to students', contextHooks => {
+  QUnit.module('when grades are being posted to students', contextHooks => {
     contextHooks.beforeEach(() => {
       props.unmuteAssignmentStatus = STARTED
       mountComponent()
     })
 
-    test('is labeled with "Displaying to Students"', () => {
+    test('is labeled with "Posting to Students"', () => {
       // The Spinner in the button duplicates the label. Assert that the label
       // includes the expected text, but is not exactly equal.
       const label = wrapper.find('button').text()
-      ok(label.match(/Displaying to Students/))
+      ok(label.match(/Posting to Students/))
     })
 
     test('is read-only', () => {
@@ -111,11 +111,11 @@ QUnit.module('GradeSummary DisplayToStudentsButton', suiteHooks => {
       mountComponent()
     })
 
-    test('is labeled with "Grades Visible to Students"', () => {
+    test('is labeled with "Grades Posted to Students"', () => {
       // The Icon in the button duplicates the label. Assert that the label
       // includes the expected text, but is not exactly equal.
       const label = wrapper.find('button').text()
-      ok(label.match(/Grades Visible to Students/))
+      ok(label.match(/Grades Posted to Students/))
     })
 
     test('is read-only', () => {
@@ -128,14 +128,14 @@ QUnit.module('GradeSummary DisplayToStudentsButton', suiteHooks => {
     })
   })
 
-  QUnit.module('when displaying to students failed', contextHooks => {
+  QUnit.module('when posting to students failed', contextHooks => {
     contextHooks.beforeEach(() => {
       props.unmuteAssignmentStatus = FAILURE
       mountComponent()
     })
 
-    test('is labeled with "Display to Students"', () => {
-      equal(wrapper.find('button').text(), 'Display to Students')
+    test('is labeled with "Post to Students"', () => {
+      equal(wrapper.find('button').text(), 'Post to Students')
     })
 
     test('is not read-only', () => {

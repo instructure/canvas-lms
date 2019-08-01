@@ -462,7 +462,7 @@ class UsersController < ApplicationController
 
           includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
           includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
-          users = users.with_last_login if includes.include?('last_login')
+          users = users.with_last_login if includes.include?('last_login') && !search_term
           users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
           user_json_preloads(users, includes.include?('email'))
           return render :json => users.map { |u| user_json(u, @current_user, session, includes)}
@@ -571,6 +571,14 @@ class UsersController < ApplicationController
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
+
+    if @current_user
+      content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
+    end
+
+    css_bundle :dashboard
+    js_bundle :dashboard
+    add_body_class "dashboard-is-planner" if show_planner?
   end
 
   def dashboard_stream_items
@@ -1338,7 +1346,7 @@ class UsersController < ApplicationController
     @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
 
-    @active_tab = @tool.asset_string
+    set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
     render Lti::AppUtil.display_template
   end

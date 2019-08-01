@@ -74,6 +74,10 @@ module Api::V1::Submission
       hash['rubric_assessment'] = indexed_rubric_assessment_json(submission.rubric_assessment)
     end
 
+    if includes.include?("full_rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(current_user)
+      hash['full_rubric_assessment'] = full_rubric_assessment_json_for_submissions(submission.rubric_assessment, current_user, session)
+    end
+
     if includes.include?("assignment")
       hash['assignment'] = assignment_json(assignment, current_user, session)
     end

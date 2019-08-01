@@ -74,6 +74,13 @@ module Canvas::Security
       end
     end
 
+    context 'with aud array' do
+      let(:aud) { 'https://canvas.instructure.com/login/oauth2/token' }
+      let(:expected_aud) { [aud, 'foo'] }
+
+      it { is_expected.to be_empty }
+    end
+
     context 'with bad aud' do
       let(:aud) { 'doesnotexist' }
 

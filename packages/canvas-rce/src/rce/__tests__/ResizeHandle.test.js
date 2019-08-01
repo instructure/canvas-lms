@@ -18,8 +18,8 @@
 
 
 import React from 'react'
-import 'jest-dom/extend-expect'
-import {render, cleanup, fireEvent} from 'react-testing-library'
+import '@testing-library/jest-dom/extend-expect'
+import {render, cleanup, fireEvent} from '@testing-library/react'
 import keycode from 'keycode'
 import ResizeHandle from '../ResizeHandle'
 

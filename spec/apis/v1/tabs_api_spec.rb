@@ -548,6 +548,31 @@ describe TabsController, type: :request do
 
     end
 
+    describe "user profile" do
+      before(:each) { user_model }
+
+      it 'should include external tools' do
+        @tool = Account.default.context_external_tools.new({
+          :name => 'Example',
+          :url => 'http://www.example.com',
+          :consumer_key => 'key',
+          :shared_secret => 'secret',
+        })
+        @tool.settings.merge!({
+          :user_navigation => {
+            :enabled => 'true',
+            :url => 'http://www.example.com',
+          },
+        })
+        @tool.save!
+
+        json = api_call(:get, "/api/v1/users/#{@user.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :user_id => @user.to_param, :format => 'json'})
+
+        expect(json).to include(include('type' => 'external', 'label' => 'Example'))
+      end
+    end
+
   end
 
   describe 'update' do

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-
 export function typeNameToFuncName (typeName) {
   const parts = typeName.split('_')
   return parts.map((part, i) => {

@@ -472,34 +472,14 @@ class CoursesController < ApplicationController
     Shackles.activate(:slave) do
       respond_to do |format|
         format.html {
-          all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).preload(:enrollment_state, :course, :course_section).to_a
-          @past_enrollments = []
-          @current_enrollments = []
-          @future_enrollments = []
+          css_bundle :context_list, :course_list
+          js_bundle :course_list
 
-          all_enrollments.group_by {|e| [e.course_id, e.type]}.values.each do |enrollments|
-            e = enrollments.sort_by {|e| e.state_with_date_sortable}.first
-            if enrollments.count > 1
-              e.course_section = nil
-              e.readonly!
-            end
-
-            state = e.state_based_on_date
-            if [:completed, :rejected].include?(state) ||
-              ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
-              @past_enrollments << e unless e.workflow_state == "invited"
-            elsif !e.hard_inactive?
-              if e.enrollment_state.pending? || state == :creation_pending || (e.admin? && e.course.start_at&.>(Time.now.utc))
-                @future_enrollments << e unless e.restrict_future_listing?
-              elsif state != :inactive
-                @current_enrollments << e
-              end
-            end
+          if @current_user
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")})
           end
-          @visible_groups = @current_user.visible_groups
 
-          @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name(@current_user))}
-          [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]}}
+          render stream: can_stream_template?
         }
 
         format.json {
@@ -508,6 +488,42 @@ class CoursesController < ApplicationController
       end
     end
   end
+
+  def load_enrollments_for_index
+    all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).preload(:enrollment_state, :course, :course_section).to_a
+    @past_enrollments = []
+    @current_enrollments = []
+    @future_enrollments = []
+
+    all_enrollments.group_by {|e| [e.course_id, e.type]}.values.each do |enrollments|
+      e = enrollments.sort_by {|e| e.state_with_date_sortable}.first
+      if enrollments.count > 1
+        e.course_section = nil
+        e.readonly!
+      end
+
+      state = e.state_based_on_date
+      if [:completed, :rejected].include?(state) ||
+        ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
+        @past_enrollments << e unless e.workflow_state == "invited"
+      elsif !e.hard_inactive?
+        if e.enrollment_state.pending? || state == :creation_pending || (e.admin? && e.course.start_at&.>(Time.now.utc))
+          @future_enrollments << e unless e.restrict_future_listing?
+        elsif state != :inactive
+          @current_enrollments << e
+        end
+      end
+    end
+
+    @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name(@current_user))}
+    [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]}}
+  end
+  helper_method :load_enrollments_for_index
+
+  def enrollments_for_index(type)
+    instance_variable_get(:"@#{type}_enrollments")
+  end
+  helper_method :enrollments_for_index
 
   # @API List courses for a user
   # Returns a paginated list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
@@ -1812,6 +1828,7 @@ class CoursesController < ApplicationController
         js_env({
                  # don't check for student enrollments because we want to show course items on the teacher's  syllabus
                  STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner),
+                 DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
                  COURSE: {
                    id: @context.id.to_s,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
@@ -1857,7 +1874,7 @@ class CoursesController < ApplicationController
           ).to_a
           @syllabus_body = syllabus_user_content
         else
-          @active_tab = "home"
+          set_active_tab "home"
           if @context.grants_right?(@current_user, session, :manage_groups)
             @contexts += @context.groups
           else
@@ -1876,6 +1893,35 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :placements => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user).to_a
         unless @context.grants_right?(@current_user, session, :manage_content)
           @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
+        end
+
+        css_bundle :dashboard
+        css_bundle :react_todo_sidebar if planner_enabled?
+        case @course_home_view
+        when 'wiki'
+          js_bundle :wiki_page_show
+          css_bundle :wiki_page, :tinymce
+        when 'modules'
+          js_bundle :context_modules
+          css_bundle :content_next, :context_modules2
+        when 'assignments'
+          js_bundle :assignment_index
+          css_bundle :new_assignments
+          add_body_class('hide-content-while-scripts-not-loaded', 'with_item_groups')
+        when 'syllabus'
+          js_bundle :syllabus
+          css_bundle :syllabus, :tinymce
+        else
+          js_bundle :dashboard
+        end
+
+        js_bundle :course, 'legacy/courses_show'
+        css_bundle :course_show
+
+        if @context_enrollment
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_course_format_path(@context_enrollment.feed_code, :atom), {:title => t("Course Atom Feed")})
+        elsif @context.available?
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_course_format_path(@context.feed_code, :atom), {:title => t("Course Atom Feed")})
         end
       elsif @context.indexed && @context.available?
         render :description
@@ -2365,7 +2411,7 @@ class CoursesController < ApplicationController
 
     params[:course] ||= {}
     params_for_update = course_params
-    params[:course][:event] = :offer if params[:offer].present?
+    params[:course][:event] = :offer if value_to_boolean(params[:offer])
 
     if params[:course][:event] && params[:course].keys.size == 1
       if authorized_action(@course, @current_user, :change_course_state) && verified_user_check

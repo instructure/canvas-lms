@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.13.3', '<= 1.17.3'
+gem 'bundler', '>= 1.13.3', '<= 2.0.2'
 
 if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   Gem::Version.new(Gem::VERSION) < Gem::Version.new('2.6.9')
@@ -53,8 +53,9 @@ unless CANVAS_RAILS5_1
   end
 end
 
-git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-  "https://github.com/#{repo_name}.git"
+if Bundler::VERSION < '2'
+  git_source(:github) do |repo_name|
+    repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+    "https://github.com/#{repo_name}.git"
+  end
 end
-

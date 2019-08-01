@@ -84,5 +84,10 @@ module Types
     def module_item(id:)
       GraphQLNodeLoader.load("ModuleItem", id, context)
     end
+
+    field :audit_logs, Types::AuditLogsType, null: true
+    def audit_logs
+      Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
+    end
   end
 end

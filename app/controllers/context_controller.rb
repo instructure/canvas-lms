@@ -288,6 +288,9 @@ class ContextController < ApplicationController
 
       js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
 
+      js_bundle :user_name, "legacy/context_roster_user"
+      css_bundle :roster_user, :pairing_code
+
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(
           @user.profile,
@@ -295,7 +298,14 @@ class ContextController < ApplicationController
           session,
           ['links', 'user_services']
         )
-        render :new_roster_user
+        add_body_class 'not-editing'
+
+        add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
+        add_crumb(@user.name, context_url(@context, :context_user_url, @user))
+        add_crumb(t('#crumbs.access_report', "Access Report"))
+        set_active_tab "people"
+
+        render :new_roster_user, stream: can_stream_template?
         return false
       end
 
@@ -311,6 +321,11 @@ class ContextController < ApplicationController
         @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
       end
 
+      add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
+      add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
+      set_active_tab "people"
+
+      render stream: can_stream_template?
       true
     end
   end

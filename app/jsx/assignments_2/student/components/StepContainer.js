@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import {bool} from 'prop-types'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import StepItem from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
 import StudentViewContext from './Context'
+import {Submission} from '../graphqlData/Submission'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 function renderCollapsedContainer(step) {
@@ -132,9 +133,9 @@ function submittedStepContainer(props, context) {
 }
 
 submittedStepContainer.propTypes = {
-  assignment: AssignmentShape,
+  assignment: Assignment.shape,
   isCollapsed: bool,
-  submission: SubmissionShape
+  submission: Submission.shape
 }
 
 function gradedStepContainer(props, context) {
@@ -195,16 +196,16 @@ function StepContainer(props) {
 //       the propType validations properly that way. If not we need to remove
 //       these or actually using jsx to call them.
 gradedStepContainer.propTypes = {
-  assignment: AssignmentShape,
+  assignment: Assignment.shape,
   isCollapsed: bool,
-  submission: SubmissionShape
+  submission: Submission.shape
 }
 
 StepContainer.propTypes = {
-  assignment: AssignmentShape,
+  assignment: Assignment.shape,
   forceLockStatus: bool,
   isCollapsed: bool,
-  submission: SubmissionShape
+  submission: Submission.shape
 }
 
 export default React.memo(StepContainer)

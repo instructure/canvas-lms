@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import MessageStudentsWhoDialog from '../MessageStudentsWhoDialog'
 import {mockAssignment, mockUser, mockSubmission} from '../../test-utils'
 import {

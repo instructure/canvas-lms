@@ -19,16 +19,16 @@
 import * as AssignmentApi from './AssignmentApi'
 
 export const FAILURE = 'FAILURE'
-export const GRADES_ALREADY_PUBLISHED = 'GRADES_ALREADY_PUBLISHED'
+export const GRADES_ALREADY_RELEASED = 'GRADES_ALREADY_RELEASED'
 export const NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE = 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE'
-export const SET_PUBLISH_GRADES_STATUS = 'SET_PUBLISH_GRADES_STATUS'
+export const SET_RELEASE_GRADES_STATUS = 'SET_RELEASE_GRADES_STATUS'
 export const SET_UNMUTE_ASSIGNMENT_STATUS = 'SET_UNMUTE_ASSIGNMENT_STATUS'
 export const STARTED = 'STARTED'
 export const SUCCESS = 'SUCCESS'
 export const UPDATE_ASSIGNMENT = 'UPDATE_ASSIGNMENT'
 
-export function setPublishGradesStatus(status) {
-  return {type: SET_PUBLISH_GRADES_STATUS, payload: {status}}
+export function setReleaseGradesStatus(status) {
+  return {type: SET_RELEASE_GRADES_STATUS, payload: {status}}
 }
 
 export function setUnmuteAssignmentStatus(status) {
@@ -39,28 +39,28 @@ export function updateAssignment(assignment) {
   return {type: UPDATE_ASSIGNMENT, payload: {assignment}}
 }
 
-export function publishGrades() {
+export function releaseGrades() {
   return function(dispatch, getState) {
     const {assignment} = getState().assignment
 
-    dispatch(setPublishGradesStatus(STARTED))
+    dispatch(setReleaseGradesStatus(STARTED))
 
-    AssignmentApi.publishGrades(assignment.courseId, assignment.id)
+    AssignmentApi.releaseGrades(assignment.courseId, assignment.id)
       .then(() => {
         dispatch(updateAssignment({gradesPublished: true}))
-        dispatch(setPublishGradesStatus(SUCCESS))
+        dispatch(setReleaseGradesStatus(SUCCESS))
       })
       .catch(({response}) => {
         switch (response.status) {
           case 400:
             dispatch(updateAssignment({gradesPublished: true}))
-            dispatch(setPublishGradesStatus(GRADES_ALREADY_PUBLISHED))
+            dispatch(setReleaseGradesStatus(GRADES_ALREADY_RELEASED))
             break
           case 422:
-            dispatch(setPublishGradesStatus(NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE))
+            dispatch(setReleaseGradesStatus(NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE))
             break
           default:
-            dispatch(setPublishGradesStatus(FAILURE))
+            dispatch(setReleaseGradesStatus(FAILURE))
         }
       })
   }

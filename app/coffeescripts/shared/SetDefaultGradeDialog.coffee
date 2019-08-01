@@ -88,7 +88,7 @@ export default class SetDefaultGradeDialog
     getStudents = =>
       if @selected_section
         _(@students).filter (s) =>
-          _.include(s.sections, @selected_section)
+          _.includes(s.sections, @selected_section)
       else
         _(@students).values()
 

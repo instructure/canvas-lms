@@ -92,7 +92,7 @@ window.messageStudents = function(settings) {
 
   $ul.show()
 
-  const dialogTitle = I18n.t('message_student', 'Message Students for %{course_name}', {
+  const dialogTitle = I18n.t('Message Students for %{course_name}', {
     course_name: title
   })
 

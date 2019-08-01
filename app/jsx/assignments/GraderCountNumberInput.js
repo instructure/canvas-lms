@@ -23,19 +23,19 @@ import {NumberInput} from '@instructure/ui-number-input'
 
 const DEFAULT_GRADER_COUNT = 2
 
-function availableGradersText(maxGraderCount) {
-  if (maxGraderCount === 1) {
+function availableGradersText(availableGradersCount) {
+  if (availableGradersCount === 1) {
     return I18n.t('There is currently 1 available grader')
   }
 
-  return I18n.t('There are currently %{maxGraderCount} available graders', {maxGraderCount})
+  return I18n.t('There are currently %{availableGradersCount} available graders', {availableGradersCount})
 }
 
 export default class GraderCountNumberInput extends React.Component {
   static propTypes = {
     currentGraderCount: number,
     locale: string.isRequired,
-    maxGraderCount: number.isRequired
+    availableGradersCount: number.isRequired
   }
 
   static defaultProps = {
@@ -44,7 +44,7 @@ export default class GraderCountNumberInput extends React.Component {
 
   state = {
     graderCount:
-      this.props.currentGraderCount || Math.min(this.props.maxGraderCount, DEFAULT_GRADER_COUNT),
+      this.props.currentGraderCount || Math.min(this.props.availableGradersCount, DEFAULT_GRADER_COUNT),
     messages: []
   }
 
@@ -56,8 +56,8 @@ export default class GraderCountNumberInput extends React.Component {
     }
 
     const current = parseInt(newValue, 10)
-    if (current > this.props.maxGraderCount) {
-      return [{text: availableGradersText(this.props.maxGraderCount), type: 'hint'}]
+    if (current > this.props.availableGradersCount) {
+      return [{text: availableGradersText(this.props.availableGradersCount), type: 'hint'}]
     }
 
     return []
@@ -93,7 +93,7 @@ export default class GraderCountNumberInput extends React.Component {
           value={this.state.graderCount.toString()}
           label={label}
           locale={this.props.locale}
-          max={this.props.maxGraderCount.toString()}
+          max={this.props.availableGradersCount.toString()}
           messages={this.state.messages}
           min="1"
           onChange={e => {

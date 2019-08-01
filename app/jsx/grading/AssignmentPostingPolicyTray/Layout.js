@@ -38,7 +38,10 @@ export default function Layout(props) {
       <Text as="div">{I18n.t('Automatically')}</Text>
 
       <Text size="small">
-        {I18n.t('Grades will be visible to students as soon as they are entered.')}
+        {I18n.t(`
+          Assignment grades will be visible to students as soon as they are entered.
+          Grades that have already been hidden will remain hidden.
+        `)}
       </Text>
     </View>
   )

@@ -17,14 +17,14 @@
 %>
 
 <%
-  @body_classes << 'hide-content-while-scripts-not-loaded'
-  @body_classes << 'with_item_groups'
+  add_body_class 'hide-content-while-scripts-not-loaded'
+  add_body_class 'with_item_groups'
 
-  content_for :page_title, join_title((t '#titles.assignments', 'Assignments'),
+  provide :page_title, join_title((t '#titles.assignments', 'Assignments'),
     @context.name)
 
   js_bundle :assignment_index
   css_bundle :new_assignments
 %>
 <div id="hidden"></div>
-<% content_for :keyboard_navigation, true %>
+<% provide :keyboard_navigation, true %>

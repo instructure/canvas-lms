@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {getByText, fireEvent, queryByLabelText, queryHelpers} from 'dom-testing-library'
+import {getAllByText, fireEvent, queryByLabelText, queryHelpers} from '@testing-library/dom'
 
 export default class LinkOptionsTrayDriver {
   static find() {
@@ -38,7 +38,7 @@ export default class LinkOptionsTrayDriver {
     return queryByLabelText(document.body, 'Link', {selector: 'input'})
   }
   get $displayAsField() {
-    return getByText(this.$element, 'Display Options').closest('fieldset')
+    return getAllByText(this.$element, 'Display Options')[0].closest('fieldset')
   }
   get $previewCheckbox() {
     return queryHelpers.queryByAttribute('name', this.$element, 'auto-preview')

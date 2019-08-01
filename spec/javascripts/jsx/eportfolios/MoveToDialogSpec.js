@@ -28,11 +28,12 @@ let appRoot
 let applicationElement
 
 const mountDialog = (opts = {}) => {
-  opts = _.extend({}, {
+  opts = {
     header: 'This is a dialog',
     source: { label: 'foo', id: '0' },
-    destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }]
-  }, opts)
+    destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }],
+    ...opts
+  }
 
   const element = <MoveToDialog {...opts} />
   const dialog = ReactDOM.render(element, root)
@@ -55,19 +56,6 @@ QUnit.module('MoveToDialog', {
     appRoot.removeAttribute('aria-hidden')
     document.getElementById('fixtures').innerHTML = ''
   }
-})
-
-test('includes all destinations in select', () => {
-  const dialog = mountDialog()
-  const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
-  ok( options.find((opt) => (opt.label === 'bar')) )
-  ok( options.find((opt) => (opt.label === 'baz')) )
-})
-
-test('includes "at the bottom" in select', () => {
-  const dialog = mountDialog()
-  const options = TestUtils.scryRenderedDOMComponentsWithTag(dialog.refs.select, 'option')
-  ok( options.find((opt) => (opt.label === '-- At the bottom --')) )
 })
 
 test('calls onMove with a destination id when selected', (assert) => {

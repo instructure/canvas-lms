@@ -61,9 +61,9 @@ export default class MessageStudentsDialog extends DialogFormView
   initialize: (opts) ->
     super
     @options.title = if @context
-      I18n.t('message_students_for_context', 'Message students for %{context}', {@context})
+      I18n.t('Message students for %{context}', {@context})
     else
-      I18n.t('message_students', 'Message students')
+      I18n.t('Message students')
 
     @recipients = @recipientGroups[0].recipients
     @model or= new ConversationCreator(chunkSize: ENV.MAX_GROUP_CONVERSATION_SIZE)
@@ -95,7 +95,7 @@ export default class MessageStudentsDialog extends DialogFormView
 
   onSaveSuccess: ->
     @close()
-    $.flashMessage(I18n.t('notices.message_sent', "Message Sent!"))
+    $.flashMessage(I18n.t("Message Sent!"))
 
   close: ->
     super

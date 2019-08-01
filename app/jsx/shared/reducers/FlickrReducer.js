@@ -17,7 +17,6 @@
  */
 
   import FlickrInitialState from '../stores/FlickrInitialState'
-import _ from 'underscore'
 
   const flickrHandlers = {
     START_FLICKR_SEARCH (state, action) {
@@ -45,11 +44,11 @@ import _ from 'underscore'
     }
   };
 
-  const flickr = (state = FlickrInitialState, action) => { 
+  const flickr = (state = FlickrInitialState, action) => {
     if (flickrHandlers[action.type]) {
-      const newState = _.extend({}, state);
+      const newState = {...state};
       return flickrHandlers[action.type](newState, action);
-    } 
+    }
     else {
       return state;
     }

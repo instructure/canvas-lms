@@ -23,7 +23,7 @@ import {
   legacyMockSubmission,
   mockMultipleAttachments
 } from '../../test-utils'
-import {fireEvent, render, waitForElement} from 'react-testing-library'
+import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
 

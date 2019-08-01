@@ -24,7 +24,7 @@ import {Query} from 'react-apollo'
 import React from 'react'
 import {string} from 'prop-types'
 import StudentViewQUery from './StudentViewQuery'
-import {SUBMISSION_ID_QUERY} from '../assignmentData'
+import {SUBMISSION_ID_QUERY} from '../graphqlData/Queries'
 
 const SubmissionIDQuery = props => (
   <Query query={SUBMISSION_ID_QUERY} variables={{assignmentLid: props.assignmentLid}}>

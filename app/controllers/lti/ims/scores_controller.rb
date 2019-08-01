@@ -119,6 +119,12 @@ module Lti::Ims
     # @argument comment [String]
     #   Comment visible to the student about this score.
     #
+    # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
+    #   (EXTENSION) Optional submission type and data.
+    #   new_submission [Boolean] flag to indicate that this is a new submission.  Defaults to true if submission_type is given.
+    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, or online_url
+    #   submission_data [String] submission data (URL or body text)
+    #
     # @returns resultUrl [String]
     #   The url to the result that was created.
     #
@@ -130,7 +136,12 @@ module Lti::Ims
     #     "comment": "This is exceptional work.",
     #     "activityProgress": "Completed",
     #     "gradingProgress": "FullyGraded",
-    #     "userId": "5323497"
+    #     "userId": "5323497",
+    #     "https://canvas.instructure.com/lti/submission": {
+    #       "new_submission": true,
+    #       "submission_type": "online_url",
+    #       "submission_data": "https://instructure.com"
+    #     }
     #   }
     def create
       update_or_create_result
@@ -141,7 +152,7 @@ module Lti::Ims
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
-    EXTENSION_PARAMS = [Lti::Result::AGS_EXT_SUBMISSION_URL].freeze
+    SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url].freeze
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
@@ -149,18 +160,18 @@ module Lti::Ims
 
     def scores_params
       @_scores_params ||= begin
-        update_params = params.permit(REQUIRED_PARAMS + OPTIONAL_PARAMS + EXTENSION_PARAMS).transform_keys do |k|
-          k.to_s.underscore
+        update_params = params.permit(REQUIRED_PARAMS + OPTIONAL_PARAMS,
+          Lti::Result::AGS_EXT_SUBMISSION => [:new_submission, :submission_type, :submission_data]).transform_keys do |k|
+            k.to_s.underscore
         end.except(:timestamp, :user_id, :score_given, :score_maximum).to_unsafe_h
         update_params[:extensions] = extract_extensions(update_params)
-        return update_params if ignore_score?
         update_params.merge(result_score: params[:scoreGiven], result_maximum: params[:scoreMaximum])
       end
     end
 
     def extract_extensions(update_params)
       {
-        Lti::Result::AGS_EXT_SUBMISSION_URL => update_params.delete(Lti::Result::AGS_EXT_SUBMISSION_URL)
+        Lti::Result::AGS_EXT_SUBMISSION => update_params.delete(Lti::Result::AGS_EXT_SUBMISSION)
       }.compact
     end
 
@@ -186,18 +197,38 @@ module Lti::Ims
     end
 
     def score_submission
-      return unless line_item.assignment_line_item? && (!ignore_score? || url_extension?)
+      return unless line_item.assignment_line_item?
 
-      submission = if !ignore_score?
-        line_item.assignment.grade_student(
-          user,
-          { score: submission_score, grader_id: -tool.id }
-        ).first
+      submission = if new_submission?
+        line_item.assignment.submit_homework(user)
       else
         line_item.assignment.find_or_create_submission(user)
       end
 
-      submission.url = scores_params[:extensions][Lti::Result::AGS_EXT_SUBMISSION_URL]
+      if ignore_score?
+        submission.score = nil
+      else
+        submission = line_item.assignment.grade_student(
+          user,
+          {score: submission_score, grader_id: -tool.id}
+        ).first
+      end
+
+      if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
+        submission.submission_type = submission_type
+        case submission_type
+        when 'none'
+          submission.body = nil
+          submission.url = nil
+        when 'basic_lti_launch', 'online_url'
+          submission.body = nil
+          submission.url = submission_data
+        when 'online_text_entry'
+          submission.url = nil
+          submission.body = submission_data
+        end
+      end
+
       submission.save!
       submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
       submission
@@ -238,8 +269,17 @@ module Lti::Ims
       lti_result_show_url(course_id: context.id, line_item_id: line_item.id, id: result.id)
     end
 
-    def url_extension?
-      scores_params[:extensions].key?(Lti::Result::AGS_EXT_SUBMISSION_URL)
+    def submission_type
+      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_type)
+    end
+
+    def submission_data
+      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_data)
+    end
+
+    def new_submission?
+      new_flag = ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :new_submission))
+      new_flag || (new_flag.nil? && !submission_type.nil? && submission_type != 'none')
     end
   end
 end

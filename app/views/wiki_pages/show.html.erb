@@ -17,9 +17,7 @@
 %>
 
 <%
-  content_for :page_title, join_title(@page.title.to_s, @context.name)
-  js_bundle :wiki_page_show
-  css_bundle :wiki_page
+  provide :page_title, join_title(@page.title.to_s, @context.name)
 %>
 
 <% unless @page.locked_for?(@current_user, {check_policies: true, context: @context, deep_check_if_needed: true}) %>

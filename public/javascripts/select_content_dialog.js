@@ -489,7 +489,7 @@ import './jquery.templateData'
     $("#add_module_item_select").change(function() {
       // Don't disable the form button for these options
       var selectedOption = $(this).val();
-      var doNotDisable = _.contains(['external_url', 'context_external_tool', 'context_module_sub_header'], selectedOption);
+      var doNotDisable = ['external_url', 'context_external_tool', 'context_module_sub_header'].includes(selectedOption);
       if (doNotDisable) {
         $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
       } else {

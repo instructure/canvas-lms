@@ -35,7 +35,7 @@ describe Api::V1::Course do
       @course.save
       course_settings = course_settings_json(@course)
       expect(course_settings[:allow_student_discussion_topics]).to eq true
-      expect(course_settings[:allow_student_forum_attachments]).to eq false
+      expect(course_settings[:allow_student_forum_attachments]).to eq true
       expect(course_settings[:allow_student_discussion_editing]).to eq true
       expect(course_settings[:grading_standard_enabled]).to eq true
       expect(course_settings[:grading_standard_id]).to eq grading_standard.id

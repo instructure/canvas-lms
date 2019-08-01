@@ -31,3 +31,21 @@
     @media only screen and (min-width: 1140px) { @content; }
   }
 }
+
+@mixin desktop-only {
+  @if $use_responsive_layout {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+  @else {
+    @content;
+  }
+}
+@mixin mobile-only {
+  @if $use_responsive_layout {
+    @media (max-width: 767px) {
+      @content;
+    }
+  }
+}

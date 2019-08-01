@@ -226,6 +226,17 @@ QUnit.module('PostAssignmentGradesTray FormContent', suiteHooks => {
       mountComponent({unpostedCount: 1})
       ok(getUnpostedHiddenText())
     })
+
+    test('the accessible message is present', () => {
+      mountComponent({unpostedCount: 2})
+      strictEqual(getUnpostedSummary().textContent.includes('2 hidden'), true)
+    })
+
+    test('the displayed context has aria-hidden set to true', () => {
+      mountComponent({unpostedCount: 2})
+      const {textContent} = getUnpostedSummary().querySelectorAll('[aria-hidden="true"]')[0]
+      strictEqual(textContent, 'Hidden2')
+    })
   })
 
   QUnit.module('when sections are absent', () => {

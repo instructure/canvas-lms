@@ -545,7 +545,7 @@ class Message < ActiveRecord::Base
     path_type ||= communication_channel.try(:path_type) || 'email'
 
     # Determine the message template file to be used in the message
-    filename = template_filename(path_type)
+    filename = path_type == 'slack' ? template_filename('sms') : template_filename(path_type)
     message_body_template = get_template(filename)
 
     context, asset, user, delayed_messages, data = [self.context,
@@ -589,17 +589,20 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    delivery_method = "deliver_via_#{path_type}".to_sym
-
-    if not delivery_method or not respond_to?(delivery_method, true)
-      logger.warn("Could not set delivery_method from #{path_type}")
+    if path_type == 'slack' && !context_root_account.settings[:encrypted_slack_key]
+      logger.warn('Could not send slack message without configured key')
       return nil
     end
 
-    check_acct = (user && user.account) || Account.site_admin
+    check_acct = user&.account || Account.site_admin
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
     else
+      delivery_method = "deliver_via_#{path_type}".to_sym
+      if !delivery_method || !respond_to?(delivery_method, true)
+        logger.warn("Could not set delivery_method from #{path_type}")
+        return nil
+      end
       send(delivery_method)
     end
   end
@@ -651,7 +654,7 @@ class Message < ActiveRecord::Base
       truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
       "#{truncated_body} #{url}"
     else
-      if to =~ /^\+[0-9]+$/
+      if to =~ /^\+[0-9]+$/ || path_type == 'slack'
         body
       else
         Mailer.create_message(self).to_s
@@ -672,6 +675,12 @@ class Message < ActiveRecord::Base
         "access_token"=> twitter_service.token,
         "access_token_secret"=> twitter_service.secret,
         "user_id"=> twitter_service.service_user_id
+      ]
+    when 'slack'
+      [
+        'recipient'=> to,
+        'access_token'=> Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
+                                                           context_root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key')
       ]
     else
       [to]

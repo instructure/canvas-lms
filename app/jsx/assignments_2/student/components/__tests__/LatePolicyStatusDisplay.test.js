@@ -18,7 +18,7 @@
 
 import LatePolicyStatusDisplay from '../LatePolicyStatusDisplay'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 describe('LatePolicyStatusDisplay', () => {
   it('renders -3 points for tooltip launch', () => {

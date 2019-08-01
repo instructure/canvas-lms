@@ -22,6 +22,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
   include Api::V1::AssignmentGroup
+  include Api::V1::GroupCategory
   include Api::V1::ModerationGrader
   include Api::V1::Outcome
   include Api::V1::ExternalTools
@@ -66,6 +67,7 @@ class AssignmentsController < ApplicationController
           HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
           QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
+          DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
         }
         js_env(hash)
 
@@ -199,13 +201,25 @@ class AssignmentsController < ApplicationController
 
         @similarity_pledge = pledge_text
 
-        js_env({
-                :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
-                :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
-                :EULA_URL => tool_eula_url,
-                :SIMILARITY_PLEDGE => @similarity_pledge,
-                PERMISSIONS: permissions,
-              })
+        env = js_env({
+          EULA_URL: tool_eula_url,
+          EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
+          PERMISSIONS: permissions,
+          ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
+          SIMILARITY_PLEDGE: @similarity_pledge
+        })
+
+        env[:SETTINGS][:filter_speed_grader_by_student_group] = @context.filter_speed_grader_by_student_group?
+
+        if env[:SETTINGS][:filter_speed_grader_by_student_group]
+          env[:group_categories] = group_categories_json(@context.group_categories, @current_user, session, {include: ['groups']})
+          env[:selected_student_group_id] = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+        end
+
+        if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?
+          env[:speed_grader_url] = context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id)
+        end
+
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)
 
@@ -223,6 +237,14 @@ class AssignmentsController < ApplicationController
         @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
+
+        @show_locked_page = @locked && !@locked[:can_view]
+        if @show_locked_page
+          js_bundle :module_sequence_footer
+        else
+          css_bundle :assignments
+          js_bundle :assignment_show
+        end
 
         render locals: {
           eula_url: tool_eula_url,

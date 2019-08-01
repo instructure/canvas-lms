@@ -116,7 +116,9 @@ describe Lti::LtiAdvantageAdapter do
         "iss",
         "login_hint",
         "target_link_uri",
-        "lti_message_hint"
+        "lti_message_hint",
+        "canvas_region",
+        "client_id"
       ]
     end
 
@@ -128,8 +130,41 @@ describe Lti::LtiAdvantageAdapter do
       expect(login_message['target_link_uri']).to eq tool.url
     end
 
+    it 'sets the "canvas_region" to "not_configured"' do
+      expect(login_message['canvas_region']).to eq 'not_configured'
+    end
+
     it 'sets the domain in the message hint' do
       expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_domain']).to eq 'test.com'
+    end
+
+    it 'sets the client_id to the developer key global id' do
+      expect(login_message['client_id']).to eq tool.global_developer_key_id
+    end
+
+    context 'when the DB has a region configured' do
+      specs_require_sharding
+
+      let(:region) { 'us-east-1' }
+      let(:config_stub) do
+        config = @shard1.database_server.config.dup
+        config[:region] = region
+        config
+      end
+      let(:course) do
+        @shard1.activate do
+          course_with_student
+          @course
+        end
+      end
+
+      before do
+        allow(@shard1.database_server).to receive(:config).and_return(config_stub)
+      end
+
+      it 'sets the "canvas_region" to the configured region' do
+        expect(login_message['canvas_region']).to eq region
+      end
     end
 
     context 'when a "launch_url" is set in the options hash' do

@@ -4474,21 +4474,39 @@ describe Assignment do
     end
 
     context "assignment unmuted" do
+      let(:assignment) { @course.assignments.create! }
+
       before :once do
-        Notification.create(:name => 'Assignment Unmuted')
+        @assignment_unmuted_notification = Notification.create(name: "Assignment Unmuted")
+        @student.update!(email: "fakeemail@example.com")
+        @student.email_channel.update!(workflow_state: :active)
       end
 
       it "should create a message when an assignment is unmuted" do
-        assignment_model(:course => @course)
-        @assignment.broadcast_unmute_event
-        expect(@assignment.messages_sent).to be_include('Assignment Unmuted')
+        assignment.mute!
+
+        expect {
+          assignment.unmute!
+        }.to change {
+          DelayedMessage.where(
+            communication_channel: @student.email_channel,
+            notification: @assignment_unmuted_notification
+          ).count
+        }.by(1)
       end
 
       it "should not create a message in an unpublished course" do
-        course_factory
-        assignment_model(:course => @course)
-        @assignment.broadcast_unmute_event
-        expect(@assignment.messages_sent).not_to be_include('Assignment Unmuted')
+        @course.update!(workflow_state: "created")
+        assignment.mute!
+
+        expect {
+          assignment.unmute!
+        }.not_to change {
+          DelayedMessage.where(
+            communication_channel: @student.email_channel,
+            notification: @assignment_unmuted_notification
+          ).count
+        }
       end
     end
 
@@ -6827,28 +6845,42 @@ describe Assignment do
   end
 
   describe '#moderated_grading_max_grader_count' do
-    before(:once) do
-      course = Course.create!
-      teacher = User.create!
-      second_teacher = User.create!
-      course.enroll_teacher(teacher, enrollment_state: 'active')
-      @second_teacher_enrollment = course.enroll_teacher(second_teacher, enrollment_state: 'active')
-      ta = User.create!
-      course.enroll_ta(ta, enrollment_state: 'active')
-      @assignment = course.assignments.create!(
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+    let_once(:assignment) {
+      course.assignments.create!(
         final_grader: teacher,
-        grader_count: 2,
+        grader_count: 1,
         moderated_grading: true
       )
+    }
+
+    before(:once) do
+      teacher2 = User.create!
+      @teacher2_enrollment = course.enroll_teacher(teacher2, enrollment_state: 'active')
+      course.enroll_teacher(User.create!, enrollment_state: 'active')
+      assignment.update!(grader_count: 2)
     end
 
     it 'returns the number of active instructors minus one' do
-      expect(@assignment.moderated_grading_max_grader_count).to eq 2
+      expect(assignment.moderated_grading_max_grader_count).to eq 2
     end
 
-    it 'returns the current grader_count if it is greater than the number of active instructors minus one' do
-      @second_teacher_enrollment.deactivate
-      expect(@assignment.moderated_grading_max_grader_count).to eq 2
+    it 'returns the number of active instructors minus one when a grader is deactivated' do
+      @teacher2_enrollment.deactivate
+      expect(assignment.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'returns number of active instructors minus 1 when number of graders > available graders count' do
+      assignment.update!(grader_count: 7)
+      expect(assignment.moderated_grading_max_grader_count).to eq 2
+    end
+
+    it 'returns available graders count when number of graders is set to the max possible' do
+      assignment.update!(grader_count: 9)
+      course.enroll_teacher(User.create!, enrollment_state: 'active')
+      course.enroll_teacher(User.create!, enrollment_state: 'active')
+      expect(assignment.moderated_grading_max_grader_count).to eq 4
     end
   end
 
@@ -7216,6 +7248,11 @@ describe Assignment do
         }.not_to change {
           assignment.submission_for_student(student1).posted_at
         }
+      end
+
+      it "calls broadcast_notifications for submissions" do
+        expect(Submission.broadcast_policy_list).to receive(:broadcast).with(student1_submission)
+        assignment.post_submissions(submission_ids: [student1_submission.id])
       end
 
       context "when given a Progress" do

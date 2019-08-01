@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
@@ -68,10 +67,10 @@ export default class DashboardCard extends Component {
   constructor(props) {
     super()
 
-    this.state = _.extend(
-      {nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id)},
-      CourseActivitySummaryStore.getStateForCourse(props.id)
-    )
+    this.state = {
+      nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id),
+      ...CourseActivitySummaryStore.getStateForCourse(props.id)
+    }
   }
 
   // ===============
@@ -163,8 +162,7 @@ export default class DashboardCard extends Component {
     }[icon]
 
     const itemStream = stream || []
-    const streamItem = _.find(
-      itemStream,
+    const streamItem = itemStream.find(
       item =>
         // only return 'Message' type if category is 'Due Date' (for assignments)
         item.type === activityType &&

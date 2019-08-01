@@ -16,14 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t('titles.access_report', 'Access Report') %>
-<% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
-  add_crumb(@user.name, context_url(@context, :context_user_url, @user))
-  @active_tab="people"
-  add_crumb(t('#crumbs.access_report', "Access Report"))
+<% provide :page_title, t('titles.access_report', 'Access Report') %>
+<%
   css_bundle :roster_user_usage
 %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>">
     <i class="icon-arrow-left"></i>
     <%= t('links.back_to_user', %{Back to User Page}) %>

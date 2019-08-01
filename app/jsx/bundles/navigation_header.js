@@ -21,6 +21,7 @@ import I18n from 'i18n!common'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Navigation from '../navigation_header/Navigation'
+import MobileNavigation from '../navigation_header/MobileNavigation'
 
 // #
 // Handle user toggling of nav width
@@ -50,4 +51,19 @@ $('body').on('click', '#primaryNavToggle', function () {
   }
 })
 
-ReactDOM.render(<Navigation />, document.getElementById('global_nav_tray_container'))
+const DesktopNavComponent = ReactDOM.render(
+  <Navigation onDataRecieved={renderMobileNav} />,
+  document.getElementById('global_nav_tray_container')
+)
+
+let mobileNavigationComponent
+function renderMobileNav() {
+  if (mobileNavigationComponent) mobileNavigationComponent.forceUpdate()
+}
+const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
+if (mobileContextNavContainer) {
+  mobileNavigationComponent = ReactDOM.render(
+    <MobileNavigation DesktopNavComponent={DesktopNavComponent} />,
+    mobileContextNavContainer
+  )
+}

@@ -32,8 +32,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  layout :application_layout
-
   attr_accessor :active_tab
   attr_reader :context
 
@@ -77,6 +75,7 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
+  after_action :add_csp_for_root
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
 
@@ -155,10 +154,8 @@ class ApplicationController < ActionController::Base
         DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
-          eportfolios_enabled: (@domain_root_account && @domain_root_account.settings[:enable_eportfolios] != false), # checking all user root accounts is slow
           collapse_global_nav: @current_user.try(:collapse_global_nav?),
-          show_feedback_link: show_feedback_link?,
-          enable_profiles: (@domain_root_account && @domain_root_account.settings[:enable_profiles] != false)
+          show_feedback_link: show_feedback_link?
         },
       }
       @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
@@ -276,11 +273,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:responsive_layout)
   end
   helper_method :use_responsive_layout?
-
-  def application_layout
-    use_responsive_layout? ? "ic_layout" : "application"
-  end
-  private :application_layout
 
   def grading_periods?
     !!@context.try(:grading_periods?)
@@ -1777,7 +1769,7 @@ class ApplicationController < ActionController::Base
 
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
-  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil) # TODO: generalize this
+  def safe_domain_file_url(attachment, host_and_shard: nil, verifier: nil, download: false, return_url: nil, fallback_url: nil) # TODO: generalize this
     if !host_and_shard
       host_and_shard = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
     end
@@ -1794,7 +1786,13 @@ class ApplicationController < ActionController::Base
       # will authorize file access but not full app access.  We need this in
       # case there are relative URLs in the file that point to other pieces
       # of content.
-      opts = generate_access_verifier(return_url: return_url)
+      fallback_url ||= request.url
+      query = URI.parse(fallback_url).query
+      # i don't know if we really need this but in case these expired tokens are a client caching issue,
+      # let's throw an extra param in the fallback so we hopefully don't infinite loop
+      fallback_url += (query.present? ? '&' : '?') + "fallback_ts=#{Time.now.to_i}"
+
+      opts = generate_access_verifier(return_url: return_url, fallback_url: fallback_url)
       opts[:verifier] = verifier if verifier.present?
 
       if download
@@ -2115,6 +2113,27 @@ class ApplicationController < ActionController::Base
     nil
   end
   helper_method :js_bundle
+
+  def add_body_class(*args)
+    @body_classes ||= []
+    raise "call add_body_class for #{args} in the controller when using streaming templates" if @streaming_template && (args - @body_classes).any?
+    @body_classes += args
+  end
+  helper_method :add_body_class
+
+  def body_classes; @body_classes ||= []; end
+  helper_method :body_classes
+
+  def set_active_tab(active_tab)
+    raise "call set_active_tab for #{active_tab.inspect} in the controller when using streaming templates" if @streaming_template && @active_tab != active_tab
+    @active_tab = active_tab
+  end
+  helper_method :set_active_tab
+
+  def get_active_tab
+    @active_tab
+  end
+  helper_method :get_active_tab
 
   def get_course_from_section
     if params[:section_id]
@@ -2503,11 +2522,16 @@ class ApplicationController < ActionController::Base
         analytics: @account.service_enabled?(:analytics),
         can_masquerade: @account.grants_right?(@current_user, session, :become_user),
         can_message_users: @account.grants_right?(@current_user, session, :send_messages),
-        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins),
+        can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
         can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
         can_manage_admin_users: @account.grants_right?(@current_user, session, :manage_admin_users)  # access to manage user avatars page?
       }
     })
     render html: '', layout: true
+  end
+
+  def can_stream_template?
+    Setting.get("disable_template_streaming_all", "false") != "true" &&
+      Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
   end
 end

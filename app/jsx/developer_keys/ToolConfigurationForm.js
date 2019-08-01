@@ -27,7 +27,8 @@ import View from '@instructure/ui-layout/lib/components/View'
 
 import ManualConfigurationForm from './ManualConfigurationForm'
 
-const validationMessage = [{text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'}]
+const validationMessageInvalidJson = [{text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'}]
+const validationMessageRequiredField = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 
 export default class ToolConfigurationForm extends React.Component {
   state = {
@@ -81,7 +82,7 @@ export default class ToolConfigurationForm extends React.Component {
           onChange={this.updatePastedJson}
           label={I18n.t('LTI 1.3 Configuration')}
           maxHeight="20rem"
-          messages={this.props.showRequiredMessages && this.state.invalidJson ? validationMessage : []}
+          messages={this.props.showRequiredMessages && this.state.invalidJson ? validationMessageInvalidJson : []}
         />
       )
     } else if (this.props.configurationMethod === 'manual') {
@@ -100,6 +101,7 @@ export default class ToolConfigurationForm extends React.Component {
         value={this.props.toolConfigurationUrl}
         onChange={this.updateToolConfigurationUrl}
         label={I18n.t('JSON URL')}
+        messages={this.props.showRequiredMessages ? validationMessageRequiredField : []}
       />
     )
   }

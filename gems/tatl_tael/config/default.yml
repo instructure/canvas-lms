@@ -214,7 +214,7 @@ Simple/NewErbLinter:
     Maybe try doing something like this in your controller instead:
 
         @page_title = t('Your Page Title')
-        @body_classes << 'whatever-classes you-want-to-add-to-body'
+        add_body_class 'whatever-classes you-want-to-add-to-body'
         js_bundle :your_js_bundle
         css_bundle :any_css_bundles_you_want
         js_env({whatever: 'you need to put in window.ENV'})

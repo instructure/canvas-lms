@@ -17,8 +17,12 @@
  */
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
-import {fireEvent, wait, waitForElement} from 'react-testing-library'
-import {SAVE_ASSIGNMENT} from './assignmentData'
+import {fireEvent, wait, waitForElement} from '@testing-library/react'
+import {
+  SAVE_ASSIGNMENT,
+  COURSE_MODULES_QUERY_LOCAL,
+  COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL
+} from './assignmentData'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
 export function closest(el, selector) {
@@ -43,7 +47,7 @@ export async function waitForNoElement(queryFn) {
       elt = queryFn()
     } catch (e) {
       // if queryFn throws, assume element can't be found and succeed
-      return
+      return true
     }
 
     // fail if the element was found
@@ -51,6 +55,32 @@ export async function waitForNoElement(queryFn) {
   })
   // if the above didn't throw, then success
   return true
+}
+
+// when TeacherView is rendered, the AssignmentModules and AssignmentGroup
+// components each do a local query to the cache for their data, which
+// remain empty until the user flips them to edit mode
+export function initialTeacherViewGQLMocks(courseId) {
+  return [
+    {
+      request: {
+        query: COURSE_MODULES_QUERY_LOCAL,
+        variables: {courseId}
+      },
+      result: {
+        data: {}
+      }
+    },
+    {
+      request: {
+        query: COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL,
+        variables: {courseId}
+      },
+      result: {
+        data: {}
+      }
+    }
+  ]
 }
 
 export function saveAssignmentResult(assignment, updates, response, errorMessage) {
@@ -71,9 +101,13 @@ export function saveAssignmentResult(assignment, updates, response, errorMessage
             lid: assignment.lid,
             gid: assignment.gid,
             dueAt: assignment.dueAt,
+            unlockAt: assignment.unlockAt,
+            lockAt: assignment.lockAt,
             name: assignment.name,
             description: assignment.description,
+            pointsPossible: assignment.pointsPossible,
             state: assignment.state,
+            assignmentOverrides: assignment.assignmentOverrides,
             ...response
           }
         }
@@ -154,9 +188,9 @@ export function mockOverride(overrides = {}) {
     gid: '1',
     lid: '1',
     title: 'Section A',
-    dueAt: '2018-12-25T23:59:59-05:00',
+    dueAt: '2018-12-25T13:00:00-05:00',
     allDay: true,
-    lockAt: '2018-12-29T23:59:00-05:00',
+    lockAt: '2018-12-29T13:00:00-05:00',
     unlockAt: '2018-12-23T00:00:00-05:00',
     set: {
       __typename: 'Section',

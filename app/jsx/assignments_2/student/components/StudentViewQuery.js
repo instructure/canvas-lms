@@ -23,7 +23,7 @@ import LoadingIndicator from '../../shared/LoadingIndicator'
 import {Query} from 'react-apollo'
 import React from 'react'
 import {string} from 'prop-types'
-import {STUDENT_VIEW_QUERY} from '../assignmentData'
+import {STUDENT_VIEW_QUERY} from '../graphqlData/Queries'
 import SubmissionHistoriesQuery from './SubmissionHistoriesQuery'
 
 const InitialQuery = props => (

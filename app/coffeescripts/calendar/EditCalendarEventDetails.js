@@ -51,9 +51,9 @@ export default class EditCalendarEventDetails {
     this.setupTimeAndDatePickers()
 
     this.$form.submit(this.formSubmit)
-    this.$form.find('.more_options_link').click(this.moreOptionsClick)
-    this.$form.find('select.context_id').change(this.contextChange)
-    this.$form.find('#duplicate_event').change(this.duplicateCheckboxChanged)
+    this.$form.find('.more_options_link').click(this.moreOptionsClick.bind(this))
+    this.$form.find('select.context_id').change(this.contextChange.bind(this))
+    this.$form.find('#duplicate_event').change(this.duplicateCheckboxChanged.bind(this))
     this.$form.find('select.context_id').triggerHandler('change', false)
 
     // show context select if the event allows moving between calendars

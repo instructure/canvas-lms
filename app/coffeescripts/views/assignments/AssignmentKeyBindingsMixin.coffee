@@ -58,7 +58,7 @@ export default
 
   handleKeys: (e) ->
     modifiers = ['shiftKey', 'altKey', 'ctrlKey']
-    return if _.any(e[mod] for mod in modifiers)
+    return if _.some(e[mod] for mod in modifiers)
     b = _.find(@keyBindings, (binding) ->
       binding.keyCode == e.keyCode
     )

@@ -141,7 +141,7 @@ function dropUnpointed(submissions, keepHighest, keepLowest) {
   const sortedSubmissions = submissions.sort(sortSubmissionsAscending)
   return _.chain(sortedSubmissions)
     .last(keepHighest)
-    .first(keepLowest)
+    .head(keepLowest)
     .value()
 }
 
@@ -168,7 +168,7 @@ function dropAssignments(allSubmissionData, rules = {}) {
   let droppableSubmissionData = allSubmissionData
   if (neverDropIds.length > 0) {
     ;[cannotDrop, droppableSubmissionData] = partition(allSubmissionData, submission =>
-      _.contains(neverDropIds, submission.submission.assignment_id)
+      _.includes(neverDropIds, submission.submission.assignment_id)
     )
   }
 
@@ -203,7 +203,7 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
   // Remove assignments without visibility from gradeableAssignments.
   const hiddenAssignmentsById = _.chain(allSubmissions)
     .filter('hidden')
-    .indexBy('assignment_id')
+    .keyBy('assignment_id')
     .value()
   const ungradeableCriteria = assignment =>
     assignment.omit_from_final_grade ||
@@ -211,7 +211,7 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
     _.isEqual(assignment.submission_types, ['not_graded']) ||
     assignment.workflow_state === 'unpublished'
   const gradeableAssignments = _.reject(group.assignments, ungradeableCriteria)
-  const assignments = _.indexBy(gradeableAssignments, 'id')
+  const assignments = _.keyBy(gradeableAssignments, 'id')
 
   // Remove submissions from other assignment groups.
   let submissions = _.filter(allSubmissions, submission => assignments[submission.assignment_id])

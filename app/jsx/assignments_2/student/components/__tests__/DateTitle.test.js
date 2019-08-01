@@ -18,9 +18,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import {mockAssignment} from '../../test-utils'
+import {mockAssignment} from '../../mocks'
 import DateTitle from '../DateTitle'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -35,39 +35,50 @@ afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-it('renders title correctly', () => {
-  const assignment = mockAssignment({name: 'Egypt Economy Research'})
+it('renders title correctly', async () => {
+  const assignment = await mockAssignment({
+    Assignment: () => ({name: 'Egypt Economy Research'})
+  })
   const {getAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
   expect(getAllByText('Egypt Economy Research')).toHaveLength(1)
 })
 
-it('renders title correctly when sticky', () => {
-  const assignment = mockAssignment({name: 'Egypt Economy Research'})
+it('renders title correctly when sticky', async () => {
+  const assignment = await mockAssignment({
+    Assignment: () => ({name: 'Egypt Economy Research'})
+  })
   const {getAllByText} = render(<DateTitle assignment={assignment} isSticky />)
   expect(getAllByText('Egypt Economy Research')).toHaveLength(1)
 })
 
-it('does not render AvailabilityDates when sticky', () => {
-  const assignment = mockAssignment({
-    unlockAt: '2016-07-11T18:00:00-01:00',
-    lockAt: '2016-11-11T18:00:00-01:00'
+it('does not render AvailabilityDates when sticky', async () => {
+  const assignment = await mockAssignment({
+    Assignment: () => ({
+      unlockAt: '2016-07-11T18:00:00-01:00',
+      lockAt: '2016-11-11T18:00:00-01:00'
+    })
   })
   const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky />)
   expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
 })
 
-it('renders AvailabilityDates when not sticky', () => {
-  const assignment = mockAssignment({
-    unlockAt: '2016-07-11T18:00:00-01:00',
-    lockAt: '2016-11-11T18:00:00-01:00'
+it('renders AvailabilityDates when not sticky', async () => {
+  const assignment = await mockAssignment({
+    Assignment: () => ({
+      unlockAt: '2016-07-11T18:00:00-01:00',
+      lockAt: '2016-11-11T18:00:00-01:00'
+    })
   })
   const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
   // Reason why this is showing up twice is once for screenreader content and again for regular content
   expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(2)
 })
 
-it('renders date correctly', () => {
-  const assignment = mockAssignment({dueAt: '2016-07-11T18:00:00-01:00'})
+it('renders date correctly', async () => {
+  const assignment = await mockAssignment({
+    Assignment: () => ({dueAt: '2016-07-11T18:00:00-01:00'})
+  })
+
   const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
   // Reason why this is showing up twice is once for screenreader content and again for regular content
   // Also, notice that it handles timezone differences here, with the `-01:00` offset
@@ -75,8 +86,8 @@ it('renders date correctly', () => {
   expect(queryAllByText('7/11/2016')).toHaveLength(1)
 })
 
-it('does not render a date if there is no dueAt set', () => {
-  const assignment = mockAssignment({dueAt: null})
+it('does not render a date if there is no dueAt set', async () => {
+  const assignment = await mockAssignment()
   const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
   expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
 })

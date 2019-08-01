@@ -55,16 +55,16 @@ export default class EntryCollectionView extends View
     @childViews = []
 
   attach: ->
-    @collection.on 'reset', @addAll
-    @collection.on 'add', @add
+    @collection.on 'reset', @addAll, this
+    @collection.on 'add', @add, this
 
   toJSON: -> @options
 
-  addAll: =>
+  addAll: ->
     @teardown()
-    @collection.each @add
+    @collection.each @add.bind(this)
 
-  add: (entry) =>
+  add: (entry) ->
     view = new EntryView
       model: entry
       treeView: @constructor

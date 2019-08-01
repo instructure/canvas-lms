@@ -184,6 +184,9 @@
           },
           {
             "name": "Quiz"
+          },
+          {
+            "name": "SubHeader"
           }
         ]
       },
@@ -220,6 +223,9 @@
           },
           {
             "name": "AdhocStudents"
+          },
+          {
+            "name": "EveryoneElse"
           }
         ]
       },

@@ -179,22 +179,22 @@ module WikiAndTinyCommon
   end
 
   def add_file_to_rce
-    wiki_page_tools_file_tree_setup
+    title = "text_file.txt"
+    @root_folder = Folder.root_folders(@course).first
+    @text_file = @root_folder.attachments.create!(:filename => title,
+                                                  :context => @course) { |a| a.content_type = 'text/plain' }
+    get "/courses/#{@course.id}/pages/front-page/edit"
     wait_for_tiny(f("form.edit-form .edit-content"))
-    wiki_page_body = clear_wiki_rce
-    f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-    root_folders = @tree1.find_elements(:css, 'li.folder')
-    root_folders.first.find_element(:css, '.sign.plus').click
-    wait_for_ajaximations
-    expect(root_folders.first.find_elements(:css, '.file.text').length).to eq 1
-    root_folders.first.find_elements(:css, '.file.text span').first.click
+    fj('[role="presentation"]:contains("Files")').click
+    fj("aside li:contains('#{title}')").click
 
     in_frame wiki_page_body_ifr_id do
-      expect(f('#tinymce')).to include_text('txt')
+      expect(f('#tinymce a').attribute('href')).to include course_file_id_path(@text_file)
     end
+
     switch_editor_views(wiki_page_body)
     expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
-    f('form.edit-form button.submit').click
+    force_click('form.edit-form button.submit')
     wait_for_ajax_requests
   end
 

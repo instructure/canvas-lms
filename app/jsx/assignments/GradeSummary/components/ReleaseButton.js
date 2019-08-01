@@ -17,21 +17,31 @@
  */
 
 import React from 'react'
-import {bool, func, oneOf, shape} from 'prop-types'
+import {bool, func, oneOf} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import I18n from 'i18n!assignment_grade_summary'
 
-import {FAILURE, STARTED, SUCCESS} from '../assignment/AssignmentActions'
+import {
+  FAILURE,
+  GRADES_ALREADY_RELEASED,
+  NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+  STARTED,
+  SUCCESS
+} from '../assignment/AssignmentActions'
 
 function readyButton(props) {
-  return <Button {...props}>{I18n.t('Display to Students')}</Button>
+  return (
+    <Button {...props} variant="primary">
+      {I18n.t('Release Grades')}
+    </Button>
+  )
 }
 
 function startedButton(props) {
-  const title = I18n.t('Displaying to Students')
+  const title = I18n.t('Releasing Grades')
 
   return (
     <Button {...props} variant="light">
@@ -43,43 +53,44 @@ function startedButton(props) {
 function successButton(props) {
   return (
     <Button {...props} icon={IconCheckMark} variant="light">
-      {I18n.t('Grades Visible to Students')}
+      {I18n.t('Grades Released')}
     </Button>
   )
 }
 
-export default function DisplayToStudentsButton(props) {
-  const {assignment, onClick, unmuteAssignmentStatus, ...otherProps} = props
-  const unmutable = assignment.gradesPublished && assignment.muted
-  const canClick = ![STARTED, SUCCESS].includes(unmuteAssignmentStatus)
+export default function ReleaseButton(props) {
+  const {gradesReleased, onClick, releaseGradesStatus, ...otherProps} = props
+  const canClick = !(gradesReleased || [STARTED, SUCCESS].includes(releaseGradesStatus))
 
   const buttonProps = {
     ...otherProps,
-    'aria-readonly': !assignment.gradesPublished ? null : !assignment.muted || !canClick,
-    disabled: assignment.gradesPublished ? null : true,
-    onClick: unmutable && canClick ? onClick : null
+    'aria-readonly': !canClick,
+    onClick: canClick ? onClick : null
   }
 
-  if (!assignment.muted) {
+  if (gradesReleased) {
     return successButton(buttonProps)
   }
 
-  if (unmuteAssignmentStatus === STARTED) {
+  if (releaseGradesStatus === STARTED) {
     return startedButton(buttonProps)
   }
 
   return readyButton(buttonProps)
 }
 
-DisplayToStudentsButton.propTypes = {
-  assignment: shape({
-    gradesPublished: bool.isRequired,
-    muted: bool.isRequired
-  }).isRequired,
+ReleaseButton.propTypes = {
+  gradesReleased: bool.isRequired,
   onClick: func.isRequired,
-  unmuteAssignmentStatus: oneOf([FAILURE, STARTED, SUCCESS])
+  releaseGradesStatus: oneOf([
+    FAILURE,
+    GRADES_ALREADY_RELEASED,
+    NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+    STARTED,
+    SUCCESS
+  ])
 }
 
-DisplayToStudentsButton.defaultProps = {
-  unmuteAssignmentStatus: null
+ReleaseButton.defaultProps = {
+  releaseGradesStatus: null
 }

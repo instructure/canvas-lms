@@ -71,9 +71,10 @@ class GradingPeriodSetForm extends React.Component {
     const associatedEnrollmentTerms = _.where(props.enrollmentTerms, {
       gradingPeriodGroupId: props.set.id
     })
-    const set = _.extend({}, props.set, {
+    const set = {
+      ...props.set,
       enrollmentTermIDs: _.pluck(associatedEnrollmentTerms, 'id')
-    })
+    }
 
     this.state = {set: buildSet(set)}
   }

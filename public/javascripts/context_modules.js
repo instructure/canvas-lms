@@ -609,7 +609,7 @@ function scrollTo ($thing, time = 500) {
           var $icon_container = $mod_item.find('.module-item-status-icon');
           var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
 
-          var completed = _.any(reqs_met, function(req) {
+          var completed = _.some(reqs_met, function(req) {
             return (req.id == mod_id && $mod_item.hasClass(req.type + "_requirement"));
           });
           if (completed)  {

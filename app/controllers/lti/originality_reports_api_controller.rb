@@ -125,6 +125,13 @@ module Lti
     before_action :report_in_context, only: [:show, :update]
     before_action :ensure_tool_proxy_associated
 
+    # NOTE
+    # The LTI 2/Live Events plagiarism detection platform lives
+    # alongside two other plagiarism solutions:
+    # the Vericite plugin and the Turnitin pugin. When making changes
+    # to any of these three services verify no regressions are
+    # introduced in the others.
+
     # @API Create an Originality Report
     # Create a new OriginalityReport for the specified file
     #

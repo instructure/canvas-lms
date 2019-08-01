@@ -18,7 +18,7 @@
 
 <% js_bundle 'module_sequence_footer' %>
 <% if @tag.context.is_a?(Assignment) %>
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <% assignment = @tag.context %>
     <% course = assignment.context %>
     <% assignment_presenter = AssignmentPresenter.new(assignment) %>

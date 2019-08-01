@@ -16,23 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
-<%
-  js_bundle :eportfolio
-  css_bundle :tinymce
-  @no_left_side_list_view = true
-  js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
-%>
+<% provide :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
+<% js_env({ SECTION_COUNT_IDX: @page.content_sections.count }) %>
 
-<% content_for :auto_discovery do %>
-  <% if can_do(@portfolio, @current_user, :update) %>
-    <%= auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, :verifier => @portfolio.uuid), {:title => t('titles.feed', "Eportfolio Atom Feed") }) %>
-  <% elsif @portfolio.public %>
-    <%= auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), {:title => t('titles.feed', "Eportfolio Atom Feed") }) %>
-  <% end %>
-<% end %>
-
-<% content_for :left_side do %>
+<% provide :left_side do %>
   <div class="eportfolio-name">
     <h3><%= @portfolio.name %></h3>
     <% if @owner_url %>
@@ -44,7 +31,7 @@
   <%= render :partial => "eportfolios/section_list" %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div id="page_sidebar">
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
       <div class="rs-margin-bottom">

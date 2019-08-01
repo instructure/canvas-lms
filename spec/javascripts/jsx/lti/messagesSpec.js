@@ -31,6 +31,10 @@ const resizeMessage = {
   height: finalHeight
 }
 
+const fetchWindowSize = {
+  subject: 'lti.fetchWindowSize'
+}
+
 const scrollMessage = {
   subject: 'lti.scrollToTop'
 }
@@ -107,6 +111,21 @@ QUnit.module('Messages', function (suiteHooks) {
     equal(iframe.height(), 100)
     ltiMessageHandler(postMessageEvent(resizeMessage, iframe[0].contentWindow));
     equal(iframe.height(), finalHeight)
+  })
+
+  test('returns the hight and width of the page along with the iframe offset', () => {
+    ltiToolWrapperFixture.append(`
+      <div>
+        <h1 class="page-title">LTI resize test</h1>
+        <p><iframe style="width: 100%; height: ${intialHeight}px;" src="https://canvas.example.com/courses/4/external_tools/retrieve?display=borderless" width="100%" height="${intialHeight}px" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></p>
+      </div>
+    `)
+    const iframe = $('iframe')
+
+    sinon.spy(iframe[0].contentWindow, 'postMessage')
+    notOk(iframe[0].contentWindow.postMessage.calledOnce)
+    ltiMessageHandler(postMessageEvent(fetchWindowSize, iframe[0].contentWindow))
+    ok(iframe[0].contentWindow.postMessage.calledOnce)
   })
 
   test('hides the module navigation', () => {

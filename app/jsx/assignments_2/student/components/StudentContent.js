@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
@@ -25,6 +25,7 @@ import LockedAssignment from './LockedAssignment'
 import MissingPrereqs from './MissingPrereqs'
 import React, {Suspense, lazy} from 'react'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Submission} from '../graphqlData/Submission'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
@@ -67,8 +68,8 @@ function StudentContent(props) {
 }
 
 StudentContent.propTypes = {
-  assignment: AssignmentShape,
-  submission: SubmissionShape
+  assignment: Assignment.shape,
+  submission: Submission.shape
 }
 
 export default StudentContent

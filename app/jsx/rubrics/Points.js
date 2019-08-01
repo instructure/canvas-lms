@@ -29,7 +29,7 @@ export const roundIfWhole = (n) => (
   I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 2, strip_insignificant_zeros: true })
 )
 const pointString = (points) =>
-  _.isNull(points.text) ? roundIfWhole(points.value) : points.text
+  (points.text === null) ? roundIfWhole(points.value) : points.text
 
 export const possibleString = (possible) =>
   I18n.t('%{possible} pts', {

@@ -18,7 +18,7 @@
 import React from 'react'
 import LoginActionPrompt from '../LoginActionPrompt'
 import {mockAssignment} from '../../test-utils'
-import {render, waitForElement, fireEvent} from 'react-testing-library'
+import {render, waitForElement, fireEvent} from '@testing-library/react'
 
 describe('LoginActionPrompt', () => {
   it('renders component locked and feedback text labels correctly', async () => {

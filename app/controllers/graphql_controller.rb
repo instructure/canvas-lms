@@ -33,6 +33,7 @@ class GraphQLController < ApplicationController
       real_current_user: @real_current_user,
       session: session,
       request: request,
+      domain_root_account: @domain_root_account,
       in_app: in_app?,
       request_id: (Thread.current[:context] || {})[:request_id],
       tracers: [

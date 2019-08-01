@@ -73,7 +73,7 @@ export default class FeatureFlagAdminView extends Backbone.View {
     } else {
       this.$alertBox.show()
     }
-    const features = _.extend({}, this.default, this.collection.groupBy('appliesTo'))
+    const features = {...this.default, ...this.collection.groupBy('appliesTo')}
     features.account = features.account.concat(features.rootaccount)
     return _.each(this.featureGroups, group => {
       if (!(features[group] != null ? features[group].length : undefined)) return

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import MockDate from 'mockdate'
 import CanvasValidatedMockedProvider from 'jsx/__tests__/CanvasValidatedMockedProvider'
 import {STUDENT_SEARCH_QUERY} from '../../../assignmentData'

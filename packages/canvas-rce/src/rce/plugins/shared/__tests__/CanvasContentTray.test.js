@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, wait, waitForElementToBeRemoved} from 'react-testing-library'
+import {act, render, wait, waitForElementToBeRemoved} from '@testing-library/react'
 
 import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'

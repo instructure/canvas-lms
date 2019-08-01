@@ -37,7 +37,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     isGroupAssignment: bool.isRequired,
     isPeerReviewAssignment: bool.isRequired,
     locale: string.isRequired,
-    maxGraderCount: number.isRequired,
+    availableGradersCount: number.isRequired,
     moderatedGradingEnabled: bool.isRequired,
     onGraderCommentsVisibleToGradersChange: func.isRequired,
     onModeratedGradingChange: func.isRequired
@@ -84,7 +84,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
               <div className="ModeratedGrading__Content">
                 <GraderCountNumberInput
                   currentGraderCount={this.props.currentGraderCount}
-                  maxGraderCount={this.props.maxGraderCount}
+                  availableGradersCount={this.props.availableGradersCount}
                   locale={this.props.locale}
                 />
 

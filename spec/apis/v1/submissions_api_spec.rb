@@ -2021,6 +2021,71 @@ describe 'Submissions API', type: :request do
     end
   end
 
+  context "show full rubric assessments" do
+    before do
+        @student = user_factory(active_all: true)
+        course_with_teacher(active_all: true)
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student)
+        @assignment1 = assignment_model(context: @course)
+        submit_homework(@assignment1, @student)
+    end
+
+    it "fails when no rubric assessment is present" do
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@student.id}.json",
+        { :controller => 'submissions_api', :action => 'show',
+          :format => 'json', :course_id => @course.id.to_s,
+          :assignment_id => @assignment1.id.to_s, :user_id => @student.id.to_s },
+        { :include => %w(full_rubric_assessment)})
+      expect(json).not_to have_key 'full_rubric_assessment'
+    end
+
+    context "if present" do
+      before do
+        @assignment2 = assignment_model(context: @course)
+        rubric_assessment_model({:purpose => "grading",
+                                 :association_object => @assignment2,
+                                 :user => @student,
+                                 :assessment_type => "grading"})
+      end
+
+      it "returns the correct data" do
+        json = api_call_as_user(@teacher, :get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
+          { :include => %w(full_rubric_assessment)})
+        expect(json).to have_key 'full_rubric_assessment'
+        expect(json['full_rubric_assessment']).to have_key 'data'
+        expect(json['full_rubric_assessment']).to have_key 'assessor_name'
+        expect(json['full_rubric_assessment']).to have_key 'assessor_avatar_url'
+      end
+
+      it "is visible to student owning the assignment" do
+        json = api_call_as_user(@student, :get,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+        { :controller => 'submissions_api', :action => 'show',
+          :format => 'json', :course_id => @course.id.to_s,
+          :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
+          { :include => %w(full_rubric_assessment)})
+        expect(json['full_rubric_assessment']).not_to be_nil
+      end
+
+      it "is not visible to students that are not the owner of the assignment" do
+        @other_student = user_factory(active_all: true)
+        student_in_section(@section, user: @other_student)
+        api_call_as_user(@other_student, :get,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+        { :controller => 'submissions_api', :action => 'show',
+          :format => 'json', :course_id => @course.id.to_s,
+          :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
+          { :include => %w(full_rubric_assessment)}, {}, expected_status: 401)
+      end
+    end
+  end
+
   context "grouped submissions" do
     before :once do
       @student1 = user_factory(active_all: true)

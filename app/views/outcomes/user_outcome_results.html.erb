@@ -21,9 +21,9 @@
 %>
 <% css_bundle :learning_outcomes %>
 <% js_bundle :rubric_assessment %>
-<% content_for :page_title do %><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %><% end %>
-  
-<% content_for :right_side do %>
+<% provide :page_title do %><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %><% end %>
+
+<% provide :right_side do %>
   <div class="rs-margin-bottom">
     <% chain = (@context.account_chain rescue [@domain_root_account]).select{|a| can_do(a, @current_user, :manage) }; %>
     <% if !chain.empty? %>
@@ -40,7 +40,6 @@
   </div>
 <% end %>
 
-<% content_for :stylesheets do %>
 <style>
 #outcomes th {
   background-color: #444;
@@ -80,7 +79,7 @@
   text-align: <%= direction('left') %>;
 }
 </style>
-<% end %>
+
 <% js_bundle 'legacy/user_outcome_results' %>
 
 <h1 class="screenreader-only"><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %></h1>

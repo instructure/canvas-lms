@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!shared.flash_notices'
 import $ from 'jquery'
-import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import 'jqueryui/effects/drop'
 import 'jquery.cookie'
@@ -77,7 +76,7 @@ class RailsFlashNotificationsHelper {
 
       $(node)
         .appendTo($(this.holder))
-        .css(_.extend({zIndex: 2}, cssOptions))
+        .css({zIndex: 2, ...cssOptions})
         .show('fast')
         .delay(timeout || 7000)
         .fadeOut('slow', function() {

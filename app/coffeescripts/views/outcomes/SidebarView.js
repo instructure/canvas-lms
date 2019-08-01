@@ -28,24 +28,6 @@ import FindDirectoryView from './FindDirectoryView'
 let findDialog
 
 export default class SidebarView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.resetSidebar = this.resetSidebar.bind(this)
-    this.addAndSelect = this.addAndSelect.bind(this)
-    this.selectDir = this.selectDir.bind(this)
-    this.refreshSelection = this.refreshSelection.bind(this)
-    this.clearOutcomeSelection = this.clearOutcomeSelection.bind(this)
-    this.goBack = this.goBack.bind(this)
-    this.renderDir = this.renderDir.bind(this)
-    this.findDialog = this.findDialog.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.directoryWidth = 200
@@ -114,7 +96,7 @@ export default class SidebarView extends Backbone.View {
   addDir(dir) {
     if (dir.outcomeGroup) this.cachedDirectories[dir.outcomeGroup.id] = dir
     dir.off('select')
-    dir.on('select', this.selectDir)
+    dir.on('select', this.selectDir, this)
     dir.sidebar = this
     dir.clearSelection()
     this.directories.push(dir)
@@ -237,7 +219,7 @@ export default class SidebarView extends Backbone.View {
 
   render() {
     this.$el.empty()
-    _.each(this.directories, this.renderDir)
+    _.each(this.directories, dir => this.renderDir(dir))
     return this
   }
 

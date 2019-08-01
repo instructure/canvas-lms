@@ -95,6 +95,7 @@ describe "assignments" do
     end
 
     it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
+      stub_rcs_config
       @assignment = @course.assignments.create(name: 'Test Assignment')
       file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
       file.context = @course
@@ -827,14 +828,11 @@ describe "assignments" do
       it "should allow publishing from the show page", priority: "1", test_id: 647851 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        expect(f("#assignment-speedgrader-link")).to have_class("hidden")
-
         f("#assignment_publish_button").click
         wait_for_ajaximations
 
         expect(@assignment.reload).to be_published
         expect(f("#assignment_publish_button")).to include_text("Published")
-        expect(f("#assignment-speedgrader-link")).not_to have_class("hidden")
       end
 
       it "should have a link to speedgrader from the show page", priority: "1", test_id: 3001903 do

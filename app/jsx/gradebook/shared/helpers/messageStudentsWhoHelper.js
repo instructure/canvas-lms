@@ -42,23 +42,23 @@ const MessageStudentsWhoHelper = {
   allOptions() {
     return [
       {
-        text: I18n.t('students_who.havent_submitted_yet', "Haven't submitted yet"),
+        text: I18n.t("Haven't submitted yet"),
         subjectFn: assignment =>
-          I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', {
+          I18n.t('No submission for %{assignment}', {
             assignment: assignment.name
           }),
         criteriaFn: student => !student.submitted_at
       },
       {
-        text: I18n.t('students_who.havent_been_graded', "Haven't been graded"),
+        text: I18n.t("Haven't been graded"),
         subjectFn: assignment =>
-          I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', {
+          I18n.t('No grade for %{assignment}', {
             assignment: assignment.name
           }),
         criteriaFn: student => !this.exists(student.score)
       },
       {
-        text: I18n.t('students_who.scored_less_than', 'Scored less than'),
+        text: I18n.t('Scored less than'),
         cutoff: true,
         subjectFn: (assignment, cutoff) =>
           I18n.t('Scored less than %{cutoff} on %{assignment}', {
@@ -69,7 +69,7 @@ const MessageStudentsWhoHelper = {
           this.scoreWithCutoff(student, cutoff) && student.score < cutoff
       },
       {
-        text: I18n.t('students_who.scored_more_than', 'Scored more than'),
+        text: I18n.t('Scored more than'),
         cutoff: true,
         subjectFn: (assignment, cutoff) =>
           I18n.t('Scored more than %{cutoff} on %{assignment}', {
@@ -86,14 +86,14 @@ const MessageStudentsWhoHelper = {
     const submissionTypes = assignment.submission_types
     if (submissionTypes.length === 0) return false
 
-    return _.any(
+    return _.some(
       submissionTypes,
       submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
     )
   },
 
   exists(value) {
-    return !_.isUndefined(value) && !_.isNull(value)
+    return value != null
   },
 
   scoreWithCutoff(student, cutoff) {

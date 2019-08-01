@@ -127,6 +127,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
     prepare_overrides!(input_hash, api_proxy)
     prepare_moderated_grading!(input_hash)
     prepare_peer_reviews!(input_hash)
+    prepare_dates!(input_hash)
 
     # prepare other ids
     if input_hash.key? :assignment_group_id
@@ -186,6 +187,16 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
       # is transformed into peer_reviews_due_at. that's probably a bug, but just to keep this update resilient
       # well get it working and if the bug needs to be addressed, we can later.
       input_hash[:peer_reviews_assign_at] = peer_reviews[:due_at]
+    end
+  end
+
+  def prepare_dates!(input)
+    # graphql gives us back proper date objects but `update_assignment`
+    # wants strings
+    %i[due_at lock_at unlock_at peer_reviews_assign_at].each do |date_field|
+      if input[date_field]
+        input[date_field] = input[date_field].iso8601
+      end
     end
   end
 

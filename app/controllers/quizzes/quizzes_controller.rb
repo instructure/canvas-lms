@@ -270,6 +270,8 @@ class Quizzes::QuizzesController < ApplicationController
           @lock_results_if_needed = true
 
           log_asset_access(@quiz, "quizzes", "quizzes")
+          js_bundle :quiz_show
+          css_bundle :quizzes, :learning_outcomes
         end
       end
       @padless = true
@@ -356,6 +358,8 @@ class Quizzes::QuizzesController < ApplicationController
       conditional_release_js_env(@quiz.assignment)
       set_master_course_js_env_data(@quiz, @context)
 
+      js_bundle :quizzes_bundle
+      css_bundle :quizzes, :tinymce
       render :new
     end
   end
@@ -734,6 +738,7 @@ class Quizzes::QuizzesController < ApplicationController
         if @quiz.require_lockdown_browser? && @quiz.require_lockdown_browser_for_results? && params[:viewing]
           return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
         end
+        js_bundle :quiz_history
       end
     end
   end
@@ -939,6 +944,10 @@ class Quizzes::QuizzesController < ApplicationController
     js_env IS_PREVIEW: true if @submission.preview?
 
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
+    if params[:persist_headless]
+      add_meta_tag(:name => "viewport", :id => "vp", :content => "initial-scale=1.0,user-scalable=yes,width=device-width")
+      js_env :MOBILE_UI => true
+    end
     render :take_quiz
   end
 
@@ -958,8 +967,8 @@ class Quizzes::QuizzesController < ApplicationController
                                             access_code: params[:access_code])
 
     if params[:take]
-      reason = can_take.declined_reason_renders
-      render reason if reason
+      @declined_reason = can_take.declined_reason_renders
+      render @declined_reason if @declined_reason
       can_take.eligible?
     else
       can_take.potentially_eligible?

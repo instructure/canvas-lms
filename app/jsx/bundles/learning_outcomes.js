@@ -65,9 +65,9 @@ const resetOutcomeViews = () => {
 }
 
 // toolbar events
-toolbar.on('goBack', sidebar.goBack)
-toolbar.on('add', sidebar.addAndSelect)
-toolbar.on('add', content.add)
+toolbar.on('goBack', sidebar.goBack.bind(sidebar))
+toolbar.on('add', sidebar.addAndSelect.bind(sidebar))
+toolbar.on('add', content.add.bind(content))
 toolbar.on('find', () => sidebar.findDialog(FindDialog))
 toolbar.on('import', () => showImportOutcomesModal({toolbar}))
 toolbar.on('start_sync', (file) => showOutcomesImporter({
@@ -87,10 +87,10 @@ showOutcomesImporterIfInProgress({
 
 // sidebar events
 sidebar.on('select', model => content.show(model))
-sidebar.on('select', toolbar.resetBackButton)
+sidebar.on('select', toolbar.resetBackButton.bind(toolbar))
 
 // content events
-content.on('addSuccess', sidebar.refreshSelection)
+content.on('addSuccess', sidebar.refreshSelection.bind(sidebar))
 content.on('deleteSuccess', () => {
   const view = sidebar.$el.find('.outcome-group.selected:last').data('view')
   const model = view && view.model

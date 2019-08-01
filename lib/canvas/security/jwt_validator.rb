@@ -54,12 +54,8 @@ module Canvas::Security
 
     def aud
       return if errors?
-      msg = "the 'aud' is invalid"
-      if @jwt.aud.is_a? String
-        errors.add(:base, msg) if @jwt.aud != @expected_aud
-      elsif @jwt.aud.exclude? @expected_aud
-        errors.add(:base, msg)
-      end
+      return if (Array(@jwt.aud) & Array(@expected_aud)).present?
+      errors.add(:base, "the 'aud' is invalid")
     end
 
     def exp

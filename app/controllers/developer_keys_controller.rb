@@ -80,7 +80,7 @@ class DeveloperKeysController < ApplicationController
   protected
 
   def set_navigation
-    @active_tab = 'developer_keys'
+    set_active_tab 'developer_keys'
     add_crumb t('#crumbs.developer_keys', "Developer Keys")
   end
 

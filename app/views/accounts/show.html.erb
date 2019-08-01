@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= @account.name %><% end %>
+<% provide :page_title do %><%= @account.name %><% end %>
 <%
-  @active_tab = "courses"
+  set_active_tab "courses"
   add_crumb t(:courses_crumb, "Courses"), account_path(@account)
 %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <%= render :partial => 'courses_right_side' %>
 <% end %>
 

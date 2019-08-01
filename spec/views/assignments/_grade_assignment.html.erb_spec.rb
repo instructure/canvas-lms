@@ -15,41 +15,60 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../spec_helper'
+require 'spec_helper'
 require_relative '../views_helper'
 
 describe '_grade_assignment' do
-  it 'renders a speedgrader link if user can view all grades but not manage grades' do
+  before :once do
     course_with_ta
-    @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
-    view_context(@course, @ta)
-    assignment = @course.assignments.create!(title: 'an assignment')
-    assign(:assignment, assignment)
-    assign(:assignment_presenter, AssignmentPresenter.new(assignment))
-    render partial: 'assignments/grade_assignment'
-    expect(response).to have_tag("a[href=\"/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}\"]")
   end
 
-  it 'renders a speedgrader link if user can manage grades but not view all grades' do
-    course_with_ta
-    @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+  before :each do
     view_context(@course, @ta)
     assignment = @course.assignments.create!(title: 'an assignment')
     assign(:assignment, assignment)
     assign(:assignment_presenter, AssignmentPresenter.new(assignment))
-    render partial: 'assignments/grade_assignment'
-    expect(response).to have_tag("a[href=\"/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}\"]")
   end
 
-  it 'does not render a speedgrader link if user can neither view all grades nor manage grades' do
-    course_with_ta
-    @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
-    @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
-    view_context(@course, @ta)
-    assignment = @course.assignments.create!(title: 'an assignment')
-    assign(:assignment, assignment)
-    assign(:assignment_presenter, AssignmentPresenter.new(assignment))
-    render partial: 'assignments/grade_assignment'
-    expect(response).not_to have_tag("a[href=\"/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}\"]")
+  describe "SpeedGrader link mount point" do
+    it 'renders if user can view all grades but not manage grades' do
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      render partial: 'assignments/grade_assignment'
+      expect(response).to have_tag("div#speed_grader_link_mount_point")
+    end
+
+    it 'renders if user can manage grades but not view all grades' do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      render partial: 'assignments/grade_assignment'
+      expect(response).to have_tag("div#speed_grader_link_mount_point")
+    end
+
+    it 'does not render if user can neither view all grades nor manage grades' do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      render partial: 'assignments/grade_assignment'
+      expect(response).not_to have_tag("div#speed_grader_link_mount_point")
+    end
+  end
+
+  describe "student group filter mount point" do
+    it 'renders if user can view all grades but not manage grades' do
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      render partial: 'assignments/grade_assignment'
+      expect(response).to have_tag("div#student_group_filter_mount_point")
+    end
+
+    it 'renders if user can manage grades but not view all grades' do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      render partial: 'assignments/grade_assignment'
+      expect(response).to have_tag("div#student_group_filter_mount_point")
+    end
+
+    it 'does not render if user can neither view all grades nor manage grades' do
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+      render partial: 'assignments/grade_assignment'
+      expect(response).not_to have_tag("div#student_group_filter_mount_point")
+    end
   end
 end

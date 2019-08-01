@@ -171,8 +171,8 @@ class ContentMigrationsController < ApplicationController
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
       js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
       js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
-      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses.count }.sum
-      js_env(:SHOW_SELECT => course_count <= 100)
+
+      js_env(:SHOW_SELECT => should_show_course_copy_dropdown)
       js_env(:CONTENT_MIGRATIONS_EXPIRE_DAYS => ContentMigration.expire_days)
       js_env(:QUIZZES_NEXT_CONFIGURED_ROOT => @context.root_account.feature_allowed?(:quizzes_next) &&
              @context.root_account.feature_enabled?(:import_to_quizzes_next))
@@ -529,6 +529,15 @@ class ContentMigrationsController < ApplicationController
       render :json => content_migration_json(@content_migration, @current_user, session, preflight_json)
     else
       render :json => @content_migration.errors, :status => :bad_request
+    end
+  end
+
+  def should_show_course_copy_dropdown
+    if @current_user.adminable_accounts.any?
+      false # assume that if they're an account admin they're probably managing so many courses it's not worth it to even try the count
+    else
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses.count }.sum
+      course_count <= 100
     end
   end
 end

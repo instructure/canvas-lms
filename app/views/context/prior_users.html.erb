@@ -16,14 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% 
+<%
   add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
   add_crumb(t('#crumbs.prior_users', "Prior Users"))
-  @active_tab="people"
+  set_active_tab "people"
 %>
-<% content_for :page_title, t('titles.prior_users', "Prior Users") %>
+<% provide :page_title, t('titles.prior_users', "Prior Users") %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide">
     <i class="icon-arrow-left"></i>
     <%= t('links.back_to_people', %{Back to People}) %>

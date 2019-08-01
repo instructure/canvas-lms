@@ -81,7 +81,7 @@ export default class CourseEvent extends Backbone.Model
 
   presentField: (value) ->
     blank = I18n.t("blank_placeholder", "-")
-    return blank if _.isNull(value)
+    return blank if value == null
     return value.toString() if _.isBoolean(value)
     if _.isArray(value)
       return _.map value, @presentField, @

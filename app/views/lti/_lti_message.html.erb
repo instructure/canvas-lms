@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= @lti_launch.link_text %><% end %>
+<% provide :page_title do %><%= @lti_launch.link_text %><% end %>
 
 <% js_bundle 'legacy/external_tools_tool_show' %>
 <% js_bundle :external_tool_redirect if @redirect_return %>

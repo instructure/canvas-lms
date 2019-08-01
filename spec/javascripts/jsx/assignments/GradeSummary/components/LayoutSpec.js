@@ -145,7 +145,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       strictEqual(statuses, store.getState().grades.selectProvisionalGradeStatuses)
     })
 
-    QUnit.module('when grades have not been published', () => {
+    QUnit.module('when grades have not been released', () => {
       test('onGradeSelect prop selects a provisional grade', () => {
         mountAndInitialize()
         const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
@@ -175,12 +175,12 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       })
     })
 
-    QUnit.module('when grades have been published', contextHooks => {
+    QUnit.module('when grades have been released', contextHooks => {
       contextHooks.beforeEach(() => {
         storeEnv.assignment.gradesPublished = true
       })
 
-      test('onGradeSelect prop is null when grades have been published', () => {
+      test('onGradeSelect prop is null when grades have been released', () => {
         mountAndInitialize()
         const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
         strictEqual(onGradeSelect, null)

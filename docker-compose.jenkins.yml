@@ -43,14 +43,18 @@ services:
     volumes:
       - pg_data:/volumes/postgres_data
       - cassandra_data:/volumes/cassandra_data
+      - dynamodb_data:/volumes/dynamodb_data
 
   dynamodb:
     image: amazon/dynamodb-local
+    command: -jar DynamoDBLocal.jar -dbPath /home/dynamodblocal
+    volumes:
+      - dynamodb_data:/home/dynamodblocal
     ports:
       - "${DYNAMODB_PORT}:8000"
 
   canvasrceapi:
-    image: instructure/canvas-rce-api
+    image: starlord.inscloudgate.net/jeremyp/canvas-rce-api_web
     environment:
       ECOSYSTEM_KEY: "astringthatisactually32byteslong"
       ECOSYSTEM_SECRET: "astringthatisactually32byteslong"
@@ -64,3 +68,4 @@ services:
 
 volumes:
   cassandra_data: {}
+  dynamodb_data: {}

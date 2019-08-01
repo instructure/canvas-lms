@@ -35,7 +35,7 @@
     user_name = t('Logged Out User %{index}', index: @logged_out_user_index)
   end
 %>
-<% content_for :page_title, (@quiz.survey? ?
+<% provide :page_title, (@quiz.survey? ?
      join_title(t(:page_title_survey, "%{user}'s Survey History", :user => user_name), @quiz.quiz_title || t(:default_survey_name, "Survey %{course_name}", :course_name => @context.name)) :
      join_title(t(:page_title_quiz, "%{user}'s Quiz History", :user => user_name), @quiz.quiz_title || t(:default_quiz_name, "Quiz %{course_name}", :course_name => @context.name)))
 %>
@@ -78,8 +78,10 @@
 <% end %>
 <% end %>
 
-<% unless params[:headless] %>
-  <% content_for :right_side do %>
+<% if params[:headless] %>
+  <% provide_blank :right_side %>
+<% else %>
+  <% provide :right_side do %>
     <% if @current_version && can_do(@quiz, @current_user, :grade) %>
       <p>
         <% if @quiz.survey? %>
@@ -193,4 +195,3 @@
   <div class="user_id"><%= @submission.user_id %></div>
 </div>
 
-<% js_bundle :quiz_history %>

@@ -82,6 +82,7 @@ class Assignment < ActiveRecord::Base
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
   belongs_to :context, polymorphic: [:course]
+  delegate :moderated_grading_max_grader_count, to: :course
   belongs_to :grading_standard
   belongs_to :group_category
 
@@ -2007,7 +2008,6 @@ class Assignment < ActiveRecord::Base
         homework.attributes = opts.merge({
           :attachment => nil,
           :processed => false,
-          :process_attempts => 0,
           :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
@@ -2399,10 +2399,6 @@ class Assignment < ActiveRecord::Base
 
   def has_peer_reviews?
     self.peer_reviews
-  end
-
-  def self.percent_considered_graded
-    0.5
   end
 
   scope :include_submitted_count, -> { select(
@@ -3022,13 +3018,6 @@ class Assignment < ActiveRecord::Base
     @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
   end
 
-  def moderated_grading_max_grader_count
-    max_course_count = course.moderated_grading_max_grader_count
-    return max_course_count if grader_count.blank?
-
-    [grader_count, max_course_count].max
-  end
-
   def moderated_grader_limit_reached?
     moderated_grading? && provisional_moderation_graders.count >= grader_count
   end
@@ -3165,8 +3154,20 @@ class Assignment < ActiveRecord::Base
     User.clear_cache_keys(user_ids, :submissions)
     unless skip_updating_timestamp
       update_time = Time.zone.now
+      # broadcast_notifications will reload each submission individually; this
+      # cuts down on unneeded work when possible. This makes the assumption
+      # that only unposted submissions need notifications.
+      previously_unposted_submissions = submissions.unposted.to_a
       submissions.update_all(posted_at: update_time, updated_at: update_time)
+
+      previously_unposted_submissions.each do |submission|
+        submission.grade_posting_in_progress = true
+        # Need to broadcast assignment_unmuted here.
+        submission.broadcast_notifications
+        submission.grade_posting_in_progress = false
+      end
     end
+
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)

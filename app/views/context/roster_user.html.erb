@@ -19,14 +19,9 @@
 <%
   js_env ga_page_title: "Roster User"
 %>
-<%
-  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
-  add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
-  @active_tab="people"
-%>
-<% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 
-<% content_for :right_side do %>
+<% provide :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
+<% provide :right_side do %>
   <h2><%= t 'links.more_about_this_user', "More About This User" %></h2>
   <div class="page-action-list rs-margin-bottom" id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
@@ -125,9 +120,6 @@
     <% end %>
   </div>
 <% end %>
-
-<% js_bundle :user_name %>
-<% css_bundle :roster_user, :pairing_code %>
 
 <h1><%= @user.name %></h1>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
@@ -236,4 +228,3 @@
 <% end %>
 <% end %>
 
-<% js_bundle 'legacy/context_roster_user' %>

@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Högerjustera"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Justeringar och indrag"
+  },
   "all_4321c3a1": {
     "message": "Alla"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "Avbryt bilduppladdning"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas-plugins"
   },
   "cc_attribution_f6de631f": {
     "message": "CC Attribut"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "Redigera länk"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "Statusfält för redigeraren"
+  },
   "embed_828fac4a": {
     "message": "Bädda in"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "Mapp"
+  },
+  "formatting_5b143aa8": {
+    "message": "Formatering"
   },
   "generating_preview_45b53be0": {
     "message": "Genererar omdöme..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "Mic"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Diverse och LTI"
+  },
   "modules_c4325335": {
     "message": "Moduler"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Välj en mapp att ladda upp din fil till"
   },
+  "selected_274ce24f": {
+    "message": "Vald"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "Visa inbäddade alternativ"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Starta inspelning"
+  },
+  "styles_2aa721ef": {
+    "message": "Stilar"
   },
   "subheader_2b87606d": {
     "message": "Underrubrik"

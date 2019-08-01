@@ -259,6 +259,7 @@ shared_context "in-process server selenium tests" do
         "Warning: [Focusable] Exactly one tabbable child is required (0 found).",
         "[View] display style is set to 'inline'",
         "Uncaught TypeError: Failed to fetch",
+        "Unexpected end of JSON input",
         "Uncaught Error: Not Found", # for canvas-rce when no backend is set up
         "Uncaught Error: Minified React error #200", # this is coming from canvas-rce, but we should fix it
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/"

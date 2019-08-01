@@ -149,6 +149,16 @@ QUnit.module('SubmissionTray', function(hooks) {
     strictEqual($elt.getAttribute('disabled'), disabled ? '' : null, message)
   }
 
+  function speedGraderLink() {
+    return document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]')
+  }
+
+  function studentGroupRequiredAlert() {
+    return [...document.querySelectorAll('div')].find($el =>
+      $el.textContent.includes('you must select a student group')
+    )
+  }
+
   QUnit.module('Student Carousel', function() {
     function assertStudentButtonsDisabled(disabled) {
       ;['Previous student', 'Next student'].forEach(label => {
@@ -234,10 +244,7 @@ QUnit.module('SubmissionTray', function(hooks) {
       '/courses/1/gradebook/speed_grader?assignment_id=30&student_id=27'
     )
     mountComponent()
-    const speedGraderLink = document
-      .querySelector('.SubmissionTray__Container a[href*="speed_grader"]')
-      .getAttribute('href')
-    strictEqual(speedGraderLink, speedGraderUrl)
+    strictEqual(speedGraderLink().getAttribute('href'), speedGraderUrl)
   })
 
   test('invokes "onAnonymousSpeedGraderClick" when the SpeedGrader link is clicked if the assignment is anonymous', function() {
@@ -252,24 +259,36 @@ QUnit.module('SubmissionTray', function(hooks) {
       onAnonymousSpeedGraderClick: sinon.stub()
     }
     mountComponent(props)
-    document.querySelector('.SubmissionTray__Container a[href*="speed_grader"]').click()
+    speedGraderLink().click()
     strictEqual(props.onAnonymousSpeedGraderClick.callCount, 1)
   })
 
   test('omits student_id from SpeedGrader link if enabled and assignment has anonymized students', function() {
     mountComponent({assignment: {anonymizeStudents: true}})
-    const speedGraderLink = document
-      .querySelector('.SubmissionTray__Container a[href*="speed_grader"]')
-      .getAttribute('href')
-    notOk(speedGraderLink.match(/student_id/))
+    notOk(
+      speedGraderLink()
+        .getAttribute('href')
+        .match(/student_id/)
+    )
   })
 
   test('does not show SpeedGrader link if disabled', function() {
     mountComponent({speedGraderEnabled: false})
-    const speedGraderLink = document.querySelector(
-      '.SubmissionTray__Container a[href*="speed_grader"]'
-    )
-    notOk(speedGraderLink)
+    notOk(speedGraderLink())
+  })
+
+  QUnit.module('when requireStudentGroupForSpeedGrader is true', requireStudentGroupHooks => {
+    requireStudentGroupHooks.beforeEach(() => {
+      mountComponent({requireStudentGroupForSpeedGrader: true})
+    })
+
+    test('disables the SpeedGrader link', () => {
+      strictEqual(speedGraderLink().getAttribute('disabled'), '')
+    })
+
+    test('shows an alert indicating a group must be selected', () => {
+      ok(studentGroupRequiredAlert())
+    })
   })
 
   test('shows avatar if avatar is not null', function() {

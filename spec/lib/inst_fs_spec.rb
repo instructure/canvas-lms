@@ -488,6 +488,30 @@ describe InstFS do
         )
       end
     end
+
+    context "duplicate" do
+      it "makes a network request to the inst-fs endpoint" do
+        instfs_uuid = "1234-abcd"
+        new_instfs_uuid = "5678-efgh"
+        allow(CanvasHttp).to receive(:post).with(/\/files\/#{instfs_uuid}\/duplicate/).and_return(double(
+          class: Net::HTTPCreated,
+          code: 200,
+          body: {id: new_instfs_uuid}.to_json
+        ))
+        expect(InstFS.duplicate_file(instfs_uuid)).to eq new_instfs_uuid
+      end
+    end
+
+    context "deletion" do
+      it "makes a network request to the inst-fs endpoint" do
+        instfs_uuid = "1234-abcd"
+        allow(CanvasHttp).to receive(:delete).with(/\/files\/#{instfs_uuid}/).and_return(double(
+          class: Net::HTTPOK,
+          code: 200,
+        ))
+        expect(InstFS.delete_file(instfs_uuid)).to eq true
+      end
+    end
   end
 
   context "settings not set" do

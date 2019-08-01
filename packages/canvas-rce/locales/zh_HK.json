@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "向右對齊"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "校準及縮排"
+  },
   "all_4321c3a1": {
     "message": "全部"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "取消影像上傳"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas 外掛程式"
   },
   "cc_attribution_f6de631f": {
     "message": "CC 屬性"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "編輯連結"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "編輯器狀態欄"
+  },
   "embed_828fac4a": {
     "message": "嵌入"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "文件夾"
+  },
+  "formatting_5b143aa8": {
+    "message": "格式"
   },
   "generating_preview_45b53be0": {
     "message": "產生預覽中..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "麥克風"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "雜項及 LTI"
+  },
   "modules_c4325335": {
     "message": "單元"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "選擇一個文件夾，以上傳您的文檔"
   },
+  "selected_274ce24f": {
+    "message": "已選擇"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "顯示嵌入選項"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "開始錄製"
+  },
+  "styles_2aa721ef": {
+    "message": "樣式"
   },
   "subheader_2b87606d": {
     "message": "子標題"

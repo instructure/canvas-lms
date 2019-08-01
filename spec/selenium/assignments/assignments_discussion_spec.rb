@@ -26,6 +26,7 @@ describe "discussion assignments" do
   include AssignmentsCommon
 
   before(:each) do
+    stub_rcs_config
     @domain_root_account = Account.default
     course_with_teacher_logged_in
   end

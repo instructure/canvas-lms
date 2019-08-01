@@ -170,13 +170,18 @@ describe Types::CourseType do
       ].sort
     end
 
-
     it "doesn't let students see other student's submissions" do
       expect(
         course_type.resolve(<<~GQL, current_user: @student2)
           submissionsConnection(
             studentIds: ["#{@student1.id}", "#{@student2.id}"],
           ) { edges { node { _id } } }
+        GQL
+      ).to eq [@student2a1_submission.id.to_s]
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @student2)
+          submissionsConnection { nodes { _id } }
         GQL
       ).to eq [@student2a1_submission.id.to_s]
     end
@@ -225,6 +230,30 @@ describe Types::CourseType do
             ) { edges { node { _id } } }
           GQL
         ).to eq [ ]
+      end
+
+      it "submitted_since" do
+        @student1a1_submission.update_attribute(:submitted_at, 1.month.ago)
+        @student1a2_submission.update_attribute(:submitted_at, 1.day.ago)
+
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              filter: { submittedSince: "#{5.days.ago.iso8601}" }
+            ) { nodes { _id } }
+          GQL
+        ).to eq [ @student1a2_submission.id.to_s ]
+      end
+
+      it "graded_since" do
+        @student2a1_submission.update_attribute(:graded_at, 1.week.from_now)
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              filter: { gradedSince: "#{1.day.from_now.iso8601}" }
+            ) { nodes { _id } }
+          GQL
+        ).to eq [ @student2a1_submission.id.to_s ]
       end
     end
   end

@@ -17,7 +17,7 @@
  */
 
 import React, {useRef} from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 import {LoadMoreButton, LoadingIndicator, LoadingStatus, useIncrementalLoading} from '..'
 

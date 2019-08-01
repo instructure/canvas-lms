@@ -42,19 +42,21 @@ export default class FeatureFlagDialog extends DialogBaseView {
       title: this.title,
       height: 300,
       width: 500,
-      buttons: [{text: this.labels.okay, click: this.onConfirm, class: 'btn-primary'}],
-      open: this.onOpen,
-      close: this.onClose
+      buttons: [{text: this.labels.okay, click: this.onConfirm.bind(this), class: 'btn-primary'}],
+      open: this.onOpen.bind(this),
+      close: this.onClose.bind(this)
     }
     if (this.hasCancelButton) {
-      options.buttons.unshift({text: this.labels.cancel, click: this.onCancel})
+      options.buttons.unshift({text: this.labels.cancel, click: this.onCancel.bind(this)})
     }
     return options
   }
 
-  onOpen = e => this.okay = false
+  onOpen(_e) {
+    this.okay = false
+  }
 
-  onClose = e => {
+  onClose(_e) {
     if (this.okay) {
       return this.deferred.resolve()
     } else {
@@ -62,11 +64,13 @@ export default class FeatureFlagDialog extends DialogBaseView {
     }
   }
 
-  onCancel = e => this.close()
+  onCancel(_e) {
+    this.close()
+  }
 
-  onConfirm = e => {
+  onConfirm(_e) {
     this.okay = this.hasCancelButton
-    return this.close()
+    this.close()
   }
 
   toJSON() {

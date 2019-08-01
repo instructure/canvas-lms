@@ -146,7 +146,7 @@ export default class CollectionView extends Backbone.View
   # @api private
 
   renderItems: ->
-    @collection.each @renderItem
+    @collection.each @renderItem.bind(this)
     @trigger "renderedItems"
 
   ##

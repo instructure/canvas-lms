@@ -84,7 +84,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
       // populate inputs with params passed through the url
       if (picked_params.duplicate) {
-        _.each(_.keys(picked_params.duplicate), key => {
+        Object.keys(picked_params.duplicate).forEach(key => {
           const oldKey = key
           if (key !== 'append_iterator') {
             key = `duplicate_${key}`
@@ -96,7 +96,7 @@ export default class EditCalendarEventView extends Backbone.View {
         picked_params.duplicate = !!picked_params.duplicate
       }
 
-      return _.each(_.keys(picked_params), key => {
+      return Object.keys(picked_params).forEach(key => {
         const $e = this.$el.find(`input[name='${key}'], select[name='${key}']`)
         const value = $e.prop('type') === 'checkbox' ? [picked_params[key]] : picked_params[key]
         $e.val(value)
@@ -267,8 +267,8 @@ export default class EditCalendarEventView extends Backbone.View {
     let data = this.$el.getFormData()
 
     // pull the true, parsed dates from the inputs to calculate start_at and end_at correctly
-    const keys = _.filter(_.keys(data), key => /start_date/.test(key))
-    _.each(keys, start_date_key => {
+    const keys = Object.keys(data).filter(key => /start_date/.test(key))
+    keys.forEach(start_date_key => {
       const start_time_key = start_date_key.replace(/start_date/, 'start_time')
       const end_time_key = start_date_key.replace(/start_date/, 'end_time')
       const start_at_key = start_date_key.replace(/start_date/, 'start_at')

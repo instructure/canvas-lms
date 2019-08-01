@@ -18,6 +18,9 @@
 
 class SubmissionsBaseController < ApplicationController
   include GradebookSettingsHelpers
+  include AssignmentsHelper
+  include AssessmentRequestHelper
+
   include Api::V1::Rubric
   include Api::V1::SubmissionComment
 
@@ -43,7 +46,16 @@ class SubmissionsBaseController < ApplicationController
           outcome_proficiency: outcome_proficiency
         })
 
-        render 'submissions/show'
+        js_bundle :submissions
+        css_bundle :submission
+
+        add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
+        add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
+        add_crumb(user_crumb_name)
+
+        set_active_tab "assignments"
+
+        render 'submissions/show', stream: can_stream_template?
       end
       format.json do
         @submission.limit_comments(@current_user, session)

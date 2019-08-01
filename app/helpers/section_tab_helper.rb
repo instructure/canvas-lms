@@ -63,7 +63,7 @@ module SectionTabHelper
         }) do
           concat(content_tag(:ul, id: 'section-tabs') do
             available_section_tabs(@context).map do |tab|
-              section_tab_tag(tab, @context, @active_tab)
+              section_tab_tag(tab, @context, get_active_tab)
             end
           end)
         end

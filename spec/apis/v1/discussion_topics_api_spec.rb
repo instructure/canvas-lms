@@ -119,7 +119,7 @@ describe Api::V1::DiscussionTopics do
     expect(data[:permissions][:attach]).to eq true # teachers can always attach
 
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
-    expect(data[:permissions][:attach]).to eq false # students can't attach by default
+    expect(data[:permissions][:attach]).to eq true # students can attach by default
 
     @topic.context.update_attribute(:allow_student_forum_attachments, true)
     AdheresToPolicy::Cache.clear

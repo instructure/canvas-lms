@@ -6768,6 +6768,46 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     strictEqual(props.postPoliciesEnabled, true)
   })
+
+  QUnit.module('requireStudentGroupForSpeedGrader', requireStudentGroupHooks => {
+    requireStudentGroupHooks.beforeEach(() => {
+      const studentGroups = [
+        {
+          groups: [{id: '1', name: 'First Group Set 1'}, {id: '2', name: 'First Group Set 2'}],
+          id: '1',
+          name: 'First Group Set'
+        },
+        {
+          groups: [{id: '3', name: 'Second Group Set 1'}, {id: '4', name: 'Second Group Set 2'}],
+          id: '2',
+          name: 'Second Group Set'
+        }
+      ]
+
+      gradebook.setStudentGroups(studentGroups)
+    })
+
+    test('is true when filter_speed_grader_by_student_group is enabled and no group is selected', () => {
+      gradebook.options.course_settings.filter_speed_grader_by_student_group = true
+      gradebook.setSubmissionTrayState(true, '1101', '2301')
+      const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+      strictEqual(props.requireStudentGroupForSpeedGrader, true)
+    })
+
+    test('is false when filter_speed_grader_by_student_group is enabled and a group is selected', () => {
+      gradebook.options.course_settings.filter_speed_grader_by_student_group = true
+      gradebook.setFilterRowsBySetting('studentGroupId', '4')
+      gradebook.setSubmissionTrayState(true, '1101', '2301')
+      const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+      strictEqual(props.requireStudentGroupForSpeedGrader, false)
+    })
+
+    test('is false when filter_speed_grader_by_student_group is not enabled', () => {
+      gradebook.setSubmissionTrayState(true, '1101', '2301')
+      const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+      strictEqual(props.requireStudentGroupForSpeedGrader, false)
+    })
+  })
 })
 
 QUnit.module('Gradebook#renderSubmissionTray', {

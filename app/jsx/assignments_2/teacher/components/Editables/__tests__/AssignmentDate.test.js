@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import {toLocaleString, browserTimeZone} from '@instructure/ui-i18n/lib/DateTime'
 import AssignmentDate from '../AssignmentDate'
 
@@ -57,9 +57,9 @@ describe('AssignmentDate', () => {
 
   it('shows error message with invalid value when in edit mode', () => {
     // because the error message is rendered by the instui DateTimeInput
-    const {getByText} = renderAssignmentDate({mode: 'edit', onValidate: () => false})
+    const {getAllByText} = renderAssignmentDate({mode: 'edit', onValidate: () => false})
 
-    expect(getByText('oh no!')).toBeInTheDocument()
+    expect(getAllByText('oh no!')[0]).toBeInTheDocument()
   })
 
   it('does not show error message in view mode', () => {

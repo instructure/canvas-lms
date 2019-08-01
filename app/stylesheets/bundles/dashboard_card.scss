@@ -68,6 +68,12 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   display: inline-block;
   vertical-align: top;
   margin: direction-sides(0 $ic-sp*3 $ic-sp*3 0);
+
+  // if there is not enough screen width to fit 2 whole cards (like on a phone) then just have one card fill the whole width
+  @media only screen and (max-width: $ic-DashboardCard-width*2 + $ic-sp*8) {
+    & { width: 100%; }
+  }
+
   .no-touch & {
     &:hover { box-shadow: 0 4px 10px rgba(black, 0.35); }
   }

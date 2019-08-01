@@ -57,7 +57,7 @@ class SubmissionList
       :current_grader, :grade_matches_current_submission, :graded_at,
       :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
       :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-      :previous_grader, :process_attempts, :processed, :published_grade,
+      :previous_grader, :processed, :published_grade,
       :published_score, :safe_grader_id, :score, :student_entered_score,
       :student_user_id, :submission_id, :student_name, :submission_type,
       :updated_at, :url, :user_id, :workflow_state, :score_before_regrade

@@ -17,37 +17,92 @@
 #
 
 class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
-  # this Logger class exists because grahpql-ruby freezes FieldExtensions, but
-  # rspec can't mock methods on frozen objects
   class Logger
-    @@_sequence = 1
-    def self.log(entry, timestamp, ttl, mutation, context, arguments)
-      raise "mutation results must respond_to #global_asset_string" unless entry.respond_to? :global_asset_string
+    def initialize(mutation, context, arguments)
+      @mutation = mutation
+      @context = context
+      @params = filter_arguments(arguments)
 
-      dynamo = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
-      dynamo.put_item(
+      @dynamo = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
+      @sequence = 0
+      @timestamp = Time.now
+      @ttl = 90.days.from_now.to_i
+    end
+
+    def log(entry, field_name)
+      @dynamo.put_item(
         table_name: "graphql_mutations",
         item: {
-          # NOTE: global_asset_string is exactly the sort of thing I
-          # need, but maybe not very user-friendly? The names of classes
-          # may not correspond to what users are used to seeing in the
-          # ui/api.
-          "object_id" => entry.global_asset_string,
-          # TODO: i need the timestamp in this column for ordering, and
-          # the request_id and sequence to guarantee uniqueness...
-          # should i also break the request_id / timestamp out into
-          # their own attribute?
-          "mutation_id" => "#{timestamp}-#{context[:request_id]}-##{@@_sequence += 1}",
-          "expires" => ttl,
-          "mutation_name" => mutation.graphql_name,
-          "current_user_id" => context[:current_user]&.global_id&.to_s,
-          "real_current_user_id" => context[:real_current_user]&.global_id&.to_s,
-          "params" => ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h),
+          # TODO: this is where you redirect
+          "object_id" => log_entry_id(entry, field_name),
+          "mutation_id" => mutation_id,
+          "timestamp" => @timestamp.iso8601,
+          "expires" => @ttl,
+          "mutation_name" => @mutation.graphql_name,
+          "current_user_id" => @context[:current_user]&.global_id&.to_s,
+          "real_current_user_id" => @context[:real_current_user]&.global_id&.to_s,
+          "params" => @params,
         },
         return_consumed_capacity: "TOTAL"
       )
     rescue Aws::DynamoDB::Errors::ServiceError => e
       Rails.logger.error "Couldn't log mutation: #{e}"
+    end
+
+    def log_entry_id(entry, field_name)
+      override_entry_method = :"#{field_name}_log_entry"
+      entry = @mutation.send(override_entry_method, entry) if @mutation.respond_to?(override_entry_method)
+
+      domain_root_account = root_account_for(entry)
+
+      "#{domain_root_account.global_id}-#{entry.asset_string}"
+    end
+
+    ##
+    # it's too expensive to try to determine if a user has permission for each
+    # log entry on the mutation audit log, so instead we make sure that they
+    # have permission to view logs in their domain root account, and embed the
+    # root_account_id for every object in its identifier.
+    #
+    # this method will have to know how to resolve a root account for every
+    # object that is logged by a mutation
+    def root_account_for(entry)
+      if Progress === entry
+        entry = entry.context
+      end
+
+      if entry.respond_to? :root_account_id
+        return entry.root_account
+      end
+
+      case entry
+      when Course
+        entry.root_account
+      when Assignment, ContextModule, SubmissionComment
+        entry.context.root_account
+      when Submission
+        entry.assignment.course.root_account
+      when SubmissionDraft
+        entry.submission.assignment.course.root_account
+      when PostPolicy
+        (entry.assignment&.course || entry.course).root_account
+      else
+        raise "don't know how to resolve root_account for #{entry.inspect}"
+      end
+    end
+
+    # TODO: i need the timestamp in this column for ordering, and
+    # the request_id and sequence to guarantee uniqueness...
+    # should i also break the request_id / timestamp out into
+    # their own attributes?
+    def mutation_id
+      "#{@timestamp.to_f}-#{@context[:request_id]}-##{@sequence += 1}"
+    end
+
+    private
+
+    def filter_arguments(arguments)
+      ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h)
     end
   end
 
@@ -59,19 +114,23 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     yield(object, arguments).tap do |value|
       next unless AuditLogFieldExtension.enabled?
 
-      timestamp = Time.now.iso8601
-      ttl = 90.days.from_now.to_i
       mutation = field.mutation
 
+      logger = Logger.new(mutation, context, arguments)
+
+      # TODO? I make a log entry all the fields of the mutation, but maybe I
+      # should make them on the arguments too???
       mutation.fields.each do |_, return_field|
         next if return_field.original_name == :errors
         if entry = value[return_field.original_name]
           # technically we could be returning lists of lists but gosh dang i
           # hope we never do that
           if entry.respond_to?(:each)
-            entry.each { |e| Logger.log(e, timestamp, ttl, mutation, context, arguments) }
+            entry.each do |e|
+              logger.log(e, return_field.original_name)
+            end
           else
-            Logger.log(entry, timestamp, ttl, mutation, context, arguments)
+            logger.log(entry, return_field.original_name)
           end
         end
       end

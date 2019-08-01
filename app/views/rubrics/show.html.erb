@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= @actual_rubric.title %><% end %>
+<% provide :page_title do %><%= @actual_rubric.title %><% end %>
 <% add_crumb t('#crumbs.rubrics', 'Rubrics'), context_url(@context, :context_rubrics_url) %>
 <% add_crumb @actual_rubric.title %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <% if can_do(@actual_rubric, @current_user, :update) %>
     <a href="#" class="edit_rubric_link Button button-sidebar-wide"><i class="icon-edit" aria-hidden="true"></i> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
   <% else %>
@@ -34,7 +34,7 @@
 
 <% js_bundle :edit_rubric %>
 <% css_bundle :learning_outcomes %>
-<% content_for :stylesheets do %>
+
   <style>
     #rubrics .find_rubric_link {
       display: none;
@@ -46,7 +46,7 @@
       height: 100%;
     }
   </style>
-<% end %>
+
 <% js_bundle 'legacy/rubrics_show' %>
 <h1><%= @actual_rubric.title %></h1>
 <div id="rubrics" class="raw_listing">

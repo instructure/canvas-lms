@@ -58,7 +58,7 @@ export default Filterable =
   filterOut: (model) ->
     return false if not @filter
     return false if not @options.filterColumns.length
-    return false if _.any @options.filterColumns, (col) =>
+    return false if _.some @options.filterColumns, (col) =>
       model.get(col).toLowerCase().indexOf(@filter) >= 0
     true
 

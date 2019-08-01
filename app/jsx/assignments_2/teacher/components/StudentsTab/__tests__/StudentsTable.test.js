@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {closest, mockAssignment, mockUser, mockSubmission} from '../../../test-utils'
 import apiUserContent from 'compiled/str/apiUserContent'
 import StudentsTable from '../StudentsTable'
@@ -37,7 +37,9 @@ it('renders basic information', () => {
   const submission = mockSubmission({nodes: [user]})
   const assignment = mockAssignment()
 
-  const {getByText} = render(<StudentsTable assignment={assignment} submissions={[submission]} />)
+  const {getByText, getAllByText} = render(
+    <StudentsTable assignment={assignment} submissions={[submission]} />
+  )
   expect(getByText('Name')).toBeInTheDocument()
   expect(getByText(user.shortName)).toBeInTheDocument()
   expect(getByText('Attempts')).toBeInTheDocument()
@@ -45,7 +47,7 @@ it('renders basic information', () => {
   expect(getByText('Score')).toBeInTheDocument()
   expect(getByText('4/5')).toBeInTheDocument()
   expect(getByText('Submission Date')).toBeInTheDocument()
-  expect(getByText(displayedTime(submission.submittedAt))).toBeInTheDocument()
+  expect(getAllByText(displayedTime(submission.submittedAt))[0]).toBeInTheDocument()
   expect(getByText('Status')).toBeInTheDocument()
   expect(getByText('More')).toBeInTheDocument()
 
@@ -85,16 +87,18 @@ it('displays multiple attempts', () => {
   const submission = mockSubmission({nodes: [user], submissionHistories: {nodes: attempts}})
   const assignment = mockAssignment()
 
-  const {getByText} = render(<StudentsTable assignment={assignment} submissions={[submission]} />)
-  expect(getByText('Attempt 1')).toBeInTheDocument()
-  expect(getByText('Attempt 2')).toBeInTheDocument()
+  const {getByText, getAllByText} = render(
+    <StudentsTable assignment={assignment} submissions={[submission]} />
+  )
+  expect(getAllByText('Attempt 1')[0]).toBeInTheDocument()
+  expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
   expect(getByText('Attempt 3')).toBeInTheDocument()
   expect(getByText('2/5')).toBeInTheDocument()
   expect(getByText('3/5')).toBeInTheDocument()
   expect(getByText('4/5')).toBeInTheDocument()
-  expect(getByText(displayedTime(attempts[0].submittedAt))).toBeInTheDocument()
-  expect(getByText(displayedTime(attempts[1].submittedAt))).toBeInTheDocument()
-  expect(getByText(displayedTime(attempts[2].submittedAt))).toBeInTheDocument()
+  expect(getAllByText(displayedTime(attempts[0].submittedAt))[0]).toBeInTheDocument()
+  expect(getAllByText(displayedTime(attempts[1].submittedAt))[0]).toBeInTheDocument()
+  expect(getAllByText(displayedTime(attempts[2].submittedAt))[0]).toBeInTheDocument()
 
   const viewSubmissionLink = closest(getByText('Attempt 1'), 'a')
   expect(viewSubmissionLink.getAttribute('href')).toMatch(

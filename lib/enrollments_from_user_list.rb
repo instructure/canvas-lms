@@ -56,10 +56,16 @@ class EnrollmentsFromUserList
         end
       end
     end
-    if !@enrollments.empty?
+    if @enrollments.present?
       @course.transaction do
         user_ids = @enrollments.map(&:user_id).uniq
-        DueDateCacher.recompute_users_for_course(user_ids, @course, nil, executing_user: @updating_user)
+        DueDateCacher.recompute_users_for_course(
+          user_ids,
+          @course,
+          nil,
+          executing_user: @updating_user,
+          update_grades: true
+        )
       end
     end
     @user_ids_to_touch.uniq.each_slice(100) do |user_ids|

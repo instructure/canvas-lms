@@ -85,6 +85,8 @@ describe DiscussionEntriesController do
     end
 
     it "should NOT attach a file if not authorized" do
+      @course.allow_student_forum_attachments = false
+      @course.save!
       user_session(@student)
       post 'create', params: {:course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}, :attachment => {:uploaded_data => default_uploaded_data}}
       expect(assigns[:topic]).to eql(@topic)
@@ -159,6 +161,8 @@ describe DiscussionEntriesController do
     end
 
     it "should not replace the file to the entry if not authorized" do
+      @course.allow_student_forum_attachments = false
+      @course.save!
       user_session(@student)
       put 'update', params: {:course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}, :attachment => {:uploaded_data => default_uploaded_data}}
       expect(response).to be_redirect

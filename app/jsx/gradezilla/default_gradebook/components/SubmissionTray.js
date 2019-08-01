@@ -19,6 +19,7 @@
 import React from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import I18n from 'i18n!gradezilla'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
@@ -94,6 +95,7 @@ export default class SubmissionTray extends React.Component {
       valid: bool.isRequired
     }),
     postPoliciesEnabled: bool.isRequired,
+    requireStudentGroupForSpeedGrader: bool.isRequired,
     student: shape({
       id: string.isRequired,
       avatarUrl: string,
@@ -206,19 +208,40 @@ export default class SubmissionTray extends React.Component {
   }
 
   renderSpeedGraderLink(speedGraderProps) {
-    const buttonProps = {variant: 'link', href: speedGraderProps.speedGraderUrl}
+    const buttonProps = {
+      disabled: speedGraderProps.requireStudentGroup,
+      href: speedGraderProps.speedGraderUrl,
+      variant: 'link'
+    }
     if (speedGraderProps.anonymizeStudents) {
       buttonProps.onClick = e => {
         e.preventDefault()
         this.props.onAnonymousSpeedGraderClick(speedGraderProps.speedGraderUrl)
       }
     }
+
     return (
-      <View as="div" textAlign="center">
-        <Button {...buttonProps}>
-          <IconSpeedGraderLine />
-          {I18n.t('SpeedGrader')}
-        </Button>
+      <View as="div">
+        {speedGraderProps.requireStudentGroup && (
+          <Alert variant="info">
+            <Text as="p" weight="bold">
+              {I18n.t('Select Student Group')}
+            </Text>
+
+            <Text as="p">
+              {I18n.t(`
+                Due to the size of your course you must select a student group before launching
+                SpeedGrader.
+              `)}
+            </Text>
+          </Alert>
+        )}
+        <View as="div" textAlign="center">
+          <Button {...buttonProps}>
+            <IconSpeedGraderLine />
+            {I18n.t('SpeedGrader')}
+          </Button>
+        </View>
       </View>
     )
   }
@@ -257,6 +280,7 @@ export default class SubmissionTray extends React.Component {
     if (this.props.speedGraderEnabled) {
       speedGraderProps = {
         anonymizeStudents: this.props.assignment.anonymizeStudents,
+        requireStudentGroup: this.props.requireStudentGroupForSpeedGrader,
         speedGraderUrl
       }
     }

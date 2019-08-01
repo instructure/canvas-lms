@@ -81,7 +81,7 @@ import parseLinkHeader from 'compiled/fn/parseLinkHeader'
   }
 
   StudentGroupStore.addGroups = function(newlyFetchedGroups){
-    const newGroupsHash = _.indexBy(newlyFetchedGroups, "id")
+    const newGroupsHash = _.keyBy(newlyFetchedGroups, "id")
     const newGroupsState = _.extend(newGroupsHash, this.getState().groups)
     this.setState({
       groups: newGroupsState

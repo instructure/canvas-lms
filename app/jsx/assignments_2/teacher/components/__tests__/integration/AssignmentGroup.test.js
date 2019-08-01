@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import AssignmentGroup from '../../Editables/AssignmentGroup'
 import CanvasValidatedMockedProvider from 'jsx/__tests__/CanvasValidatedMockedProvider'
 import {COURSE_ASSIGNMENT_GROUPS_QUERY} from '../../../assignmentData'

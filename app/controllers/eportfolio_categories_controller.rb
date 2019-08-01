@@ -74,7 +74,8 @@ class EportfolioCategoriesController < ApplicationController
         @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
         raise ActiveRecord::RecordNotFound if !@page
         eportfolio_page_attributes
-        render "eportfolios/show"
+
+        render "eportfolios/show", stream: can_stream_template?
       end
     rescue ActiveRecord::RecordNotFound
       flash[:notice] = t('errors.missing_page', "Couldn't find that page")

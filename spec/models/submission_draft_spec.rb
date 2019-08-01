@@ -70,9 +70,15 @@ RSpec.describe SubmissionDraft do
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it 'submission_attempt cannot be larger then the root submissions attempt' do
+    it 'submission_attempt can be one attempt ahead of the current submissions' do
       expect{
         SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt + 1)
+      }.not_to raise_error
+    end
+
+    it 'submission_attempt cannot be more then one attempt ahead of the current submissions' do
+      expect{
+        SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt + 2)
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end

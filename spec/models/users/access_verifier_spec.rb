@@ -91,7 +91,7 @@ module Users
       it "raises InvalidVerifier if too old" do
         verifier = Users::AccessVerifier.generate(user: user)
         Timecop.freeze(10.minutes.from_now) do
-          expect{ Users::AccessVerifier.validate(verifier) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
+          expect{ Users::AccessVerifier.validate(verifier) }.to raise_exception(Canvas::Security::TokenExpired)
         end
       end
 

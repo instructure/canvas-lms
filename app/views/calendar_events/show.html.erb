@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <% return_to_url = return_to_calendar(:context => @context, :event => @event) %>
   <a class="base_calendar_url" href="<%= calendar_url_for() %>" style="display: none;">&nbsp;</a>
   <div id="sidebar_content">

@@ -20,8 +20,8 @@
 <% js_bundle :teacher_activity_report %>
 <% add_crumb(t('crumbs.interaction_report', "Student Interactions Report")) %>
 
-<% content_for :page_title, t('title', 'Teacher Activity Report') %>
-<% content_for :stylesheets do %>
+<% provide :page_title, t('title', 'Teacher Activity Report') %>
+
 <style type="text/css" media="screen">
   a.view_full_link {
     font-size: 85%;
@@ -30,7 +30,6 @@
     vertical-align: top;
   }
 </style>
-<% end %>
 
 <h1><%= t('headings.teacher_activity', "Teacher Activity Report for %{teacher}", :teacher => @teacher.name) %></h1>
 

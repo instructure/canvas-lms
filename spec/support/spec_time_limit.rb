@@ -93,7 +93,7 @@ module SpecTimeLimit
       #
       # furthermore, these are exempt from rerun thresholds so your build
       # will likely still pass if it was a total fluke.
-      ((stats[stat_key] * 2) + 5).ceil
+      ((stats[stat_key] * 3) + 5).ceil
     end
 
     def stats

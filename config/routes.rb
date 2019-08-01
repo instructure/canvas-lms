@@ -1020,6 +1020,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/tabs", action: :index, as: 'account_tabs'
       get "courses/:course_id/tabs", action: :index, as: 'course_tabs'
       get "groups/:group_id/tabs", action: :index, as: 'group_tabs'
+      get "users/:user_id/tabs", action: :index, as: 'user_profile_tabs'
       put "courses/:course_id/tabs/:tab_id", action: :update
     end
 

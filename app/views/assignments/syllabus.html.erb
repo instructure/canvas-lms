@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t :page_title, "Syllabus for %{course}", :course => @context.name %><% end %>
-<% content_for :right_side do %>
+<% provide :page_title do %><%= t :page_title, "Syllabus for %{course}", :course => @context.name %><% end %>
+<% provide :right_side do %>
   <%= render :partial => 'assignments/syllabus_right_side' %>
 <% end %>
 

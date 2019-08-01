@@ -255,12 +255,12 @@ class GroupsController < ApplicationController
     unless api_request?
       if @context.is_a?(Account)
         user_crumb = t('#crumbs.users', "Users")
-        @active_tab = "users"
+        set_active_tab "users"
         @group_user_type = "user"
         @allow_self_signup = false
       else
         user_crumb = t('#crumbs.people', "People")
-        @active_tab = "people"
+        set_active_tab "people"
         @group_user_type = "student"
         @allow_self_signup = true
         if @context.grants_right? @current_user, session, :read_as_admin
@@ -393,6 +393,13 @@ class GroupsController < ApplicationController
           set_badge_counts_for(@group, @current_user)
           @home_page = @group.wiki.front_page
         end
+
+        if @context_membership
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")})
+        elsif @context.available?
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")})
+        end
+
       end
       format.json do
         if authorized_action(@group, @current_user, :read)

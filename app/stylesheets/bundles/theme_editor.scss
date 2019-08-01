@@ -559,6 +559,9 @@ $te-footer-height: 72px;
     &.Theme__editor_preview-img-container--ic-brand-favicon {
       background: #ffffff; // will always be white due to xbrowsers
     }
+    &.Theme__editor_preview-img-container--ic-brand-mobile-global-nav-logo {
+      background: #ffffff;
+    }
     &.Theme__editor_preview-img-container--ic-brand-apple-touch-icon {
       background: #212121;
       .Theme__editor_preview-img {

@@ -29,7 +29,7 @@ function submissionGradingPeriodInformation(assignment, student) {
 
 function hiddenFromStudent(assignment, student) {
   if (assignment.only_visible_to_overrides) {
-    return !_.contains(assignment.assignment_visibility, student.id)
+    return !_.includes(assignment.assignment_visibility, student.id)
   }
   return false
 }

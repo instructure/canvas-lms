@@ -15,29 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-<%
-  content_for :right_side, render(:partial => "assignment_sidebar")
-%>
-<% content_for :stylesheets do %>
-  <style>
-    #right-side-wrapper {
-      height: 100%;
-    }
-  </style>
-<% end %>
 
-<% if @locked && !@locked[:can_view] %>
-  <% js_bundle :module_sequence_footer %>
+<style>
+  #right-side-wrapper {
+    height: 100%;
+  }
+</style>
+
+<% provide :page_title, @assignment.title %>
+<% provide :right_side, render(:partial => "assignment_sidebar") %>
+
+<% if @show_locked_page %>
 
   <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
 <% else %>
-
-<%
-  css_bundle :assignments
-  js_bundle :assignment_show
-%>
 
 <% if @assignment.omit_from_final_grade %>
   <div class="alert alert-info omit-from-final-warning">

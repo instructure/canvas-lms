@@ -109,7 +109,7 @@ test('adding groups works', () => {
   const arrayOfGroups = [{id: 2, title: 'group 2'}]
   StudentGroupStore.setState({groups: initialGroups})
   StudentGroupStore.addGroups(arrayOfGroups)
-  deepEqual(StudentGroupStore.getGroups(), _.indexBy([g1, g2], 'id'))
+  deepEqual(StudentGroupStore.getGroups(), _.keyBy([g1, g2], 'id'))
 })
 
 // ==================

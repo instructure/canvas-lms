@@ -32,5 +32,13 @@ PactConfig::Consumers::ALL.each do |consumer|
         @teacher.pseudonyms.create!(unique_id: "Teacher2@instructure.com", password: 'password', password_confirmation: 'password')
       end
     end
+
+    provider_state 'shareable users existing in canvas' do
+      set_up do
+        @teacher = user_factory(active_all: true, name: "Pact Teacher")
+        course_with_teacher({ user: @teacher })
+        @teacher.update(email: "pact-teacher@example.com")
+      end
+    end
   end
 end

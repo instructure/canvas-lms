@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "右对齐"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "校准和缩进"
+  },
   "all_4321c3a1": {
     "message": "全部"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "取消图片上传"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas 插件"
   },
   "cc_attribution_f6de631f": {
     "message": "CC 署名"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "编辑链接"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "编辑器状态栏"
+  },
   "embed_828fac4a": {
     "message": "嵌入"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "文件夹"
+  },
+  "formatting_5b143aa8": {
+    "message": "格式化"
   },
   "generating_preview_45b53be0": {
     "message": "生成预览..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "麦克风"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "杂项和LTI"
+  },
   "modules_c4325335": {
     "message": "单元"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "选择您的文件要上传至其中的文件夹"
   },
+  "selected_274ce24f": {
+    "message": "已选择"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "显示嵌入选项"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "开始录制"
+  },
+  "styles_2aa721ef": {
+    "message": "样式"
   },
   "subheader_2b87606d": {
     "message": "子标题"

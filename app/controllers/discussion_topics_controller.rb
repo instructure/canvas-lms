@@ -367,7 +367,7 @@ class DiscussionTopicsController < ApplicationController
       format.html do
         log_asset_access([ "topics", @context ], 'topics', 'other')
 
-        @active_tab = 'discussions'
+        set_active_tab 'discussions'
         add_crumb(t('#crumbs.discussions', 'Discussions'),
                   named_context_url(@context, :context_discussion_topics_url))
 
@@ -390,8 +390,11 @@ class DiscussionTopicsController < ApplicationController
         fetch_params[:include] = ['sections_user_count', 'sections'] if @context.is_a?(Course)
 
         discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
-        @discussion_topics_urls_to_prefetch = (scope.count / fetch_params[:per_page].to_f).ceil.times.map do |i|
+        discussion_topics_urls_to_prefetch = (scope.count / fetch_params[:per_page].to_f).ceil.times.map do |i|
           discussion_topics_fetch_url.gsub(fetch_params[:page], (i+1).to_s)
+        end
+        discussion_topics_urls_to_prefetch.each_with_index do |url, i|
+          prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
         end
 
         hash = {
@@ -417,6 +420,17 @@ class DiscussionTopicsController < ApplicationController
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
+
+        add_body_class 'hide-content-while-scripts-not-loaded'
+        @page_title = join_title(t('#titles.discussions', "Discussions"), @context.name)
+
+        feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
+
+        js_bundle :discussion_topics_index_v2
+        css_bundle :discussions_index
+
+        render html: '', layout: true
       end
       format.json do
         if @context.grants_right?(@current_user, session, :moderate_forum)
@@ -764,6 +778,21 @@ class DiscussionTopicsController < ApplicationController
             js_env(js_hash)
             set_master_course_js_env_data(@topic, @context)
             conditional_release_js_env(@topic.assignment, includes: [:rule])
+            js_bundle :discussion
+            css_bundle :tinymce, :discussions, :learning_outcomes
+
+            if @context_enrollment
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              if @topic.podcast_enabled
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+              end
+            elsif @context.available?
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              if @topic.podcast_enabled
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+              end
+            end
+
           end
         end
       end
@@ -1032,10 +1061,10 @@ class DiscussionTopicsController < ApplicationController
 
   def add_discussion_or_announcement_crumb
     if  @topic.is_a? Announcement
-      @active_tab = "announcements"
+      set_active_tab "announcements"
       add_crumb t('#crumbs.announcements', "Announcements"), named_context_url(@context, :context_announcements_url)
     else
-      @active_tab = "discussions"
+      set_active_tab "discussions"
       add_crumb t('#crumbs.discussions', "Discussions"), named_context_url(@context, :context_discussion_topics_url)
     end
   end

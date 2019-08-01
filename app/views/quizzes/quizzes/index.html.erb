@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, t(:page_titles, "Quizzes") %>
+<% provide :page_title, t(:page_titles, "Quizzes") %>
 
 <% css_bundle :quizzes %>
 <% js_bundle :quizzes_index %>
 
 <%
-  @body_classes << 'with_item_groups'
+  add_body_class 'with_item_groups'
 %>

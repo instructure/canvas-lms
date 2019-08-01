@@ -24,8 +24,8 @@ describe 'RequestThrottle' do
   let(:request_user_2) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'rack.session' => { user_id: 2 } }) }
   let(:token1) { AccessToken.create!(user: user_factory) }
   let(:token2) { AccessToken.create!(user: user_factory) }
-  let(:request_query_token) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'QUERY_STRING' => "access_token=#{token1.full_token}" }) }
-  let(:request_header_token) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => "Bearer #{token2.full_token}" }) }
+  let(:request_query_token) { request_user_1.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'QUERY_STRING' => "access_token=#{token1.full_token}" }) }
+  let(:request_header_token) { request_user_2.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session.options' => { id: 'sess1' } }) }
   let(:request_no_session) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4' }) }
 
@@ -109,6 +109,11 @@ describe 'RequestThrottle' do
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
       set_blacklist("token:#{AccessToken.hashed_token(token1.full_token)},token:#{AccessToken.hashed_token(token2.full_token)}")
       expect(throttler.call(request_query_token)).to eq rate_limit_exceeded
+      expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
+    end
+
+    it "blacklists users even when using access tokens" do
+      set_blacklist('user:2')
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
     end
   end

@@ -19,9 +19,9 @@
 <%
   js_env ga_page_title: "User"
 %>
-<% content_for :page_title do %><%= @user.short_name %><% end %>
+<% provide :page_title do %><%= @user.short_name %><% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div>
     <a href="<%= message_user_path(@user, @context) %>" class="btn button-sidebar-wide">
       <i class="icon-email"></i>
@@ -50,7 +50,7 @@
     </div>
   <% end %>
   <h2><%= @user.short_name %></h2>
-<% content_for :stylesheets do %>
+
 <style type="text/css" media="screen">
   #user-info-fieldsets{
     margin-bottom: 2em;
@@ -63,7 +63,6 @@
     line-height: 1.0em;
   }
 </style>
-<% end %>
 
 <% css_bundle :roster_user, :context_list, :pairing_code %>
 

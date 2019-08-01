@@ -25,7 +25,22 @@ module AddressBook
         asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
         known_users = @sender.messageable_user_calculator.
           messageable_users_in_context(asset_string, admin_context: admin_context?(options[:context])).
-          select{ |user| user_ids.include?(user.global_id) }
+          select { |user| user_ids.include?(user.global_id) }
+
+        # group members who are in different sections will not be included by
+        # the logic above; if the context is a course, we must check if there
+        # are any group members who need to be included as known users
+        if options[:context].is_a?(Course) && options[:context].groups.present?
+          # retrieve only the groups that belong to the course and that the
+          # sender belongs to
+          groups = @sender.groups.merge(options[:context].groups)
+          groups.each do |group|
+            group_members = @sender.messageable_user_calculator.
+              messageable_users_in_group(group).
+              select { |user| user_ids.include?(user.global_id) }
+            known_users.concat(group_members).uniq
+          end
+        end
       else
         # in case we were handed something that's already a messageable user,
         # pass it in as just the id so we don't modify it in place

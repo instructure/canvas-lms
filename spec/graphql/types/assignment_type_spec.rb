@@ -397,7 +397,7 @@ describe Types::AssignmentType do
       ).to eq [section.id.to_s]
     end
 
-    it "works for adhoc students" do
+    def make_adhoc_student_override
       adhoc_override = assignment.assignment_overrides.new(set_type: "ADHOC")
       adhoc_override.assignment_override_students.build(
         assignment: assignment,
@@ -405,6 +405,10 @@ describe Types::AssignmentType do
         assignment_override: adhoc_override
       )
       adhoc_override.save!
+    end
+
+    it "works for adhoc students" do
+      make_adhoc_student_override
 
       expect(
         assignment_type.resolve(<<~GQL, current_user: teacher)
@@ -417,6 +421,57 @@ describe Types::AssignmentType do
           } } } }
         GQL
       ).to eq [[student.id.to_s]]
+    end
+
+    context "base dates" do
+      before do
+        @base_due = 1.day.ago
+        assignment.update(due_at: @base_due)
+      end
+
+      it "returns base dates" do
+        expect(
+          assignment_type.resolve("assignmentOverrides(includeBaseDates: true) { nodes { title } }",
+                                  current_user: teacher)
+        ).to include "Everyone else"
+
+        expect(
+          assignment_type.resolve("assignmentOverrides(includeBaseDates: true) { nodes { dueAt } }",
+                                  current_user: teacher)
+        ).to include @base_due.iso8601
+
+        expect(
+          assignment_type.resolve(<<~GQL, current_user: teacher)
+            assignmentOverrides(includeBaseDates: true) { nodes {
+              set { __typename }
+            } }
+          GQL
+        ).to include "EveryoneElse"
+      end
+
+      it "returns base dates for students who don't have an applicable override" do
+        expect(
+          assignment_type.resolve("assignmentOverrides(includeBaseDates: true) { nodes { title } }",
+                                  current_user: student)
+        ).to include "Everyone else"
+      end
+
+      it "doesn't return base dates for students with an override" do
+        make_adhoc_student_override
+
+        expect(
+          assignment_type.resolve("assignmentOverrides(includeBaseDates: true) { nodes { title } }",
+                                  current_user: student)
+        ).not_to include "Everyone else"
+      end
+
+      it "doesn't return base dates for selective release" do
+        assignment.update! only_visible_to_overrides: true
+        expect(
+          assignment_type.resolve("assignmentOverrides(includeBaseDates: true) { nodes { title } }",
+                                  current_user: @teacher)
+        ).not_to include "Everyone else"
+      end
     end
   end
 

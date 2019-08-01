@@ -294,6 +294,7 @@ import 'jqueryui/tabs'
       var date = $(this).data('unfudged-date');
       var isMidnight = tz.isMidnight(date);
       $warning.detach().appendTo($parent).showIf(isMidnight);
+      $(this).attr('aria-describedby', isMidnight ? 'course_conclude_at_warning' : null)
     });
     $course_form.formSubmit({
       beforeSubmit: function(data) {

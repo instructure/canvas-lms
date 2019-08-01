@@ -19,11 +19,12 @@
 class GradingStandard < ActiveRecord::Base
   include Workflow
 
-  belongs_to :context, polymorphic: [:account, :course]
+  belongs_to :context, polymorphic: [:account, :course], required: true
   belongs_to :user
   has_many :assignments
 
-  validates :context_id, :context_type, :workflow_state, :data, presence: true
+  validates :workflow_state, presence: true
+  validates :data, presence: true
   validate :valid_grading_scheme_data
   validate :full_range_scheme
 
@@ -129,7 +130,9 @@ class GradingStandard < ActiveRecord::Base
     # round values to the nearest 0.01 (0.0001 since e.g. 78 is stored as .78)
     # and dup the data while we're at it. (new_val.dup only dups one level, the
     # elements of new_val.dup are the same objects as the elements of new_val)
-    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] } unless new_val.nil?
+    if new_val.respond_to?(:map)
+      new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, lower_bound.round(4) ] }
+    end
     write_attribute(:data, new_val)
     @ordered_scheme = nil
   end

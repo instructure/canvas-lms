@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -33,18 +34,28 @@ module Types
     end
   end
 
+  class EveryoneElseType < ApplicationObjectType
+    description "Represents everyone an override does not apply to"
+
+    field :title, String, null: false
+    def title
+      I18n.t "Everyone else"
+    end
+  end
+
   class AssignmentOverrideSetUnion < BaseUnion
     graphql_name "AssignmentOverrideSet"
 
     description "Objects that can be assigned overridden dates"
 
-    possible_types SectionType, GroupType, AdhocStudentsType
+    possible_types SectionType, GroupType, AdhocStudentsType, EveryoneElseType
 
     def self.resolve_type(obj, _)
       case obj
       when CourseSection then SectionType
       when Group then GroupType
       when AssignmentOverride then AdhocStudentsType
+      when AssignmentOverrideType::FakeOverride then EveryoneElseType
       end
     end
   end
@@ -61,7 +72,9 @@ module Types
 
     field :assignment, AssignmentType, null: true
     def assignment
-      load_association(:assignment)
+      override.is_a? FakeOverride ?
+        override.assignment :
+        load_association(:assignment)
     end
 
     field :title, String, null: true
@@ -70,7 +83,7 @@ module Types
       "This object specifies what students this override applies to",
       null: true
     def set
-      if override.set_type == "ADHOC"
+      if override.set_type == "ADHOC" || override.is_a?(FakeOverride)
         override
       else
         load_association(:set)
@@ -81,5 +94,26 @@ module Types
     field :lock_at, DateTimeType, null: true
     field :unlock_at, DateTimeType, null: true
     field :all_day, Boolean, null: true
+
+    class FakeOverride
+      def initialize(assignment)
+        @assignment = assignment.without_overrides
+      end
+
+      attr_reader :assignment
+      delegate :due_at, :lock_at, :unlock_at, :all_day, to: :assignment
+
+      def id
+        0
+      end
+
+      def title
+        I18n.t "Everyone else"
+      end
+
+      def set_type
+        "Base"
+      end
+    end
   end
 end

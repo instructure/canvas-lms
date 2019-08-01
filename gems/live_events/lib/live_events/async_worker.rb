@@ -115,18 +115,31 @@ module LiveEvents
 
     private
 
+    def time_block
+      res = nil
+      unless LiveEvents&.statsd.nil?
+        LiveEvents.statsd.time("live_events.put_records") do
+          res = yield
+        end
+      else
+        res = yield
+      end
+    end
+
     def send_events(records)
       return if records.empty?
 
-      res = @stream_client.put_records(
-        records: records.map do |record|
-          {
-            data: record[:data],
-            partition_key: record[:partition_key]
-          }
-        end,
-        stream_name: @stream_name
-      )
+      res = time_block do
+        @stream_client.put_records(
+          records: records.map do |record|
+            {
+              data: record[:data],
+              partition_key: record[:partition_key]
+            }
+          end,
+          stream_name: @stream_name
+        )
+      end
       process_results(res, records)
     end
 

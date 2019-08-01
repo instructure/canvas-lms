@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, waitForElement} from 'react-testing-library'
+import {fireEvent, waitForElement} from '@testing-library/react'
 import {renderTeacherView} from './integration-utils'
 import {closest, mockAssignment, itBehavesLikeADialog} from '../../../test-utils'
 
@@ -31,8 +31,10 @@ describe('MessageStudentsWho integration', () => {
   })
 
   it('shows the message students who dialog when the message students who button is clicked', async () => {
-    const {getByText} = await renderTeacherView(mockAssignment({submissionTypes: ['none']}))
-    fireEvent.click(getByText(/students/i))
+    const {getByText, getAllByText} = await renderTeacherView(
+      mockAssignment({submissionTypes: ['none']})
+    )
+    fireEvent.click(getAllByText(/students/i)[0])
     fireEvent.click(closest(getByText(/message students/i), 'button'))
     expect(await waitForElement(() => getByText('Message Students Who...'))).toBeInTheDocument()
   })

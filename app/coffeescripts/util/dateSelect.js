@@ -91,7 +91,7 @@ export default function dateSelect (name, options, htmlOptions = _.clone(options
   for (let i = 0, end = options.order.length, asc = end >= 0; asc ? i < end : i > end; asc ? i++ : i--) {
     const type = options.order[i]
     const tName = name.replace(/(\]?)$/, `(${position[type]}i)$1`)
-    const html = builders[type](options, _.extend({name: tName}, htmlOptions), dateSettings)
+    const html = builders[type](options, {name: tName, ...htmlOptions}, dateSettings)
     $result.append(html)
     delete htmlOptions.id
   }

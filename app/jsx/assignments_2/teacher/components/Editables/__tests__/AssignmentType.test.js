@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import AssignmentType from '../AssignmentType'
 
 beforeAll(() => {
@@ -51,11 +51,11 @@ it('renders the given assignment type in edit mode', () => {
 })
 
 it('renders the placeholder when not given a value', () => {
-  const {getByText, getByTestId} = render(
+  const {getAllByText, getByTestId} = render(
     <AssignmentType mode="view" onChange={() => {}} onChangeMode={() => {}} />
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
-  expect(getByText('Assignment Type')).toBeInTheDocument()
+  expect(getAllByText('Assignment Type')[0]).toBeInTheDocument()
 })
 
 it('has 3 options if quiz.next is not enabled', () => {

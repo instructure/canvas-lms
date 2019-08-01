@@ -22,7 +22,7 @@
   js_env ga_page_title: "Submission Preview"
 %>
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
-<% content_for :page_title do %><%= join_title @assignment.title, submission_author_name_for(@assessment_request) %><% end %>
+<% provide :page_title do %><%= join_title @assignment.title, submission_author_name_for(@assessment_request) %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>
@@ -206,9 +206,7 @@
 
   <% js_bundle 'legacy/submissions_show_preview_upload' %>
 <% elsif @submission.submission_type == "online_quiz" %>
-  <% content_for :stylesheets do %>
-    <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
-  <% end %>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :hide_student_name => params[:hide_student_name], :headless => 1, :version => @submission.quiz_submission_version) %>"/>
   <div style="text-align: center;">
     <%= t('quiz_submission', 'This submission was a quiz submission.  Redirecting to quiz page.') %>
   </div>
