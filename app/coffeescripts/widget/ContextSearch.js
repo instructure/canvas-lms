@@ -22,8 +22,24 @@ import _ from 'underscore'
 import contextList from '../util/contextList'
 import TokenInput from '../widget/TokenInput'
 import avatarTemplate from 'jst/_avatar'
+import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
-export default class ContextSearch extends TokenInput {
+_inherits(ContextSearch, TokenInput)
+
+export default function ContextSearch($node, options) {
+  this.populator = this.populator.bind(this)
+  this.buildContextInfo = this.buildContextInfo.bind(this)
+  this.contextList = this.contextList.bind(this)
+  options = $.extend(true, {}, this.defaults(), options)
+  this.prefixUserIds = options.prefixUserIds
+  this.contexts = options.contexts
+  if (options.canToggle) {
+    this.canToggle = options.canToggle
+  }
+  TokenInput.call(this, $node, options)
+}
+
+Object.assign(ContextSearch.prototype, {
   defaults() {
     return {
       placeholder: I18n.t('context_search_placeholder', 'Enter a name, course, or group'),
@@ -41,27 +57,7 @@ export default class ContextSearch extends TokenInput {
         }
       }
     }
-  }
-
-  constructor($node, options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.populator = this.populator.bind(this)
-    this.buildContextInfo = this.buildContextInfo.bind(this)
-    this.contextList = this.contextList.bind(this)
-    options = $.extend(true, {}, this.defaults(), options)
-    this.prefixUserIds = options.prefixUserIds
-    this.contexts = options.contexts
-    if (options.canToggle) {
-      this.canToggle = options.canToggle
-    }
-    super($node, options)
-  }
+  },
 
   populator(selector, $node, data, options = {}) {
     let $contextInfo
@@ -135,11 +131,11 @@ export default class ContextSearch extends TokenInput {
       $node.prepend('<a class="expand"><i></i></a>')
       return $node.addClass('expandable')
     }
-  }
+  },
 
   canToggle(data) {
     return !data.item_count // can't toggle certain synthetic contexts, e.g. "Student Groups"
-  }
+  },
 
   buildContextInfo(data) {
     let termInfo
@@ -159,13 +155,13 @@ export default class ContextSearch extends TokenInput {
     } else {
       return ''
     }
-  }
+  },
 
   contextList(contexts) {
     contexts = {courses: _.keys(contexts.courses), groups: _.keys(contexts.groups)}
     return contextList(contexts, this.contexts, {linkToContexts: false, hardCutoff: 2})
   }
-}
+})
 
 $.fn.contextSearch = function(options) {
   return this.each(function() {
