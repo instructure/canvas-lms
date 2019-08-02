@@ -2,7 +2,7 @@ require_relative '../../../rails_helper'
 
 RSpec.describe SettingsService::Commands::UpdateEnrollmentSetting do
   before do
-    SettingsService.canvas_domain = 'somedomain.com'
+    SettingsService.settings_table_prefix = 'somedomain.com'
   end
   subject do
     SettingsService::Commands::UpdateEnrollmentSetting.new(

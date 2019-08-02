@@ -8,7 +8,7 @@ RSpec.describe SettingsService::Assignment do
   let(:table_name) { 'integration.example.com-assignment_settings' }
 
   before do
-    SettingsService.canvas_domain = 'integration.example.com'
+    SettingsService.settings_table_prefix = 'integration.example.com'
   end
 
   describe '#create_table' do

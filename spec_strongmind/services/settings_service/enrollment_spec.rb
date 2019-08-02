@@ -21,7 +21,7 @@ RSpec.describe SettingsService::Enrollment do
 
   context 'canvas domain present' do
     before do
-      SettingsService.canvas_domain = 'integration.example.com'
+      SettingsService.settings_table_prefix = 'integration.example.com'
     end
 
     describe '#create_table' do
