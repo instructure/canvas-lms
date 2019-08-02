@@ -46,7 +46,7 @@
     <span class="group_display">
       <%= t(:show_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
             :num_questions => hash_get(group, :pick_count, 1),
-            :num_points => hash_get(group, :question_points, 1),
+            :num_points => render_score(hash_get(group, :question_points, 1)),
             :wrapper => {
               '*' => '<span class="pick_count">\1</span>',
               '#' => '<span class="question_points">\1</span>'
@@ -55,7 +55,7 @@
     <span class="group_edit">
       <%= t(:edit_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
             :num_questions => hash_get(group, :pick_count, 1),
-            :num_points => hash_get(group, :question_points, 1),
+            :num_points => render_score(hash_get(group, :question_points, 1)),
             :wrapper => {
               '*' => "<input name='quiz_group[pick_count]' aria-label='#{h(t('labels.number_of_questions', "Number of Questions"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/>",
               '#' => "<input name='quiz_group[question_points]' class='float_value' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/>"
