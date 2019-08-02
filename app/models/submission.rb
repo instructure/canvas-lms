@@ -2500,6 +2500,9 @@ class Submission < ActiveRecord::Base
   end
 
   def posted?
+    # NOTE: This really should be a call to assignment.course.post_policies_enabled?
+    # but we're going to leave it the way it is for the next few months (until
+    # New Gradebook becomes universal) for fear of breaking even more things.
     if PostPolicy.feature_enabled?
       posted_at.present?
     else

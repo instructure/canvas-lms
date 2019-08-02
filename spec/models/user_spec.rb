@@ -524,53 +524,130 @@ describe User do
     @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
   end
 
-  it "should not include recent feedback for muted assignments" do
-    create_course_with_student_and_assignment
-    @assignment.mute!
-    @assignment.grade_student @student, grade: 9, grader: @teacher
-    expect(@user.recent_feedback).to be_empty
-  end
+  describe "#recent_feedback" do
+    let_once(:post_policies_course) do
+      course = Course.create!(workflow_state: :available)
+      course.enable_feature!(:new_gradebook)
+      PostPolicy.enable_feature!
+      course
+    end
+    let_once(:auto_posted_assignment) { post_policies_course.assignments.create!(points_possible: 10) }
+    let_once(:manual_posted_assignment) do
+      assignment = post_policies_course.assignments.create!(points_possible: 10)
+      assignment.post_policy.update!(post_manually: true)
+      assignment
+    end
 
-  it "should include recent feedback for unmuted assignments" do
-    create_course_with_student_and_assignment
-    @assignment.grade_student @user, grade: 9, grader: @teacher
-    expect(@user.recent_feedback(:contexts => [@course])).not_to be_empty
-  end
+    let_once(:old_course) { Course.create!(workflow_state: :available) }
+    let_once(:unmuted_assignment) { old_course.assignments.create!(points_possible: 10) }
+    let_once(:muted_assignment) do
+      assignment = old_course.assignments.create!(points_possible: 10)
+      assignment.mute!
+      assignment
+    end
 
-  it "should include recent feedback for student view users" do
-    @course = course_model
-    @course.offer!
-    @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
-    test_student = @course.student_view_student
-    @assignment.grade_student test_student, grade: 9, grader: @teacher
-    expect(test_student.recent_feedback).not_to be_empty
-  end
+    let_once(:student) { User.create! }
+    let_once(:teacher) { User.create! }
 
-  it "should not include recent feedback for unpublished assignments" do
-    create_course_with_student_and_assignment
-    @assignment.grade_student @user, grade: 9, grader: @teacher
-    @assignment.unpublish
-    expect(@user.recent_feedback(:contexts => [@course])).to be_empty
-  end
+    before(:once) do
+      [post_policies_course, old_course].each do |course|
+        course.enroll_student(student, enrollment_state: :active)
+        course.enroll_teacher(teacher, enrollment_state: :active)
+      end
+    end
 
-  it "should not include recent feedback for other students in admin feedback" do
-    create_course_with_student_and_assignment
-    other_teacher = @teacher
-    teacher = teacher_in_course(:active_all => true).user
-    student = student_in_course(:active_all => true).user
-    sub = @assignment.grade_student(student, grade: 9, grader: @teacher).first
-    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher)
-    sub.save!
-    expect(teacher.recent_feedback(:contexts => [@course])).to be_empty
-  end
+    context "for a non-Post Policies course" do
+      it "does not include recent feedback for muted assignments" do
+        muted_assignment.grade_student(student, grader: teacher, score: 10)
+        expect(student.recent_feedback).to be_empty
+      end
 
-  it "should not include non-recent feedback via old submission comments" do
-    create_course_with_student_and_assignment
-    sub = @assignment.grade_student(@user, grade: 9, grader: @teacher).first
-    sub.submission_comments.create!(:author => @teacher, :comment => 'good jorb')
-    expect(@user.recent_feedback(:contexts => [@course])).to include sub
-    Timecop.travel(1.year.from_now) do
-      expect(@user.recent_feedback(:contexts => [@course])).not_to include sub
+      it "includes recent feedback for unmuted assignments" do
+        unmuted_assignment.grade_student(student, grader: teacher, score: 10)
+        expect(student.recent_feedback).to contain_exactly(unmuted_assignment.submission_for_student(student))
+      end
+    end
+
+    context "for a course with Post Policies enabled" do
+      it "does not include assignments for which there is no feedback" do
+        expect(student.recent_feedback).to be_empty
+      end
+
+      it "includes recent posted feedback" do
+        auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
+        expect(student.recent_feedback).to contain_exactly(auto_posted_assignment.submission_for_student(student))
+      end
+
+      it "includes feedback that was posted after being initially hidden" do
+        manual_posted_assignment.grade_student(student, grader: teacher, score: 10)
+        manual_posted_assignment.post_submissions
+
+        expect(student.recent_feedback).to contain_exactly(manual_posted_assignment.submission_for_student(student))
+      end
+
+      it "does not include recent unposted feedback" do
+        manual_posted_assignment.grade_student(student, grader: teacher, score: 10)
+        expect(student.recent_feedback).to be_empty
+      end
+
+      it "does not include recent feedback that was posted but subsequently hidden" do
+        auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
+        auto_posted_assignment.hide_submissions
+
+        expect(student.recent_feedback).to be_empty
+      end
+    end
+
+    context "when considering both types of courses simultaneously" do
+      it "only returns feedback for posted submissions and unmuted assignments" do
+        muted_assignment.grade_student(student, grader: teacher, score: 10)
+        unmuted_assignment.grade_student(student, grader: teacher, score: 10)
+        auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
+        manual_posted_assignment.grade_student(student, grader: teacher, score: 10)
+
+        expect(student.recent_feedback).to contain_exactly(
+          unmuted_assignment.submission_for_student(student),
+          auto_posted_assignment.submission_for_student(student)
+        )
+      end
+
+      it "only returns feedback for specific courses if specified" do
+        unmuted_assignment.grade_student(student, grader: teacher, score: 10)
+        auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
+
+        expect(student.recent_feedback(contexts: [post_policies_course])).to contain_exactly(
+          auto_posted_assignment.submission_for_student(student)
+        )
+      end
+    end
+
+    it "includes recent feedback for student view users" do
+      test_student = post_policies_course.student_view_student
+      auto_posted_assignment.grade_student(test_student, grade: 9, grader: teacher)
+      expect(test_student.recent_feedback).not_to be_empty
+    end
+
+    it "does not include recent feedback for unpublished assignments" do
+      auto_posted_assignment.grade_student(student, grade: 9, grader: teacher)
+      auto_posted_assignment.unpublish
+      expect(student.recent_feedback(contexts: [post_policies_course])).to be_empty
+    end
+
+    it "does not include recent feedback for other students in admin feedback" do
+      other_teacher = post_policies_course.enroll_teacher(User.create!, enrollment_state: :active).user
+      submission = auto_posted_assignment.grade_student(student, grade: 9, grader: teacher).first
+      submission.add_comment(author: other_teacher, comment: "hi :)")
+
+      expect(teacher.recent_feedback(contexts: [post_policies_course])).to be_empty
+    end
+
+    it "does not include non-recent feedback via old submission comments" do
+      submission = auto_posted_assignment.grade_student(student, grade: 9, grader: teacher).first
+      submission.add_comment(author: teacher, comment: "hooray")
+
+      Timecop.travel(1.year.from_now) do
+        expect(student.recent_feedback(contexts: [post_policies_course])).not_to include submission
+      end
     end
   end
 
