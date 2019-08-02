@@ -954,14 +954,16 @@ describe CoursesController do
 
     context "show feedback for the current course only on course front page" do
       before(:once) do
-        course_with_student(:active_all => true)
-        @me = @user
-        @course1 = @course
-        course_with_teacher(:course => @course1)
+        PostPolicy.enable_feature!
 
-        course_with_student(:active_all => true, :user => @student)
+        course_with_teacher(active_all: true)
+        @course1 = @course
+        student_in_course(active_all: true, course: @course1)
+        @me = @user
+
+        course_with_teacher(active_all: true, user: @teacher)
         @course2 = @course
-        course_with_teacher(:course => @course2, :user => @teacher)
+        student_in_course(active_all: true, course: @course2, user: @me)
 
         @a1 = @course1.assignments.new(:title => "some assignment course 1")
         @a1.workflow_state = "published"
