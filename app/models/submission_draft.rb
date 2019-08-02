@@ -24,6 +24,7 @@ class SubmissionDraft < ActiveRecord::Base
   validates :submission, presence: true
   validates :submission_attempt, numericality: { only_integer: true }
   validates :submission, uniqueness: { scope: :submission_attempt }
+  validates :body, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
   validate :submission_attempt_matches_submission
 
   def submission_attempt_matches_submission

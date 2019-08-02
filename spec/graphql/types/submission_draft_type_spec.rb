@@ -29,7 +29,7 @@ RSpec.describe Types::SubmissionDraftType do
   end
 
   def resolve_submission_draft
-    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher})
+    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher, request: ActionDispatch::TestRequest.create})
       query {
         assignment(id: "#{@assignment.id}") {
           submissionsConnection(filter: {states: [unsubmitted, graded, pending_review, submitted]}) {
@@ -40,6 +40,7 @@ RSpec.describe Types::SubmissionDraftType do
                   _id
                   displayName
                 }
+                body
                 submissionAttempt
               }
             }
@@ -69,5 +70,13 @@ RSpec.describe Types::SubmissionDraftType do
 
     submission_draft = resolve_submission_draft
     expect(submission_draft['attachments'].first['displayName']).to eq(attachment.display_name)
+  end
+
+  it 'returns the draft body' do
+    @submission_draft.body = 'some text'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['body']).to eq('some text')
   end
 end

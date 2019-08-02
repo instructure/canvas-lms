@@ -264,17 +264,6 @@ module Types
       )
     end
 
-    class AttachmentPreloader < GraphQL::Batch::Loader
-      def initialize(context)
-        @context = context
-      end
-
-      def perform(htmls)
-        as = Api.api_bulk_load_user_content_attachments(htmls, @context)
-        htmls.each { |html| fulfill(html, as) }
-      end
-    end
-
     field :description, String, null: true
     def description
       return nil if assignment.description.blank?
@@ -282,8 +271,7 @@ module Types
       load_locked_for do |lock_info|
         # some (but not all) locked assignments allow viewing the description
         next nil if lock_info && !assignment.include_description?(current_user, lock_info)
-        AttachmentPreloader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
-
+        Loaders::ApiContentAttachmentLoader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
             GraphQLHelpers::UserContent.process(assignment.description,
                                                 request: context[:request],
                                                 context: assignment.context,
