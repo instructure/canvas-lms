@@ -2420,6 +2420,7 @@ type Submission implements Node & SubmissionInterface & Timestamped {
   ): SubmissionHistoryConnection
   submissionStatus: String
   submittedAt: DateTime
+  unreadCommentCount: Int!
   updatedAt: DateTime
   user: User
 }
@@ -2435,6 +2436,7 @@ type SubmissionComment implements Timestamped {
   comment: String
   createdAt: DateTime
   mediaObject: MediaObject
+  read: Boolean!
   updatedAt: DateTime
 }
 
@@ -2608,6 +2610,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   submissionDraft: SubmissionDraft
   submissionStatus: String
   submittedAt: DateTime
+  unreadCommentCount: Int!
   updatedAt: DateTime
   user: User
 }
@@ -2723,6 +2726,7 @@ interface SubmissionInterface {
   submissionDraft: SubmissionDraft
   submissionStatus: String
   submittedAt: DateTime
+  unreadCommentCount: Int!
   user: User
 }
 

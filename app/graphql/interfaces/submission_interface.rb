@@ -44,6 +44,12 @@ module Interfaces::SubmissionInterface
     load_association(:assignment)
   end
 
+  field :unread_comment_count, Integer, null: false
+  def unread_comment_count
+    return 0 if object.read?(current_user)
+    submission.submission_comments.where('NOT EXISTS (?)', ViewedSubmissionComment.where("viewed_submission_comments.submission_comment_id=submission_comments.id").where(:user_id => current_user)).count
+  end
+
   field :user, Types::UserType, null: true
   def user
     load_association(:user)

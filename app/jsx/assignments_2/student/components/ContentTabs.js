@@ -28,6 +28,7 @@ import {
 } from './RubricProps'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
+import {Badge} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
@@ -40,7 +41,6 @@ import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import GradeDisplay from './GradeDisplay'
-import {img} from '@instructure/ui-elements'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
@@ -100,7 +100,20 @@ function ContentTabs(props) {
         >
           <AttemptTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
-        <TabPanel title={I18n.t('Comments')}>
+        <TabPanel
+          title={
+            <span>
+              {I18n.t('Comments')}{' '}
+              {!!props.submission.unreadCommentCount && (
+                <Badge
+                  count={props.submission.unreadCommentCount}
+                  standalone
+                  margin="0 small 0 0"
+                />
+              )}
+            </span>
+          }
+        >
           {props.submission.posted ? (
             <Suspense fallback={<LoadingIndicator />}>
               <CommentsTab assignment={props.assignment} submission={props.submission} />

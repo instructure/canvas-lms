@@ -58,6 +58,12 @@ module Types
       end
     end
 
+    # TODO: Handle N+1 so we don't cry later
+    field :read, Boolean, null: false
+    def read
+      object.read?(current_user)
+    end
+
     field :media_object, Types::MediaObjectType, null: true
     def media_object
       Loaders::MediaObjectLoader.load(object.media_comment_id)
