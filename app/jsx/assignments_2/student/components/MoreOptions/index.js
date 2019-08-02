@@ -35,12 +35,35 @@ class MoreOptions extends React.Component {
     open: false
   }
 
+  _isMounted = false
+
+  componentDidMount() {
+    this._isMounted = true
+    window.addEventListener('message', this.handleIframeTask)
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
+  handleIframeTask = async e => {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      if (this._isMounted) {
+        this.setState({open: false})
+      }
+    }
+  }
+
   handleModalOpen = () => {
-    this.setState({open: true})
+    if (this._isMounted) {
+      this.setState({open: true})
+    }
   }
 
   handleModalClose = () => {
-    this.setState({open: false})
+    if (this._isMounted) {
+      this.setState({open: false})
+    }
   }
 
   renderCloseButton = () => (

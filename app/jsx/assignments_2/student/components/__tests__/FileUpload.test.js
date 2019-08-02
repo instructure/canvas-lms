@@ -277,6 +277,45 @@ describe('FileUpload', () => {
     expect(emptyRender).toContainElement(getByText('More Options'))
   })
 
+  it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
+    const props = await makeProps({
+      Submission: () => ({attempt: 0})
+    })
+    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
+
+    render(
+      <MockedProvider>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'LtiDeepLinkingResponse',
+          content_items: [
+            {
+              url: 'http://lemon.com',
+              title: 'LemonRules.txt',
+              mediaType: 'plain/txt'
+            }
+          ]
+        }
+      })
+    )
+
+    await wait(() => {
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          attempt: 1,
+          fileIds: ['1']
+        }
+      })
+    })
+  })
+
   it('displays allowed extensions in the upload box', async () => {
     const props = await makeProps({
       Assignment: () => ({allowedExtensions: ['jpg, png']})

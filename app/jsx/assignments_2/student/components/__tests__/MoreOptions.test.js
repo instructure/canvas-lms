@@ -17,7 +17,7 @@
  */
 
 import {EXTERNAL_TOOLS_QUERY} from '../../graphqlData/Queries'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render, waitForElement, waitForElementToBeRemoved} from '@testing-library/react'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {mockQuery} from '../../mocks'
 import MoreOptions from '../MoreOptions'
@@ -73,5 +73,29 @@ describe('MoreOptions', () => {
     const tabs = await waitForElement(() => getAllByRole('tab'))
     expect(tabs[0]).toContainHTML('Tool 1')
     expect(tabs[1]).toContainHTML('Tool 2')
+  })
+
+  it('closes the modal when it receives the "LtiDeepLinkingResponse" event', async () => {
+    const overrides = {
+      ExternalToolConnection: () => ({
+        nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
+      })
+    }
+    const mocks = await createGraphqlMocks(overrides)
+    const {getByTestId, queryByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <MoreOptions assignmentID="1" courseID="1" />
+      </MockedProvider>
+    )
+    const moreOptionsButton = getByTestId('more-options-button')
+    fireEvent.click(moreOptionsButton)
+
+    const modal = await waitForElement(() => getByTestId('more-options-modal'))
+    expect(modal).toBeInTheDocument()
+
+    fireEvent(window, new MessageEvent('message', {data: {messageType: 'LtiDeepLinkingResponse'}}))
+
+    await waitForElementToBeRemoved(() => queryByTestId('more-options-modal'))
+    expect(queryByTestId('more-options-modal')).not.toBeInTheDocument()
   })
 })

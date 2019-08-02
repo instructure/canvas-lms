@@ -211,12 +211,33 @@ export async function submissionCommentAttachmentsUpload(files, courseId, assign
  * @returns an array of attachment objects.
  */
 export async function uploadFiles(files, uploadUrl) {
-  const uploadPromises = files.map(currentFile => {
-    const preflightFileData = {
-      name: currentFile.name,
-      content_type: currentFile.type
+  // We differentiate between a normal file and an lti content item
+  // based on the existence of a url attribute on the object. Then we invoke
+  // the uploadFile function with different parameters based on whether its a
+  // normal file or a content item backed by a file url. The parameters we are
+  // providing are determined by the file uploads api whose documentation can
+  // be found at /doc/api/file_uploads.md
+  const uploadPromises = files.map(file => {
+    if (file.url) {
+      return uploadFile(
+        uploadUrl,
+        {
+          url: file.url,
+          name: file.title,
+          content_type: file.mediaType,
+          submit_assignment: false
+        }
+      )
+    } else {
+      return uploadFile(
+        uploadUrl,
+        {
+          name: file.name,
+          content_type: file.type
+        },
+        file
+      )
     }
-    return uploadFile(uploadUrl, preflightFileData, currentFile)
   })
   return Promise.all(uploadPromises)
 }

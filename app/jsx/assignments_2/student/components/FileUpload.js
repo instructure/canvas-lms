@@ -60,6 +60,7 @@ export default class FileUpload extends Component {
 
   componentDidMount() {
     this._isMounted = true
+    window.addEventListener('message', this.handleLTIFiles)
   }
 
   componentWillUnmount() {
@@ -71,6 +72,12 @@ export default class FileUpload extends Component {
       this.props.submission.submissionDraft.attachments
       ? this.props.submission.submissionDraft.attachments
       : []
+  }
+
+  handleLTIFiles = async e => {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      this.handleDropAccepted(e.data.content_items)
+    }
   }
 
   handleDropAccepted = async files => {
