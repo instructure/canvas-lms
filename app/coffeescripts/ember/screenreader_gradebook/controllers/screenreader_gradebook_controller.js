@@ -140,16 +140,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   has_grading_periods: get(window, 'ENV.GRADEBOOK_OPTIONS.grading_period_set') != null,
 
-  gradingPeriods: (function() {
-    const periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
-    const deserializedPeriods = GradingPeriodsApi.deserializePeriods(periods)
-    const optionForAllPeriods = {
-      id: '0',
-      title: I18n.t('all_grading_periods', 'All Grading Periods')
-    }
-    return _.compact([optionForAllPeriods].concat(deserializedPeriods))
-  })(),
-
   getGradingPeriodSet() {
     const grading_period_set = get(window, 'ENV.GRADEBOOK_OPTIONS.grading_period_set')
     if (grading_period_set) {
@@ -986,15 +976,13 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const assignments = this.get('assignmentsFromGroups')
     const assignmentsByID = this.groupById(assignments)
     const studentsByID = this.groupById(this.get('students'))
-    const submissions = this.get('submissions')
+    const submissions = this.get('submissions') || []
     submissions.forEach(function(submission) {
       const student = studentsByID[submission.user_id]
       if (student) {
         submission.submissions.forEach(function(s) {
           const assignment = assignmentsByID[s.assignment_id]
-          if (!this.differentiatedAssignmentVisibleToStudent(assignment, s.user_id)) {
-            set(s, 'hidden', true)
-          }
+          set(s, 'hidden', !this.differentiatedAssignmentVisibleToStudent(assignment, s.user_id))
           return this.updateSubmission(s, student)
         }, this)
         // fill in hidden ones
@@ -1015,7 +1003,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
         this.calculateStudentGrade(student)
       }
     }, this)
-  }.observes('submissions.@each'),
+  }.observes('submissions.@each', 'assignmentsFromGroups.isLoaded'),
 
   updateSubmission(submission, student) {
     submission.submitted_at = tz.parse(submission.submitted_at)
