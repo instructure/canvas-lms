@@ -1,0 +1,45 @@
+  #resume {
+    position: relative;
+  }
+
+  #resume .point,
+  #resume img {
+    user-select: none;
+  }
+
+  .point {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 0, 0, 0.35);
+    text-align: center;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .point.current {
+    background: red;
+  }
+
+  #commentary textarea {
+    display: block;
+    width: 100%;
+    height: 8em;
+    font-family: sans-serif;
+  }
+
+  #resume #commentary {
+    display: none;
+    position: absolute;
+    width: 300px;
+    z-index: 100;
+  }
+
+  #commentary.readonly textarea {
+    border: solid 1px black;
+  }
+
+  #commentary.readonly button {
+    display: none;
+  }

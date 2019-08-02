@@ -18,20 +18,32 @@ class BzController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user, :user_retained_data_batch, :prepare_qualtrics_links]
 
 
+  # used by the pdf annotator
+  def submission_comment
+    comment = SubmissionComment.new
+    comment.author_id = @current_user
+    comment.comment = params[:comment]
+    comment.submission_id = params[:submission_id]
+    comment.attached_to = params[:attachment_id]
+    comment.x = params[:x]
+    comment.y = params[:y]
+    comment.save
 
+    render :json => comment.to_json
+  end
 
   # I need to add the coordinates info to the comment model and use
   # that in here and a custom function to add it or something.
   def pdf_annotator
-    # basically just for dev
     url = params[:url]
     matches = url.scan(/\/users\/[1-9]+\/files\/([1-9]+)\/download/)
+    attachment_id = 0
     if matches.any?
-      id = matches.first[0]
+      attachment_id = matches.first[0]
       if Attachment.local_storage?
-        data = File.read(Attachment.find(id).full_filename)
+        data = File.read(Attachment.find(attachment_id).full_filename)
       else
-        url = Attachment.find(id).download_url
+        url = Attachment.find(attachment_id).download_url
         url = URI.parse(params[:url])
         data = Net::HTTP.get(url)
       end
@@ -42,6 +54,14 @@ class BzController < ApplicationController
     submission = Submission.find(params[:submission_id])
 
     comments_html = ''
+    count = 0
+    submission.submission_comments.each do |comment|
+      next if comment.x.nil?
+      next if comment.comment.nil?
+      next if comment.attached_to.to_s != attachment_id.to_s
+      count += 1
+      comments_html += '<div class="point '+(params[:highlight].to_s == comment.id.to_s ? 'highlighted' : '')+'" style="left: '+(comment.x).to_s+'px; top: '+(comment.y).to_s+'px;" title="'+CGI.escapeHTML(comment.comment)+'" data-x="'+comment.x.to_s+'" data-y="'+comment.y.to_s+'">'+count.to_s+'</div>'
+    end
 
     image_data = nil
 
@@ -51,7 +71,12 @@ class BzController < ApplicationController
       image_data = io.read
     end
 
-    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" /><div id="commentary"><textarea></textarea><button type="button">Save</button></div></div><script>var authtoken="'+form_authenticity_token+'";</script><script src="/bz_annotator.js"></script></body></html>';
+    readonly = false
+    if params[:readonly]
+      readonly = true
+    end
+
+    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button type="button">Save</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js"></script></body></html>';
   end
 
   # this is meant to be used for requests from external services like LL kits
