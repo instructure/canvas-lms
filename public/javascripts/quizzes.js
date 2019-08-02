@@ -767,7 +767,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
       $formQuestion.find(".question_header").text(I18n.t('question_colon', "Question:"));
       $formQuestion.addClass(question_type);
-        $formQuestion.find(".question_points_holder").showIf(!$formQuestion.closest(".question_holder").hasClass('group') && question_type != 'text_only_question');
+      $formQuestion.find(".question_points_holder").showIf(!$formQuestion.closest(".question_holder").hasClass('group') && question_type !== 'text_only_question');
 
       var options = {
         addable: true
@@ -3321,10 +3321,12 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
       // rewrite the data so that it fits the jsonapi format
       processData: function(data) {
-        var quizGroupQuestionPoints = data['quiz_group[question_points]'];
+        var quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]']);
         if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
           $(this).find("input[name='quiz_group[question_points]']").errorBox(I18n.t('question.positive_points', "Must be zero or greater"));
           return false;
+        } else {
+          data['quiz_group[question_points]'] = quizGroupQuestionPoints;
         }
         var newData = {};
         _.each(data, function(val, key) {
@@ -3345,6 +3347,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var $group = $form.parents(".group_top");
         var groups = data.quiz_groups;
         var group = groups[0];
+        group.question_points = I18n.n(group.question_points);
         $form.loadingImage('remove');
         $group.removeClass('editing');
         $group.fillTemplateData({
