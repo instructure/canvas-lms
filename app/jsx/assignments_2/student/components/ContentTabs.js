@@ -141,11 +141,13 @@ function ContentTabs(props) {
         >
           {renderCommentsTab(props)}
         </TabPanel>
-        <TabPanel title={I18n.t('Rubric')}>
-          <Suspense fallback={<LoadingIndicator />}>
-            <RubricTab assignment={props.assignment} />
-          </Suspense>
-        </TabPanel>
+        {props.assignment.rubric && (
+          <TabPanel title={I18n.t('Rubric')}>
+            <Suspense fallback={<LoadingIndicator />}>
+              <RubricTab assignment={props.assignment} />
+            </Suspense>
+          </TabPanel>
+        )}
       </TabList>
     </div>
   )

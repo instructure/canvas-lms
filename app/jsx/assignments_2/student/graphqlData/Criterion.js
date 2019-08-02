@@ -37,9 +37,9 @@ export const Criterion = {
 
   shape: shape({
     id: string.isRequired,
-    criterionUseRange: bool.isRequired,
+    criterion_use_range: bool.isRequired,
     description: string.isRequired,
-    longDescription: string,
+    long_description: string,
     points: number,
     ratings: arrayOf(Rating.shape)
   })

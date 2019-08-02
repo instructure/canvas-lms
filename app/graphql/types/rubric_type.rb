@@ -22,15 +22,15 @@ module Types
 
     global_id_field :id
     field :_id, ID, 'legacy canvas id', method: :id, null: false
-    field :free_form_criterion_comments, Boolean, null: true
+    field :context_id, String, null: false
 
     field :criteria, [CriterionType], null: false
     def criteria
       object.data
     end
 
+    field :free_form_criterion_comments, Boolean, null: true
     field :points_possible, Int, null: false
     field :title, String, null: false
-    field :context_id, String, null: false
   end
 end

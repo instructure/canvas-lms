@@ -42,11 +42,7 @@ function RubricTab(props) {
             />
           )
         }
-        // TODO: Currently, if an assignment has no associated rubric, the Rubric
-        // Tab is rendered, but upon clicking, no rubric is rendered. In the future,
-        // when an assignment has no associated rubric, the Rubric Tab will not be
-        // rendered at all.
-        return data.assignment.rubric ? <Rubric rubric={data.assignment.rubric} /> : null
+        return <Rubric rubric={data.assignment.rubric} />
       }}
     </Query>
   )

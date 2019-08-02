@@ -37,10 +37,10 @@ export const Rubric = {
 
   shape: shape({
     _id: string.isRequired,
-    contextId: string.isRequired,
+    context_id: string.isRequired,
     criteria: arrayOf(Criterion.shape),
-    freeFormCriterionComments: bool,
-    pointsPossible: number.isRequired,
+    free_form_criterion_comments: bool,
+    points_possible: number.isRequired,
     title: string.isRequired
   })
 }

@@ -32,7 +32,7 @@ export const Rating = {
   shape: shape({
     id: string.isRequired,
     description: string.isRequired,
-    longDescription: string,
+    long_description: string,
     points: number
   })
 }
@@ -41,7 +41,7 @@ export const RatingDefaultMocks = {
   Rating: () => ({
     id: '1',
     description: 'Full Marks',
-    long_description: 'You earned full marks',
+    longDescription: 'You earned full marks',
     points: 5
   })
 }
