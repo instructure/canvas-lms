@@ -491,6 +491,7 @@ class FilesController < ApplicationController
       # this implicit context magic happens in ApplicationController#get_context
       if @context.nil? || @current_user.nil? || @context == @current_user
         @attachment = Attachment.find(params[:id])
+        @context = nil unless @context == @current_user || @context == @attachment.context
         @skip_crumb = true unless @context
       else
         # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
