@@ -20,7 +20,7 @@ require 'atom'
 require 'anonymity'
 
 class Submission < ActiveRecord::Base
-  self.ignored_columns = %w{has_admin_comment has_rubric_assessments process_attempts}
+  self.ignored_columns = %w{has_admin_comment has_rubric_assessment process_attempts}
 
   include Canvas::GradeValidations
   include CustomValidations
