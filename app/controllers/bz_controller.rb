@@ -35,20 +35,13 @@ class BzController < ApplicationController
   # I need to add the coordinates info to the comment model and use
   # that in here and a custom function to add it or something.
   def pdf_annotator
-    url = params[:url]
-    matches = url.scan(/\/users\/[1-9]+\/files\/([1-9]+)\/download/)
-    attachment_id = 0
-    if matches.any?
-      attachment_id = matches.first[0]
-      if Attachment.local_storage?
-        data = File.read(Attachment.find(attachment_id).full_filename)
-      else
-        url = Attachment.find(attachment_id).download_url
-        url = URI.parse(params[:url])
-        data = Net::HTTP.get(url)
-      end
+    attachment_id = params[:attachment_id]
+
+    if Attachment.local_storage?
+      data = File.read(Attachment.find(attachment_id).full_filename)
     else
-      raise Exception.new "no such file"
+      url = Attachment.find(attachment_id).download_url
+      data = Net::HTTP.get(URI.parse(url))
     end
 
     submission = Submission.find(params[:submission_id])
@@ -65,7 +58,7 @@ class BzController < ApplicationController
 
     image_data = nil
 
-    IO::popen('convert -append - png:-', 'r+') do |io|
+    IO::popen('convert -density 300 -scale x1200 -append - png:-', 'r+') do |io|
       io.write(data)
       io.close_write
       image_data = io.read
