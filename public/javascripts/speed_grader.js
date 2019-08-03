@@ -1836,7 +1836,7 @@ define([
               $.extend(previewOptions, data);
 
               $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-                bz_annotation_url: "/bz/pdf_annotator?url=" + encodeURIComponent(data.public_url) + "&submission_id=" + previewOptions.submission_id
+                bz_annotation_url: "/bz/pdf_annotator?url=" + encodeURIComponent(data.public_url) + "&attachment_id="+previewOptions.attachment_id+"&submission_id=" + previewOptions.submission_id
               }));
             }
           });
