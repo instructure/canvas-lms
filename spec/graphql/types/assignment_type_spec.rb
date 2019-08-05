@@ -195,6 +195,7 @@ describe Types::AssignmentType do
             userSearch: foo,
             scoredLessThan: 3
             scoredMoreThan: 1
+            gradingStatus: needs_grading
           }
           orderBy: {field: username, direction: descending}
         ) { nodes { _id } }
@@ -206,6 +207,7 @@ describe Types::AssignmentType do
         user_search: 'foo',
         scored_less_than: 3.0,
         scored_more_than: 1.0,
+        grading_status: :needs_grading,
         order_by: [{
           field: "username",
           direction: "descending"
@@ -286,6 +288,77 @@ describe Types::AssignmentType do
         GQL
         expect(section1_submission_ids.map(&:to_i)).to contain_exactly(@section1_student_submission.id)
       end
+    end
+  end
+
+  describe 'groupSubmissionConnection' do
+    before(:once) do
+      course_with_teacher()
+      assignment_model(group_category: 'GROUPS!')
+      @group_category.create_groups(2)
+      2.times {
+        student_in_course()
+        @group_category.groups.first.add_user(@user)
+      }
+      2.times {
+        student_in_course()
+        @group_category.groups.last.add_user(@user)
+      }
+      @assignment.submit_homework(@group_category.groups.first.users.first, body: 'Submit!')
+      @assignment.submit_homework(@group_category.groups.last.users.first, body: 'Submit!')
+
+      @assignment_type = GraphQLTypeTester.new(@assignment, current_user: @teacher)
+    end
+
+    it "plumbs through filter options to SubmissionSearch" do
+      allow(SubmissionSearch).to receive(:new).and_call_original
+      @assignment_type.resolve(<<~GQL, current_user: @teacher)
+        groupSubmissionsConnection(
+          filter: {
+            states: submitted,
+            sectionIds: 42,
+            enrollmentTypes: StudentEnrollment,
+            userSearch: foo,
+            scoredLessThan: 3
+            scoredMoreThan: 1
+            gradingStatus: needs_grading
+          }
+        ) { nodes { _id } }
+      GQL
+      expect(SubmissionSearch).to have_received(:new).with(@assignment, @teacher, nil, {
+        states: ["submitted"],
+        section_ids: ["42"],
+        enrollment_types: ["StudentEnrollment"],
+        user_search: 'foo',
+        scored_less_than: 3.0,
+        scored_more_than: 1.0,
+        grading_status: :needs_grading,
+        order_by: []
+      })
+    end
+
+    it "returns nil if not a group assignment" do
+      assignment = @course.assignments.create!
+      type = GraphQLTypeTester.new(assignment, current_user: @teacher)
+      result = type.resolve(<<~GQL, current_user: @teacher)
+        groupSubmissionsConnection {
+          edges { node { _id } }
+        }
+      GQL
+      expect(result).to be_nil
+    end
+
+    it "returns submissions grouped up" do
+      result = @assignment_type.resolve(<<~GQL, current_user: @teacher)
+        groupSubmissionsConnection(
+          filter: {
+            states: submitted
+          }
+        ) {
+          edges { node { _id } }
+        }
+      GQL
+      expect(result.count).to eq 2
     end
   end
 
