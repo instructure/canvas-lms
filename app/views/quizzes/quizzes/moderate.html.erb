@@ -107,7 +107,7 @@
           <% end %>
         </td>
         <td class="score_holder">
-          <span class="score"><%= submission && submission.kept_score %></span>
+          <span class="score"><%= submission && render_score(submission.kept_score) %></span>
         </td>
         <td class="unlocked_col">
           <span class="unlocked" title="<%= manually_unlocked_title %>" style="<%= hidden unless submission && submission.manually_unlocked %>"><i class="icon-unlock standalone-icon" alt="<%= manually_unlocked_title %>"><span class="screenreader-only"><%= manually_unlocked_title %></span></i></span>
