@@ -171,6 +171,7 @@
     "format-message-parse": "^6",
     "jest": "^24",
     "jest-canvas-mock": "^1",
+    "jest-environment-jsdom-fourteen": "^0.1.0",
     "jest-junit": "^6.4.0",
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",

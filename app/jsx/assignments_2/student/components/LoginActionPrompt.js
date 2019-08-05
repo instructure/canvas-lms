@@ -27,7 +27,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 import lockedSVG from '../SVG/Locked1.svg'
 
 const navigateToLogin = () => {
-  document.location.assign('/login')
+  window.location.assign('/login')
 }
 
 function LoginActionPrompt() {
