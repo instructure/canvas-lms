@@ -1066,7 +1066,11 @@ import 'compiled/jquery/fixDialogButtons'
           $("#assignment_show .points_possible").text(rubric.points_possible);
           var discussion_points_text = I18n.t('discussion_points_possible',
                                           {one: '%{count} point possible', other: '%{count} points possible' },
-                                          {count: rubric.points_possible || 0})
+                                          {
+                                            count: rubric.points_possible || 0,
+                                            precision: 2,
+                                            strip_insignificant_zeros: true
+                                          })
           $(".discussion-title .discussion-points").text(discussion_points_text);
         }
         if(!limitToOneRubric) {
