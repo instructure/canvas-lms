@@ -606,6 +606,13 @@ class SubmissionsApiController < ApplicationController
   def create_file
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
+    if @assignment.root_account.feature_enabled?(:check_submission_file_type) && @assignment.allowed_extensions.any?
+      filetype = infer_upload_content_type(params)
+      reject!(t('unable to find filetype')) unless filetype
+      extension = File.mime_types[filetype]
+      reject!(t('unable to find extension')) unless extension
+      reject!(t('filetype not allowed')) unless @assignment.allowed_extensions.include?(extension)
+    end
     permission = @assignment.submission_types.include?("online_upload") ? :submit : :nothing
     submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
 

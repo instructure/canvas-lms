@@ -3927,12 +3927,38 @@ describe 'Submissions API', type: :request do
           api_url: "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
           request_params: { user_id: @student2.to_param }
         )
-
         assert_status(401)
       end
 
       it "allows a teacher to upload files for a student" do
         @user = @teacher
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
+      end
+
+      it "allows any filetype when there are no restrictions on type" do
+        @assignment.root_account.enable_feature!(:check_submission_file_type)
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
+      end
+
+      it "rejects uploading files when filetype is not allowed" do
+        @assignment.root_account.enable_feature!(:check_submission_file_type)
+        @assignment.update_attributes(:allowed_extensions => ['doc'])
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(400)
+      end
+
+      it "allows filetype when restricted and is correct filetype" do
+        @assignment.root_account.enable_feature!(:check_submission_file_type)
+        @assignment.update_attributes(:allowed_extensions => ['txt'])
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
+      end
+
+      it "will allow you to upload any type when feature not enabled" do
+        @assignment.root_account.disable_feature!(:check_submission_file_type)
+        @assignment.update_attributes(:allowed_extensions => ['doc'])
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         assert_status(200)
       end
