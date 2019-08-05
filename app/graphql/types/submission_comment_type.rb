@@ -16,6 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+class SubmissionCommentReadLoader < GraphQL::Batch::Loader
+  def initialize(current_user)
+    @current_user = current_user
+  end
+
+  def perform(submission_comments)
+    vsc = ViewedSubmissionComment.where(submission_comment_id: submission_comments, user: @current_user).pluck('submission_comment_id').to_set
+    submission_comments.each do |sc|
+      fullfill(sc, vsc.include?(sc.id))
+    end
+  end
+end
+
 module Types
   class SubmissionCommentType < ApplicationObjectType
     graphql_name 'SubmissionComment'
@@ -58,9 +71,17 @@ module Types
       end
     end
 
-    # TODO: Handle N+1 so we don't cry later
     field :read, Boolean, null: false
     def read
+      load_association(:submission).then do |submission|
+        Promise.all([
+          Loaders::AssociationLoader.for(Submission, :content_participations).load(submission),
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+        ]).then {
+          next true if submission.read?(current_user)
+          SubmissionCommentReadLoader.for(current_user).load(object)
+        }
+      end
       object.read?(current_user)
     end
 
