@@ -40,6 +40,8 @@
       # still provide a fallback if they don't have it.
       # The crazy string concatenation in the document.write is to trick Chrome
       # into not preemptively downloading it anyway.
+
+      # Always give edge <= 17 the fetch polyfill to work around https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/18775440/
       javascript_tag(%(
 !function(){
   function get(u){document.write('<scr'+'ipt src="'+ u +'"></sc'+'ript>')}
@@ -47,7 +49,7 @@
   if (!(window.Promise && Object.assign && Object.values && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
     get("#{javascript_path(polyfill_url)}");
   }
-  window.fetch || get("#{fetch_polyfill_url}");
+  if (!window.fetch || /Edge\/1[2-7]/i.test(navigator.userAgent)) get("#{fetch_polyfill_url}");
 }();
       ))
     end
