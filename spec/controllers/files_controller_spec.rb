@@ -277,6 +277,12 @@ describe FilesController do
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => verifier}, :format => 'json'
         expect(response).to be_successful
       end
+
+      it "should emit an asset_accessed live event" do
+        allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
+        expect(Canvas::LiveEvents).to receive(:asset_access).with(@file, 'files', nil, nil)
+        get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => @file.uuid, download: 1}, :format => 'json'
+      end
     end
 
     it "should assign variables" do

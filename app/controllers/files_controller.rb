@@ -332,6 +332,9 @@ class FilesController < ApplicationController
 
         url = @context ? context_files_url : api_v1_list_files_url(@folder)
         @files = Api.paginate(scope, self, url)
+
+        log_asset_access(['files', @context], 'files')
+
         render json: attachments_json(@files, @current_user, {}, {
           can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
           context: @context || @folder.context,
@@ -701,7 +704,12 @@ class FilesController < ApplicationController
     user = @current_user
     user ||= api_find(User, session['file_access_user_id']) if session['file_access_user_id'].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
-    log_asset_access(@attachment, "files", "files") unless params[:preview]
+
+    if params[:preview].blank?
+      log_asset_access(@attachment, "files", "files")
+      Canvas::LiveEvents.asset_access(@attachment, 'files', nil, nil) if @current_user.blank?
+    end
+
     render_or_redirect_to_stored_file(
       attachment: attachment,
       verifier: params[:verifier],
