@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {updateSubmissionComment} from 'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
+import SubmissionCommentApi from 'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
 import {underscore} from 'convert_case'
 
 QUnit.module('SubmissionCommentApi.updateSubmissionComment', function(hooks) {
@@ -43,22 +43,61 @@ QUnit.module('SubmissionCommentApi.updateSubmissionComment', function(hooks) {
 
   test('on success, returns the submission comment with the updated comment', function() {
     server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
-    return updateSubmissionComment(commentId, updatedComment).then(response => {
+    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(response => {
       strictEqual(response.data.comment, updatedComment)
     })
   })
 
   test('on success, returns the submission comment with an updated editedAt', function() {
     server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
-    return updateSubmissionComment(commentId, updatedComment).then(response => {
+    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(response => {
       strictEqual(response.data.editedAt.getTime(), new Date(editedAt).getTime())
     })
   })
 
   test('on failure, returns a rejected promise with the error', function() {
     server.respondWith('PUT', url, [500, {'Content-Type': 'application/json'}, JSON.stringify({})])
-    return updateSubmissionComment(commentId, updatedComment).catch(error => {
+    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).catch(error => {
       strictEqual(error.response.status, 500)
     })
+  })
+})
+
+QUnit.module('SubmissionCommentApi.createSubmissionComment', function(hooks) {
+  let assignmentId
+  let commentData
+  let courseId
+  let server
+  let studentId
+  let url
+
+  hooks.beforeEach(() => {
+    assignmentId = '2301'
+    commentData = {group_comment: 0, text_comment: 'comment!'}
+    courseId = '1201'
+    studentId = '1101'
+    server = sinon.fakeServer.create({respondImmediately: true})
+    url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+  })
+
+  test('builds data from comment data', async () => {
+    const response = [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify({submission_comments: []})
+    ]
+    server.respondWith('PUT', url, response)
+    await SubmissionCommentApi.createSubmissionComment(
+      courseId,
+      assignmentId,
+      studentId,
+      commentData
+    )
+    const {requestBody} = server.requests[0]
+    deepEqual(JSON.parse(requestBody), {comment: {group_comment: 0, text_comment: 'comment!'}})
   })
 })

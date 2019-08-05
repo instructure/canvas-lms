@@ -42,7 +42,7 @@ import * as EnterGradesAsSetting from 'jsx/gradezilla/shared/EnterGradesAsSettin
 import SetDefaultGradeDialogManager from 'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
 import CurveGradesDialogManager from 'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi'
-import * as SubmissionCommentApi from 'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
+import SubmissionCommentApi from 'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
 import CourseSettings from 'jsx/gradezilla/default_gradebook/CourseSettings'
 import FinalGradeOverrides from 'jsx/gradezilla/default_gradebook/FinalGradeOverrides'
 import GradebookGrid from 'jsx/gradezilla/default_gradebook/GradebookGrid'
@@ -2466,7 +2466,11 @@ export default do ->
 
     apiCreateSubmissionComment: (comment) =>
       { assignmentId, studentId } = @getSubmissionTrayState()
-      SubmissionCommentApi.createSubmissionComment(@options.context_id, assignmentId, studentId, comment)
+      assignment = @getAssignment(assignmentId)
+      groupComment = if assignmentHelper.gradeByGroup(assignment) then 1 else 0
+      commentData = {group_comment: groupComment, text_comment: comment}
+
+      SubmissionCommentApi.createSubmissionComment(@options.context_id, assignmentId, studentId, commentData)
         .then(@updateSubmissionComments)
         .then(FlashAlert.showFlashSuccess I18n.t 'Successfully posted the comment')
         .catch(=> @setCommentsUpdating(false))
@@ -3052,7 +3056,7 @@ export default do ->
 
     requireStudentGroupForSpeedGrader: (assignment) =>
       # Assignments that grade by group (not by student) don't require a group selection
-      return false if assignment.group_category_id? && !assignment.grade_group_students_individually
+      return false if assignmentHelper.gradeByGroup(assignment)
 
       @options.course_settings.filter_speed_grader_by_student_group && @getStudentGroupToShow() == '0'
 

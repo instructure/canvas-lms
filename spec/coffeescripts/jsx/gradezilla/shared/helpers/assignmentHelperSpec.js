@@ -247,3 +247,34 @@ test('treats assignments with the same position and group position as equal', ()
   const comparisonVal = assignmentHelper.compareByAssignmentGroup(assignment1, assignment2)
   ok(comparisonVal === 0)
 })
+
+QUnit.module('assignmentHelper#gradeByGroup', hooks => {
+  let assignment
+
+  hooks.beforeEach(() => {
+    assignment = {
+      grade_group_students_individually: false,
+      group_category_id: null,
+      id: '2301'
+    }
+  })
+
+  test('returns false when not a group assignment', () => {
+    strictEqual(assignmentHelper.gradeByGroup(assignment), false)
+  })
+
+  QUnit.module('when group assignment', contextHooks => {
+    contextHooks.beforeEach(() => {
+      assignment.group_category_id = '2201'
+    })
+
+    test('returns false when grading individually', () => {
+      assignment.grade_group_students_individually = true
+      strictEqual(assignmentHelper.gradeByGroup(assignment), false)
+    })
+
+    test('returns true when not grading individually', () => {
+      strictEqual(assignmentHelper.gradeByGroup(assignment), true)
+    })
+  })
+})

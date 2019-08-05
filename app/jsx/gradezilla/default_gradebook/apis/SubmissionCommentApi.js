@@ -44,7 +44,7 @@ function deserializeComments(comments) {
   return comments.map(deserializeComment)
 }
 
-export function getSubmissionComments(courseId, assignmentId, studentId) {
+function getSubmissionComments(courseId, assignmentId, studentId) {
   const commentOptions = {params: {include: 'submission_comments'}}
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
   return axios
@@ -52,23 +52,30 @@ export function getSubmissionComments(courseId, assignmentId, studentId) {
     .then(response => deserializeComments(response.data.submission_comments))
 }
 
-export function createSubmissionComment(courseId, assignmentId, studentId, comment) {
+function createSubmissionComment(courseId, assignmentId, studentId, commentData) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
-  const data = {group_comment: 0, comment: {text_comment: comment}}
+  const data = {comment: commentData}
   return axios
     .put(url, data)
     .then(response => deserializeComments(response.data.submission_comments))
 }
 
-export function deleteSubmissionComment(commentId) {
+function deleteSubmissionComment(commentId) {
   const url = `/submission_comments/${commentId}`
   return axios.delete(url)
 }
 
-export function updateSubmissionComment(commentId, comment) {
+function updateSubmissionComment(commentId, comment) {
   const url = `/submission_comments/${commentId}`
   const data = {id: commentId, submission_comment: {comment}}
   return axios
     .put(url, data)
     .then(response => ({data: deserializeComment(response.data.submission_comment)}))
+}
+
+export default {
+  createSubmissionComment,
+  deleteSubmissionComment,
+  getSubmissionComments,
+  updateSubmissionComment
 }
