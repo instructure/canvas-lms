@@ -257,6 +257,7 @@ describe Course do
       @course = Account.default.courses.create!
       @course.root_account.enable_feature!(:new_gradebook)
       @course.enable_feature!(:new_gradebook)
+      @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
       @course.filter_speed_grader_by_student_group = true
     end
 
@@ -271,6 +272,11 @@ describe Course do
 
     it "returns false when new gradebook is disabled" do
       @course.disable_feature!(:new_gradebook)
+      expect(@course).not_to be_filter_speed_grader_by_student_group
+    end
+
+    it "returns false when the 'Filter SpeedGrader by Student Group' root account setting is off" do
+      @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
       expect(@course).not_to be_filter_speed_grader_by_student_group
     end
   end
