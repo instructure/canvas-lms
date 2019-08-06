@@ -61,7 +61,7 @@ define(function(require) {
     it('should add a description each bar', function() {
       setProps({
         scores: {
-          1: 1,]
+          1: 1,
           62: 2
         }
       });

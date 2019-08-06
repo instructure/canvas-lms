@@ -17,6 +17,8 @@
  */
 
 define([ '../config' ], function(config) {
+  var I18n = require('i18n!quiz_statistics').default;
+  var parseNumber = require('./parse_number');
   /**
    * @member Util
    * @method formatNumber
@@ -44,9 +46,9 @@ define([ '../config' ], function(config) {
     }
 
     if (typeof n !== 'number' || !(n instanceof Number)) {
-      n = parseFloat(n);
+      n = parseNumber(n);
     }
 
-    return n.toFixed(parseInt(precision, 10));
+    return I18n.n(n.toFixed(parseInt(precision, 10)));
   };
 });
