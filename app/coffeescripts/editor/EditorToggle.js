@@ -54,6 +54,7 @@ class EditorToggle {
   constructor(elem, options) {
     this.editingElement(elem)
     this.options = $.extend({}, this.options, options)
+    if (this.options.view) this.view = this.options.view
     this.textArea = this.createTextArea()
     this.textAreaContainer = $('<div/>').append(this.textArea)
 
