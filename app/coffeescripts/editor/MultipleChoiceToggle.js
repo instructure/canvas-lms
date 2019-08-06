@@ -17,14 +17,16 @@
 
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import EditorToggle from '../editor/EditorToggle'
+import _EditorToggle from '../editor/EditorToggle'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import newless from 'newless'
 
-// #
-// Toggles a multiple choice quiz answer between an editor and an element
+const EditorToggle = newless(_EditorToggle)
 
 _inherits(MultipleChoiceToggle, EditorToggle)
+// #
+// Toggles a multiple choice quiz answer between an editor and an element
 
 // #
 // @param {jQuery} @editButton - the edit button to trigger the toggle

@@ -20,9 +20,12 @@ import I18n from 'i18n!recipient_input'
 import $ from 'jquery'
 import _ from 'underscore'
 import contextList from '../util/contextList'
-import TokenInput from '../widget/TokenInput'
+import _TokenInput from '../widget/TokenInput'
 import avatarTemplate from 'jst/_avatar'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
+import newless from 'newless'
+
+const TokenInput = newless(_TokenInput)
 
 _inherits(ContextSearch, TokenInput)
 
@@ -36,7 +39,7 @@ export default function ContextSearch($node, options) {
   if (options.canToggle) {
     this.canToggle = options.canToggle
   }
-  TokenInput.call(this, $node, options)
+  return TokenInput.call(this, $node, options)
 }
 
 Object.assign(ContextSearch.prototype, {
