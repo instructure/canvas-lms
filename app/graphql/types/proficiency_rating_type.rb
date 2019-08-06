@@ -17,14 +17,19 @@
 #
 
 module Types
-  class CriterionType < ApplicationObjectType
-    graphql_name 'Criterion'
+  class ProficiencyRatingType < ApplicationObjectType
+    description 'Customized proficiency ratings'
 
-    field :id, ID, null:false
-    field :criterion_use_range, Boolean, null: false
-    field :description, String, null: false
-    field :long_description, String, null: true
-    field :points, Int, null: false
-    field :ratings, [RatingType], null: false
+    implements Interfaces::LegacyIDInterface
+
+    field :color, String, null: true
+    field :description, String, null: true
+
+    field :mastery, Boolean, null: false
+    def mastery
+      !!object.mastery
+    end
+
+    field :points, Float, null: true
   end
 end

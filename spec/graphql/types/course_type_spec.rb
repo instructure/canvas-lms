@@ -433,4 +433,10 @@ describe Types::CourseType do
       end
     end
   end
+
+  describe 'Account' do
+    it 'works' do
+      expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s
+    end
+  end
 end

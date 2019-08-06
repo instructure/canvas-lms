@@ -16,47 +16,148 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
-import {mockQuery} from '../../mocks'
 import React from 'react'
-import {render} from '@testing-library/react'
-import Rubric from '../../../../rubrics/Rubric'
+import {render, waitForElement} from '@testing-library/react'
+import RubricTab from '../RubricTab'
 import {RUBRIC_QUERY} from '../../graphqlData/Queries'
 
-async function mockRubric(overrides = {}) {
-  const variables = {assignmentID: '1'}
-  const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
-  return result.data.assignment.rubric
+function gradedOverrides() {
+  return {
+    Submission: () => ({
+      rubricAssessmentsConnection: {
+        nodes: [{}]
+      }
+    }),
+    Course: () => ({
+      account: {
+        proficiencyRatingsConnection: {
+          nodes: [{}]
+        }
+      }
+    })
+  }
+}
+
+function ungradedOverrides() {
+  return {
+    Submission: () => ({rubricAssessmentsConnection: null}),
+    Course: () => ({
+      account: {
+        proficiencyRatingsConnection: null
+      }
+    })
+  }
+}
+
+async function makeMocks(opts = {}) {
+  const variables = {
+    courseID: '1',
+    rubricID: '1',
+    submissionID: '1'
+  }
+
+  const overrides = opts.graded ? gradedOverrides() : ungradedOverrides()
+  const allOverrides = [
+    {
+      Node: () => ({__typename: 'Rubric'}),
+      Rubric: () => ({
+        criteria: [{}]
+      }),
+      ...overrides
+    }
+  ]
+
+  const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+  return [
+    {
+      request: {
+        query: RUBRIC_QUERY,
+        variables
+      },
+      result
+    }
+  ]
+}
+
+async function makeProps() {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: () => ({
+      rubric: {}
+    })
+  })
+  return props
 }
 
 describe('RubricTab', () => {
-  it('contains the rubric criteria heading', async () => {
-    const rubric = await mockRubric({})
-    const {getAllByText} = render(
-      <MockedProvider>
-        <Rubric rubric={rubric} />
-      </MockedProvider>
-    )
-    expect(getAllByText('Criteria')[1]).toBeInTheDocument()
+  describe('ungraded rubric', () => {
+    it('contains the rubric criteria heading', async () => {
+      const mocks = await makeMocks({graded: false})
+      const props = await makeProps()
+      const {getAllByText} = render(
+        <MockedProvider mocks={mocks}>
+          <RubricTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitForElement(() => getAllByText('Criteria')[1])).toBeInTheDocument()
+    })
+
+    it('contains the rubric ratings heading', async () => {
+      const mocks = await makeMocks({graded: false})
+      const props = await makeProps()
+      const {getAllByText} = render(
+        <MockedProvider mocks={mocks}>
+          <RubricTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitForElement(() => getAllByText('Ratings')[1])).toBeInTheDocument()
+    })
+
+    it('contains the rubric points heading', async () => {
+      const mocks = await makeMocks({graded: false})
+      const props = await makeProps()
+      const {getAllByText} = render(
+        <MockedProvider mocks={mocks}>
+          <RubricTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitForElement(() => getAllByText('Pts')[1])).toBeInTheDocument()
+    })
   })
 
-  it('contains the rubric ratings heading', async () => {
-    const rubric = await mockRubric({})
-    const {getAllByText} = render(
-      <MockedProvider>
-        <Rubric rubric={rubric} />
-      </MockedProvider>
-    )
-    expect(getAllByText('Ratings')[1]).toBeInTheDocument()
-  })
+  describe('graded rubric', () => {
+    it('displays comments', async () => {
+      const mocks = await makeMocks({graded: true})
+      const props = await makeProps()
+      const {getAllByText} = render(
+        <MockedProvider mocks={mocks}>
+          <RubricTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitForElement(() => getAllByText('Comments')[0])).toBeInTheDocument()
+    })
 
-  it('contains the rubric points heading', async () => {
-    const rubric = await mockRubric({})
-    const {getAllByText} = render(
-      <MockedProvider>
-        <Rubric rubric={rubric} />
-      </MockedProvider>
-    )
-    expect(getAllByText('Pts')[1]).toBeInTheDocument()
+    it('displays the points for a criteria', async () => {
+      const mocks = await makeMocks({graded: true})
+      const props = await makeProps()
+      const {getByText} = render(
+        <MockedProvider mocks={mocks}>
+          <RubricTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitForElement(() => getByText('6 / 6 pts'))).toBeInTheDocument()
+    })
+
+    it('displays the total points for the rubric assessment', async () => {
+      const mocks = await makeMocks({graded: true})
+      const props = await makeProps()
+      const {getByText} = render(
+        <MockedProvider mocks={mocks}>
+          <RubricTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitForElement(() => getByText('Total Points: 10'))).toBeInTheDocument()
+    })
   })
 })

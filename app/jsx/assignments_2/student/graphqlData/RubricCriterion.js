@@ -16,32 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
-import {number, shape, string} from 'prop-types'
+import {RubricRating} from './RubricRating'
 
-export const Rating = {
+export const RubricCriterion = {
   fragment: gql`
-    fragment Rating on Rating {
-      id
+    fragment RubricCriterion on RubricCriterion {
+      id: _id
+      criterion_use_range: criterionUseRange
       description
+      ignore_for_scoring: ignoreForScoring
       long_description: longDescription
+      mastery_points: masteryPoints
+      outcome {
+        _id
+      }
       points
+      ratings {
+        ...RubricRating
+      }
     }
+    ${RubricRating.fragment}
   `,
 
   shape: shape({
     id: string.isRequired,
+    criterion_use_range: bool.isRequired,
     description: string.isRequired,
+    ignore_for_scoring: bool,
     long_description: string,
-    points: number
+    mastery_points: number,
+    outcome: shape({
+      _id: string.isRequired
+    }),
+    points: number,
+    ratings: arrayOf(RubricRating.shape)
   })
 }
 
-export const RatingDefaultMocks = {
-  Rating: () => ({
-    id: '1',
-    description: 'Full Marks',
-    longDescription: 'You earned full marks',
-    points: 5
+export const RubricCriterionDefaultMocks = {
+  RubricCriterion: () => ({
+    _id: '1',
+    criterionUseRange: false,
+    ignoreForScoring: false,
+    masteryPoints: null,
+    outcome: null,
+    points: 6,
+    ratings: [{}]
   })
 }

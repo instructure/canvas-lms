@@ -36,4 +36,11 @@ describe Types::AccountType do
   it "requires read permission" do
     expect(account_type.resolve(:name, current_user: @student)).to be_nil
   end
+
+  it 'works for field proficiency_ratings_connection' do
+    outcome_proficiency_model(account)
+    expect(
+      account_type.resolve('proficiencyRatingsConnection { nodes { _id } }').sort
+    ).to eq OutcomeProficiencyRating.all.map { |r| r.id.to_s }.sort
+  end
 end

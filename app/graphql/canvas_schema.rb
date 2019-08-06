@@ -64,6 +64,7 @@ class CanvasSchema < GraphQL::Schema
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
     when Progress then Types::ProgressType
+    when Rubric then Types::RubricType
     when MediaObject then Types::MediaObjectType
     when ContentTag
       if type&.name == "ModuleItemInterface"

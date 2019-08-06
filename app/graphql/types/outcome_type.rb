@@ -17,12 +17,7 @@
 #
 
 module Types
-  class RatingType < ApplicationObjectType
-    graphql_name 'Rating'
-
-    field :id, ID, null: false
-    field :description, String, null: false
-    field :long_description, String, null: true
-    field :points, Int, null: false
+  class OutcomeType < ApplicationObjectType
+    implements Interfaces::LegacyIDInterface
   end
 end

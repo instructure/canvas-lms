@@ -19,7 +19,9 @@ import gql from 'graphql-tag'
 
 import {Assignment, AssignmentSubmissionsConnection} from './Assignment'
 import {ExternalTool} from './ExternalTool'
+import {ProficiencyRating} from './ProficiencyRating'
 import {Rubric} from './Rubric'
+import {RubricAssessment} from './RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
 import {UserGroups} from './UserGroups'
@@ -37,15 +39,34 @@ export const EXTERNAL_TOOLS_QUERY = gql`
   ${ExternalTool.fragment}
 `
 
+// TODO: Move proficiencyRatings stuff into it's own fragment
 export const RUBRIC_QUERY = gql`
-  query GetRubric($assignmentID: ID!) {
-    assignment(id: $assignmentID) {
-      rubric {
+  query GetRubric($rubricID: ID!, $submissionID: ID!, $courseID: ID!) {
+    rubric: node(id: $rubricID) {
+      ... on Rubric {
         ...Rubric
+      }
+    }
+    submission(id: $submissionID) {
+      rubricAssessmentsConnection {
+        nodes {
+          ...RubricAssessment
+        }
+      }
+    }
+    course(id: $courseID) {
+      account {
+        proficiencyRatingsConnection {
+          nodes {
+            ...ProficiencyRating
+          }
+        }
       }
     }
   }
   ${Rubric.fragment}
+  ${RubricAssessment.fragment}
+  ${ProficiencyRating.fragment}
 `
 
 export const STUDENT_VIEW_QUERY = gql`

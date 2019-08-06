@@ -152,7 +152,7 @@ function ContentTabs(props) {
         {props.assignment.rubric && (
           <Tabs.Panel renderTitle={I18n.t('Rubric')} selected={selectedTabIndex === 2}>
             <Suspense fallback={<LoadingIndicator />}>
-              <RubricTab assignment={props.assignment} />
+              <RubricTab assignment={props.assignment} submission={props.submission} />
             </Suspense>
           </Tabs.Panel>
         )}

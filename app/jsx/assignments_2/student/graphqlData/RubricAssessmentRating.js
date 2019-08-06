@@ -15,40 +15,43 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
-import {RubricCriterion} from './RubricCriterion'
+import {number, shape, string} from 'prop-types'
 
-export const Rubric = {
+export const RubricAssessmentRating = {
   fragment: gql`
-    fragment Rubric on Rubric {
-      criteria {
-        ...RubricCriterion
+    fragment RubricAssessmentRating on RubricAssessmentRating {
+      _id
+      criterion {
+        id: _id
       }
-      free_form_criterion_comments: freeFormCriterionComments
-      hide_score_total: hideScoreTotal
-      id: _id
-      points_possible: pointsPossible
-      title
+      comments
+      description
+      outcome {
+        id: _id
+      }
+      points
     }
-    ${RubricCriterion.fragment}
   `,
 
   shape: shape({
-    criteria: arrayOf(RubricCriterion.shape),
-    free_form_criterion_comments: bool,
-    hide_score_total: bool,
-    id: string.isRequired,
-    points_possible: number.isRequired,
-    title: string.isRequired
+    _id: string.isRequired,
+    criterion: shape({
+      id: string.isRequired
+    }),
+    comments: string,
+    description: string,
+    outcome: shape({
+      id: string.isRequired
+    }),
+    points: number.isRequired
   })
 }
 
-export const RubricDefaultMocks = {
-  Rubric: () => ({
-    id: '1',
-    criteria: [{}],
-    freeFormCriterionComments: false
+export const RubricAssessmentRatingDefaultMocks = {
+  RubricAssessmentRating: () => ({
+    _id: '1',
+    outcome: null,
+    points: 6
   })
 }

@@ -36,7 +36,7 @@ describe('ContentTabs', () => {
 
   it('renders the tabs in the correct order when the assignment has a rubric', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({attempt: 1})
+      Assignment: () => ({rubric: {}})
     })
 
     const {getAllByRole, getByText, getAllByText} = render(

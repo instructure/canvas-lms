@@ -60,6 +60,9 @@
             "name": "Quiz"
           },
           {
+            "name": "Rubric"
+          },
+          {
             "name": "Section"
           },
           {
@@ -129,10 +132,16 @@
             "name": "ModuleItem"
           },
           {
+            "name": "Outcome"
+          },
+          {
             "name": "Page"
           },
           {
             "name": "PostPolicy"
+          },
+          {
+            "name": "ProficiencyRating"
           },
           {
             "name": "Progress"
@@ -142,6 +151,21 @@
           },
           {
             "name": "Rubric"
+          },
+          {
+            "name": "RubricAssessment"
+          },
+          {
+            "name": "RubricAssessmentRating"
+          },
+          {
+            "name": "RubricAssociation"
+          },
+          {
+            "name": "RubricCriterion"
+          },
+          {
+            "name": "RubricRating"
           },
           {
             "name": "Section"

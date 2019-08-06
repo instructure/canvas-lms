@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,19 +17,14 @@
 #
 
 module Types
-  class RubricType < ApplicationObjectType
-    implements GraphQL::Types::Relay::Node
+  class RubricAssociationType < ApplicationObjectType
+    description 'How a rubric is being used in a context'
+
     implements Interfaces::LegacyIDInterface
 
-    global_id_field :id
-
-    field :criteria, [RubricCriterionType], <<~DESC, null: false
-      The different criteria that makes up this rubric
-    DESC
-
-    field :free_form_criterion_comments, Boolean, null: false
-    def free_form_criterion_comments
-      !!object.free_form_criterion_comments
+    field :hide_points, Boolean, null: false
+    def hide_points
+      !!object.hide_points
     end
 
     field :hide_score_total, Boolean, null: false
@@ -37,7 +32,9 @@ module Types
       !!object.hide_score_total
     end
 
-    field :points_possible, Float, null: true
-    field :title, String, null: true
+    field :use_for_grading, Boolean, null: false
+    def use_for_grading
+      !!object.use_for_grading
+    end
   end
 end

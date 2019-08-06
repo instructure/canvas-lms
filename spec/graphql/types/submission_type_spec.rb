@@ -385,4 +385,34 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
     end
   end
+
+  describe 'rubric_Assessments_connection' do
+    before(:once) do
+      rubric_for_course
+      rubric_association_model(
+        context: @course,
+        rubric: @rubric,
+        association_object: @assignment,
+        purpose: 'grading'
+      )
+      rubric_assessment_model(
+        user: @student,
+        assessor: @teacher,
+        rubric_association: @rubric_association,
+        assessment_type: 'grading'
+      )
+    end
+
+    it 'works' do
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'requires permission' do
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }', current_user: @student)
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+  end
 end

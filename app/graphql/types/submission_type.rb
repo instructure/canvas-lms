@@ -16,6 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+
+#############################################################################
+# NOTE: In most cases you shouldn't add new fields here, instead they should
+#       be added to interfaces/submission_interface.rb so that they work for
+#       both submissions and submission histories
+#############################################################################
+
+
 module Types
   class SubmissionHistoryFilterInputType < Types::BaseInputObject
     graphql_name 'SubmissionHistoryFilterInput'
@@ -39,10 +47,6 @@ module Types
 
     global_id_field :id
 
-    # NOTE: In most cases you shouldn't add new fields here, instead they should
-    #       be added to interfaces/submission_interface.rb so that they work for
-    #       both submissions and submission histories
-
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
@@ -57,6 +61,28 @@ module Types
         histories = object.submission_history
         histories.pop unless include_current_submission
         histories.select{ |h| states.include?(h.workflow_state) }
+      end
+    end
+
+    # TODO: In the context of a versionable backed submission history, this will
+    #       need to look up the correct rubric assessment from their versionable
+    #       entries. This will probably suck a lot, and as such can happen in a
+    #       different ticket. Will probably need to duplicate some of the logic
+    #       around the visible_rubric_assessments_for crap to get it workable
+    #       for versionable backed rubric assessments.
+    field :rubric_assessments_connection, RubricAssessmentType.connection_type, null: true
+    def rubric_assessments_connection
+      Promise.all([
+        load_association(:assignment),
+        load_association(:rubric_assessments)
+      ]).then do
+        Promise.all([
+          Loaders::AssociationLoader.for(Assignment, :rubric_association).load(submission.assignment),
+          Loaders::AssociationLoader.for(RubricAssessment, :rubric_association).
+            load_many(submission.rubric_assessments)
+        ]).then do
+          submission.visible_rubric_assessments_for(current_user)
+        end
       end
     end
   end

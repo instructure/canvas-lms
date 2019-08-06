@@ -16,42 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, number, shape, string} from 'prop-types'
+import {bool, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
-import {Rating} from './Rating'
 
-export const Criterion = {
+export const RubricAssociation = {
   fragment: gql`
-    fragment Criterion on Criterion {
-      id
-      criterion_use_range: criterionUseRange
-      description
-      long_description: longDescription
-      points
-      ratings {
-        ...Rating
-      }
+    fragment RubricAssociation on RubricAssociation {
+      _id
+      hide_points: hidePoints
+      hide_score_total: hideScoreTotal
+      use_for_grading: useForGrading
     }
-    ${Rating.fragment}
   `,
 
   shape: shape({
-    id: string.isRequired,
-    criterion_use_range: bool.isRequired,
-    description: string.isRequired,
-    long_description: string,
-    points: number,
-    ratings: arrayOf(Rating.shape)
+    _id: string.isRequired,
+    hide_points: bool,
+    hide_score_total: bool.isRequired,
+    use_for_grading: bool.isRequired
   })
 }
 
-export const CriterionDefaultMocks = {
-  Criterion: () => ({
-    id: '1',
-    criterionUseRange: false,
-    description: 'First Criterion',
-    longDescription: '',
-    points: 6,
-    ratings: [{}]
+export const RubricAssociationDefaultMocks = {
+  RubricAssociation: () => ({
+    _id: '1',
+    hidePoints: false,
+    hideScoreTotal: false,
+    useForGrading: false
   })
 }

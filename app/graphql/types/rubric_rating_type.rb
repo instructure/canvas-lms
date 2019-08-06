@@ -17,19 +17,13 @@
 #
 
 module Types
-  class AccountType < ApplicationObjectType
-    implements GraphQL::Types::Relay::Node
+  class RubricRatingType < ApplicationObjectType
+    description 'Possible rating for a rubric criterion'
+
     implements Interfaces::LegacyIDInterface
 
-    global_id_field :id
-
-    field :name, String, null: true
-
-    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
-    def proficiency_ratings_connection
-      # This does a recursive lookup of parent accounts, not sure how we could
-      # batch load it in a reasonable way.
-      object.resolved_outcome_proficiency&.outcome_proficiency_ratings
-    end
+    field :description, String, null: false
+    field :long_description, String, null: true
+    field :points, Float, null: false
   end
 end
