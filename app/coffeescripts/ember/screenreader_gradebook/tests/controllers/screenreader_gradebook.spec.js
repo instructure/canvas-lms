@@ -317,27 +317,28 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     QUnit.module('when assignment groups load after submissions', contextHooks => {
       let student
 
-      contextHooks.beforeEach(async () => {
+      contextHooks.beforeEach(() => {
         initializeApp()
-        await asyncHelper.waitForRequests()
-        student = srgb.get('students.firstObject')
+        return asyncHelper.waitForRequests().then(() => {
+          student = srgb.get('students.firstObject')
 
-        /*
-         * Set all submissions for the student as hidden.
-         * This would result in a zero grade for the student.
-         */
-        let submissions = srgb.submissionsForStudent(student)
-        submissions.forEach(submission => {
-          srgb.updateSubmission({...submission, hidden: true}, student)
+          /*
+           * Set all submissions for the student as hidden.
+           * This would result in a zero grade for the student.
+           */
+          let submissions = srgb.submissionsForStudent(student)
+          submissions.forEach(submission => {
+            srgb.updateSubmission({...submission, hidden: true}, student)
+          })
+          submissions = srgb.submissionsForStudent(student)
+
+          // Clear the student's current grade.
+          Ember.set(student, 'total_grade', null)
+
+          // Simulate the assignments being determined again.
+          srgb.set('assignmentsFromGroups.isLoaded', false)
+          srgb.set('assignmentsFromGroups.isLoaded', true)
         })
-        submissions = srgb.submissionsForStudent(student)
-
-        // Clear the student's current grade.
-        Ember.set(student, 'total_grade', null)
-
-        // Simulate the assignments being determined again.
-        srgb.set('assignmentsFromGroups.isLoaded', false)
-        srgb.set('assignmentsFromGroups.isLoaded', true)
       })
 
       test('updates the hidden state of submissions', () => {
