@@ -414,6 +414,35 @@ describe "Files API", type: :request do
         )
       )
       expect(redirect_params['include']).to include('preview_url')
+      expect(redirect_params['include']).not_to include('enhanced_preview_url')
+    end
+
+    it "includes enhanced_preview_url in course context" do
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{base_params.to_query}",
+        base_params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json"
+        )
+      )
+      expect(redirect_params['include']).to include('enhanced_preview_url')
+    end
+
+    it "includes enhanced_preview_url in group context" do
+      group = @course.groups.create!
+      params = base_params.merge(context_type: Group, context_id: group.id)
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{params.to_query}",
+        params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json"
+        )
+      )
+      expect(redirect_params['include']).to include('enhanced_preview_url')
     end
   end
 

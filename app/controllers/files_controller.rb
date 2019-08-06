@@ -931,7 +931,7 @@ class FilesController < ApplicationController
     if Array(params[:include]).include?('preview_url')
       includes << 'preview_url'
     # only use implicit enhanced_preview_url if there is no explicit preview_url
-    elsif @context.is_a?(User) || @context.is_a?(Course)
+    elsif @context.is_a?(User) || @context.is_a?(Course) || @context.is_a?(Group)
       includes << 'enhanced_preview_url'
     end
 
