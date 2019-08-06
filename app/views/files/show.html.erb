@@ -39,12 +39,12 @@
   </div>
   <% if @attachment.content_type == "application/x-shockwave-flash" %>
     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" class="embedded_swf">
-      <param name="movie" value="<%= safe_domain_file_url(@attachment) %>" />
+      <param name="movie" value="<%= safe_domain_file_url(@attachment, fallback_url: download_url) %>" />
       <param name="wmode" value="transparent" />
       <param name="salign" value="t" />
       <param name="allowscriptaccess" value="never" />
       <!--[if !IE]>-->
-      <object type="application/x-shockwave-flash" data="<%= safe_domain_file_url(@attachment) %>" class="embedded_swf">
+      <object type="application/x-shockwave-flash" data="<%= safe_domain_file_url(@attachment, fallback_url: download_url) %>" class="embedded_swf">
         <param name="wmode" value="transparent" />
         <param name="salign" value="t" />
         <param name="allowscriptaccess" value="never" />
@@ -55,7 +55,7 @@
     </object>
   <% elsif @attachment.inline_content? && !@attachment.canvadocable? %>
     <% js_bundle :file_inline %>
-    <iframe id="file_content" src="<%= safe_domain_file_url(@attachment) %>" style="width: 100%; height: 400px;" title="<%= t('File Content') %>"></iframe>
+    <iframe id="file_content" src="<%= safe_domain_file_url(@attachment, fallback_url: download_url) %>" style="width: 100%; height: 400px;" title="<%= t('File Content') %>"></iframe>
   <% elsif @attachment.content_type && @attachment.content_type.match(/\Aimage\//) %>
     <%= link_to(image_tag(download_url, :alt => @attachment.display_name), download_url) %>
   <% elsif @attachment.content_type && @attachment.content_type.match(/\Avideo\/|audio\//) %>

@@ -194,10 +194,13 @@ class FilesController < ApplicationController
   end
 
   def check_file_access_flags
+    access_verifier = {}
     begin
       access_verifier = validate_access_verifier
+    rescue Canvas::Security::TokenExpired
+      # maybe their browser is being stupid and came to the files domain directly with an old verifier - try to go back and get a new one
+      return redirect_to_fallback_url if files_domain?
     rescue Users::AccessVerifier::InvalidVerifier
-      access_verifier = {}
     end
 
     if access_verifier[:user]
@@ -227,6 +230,16 @@ class FilesController < ApplicationController
     true
   end
   protected :check_file_access_flags
+
+  def redirect_to_fallback_url
+    fallback_url = params[:sf_verifier] && Canvas::Security.decode_jwt(params[:sf_verifier], ignore_expiration: true)[:fallback_url]
+    if fallback_url
+      redirect_to fallback_url
+    else
+      render_unauthorized_action # oh well we tried
+    end
+  end
+  protected :redirect_to_fallback_url
 
   def index
     return react_files
