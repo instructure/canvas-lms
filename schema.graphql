@@ -42,12 +42,6 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
     first: Int
 
     """
-    When true, also includes an `AssignmentOverride` with the assignment's
-    default due/availability dates
-    """
-    includeBaseDates: Boolean = false
-
-    """
     Returns the last _n_ elements from the list.
     """
     last: Int
@@ -415,7 +409,7 @@ type AssignmentOverrideEdge {
 """
 Objects that can be assigned overridden dates
 """
-union AssignmentOverrideSet = AdhocStudents | EveryoneElse | Group | Section
+union AssignmentOverrideSet = AdhocStudents | Group | Section
 
 input AssignmentPeerReviewsUpdate {
   anonymousReviews: Boolean
@@ -1073,13 +1067,6 @@ enum EnrollmentWorkflowState {
   inactive
   invited
   rejected
-}
-
-"""
-Represents everyone an override does not apply to
-"""
-type EveryoneElse {
-  title: String!
 }
 
 type ExternalTool implements ModuleItemInterface & Timestamped {
