@@ -21,12 +21,10 @@ import clickCallback from "./clickCallback"
 import bridge from '../../../bridge'
 import {getContentFromElement, FILE_LINK_TYPE} from '../shared/ContentSelection'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
-
+import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
 const trayController = new LinkOptionsTrayController()
 
 const PLUGIN_KEY = 'links'
-const CREATE_LINK = 'create'
-const EDIT_LINK = 'edit'
 
 const getLink = function (editor, elm) {
   return editor.dom.getParent(elm, 'a[href]');

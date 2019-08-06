@@ -385,9 +385,10 @@ class RCEWrapper extends React.Component {
           return
         }
 
-        if (document.activeElement.getAttribute('class').includes('tox-')) {
+        const activeClass = document.activeElement && document.activeElement.getAttribute('class')
+        if (activeClass && activeClass.includes('tox-')) {
           // if a toolbar button has focus, then the user clicks on the "more" button
-          // focus jumps to the body, then eventually to the popped pup toolbar. This
+          // focus jumps to the body, then eventually to the popped up toolbar. This
           // catches that case, but could also fail to blur an rce if the user clicked from
           // one rce on the page to another.  I think this is the lesser of the 2 evils
           return
@@ -535,16 +536,19 @@ class RCEWrapper extends React.Component {
   }
 
   onResize = (_e, coordinates) => {
-    const container = this.mceInstance().getContainer()
-    if (!container) return
-    const currentContainerHeight = Number.parseInt(container.style.height, 10)
-    if (isNaN(currentContainerHeight)) return
-    const modifiedHeight = currentContainerHeight + coordinates.deltaY
-    const newHeight = `${modifiedHeight}px`
-    container.style.height = newHeight
-    this.getTextarea().style.height = newHeight
-    // play nice and send the same event that the silver theme would send
-    this.mceInstance().fire('ResizeEditor')
+    const editor = this.mceInstance()
+    if (editor) {
+      const container = editor.getContainer()
+      if (!container) return
+      const currentContainerHeight = Number.parseInt(container.style.height, 10)
+      if (isNaN(currentContainerHeight)) return
+      const modifiedHeight = currentContainerHeight + coordinates.deltaY
+      const newHeight = `${modifiedHeight}px`
+      container.style.height = newHeight
+      this.getTextarea().style.height = newHeight
+      // play nice and send the same event that the silver theme would send
+      editor.fire('ResizeEditor')
+    }
   }
 
   onA11yChecker = () => {
