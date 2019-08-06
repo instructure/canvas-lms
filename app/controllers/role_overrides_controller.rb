@@ -249,6 +249,7 @@ class RoleOverridesController < ApplicationController
   #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_course_changes              -- Courses - view change logs
   #     view_error_reports               -- View error reports
+  #     view_feature_flags               -- Feature Options - view
   #     view_grade_changes               -- Grades - view change logs
   #     view_jobs                        -- View background jobs
   #     view_notifications               -- Notifications - view

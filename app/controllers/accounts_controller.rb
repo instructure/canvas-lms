@@ -1010,6 +1010,7 @@ class AccountsController < ApplicationController
         NEW_FEATURES_UI: @account.root_account.feature_enabled?(:new_features_ui),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
+          :manage_feature_flags => @account.grants_right?(@current_user, session, :manage_feature_flags)
         },
         CSP: {
           :enabled => @account.csp_enabled?,

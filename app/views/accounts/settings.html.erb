@@ -70,7 +70,7 @@
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_feature_flags) %>
+    <% if can_do(@context, @current_user, :view_feature_flags) %>
       <li><a href="#tab-features" id="tab-features-link">
         <% if @account.root_account.feature_enabled?(:new_features_ui) %>
           <%= t(:feature_preview, "Feature Preview") %>
@@ -1146,7 +1146,7 @@ acknowledge that you have read and agreed to the
         <%= render :partial => 'alerts/alerts' %>
       </div>
   <% end %>
-  <% if can_do(@context, @current_user, :manage_feature_flags) %>
+  <% if can_do(@context, @current_user, :view_feature_flags) %>
     <div id="tab-features"></div>
   <% end %>
   <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>

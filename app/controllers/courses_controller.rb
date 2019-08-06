@@ -1285,6 +1285,7 @@ class CoursesController < ApplicationController
           :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
           :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
           :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
+          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags)
         },
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
