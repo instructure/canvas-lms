@@ -57,6 +57,7 @@
     "@instructure/ui-buttons": "^6.8.1",
     "@instructure/ui-color-utils": "^6.8.1",
     "@instructure/ui-elements": "^6.8.1",
+    "@instructure/ui-focusable": "^6.8.1",
     "@instructure/ui-forms": "^6.8.1",
     "@instructure/ui-icons": "^6.8.1",
     "@instructure/ui-layout": "^6.8.1",
