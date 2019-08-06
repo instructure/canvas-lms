@@ -158,6 +158,16 @@ RSpec.describe Outcomes::Import do
         new_group = LearningOutcomeGroup.find_by!(context: context, vendor_guid: group_vendor_guid)
         expect(new_group.id).not_to eq existing_group.id
       end
+
+      it 'given two groups with the same guid, update an active group before resurrecting a deleted group' do
+        deleted_group = outcome_group_model(context: context, vendor_guid: group_vendor_guid, workflow_state: "deleted")
+        importer.import_group(group_attributes)
+        deleted_group.reload
+        existing_group.reload
+        expect(existing_group.title).to eq "i'm a group"
+        expect(deleted_group.workflow_state).to eq "deleted"
+        expect(deleted_group.title).not_to eq existing_group.title
+      end
     end
 
     it 'updates attributes' do
@@ -323,6 +333,17 @@ RSpec.describe Outcomes::Import do
         new_outcome = LearningOutcome.find_by(vendor_guid: 'new_outcome_frd')
         expect(new_outcome).not_to eq existing_outcome
         expect(new_outcome.context).to eq context
+      end
+
+      it 'given two outcomes with the same guid, update an active outcome rather than a deleted outcome' do
+        new_outcome = outcome_model(context: context, vendor_guid: outcome_vendor_guid, display_name: '', calculation_method: 'highest')
+        existing_outcome.update! workflow_state: "deleted"
+        importer.import_outcome(**outcome_attributes)
+        new_outcome.reload
+        existing_outcome.reload
+        expect(new_outcome.title).to eq "i'm an outcome"
+        expect(existing_outcome.title).not_to eq new_outcome.title
+        expect(existing_outcome.workflow_state).to eq "deleted"
       end
     end
 
