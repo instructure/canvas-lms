@@ -1203,6 +1203,47 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
     end
 
+    context 'when the root account does not have a default tool url set' do
+      let(:course) { @course }
+      let(:root_account) { course.root_account }
+
+      before do
+        user_session(@teacher)
+        get :edit, params: { course_id: course.id, id: @assignment.id }
+      end
+
+      it 'does not set "DEFAULT_ASSIGNMENT_TOOL_URL"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_URL)).to be_nil
+      end
+
+      it 'does not set "DEFAULT_ASSIGNMENT_TOOL_NAME"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_NAME)).to be_nil
+      end
+    end
+
+    context 'when the root account has a default tool url and name set' do
+      let(:course) { @course }
+      let(:root_account) { course.root_account }
+      let(:default_url) { 'https://www.my-tool.com/blti' }
+      let(:default_name) { 'Default Name' }
+
+      before do
+        root_account.settings[:default_assignment_tool_url] = default_url
+        root_account.settings[:default_assignment_tool_name] = default_name
+        root_account.save!
+        user_session(@teacher)
+        get :edit, params: { course_id: course.id, id: @assignment.id }
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_URL"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_URL)).to eq default_url
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_NAME"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_NAME)).to eq default_name
+      end
+    end
+
     describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
       before(:each) do
         user_session(@teacher)
