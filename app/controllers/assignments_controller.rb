@@ -83,7 +83,14 @@ class AssignmentsController < ApplicationController
 
   def show
     Shackles.activate(:slave) do
-      if @context.feature_enabled?(:assignments_2) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+      @assignment ||= @context.assignments.find(params[:id])
+      a2_enabled = @context.feature_enabled?(:assignments_2) &&
+                   (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+
+      # We will need to do some additional work here about figuring out when we
+      # can short-circuit to A2 vs when we need to go through the rest of the
+      # method here.
+      if a2_enabled && @assignment.submission_types != 'external_tool'
         unless can_do(@context, @current_user, :read_as_admin)
           assignment_prereqs = context_module_sequence_items_by_asset_id(params[:id], "Assignment")
           js_env({
@@ -98,7 +105,6 @@ class AssignmentsController < ApplicationController
         end
       end
 
-      @assignment ||= @context.assignments.find(params[:id])
 
       if @assignment.deleted?
         flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
