@@ -17,12 +17,9 @@
 
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import _EditorToggle from '../editor/EditorToggle'
+import EditorToggle from '../editor/EditorToggle'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
-import newless from 'newless'
-
-const EditorToggle = newless(_EditorToggle)
 
 _inherits(MultipleChoiceToggle, EditorToggle)
 // #
