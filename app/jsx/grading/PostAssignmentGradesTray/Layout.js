@@ -43,7 +43,6 @@ export default function Layout({
   selectedSectionIds,
   unpostedCount
 }) {
-
   return (
     <Fragment>
       {!gradesPublished && (
@@ -63,7 +62,7 @@ export default function Layout({
       {gradesPublished && anonymousGrading && (
         <Alert margin="x-small" variant="info">
           {I18n.t(
-            'Grades can only be posted to everyone when the assignment is anonymous. Anonymity will be removed.'
+            'When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed.'
           )}
         </Alert>
       )}

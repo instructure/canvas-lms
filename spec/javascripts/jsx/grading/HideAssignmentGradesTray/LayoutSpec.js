@@ -32,7 +32,7 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
 
   function getAnonymousText() {
     const hideText =
-      'Grades can only be hidden for everyone when the assignment is anonymous. Anonymity will be enabled.'
+      'When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.'
     return [...$container.querySelectorAll('div')].find($el => $el.textContent === hideText)
   }
 
