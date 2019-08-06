@@ -53,6 +53,7 @@ function createdMountedElement(additionalProps = {}) {
       textareaId,
       tinymce: fakeTinyMCE,
       editorOptions: {},
+      trayProps: {},
       ...additionalProps
     })
   );
@@ -655,4 +656,89 @@ describe("RCEWrapper", () => {
       });
     });
   });
+
+  describe('alert area', () => {
+
+    afterEach(() => {
+      jsdomify.destroy();
+    })
+
+    it('adds an alert and attaches an id when addAlert is called', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance();
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      assert.ok(rce.state.messages[0].id === 0)
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 1)
+    })
+
+    it('adds multiple alerts', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance();
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading 2, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading 3, check your connection and try again.',
+        variant: 'error'
+      })
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 3)
+    })
+
+    it('does not add alerts with the exact same text', () => {
+      const tree = createdMountedElement()
+      const rce = tree.getMountedInstance();
+      rce.resetAlertId()
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      rce.addAlert({
+        text: 'Something went wrong uploading, check your connection and try again.',
+        variant: 'error'
+      })
+      const alertArea = tree.dive(['AlertMessageArea'])
+      const alerts = alertArea.everySubTree('Alert')
+      assert.ok(alerts.length === 1)
+    })
+
+    it('removes an alert when removeAlert is called', () => {
+        const tree = createdMountedElement()
+        const rce = tree.getMountedInstance();
+        rce.resetAlertId()
+        rce.addAlert({
+          text: 'First',
+          variant: 'error'
+        })
+        rce.addAlert({
+          text: 'Second',
+          variant: 'error'
+        })
+        rce.addAlert({
+          text: 'Third',
+          variant: 'error'
+        })
+        rce.removeAlert(1)
+        const alertArea = tree.dive(['AlertMessageArea'])
+        const alerts = alertArea.everySubTree('Alert')
+        assert.ok(alerts.length === 2)
+    })
+  })
 });

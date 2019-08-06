@@ -22,6 +22,8 @@ import Bridge from "../../bridge";
 import {fileEmbed} from "../../common/mimeClass";
 import {VIDEO_SIZE_OPTIONS} from '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
+import alertHandler from '../../rce/alertHandler';
+import formatMessage from '../../format-message';
 
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
@@ -264,6 +266,12 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
       delete fileMetaProps.domObject.preview // don't need this anymore
       dispatch(uploadPreflight(tabContext, fileMetaProps))
     })
+    .catch((e) => {
+      // Get rid of any placeholder that might be there.
+      dispatch(removePlaceholdersFor(fileMetaProps.name))
+      // eslint-disable-next-line no-console
+      console.error('Fetching the media folder failed.', e)
+    })
   }
 }
 
@@ -319,7 +327,8 @@ export function setAltText(altText, results) {
 }
 
 export function handleFailures(error, dispatch) {
-  return error.response
+  if (error && error.response) {
+    return error.response
     .json()
     .then(resp => {
       if (resp.message === "file size exceeds quota") {
@@ -329,6 +338,10 @@ export function handleFailures(error, dispatch) {
       }
     })
     .catch(error => dispatch(failUpload(error)));
+  }
+  if (error) {
+    return Promise.resolve().then(() => dispatch(failUpload(error)))
+  }
 }
 
 export function uploadPreflight(tabContext, fileMetaProps) {
@@ -369,6 +382,10 @@ export function uploadPreflight(tabContext, fileMetaProps) {
       .then(results => {
         dispatch(allUploadCompleteActions(results, fileMetaProps));
       })
-      .catch(err => handleFailures(err, dispatch));
+      .catch(err => {
+        // This may or may not be necessary depending on the upload
+        dispatch(removePlaceholdersFor(fileMetaProps.name))
+        handleFailures(err, dispatch)
+      });
   };
 }

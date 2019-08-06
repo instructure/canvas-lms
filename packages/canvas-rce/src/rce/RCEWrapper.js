@@ -19,6 +19,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import {Editor} from "@tinymce/tinymce-react";
+import uniqBy from 'lodash/uniqBy'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
@@ -35,6 +36,8 @@ import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
 import {isImage} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
+import AlertMessageArea from './AlertMessageArea'
+import alertHandler from './alertHandler'
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
@@ -91,6 +94,15 @@ function focusFirstMenuButton(el) {
   $firstMenu && $firstMenu.focus()
 }
 
+function focusContextToolbar() {
+  const $focusable = document.querySelector('.tox-tinymce-aux .tox-toolbar button')
+  if ($focusable) {
+    $focusable.focus()
+  }
+}
+
+let alertIdValue = 0;
+
 @themeable(theme, styles)
 class RCEWrapper extends React.Component {
   static getByEditor(editor) {
@@ -139,8 +151,11 @@ class RCEWrapper extends React.Component {
       wordCount: 0,
       isHtmlView: false,
       KBShortcutModalOpen: false,
-      focused: false
+      focused: false,
+      messages: []
     }
+
+    alertHandler.alertFunc = this.addAlert;
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -682,6 +697,33 @@ class RCEWrapper extends React.Component {
     }
   }
 
+  addAlert = alert => {
+    alert.id = alertIdValue++;
+    this.setState(state => {
+      let messages = state.messages.concat(alert);
+      messages = uniqBy(messages, 'text'); // Don't show the same message twice
+      return { messages };
+    });
+  };
+
+
+  removeAlert = (messageId) => {
+    this.setState(state => {
+      const messages = state.messages.filter(message => message.id !== messageId);
+      return { messages };
+    })
+  }
+
+  /**
+   * Used for reseting the value during tests
+   */
+  resetAlertId = () => {
+    if (this.state.messages.length > 0) {
+      throw new Error('There are messages currently, you cannot reset when they are non-zero')
+    }
+    alertIdValue = 0;
+  }
+
   render() {
     const {trayProps, ...mceProps} = this.props
     mceProps.editorOptions.statusbar = false
@@ -704,6 +746,7 @@ class RCEWrapper extends React.Component {
         >
           {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
         </ShowOnFocusButton>
+        <AlertMessageArea messages={this.state.messages} liveRegion={trayProps.liveRegion} afterDismiss={this.removeAlert} />
         <Editor
           id={mceProps.textareaId}
           textareaName={mceProps.name}

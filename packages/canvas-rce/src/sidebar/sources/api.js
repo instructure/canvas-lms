@@ -17,8 +17,10 @@
  */
 
 import 'isomorphic-fetch'
-import {downloadToWrap} from '../../common/fileUrl'
 import {parse} from 'url'
+import {downloadToWrap} from '../../common/fileUrl'
+import formatMessage from '../../format-message'
+import alertHandler from '../../rce/alertHandler'
 
 function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -68,14 +70,13 @@ function normalizeFileData(file) {
 
 function throwConnectionError (error) {
     if (error.name === 'TypeError') {
-      throw new Error(`Failed to fetch from the canvas-rce-api.
-        Did you forget to start it or configure it?
-        Details can be found at https://github.com/instructure/canvas-rce-api
-      `)
-    } else {
-      throw error
+      //eslint-disable-next-line no-console
+      console.error(`Failed to fetch from the canvas-rce-api.
+      Did you forget to start it or configure it?
+      Details can be found at https://github.com/instructure/canvas-rce-api
+    `)
     }
-
+    throw error
 }
 
 class RceApiSource {
@@ -84,6 +85,7 @@ class RceApiSource {
     this.host = options.host
     this.refreshToken = options.refreshToken || defaultRefreshTokenHandler
     this.hasSession = false
+    this.alertFunc = options.alertFunc || alertHandler.handleAlert
   }
 
   getSession() {
@@ -234,6 +236,14 @@ class RceApiSource {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
       .then(normalizeFileData)
+      .catch((e) => {
+        this.alertFunc({
+          text: formatMessage('Something went wrong uploading, check your connection and try again.'),
+          variant: 'error'
+        })
+        // eslint-disable-next-line no-console
+        console.error(e)
+      })
   }
 
   finalizeUpload(preflightProps, uploadResults) {
@@ -322,6 +332,13 @@ class RceApiSource {
       .then(checkStatus)
       .then(options.skipParse ? () => {} : parseResponse)
       .catch(throwConnectionError)
+      .catch((e) => {
+        this.alertFunc({
+          text: formatMessage('Something went wrong, try again after refreshing the page'),
+          variant: 'error'
+        })
+        throw e;
+      })
   }
 
   // @private
@@ -348,7 +365,15 @@ class RceApiSource {
       .then(checkStatus)
       .then(parseResponse)
       .catch(throwConnectionError)
-  }
+      .catch((e) => {
+        this.alertFunc({
+         text: formatMessage('Something went wrong uploading, check your connection and try again.'),
+         variant: 'error'
+       })
+       // eslint-disable-next-line no-console
+       console.error(e)
+      })
+    }
 
   // @private
   normalizeUriProtocol(uri, windowOverride) {

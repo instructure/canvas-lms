@@ -30,13 +30,16 @@ describe('sources/api', () => {
     contextId: 123
   }
   let apiSource
+  let alertFuncSpy
 
   beforeEach(() => {
+    alertFuncSpy = sinon.spy()
     apiSource = new RceApiSource({
       jwt: 'theJWT',
       refreshToken: callback => {
         callback('freshJWT')
-      }
+      },
+      alertFunc: alertFuncSpy
     })
     fetchMock.mock('/api/session', '{}')
   })
@@ -278,6 +281,23 @@ describe('sources/api', () => {
         assert.equal(apiSource.jwt, 'freshJWT')
       })
     })
+
+    it('calls alertFunc when an error occurs', () => {
+      fetchMock.mock(uri, 500)
+      return apiSource.preflightUpload(fileProps, apiProps).then(() => {
+        sinon.assert.calledWith(alertFuncSpy, {
+          text: 'Something went wrong uploading, check your connection and try again.',
+          variant: 'error'
+        })
+      }).catch(() => {
+        // This will re-throw so we just catch it here.
+      })
+    })
+
+    it('throws an exception when an error occurs', () => {
+      fetchMock.mock(uri, 500)
+      assert.rejects(() => apiSource.preflightUpload(fileProps, apiProps))
+    })
   })
 
   describe('uploadFRD', () => {
@@ -296,6 +316,16 @@ describe('sources/api', () => {
 
     afterEach(() => {
       fetchMock.restore()
+    })
+
+    it('calls alertFunc if there is a problem', () => {
+      fetchMock.once(uploadUrl, 500, { overwriteRoutes: true})
+      return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
+        sinon.assert.calledWith(alertFuncSpy, {
+          text: 'Something went wrong uploading, check your connection and try again.',
+          variant: 'error'
+        })
+      })
     })
 
     describe('files', () => {

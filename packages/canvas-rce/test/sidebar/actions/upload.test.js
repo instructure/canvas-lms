@@ -544,6 +544,19 @@ describe("Upload data actions", () => {
         );
       })
     })
+
+    it('calls failUpload if there is no response property on the error', () => {
+      const fakeDispatch = sinon.spy();
+      const error = new Error('Fake Client Side Error')
+      return actions.handleFailures(error, fakeDispatch).then(() => {
+        sinon.assert.calledWith(fakeDispatch,
+          sinon.match({
+            type: 'FAIL_FILE_UPLOAD',
+            error
+          })
+        );
+      })
+    })
   })
 
   describe('activateMediaUpload', () => {
