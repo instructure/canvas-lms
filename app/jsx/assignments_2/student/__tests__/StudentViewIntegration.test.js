@@ -128,4 +128,52 @@ describe('SubmissionIDQuery', () => {
     fireEvent.change(fileInput, {target: {files}})
     expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
   })
+
+  describe('the submission is a text entry', () => {
+    async function createTextMocks(overrides = {}) {
+      const mocks = [
+        {
+          query: SUBMISSION_ID_QUERY,
+          variables: {assignmentLid: '1'}
+        },
+        {
+          query: STUDENT_VIEW_QUERY,
+          variables: {assignmentLid: '1', submissionID: '1'}
+        },
+        {
+          query: CREATE_SUBMISSION_DRAFT,
+          variables: {id: '1', attempt: 1, body: ''}
+        }
+      ]
+
+      const mockResults = await Promise.all(
+        mocks.map(async ({query, variables}) => {
+          const result = await mockQuery(query, overrides, variables)
+          return {
+            request: {query, variables},
+            result
+          }
+        })
+      )
+      return mockResults
+    }
+
+    it('opens the RCE when the Start Entry button is clicked', async () => {
+      const mocks = await createTextMocks({
+        Assignment: () => ({submissionTypes: ['online_text_entry']}),
+        SubmissionDraft: () => ({body: ''})
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+
+      const startButton = await waitForElement(() => getByTestId('start-text-entry'))
+      fireEvent.click(startButton)
+
+      expect(await waitForElement(() => getByTestId('text-editor'))).toBeInTheDocument()
+    })
+  })
 })

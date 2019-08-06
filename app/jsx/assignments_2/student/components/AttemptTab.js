@@ -37,7 +37,6 @@ export default class AttemptTab extends Component {
 
   state = {
     submissionState: null,
-    textValue: null,
     uploadState: null
   }
 
@@ -93,10 +92,6 @@ export default class AttemptTab extends Component {
     this.setState({submissionState: state})
   }
 
-  updateText = newValue => {
-    this.setState({textValue: newValue})
-  }
-
   renderUploadAlert() {
     if (this.state.uploadState) {
       let errorMessage, successMessage
@@ -137,49 +132,47 @@ export default class AttemptTab extends Component {
     }
   }
 
-  renderFileUpload = createSubmission => {
+  renderFileUpload = (createSubmission, createSubmissionDraft) => {
     return (
-      <Mutation
-        mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={() => this.updateUploadState('success')}
-        onError={() => this.updateUploadState('error')}
-        update={this.updateSubmissionDraftCache}
-      >
-        {createSubmissionDraft => (
-          <React.Fragment>
-            {this.renderUploadAlert()}
-            <FileUpload
-              assignment={this.props.assignment}
-              createSubmission={createSubmission}
-              createSubmissionDraft={createSubmissionDraft}
-              submission={this.props.submission}
-              updateSubmissionState={this.updateSubmissionState}
-              updateUploadState={this.updateUploadState}
-            />
-          </React.Fragment>
-        )}
-      </Mutation>
+      <FileUpload
+        assignment={this.props.assignment}
+        createSubmission={createSubmission}
+        createSubmissionDraft={createSubmissionDraft}
+        submission={this.props.submission}
+        updateSubmissionState={this.updateSubmissionState}
+        updateUploadState={this.updateUploadState}
+      />
     )
   }
 
-  renderFileAttempt = createSubmission => {
+  renderFileAttempt = (createSubmission, createSubmissionDraft) => {
     return this.props.submission.state === 'graded' ||
       this.props.submission.state === 'submitted' ? (
       <FilePreview key={this.props.submission.attempt} files={this.props.submission.attachments} />
     ) : (
-      this.renderFileUpload(createSubmission)
+      this.renderFileUpload(createSubmission, createSubmissionDraft)
     )
   }
 
-  renderSubmissionByType = createSubmission => {
+  renderTextAttempt = createSubmissionDraft => {
+    return (
+      <TextEntry
+        createSubmissionDraft={createSubmissionDraft}
+        submission={this.props.submission}
+        updateUploadState={this.updateUploadState}
+      />
+    )
+  }
+
+  renderSubmissionByType = (createSubmission, createSubmissionDraft) => {
     // TODO: we need to ensure we handle multiple submission types eventually
     switch (this.props.assignment.submissionTypes[0]) {
       case 'online_text_entry':
-        return <TextEntry changeText={this.updateText} value={this.state.textValue} />
+        return this.renderTextAttempt(createSubmissionDraft)
       case 'online_upload':
       default:
         // TODO: we should probably figure out what the default case should actually be
-        return this.renderFileAttempt(createSubmission)
+        return this.renderFileAttempt(createSubmission, createSubmissionDraft)
     }
   }
 
@@ -194,7 +187,19 @@ export default class AttemptTab extends Component {
         return (
           <React.Fragment>
             {this.renderSubmissionAlert()}
-            {this.renderSubmissionByType(createSubmission)}
+            <Mutation
+              mutation={CREATE_SUBMISSION_DRAFT}
+              onCompleted={() => this.updateUploadState('success')}
+              onError={() => this.updateUploadState('error')}
+              update={this.updateSubmissionDraftCache}
+            >
+              {createSubmissionDraft => (
+                <React.Fragment>
+                  {this.renderUploadAlert()}
+                  {this.renderSubmissionByType(createSubmission, createSubmissionDraft)}
+                </React.Fragment>
+              )}
+            </Mutation>
           </React.Fragment>
         )
     }

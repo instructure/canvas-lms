@@ -18,36 +18,45 @@
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import {func, string} from 'prop-types'
+import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_text_entry'
 import IconText from '@instructure/ui-icons/lib/Line/IconText'
 import React from 'react'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import {Submission} from '../graphqlData/Submission'
 import View from '@instructure/ui-layout/lib/components/View'
 
 RichContentEditor.preloadRemoteModule()
 
 export default class TextEntry extends React.Component {
   static propTypes = {
-    changeText: func,
-    value: string
+    createSubmissionDraft: func,
+    submission: Submission.shape,
+    updateUploadState: func
   }
 
   state = {
     editorLoaded: false
   }
 
+  getDraftBody = () => {
+    if (this.props.submission.submissionDraft) {
+      return this.props.submission.submissionDraft.body
+    } else {
+      return null
+    }
+  }
+
   componentDidMount() {
-    // TODO: Will need to actually check if text draft is null
-    if (this.props.value !== null && !this.state.editorLoaded) {
+    if (this.getDraftBody() !== null && !this.state.editorLoaded) {
       this.loadRCE()
     }
   }
 
   componentDidUpdate() {
-    if (this.props.value !== null && !this.state.editorLoaded) {
+    if (this.getDraftBody() !== null && !this.state.editorLoaded) {
       this.loadRCE()
-    } else if (this.props.value === null && this.state.editorLoaded) {
+    } else if (this.getDraftBody() === null && this.state.editorLoaded) {
       this.unloadRCE()
     }
   }
@@ -98,11 +107,14 @@ export default class TextEntry extends React.Component {
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
 
-    document
-      .getElementById('content')
-      .querySelector('[id^="random_editor"]')
-      .addEventListener('focus', this.handleEditorIframeFocus)
-    this._tinyeditor.focus()
+    const documentContent = document.getElementById('content')
+    if (documentContent) {
+      const editorIframe = documentContent.querySelector('[id^="random_editor"]')
+      if (editorIframe) {
+        editorIframe.addEventListener('focus', this.handleEditorIframeFocus)
+        this._tinyeditor.focus()
+      }
+    }
   }
 
   handleEditorIframeFocus = _event => {
@@ -123,17 +135,30 @@ export default class TextEntry extends React.Component {
     return RichContentEditor.callOnRCE(this._textareaRef, 'get_code')
   }
 
+  updateSubmissionDraft = async rceText => {
+    try {
+      await this.props.createSubmissionDraft({
+        variables: {
+          id: this.props.submission.id,
+          attempt: this.props.submission.attempt || 1,
+          body: rceText
+        }
+      })
+    } catch (err) {
+      this.props.updateUploadState('error')
+    }
+  }
+
   handleStartButton = () => {
-    this.props.changeText('')
+    this.updateSubmissionDraft('')
   }
 
   handleSaveButton = () => {
-    // just a placeholder to show how the data will be accessed
-    this.props.changeText(this.getRCEText())
+    this.updateSubmissionDraft(this.getRCEText())
   }
 
   handleCancelButton = () => {
-    this.props.changeText(null)
+    this.updateSubmissionDraft(null)
   }
 
   renderButtons() {
@@ -163,7 +188,7 @@ export default class TextEntry extends React.Component {
     return (
       <div data-testid="text-editor">
         <span>
-          <textarea defaultValue={this.props.value} ref={this.setTextareaRef} />
+          <textarea defaultValue={this.getDraftBody()} ref={this.setTextareaRef} />
         </span>
         {this.renderButtons()}
       </div>
@@ -187,8 +212,7 @@ export default class TextEntry extends React.Component {
   }
 
   render() {
-    // TODO: Will need to actually check if text draft is null
-    if (this.props.value === null) {
+    if (this.getDraftBody() === null) {
       return this.renderInitialBox()
     } else {
       return this.renderEditor()
