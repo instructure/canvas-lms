@@ -112,6 +112,11 @@ module CanvasRails
     config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
                                   #{Rails.root}/app/stylesheets)
 
+    config.middleware.use Rack::Chunked
+    config.middleware.use Rack::Deflater, if: -> (*) {
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation"]
+    }
+
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|

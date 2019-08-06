@@ -3,6 +3,29 @@ module MarkTemplateStreaming
     @streaming_template = true if options[:stream]
     super
   end
+
+  # credit to https://stackoverflow.com/questions/7986150/http-streaming-in-rails-not-working-when-using-rackdeflater/10596123#10596123
+  def _process_options(options)
+    stream = options.delete(:stream)
+    super
+    if stream && request.version != "HTTP/1.0"
+      # Same as org implmenation except don't set the transfer-encoding header
+      # The Rack::Chunked middleware will handle it
+      headers["Cache-Control"] ||= "no-cache"
+      headers.delete('Content-Length')
+      options[:stream] = stream
+    end
+  end
+
+  def _render_template(options)
+    if options.delete(:stream)
+      # Just render, don't wrap in a Chunked::Body, let
+      # Rack::Chunked middleware handle it
+      view_renderer.render_body(view_context, options)
+    else
+      super
+    end
+  end
 end
 ActionController::Base.include(MarkTemplateStreaming)
 
@@ -71,3 +94,11 @@ module StreamingContentChecks
   end
 end
 ActionView::StreamingFlow.prepend(StreamingContentChecks) unless ::Rails.env.production?
+
+module SkipEmptyTemplateConcats
+  def initialize(original_block)
+    new_block = -> (value) { original_block.call(value) if value.size > 0}
+    super(new_block)
+  end
+end
+ActionView::StreamingBuffer.prepend(SkipEmptyTemplateConcats)
