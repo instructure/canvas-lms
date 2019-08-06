@@ -37,7 +37,12 @@ function CommentRow(props) {
   return (
     <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
-        {!read && <Badge type="notification" standalone margin="0 small 0 0" />}
+        <Badge
+          theme={read ? {colorPrimary: 'white'} : undefined}
+          type="notification"
+          standalone
+          margin="0 small 0 0"
+        />
         <Avatar
           name={author ? author.shortName : I18n.t('Anonymous')}
           src={author ? author.avatarUrl : ''}
