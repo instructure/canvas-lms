@@ -135,7 +135,7 @@
     "message": "Rediger { title }"
   },
   "error_loading_grades_e0b38f4d": {
-    "message": "Feil under lasting av karakterar"
+    "message": "Feil under lasting av vurderingar"
   },
   "error_loading_more_items_3f109d9f": {
     "message": "Feil under lasting av fleire element"
@@ -165,13 +165,13 @@
     "message": "Gå til rutevising av dashbord"
   },
   "graded_25cd3fcd": {
-    "message": "Karaktersett"
+    "message": "Vurdert"
   },
   "grades_are_loading_c899652d": {
-    "message": "Lastar karakterar"
+    "message": "Lastar vurderingar"
   },
   "grades_loaded_5056277c": {
-    "message": "Karakterar lasta"
+    "message": "Vurderingar er lasta"
   },
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
@@ -195,7 +195,7 @@
     "message": "lastar"
   },
   "loading_grades_c842c887": {
-    "message": "Lastar karakterar"
+    "message": "Lastar vurderingar"
   },
   "loading_past_items_ca499e75": {
     "message": "Lastar tidlegare element"
@@ -216,7 +216,7 @@
     "message": "Manglar element i { title }"
   },
   "my_grades_98834476": {
-    "message": "Mine karakterar"
+    "message": "Mine vurderingar"
   },
   "new_13daf639": {
     "message": "Ny"
@@ -237,7 +237,7 @@
     "message": "Ingen innleveringsfristar er sett opp"
   },
   "no_grade_3b4d7f3e": {
-    "message": "Ingen karakter"
+    "message": "Inga vurdering"
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Ingenting akkurat no"
@@ -315,7 +315,7 @@
     "message": "Vis alt"
   },
   "show_my_grades_ebd08684": {
-    "message": "Vis karakterane mine"
+    "message": "Vis vurderingsresultata mine"
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
