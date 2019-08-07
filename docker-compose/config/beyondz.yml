@@ -1,9 +1,9 @@
 development:
-  base_url: http://canvas.docker
+  base_url: http://canvasweb
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
-  help_url: http://help.docker
+  help_url: http://helpweb
 
 test:
   base_url: https://test.bebraven.org/
