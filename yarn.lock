@@ -3634,15 +3634,16 @@ axe-testcafe@^1.1.0:
   dependencies:
     axe-core "^2.2.3"
 
-axios-cache-adapter@^2.1.1:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/axios-cache-adapter/-/axios-cache-adapter-2.3.3.tgz#e35f9b739c3e1559a009763cc441f2c6b2698826"
-  integrity sha512-8sDkMwrW1zXB4J2VxVyjjKocPqCzGRPrqNtKChbkIR/MCpSUVGcdCcJlO3nnsJMAIak/NCCRy8wX5uvNJ6Yj2Q==
+axios-cache-adapter@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/axios-cache-adapter/-/axios-cache-adapter-2.4.0.tgz#d2a9ef7d85ee57af4e6fd71baa3d778e0c575405"
+  integrity sha512-aLYENztdHt3EVjhZw5InOpyV3ARQAsOZ/073tRHEho6EwEJUjBwWeeqkkXAYbjPEzviDh6BKId3q45Wh0o0IZw==
   dependencies:
-    axios "^0.18.0"
+    axios "0.18.1"
+    cache-control-esm "1.0.0"
     lodash "^4.17.11"
 
-axios@^0.18.0:
+axios@0.18.1, axios@^0.18.0:
   version "0.18.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.18.1.tgz#ff3f0de2e7b5d180e757ad98000f1081b87bcea3"
   integrity sha512-0BfJq4NSfQXd+SkFdrvFbG7addhYSBA2mQwISr46pD6E5iqkWg02RAs8vyTT/j0RTnoYmeXauBuSv1qKwR179g==
@@ -5022,6 +5023,11 @@ cache-base@^1.0.1:
     to-object-path "^0.3.0"
     union-value "^1.0.0"
     unset-value "^1.0.0"
+
+cache-control-esm@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/cache-control-esm/-/cache-control-esm-1.0.0.tgz#417647ecf1837a5e74155f55d5a4ae32a84e2581"
+  integrity sha512-Fa3UV4+eIk4EOih8FTV6EEsVKO0W5XWtNs6FC3InTfVz+EjurjPfDXY5wZDo/lxjDxg5RjNcurLyxEJBcEUx9g==
 
 caching-transform@^3.0.1:
   version "3.0.2"
