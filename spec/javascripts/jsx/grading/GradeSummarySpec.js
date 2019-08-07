@@ -1244,16 +1244,19 @@ QUnit.module('GradeSummary - Revert Score', hooks => {
     equal($grade.find('.screenreader-only').text(), 'Click to test a different score')
   })
 
+  test('sets the title attribute', () => {
+    const $unpostedAssignment = $fixtures.find('#grades_summary .student_assignment').eq(1)
+    simulateWhatIfUse($unpostedAssignment)
+    GradeSummary.onScoreRevert($unpostedAssignment)
+    equal(
+      $unpostedAssignment.find('.assignment_score').attr('title'),
+      'Instructor is working on grades'
+    )
+  })
+
   QUnit.module('when post policies are enabled', postPoliciesEnabledHooks => {
     postPoliciesEnabledHooks.beforeEach(() => {
       ENV.post_policies_enabled = true
-    })
-
-    test('sets the title attribute to be "Hidden" when the submission is unposted', () => {
-      const $unpostedAssignment = $fixtures.find('#grades_summary .student_assignment').eq(1)
-      simulateWhatIfUse($unpostedAssignment)
-      GradeSummary.onScoreRevert($unpostedAssignment)
-      strictEqual($unpostedAssignment.find('.assignment_score').attr('title'), 'Hidden')
     })
 
     test('sets the unposted icon to icon-off when submission is unposted', () => {

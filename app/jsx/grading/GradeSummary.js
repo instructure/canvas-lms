@@ -201,13 +201,10 @@ const GradeSummary = {
     }
 
     if ($assignment.data('muted')) {
-      if (ENV.post_policies_enabled) {
-        title = I18n.t('Hidden')
-        $grade.html('<i class="icon-off" aria-hidden="true"></i>')
-      } else {
-        title = I18n.t('Muted')
-        $grade.html('<i class="icon-muted muted_icon" aria-hidden="true"></i>')
-      }
+      title = I18n.t('Instructor is working on grades')
+      const className = ENV.post_policies_enabled ? 'icon-off' : 'icon-muted muted_icon'
+      // xsslint safeString.identifier className title
+      $grade.html(`<i class="${className}" aria-hidden="true" title="${title}"=></i>`)
     } else {
       title = I18n.t('Click to test a different score')
       $grade.text(score.formattedValue)
@@ -244,7 +241,7 @@ function addTooltipElementForAssignment($assignment) {
   $tooltipWrapRight = $grade.find('.tooltip_wrap right')
 
   if ($tooltipWrapRight.length === 0) {
-    $tooltipWrapRight = $('<span aria-hidden="true" class="tooltip_wrap right"></span>')
+    $tooltipWrapRight = $('<span class="tooltip_wrap right"></span>')
     $grade.append($tooltipWrapRight)
 
     $tooltipScoreTeaser = $tooltipWrapRight.find('.tooltip_text score_teaser')
