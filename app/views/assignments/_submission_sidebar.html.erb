@@ -98,7 +98,7 @@
           <div id="comment-<%= comment.id %>" class="comment">
             <%= comment.comment %>
             <% unless comment.attached_to.nil? %>
-              <a target="_BLANK" href="/bz/pdf_annotator?url=<%= "/users/#{@current_user_submission.user_id}/files/#{comment.attached_to}/download"%>&submission_id=<%=@current_user_submission.id%>&readonly=true&highlight=<%= comment.id %>">See in context on attached file</a>
+              <a target="_BLANK" href="/bz/pdf_annotator?url=<%= "/users/#{@current_user_submission.user_id}/files/#{comment.attached_to}/download"%>&attachment_id=<%=comment.attached_to%>&submission_id=<%=@current_user_submission.id%>&readonly=true&highlight=<%= comment.id %>">See in context on attached file</a>
             <% end %>
             <div class="comment_attachments">
               <% comment.attachments.each do |attachment| %>
