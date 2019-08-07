@@ -18962,9 +18962,9 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   integrity sha1-9PrTM0R7wLB9TcjpIJ2POaisd+g=
 
 tinymce-a11y-checker@^2:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-2.2.0.tgz#8ac8ad0fa298b2c24ad025ca3345199ce18486f3"
-  integrity sha512-0GSXRNZa8zhj/f1S0DGRNRPnhJ7SDg5rMRqTlSrKOb9El6eR8JxokE/jc2OPLtlCioJMhre6KUUiV8G0tlWAAQ==
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-2.3.0.tgz#9698550ae50664281df7de5c08abf2fc0cf7187c"
+  integrity sha512-7WlvnS0zLGf+HP3QqMdvZ9jSt91ZNBcay+XDPjKlBHPIpVnF8rQdWK6QwDDenMlOu9fg/jmOYb+A799Uox24Rg==
   dependencies:
     "@instructure/ui-buttons" "^5"
     "@instructure/ui-core" "^5"

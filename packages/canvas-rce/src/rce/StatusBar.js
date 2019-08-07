@@ -111,7 +111,7 @@ export default function StatusBar(props) {
         >
           <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
         </Button>
-        <Button 
+        <Button
           variant="link"
           icon={IconA11yLine}
           title={a11y}

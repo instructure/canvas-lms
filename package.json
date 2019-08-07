@@ -233,7 +233,9 @@
   "optionalDependencies": {
     "inspect-process": "^0.5"
   },
-  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
+  "browserslist": [
+    "extends @instructure/browserslist-config-canvas-lms"
+  ],
   "jest-junit": {
     "output": "./coverage-js/junit-reports/jest.xml"
   },

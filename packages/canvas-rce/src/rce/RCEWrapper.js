@@ -137,6 +137,7 @@ class RCEWrapper extends React.Component {
     this.indicator = false;
 
     this._elementRef = null;
+    this._showOnFocusButton = null;
 
     injectTinySkin()
 
@@ -278,14 +279,14 @@ class RCEWrapper extends React.Component {
     return editors.filter(ed => ed.id === this.props.textareaId)[0];
   }
 
-  onTinyMCEInstance(command) {
-    if (command == "mceRemoveEditor") {
-      let editor = this.mceInstance();
-      if (editor) {
+  onTinyMCEInstance(command, args) {
+    const editor = this.mceInstance();
+    if (editor) {
+      if (command == "mceRemoveEditor") {
         editor.execCommand("mceNewDocument");
       } // makes sure content can't persist past removal
+      editor.execCommand(command, false, this.props.textareaId, args);
     }
-    this.props.tinymce.execCommand(command, false, this.props.textareaId);
   }
 
   destroy() {
@@ -552,7 +553,7 @@ class RCEWrapper extends React.Component {
   }
 
   onA11yChecker = () => {
-    this.onTinyMCEInstance('openAccessibilityChecker', {'data-canvas-component': true})
+    this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
   }
 
   handleShortcutKeyShortcut = (event) => {
@@ -572,8 +573,10 @@ class RCEWrapper extends React.Component {
   }
 
   KBShortcutModalClosed = () => {
-    if(Bridge.activeEditor() === this) {
-      Bridge.focusActiveEditor(false)
+    // when the modal is opened from the showOnFocus button, focus doesn't
+    // get automatically returned to the button like it should.
+    if (this._showOnFocusButton && document.activeElement === document.body) {
+      this._showOnFocusButton.focus()
     }
   }
 
@@ -710,6 +713,7 @@ class RCEWrapper extends React.Component {
             icon: IconKeyboardShortcutsLine,
             margin: 'xx-small'
           }}
+          ref={el => this._showOnFocusButton = el}
         >
           {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
         </ShowOnFocusButton>
