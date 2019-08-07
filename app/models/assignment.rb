@@ -2130,8 +2130,8 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil)
-    return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id) unless grade_as_group?
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil)
+    return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id, section_id: section_id) unless grade_as_group?
 
     submissions = self.submissions.to_a
     user_ids_with_submissions = submissions.select(&:has_submission?).map(&:user_id).to_set
@@ -2205,8 +2205,8 @@ class Assignment < ActiveRecord::Base
 
   # using this method instead of students_with_visibility so we
   # can add the includes and students_visible_to/participating_students scopes.
-  # a group_id filter can optionally be supplied.
-  def visible_students_for_speed_grader(user:, includes: [:inactive], group_id: nil)
+  # group_id and section_id filters may optionally be supplied.
+  def visible_students_for_speed_grader(user:, includes: [:inactive], group_id: nil, section_id: nil)
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[[user.global_id, includes, group_id]] ||= begin
       student_scope = if user.present?
@@ -2218,6 +2218,11 @@ class Assignment < ActiveRecord::Base
       if group_id.present?
         students = students.joins(:group_memberships).
           where(group_memberships: {group_id: group_id, workflow_state: :accepted})
+      end
+
+      if section_id.present?
+        students = students.joins(:enrollments).
+          where(enrollments: {course_section_id: section_id, workflow_state: :active})
       end
       students.to_a
     end

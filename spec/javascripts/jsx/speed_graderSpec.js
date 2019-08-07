@@ -3793,6 +3793,35 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           ReactDOM.render.restore()
         })
       })
+
+      QUnit.module('when SpeedGrader is loaded with no students', noStudentsHooks => {
+        let oldStudentData
+
+        noStudentsHooks.beforeEach(() => {
+          oldStudentData = windowJsonData.context.students
+          windowJsonData.context.students = []
+
+          sinon.stub(window, 'alert')
+        })
+
+        noStudentsHooks.afterEach(() => {
+          window.alert.restore()
+          windowJsonData.context.students = oldStudentData
+        })
+
+        QUnit.module('when not filtering by a section', () => {
+          test('displays a message indicating there are no students in the course', () => {
+            SpeedGrader.EG.jsonReady()
+            const [message] = window.alert.firstCall.args
+            ok(message.includes('Sorry, there are either no active students in the course'))
+          })
+
+          test('calls back() on the browser history', () => {
+            SpeedGrader.EG.jsonReady()
+            strictEqual(history.back.callCount, 1)
+          })
+        })
+      })
     })
 
     QUnit.module('#skipRelativeToCurrentIndex', hooks => {
@@ -5600,6 +5629,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
             {
               id: 4,
               name: 'Guy B. Studying'
+            },
+            {
+              id: 5,
+              name: 'Fella B. Indolent'
             }
           ],
           enrollments: [
@@ -5617,6 +5650,11 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
               user_id: 4,
               workflow_state: 'active',
               course_section_id: 3
+            },
+            {
+              user_id: 5,
+              workflow_state: 'active',
+              course_section_id: 2
             }
           ],
           active_course_sections: [
@@ -5782,6 +5820,20 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
 
         const [sectionId] = SpeedGrader.EG.changeToSection.firstCall.args
         strictEqual(sectionId, 'all')
+      })
+    })
+
+    QUnit.module('filtering by section', () => {
+      test('filters the list of students by the section ID specified in userSettings if set', () => {
+        SpeedGrader.EG.jsonReady()
+
+        strictEqual(window.jsonData.studentsWithSubmissions.length, 1)
+      })
+
+      test('does not filter the list of students if no section ID is specified in userSettings', () => {
+        userSettings.contextGet.returns(null)
+        SpeedGrader.EG.jsonReady()
+        strictEqual(window.jsonData.studentsWithSubmissions.length, 2)
       })
     })
   })
