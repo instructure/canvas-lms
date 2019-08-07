@@ -121,7 +121,8 @@
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-transform-react-inline-elements": "^7.2.0",
-    "@instructure/ui-babel-preset": "^5",
+    "@instructure/browserslist-config-canvas-lms": ">=2",
+    "@instructure/ui-babel-preset": "^6",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
     "@testing-library/dom": "^5",
@@ -232,6 +233,7 @@
   "optionalDependencies": {
     "inspect-process": "^0.5"
   },
+  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
   "jest-junit": {
     "output": "./coverage-js/junit-reports/jest.xml"
   },

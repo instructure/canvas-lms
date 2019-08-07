@@ -33,6 +33,7 @@
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
+  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
   "nyc": {
     "include": [
       "shared/**/*.js",

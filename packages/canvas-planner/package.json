@@ -8,7 +8,7 @@
     "url": "https://github.com/instructure/canvas-planner.git"
   },
   "scripts": {
-    "check-transifex": "BABEL_ENV=test babel-node ./scripts/check-transifex.js",
+    "check-transifex": "node -r esm ./scripts/check-transifex.js",
     "extract": "format-message extract $(find src -name \"*.js\") -g underscored_crc32 -o config/locales/en.json",
     "lint-staged": "lint-staged",
     "lint": "eslint src/",
@@ -37,6 +37,9 @@
   ],
   "author": "Instructure, Inc.",
   "license": "AGPL-3.0",
+  "browserslist": [
+    "extends @instructure/browserslist-config-canvas-lms"
+  ],
   "dependencies": {
     "@instructure/ui-a11y": "^5",
     "@instructure/ui-alerts": "^5",
@@ -80,13 +83,12 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
-    "@babel/node": "^7",
-    "@instructure/canvas-supported-browsers": "latest",
-    "@instructure/ui-babel-preset": "^5",
+    "@instructure/ui-babel-preset": "^6",
     "babel-jest": "^24",
     "enzyme": "^3",
     "enzyme-adapter-react-16": "^1",
     "enzyme-to-json": "^3",
+    "esm": "^3.2.25",
     "format-message-cli": "^6",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24",
