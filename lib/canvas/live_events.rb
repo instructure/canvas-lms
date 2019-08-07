@@ -494,6 +494,7 @@ module Canvas::LiveEvents
     end
 
     post_event_stringified('asset_accessed', {
+      asset_name: asset_obj.try(:name) || asset_obj.try(:title),
       asset_type: asset_obj.class.reflection_type_name,
       asset_id: asset_obj.global_id,
       asset_subtype: asset_subtype,

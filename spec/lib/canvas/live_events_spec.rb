@@ -565,6 +565,7 @@ describe Canvas::LiveEvents do
       course_factory
 
       expect_event('asset_accessed', {
+        asset_name: "Unnamed Course",
         asset_type: 'course',
         asset_id: @course.global_id.to_s,
         asset_subtype: nil,
@@ -580,6 +581,7 @@ describe Canvas::LiveEvents do
       course_factory
 
       expect_event('asset_accessed', {
+        asset_name: "Unnamed Course",
         asset_type: 'course',
         asset_id: @course.global_id.to_s,
         asset_subtype: 'assignments',
@@ -591,10 +593,28 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
     end
 
+    it 'asset_name is correctly accessed when title is used' do
+      course_with_teacher
+      @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
+
+      expect_event('asset_accessed', {
+        asset_name: "old title",
+        asset_type: 'wiki_page',
+        asset_id: @page.global_id.to_s,
+        asset_subtype: nil,
+        category: 'category',
+        role: 'role',
+        level: 'participation'
+      }).once
+
+      Canvas::LiveEvents.asset_access(@page, 'category', 'role', 'participation')
+    end
+
     it "should include filename and display_name if asset is an attachment" do
       attachment_model
 
       expect_event('asset_accessed', {
+        asset_name: "unknown.loser",
         asset_type: 'attachment',
         asset_id: @attachment.global_id.to_s,
         asset_subtype: nil,
