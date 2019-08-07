@@ -291,10 +291,6 @@ export default class Checker extends React.Component {
     this.setState({ open: false })
   }
 
-  handleExited() {
-    this.props.editor.focus(false)
-  }
-
   render() {
     const rule = this.errorRule()
     const issueNumberMessage = formatMessage("Issue { num }/{ total }", {
@@ -309,7 +305,6 @@ export default class Checker extends React.Component {
           label={formatMessage("Accessibility Checker")}
           open={this.state.open}
           onDismiss={() => this.handleClose()}
-          onExited={() => this.handleExited()}
           placement="end"
           contentRef={e => (this.trayElement = e)}
         >
