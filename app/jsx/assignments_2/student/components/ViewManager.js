@@ -167,7 +167,8 @@ class ViewManager extends React.Component {
       // Case where we have new submission histories available to display. This will
       // happen as a result of `this.props.onLoadMore()` call finishing after the
       // previous submission button was clicked.
-      nextState.displayedAttempt = nextState.submissions.length - prevState.submissions.length - 1
+      const nextIndex = nextState.submissions.length - prevState.submissions.length - 1
+      nextState.displayedAttempt = nextState.submissions[nextIndex].attempt
       nextState.loadingMore = false
     }
 
