@@ -15,16 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 class SubmissionCommentReadLoader < GraphQL::Batch::Loader
   def initialize(current_user)
     @current_user = current_user
   end
 
   def perform(submission_comments)
-    vsc = ViewedSubmissionComment.where(submission_comment_id: submission_comments, user: @current_user).pluck('submission_comment_id').to_set
+    vsc = ViewedSubmissionComment.
+      where(submission_comment_id: submission_comments, user: @current_user).
+      pluck('submission_comment_id').
+      to_set
+
     submission_comments.each do |sc|
-      fullfill(sc, vsc.include?(sc.id))
+      fulfill(sc, vsc.include?(sc.id))
     end
   end
 end
@@ -49,9 +52,7 @@ module Types
         load_association(:submission).then do |submission|
           Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
         end
-      ]).then {
-        object.author if object.grants_right?(current_user, :read_author)
-      }
+      ]).then { object.author if object.grants_right?(current_user, :read_author) }
     end
 
     field :attachments, [Types::FileType], null: true
@@ -77,12 +78,11 @@ module Types
         Promise.all([
           Loaders::AssociationLoader.for(Submission, :content_participations).load(submission),
           Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
-        ]).then {
+        ]).then do
           next true if submission.read?(current_user)
           SubmissionCommentReadLoader.for(current_user).load(object)
-        }
+        end
       end
-      object.read?(current_user)
     end
 
     field :media_object, Types::MediaObjectType, null: true

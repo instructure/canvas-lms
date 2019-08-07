@@ -62,18 +62,26 @@ describe Types::SubmissionType do
     let(:valid_submission_comment_attributes) {{ comment: 'some comment' }}
 
     it 'returns 0 if the submission is read' do
-      @submission.mark_read(@user)
+      @submission.mark_read(@teacher)
       submission_unread_count = submission_type.resolve('unreadCommentCount')
       expect(submission_unread_count).to eq 0
     end
 
     it 'returns unread count if the submission is unread' do
-      @submission.mark_unread(@user)
+      @submission.mark_unread(@teacher)
       @submission.submission_comments.create!(valid_submission_comment_attributes)
       @submission.submission_comments.create!(valid_submission_comment_attributes)
       @submission.submission_comments.create!(valid_submission_comment_attributes)
       submission_unread_count = submission_type.resolve('unreadCommentCount')
       expect(submission_unread_count).to eq 3
+    end
+
+    it 'returns 0 if the submission is unread and all comments are read' do
+      comment = @submission.submission_comments.create!(valid_submission_comment_attributes)
+      comment.mark_read!(@teacher)
+      @submission.mark_unread(@teacher)
+      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      expect(submission_unread_count).to eq 0
     end
   end
 
