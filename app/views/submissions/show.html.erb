@@ -195,7 +195,7 @@
                     <span style="white-space: pre-wrap;"><%= comment.comment %></span>
 
                     <% unless comment.attached_to.nil? %>
-                      <a target="preview_frame" href="/bz/pdf_annotator?url=<%= "/users/#{@submission.user_id}/files/#{comment.attached_to}/download"%>&submission_id=<%=@submission.id%>&readonly=true&highlight=<%= comment.id %>">See in context on attached file</a>
+                      <a target="preview_frame" href="/bz/pdf_annotator?url=<%= "/users/#{@submission.user_id}/files/#{comment.attached_to}/download"%>&attachment_id=<%=comment.attached_to%>&submission_id=<%=@submission.id%>&readonly=true&highlight=<%= comment.id %>">See in context on attached file</a>
                     <% end %>
                   <% end %>
                 </div>
