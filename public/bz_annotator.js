@@ -2,8 +2,12 @@
 
   var activePoint = null;
 
-  var saveButton = document.querySelector("#commentary button");
-  saveButton.addEventListener("click", function(event) {
+  var saveButton = document.querySelector("#commentary button.save");
+  var cancelButton = document.querySelector("#commentary button.cancel");
+
+  cancelButton.style.display = 'none';
+
+  function save() {
       var xhr = new XMLHttpRequest();
       var url = "/bz/submission_comment";
       xhr.open("POST", url, true);
@@ -20,7 +24,27 @@
       commentary.style.display = "";
 
       activePoint.setAttribute("title", ta.value);
+      if(ta.value == "") {
+        activePoint.parentNode.removeChild(activePoint);
+        activePoint = null;
+      }
+
       ta.value = "";
+  }
+
+  saveButton.addEventListener("click", function(event) {
+    save();
+  });
+
+  cancelButton.addEventListener("click", function(event) {
+      var o = document.querySelector(".point.current");
+      if(o) {
+        o.classList.remove("current");
+        o.parentNode.removeChild(o);
+        count--;
+      }
+      var commentary = document.getElementById("commentary");
+      commentary.style.display = "none";
   });
 
   function showCommentaryOn(e) {
@@ -37,6 +61,8 @@
       if(readonly)
         commentary.classList.add("readonly");
 
+      cancelButton.style.display = 'none';
+
       activePoint = e;
 
       var ta = commentary.querySelector("textarea");
@@ -52,8 +78,17 @@
 
     if(event.target.tagName == "IMG") {
       var o = document.querySelector(".point.current");
-      if(o)
+      if(o) {
         o.classList.remove("current");
+        var ta = document.querySelector("#commentary textarea");
+        if(ta.value.length) {
+          save();
+          ta.value = "";
+        } else {
+          o.parentNode.removeChild(o);
+          count--;
+        }
+      }
 
       var commentary = document.getElementById("commentary");
 
@@ -61,6 +96,8 @@
         commentary.style.display = "none";
         return;
       }
+
+      cancelButton.style.display = '';
 
       var point = document.createElement("div");
       point.className = "point current";

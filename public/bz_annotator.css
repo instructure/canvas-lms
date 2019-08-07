@@ -27,6 +27,7 @@
     width: 100%;
     height: 8em;
     font-family: sans-serif;
+    opacity: 0.8;
   }
 
   #resume #commentary {
