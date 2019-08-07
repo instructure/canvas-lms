@@ -115,6 +115,14 @@ class Attachments::GarbageCollector
     def to_delete_scope
       scope = Attachment.where(context_type: context_type).
         where.not(file_state: 'deleted')
+      if context_type == 'ContentExport'
+        scope = scope.where.not("EXISTS (
+          SELECT 1
+          FROM #{ContentExport.quoted_table_name}
+          INNER JOIN #{ContentShare.quoted_table_name} ON content_shares.content_export_id = content_exports.id
+          WHERE content_exports.attachment_id = attachments.id
+        )")
+      end
       scope = scope.where("created_at < ?", older_than) if older_than
       scope
     end
