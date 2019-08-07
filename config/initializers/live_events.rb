@@ -17,7 +17,8 @@
 
 class StubbedClient
   def self.put_records(records:, stream_name:)
-    puts "Live Events Records put to stream #{stream_name}: #{records}"
+    events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
+    puts "Events #{events} put to stream #{stream_name}: #{records}"
   end
 
   def self.stream_name
