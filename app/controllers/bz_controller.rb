@@ -20,14 +20,31 @@ class BzController < ApplicationController
 
   # used by the pdf annotator
   def submission_comment
-    comment = SubmissionComment.new
-    comment.author_id = @current_user
-    comment.comment = params[:comment]
-    comment.submission_id = params[:submission_id]
-    comment.attached_to = params[:attachment_id]
-    comment.x = params[:x]
-    comment.y = params[:y]
-    comment.save
+    existing = SubmissionComment.where(
+      :author_id => @current_user.id,
+      :submission_id => params[:submission_id],
+      :attached_to => params[:attachment_id],
+      :x => params[:x],
+      :y => params[:y]
+    )
+    comment = nil
+    if existing.any?
+      comment = existing.first
+    else
+      comment = SubmissionComment.new
+      comment.author_id = @current_user.id
+      comment.submission_id = params[:submission_id]
+      comment.attached_to = params[:attachment_id]
+      comment.x = params[:x]
+      comment.y = params[:y]
+    end
+
+    if params[:comment].blank?
+      comment.destroy
+    else
+      comment.comment = params[:comment]
+      comment.save
+    end
 
     render :json => comment.to_json
   end
@@ -69,7 +86,7 @@ class BzController < ApplicationController
       readonly = true
     end
 
-    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button type="button">Save</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js"></script></body></html>';
+    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js"></script></body></html>';
   end
 
   # this is meant to be used for requests from external services like LL kits
