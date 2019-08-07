@@ -18,9 +18,9 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import { momentObj } from 'react-moment-proptypes';
-import themeable from '@instructure/ui-themeable/lib';
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails';
-import Pill from '@instructure/ui-elements/lib/components/Pill';
+import {themeable} from '@instructure/ui-themeable'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Pill} from '@instructure/ui-elements'
 import BadgeList from '../BadgeList';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator} from '../NotificationBadge';
 import { func, number, string, arrayOf, shape, oneOf } from 'prop-types';

@@ -17,12 +17,11 @@
  */
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import themeable from '@instructure/ui-themeable/lib';
+import {themeable} from '@instructure/ui-themeable'
 import { func, bool, string } from 'prop-types';
 
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Link from '@instructure/ui-elements/lib/components/Link';
-import Button from '@instructure/ui-buttons/lib/components/Button';
+import {Heading, Link} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 
 import formatMessage from '../../format-message';
 import DesertSvg from './empty-desert.svg'; // Currently uses react-svg-loader

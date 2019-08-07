@@ -33,7 +33,6 @@ exports[`renders desert when completely empty 1`] = `
       Looks like there isn't anything here
     </div>
     <Link
-      as="button"
       disabled={false}
       iconPlacement="start"
       id="PlannerEmptyState_CardView"

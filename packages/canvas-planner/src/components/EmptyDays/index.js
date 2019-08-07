@@ -20,10 +20,8 @@
 import React, { Component } from 'react';
 import moment from 'moment-timezone';
 import classnames from 'classnames';
-import themeable from '@instructure/ui-themeable/lib';
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import View from '@instructure/ui-layout/lib/components/View';
+import {themeable} from '@instructure/ui-themeable'
+import {Heading, Text} from '@instructure/ui-elements'
 import { string } from 'prop-types';
 import { sizeShape } from '../plannerPropTypes';
 import styles from './styles.css';

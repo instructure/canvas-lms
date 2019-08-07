@@ -17,9 +17,9 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import View from '@instructure/ui-layout/lib/components/View';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
-import Text from '@instructure/ui-elements/lib/components/Text';
+import {View} from '@instructure/ui-layout'
+import {Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
 import ErrorAlert from '../ErrorAlert';
 import formatMessage from '../../format-message';
 import TV from './tv.svg';
@@ -75,7 +75,7 @@ export default class LoadingPastIndicator extends Component {
     if (this.props.loadingPast && !this.props.allPastItemsLoaded) {
       return (
         <View as="div" padding="medium small small small" textAlign="center">
-          <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading past items')}/>
+          <Spinner size="small" margin="0 x-small 0 0" renderTitle={() => formatMessage('Loading past items')}/>
           <Text size="small" color="secondary">
             {formatMessage('Loading past items')}
           </Text>

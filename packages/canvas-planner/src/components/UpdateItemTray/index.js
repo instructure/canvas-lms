@@ -17,17 +17,15 @@
  */
 import React, { Component } from 'react';
 import _ from 'lodash';
-import themeable from '@instructure/ui-themeable/lib';
-import View from '@instructure/ui-layout/lib/components/View';
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import Button from '@instructure/ui-buttons/lib/components/Button';
+import {themeable} from '@instructure/ui-themeable'
+import {View} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Button} from '@instructure/ui-buttons'
 import formatMessage from '../../format-message';
 import PropTypes from 'prop-types';
-import TextInput from '@instructure/ui-forms/lib/components/TextInput';
-import Select from '@instructure/ui-forms/lib/components/Select';
-import TextArea from '@instructure/ui-forms/lib/components/TextArea';
-import DateTimeInput from '@instructure/ui-forms/lib/components/DateTimeInput';
+import {Select, TextArea, DateTimeInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import moment from 'moment-timezone';
 
 import { courseShape } from '../plannerPropTypes';
@@ -187,7 +185,7 @@ export class UpdateItemTray extends Component {
     const value = this.findCurrentValue('title');
     return (
       <TextInput
-        label={formatMessage("Title")}
+        renderLabel={() => formatMessage("Title")}
         value={value}
         messages={this.state.titleMessages}
         onChange={this.handleTitleChange}

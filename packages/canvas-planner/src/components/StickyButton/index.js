@@ -17,14 +17,13 @@
  */
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import themeable from '@instructure/ui-themeable/lib';
+import {themeable} from '@instructure/ui-themeable'
 import { bool, func, node, number, string, oneOf } from 'prop-types';
-import IconArrowUpSolid from '@instructure/ui-icons/lib/Solid/IconArrowUp';
-import IconArrowDownLine from '@instructure/ui-icons/lib/Line/IconArrowDown';
+import {IconArrowUpSolid, IconArrowDownLine} from '@instructure/ui-icons'
 
 import styles from './styles.css';
 import theme from './theme.js';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 class StickyButton extends Component {
   static propTypes = {

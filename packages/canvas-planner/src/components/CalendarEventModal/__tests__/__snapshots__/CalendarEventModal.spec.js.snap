@@ -86,20 +86,28 @@ exports[`renders 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             the course
           </Text>
@@ -111,20 +119,28 @@ exports[`renders 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018 1:00 PM - 2:00 PM
           </Text>
@@ -136,20 +152,28 @@ exports[`renders 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Location:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             somewhere
           </Text>
@@ -161,20 +185,28 @@ exports[`renders 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Address:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             here, specifically
           </Text>
@@ -188,6 +220,7 @@ exports[`renders 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Details:
         </Text>
@@ -290,20 +323,28 @@ exports[`renders with allDay 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             the course
           </Text>
@@ -315,20 +356,28 @@ exports[`renders with allDay 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018
           </Text>
@@ -340,20 +389,28 @@ exports[`renders with allDay 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Location:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             somewhere
           </Text>
@@ -365,20 +422,28 @@ exports[`renders with allDay 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Address:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             here, specifically
           </Text>
@@ -392,6 +457,7 @@ exports[`renders with allDay 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Details:
         </Text>
@@ -494,20 +560,28 @@ exports[`renders with only the startTime 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             the course
           </Text>
@@ -519,20 +593,28 @@ exports[`renders with only the startTime 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018 1:00 PM
           </Text>
@@ -544,20 +626,28 @@ exports[`renders with only the startTime 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Location:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             somewhere
           </Text>
@@ -569,20 +659,28 @@ exports[`renders with only the startTime 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Address:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             here, specifically
           </Text>
@@ -596,6 +694,7 @@ exports[`renders with only the startTime 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Details:
         </Text>
@@ -698,20 +797,28 @@ exports[`renders with user displayName for calendar 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             me
           </Text>
@@ -723,20 +830,28 @@ exports[`renders with user displayName for calendar 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018 1:00 PM - 2:00 PM
           </Text>
@@ -748,20 +863,28 @@ exports[`renders with user displayName for calendar 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Location:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             somewhere
           </Text>
@@ -773,20 +896,28 @@ exports[`renders with user displayName for calendar 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Address:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             here, specifically
           </Text>
@@ -800,6 +931,7 @@ exports[`renders with user displayName for calendar 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Details:
         </Text>
@@ -902,20 +1034,28 @@ exports[`renders without address 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             the course
           </Text>
@@ -927,20 +1067,28 @@ exports[`renders without address 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018 1:00 PM - 2:00 PM
           </Text>
@@ -952,20 +1100,28 @@ exports[`renders without address 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Location:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             somewhere
           </Text>
@@ -979,6 +1135,7 @@ exports[`renders without address 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Details:
         </Text>
@@ -1081,20 +1238,28 @@ exports[`renders without details 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             the course
           </Text>
@@ -1106,20 +1271,28 @@ exports[`renders without details 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018 1:00 PM - 2:00 PM
           </Text>
@@ -1131,20 +1304,28 @@ exports[`renders without details 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Location:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             somewhere
           </Text>
@@ -1156,20 +1337,28 @@ exports[`renders without details 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Address:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             here, specifically
           </Text>
@@ -1266,20 +1455,28 @@ exports[`renders without location 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Calendar:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             the course
           </Text>
@@ -1291,20 +1488,28 @@ exports[`renders without location 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Date & Time:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             Sep 27, 2018 1:00 PM - 2:00 PM
           </Text>
@@ -1316,20 +1521,28 @@ exports[`renders without location 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Address:
         </Text>
         <View
+          borderColor="default"
           debug={false}
           display="auto"
+          focusColor="info"
+          focusPosition="offset"
+          focused={false}
           margin="0 0 0 x-small"
           overflowX="visible"
           overflowY="visible"
+          position="static"
+          shouldAnimateFocus={true}
         >
           <Text
             as="span"
             letterSpacing="normal"
             size="medium"
+            wrap="normal"
           >
             here, specifically
           </Text>
@@ -1343,6 +1556,7 @@ exports[`renders without location 1`] = `
           letterSpacing="normal"
           size="medium"
           weight="bold"
+          wrap="normal"
         >
           Details:
         </Text>

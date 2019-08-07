@@ -4,11 +4,17 @@ exports[`renders all future items loaded regardless of other props 1`] = `
 <div>
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
   >
     <Text
@@ -16,6 +22,7 @@ exports[`renders all future items loaded regardless of other props 1`] = `
       color="secondary"
       letterSpacing="normal"
       size="small"
+      wrap="normal"
     >
       All items loaded
     </Text>
@@ -27,11 +34,17 @@ exports[`renders load more by default 1`] = `
 <div>
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
   >
     <Button
@@ -55,24 +68,36 @@ exports[`renders loading when indicated 1`] = `
 <div>
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
   >
     <View
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
     >
       <Spinner
         as="div"
         margin="0 x-small 0 0"
+        renderTitle={[Function]}
         size="small"
-        title="Loading..."
         variant="default"
       />
       <Text
@@ -80,6 +105,7 @@ exports[`renders loading when indicated 1`] = `
         color="secondary"
         letterSpacing="normal"
         size="small"
+        wrap="normal"
       >
         Loading...
       </Text>
@@ -92,11 +118,17 @@ exports[`shows an Alert when there's a query error 1`] = `
 <div>
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
+    position="static"
+    shouldAnimateFocus={true}
     textAlign="center"
   >
     <div

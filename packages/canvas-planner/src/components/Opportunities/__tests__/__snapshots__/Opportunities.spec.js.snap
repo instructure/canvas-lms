@@ -24,6 +24,7 @@ exports[`renders nothing if no opportunities 1`] = `
   </CloseButton>
   <TabList
     defaultSelectedIndex={0}
+    elementRef={[Function]}
     focus={false}
     variant="minimal"
   >
@@ -99,6 +100,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
   </CloseButton>
   <TabList
     defaultSelectedIndex={0}
+    elementRef={[Function]}
     focus={false}
     variant="minimal"
   >
@@ -206,6 +208,7 @@ exports[`renders the right course with the right opportunity 1`] = `
   </CloseButton>
   <TabList
     defaultSelectedIndex={0}
+    elementRef={[Function]}
     focus={false}
     variant="minimal"
   >

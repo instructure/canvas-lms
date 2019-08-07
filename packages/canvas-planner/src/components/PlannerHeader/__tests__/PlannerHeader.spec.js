@@ -147,7 +147,7 @@ it('toggles aria-hidden on the ariaHideElement when opening the add to do item t
     <PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />
   );
 
-  const button = wrapper.find('IconPlus').closest('button');
+  const button = wrapper.find('IconPlusLine').closest('button');
 
   button.simulate('click');
   expect(fakeElement.getAttribute('aria-hidden')).toBe('true');

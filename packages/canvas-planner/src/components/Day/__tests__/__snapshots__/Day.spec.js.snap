@@ -16,6 +16,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       lineHeight="condensed"
       size="medium"
       transform="uppercase"
+      wrap="normal"
     >
       Tuesday
     </Text>
@@ -24,6 +25,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 25, 2017
     </Text>
@@ -111,6 +113,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       lineHeight="condensed"
       size="medium"
       transform="uppercase"
+      wrap="normal"
     >
       Tuesday
     </Text>
@@ -119,6 +122,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 25, 2017
     </Text>
@@ -240,6 +244,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       lineHeight="condensed"
       size="medium"
       transform="uppercase"
+      wrap="normal"
     >
       Tuesday
     </Text>
@@ -248,6 +253,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 25, 2017
     </Text>
@@ -369,6 +375,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       lineHeight="condensed"
       size="medium"
       transform="uppercase"
+      wrap="normal"
     >
       Tuesday
     </Text>
@@ -377,6 +384,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 25, 2017
     </Text>
@@ -508,6 +516,7 @@ exports[`renders the base component with required props 1`] = `
       lineHeight="condensed"
       size="medium"
       transform="uppercase"
+      wrap="normal"
     >
       Tuesday
     </Text>
@@ -516,17 +525,24 @@ exports[`renders the base component with required props 1`] = `
       letterSpacing="normal"
       lineHeight="condensed"
       size="medium"
+      wrap="normal"
     >
       April 25, 2017
     </Text>
   </Heading>
   <div>
     <View
+      borderColor="default"
       debug={false}
       display="block"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       margin="small 0 0 0"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
       textAlign="center"
     >
       Nothing Planned Yet

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, { Component } from 'react';
-import themeable from '@instructure/ui-themeable/lib';
+import {themeable} from '@instructure/ui-themeable'
 import classnames from 'classnames';
 import { partition } from 'lodash';
 import { arrayOf, string, number, shape, func } from 'prop-types';
