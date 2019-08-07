@@ -63,6 +63,7 @@ export default class Assignment extends Model
   isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
   isPage: => @_hasOnlyType 'wiki_page'
   isExternalTool: => @_hasOnlyType 'external_tool'
+  defaultToolName: => ENV.DEFAULT_ASSIGNMENT_TOOL_NAME
   isNotGraded: => @_hasOnlyType 'not_graded'
   isAssignment: =>
     ! _.includes @_submissionTypes(), 'online_quiz', 'discussion_topic',
@@ -456,7 +457,8 @@ export default class Assignment extends Model
       'isImporting', 'failedToImport',
       'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
       'submissionTypesFrozen', 'anonymousInstructorAnnotations',
-      'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox'
+      'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
+      'defaultToolName'
     ]
 
     hash =
