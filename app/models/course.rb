@@ -2120,7 +2120,7 @@ class Course < ActiveRecord::Base
 
   def resubmission_for(asset)
     asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
-    instructors.touch_all
+    instructors.clear_cache_keys(:todo_list)
   end
 
   def grading_standard_enabled
