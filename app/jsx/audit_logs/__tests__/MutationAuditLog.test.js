@@ -72,7 +72,9 @@ describe('AuditLogResults', () => {
                     __typename: 'User'
                   },
                   realUser: null,
-                  params: {},
+                  params: {
+                    test: "I AM A PARAMETER",
+                  },
                   __typename: 'MutationLog'
                 }
               ],
@@ -212,5 +214,24 @@ describe('AuditLogResults', () => {
     )
 
     expect(await waitForElement(() => getByText(/went wrong/))).toBeInTheDocument()
+  })
+
+  it('expands parameters', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <AuditLogResults assetString="user_123" pageSize={1} />
+      </MockedProvider>
+    )
+
+    const showParamsBtn = await waitForElement(() => getByText('Show params'))
+    expect(showParamsBtn).toBeInTheDocument()
+
+    fireEvent.click(showParamsBtn)
+    const shownParameters = getByText(/A PARAMETER/)
+    expect(shownParameters).toBeInTheDocument()
+
+    const hideParamsBtn = getByText('Hide params')
+    fireEvent.click(hideParamsBtn)
+    expect(shownParameters).not.toBeInTheDocument()
   })
 })

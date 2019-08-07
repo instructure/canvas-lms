@@ -98,6 +98,34 @@ const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
   </tr>
 )
 
+const LogEntry = ({logEntry}) => {
+  const [showingParams, setShowingParams] = useState(false)
+
+  return (
+    <>
+      <tr>
+        <td>{logEntry.timestamp}</td>
+        <td>{logEntry.mutationName}</td>
+        <td>
+          <User user={logEntry.user} realUser={logEntry.realUser} />
+        </td>
+        <td>
+          <Button variant="link" onClick={() => setShowingParams(!showingParams)}>
+            {showingParams ? I18n.t('Hide params') : I18n.t('Show params')}
+          </Button>
+        </td>
+      </tr>
+      {showingParams ? (
+        <tr>
+          <td colSpan={4}>
+            <pre>{JSON.stringify(logEntry.params, null, 2)}</pre>
+          </td>
+        </tr>
+      ) : null}
+    </>
+  )
+}
+
 const AuditLogResults = ({assetString, pageSize}) => {
   if (!assetString) return null
 
@@ -132,14 +160,7 @@ const AuditLogResults = ({assetString, pageSize}) => {
               </thead>
               <tbody>
                 {logEntries.map(logEntry => (
-                  <tr key={logEntry.mutationId}>
-                    <td>{logEntry.timestamp}</td>
-                    <td>{logEntry.mutationName}</td>
-                    <td>
-                      <User user={logEntry.user} realUser={logEntry.realUser} />
-                    </td>
-                    <td>...{/* TODO */}</td>
-                  </tr>
+                  <LogEntry key={logEntry.mutationId} logEntry={logEntry} />
                 ))}
                 <LoadMoreButton
                   pageInfo={data.auditLogs.mutationLogs.pageInfo}
