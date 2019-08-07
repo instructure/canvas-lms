@@ -181,7 +181,7 @@ $gradebook_cell_padding_top: 8px;
 .secondary-info,
 .student-section,
 .student-placeholder,
-.Gradebook__ColumnHeaderDetail > * {
+.Gradebook__ColumnHeaderDetail--secondary {
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -255,8 +255,6 @@ $gradebook_cell_padding_top: 8px;
     display: block;
     height: $header-content-height;
     line-height: $header-content-height;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .Gradebook__ColumnHeaderDetailLine {
