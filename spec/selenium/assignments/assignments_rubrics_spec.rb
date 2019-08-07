@@ -27,19 +27,6 @@ describe "assignment rubrics" do
       course_with_teacher_logged_in
     end
 
-    def create_assignment_with_points(points)
-      assignment_name = 'first test assignment'
-      due_date = Time.now.utc + 2.days
-      @group = @course.assignment_groups.create!(name: "default")
-      @assignment = @course.assignments.create(
-          name: assignment_name,
-          due_at: due_date,
-          points_possible: points,
-          assignment_group: @group
-      )
-      @assignment
-    end
-
     def get(url)
       super
       # terrible... some rubric dom handlers get set after dom ready
