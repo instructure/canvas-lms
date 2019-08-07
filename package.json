@@ -130,6 +130,7 @@
     "@testing-library/dom": "^5",
     "@testing-library/jest-dom": "^4",
     "@testing-library/react": "^8.0.5",
+    "@testing-library/react-hooks": "^2.0.1",
     "@yarnpkg/lockfile": "^1.0.2",
     "axe-core": "~2.1.7",
     "babel-eslint": "^10",
