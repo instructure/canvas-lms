@@ -6640,11 +6640,12 @@ describe Assignment do
     before(:once) do
       @assignment = @course.assignments.create! points_possible: 10
       @submission = @assignment.submit_homework(@student, body: "hello")
+      @submission_last_updated_at = @submission.updated_at
       @assignment.mute!
     end
 
     it "touches submissions if you mute the assignment" do
-      touched = @submission.reload.updated_at > @assignment.updated_at
+      touched = @submission.reload.updated_at > @submission_last_updated_at
       expect(touched).to eq true
     end
 

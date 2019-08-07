@@ -213,6 +213,27 @@ describe ContentMigration do
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
+    it "copies an assignment's post policy along with the assignment" do
+      assignment_model(course: @copy_from, points_possible: 40)
+      @assignment.post_policy.update!(post_manually: true)
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.find_by(migration_id: mig_id(@assignment))
+      expect(new_assignment.post_policy).to be_post_manually
+    end
+
+    it "always sets a moderated assignment to post manually" do
+      @copy_to.enable_feature!(:moderated_grading)
+      assignment_model(course: @copy_from, points_possible: 40, moderated_grading: true, grader_count: 2)
+      @assignment.post_policy.update!(post_manually: false)
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.find_by(migration_id: mig_id(@assignment))
+      expect(new_assignment.post_policy).to be_post_manually
+    end
+
     it "should unset allowed extensions" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload',
         :grading_type => 'points', :allowed_extensions => ["txt", "doc"])

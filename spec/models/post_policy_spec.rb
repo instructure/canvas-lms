@@ -46,6 +46,51 @@ describe PostPolicy do
     end
   end
 
+  describe "callbacks" do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(title: '!!!') }
+
+    context "when the policy is for a specific assignment" do
+      let(:policy) { assignment.post_policy }
+
+      it "updates the assignment's updated_at date when saved" do
+        assignment.update!(updated_at: 1.day.ago)
+
+        save_time = Time.zone.now
+        Timecop.freeze(save_time) do
+          expect {
+            policy.update!(post_manually: true)
+          }.to change { assignment.updated_at }.to(save_time)
+        end
+      end
+
+      it "does not update the owning course's updated_at date when saved" do
+        course.update!(updated_at: 1.day.ago)
+
+        Timecop.freeze(Time.zone.now) do
+          expect {
+            policy.update!(post_manually: true)
+          }.not_to change { course.updated_at }
+        end
+      end
+    end
+
+    context "when the policy is the default policy for a course" do
+      let(:policy) { course.default_post_policy }
+
+      it "updates the course's updated_at date when saved" do
+        course.update!(updated_at: 1.day.ago)
+        save_time = Time.zone.now
+
+        Timecop.freeze(save_time) do
+          expect {
+            policy.update!(post_manually: true)
+          }.to change { course.updated_at }.to(save_time)
+        end
+      end
+    end
+  end
+
   describe "post policies feature" do
     describe ".feature_enabled?" do
       it "returns true if the post_policies_enabled setting is set to true" do
