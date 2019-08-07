@@ -91,13 +91,6 @@ function focusFirstMenuButton(el) {
   $firstMenu && $firstMenu.focus()
 }
 
-function focusContextToolbar() {
-  const $focusable = document.querySelector('.tox-tinymce-aux .tox-toolbar button')
-  if ($focusable) {
-    $focusable.focus()
-  }
-}
-
 @themeable(theme, styles)
 class RCEWrapper extends React.Component {
   static getByEditor(editor) {
@@ -482,14 +475,6 @@ class RCEWrapper extends React.Component {
     })
 
     editor.on('keydown', this.handleShortcutKeyShortcut)
-    editor.on('keydown', event => {
-      // Alt+F7 is used to "enter into" the context's popover.
-      if (event.keyCode === 118 && event.altKey) {
-        event.preventDefault()
-        event.stopPropagation()
-        focusContextToolbar()
-      }
-    })
   }
 
   onInit(_e, editor) {

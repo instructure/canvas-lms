@@ -51,8 +51,8 @@ export default function KeyboardShortcutModal(props) {
       <Modal.Body>
         <View as="div" margin="small">
           <List variant="unstyled">
-            <List.Item><Text weight="bold">ALT+F7</Text> {formatMessage('Focus the popup context toolbar')}</List.Item>
             <List.Item><Text weight="bold">ALT+F8/ALT+0</Text> {formatMessage('Open this keyboard shortcuts dialog')}</List.Item>
+            <List.Item><Text weight="bold">CTRL+F9</Text> {formatMessage('Focus the popup context toolbar')}</List.Item>
             <List.Item><Text weight="bold">ALT+F9</Text> {formatMessage('Go to the editor\'s menubar')}</List.Item>
             <List.Item><Text weight="bold">ALT+F10</Text> {formatMessage('Go to the editor\'s toolbar')}</List.Item>
             <List.Item><Text weight="bold">ESC</Text> {formatMessage('Close a menu or dialog. Also returns you to the editor area')}</List.Item>
