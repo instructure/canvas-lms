@@ -140,10 +140,6 @@
     text-decoration: underline;
   }
 
-  h3, .h3 {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
   table:not([cellpadding]) {
     margin-#{direction(left)}: 5px;
     td {
@@ -151,6 +147,7 @@
     }
   }
 }
+
 
 .user_content iframe,
 .user_content video
