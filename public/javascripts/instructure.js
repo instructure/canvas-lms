@@ -203,36 +203,35 @@ function handleYoutubeLink () {
       }
     }
 
-    ///////////// START layout related stuff
-
     // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
-    var $breadcrumbs = $("#breadcrumbs"),
-        $breadcrumbEllipsis,
-        addedEllipsisClass = false;
-    function resizeBreadcrumb(){
-      var maxWidth = 500,
-          // we want to make sure that the breadcrumb doesnt wrap multiple lines, the way we are going to check if it is one line
-          // is by grabbing the first (which should be the home crumb) and checking to see how high it is, the * 1.5 part is
-          // just in case to ever handle any padding or margin.
-          hightOfOneBreadcrumb = $breadcrumbs.find('li:visible:first').height() * 1.5;
-      $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible');
-      $breadcrumbEllipsis.css('maxWidth', "");
-      $breadcrumbEllipsis.ifExists(function(){
-        for (var i=0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) { //the i here is just to make sure we don't get into an ifinite loop somehow
-          if (!addedEllipsisClass) {
-            addedEllipsisClass = true;
-            $breadcrumbEllipsis.addClass('ellipsis');
+    const $breadcrumbs = $("#breadcrumbs")
+    if ($breadcrumbs.length) {
+      let $breadcrumbEllipsis
+      let addedEllipsisClass = false
+      // we want to make sure that the breadcrumb doesnt wrap multiple lines, the way we are going to check if it is one line
+      // is by grabbing the first (which should be the home crumb) and checking to see how high it is, the * 1.5 part is
+      // just in case to ever handle any padding or margin.
+      const hightOfOneBreadcrumb = $breadcrumbs.find('li:visible:first').height() * 1.5;
+
+      const resizeBreadcrumb = () => {
+        let maxWidth = 500
+        $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible');
+        $breadcrumbEllipsis.ifExists(function(){
+          $breadcrumbEllipsis.css('maxWidth', "");
+          for (let i=0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) { // the i here is just to make sure we don't get into an ifinite loop somehow
+            if (!addedEllipsisClass) {
+              addedEllipsisClass = true;
+              $breadcrumbEllipsis.addClass('ellipsis');
+            }
+            $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20));
           }
-          $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20));
-        }
-      });
+        });
+      }
+      resizeBreadcrumb(); // force it to run once right now
+      $(window).resize(resizeBreadcrumb);
+      // end breadcrumb ellipsis
     }
-    resizeBreadcrumb(); //force it to run once right now
-    $(window).resize(resizeBreadcrumb);
-    // end breadcrumb ellipsis
 
-
-    //////////////// END layout related stuff
 
     KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')});
 
