@@ -86,7 +86,7 @@ class BzController < ApplicationController
       readonly = true
     end
 
-    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css?v2" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js?v2"></script></body></html>';
+    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css?v2" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button><button class="delete">Delete</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js?v2"></script></body></html>';
   end
 
   # this is meant to be used for requests from external services like LL kits
