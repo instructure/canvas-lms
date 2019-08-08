@@ -105,6 +105,17 @@ module Lti
           end
         end
 
+        context 'with uuid that first digit matches user_id' do
+          before { user.enrollments.first.update!(workflow_state: 'active') }
+          let(:valid_params) { {course_id: context.id, user_id: "#{user.id}apzx", line_item_id: line_item.id} }
+
+          it 'fails to find user' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+            expect(JSON.parse(response.body)['errors']['message']).to eq('User not found in course or is not a student')
+          end
+        end
+
         context 'when line item does not exist' do
           before { user.enrollments.first.update!(workflow_state: 'active') }
 
