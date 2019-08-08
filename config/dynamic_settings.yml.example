@@ -10,9 +10,6 @@ development:
     # service
     canvas:
       # environment
-      address-book:
-        app-host: "http://address-book.docker"
-        secret: "opensesame"
       canvas:
         encryption-secret: "astringthatisactually32byteslong"
         signing-secret: "astringthatisactually32byteslong"
