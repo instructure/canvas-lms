@@ -38,7 +38,8 @@ function makeDummyNextSubmission(submission) {
     state: 'unsubmitted',
     submissionDraft: submission.submissionDraft,
     submissionStatus: 'unsubmitted',
-    submittedAt: null
+    submittedAt: null,
+    unreadCommentCount: 0
   }
 }
 

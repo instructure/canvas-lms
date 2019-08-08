@@ -170,9 +170,9 @@ export default class AttemptTab extends Component {
       case 'online_text_entry':
         return this.renderTextAttempt(createSubmissionDraft)
       case 'online_upload':
-      default:
-        // TODO: we should probably figure out what the default case should actually be
         return this.renderFileAttempt(createSubmission, createSubmissionDraft)
+      default:
+        throw new Error('submission type not yet supported in A2')
     }
   }
 
