@@ -92,7 +92,7 @@ export default class ProficiencyTable extends React.Component {
       })
       .catch((e) => {
         // 404 status means no custom ratings, so use defaults without an alert
-        if (e.response.status !== 404) {
+        if (e.response && e.response.status !== 404) {
           $.flashError(I18n.t(
             'An error occurred while loading account proficiency ratings: %{m}', {
               m: e.response.statusText
