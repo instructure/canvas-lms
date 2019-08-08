@@ -176,7 +176,7 @@ describe Attachments::GarbageCollector do
       export.attachment = att
       export.save
       Attachment.where(id: att.id).update_all(created_at: 1.year.ago)
-      export.content_shares.create!(name: 'content export', read_state: 'read', user: user_model)
+      SentContentShare.create!(name: 'content export', read_state: 'read', user: user_model, content_export: export)
 
       gc.delete_content
       expect(att.reload).not_to be_deleted

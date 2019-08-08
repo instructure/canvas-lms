@@ -14,11 +14,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class ContentShare < ActiveRecord::Base
+module Api::V1::ContentShare
+  include Api::V1::Json
+  include Api::V1::ContentExport
 
-  belongs_to :user
-  belongs_to :content_export
-
+  def content_share_json(content_share, user, session, opts = {})
+    json = api_json(content_share, user, session, opts.merge(only: %w(id name created_at updated_at user_id read_state)))
+    json['sender'] = content_share.respond_to?(:sender) ? user_display_json(content_share.sender) : nil
+    json['receivers'] = content_share.respond_to?(:receivers) ? content_share.receivers.map {|rec| user_display_json(rec)} : []
+    json
+  end
 end

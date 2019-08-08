@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentShare < ActiveRecord::Base
+class SentContentShare < ContentShare
 
-  belongs_to :user
-  belongs_to :content_export
+  has_many :received_content_shares, through: :content_export, source: :received_content_shares
+  has_many :receivers, through: :received_content_shares, source: :user
 
 end

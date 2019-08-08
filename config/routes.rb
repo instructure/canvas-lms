@@ -2185,6 +2185,10 @@ CanvasRails::Application.routes.draw do
       delete 'planner_notes/:id', action: :destroy
     end
 
+    scope(controller: :content_shares) do
+      post 'users/:user_id/content_shares', action: :create
+    end
+
     scope(:controller => :csp_settings) do
       %w(course account).each do |context|
         get "#{context.pluralize}/:#{context}_id/csp_settings", :action => :get_csp_settings

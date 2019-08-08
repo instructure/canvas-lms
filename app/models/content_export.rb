@@ -23,8 +23,8 @@ class ContentExport < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
-  has_many :content_shares
-  has_many :sent_content_shares, -> { where.not(sender_id: nil) }, class_name: 'ContentShare', inverse_of: :content_export
+  has_one :sent_content_share
+  has_many :received_content_shares
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings

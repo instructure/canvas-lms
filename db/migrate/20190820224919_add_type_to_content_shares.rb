@@ -16,9 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentShare < ActiveRecord::Base
+class AddTypeToContentShares < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-  belongs_to :user
-  belongs_to :content_export
+  def up
+    add_column :content_shares, :type, :string, limit: 255
+    # there shouldn't be any ContentShares in production, so we shouldn't have to worry
+    # about long jobs
+    ContentShare.where(type: nil, sender_id: nil).update_all(type: 'SentContentShare')
+    ContentShare.where(type: nil).where.not(sender_id: nil).update_all(type: 'ReceivedContentShare')
+    change_column :content_shares, :type, :string, limit: 255, null: false
+  end
 
+  def down
+    remove_column :content_shares, :type, :string, limit: 255
+  end
 end
