@@ -128,8 +128,6 @@ function bzRetainedInfoSetup(readonly) {
       }
     } else if(element.tagName == "INPUT" || element.tagName == "TEXTAREA"){
       element.value = value;
-    } else if(element.tagName == "IFRAME") {
-      element.src = value;
     } else if(element.tagName == "SELECT") {
       element.value = value;
     } else {
@@ -715,6 +713,10 @@ function BZ_SaveMagicField(field_name, field_value, optional, type, answer, weig
   if(BZ_MagicFieldSaveTimeouts[field_name])
     clearTimeout(BZ_MagicFieldSaveTimeouts[field_name]);
 
+
+  var ce = new Event("magic_fields_saving");
+    window.dispatchEvent(ce);
+
   var http = new XMLHttpRequest();
   http.open("POST", "/bz/user_retained_data", true);
   var data = "name=" + encodeURIComponent(field_name) + "&value=" + encodeURIComponent(field_value) + "&type=" + type;
@@ -763,8 +765,18 @@ function BZ_SaveMagicField(field_name, field_value, optional, type, answer, weig
             lateWarning.style.display = "";
         }
 
-	if(magicFieldsSaveInProgress > 0)
+	if(res["score_set_to"]) {
+		var ce = new CustomEvent("participation_score_changed", { detail: res["score_set_to"] });
+		window.dispatchEvent(ce);
+	}
+
+	if(magicFieldsSaveInProgress > 0) {
 		magicFieldsSaveInProgress -= 1;
+		if(magicFieldsSaveInProgress <= 0) {
+			var ce = new Event("magic_fields_saved");
+			window.dispatchEvent(ce);
+		}
+	}
       }
     }
   };
