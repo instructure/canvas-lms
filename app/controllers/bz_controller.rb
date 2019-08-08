@@ -86,7 +86,7 @@ class BzController < ApplicationController
       readonly = true
     end
 
-    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css?v2" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js?v2"></script></body></html>';
+    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css?v2" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button><button class="delete">Delete</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js?v2"></script></body></html>';
   end
 
   # this is meant to be used for requests from external services like LL kits
@@ -1797,6 +1797,8 @@ class BzController < ApplicationController
     # add the necessary students to this list
     # see: https://api.qualtrics.com/reference#create-contacts-import
 
+    additional_data_from_join_server = JSON.parse(params[:additional_data])
+
     sync = {}
     sync["contacts"] = []
     all_new_students.each do |student|
@@ -1806,6 +1808,16 @@ class BzController < ApplicationController
       s["lastName"] = student.last_name
       s["email"] = student.email
       s["language"] = "EN"
+
+      ed = {}
+      if additional_data_from_join_server[student.id]
+        ed["Site"] = additional_data_from_join_server[student.id]["site"]
+        ed["Student ID"] = additional_data_from_join_server[student.id]["student_id"]
+        ed["Salesforce ID"] = additional_data_from_join_server[student.id]["salesforce_id"]
+      end
+
+      s["embeddedData"] = ed
+
       sync["contacts"] << s
     end
 

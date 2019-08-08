@@ -4,8 +4,10 @@
 
   var saveButton = document.querySelector("#commentary button.save");
   var cancelButton = document.querySelector("#commentary button.cancel");
+  var deleteButton = document.querySelector("#commentary button.delete");
 
   cancelButton.style.display = 'none';
+  deleteButton.style.display = 'none';
 
   function save() {
       var xhr = new XMLHttpRequest();
@@ -22,6 +24,7 @@
       xhr.send(args);
       var commentary = document.getElementById("commentary");
       commentary.style.display = "";
+      deleteButton.style.display = 'none';
 
       activePoint.setAttribute("title", ta.value);
       if(ta.value == "") {
@@ -34,6 +37,12 @@
 
   saveButton.addEventListener("click", function(event) {
     save();
+  });
+
+  deleteButton.addEventListener("click", function() {
+        var ta = document.querySelector("#commentary textarea");
+        ta.value = "";
+        save();
   });
 
   cancelButton.addEventListener("click", function(event) {
@@ -62,6 +71,7 @@
         commentary.classList.add("readonly");
 
       cancelButton.style.display = 'none';
+      deleteButton.style.display = '';
 
       activePoint = e;
 

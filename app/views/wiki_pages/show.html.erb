@@ -8,6 +8,17 @@
 
 <script>
   <%
+    score = 0
+
+    begin
+      res = @context.assignments.active.where(:title => "Course Participation - #{@page.title}")
+      if !res.empty?
+        score = res.first.find_or_create_submission(@current_user).grade
+      end
+    rescue
+      # intentionally blank, this is non-sessential
+    end
+
     data = 0
     if @current_user
       result = RetainedData.where(:user_id => @current_user.id, :name => "module_position_#{@page.id}")
@@ -19,6 +30,9 @@
 
   window.openBzBoxPosition = <%= data %>;
   window.position_magic_field_name = "module_position_<%= @page.id %>";
+  <% if !score.nil? && score > 0 %>
+    window.startingBzParticipationScore = <%= score %>;
+  <% end %>
 </script>
 
 
