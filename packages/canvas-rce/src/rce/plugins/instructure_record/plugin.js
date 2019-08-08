@@ -20,7 +20,7 @@ import htmlEscape from "escape-html";
 import clickCallback from "./clickCallback";
 import formatMessage from "../../../format-message";
 import TrayController from './VideoOptionsTray/TrayController'
-import {getContentFromElement, VIDEO_EMBED_TYPE} from '../shared/ContentSelection'
+import {isVideoElement} from '../shared/ContentSelection'
 
 const trayController = new TrayController()
 
@@ -69,10 +69,6 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
     });
-
-    function isVideoElement($el) {
-      return getContentFromElement($el).type === VIDEO_EMBED_TYPE
-    }
 
     ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
       items: 'instructure-video-options',

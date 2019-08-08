@@ -24,6 +24,7 @@ import uniqBy from 'lodash/uniqBy'
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Alert} from '@instructure/ui-alerts'
 
 import formatMessage from "../format-message";
 import * as contentInsertion from "./contentInsertion";
@@ -38,6 +39,7 @@ import {isImage} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
+import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
@@ -101,6 +103,17 @@ function focusContextToolbar() {
   }
 }
 
+function isElementWithinTable(node) {
+  let elem = node
+  while(elem) {
+    if (elem.tagName === 'TABLE' || elem.tagName === 'TD' || elem.tagName === 'TH') {
+      return true
+    }
+    elem = elem.parentElement
+  }
+  return false
+}
+
 let alertIdValue = 0;
 
 @themeable(theme, styles)
@@ -152,7 +165,8 @@ class RCEWrapper extends React.Component {
       isHtmlView: false,
       KBShortcutModalOpen: false,
       focused: false,
-      messages: []
+      messages: [],
+      announcement: null
     }
 
     alertHandler.alertFunc = this.addAlert;
@@ -507,6 +521,42 @@ class RCEWrapper extends React.Component {
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
     editor.on('Change', this.doAutoResize)
+
+    this.announceContextToolbars(editor)
+  }
+
+  announcing = 0
+  announceContextToolbars(editor) {
+    editor.on('NodeChange', () => {
+      const node = editor.selection.getNode()
+      if (isImageEmbed(node)) {
+        if (this.announcing !== 1) {
+          this.setState({
+            announcement: formatMessage('type Control F9 to access image options. {text}', {text: node.getAttribute('alt')})
+          })
+          this.announcing = 1
+        }
+      } else if(isFileLink(node)) {
+        if (this.announcing !== 2) {
+          this.setState({
+            announcement: formatMessage('type Control F9 to access link options. {text}', {text: node.textContent})
+          })
+          this.announcing = 2
+        }
+      } else if(isElementWithinTable(node)) {
+        if (this.announcing !== 3) {
+          this.setState({
+            announcement: formatMessage('type Control F9 to access table options. {text}', {text: node.textContent})
+          })
+          this.announcing = 3
+        }
+      } else {
+        this.setState({
+          announcement: null
+        })
+        this.announcing = 0
+      }
+    })
   }
 
   doAutoResize = (e) => {
@@ -776,6 +826,12 @@ class RCEWrapper extends React.Component {
           onDismiss={this.closeKBShortcutModal}
           open={this.state.KBShortcutModalOpen}
         />
+        <Alert
+          screenReaderOnly
+          liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          >
+          {this.state.announcement}
+        </Alert>
       </div>
     );
   }

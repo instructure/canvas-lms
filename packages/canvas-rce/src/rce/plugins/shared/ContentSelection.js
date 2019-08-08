@@ -146,3 +146,15 @@ export function getContentFromEditor(editor, expandSelection = false) {
 
   return getContentFromElement($element, editor)
 }
+
+export function isFileLink($element, editor) {
+  return !!asLink($element, editor)
+}
+
+export function isImageEmbed($element) {
+  return !!asImageEmbed($element)
+}
+
+export function isVideoElement($element) {
+  return !!asVideoElement($element)
+}

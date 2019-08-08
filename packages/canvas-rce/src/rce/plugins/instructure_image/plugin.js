@@ -20,7 +20,7 @@ import htmlEscape from 'escape-html'
 
 import formatMessage from '../../../format-message'
 import bridge from '../../../bridge'
-import {getContentFromElement, IMAGE_EMBED_TYPE} from '../shared/ContentSelection'
+import {isImageEmbed} from '../shared/ContentSelection'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 
@@ -79,10 +79,6 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
     })
-
-    function isImageEmbed($el) {
-      return getContentFromElement($el).type === IMAGE_EMBED_TYPE
-    }
 
     editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
       items: 'instructure-image-options',
