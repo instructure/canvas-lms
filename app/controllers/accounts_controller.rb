@@ -1005,7 +1005,6 @@ class AccountsController < ApplicationController
         EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, account_id: @context.id),
         TOOL_CONFIGURATION_SHOW_URL: account_show_tool_configuration_url(account_id: @context.id, developer_key_id: ':developer_key_id'),
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
-        LTI_13_TOOLS_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:lti_1_3),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
         NEW_FEATURES_UI: @account.root_account.feature_enabled?(:new_features_ui),

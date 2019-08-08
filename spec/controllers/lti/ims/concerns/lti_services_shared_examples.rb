@@ -93,7 +93,6 @@ shared_examples_for "lti services" do
         let(:before_send_request) do
           -> do
             developer_key.update!(account: nil)
-            Account.site_admin.allow_feature!(:lti_1_3)
           end
         end
 
@@ -252,20 +251,6 @@ shared_examples_for "lti services" do
       it 'returns 401 unauthorized and complains about missing developer key' do
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Unknown or inactive Developer Key')
-      end
-    end
-
-    context 'with disabled LTI 1.3/Advantage account-level features' do
-      # Would also work to just override :root_account, but let's have all the setup run w/ 1.3 enabled in case
-      # that has any side-effects, _then_ suddenly disable features before a LTI Advantage call arrives... as if a
-      # customer had a change of heart after initially turning on LTI/Advantage 1.3 features.
-      let(:before_send_request) { -> { disable_1_3(root_account) } }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about disabled LTI 1.3/Advantage features' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'LTI 1.3/Advantage features not enabled')
       end
     end
 

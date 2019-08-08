@@ -675,7 +675,7 @@ describe ExternalToolsController do
       end
 
       before do
-        lti_1_3_tool.context.root_account.enable_feature!(:lti_1_3)
+        lti_1_3_tool
         user_session(@teacher)
       end
 

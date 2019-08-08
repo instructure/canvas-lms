@@ -105,16 +105,8 @@ module Lti::Ims::Concerns
       before_action(
         :verify_access_token,
         :verify_developer_key,
-        :verify_1_3_enabled,
         :verify_access_scope
       )
-
-      def verify_1_3_enabled
-        owner_account = developer_key.owner_account
-        return if owner_account.feature_enabled?(:lti_1_3) ||
-          (owner_account.site_admin? && owner_account.feature_allowed?(:lti_1_3))
-        render_error("LTI 1.3/Advantage features not enabled", :unauthorized)
-      end
 
       def verify_access_token
         if access_token.blank?

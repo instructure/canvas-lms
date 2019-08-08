@@ -1293,7 +1293,6 @@ class CoursesController < ApplicationController
         EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, course_id: @context.id),
         TOOL_CONFIGURATION_SHOW_URL: course_show_tool_configuration_url(course_id: @context.id, developer_key_id: ':developer_key_id'),
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
-        LTI_13_TOOLS_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:lti_1_3),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images),

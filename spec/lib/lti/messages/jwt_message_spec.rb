@@ -360,10 +360,6 @@ describe Lti::Messages::JwtMessage do
     end
     let(:lti_advantage_service_claim) { raise 'Set in example' }
 
-    before(:each) do
-      course.root_account.enable_feature!(:lti_1_3)
-      course.root_account.save!
-    end
   end
 
   shared_context 'with lti advantage group context' do

@@ -256,7 +256,6 @@ export default class AddExternalToolButton extends React.Component {
             handleSubmit={this.createTool}
             hideComponent={this.state.isLti2}
             membershipServiceFeatureFlagEnabled={window.ENV.MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED}
-            lti13Enabled={ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED}
           >
             <button type="button" className="Button" onClick={this.closeModal}>
               {I18n.t('Cancel')}

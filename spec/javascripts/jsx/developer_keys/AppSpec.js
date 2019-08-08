@@ -306,8 +306,10 @@ test('displays the developer key on click of show key button', () => {
     <DeveloperKeysApp {...props} />
   )
 
-  wrapper.find('Button').at(1).simulate('click')
-  ok(wrapper.find('Popover').first().html().includes("Hide Key"))
+  btn = wrapper.find('table button').first()
+  ok(btn.html().includes('Show Key'))
+  btn.simulate('click')
+  ok(btn.html().includes('Hide Key'))
   wrapper.unmount()
 })
 
@@ -336,10 +338,6 @@ test('renders the spinner', () => {
 })
 
 test('opens the key selection menu when the create button is clicked', () => {
-  window.ENV = {
-    LTI_1_3_ENABLED: true
-  }
-
   const applicationState = {
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},

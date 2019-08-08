@@ -107,7 +107,6 @@ const defaultApps = () => [
 let wrapper = 'empty wrapper'
 
 beforeEach(() => {
-  window.ENV = {LTI_13_TOOLS_FEATURE_FLAG_ENABLED: true}
   store.setState({apps: defaultApps()})
 })
 
