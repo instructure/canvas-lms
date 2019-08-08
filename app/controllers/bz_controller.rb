@@ -1797,6 +1797,8 @@ class BzController < ApplicationController
     # add the necessary students to this list
     # see: https://api.qualtrics.com/reference#create-contacts-import
 
+    additional_data_from_join_server = JSON.parse(params[:additional_data])
+
     sync = {}
     sync["contacts"] = []
     all_new_students.each do |student|
@@ -1806,6 +1808,16 @@ class BzController < ApplicationController
       s["lastName"] = student.last_name
       s["email"] = student.email
       s["language"] = "EN"
+
+      ed = {}
+      if additional_data_from_join_server[student.id]
+        ed["Site"] = additional_data_from_join_server[student.id]["site"]
+        ed["Student ID"] = additional_data_from_join_server[student.id]["student_id"]
+        ed["Salesforce ID"] = additional_data_from_join_server[student.id]["salesforce_id"]
+      end
+
+      s["embeddedData"] = ed
+
       sync["contacts"] << s
     end
 
