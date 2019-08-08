@@ -28,6 +28,7 @@ import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import {Submission} from '../graphqlData/Submission'
 import TextEntry from './TextEntry'
+import MediaAttempt from './AttemptType/MediaAttempt'
 
 export default class AttemptTab extends Component {
   static propTypes = {
@@ -164,9 +165,21 @@ export default class AttemptTab extends Component {
     )
   }
 
+  renderMediaAttempt = createSubmissionDraft => {
+    return (
+      <MediaAttempt
+        createSubmissionDraft={createSubmissionDraft}
+        submission={this.props.submission}
+        updateUploadState={this.updateUploadState}
+      />
+    )
+  }
+
   renderSubmissionByType = (createSubmission, createSubmissionDraft) => {
     // TODO: we need to ensure we handle multiple submission types eventually
     switch (this.props.assignment.submissionTypes[0]) {
+      case 'media_recording':
+        return this.renderMediaAttempt(createSubmission, createSubmissionDraft)
       case 'online_text_entry':
         return this.renderTextAttempt(createSubmissionDraft)
       case 'online_upload':
