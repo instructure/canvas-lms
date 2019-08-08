@@ -200,19 +200,25 @@ class CustomDataController < ApplicationController
   def set_data
     return unless authorized_action(@context, @current_user, [:manage, :manage_user_details])
 
-    cd = CustomData.where(user_id: @context.id, namespace: @namespace).first
-    cd = CustomData.new(user_id: @context.id, namespace: @namespace) unless cd
+    cd = CustomData.unique_constraint_retry do
+      CustomData.where(user_id: @context.id, namespace: @namespace).first_or_create!
+    end
 
     data = params[:data]
     render(json: {message: 'no data specified'}, status: :bad_request) and return if data.nil?
     data = data.to_unsafe_h if data.is_a?(ActionController::Parameters)
 
+    saved = false
+    overwrite = nil
     begin
-      overwrite = cd.set_data(@scope, data)
+      saved = cd.lock_and_save do
+        overwrite = cd.set_data(@scope, data)
+      end
     rescue CustomData::WriteConflict => wc
       render(json: wc.as_json.merge(message: wc.message), status: :conflict) and return
     end
-    if cd.save
+
+    if saved
       render(json: {data: cd.get_data(@scope)},
              status: (overwrite ? :ok : :created))
     else
@@ -381,13 +387,16 @@ class CustomDataController < ApplicationController
   def delete_data
     return unless authorized_action(@context, @current_user, [:manage, :manage_user_details])
 
+    ret = nil
     begin
-      ret = @cd.delete_data(@scope)
+      saved = @cd.lock_and_save do
+        ret = @cd.delete_data(@scope)
+      end
     rescue ArgumentError => e
       render(json: {message: e.message}, status: :bad_request) and return
     end
 
-    if @cd.destroyed? || @cd.save
+    if saved
       render(json: {data: ret})
     else
       render(json: @cd.errors, status: :bad_request)
