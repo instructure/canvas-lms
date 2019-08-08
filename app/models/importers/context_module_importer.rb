@@ -167,7 +167,10 @@ module Importers
       end
 
       item.content_tags.where.not(:migration_id => nil).
-        where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
+        where.not(:migration_id => imported_migration_ids).each do |tag|
+        tag.skip_downstream_changes!
+        tag.destroy # clear out missing items afterwards
+      end
 
       if hash[:completion_requirements]
         c_reqs = []
