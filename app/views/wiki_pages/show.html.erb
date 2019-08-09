@@ -30,7 +30,7 @@
 
   window.openBzBoxPosition = <%= data %>;
   window.position_magic_field_name = "module_position_<%= @page.id %>";
-  <% if !score.nil? && score > 0 %>
+  <% if !score.nil? && score.to_f > 0 %>
     window.startingBzParticipationScore = <%= score %>;
   <% end %>
 </script>

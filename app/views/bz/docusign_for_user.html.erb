@@ -1,0 +1,27 @@
+<div style="
+  max-width: 650px;
+  margin: 50px auto;
+  font-size: 20px;
+  line-height: 1.5;
+">
+  <p>Before you get started in the Braven Portal, please <a href="<%=@link%>">click here</a> to review terms regarding your participation in Braven. Be sure to review each section carefully. If you have questions, send them to <a href="mailto:dennis@bebraven.org">dennis@bebraven.org</a></p>
+
+  <div style="text-align: center;">
+  <a style="
+    background-color: rgb(235, 59, 69);
+    border-color: #204d74;
+    color: white;
+    padding: 10px 50px;
+    text-transform: uppercase;
+    border-radius: 5px;
+    display: inline-block;
+  " href="<%=@link%>">Next</a>
+  </div>
+
+  <script>
+    setTimeout(function() { window.location = "<%=@link%>"; }, 15000);
+  </script>
+  <style>
+    #footer, #header { display: none !important; }
+  </style>
+</div>
