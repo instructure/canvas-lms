@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import DefaultToolForm from '../DefaultToolForm'
+import DefaultToolForm, { toolSubmissionType } from '../DefaultToolForm'
 import SelectContentDialog from '../../../../public/javascripts/select_content_dialog.js'
 
 const newProps = (overrides = {}) => ({
@@ -29,26 +29,38 @@ const newProps = (overrides = {}) => ({
   ...overrides
 })
 
-let wrapper = 'empty wrapper'
+describe('DefaultToolForm', () => {
+  let wrapper = 'empty wrapper'
 
-afterEach(() => {
-  wrapper.unmount()
+  afterEach(() => {
+    wrapper.unmount()
+  })
+
+  it('renders a button to launch the tool', () => {
+    wrapper = mount(<DefaultToolForm {...newProps()} />)
+    expect(wrapper.find('#default-tool-launch-button')).toBeTruthy()
+  })
+
+  it('launches the tool when the button is clicked', () => {
+    SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
+    wrapper = mount(<DefaultToolForm {...newProps()} />)
+    wrapper.find('#default-tool-launch-button').first().simulate('click')
+    expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()
+    SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
+  })
+
+  it('renders the information mesage', () => {
+    wrapper = mount(<DefaultToolForm {...newProps()} />)
+    expect(wrapper.find('Alert').html()).toContain('Click the button above to add a WileyPLUS Question Set')
+  })
 })
 
-it('renders a button to launch the tool', () => {
-  wrapper = mount(<DefaultToolForm {...newProps()} />)
-  expect(wrapper.find('#default-tool-launch-button')).toBeTruthy()
-})
+describe('toolSubmissionType', () => {
+  it('returns "external_tool" if the submission type is "default_external_tool"', () => {
+    expect(toolSubmissionType('default_external_tool')).toEqual('external_tool')
+  })
 
-it('launches the tool when the button is clicked', () => {
-  SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
-  wrapper = mount(<DefaultToolForm {...newProps()} />)
-  wrapper.find('#default-tool-launch-button').first().simulate('click')
-  expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()
-  SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
-})
-
-it('renders the information mesage', () => {
-  wrapper = mount(<DefaultToolForm {...newProps()} />)
-  expect(wrapper.find('Alert').html()).toContain('Click the button above to add a WileyPLUS Question Set')
+  it('returns the submission type if it is not a tool submission type', () => {
+    expect(toolSubmissionType('online')).toEqual('online')
+  })
 })

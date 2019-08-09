@@ -19,17 +19,25 @@
 import $ from 'jquery'
 import axios from 'axios'
 import I18n from 'i18n!DefaultToolForm'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React, {useState, useEffect} from 'react'
 
 import SelectContentDialog from '../../../public/javascripts/select_content_dialog.js'
+import usePostMessage from './hooks/usePostMessage'
 
-import {Alert} from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-layout'
+import { Alert } from '@instructure/ui-alerts'
+import { Button } from '@instructure/ui-buttons'
+import { Text } from '@instructure/ui-elements'
+import { View } from '@instructure/ui-layout'
+
+export function toolSubmissionType(submissionType) {
+  const toolTypes = ['default_external_tool']
+  return toolTypes.includes(submissionType) ? 'external_tool' : submissionType
+}
 
 const DefaultToolForm = props => {
   const [launchDefinitions, setLaunchDefinitions] = useState([])
+  const toolMessageData = usePostMessage('defaultToolContentReady')
 
   const defaultToolData = launchDefinitions.find(definition =>
     Object.values(definition.placements).find(placement => placement.url === props.toolUrl)
@@ -59,9 +67,18 @@ const DefaultToolForm = props => {
       <Button id="default-tool-launch-button" onClick={handleLaunchButton}>
         {I18n.t('Add a Question Set')}
       </Button>
-      <Alert variant="info" renderCloseButtonLabel="Close" margin="small small 0 0">
-        {I18n.t('Click the button above to add a WileyPLUS Question Set')}
-      </Alert>
+
+      {toolMessageData ? (
+        <Alert variant="success" margin="small small 0 0">
+          <Text weight="bold">{toolMessageData.content.title}</Text><br/>
+          <Text>{I18n.t('Successfully Added')}</Text>
+        </Alert>
+      ) : (
+        <Alert variant="info" margin="small small 0 0">
+          {I18n.t('Click the button above to add a WileyPLUS Question Set')}
+        </Alert>
+      )}
+
       {defaultToolData && (
         <div style={{display: 'none'}}>
           <ul className="tools">

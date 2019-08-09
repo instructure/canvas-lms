@@ -27,6 +27,7 @@ import htmlEscape from 'str/htmlEscape'
 import { uploadFile } from 'jsx/shared/upload_file'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import SelectContent from './lti/select_content'
+import setDefaultToolValues from './lti/setDefaultToolValues'
 import processSingleContentItem from 'jsx/deep_linking/processors/processSingleContentItem'
 import {findLinkForService, getUserServices} from './findLinkForService'
 import './jquery.instructure_date_and_time' /* datetime_field */
@@ -94,6 +95,9 @@ import './jquery.templateData'
   }
 
   SelectContentDialog.handleContentItemResult = function(result, tool) {
+    if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
+      setDefaultToolValues(result, tool)
+    }
     $("#external_tool_create_url").val(result.url)
     $("#external_tool_create_title").val(result.title || tool.name)
     $("#context_external_tools_select .domain_message").hide()

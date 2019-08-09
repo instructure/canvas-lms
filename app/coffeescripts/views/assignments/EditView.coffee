@@ -40,7 +40,7 @@ import deparam from '../../util/deparam'
 import SisValidationHelper from '../../util/SisValidationHelper'
 import SimilarityDetectionTools from 'jsx/assignments/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from 'jsx/assignments/ModeratedGradingFormFieldGroup'
-import DefaultToolForm from 'jsx/assignments/DefaultToolForm'
+import DefaultToolForm, { toolSubmissionType } from 'jsx/assignments/DefaultToolForm'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 import * as returnToHelper from '../../../jsx/shared/helpers/returnToHelper'
 import 'jqueryui/dialog'
@@ -494,6 +494,9 @@ export default class EditView extends ValidatedFormView
     event.stopPropagation()
 
     @cacheAssignmentSettings()
+
+    # Get the submission type if an alias type is used (e.g. default_external_tool)
+    $(SUBMISSION_TYPE).val(toolSubmissionType($(SUBMISSION_TYPE).val()))
 
     if @dueDateOverrideView.containsSectionsWithoutOverrides()
       sections = @dueDateOverrideView.sectionsWithoutOverrides()
