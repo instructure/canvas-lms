@@ -1577,8 +1577,6 @@ class BzController < ApplicationController
   end
 
   def docusign_for_user
-  @link = "about:blank"
-  return
     doc = {}
     doc["emailSubject"] = "Please sign this for Braven"
     doc["compositeTemplates"] = [
