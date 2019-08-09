@@ -22,7 +22,7 @@ import {DraggableCore} from 'react-draggable'
 import keycode from 'keycode'
 import {Focusable} from '@instructure/ui-focusable'
 import {View} from '@instructure/ui-layout'
-import IconDragHandle from '@instructure/ui-icons/lib/Line/IconDragHandle'
+import {IconDragHandleLine} from '@instructure/ui-icons'
 import DraggingBlocker from './DraggingBlocker'
 import formatMessage from '../format-message'
 
@@ -64,7 +64,7 @@ export default function ResizeHandle(props) {
             onStop={() => setDragging(false)}
           >
             <View cursor="ns-resize">
-              <IconDragHandle />
+              <IconDragHandleLine />
             </View>
           </DraggableCore>
           <DraggingBlocker dragging={dragging} />

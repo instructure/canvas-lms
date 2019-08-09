@@ -87,6 +87,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
+    "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/ui-babel-preset": "^6",
     "babel-jest": "^24",
     "enzyme": "^3",
