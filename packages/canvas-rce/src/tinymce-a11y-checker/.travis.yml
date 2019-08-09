@@ -2,6 +2,8 @@ language: node_js
 node_js:
   - 12.4
   - lts/*
+cache:
+  yarn: true
 script:
   - npm run test:coverage
   - npm run cypress:ci
