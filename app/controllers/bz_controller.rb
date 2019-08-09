@@ -86,7 +86,7 @@ class BzController < ApplicationController
       readonly = true
     end
 
-    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css?v2" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button><button class="delete">Delete</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js?v2"></script></body></html>';
+    render :text => '<!DOCTYPE html><html><head><link rel="stylesheet" href="/bz_annotator.css?v3" /></head><body><div id="resume"><img src="data:image/png;base64,' + Base64.encode64(image_data) + '" />'+comments_html+'<div id="commentary"><textarea></textarea><button class="save" type="button">Save</button><button class="cancel" type="button">Cancel</button><button class="delete">Delete</button></div></div><script>var submission_id='+submission.id.to_s+';var authtoken="'+form_authenticity_token+'"; var count='+count.to_s+'; var attachment_id='+attachment_id.to_s+'; var readonly='+readonly.to_s+';</script><script src="/bz_annotator.js?v3"></script></body></html>';
   end
 
   # this is meant to be used for requests from external services like LL kits
@@ -1659,8 +1659,9 @@ class BzController < ApplicationController
     response = http.request(request)
     answer = JSON.parse(response.body)
 
-    redirect_to answer["url"]
+    @link = answer["url"]
 
+    # renders a view for the user
   end
 
   def docusign_user_redirect
@@ -1669,7 +1670,7 @@ class BzController < ApplicationController
     if event == 'signing_complete'
       @current_user.accept_terms
       @current_user.save
-      redirect_to("/")
+      redirect_to(post_terms_accept_url)
     else
       render :text => "Sorry, but to access this system, you must sign the documentation. If you have concerns about it or believe you are seeing this message in error, please contact Braven."
     end
