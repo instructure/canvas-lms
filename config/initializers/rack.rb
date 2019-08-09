@@ -18,3 +18,16 @@
 
 Rack::Utils.key_space_limit = 128.kilobytes # default is 64KB
 Rack::Utils.multipart_part_limit = 256 # default is 128
+
+module EnableRackChunking
+  def chunkable_version?(*)
+    if defined?(PactConfig)
+      false
+    elsif ::Rails.env.test? || ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_chunking"]
+      super
+    else
+      false
+    end
+  end
+end
+Rack::Chunked.prepend(EnableRackChunking)

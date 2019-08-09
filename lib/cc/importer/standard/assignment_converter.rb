@@ -156,6 +156,9 @@ module CC::Importer::Standard
           assignment[:assignment_overrides] << override
         end
       end
+      if meta_doc.at_css("post_policy")
+        assignment[:post_policy] = {post_manually: get_bool_val(meta_doc, "post_policy post_manually") || false}
+      end
       assignment
     end
 
