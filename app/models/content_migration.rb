@@ -101,6 +101,11 @@ class ContentMigration < ActiveRecord::Base
     read_or_initialize_attribute(:migration_settings, {}.with_indifferent_access)
   end
 
+  # this is needed by Attachment#clone_for, which is used to allow a ContentExport to be directly imported
+  def attachments
+    Attachment.where(id: self.attachment_id)
+  end
+
   def update_migration_settings(new_settings)
     new_settings.each do |key, val|
       migration_settings[key] = val
