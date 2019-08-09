@@ -19,23 +19,6 @@
  */
 
 gems = [
-  'analytics',
-  'banner_grade_export_plugin',
-  'canvas_geoip',
-  'canvas_salesforce_plugin',
-  'canvas_webhooks',
-  'canvas_zendesk_plugin',
-  'canvasnet_registration',
-  'catalog_provisioner',
-  'custom_reports',
-  'demo_site',
-  'ims_es_importer_plugin',
-  'instructure_misc_plugin',
-  'migration_tool',
-  'multiple_root_accounts',
-  'phone_home_plugin',
-  'respondus_lockdown_browser',
-  'uuid_provisioner'
 ]
 
 def withGerritCredentials = { Closure command ->
