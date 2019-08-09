@@ -1093,6 +1093,28 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def post_terms_accept_url
+    # Can we find a pre-accelerator survey for them? if so, send them there
+    course_id = 0
+    assignment_id = 0
+    @current_user.enrollments.active.each do |enrollment|
+      result = enrollment.course.assignments.where(:title => "Pre-Accelerator Survey")
+      if result.any?
+        if enrollment.course.id > course_id
+          course_id = enrollment.course.id
+          assignment_id = result.first.id
+        end
+      end
+    end
+    if course_id > 1
+      next_url = "/courses/#{course_id}/assignments/#{assignment_id}"
+    else
+      next_url = "/"
+    end
+
+    return next_url
+  end
+
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
       session.delete(:require_terms)
@@ -1101,7 +1123,8 @@ class ApplicationController < ActionController::Base
         # to avoid a nonsense redirect and docusign error
         @current_user.accept_terms
         @current_user.save
-        redirect_to("/")
+
+        redirect_to(post_terms_accept_url)
       else
         # but otherwise...
         # we are going to use docusign instead of canvas' built in terms screen, hence the redirect here

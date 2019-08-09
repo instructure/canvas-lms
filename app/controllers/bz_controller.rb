@@ -1659,8 +1659,9 @@ class BzController < ApplicationController
     response = http.request(request)
     answer = JSON.parse(response.body)
 
-    redirect_to answer["url"]
+    @link = answer["url"]
 
+    # renders a view for the user
   end
 
   def docusign_user_redirect
@@ -1669,7 +1670,7 @@ class BzController < ApplicationController
     if event == 'signing_complete'
       @current_user.accept_terms
       @current_user.save
-      redirect_to("/")
+      redirect_to(post_terms_accept_url)
     else
       render :text => "Sorry, but to access this system, you must sign the documentation. If you have concerns about it or believe you are seeing this message in error, please contact Braven."
     end
