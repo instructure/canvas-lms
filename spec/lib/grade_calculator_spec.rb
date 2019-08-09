@@ -951,12 +951,12 @@ describe GradeCalculator do
 
       assignment_scores = [
         # Assignment Group 1
-        35.0,  # dropped
+        35.0,  # dropped when we're not treating muted as 0
         99.6,  # muted
         142.7,
 
         # Assignment Group 2
-        42.0,  # dropped
+        42.0,  # dropped when we're not treating muted as 0
         95.0,  # muted
         131.4
       ]
@@ -978,6 +978,11 @@ describe GradeCalculator do
 
       @dropped_assignments = [0, 3].map { |i| @assignments[i] }
       @dropped_submissions = @dropped_assignments.map { |a| Submission.find_by(assignment: a, user: @student) }
+    end
+
+    let(:dropped_current_submissions) do
+      # ignore muted submissions, drop lowest scores
+      [@assignments.first, @assignments.fourth].map { |assignment| assignment.submission_for_student(@student) }
     end
 
     let(:student_enrollment) { @student.enrollments.first }
@@ -1007,13 +1012,13 @@ describe GradeCalculator do
           end
 
           it 'posted final course score is updated' do
-            # (0 + 142.7) / 300 * 0.45 + (0 + 131.4) / 300 * 0.55
-            expect(overall_course_score.final_score).to equal(45.50)
+            # (35.0 + 142.7) / 300 * 0.45 + (42.0 + 131.4) / 300 * 0.55
+            expect(overall_course_score.final_score).to equal(58.45)
           end
 
           it 'posted final course points are updated' do
-            # (0 + 142.7) / 300 * 0.45 + (0 + 131.4) / 300 * 0.55
-            expect(overall_course_score.final_points).to equal(45.50)
+            # (35.0 + 142.7) / 300 * 0.45 + (42.0 + 131.4) / 300 * 0.55
+            expect(overall_course_score.final_points).to equal(58.45)
           end
 
           it 'unposted current course score is updated' do
@@ -1053,13 +1058,13 @@ describe GradeCalculator do
           end
 
           it 'current final course score is updated' do
-            # (0 + 142.7 + 0 + 131.4) / 600
-            expect(overall_course_score.final_score).to equal(45.68)
+            # (35 + 142.7 + 42 + 131.4) / 600
+            expect(overall_course_score.final_score).to equal(58.52)
           end
 
           it 'current final course points are updated' do
-            # 0 + 142.7 + 0 + 131.4
-            expect(overall_course_score.final_points).to equal(274.10)
+            # 35 + 142.7 + 42 + 131.4
+            expect(overall_course_score.final_points).to equal(351.10)
           end
 
           it 'unposted current course score is updated' do
@@ -1121,13 +1126,13 @@ describe GradeCalculator do
           end
 
           it 'posted final assignment group scores are updated' do
-            # [142.7 / 150, 131.4 / 150]
-            expect(assignment_group_scores.map(&:final_score)).to eq([47.57, 43.80])
+            # [(142.7 + 35) / 300, (131.4 + 42) / 300]
+            expect(assignment_group_scores.map(&:final_score)).to eq([59.23, 57.80])
           end
 
           it 'posted final assignment group points are updated' do
-            # [0 + 142.7, 0 + 131.4]
-            expect(assignment_group_scores.map(&:final_points)).to eq([142.70, 131.40])
+            # [35 + 142.7, 42 + 131.4]
+            expect(assignment_group_scores.map(&:final_points)).to eq([177.70, 173.40])
           end
 
           it 'unposted current assignment group scores are updated' do
@@ -1167,13 +1172,13 @@ describe GradeCalculator do
           end
 
           it 'posted final assignment group scores are updated' do
-            # [142.7 / 150, 131.4 / 150]
-            expect(assignment_group_scores.map(&:final_score)).to eq([47.57, 43.80])
+            # [(35.0 + 142.7) / 300, (42.0 + 131.4) / 300]
+            expect(assignment_group_scores.map(&:final_score)).to eq([59.23, 57.80])
           end
 
           it 'posted final assignment group points are updated' do
-            # [0 + 142.7, 0 + 131.4]
-            expect(assignment_group_scores.map(&:final_points)).to eq([142.70, 131.40])
+            # [35.0 + 142.7, 42.0 + 131.4]
+            expect(assignment_group_scores.map(&:final_points)).to eq([177.7, 173.40])
           end
 
           it 'unposted current assignment group scores are updated' do
@@ -1216,18 +1221,20 @@ describe GradeCalculator do
         expected_metadata = [
           {
             'current' => {
-              'dropped' => [@dropped_submissions[0].id]
+              'dropped' => [dropped_current_submissions[0].id]
             },
             'final' => {
-              'dropped' => [@dropped_submissions[0].id]
+              # we dropped a muted submission, which won't be included here
+              'dropped' => []
             }
           },
           {
             'current' => {
-              'dropped' => [@dropped_submissions[1].id]
+              'dropped' => [dropped_current_submissions[1].id]
             },
             'final' => {
-              'dropped' => [@dropped_submissions[1].id]
+              # we dropped a muted submission, which won't be included here
+              'dropped' => []
             }
           }
         ]
@@ -1309,10 +1316,10 @@ describe GradeCalculator do
           # GP2: 131.4 / 150 * 100 = 87.60
           # Course: 95.13 * 0.25 + 87.60 * 0.75 = 89.48
           expect(overall_course_score.current_score).to equal(89.48)
-          # GP1: (142.7 + 0) / 300 * 100 = 47.57
-          # GP2: (131.4 + 0) / (300 + 100) * 100 = 32.85
-          # Course: 47.57 * 0.25 + 32.85 * 0.75 = 36.53
-          expect(overall_course_score.final_score).to equal(36.53)
+          # GP1: (142.7 + 35) / 300 * 100 = 59.23
+          # GP2: (131.4 + 42) / (300 + 100) * 100 = 43.35
+          # Course: 59.23 * 0.25 + 43.35 * 0.75 = 47.32
+          expect(overall_course_score.final_score).to equal(47.32)
         end
 
         it 'up-scales grading period weights which add up to less than 100 percent' do
@@ -1323,10 +1330,10 @@ describe GradeCalculator do
           # GP2: 131.4 / 150 * 100 = 87.60
           # Course: (95.13 * 0.25 + 87.60 * 0.50) / (0.25 + 0.50) = 90.11
           expect(overall_course_score.current_score).to equal(90.11)
-          # GP1: (142.7 + 0) / 300 * 100 = 47.57
-          # GP2: (131.4 + 0) / (300 + 100) * 100 = 32.85
-          # Course: (47.57 * 0.25 + 32.85 * 0.50) / (0.25 + 0.50) = 37.76
-          expect(overall_course_score.final_score).to equal(37.76)
+          # GP1: (142.7 + 35) / 300 * 100 = 59.23
+          # GP2: (131.4 + 42) / (300 + 100) * 100 = 43.35
+          # Course: (59.23 * 0.25 + 43.35 * 0.50) / (0.25 + 0.50) = 37.76
+          expect(overall_course_score.final_score).to equal(48.64)
         end
 
         it 'does not down-scale grading period weights which add up to greater than 100 percent' do
@@ -1337,10 +1344,10 @@ describe GradeCalculator do
           # GP2: 131.4 / 150 * 100 = 87.60
           # Course: 95.13 * 1.00 + 87.60 * 0.50 = 138.93
           expect(overall_course_score.current_score).to equal(138.93)
-          # GP1: (142.7 + 0) / 300 * 100 = 47.57
-          # GP2: (131.4 + 0) / (300 + 100) * 100 = 32.85
-          # Course: 47.57 * 1.00 + 32.85 * 0.50 = 64.00
-          expect(overall_course_score.final_score).to equal(64.0)
+          # GP1: (142.7 + 35) / 300 * 100 = 59.23
+          # GP2: (131.4 + 42) / (300 + 100) * 100 = 43.35
+          # Course: 59.23 * 1.00 + 43.35 * 0.50 = 64.00
+          expect(overall_course_score.final_score).to equal(80.91)
         end
 
         it 'sets current course score to zero when all grading period weights are zero' do
@@ -1398,7 +1405,9 @@ describe GradeCalculator do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: 50.0)
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
-          expect(overall_course_score.final_score).to equal(32.85)
+          # GP1: not considered
+          # GP2: (131.4 + 42) / (300 + 100) * 100 = 43.35
+          expect(overall_course_score.final_score).to equal(43.35)
         end
 
         it 'sets current course score to nil when all grading period current scores are nil' do
@@ -1446,9 +1455,9 @@ describe GradeCalculator do
           # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           # GP1: 0
-          # GP2: (131.4 + 0) / (300 + 100) * 100 = 32.85
-          # Course: 32.85 * 0.75 = 24.64
-          expect(overall_course_score.final_score).to equal(24.64)
+          # GP2: (131.4 + 42) / (300 + 100) * 100 = 43.35
+          # Course: 43.35 * 0.75 = 32.51
+          expect(overall_course_score.final_score).to equal(32.51)
         end
 
         it 'sets course current score to zero when all grading period current scores are zero' do
@@ -1592,13 +1601,13 @@ describe GradeCalculator do
           end
 
           it 'posted final assignment group scores are updated' do
-            # [142.7 / 150, 131.4 / 150]
-            expect(assignment_group_scores.map(&:final_score)).to eq([47.57, 43.80])
+            # [(142.7 + 35.0) / 300, (131.4 + 42.0) / 300]
+            expect(assignment_group_scores.map(&:final_score)).to eq([59.23, 57.8])
           end
 
           it 'posted final assignment group points are updated' do
-            # [0 + 142.7, 0 + 131.4]
-            expect(assignment_group_scores.map(&:final_points)).to eq([142.70, 131.40])
+            # [35 + 142.7, 42 + 131.4]
+            expect(assignment_group_scores.map(&:final_points)).to eq([177.70, 173.40])
           end
 
           it 'unposted current assignment group scores are updated' do
@@ -1638,13 +1647,13 @@ describe GradeCalculator do
           end
 
           it 'posted final assignment group scores are updated' do
-            # [142.7 / 150, 131.4 / 150]
-            expect(assignment_group_scores.map(&:final_score)).to eq([47.57, 43.80])
+            # [(142.7 + 35) / 150, (131.4 + 42) / 150]
+            expect(assignment_group_scores.map(&:final_score)).to eq([59.23, 57.80])
           end
 
           it 'posted final assignment group points are updated' do
-            # [0 + 142.7, 0 + 131.4]
-            expect(assignment_group_scores.map(&:final_points)).to eq([142.70, 131.40])
+            # [35 + 142.7, 42 + 131.4]
+            expect(assignment_group_scores.map(&:final_points)).to eq([177.70, 173.40])
           end
 
           it 'unposted current assignment group scores are updated' do
@@ -1673,10 +1682,11 @@ describe GradeCalculator do
     it 'updates the overall course score metadata' do
       expected_metadata = {
         'current' => {
-          'dropped' => @dropped_submissions.map(&:id)
+          'dropped' => dropped_current_submissions.map(&:id)
         },
         'final' => {
-          'dropped' => @dropped_submissions.map(&:id)
+          # we dropped a muted submission, which won't be included here
+          'dropped' => []
         }
       }
       metadata = overall_course_score.score_metadata
@@ -1690,10 +1700,11 @@ describe GradeCalculator do
     it 'updates the overall course score metadata when only_update_course_gp_metadata: true' do
       expected_metadata = {
         'current' => {
-          'dropped' => @dropped_submissions.map(&:id)
+          'dropped' => dropped_current_submissions.map(&:id)
         },
         'final' => {
-          'dropped' => @dropped_submissions.map(&:id)
+          # we dropped a muted submission, which won't be included here
+          'dropped' => []
         }
       }
       metadata = overall_course_score.score_metadata
@@ -1977,6 +1988,20 @@ describe GradeCalculator do
       check_current_grade(90.0)
     end
 
+    it "muted assignments are treated as 0/points_possible for the drop list when " \
+      "computing final grade for students" do
+
+      set_grades([[4, 10], [3, 10], [9, 10]])
+      @group.update_attribute(:rules, 'drop_lowest:1')
+      @assignments.first.mute!
+      # 4/10 is treated as 0/10 because it is muted. Since it's treated as 0/10,
+      # it is dropped for being the lowest
+      # 3/10 is included
+      # 9/10 is included
+      # 12/20 => 60.0%
+      check_final_grade(60.0)
+    end
+
     it "ungraded assignments are treated as 0/points_possible for the drop list " \
       "when computing final grade for students" do
       set_grades([[nil, 20], [3, 10], [9, 10]])
@@ -1986,18 +2011,6 @@ describe GradeCalculator do
       # 9/10 is included
       # 12/20 => 60.0%
       check_final_grade(60.0)
-    end
-
-    it "muted assignments are not considered for the drop list when computing " \
-      "final grade for students (but they are included as 0/10 in the final computation)" do
-      set_grades([[4, 10], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
-      @assignments.first.mute!
-      # 4/10 is ignored for drop rules because it is muted. it is included
-      # 3/10 is dropped for being the lowest
-      # 9/10 is included
-      # (4/10 is treated as 0/10 because it is muted) + 9/10 = 9/20 => 45.0%
-      check_final_grade(45.0)
     end
 
     it "ungraded are treated as 0/points_possible for the drop list and muted " \
