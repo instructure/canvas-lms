@@ -28,12 +28,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet">
   <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
-  <%= browser_performance_monitor_embed %>
-  <%= favicon_link_tag(favicon) %>
-  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
-  <%= yield :auto_discovery %>
-  <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
-  <%= yield :head %>
   <%=
     # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
     polyfill_url = "/ie11-polyfill.js"
@@ -47,6 +41,8 @@
       # still provide a fallback if they don't have it.
       # The crazy string concatenation in the document.write is to trick Chrome
       # into not preemptively downloading it anyway.
+
+      # Always give edge <= 17 the fetch polyfill to work around https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/18775440/
       javascript_tag(%(
 !function(){
   function get(u){document.write('<scr'+'ipt src="'+ u +'"></sc'+'ript>')}
@@ -54,12 +50,19 @@
   if (!(window.Promise && Object.assign && Object.values && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
     get("#{javascript_path(polyfill_url)}");
   }
-  window.fetch || get("#{fetch_polyfill_url}");
+  if (/Edge\\/1[2-7]/i.test(navigator.userAgent)) delete window.fetch
+  if (!window.fetch) get("#{fetch_polyfill_url}");
 }();
       ))
     end
   %>
   <%= yield :meta_tags %>
+  <%= browser_performance_monitor_embed %>
+  <%= favicon_link_tag(favicon) %>
+  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
+  <%= yield :auto_discovery %>
+  <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
+  <%= yield :head %>
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
