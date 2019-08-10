@@ -416,7 +416,6 @@ CanvasRails::Application.routes.draw do
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
     resources :outcomes do
-      post 'alignments/reorder' => 'outcomes#reorder_alignments', as: :reorder_alignments
       get 'alignments/:id' => 'outcomes#alignment_redirect', as: :alignment_redirect
       post 'alignments' => 'outcomes#align', as: :align
       delete 'alignments/:id' => 'outcomes#remove_alignment', as: :remove_alignment
