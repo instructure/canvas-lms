@@ -46,6 +46,12 @@ const DefaultToolForm = props => {
   const launchDefinitionUrl = () =>
     `/api/v1/courses/${props.courseId}/lti_apps/launch_definitions?per_page=100&placements%5B%5D=assignment_selection&placements%5B%5D=resource_selection`
 
+  const contentTitle = () => {
+    if (toolMessageData) {
+      return toolMessageData.content && toolMessageData.content.title
+    }
+    return props.toolName
+  }
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios.get(launchDefinitionUrl())
@@ -68,9 +74,9 @@ const DefaultToolForm = props => {
         {I18n.t('Add a Question Set')}
       </Button>
 
-      {toolMessageData ? (
+      {toolMessageData || props.previouslySelected ? (
         <Alert variant="success" margin="small small 0 0">
-          <Text weight="bold">{toolMessageData.content.title}</Text><br/>
+          <Text weight="bold">{contentTitle()}</Text><br/>
           <Text>{I18n.t('Successfully Added')}</Text>
         </Alert>
       ) : (
@@ -97,7 +103,9 @@ const DefaultToolForm = props => {
 
 DefaultToolForm.propTypes = {
   toolUrl: PropTypes.string.isRequired,
-  courseId: PropTypes.number.isRequired
+  courseId: PropTypes.number.isRequired,
+  toolName: PropTypes.string.isRequired,
+  previouslySelected: PropTypes.bool.isRequired
 }
 
 export default DefaultToolForm
