@@ -37,6 +37,7 @@ export default class AttemptTab extends Component {
   }
 
   state = {
+    shouldDisplayRCE: false,
     submissionState: null,
     uploadState: null
   }
@@ -83,6 +84,10 @@ export default class AttemptTab extends Component {
       variables: {submissionID: this.props.submission.id},
       data: {node}
     })
+  }
+
+  updateShouldDisplayRCE = shouldDisplay => {
+    this.setState({shouldDisplayRCE: shouldDisplay})
   }
 
   updateUploadState = state => {
@@ -159,7 +164,9 @@ export default class AttemptTab extends Component {
     return (
       <TextEntry
         createSubmissionDraft={createSubmissionDraft}
+        shouldDisplayRCE={this.state.shouldDisplayRCE}
         submission={this.props.submission}
+        updateShouldDisplayRCE={this.updateShouldDisplayRCE}
         updateUploadState={this.updateUploadState}
       />
     )

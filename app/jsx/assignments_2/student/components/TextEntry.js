@@ -16,14 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import {func} from 'prop-types'
+import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2_text_entry'
-import IconText from '@instructure/ui-icons/lib/Line/IconText'
 import React from 'react'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import {Submission} from '../graphqlData/Submission'
+
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
+import IconText from '@instructure/ui-icons/lib/Line/IconText'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
 
 RichContentEditor.preloadRemoteModule()
@@ -31,13 +35,17 @@ RichContentEditor.preloadRemoteModule()
 export default class TextEntry extends React.Component {
   static propTypes = {
     createSubmissionDraft: func,
+    shouldDisplayRCE: bool,
     submission: Submission.shape,
+    updateShouldDisplayRCE: func,
     updateUploadState: func
   }
 
   state = {
     editorLoaded: false
   }
+
+  _isMounted = false
 
   getDraftBody = () => {
     if (this.props.submission.submissionDraft) {
@@ -48,21 +56,25 @@ export default class TextEntry extends React.Component {
   }
 
   componentDidMount() {
-    if (this.getDraftBody() !== null && !this.state.editorLoaded) {
+    this._isMounted = true
+
+    if (this.getDraftBody() !== null && this.props.shouldDisplayRCE && !this.state.editorLoaded) {
       this.loadRCE()
     }
   }
 
   componentDidUpdate() {
-    if (this.getDraftBody() !== null && !this.state.editorLoaded) {
+    if (this.getDraftBody() !== null && this.props.shouldDisplayRCE && !this.state.editorLoaded) {
       this.loadRCE()
-    } else if (this.getDraftBody() === null && this.state.editorLoaded) {
+    } else if (!this.props.shouldDisplayRCE && this.state.editorLoaded) {
       this.unloadRCE()
     }
   }
 
   componentWillUnmount() {
-    if (this.state.editorLoaded) {
+    this._isMounted = false
+
+    if (this.state.editorLoaded && !this.props.shouldDisplayRCE) {
       this.unloadRCE()
     }
   }
@@ -150,15 +162,24 @@ export default class TextEntry extends React.Component {
   }
 
   handleStartButton = () => {
-    this.updateSubmissionDraft('')
+    if (this._isMounted) {
+      this.updateSubmissionDraft('')
+      this.props.updateShouldDisplayRCE(true)
+    }
   }
 
   handleSaveButton = () => {
-    this.updateSubmissionDraft(this.getRCEText())
+    if (this._isMounted) {
+      this.updateSubmissionDraft(this.getRCEText())
+      this.props.updateShouldDisplayRCE(false)
+    }
   }
 
   handleCancelButton = () => {
-    this.updateSubmissionDraft(null)
+    if (this._isMounted) {
+      this.updateSubmissionDraft(null)
+      this.props.updateShouldDisplayRCE(false)
+    }
   }
 
   renderButtons() {
@@ -173,7 +194,9 @@ export default class TextEntry extends React.Component {
         <Button
           data-testid="cancel-text-entry"
           margin="0 xx-small 0 0"
-          onClick={this.handleCancelButton}
+          onClick={() => {
+            this.props.updateShouldDisplayRCE(false)
+          }}
         >
           {I18n.t('Cancel')}
         </Button>
@@ -192,6 +215,35 @@ export default class TextEntry extends React.Component {
         </span>
         {this.renderButtons()}
       </div>
+    )
+  }
+
+  renderSavedDraft() {
+    return (
+      <Billboard
+        heading={I18n.t('Text Entry')}
+        hero={<IconDocument />}
+        message={
+          <div>
+            <Button
+              data-testid="edit-text-draft"
+              margin="0 x-small 0 0"
+              onClick={() => {
+                this.props.updateShouldDisplayRCE(true)
+              }}
+            >
+              {I18n.t('Edit')}
+            </Button>
+            <Button
+              data-testid="delete-text-draft"
+              icon={IconTrash}
+              onClick={this.handleCancelButton}
+            >
+              <ScreenReaderContent>{I18n.t('Remove submission draft')}</ScreenReaderContent>
+            </Button>
+          </div>
+        }
+      />
     )
   }
 
@@ -215,7 +267,7 @@ export default class TextEntry extends React.Component {
     if (this.getDraftBody() === null) {
       return this.renderInitialBox()
     } else {
-      return this.renderEditor()
+      return this.props.shouldDisplayRCE ? this.renderEditor() : this.renderSavedDraft()
     }
   }
 }

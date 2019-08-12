@@ -21,93 +21,124 @@ import {mockSubmission} from '../../mocks'
 import React from 'react'
 import TextEntry from '../TextEntry'
 
+async function makeProps(opts = {}) {
+  const mockedSubmission =
+    opts.submission ||
+    (await mockSubmission({
+      Submission: () => ({
+        submissionDraft: {body: 'words'}
+      })
+    }))
+
+  return {
+    createSubmissionDraft: jest.fn(),
+    shouldDisplayRCE: opts.shouldDisplayRCE || false,
+    submission: mockedSubmission,
+    updateShouldDisplayRCE: jest.fn()
+  }
+}
+
 describe('TextEntry', () => {
   describe('when the submission draft body is null', () => {
     it('renders a Start Entry item', async () => {
-      const submission = await mockSubmission()
-      const {getByText} = render(<TextEntry submission={submission} />)
+      const mockedSubmission = await mockSubmission()
+      const props = await makeProps({submission: mockedSubmission})
+      const {getByText} = render(<TextEntry {...props} />)
 
       expect(getByText('Start Entry')).toBeInTheDocument()
     })
   })
 
   describe('when the submission draft body is not null', () => {
-    it('renders the RCE when the draft body is not null', async () => {
-      const submission = await mockSubmission({
-        Submission: () => ({
-          submissionDraft: {body: 'words'}
-        })
+    describe('with the RCE view disabled', () => {
+      it('renders the Edit button', async () => {
+        const props = await makeProps()
+        const {getByTestId, getByText} = render(<TextEntry {...props} />)
+        const editButton = getByTestId('edit-text-draft')
+
+        expect(editButton).toContainElement(getByText('Edit'))
       })
-      const {getByTestId} = render(<TextEntry submission={submission} />)
 
-      expect(getByTestId('text-editor')).toBeInTheDocument()
-    })
+      it('renders the Delete button', async () => {
+        const props = await makeProps()
+        const {getByTestId} = render(<TextEntry {...props} />)
 
-    it('renders the Cancel button when the RCE is loaded', async () => {
-      const submission = await mockSubmission({
-        Submission: () => ({
-          submissionDraft: {body: 'words'}
-        })
+        expect(getByTestId('delete-text-draft')).toBeInTheDocument()
       })
-      const {getByTestId, getByText} = render(<TextEntry submission={submission} />)
-      const cancelButton = getByTestId('cancel-text-entry')
 
-      expect(cancelButton).toContainElement(getByText('Cancel'))
-    })
+      it('enables the RCE view when the Edit button is clicked', async () => {
+        const props = await makeProps()
+        const {getByTestId} = render(<TextEntry {...props} />)
+        const editButton = getByTestId('edit-text-draft')
+        fireEvent.click(editButton)
 
-    it('renders the Save button when the RCE is loaded', async () => {
-      const submission = await mockSubmission({
-        Submission: () => ({
-          submissionDraft: {body: 'words'}
-        })
+        expect(props.updateShouldDisplayRCE).toHaveBeenCalledWith(true)
       })
-      const {getByTestId, getByText} = render(<TextEntry submission={submission} />)
-      const saveButton = getByTestId('save-text-entry')
 
-      expect(saveButton).toContainElement(getByText('Save'))
-    })
+      it('deletes the saved draft when the Delete button is clicked', async () => {
+        const props = await makeProps()
+        const {getByTestId} = render(<TextEntry {...props} />)
+        const editButton = getByTestId('delete-text-draft')
+        fireEvent.click(editButton)
 
-    it('saves the text draft when the Save button is clicked', async () => {
-      const createSubmissionDraft = jest.fn()
-      const submission = await mockSubmission({
-        Submission: () => ({
-          submissionDraft: {body: 'words'}
+        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+          variables: {
+            id: '1',
+            attempt: 1,
+            body: null
+          }
         })
-      })
-      const {getByTestId} = render(
-        <TextEntry createSubmissionDraft={createSubmissionDraft} submission={submission} />
-      )
-      const saveButton = getByTestId('save-text-entry')
-      fireEvent.click(saveButton)
-
-      expect(createSubmissionDraft).toHaveBeenCalledWith({
-        variables: {
-          id: '1',
-          attempt: 1,
-          body: 'words'
-        }
       })
     })
 
-    it('clears the text draft when the Cancel button is clicked', async () => {
-      const createSubmissionDraft = jest.fn()
-      const submission = await mockSubmission({
-        Submission: () => ({
-          submissionDraft: {body: 'words'}
+    describe('with the RCE view enabled', () => {
+      it('renders the RCE when the draft body is not null', async () => {
+        const props = await makeProps({shouldDisplayRCE: true})
+        const {getByTestId} = render(<TextEntry {...props} />)
+
+        expect(getByTestId('text-editor')).toBeInTheDocument()
+      })
+
+      it('renders the Cancel button when the RCE is loaded', async () => {
+        const props = await makeProps({shouldDisplayRCE: true})
+        const {getByTestId, getByText} = render(<TextEntry {...props} />)
+
+        const cancelButton = getByTestId('cancel-text-entry')
+        expect(cancelButton).toContainElement(getByText('Cancel'))
+      })
+
+      it('renders the Save button when the RCE is loaded', async () => {
+        const props = await makeProps({shouldDisplayRCE: true})
+        const {getByTestId, getByText} = render(<TextEntry {...props} />)
+
+        const saveButton = getByTestId('save-text-entry')
+        expect(saveButton).toContainElement(getByText('Save'))
+      })
+
+      it('saves the text draft when the Save button is clicked', async () => {
+        const props = await makeProps({shouldDisplayRCE: true})
+        const {getByTestId} = render(<TextEntry {...props} />)
+
+        const saveButton = getByTestId('save-text-entry')
+        fireEvent.click(saveButton)
+
+        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+          variables: {
+            id: '1',
+            attempt: 1,
+            body: 'words'
+          }
         })
       })
-      const {getByTestId} = render(
-        <TextEntry createSubmissionDraft={createSubmissionDraft} submission={submission} />
-      )
-      const cancelButton = getByTestId('cancel-text-entry')
-      fireEvent.click(cancelButton)
 
-      expect(createSubmissionDraft).toHaveBeenCalledWith({
-        variables: {
-          id: '1',
-          attempt: 1,
-          body: null
-        }
+      it('stops displaying the RCE when the Cancel button is clicked', async () => {
+        const props = await makeProps({shouldDisplayRCE: true})
+        const {getByTestId} = render(<TextEntry {...props} />)
+
+        const cancelButton = getByTestId('cancel-text-entry')
+        fireEvent.click(cancelButton)
+
+        expect(props.updateShouldDisplayRCE).toHaveBeenCalledWith(false)
       })
     })
   })
