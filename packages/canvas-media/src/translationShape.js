@@ -16,25 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { string, func } from 'prop-types'
-import { TextArea } from '@instructure/ui-forms'
+import {shape, string} from 'prop-types'
 
-export default function EmbedPanel ({embedCode, setEmbedCode, label}) {
-  return (
-    <TextArea
-      maxHeight="10rem"
-      label={label}
-      value={embedCode}
-      onChange={(e) =>{
-        setEmbedCode(e.target.value)}
-      }
-    />
-  )
-}
+const translationShape = shape({
+  LOADING_MEDIA: string,
+  COMPUTER_PANEL_TITLE: string,
+  DRAG_FILE_TEXT: string,
+  RECORD_PANEL_TITLE: string,
+  EMBED_PANEL_TITLE: string,
+  SUBMIT_TEXT: string,
+  CLOSE_TEXT: string,
+  UPLOAD_MEDIA_LABEL: string,
+  CLEAR_FILE_TEXT: string,
+  INVALID_FILE_TEXT: string,
+  DRAG_DROP_CLICK_TO_BROWSE: string,
+  EMBED_VIDEO_CODE_TEXT: string,
+  UPLOADING_ERROR: string,
+})
 
-EmbedPanel.propTypes = {
-  embedCode: string.isRequired,
-  label: string.isRequired,
-  setEmbedCode: func.isRequired
-}
+export default translationShape

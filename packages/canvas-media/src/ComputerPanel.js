@@ -29,14 +29,16 @@ import {Text} from '@instructure/ui-elements'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
 import RocketSVG from './RocketSVG'
+import translationShape from './translationShape'
 
 export default function ComputerPanel({
-  theFile,
-  setFile,
-  hasUploadedFile,
-  setHasUploadedFile,
   accept,
-  label
+  hasUploadedFile,
+  label,
+  setFile,
+  setHasUploadedFile,
+  theFile,
+  uploadMediaTranslations
 }) {
   const [messages, setMessages] = useState([])
   if (hasUploadedFile) {
@@ -52,7 +54,9 @@ export default function ComputerPanel({
               }}
               icon={IconTrashLine}
             >
-              <ScreenReaderContent>Clear selected file</ScreenReaderContent>
+              <ScreenReaderContent>
+                {uploadMediaTranslations.UploadMediaStrings.CLEAR_FILE_TEXT}
+              </ScreenReaderContent>
             </Button>
           </Flex.Item>
           <Flex.Item grow shrink>
@@ -82,7 +86,7 @@ export default function ComputerPanel({
         onDropRejected={() => {
           setMessages((msgs) =>
             msgs.concat({
-              text:'Invalid file type',
+              text: uploadMediaTranslations.UploadMediaStrings.INVALID_FILE_TEXT,
               type: 'error'
             })
           )
@@ -92,7 +96,7 @@ export default function ComputerPanel({
           <Billboard
             heading={label}
             hero={<RocketSVG width="3em" height="3em" />}
-            message='Drag and drop, or click to browse your computer'
+            message={uploadMediaTranslations.UploadMediaStrings.DRAG_DROP_CLICK_TO_BROWSE}
           />
         }
       />
@@ -101,11 +105,12 @@ export default function ComputerPanel({
 }
 
 ComputerPanel.propTypes = {
-  theFile: instanceOf(File),
-  setFile: func.isRequired,
-  hasUploadedFile: bool,
-  setHasUploadedFile: func.isRequired,
   accept: oneOfType([string, arrayOf(string)]),
-  label: string.isRequired
+  hasUploadedFile: bool,
+  label: string.isRequired,
+  setFile: func.isRequired,
+  setHasUploadedFile: func.isRequired,
+  theFile: instanceOf(File),
+  uploadMediaTranslations: translationShape
 }
 

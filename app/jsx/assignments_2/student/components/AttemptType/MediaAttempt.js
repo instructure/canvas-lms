@@ -23,13 +23,18 @@ import {IconAttachMediaLine} from '@instructure/ui-icons'
 import React, {useState} from 'react'
 import UploadMedia from '@instructure/canvas-media'
 import View from '@instructure/ui-layout/lib/components/View'
+import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
 
 export default function MediaAttempt() {
   const [mediaModalOpen, setMediaModalOpen] = useState(false)
 
   return (
     <View as="div" borderWidth="small">
-      <UploadMedia onDismiss={() => setMediaModalOpen(false)} open={mediaModalOpen} />
+      <UploadMedia
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+        onDismiss={() => setMediaModalOpen(false)}
+        open={mediaModalOpen}
+      />
       <Billboard
         heading={I18n.t('Add Media')}
         hero={<IconAttachMediaLine color="brand" />}
