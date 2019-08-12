@@ -306,11 +306,16 @@ export default class EditView extends ValidatedFormView
   defaultExternalToolUrl: =>
     ENV.DEFAULT_ASSIGNMENT_TOOL_URL
 
+  defaultExternalToolName: =>
+    ENV.DEFAULT_ASSIGNMENT_TOOL_NAME
+
   renderDefaultExternalTool: =>
     props = {
       toolDialog: $("#resource_selection_dialog"),
       courseId: ENV.COURSE_ID,
-      toolUrl: @defaultExternalToolUrl()
+      toolUrl: @defaultExternalToolUrl(),
+      toolName: @defaultExternalToolName(),
+      previouslySelected: @assignment.defaultToolSelected()
     }
 
     ReactDOM.render(

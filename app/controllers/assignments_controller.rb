@@ -69,6 +69,9 @@ class AssignmentsController < ApplicationController
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
           DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
         }
+
+        set_default_tool_env!(@context, hash)
+
         js_env(hash)
 
         respond_to do |format|
@@ -521,8 +524,6 @@ class AssignmentsController < ApplicationController
     rce_js_env
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
-      root_account_settings = @context.root_account.settings
-
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
@@ -615,10 +616,7 @@ class AssignmentsController < ApplicationController
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
 
-      if root_account_settings[:default_assignment_tool_url] && root_account_settings[:default_assignment_tool_name]
-        hash[:DEFAULT_ASSIGNMENT_TOOL_URL] = root_account_settings[:default_assignment_tool_url]
-        hash[:DEFAULT_ASSIGNMENT_TOOL_NAME] = root_account_settings[:default_assignment_tool_name]
-      end
+      set_default_tool_env!(@context, hash)
 
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
@@ -662,6 +660,14 @@ class AssignmentsController < ApplicationController
   end
 
   protected
+
+  def set_default_tool_env!(context, hash)
+    root_account_settings = context.root_account.settings
+    if root_account_settings[:default_assignment_tool_url] && root_account_settings[:default_assignment_tool_name]
+      hash[:DEFAULT_ASSIGNMENT_TOOL_URL] = root_account_settings[:default_assignment_tool_url]
+      hash[:DEFAULT_ASSIGNMENT_TOOL_NAME] = root_account_settings[:default_assignment_tool_name]
+    end
+  end
 
   def show_moderate_env
     can_view_grader_identities = @assignment.can_view_other_grader_identities?(@current_user)

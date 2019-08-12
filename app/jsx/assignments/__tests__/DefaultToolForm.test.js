@@ -24,7 +24,8 @@ import SelectContentDialog from '../../../../public/javascripts/select_content_d
 const newProps = (overrides = {}) => ({
   ...{
     toolUrl: 'https://www.default-tool.com/blti',
-    courseId: 1
+    courseId: 1,
+    toolName: 'Awesome Tool'
   },
   ...overrides
 })
@@ -52,6 +53,11 @@ describe('DefaultToolForm', () => {
   it('renders the information mesage', () => {
     wrapper = mount(<DefaultToolForm {...newProps()} />)
     expect(wrapper.find('Alert').html()).toContain('Click the button above to add a WileyPLUS Question Set')
+  })
+
+  it('renders the success message if previouslySelected is true', () => {
+    wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
+    expect(wrapper.find('Alert').html()).toContain('Successfully Added')
   })
 })
 
