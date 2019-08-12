@@ -63,9 +63,9 @@ describe InfoController do
       # stick a Version into last partition
       last_partition = CanvasPartman::PartitionManager.create(Version).partition_tables.last
       v_id = (last_partition.sub("versions_", "").to_i * Version.partition_size) + 1
-      Version.suspend_callbacks(:initialize_number) do
-        Version.create!(:versionable_id => v_id, :versionable_type => "Assignment")
-      end
+
+      # don't have to make a real version anymore, just an object that _could_ make a version
+      Course.create.wiki_pages.create!(:id => v_id, :title => "t")
 
       Timecop.freeze(4.years.from_now) do # and jump forward a ways
         get "health_prognosis"

@@ -161,6 +161,7 @@ describe CanvasPartman::PartitionManager do
     describe "#ensure_partitions" do
       it "creates the proper number of partitions" do
         expect(subject).to receive(:partition_tables).and_return([])
+        expect(Zoo).to receive(:maximum).and_return(nil)
         expect(subject).to receive(:create_partition).with(0)
         expect(subject).to receive(:create_partition).with(5)
 
@@ -169,8 +170,20 @@ describe CanvasPartman::PartitionManager do
 
       it "detects when enough partitions already exist" do
         expect(subject).to receive(:partition_tables).and_return(['partman_trails_0', 'partman_trails_1'])
-        expect(subject.base_class).to receive(:from).twice.and_return(Trail.none)
+        expect(Zoo).to receive(:maximum).and_return(nil)
         expect(subject).to receive(:create_partition).never
+
+        subject.ensure_partitions(2)
+      end
+
+      it "detects how many partitions are needed based on the foreign key table" do
+        expect(subject).to receive(:partition_tables).and_return([])
+        expect(Zoo).to receive(:maximum).and_return(7)
+
+        expect(subject).to receive(:create_partition).with(0)
+        expect(subject).to receive(:create_partition).with(5) # catches up
+        expect(subject).to receive(:create_partition).with(10)
+        expect(subject).to receive(:create_partition).with(15) # and adds two more
 
         subject.ensure_partitions(2)
       end
