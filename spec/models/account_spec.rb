@@ -885,7 +885,7 @@ describe Account do
       tool.settings[:account_navigation] = account_navigation
       tool.save!
 
-      tabs = @account.external_tool_tabs({})
+      tabs = @account.external_tool_tabs({}, User.new)
 
       expect(tabs.first[:label]).to eq "English Label"
     end

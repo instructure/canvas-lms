@@ -526,6 +526,10 @@ class ExternalToolsController < ApplicationController
                             @context.user_has_been_student?(student)
                           raise Lti::Errors::UnauthorizedError unless can_launch
                           adapter.generate_post_payload(student_id: student.global_id)
+                        elsif tool.extension_setting(selection_type, 'required_permissions')
+                          can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session)
+                          raise Lti::Errors::UnauthorizedError unless can_launch
+                          adapter.generate_post_payload
                         else
                           adapter.generate_post_payload
                         end

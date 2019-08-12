@@ -3997,7 +3997,7 @@ describe Course, 'tabs_available' do
     expect(tool.course_navigation(:url)).to eq "http://www.example.com"
     expect(tool.has_placement?(:course_navigation)).to eq true
 
-    settings = @course.external_tool_tabs({}).first
+    settings = @course.external_tool_tabs({}, User.new).first
     expect(settings).to include(:visibility=>"members")
     expect(settings).to include(:hidden=>true)
   end
@@ -4012,7 +4012,7 @@ describe Course, 'tabs_available' do
     expect(tool.course_navigation(:url)).to eq "http://www.example.com"
     expect(tool.has_placement?(:course_navigation)).to eq true
 
-    settings = @course.external_tool_tabs({}).first
+    settings = @course.external_tool_tabs({}, User.new).first
     expect(settings).to include(:visibility=>"admins")
     expect(settings).to include(:hidden=>false)
   end

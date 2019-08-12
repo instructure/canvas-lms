@@ -2723,9 +2723,10 @@ class Course < ActiveRecord::Base
     return tab && tab[:hidden]
   end
 
-  def external_tool_tabs(opts)
+  def external_tool_tabs(opts, user)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
+    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 
@@ -2745,7 +2746,7 @@ class Course < ActiveRecord::Base
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]
       external_tabs = if opts[:include_external]
-                        external_tool_tabs(opts) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                        external_tool_tabs(opts, user) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
                       else
                         []
                       end
