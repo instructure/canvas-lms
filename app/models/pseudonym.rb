@@ -63,7 +63,8 @@ class Pseudonym < ActiveRecord::Base
         scope: [:account_id, :workflow_state, :authentication_provider_id],
         if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
     }
-    config.crypto_provider = Authlogic::CryptoProviders::Sha512
+    config.crypto_provider = ScryptProvider.new("4000$8$1$")
+    config.transition_from_crypto_providers = [Authlogic::CryptoProviders::Sha512]
   end
 
   attr_writer :require_password
