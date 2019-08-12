@@ -1854,15 +1854,15 @@ class User < ActiveRecord::Base
 
         Shackles.activate(:slave) do
           submissions = []
-          submissions += self.submissions.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", start_at).
+          submissions += self.submissions.posted.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", start_at).
             for_context_codes(context_codes).eager_load(:assignment).
-            where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
+            where("submissions.score IS NOT NULL AND assignments.workflow_state=?", 'published').
             order('submissions.created_at DESC').
             limit(limit).to_a
 
-          submissions += Submission.active.where(user_id: self).for_context_codes(context_codes).
+          submissions += Submission.active.posted.where(user_id: self).for_context_codes(context_codes).
             joins(:assignment).
-            where(assignments: {muted: false, workflow_state: 'published'}).
+            where(assignments: {workflow_state: 'published'}).
             where('last_comment_at > ?', start_at).
             limit(limit).order("last_comment_at").to_a
 
