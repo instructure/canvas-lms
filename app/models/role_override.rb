@@ -138,6 +138,13 @@ class RoleOverride < ActiveRecord::Base
          'AccountAdmin'
        ]
      },
+     :manage_data_services => {
+       :label => lambda { t('permissions.manage_data_services', "Manage data services") },
+       :label_v2 => lambda { t("Data Services - manage ") },
+       :account_only => true,
+       :true_for => %w(AccountAdmin),
+       :available_to => %w(AccountAdmin AccountMembership),
+     },
      :manage_developer_keys => {
        :label => lambda { t('permissions.manage_developer_keys', "Manage developer keys") },
        :label_v2 => lambda { t("Developer Keys - manage ") },
