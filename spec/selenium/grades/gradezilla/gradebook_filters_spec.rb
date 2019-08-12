@@ -111,7 +111,7 @@ describe "Filter" do
       Gradezilla::Cells.edit_grade(@student_2, @first_assignment, 1)
 
       Gradezilla.select_section(@other_section)
-      expect(Gradezilla.section_dropdown).to include_text(@other_section.name)
+      expect(Gradezilla.section_dropdown).to have_value(@other_section.name)
 
       expect(Gradezilla::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
     end
@@ -140,7 +140,7 @@ describe "Filter" do
 
       group2 = @category.groups.second
       Gradezilla.select_student_group(group2)
-      expect(Gradezilla.student_group_dropdown).to include_text(group2.name)
+      expect(Gradezilla.student_group_dropdown).to have_value(group2.name)
 
       expect(Gradezilla::Cells.get_grade(@student_2, @first_assignment)).to eq '1'
     end

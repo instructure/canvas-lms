@@ -44,6 +44,7 @@ import {
   defaultColors
 } from 'jsx/gradezilla/default_gradebook/constants/colors'
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
+import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 
 import {
   createGradebook,
@@ -2634,79 +2635,72 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
   }
 })
 
-test('renders the section select when not already rendered', function() {
+test('renders the section filter when not already rendered', function() {
   this.gradebook.updateSectionFilterVisibility()
   ok(this.container.children.length > 0, 'section menu was rendered')
-})
-
-test('stores a reference to the section select when it is rendered', function() {
-  this.gradebook.updateSectionFilterVisibility()
-  ok(this.gradebook.sectionFilterMenu, 'section menu reference has been stored')
 })
 
 test('does not render when only one section exists', function() {
   this.gradebook.sections_enabled = false
   this.gradebook.updateSectionFilterVisibility()
-  notOk(this.gradebook.sectionFilterMenu, 'section menu reference has not been stored')
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
 test('does not render when filter is not selected', function() {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateSectionFilterVisibility()
-  notOk(this.gradebook.sectionFilterMenu, 'section menu reference has been removed')
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
 })
 
-test('renders the section select with a list of sections', function() {
+test('renders the filter with a list of sections', function() {
   this.gradebook.updateSectionFilterVisibility()
-  const sections = this.gradebook.sectionFilterMenu.props.items
-  strictEqual(sections.length, 2, 'includes the "nothing selected" option plus the two sections')
-  deepEqual(sections.map(section => section.id), ['2001', '2002'])
+  const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
+  filter.clickToExpand()
+  deepEqual(filter.optionLabels.slice(1), ['Freshmen / First-Year', 'Sophomores'])
 })
 
-test('unescapes section names', function() {
-  this.gradebook.updateSectionFilterVisibility()
-  const sections = this.gradebook.sectionFilterMenu.props.items
-  deepEqual(sections.map(section => section.name), ['Freshmen / First-Year', 'Sophomores'])
-})
-
-test('sets the section select to show the saved "filter rows by" setting', function() {
+test('sets the filter to show the saved "filter rows by" setting', function() {
   this.gradebook.setFilterRowsBySetting('sectionId', '2002')
   this.gradebook.updateSectionFilterVisibility()
-  strictEqual(this.gradebook.sectionFilterMenu.props.selectedItemId, '2002')
+  const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
+  filter.clickToExpand()
+  equal(filter.selectedItemLabel, 'Sophomores')
 })
 
-test('sets the section select as disabled when students are not loaded', function() {
+test('sets the filter as disabled when students are not loaded', function() {
   this.gradebook.updateSectionFilterVisibility()
-  strictEqual(this.gradebook.sectionFilterMenu.props.disabled, true)
+  const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
+  filter.clickToExpand()
+  strictEqual(filter.isDisabled, true)
 })
 
-test('sets the section select as not disabled when students are loaded', function() {
+test('sets the filter as not disabled when students are loaded', function() {
   this.gradebook.setStudentsLoaded(true)
   this.gradebook.updateSectionFilterVisibility()
-  strictEqual(this.gradebook.sectionFilterMenu.props.disabled, false)
+  const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
+  filter.clickToExpand()
+  strictEqual(filter.isDisabled, false)
 })
 
-test('updates the disabled state of the rendered section select', function() {
+test('updates the disabled state of the rendered filter', function() {
   this.gradebook.updateSectionFilterVisibility()
   this.gradebook.setStudentsLoaded(true)
   this.gradebook.updateSectionFilterVisibility()
-  strictEqual(this.gradebook.sectionFilterMenu.props.disabled, false)
+  const filter = ContentFilterDriver.findWithLabelText('Section Filter', this.container)
+  filter.clickToExpand()
+  strictEqual(filter.isDisabled, false)
 })
 
-test('renders only one section select when updated', function() {
+test('renders only one section filter when updated', function() {
   this.gradebook.updateSectionFilterVisibility()
   this.gradebook.updateSectionFilterVisibility()
-  ok(this.gradebook.sectionFilterMenu, 'section menu reference has been stored')
-  strictEqual(this.container.children.length, 1, 'only one section select is rendered')
+  strictEqual(this.container.children.length, 1)
 })
 
-test('removes the section select when filter is deselected', function() {
+test('removes the filter when the "view section filter" option is turned off', function() {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateSectionFilterVisibility()
-  notOk(this.gradebook.sectionFilterMenu, 'section menu reference has been stored')
-  strictEqual(this.container.children.length, 0, 'nothing was rendered')
+  strictEqual(this.container.children.length, 0)
 })
 
 QUnit.module('Gradebook#updateCurrentSection', {
@@ -2812,59 +2806,50 @@ QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
   }
 })
 
-test('renders the grading period select when not already rendered', function() {
+test('renders the grading period filter when not already rendered', function() {
   this.gradebook.updateGradingPeriodFilterVisibility()
   ok(this.container.children.length > 0, 'grading period menu was rendered')
-})
-
-test('stores a reference to the grading period select when it is rendered', function() {
-  this.gradebook.updateGradingPeriodFilterVisibility()
-  ok(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been stored')
 })
 
 test('does not render when a grading period set does not exist', function() {
   this.gradebook.gradingPeriodSet = null
   this.gradebook.updateGradingPeriodFilterVisibility()
-  notOk(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has not been stored')
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
 test('does not render when filter is not selected', function() {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateGradingPeriodFilterVisibility()
-  notOk(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been removed')
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
 })
 
-test('renders the grading period select with a list of grading periods', function() {
+test('renders the filter with a list of grading periods', function() {
   this.gradebook.updateGradingPeriodFilterVisibility()
-  const periods = this.gradebook.gradingPeriodFilterMenu.props.items
-  strictEqual(
-    periods.length,
-    2,
-    'includes the "nothing selected" option plus the two grading periods'
-  )
-  deepEqual(periods.map(gradingPeriod => gradingPeriod.id), ['701', '702'])
+  const filter = ContentFilterDriver.findWithLabelText('Grading Period Filter', this.container)
+  filter.clickToExpand()
+  deepEqual(filter.optionLabels.slice(1), ['Grading Period 1', 'Grading Period 2'])
 })
 
-test('sets the grading period select to show the selected grading period', function() {
+test('sets the filter to show the selected grading period', function() {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
   this.gradebook.updateGradingPeriodFilterVisibility()
-  strictEqual(this.gradebook.gradingPeriodFilterMenu.props.selectedItemId, '702')
+  const filter = ContentFilterDriver.findWithLabelText('Grading Period Filter', this.container)
+  filter.clickToExpand()
+  equal(filter.selectedItemLabel, 'Grading Period 2')
 })
 
-test('renders only one grading period select when updated', function() {
+test('renders only one grading period filter when updated', function() {
   this.gradebook.updateGradingPeriodFilterVisibility()
   this.gradebook.updateGradingPeriodFilterVisibility()
-  ok(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been stored')
-  strictEqual(this.container.children.length, 1, 'only one grading period select is rendered')
+  const filter = ContentFilterDriver.findWithLabelText('Grading Period Filter', this.container)
+  filter.clickToExpand()
+  strictEqual(this.container.children.length, 1)
 })
 
-test('removes the grading period select when filter is deselected', function() {
+test('removes the filter when the "view grading period filter" option is turned off', function() {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateGradingPeriodFilterVisibility()
-  notOk(this.gradebook.gradingPeriodFilterMenu, 'grading period menu reference has been stored')
-  strictEqual(this.container.children.length, 0, 'nothing was rendered')
+  strictEqual(this.container.children.length, 0)
 })
 
 QUnit.module('Gradebook#updateModulesFilterVisibility', {
@@ -2890,22 +2875,15 @@ test('renders the module select when not already rendered', function() {
   ok(this.container.children.length > 0, 'something was rendered')
 })
 
-test('stores a reference to the module select when it is rendered', function() {
-  this.gradebook.updateModulesFilterVisibility()
-  ok(this.gradebook.moduleFilterMenu)
-})
-
 test('does not render when modules do not exist', function() {
   this.gradebook.setContextModules(undefined)
   this.gradebook.updateModulesFilterVisibility()
-  notOk(this.gradebook.moduleFilterMenu, 'module filter menu reference has not been stored')
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
 test('does not render when filter is not selected', function() {
   this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   this.gradebook.updateModulesFilterVisibility()
-  notOk(this.gradebook.moduleFilterMenu, 'grading period menu reference has been removed')
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
 })
 
@@ -2933,28 +2911,15 @@ test('renders the assignment group select when not already rendered', function()
   ok(this.container.children.length > countBefore, 'something was rendered')
 })
 
-test('stores a reference to the assignment group select when it is rendered', function() {
-  this.gradebook.updateAssignmentGroupFilterVisibility()
-  ok(this.gradebook.assignmentGroupFilterMenu)
-})
-
 test('does not render when there is only one assignment group', function() {
   this.gradebook.setAssignmentGroups([{id: '1', name: 'Assignments', position: 1}])
   this.gradebook.updateAssignmentGroupFilterVisibility()
-  notOk(
-    this.gradebook.assignmentGroupFilterMenu,
-    'assignment group filter menu reference has not been stored'
-  )
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })
 
 test('does not render when filter is not selected', function() {
   this.gradebook.setSelectedViewOptionsFilters(['modules'])
   this.gradebook.updateAssignmentGroupFilterVisibility()
-  notOk(
-    this.gradebook.assignmentGroupFilterMenu,
-    'assignment group menu reference has been removed'
-  )
   strictEqual(this.container.children.length, 0, 'rendered elements have been removed')
 })
 
@@ -2989,57 +2954,36 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
     $fixtures.innerHTML = ''
   })
 
-  test('renders the section select when not already rendered', () => {
+  test('renders the student group filter when not already rendered', () => {
     gradebook.updateStudentGroupFilterVisibility()
-    ok(container.children.length > 0, 'student group menu was rendered')
-  })
-
-  test('stores a reference to the section select when it is rendered', () => {
-    gradebook.updateStudentGroupFilterVisibility()
-    ok(gradebook.studentGroupFilterMenu, 'student group menu reference has been stored')
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    ok(filter, 'student group menu was rendered')
   })
 
   test('does not render when there are no student groups', () => {
     gradebook.studentGroupsEnabled = false
     gradebook.updateStudentGroupFilterVisibility()
-    notOk(gradebook.studentGroupFilterMenu, 'student group menu reference has not been stored')
     strictEqual(container.children.length, 0, 'nothing was rendered')
   })
 
   test('does not render when filter is not selected', () => {
     gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
     gradebook.updateStudentGroupFilterVisibility()
-    notOk(gradebook.studentGroupFilterMenu, 'student group menu reference has been removed')
     strictEqual(container.children.length, 0, 'rendered elements have been removed')
   })
 
-  test('renders the group select with group categories at the top level', () => {
+  test('renders the filter with group sets at the top level', () => {
     gradebook.updateStudentGroupFilterVisibility()
-    const studentGroupCategories = gradebook.studentGroupFilterMenu.props.items
-    deepEqual(studentGroupCategories.map(group => group.id), ['1', '2'])
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    filter.clickToExpand()
+    deepEqual(filter.optionGroupLabels, ['First Group Set', 'Second Group Set'])
   })
 
-  test('renders the group select with all groups', () => {
+  test('renders the filter with all groups', () => {
     gradebook.updateStudentGroupFilterVisibility()
-    const studentGroupCategories = gradebook.studentGroupFilterMenu.props.items
-    const studentGroups = _.flatten(studentGroupCategories.map(category => category.children))
-    deepEqual(studentGroups.map(group => group.id), ['1', '2', '3', '4'])
-  })
-
-  test('unescapes student group category names', () => {
-    gradebook.updateStudentGroupFilterVisibility()
-    const studentGroupCategories = gradebook.studentGroupFilterMenu.props.items
-    deepEqual(studentGroupCategories.map(section => section.name), [
-      'First Group Set',
-      'Second Group Set'
-    ])
-  })
-
-  test('unescapes student group names', () => {
-    gradebook.updateStudentGroupFilterVisibility()
-    const studentGroupCategories = gradebook.studentGroupFilterMenu.props.items
-    const studentGroups = _.flatten(studentGroupCategories.map(category => category.children))
-    deepEqual(studentGroups.map(section => section.name), [
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    filter.clickToExpand()
+    deepEqual(filter.optionLabels.slice(1), [
       'First Group Set 1',
       'First Group Set 2',
       'Second Group Set 1',
@@ -3047,42 +2991,48 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
     ])
   })
 
-  test('sets the student group select to show the saved "filter rows by" setting', () => {
+  test('sets the filter to show the saved "filter rows by" setting', () => {
     gradebook.setFilterRowsBySetting('studentGroupId', '4')
     gradebook.updateStudentGroupFilterVisibility()
-    strictEqual(gradebook.studentGroupFilterMenu.props.selectedItemId, '4')
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    filter.clickToExpand()
+    equal(filter.selectedItemLabel, 'Second Group Set 2')
   })
 
-  test('sets the student group select as disabled when students are not loaded', () => {
+  test('sets the filter as disabled when students are not loaded', () => {
     gradebook.updateStudentGroupFilterVisibility()
-    strictEqual(gradebook.studentGroupFilterMenu.props.disabled, true)
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    filter.clickToExpand()
+    strictEqual(filter.isDisabled, true)
   })
 
-  test('sets the section select as not disabled when students are loaded', () => {
+  test('sets the filter as not disabled when students are loaded', () => {
     gradebook.setStudentsLoaded(true)
     gradebook.updateStudentGroupFilterVisibility()
-    strictEqual(gradebook.studentGroupFilterMenu.props.disabled, false)
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    filter.clickToExpand()
+    strictEqual(filter.isDisabled, false)
   })
 
-  test('updates the disabled state of the rendered section select', () => {
+  test('updates the disabled state of the rendered filter', () => {
     gradebook.updateStudentGroupFilterVisibility()
     gradebook.setStudentsLoaded(true)
     gradebook.updateStudentGroupFilterVisibility()
-    strictEqual(gradebook.studentGroupFilterMenu.props.disabled, false)
+    const filter = ContentFilterDriver.findWithLabelText('Student Group Filter', container)
+    filter.clickToExpand()
+    strictEqual(filter.isDisabled, false)
   })
 
-  test('renders only one section select when updated', () => {
+  test('renders only one student group filter when updated', () => {
     gradebook.updateStudentGroupFilterVisibility()
     gradebook.updateStudentGroupFilterVisibility()
-    ok(gradebook.studentGroupFilterMenu, 'student group menu reference has been stored')
-    strictEqual(container.children.length, 1, 'only one section select is rendered')
+    strictEqual(container.children.length, 1)
   })
 
-  test('removes the section select when filter is deselected', () => {
+  test('removes the filter when the "view student group filter" option is turned off', () => {
     gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
     gradebook.updateStudentGroupFilterVisibility()
-    notOk(gradebook.studentGroupFilterMenu, 'student group menu reference has been stored')
-    strictEqual(container.children.length, 0, 'nothing was rendered')
+    strictEqual(container.children.length, 0)
   })
 })
 
@@ -5836,6 +5786,7 @@ QUnit.module('Gradebook', () => {
         <div id="grading-periods-filter-container"></div>
         <div id="modules-filter-container"></div>
         <div id="sections-filter-container"></div>
+        <div id="student-group-filter-container"></div>
         <div id="search-filter-container">
           <input type="text" />
         </div>
@@ -5845,8 +5796,8 @@ QUnit.module('Gradebook', () => {
         grading_period_set: {
           id: '1501',
           grading_periods: [
-            {id: '1401', name: 'Grading Period #1'},
-            {id: '1402', name: 'Grading Period #2'}
+            {id: '1401', title: 'Grading Period #1'},
+            {id: '1402', title: 'Grading Period #2'}
           ]
         },
         sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
