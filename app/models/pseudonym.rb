@@ -73,7 +73,8 @@ class Pseudonym < ActiveRecord::Base
   acts_as_authentic do |config|
     config.login_field :unique_id
     config.perishable_token_valid_for = 30.minutes
-    config.crypto_provider = Authlogic::CryptoProviders::Sha512
+    config.crypto_provider = ScryptProvider.new("4000$8$1$")
+    config.transition_from_crypto_providers = [Authlogic::CryptoProviders::Sha512]
   end
 
   attr_writer :require_password
