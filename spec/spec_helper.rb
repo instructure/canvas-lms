@@ -478,7 +478,7 @@ RSpec.configure do |config|
     Canvas.redis_used = false
   end
 
-  if Bullet.enable?
+  if CANVAS_RAILS5_2 && Bullet.enable?
     config.before(:each) do |example|
       Bullet.start_request
       # we walk the example group chain until we reach one that actually recorded something

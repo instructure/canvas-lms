@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-gem 'rails', '5.2.3'
-  gem 'loofah', '2.2.3'
+if CANVAS_RAILS5_2
+  gem 'rails', '5.2.3'
+    gem 'loofah', '2.2.3'
+else
+  gem 'rails', '6.0.0.rc2'
+end
 
 gem 'rack', '2.0.6'
 
@@ -61,7 +65,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.15.11'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.3.4'
+gem 'switchman-inst-jobs', '1.3.5'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.25.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
@@ -124,7 +128,7 @@ gem 'inst_statsd', '2.1.6'
 gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
-gem 'academic_benchmarks', '0.0.10', require: false
+gem 'academic_benchmarks', '0.0.11', require: false
 
 gem 'graphql', '1.9.7'
 gem 'graphql-batch', '0.4.1'
