@@ -26,7 +26,6 @@ function renderLink(anchorProps) {
   // <Tooltip /> and disabled <Link /> currently do not work together.
   return (
     <a
-      className="icon-speed-grader"
       rel="noopener noreferrer"
       target="_blank"
       {...anchorProps}
@@ -37,7 +36,9 @@ function renderLink(anchorProps) {
 }
 
 function SpeedGraderLink(props) {
+  const className = props.className ? `icon-speed-grader ${props.className}` : 'icon-speed-grader'
   let anchorProps = {
+    className,
     href: props.href
   }
 
@@ -60,6 +61,7 @@ function SpeedGraderLink(props) {
 }
 
 SpeedGraderLink.propTypes = {
+  className: string,
   disabled: bool.isRequired,
   href: string.isRequired,
   disabledTip: string
