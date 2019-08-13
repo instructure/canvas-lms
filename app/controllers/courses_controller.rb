@@ -490,7 +490,7 @@ class CoursesController < ApplicationController
   end
 
   def load_enrollments_for_index
-    all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).preload(:enrollment_state, :course, :course_section).to_a
+    all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
     @past_enrollments = []
     @current_enrollments = []
     @future_enrollments = []
