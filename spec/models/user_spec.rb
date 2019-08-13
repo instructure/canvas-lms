@@ -1793,6 +1793,15 @@ describe User do
       expect(-> {@user.email = ''}).to raise_error("Validation failed: Path can't be blank, Email is invalid")
       expect(@user.communication_channels.any?).to be_falsey
     end
+
+    it "restores retired channels" do
+      @user = User.create!
+      path = 'john@example.com'
+      @user.communication_channels.create!(:path => path, :workflow_state => "retired")
+      @user.email = path
+      expect(@user.communication_channels.first).to be_unconfirmed
+      expect(@user.email).to eq 'john@example.com'
+    end
   end
 
   describe "event methods" do

@@ -866,6 +866,7 @@ class User < ActiveRecord::Base
       cc.user = self
     end
     cc.move_to_top
+    cc.workflow_state = 'unconfirmed' if cc.retired?
     cc.save!
     self.reload
     self.clear_email_cache!
