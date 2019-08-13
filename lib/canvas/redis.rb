@@ -74,6 +74,11 @@ module Canvas::Redis
     raise reply if reply.is_a?(Exception)
     reply
   rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
+    # spring calls its after_fork hooks _after_ establishing a new db connection
+    # after forking. so we don't get a chance to close the connection. just ignore
+    # the error
+    return failure_retval if e.is_a?(::Redis::InheritedError) && defined?(Spring)
+
     # We want to rescue errors such as "max number of clients reached", but not
     # actual logic errors such as trying to evalsha a script that doesn't
     # exist.
