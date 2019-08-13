@@ -2465,6 +2465,10 @@ class ApplicationController < ActionController::Base
     ctx[:url] = request.url
     ctx[:producer] = 'canvas'
 
+    if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
+      ctx[:compact_live_events] = true
+    end
+
     StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
   end

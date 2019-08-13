@@ -23,6 +23,8 @@ require 'active_support/core_ext/object/blank'
 
 module LiveEvents
   class Client
+    ATTRIBUTE_BLACKLIST = [:compact_live_events].freeze
+
     attr_reader :stream_name, :stream_client
 
     def self.config
@@ -68,7 +70,7 @@ module LiveEvents
       statsd_prefix = "live_events.events.#{event_name}"
 
       ctx ||= {}
-      attributes = ctx.merge({
+      attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
         event_name: event_name,
         event_time: time.utc.iso8601(3)
       })

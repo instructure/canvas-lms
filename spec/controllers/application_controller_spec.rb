@@ -1128,7 +1128,8 @@ describe ApplicationController do
         {
           uuid: 'account_uuid1',
           global_id: 'account_global1',
-          lti_guid: 'lti1'
+          lti_guid: 'lti1',
+          feature_enabled?: false
         }
       end
 

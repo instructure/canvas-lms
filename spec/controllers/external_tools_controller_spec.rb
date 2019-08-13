@@ -1501,6 +1501,7 @@ describe ExternalToolsController do
     end
 
     it 'updates allow_membership_service_access if the feature flag is set' do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       @tool = new_valid_tool(@course)
       user_session(@teacher)

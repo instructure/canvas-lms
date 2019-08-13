@@ -32,6 +32,7 @@ describe Canvas::LiveEvents do
 
   before do
     LiveEvents.stream_client = FakeStreamClient.new
+    allow(LiveEvents).to receive(:get_context).and_return({compact_live_events: true})
   end
 
   class FakeSettings
@@ -78,7 +79,8 @@ describe Canvas::LiveEvents do
           :context_type => context_type,
           :root_account_id => root_account_id,
           :root_account_uuid => root_account_uuid.to_s,
-          :root_account_lti_guid => root_account_lti_guid.to_s
+          :root_account_lti_guid => root_account_lti_guid.to_s,
+          :compact_live_events => true
         }
       )
     end
@@ -87,7 +89,7 @@ describe Canvas::LiveEvents do
       LiveEvents.set_context(nil)
       user = user_model
       amended_context = Canvas::LiveEvents.amended_context(user)
-      expect(amended_context).to eq({context_id: user.global_id, context_type: 'User'})
+      expect(amended_context).to eq({context_id: user.global_id, context_type: 'User', compact_live_events: true})
     end
   end
 
@@ -95,15 +97,6 @@ describe Canvas::LiveEvents do
     it "should not include associated_user_id for non-observer enrollments" do
       enrollment = course_with_student
       expect_event('enrollment_updated', hash_excluding(:associated_user_id))
-      Canvas::LiveEvents.enrollment_updated(enrollment)
-    end
-
-    it "should include nil associated_user_id for unassigned observer enrollment" do
-      enrollment = course_with_observer
-      expect_event('enrollment_updated',
-        hash_including(
-          associated_user_id: nil
-        ))
       Canvas::LiveEvents.enrollment_updated(enrollment)
     end
 
@@ -260,13 +253,13 @@ describe Canvas::LiveEvents do
     it "should set the grader to nil for an autograded quiz" do
       quiz_with_graded_submission([])
 
-      expect_event('grade_change', hash_including(
+      expect_event('grade_change', hash_including({
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
-      ), course_context)
+      }.compact!), course_context)
 
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, @quiz_submission.submission.versions.current.model)
     end
@@ -294,12 +287,12 @@ describe Canvas::LiveEvents do
       submission = @course.assignments.first.submissions.first
 
       expect_event('grade_change',
-        hash_including(
+        hash_including({
           assignment_id: submission.global_assignment_id.to_s,
           user_id: @student.global_id.to_s,
           student_id: @student.global_id.to_s,
           student_sis_id: nil
-        ), course_context)
+        }.compact!), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
@@ -572,7 +565,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }.compact!).once
 
       Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
     end
@@ -601,7 +594,6 @@ describe Canvas::LiveEvents do
         asset_name: "old title",
         asset_type: 'wiki_page',
         asset_id: @page.global_id.to_s,
-        asset_subtype: nil,
         category: 'category',
         role: 'role',
         level: 'participation'
@@ -623,7 +615,7 @@ describe Canvas::LiveEvents do
         level: 'participation',
         filename: @attachment.filename,
         display_name: @attachment.display_name
-      }).once
+      }.compact!).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
     end
@@ -651,7 +643,7 @@ describe Canvas::LiveEvents do
           lti_resource_link_id: assignment.lti_resource_link_id,
           lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
           submission_types: assignment.submission_types
-        })).once
+        }.compact!)).once
 
       Canvas::LiveEvents.assignment_created(assignment)
     end
@@ -679,7 +671,7 @@ describe Canvas::LiveEvents do
           lti_resource_link_id: assignment.lti_resource_link_id,
           lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
           submission_types: assignment.submission_types
-        })).once
+        }.compact!)).once
 
       Canvas::LiveEvents.assignment_updated(assignment)
     end
@@ -703,7 +695,7 @@ describe Canvas::LiveEvents do
         integration_data: assignment_group.integration_data,
         rules: assignment_group.rules,
         workflow_state: assignment_group.workflow_state
-      }
+      }.compact!
     end
 
     context 'when updated' do
@@ -815,7 +807,7 @@ describe Canvas::LiveEvents do
           nonxlist_course_id: nil,
           stuck_sis_fields: section.stuck_sis_fields,
           integration_id: nil
-        }).once
+        }.compact!).once
       Canvas::LiveEvents.course_section_created(section)
     end
   end
@@ -844,7 +836,7 @@ describe Canvas::LiveEvents do
           nonxlist_course_id: nil,
           stuck_sis_fields: section.stuck_sis_fields,
           integration_id: nil
-        }).once
+        }.compact!).once
       Canvas::LiveEvents.course_section_updated(section)
     end
   end
@@ -898,7 +890,7 @@ describe Canvas::LiveEvents do
         name: context_module.name,
         position: context_module.position,
         workflow_state: context_module.workflow_state
-      }
+      }.compact!
 
       expect_event('module_created', expected_event_body).once
 
@@ -918,7 +910,7 @@ describe Canvas::LiveEvents do
         name: context_module.name,
         position: context_module.position,
         workflow_state: context_module.workflow_state
-      }
+      }.compact!
 
       expect_event('module_updated', expected_event_body).once
 
@@ -1038,7 +1030,7 @@ describe Canvas::LiveEvents do
         workflow_state: topic.workflow_state,
         lock_at: topic.lock_at,
         updated_at: topic.updated_at
-      }).once
+      }.compact!).once
 
       Canvas::LiveEvents.discussion_topic_created(topic)
     end
@@ -1141,7 +1133,7 @@ describe Canvas::LiveEvents do
           assessed_at: result.assessed_at,
           title: result.title,
           percent: result.percent
-        }).once
+        }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
       end
@@ -1164,7 +1156,7 @@ describe Canvas::LiveEvents do
           assessed_at: result.assessed_at,
           title: result.title,
           percent: result.percent
-        }).once
+        }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)
       end

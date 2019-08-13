@@ -460,3 +460,9 @@ filter_speed_grader_by_student_group:
   environments:
     production:
       state: hidden
+compact_live_event_payloads:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Remove null values from live event payloads
+  description: Canvas will remove keys with null values from
+    live event payloads if this feature is enabled.

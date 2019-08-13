@@ -120,6 +120,32 @@ describe LiveEvents::Client do
         partition_key: 'pkey'
       }])
     end
+
+    it "should not send blacklisted conxted attributes" do
+      now = Time.now
+      @client.post_event(
+        'event',
+        {},
+        now,
+        { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent', compact_live_events: true },
+        'pkey'
+      )
+      LiveEvents.worker.stop!
+      expect_put_records([{
+        data: {
+          "attributes" => {
+            "event_name" => 'event',
+            "event_time" => now.utc.iso8601(3),
+            "user_id" => 123,
+            "real_user_id" => 321,
+            "login" => 'loginname',
+            "user_agent" => 'agent'
+          },
+          "body" => {}
+        },
+        partition_key: 'pkey'
+      }])
+    end
   end
 
   describe "LiveEvents helper" do
