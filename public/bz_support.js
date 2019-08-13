@@ -128,6 +128,8 @@ function bzRetainedInfoSetup(readonly) {
       }
     } else if(element.tagName == "INPUT" || element.tagName == "TEXTAREA"){
       element.value = value;
+    } else if(element.tagName == "IFRAME") {
+      element.src = value;
     } else if(element.tagName == "SELECT") {
       element.value = value;
     } else {
