@@ -1681,6 +1681,7 @@ class BzController < ApplicationController
 
     url = URI.parse("https://#{BeyondZConfiguration.docusign_host}/oauth/token")
 
+    Rails.logger.error "The DocuSign token has expired. Go here to refresh it: <domain>/bz/docusign_authorize" if account.docusign_refresh_token.nil?
     data = "grant_type=refresh_token&refresh_token=#{URI::encode(account.docusign_refresh_token)}"
 
     headers = {}
