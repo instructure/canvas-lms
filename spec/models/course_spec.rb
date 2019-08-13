@@ -1120,6 +1120,8 @@ describe Course do
       @course.sis_source_id = 'sis_id'
       @course.lti_context_id = 'lti_context_id'
       @course.stuck_sis_fields = [].to_set
+      gs = @course.grading_standards.create!(:title => "Standard eh", :data => [["Eh", 0.93], ["Eff", 0]])
+      @course.grading_standard = gs
       profile = @course.profile
       profile.description = "description"
       profile.save!
@@ -1145,6 +1147,7 @@ describe Course do
       expect(@course.lti_context_id).not_to be_nil
 
       @new_course.reload
+      expect(@new_course.grading_standard).to be_nil
       expect(@new_course).to be_created
       expect(@new_course.course_sections).not_to be_empty
       expect(@new_course.students).to eq [@student]

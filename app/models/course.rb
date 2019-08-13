@@ -3010,7 +3010,8 @@ class Course < ActiveRecord::Base
       new_course = Course.new
       keys_to_copy = Course.column_names - [
         :id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view,
-        :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id
+        :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id,
+        :grading_standard_id
       ].map(&:to_s)
       self.attributes.each do |key, val|
         new_course.write_attribute(key, val) if keys_to_copy.include?(key)
