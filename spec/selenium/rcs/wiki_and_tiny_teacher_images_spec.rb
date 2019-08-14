@@ -61,5 +61,30 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       wait_for_ajaximations
       expect(sidebar_images.count).to eq 2
     end
+
+    it "should paginate images" do
+      wiki_page_tools_file_tree_setup(true, true)
+      150.times do |i|
+        image = @root_folder.attachments.build(:context => @course)
+        path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/graded.png')
+        image.display_name = "image #{i}"
+        image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        image.save!
+      end
+
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 50
+
+      # click the load more link; it should load another 50
+      fj('button:contains("Load more results")').click
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 100
+
+      # click the very last load more link
+      fj('button:contains("Load more results")').click
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 150
+    end
   end
 end
