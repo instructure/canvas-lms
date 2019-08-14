@@ -93,6 +93,29 @@ describe 'Account Reports API', type: :request do
         expect(report.key?('file_url')).to be_truthy
       end
     end
+
+    it 'should paginate reports' do
+      report2 = AccountReport.new
+      report2.account = @admin.account
+      report2.user = @admin
+      report2.progress = rand(100)
+      report2.report_type = "student_assignment_outcome_map_csv"
+      report2.parameters = HashWithIndifferentAccess['param' => 'test', 'error'=>'failed']
+
+      folder = Folder.assert_path("test", @admin.account)
+      report2.attachment = Attachment.create!(folder: folder, context: @admin.account, filename: "test.txt",
+        uploaded_data: StringIO.new("test file"))
+      report2.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}?per_page=1&page=1",
+                      { report: @report.report_type, controller: 'account_reports', action: 'index', format: 'json',
+                        account_id: @admin.account.id.to_s, per_page: 1, page: 1 })
+      expect(json.length).to eq 1
+      json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}?per_page=1&page=2",
+                      { report: @report.report_type, controller: 'account_reports', action: 'index', format: 'json',
+                        account_id: @admin.account.id.to_s, per_page: 1, page: 2 })
+      expect(json.length).to eq 1
+    end
   end
 
   describe 'show' do
