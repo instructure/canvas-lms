@@ -70,7 +70,7 @@ const DefaultToolForm = props => {
 
   return (
     <View display="block" padding="medium none small small">
-      <Button id="default-tool-launch-button" onClick={handleLaunchButton}>
+      <Button id="default-tool-launch-button" name="default-tool-launch-button" onClick={handleLaunchButton}>
         {I18n.t('Add a Question Set')}
       </Button>
 

@@ -690,8 +690,12 @@ export default class EditView extends ValidatedFormView
 
   _validateExternalTool: (data, errors) =>
     if data.submission_type == 'external_tool' && data.grading_type != 'not_graded' && $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
+      message = I18n.t 'External Tool URL cannot be left blank'
       errors["external_tool_tag_attributes[url]"] = [
-        message: I18n.t 'External Tool URL cannot be left blank'
+        message: message
+      ]
+      errors["default-tool-launch-button"] = [
+        message: message
       ]
     errors
 
