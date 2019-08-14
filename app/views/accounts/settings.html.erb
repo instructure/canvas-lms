@@ -19,16 +19,22 @@
   js_bundle :account_settings
   css_bundle :account_settings, :reports, :tinymce
   provide :page_title, t(:page_title, "Account Settings")
-  if can_do(@context, @current_user, :manage_storage_quotas)
-    js_env :ACCOUNT => {
+
+  js_env(
+    :ACCOUNT => {
       'id' => @context.id,
-      'default_storage_quota_mb' => @context.default_storage_quota_mb,
-      'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
-      'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb,
       'site_admin' => @account.site_admin?,
       'root_account' => @account.root_account?
-    }
-  end
+    }.tap do |h|
+      if can_do(@context, @current_user, :manage_storage_quotas)
+        h.merge!(
+          'default_storage_quota_mb' => @context.default_storage_quota_mb,
+          'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
+          'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb
+        )
+      end
+    end
+  )
 %>
 <% provide :right_side do %>
   <%= render :partial => "additional_settings_right_side" %>
