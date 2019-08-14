@@ -17,18 +17,16 @@
  */
 
 import React from 'react'
-import { string, func } from 'prop-types'
-import { TextArea } from '@instructure/ui-forms'
+import {string, func} from 'prop-types'
+import {TextArea} from '@instructure/ui-forms'
 
-export default function EmbedPanel ({embedCode, setEmbedCode, label}) {
+export default function EmbedPanel({embedCode, setEmbedCode, label}) {
   return (
     <TextArea
       maxHeight="10rem"
       label={label}
       value={embedCode}
-      onChange={(e) =>{
-        setEmbedCode(e.target.value)}
-      }
+      onChange={e => setEmbedCode(e.target.value)}
     />
   )
 }

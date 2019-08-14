@@ -84,7 +84,7 @@ export default function ComputerPanel({
           setHasUploadedFile(true)
         }}
         onDropRejected={() => {
-          setMessages((msgs) =>
+          setMessages(msgs =>
             msgs.concat({
               text: uploadMediaTranslations.UploadMediaStrings.INVALID_FILE_TEXT,
               type: 'error'
@@ -113,4 +113,3 @@ ComputerPanel.propTypes = {
   theFile: instanceOf(File),
   uploadMediaTranslations: translationShape
 }
-

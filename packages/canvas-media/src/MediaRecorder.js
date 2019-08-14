@@ -16,32 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+
 import {Alert} from '@instructure/ui-alerts'
 import {canUseMediaCapture, MediaCapture} from '@instructure/media-capture'
-import {string, object} from 'prop-types'
-import React from 'react'
+import {object, string} from 'prop-types'
 
 export default class MediaRecorder extends React.Component {
   // saveFile = (file) => {
-    // this.props.contentProps.saveMediaRecording(file, this.props.editor, this.props.dismiss)
+  //   this.props.contentProps.saveMediaRecording(file, this.props.editor, this.props.dismiss)
   // }
 
   render() {
     return (
       <div>
         {canUseMediaCapture() ? (
-          <MediaCapture
-            translations={this.props.MediaCaptureStrings}
-            onCompleted={this.saveFile}
-          />
-        ) :
-        (<Alert
-          variant="error"
-          margin="small"
-        >
-          {this.props.errorMessage}
-        </Alert>)
-      }
+          <MediaCapture translations={this.props.MediaCaptureStrings} onCompleted={this.saveFile} />
+        ) : (
+          <Alert variant="error" margin="small">
+            {this.props.errorMessage}
+          </Alert>
+        )}
       </div>
     )
   }
@@ -49,5 +44,5 @@ export default class MediaRecorder extends React.Component {
 
 MediaRecorder.propTypes = {
   errorMessage: string.isRequired,
-  MediaCaptureStrings: object, // eslint-disable-line react/forbid-prop-types
+  MediaCaptureStrings: object // eslint-disable-line react/forbid-prop-types
 }

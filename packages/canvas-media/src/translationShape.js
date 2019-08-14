@@ -19,19 +19,19 @@
 import {shape, string} from 'prop-types'
 
 const translationShape = shape({
-  LOADING_MEDIA: string,
-  COMPUTER_PANEL_TITLE: string,
-  DRAG_FILE_TEXT: string,
-  RECORD_PANEL_TITLE: string,
-  EMBED_PANEL_TITLE: string,
-  SUBMIT_TEXT: string,
-  CLOSE_TEXT: string,
-  UPLOAD_MEDIA_LABEL: string,
   CLEAR_FILE_TEXT: string,
-  INVALID_FILE_TEXT: string,
+  CLOSE_TEXT: string,
+  COMPUTER_PANEL_TITLE: string,
   DRAG_DROP_CLICK_TO_BROWSE: string,
+  DRAG_FILE_TEXT: string,
+  EMBED_PANEL_TITLE: string,
   EMBED_VIDEO_CODE_TEXT: string,
+  INVALID_FILE_TEXT: string,
+  LOADING_MEDIA: string,
+  RECORD_PANEL_TITLE: string,
+  SUBMIT_TEXT: string,
   UPLOADING_ERROR: string,
+  UPLOAD_MEDIA_LABEL: string
 })
 
 export default translationShape
