@@ -22,6 +22,7 @@ import {ExternalTool} from './ExternalTool'
 import {Rubric} from './Rubric'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
+import {UserGroups} from './UserGroups'
 
 export const EXTERNAL_TOOLS_QUERY = gql`
   query ExternalTools($courseID: ID!) {
@@ -109,4 +110,13 @@ export const SUBMISSION_ID_QUERY = gql`
       }
     }
   }
+`
+
+export const USER_GROUPS_QUERY = gql`
+  query GetUserGroups($userID: ID!) {
+    legacyNode(_id: $userID, type: User) {
+      ...UserGroups
+    }
+  }
+  ${UserGroups.fragment}
 `

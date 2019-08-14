@@ -2987,6 +2987,7 @@ type User implements Node & Timestamped {
     """
     courseId: ID
   ): [Enrollment!]!
+  groups: [Group!]
   id: ID!
   name: String
 
