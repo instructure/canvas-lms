@@ -46,8 +46,8 @@ function sanitizeExternalPlugins(external_plugins) {
   return external_plugins;
 }
 
-function sanitizeEditorOptions(options) {
-  let fixed = Object.assign({}, options);
+export default function sanitizeEditorOptions(options) {
+  const fixed = { ...options};
 
   fixed.plugins = sanitizePlugins(options.plugins);
   fixed.external_plugins = sanitizeExternalPlugins(options.external_plugins);
@@ -55,5 +55,3 @@ function sanitizeEditorOptions(options) {
 
   return fixed;
 }
-
-module.exports = sanitizeEditorOptions;
