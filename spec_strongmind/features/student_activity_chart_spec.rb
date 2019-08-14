@@ -48,9 +48,9 @@ RSpec.describe 'Student Access Report', type: :feature, js: true do
 
       click_link 'Access Report'
 
-      expect(page).to have_selector('.student-activity-chart')
+      expect(page).to have_selector('#student-activity-chart')
 
-      within '.student-activity-chart' do
+      within '#student-activity-chart' do
         expect(all('.band-8').size).to be >= 1
         expect(all('.band-7').size).to be >= 1
         expect(all('.band-6').size).to be >= 1
