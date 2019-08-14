@@ -329,6 +329,16 @@ test('does not allow blank external tool url', function() {
   )
 })
 
+test('does not allow blank default external tool url', function() {
+  const view = this.editView()
+  const data = {submission_type: 'external_tool'}
+  const errors = view._validateExternalTool(data, [])
+  equal(
+    errors['default-tool-launch-button'][0].message,
+    'External Tool URL cannot be left blank'
+  )
+})
+
 test('does not validate allowed extensions if file uploads is not a submission type', function() {
   const view = this.editView()
   const data = {submission_types: ['online_url'], allowed_extensions: []}
