@@ -281,9 +281,14 @@
         <% if assessing %>
           <% if question %>
             <% if question_type.display_answers == "multiple" && !["missing_word_question", "fill_in_multiple_blanks_question"].include?(hash_get(question, :question_type)) %>
-              <% list = hash_get(question, :answers, []) %>
-              <%= render :partial => "quizzes/quizzes/multi_answer", :collection => list, :locals =>
-                  {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
+              <fieldset>
+                <legend class="screenreader-only">
+                  <%= t(:group_of_answer_choices, "Group of answer choices") %>
+                </legend>
+                <% list = hash_get(question, :answers, []) %>
+                <%= render :partial => "quizzes/quizzes/multi_answer", :collection => list, :locals =>
+                    {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer} %>
+              </fieldset>
             <% elsif question_type.display_answers == "single" %>
               <%= render :partial => "quizzes/quizzes/single_answer", :locals =>
                     {:question => question, :right_answers => right_answers, :question_type => question_type, :user_answer => user_answer, :editable => assessing} %>
