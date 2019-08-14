@@ -18,22 +18,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def withGerritCredentials = { Closure command ->
-  withCredentials([
-    sshUserPrivateKey(credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USERNAME')
-  ]) { command() }
-}
-
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
-  withGerritCredentials({ ->
-    sh """
-      mkdir -p ${path}/${customRepoDestination ?: repo}
-      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -v -C ${path}/${customRepoDestination ?: repo}
-    """
-  })
-}
-
 pipeline {
   agent none
   options {
@@ -42,43 +26,23 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    GERRIT_PORT = '29418'
-    GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-    MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
   }
 
   stages {
     stage ('Run Tests Parallel') {
       parallel {
-        stage('Smoke Tests') {
+        stage('Selenium Tests') {
           agent { label 'docker' }
           steps {
             timeout(time: 60) {
               sh 'printenv | sort'
               sh 'build/new-jenkins/docker-compose-build.sh'
+              // Todo: create script for selenium tests
               sh 'build/new-jenkins/smoke-test.sh'
             }
           }
-          post {
-            cleanup {
-              sh 'docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all'
-            }
-          }
-        }
-
-        stage('Xbrowser Tests') {
-          agent { label 'docker' }
-          steps {
-            timeout(time: 60) {
-              sh 'printenv | sort'
-              sh 'build/new-jenkins/docker-compose-build.sh'
-              sh 'build/new-jenkins/xbrowser-test.sh'
-            }
-          }
-
           post {
             cleanup {
               sh 'docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all'

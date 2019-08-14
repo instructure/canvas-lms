@@ -19,23 +19,26 @@
  */
 
 pipeline {
-  agent { label 'docker' }
+  agent none
   options {
     ansiColor('xterm')
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-vendored-gems.yml'
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
   }
-
+  // Todo: This will run all rspec tests consecutively, still need to get parallel depending on runtime
   stages {
-    stage ('Run Vendored Gems specs') {
+    stage ('Rspec Tests') {
+      agent { label 'docker' }
       steps {
         timeout(time: 60) {
           sh 'printenv | sort'
-          sh 'build/new-jenkins/test-gems.sh'
+          sh 'build/new-jenkins/docker-compose-build.sh'
+          // Todo: create script for rspec tests
+          // sh 'build/new-jenkins/rspec-tests.sh'
         }
       }
 

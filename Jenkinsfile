@@ -35,6 +35,16 @@ def fetchFromGerrit = { String repo, String path, String customRepoDestination =
   })
 }
 
+def build_parameters = [
+  string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+  string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+  string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
+  string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
+  string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
+  string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
+  string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}")
+]
+
 pipeline {
   agent { label 'docker' }
 
@@ -144,21 +154,23 @@ pipeline {
 
     stage('Parallel Run Tests') {
       parallel {
+        // TODO: this is temporary until we can get some actual builds passing
+        stage('Smoke Test') {
+          steps {
+            timeout(time: 10) {
+              sh 'build/new-jenkins/docker-compose-build.sh'
+              sh 'build/new-jenkins/smoke-test.sh'
+            }
+          }
+        }
+
         stage('Selenium Chrome') {
           steps {
             // propagate set to false until we can get tests passing
             build(
               job: 'selenium-chrome',
               propagate: false,
-              parameters: [
-                string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-                string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
-                string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
-                string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
-                string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
-                string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
-                string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}")
-              ]
+              parameters: build_parameters
             )
           }
         }
@@ -169,15 +181,62 @@ pipeline {
             build(
               job: 'vendored-gems',
               propagate: false,
-              parameters: [
-                string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-                string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
-                string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
-                string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
-                string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
-                string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
-                string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}")
-              ]
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Rspec') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'rspec',
+              propagate: false,
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Selenium Performance Chrome') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'selenium-performance-chrome',
+              propagate: false,
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Contract Tests') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'contract-tests',
+              propagate: false,
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Linters and JS') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'linters-and-js',
+              propagate: false,
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Xbrowser') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'xbrowser',
+              propagate: false,
+              parameters: build_parameters
             )
           }
         }
