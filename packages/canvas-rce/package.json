@@ -103,6 +103,7 @@
   "dependencies": {
     "@instructure/canvas-theme": "^6.8.1",
     "@instructure/media-capture": "^5",
+    "@instructure/k5uploader": ">=1",
     "@instructure/ui-a11y": "^6.8.1",
     "@instructure/ui-alerts": "^6.8.1",
     "@instructure/ui-billboard": "^6.8.1",
