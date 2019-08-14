@@ -84,7 +84,6 @@ export default function ImageOptionsTray(props) {
       <Flex.Item>{formatMessage('Alt Text')}</Flex.Item>
 
       <Flex.Item margin="0 0 0 xx-small">
-        <PresentationContent>
           <Tooltip
             on={['hover', 'focus']}
             placement="top"
@@ -98,7 +97,6 @@ export default function ImageOptionsTray(props) {
               <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
             </Button>
           </Tooltip>
-        </PresentationContent>
       </Flex.Item>
     </Flex>
   )

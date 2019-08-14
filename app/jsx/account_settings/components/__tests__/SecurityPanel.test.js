@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent} from 'react-testing-library'
+import {fireEvent} from '@testing-library/react'
 import {ConnectedSecurityPanel} from '../SecurityPanel'
 import {renderWithRedux} from './utils'
 

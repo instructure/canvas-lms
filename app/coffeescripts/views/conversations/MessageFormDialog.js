@@ -35,29 +35,6 @@ import 'jquery.elastic'
 // #
 // reusable message composition dialog
 export default class MessageFormDialog extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.onCourse = this.onCourse.bind(this)
-    this.recipientIdsChanged = this.recipientIdsChanged.bind(this)
-    this.recipientTotalChanged = this.recipientTotalChanged.bind(this)
-    this.canAddNotesFor = this.canAddNotesFor.bind(this)
-    this.resizeBody = this.resizeBody.bind(this)
-    this.handleBodyClick = this.handleBodyClick.bind(this)
-    this.handleAttachmentClick = this.handleAttachmentClick.bind(this)
-    this.handleAttachmentDblClick = this.handleAttachmentDblClick.bind(this)
-    this.handleAttachment = this.handleAttachment.bind(this)
-    this.handleAttachmentKeyDown = this.handleAttachmentKeyDown.bind(this)
-    this.removeAttachment = this.removeAttachment.bind(this)
-    this.focusPrevAttachment = this.focusPrevAttachment.bind(this)
-    this.focusNextAttachment = this.focusNextAttachment.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.template = template
@@ -230,8 +207,8 @@ export default class MessageFormDialog extends DialogBaseView {
       el: this.$recipients,
       disabled: this.model != null ? this.model.get('private') : undefined
     }).render()
-    this.recipientView.on('changeToken', this.recipientIdsChanged)
-    this.recipientView.on('recipientTotalChange', this.recipientTotalChanged)
+    this.recipientView.on('changeToken', this.recipientIdsChanged, this)
+    this.recipientView.on('recipientTotalChange', this.recipientTotalChanged, this)
 
     if (!ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT) {
       this.$messageCourse.attr('aria-required', true)
@@ -249,18 +226,18 @@ export default class MessageFormDialog extends DialogBaseView {
       if (this.model.get('context_code')) {
         this.onCourse({id: this.model.get('context_code'), name: this.model.get('context_name')})
       } else {
-        this.courseView.on('course', this.onCourse)
+        this.courseView.on('course', c => this.onCourse(c))
         this.courseView.setValue(`course_${_.keys(this.model.get('audience_contexts').courses)[0]}`)
       }
       this.recipientView.disable(false)
     } else if (this.launchParams) {
-      this.courseView.on('course', this.onCourse)
+      this.courseView.on('course', c => this.onCourse(c))
       if (this.launchParams.context) {
         this.courseView.setValue(this.launchParams.context)
       }
       this.recipientView.disable(false)
     } else {
-      this.courseView.on('course', this.onCourse)
+      this.courseView.on('course', c => this.onCourse(c))
       this.courseView.setValue(this.defaultCourse)
     }
     if (this.model) {
@@ -326,7 +303,7 @@ export default class MessageFormDialog extends DialogBaseView {
         messages.filter(
           m =>
             new Date(m.get('created_at')) <= date &&
-            !_.find(participants, p => !_.contains(m.get('participating_user_ids'), p))
+            !_.find(participants, p => !_.includes(m.get('participating_user_ids'), p))
         )
       )
       const contextView = new ContextMessagesView({
@@ -336,17 +313,17 @@ export default class MessageFormDialog extends DialogBaseView {
       contextView.render()
     }
 
-    this.$fullDialog.on('click', '.message-body', this.handleBodyClick)
+    this.$fullDialog.on('click', '.message-body', (e) => this.handleBodyClick(e))
     this.$fullDialog.on('click', '.attach-file', () => this.addAttachment())
     this.$fullDialog.on(
       'click',
       '.attachment .remove_link',
       preventDefault(e => this.removeAttachment($(e.currentTarget)))
     )
-    this.$fullDialog.on('keydown', '.attachment', this.handleAttachmentKeyDown)
-    this.$fullDialog.on('click', '.attachment', this.handleAttachmentClick)
-    this.$fullDialog.on('dblclick', '.attachment', this.handleAttachmentDblClick)
-    this.$fullDialog.on('change', '.file_input', this.handleAttachment)
+    this.$fullDialog.on('keydown', '.attachment', e => this.handleAttachmentKeyDown(e))
+    this.$fullDialog.on('click', '.attachment', e => this.handleAttachmentClick(e))
+    this.$fullDialog.on('dblclick', '.attachment', e => this.handleAttachmentDblClick(e))
+    this.$fullDialog.on('change', '.file_input', e => this.handleAttachment(e))
 
     this.$fullDialog.on('click', '.attach-media', preventDefault(() => this.addMediaComment()))
     this.$fullDialog.on(
@@ -419,7 +396,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   recipientIdsChanged(recipientIds) {
-    if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/)) {
+    if (_.isEmpty(recipientIds) || _.includes(recipientIds, /(teachers|tas|observers)$/)) {
       return this.toggleUserNote(false)
     } else {
       const canAddNotes = _.map(this.recipientView.tokenModels(), tokenModel =>
@@ -604,7 +581,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   removeEmptyAttachments() {
-    return _.each(this.$attachments.find('input[value=]'), this.removeAttachment)
+    return _.each(this.$attachments.find('input[value=]'), node => this.removeAttachment(node))
   }
 
   removeAttachment(node) {

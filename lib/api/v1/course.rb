@@ -100,7 +100,7 @@ module Api::V1::Course
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
-      hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
+      hash['is_favorite'] = course.favorite_for_user?(subject_user) if includes.include?('favorites')
       if includes.include?('teachers')
         if course.teacher_count
           hash['teacher_count'] = course.teacher_count

@@ -85,8 +85,8 @@ export default class CreateGroupView extends DialogFormView
   getFormData: ->
     data = super
     if data.rules
-      delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
-      delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
+      delete data.rules.drop_lowest if ["", "0"].includes(data.rules.drop_lowest)
+      delete data.rules.drop_highest if ["", "0"].includes(data.rules.drop_highest)
       delete data.rules.never_drop if data.rules.never_drop?.length == 0
     data.group_weight = round(numberHelper.parse(data.group_weight), 2)
     data

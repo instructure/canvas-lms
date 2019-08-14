@@ -57,10 +57,10 @@ export default class User extends Backbone.Model
     @enrollments {role}
 
   pending: (role) ->
-    _.any @get('enrollments'), (e) -> e.role == role && e.enrollment_state in ['creation_pending', 'invited']
+    _.some @get('enrollments'), (e) -> e.role == role && e.enrollment_state in ['creation_pending', 'invited']
 
   inactive: ->
-    _.all @get('enrollments'), (e) -> e.enrollment_state == 'inactive'
+    _.every @get('enrollments'), (e) -> e.enrollment_state == 'inactive'
 
   sectionEditableEnrollments: ->
     _.select @get('enrollments'), (e) -> e.type != 'ObserverEnrollment'

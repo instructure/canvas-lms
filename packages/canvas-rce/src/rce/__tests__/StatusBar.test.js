@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import 'jest-dom/extend-expect'
-import {render, fireEvent} from 'react-testing-library'
+import '@testing-library/jest-dom/extend-expect'
+import {render, fireEvent} from '@testing-library/react'
 import keycode from 'keycode'
 import StatusBar from '../StatusBar'
 

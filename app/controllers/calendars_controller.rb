@@ -104,6 +104,7 @@ class CalendarsController < ApplicationController
       info
     end
     StringifyIds.recursively_stringify_ids(@contexts_json)
+    content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")})
     js_env(@hash) if @hash
   end
 end

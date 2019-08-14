@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import 'jest-dom/extend-expect'
-import {render, fireEvent, waitForElement, cleanup} from 'react-testing-library'
+import '@testing-library/jest-dom/extend-expect'
+import {render, fireEvent, waitForElement, cleanup} from '@testing-library/react'
 import {act} from 'react-dom/test-utils';
 import ComputerPanel from '../ComputerPanel'
 

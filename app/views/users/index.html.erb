@@ -17,12 +17,12 @@
 %>
 
 <% add_crumb t('crumbs.users', "Users") %>
-<% @active_tab = "users" %>
+<% set_active_tab "users" %>
 <% if @query %>
   <% js_env ga_page_title: "User Search Results" %>
 <% end %>
 
-<% content_for :page_title do %>
+<% provide :page_title do %>
   <% if @query %>
     <%= t('search_for_user', 'User Search results for %{user_name}', :user_name => (params[:user][:name] rescue '')) %>
   <% else %>
@@ -30,7 +30,7 @@
   <% end %>
 <% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div class="rs-margin-bottom">
     <% if can_do(@context, @current_user, :manage_groups) %>
       <a href="<%= context_url(@context, :context_groups_url) %>" class="btn button-sidebar-wide user_groups"><i class="icon-group"></i> <%= t('buttons.user_groups', 'View User Groups') %></a>

@@ -132,7 +132,7 @@ export default class TokenSelector {
     if (this.uiLocked) {
       return true
     }
-    if (this.$menu.find('.no-results').length > 0 && _.include([13, 'Enter'], keyCode)) {
+    if (this.$menu.find('.no-results').length > 0 && [13, 'Enter'].includes(keyCode)) {
       return e.preventDefault()
     }
 

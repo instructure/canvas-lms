@@ -31,7 +31,7 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import PandaPubPoller from '../util/PandaPubPoller'
 
 isAdmin = () ->
-  _.contains(ENV.current_user_roles, 'admin')
+  _.includes(ENV.current_user_roles, 'admin')
 
 export default class Assignment extends Model
   @mixin DefaultUrlMixin
@@ -65,7 +65,7 @@ export default class Assignment extends Model
   isExternalTool: => @_hasOnlyType 'external_tool'
   isNotGraded: => @_hasOnlyType 'not_graded'
   isAssignment: =>
-    ! _.include @_submissionTypes(), 'online_quiz', 'discussion_topic',
+    ! _.includes @_submissionTypes(), 'online_quiz', 'discussion_topic',
       'not_graded', 'external_tool'
 
   assignmentType: (type) =>
@@ -122,7 +122,7 @@ export default class Assignment extends Model
     not @inClosedGradingPeriod() and not @frozen()
 
   canMove: =>
-    not @inClosedGradingPeriod() and not _.include(@frozenAttributes(), 'assignment_group_id')
+    not @inClosedGradingPeriod() and not _.includes(@frozenAttributes(), 'assignment_group_id')
 
   freezeOnCopy: =>
     @get('freeze_on_copy')
@@ -153,18 +153,18 @@ export default class Assignment extends Model
 
   submissionType: =>
     submissionTypes = @_submissionTypes()
-    if _.include(submissionTypes, 'none') || submissionTypes.length == 0 then 'none'
-    else if _.include submissionTypes, 'on_paper' then 'on_paper'
-    else if _.include submissionTypes, 'external_tool' then 'external_tool'
+    if _.includes(submissionTypes, 'none') || submissionTypes.length == 0 then 'none'
+    else if _.includes submissionTypes, 'on_paper' then 'on_paper'
+    else if _.includes submissionTypes, 'external_tool' then 'external_tool'
     else 'online'
 
   expectsSubmission: =>
     submissionTypes = @_submissionTypes()
-    submissionTypes.length > 0 && !_.include(submissionTypes, "") && !_.include(submissionTypes, 'none') && !_.include(submissionTypes, 'not_graded') && !_.include(submissionTypes, 'on_paper') && !_.include(submissionTypes, 'external_tool')
+    submissionTypes.length > 0 && !_.includes(submissionTypes, "") && !_.includes(submissionTypes, 'none') && !_.includes(submissionTypes, 'not_graded') && !_.includes(submissionTypes, 'on_paper') && !_.includes(submissionTypes, 'external_tool')
 
   allowedToSubmit: =>
     submissionTypes = @_submissionTypes()
-    @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
+    @expectsSubmission() && !@get('locked_for_user') && !_.includes(submissionTypes, 'online_quiz') && !_.includes(submissionTypes, 'attendance')
 
   hasSubmittedSubmissions: =>
     @get('has_submitted_submissions')
@@ -174,19 +174,19 @@ export default class Assignment extends Model
     !sub? || sub.withoutGradedSubmission()
 
   acceptsOnlineUpload: =>
-    !! _.include @_submissionTypes(), 'online_upload'
+    !! _.includes @_submissionTypes(), 'online_upload'
 
   acceptsOnlineURL: =>
-    !! _.include @_submissionTypes(), 'online_url'
+    !! _.includes @_submissionTypes(), 'online_url'
 
   acceptsMediaRecording: =>
-    !! _.include @_submissionTypes(), 'media_recording'
+    !! _.includes @_submissionTypes(), 'media_recording'
 
   acceptsOnlineTextEntries: =>
-    !! _.include @_submissionTypes(), 'online_text_entry'
+    !! _.includes @_submissionTypes(), 'online_text_entry'
 
   isOnlineSubmission: =>
-    _.any @_submissionTypes(), (thing) ->
+    _.some @_submissionTypes(), (thing) ->
       thing in ['online', 'online_text_entry',
         'media_recording', 'online_url', 'online_upload']
 
@@ -432,7 +432,7 @@ export default class Assignment extends Model
     @get('workflow_state') == 'failed_to_import'
 
   submissionTypesFrozen: =>
-    _.include(@frozenAttributes(), 'submission_types')
+    _.includes(@frozenAttributes(), 'submission_types')
 
   toView: =>
     fields = [
@@ -478,7 +478,7 @@ export default class Assignment extends Model
     dateGroups = @get("all_dates")
     gradingPeriodsHelper = new GradingPeriodsHelper(gradingPeriod)
     if dateGroups
-      _.any dateGroups.models, (dateGroup) =>
+      _.some dateGroups.models, (dateGroup) =>
         gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
     else
       gradingPeriodsHelper.isDateInGradingPeriod(tz.parse(@dueAt()), gradingPeriod.id)
@@ -534,13 +534,13 @@ export default class Assignment extends Model
 
   _filterFrozenAttributes: (data) =>
     for own key, value of @attributes
-      if _.contains(@frozenAttributes(), key)
+      if _.includes(@frozenAttributes(), key)
         delete data[key]
-    if _.contains(@frozenAttributes(), "title")
+    if _.includes(@frozenAttributes(), "title")
       delete data.name
-    if _.contains(@frozenAttributes(), "group_category_id")
+    if _.includes(@frozenAttributes(), "group_category_id")
       delete data.grade_group_students_individually
-    if _.contains(@frozenAttributes(), "peer_reviews")
+    if _.includes(@frozenAttributes(), "peer_reviews")
       delete data.automatic_peer_reviews
       delete data.peer_review_count
       delete data.peer_reviews_assign_at

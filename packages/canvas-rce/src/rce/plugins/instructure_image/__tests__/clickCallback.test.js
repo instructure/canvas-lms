@@ -17,7 +17,7 @@
  */
 
 import clickCallback from '../clickCallback'
-import {getByLabelText} from 'react-testing-library'
+import {getAllByLabelText} from '@testing-library/react'
 
 describe('Instructure Image Plugin: clickCallback', () => {
   let trayProps;
@@ -52,9 +52,9 @@ describe('Instructure Image Plugin: clickCallback', () => {
   it('opens the UploadImage modal when called', async () => {
     await clickCallback({}, document, trayProps)
     expect(
-      getByLabelText(document, 'Upload Image', {
+      getAllByLabelText(document, 'Upload Image', {
         selector: 'form'
-      })
+      })[0]
     ).toBeVisible()
   })
 })

@@ -170,7 +170,7 @@ class RoleOverridesController < ApplicationController
 
       js_bundle :permissions_index
       css_bundle :permissions
-      @active_tab = 'permissions'
+      set_active_tab 'permissions'
     end
   end
 

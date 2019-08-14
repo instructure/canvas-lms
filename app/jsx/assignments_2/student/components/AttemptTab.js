@@ -16,26 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from '../graphqlData/Assignment'
 import AssignmentAlert from './AssignmentAlert'
-import {
-  AssignmentShape,
-  CREATE_SUBMISSION,
-  CREATE_SUBMISSION_DRAFT,
-  STUDENT_VIEW_QUERY,
-  SUBMISSION_HISTORIES_QUERY,
-  SubmissionShape
-} from '../assignmentData'
+import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import FilePreview from './FilePreview'
 import FileUpload from './FileUpload'
 import I18n from 'i18n!assignments_2_content_upload_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
+import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
+import {Submission} from '../graphqlData/Submission'
+import TextEntry from './TextEntry'
 
 export default class AttemptTab extends Component {
   static propTypes = {
-    assignment: AssignmentShape,
-    submission: SubmissionShape
+    assignment: Assignment.shape,
+    submission: Submission.shape
   }
 
   state = {
@@ -58,7 +55,7 @@ export default class AttemptTab extends Component {
 
     cache.writeQuery({
       query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id},
+      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id},
       data: {assignment}
     })
   }
@@ -125,7 +122,7 @@ export default class AttemptTab extends Component {
 
       if (this.state.submissionState === 'error') {
         errorMessage = I18n.t('Error sending submission')
-      } else if (this.state.uploadState === 'success') {
+      } else if (this.state.submissionState === 'success') {
         successMessage = I18n.t('Submission sent')
       }
 
@@ -173,6 +170,18 @@ export default class AttemptTab extends Component {
     )
   }
 
+  renderSubmissionByType = createSubmission => {
+    // TODO: we need to ensure we handle multiple submission types eventually
+    switch (this.props.assignment.submissionTypes[0]) {
+      case 'online_text_entry':
+        return <TextEntry />
+      case 'online_upload':
+      default:
+        // TODO: we should probably figure out what the default case should actually be
+        return this.renderFileAttempt(createSubmission)
+    }
+  }
+
   renderSubmission = createSubmission => {
     switch (this.state.submissionState) {
       case 'error':
@@ -184,7 +193,7 @@ export default class AttemptTab extends Component {
         return (
           <React.Fragment>
             {this.renderSubmissionAlert()}
-            {this.renderFileAttempt(createSubmission)}
+            {this.renderSubmissionByType(createSubmission)}
           </React.Fragment>
         )
     }

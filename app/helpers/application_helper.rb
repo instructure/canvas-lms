@@ -198,6 +198,7 @@ module ApplicationHelper
       chunk_urls.each { |url| concat preload_link_tag(url) }
 
       concat javascript_include_tag(*(paths + chunk_urls), defer: true)
+      concat include_js_bundles
     end
   end
 
@@ -206,10 +207,16 @@ module ApplicationHelper
     # and let the browser know it needs to start downloading all of these chunks
     # even before any webpack code runs. It will put a <link rel="preload" ...>
     # for every chunk that is needed by any of the things you `js_bundle` in your rails controllers/views
-    preload_chunks = js_bundles.map do |(bundle, plugin)|
+    @rendered_js_bundles ||= []
+    new_js_bundles = js_bundles - @rendered_js_bundles
+    @rendered_js_bundles += new_js_bundles
+
+    @rendered_preload_chunks ||= []
+    preload_chunks = new_js_bundles.map do |(bundle, plugin)|
       key = "#{plugin ? "#{plugin}-" : ''}#{bundle}"
       Canvas::Cdn::RevManifest.all_webpack_chunks_for(key)
-    end.flatten.uniq - @script_chunks # subtract out the ones we already preloaded in the <head>
+    end.flatten.uniq - @script_chunks - @rendered_preload_chunks # subtract out the ones we already preloaded in the <head>
+    @rendered_preload_chunks += preload_chunks
 
     capture do
       preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
@@ -219,9 +226,9 @@ module ApplicationHelper
       # to load that "js_bundle". And by the time that runs, the browser will have already
       # started downloading those script urls because of those preload tags above,
       # so it will not cause a new request to be made.
-      concat javascript_tag js_bundles.map { |(bundle, plugin)|
+      concat javascript_tag new_js_bundles.map { |(bundle, plugin)|
         "(window.bundles || (window.bundles = [])).push('#{plugin ? "#{plugin}-" : ''}#{bundle}');"
-      }.join("\n")
+      }.join("\n") if new_js_bundles.present?
     end
   end
 
@@ -853,8 +860,16 @@ module ApplicationHelper
     end
   end
 
+  def content_for_head(string)
+    (@content_for_head ||= []) << string
+  end
+
+  def add_meta_tag(tag)
+    @meta_tags ||= []
+    @meta_tags << tag
+  end
+
   def include_custom_meta_tags
-    add_csp_for_root
     js_env(csp: csp_iframe_attribute) if csp_enforced?
 
     output = []
@@ -884,7 +899,7 @@ module ApplicationHelper
           # search for an attachment association
           aas = attachment.attachment_associations.where(context_type: 'Submission').preload(:context).to_a
           ActiveRecord::Associations::Preloader.new.preload(aas.map(&:submission), assignment: :context)
-          courses = aas.map { |aa| aa.submission.assignment.course }.uniq
+          courses = aas.map { |aa| aa&.submission&.assignment&.course }.uniq
           if courses.length == 1
             @csp_context_is_submission = true
             courses.first
@@ -940,6 +955,7 @@ module ApplicationHelper
   end
 
   def add_csp_for_root
+    return unless request.format.html? || request.format == "*/*"
     return unless csp_enabled?
     return if csp_report_uri.empty? && !csp_enforced?
 

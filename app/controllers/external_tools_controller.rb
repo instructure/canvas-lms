@@ -376,7 +376,7 @@ class ExternalToolsController < ApplicationController
              :redirect_return_cancel_url => cancel_url)
       js_env(:course_id => @context.id) if @context.is_a?(Course)
 
-      @active_tab = @tool.asset_string
+      set_active_tab @tool.asset_string
       @show_embedded_chat = false if @tool.tool_id == 'chat'
 
       @lti_launch = lti_launch(tool: @tool, selection_type: placement)

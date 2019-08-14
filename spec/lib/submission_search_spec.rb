@@ -95,6 +95,14 @@ describe SubmissionSearch do
     expect(results).to eq [Submission.find_by(user: amanda)]
   end
 
+  it 'filters by late' do
+    late_student = student_in_course(course: course, active_all: true).user
+    assignment = course.assignments.create!(name: "assignment", points_possible: 10, due_at: 2.days.ago)
+    submission = assignment.submit_homework(late_student, body: 'asdf', submitted_at: 1.day.ago)
+    results = SubmissionSearch.new(assignment, teacher, nil, late: true).search
+    expect(results).to eq [submission]
+  end
+
   it "limits results to just the user's submission if the user is a student" do
     results = SubmissionSearch.new(assignment, amanda, nil, {}).search
     expect(results).to eq [Submission.find_by(user: amanda)]

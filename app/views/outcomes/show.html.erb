@@ -19,9 +19,9 @@
 <%
   css_bundle :learning_outcomes
   js_bundle :react_outcome_alignment
-  content_for :page_title, @outcome.short_description
+  provide :page_title, @outcome.short_description
 %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>">
     <i class="icon-arrow-left"></i>
     <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %>

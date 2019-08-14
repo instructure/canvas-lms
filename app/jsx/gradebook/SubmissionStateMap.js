@@ -28,7 +28,7 @@ const TOOLTIP_KEYS = {
 
 function visibleToStudent(assignment, student) {
   if (!assignment.only_visible_to_overrides) return true
-  return _.contains(assignment.assignment_visibility, student.id)
+  return _.includes(assignment.assignment_visibility, student.id)
 }
 
 function cellMapForSubmission(

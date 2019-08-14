@@ -41,8 +41,6 @@
     "peer_review"
   end
 
-  js_bundle :submissions
-  css_bundle :submission
   js_env({
     :RUBRIC_ASSESSMENT => {
       assessment_type: assessment_type,
@@ -64,19 +62,15 @@
       **submission_owner_param
     }
   })
-  content_for :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
-  add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
-  add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
-  add_crumb(user_crumb_name)
-  @active_tab = "assignments"
+  provide :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
+  provide_blank :right_side
 %>
-<% content_for :stylesheets do %>
+
   <style>
     .rubric {
       max-width: 600px;
     }
   </style>
-<% end %>
 
 <% if @assignment.omit_from_final_grade %>
   <div class="alert alert-info omit-from-final-warning">

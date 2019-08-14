@@ -32,7 +32,7 @@ group :test do
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '3.8.2'
   gem 'rspec-collection_matchers', '1.1.3'
-  gem 'shoulda-matchers', '3.1.3'
+  gem 'shoulda-matchers', '4.1.0'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
     gem 'rubocop', '0.52.1', require: false

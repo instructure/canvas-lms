@@ -20,10 +20,9 @@
   js_env ga_page_title: "Grades for Student"
 %>
 <%
-  js_bundle :grade_summary, :rubric_assessment
-  css_bundle :grade_summary
-  content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
+  provide :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
+<% load_grade_summary_data %>
 <%
   whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
 
@@ -31,7 +30,7 @@
   hidden_icon_class = @context.post_policies_enabled? ? "icon-off" : "icon-muted"
 %>
 <div id="grade-summary-content" style="display: none;">
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <div id="student-grades-right-content" style="display: none;">
       <% if @exclude_total %>
         <div id="student-grades-final" class="student_assignment final_grade" style="font-size: 1.2em;">
@@ -188,7 +187,7 @@
         <td class="assignment_score" title="<%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>">
           <div style="position: relative; height: 100%;" class="score_holder">
             <% if !assignment_presenter.upload_status.present?  %>
-              <% js_bundle 'progress_pill' %>
+              <% js_bundle :progress_pill %>
               <span class="assignment_presenter_for_submission" style="display: none;"><%= assignment_presenter.upload_status %></span>
               <span class="react_pill_container"></span>
             <% end %>

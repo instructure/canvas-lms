@@ -27,19 +27,6 @@ import 'jqueryui/draggable'
 import 'jqueryui/droppable'
 
 export default class GroupUsersView extends PaginatedCollectionView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.renderItem = this.renderItem.bind(this)
-    this._initDrag = this._initDrag.bind(this)
-    this.removeItem = this.removeItem.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.defaults = {
@@ -81,9 +68,9 @@ export default class GroupUsersView extends PaginatedCollectionView {
   }
 
   attach() {
-    this.model.on('change:members_count', this.render)
-    this.model.on('change:leader', this.render)
-    return this.collection.on('moved', this.highlightUser)
+    this.model.on('change:members_count', this.render, this)
+    this.model.on('change:leader', this.render, this)
+    return this.collection.on('moved', this.highlightUser, this)
   }
 
   highlightUser(user) {

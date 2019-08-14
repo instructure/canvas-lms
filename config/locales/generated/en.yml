@@ -663,12 +663,14 @@ en:
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: This is a feature to allow the development of a responsive layout
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: Turn on RTL Even For Non-RTL Languages
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: This is just a dev-only feature you can turn on to get a preview of how pages would look in a RTL environment, without having to change your language to one that is normally RTL
-  include_byte_order_mark_in_gradebook_exports_d2ad0d4e: Include Byte-Order Mark in Gradebook Exports
-  optionally_include_a_byte_order_mark_in_gradebook__555cc605: Optionally include a byte-order mark in Gradebook exports so they can be imported into Excel for users in some locales.
-  use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: Use semicolons to separate fields in Gradebook Exports
-  use_semicolons_instead_of_commas_to_separate_field_f50945f2: Use semicolons instead of commas to separate fields in Gradebook exports so they can be imported into Excel for users in some locales.
-  autodetect_field_separators_in_gradebook_exports_ed9a9d77: Autodetect field separators in Gradebook Exports
-  attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: Attempt to detect an appropriate field separator in Gradebook exports based on the number format for your language.
+  enable_i18n_features_in_outcomes_exports_64bcf82b: Enable i18n features in outcomes exports
+  enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled on or off for outcomes exports.
+  include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: Include Byte-Order Mark in compatible spreadsheet exports
+  optionally_include_a_byte_order_mark_in_compatible_f3d0d243: Optionally include a byte-order mark in compatible spreadsheet exports so they can be imported into Excel for users in some locales.
+  use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: Use semicolons to separate fields in compatible spreadsheet exports
+  use_semicolons_instead_of_commas_to_separate_field_62d24565: Use semicolons instead of commas to separate fields in compatible spreadsheet exports so they can be imported into Excel for users in some locales.
+  autodetect_field_separators_in_compatible_spreadsh_768067e1: Autodetect field separators in compatible spreadsheet exports
+  attempt_to_detect_an_appropriate_field_separator_i_bc043389: Attempt to detect an appropriate field separator in compatible spreadsheet exports based on the number format for your language.
   international_sms_9edb9868: International SMS
   allows_users_with_international_phone_numbers_to_r_f90f8522: Allows users with international phone numbers to receive text messages from Canvas.
   account_course_and_user_search_22bf297a: Account Course and User Search
@@ -702,6 +704,8 @@ en:
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: If enabled, access to LTI 1.3 and LTI Advantage will be enabled.
   assignments_2_e88d7a26: Assignments 2
   use_the_new_assignments_page_dd292b9d: Use the new assignments page
+  slack_notifications_3a0288e6: Slack Notifications
+  the_ability_for_users_to_receive_notifications_fro_bbcf487b: The ability for users to receive notifications from slack
   content_security_policy_3bb8d922: Content Security Policy
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: Enable the Security tab on the settings page to adjust CSP settings
   restrict_students_from_annotating_6c28ab9b: Restrict Students from Annotating
@@ -710,6 +714,8 @@ en:
   allow_switching_to_the_enhanced_rce_317e746f: Allow switching to the enhanced RCE
   new_feature_flags_c4b70a5e: New Feature Flags
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: This feature creates a SiteAdmin Release Flag tab to be able to release features to users through the UI. It also reworks the UI for the old Feature Options tabs.
+  direct_share_80afd4a7: Direct Share
+  this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: This feature allows teachers to easily copy single items from one course to another, and to share a single item of content with other users so they can import those items into their courses as well.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -719,6 +725,10 @@ en:
   enable_anonymous_grading_of_assignments_e18f75be: Enable anonymous grading of assignments.
   moderated_grading_e6127f72: Moderated Grading
   enable_moderated_grading_bacd20d8: Enable moderated grading.
+  graphql_mutation_log_25acc923: GraphQL Mutation Log
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+    Allows admins to view a log containing information about all recently run
+    GraphQL mutations
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -904,6 +914,7 @@ en:
         authentication: Login / Logout Activity
         grade_change: Grade Change Activity
         course: Course Activity
+        mutations: GraphQL Mutation Activity
       user_date_range_search_form:
         search_people: Search people
         search: Search for people by ID or name
@@ -1700,16 +1711,15 @@ en:
   oldest_newest_4de86803: Oldest - Newest
   announcements:
     announcements_crumb: Announcements
+    feed_title_course: Course Announcements Atom Feed
+    podcast_title_course: Course Announcements Podcast Feed
+    feed_title_group: Group Announcements Atom Feed
+    podcast_title_group: Group Announcements Podcast Feed
     feed_name: "%{course} Announcements Feed"
     podcast_feed_name: "%{course} Announcements Podcast Feed"
     podcast_feed_description_course: Any media files linked from or embedded within announcements in the course "%{course}" will appear in this feed.
     podcast_feed_description_group: Any media files linked from or embedded within announcements in the group "%{group}" will appear in this feed.
     error_draft_state: This topic cannot be set to draft state because it is an announcement.
-    index:
-      feed_title_course: Course Announcements Atom Feed
-      podcast_title_course: Course Announcements Podcast Feed
-      feed_title_group: Group Announcements Atom Feed
-      podcast_title_group: Group Announcements Podcast Feed
   links:
     dashboard: My Dashboard
     errors:
@@ -1768,6 +1778,8 @@ en:
     calendar_events: Calendar Events
     collaborations: Collaborations
     conferences: Conferences
+    people: People
+    access_report: Access Report
     modules: Modules
     settings: Settings
     developer_keys: Developer Keys
@@ -1777,7 +1789,6 @@ en:
     grades: Grades
     grading_standards: Grading
     users: Users
-    people: People
     groups: Groups
     jobs: Jobs
     outcomes: Outcomes
@@ -1789,7 +1800,6 @@ en:
     media: Media
     prior_users: Prior Users
     registered_services: Registered Services
-    access_report: Access Report
     confirmation: Confirmation
     copy_course: Copy Course
     stats: Statistics
@@ -1843,7 +1853,6 @@ en:
     grade_assignment:
       titles:
         related_items: Related Items
-      speed_grader: SpeedGrader™
       links:
         download_submissions: Download Submissions
         reupload_submissions: Re-Upload Submissions
@@ -2321,6 +2330,21 @@ en:
         back_to_calendar: Back to Calendar
         edit: Edit Calendar Event
         delete: Delete the Event
+  calendars:
+    feed_title: Course Calendar Atom Feed
+    event:
+      event_title: 'due: %{event_title}'
+      due: due
+    show:
+      page_title_header: Calendar
+      skip_to_calendar: Skip to calendar
+      calendars: Calendars
+      undated_items: Undated
+      calendar_feed: Calendar Feed
+      feed_dialog_title: Calendar Feed
+      calendar_feed_instructions: Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)
+      links:
+        feed: click here to view the feed
   collaborations:
     errors:
       cannot_load_collaboration: Cannot load collaboration
@@ -2959,9 +2983,6 @@ en:
       one: and 1 other
       other: and %{count} others
     index_new:
-      page_title_header: Conversations
-      titles:
-        conversations: Conversations
       filter_messages_by_course: Filter messages by course
       reply: Reply
       compose_new_message: Compose a new message
@@ -3045,14 +3066,11 @@ en:
       no_subject: No subject
       reply: Reply
       more_options: More options
-      message_actions: Message actions
       reply_all: Reply all
       forward: Forward
       delete: Delete
     message_item:
-      reply: Reply
       more_options: More options
-      message_actions: Message actions
       reply_all: Reply all
       forward: Forward
       delete: Delete
@@ -3062,6 +3080,10 @@ en:
       batch_selected: Multiple Conversations Selected
       no_conversations_selected: No Conversations Selected
   courses:
+    titles:
+      rss:
+        course_announcements: Course Announcements Atom Feed
+      rss_feed: "%{course} Feed"
     errors:
       create_failed: Course creation failed
       role_not_active: 'Can''t add users for non-active role: ''%{role}'''
@@ -3081,8 +3103,6 @@ en:
       reset_test_student: The test student has been reset successfully.
     unauthorized:
       invalid_link: The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.
-    titles:
-      rss_feed: "%{course} Feed"
     recent_event:
       not_submitted: not submitted
       no_submissions: no submissions
@@ -3150,8 +3170,8 @@ en:
       tooltips:
         cannot_unpublish_course: You cannot unpublish this course if there are graded student submissions
       sis_source_id: SIS ID
-      course_conclude_at_warning_title: Course Ending at Midnight
       course_conclude_at_warning_message: The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active.
+      course_conclude_at_warning_title: Course Ending at Midnight
       no_language_preference: Not set (user-configurable, defaults to %{language})
       language_overrides_preferences: This will override any user/system language preferences. This is only recommended for foreign language courses
       megabytes: megabytes
@@ -3283,8 +3303,6 @@ en:
     index:
       titles:
         courses: Courses
-        rss:
-          course_announcements: Course Announcements Atom Feed
       headings:
         my_courses: All Courses
         past_enrollments: Past Enrollments
@@ -3442,6 +3460,7 @@ en:
   first_name_d5c12500: First Name
   pairing_code_bde979a7: Pairing Code
   expires_at_6214b43f: Expires At
+  course_atom_feed_9d95214e: Course Atom Feed
   invalid_restrictions_316cd740: Invalid restrictions
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: There was an error saving the changes to the course
   exported_package_history_bfca44b9: Exported Package History
@@ -3456,10 +3475,26 @@ en:
     podcast_description: Any media files linked from or embedded within entries in the topic "%{title}" will appear in this feed.
   announcements_cannot_be_duplicated_2de8824c: announcements cannot be duplicated
   unable_to_save_new_discussion_topic_99239f3f: unable to save new discussion topic
+  titles:
+    discussions: Discussions
+    announcement: Announcement
+    discussion: Discussion
+    come_back_later: You marked this question to come back to later
+    announcements: Announcements
+    assignments: Assignments
+    error_reports: Error Reports
+    messages: Messages
+    learning_outcomes: Learning Outcomes
+    aligned_items: Aligned Items
+    outcome_artifacts: Outcome Artifacts
+    view_in_separate_window: View in Separate Window
   discussion_topics:
+    course_discussions_atom_feed_title: Course Discussions Atom Feed
     create_new_crumb: Create new
     edit_crumb: Edit
     deleted_topic_notice: That topic has been deleted
+    discussion_atom_feed_title: Discussion Atom Feed
+    discussion_podcast_feed_title: Discussion Podcast Feed
     topic_deleted_notice: "%{topic_title} deleted successfully"
     discussion_feed_title: "%{title} Discussion Feed"
     error_section_permission: You do not have permissions to modify discussion for section(s) %{section_ids}
@@ -3510,12 +3545,8 @@ en:
     sub_entry:
       authors_name: Author's name
       post_message: Post Message
-    index:
-      course_discussions_atom_feed_title: Course Discussions Atom Feed
     show:
       topic: Topic
-      discussion_atom_feed_title: Discussion Atom Feed
-      discussion_podcast_feed_title: Discussion Podcast Feed
       announcement_locked_until: This announcement is locked until %{time}
       topic_time_locked: This topic is locked until %{time}
       edit: Edit
@@ -3610,6 +3641,8 @@ en:
       updated: ePortfolio successfully updated
       deleted: ePortfolio successfully deleted
       zipping: File zipping still in process...
+    titles:
+      feed: Eportfolio Atom Feed
     title: "%{portfolio_name} Feed"
     show_me: show me
     edit_link_text: "%{edit_icon} Edit This Page"
@@ -3691,10 +3724,6 @@ en:
       links:
         portfolio: View the Portfolio
     show:
-      titles:
-        feed: Eportfolio Atom Feed
-        already_used: This submission is already included in your portfolio
-        view_submission: View the Submission
       links:
         back: Back to Portfolio Dashboard
         rich_content: Rich Text Content
@@ -3730,6 +3759,9 @@ en:
       private_eportfolio: 'That means people can''t find it or even view it without permission. You can see it since it''s your portfolio, but if you want to let anybody else see it, you''ll need to copy and share the the following special link so they can access your portfolio:'
       recent_submissions: Click any submission to add it to a new page in your ePortfolio.
       no_submissions: No Submissions Found
+      titles:
+        already_used: This submission is already included in your portfolio
+        view_submission: View the Submission
       attachment_count:
         one: 1 Attachment
         other: "%{count} Attachments"
@@ -4030,6 +4062,7 @@ en:
       invalid_invitation: ''
     errors:
       group_full: The group is full.
+    group_atom_feed: Group Atom Feed
     feed_title: "%{course_or_account_name} Feed"
     context_groups:
       page_title: Course Groups
@@ -4062,7 +4095,6 @@ en:
       group_join_request: Group Join Request
       group_join_request_info: This group has received your request to join. You'll be notified once they accept or reject your request.
     show:
-      group_atom_feed: Group Atom Feed
       edit_group: Edit Group
       new_announcement: Announcement
       coming_up: Coming Up
@@ -4897,8 +4929,6 @@ en:
         text_sms: Text (SMS)
         resend_confirmation: Re-Send Confirmation
       bouncing_channel: Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.
-      contact_types:
-        sms: sms
       labels:
         email_address: Email Address
         enable_login_for_email: I want to log in to Canvas using this email address
@@ -5065,7 +5095,6 @@ en:
       register_communication: Register Communication
       unconfirmed_click_to_confirm: Unconfirmed.  Click to confirm
       confirm_email_address: Confirm Email Address
-      confirm_sms_number: Confirm SMS Number
     links:
       resend_confirmation: Re-Send Confirmation
       resending_confirmation: Re-Sending...
@@ -5678,7 +5707,6 @@ en:
           keep_editing_this_quiz: Keep Editing This Quiz
           show_student_survey_results: Show Student Survey Results
           show_student_quiz_results: Show Student Quiz Results
-          message_students_who: Message Students Who...
         manage: Manage
         titles:
           delete: Delete
@@ -6032,6 +6060,8 @@ en:
   invalid_datetime_for_submitted_since_a238f3a6: Invalid datetime for submitted_since
   invalid_datetime_for_graded_since_884cce5: Invalid datetime for graded_since
   submissions_base:
+    crumbs:
+      assignments: Assignments
     assignment_submitted: Assignment submitted.
     errors_update_failed: Update Failed
     errors:
@@ -6052,8 +6082,6 @@ en:
     submission_download:
       download_message: "**Your student submissions are being gathered** and compressed into a zip file. This may take some time, depending on the size and number of submission files."
     show:
-      crumbs:
-        assignments: Assignments
       peer_review: Peer Review
       submission_details: Submission Details
       student_mute_notification: Grades are unavailable because the instructor is working on them.
@@ -6245,6 +6273,7 @@ en:
     linkedin_fail: LinkedIn authorization failed. Please try again
     twitter_added: Twitter access authorized!
     twitter_fail_whale: Twitter authorization failed. Please try again
+    user_atom_feed: User Atom Feed (All Courses)
     birthdate_invalid: Invalid date or invalid datetime for birthdate
     user_updated: User was successfully updated.
     could_not_find_url: Could not find download URL
@@ -6443,8 +6472,6 @@ en:
       message_student: Message this student
       links:
         view_full_course: View the full Student Interaction Report for %{course}
-    user_dashboard:
-      user_atom_feed: User Atom Feed (All Courses)
     confirms:
       unenroll_user: Are you sure you want to unenroll this user?
   act_as_user_name_5581cdbb: Act as %{user_name}
@@ -6476,6 +6503,7 @@ en:
   invalid_file_type_881cc9b2: Invalid file type
   anonymous_assignments_must_be_manually_posted_a13d2ca5: Anonymous assignments must be manually posted
   moderated_assignments_must_be_manually_posted_unti_39545855: Moderated assignments must be manually posted until grades are released
+  everyone_else_cc5f6888: Everyone else
   global_message_icons:
     information: information
     error: error
@@ -6547,7 +6575,8 @@ en:
     media_submission: Media Submission
   graded_date_by_grader_e8e1ff75: "%{graded_date} by %{grader}"
   grading_period_set_for_account_name_b9823b2a: Grading Period Set for %{account_name}
-  someone: Someone
+  anonymous_user_d984b9ce: Anonymous User
+  someone_bbbc538b: Someone
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
   practice_quiz_19a8505d: Practice Quiz
@@ -6629,7 +6658,6 @@ en:
   disabled_in_course_settings_d15ee35d: "* Disabled in Course Settings"
   no_content_has_been_added_f36bab43: "* No content has been added"
   for: for
-  anonymous_user_d984b9ce: Anonymous User
   you_do_not_have_access_to_the_requested_resource_316ce49a: You do not have access to the requested resource.
   previous_page_928fc112: Previous Page
   next_page_d2a39853: Next Page
@@ -7090,19 +7118,6 @@ en:
     atom_no_author: No Author
     empty_message: No message
   searching_for_announcements_in_sections_must_span__80e4dfe4: Searching for announcements in sections must span exactly one course
-  titles:
-    announcement: Announcement
-    discussion: Discussion
-    come_back_later: You marked this question to come back to later
-    announcements: Announcements
-    assignments: Assignments
-    discussions: Discussions
-    error_reports: Error Reports
-    messages: Messages
-    learning_outcomes: Learning Outcomes
-    aligned_items: Aligned Items
-    outcome_artifacts: Outcome Artifacts
-    view_in_separate_window: View in Separate Window
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: Cannot add section to a non-section-specific discussion
   section_does_not_belong_to_course_for_this_discuss_39fd6808: Section does not belong to course for this discussion topic
   enrollment:
@@ -8107,15 +8122,9 @@ en:
       crowdsourced_warning_title: Crowdsourced Language
       crowdsourced_warning_message: The language you have selected was translated via crowdsourcing. Instructure has not reviewed or verified the accuracy of the translation, and accepts no responsibility for your use of this language setting. Please use at your own discretion.
     message_students:
-      message_students_who: Message students who...
-      for_title: for %{title}
-      message_type: Message Type
-      out_of_points: out of %{points_possible}
       labels:
         subject: Subject
         body: Message
-      buttons:
-        send_message: Send Message
     mute_dialog:
       gradebook:
         mute_assignment: Mute Assignment
@@ -8148,8 +8157,9 @@ en:
       create_course: Create course
     new_nav_header:
       links:
-        skip_to_content: Skip To Content
         dashboard: Dashboard
+        skip_to_content: Skip To Content
+      default_page_title: Canvas LMS
     no_recent_activity:
       no_recent_messages: No Recent Messages
       empty_stream_message: You don't have any messages to show in your stream yet. Once you begin participating in your courses you'll see this stream fill up with messages from discussions, grading updates, private messages between you and other users, etc.
@@ -8767,12 +8777,13 @@ en:
   rce_contents_replace_display_name: RCE Contents Replace
   rce_contents_replace_description: Enable RCE full text replace from LTI's
   submit_a_feature_idea_2d4baa3d: Submit a Feature Idea
+  this_canvas_installation_is_only_for_testing_and_w_12e52370: This Canvas installation is only for testing and *will reset every month.*
+  this_canvas_installation_is_only_for_testing_and_w_17ce8bc2:
+    one: This Canvas installation is only for testing and *will reset every week.*
+    other: This Canvas installation is only for testing and *will reset every %{count} weeks.*
   warnings:
     test_install:
-      weekly_message:
-        one: This Canvas installation is only for testing and will reset every week.
-        other: This Canvas installation is only for testing and will reset every %{count} weeks.
-      periodic_message: This Canvas installation is only for testing and will reset periodically.
+      periodic_message: This Canvas installation is only for testing and *will reset periodically.*
       title: Canvas Test Installation
   students_are_not_allowed_to_access_test_installati_11b9078: Students are not allowed to access test installations.
   this_environment_is_currently_being_updated_with_a_235f1875: This environment is currently being updated with a copy of the latest production data. Please check back later.
@@ -9039,6 +9050,7 @@ en:
   nav_badge_text_574b6eb: Nav Badge Text
   nav_logo_background_ba33fb7f: Nav Logo Background
   nav_logo_4b255c91: Nav Logo
+  mobile_global_nav_logo_a189f7bb: Mobile Global Nav Logo
   watermark_c93fae0d: Watermark
   watermark_opacity_ce3d3097: Watermark Opacity
   favicon_6e658914: Favicon
@@ -9067,6 +9079,7 @@ en:
   watermarks_other_images_e970fc6a: Watermarks & Other Images
   login_screen_83518c07: Login Screen
   accepted_formats_svg_png_jpg_gif_f793e4bc: 'Accepted formats: svg, png, jpg, gif'
+  appears_at_the_top_of_the_global_navigation_tray_t_f293877e: 'Appears at the top of the global navigation tray that opens on mobile sized screens. display height: 48px. Accepted formats: svg, png, jpg, gif'
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: 'This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg'
   specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: Specify the transparency of the watermark background image.
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: You can use a single 16x16, 32x32, 48x48 ico file.
@@ -10908,9 +10921,6 @@ en:
     okay: Okay
     import: Import
     done: Done
-    sending: Sending...
-    sent: Sent!
-    send_message: Send Message
     delete_file: Delete file %{name}
     choose_a_file: Choose a File
   blueprint_course_e16ed131: Blueprint Course
@@ -10972,6 +10982,9 @@ en:
   restrict_students_from_accessing_courses_before_st_f7c22c00: Restrict students from accessing courses before start date
   restrict_students_from_accessing_courses_after_end_7dd66bce: Restrict students from accessing courses after end date
   allow_students_to_download_course_content_and_view_810e66ec: Allow students to download course content and view offline
+  slack_api_key_92f0c667: Slack Api Key
+  current_slack_api_key_9eba6a5: 'Current Slack Api Key:'
+  new_slack_api_key_453d04d: New Slack Api Key
   acceptable_use_policy_29a28124: Acceptable Use Policy
   license_type_6b74b543: License Type
   old_policy_39e4f77: Old Policy
@@ -11260,21 +11273,6 @@ en:
   content_for_section_3_90c1d235: Content for Section 3
   login_6f3d6249: Login
   are_you_sure_you_want_to_delete_this_event_824b1e33: Are you sure you want to delete this event?
-  calendars:
-    event:
-      event_title: 'due: %{event_title}'
-      due: due
-    show:
-      page_title_header: Calendar
-      feed_title: Course Calendar Atom Feed
-      skip_to_calendar: Skip to calendar
-      calendars: Calendars
-      undated_items: Undated
-      calendar_feed: Calendar Feed
-      feed_dialog_title: Calendar Feed
-      calendar_feed_instructions: Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)
-      links:
-        feed: click here to view the feed
   prev_month_34bd934c: Prev month
   next_month_b55a387c: Next month
   calendar_d14cfc8f: Calendar
@@ -11421,6 +11419,7 @@ en:
   prerequisites_49659f16: 'Prerequisites:'
   open_title_in_a_new_window_b29fed77: Open %{title} in a new window
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: You are trying to launch insecure content from within a secure site (canvas). Some web browsers may prevent this content from loading.
+  inbox_bb245a60: Inbox
   archive_selected_d64506ca: Archive Selected
   delete_selected_a023ccf8: Delete Selected
   search_by_user_dd3ad189: Search by user
@@ -11471,7 +11470,6 @@ en:
   move_abf00365: Move
   disabled_links_b3bdea99: Disabled Links
   enable_6f5d1328: Enable
-  course_atom_feed_9d95214e: Course Atom Feed
   coming_up_4348b0bd: Coming Up
   all_assignments_b79a4d6a: All Assignments
   developer_keys:
@@ -11732,6 +11730,8 @@ en:
     titles:
       job_handler: Job Handler
       last_error: Last Error
+  warning_aacb8c24: Warning
+  close_warning_d61daf2c: Close warning
   layouts:
     fixed_bottom:
       student_view:
@@ -11848,12 +11848,15 @@ en:
   reset_this_contact_method_s_bounce_count_3845ecf4: Reset this contact method's bounce count
   confirm_contact_method_29d6fe4b: Confirm contact method
   remove_contact_method_ca890ba3: Remove contact method
+  sms_f0ddceeb: sms
   add_contact_method_d2dfea03: Add Contact Method
+  slack_email_9204e2ea: Slack Email
+  register_slack_email_1f6d7e6d: Register Slack Email
   select_country_d21cb85a: Select Country
   international_text_messaging_rates_may_apply_d4b4a97a: International text messaging rates may apply.
   other_carrier_45531207: Other Carrier
   we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: We emailed a confirmation link to %{email_address}. Click the link in that email to finish registering. Make sure to check your spam box in case it got filtered.
-  to_activate_sms_enter_the_four_character_confirmat_3982a3ec: To activate SMS, enter the four-character confirmation code sent to %{sms_number}.
+  to_activate_this_communication_channel_enter_the_f_f465efc5: To activate this communication channel, enter the four-character confirmation code sent to %{sms_number}.
   code_is_case_sensitive_d8175cad: Code is case sensitive.
   confirmation_code_required_22984955: Confirmation code (required)
   user_settings_785eed40: User Settings
@@ -11957,7 +11960,7 @@ en:
   search_people_4782671a: Search People
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.
   available_until_date_cd125c62: Available Until Date
-  warning_aacb8c24: Warning
+  message_students_who_369b8488: Message Students Who...
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: This is a preview of the draft version of the quiz
   this_quiz_has_been_excused_d89d2b74: This quiz has been excused
   this_is_a_preview_of_the_published_version_of_the__70e0c8: This is a preview of the published version of the quiz
@@ -12069,11 +12072,14 @@ en:
   hide_sidebar_2b5b3776: Hide Sidebar
   done_54e3d4b6: Done
   mark_as_done_6fa48d2f: Mark as done
+  message_students_who_b9f2bf20: Message students who...
+  for_title_69d92b3a: for %{title}
+  message_type_480e7b89: Message Type
   cutoff_score_74254c89: cutoff score
+  send_message_6ccc90e8: Send Message
   account_97b34646: Account
   admin_4d3ba42f: Admin
   dashboard_7f1dbf71: Dashboard
-  inbox_bb245a60: Inbox
   expand_global_navigation_2c28d5d4: Expand global navigation
   minimize_global_navigation_2d839351: Minimize global navigation
   click_to_report_profile_picture_370f9625: Click to report profile picture
@@ -12738,6 +12744,7 @@ en:
   cell_number_is_required_2edcee60: Cell Number is required
   cell_number_is_invalid_bd6faee0: Cell Number is invalid!
   bounce_count_reset_c4c2218f: Bounce count reset!
+  confirm_communication_channel_81c48d08: Confirm Communication Channel
   confirmation_failed_please_try_again_ae566d37: Confirmation failed.  Please try again.
   your_content_has_been_exported_bbb57764: Your content has been exported.
   new_export_3ab758: New Export
@@ -13023,12 +13030,11 @@ en:
   are_you_sure_you_want_to_delete_this_track_f5a16357: Are you sure you want to delete this track?
   delete_track_fc21128b: Delete track
   remove_student_from_recipients_4b206e35: Remove %{student} from recipients
+  message_students_for_course_name_e55f8077: Message Students for %{course_name}
   public_message_students:
-    message_student: Message Students for %{course_name}
     send_message: Send Message
   sending_message_8ac5bc90: Sending Message...
   message_sent_9ff3a79d: Message sent!
-  send_message_6ccc90e8: Send Message
   sending_message_failed_please_try_again_b53cc904: Sending Message Failed, please try again
   prerequisites_lookup:
     headers:
@@ -13337,7 +13343,7 @@ en:
   the_maximum_number_of_graders_has_been_reached_for_a9302ebb: The maximum number of graders has been reached for this assignment.
   the_grade_you_entered_has_been_selected_and_can_no_ca87612b: The grade you entered has been selected and can no longer be changed.
   an_error_occurred_updating_this_assignment_21287c7e: An error occurred updating this assignment.
-  something_went_wrong_please_try_refreshing_the_pag_4e14a67: Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "%{assignmentTitle}" to load SpeedGrader.
+  something_went_wrong_please_try_refreshing_the_pag_3f651814: Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.
   speed_grader_helpers:
     graded: graded
     not_graded: not graded
@@ -13491,8 +13497,6 @@ en:
       x_people_have_signed_up: "%{n_participant_count} people have signed up"
       manage: Manage %{title} appointment group
       edit: Edit
-      message_groups: Message Groups Who...
-      message_students: Message Students Who...
       delete: Delete
       signed_up_for: "*%{title} appointment group* You're signed up for"
       scheduler_explanation_teacher_header: You have not created any appointment groups, and there are none you can sign up for
@@ -14127,16 +14131,12 @@ en:
       weekly: Weekly
       never: Never
     communication:
-      email:
-        display: Email Address
-      sms:
-        display: Cell Number
-      push:
-        display: Push Notification
-      twitter:
-        display: Twitter
       errors:
         saving_preferences_failed: Oops! Something broke.  Please try again
+  email_address_a1b97a39: Email Address
+  cell_number_69a7c309: Cell Number
+  push_notification_a6532ff3: Push Notification
+  slack_1130ad43: Slack
   show_name_of_observed_students_in_notifications_a56dd9e4: Show name of observed students in notifications.
   react_files:
     name: Name
@@ -14371,11 +14371,9 @@ en:
   unlocked_beee43de: Unlocked
   lock_c341af13: Lock
   locking_91f476a5: Locking...
-  viewsMessageStudentsDialog:
-    message_students_for_context: Message students for %{context}
-    message_students: Message students
-    notices:
-      message_sent: Message Sent!
+  message_students_for_context_ee62ff92: Message students for %{context}
+  message_students_37ba5dd5: Message students
+  message_sent_5e328899: Message Sent!
   unpublished_click_to_publish_title_7c57293f: Unpublished.  Click to publish %{title}.
   unpublished_click_to_publish_6a6d12e1: Unpublished.  Click to publish.
   published_click_to_unpublish_title_358122a: Published.  Click to unpublish %{title}.
@@ -14606,6 +14604,7 @@ en:
     greater_than_three: Please enter a search term with three or more characters
     unknown_error: Something went wrong with your search, please try again.
   open_this_keyboard_shortcuts_dialog_9658b83a: Open this keyboard shortcuts dialog
+  this_will_affect_every_customer_are_you_sure_a1e0cac6: This will affect every customer. Are you sure?
   gradebookHeaderFilterView:
     course_average: Course average
     course_median: Course median
@@ -14879,7 +14878,6 @@ en:
   don_t_add_this_user_for_now_32912974: Don’t add this user for now.
   possible_matches_for_address_select_the_correct_on_e206f972: Possible matches for "%{address}". Select the correct one below or create a new user.
   user_selection_f6139840: User Selection
-  email_address_a1b97a39: Email Address
   login_id_12109693: Login ID
   institution_14179014: Institution
   click_to_add_a_name_6cf551b0: Click to add a name
@@ -14960,13 +14958,10 @@ en:
   external_tool_tool_id_6028b3b1: External Tool %{tool_id}
   grader_that_determines_final_grade_cc55f20: Grader that determines final grade
   select_grader_782af48: Select Grader
-  display_to_students_e1301f99: Display to Students
-  displaying_to_students_b1e92058: Displaying to Students
-  grades_visible_to_students_1584fa83: Grades Visible to Students
-  grades_were_successfully_published_to_the_gradeboo_79203993: Grades were successfully published to the gradebook.
-  assignment_grades_have_already_been_published_ff2d84c6: Assignment grades have already been published.
+  grades_were_successfully_released_to_the_gradebook_4c3b07d6: Grades were successfully released to the gradebook.
+  assignment_grades_have_already_been_released_4c8a91b: Assignment grades have already been released.
   all_submissions_must_have_a_selected_grade_3a84e5a9: All submissions must have a selected grade.
-  there_was_a_problem_publishing_grades_b0b9202f: There was a problem publishing grades.
+  there_was_a_problem_releasing_grades_fa0ae6: There was a problem releasing grades.
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: Grades for this assignment are now visible to students.
   there_was_a_problem_updating_the_assignment_61b9b98b: There was a problem updating the assignment.
   there_was_a_problem_loading_students_5bdb6cf2: There was a problem loading students.
@@ -14988,18 +14983,21 @@ en:
   final_grade_4d7f6545: Final Grade
   student_studentnumber_f398d9c2: Student %{studentNumber}
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.
-  are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: Are you sure you want to display grades for this assignment to students?
+  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: Are you sure you want to post grades for this assignment to students?
   attention_aaca1f1d: Attention!
-  grades_cannot_be_modified_from_this_page_as_they_h_af66cd9f: Grades cannot be modified from this page as they have already been posted.
+  grades_cannot_be_modified_from_this_page_as_they_h_d0ebeb6: Grades cannot be modified from this page as they have already been released.
   grade_summary_255289f6: Grade Summary
   students_are_loading_206c5246: Students are loading
-  post_1e445890: Post
-  grades_posting_bc7cfc1a: Grades Posting
-  grades_posted_c274d9f8: Grades Posted
+  post_to_students_b02df196: Post to Students
+  posting_to_students_eaa57964: Posting to Students
+  grades_posted_to_students_56b8cb2d: Grades Posted to Students
+  release_grades_c68fbcc: Release Grades
+  releasing_grades_31a57dde: Releasing Grades
+  grades_released_488c2808: Grades Released
   grader_gradernumber_fef5d5cf: Grader %{graderNumber}
   graders_can_view_each_other_s_comments_d836b848: Graders can view each other's comments
   there_is_currently_1_available_grader_758e4a21: There is currently 1 available grader
-  there_are_currently_maxgradercount_available_grade_9ab81123: There are currently %{maxGraderCount} available graders
+  there_are_currently_availablegraderscount_availabl_58f85403: There are currently %{availableGradersCount} available graders
   must_have_at_least_1_grader_d4a54e85: Must have at least 1 grader
   number_of_graders_cde8dd54: Number of graders
   final_grader_can_view_other_grader_names_67736530: Final grader can view other grader names
@@ -15057,6 +15055,7 @@ en:
   upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
+  more_options_272b4953: More Options
   uploaded_285a2bfb: Uploaded
   ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
   ungraded_147a0dce: ungraded
@@ -15135,7 +15134,6 @@ en:
   sending_messages_effc7237: Sending messages
   messages_sent_b851d0dd: Messages sent
   error_sending_messages_13c874eb: Error sending messages
-  message_students_who_369b8488: Message Students Who...
   sending_messages_f8f41998: sending messages...
   haven_t_submitted_yet_e63834db: Haven't submitted yet
   haven_t_been_graded_d7dee5bb: Haven't been graded
@@ -15147,7 +15145,6 @@ en:
   remove_studentname_16ba8c3a: Remove %{studentName}
   subject_1bc03dea: 'Subject:'
   body_f48fe5cd: 'Body:'
-  everyone_else_cc5f6888: Everyone else
   everyone_854554dd: Everyone
   click_to_hide_details_f7d353d9: Click to hide details
   click_to_show_details_310154eb: Click to show details
@@ -15379,6 +15376,8 @@ en:
   due_dates_520a6c08: Due Dates
   course_catalog_4cc7c8ce: Course Catalog
   recent_announcements_8becc59c: Recent Announcements
+  must_select_a_student_group_first_15c6a3cb: Must select a student group first
+  select_group_to_grade_6df28d80: Select Group to Grade
   please_upload_files_as_a_zip_5a2c799f: Please upload files as a .zip
   are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe:
     one: Are you sure you want to archive your copy of this conversation?
@@ -15676,7 +15675,6 @@ en:
   additional_settings_20362654: Additional Settings
   identification_values_86d9ffda: Identification Values
   tool_id_afd739e1: Tool Id
-  display_values_f517c73c: Display Values
   icon_url_e3d56e89: Icon Url
   text_7f4593da: Text
   selection_height_9d57ec24: Selection Height
@@ -15690,6 +15688,7 @@ en:
   target_link_uri_d166858: Target Link URI
   select_message_type_806b2dea: Select Message Type
   label_values_76f4b5fa: Label Values
+  display_values_f517c73c: Display Values
   must_have_at_least_one_placement_defined_1bc586c6: Must have at least one placement defined.
   remove_placement_90862c13: Remove %{placement}
   field_cannot_be_blank_afb5b332: Field cannot be blank.
@@ -15722,6 +15721,7 @@ en:
   save_successful_b2f64da4: Save successful.
   failed_to_save_changes_errors_6920f334: 'Failed to save changes: %{errors}%'
   a_redirect_uri_is_required_please_supply_one_471908db: A redirect_uri is required, please supply one.
+  a_json_url_is_required_please_supply_one_ed03101c: A json url is required, please supply one.
   create_developer_key_78de8510: Create developer key
   edit_developer_key_d8fa33c4: Edit developer key
   key_settings_44df6a41: Key Settings
@@ -16127,14 +16127,8 @@ en:
   score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
   complete_4f4efbc: complete
   incomplete_95612d72: incomplete
-  sharedMessageStudentsWhoHelper:
-    students_who:
-      havent_submitted_yet: Haven't submitted yet
-      no_submission_for: No submission for %{assignment}
-      havent_been_graded: Haven't been graded
-      no_grade_for: No grade for %{assignment}
-      scored_less_than: Scored less than
-      scored_more_than: Scored more than
+  no_submission_for_assignment_a9cb6fe2: No submission for %{assignment}
+  no_grade_for_assignment_97c9bc75: No grade for %{assignment}
   scored_less_than_cutoff_on_assignment_5f5c4303: Scored less than %{cutoff} on %{assignment}
   scored_more_than_cutoff_on_assignment_f422fec: Scored more than %{cutoff} on %{assignment}
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: You will be redirected to Gradebook while your file is being uploaded. If you have a large CSV file, your changes may take a few minutes to update. To prevent overwriting any data, please confirm the upload has completed and Gradebook is correct before making additional changes.
@@ -16156,6 +16150,12 @@ en:
     other: Score does not include %{groups} because they have no points possible
   can_t_compute_score_until_an_assignment_has_points_f34dd600: Can't compute score until an assignment has points possible
   out_of_pointspossible_3fb5ee20: Out of %{pointsPossible}
+  no_grades_to_post_91425bfd: No grades to post
+  post_grades_3e692d46: Post grades
+  all_grades_posted_616a85ab: All grades posted
+  no_grades_to_hide_6f51fc5b: No grades to hide
+  hide_grades_5ff26682: Hide grades
+  all_grades_hidden_3092d5b5: All grades hidden
   name_options_bc5c95ce: "%{name} Options"
   sort_by_72dbba9c: Sort by
   grade_low_to_high_1678b713: Grade - Low to High
@@ -16164,10 +16164,6 @@ en:
   message_students_who_57f07a41: Message Students Who
   curve_grades_b7a75443: Curve Grades
   set_default_grade_a202ebc1: Set Default Grade
-  post_grades_3e692d46: Post grades
-  all_grades_posted_616a85ab: All grades posted
-  hide_grades_5ff26682: Hide grades
-  all_grades_hidden_3092d5b5: All grades hidden
   enter_grades_as_e113e606: Enter Grades as
   grading_scheme_f151d195: Grading Scheme
   re_upload_submissions_125e415d: Re-Upload Submissions
@@ -16205,7 +16201,7 @@ en:
   this_grade_is_unusually_high_60533c20: This grade is unusually high
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.
   automatically_post_grades_29a7eff5: Automatically Post Grades
-  assignment_grades_will_be_visible_to_students_as_s_8c19fa1: Assignment grades will be visible to students as soon as they are entered.
+  assignment_grades_will_be_visible_to_students_as_s_62975ef6: "\n            Assignment grades will be visible to students as soon as they are entered.\n            Grades that have already been hidden will remain hidden.\n          "
   manually_post_grades_18248306: Manually Post Grades
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n            Grades will be hidden by default. Any grades that have already posted will remain visible.\n            Choose when to post grades for each assignment on each column in the gradebook.\n          "
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: 'While the grades for an assignment are set to manual, students will not receive new notifications about or be able to see:'
@@ -16266,6 +16262,8 @@ en:
   this_student_s_enrollment_has_been_concluded_f135b8e4: This student's enrollment has been concluded
   not_calculated_in_final_grade_2b7d5bd1: Not calculated in final grade
   loading_comments_32366acf: Loading comments
+  select_student_group_c0be9f3e: Select Student Group
+  due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: "\n                Due to the size of your course you must select a student group before launching\n                SpeedGrader.\n              "
   submission_tray_429ac3df: Submission tray
   close_submission_tray_c4988fa8: Close submission tray
   previous_assignment_83d1f423: Previous assignment
@@ -16298,8 +16296,6 @@ en:
   error_exporting_gradebook_msg_6ea31e2f: 'Error exporting gradebook: %{msg}'
   no_way_to_export_gradebooks_provided_b4c2939d: No way to export gradebooks provided!
   an_export_is_already_in_progress_54270f01: An export is already in progress.
-  no_submission_for_assignment_a9cb6fe2: No submission for %{assignment}
-  no_grade_for_assignment_97c9bc75: No grade for %{assignment}
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: Invalid CSV file. Grades could not be updated.
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: Are you sure you want to delete this grading period?
   the_grading_period_was_deleted_7814a349: The grading period was deleted
@@ -16311,7 +16307,7 @@ en:
   closes_5c6b4367: 'Closes:'
   grading_schemes_1c3c3252: Grading Schemes
   automatically_dff02416: Automatically
-  grades_will_be_visible_to_students_as_soon_as_they_62805e34: Grades will be visible to students as soon as they are entered.
+  assignment_grades_will_be_visible_to_students_as_s_bfbea571: "\n          Assignment grades will be visible to students as soon as they are entered.\n          Grades that have already been hidden will remain hidden.\n        "
   manually_9de23e1f: Manually
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n          Grades will be hidden by default. Any grades that have already posted will remain visible.\n          Choose when to post grades for this assignment in the gradebook.\n        "
   while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: 'While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:'
@@ -16395,6 +16391,8 @@ en:
   successfully_created_a_set_38374719: Successfully created a set
   there_was_a_problem_submitting_your_set_27ca2ed0: There was a problem submitting your set
   posting_grades_cd7cd758: Posting grades
+  count_hidden_e8d2c57c: "%{count} hidden"
+  post_1e445890: Post
   posting_grades_is_not_allowed_because_grades_have__229d9c9e: Posting grades is not allowed because grades have not been released for this assignment.
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: Posting grades will refresh your browser. This may take a moment.
   grades_can_only_be_posted_to_everyone_when_the_ass_b866ca05: Grades can only be posted to everyone when the assignment is anonymous. Anonymity will be removed.
@@ -16534,6 +16532,12 @@ en:
   before_cb32fc0: Before..
   after_48b9d69: After..
   at_the_bottom_a6a5f0fe: At the Bottom
+  logout_a9312e35: Logout
+  my_dashboard_8983c283: My Dashboard
+  all_accounts_3bafc860: All Accounts
+  all_courses_a7dbb853: All Courses
+  all_groups_cea25817: All Groups
+  loading_f99d93d4: "...Loading"
   count_unread_messages_99d6bf17:
     one: 1 unread message
     other: "%{count} unread messages"
@@ -16543,14 +16547,8 @@ en:
   profile_tray_bcec5044: Profile tray
   title_tray_ec9f7488: "%{title} tray"
   global_navigation_tray_35612e2e: Global navigation tray
-  all_accounts_3bafc860: All Accounts
-  all_courses_a7dbb853: All Courses
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
-  all_groups_cea25817: All Groups
   user_profile_picture_46bffbc7: User profile picture
-  logout_a9312e35: Logout
-  profile_6bd2baed: Profile
-  eportfolios_f6dc4579: ePortfolios
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
   okay_1772bbeb: Okay
@@ -17498,6 +17496,8 @@ en:
     one: 1 Section
     other: "%{count} Sections"
   count_users_374d6e47: "(%{count} Users)"
+  speedgrader_tm_44688790: SpeedGrader™
+  select_one_8e0af564: Select One
   delayed_until_58b7af4b: 'Delayed until:'
   posted_on_e1010e1e: 'Posted on:'
   reply_389d6fb9: Reply
@@ -17639,7 +17639,9 @@ en:
   loading_assessment_audit_trail_5cf4c10: Loading assessment audit trail
   post_or_hide_grades_2d1d7815: Post or Hide Grades
   all_grades_posted_d5b8cb68: All Grades Posted
+  no_grades_to_post_fc148c1b: No Grades to Post
   all_grades_hidden_84409b76: All Grades Hidden
+  no_grades_to_hide_2072bbd: No Grades to Hide
   out_of_pointspossible_c163105a: out of %{pointsPossible}
   how_is_the_grade_determined_bb75bf53: How Is the Grade Determined?
   select_a_provisional_grade_7106e3d5: Select a provisional grade
@@ -17974,6 +17976,10 @@ en:
   move_to_9b91c6e0: Move To…
   edit_assignment_name_mastery_paths_40b50541: Edit Assignment %{name} Mastery Paths
   delete_assignment_name_deec56e3: Delete Assignment %{name}
+  send_assignment_name_to_another_user_e2ca494d: Send Assignment %{name} to another user
+  send_to_7881bf0e: Send to...
+  copy_assignment_name_to_another_course_b62d0a54: Copy Assignment %{name} to another course
+  copy_to_a5396a6f: Copy to...
   assignment_group_weights_can_t_be_edited_because_t_b6b591ae: Assignment group weights can't be edited because there are assignments in one of the groups whose due dates are closed.
   weight_final_grade_based_on_assignment_groups_3124161: Weight final grade based on assignment groups
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: Are you sure you want to disable Sync to %{sisName} for all assignments?
@@ -18013,6 +18019,7 @@ en:
   not_completed_55fb4c00: Not Completed
   calendar_contextinfo_name_a7d98525: Calendar %{contextInfo.name}
   open_event_menu_for_783510e3: Open event menu for
+  message_groups_who_1ba736f: Message Groups Who...
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} appointment group* You can **sign up** for this."
   open_name_color_picker_a2646a33: Open %{name} Color Picker
   course_section_name_ea880ed1: Course Section %{name}
@@ -18069,6 +18076,12 @@ en:
   starred_no_subject_click_to_unstar_bff04bce: Starred "(No subject)", Click to unstar.
   not_starred_no_subject_click_to_star_adfefe93: '''Not starred "(No Subject)", Click to star.'
   open_message_d7b12975: Open Message
+  reply_to_conversation_subject_4b2e6fe7: Reply to conversation %{subject}
+  reply_to_conversation_f1aa0d4: Reply to conversation
+  message_actions_for_conversation_subject_fdb54c88: Message actions for conversation %{subject}
+  message_actions_for_conversation_d29b26cc: Message actions for conversation
+  reply_to_conversation_text_cd45c48f: Reply to conversation %{text}
+  message_actions_for_text_27eead86: Message actions for %{text}
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: This attachment has been unpublished by the author.
   calendar_event_89aadc1c: Calendar Event
   due_by_c263dc10: due by
@@ -18175,8 +18188,8 @@ en:
     module_sequence_footer:
       previous: Previous
       next: Next
-  message_students_dialog:
-    recipients: 'Recipients:'
+  recipients_a69b5e55: 'Recipients:'
+  sent_f4ee89ec: Sent!
   you_have_changed_the_progression_requirements_for__6772bc89: You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it.
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?
   mute_dialog:
@@ -18318,7 +18331,6 @@ en:
     assignment_information:
       actions:
         assignment_is_muted: Muted?
-        message_students: Message students who...
         set_default_grade: Set default grade
         curve_grades: Curve Grades
       details:

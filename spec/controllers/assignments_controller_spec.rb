@@ -214,6 +214,19 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    it "js_env DIRECT_SHARE_ENABLED when direct_share feature is enabled" do
+      @course.root_account.enable_feature!(:direct_share)
+      user_session(@teacher)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to eq true
+    end
+
+    it "js_env DIRECT_SHARE_ENABLED when direct_share feature is disabled" do
+      user_session(@teacher)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to eq false
+    end
+
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)
@@ -721,35 +734,82 @@ describe AssignmentsController do
       end
     end
 
-    describe "description" do
-      render_views
-
-      let(:description) { <<~HTML }
-        <a href="#{attachment_model.public_download_url}">link</a>
-      HTML
-
-      it "excludes verifiers if course is not public" do
-        user_session(@student)
-        expect(UserContent::FilesHandler).to receive(:new).with(hash_including(in_app: true))
-        assignment = @course.assignments.create(
-          title: 'some assignment',
-          description: description
-        )
-        get 'show', params: {course_id: @course.id, id: assignment.id}, format: 'html'
+    describe "js_env" do
+      before :each do
+        user_session @teacher
       end
 
-      it "includes verifiers if course is public" do
-        expect(UserContent::FilesHandler).to receive(:new).with(hash_including(in_app: false))
-        course = course_factory(
-          active_all: true,
-          is_public: true,
-        )
-        assignment = assignment_model(
-          course: course,
-          submission_types: "online_url",
-          description: description
-        )
-        get 'show', params: {course_id: course.id, id: assignment.id}
+      it "includes filter_speed_grader_by_student_group in SETTINGS hash" do
+        get :show, params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:SETTINGS]).to have_key :filter_speed_grader_by_student_group
+      end
+
+      context "when filter_speed_grader_by_student_group? is true" do
+        before :once do
+          @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+          @course.enable_feature!(:new_gradebook)
+          @course.update!(filter_speed_grader_by_student_group: true)
+        end
+
+        it "includes the course group categories" do
+          @course.group_categories.create!(name: "category")
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          group_categories_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+          expect(group_categories_ids).to eq @course.group_categories.map(&:id)
+        end
+
+        it "includes the gradebook settings student group id" do
+          @teacher.preferences[:gradebook_settings] = {
+            @course.id => {
+              'filter_rows_by' => {
+                'student_group_id' => '23'
+              }
+            }
+          }
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env][:selected_student_group_id]).to eq "23"
+        end
+      end
+
+      context "when filter_speed_grader_by_student_group? is false" do
+        it "does not include the course group categories" do
+          @course.group_categories.create!(name: "category")
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :group_categories
+        end
+
+        it "does not include the gradebook settings student group id" do
+          @teacher.preferences[:gradebook_settings] = {
+            @course.id => {
+              'filter_rows_by' => {
+                'student_group_id' => '23'
+              }
+            }
+          }
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :selected_student_group_id
+        end
+      end
+
+      describe "speed_grader_url" do
+        it "is included when user can view SpeedGrader and assignment is published" do
+          user_session @teacher
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).to have_key :speed_grader_url
+        end
+
+        it "is not included when user cannot view SpeedGrader" do
+          user_session @student
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :speed_grader_url
+        end
+
+        it "is not included when assignment is not published" do
+          @assignment.unpublish
+          user_session @teacher
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).not_to have_key :speed_grader_url
+        end
       end
     end
   end

@@ -78,6 +78,6 @@ class PluginsController < ApplicationController
   end
 
   def set_navigation
-    @active_tab = 'plugins'
+    set_active_tab 'plugins'
   end
 end

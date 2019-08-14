@@ -20,13 +20,14 @@ require_relative '../pages/speedgrader_page'
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_grade_detail_tray_page'
 require_relative '../pages/gradezilla_cells_page'
+require_relative '../setup/gradebook_setup'
 require_relative '../../assignments/page_objects/assignment_page'
 
 describe 'filter speed grader by student group' do
   include_context "in-process server selenium tests"
+  include GradebookSetup
 
   before :once do
-    skip('unskip in first example to be implemented')
     # course with student groups
     course_with_teacher(
       course_name: "Filter Speedgrader Course",
@@ -39,7 +40,7 @@ describe 'filter speed grader by student group' do
     @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
     @course.update!(filter_speed_grader_by_student_group: true)
 
-    @course.assignments.create!(
+    @assignment = @course.assignments.create!(
       title: 'filtering assignment',
       submission_types: 'online_text_entry',
       grading_type: 'points',
@@ -58,27 +59,22 @@ describe 'filter speed grader by student group' do
     @group1_students = @students[0,2]
     @group2_students = @students[2,2]
 
-    # TODO: enable filtering setting
+    @course.update!(filter_speed_grader_by_student_group: true)
   end
 
   context 'on assignments page' do
     before :each do
       user_session(@teacher)
-      AssignmentPage.visit(@course, @assignment)
-    end
-
-    it 'speedgrader link with correct href' do
-      skip('unskip in GRADE-2243')
-      # TODO: select group @category.groups.first from dropdown
-      # AssignmentPage.student_group_speedgrader_dropdown(@category.groups.first)
-      speedgrader_link_text = "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(AssignmentPage.speedgrader_link.attribute("href")).to include(speedgrader_link_text)
+      AssignmentPage.visit(@course.id, @assignment.id)
     end
 
     it 'disables speedgrader when no group selected' do
-      skip('Unskip in GRADE-2244')
-      # verify speecgrader link is disabled
       expect(AssignmentPage.speedgrader_link).to be_disabled
+    end
+
+    it 'does not disable speedgrader link when a group is selected' do
+      AssignmentPage.student_group_speedgrader_dropdown(@category.groups.first)
+      expect(AssignmentPage.speedgrader_link).not_to be_disabled
     end
   end
 
@@ -88,7 +84,8 @@ describe 'filter speed grader by student group' do
     end
 
     it 'speedgrader link from tray has correct href' do
-      skip('unskip in GRADE-2238')
+      show_student_groups_filter(@teacher)
+
       Gradezilla.visit(@course)
       # select group from gradebook
       Gradezilla.select_student_group(@category.groups.second)
@@ -99,7 +96,7 @@ describe 'filter speed grader by student group' do
     end
 
     it 'loads speedgrader when group selected' do
-      skip('unskip in GRADE-2238')
+      skip('Unskip in GRADE-2245')
       # select group from gradebook setting
       @teacher.preferences[:gradebook_settings] = {
         @course.id => {
@@ -111,17 +108,15 @@ describe 'filter speed grader by student group' do
       Speedgrader.visit(@course.id, @assignment.id)
       # verify
       Speedgrader.click_students_dropdown
-      expect(Speedgrader.fetch_student_names).to contain_exaclty(@group2_students)
+      expect(Speedgrader.fetch_student_names).to contain_exactly(@group2_students)
     end
 
     it 'disables speedgrader from tray' do
-      skip('unskip in GRADE-2239')
       Gradezilla.visit(@course)
       # verify link is disabled and message
       Gradezilla::Cells.open_tray(@group2_students.first, @assignment)
-      # expect(Gradezilla::GradeDetailTray.group_message).to contain_text("you must select a student group")
+      expect(Gradezilla::GradeDetailTray.group_message).to include_text("you must select a student group")
       expect(Gradezilla::GradeDetailTray.speedgrader_link).to be_disabled
     end
   end
-
 end

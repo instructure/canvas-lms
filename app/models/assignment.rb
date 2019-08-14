@@ -82,6 +82,7 @@ class Assignment < ActiveRecord::Base
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
   belongs_to :context, polymorphic: [:course]
+  delegate :moderated_grading_max_grader_count, to: :course
   belongs_to :grading_standard
   belongs_to :group_category
 
@@ -2007,7 +2008,6 @@ class Assignment < ActiveRecord::Base
         homework.attributes = opts.merge({
           :attachment => nil,
           :processed => false,
-          :process_attempts => 0,
           :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
@@ -2399,10 +2399,6 @@ class Assignment < ActiveRecord::Base
 
   def has_peer_reviews?
     self.peer_reviews
-  end
-
-  def self.percent_considered_graded
-    0.5
   end
 
   scope :include_submitted_count, -> { select(
@@ -3020,13 +3016,6 @@ class Assignment < ActiveRecord::Base
   def anonymous_grader_identities_by_anonymous_id
     # Response looks like: { anonymous_id => { id: anonymous_id, name: anonymous_name } }
     @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
-  end
-
-  def moderated_grading_max_grader_count
-    max_course_count = course.moderated_grading_max_grader_count
-    return max_course_count if grader_count.blank?
-
-    [grader_count, max_course_count].max
   end
 
   def moderated_grader_limit_reached?

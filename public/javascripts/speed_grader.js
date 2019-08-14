@@ -36,7 +36,7 @@ import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
-import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
+import {isGraded, isHidden} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
@@ -44,9 +44,7 @@ import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
 import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
 import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import View from '@instructure/ui-layout/lib/components/View'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
@@ -338,7 +336,7 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  jsonData.studentMap = _.indexBy(jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
@@ -622,9 +620,9 @@ function setupHeader({showMuteButton = true}) {
     toAssignment(e) {
       e.preventDefault()
       const classes = e.target.getAttribute('class').split(' ')
-      if (_.contains(classes, 'prev')) {
+      if (classes.includes('prev')) {
         EG.prev()
-      } else if (_.contains(classes, 'next')) {
+      } else if (classes.includes('next')) {
         EG.next()
       }
     },
@@ -2170,7 +2168,7 @@ EG = {
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
     $enrollment_inactive_notice.showIf(
-      _.any(jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments, enrollment => {
+      _.some(jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments, enrollment => {
         if (enrollment.workflow_state === 'inactive') {
           $full_width_container.addClass('with_enrollment_notice')
           return true
@@ -2203,7 +2201,7 @@ EG = {
       return false
     }
 
-    return _.any(
+    return _.some(
       jsonData.studentMap[student].enrollments,
       enrollment => enrollment.workflow_state === 'completed'
     )
@@ -2365,7 +2363,7 @@ EG = {
   totalStudentCount() {
     if (sectionToShow) {
       return _.filter(jsonData.context.students, student =>
-        _.contains(student.section_ids, sectionToShow)
+        _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
       return jsonData.context.students.length
@@ -2531,9 +2529,7 @@ EG = {
 
       const currentStudentIDAsOfAjaxCall = this.currentStudent[anonymizableId]
       previewOptions = $.extend(previewOptions, {
-        ajax_valid: _.bind(function() {
-          return currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
-        }, this)
+        ajax_valid: () => currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
       })
       $iframe_holder.show().loadDocPreview(previewOptions)
     } else if (browserableCssClasses.test(attachment.mime_class)) {
@@ -2636,7 +2632,7 @@ EG = {
     const defaultOpts = {
       commentAttachmentBlank: $comment_attachment_blank
     }
-    const opts = _.extend({}, defaultOpts, incomingOpts)
+    const opts = {...defaultOpts, ...incomingOpts}
     const attachment = attachmentData.attachment ? attachmentData.attachment : attachmentData
     let attachmentElement = opts.commentAttachmentBlank.clone(true)
 
@@ -2760,7 +2756,7 @@ EG = {
       commentBlank: $comment_blank,
       commentAttachmentBlank: $comment_attachment_blank
     }
-    const opts = _.extend({}, defaultOpts, incomingOpts)
+    const opts = {...defaultOpts, ...incomingOpts}
     let commentElement = opts.commentBlank.clone(true)
 
     // Serialization seems to have changed... not sure if it's changed everywhere, though...
@@ -3556,24 +3552,31 @@ function getGradingPeriods() {
 
 function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
   const speedGraderJSON = speedGraderJsonResponse[0]
-  speedGraderJSON.gradingPeriods = _.indexBy(gradingPeriods, 'id')
+  speedGraderJSON.gradingPeriods = _.keyBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()
 }
 
-function speedGraderJSONErrorFn(data, _xhr, _textStatus, _errorThrown) {
-  if (data.status === 504) {
+function buildAlertMessage() {
+  const alertMessage = I18n.t(
+    'Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.',
+    {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]}
+  )
+  return {__html: alertMessage.string}
+}
+
+function speedGraderJSONErrorFn(_data, xhr, _textStatus, _errorThrown) {
+  if (xhr.status === 504) {
     const alertProps = {
       variant: 'error',
       dismissible: false
     }
-    const alertMessage = I18n.t(
-      'Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on "%{assignmentTitle}" to load SpeedGrader.',
-      {assignmentTitle: ENV.assignment_title}
-    )
+
     ReactDOM.render(
-      <Alert {...alertProps}>{alertMessage}</Alert>,
+      <Alert {...alertProps}>
+        <span dangerouslySetInnerHTML={buildAlertMessage()} />
+      </Alert>,
       document.getElementById('speed_grader_timeout_alert')
     )
   }
@@ -3651,7 +3654,7 @@ function setupSelectors() {
   fileIndex = 1
   gradeeLabel = studentLabel
   groupLabel = I18n.t('group', 'Group')
-  isAdmin = _.include(ENV.current_user_roles, 'admin')
+  isAdmin = _.includes(ENV.current_user_roles, 'admin')
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
   header = setupHeader({showMuteButton: !ENV.post_policies_enabled})
@@ -3690,8 +3693,12 @@ function teardownSettingsMenu() {
 function renderPostGradesMenu() {
   const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
-  const allowHidingGrades = submissions.some(submission => submission && submission.posted_at != null)
-  const allowPostingGrades = submissions.some(submission => submission && submission.posted_at == null)
+
+  const hasGrades = submissions.some(isGraded)
+  const allowHidingGrades = submissions.some(
+    submission => submission && submission.posted_at != null
+  )
+  const allowPostingGrades = submissions.some(submission => submission && isHidden(submission))
 
   function onHideGrades() {
     EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
@@ -3704,6 +3711,7 @@ function renderPostGradesMenu() {
   const props = {
     allowHidingGrades,
     allowPostingGrades,
+    hasGrades,
     onHideGrades,
     onPostGrades
   }

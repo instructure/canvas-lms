@@ -18,7 +18,7 @@
 
 import {camelize} from 'convert_case'
 
-function isGraded(submission) {
+export function isGraded(submission) {
   const sub = camelize(submission)
   return (sub.score != null && sub.workflowState === 'graded') || sub.excused
 }

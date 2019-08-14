@@ -15,14 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {
-  CREATE_SUBMISSION,
-  CREATE_SUBMISSION_COMMENT,
-  CREATE_SUBMISSION_DRAFT,
-  STUDENT_VIEW_QUERY,
-  SUBMISSION_COMMENT_QUERY,
-  SUBMISSION_ID_QUERY
-} from './assignmentData'
+import {CREATE_SUBMISSION_COMMENT} from './graphqlData/Mutations'
+import {SUBMISSION_COMMENT_QUERY} from './graphqlData/Queries'
+
+/*
+ * !!! THIS FILE IS DEPRECIATED !!!
+ *
+ * Use the mocks.js file for your testing needs
+ *
+ * !!! THIS FILE IS DEPRECIATED !!!
+ */
 
 export function mockAssignment(overrides = {}) {
   return {
@@ -37,6 +39,7 @@ export function mockAssignment(overrides = {}) {
     gradingType: 'points',
     allowedAttempts: null,
     allowedExtensions: [],
+    submissionTypes: ['online_upload'],
     assignmentGroup: {
       name: 'Assignments',
       __typename: 'AssignmentGroup'
@@ -120,21 +123,6 @@ export function mockMultipleAttachments() {
       __typename: 'Attachment'
     }
   ]
-}
-
-export function singleMediaObject(overrides = {}) {
-  return {
-    __typename: 'MediaObject',
-    id: '9',
-    title: 'video media comment',
-    mediaType: 'video/mp4',
-    mediaSources: {
-      __typename: 'MediaSource',
-      src: 'www.blah.com',
-      type: 'video/mp4'
-    },
-    ...overrides
-  }
 }
 
 export function singleComment(overrides = {}) {
@@ -246,131 +234,6 @@ export function commentGraphqlMock(comments) {
   ]
 }
 
-export function mockSubmissionHistoriesConnection() {
-  const submissionHistory = mockSubmission()
-
-  return {
-    __typename: 'SubmissionHistoryConnection',
-    pageInfo: {
-      __typename: 'PageInfo',
-      hasPreviousPage: false,
-      startCursor: btoa('1')
-    },
-    edges: [
-      {
-        __typename: 'SubmissionHistoryEdge',
-        cursor: btoa('1'),
-        node: submissionHistory
-      }
-    ]
-  }
-}
-
-export function mockGraphqlQueryResults(overrides = {}) {
-  const assignment = mockAssignment(overrides)
-  assignment.submissionsConnection = {
-    nodes: [mockSubmission()],
-    __typename: 'SubmissionConnection'
-  }
-  return assignment
-}
-
-export function submissionGraphqlMock() {
-  return [
-    {
-      request: {
-        query: CREATE_SUBMISSION_DRAFT,
-        variables: {
-          id: mockSubmission().id,
-          attempt: 1,
-          fileIds: ['1']
-        }
-      },
-      result: {
-        data: {
-          createSubmissionDraft: {
-            submissionDraft: {
-              __typename: 'SubmissionDraft',
-              _id: '22',
-              attachments: [singleAttachment({_id: '1'})]
-            },
-            errors: {
-              attribute: null,
-              message: null,
-              __typename: 'Errors'
-            },
-            __typename: 'CreateSubmissionDraftPayload'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: CREATE_SUBMISSION,
-        variables: {
-          assignmentLid: '22',
-          submissionID: mockSubmission().id,
-          type: 'online_upload',
-          fileIds: ['1']
-        }
-      },
-      result: {
-        data: {
-          createSubmission: {
-            submission: mockSubmission(),
-            errors: {
-              attribute: null,
-              message: null,
-              __typename: 'Errors'
-            },
-            __typename: 'CreateSubmissionPayload'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: STUDENT_VIEW_QUERY,
-        variables: {
-          assignmentLid: '22',
-          submissionID: mockSubmission().id
-        }
-      },
-      result: {
-        data: {
-          assignment: mockGraphqlQueryResults({
-            lockInfo: {isLocked: false, __typename: 'LockInfo'}
-          })
-        }
-      }
-    },
-    {
-      request: {
-        query: SUBMISSION_ID_QUERY,
-        variables: {
-          assignmentLid: '22'
-        }
-      },
-      result: {
-        data: {
-          assignment: {
-            submissionsConnection: {
-              nodes: [
-                {
-                  id: mockSubmission().id,
-                  __typename: 'Submission'
-                }
-              ],
-              __typename: 'SubmissionConnection'
-            },
-            __typename: 'Assignment'
-          }
-        }
-      }
-    }
-  ]
-}
-
 export function mockSubmission(overrides = {}) {
   return {
     attachments: mockMultipleAttachments(),
@@ -398,25 +261,12 @@ export function mockSubmission(overrides = {}) {
     gradingStatus: 'needs_grading',
     id: btoa('Submission-22'),
     latePolicyStatus: null,
+    posted: true,
     state: 'submitted',
     submissionDraft: null,
     submissionStatus: 'submitted',
     submittedAt: '2019-05-08T10:02:42-06:00',
     __typename: 'Submission',
-    ...overrides
-  }
-}
-
-export function mockSubmissionHistory() {
-  const submissionHistory = mockSubmission()
-  delete submissionHistory.id
-  return submissionHistory
-}
-
-export function mockSubmissionDraft(overrides = {}) {
-  return {
-    _id: '50',
-    attachments: [singleAttachment()],
     ...overrides
   }
 }

@@ -26,7 +26,7 @@ export default class RoleSelectView extends SelectView {
   }
 
   attach() {
-    return this.rolesCollection.on('add reset remove change', this.render)
+    return this.rolesCollection.on('add reset remove change', this.render, this)
   }
 
   toJSON() {

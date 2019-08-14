@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Tasaa oikealle"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Kohdistus ja tunnistus"
+  },
   "all_4321c3a1": {
     "message": "Kaikki"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "Peruuta kuvan lataus"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Canvas-lisäosat"
   },
   "cc_attribution_f6de631f": {
     "message": "CC-määritteet"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "Muokkaa linkkiä"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "Editorin tilapalkki"
+  },
   "embed_828fac4a": {
     "message": "Upota"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "Kansio"
+  },
+  "formatting_5b143aa8": {
+    "message": "Muotoillaan"
   },
   "generating_preview_45b53be0": {
     "message": "Luodaan esikatselua..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "Mikrofoni"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Sekavaa ja LTI"
+  },
   "modules_c4325335": {
     "message": "Moduulit"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Valitse kansio, johon tiedostosi ladataan"
   },
+  "selected_274ce24f": {
+    "message": "Valittu"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "Näytä upotusasetukset"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Aloita nauhoitus"
+  },
+  "styles_2aa721ef": {
+    "message": "Tyylit"
   },
   "subheader_2b87606d": {
     "message": "Alaotsikko"

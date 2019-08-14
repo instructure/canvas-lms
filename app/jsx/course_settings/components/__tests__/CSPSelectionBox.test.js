@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, wait, fireEvent} from 'react-testing-library'
+import {render, wait, fireEvent} from '@testing-library/react'
 import CSPSelectionBox from '../CSPSelectionBox'
 
 function getFakeApi(getResponse, putResponse, delay, throwError = 'none') {

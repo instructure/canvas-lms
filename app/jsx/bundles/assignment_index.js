@@ -35,7 +35,7 @@ const course = new Course({
 })
 course.url = ENV.URLS.course_url
 
-const userIsAdmin = _.contains(ENV.current_user_roles, 'admin')
+const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
 
 const assignmentGroups = new AssignmentGroupCollection([], {
   course,

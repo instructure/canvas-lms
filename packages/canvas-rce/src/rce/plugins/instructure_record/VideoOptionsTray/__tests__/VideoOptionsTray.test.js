@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'

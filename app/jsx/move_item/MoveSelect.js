@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!move_select'
-import React from 'react'
-import { func, arrayOf } from 'prop-types'
-import Select from '@instructure/ui-core/lib/components/Select'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-
+import {arrayOf, func} from 'prop-types'
 import ConnectorIcon from './ConnectorIcon'
-import { itemShape, moveOptionsType } from './propTypes'
-import { positions } from './positions'
+import I18n from 'i18n!move_select'
+import {itemShape, moveOptionsType} from './propTypes'
+import {positions} from './positions'
+import React from 'react'
+
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import FormField from '@instructure/ui-form-field/lib/components/FormField'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import View from '@instructure/ui-layout/lib/components/View'
 
 export default class MoveSelect extends React.Component {
   static propTypes = {
@@ -109,13 +109,21 @@ export default class MoveSelect extends React.Component {
   renderSelect ({ label, onChange, options, className,  selectOneDefault}) {
     return (
       <View margin="medium 0" display="block" className={className}>
-        <Select
+        <FormField
+          id="move-select-form"
           label={<ScreenReaderContent>{label}</ScreenReaderContent>}
-          onChange={onChange}
+        >
+          <select
+            onChange={onChange}
+            style={{
+              margin: '0',
+              width: '100%'
+            }}
           >
-          {selectOneDefault && (<option>{I18n.t('Select one')}</option>)}
-          {options}
-        </Select>
+            {selectOneDefault && (<option>{I18n.t('Select one')}</option>)}
+            {options}
+          </select>
+        </FormField>
       </View>
     )
   }

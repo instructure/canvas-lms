@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, getByLabelText, getByText, queryByLabelText, wait} from 'dom-testing-library'
+import {fireEvent, getByLabelText, getByText, getAllByText, queryByLabelText, wait} from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {
   const controlledId = $sizeSelect.getAttribute('aria-controls')
@@ -53,7 +53,7 @@ export default class ImageOptionsTrayDriver {
   }
 
   get $displayAsField() {
-    return getByText(this.$element, 'Display Options').closest('fieldset')
+    return getAllByText(this.$element, 'Display Options')[0].closest('fieldset')
   }
 
   get $sizeSelect() {

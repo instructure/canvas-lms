@@ -68,7 +68,7 @@ describe "discussion_topics" do
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML(response.body)
     expect(doc.at_css('.admin-links .icon-speed-grader')).not_to be_nil
   end
 
@@ -80,7 +80,7 @@ describe "discussion_topics" do
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_successful
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML(response.body)
     expect(doc.at_css('.admin-links .icon-peer-review')).not_to be_nil
   end
 end

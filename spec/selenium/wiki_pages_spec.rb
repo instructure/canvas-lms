@@ -418,7 +418,7 @@ describe "Wiki Pages" do
       end
     end
 
-    context "Edit Page" do
+    context "Edit Page", ignore_js_errors: true do
       before :each do
         get "/courses/#{@course.id}/pages/bar/edit"
         wait_for_ajaximations
@@ -460,14 +460,20 @@ describe "Wiki Pages" do
         expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
       end
+    end
+  end
 
-      it "should insert a file using RCE in the wiki page", priority: "1", test_id: 126673 do
-        file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
-        file.context = @course
-        file.save!
-        get "/courses/#{@course.id}/pages/bar/edit"
-        insert_file_from_rce
-      end
+  context "Insert RCE File" do
+    it "should insert a file using RCE in the wiki page", priority: "1", test_id: 126673 do
+      stub_rcs_config
+      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+      @course.wiki_pages.create!(:title => "Bar")
+      user_session(@user)
+      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
+      file.context = @course
+      file.save!
+      get "/courses/#{@course.id}/pages/bar/edit"
+      insert_file_from_rce
     end
   end
 

@@ -17,73 +17,56 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, cleanup} from '@testing-library/react'
 import ProfileTray from '../ProfileTray'
 
-function noop() {}
-const imageurl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
-describe('MissingPeopleSection', () =>{
+describe('ProfileTray', () =>{
+  let props
+
+  beforeEach(() => {
+    props = {
+      userDisplayName: 'Sample Student',
+      userAvatarURL: imageUrl,
+      tabs: [
+        {
+          id: 'foo',
+          label: "Foo",
+          html_url: "/foo"
+        },
+        {
+          id: 'bar',
+          label: "Bar",
+          html_url: "/bar"
+        }
+      ],
+      loaded: true
+    }
+  })
+
+  afterEach(cleanup)
+
   it('renders the component', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled
-        eportfoliosEnabled
-        closeTray={noop}
-      />
-    )
-    expect(wrapper.find('Heading').text()).toEqual('Sample Student')
+    const {getByText} = render(<ProfileTray {...props} />)
+    getByText("Sample Student")
   })
 
-  it('renders the complete list', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled
-        eportfoliosEnabled
-        closeTray={noop}
-      />
-    )
-
-    expect(wrapper.find('Avatar').exists()).toBeTruthy()
-
-    expect(wrapper.containsAllMatchingElements(
-      ['Profile', 'Settings', 'Notifications', 'Files', 'ePortfolios']
-    )).toBeTruthy()
+  it('renders the avatar', () => {
+    const {getByAltText} = render(<ProfileTray {...props} />)
+    const avatar = getByAltText('User profile picture')
+    expect(avatar.src).toBe(imageUrl)
   })
 
-  it('renders the list without Profiles', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled={false}
-        eportfoliosEnabled
-        closeTray={noop}
-      />
-    )
-
-    expect(wrapper.containsAllMatchingElements(
-      ['Settings', 'Notifications', 'Files', 'ePortfolios']
-    )).toBeTruthy()
+  it('renders loading spinner', () => {
+    const {getByTitle, queryByText} = render(<ProfileTray {...props} loaded={false} />)
+    getByTitle("Loading")
+    expect(queryByText("Foo")).toBeFalsy()
   })
 
-  it('renders the list without ePortfolios', () => {
-    const wrapper = mount(
-      <ProfileTray
-        userDisplayName="Sample Student"
-        userAvatarURL={imageurl}
-        profileEnabled
-        eportfoliosEnabled={false}
-        closeTray={noop}
-      />
-    )
-    expect(wrapper.find('Avatar').exists()).toBeTruthy()
-    expect(wrapper.containsAllMatchingElements(
-      ['Profile', 'Settings', 'Notifications', 'Files']
-    )).toBeTruthy()
+  it('renders the tabs', () => {
+    const {getByText} = render(<ProfileTray {...props} />)
+    getByText("Foo")
+    getByText("Bar")
   })
 })

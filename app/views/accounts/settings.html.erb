@@ -14,11 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-  @active_tab = "settings"
+  set_active_tab "settings"
   add_crumb t(:settings_crumb, "Settings")
   js_bundle :account_settings
   css_bundle :account_settings, :reports, :tinymce
-  content_for :page_title, t(:page_title, "Account Settings")
+  provide :page_title, t(:page_title, "Account Settings")
   if can_do(@context, @current_user, :manage_storage_quotas)
     js_env :ACCOUNT => {
       'id' => @context.id,
@@ -30,24 +30,23 @@
     }
   end
 %>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
 <h1 class='screenreader-only'><%= t(:page_header_title, "Account Settings") %></h1>
-<% content_for :stylesheets do %>
-  <style type="text/css" media="screen">
-    fieldset {
-      margin: 2em 0;
-    }
-    fieldset.nested {
-      margin-top: 0;
-      margin-<%= direction('left') %>: 20px;
-    }
-    legend{
-      font-size: 1.1em;
-    }
-  </style>
-<% end %>
+
+<style type="text/css" media="screen">
+  fieldset {
+    margin: 2em 0;
+  }
+  fieldset.nested {
+    margin-top: 0;
+    margin-<%= direction('left') %>: 20px;
+  }
+  legend{
+    font-size: 1.1em;
+  }
+</style>
 
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
@@ -62,7 +61,9 @@
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
     <li><a href="#tab-announcements" id="tab-announcements-link"><%= t(:tab_announcements, "Announcements") %></a></li>
-    <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
+    <% if can_do(@context, @current_user, :read_reports) %>
+      <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
+    <% end %>
     <% if can_do(@context, @current_user, :read_as_admin) %>
       <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "Apps") %></a></li>
     <% end %>
@@ -305,6 +306,20 @@
 
         <%= render partial: 'additional_settings', locals: { f: f } %>
 
+        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) && @account.feature_enabled?(:slack_notifications)%>
+          <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
+          <fieldset>
+            <legend><%= t("Slack Api Key") %></legend>
+            <div class="dim-till-hover">
+              <span><%= t("Current Slack Api Key:") %></span>
+              <span id="current_slack_api_key"><%= slack_api_key.length > 4 ? "#{slack_api_key[0..3]}#{'*' * (slack_api_key.length - 4)}" : '****' %></span>
+            </div>
+            <%= f.fields_for :slack do |slack| %>
+              <%= slack.label :slack_api_key , t("New Slack Api Key") %>
+              <%= slack.text_field :slack_api_key, placeholder: t("New Slack Api Key"), value:''%>
+            <% end %>
+          </fieldset>
+        <% end %>
         <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
           <% TermsOfService.ensure_terms_for_account(@account) %>
           <% js_env(:TERMS_OF_SERVICE_CUSTOM_CONTENT => @account.terms_of_service_content&.content) %>

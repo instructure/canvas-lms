@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
-
 export default class VeriCiteSettings
 
   constructor: (options = {}) ->
@@ -38,4 +36,4 @@ export default class VeriCiteSettings
     json
 
   normalizeBoolean: (value) =>
-    _.contains(["1", true, "true", 1], value)
+    ["1", true, "true", 1].includes(value)

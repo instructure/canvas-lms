@@ -45,7 +45,7 @@ function joinFormats(separator, ...formats) {
   return () => formats.map(key => I18n.lookup(key)).join(separator)
 }
 
-export default {
+const moment_formats = {
 
   i18nToMomentHash: {
     '%A': 'dddd',
@@ -81,8 +81,8 @@ export default {
   ],
 
   getFormats () {
-    let formatsToTransform = this.formatsForLocale()
-    formatsToTransform = this.formatsIncludingImplicitMinutes(formatsToTransform)
+    let formatsToTransform = moment_formats.formatsForLocale()
+    formatsToTransform = moment_formats.formatsIncludingImplicitMinutes(formatsToTransform)
     return this.transformFormats(formatsToTransform)
   },
 
@@ -94,8 +94,8 @@ export default {
   },
 
   transformFormats: _.memoize(function (formats) {
-    const localeSpecificFormats = _.map(formats, this.i18nToMomentFormat, this)
-    return _.union(this.basicMomentFormats, localeSpecificFormats)
+    const localeSpecificFormats = _.map(formats, moment_formats.i18nToMomentFormat)
+    return _.union(moment_formats.basicMomentFormats, localeSpecificFormats)
   }),
 
     // examples are from en_US. order is significant since if an input matches
@@ -126,27 +126,29 @@ export default {
   ],
 
   formatsForLocale () {
-    return _.compact(this.orderedFormats.map(fn => fn()))
+    return _.compact(moment_formats.orderedFormats.map(fn => fn()))
   },
 
   i18nToMomentFormat (fullString) {
-    const withEscapes = this.escapeSubStrings(fullString)
-    return this.replaceDateKeys(withEscapes)
+    const withEscapes = moment_formats.escapeSubStrings(fullString)
+    return moment_formats.replaceDateKeys(withEscapes)
   },
 
   escapeSubStrings (formatString) {
     const substrings = formatString.split(' ')
-    const escapedSubs = _.map(substrings, this.escapedUnlessi18nKey, this)
+    const escapedSubs = _.map(substrings, moment_formats.escapedUnlessi18nKey)
     return escapedSubs.join(' ')
   },
 
   escapedUnlessi18nKey (string) {
-    const isKey = _.detect(_.keys(this.i18nToMomentHash), k => string.indexOf(k) > -1)
+    const isKey = _.find(_.keys(moment_formats.i18nToMomentHash), k => string.indexOf(k) > -1)
 
     return isKey ? string : `[${string}]`
   },
 
   replaceDateKeys (formatString) {
-    return _.reduce(this.i18nToMomentHash, (string, forMoment, forBase) => string.replace(forBase, forMoment), formatString)
+    return _.reduce(moment_formats.i18nToMomentHash, (string, forMoment, forBase) => string.replace(forBase, forMoment), formatString)
   }
 }
+
+export default moment_formats

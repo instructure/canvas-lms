@@ -36,26 +36,6 @@ import 'jquery.instructure_misc_helpers'
 import '../calendar/fcMomentHandlebarsHelpers'
 
 export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.setContext = this.setContext.bind(this)
-    this.activate = this.activate.bind(this)
-    this.moreOptions = this.moreOptions.bind(this)
-    this.setContext = this.setContext.bind(this)
-    this.contextChange = this.contextChange.bind(this)
-    this.setupTimeAndDatePickers = this.setupTimeAndDatePickers.bind(this)
-    this.submitAssignment = this.submitAssignment.bind(this)
-    this.getFormData = this.getFormData.bind(this)
-    this.onSaveSuccess = this.onSaveSuccess.bind(this)
-    this.onSaveFail = this.onSaveFail.bind(this)
-    super(...args)
-  }
 
   initialize(selector, event, contextChangeCB, closeCB) {
     this.event = event

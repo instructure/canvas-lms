@@ -17,26 +17,12 @@
 %>
 
 <%
-  content_for :page_title, join_title( t(:topic, "Topic"), @topic.title)
+  provide :page_title, join_title( t(:topic, "Topic"), @topic.title)
   @discussion_presenter = DiscussionTopicPresenter.new(@topic, @current_user)
 %>
 
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")}) %>
-    <% if @topic.podcast_enabled %>
-      <%= auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")}) %>
-    <% end %>
-  <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")}) %>
-    <% if @topic.podcast_enabled %>
-      <%= auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")}) %>
-    <% end %>
-  <% end %>
-<% end %>
-
 <% if (@headers || !@locked) && ((show_crs_graphs = can_do(@context, @current_user, :view_all_grades) && ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session)) || !@context.try(:feature_enabled?, :rce_enhancements)) %>
-  <% content_for :right_side do %>
+  <% provide :right_side do %>
     <div id="sidebar_content" class="rs-margin-bottom">
       <% if show_crs_graphs %>
         <div id="crs-graphs"></div>
@@ -44,15 +30,14 @@
     </div>
     <%= render :partial => "shared/wiki_sidebar" %>
   <% end %>
+<% else %>
+  <% provide_blank :right_side %>
 <% end %>
+
 <% if !@headers %>
   <div style="width: 600px; margin: 10px auto;">
   <h2><%= @topic.title %></h2>
 <% end %>
-<%
-  js_bundle :discussion
-  css_bundle :tinymce, :discussions, :learning_outcomes
-%>
 
 <% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
   <div id="discussion-managebar" class="toolbarView">

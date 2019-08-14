@@ -29,18 +29,6 @@ import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 
 export default class EditSectionsView extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.onNewToken = this.onNewToken.bind(this)
-    this.update = this.update.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.mixin(RosterDialogMixin)
@@ -68,7 +56,7 @@ export default class EditSectionsView extends DialogBaseView {
       contexts: ENV.CONTEXTS,
       placeholder: I18n.t('edit_sections_placeholder', 'Enter a section name'),
       title: I18n.t('edit_sections_title', 'Section name'),
-      onNewToken: this.onNewToken,
+      onNewToken: this.onNewToken.bind(this),
       added: (data, $token, newToken) => {
         return this.$('#user_sections').append($token)
       },
@@ -153,7 +141,7 @@ export default class EditSectionsView extends DialogBaseView {
           .val()
           .split('_')[1]
     )
-    const newSections = _.reject(sectionIds, i => _.include(currentIds, i))
+    const newSections = _.reject(sectionIds, i => _.includes(currentIds, i))
     const newEnrollments = []
     const deferreds = []
     // create new enrollments
@@ -183,7 +171,7 @@ export default class EditSectionsView extends DialogBaseView {
     // delete old section enrollments
     const sectionsToRemove = _.difference(currentIds, sectionIds)
     const enrollmentsToRemove = _.filter(this.model.sectionEditableEnrollments(), en =>
-      _.include(sectionsToRemove, en.course_section_id)
+      _.includes(sectionsToRemove, en.course_section_id)
     )
     for (let en of Array.from(enrollmentsToRemove)) {
       url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`

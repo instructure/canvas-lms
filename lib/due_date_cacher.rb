@@ -66,11 +66,11 @@ class DueDateCacher
 
   INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT.freeze
     CASE
-    WHEN submissions.grade IS NOT NULL OR submissions.excused IS TRUE THEN
+    WHEN grade IS NOT NULL OR excused IS TRUE THEN
       'graded'
-    WHEN submissions.submission_type = 'online_quiz' AND submissions.quiz_submission_id IS NOT NULL THEN
+    WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
       'pending_review'
-    WHEN submissions.submission_type IS NOT NULL AND submissions.submitted_at IS NOT NULL THEN
+    WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
       'submitted'
     ELSE
       'unsubmitted'
@@ -236,40 +236,46 @@ class DueDateCacher
 
         # Construct upsert statement to update existing Submissions or create them if needed.
         query = <<~SQL
+          UPDATE #{Submission.quoted_table_name}
+            SET
+              cached_due_date = vals.due_date::timestamptz,
+              grading_period_id = vals.grading_period_id::integer,
+              workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
+                #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
+              )),
+              anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
+              cached_quiz_lti = vals.cached_quiz_lti,
+              updated_at = now() AT TIME ZONE 'UTC'
+            FROM (VALUES #{batch_values.join(',')})
+              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti)
+            WHERE submissions.user_id = vals.student_id AND
+                  submissions.assignment_id = vals.assignment_id AND
+                  (
+                    (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR
+                    (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR
+                    (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
+                      (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
+                    )) OR
+                    (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR
+                    (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)
+                  );
           INSERT INTO #{Submission.quoted_table_name}
-            (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, process_attempts,
+            (assignment_id, user_id, workflow_state, created_at, updated_at, context_code,
             cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti)
             SELECT
               assignments.id, vals.student_id, 'unsubmitted',
               now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',
-              assignments.context_code, 0, vals.due_date::timestamptz, vals.grading_period_id::integer,
+              assignments.context_code, vals.due_date::timestamptz, vals.grading_period_id::integer,
               vals.anonymous_id,
-              vals.quiz_lti
+              vals.cached_quiz_lti
             FROM (VALUES #{batch_values.join(',')})
-              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, quiz_lti)
+              AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti)
             INNER JOIN #{Assignment.quoted_table_name} assignments
               ON assignments.id = vals.assignment_id
             LEFT OUTER JOIN #{Submission.quoted_table_name} submissions
               ON submissions.assignment_id = assignments.id
               AND submissions.user_id = vals.student_id
-          ON CONFLICT (user_id, assignment_id)
-          DO UPDATE SET
-              cached_due_date = excluded.cached_due_date,
-              grading_period_id = excluded.grading_period_id,
-              workflow_state =  COALESCE(NULLIF(submissions.workflow_state, 'deleted'), (
-                  #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
-                )),
-              anonymous_id = COALESCE(submissions.anonymous_id, excluded.anonymous_id),
-              cached_quiz_lti = excluded.cached_quiz_lti,
-              updated_at = excluded.updated_at
-            WHERE
-              (submissions.cached_due_date IS DISTINCT FROM excluded.cached_due_date) OR
-              (submissions.grading_period_id IS DISTINCT FROM excluded.grading_period_id) OR
-              (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
-                (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
-               )) OR
-              (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, excluded.anonymous_id)) OR
-              (submissions.cached_quiz_lti IS DISTINCT FROM excluded.cached_quiz_lti)
+            WHERE submissions.id IS NULL;
         SQL
 
         Assignment.connection.execute(query)

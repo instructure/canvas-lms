@@ -107,7 +107,7 @@ export default class GroupCategoryView extends View {
     this.model.progressModel.on('change:url', () => {
       return this.model.progressModel.set({completion: 0})
     })
-    this.model.progressModel.on('change', this.render)
+    this.model.progressModel.on('change', this.render, this)
     return this.model.on('progressResolved', () => {
       return this.model.fetch({
         success: () => {

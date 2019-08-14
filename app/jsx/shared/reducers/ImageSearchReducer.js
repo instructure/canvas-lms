@@ -17,7 +17,6 @@
  */
 
   import ImageSearchInitialState from '../stores/ImageSearchInitialState'
-  import _ from 'underscore'
 
   const imageSearchHandlers = {
     UPDATE_SEARCH_TERM (state, action) {
@@ -62,7 +61,7 @@
 
   const imageSearchReducer = (state = ImageSearchInitialState, action) => {
     if (imageSearchHandlers[action.type]) {
-      const newState = _.extend({}, state);
+      const newState = {...state};
       return imageSearchHandlers[action.type](newState, action);
     }
     else {

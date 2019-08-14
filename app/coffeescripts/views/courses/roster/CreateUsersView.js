@@ -16,24 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import CreateUserList from '../../../models/CreateUserList'
-import _ from 'underscore'
 import I18n from 'i18n!create_users_view'
 import DialogFormView from '../../DialogFormView'
 import template from 'jst/courses/roster/createUsers'
 import wrapper from 'jst/EmptyDialogFormWrapper'
 
 export default class CreateUsersView extends DialogFormView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.toJSON = this.toJSON.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.optionProperty('rolesCollection')
@@ -49,13 +37,14 @@ export default class CreateUsersView extends DialogFormView {
       '#user_list_textarea': '$textarea'
     }
 
-    this.prototype.events = _.extend({}, this.prototype.events, {
+    this.prototype.events = {
+      ...this.prototype.events,
       'click .createUsersStartOver': 'startOver',
       'click .createUsersStartOverFrd': 'startOverFrd',
       'change #role_id': 'changeEnrollment',
       'click #role_id': 'changeEnrollment',
       'click .dialog_closer': 'close'
-    })
+    }
 
     this.prototype.template = template
 

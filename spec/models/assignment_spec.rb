@@ -6846,28 +6846,42 @@ describe Assignment do
   end
 
   describe '#moderated_grading_max_grader_count' do
-    before(:once) do
-      course = Course.create!
-      teacher = User.create!
-      second_teacher = User.create!
-      course.enroll_teacher(teacher, enrollment_state: 'active')
-      @second_teacher_enrollment = course.enroll_teacher(second_teacher, enrollment_state: 'active')
-      ta = User.create!
-      course.enroll_ta(ta, enrollment_state: 'active')
-      @assignment = course.assignments.create!(
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+    let_once(:assignment) {
+      course.assignments.create!(
         final_grader: teacher,
-        grader_count: 2,
+        grader_count: 1,
         moderated_grading: true
       )
+    }
+
+    before(:once) do
+      teacher2 = User.create!
+      @teacher2_enrollment = course.enroll_teacher(teacher2, enrollment_state: 'active')
+      course.enroll_teacher(User.create!, enrollment_state: 'active')
+      assignment.update!(grader_count: 2)
     end
 
     it 'returns the number of active instructors minus one' do
-      expect(@assignment.moderated_grading_max_grader_count).to eq 2
+      expect(assignment.moderated_grading_max_grader_count).to eq 2
     end
 
-    it 'returns the current grader_count if it is greater than the number of active instructors minus one' do
-      @second_teacher_enrollment.deactivate
-      expect(@assignment.moderated_grading_max_grader_count).to eq 2
+    it 'returns the number of active instructors minus one when a grader is deactivated' do
+      @teacher2_enrollment.deactivate
+      expect(assignment.moderated_grading_max_grader_count).to eq 1
+    end
+
+    it 'returns number of active instructors minus 1 when number of graders > available graders count' do
+      assignment.update!(grader_count: 7)
+      expect(assignment.moderated_grading_max_grader_count).to eq 2
+    end
+
+    it 'returns available graders count when number of graders is set to the max possible' do
+      assignment.update!(grader_count: 9)
+      course.enroll_teacher(User.create!, enrollment_state: 'active')
+      course.enroll_teacher(User.create!, enrollment_state: 'active')
+      expect(assignment.moderated_grading_max_grader_count).to eq 4
     end
   end
 

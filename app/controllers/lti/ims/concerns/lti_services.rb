@@ -19,6 +19,9 @@ module Lti::Ims::Concerns
   module LtiServices
     extend ActiveSupport::Concern
 
+    UNIVERSAL_GRANT_HOST = Canvas::Security.config['lti_grant_host'] ||
+      'canvas.instructure.com'.freeze
+
     class AccessToken
       def initialize(raw_jwt_str)
         @raw_jwt_str = raw_jwt_str
@@ -144,7 +147,9 @@ module Lti::Ims::Concerns
       end
 
       def expected_access_token_audience
-        Rails.application.routes.url_helpers.oauth2_token_url(host: host, protocol: protocol)
+        [host, UNIVERSAL_GRANT_HOST].map do |h|
+          Rails.application.routes.url_helpers.oauth2_token_url(host: h, protocol: protocol)
+        end
       end
 
       delegate :host, to: :request

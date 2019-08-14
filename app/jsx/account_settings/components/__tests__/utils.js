@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Provider} from 'react-redux'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {configStore} from '../../store'
 
 const fakeAxios = {
@@ -29,7 +29,7 @@ const fakeAxios = {
 }
 
 // This is modified from a version by Kent C. Dodds described here:
-// https://github.com/kentcdodds/react-testing-library/blob/master/examples/__tests__/react-redux.js
+// https://github.com/kentcdodds/@testing-library/react/blob/master/examples/__tests__/react-redux.js
 export function renderWithRedux(
   ui,
   {

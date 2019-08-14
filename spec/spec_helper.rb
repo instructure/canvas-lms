@@ -61,6 +61,7 @@ BlankSlateProtection.install!
 GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+ActionView::Base.streaming_completion_on_exception = "</html>"
 
 # this makes sure that a broken transaction becomes functional again
 # by the time we hit rescue_action_in_public, so that the error report
@@ -147,6 +148,12 @@ module RSpec::Rails
 end
 
 module RenderWithHelpers
+  def assign(key, value)
+    @assigned_variables ||= {}
+    @assigned_variables[key] = value
+    super
+  end
+
   def render(*args)
     controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
 
@@ -174,6 +181,12 @@ module RenderWithHelpers
     real_controller = controller_class.new
     real_controller.instance_variable_set(:@_request, @controller.request)
     real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
+    @assigned_variables&.each do |key, value|
+      real_controller.instance_variable_set(:"@#{key}", value)
+    end
+    if real_controller.instance_variable_get(:@domain_root_account).nil?
+      real_controller.instance_variable_set(:@domain_root_account, Account.default)
+    end
     @controller.real_controller = real_controller
 
     # just calling "render 'path/to/view'" by default looks for a partial

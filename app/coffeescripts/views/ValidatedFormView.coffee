@@ -92,7 +92,7 @@ export default class ValidatedFormView extends Backbone.View
     if _.keys(errors).length == 0
       disablingDfd = new $.Deferred()
       saveDfd = @saveFormData(data)
-      saveDfd.then(@onSaveSuccess, @onSaveFail)
+      saveDfd.then(@onSaveSuccess.bind(this), @onSaveFail.bind(this))
       saveDfd.fail =>
         disablingDfd.reject()
         @setFocusAfterError() if @setFocusAfterError
@@ -109,7 +109,7 @@ export default class ValidatedFormView extends Backbone.View
         $(element).attr('data-error-type')
       )
       assignmentFieldErrors = _.chain(_.keys(errors))
-                              .reject((err) -> _.contains(dateOverrideErrors, err))
+                              .reject((err) -> _.includes(dateOverrideErrors, err))
                               .value()
       first_error = assignmentFieldErrors[0] || dateOverrideErrors[0]
       @findField(first_error).focus()

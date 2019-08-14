@@ -20,6 +20,11 @@
       {{#t "course"}}Course Activity{{/t}}
     </option>
     {{/if}}
+    {{#if mutation}}
+    <option value='#loggingMutation'>
+      {{#t "mutations"}}GraphQL Mutation Activity{{/t}}
+    </option>
+    {{/if}}
   </select>
 </div>
 <hr aria-hidden="true"/>
@@ -34,4 +39,8 @@
 
 {{#if course}}
 <div id="loggingCourse" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if mutation}}
+<div id="loggingMutation" class="loggingTypeContent"></div>
 {{/if}}

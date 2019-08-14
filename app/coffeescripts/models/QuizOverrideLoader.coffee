@@ -42,17 +42,17 @@ export default QuizOverrideLoader = {
     quiz.set('loadingOverrides', false)
 
   _chooseLatest: (dates, type) ->
-    if _.any(dates, (d) -> _.isNull(d[type]) || _.isUndefined(d[type]))
+    if _.some(dates, (d) -> _.isNull(d[type]) || _.isUndefined(d[type]))
       return null
     sortedDates = @_sortedDatesOfType(dates, type)
-    if _.any(sortedDates)
+    if _.some(sortedDates)
       _.last(sortedDates)
 
   _chooseEarliest: (dates, type) ->
-    if _.any(dates, (d) -> _.isNull(d[type]) || _.isUndefined(d[type]))
+    if _.some(dates, (d) -> _.isNull(d[type]) || _.isUndefined(d[type]))
       return null
     sortedDates = @_sortedDatesOfType(dates, type)
-    if _.any(sortedDates)
+    if _.some(sortedDates)
       _.first(sortedDates)
 
   _sortedDatesOfType: (dates, type) ->

@@ -106,7 +106,7 @@ $(document).ready(function() {
     formatTabs(this);
   });
 
-  $("#register_sms_number,#register_email_address").formSubmit({
+  $("#register_sms_number,#register_email_address,#register_slack_handle").formSubmit({
     object_name: 'communication_channel',
     processData: function(data) {
       var address;
@@ -115,6 +115,10 @@ $(document).ready(function() {
         // Email channel
         type = 'email';
         address = data.communication_channel_email;
+      } else if (data['communication_channel[type]'] === 'slack') {
+        // Slack channel
+        type = 'slack'
+        address = data.communication_channel_slack
       } else if (ENV.INTERNATIONAL_SMS_ENABLED && $('#communication_channel_sms_country').val() === 'undecided') {
         // Haven't selected a country yet
         $(this).formErrors({communication_channel_sms_country: I18n.t("Country is required")});
@@ -131,7 +135,7 @@ $(document).ready(function() {
 
       delete data.communication_channel_sms_country;
 
-      if (type == 'email' || type == 'sms_email') {
+      if (type === 'email' || type === 'sms_email' || type === 'slack') {
         // Make sure it's a valid email address
         var match = address.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
         if (!match) {
@@ -160,12 +164,13 @@ $(document).ready(function() {
       // Don't need these anymore
       delete data.communication_channel_sms_number;
       delete data.communication_channel_sms_email;
+      delete data.communication_channel_slack;
 
       data['communication_channel[address]'] = address;
     },
     beforeSubmit: function(data) {
-      var $list = $(".email_channels");
-      if($(this).attr('id') == "register_sms_number") {
+      let $list = $(".email_channels");
+      if($(this).attr('id') === "register_sms_number" || $(this).attr('id') === "register_slack_handle") {
         $list = $(".other_channels");
       }
       var path = data['communication_channel[address]'];
@@ -174,12 +179,15 @@ $(document).ready(function() {
         if($(this).text() == path) { path = ""; }
       });
       $list.removeClass('single');
-      var $channel = null;
+      let $channel = null;
       if(path) {
         $channel = $list.find(".channel.blank").clone(true).removeClass('blank');
+        if(data['communication_channel[type]'] === "slack") {
+          $channel.find("#communication_text_type").text("slack")
+        }
         $channel.find(".path").attr('title',  I18n.t('titles.unconfirmed_click_to_confirm', "Unconfirmed.  Click to confirm") );
         $channel.fillTemplateData({
-          data: {path: path}
+          data: {path}
         });
         $list.find(".channel.blank").before($channel.show());
       }
@@ -269,9 +277,9 @@ $(document).ready(function() {
     event.preventDefault();
     var $channel = $(this).parents(".channel");
     if($channel.hasClass('unconfirmed')) {
-      var type = "email address", confirm_title =  I18n.t('titles.confirm_email_address', "Confirm Email Address") ;
+      var type = "email address", confirm_title = I18n.t('titles.confirm_email_address', "Confirm Email Address") ;
       if($(this).parents(".channel_list").hasClass('other_channels')) {
-        type = "sms number", confirm_title =  I18n.t('titles.confirm_sms_number', "Confirm SMS Number") ;
+        type = "sms number", confirm_title = I18n.t("Confirm Communication Channel") ;
       }
       var $box = $("#confirm_communication_channel");
 

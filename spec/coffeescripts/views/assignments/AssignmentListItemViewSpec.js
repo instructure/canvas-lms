@@ -138,6 +138,8 @@ const createView = function(model, options) {
 
   ENV.POST_TO_SIS = options.post_to_sis
   ENV.DUPLICATE_ENABLED = options.duplicateEnabled
+  ENV.DIRECT_SHARE_ENABLED = options.directShareEnabled
+
   const view = new AssignmentListItemView({
     model,
     userIsAdmin: options.userIsAdmin
@@ -288,6 +290,22 @@ test('does not initialize sis toggle if sis enabled, can manage and is unpublish
     post_to_sis: true
   })
   ok(!view.sisButtonView)
+})
+
+test('shows sharing and copying menu items if DIRECT_SHARE_ENABLED', function() {
+  const view = createView(this.model, {
+    directShareEnabled: true
+  })
+  ok(view.$('.send_assignment_to').length)
+  ok(view.$('.copy_assignment_to').length)
+})
+
+test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function() {
+  const view = createView(this.model, {
+    directShareEnabled: false
+  })
+  strictEqual(view.$('.send_assignment_to').length, 0)
+  strictEqual(view.$('.copy_assignment_to').length, 0)
 })
 
 test('upatePublishState toggles ig-published', function() {
@@ -908,7 +926,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
       individualAssignmentPermissions: {update: true}
     })
 
-    strictEqual(view.$('.edit_assignment').hasClass('disabled'), false);
+    strictEqual(view.$('.edit_assignment').hasClass('disabled'), false)
   })
 
   test('edit link is disabled when the individual assignment is not editable', function() {
@@ -916,9 +934,9 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function(hooks)
       individualAssignmentPermissions: {update: false}
     })
 
-    strictEqual(view.$('.edit_assignment').hasClass('disabled'), true);
+    strictEqual(view.$('.edit_assignment').hasClass('disabled'), true)
   })
-});
+})
 
 QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks) {
   hooks.beforeEach(function() {
@@ -969,7 +987,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
       individualAssignmentPermissions: {update: true}
     })
 
-    strictEqual(view.$('.delete_assignment').hasClass('disabled'), false);
+    strictEqual(view.$('.delete_assignment').hasClass('disabled'), false)
   })
 
   test('delete link is disabled when canDelete returns false', function() {
@@ -977,7 +995,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function(hooks
       individualAssignmentPermissions: {update: false}
     })
 
-    strictEqual(view.$('.delete_assignment').hasClass('disabled'), true);
+    strictEqual(view.$('.delete_assignment').hasClass('disabled'), true)
   })
 })
 
@@ -1002,7 +1020,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function(hoo
     })
 
     const json = view.toJSON()
-    strictEqual(view.$('.publish-icon').hasClass('disabled'), false);
+    strictEqual(view.$('.publish-icon').hasClass('disabled'), false)
   })
 
   test('publish icon is enabled if canManage is true and the individual assignment can be updated', function() {
@@ -1012,7 +1030,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function(hoo
     })
 
     const json = view.toJSON()
-    strictEqual(view.$('.publish-icon').hasClass('disabled'), false);
+    strictEqual(view.$('.publish-icon').hasClass('disabled'), false)
   })
 
   test('publish icon is disabled if canManage is true and the individual assignment cannot be updated', function() {
@@ -1022,7 +1040,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function(hoo
     })
 
     const json = view.toJSON()
-    strictEqual(view.$('.publish-icon').hasClass('disabled'), true);
+    strictEqual(view.$('.publish-icon').hasClass('disabled'), true)
   })
 })
 

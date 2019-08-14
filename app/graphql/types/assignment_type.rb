@@ -340,8 +340,7 @@ module Types
        `AssignmentOverride` applies.",
       null: false
 
-    field :assignment_overrides, AssignmentOverrideType.connection_type,
-      null: true
+    field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
     def assignment_overrides
         # this is the assignment overrides index method of loading
         # overrides... there's also the totally different method found in

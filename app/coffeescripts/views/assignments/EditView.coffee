@@ -588,7 +588,7 @@ export default class EditView extends ValidatedFormView
     errors
 
   _validateTitle: (data, errors) =>
-    return errors if _.contains(@model.frozenAttributes(), "title")
+    return errors if _.includes(@model.frozenAttributes(), "title")
 
     post_to_sis = data.post_to_sis == '1'
     max_name_length = 256
@@ -629,14 +629,14 @@ export default class EditView extends ValidatedFormView
     errors
 
   _validateAllowedExtensions: (data, errors) =>
-    if (data.allowed_extensions and _.contains(data.submission_types, "online_upload")) and data.allowed_extensions.length == 0
+    if (data.allowed_extensions and _.includes(data.submission_types, "online_upload")) and data.allowed_extensions.length == 0
       errors["allowed_extensions"] = [
         message: I18n.t 'at_least_one_file_type', 'Please specify at least one allowed file type'
       ]
     errors
 
   _validatePointsPossible: (data, errors) =>
-    return errors if _.contains(@model.frozenAttributes(), "points_possible")
+    return errors if _.includes(@model.frozenAttributes(), "points_possible")
     return errors if this.lockedItems.points
 
     if typeof data.points_possible != 'number' or isNaN(data.points_possible)
@@ -648,7 +648,7 @@ export default class EditView extends ValidatedFormView
   # Require points possible > 0
   # if grading type === percent || letter_grade || gpa_scale
   _validatePointsRequired: (data, errors) =>
-    return errors unless _.include ['percent','letter_grade','gpa_scale'], data.grading_type
+    return errors unless ['percent','letter_grade','gpa_scale'].includes data.grading_type
 
     if typeof data.points_possible != 'number' or data.points_possible < 0 or isNaN(data.points_possible)
       errors["points_possible"] = [
@@ -751,7 +751,7 @@ export default class EditView extends ValidatedFormView
       isPeerReviewAssignment: !!@$peerReviewsBox.prop('checked')
       locale: ENV.LOCALE
       moderatedGradingEnabled: @assignment.moderatedGrading()
-      maxGraderCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
+      availableGradersCount: ENV.MODERATED_GRADING_MAX_GRADER_COUNT
       onGraderCommentsVisibleToGradersChange: @handleGraderCommentsVisibleToGradersChanged
       onModeratedGradingChange: @handleModeratedGradingChanged
 

@@ -1397,11 +1397,16 @@ class Attachment < ActiveRecord::Base
       att.send_to_purgatory(deleted_by_user)
       att.destroy_content
       att.thumbnail&.destroy
-      new_name = 'file_removed.pdf'
-      file_removed_file = File.open Rails.root.join('public', 'file_removed', new_name)
-      # TODO set the instfs_uuid of the attachment to a single "file removed" file to avoid
-      # upload the same file over and over. This instfs_uuid should be retrieved from the inst-fs services
-      Attachments::Storage.store_for_attachment(att, file_removed_file)
+
+      file_removed_path = self.class.file_removed_path
+      new_name = File.basename(file_removed_path)
+
+      if att.instfs_hosted? && InstFS.enabled?
+        # dupliciate the base file_removed file to a unique uuid
+        att.instfs_uuid = InstFS.duplicate_file(self.class.file_removed_base_instfs_uuid)
+      else
+        Attachments::Storage.store_for_attachment(att, File.open(file_removed_path))
+      end
       att.filename = new_name
       att.display_name = new_name
       att.content_type = "application/pdf"
@@ -1413,11 +1418,38 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def self.file_removed_path
+    Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+  end
+
+  # find the file_removed file on instfs (or upload it)
+  def self.file_removed_base_instfs_uuid
+    # i imagine that inevitably someone is going to change the file without knowing about any of this
+    # so make the cache depend on the file contents
+    path = self.file_removed_path
+    @@file_removed_md5 ||= Digest::MD5.hexdigest(File.read(path))
+    key = "file_removed_instfs_uuid_#{@@file_removed_md5}_#{Digest::MD5.hexdigest(InstFS.app_host)}"
+
+    @@base_file_removed_uuids ||= {}
+    @@base_file_removed_uuids[key] ||= Rails.cache.fetch(key) do
+      # re-upload and save the uuid - it's okay if we end up repeating this every now and then
+      # it's at least an improvement over re-uploading the file _every time_ we replace
+      InstFS.direct_upload(
+        file_object: File.open(path),
+        file_name: File.basename(path)
+      )
+    end
+  end
+
   # this method does not destroy anything. It copies the content to a new s3object
   def send_to_purgatory(deleted_by_user = nil)
     make_rootless
+    new_instfs_uuid = nil
     if Attachment.s3_storage? && self.s3object.exists?
       s3object.copy_to(bucket.object(purgatory_filename))
+    elsif self.instfs_hosted? && InstFS.enabled?
+      # copy to a new instfs file
+      new_instfs_uuid = InstFS.duplicate_file(self.instfs_uuid)
     elsif Attachment.local_storage?
       FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
       FileUtils.cp full_filename, local_purgatory_file
@@ -1428,10 +1460,12 @@ class Attachment < ActiveRecord::Base
       p.old_filename = filename
       p.old_display_name = display_name
       p.old_content_type = content_type
+      p.new_instfs_uuid = new_instfs_uuid
       p.workflow_state = 'active'
       p.save!
     else
-      Purgatory.create!(attachment: self, old_filename: filename, old_display_name: display_name, old_content_type: content_type, deleted_by_user: deleted_by_user)
+      Purgatory.create!(attachment: self, old_filename: filename, old_display_name: display_name,
+        old_content_type: content_type, new_instfs_uuid: new_instfs_uuid, deleted_by_user: deleted_by_user)
     end
   end
 
@@ -1450,12 +1484,21 @@ class Attachment < ActiveRecord::Base
   def resurrect_from_purgatory
     p = Purgatory.where(attachment_id: id).take
     raise 'must have been sent to purgatory first' unless p
+    raise "purgatory record has expired" if p.workflow_state == "expired"
+
     write_attribute(:filename, p.old_filename)
     write_attribute(:display_name, p.old_display_name)
     write_attribute(:content_type, p.old_content_type)
     write_attribute(:root_attachment_id, nil)
 
-    if Attachment.s3_storage?
+    if InstFS.enabled?
+      if p.new_instfs_uuid
+        # just set it to the copied uuid, shouldn't get deleted when expired since we'll set p to 'restored'
+        write_attribute(:instfs_uuid, p.new_instfs_uuid)
+      else
+        raise "purgatory record was created before being fixed for inst-fs"
+      end
+    elsif Attachment.s3_storage?
       old_s3object = self.bucket.object(purgatory_filename)
       raise Attachment::FileDoesNotExist unless old_s3object.exists?
       old_s3object.copy_to(bucket.object(full_filename))
@@ -1476,9 +1519,8 @@ class Attachment < ActiveRecord::Base
     raise 'must be a root_attachment' if self.root_attachment_id
     return unless self.filename
     if instfs_hosted?
+      InstFS.delete_file(self.instfs_uuid)
       self.instfs_uuid = nil
-      # TODO: once inst-fs has a delete method, call here
-      # for now these objects will be orphaned
     elsif Attachment.s3_storage?
       self.s3object.delete unless ApplicationController.test_cluster?
     else

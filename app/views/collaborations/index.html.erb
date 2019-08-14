@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title t(:page_title, "Collaboration"), @context.name %><% end %>
+<% provide :page_title do %><%= join_title t(:page_title, "Collaboration"), @context.name %><% end %>
 
 <% js_bundle :collaborations %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com"
 Free online web tools like [Google Docs](%{google_url}) are an excellent place for students to work on group projects or papers, take shared notes, etc.
 Teacher *or* students can set up group collaborations.

@@ -55,38 +55,38 @@ QUnit.module('GradeSummary assignmentReducer()', suiteHooks => {
     })
   })
 
-  QUnit.module('when handling "SET_PUBLISH_GRADES_STATUS"', () => {
-    function setPublishGradesStatus(status) {
-      store.dispatch(AssignmentActions.setPublishGradesStatus(status))
+  QUnit.module('when handling "SET_RELEASE_GRADES_STATUS"', () => {
+    function setReleaseGradesStatus(status) {
+      store.dispatch(AssignmentActions.setReleaseGradesStatus(status))
     }
 
-    function getPublishGradesStatus() {
-      return store.getState().assignment.publishGradesStatus
+    function getReleaseGradesStatus() {
+      return store.getState().assignment.releaseGradesStatus
     }
 
-    test('optionally sets the "publish grades" status to "failure"', () => {
-      setPublishGradesStatus(AssignmentActions.FAILURE)
-      equal(getPublishGradesStatus(), 'FAILURE')
+    test('optionally sets the "release grades" status to "failure"', () => {
+      setReleaseGradesStatus(AssignmentActions.FAILURE)
+      equal(getReleaseGradesStatus(), 'FAILURE')
     })
 
-    test('optionally sets the "publish grades" status to "started"', () => {
-      setPublishGradesStatus(AssignmentActions.STARTED)
-      equal(getPublishGradesStatus(), 'STARTED')
+    test('optionally sets the "release grades" status to "started"', () => {
+      setReleaseGradesStatus(AssignmentActions.STARTED)
+      equal(getReleaseGradesStatus(), 'STARTED')
     })
 
-    test('optionally sets the "publish grades" status to "success"', () => {
-      setPublishGradesStatus(AssignmentActions.SUCCESS)
-      equal(getPublishGradesStatus(), 'SUCCESS')
+    test('optionally sets the "release grades" status to "success"', () => {
+      setReleaseGradesStatus(AssignmentActions.SUCCESS)
+      equal(getReleaseGradesStatus(), 'SUCCESS')
     })
 
-    test('optionally sets the "publish grades" status to "already published"', () => {
-      setPublishGradesStatus(AssignmentActions.GRADES_ALREADY_PUBLISHED)
-      equal(getPublishGradesStatus(), 'GRADES_ALREADY_PUBLISHED')
+    test('optionally sets the "release grades" status to "already released"', () => {
+      setReleaseGradesStatus(AssignmentActions.GRADES_ALREADY_RELEASED)
+      equal(getReleaseGradesStatus(), 'GRADES_ALREADY_RELEASED')
     })
 
-    test('optionally sets the "publish grades" status to "not all selected"', () => {
-      setPublishGradesStatus(AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE)
-      equal(getPublishGradesStatus(), 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE')
+    test('optionally sets the "release grades" status to "not all selected"', () => {
+      setReleaseGradesStatus(AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE)
+      equal(getReleaseGradesStatus(), 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE')
     })
   })
 

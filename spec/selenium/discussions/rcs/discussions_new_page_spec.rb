@@ -170,12 +170,19 @@ describe "discussions" do
         expect(f("#content")).not_to contain_css('#topic_publish_button')
       end
 
-      it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223507 do
+      it 'should not show file attachment if allow_student_forum_attachments is not true', priority: '2', test_id: 223507 do
         skip_if_safari(:alert)
         # given
+        course.allow_student_forum_attachments = false
+        course.save!
+        # expect
         get url
         expect(f("#content")).not_to contain_css('#disussion_attachment_uploaded_data')
-        # when
+      end
+
+      it 'should show file attachment if allow_student_forum_attachments is true', priority: '2' do
+        skip_if_safari(:alert)
+        # given
         course.allow_student_forum_attachments = true
         course.save!
         # expect
@@ -183,15 +190,22 @@ describe "discussions" do
         expect(f('#discussion_attachment_uploaded_data')).not_to be_nil
       end
 
-      context "in a group" do
+      context 'in a group' do
         let(:url) { "/groups/#{group.id}/discussion_topics/new" }
 
-        it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223508 do
+        it 'should not show file attachment if allow_student_forum_attachments is not true', priority: '2', test_id: 223508 do
           skip_if_safari(:alert)
           # given
+          course.allow_student_forum_attachments = false
+          course.save!
+          # expect
           get url
           expect(f("#content")).not_to contain_css('label[for=discussion_attachment_uploaded_data]')
-          # when
+        end
+
+        it 'should show file attachment if allow_student_forum_attachments is true', priority: '2' do
+          skip_if_safari(:alert)
+          # given
           course.allow_student_forum_attachments = true
           course.save!
           # expect

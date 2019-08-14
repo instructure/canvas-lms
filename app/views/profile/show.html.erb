@@ -18,7 +18,7 @@
 <%
   js_env ga_page_title: "User Profile"
 %>
-<% content_for :page_title, @user_data[:short_name] %>
+<% provide :page_title, @user_data[:short_name] %>
 
 <div class="ic-Profile-layout">
   <div class="ic-Profile-layout__Primary">

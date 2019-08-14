@@ -31,21 +31,6 @@ import 'jquery.instructure_date_and_time'
 RichContentEditor.preloadRemoteModule()
 
 export default class WikiPageEditView extends ValidatedFormView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.onUnload = this.onUnload.bind(this)
-    this.toggleStudentTodo = this.toggleStudentTodo.bind(this)
-    this.handleStudentTodoUpdate = this.handleStudentTodoUpdate.bind(this)
-    this.renderStudentTodoAtDate = this.renderStudentTodoAtDate.bind(this)
-    this.onSaveFail = this.onSaveFail.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.mixin({
@@ -152,7 +137,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     return this.$studentTodoAtContainer.toggle()
   }
 
-  handleStudentTodoUpdate(newDate) {
+  handleStudentTodoUpdate = (newDate) => {
     this.studentTodoAtDateValue = newDate
     return this.renderStudentTodoAtDate()
   }
@@ -194,7 +179,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     RichContentEditor.loadNewEditor(this.$wikiPageBody, {focus: true, manageParent: true})
 
     this.checkUnsavedOnLeave = true
-    $(window).on('beforeunload', this.onUnload)
+    $(window).on('beforeunload', this.onUnload.bind(this))
 
     if (!this.firstRender) {
       this.firstRender = true

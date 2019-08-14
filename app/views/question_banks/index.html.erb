@@ -16,13 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% @active_tab = "question_banks" %>
-<% content_for :page_title, t(:page_title, "Question Banks") %>
+<% set_active_tab "question_banks" %>
+<% provide :page_title, t(:page_title, "Question Banks") %>
 
 <% css_bundle :quizzes %>
 <% js_bundle :question_banks %>
-<% content_for :stylesheets do %>
-  <style>
+
+<style>
   .question_bank {
     padding-bottom: 10px;
   }
@@ -50,10 +50,9 @@
     padding-<%= direction('left') %>: 20px;
     font-size: 0.8em;
   }
-  </style>
-<% end %>
+</style>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <% if !@context.is_a?(User) && @context.grants_right?(@current_user, session, :manage_assignments) %>
     <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
   <% end %>

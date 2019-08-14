@@ -62,7 +62,7 @@ describe('saveLtiToolConfiguration', () => {
 
     it('prepends the developer key to the list', () => {
       expect(dispatch).toBeCalledWith(
-        developerKeysActions.listDeveloperKeysPrepend({id: 100000000087, name: 'test key'})
+        developerKeysActions.listDeveloperKeysPrepend({id: 100000000087, name: 'test key', tool_configuration: {test: "config"}})
       )
     })
   })

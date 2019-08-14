@@ -58,7 +58,7 @@ const helpDialog = {
     helpDialog.helpLinksDfd = $.getJSON('/help_links').done((links) => {
       // only show the links that are available to the roles of this user
       links = $.grep(links, link =>
-        _.detect(link.available_to, role => role === 'user' || (ENV.current_user_roles && ENV.current_user_roles.includes(role)))
+        _.find(link.available_to, role => role === 'user' || (ENV.current_user_roles && ENV.current_user_roles.includes(role)))
       )
       const locals = {
         showEmail: helpDialog.showEmail(),

@@ -15,16 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-  @locale = raw I18n.locale.to_json
-  @body_classes ||= []
-  @body_classes << "context-#{@context.asset_string}" if @context
-  yield :pre_html
-
 -%><!DOCTYPE html>
-<html class="scripts-not-loaded" dir="<%= use_rtl? ? 'rtl' : 'ltr' %>"   lang=<%= @locale %>>
+<html class="scripts-not-loaded" dir="<%= use_rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
-  <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet">
   <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
@@ -56,18 +50,15 @@
       ))
     end
   %>
-  <%= yield :meta_tags %>
-  <%= browser_performance_monitor_embed %>
+  <script>window.fetchIgnoredByNewRelic = window.fetch</script><%= browser_performance_monitor_embed %>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
-  <%= yield :auto_discovery %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
   <%= yield :head %>
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
   <%= include_css_bundles %>
-  <%= yield :stylesheets %>
   <%= include_account_css %>
   <script>
     <%#
@@ -89,8 +80,14 @@
     document.addEventListener('click', _earlyClick)
   </script>
   <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
+
+  <% js_bundle :navigation_header unless @headers == false %>
   <%= include_head_js %>
   <% @xhrs_to_prefetch_from_controller&.each do |args| %>
     <%= prefetch_xhr(*args) %>
   <% end %>
+  <% @content_for_head&.each do |string| %>
+    <%= string %>
+  <% end %>
+  <title><%= @page_title || (yield :page_title).presence || t('default_page_title', "Canvas LMS") %></title>
 </head>

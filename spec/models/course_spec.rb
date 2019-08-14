@@ -463,6 +463,18 @@ describe Course do
     end
   end
 
+  describe 'allow_student_forum_attachments' do
+    it 'should default to true' do
+      expect(@course.allow_student_forum_attachments).to eq true
+    end
+
+    it 'should allow setting and getting' do
+      @course.allow_student_forum_attachments = false
+      @course.save!
+      expect(@course.allow_student_forum_attachments).to eq false
+    end
+  end
+
   describe "allow_student_discussion_topics" do
 
     it "should default true" do

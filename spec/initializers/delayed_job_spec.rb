@@ -19,7 +19,7 @@ require File.expand_path('../sharding_spec_helper', File.dirname( __FILE__ ))
 
 describe 'Delayed::Job' do
   it "should define job.account" do
-    job = Delayed::Job.create
+    job = Delayed::Job.new
     expect(job).to respond_to(:account)
   end
 

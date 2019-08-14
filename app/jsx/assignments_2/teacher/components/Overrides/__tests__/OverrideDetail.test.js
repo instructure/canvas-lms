@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {mockOverride} from '../../../test-utils'
 import OverrideDetail from '../OverrideDetail'
 
@@ -39,14 +39,14 @@ describe('OverrideDetail', () => {
       submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
     })
 
-    const {getByText, getByTestId} = renderOD(override, {readOnly: true})
+    const {getByText, getAllByText, getByTestId} = renderOD(override, {readOnly: true})
 
     // the labels
     expect(getByText('Assign to:')).toBeInTheDocument()
     expect(getByText('Due:')).toBeInTheDocument()
     expect(getByText('Available:')).toBeInTheDocument()
     expect(getByText('Until:')).toBeInTheDocument()
-    expect(getByText('Submission Items')).toBeInTheDocument()
+    expect(getAllByText('Submission Items')[0]).toBeInTheDocument()
     expect(getByText('Attempts Allowed')).toBeInTheDocument()
     // the sub-components
     expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
@@ -60,14 +60,14 @@ describe('OverrideDetail', () => {
       submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
     })
 
-    const {getByText, getByTestId} = renderOD(override)
+    const {getByText, getAllByText, getByTestId} = renderOD(override)
 
     // the labels
     expect(getByText('Assign to:')).toBeInTheDocument()
     expect(getByText('Due:')).toBeInTheDocument()
     expect(getByText('Available:')).toBeInTheDocument()
     expect(getByText('Until:')).toBeInTheDocument()
-    expect(getByText('Submission Items')).toBeInTheDocument()
+    expect(getAllByText('Submission Items')[0]).toBeInTheDocument()
     expect(getByText('Attempts Allowed')).toBeInTheDocument()
     // the sub-components
     expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()

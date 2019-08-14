@@ -32,10 +32,10 @@ export default class ToggleShowByView extends Backbone.View {
     super.initialize(...args)
     this.initialized = $.Deferred()
     this.course.on('change', () => this.initializeCache())
-    this.course.on('change', this.render)
+    this.course.on('change', this.render, this)
     this.assignmentGroups.once('change:submissions', () => this.initializeDateGroups())
     this.on('changed:showBy', () => this.setAssignmentGroups())
-    this.on('changed:showBy', this.render)
+    this.on('changed:showBy', this.render, this)
   }
 
   initializeCache() {
@@ -48,7 +48,7 @@ export default class ToggleShowByView extends Backbone.View {
 
   initializeDateGroups() {
     const assignments = _.flatten(this.assignmentGroups.map(ag => ag.get('assignments').models))
-    const dated = _.select(assignments, a => a.dueAt())
+    const dated = _.filter(assignments, a => a.dueAt())
     const undated = _.difference(assignments, dated)
     const past = []
     const overdue = []
@@ -137,7 +137,7 @@ export default class ToggleShowByView extends Backbone.View {
   setAssignmentGroups() {
     let groups = this.showByDate() ? this.groupedByDate : this.groupedByAG
     this.setAssignmentGroupAssociations(groups)
-    groups = _.select(groups, group => {
+    groups = _.filter(groups, group => {
       const hasWeight = this.course.get('apply_assignment_group_weights') && group.get('group_weight') > 0
       return group.get('assignments').length > 0 || hasWeight
     })

@@ -27,10 +27,10 @@
   })
   @show_left_side = false
   @show_embedded_chat = false
-  @body_classes << 'ic-no-flex-layout full-width'
+  add_body_class 'ic-no-flex-layout full-width'
   @can_edit_anything = !@context.completed?
 %>
-<% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
+<% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
 <div id="speed_grader_timeout_alert"></div>
 <h4 id="speed_grader_loading">
   <%= t(:loading, "loading...") %>

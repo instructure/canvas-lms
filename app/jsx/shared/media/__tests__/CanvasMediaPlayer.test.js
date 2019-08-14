@@ -19,7 +19,7 @@
 import CanvasMediaPlayer from '../CanvasMediaPlayer'
 import moxios from 'moxios'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 const defaultMediaObject = () => ({
   bitrate: '12345',

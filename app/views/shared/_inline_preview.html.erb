@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :stylesheets do %>
 <style>
 #content {
   padding: 0;
@@ -126,7 +125,6 @@
   font-weight: bold;
 }
 </style>
-<% end %>
 
 <div id="file_content_header">
   <div class="pull-left" id="file_display_name"><%= @attachment ? @attachment.display_name : @tag.title %>

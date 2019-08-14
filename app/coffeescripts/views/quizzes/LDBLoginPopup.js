@@ -104,14 +104,14 @@ export default class LDBLoginPopup extends Backbone.View {
     // @public
     //
     // Install an event handler.
-    this.on = _.bind($delegate.on, $delegate)
-    this.one = _.bind($delegate.one, $delegate)
+    this.on = $delegate.on.bind($delegate)
+    this.one = $delegate.one.bind($delegate)
 
     // @method off
     // @public
     //
     // Remove a previously registered event handler.
-    this.off = _.bind($delegate.off, $delegate)
+    this.off = $delegate.off.bind($delegate)
 
     // When the popup is closed manually by clicking the X in the titlebar
     // in LDB, it will not honor nor trigger the `onbeforeunload` event, so

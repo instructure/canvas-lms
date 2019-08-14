@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %>: <%= t(:comments_made, {:one => "1 Comment Made", :other => "%{count} Comments Made"}, :count => @comments.length) %>, <%= t(:files_ignored, {:one => "1 File Ignored", :other => "%{count} Files Ignored"}, :count => @failures.length) %><% end %>
+<% provide :page_title do %><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %>: <%= t(:comments_made, {:one => "1 Comment Made", :other => "%{count} Comments Made"}, :count => @comments.length) %>, <%= t(:files_ignored, {:one => "1 File Ignored", :other => "%{count} Files Ignored"}, :count => @failures.length) %><% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <p><%= t(:done, <<-TEXT)
     Done! We took the files you uploaded and attached them with a short comment
     to each user's submission page for this assignment. The students will get a
@@ -42,7 +42,6 @@
   </a>
 <% end %>
 
-<% content_for :stylesheets do %>
 <style>
 #student_list {
   list-style-type: none;
@@ -78,7 +77,6 @@
   background-position: 3px 6px;
 }
 </style>
-<% end %>
 
 <h2><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %></h2>
 <h3 style="margin-top: 5px;"><%= t('headers.attached_files', "Attached files to the following user submissions") %></h3>

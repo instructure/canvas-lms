@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title t(:page_title, "Plugin Settings"), @plugin.name %><% end %>
+<% provide :page_title do %><%= join_title t(:page_title, "Plugin Settings"), @plugin.name %><% end %>
 <%
   js_bundle :plugins
   add_crumb(t('#crumbs.plugins', "Plugins"), plugins_path)

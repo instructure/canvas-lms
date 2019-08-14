@@ -32,12 +32,12 @@ class ModeratePage
       grade_input_dropdown_list(student)[position].click
     end
 
-    def click_post_grades_button
-      post_grades_button.click
+    def click_release_grades_button
+      release_grades_button.click
     end
 
-    def click_display_to_students_button
-      display_to_students_button.click
+    def click_post_to_students_button
+      post_to_students_button.click
     end
 
     def click_page_number(page_number)
@@ -116,20 +116,20 @@ class ModeratePage
       fj(".GradesGrid__BodyRow:contains('#{name}')")
     end
 
-    def post_grades_button
-      fj("button:contains('Post')")
+    def release_grades_button
+      fj("button:contains('Release Grades')")
     end
 
-    def grades_posted_button
-      fj("button:contains('Grades Posted')")
+    def grades_released_button
+      fj("button:contains('Grades Released')")
     end
 
-    def display_to_students_button
-      fj("button:contains('Display to Students')")
+    def post_to_students_button
+      fj("button:contains('Post to Students')")
     end
 
-    def grades_visible_to_students_button
-      fj("button:contains('Grades Visible to Students')")
+    def grades_posted_to_students_button
+      fj("button:contains('Grades Posted to Students')")
     end
 
     def page_buttons

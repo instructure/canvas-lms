@@ -15,17 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import {Assignment, AssignmentSubmissionsConnection} from '../graphqlData/Assignment'
 import AssignmentAlert from './AssignmentAlert'
 import I18n from 'i18n!assignments_2_submission_histories_query'
-import {InitialQueryShape, SUBMISSION_HISTORIES_QUERY} from '../assignmentData'
 import {Query} from 'react-apollo'
 import React from 'react'
+import {shape} from 'prop-types'
+import {SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import ViewManager from './ViewManager'
 
 class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
-    initialQueryData: InitialQueryShape
+    initialQueryData: shape({
+      ...Assignment.shape.propTypes,
+      ...AssignmentSubmissionsConnection.shape.propTypes
+    })
   }
 
   state = {

@@ -17,12 +17,12 @@
 %>
 
 <%
-  @active_tab = "courses"
+  set_active_tab "courses"
   add_crumb t(:courses_crumb, "Courses"), account_path(@account)
   add_crumb t(:search_results_crumb, "Search results for \"%{query}\"", :query => @query)
 %>
-<% content_for :page_title do %><%= t(:page_title, "Course Search results for \"%{query}\"", :query => @query) %><% end %>
-<% content_for :right_side do %>
+<% provide :page_title do %><%= t(:page_title, "Course Search results for \"%{query}\"", :query => @query) %><% end %>
+<% provide :right_side do %>
   <%= render :partial => 'courses_right_side' %>
 <% end %>
 <h2><%= t(:title, "Course Search Results for \"%{query}\"", :query => @query) %></h2>

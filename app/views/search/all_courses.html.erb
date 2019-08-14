@@ -18,7 +18,7 @@
 
 <% css_bundle :all_courses %>
 <% js_bundle  :all_courses %>
-<% content_for :page_title, t('titles.all_courses', "All Courses") %>
+<% provide :page_title, t('titles.all_courses', "All Courses") %>
 
 <h1>All Courses</h1>
 <form id="course_filter" action="/search/all_courses" method="get" class="form-inline">

@@ -23,7 +23,7 @@ import 'jquery.instructure_misc_helpers'
 
 function prepare (context, filters) {
   context = _.clone(context)
-  context.activeFilter = _.include(filters, `${context.type}_${context.id}`)
+  context.activeFilter = _.includes(filters, `${context.type}_${context.id}`)
   context.sortBy = `${context.activeFilter ? 0 : 1}_${context.name.toLowerCase()}`
   return context
 }

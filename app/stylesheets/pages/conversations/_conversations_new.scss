@@ -74,8 +74,8 @@
     padding-bottom: 0;
     padding-top: 0;
   }
+  @media only screen and (max-width: 576px) { height: 163px; }
   .panel__primary {
-    margin-bottom: $ic-sp;
     // TODO: revisit when breakpoint fixed
     // until we have a better breakpoint for desktop
     // need to put in direct amount for better ux
@@ -98,6 +98,7 @@
       display: inline-block;
       vertical-align: middle;
       white-space: nowrap;
+      margin-top: $ic-sp;
     }
   }
 
@@ -202,6 +203,7 @@
   bottom: 0;
   top: 112px;
   @media only screen and (min-width: 1200px) { top: 62px; }
+  @media only screen and (max-width: 576px) { top: 163px; }
 }
 
 .message-list-scroller {

@@ -15,186 +15,257 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {fireEvent, render, wait} from 'react-testing-library'
-import {mockGraphqlQueryResults, mockSubmissionHistory} from '../../test-utils'
+import {fireEvent, render, wait} from '@testing-library/react'
+import {MockedProvider} from 'react-apollo/test-utils'
+import {mockQuery} from '../../mocks'
+import range from 'lodash/range'
 import React from 'react'
+import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/Queries'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 import ViewManager from '../ViewManager'
 
-function mockSubmissionHistoriesQueryData(opts) {
-  const historiesCount = opts.currentAttempt - 1
-  const submissionHistories = [...Array(historiesCount)].map((_, i) => {
-    const submissionHistory = mockSubmissionHistory()
-    submissionHistory.attempt = i + 1
-    return submissionHistory
-  })
+async function mockStudentViewResult(overrides = {}) {
+  const variables = {assignmentLid: '1', submissionID: '1'}
+  const result = await mockQuery(STUDENT_VIEW_QUERY, overrides, variables)
+  return result.data
+}
 
-  return {
-    node: {
-      submissionHistoriesConnection: {
-        pageInfo: {
-          hasPreviousPage: opts.hasPreviousPage,
-          startCursor: btoa('1')
-        },
-        nodes: submissionHistories
-      }
+async function mockSubmissionHistoriesResult(overrides = {}) {
+  const variables = {submissionID: '1', cursor: null}
+  const allOverrides = [overrides, {Node: () => ({__typename: 'Submission'})}]
+  const result = await mockQuery(SUBMISSION_HISTORIES_QUERY, allOverrides, variables)
+  return result.data
+}
+
+async function makeProps(opts = {}) {
+  const currentAttempt = opts.currentAttempt
+  const numSubmissionHistories =
+    opts.numSubmissionHistories === undefined ? currentAttempt - 1 : opts.numSubmissionHistories
+  const hasPreviousPage = !!opts.hasPreviousPage
+
+  // Mock the current submission
+  const studentViewOverrides = [
+    {
+      Submission: () => ({
+        ...SubmissionMocks.submitted,
+        attempt: currentAttempt
+      })
     }
-  }
-}
+  ]
+  const studentViewResult = await mockStudentViewResult(studentViewOverrides)
 
-function makeProps(opts = {}) {
-  const optsWithDefaults = {
-    currentAttempt: opts.currentAttempt || 1,
-    hasPreviousPage: opts.hasPreviousPage || false,
-    loadMoreSubmissionHistories: opts.loadMoreSubmissionHistories || (() => {})
-  }
-  const {currentAttempt, loadMoreSubmissionHistories} = optsWithDefaults
+  // Mock the submission histories, as needed.
+  let submissionHistoriesResult = null
+  if (numSubmissionHistories > 0) {
+    const start = currentAttempt - numSubmissionHistories
+    const mockedNodeResults = range(start, currentAttempt).map(attempt => ({
+      ...SubmissionMocks.graded,
+      attempt
+    }))
 
-  const assignment = mockGraphqlQueryResults()
-  assignment.submissionsConnection.nodes[0].attempt = currentAttempt
-
-  let submissionHistoriesQueryData = null
-  if (currentAttempt > 1) {
-    submissionHistoriesQueryData = mockSubmissionHistoriesQueryData(opts)
+    submissionHistoriesResult = await mockSubmissionHistoriesResult({
+      SubmissionHistoryConnection: () => ({nodes: mockedNodeResults}),
+      PageInfo: () => ({hasPreviousPage})
+    })
   }
 
   return {
-    initialQueryData: {assignment},
-    loadMoreSubmissionHistories,
-    submissionHistoriesQueryData
+    initialQueryData: studentViewResult,
+    submissionHistoriesQueryData: submissionHistoriesResult,
+    loadMoreSubmissionHistories: jest.fn()
   }
 }
 
-describe('Next Submission Button', () => {
-  it('is not displayed if we are at the most current submission', () => {
-    const {queryByText} = render(<ViewManager {...makeProps()} />)
-    expect(queryByText('View Next Submission')).not.toBeInTheDocument()
+describe('ViewManager', () => {
+  beforeEach(() => {
+    window.ENV = {
+      context_asset_string: 'test_1',
+      COURSE_ID: '1',
+      current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
+      PREREQS: {}
+    }
   })
 
-  it('is displayed if we are not at the most current submission', async () => {
-    const props = makeProps({currentAttempt: 2})
-    const {getByText, queryByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    await wait(() => expect(queryByText('View Next Submission')).toBeInTheDocument())
-  })
-
-  it('changes the currently displayed submission to the next one when clicked', () => {
-    const props = makeProps({currentAttempt: 3})
-    const {getByText} = render(<ViewManager {...props} />)
-
-    // The component will always start with the most current submission, so we
-    // need to manually go back a few submissions before clicking the next button
-    // in order to test this functionality
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    fireEvent.click(prevButton)
-
-    const nextButton = getByText('View Next Submission')
-    fireEvent.click(nextButton)
-
-    expect(getByText('Attempt 2')).toBeInTheDocument()
-  })
-
-  it('does not call loadMoreSubmissionHistories() when clicked', () => {
-    const mockedOnLoadMore = jest.fn()
-    const props = makeProps({
-      currentAttempt: 2,
-      loadMoreSubmissionHistories: mockedOnLoadMore
+  describe('Next Submission Button', () => {
+    it('is not displayed if we are at the most current submission', async () => {
+      const props = await makeProps({currentAttempt: 1})
+      const {queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('View Next Submission')).not.toBeInTheDocument()
     })
-    const {getByText} = render(<ViewManager {...props} />)
 
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    const nextButton = getByText('View Next Submission')
-    fireEvent.click(nextButton)
-    expect(mockedOnLoadMore).not.toHaveBeenCalled()
-  })
-})
-
-describe('Previous Submission Button', () => {
-  it('is not displayed if we are at submission 0', () => {
-    const props = makeProps({currentAttempt: 0})
-    const {queryByText} = render(<ViewManager {...props} />)
-    expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
-  })
-
-  it('is not displayed if we are at submission 1', () => {
-    const props = makeProps({currentAttempt: 1})
-    const {queryByText} = render(<ViewManager {...props} />)
-    expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
-  })
-
-  it('is displayed if we are not at the earliest submission', () => {
-    const props = makeProps({currentAttempt: 2})
-    const {getByText} = render(<ViewManager {...props} />)
-    expect(getByText('View Previous Submission')).toBeInTheDocument()
-  })
-
-  it('is displayed if we are at the earliest submission but have not exhaused pagination', () => {
-    const props = makeProps({currentAttempt: 3, hasPreviousPage: true})
-    props.submissionHistoriesQueryData.node.submissionHistoriesConnection.nodes.shift()
-    const {getByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    expect(getByText('View Previous Submission')).toBeInTheDocument()
-  })
-
-  it('is not displayed if we are at the earliest submission and pagination is exhausted', async () => {
-    const props = makeProps({currentAttempt: 3, hasPreviousPage: false})
-    props.submissionHistoriesQueryData.node.submissionHistoriesConnection.nodes.shift()
-    const {getByText, queryByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    await wait(() => expect(queryByText('View Previous Submission')).not.toBeInTheDocument())
-  })
-
-  it('changes the currently displayed submission to the previous one when clicked', () => {
-    const props = makeProps({currentAttempt: 2})
-    const {getByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    expect(getByText('Attempt 1')).toBeInTheDocument()
-  })
-
-  it('does not call loadMoreSubmissionHistories() when the previous item is already fetched', () => {
-    const mockedOnLoadMore = jest.fn()
-    const props = makeProps({currentAttempt: 2, loadMoreSubmissionHistories: mockedOnLoadMore})
-    const {getByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    expect(mockedOnLoadMore).not.toHaveBeenCalled()
-  })
-
-  it('calls loadMoreSubmissionHistories() when the previous item has not already been fetched', () => {
-    const mockedOnLoadMore = jest.fn()
-    const props = makeProps({
-      currentAttempt: 2,
-      loadMoreSubmissionHistories: mockedOnLoadMore,
-      hasPreviousPage: true
+    it('is displayed if we are not at the most current submission', async () => {
+      const props = await makeProps({currentAttempt: 2})
+      const {getByText, queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      await wait(() => expect(queryByText('View Next Submission')).toBeInTheDocument())
     })
-    props.submissionHistoriesQueryData.node.submissionHistoriesConnection.nodes.shift()
 
-    const {getByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    expect(mockedOnLoadMore).toHaveBeenCalledTimes(1)
+    it('changes the currently displayed submission to the next one when clicked', async () => {
+      const props = await makeProps({currentAttempt: 3})
+      const {getAllByText, getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+
+      // The component will always start with the most current submission, so we
+      // need to manually go back a few submissions before clicking the next button
+      // in order to test this functionality
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      fireEvent.click(prevButton)
+
+      const nextButton = getByText('View Next Submission')
+      fireEvent.click(nextButton)
+
+      expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
+    })
+
+    it('does not call loadMoreSubmissionHistories() when clicked', async () => {
+      const props = await makeProps({currentAttempt: 2})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      const nextButton = getByText('View Next Submission')
+      fireEvent.click(nextButton)
+      expect(props.loadMoreSubmissionHistories).not.toHaveBeenCalled()
+    })
   })
 
-  it('prevents loadMoreSubmissionHistories() from being called again until graphql query finishes', () => {
-    const mockedOnLoadMore = jest.fn()
-    const props = makeProps({
-      currentAttempt: 2,
-      loadMoreSubmissionHistories: mockedOnLoadMore,
-      hasPreviousPage: true
+  describe('Previous Submission Button', () => {
+    it('is not displayed if we are at submission 0', async () => {
+      const props = await makeProps({currentAttempt: 0})
+      const {queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
     })
-    props.submissionHistoriesQueryData.node.submissionHistoriesConnection.nodes.shift()
 
-    const {getByText} = render(<ViewManager {...props} />)
-    const prevButton = getByText('View Previous Submission')
-    fireEvent.click(prevButton)
-    fireEvent.click(prevButton)
-    fireEvent.click(prevButton)
-    expect(mockedOnLoadMore).toHaveBeenCalledTimes(1)
+    it('is not displayed if we are at submission 1', async () => {
+      const props = await makeProps({currentAttempt: 1})
+      const {queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
+    })
+
+    it('is displayed if we are not at the earliest submission', async () => {
+      const props = await makeProps({currentAttempt: 2})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(getByText('View Previous Submission')).toBeInTheDocument()
+    })
+
+    it('is displayed if we are at the earliest loaded submission but have not exhaused pagination', async () => {
+      const props = await makeProps({
+        currentAttempt: 3,
+        hasPreviousPage: true,
+        numSubmissionHistories: 1
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(getByText('View Previous Submission')).toBeInTheDocument()
+    })
+
+    it('is not displayed if we are at the earliest submission and pagination is exhausted', async () => {
+      const props = await makeProps({
+        currentAttempt: 3,
+        hasPreviousPage: false,
+        numSubmissionHistories: 1
+      })
+      const {getByText, queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      await wait(() => expect(queryByText('View Previous Submission')).not.toBeInTheDocument())
+    })
+
+    it('changes the currently displayed submission to the previous one when clicked', async () => {
+      const props = await makeProps({currentAttempt: 2})
+      const {getAllByText, getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(getAllByText('Attempt 1')[0]).toBeInTheDocument()
+    })
+
+    it('does not call loadMoreSubmissionHistories() when the previous item is already fetched', async () => {
+      const props = await makeProps({currentAttempt: 2})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(props.loadMoreSubmissionHistories).not.toHaveBeenCalled()
+    })
+
+    it('calls loadMoreSubmissionHistories() when the previous item has not already been fetched', async () => {
+      const props = await makeProps({
+        currentAttempt: 3,
+        hasPreviousPage: true,
+        numSubmissionHistories: 0
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(props.loadMoreSubmissionHistories).toHaveBeenCalledTimes(1)
+    })
+
+    it('prevents loadMoreSubmissionHistories() from being called again until graphql query finishes', async () => {
+      const props = await makeProps({
+        currentAttempt: 3,
+        hasPreviousPage: true,
+        numSubmissionHistories: 0
+      })
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      fireEvent.click(prevButton)
+      fireEvent.click(prevButton)
+      expect(props.loadMoreSubmissionHistories).toHaveBeenCalledTimes(1)
+    })
   })
 })

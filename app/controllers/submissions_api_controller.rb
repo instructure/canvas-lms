@@ -570,7 +570,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"visibility"|"course"|"user"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"]
   #   Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])

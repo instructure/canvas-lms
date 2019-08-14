@@ -195,7 +195,11 @@ export default class DeveloperKeyModal extends React.Component {
         developer_key
       }
       if (this.isUrlConfig) {
-        if(!this.state.toolConfigurationUrl) { return }
+        if(!this.state.toolConfigurationUrl) {
+          $.flashError(I18n.t('A json url is required, please supply one.'))
+          this.setState({submitted: true})
+          return
+        }
         toSave.settings_url = this.state.toolConfigurationUrl
       } else {
         toSave.settings = settings

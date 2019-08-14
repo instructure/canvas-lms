@@ -16,32 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {Assignment} from '../../graphqlData/Assignment'
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import FileList from '../../../shared/FileList'
 import I18n from 'i18n!assignments_2'
 import IconAudio from '@instructure/ui-icons/lib/Line/IconAudio'
 import IconMedia from '@instructure/ui-icons/lib/Line/IconMedia'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
+import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {submissionCommentAttachmentsUpload} from '../../../../shared/upload_file'
+import {Submission} from '../../graphqlData/Submission'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-
-import {
-  AssignmentShape,
-  SubmissionShape,
-  CREATE_SUBMISSION_COMMENT,
-  SUBMISSION_COMMENT_QUERY
-} from '../../assignmentData'
-import {Mutation} from 'react-apollo'
 
 const ALERT_TIMEOUT = 5000
 
 export default class CommentTextArea extends Component {
   static propTypes = {
-    assignment: AssignmentShape,
-    submission: SubmissionShape
+    assignment: Assignment.shape,
+    submission: Submission.shape
   }
 
   state = {

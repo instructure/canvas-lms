@@ -19,6 +19,10 @@
 import INST from 'INST'
 import I18n from 'i18n!assignment'
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import axios from 'axios'
+import qs from 'qs'
 import Assignment from 'compiled/models/Assignment'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import SpeedgraderLinkView from 'compiled/views/assignments/SpeedgraderLinkView'
@@ -29,15 +33,59 @@ import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
 import LockManager from '../blueprint_courses/apps/LockManager'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import StudentGroupFilter from '../shared/StudentGroupFilter'
+import SpeedGraderLink from '../shared/SpeedGraderLink'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'assignment', page: 'show' })
 
-$(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
-    return MarkAsDone.toggle(this)
-  })
-)
+function onStudentGroupSelected(selectedStudentGroupId) {
+  if (selectedStudentGroupId !== '0') {
+    axios.put(`/api/v1/courses/${ENV.COURSE_ID}/gradebook_settings`, qs.stringify({
+      gradebook_settings: {
+        filter_rows_by: {
+          student_group_id: selectedStudentGroupId
+        }
+      }
+    }))
+
+    ENV.selected_student_group_id = selectedStudentGroupId
+    renderStudentGroupFilter()
+    renderSpeedGraderLink()
+  }
+}
+
+function renderSpeedGraderLink() {
+  const disabled = ENV.SETTINGS.filter_speed_grader_by_student_group && !ENV.selected_student_group_id
+  const $mountPoint = document.getElementById('speed_grader_link_mount_point')
+
+  if ($mountPoint) {
+    ReactDOM.render(
+      <SpeedGraderLink
+        disabled={disabled}
+        href={ENV.speed_grader_url}
+        disabledTip={I18n.t('Must select a student group first')}
+      />,
+      $mountPoint
+    )
+  }
+}
+
+function renderStudentGroupFilter() {
+  const $mountPoint = document.getElementById('student_group_filter_mount_point')
+
+  if ($mountPoint) {
+    ReactDOM.render(
+      <StudentGroupFilter
+        categories={ENV.group_categories}
+        label={I18n.t('Select Group to Grade')}
+        onChange={onStudentGroupSelected}
+        value={ENV.selected_student_group_id}
+      />,
+      $mountPoint
+    )
+  }
+}
 
 $(() => {
   const $el = $('#assignment_publish_button')
@@ -70,7 +118,23 @@ $(() => {
   return vddTooltip()
 })
 
+$(() =>
+  $('#content').on('click', '#mark-as-done-checkbox', function () {
+    return MarkAsDone.toggle(this)
+  })
+)
+
   // -- This is all for the _grade_assignment sidebar partial
+$(() => {
+  if (ENV.speed_grader_url) {
+    if (ENV.SETTINGS.filter_speed_grader_by_student_group) {
+      renderStudentGroupFilter()
+    }
+
+    renderSpeedGraderLink()
+  }
+})
+
 $(() => {
   $('.upload_submissions_link').click((event) => {
     event.preventDefault()

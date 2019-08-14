@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!conversation_dialog'
 import $ from 'jquery'
-import _ from 'underscore'
 import 'Backbone'
 import DialogBaseView from '../DialogBaseView'
 import template from 'jst/conversations/SubmissionCommentFormDialog'
@@ -30,18 +29,6 @@ import 'jquery.elastic'
 // reusable message composition dialog
 
 export default class SubmissionCommentFormDialog extends DialogBaseView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.resizeBody = this.resizeBody.bind(this)
-    this.handleBodyClick = this.handleBodyClick.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.template = template
@@ -144,7 +131,7 @@ export default class SubmissionCommentFormDialog extends DialogBaseView {
   initializeForm() {
     this.prepareTextarea(this.$el)
 
-    this.$fullDialog.on('click', '.message-body', this.handleBodyClick)
+    this.$fullDialog.on('click', '.message-body', e => this.handleBodyClick(e))
 
     return this.$form.formSubmit({
       intent: 'message',
@@ -161,7 +148,7 @@ export default class SubmissionCommentFormDialog extends DialogBaseView {
           dfd.resolve()
           $.flashMessage(this.messages.flashSuccess)
           const message = new Message(
-            _.extend(this.model.attributes, {submission_comments: response.submission_comments}),
+            {...this.model.attributes, submission_comments: response.submission_comments},
             {parse: true}
           )
           return this.trigger('addMessage', message.get('messages')[0], response)

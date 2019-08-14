@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
@@ -24,6 +24,7 @@ import {getCurrentAttempt} from './Attempt'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
+import {Submission} from '../graphqlData/Submission'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -35,8 +36,8 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 const CommentsTab = lazy(() => import('./CommentsTab'))
 
 ContentTabs.propTypes = {
-  assignment: AssignmentShape,
-  submission: SubmissionShape
+  assignment: Assignment.shape,
+  submission: Submission.shape
 }
 
 // We should revisit this after the InstructureCon demo to ensure this is
@@ -89,7 +90,7 @@ function ContentTabs(props) {
           <AttemptTab assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel title={I18n.t('Comments')}>
-          {!props.assignment.muted ? (
+          {props.submission.posted ? (
             <Suspense fallback={<LoadingIndicator />}>
               <CommentsTab assignment={props.assignment} submission={props.submission} />
             </Suspense>

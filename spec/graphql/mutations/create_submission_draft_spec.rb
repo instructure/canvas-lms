@@ -134,7 +134,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq 'not found'
   end
 
-  it 'returns an error if the draft attempt is higher than the allowed attempts' do
+  it 'returns an error if the draft is more then one attempt more the current submission attempt' do
     result = run_mutation(
       submission_id: @submission.id,
       attempt: 1337,
@@ -142,17 +142,17 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :errors, 0, :message)
-    ).to eq 'submission draft attempt cannot be larger then the submission attempt'
+    ).to eq 'submission draft cannot be more then one attempt ahead of the current submission'
   end
 
-  it "uses the submission attempt if one isn't provided" do
+  it "uses the submission attempt plus one if an explicit attempt isn't provided" do
     result = run_mutation(
       submission_id: @submission.id,
       file_ids: [@attachments[0].id]
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :submissionAttempt)
-    ).to eq @submission.attempt
+    ).to eq @submission.attempt + 1
   end
 
   it 'uses the given attempt when provided' do

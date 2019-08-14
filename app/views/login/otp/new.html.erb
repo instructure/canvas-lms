@@ -20,13 +20,9 @@
   css_bundle :otp_login
   js_bundle :otp_login
   @headers = false
-  @body_classes << "full-width modal body--login-confirmation"
-  content_for :page_title, t(:page_title, "Multi-factor Authentication")
+  add_body_class "full-width modal body--login-confirmation"
+  provide :page_title, t(:page_title, "Multi-factor Authentication")
 %>
-
-<% content_for :meta_tags do %>
-  <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=yes,width=device-width">
-<% end %>
 
 <div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">

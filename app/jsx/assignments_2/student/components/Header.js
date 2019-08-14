@@ -17,7 +17,7 @@
  */
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import Attempt from './Attempt'
 import DateTitle from './DateTitle'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -29,13 +29,18 @@ import React from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import StepContainer from './StepContainer'
 import StudentViewContext from './Context'
+import {Submission} from '../graphqlData/Submission'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 
 class Header extends React.Component {
   static propTypes = {
-    assignment: AssignmentShape,
+    assignment: Assignment.shape,
     scrollThreshold: number.isRequired,
-    submission: SubmissionShape
+    submission: Submission.shape
+  }
+
+  static defaultProps = {
+    scrollThreshold: 150
   }
 
   state = {

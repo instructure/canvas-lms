@@ -25,7 +25,7 @@
         tool_display = tool.extension_setting('global_navigation', 'windowTarget') == '_blank' ? 'borderless' : nil
         tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation', display: tool_display)
     %>
-      <li id="<%= tool.asset_string %>_menu_item" class="menu-item ic-app-header__menu-list-item<% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
+      <li id="<%= tool.asset_string %>_menu_item" class="globalNavExternalTool menu-item ic-app-header__menu-list-item<% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
         <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
           <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
           <% if svg_path %>

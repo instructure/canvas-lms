@@ -20,7 +20,7 @@ import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
 import ErrorBoundary from '../ErrorBoundary'
 import GenericErrorPage from '../GenericErrorPage'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 class ThrowsErrorComponent extends React.Component {
   componentDidMount() {

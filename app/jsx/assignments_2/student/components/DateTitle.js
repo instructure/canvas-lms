@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
 import {bool} from 'prop-types'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
@@ -63,7 +63,7 @@ function DateTitle(props) {
 }
 
 DateTitle.propTypes = {
-  assignment: AssignmentShape,
+  assignment: Assignment.shape,
   isSticky: bool.isRequired
 }
 

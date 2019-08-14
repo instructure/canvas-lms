@@ -138,7 +138,7 @@ export default class IndexView extends Backbone.View
       gradingPeriodIndex = $("#grading_period_selector").val()
       gradingPeriod = @gradingPeriods[parseInt(gradingPeriodIndex)] if gradingPeriodIndex != "all"
       @saveSelectedGradingPeriod(gradingPeriod)
-    if term == "" && _.isNull(gradingPeriod)
+    if term == "" && (gradingPeriod == null)
       #show all
       @collection.each (group) =>
         group.groupView.endSearch()
@@ -200,11 +200,11 @@ export default class IndexView extends Backbone.View
 
   filterKeyBindings: =>
     @keyBindings = @keyBindings.filter (binding) ->
-      ! _.contains([69,68,65], binding.keyCode)
+      ! [69,68,65].includes(binding.keyCode)
 
   selectGradingPeriod: ->
     gradingPeriodId = userSettings.contextGet('assignments_current_grading_period')
-    unless _.isNull(gradingPeriodId)
+    unless gradingPeriodId == null
       for i of @gradingPeriods
         if @gradingPeriods[i].id == gradingPeriodId
           $("#grading_period_selector").val(i)

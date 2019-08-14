@@ -17,9 +17,9 @@
 %>
 
 <% add_crumb t(:page_title, 'Profile Pictures') %>
-<% content_for :page_title do %><%= t(:page_title, "Profile Pictures") %><% end %>
+<% provide :page_title do %><%= t(:page_title, "Profile Pictures") %><% end %>
 
-<% content_for :stylesheets do %>
+
 <style>
 .views .selected {
   font-weight: bold;
@@ -41,7 +41,7 @@
   text-align: <%= direction('right') %>;
 }
 </style>
-<% end %>
+
 <h1><%= t(:title, "Profile Pictures") %></h1>
 <div class="views">
   <span style="padding-<%= direction('right') %>: 10px; font-weight: bold;"><%= before_label :show, 'Show' %> </span>

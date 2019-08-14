@@ -18,7 +18,7 @@
 
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 import FileList from '../FileList'
 

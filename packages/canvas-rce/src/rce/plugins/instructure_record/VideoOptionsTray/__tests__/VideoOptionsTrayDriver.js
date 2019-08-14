@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByLabelText, queryByLabelText, wait} from 'dom-testing-library'
+import {getByLabelText, queryByLabelText, wait} from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {
   const controlledId = $sizeSelect.getAttribute('aria-controls')

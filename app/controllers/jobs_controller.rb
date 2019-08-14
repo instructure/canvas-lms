@@ -108,7 +108,7 @@ class JobsController < ApplicationController
   end
 
   def set_navigation
-    @active_tab = 'jobs'
+    set_active_tab 'jobs'
     add_crumb t('#crumbs.jobs', "Jobs")
   end
 end

@@ -503,11 +503,11 @@ export default class EventDataSource {
         ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(cc) >= 0
       ))
       if (student_contexts.length) {
-        const pparams = _.extend({filter: 'ungraded_todo_items'}, params, {context_codes: student_contexts})
+        const pparams = {filter: 'ungraded_todo_items', ...params, context_codes: student_contexts}
         eventDataSources.push(['/api/v1/planner/items', pparams])
       }
       if (admin_contexts.length) {
-        const pparams = _.extend({filter: 'all_ungraded_todo_items'}, params, {context_codes: admin_contexts})
+        const pparams = {filter: 'all_ungraded_todo_items', ...params, context_codes: admin_contexts}
         eventDataSources.push(['/api/v1/planner/items', pparams])
       }
     }

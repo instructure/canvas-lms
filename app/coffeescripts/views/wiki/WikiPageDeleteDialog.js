@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!pages'
 import DialogFormView from '../DialogFormView'
 
@@ -45,7 +44,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
   }
 
   initialize(options) {
-    return super.initialize(_.extend({}, dialogDefaults, options))
+    return super.initialize({...dialogDefaults, ...options})
   }
 
   submit(event) {

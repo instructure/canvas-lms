@@ -46,9 +46,9 @@ describe GradingStandard do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:context_type) }
-    it { is_expected.to validate_presence_of(:context_id) }
+    it { is_expected.to belong_to(:context).required }
     it { is_expected.to validate_presence_of(:data) }
+    it { is_expected.to serialize(:data) }
 
     describe 'grading standard data' do
       let(:standard) { GradingStandard.new(context: @course) }

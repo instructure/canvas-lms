@@ -17,29 +17,38 @@
  */
 
 import $ from 'jquery'
+import * as uploadFileModule from '../../../../shared/upload_file'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import FileUpload from '../FileUpload'
-import {fireEvent, render} from 'react-testing-library'
-import {
-  mockAssignment,
-  mockSubmission,
-  mockSubmissionDraft,
-  singleAttachment
-} from '../../test-utils'
+import {fireEvent, render, wait} from '@testing-library/react'
+import {mockAssignmentAndSubmission} from '../../mocks'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 
-let mockedSubmission
+async function makeProps(overrides) {
+  const assignmentAndSubmission = await mockAssignmentAndSubmission(overrides)
+  const props = {
+    ...assignmentAndSubmission,
+    createSubmission: jest.fn(),
+    createSubmissionDraft: jest.fn(),
+    updateSubmissionState: jest.fn(),
+    updateUploadState: jest.fn()
+  }
+
+  // Make these return a promise that will resolve
+  props.createSubmission.mockResolvedValue({})
+  props.createSubmissionDraft.mockResolvedValue({})
+  return props
+}
 
 beforeAll(() => {
   $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 })
 
 beforeEach(() => {
-  mockedSubmission = mockSubmission({
-    submissionDraft: mockSubmissionDraft()
-  })
   window.URL.createObjectURL = jest.fn().mockReturnValue('perry_preview')
+  uploadFileModule.uploadFiles = jest.fn()
 })
 
 describe('FileUpload', () => {
@@ -52,9 +61,10 @@ describe('FileUpload', () => {
   }
 
   it('renders the upload tab by default', async () => {
+    const props = await makeProps()
     const {container, getByTestId, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('upload-box')
@@ -66,53 +76,57 @@ describe('FileUpload', () => {
   })
 
   it('renders the submission draft files if there are any', async () => {
-    const {getByTestId, getByText} = render(
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment,
+      File: () => ({displayName: 'foobarbaz'})
+    })
+
+    const {getByTestId, getAllByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const uploadRender = getByTestId('non-empty-upload')
-
-    mockedSubmission.submissionDraft.attachments.forEach(attachment => {
-      expect(uploadRender).toContainElement(getByText(attachment.displayName))
-    })
+    expect(uploadRender).toContainElement(getAllByText('foobarbaz')[0])
   })
 
   it('renders in an img tag if the file type is an image', async () => {
-    const mockedAttachment = singleAttachment({
-      mimeClass: 'image'
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment,
+      File: () => ({displayName: 'foobarbaz', mimeClass: 'image'})
     })
-    mockedSubmission.submissionDraft.attachments = [mockedAttachment]
     const {container, getByTestId} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const uploadRender = getByTestId('non-empty-upload')
-
-    expect(uploadRender).toContainElement(
-      container.querySelector(`img[alt="${mockedAttachment.displayName} preview"]`)
-    )
+    expect(uploadRender).toContainElement(container.querySelector('img[alt="foobarbaz preview"]'))
   })
 
   it('renders an icon if a non-image file is uploaded', async () => {
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment,
+      File: () => ({displayName: 'foobarbaz', mimeClass: 'pdf'})
+    })
+
     const {container, getByTestId} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const uploadRender = getByTestId('non-empty-upload')
 
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconPdf"]'))
-    mockedSubmission.submissionDraft.attachments.forEach(attachment => {
-      expect(container.querySelector(`img[alt="${attachment.displayName} preview"]`)).toBeNull()
-    })
+    expect(container.querySelector('img[alt="foobarbaz preview"]')).toBeNull()
   })
 
-  it('allows uploading multiple files at a time', () => {
+  it('allows uploading multiple files at a time', async () => {
+    const props = await makeProps()
+
     const {container, getByTestId, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -126,40 +140,81 @@ describe('FileUpload', () => {
     expect(filesRender).toContainElement(getByText('Loading'))
   })
 
-  it('renders a button to remove the file', async () => {
-    const {container, getByText} = render(
+  it('creates a submission draft with the attempt one larger then the current submisison', async () => {
+    const props = await makeProps({
+      Submission: () => ({attempt: 0})
+    })
+    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
+
+    const {container} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
-    const button = container.querySelector(
-      `button[id="${mockedSubmission.submissionDraft.attachments[0]._id}"]`
-    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    uploadFiles(fileInput, [file])
 
-    mockedSubmission.submissionDraft.attachments.forEach(attachment => {
-      expect(button).toContainElement(getByText(`Remove ${attachment.displayName}`))
+    await wait(() => {
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          attempt: 1,
+          fileIds: ['1']
+        }
+      })
     })
+  })
+
+  it('renders a button to remove the file', async () => {
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment,
+      File: () => ({_id: '1', displayName: 'foobarbaz'})
+    })
+
+    const {container, getByText} = render(
+      <MockedProvider>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const button = container.querySelector('button[id="1"]')
+
+    expect(button).toContainElement(getByText('Remove foobarbaz'))
     expect(button).toContainElement(container.querySelector('svg[name="IconTrash"]'))
   })
 
   it('renders a remove button for each uploaded file', async () => {
+    const attachmentOverrides = [
+      {_id: '1', displayName: 'foobarbaz1'},
+      {_id: '2', displayName: 'foobarbaz2'}
+    ]
+    const props = await makeProps({
+      Submission: () => ({
+        submissionDraft: {attachments: attachmentOverrides}
+      })
+    })
+
     const {container, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
 
-    mockedSubmission.submissionDraft.attachments.forEach(attachment => {
+    attachmentOverrides.forEach(attachment => {
       const button = container.querySelector(`button[id="${attachment._id}"]`)
       expect(button).toContainElement(getByText(`Remove ${attachment.displayName}`))
     })
   })
 
   it('ellides filenames for files greater than 21 characters', async () => {
-    mockedSubmission.submissionDraft.attachments[0].displayName = 'c'.repeat(22)
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment,
+      File: () => ({displayName: 'c'.repeat(22)})
+    })
+
     const {getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
 
@@ -168,21 +223,39 @@ describe('FileUpload', () => {
 
   it('does not ellide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
-    mockedSubmission.submissionDraft.attachments[0].displayName = filename
-    const {getByText} = render(
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment,
+      File: () => ({displayName: filename})
+    })
+
+    const {getAllByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
 
-    expect(getByText(filename)).toBeInTheDocument()
+    expect(getAllByText(filename)[0]).toBeInTheDocument()
+  })
+
+  it('displays the more options button in the upload box', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId, getByText} = render(
+      <MockedProvider>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const emptyRender = getByTestId('upload-box')
+
+    expect(emptyRender).toContainElement(getByText('More Options'))
   })
 
   it('displays allowed extensions in the upload box', async () => {
-    const mockedAssignment = mockAssignment({allowedExtensions: ['jpg, png']})
+    const props = await makeProps({
+      Assignment: () => ({allowedExtensions: ['jpg, png']})
+    })
     const {getByTestId, getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('upload-box')
@@ -191,9 +264,10 @@ describe('FileUpload', () => {
   })
 
   it('does not display any allowed extensions if there are none', async () => {
+    const props = await makeProps()
     const {getByTestId, queryByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('upload-box')
@@ -202,10 +276,12 @@ describe('FileUpload', () => {
   })
 
   it('renders an error when adding a file that is not an allowed extension', async () => {
-    const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
+    const props = await makeProps({
+      Assignment: () => ({allowedExtensions: ['jpg']})
+    })
     const {container, getByText, queryByTestId} = render(
       <MockedProvider>
-        <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
@@ -218,10 +294,12 @@ describe('FileUpload', () => {
   })
 
   it('does not render an error when adding a file that is an allowed extension', async () => {
-    const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
+    const props = await makeProps({
+      Assignment: () => ({allowedExtensions: ['jpg']})
+    })
     const {container, queryByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockedAssignment} submission={mockSubmission()} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
@@ -233,9 +311,10 @@ describe('FileUpload', () => {
   })
 
   it('does not render a submit button when a file has not been uploaded', async () => {
+    const props = await makeProps()
     const {getByTestId, queryByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockSubmission()} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('upload-box')
@@ -244,9 +323,12 @@ describe('FileUpload', () => {
   })
 
   it('renders a submit button when a file has been uploaded', async () => {
+    const props = await makeProps({
+      Submission: () => SubmissionMocks.draftWithAttachment
+    })
     const {getByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
 
@@ -254,9 +336,10 @@ describe('FileUpload', () => {
   })
 
   it('renders a loading indicator when a file is being uploaded', async () => {
+    const props = await makeProps()
     const {container, getByTestId, getByText, queryByText} = render(
       <MockedProvider>
-        <FileUpload assignment={mockAssignment()} submission={mockedSubmission} />
+        <FileUpload {...props} />
       </MockedProvider>
     )
 

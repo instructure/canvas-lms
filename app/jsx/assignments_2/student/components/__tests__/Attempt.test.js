@@ -16,33 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import Attempt from '../Attempt'
-import {mockAssignment, mockSubmission} from '../../test-utils'
+import {mockAssignmentAndSubmission} from '../../mocks'
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 describe('unlimited attempts', () => {
-  it('renders correctly', () => {
-    const submission = mockSubmission()
-    submission.attempt = 1
-    const {getByText} = render(<Attempt assignment={mockAssignment()} submission={submission} />)
+  it('renders correctly', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({attempt: 1})
+    })
+    const {getByText} = render(<Attempt {...props} />)
     expect(getByText('Attempt 1')).toBeInTheDocument()
   })
 
-  it('renders the curent submission attempt', () => {
-    const submission = mockSubmission()
-    submission.attempt = 3
-    const {getByText} = render(<Attempt assignment={mockAssignment()} submission={submission} />)
+  it('renders attempt 0 as attempt 1', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({attempt: 0})
+    })
+    const {getByText} = render(<Attempt {...props} />)
+    expect(getByText('Attempt 1')).toBeInTheDocument()
+  })
+
+  it('renders the current submission attempt', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({attempt: 3})
+    })
+    const {getByText} = render(<Attempt {...props} />)
     expect(getByText('Attempt 3')).toBeInTheDocument()
   })
 })
 
 describe('limited attempts', () => {
-  it('renders attempt', () => {
-    const assignment = mockAssignment()
-    const submission = mockSubmission()
-    assignment.allowedAttempts = 4
-    submission.attempt = 2
-    const {getByText} = render(<Attempt assignment={assignment} submission={submission} />)
+  it('renders attempt', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({attempt: 2}),
+      Assignment: () => ({allowedAttempts: 4})
+    })
+    const {getByText} = render(<Attempt {...props} />)
     expect(getByText('Attempt 2 of 4')).toBeInTheDocument()
   })
 })

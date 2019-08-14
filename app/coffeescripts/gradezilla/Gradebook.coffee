@@ -101,7 +101,7 @@ export default do ->
       assignment.assignment_visibility.push(submission.user_id)
 
   isAdmin = =>
-    _.contains(ENV.current_user_roles, 'admin')
+    _.includes(ENV.current_user_roles, 'admin')
 
   IS_ADMIN = isAdmin()
 
@@ -714,15 +714,15 @@ export default do ->
 
     updateAssignmentEffectiveDueDates: (assignment) ->
       assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
-      assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
+      assignment.inClosedGradingPeriod = _.some(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
 
     updateStudentAttributes: (student) =>
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
 
-      student.isConcluded = _.all student.enrollments, (e) ->
+      student.isConcluded = _.every student.enrollments, (e) ->
         e.enrollment_state == 'completed'
-      student.isInactive = _.all student.enrollments, (e) ->
+      student.isInactive = _.every student.enrollments, (e) ->
         e.enrollment_state == 'inactive'
 
       student.cssClass = "student_#{student.id}"
@@ -914,7 +914,7 @@ export default do ->
 
       propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
       pattern = new RegExp(@userFilterTerm, 'i')
-      _.any propertiesToMatch, (prop) ->
+      _.some propertiesToMatch, (prop) ->
         student[prop]?.match pattern
 
     filterAssignments: (assignments) =>
@@ -1496,7 +1496,7 @@ export default do ->
     renderGradebookSettingsModal: =>
       gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
       gradebookSettingsModalProps =
-        anonymousAssignmentsPresent: _.any(@assignments, (assignment) => assignment.anonymous_grading)
+        anonymousAssignmentsPresent: _.some(@assignments, (assignment) => assignment.anonymous_grading)
         courseId: @options.context_id
         courseFeatures: @courseFeatures
         courseSettings: @courseSettings
@@ -2376,6 +2376,7 @@ export default do ->
       onRequestClose: @closeSubmissionTray
       pendingGradeInfo: @getPendingGradeInfo({ assignmentId, userId: studentId })
       postPoliciesEnabled: @options.post_policies_enabled
+      requireStudentGroupForSpeedGrader: @requireStudentGroupForSpeedGrader()
       selectNextAssignment: => @loadTrayAssignment('next')
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
@@ -3048,6 +3049,9 @@ export default do ->
     hideAnonymousSpeedGraderAlert: =>
       # React throws an error if we try to unmount while the event is being handled
       @delayedCall 0, => ReactDOM.unmountComponentAtNode(anonymousSpeedGraderAlertMountPoint())
+
+    requireStudentGroupForSpeedGrader: =>
+      @options.course_settings.filter_speed_grader_by_student_group && @getStudentGroupToShow() == '0'
 
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')

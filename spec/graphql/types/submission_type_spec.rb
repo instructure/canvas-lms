@@ -39,6 +39,16 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("_id", current_user: other_student)).to be_nil
   end
 
+  describe "posted" do
+    it "returns the posted status of the submission" do
+      PostPolicy.enable_feature!
+      @submission.update!(posted_at: nil)
+      expect(submission_type.resolve("posted")).to eq false
+      @submission.update!(posted_at: Time.zone.now)
+      expect(submission_type.resolve("posted")).to eq true
+    end
+  end
+
   describe "posted_at" do
     it "returns the posted_at of the submission" do
       now = Time.zone.now.change(usec: 0)
@@ -183,24 +193,24 @@ describe Types::SubmissionType do
   describe 'submission_drafts' do
     it 'returns the draft for attempt 0 when the submission attempt is nil' do
       @submission.update_columns(attempt: nil) # bypass #infer_details for test
-      SubmissionDraft.create!(submission: @submission, submission_attempt: 0)
+      SubmissionDraft.create!(submission: @submission, submission_attempt: 1)
       expect(
         submission_type.resolve('submissionDraft { submissionAttempt }')
-      ).to eq 0
+      ).to eq 1
     end
 
     it 'returns nil for a non current submission history that has a draft' do
       assignment = @course.assignments.create! name: "asdf", points_possible: 10
       @submission1 = assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
       @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
-      SubmissionDraft.create!(submission: @submission1, submission_attempt: @submission1.attempt)
-      SubmissionDraft.create!(submission: @submission2, submission_attempt: @submission2.attempt)
+      SubmissionDraft.create!(submission: @submission1, submission_attempt: @submission1.attempt + 1)
+      SubmissionDraft.create!(submission: @submission2, submission_attempt: @submission2.attempt + 1)
       resolver = GraphQLTypeTester.new(@submission2, current_user: @teacher)
       expect(
         resolver.resolve(
           'submissionHistoriesConnection { nodes { submissionDraft { submissionAttempt }}}'
         )
-      ).to eq [nil, @submission2.attempt]
+      ).to eq [nil, @submission2.attempt + 1]
     end
   end
 
@@ -302,6 +312,52 @@ describe Types::SubmissionType do
           ).to eq [1, 2]
         end
       end
+    end
+  end
+
+  describe 'late' do
+    before(:once) do
+      assignment = @course.assignments.create!(name: "late assignment", points_possible: 10, due_at: 2.hours.ago)
+      @submission1 = assignment.submit_homework(@student, body: 'late', submitted_at: 1.hour.ago)
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it 'returns late' do
+      expect(submission_type.resolve("late")).to eq true
+    end
+  end
+
+  describe 'missing' do
+    before(:once) do
+      assignment = @course.assignments.create!(
+        name: "missing assignment",
+        points_possible: 10,
+        due_at: 1.hour.ago,
+        submission_types: ['online_text_entry']
+      )
+      @submission1 = Submission.where(assignment_id: assignment.id, user_id: @student.id).first
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it 'returns missing' do
+      expect(submission_type.resolve("missing")).to eq true
+    end
+  end
+
+  describe 'gradeMatchesCurrentSubmission' do
+    before(:once) do
+      assignment = @course.assignments.create!(name: "assignment", points_possible: 10)
+      assignment.submit_homework(@student, body: 'asdf')
+      assignment.grade_student(@student, score: 8, grader: @teacher)
+      @submission1 = assignment.submit_homework(@student, body: 'asdf')
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
+
+    it 'returns gradeMatchesCurrentSubmission' do
+      expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
     end
   end
 end

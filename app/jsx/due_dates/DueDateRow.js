@@ -102,7 +102,7 @@ class DueDateRow extends React.Component {
     return _.reduce(
       adhocOverrides,
       (overrideTokens, ov) => {
-        const tokensForStudents = _.map(ov.get('student_ids'), this.tokenFromStudentId, this)
+        const tokensForStudents = _.map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))
         return overrideTokens.concat(tokensForStudents)
       },
       []

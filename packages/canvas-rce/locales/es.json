@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Alinear a la derecha"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Alineación y sangría"
+  },
   "all_4321c3a1": {
     "message": "Todo"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "Cancelar la carga de imágenes"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Complementos de Canvas"
   },
   "cc_attribution_f6de631f": {
     "message": "Atribución de CC"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "Editar enlace"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "Barra de estado del editor"
+  },
   "embed_828fac4a": {
     "message": "Incrustar"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "Carpeta"
+  },
+  "formatting_5b143aa8": {
+    "message": "Formato"
   },
   "generating_preview_45b53be0": {
     "message": "Generando la vista previa..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "Micrófono"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Varios y LTI"
+  },
   "modules_c4325335": {
     "message": "Módulos"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Seleccione una carpeta en donde guardar el archivo cargado"
   },
+  "selected_274ce24f": {
+    "message": "Seleccionado"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "Mostrar opciones de incrustación"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Comenzar grabación"
+  },
+  "styles_2aa721ef": {
+    "message": "Estilos"
   },
   "subheader_2b87606d": {
     "message": "Subencabezado"

@@ -85,16 +85,14 @@ module Canvas::LiveEvents
 
   def self.get_discussion_entry_data(entry)
     payload = {
-      user_id:  entry.global_user_id,
+      user_id:  entry.user_id,
       created_at: entry.created_at,
-      discussion_entry_id: entry.global_id,
-      discussion_topic_id: entry.global_discussion_topic_id,
+      discussion_entry_id: entry.id,
+      discussion_topic_id: entry.discussion_topic_id,
       text: LiveEvents.truncate(entry.message)
     }
 
-    if entry.parent_id
-      payload[:parent_discussion_entry_id] = entry.global_parent_id
-    end
+    payload[:parent_discussion_entry_id] = entry.parent_id if entry.parent_id
     payload
   end
 
@@ -210,7 +208,8 @@ module Canvas::LiveEvents
       points_possible: assignment.points_possible,
       lti_assignment_id: assignment.lti_context_id,
       lti_resource_link_id: assignment.lti_resource_link_id,
-      lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id
+      lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
+      submission_types: assignment.submission_types
     }
   end
 
@@ -607,11 +606,40 @@ module Canvas::LiveEvents
     post_event_stringified('course_completed', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
   end
 
+  def self.course_progress(context_module_progression)
+    post_event_stringified('course_progress', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
+  end
+
   def self.get_course_completed_data(course, user)
     {
       progress: CourseProgress.new(course, user, read_only: true).to_json,
       user: { id: user.id, name: user.name, email: user.email },
       course: { id: course.id, name: course.name }
     }
+  end
+
+  def self.get_learning_outcome_data(result)
+    {
+      learning_outcome_id: result.learning_outcome_id,
+      mastery: result.learning_outcome_id,
+      score: result.score,
+      created_at: result.created_at,
+      attempt: result.attempt,
+      possible: result.possible,
+      original_score: result.original_score,
+      original_possible: result.original_possible,
+      original_mastery: result.original_mastery,
+      assessed_at: result.assessed_at,
+      title: result.title,
+      percent: result.percent
+    }
+  end
+
+  def self.learning_outcome_result_updated(result)
+    post_event_stringified('learning_outcome_result_updated', get_learning_outcome_data(result).merge(updated_at: result.updated_at))
+  end
+
+  def self.learning_outcome_result_created(result)
+    post_event_stringified('learning_outcome_result_created', get_learning_outcome_data(result))
   end
 end

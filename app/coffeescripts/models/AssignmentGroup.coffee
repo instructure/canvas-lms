@@ -21,7 +21,7 @@ import DefaultUrlMixin from '../backbone-ext/DefaultUrlMixin'
 import AssignmentCollection from '../collections/AssignmentCollection'
 
 isAdmin = ->
-  _.contains(ENV.current_user_roles, 'admin')
+  _.includes(ENV.current_user_roles, 'admin')
 
 export default class AssignmentGroup extends Backbone.Model
   @mixin DefaultUrlMixin

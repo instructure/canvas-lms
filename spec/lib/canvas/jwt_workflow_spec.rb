@@ -59,6 +59,7 @@ module Canvas
     describe 'workflows' do
       describe ':rich_content' do
         before(:each) do
+          allow(@c).to receive(:respond_to?).and_return(true)
           allow(@c).to receive(:grants_right?)
           allow(@c).to receive(:feature_enabled?)
           @wiki = Wiki.new

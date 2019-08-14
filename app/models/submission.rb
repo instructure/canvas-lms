@@ -20,6 +20,8 @@ require 'atom'
 require 'anonymity'
 
 class Submission < ActiveRecord::Base
+  self.ignored_columns = %w{has_admin_comment has_rubric_assessment process_attempts}
+
   include Canvas::GradeValidations
   include CustomValidations
   include SendToStream
@@ -383,7 +385,6 @@ class Submission < ActiveRecord::Base
       "updated_at",
       "posted_at",
       "processed",
-      "process_attempts",
       "grade_matches_current_submission",
       "published_score",
       "published_grade"
@@ -1351,7 +1352,6 @@ class Submission < ActiveRecord::Base
         score.to_s
     end
 
-    self.process_attempts ||= 0
     self.grade = nil if !self.score
     # I think the idea of having unpublished scores is unnecessarily confusing.
     # It may be that we want to have that functionality later on, but for now
@@ -1861,7 +1861,7 @@ class Submission < ActiveRecord::Base
   scope :include_submission_comments, -> { preload(:submission_comments) }
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
+  scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
 
   def assignment_visible_to_user?(user, opts={})
     return visible_to_user unless visible_to_user.nil?
@@ -2468,6 +2468,9 @@ class Submission < ActiveRecord::Base
   end
 
   def posted?
+    # NOTE: This really should be a call to assignment.course.post_policies_enabled?
+    # but we're going to leave it the way it is for the next few months (until
+    # New Gradebook becomes universal) for fear of breaking even more things.
     if PostPolicy.feature_enabled?
       posted_at.present?
     else

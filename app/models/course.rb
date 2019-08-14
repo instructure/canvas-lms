@@ -2949,6 +2949,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_final_grade_override, boolean: false, default: false
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :allow_student_forum_attachments, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true
@@ -3006,8 +3007,12 @@ class Course < ActiveRecord::Base
     self.shard.activate do
     Course.transaction do
       new_course = Course.new
-      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id].include?(k.to_sym) }.each do |key, val|
-        new_course.write_attribute(key, val)
+      keys_to_copy = Course.column_names - [
+        :id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view,
+        :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id
+      ].map(&:to_s)
+      self.attributes.each do |key, val|
+        new_course.write_attribute(key, val) if keys_to_copy.include?(key)
       end
       new_course.workflow_state = (self.admins.any? ? 'claimed' : 'created')
       # there's a unique constraint on this, so we need to clear it out

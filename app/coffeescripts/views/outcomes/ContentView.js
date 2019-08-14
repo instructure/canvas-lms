@@ -17,7 +17,6 @@
 //
 
 import $ from 'jquery'
-import _ from 'underscore'
 import I18n from 'i18n!contentview'
 import Backbone from 'Backbone'
 import Outcome from '../../models/Outcome'
@@ -35,21 +34,6 @@ import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 // It uses OutcomeView and OutcomeGroupView to render
 
 export default class ContentView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.show = this.show.bind(this)
-    this.add = this.add.bind(this)
-    this.resetContent = this.resetContent.bind(this)
-    this.renderNoOutcomeWarning = this.renderNoOutcomeWarning.bind(this)
-    this.clearNoOutcomeWarning = this.clearNoOutcomeWarning.bind(this)
-    super(...args)
-  }
 
   initialize({readOnly, setQuizMastery, useForScoring, instructionsTemplate, renderInstructions}) {
     this.readOnly = readOnly
@@ -58,8 +42,8 @@ export default class ContentView extends Backbone.View {
     this.instructionsTemplate = instructionsTemplate
     this.renderInstructions = renderInstructions
     super.initialize(...arguments)
-    subscribe('renderNoOutcomeWarning', this.renderNoOutcomeWarning)
-    subscribe('clearNoOutcomeWarning', this.clearNoOutcomeWarning)
+    subscribe('renderNoOutcomeWarning', this.renderNoOutcomeWarning.bind(this))
+    subscribe('clearNoOutcomeWarning', this.clearNoOutcomeWarning.bind(this))
     return this.render()
   }
 
@@ -78,11 +62,12 @@ export default class ContentView extends Backbone.View {
 
   // private
   _show(viewOpts) {
-    viewOpts = _.extend({}, viewOpts, {
+    viewOpts = {
+      ...viewOpts,
       readOnly: this.readOnly,
       setQuizMastery: this.setQuizMastery,
       useForScoring: this.useForScoring
-    })
+    }
     if (this.innerView != null) {
       this.innerView.remove()
     }

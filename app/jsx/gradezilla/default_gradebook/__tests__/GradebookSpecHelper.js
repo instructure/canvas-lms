@@ -30,7 +30,8 @@ export function createGradebook(options = {}) {
     context_url: '/courses/1/',
 
     course_settings: {
-      allow_final_grade_override: false
+      allow_final_grade_override: false,
+      filter_speed_grader_by_student_group: false
     },
 
     currentUserId: '1',

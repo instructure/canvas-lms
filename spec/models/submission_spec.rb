@@ -5148,9 +5148,9 @@ describe Submission do
       student.submissions.destroy_all
 
       create_sql = "INSERT INTO #{Submission.quoted_table_name}
-                     (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, process_attempts)
+                     (assignment_id, user_id, workflow_state, created_at, updated_at, context_code)
                      values
-                     (#{@assignment.id}, #{student.id}, 'unsubmitted', now(), now(), '#{@assignment.context_code}', 0)"
+                     (#{@assignment.id}, #{student.id}, 'unsubmitted', now(), now(), '#{@assignment.context_code}')"
 
       sub = Submission.find(Submission.connection.create(create_sql))
       expect(sub.submission_history).to eq([sub])

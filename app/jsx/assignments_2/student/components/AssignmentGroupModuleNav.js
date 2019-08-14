@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {AssignmentShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
 
@@ -73,7 +73,7 @@ function AssignmentGroupModuleNav(props) {
 }
 
 AssignmentGroupModuleNav.propTypes = {
-  assignment: AssignmentShape
+  assignment: Assignment.shape
 }
 
 export default React.memo(AssignmentGroupModuleNav)

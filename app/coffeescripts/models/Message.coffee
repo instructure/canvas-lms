@@ -69,6 +69,7 @@ export default class Message extends Model
         message.context_name = data.context_name
         message.has_attachments = message.media_comment || message.attachments.length
         message.bodyHTML = TextHelper.formatMessage(message.body)
+        message.text = TextHelper.plainText(message.body)
     data
 
   handleMessages: ->

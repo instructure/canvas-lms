@@ -40,7 +40,7 @@ QUnit.module('GraderCountNumberInput', hooks => {
     props = {
       currentGraderCount: null,
       locale: 'en',
-      maxGraderCount: 10
+      availableGradersCount: 10
     }
   })
 
@@ -55,13 +55,13 @@ QUnit.module('GraderCountNumberInput', hooks => {
     strictEqual(numberInput().instance().value, '6')
   })
 
-  test('initializes count to 2 if currentGraderCount is not present and maxGraderCount is > 1', () => {
+  test('initializes count to 2 if currentGraderCount is not present and availableGradersCount is > 1', () => {
     mountComponent()
     strictEqual(numberInput().instance().value, '2')
   })
 
-  test('initializes count to maxGraderCount if currentGraderCount is not present and maxGraderCount is < 2', () => {
-    props.maxGraderCount = 1
+  test('initializes count to availableGradersCount if currentGraderCount is not present and availableGradersCount is < 2', () => {
+    props.availableGradersCount = 1
     mountComponent()
     strictEqual(numberInput().instance().value, '1')
   })
@@ -117,7 +117,7 @@ QUnit.module('GraderCountNumberInput', hooks => {
   })
 
   test('shows a message with correct grammar if the grader count is > the max and the max is 1', () => {
-    props.maxGraderCount = 1
+    props.availableGradersCount = 1
     mountComponent()
     numberInput().simulate('change', {target: {value: '2'}})
     ok(

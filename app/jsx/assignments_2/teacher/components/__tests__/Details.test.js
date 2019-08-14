@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 import {mockAssignment, mockOverride} from '../../test-utils'
 import Details from '../Details'
 
@@ -38,11 +38,11 @@ function renderDetails(assignment, props = {}) {
 describe('Assignent Details', () => {
   it('renders', () => {
     const assignment = mockAssignment()
-    const {getByText, getByTestId} = renderDetails(assignment)
+    const {getByText, getAllByText, getByTestId} = renderDetails(assignment)
 
     expect(getByTestId('AssignmentDescription')).toBeInTheDocument()
     expect(getByText('Everyone')).toBeInTheDocument()
-    expect(getByText('Due:', {exact: false})).toBeInTheDocument()
+    expect(getAllByText('Due:', {exact: false})[0]).toBeInTheDocument()
     expect(getByText('Available', {exact: false})).toBeInTheDocument()
   })
 

@@ -366,8 +366,7 @@ describe 'Speedgrader' do
         )
         @submission = @assignment.submissions.find_by!(user: @students.first)
         @submission.update!(
-          submission_type: "online_text_entry",
-          has_rubric_assessment: true
+          submission_type: "online_text_entry"
         )
         criterion1 = rubric.criteria.first
         criterion2 = rubric.criteria.last

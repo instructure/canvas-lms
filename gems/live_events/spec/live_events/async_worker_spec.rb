@@ -55,6 +55,7 @@ describe LiveEvents::AsyncWorker do
 
   before(:each) do
     LiveEvents.max_queue_size = -> { 100 }
+    LiveEvents.statsd = nil
     LiveEvents.logger = LELogger.new
     @worker = LiveEvents::AsyncWorker.new(false, stream_client: stream_client, stream_name: stream_name)
     allow(@worker).to receive(:at_exit)
@@ -78,6 +79,21 @@ describe LiveEvents::AsyncWorker do
       results = OpenStruct.new(records: results_double)
       expect(results_double).to receive(:each_with_index).and_return([])
       allow(stream_client).to receive(:put_records).once.and_return(results)
+      @worker.start!
+
+      4.times { @worker.push event, partition_key }
+
+      @worker.stop!
+    end
+
+    it "should time batch write" do
+      results_double = double
+      results = OpenStruct.new(records: results_double)
+      allow(results_double).to receive(:each_with_index).and_return([])
+      allow(stream_client).to receive(:put_records).once.and_return(results)
+      statsd_double = double
+      LiveEvents.statsd = statsd_double
+      expect(statsd_double).to receive(:time).and_yield
       @worker.start!
 
       4.times { @worker.push event, partition_key }

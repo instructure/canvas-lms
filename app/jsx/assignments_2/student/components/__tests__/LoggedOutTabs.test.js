@@ -18,7 +18,7 @@
 import React from 'react'
 import LoggedOutTabs from '../LoggedOutTabs'
 import {mockAssignment} from '../../test-utils'
-import {render, waitForElement} from 'react-testing-library'
+import {render, waitForElement} from '@testing-library/react'
 
 describe('LoggedOutTabs', () => {
   it('renders component LoginActionPrompt', async () => {

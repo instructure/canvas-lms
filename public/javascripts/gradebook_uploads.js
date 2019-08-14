@@ -385,18 +385,18 @@ const GradebookUploader = {
                   break
                 default:
                   // merge
-                  const obj = _.detect(uploadedGradebook[`${thing}s`], thng => id == thng.id)
+                  const obj = _.find(uploadedGradebook[`${thing}s`], thng => id == thng.id)
                   obj.id = obj.previous_id = val
                   if (thing === 'assignment') {
                     // find the original grade for this assignment for each student
                     $.each(uploadedGradebook.students, function() {
                       const student = this
-                      const submission = _.detect(
+                      const submission = _.find(
                         student.submissions,
                         thng => thng.assignment_id == id
                       )
                       submission.assignment_id = val
-                      const original_submission = _.detect(
+                      const original_submission = _.find(
                         uploadedGradebook.original_submissions,
                         sub => sub.user_id == student.id && sub.assignment_id == val
                       )
@@ -409,7 +409,7 @@ const GradebookUploader = {
                     // find the original grade for each assignment for this student
                     $.each(obj.submissions, function() {
                       const submission = this
-                      const original_submission = _.detect(
+                      const original_submission = _.find(
                         uploadedGradebook.original_submissions,
                         sub =>
                           sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
@@ -428,7 +428,7 @@ const GradebookUploader = {
           $.each(uploadedGradebook.assignments, index => {
             if (
               uploadedGradebook.assignments[index].previous_id &&
-              _.all(uploadedGradebook.students, student => {
+              _.every(uploadedGradebook.students, student => {
                 const submission = student.submissions[index]
 
                 return (

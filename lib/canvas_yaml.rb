@@ -242,8 +242,13 @@ SafeYAML::Transform.singleton_class.prepend(ScalarTransformFix)
 
 module YAMLSingletonFix
   def revive(klass, node)
-    return klass.instance if klass < Singleton
-    super
+    if klass < Singleton
+      klass.instance
+    elsif klass == Set
+      super.tap{|s| s.instance_variable_get(:@hash).default = false}
+    else
+      super
+    end
   end
 end
 Psych::Visitors::ToRuby.prepend(YAMLSingletonFix)

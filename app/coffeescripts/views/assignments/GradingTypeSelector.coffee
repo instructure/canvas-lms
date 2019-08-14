@@ -96,6 +96,6 @@ export default class GradingTypeSelector extends Backbone.View
     gradingStandardId: @parentModel.gradingStandardId()
     nested: @nested
     preventNotGraded: @preventNotGraded || (@lockedItems?.points && !@parentModel.isNotGraded())
-    freezeGradingType: _.include(@parentModel.frozenAttributes(), 'grading_type') ||
+    freezeGradingType: _.includes(@parentModel.frozenAttributes(), 'grading_type') ||
                         @parentModel.inClosedGradingPeriod() || (@lockedItems?.points && @parentModel.isNotGraded())
     gradingTypeMap: @gradingTypeMap()

@@ -20,7 +20,7 @@
   add_crumb @quiz.title, context_url(@context, :context_quiz_url, @quiz)
   add_crumb t(:page_title, 'Moderate Quiz')
 %>
-<% content_for :page_title do %><%= t(:moderate_page_title, "%{title}: Moderate", :title => @quiz.title) %><% end %>
+<% provide :page_title do %><%= t(:moderate_page_title, "%{title}: Moderate", :title => @quiz.title) %><% end %>
 <div class="alert" id="outstanding_quiz_submissions_found" style="display: none">
   <%= t(:outstanding_quiz_submissions_found, "There are outstanding quiz submissions.") %>
   <a href="#" role="button" class="icon-not-graded outstanding_link" id="check_outstanding">

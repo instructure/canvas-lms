@@ -112,6 +112,7 @@ module Interfaces::SubmissionInterface
   field :submitted_at, Types::DateTimeType, null: true
   field :graded_at, Types::DateTimeType, null: true
   field :posted_at, Types::DateTimeType, null: true
+  field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
   field :submission_status, String, null: true
@@ -127,6 +128,10 @@ module Interfaces::SubmissionInterface
 
   field :grading_status, String, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
+  field :late, Boolean, method: :late?, null: true
+  field :missing, Boolean, method: :missing?, null: true
+  field :grade_matches_current_submission, Boolean,
+    'was the grade given on the current submission (resubmission)', null: true
 
   field :attachments, [Types::FileType], null: true
   def attachments
@@ -137,7 +142,8 @@ module Interfaces::SubmissionInterface
   def submission_draft
     load_association(:submission_drafts).then do |drafts|
       # Submission.attempt can be in either 0 or nil which mean the same thing
-      drafts.select { |draft| draft.submission_attempt == (object.attempt || 0) }.first
+      target_attempt = (object.attempt || 0) + 1
+      drafts.select { |draft| draft.submission_attempt == target_attempt }.first
     end
   end
 end

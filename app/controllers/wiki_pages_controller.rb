@@ -64,6 +64,8 @@ class WikiPagesController < ApplicationController
     if @page && !@page.new_record?
       wiki_pages_js_env(@context)
       @padless = true
+      js_bundle :wiki_page_show
+      css_bundle :wiki_page
       render template: 'wiki_pages/show'
     else
       redirect_to polymorphic_url([@context, :wiki_pages])
@@ -111,6 +113,8 @@ class WikiPagesController < ApplicationController
           @padless = true
         end
       end
+      js_bundle :wiki_page_show
+      css_bundle :wiki_page
     end
   end
 

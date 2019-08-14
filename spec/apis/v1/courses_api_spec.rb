@@ -59,6 +59,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, ['favorites'], [teacher_enrollment])).to include 'is_favorite'
     end
 
+    it 'should call is_favorite with subject_user' do
+      expect(@course1).to receive(:favorite_for_user?).with(@student)
+      @test_api.course_json(@course1, @me, {}, ['favorites'], [teacher_enrollment], @student)
+    end
+
     it 'should honor needs_grading_count for teachers' do
       expect(@test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [teacher_enrollment])).to include "needs_grading_count"
     end
@@ -3588,7 +3593,7 @@ describe CoursesController, type: :request do
         expect(json).to eq({
           'allow_final_grade_override' => false,
           'allow_student_discussion_topics' => true,
-          'allow_student_forum_attachments' => false,
+          'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
@@ -3683,7 +3688,7 @@ describe CoursesController, type: :request do
         expect(json).to eq({
           'allow_final_grade_override' => false,
           'allow_student_discussion_topics' => true,
-          'allow_student_forum_attachments' => false,
+          'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,

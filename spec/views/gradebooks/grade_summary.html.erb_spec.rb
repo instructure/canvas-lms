@@ -144,7 +144,10 @@ describe "/gradebooks/grade_summary" do
     let(:attachment) { attachment_model(context: student, content_type: 'text/plain') }
     let(:state) { 'acceptable' }
 
-    before { assign(:context, course) }
+    before do
+      assign(:context, course)
+      assign(:domain_root_account, Account.default)
+    end
 
     context "when there is no turnitin_data" do
       context "when an assignment is not anonymous" do
@@ -368,6 +371,7 @@ describe "/gradebooks/grade_summary" do
       assign(:presenter, GradeSummaryPresenter.new(course, student, student.id))
       assign(:current_user, student)
       assign(:context, course)
+      assign(:domain_root_account, Account.default)
     end
 
     context "when post policies are enabled" do

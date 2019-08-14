@@ -462,6 +462,34 @@ interface AssignmentsConnectionInterface {
   ): AssignmentConnection
 }
 
+type AuditLogs {
+  """
+  A list of all recent graphql mutations run on the specified object
+  """
+  mutationLogs(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+    assetString: String!
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): MutationLogConnection
+}
+
 """
 Determines if/how a leader is chosen for each group
 """
@@ -565,6 +593,28 @@ type Course implements AssignmentsConnectionInterface & Node & Timestamped {
   """
   courseCode: String
   createdAt: DateTime
+  externalToolsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: ExternalToolFilterInput = {}
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ExternalToolConnection
   gradingPeriodsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -717,7 +767,7 @@ type Course implements AssignmentsConnectionInterface & Node & Timestamped {
     """
     Only return submissions for the given students.
     """
-    studentIds: [ID!]!
+    studentIds: [ID!]
   ): SubmissionConnection
   term: Term
   updatedAt: DateTime
@@ -1025,8 +1075,86 @@ type ExternalTool implements ModuleItemInterface & Timestamped {
   """
   _id: ID!
   createdAt: DateTime
+  description: String
   modules: [Module!]
+  name: String
+  settings: ExternalToolSettings
+  state: ExternalToolState
   updatedAt: DateTime
+  url: URL
+}
+
+"""
+The connection type for ExternalTool.
+"""
+type ExternalToolConnection {
+  """
+  A list of edges.
+  """
+  edges: [ExternalToolEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [ExternalTool]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type ExternalToolEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: ExternalTool
+}
+
+input ExternalToolFilterInput {
+  placement: ExternalToolPlacement = null
+  state: ExternalToolState = null
+}
+
+"""
+Placements that an External Tool can have
+"""
+enum ExternalToolPlacement {
+  homework_submission
+}
+
+type ExternalToolPlacements {
+  canvasIconClass: String
+  iconUrl: URL
+  messageType: String
+  text: String
+  url: URL
+}
+
+type ExternalToolSettings {
+  homeworkSubmission: ExternalToolPlacements
+  iconUrl: URL
+  selectionHeight: Int
+  selectionWidth: Int
+  text: String
+}
+
+"""
+States that an External Tool can be in
+"""
+enum ExternalToolState {
+  anonymous
+  email_only
+  name_only
+  public
 }
 
 type ExternalUrl implements ModuleItemInterface & Timestamped {
@@ -1440,6 +1568,11 @@ type HideAssignmentGradesPayload {
   progress: Progress
 }
 
+"""
+Represents untyped JSON
+"""
+scalar JSON
+
 enum LatePolicyStatusType {
   late
   missing
@@ -1468,6 +1601,7 @@ type MediaObject implements Node {
   canAddCaptions: Boolean
   id: ID!
   mediaSources: [MediaSource!]
+  mediaTracks: [MediaTrack!]
   mediaType: MediaType
   title: String
 }
@@ -1481,6 +1615,14 @@ type MediaSource {
   size: String
   url: URL
   width: String
+}
+
+type MediaTrack {
+  content: String!
+  kind: String
+  locale: String
+  mediaObject: MediaObject
+  webvttContent: String
 }
 
 enum MediaType {
@@ -1638,6 +1780,56 @@ type Mutation {
   """
   setOverrideScore(input: SetOverrideScoreInput!): SetOverrideScorePayload
   updateAssignment(input: UpdateAssignmentInput!): UpdateAssignmentPayload
+}
+
+type MutationLog {
+  assetString: ID!
+  mutationId: ID!
+  mutationName: String!
+  params: JSON
+
+  """
+  If the mutation was performed by a user masquerading as another user,
+  this field returns the "real" (logged-in) user.
+  """
+  realUser: User
+  timestamp: DateTime
+  user: User
+}
+
+"""
+The connection type for MutationLog.
+"""
+type MutationLogConnection {
+  """
+  A list of edges.
+  """
+  edges: [MutationLogEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [MutationLog]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type MutationLogEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: MutationLog
 }
 
 """
@@ -1922,6 +2114,7 @@ type Query {
     """
     id: ID!
   ): AssignmentGroup
+  auditLogs: AuditLogs
   course(
     """
     a graphql or legacy id
@@ -2106,6 +2299,11 @@ type StudentSummaryAnalytics {
   tardinessBreakdown: TardinessBreakdown
 }
 
+type SubHeader implements ModuleItemInterface {
+  modules: [Module!]
+  title: String
+}
+
 type Submission implements Node & SubmissionInterface & Timestamped {
   """
   legacy canvas id
@@ -2158,10 +2356,18 @@ type Submission implements Node & SubmissionInterface & Timestamped {
   """
   excused: Boolean
   grade: String
+
+  """
+  was the grade given on the current submission (resubmission)
+  """
+  gradeMatchesCurrentSubmission: Boolean
   gradedAt: DateTime
   gradingStatus: String
   id: ID!
+  late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
+  posted: Boolean!
   postedAt: DateTime
   score: Float
   state: SubmissionState!
@@ -2302,8 +2508,10 @@ type SubmissionEdge {
 }
 
 input SubmissionFilterInput {
+  gradedSince: DateTime
   sectionIds: [ID!]
   states: [SubmissionState!] = [submitted, pending_review, graded]
+  submittedSince: DateTime
 }
 
 type SubmissionHistory implements SubmissionInterface & Timestamped {
@@ -2354,9 +2562,17 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   """
   excused: Boolean
   grade: String
+
+  """
+  was the grade given on the current submission (resubmission)
+  """
+  gradeMatchesCurrentSubmission: Boolean
   gradedAt: DateTime
   gradingStatus: String
+  late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
+  posted: Boolean!
   postedAt: DateTime
 
   """
@@ -2466,9 +2682,17 @@ interface SubmissionInterface {
   """
   excused: Boolean
   grade: String
+
+  """
+  was the grade given on the current submission (resubmission)
+  """
+  gradeMatchesCurrentSubmission: Boolean
   gradedAt: DateTime
   gradingStatus: String
+  late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
+  posted: Boolean!
   postedAt: DateTime
   score: Float
   state: SubmissionState!
@@ -2490,6 +2714,11 @@ enum SubmissionOrderField {
 
 input SubmissionSearchFilterInput {
   enrollmentTypes: [EnrollmentType!]
+
+  """
+  Limit results to submissions that are late
+  """
+  late: Boolean
 
   """
   Limit results to submissions that scored below the specified value

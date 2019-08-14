@@ -20,6 +20,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CoursesController do
   describe "GET 'index'" do
+    def get_index(user=nil)
+      user_session(user) if user
+      user ||= @user
+      controller.instance_variable_set(:@current_user, user)
+      controller.load_enrollments_for_index
+      get 'index'
+    end
+
     it "should force login" do
       course_with_student(:active_all => true)
       get 'index'
@@ -28,7 +36,7 @@ describe CoursesController do
 
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
-      get 'index'
+      get_index
       expect(response).to be_successful
       expect(assigns[:current_enrollments]).not_to be_nil
       expect(assigns[:current_enrollments]).not_to be_empty
@@ -45,7 +53,7 @@ describe CoursesController do
       @course.save!
       @course.offer!
       @course.enroll_student(@user)
-      get 'index'
+      get_index
       expect(response).to be_successful
       assigns[:future_enrollments].each do |e|
         expect(assigns[:current_enrollments]).not_to include e
@@ -68,7 +76,7 @@ describe CoursesController do
         ens[1].conclude # the current enrollment should take precedence over the concluded one
 
         user_session(@user)
-        get 'index'
+        get_index
         expect(response).to be_successful
         current_ens = assigns[:current_enrollments]
         expect(current_ens.count).to eql(2)
@@ -90,7 +98,7 @@ describe CoursesController do
         enrollment1.course.complete!
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eql([enrollment1])
         expect(assigns[:current_enrollments]).to eql([])
@@ -106,7 +114,7 @@ describe CoursesController do
         completed_enrollment.update_attribute(:workflow_state, 'completed')
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [completed_enrollment, rejected_enrollment]
         expect(assigns[:current_enrollments]).to eq [active_enrollment]
@@ -125,7 +133,7 @@ describe CoursesController do
 
         user_session(@student)
 
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [old_enroll]
       end
@@ -186,7 +194,7 @@ describe CoursesController do
         enrollment7 = course_with_student course: course7, user: @student, active_all: true
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to match_array([enrollment7, enrollment5, enrollment3, enrollment2, enrollment1])
         expect(assigns[:current_enrollments]).to eq [enrollment4]
@@ -209,7 +217,7 @@ describe CoursesController do
         enrollment2 = course_with_student course: course2, user: @student, active_all: true
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [enrollment1]
         expect(assigns[:current_enrollments]).to eq [enrollment2]
@@ -223,7 +231,7 @@ describe CoursesController do
         enrollment.deactivate
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:future_enrollments]).to be_empty
       end
@@ -242,7 +250,7 @@ describe CoursesController do
         expect(enrollment).to_not be_invited # state_based_on_date
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
@@ -265,8 +273,7 @@ describe CoursesController do
 
         course1.enrollment_term.update_attribute(:end_at, 1.month.ago)
 
-        user_session(@student)
-        get 'index'
+        get_index(@student)
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -274,15 +281,13 @@ describe CoursesController do
 
         observer = user_with_pseudonym(active_all: true)
         add_linked_observer(@student, observer)
-        user_session(observer)
-        get 'index'
+        get_index(observer)
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
-        user_session(teacher)
-        get 'index'
+        get_index(teacher)
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [teacher_enrollment]
         expect(assigns[:current_enrollments]).to be_empty
@@ -303,7 +308,7 @@ describe CoursesController do
         course1.enrollment_term.update_attribute(:end_at, 1.month.from_now)
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to eq [enrollment]
         expect(assigns[:current_enrollments]).to be_empty
@@ -330,7 +335,7 @@ describe CoursesController do
         enrollment3 = student_in_course user: @student, course: course3, active_all: true
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2, enrollment3]
@@ -350,7 +355,7 @@ describe CoursesController do
         enrollment2.course.save!
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
@@ -366,7 +371,7 @@ describe CoursesController do
         enrollment2 = course_with_student user: @student, course_name: 'A', active_all: true
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment1, enrollment2]
@@ -379,7 +384,7 @@ describe CoursesController do
         enrollment.invite!
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to eq [enrollment]
@@ -400,7 +405,7 @@ describe CoursesController do
         enrollment2 = course_with_student user: @student, course: course2
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -409,7 +414,7 @@ describe CoursesController do
         observer = user_with_pseudonym(active_all: true)
         add_linked_observer(@student, observer)
         user_session(observer)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -421,7 +426,7 @@ describe CoursesController do
         course1.offer!
         student_in_course course: course1, active_all: true
         user_session(@student)
-        get 'index'
+        get_index
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id]
       end
 
@@ -434,7 +439,7 @@ describe CoursesController do
         expect(course1.restrict_student_future_view?).to be_truthy # should inherit
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -443,7 +448,7 @@ describe CoursesController do
         observer = user_with_pseudonym(active_all: true)
         add_linked_observer(@student, observer)
         user_session(observer)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -452,7 +457,7 @@ describe CoursesController do
         teacher = user_with_pseudonym(:active_all => true)
         teacher_enrollment = course_with_teacher course: course1, :user => teacher
         user_session(teacher)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
@@ -468,7 +473,7 @@ describe CoursesController do
         expect(enrollment1.restrict_future_listing?).to be_truthy
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:future_enrollments]).to eq []
       end
@@ -485,12 +490,12 @@ describe CoursesController do
         expect(enrollment1.restrict_future_listing?).to be_truthy
 
         user_session(@student)
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:future_enrollments]).to eq []
 
         course1.offer!
-        get 'index'
+        get_index
         expect(response).to be_successful
         expect(assigns[:future_enrollments]).to eq [enrollment1] # show it because it's accessible now
       end
@@ -949,14 +954,16 @@ describe CoursesController do
 
     context "show feedback for the current course only on course front page" do
       before(:once) do
-        course_with_student(:active_all => true)
-        @me = @user
-        @course1 = @course
-        course_with_teacher(:course => @course1)
+        PostPolicy.enable_feature!
 
-        course_with_student(:active_all => true, :user => @student)
+        course_with_teacher(active_all: true)
+        @course1 = @course
+        student_in_course(active_all: true, course: @course1)
+        @me = @user
+
+        course_with_teacher(active_all: true, user: @teacher)
         @course2 = @course
-        course_with_teacher(:course => @course2, :user => @teacher)
+        student_in_course(active_all: true, course: @course2, user: @me)
 
         @a1 = @course1.assignments.new(:title => "some assignment course 1")
         @a1.workflow_state = "published"
@@ -1592,6 +1599,14 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_published).once
       user_session(@teacher)
       put 'update', params: {:id => @course.id, :offer => true}
+    end
+
+    it "should not publish when offer is false" do
+      @course.claim!
+      expect(Auditors::Course).to receive(:record_published).never
+      user_session(@teacher)
+      put 'update', params: {:id => @course.id, :offer => "false"}
+      expect(@course.reload).to be_claimed
     end
 
     it "should not log published event if course was already published" do

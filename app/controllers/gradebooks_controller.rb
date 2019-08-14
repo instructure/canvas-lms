@@ -62,6 +62,13 @@ class GradebooksController < ApplicationController
 
     add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url,
                                                          @presenter.student_id))
+
+    js_bundle :grade_summary, :rubric_assessment
+    css_bundle :grade_summary
+    render stream: can_stream_template?
+  end
+
+  def load_grade_summary_data
     gp_id = nil
     if grading_periods?
       @grading_periods = active_grading_periods_json
@@ -72,13 +79,13 @@ class GradebooksController < ApplicationController
           where(user_id: @presenter.student_id, assignment_id: @context.assignments.active).
           select(:cached_due_date, :grading_period_id, :assignment_id, :user_id).
           each_with_object({}) do |submission, hsh|
-            hsh[submission.assignment_id] = {
-              submission.user_id => {
-                due_at: submission.cached_due_date,
-                grading_period_id: submission.grading_period_id,
-              }
+          hsh[submission.assignment_id] = {
+            submission.user_id => {
+              due_at: submission.cached_due_date,
+              grading_period_id: submission.grading_period_id,
             }
-          end
+          }
+        end
     end
 
     @exclude_total = exclude_total?(@context)
@@ -94,13 +101,13 @@ class GradebooksController < ApplicationController
     submissions_json = @presenter.submissions.
       select { |s| s.user_can_read_grade?(@current_user) }.
       map do |s|
-        {
-          assignment_id: s.assignment_id,
-          score: s.score,
-          excused: s.excused?,
-          workflow_state: s.workflow_state,
-        }
-      end
+      {
+        assignment_id: s.assignment_id,
+        score: s.score,
+        excused: s.excused?,
+        workflow_state: s.workflow_state,
+      }
+    end
 
     grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
 
@@ -134,16 +141,17 @@ class GradebooksController < ApplicationController
 
     if @context.feature_enabled?(:final_grades_override)
       total_score = if grading_periods? && !view_all_grading_periods?
-        student_enrollment.find_score(grading_period_id: @current_grading_period_id)
-      else
-        student_enrollment.find_score(course_score: true)
-      end
+                      @presenter.student_enrollment.find_score(grading_period_id: @current_grading_period_id)
+                    else
+                      @presenter.student_enrollment.find_score(course_score: true)
+                    end
 
       js_hash[:effective_final_score] = total_score.effective_final_score if total_score&.overridden?
     end
 
     js_env(js_hash)
   end
+  helper_method :load_grade_summary_data
 
   def save_assignment_order
     if authorized_action(@context, @current_user, :read)

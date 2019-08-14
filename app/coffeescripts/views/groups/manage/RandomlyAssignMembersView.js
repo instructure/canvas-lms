@@ -24,17 +24,6 @@ import wrapper from 'jst/EmptyDialogFormWrapper'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
 export default class RandomlyAssignMembersView extends DialogFormView {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.openAgain = this.openAgain.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.defaults = {
@@ -60,7 +49,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
   openAgain() {
     super.openAgain(...arguments)
     const groups = this.model.groups().models
-    if (_.any(groups, group => group.usersCount() > 0 || !!group.get('max_membership'))) {
+    if (_.some(groups, group => group.usersCount() > 0 || !!group.get('max_membership'))) {
       return this.disableCheckbox(
         this.$group_by_section,
         I18n.t('Cannot restrict by section unless groups are empty and not limited in size')

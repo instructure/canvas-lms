@@ -16,17 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func} from 'prop-types'
-import {
-  GetAssignmentEnvVariables,
-  InitialQueryShape,
-  SubmissionHistoriesQueryShape
-} from '../assignmentData'
+import {arrayOf, func, shape} from 'prop-types'
+import {Assignment, AssignmentSubmissionsConnection} from '../graphqlData/Assignment'
 import React from 'react'
 import StudentContent from './StudentContent'
 import StudentViewContext from './Context'
+import {Submission} from '../graphqlData/Submission'
 
-/* Some helper functions for parsing various graphql query results */
+// Helper functions used by this component
+
+function getAssignmentEnvVariables() {
+  const baseUrl = `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
+    ENV.context_asset_string.split('_')[1]
+  }`
+
+  const env = {
+    assignmentUrl: `${baseUrl}/assignments`,
+    courseId: ENV.context_asset_string.split('_')[1],
+    currentUser: ENV.current_user,
+    modulePrereq: null,
+    moduleUrl: `${baseUrl}/modules`
+  }
+
+  if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
+    const prereq = ENV.PREREQS.items[0].prev
+    env.modulePrereq = {
+      title: prereq.title,
+      link: prereq.html_url,
+      __typename: 'modulePrereq'
+    }
+  }
+
+  return env
+}
 
 function getInitialSubmission(initialQueryData) {
   const submissionsConnection = initialQueryData.assignment.submissionsConnection
@@ -66,14 +88,19 @@ function getAllSubmissions({initialQueryData, submissionHistoriesQueryData}) {
   return submissionHistories
 }
 
-/* End helper functions for parsing graphql query results */
-
 class ViewManager extends React.Component {
   static propTypes = {
-    initialQueryData: InitialQueryShape,
+    initialQueryData: shape({
+      ...Assignment.shape.propTypes,
+      ...AssignmentSubmissionsConnection.shape.propTypes
+    }),
     loadMoreSubmissionHistories: func,
     // eslint-disable-next-line react/no-unused-prop-types
-    submissionHistoriesQueryData: SubmissionHistoriesQueryShape
+    submissionHistoriesQueryData: shape({
+      submissionHistoriesConnection: shape({
+        nodes: arrayOf(Submission.shape)
+      })
+    })
   }
 
   state = {
@@ -120,7 +147,7 @@ class ViewManager extends React.Component {
     const assignment = this.props.initialQueryData.assignment
     const assignmentCopy = JSON.parse(JSON.stringify(assignment))
     delete assignmentCopy.submissionsConnection
-    assignmentCopy.env = GetAssignmentEnvVariables()
+    assignmentCopy.env = getAssignmentEnvVariables()
     return assignmentCopy
   }
 

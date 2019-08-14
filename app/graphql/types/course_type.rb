@@ -141,27 +141,38 @@ module Types
 
       argument :student_ids, [ID], "Only return submissions for the given students.",
         prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
-        required: true
+        required: false
       argument :order_by, [SubmissionOrderInputType], required: false
       argument :filter, SubmissionFilterInputType, required: false
     end
-    def submissions_connection(student_ids:, order_by: [], filter: {})
-      user_ids = student_ids.map(&:to_i)
+    def submissions_connection(student_ids: nil, order_by: [], filter: {})
       if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
         # TODO: make a preloader for this???
         allowed_user_ids = course.apply_enrollment_visibility(course.all_student_enrollments, current_user).pluck(:user_id)
-        allowed_user_ids &= user_ids
       elsif course.grants_right?(current_user, session, :read_grades)
-        allowed_user_ids = user_ids & [current_user.id]
+        allowed_user_ids = [current_user.id]
       else
         allowed_user_ids = []
       end
 
+      if student_ids.present?
+        allowed_user_ids &= student_ids.map(&:to_i)
+      end
+
+      filter ||= {}
+
       submissions = Submission.active.joins(:assignment).where(
         user_id: allowed_user_ids,
         assignment_id: course.assignments.published,
-        workflow_state: (filter || {})[:states] || DEFAULT_SUBMISSION_STATES
+        workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
       )
+
+      if filter[:submitted_since]
+        submissions = submissions.where("submitted_at > ?", filter[:submitted_since])
+      end
+      if filter[:graded_since]
+        submissions = submissions.where("graded_at > ?", filter[:graded_since])
+      end
 
       (order_by || []).each { |order|
         direction = order[:direction] == 'descending' ? "DESC NULLS LAST" : "ASC"
@@ -190,6 +201,14 @@ module Types
       if course.grants_right? current_user, :manage_groups
         course.group_categories.where(role: nil)
       end
+    end
+
+    field :external_tools_connection, ExternalToolType.connection_type, null: true do
+      argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
+    end
+    def external_tools_connection(filter:)
+      scope = ContextExternalTool.all_tools_for(course, {placements: filter.placement})
+      filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
     end
 
     field :term, TermType, null: true

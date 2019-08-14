@@ -16,19 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title, @context.name %>
-<% css_bundle :course_show %>
-<% @active_tab ||= "home" %>
+<% provide :page_title, @context.name %>
+<% set_active_tab "home" unless get_active_tab %>
 <h1 class='screenreader-only'><%= @context.name %></h1>
-<% content_for :auto_discovery do %>
-  <% if @context_enrollment %>
-    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context_enrollment.feed_code, :atom), {:title => t("Course Atom Feed")}) %>
-  <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_course_format_path(@context.feed_code, :atom), {:title => t("Course Atom Feed")}) %>
-  <% end %>
-<% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div id="course_show_secondary">
     <% @can_manage = can_do(@context, @current_user, :manage) %>
     <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
@@ -157,27 +149,6 @@
   <% end %>
 <% end %>
 
-<%
-  css_bundle :dashboard
-  css_bundle :react_todo_sidebar if planner_enabled?
-  case @course_home_view
-  when 'wiki'
-    css_bundle :tinymce
-  when 'modules'
-    js_bundle :context_modules
-    css_bundle :context_modules2
-  when 'assignments'
-    js_bundle :assignment_index
-    css_bundle :new_assignments
-  when 'syllabus'
-    js_bundle :syllabus
-    css_bundle :tinymce
-  else
-    js_bundle :dashboard
-  end
-%>
-
-<% js_bundle 'legacy/courses_show' %>
 <% if @pending_enrollment %>
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
@@ -188,17 +159,10 @@
 <% end %>
 <div id="course_home_content">
   <% if @course_home_view == 'wiki' %>
-    <% js_bundle :wiki_page_show %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>
     <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'assignments' %>
-    <%
-      @body_classes << 'hide-content-while-scripts-not-loaded'
-      @body_classes << 'with_item_groups'
-      js_bundle :assignment_index
-      css_bundle :new_assignments
-    %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
   <% else %>
@@ -216,4 +180,3 @@
 <% end %>
 <div id="wizard_box"></div>
 
-<% js_bundle :course %>

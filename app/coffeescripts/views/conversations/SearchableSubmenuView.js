@@ -22,20 +22,6 @@ import _ from 'underscore'
 import {View} from 'Backbone'
 
 export default class SearchableSubmenuView extends View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.search = this.search.bind(this)
-    this.handleDownArrow = this.handleDownArrow.bind(this)
-    this.handleUpArrow = this.handleUpArrow.bind(this)
-    this.handleRightArrow = this.handleRightArrow.bind(this)
-    super(...args)
-  }
 
   initialize() {
     super.initialize(...arguments)
@@ -50,8 +36,8 @@ export default class SearchableSubmenuView extends View {
           {content_type}
         )
       })
-      .keyup(_.debounce(this.search, 100))
-      .keydown(this.handleDownArrow)
+      .keyup(_.debounce(() => this.search(), 100))
+      .keydown(e => this.handleDownArrow(e))
     this.$announce = $('<span class="screenreader-only" aria-live="polite"></span>')
     const label = this.getMenuRoot().text()
     const $labelledField = $('<label>')
@@ -61,8 +47,8 @@ export default class SearchableSubmenuView extends View {
       .children('.dropdown-menu')
       .prepend($labelledField)
       .find('.inner')
-      .keydown(this.handleUpArrow)
-    this.getMenuRoot().keydown(this.handleRightArrow)
+      .keydown(e => this.handleUpArrow(e))
+    this.getMenuRoot().keydown(e => this.handleRightArrow(e))
     return (this.$contents = this.$el.find('li'))
   }
 

@@ -439,6 +439,9 @@
   "no_results_940393cf": {
     "message": "No results."
   },
+  "no_results_found_for_term_1564c08e": {
+    "message": "No results found for { term }."
+  },
   "no_video_1ed00b26": {
     "message": "No Video"
   },
@@ -621,6 +624,9 @@
   },
   "to_do_when_2783d78f": {
     "message": "To Do: { when }"
+  },
+  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+    "message": "{ totalResults } results found, { numDisplayed } results currently displayed"
   },
   "tray_839df38a": {
     "message": "Tray"

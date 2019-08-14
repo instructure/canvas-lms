@@ -19,14 +19,9 @@
 <%
   js_env ga_page_title: "#{@context.name} People"
 %>
-<%
-  add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
-  add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
-  @active_tab="people"
-%>
-<% content_for :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
+<% provide :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div id="right_nav">
     <% if can_do(@membership, @current_user, :read_grades) && @membership.is_a?(StudentEnrollment) %>
       <a class="btn button-sidebar-wide" href="<%= context_url(@context, :controller => :gradebooks, :action => :grade_summary, :id => @user.id) %>">
@@ -85,9 +80,6 @@
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
 <% end %>
-
-<% js_bundle :user_name %>
-<% css_bundle :roster_user, :pairing_code %>
 
 <%= render :partial => 'shared/profile' %>
 
@@ -174,4 +166,3 @@
 </div>
 <% end %>
 
-<% js_bundle 'legacy/context_roster_user' %>

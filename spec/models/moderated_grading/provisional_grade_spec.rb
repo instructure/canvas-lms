@@ -41,8 +41,8 @@ describe ModeratedGrading::ProvisionalGrade do
       class_name('ModeratedGrading::Selection')
   end
 
-  it { is_expected.to belong_to(:submission) }
-  it { is_expected.to belong_to(:scorer).class_name('User') }
+  it { is_expected.to belong_to(:submission).required }
+  it { is_expected.to belong_to(:scorer).required.class_name('User') }
   it { is_expected.to have_many(:rubric_assessments) }
 
   it { is_expected.to validate_presence_of(:scorer) }

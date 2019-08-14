@@ -17,10 +17,10 @@
 %>
 
 <%
-  content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
+  provide :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   css_bundle :course_settings
   js_bundle :course_settings
-  @active_tab = "settings"
+  set_active_tab "settings"
 
   can_manage = can_do(@context, @current_user, :manage)
 
@@ -36,7 +36,7 @@
   master_course = blueprint_subscription&.master_template&.course
 %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <%= render :partial => 'settings_sidebar', :locals => { :blueprint_subscription => blueprint_subscription } %>
 <% end %>
 
@@ -239,11 +239,12 @@
         <td class="nobr tall-row">
           <% if can_manage %>
           <div>
+            <% warning_message = t(:course_conclude_at_warning_message, "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active.") %>
             <%= f.text_field :conclude_at, :class => "date_entry", :value => datetime_string(@context.conclude_at, :verbose) %>
             <i id="course_conclude_at_warning" style="<%= hidden %>" class="date-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
                data-html-tooltip-title="<div class='popover-title'><%= t(:course_conclude_at_warning_title, "Course Ending at Midnight") %></div><div class='popover-content'><p>
-              <%= t(:course_conclude_at_warning_message, "The course is currently set to end at midnight,
-                meaning that the previous day will be the last day this course is active.") %></p></div>">
+              <%= warning_message %></p></div>">
+              <span class="screenreader-only"><%= warning_message %></span>
             </i>
 
             <%= f.check_box :restrict_enrollments_to_course_dates, "aria-describedby" => 'users-can-only-participate-description' %>

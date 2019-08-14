@@ -15,13 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  js_bundle :quizzes_bundle, :question_bank
-  css_bundle :quizzes, :learning_outcomes, :tinymce, :question_bank
-  content_for :page_title, @bank.title
-%>
-<% content_for :right_side do %>
+<% provide :right_side do %>
   <div class="rs-margin-bottom">
     <% if can_do(@bank, @current_user, :manage) %>
       <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>

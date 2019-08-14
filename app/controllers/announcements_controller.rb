@@ -52,6 +52,24 @@ class AnnouncementsController < ApplicationController
         css_bundle :announcements_index
 
         set_tutorial_js_env
+
+        feed_key = nil
+        if @context_enrollment
+          feed_key = @context_enrollment.feed_code
+        elsif can_do(@context, @current_user, :manage)
+          feed_key = @context.feed_code
+        elsif @context.available? && @context.respond_to?(:is_public) && @context.is_public
+          feed_key = @context.asset_string
+        end
+        if feed_key
+          if @context.is_a?(Course)
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), {:title => t(:feed_title_course, "Course Announcements Atom Feed")})
+            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), {:title => t(:podcast_title_course, "Course Announcements Podcast Feed")})
+          elsif @context.is_a?(Group)
+            content_for_head helpers.auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), {:title => t(:feed_title_group, "Group Announcements Atom Feed")})
+            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), {:title => t(:podcast_title_group, "Group Announcements Podcast Feed")})
+          end
+        end
       end
     end
   end

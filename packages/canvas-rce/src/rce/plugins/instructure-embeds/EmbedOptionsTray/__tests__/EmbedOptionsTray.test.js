@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render} from '@testing-library/react'
 
 import EmbedOptionsTray from '../../EmbedOptionsTray'
 import EmbedOptionsTrayDriver from './EmbedOptionsTrayDriver'

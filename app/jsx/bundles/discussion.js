@@ -207,7 +207,7 @@ router.route('topic', 'topic', function () {
     $container.one('scroll', () => router.navigate(''))
   }, 10)
 })
-router.route('entry-:id', 'id', entriesView.goToEntry)
+router.route('entry-:id', 'id', entriesView.goToEntry.bind(entriesView))
 router.route('page-:page', 'page', function (page) {
   entriesView.render(page)
   // TODO: can get a little bouncy when the page isn't as tall as the previous

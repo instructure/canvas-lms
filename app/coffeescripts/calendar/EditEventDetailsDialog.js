@@ -107,7 +107,7 @@ export default class EditEventDetailsDialog {
 
       // don't even show the assignments tab if the user doesn't have
       // permission to create them
-      const can_create_assignments = _.any(
+      const can_create_assignments = _.some(
         this.event.allPossibleContexts,
         c => c.can_create_assignments
       )
@@ -117,7 +117,7 @@ export default class EditEventDetailsDialog {
     }
   }
 
-  contextChange = newContext => {
+  contextChange(newContext){
     // Update the style of the dialog box to reflect the current context
     dialog.removeClass(dialog.data('group_class'))
     dialog.addClass(`group_${newContext}`).data('group_class', `group_${newContext}`)
@@ -125,7 +125,9 @@ export default class EditEventDetailsDialog {
     if (this.assignmentDetailsForm) this.assignmentDetailsForm.setContext(newContext)
   }
 
-  closeCB = () => dialog.dialog('close')
+  closeCB() {
+    dialog.dialog('close')
+  }
 
   dialogClose = () => {
     if (this.oldFocus != null) {
@@ -158,7 +160,7 @@ export default class EditEventDetailsDialog {
         this.calendarEventForm = new EditCalendarEventDetails(
           formHolder,
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         formHolder.data('form-widget', this.calendarEventForm)
@@ -168,7 +170,7 @@ export default class EditEventDetailsDialog {
         this.assignmentDetailsForm = new EditAssignmentDetails(
           $('#edit_assignment_form_holder'),
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         dialog.find('#edit_assignment_form_holder').data('form-widget', this.assignmentDetailsForm)
@@ -179,7 +181,7 @@ export default class EditEventDetailsDialog {
         this.plannerNoteDetailsForm = new EditPlannerNoteDetails(
           formHolder,
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         formHolder.data('form-widget', this.plannerNoteDetailsForm)
@@ -190,7 +192,7 @@ export default class EditEventDetailsDialog {
         this.toDoItemDetailsForm = new EditToDoItemDetails(
           formHolder,
           this.event,
-          this.contextChange,
+          this.contextChange.bind(this),
           this.closeCB
         )
         formHolder.data('form-widget', this.toDoItemDetailsForm)

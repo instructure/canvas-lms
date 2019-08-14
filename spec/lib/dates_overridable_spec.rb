@@ -101,7 +101,7 @@ shared_examples_for "an object whose dates are overridable" do
 
         expect(overridable.overrides_for(@student, ensure_set_not_empty: true).size).to eq 1
 
-        override_student.user.enrollments.each(&:destroy_permanently!)
+        override_student.user.enrollments.destroy_all
 
         expect(overridable.overrides_for(@student, ensure_set_not_empty: true)).to be_empty
       end

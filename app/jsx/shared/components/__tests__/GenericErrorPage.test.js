@@ -19,7 +19,7 @@
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
 import GenericErrorPage from '../GenericErrorPage'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import moxios from 'moxios'
 
 beforeEach(() => {

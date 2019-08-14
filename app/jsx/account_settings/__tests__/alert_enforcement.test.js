@@ -17,7 +17,7 @@
  */
 
 import setupCSP from '../alert_enforcement'
-import {wait} from 'react-testing-library'
+import {wait} from '@testing-library/react'
 
 const oldEnv = window.ENV
 

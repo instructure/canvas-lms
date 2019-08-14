@@ -70,6 +70,10 @@ class QuestionBanksController < ApplicationController
       @alignments = Canvas::ICU.collate_by(@bank.learning_outcome_alignments) { |a| a.learning_outcome.short_description }
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
     end
+
+    js_bundle :quizzes_bundle, :question_bank
+    css_bundle :quizzes, :learning_outcomes, :tinymce, :question_bank
+    @page_title = @bank.title
   end
 
   def move_questions

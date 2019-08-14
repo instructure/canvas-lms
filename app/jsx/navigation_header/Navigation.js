@@ -21,6 +21,7 @@ import $ from 'jquery'
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {func} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
@@ -37,11 +38,14 @@ const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversa
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
 const UNREAD_COUNT_POLL_INTERVAL = 60000 // 60 seconds
+const UNREAD_COUNT_ALLOWED_AGE = UNREAD_COUNT_POLL_INTERVAL / 2
+const UNREAD_COUNT_SESSION_STORAGE_KEY = `unread_count_for_${window.ENV.current_user_id}`
 
 const TYPE_URL_MAP = {
   courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
   groups: '/api/v1/users/self/groups?include[]=can_access',
   accounts: '/api/v1/accounts',
+  profile: '/api/v1/users/self/tabs',
   help: '/help_links'
 }
 
@@ -52,13 +56,17 @@ const TYPE_FILTER_MAP = {
 const RESOURCE_COUNT = 10
 
 export default class Navigation extends React.Component {
+  static propTypes = {
+    onDataRecieved: func
+  }
+
   state = {
     groups: [],
     accounts: [],
     courses: [],
     help: [],
+    profile: [],
     unread_count: 0,
-    unread_count_attempts: 0,
     isTrayOpen: false,
     type: null,
     coursesLoading: false,
@@ -68,7 +76,9 @@ export default class Navigation extends React.Component {
     groupsLoading: false,
     groupsAreLoaded: false,
     helpLoading: false,
-    helpAreLoaded: false
+    helpAreLoaded: false,
+    profileAreLoading: false,
+    profileAreLoaded: false
   }
 
   componentWillMount() {
@@ -113,13 +123,23 @@ export default class Navigation extends React.Component {
 
   componentDidMount() {
     if (
-      !this.state.unread_count_attempts &&
+      !this.unread_count_attempts &&
       window.ENV.current_user_id &&
       !window.ENV.current_user_disabled_inbox &&
-      this.unreadCountElement().length &&
+      this.unreadCountElement() &&
       !(window.ENV.current_user && window.ENV.current_user.fake_student)
     ) {
-      this.pollUnreadCount()
+      let msUntilIShouldStartPolling = 0
+      const saved = sessionStorage.getItem(UNREAD_COUNT_SESSION_STORAGE_KEY)
+      if (saved) {
+        const {updatedAt, unread_count} = JSON.parse(saved)
+        const millisecondsSinceLastUpdate = new Date() - updatedAt
+        if (millisecondsSinceLastUpdate < UNREAD_COUNT_ALLOWED_AGE) {
+          this.updateUnreadCount(unread_count)
+          msUntilIShouldStartPolling = UNREAD_COUNT_ALLOWED_AGE - millisecondsSinceLastUpdate
+        }
+      }
+      setTimeout(() => this.pollUnreadCount(), msUntilIShouldStartPolling)
     }
   }
 
@@ -140,6 +160,12 @@ export default class Navigation extends React.Component {
     this.loadResourcePage(url, type)
   }
 
+  ensureLoaded(type) {
+    if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
+      this.getResource(TYPE_URL_MAP[type], type)
+    }
+  }
+
   loadResourcePage(url, type, previousData = []) {
     $.getJSON(url, (data, __, xhr) => {
       const newData = previousData.concat(this.filterDataForType(data, type))
@@ -158,7 +184,7 @@ export default class Navigation extends React.Component {
         [type]: newData,
         [`${type}Loading`]: false,
         [`${type}AreLoaded`]: true
-      })
+      }, this.props.onDataRecieved)
     })
   }
 
@@ -170,31 +196,46 @@ export default class Navigation extends React.Component {
     return data
   }
 
-  pollUnreadCount() {
-    this.setState({unread_count_attempts: this.state.unread_count_attempts + 1}, function() {
-      if (this.state.unread_count_attempts <= 5) {
-        $.ajax('/api/v1/conversations/unread_count')
-          .then(data => this.updateUnreadCount(data.unread_count))
-          .then(null, console.log.bind(console, 'something went wrong updating unread count'))
-          .always(() =>
-            setTimeout(
-              () => this.pollUnreadCount(),
-              this.state.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL
-            )
-          )
+  async pollUnreadCount() {
+    this.unread_count_attempts = (this.unread_count_attempts || 0) + 1
+    if (this.unread_count_attempts > 5) return
+
+    // don't let this count against us in newRelic's SPA load time stats
+    const fetch = window.fetchIgnoredByNewRelic || window.fetch
+
+    try {
+      const {unread_count} = await (await fetch('/api/v1/conversations/unread_count', {
+        headers: {Accept: 'application/json'}
+      })).json()
+
+      try {
+        sessionStorage.setItem(
+          UNREAD_COUNT_SESSION_STORAGE_KEY,
+          JSON.stringify({
+            updatedAt: +new Date(),
+            unread_count
+          })
+        )
+      } catch (e) {
+        // maybe session storage is full or something, ignore
       }
-    })
+      this.updateUnreadCount(unread_count)
+    } catch (error) {
+      console.warn('something went wrong updating unread count', error)
+    }
+    setTimeout(() => this.pollUnreadCount(), this.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL)
   }
 
   unreadCountElement() {
     return (
-      this.$unreadCount ||
-      (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
+      this._unreadCountElement ||
+      (this._unreadCountElement = $('#global_nav_conversations_link').find('.menu-item__badge')[0])
     )
   }
 
   updateUnreadCount(count) {
     count = parseInt(count, 10)
+    this.setState({unread_count: count}, this.props.onDataRecieved)
     ReactDOM.render(
       <React.Fragment>
         <ScreenReaderContent>
@@ -208,9 +249,12 @@ export default class Navigation extends React.Component {
         </ScreenReaderContent>
         <PresentationContent>{count}</PresentationContent>
       </React.Fragment>,
-      this.unreadCountElement()[0]
+      this.unreadCountElement()
     )
-    this.unreadCountElement().toggle(count > 0)
+    const badgeElements = [this.unreadCountElement(), document.getElementById('mobileHeaderInboxUnreadBadge')]
+    badgeElements.forEach(el => {
+      if (el) el.style.display = count > 0 ? '' : 'none'
+    })
   }
 
   determineActiveLink() {
@@ -226,9 +270,7 @@ export default class Navigation extends React.Component {
 
   handleMenuClick(type) {
     // Make sure data is loaded up
-    if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
-      this.getResource(TYPE_URL_MAP[type], type)
-    }
+    this.ensureLoaded(type)
 
     if (this.state.isTrayOpen && this.state.activeItem === type) {
       this.closeTray()
@@ -287,9 +329,8 @@ export default class Navigation extends React.Component {
                 ? null
                 : window.ENV.current_user.avatar_image_url
             }
-            profileEnabled={window.ENV.SETTINGS.enable_profiles}
-            eportfoliosEnabled={window.ENV.SETTINGS.eportfolios_enabled}
-            closeTray={this.closeTray}
+            loaded={this.state.profileAreLoaded}
+            tabs={this.state.profile}
           />
         )
       case 'help':

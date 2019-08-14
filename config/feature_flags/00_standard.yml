@@ -253,6 +253,7 @@ responsive_layout:
   description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount
   root_opt_in: true
+  beta: true
   development: true
 force_rtl:
   state: hidden
@@ -262,23 +263,29 @@ force_rtl:
     to one that is normally RTL
   applies_to: User
   development: true
+enable_i18n_features_in_outcomes_exports:
+  state: hidden
+  display_name: Enable i18n features in outcomes exports
+  description: Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled
+    on or off for outcomes exports.
+  applies_to: RootAccount
 include_byte_order_mark_in_gradebook_exports:
   state: allowed
-  display_name: Include Byte-Order Mark in Gradebook Exports
-  description: Optionally include a byte-order mark in Gradebook exports so they can
+  display_name: Include Byte-Order Mark in compatible spreadsheet exports
+  description: Optionally include a byte-order mark in compatible spreadsheet exports so they can
     be imported into Excel for users in some locales.
   applies_to: User
 use_semi_colon_field_separators_in_gradebook_exports:
   state: allowed
-  display_name: Use semicolons to separate fields in Gradebook Exports
-  description: Use semicolons instead of commas to separate fields in Gradebook exports
+  display_name: Use semicolons to separate fields in compatible spreadsheet exports
+  description: Use semicolons instead of commas to separate fields in compatible spreadsheet exports
     so they can be imported into Excel for users in some locales.
   applies_to: User
   custom_transition_proc: use_semi_colon_field_separators_in_gradebook_exports_custom_transition_hook
 autodetect_field_separators_for_gradebook_exports:
   state: allowed
-  display_name: Autodetect field separators in Gradebook Exports
-  description: Attempt to detect an appropriate field separator in Gradebook exports
+  display_name: Autodetect field separators in compatible spreadsheet exports
+  description: Attempt to detect an appropriate field separator in compatible spreadsheet exports
     based on the number format for your language.
   applies_to: User
   custom_transition_proc: autodetect_field_separators_for_gradebook_exports_custom_transition_hook
@@ -401,6 +408,14 @@ assignments_2:
   root_opt_in: true
   beta: true
   development: true
+slack_notifications:
+  state: hidden
+  display_name: Slack Notifications
+  description: The ability for users to receive notifications from slack
+  applies_to: RootAccount
+  root_opt_in: true
+  beta: true
+  development: true
 javascript_csp:
   state: hidden_in_prod
   display_name: Content Security Policy
@@ -430,6 +445,14 @@ new_features_ui:
   description: This feature creates a SiteAdmin Release Flag tab to be able
     to release features to users through the UI. It also reworks the UI for
     the old Feature Options tabs.
+  development: true
+direct_share:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Direct Share
+  description: This feature allows teachers to easily copy single items from
+    one course to another, and to share a single item of content with other
+    users so they can import those items into their courses as well.
   development: true
 filter_speed_grader_by_student_group:
   state: hidden_in_prod

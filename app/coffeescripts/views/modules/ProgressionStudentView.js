@@ -20,106 +20,85 @@ import ModuleCollection from "../../collections/ModuleCollection";
 import template from "jst/modules/ProgressionStudentView";
 import collectionTemplate from "jst/modules/ProgressionModuleCollection";
 import PaginatedCollectionView from "../PaginatedCollectionView";
-import ProgressionModuleView from "../modules/ProgressionModuleView";
+import ProgressionModuleView from "./ProgressionModuleView";
 
-let ProgressionStudentView;
+export default class ProgressionStudentView extends Backbone.View {
 
-export default ProgressionStudentView = (function() {
-  ProgressionStudentView = class ProgressionStudentView extends Backbone.View {
-    constructor(...args) {
-      {
-        // Hack: trick Babel/TypeScript into allowing this before super.
-        if (false) { super(); }
-        let thisFn = (() => { return this; }).toString();
-        let thisName = thisFn.match(/_this\d*/)[0];
-        eval(`${thisName} = this;`);
+  initialize() {
+    super.initialize(...arguments);
+    this.$index = this.model.collection.view.$el;
+    this.$students = this.$index.find('#progression_students');
+    return this.$modules = this.$index.find('#progression_modules');
+  }
+
+  afterRender() {
+    super.afterRender(...arguments);
+    if (!this.model.collection.currentStudentView) this.showProgressions();
+    return this.syncHeight();
+  }
+
+  createProgressions() {
+    const studentId = this.model.get('id');
+    const modules = new ModuleCollection(null, {
+      course_id: ENV.COURSE_ID,
+      per_page: 50,
+      params: {
+        student_id: studentId,
+        include: ['items']
       }
-      this.syncHeight = this.syncHeight.bind(this);
-      super(...args);
+    });
+    modules.student_id = studentId;
+    modules.syncHeight = this.syncHeight;
+    modules.fetch();
+
+    const studentUrl = `${ENV.COURSE_USERS_PATH}/${studentId}`;
+    this.progressions = new PaginatedCollectionView({
+      collection: modules,
+      itemView: ProgressionModuleView,
+      template: collectionTemplate,
+      student: this.model.attributes,
+      studentUrl,
+      autoFetch: true
+    });
+
+    this.progressions.render();
+    return this.progressions.$el.appendTo(this.$modules);
+  }
+
+  showProgressions() {
+    this.$modules.attr('aria-busy', 'true');
+    if (this.model.collection.currentStudentView != null) {
+      this.model.collection.currentStudentView.hideProgressions();
     }
+    this.model.collection.currentStudentView = this;
 
-    static initClass() {
-
-      this.prototype.tagName = 'li';
-      this.prototype.className = 'student';
-      this.prototype.template = template;
-
-      this.prototype.events =
-        {'click': 'showProgressions'};
+    this.syncHeight();
+    this.$el.addClass('active').attr('aria-selected', true);
+    if (!this.progressions) {
+      return this.createProgressions();
+    } else {
+      return this.progressions.show();
     }
+  }
 
-    initialize() {
-      super.initialize(...arguments);
-      this.$index = this.model.collection.view.$el;
-      this.$students = this.$index.find('#progression_students');
-      return this.$modules = this.$index.find('#progression_modules');
+  hideProgressions() {
+    this.progressions.hide();
+    return this.$el.removeClass('active').removeAttr('aria-selected');
+  }
+
+  syncHeight = () => {
+    return setTimeout(() => {
+      this.$students.height(this.$modules.height());
+      return this.$students.find('.collectionViewItems').
+        height((this.$students.height() || 0) - (this.$students.find('.header').height() || 16) - 16);
     }
+    , 0);
+  }
+};
 
-    afterRender() {
-      super.afterRender(...arguments);
-      if (!this.model.collection.currentStudentView) this.showProgressions();
-      return this.syncHeight();
-    }
+ProgressionStudentView.prototype.tagName = 'li'
+ProgressionStudentView.prototype.className = 'student'
+ProgressionStudentView.prototype.template = template
+ProgressionStudentView.prototype.events = {click: 'showProgressions'}
 
-    createProgressions() {
-      const studentId = this.model.get('id');
-      const modules = new ModuleCollection(null, {
-        course_id: ENV.COURSE_ID,
-        per_page: 50,
-        params: {
-          student_id: studentId,
-          include: ['items']
-        }
-      });
-      modules.student_id = studentId;
-      modules.syncHeight = this.syncHeight;
-      modules.fetch();
-
-      const studentUrl = `${ENV.COURSE_USERS_PATH}/${studentId}`;
-      this.progressions = new PaginatedCollectionView({
-        collection: modules,
-        itemView: ProgressionModuleView,
-        template: collectionTemplate,
-        student: this.model.attributes,
-        studentUrl,
-        autoFetch: true
-      });
-
-      this.progressions.render();
-      return this.progressions.$el.appendTo(this.$modules);
-    }
-
-    showProgressions() {
-      this.$modules.attr('aria-busy', 'true');
-      if (this.model.collection.currentStudentView != null) {
-        this.model.collection.currentStudentView.hideProgressions();
-      }
-      this.model.collection.currentStudentView = this;
-
-      this.syncHeight();
-      this.$el.addClass('active').attr('aria-selected', true);
-      if (!this.progressions) {
-        return this.createProgressions();
-      } else {
-        return this.progressions.show();
-      }
-    }
-
-    hideProgressions() {
-      this.progressions.hide();
-      return this.$el.removeClass('active').removeAttr('aria-selected');
-    }
-
-    syncHeight() {
-      return setTimeout(() => {
-        this.$students.height(this.$modules.height());
-        return this.$students.find('.collectionViewItems').
-          height((this.$students.height() || 0) - (this.$students.find('.header').height() || 16) - 16);
-      }
-      , 0);
-    }
-  };
-  ProgressionStudentView.initClass();
-  return ProgressionStudentView;
-})();
 

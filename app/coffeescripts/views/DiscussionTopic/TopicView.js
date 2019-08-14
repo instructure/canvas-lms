@@ -29,19 +29,6 @@ import htmlEscape from 'str/htmlEscape'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 
 export default class TopicView extends Backbone.View {
-  constructor(...args) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.hideIfFiltering = this.hideIfFiltering.bind(this)
-    this.subscriptionStatusChanged = this.subscriptionStatusChanged.bind(this)
-    this.handleKeyDown = this.handleKeyDown.bind(this)
-    super(...args)
-  }
 
   static initClass() {
     this.prototype.events = {
@@ -85,7 +72,7 @@ export default class TopicView extends Backbone.View {
     this.model.cid = 'main'
     this.model.set('canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH)
     this.filterModel = this.options.filterModel
-    this.filterModel.on('change', this.hideIfFiltering)
+    this.filterModel.on('change', this.hideIfFiltering, this)
     this.topic = new DiscussionTopic({id: ENV.DISCUSSION.TOPIC.ID})
     // get rid of the /view on /api/vl/courses/x/discusison_topics/x/view
     this.topic.url = ENV.DISCUSSION.ROOT_URL.replace(/\/view/m, '')
@@ -94,7 +81,7 @@ export default class TopicView extends Backbone.View {
 
     // catch when non-root replies are added so we can twiddle the subscribed button
     EntryView.on('addReply', () => this.setSubscribed(true))
-    $(window).on('keydown', this.handleKeyDown)
+    $(window).on('keydown', e => this.handleKeyDown(e))
   }
 
   hideIfFiltering() {

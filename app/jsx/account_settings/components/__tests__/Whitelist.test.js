@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent} from 'react-testing-library'
+import {fireEvent} from '@testing-library/react'
 import {ConnectedWhitelist} from '../Whitelist'
 import {renderWithRedux} from './utils'
 

@@ -17,35 +17,21 @@
  */
 
 import Header from '../Header'
-import {legacyMockSubmission, mockAssignment} from '../../test-utils'
+import {mockAssignmentAndSubmission, mockSubmission} from '../../mocks'
 import React from 'react'
+import {render} from '@testing-library/react'
 import StudentViewContext from '../Context'
-import {render} from 'react-testing-library'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 
-// TODO: is scroll threshold is always 150 in every case, why are we passing
-//       that down as a prop instead of just having it be a constant in the
-//       component or a default prop value?
-
-it('renders normally', () => {
-  const {getByTestId} = render(
-    <Header
-      scrollThreshold={150}
-      assignment={mockAssignment()}
-      submission={legacyMockSubmission()}
-    />
-  )
-
+it('renders normally', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
 })
 
-it('dispatches scroll event properly when less than threshold', () => {
-  const {getByTestId} = render(
-    <Header
-      scrollThreshold={150}
-      assignment={mockAssignment()}
-      submission={legacyMockSubmission()}
-    />
-  )
+it('dispatches scroll event properly when less than threshold', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 100
   window.dispatchEvent(scrollEvent)
@@ -53,14 +39,9 @@ it('dispatches scroll event properly when less than threshold', () => {
   expect(getByTestId('assignment-student-pizza-header-normal')).toBeInTheDocument()
 })
 
-it('dispatches scroll event properly when greater than threshold', () => {
-  const {getByTestId} = render(
-    <Header
-      scrollThreshold={150}
-      assignment={mockAssignment()}
-      submission={legacyMockSubmission()}
-    />
-  )
+it('dispatches scroll event properly when greater than threshold', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 500
   window.dispatchEvent(scrollEvent)
@@ -68,14 +49,9 @@ it('dispatches scroll event properly when greater than threshold', () => {
   expect(getByTestId('assignment-student-pizza-header-sticky')).toBeInTheDocument()
 })
 
-it('displays element filler when scroll offset is in correct place', () => {
-  const {getByTestId} = render(
-    <Header
-      scrollThreshold={150}
-      assignment={mockAssignment()}
-      submission={legacyMockSubmission()}
-    />
-  )
+it('displays element filler when scroll offset is in correct place', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 100
   window.dispatchEvent(scrollEvent)
@@ -89,15 +65,11 @@ it('displays element filler when scroll offset is in correct place', () => {
   expect(getByTestId('assignment-student-header-sticky')).toBeInTheDocument()
 })
 
-it('will render the uncollapsed step container when scroll offset is less than scroll threshold', () => {
-  const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  submission.state = 'submitted'
-
-  const {getByTestId, queryByTestId} = render(
-    <Header scrollThreshold={150} assignment={assignment} submission={submission} />
-  )
+it('will render the uncollapsed step container when scroll offset is less than scroll threshold', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: () => SubmissionMocks.submitted
+  })
+  const {getByTestId, queryByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
 
   window.pageYOffset = 100
@@ -107,14 +79,9 @@ it('will render the uncollapsed step container when scroll offset is less than s
   expect(queryByTestId('collapsed-step-container')).not.toBeInTheDocument()
 })
 
-it('will render the collapsed step container when scroll offset is greater than scroll threshold', () => {
-  const {getByTestId} = render(
-    <Header
-      scrollThreshold={150}
-      assignment={mockAssignment()}
-      submission={legacyMockSubmission()}
-    />
-  )
+it('will render the collapsed step container when scroll offset is greater than scroll threshold', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {getByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
 
   window.pageYOffset = 200
@@ -123,52 +90,58 @@ it('will render the collapsed step container when scroll offset is greater than 
   expect(getByTestId('collapsed-step-container')).toBeInTheDocument()
 })
 
-it('will not render LatePolicyStatusDisplay if the submission is not late', () => {
-  const submission = legacyMockSubmission()
-  submission.latePolicyStatus = null
-  submission.submissionStatus = null
-  const {queryByTestId} = render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} submission={submission} />
-  )
-
+it('will not render LatePolicyStatusDisplay if the submission is not late', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('late-policy-container')).not.toBeInTheDocument()
 })
 
-it('will render LatePolicyStatusDisplay if the submission status is late', () => {
-  const submission = legacyMockSubmission()
-  submission.latePolicyStatus = null
-  const {getByTestId} = render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} submission={submission} />
-  )
-
+it('will render LatePolicyStatusDisplay if the submission status is late', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: () => ({
+      ...SubmissionMocks.graded,
+      submissionStatus: 'late'
+    })
+  })
+  const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
 
-it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', () => {
-  const submission = legacyMockSubmission()
-  submission.submissionStatus = null
-  const {getByTestId} = render(
-    <Header scrollThreshold={150} assignment={mockAssignment()} submission={submission} />
-  )
-
+it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: () => ({
+      ...SubmissionMocks.graded,
+      latePolicyStatus: 'late'
+    })
+  })
+  const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
 
-it('will render the latest grade instead of the displayed submissions grade', () => {
-  const assignment = mockAssignment()
-  const displayedSubmission = legacyMockSubmission()
-  const latestSubmission = legacyMockSubmission()
-  displayedSubmission.grade = '131'
-  latestSubmission.grade = '147'
-  assignment.gradingType = 'points'
-  assignment.pointsPossible = 150
+it('will render the latest grade instead of the displayed submissions grade', async () => {
+  const latestSubmission = await mockSubmission({
+    Submission: () => ({
+      ...SubmissionMocks.graded,
+      grade: '147',
+      enteredGrade: '147'
+    })
+  })
 
-  const {queryByText} = render(
+  const props = await mockAssignmentAndSubmission({
+    Assignment: () => ({pointsPossible: 150}),
+    Submission: () => ({
+      ...SubmissionMocks.graded,
+      grade: '131',
+      enteredGrade: '131'
+    })
+  })
+
+  const {queryByText, queryAllByText} = render(
     <StudentViewContext.Provider value={{latestSubmission}}>
-      <Header scrollThreshold={150} assignment={assignment} submission={displayedSubmission} />
+      <Header {...props} />
     </StudentViewContext.Provider>
   )
 
-  expect(queryByText('147/150 Points')).toBeInTheDocument()
+  expect(queryAllByText('147/150 Points')[0]).toBeInTheDocument()
   expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })

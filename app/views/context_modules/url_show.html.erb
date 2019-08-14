@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, @tag.title
+  provide :page_title, @tag.title
 
   # modules are a bit different, and it's not possible to get the URL to a specific
   # module using context_url, so we get the URL to a course's modules, and append

@@ -20,8 +20,8 @@
   css_bundle :login_confirm
   js_bundle :oauth2_confirm
   @headers = false
-  @body_classes << "full-width modal body--login-confirmation"
-  content_for :page_title, t(:page_title, "App Login")
+  add_body_class "full-width modal body--login-confirmation"
+  provide :page_title, t(:page_title, "App Login")
 %>
 
 <div id="modal-box" class="ic-Login-confirmation">

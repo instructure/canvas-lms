@@ -44,6 +44,7 @@ class Login::OtpController < ApplicationController
     end
 
     send_otp unless configuring?
+    add_meta_tag(:name => "viewport", :id => "vp", :content => "initial-scale=1.0,user-scalable=yes,width=device-width")
   end
 
   def send_via_sms

@@ -319,6 +319,37 @@ describe "accounts/settings.html.erb" do
     end
   end
 
+  describe "reports" do
+    before do
+      @account = Account.default
+      assign(:account, @account)
+      assign(:account_users, [])
+      assign(:root_account, @account)
+      assign(:associated_courses_count, 0)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    context "with :read_reports" do
+      it "should show reports tab link" do
+        admin = account_admin_user
+        view_context(@account, admin)
+        assign(:current_user, admin)
+        render
+        expect(response).to have_tag '#tab-reports-link'
+      end
+    end
+
+    context "without :read_reports" do
+      it "should not show reports tab link" do
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'read_reports' => false})
+        view_context(@account, admin)
+        assign(:current_user, admin)
+        render
+        expect(response).not_to have_tag '#tab-reports-link'
+      end
+    end
+  end
+
   context "admins" do
     it "should not show add admin button if don't have permission to any roles" do
       role = custom_account_role('CustomAdmin', :account => Account.site_admin)

@@ -17,27 +17,7 @@
 %>
 
 <%
-  @body_classes << 'hide-content-while-scripts-not-loaded right-side-optional'
-  content_for :page_title, join_title(t('#titles.announcements', "Announcements"), @context.name)
+  add_body_class 'hide-content-while-scripts-not-loaded right-side-optional'
+  provide :page_title, join_title(t('#titles.announcements', "Announcements"), @context.name)
   feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
 %>
-<% content_for :auto_discovery do %>
-  <% feed_key = nil
-     if @context_enrollment
-       feed_key = @context_enrollment.feed_code
-     elsif can_do(@context, @current_user, :manage)
-       feed_key = @context.feed_code
-     elsif @context.available? && @context.respond_to?(:is_public) && @context.is_public
-       feed_key = @context.asset_string
-     end
-     if feed_key
-       if @context.is_a?(Course) %>
-         <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), {:title => t(:feed_title_course, "Course Announcements Atom Feed")}) %>
-         <%= auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), {:title => t(:podcast_title_course, "Course Announcements Podcast Feed")}) %>
-  <%   elsif @context.is_a?(Group) %>
-         <%= auto_discovery_link_tag(:atom, feeds_announcements_format_path(feed_key, :atom), {:title => t(:feed_title_group, "Group Announcements Atom Feed")}) %>
-         <%= auto_discovery_link_tag(:rss, feeds_announcements_format_path(feed_key, :rss), {:title => t(:podcast_title_group, "Group Announcements Podcast Feed")}) %>
-  <%   end
-     end %>
-<% end %>
-

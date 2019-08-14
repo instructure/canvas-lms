@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import EditableHeading from '../EditableHeading'
 
 describe('EditableHeading', () => {
   it('renders the value in view mode', () => {
-    const {getByText} = render(
+    const {getAllByText} = render(
       <EditableHeading
         mode="view"
         onChange={() => {}}
@@ -33,7 +33,7 @@ describe('EditableHeading', () => {
       />
     )
 
-    expect(getByText('Another Roadside Attraction')).toBeInTheDocument()
+    expect(getAllByText('Another Roadside Attraction')[0]).toBeInTheDocument()
     expect(document.querySelector('h3')).toBeInTheDocument()
   })
 

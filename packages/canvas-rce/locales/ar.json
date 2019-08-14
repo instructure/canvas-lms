@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "محاذاة إلى اليمين"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "المحاذاة والمسافة البادئة"
+  },
   "all_4321c3a1": {
     "message": "الكل"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "إلغاء تحميل صورة"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "المكونات الإضافية لـ Canvas"
   },
   "cc_attribution_f6de631f": {
     "message": "سمة CC"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "تحرير الارتباط"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "شريط حالة المحرر"
+  },
   "embed_828fac4a": {
     "message": "تضمين"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "مجلد"
+  },
+  "formatting_5b143aa8": {
+    "message": "التنسيق"
   },
   "generating_preview_45b53be0": {
     "message": "جارٍ إنشاء المعاينة..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "الميكروفون"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "متنوع وLTI"
+  },
   "modules_c4325335": {
     "message": "الوحدات"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "حدد مجلدًا لتحميل ملفك عليه"
   },
+  "selected_274ce24f": {
+    "message": "تم التحديد"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "إظهار خيارات التضمين"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "بدء التسجيل"
+  },
+  "styles_2aa721ef": {
+    "message": "الأنماط"
   },
   "subheader_2b87606d": {
     "message": "العنوان الفرعي"

@@ -17,7 +17,6 @@
 %>
 
 <%
-  @body_classes << 'padless-content'
   course_home ||= false
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
@@ -26,8 +25,6 @@
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
   })
-  js_bundle :context_modules
-  css_bundle :content_next
 %>
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>

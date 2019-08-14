@@ -177,7 +177,7 @@ const ConversationsRouter = Backbone.Router.extend({
       m.set('workflow_state', newState)
       this.header.onArchivedStateChange(m)
     })
-    if (_.include(['inbox', 'archived'], this.filters.type)) {
+    if (['inbox', 'archived'].includes(this.filters.type)) {
       this.list.collection.remove(messages)
       this.header.onModelChange(null, null)
       this.detail.onModelChange(null, null)
@@ -233,11 +233,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this.list.selectedMessages = []
     this.list.collection.reset()
     if (filters.type === 'submission_comments') {
-      _.each(
-        ['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'],
-        this.list.collection.deleteParam,
-        this.list.collection
-      )
+      ['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'].forEach(this.list.collection.deleteParam.bind(this.list.collection))
       this.list.collection.url = '/api/v1/users/self/activity_stream'
       this.list.collection.setParam('asset_type', 'Submission')
       if (filters.course) {
@@ -246,11 +242,7 @@ const ConversationsRouter = Backbone.Router.extend({
         this.list.collection.deleteParam('context_code')
       }
     } else {
-      _.each(
-        ['context_code', 'asset_type', 'submission_user_id'],
-        this.list.collection.deleteParam,
-        this.list.collection
-      )
+      ['context_code', 'asset_type', 'submission_user_id'].forEach(this.list.collection.deleteParam.bind(this.list.collection))
       this.list.collection.url = '/api/v1/conversations'
       this.list.collection.setParam('scope', filters.type)
       this.list.collection.setParam('filter', this._currentFilter())
@@ -276,7 +268,7 @@ const ConversationsRouter = Backbone.Router.extend({
       model.handleMessages()
       model.set('messages', _.filter(model.get('messages'), m =>
         m.id === message.id ||
-        (_.include(m.participating_user_ids, message.author_id) && m.created_at < message.created_at)
+        (_.includes(m.participating_user_ids, message.author_id) && m.created_at < message.created_at)
       ))
     } else {
       model = this.detail.model
@@ -362,7 +354,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this.header.on('submission-reply', this.onReply)
     this.compose.on('close', this.onCloseCompose)
     this.compose.on('addMessage', this.onAddMessage)
-    this.compose.on('addMessage', this.list.updateMessage)
+    this.compose.on('addMessage', this.list.updateMessage, this.list)
     this.compose.on('newConversations', this.onNewConversations)
     this.compose.on('submitting', this.onSubmit)
     this.submissionReply.on('addMessage', this.onSubmissionAddMessage)

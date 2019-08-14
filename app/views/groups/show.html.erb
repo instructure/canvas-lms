@@ -16,19 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% content_for :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
+<% provide :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
 <% css_bundle :dashboard %>
 <% js_bundle :dashboard %>
-<%  @active_tab = "home" %>
-<% content_for :auto_discovery do %>
-  <% if @context_membership %>
-    <%= auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")}) %>
-  <% elsif @context.available? %>
-    <%= auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")}) %>
-  <% end %>
-<% end %>
+<%  set_active_tab "home" %>
 
-<% content_for :right_side do %>
+<% provide :right_side do %>
 
   <% if can_do(@context, @current_user, :update) %>
     <div>

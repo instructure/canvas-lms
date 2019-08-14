@@ -66,7 +66,10 @@ export default class GradePostingPolicyTabPanel extends Component {
         <br />
 
         <Text size="small">
-          {I18n.t('Assignment grades will be visible to students as soon as they are entered.')}
+          {I18n.t(`
+            Assignment grades will be visible to students as soon as they are entered.
+            Grades that have already been hidden will remain hidden.
+          `)}
         </Text>
       </View>
     )

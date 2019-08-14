@@ -63,7 +63,7 @@ export default class NotificationPreferences {
       title: I18n.t('frequencies.title.never', 'Do not send me anything'),
     }]
 
-    this.limitedButtonData = [_.first(this.buttonData), _.last(this.buttonData)]
+    this.limitedButtonData = [_.head(this.buttonData), _.last(this.buttonData)]
 
     this.updateUrl = this.options.update_url
     this.channels = this.options.channels || []
@@ -74,10 +74,11 @@ export default class NotificationPreferences {
     // Give each channel a 'name'
     this.channels.forEach((c) => {
       c.name = {
-        email: I18n.t('communication.email.display', 'Email Address'),
-        sms: I18n.t('communication.sms.display', 'Cell Number'),
-        push: I18n.t('communication.push.display', 'Push Notification'),
-        twitter: I18n.t('communication.twitter.display', 'Twitter')
+        email: I18n.t('Email Address'),
+        sms: I18n.t('Cell Number'),
+        push: I18n.t('Push Notification'),
+        twitter: I18n.t('Twitter'),
+        slack: I18n.t('Slack')
       }[c.type]
     })
     // Setup the mappings
@@ -95,7 +96,7 @@ export default class NotificationPreferences {
 
   policyCellProps = (category, channel, selectedValue = 'never') => {
     let {buttonData} = this
-    if (channel.type === 'push' || channel.type === 'sms' || channel.type === 'twitter') {
+    if (['push', 'sms', 'twitter', 'slack'].includes(channel.type)) {
       buttonData = this.limitedButtonData
     }
     return {

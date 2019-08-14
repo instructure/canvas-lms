@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentShape, SubmissionShape} from '../assignmentData'
+import {Assignment} from '../graphqlData/Assignment'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {Component} from 'react'
+import {Submission} from '../graphqlData/Submission'
 import {uploadFiles} from '../../../shared/upload_file'
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
@@ -36,17 +37,15 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import theme from '@instructure/ui-themes/lib/canvas/base'
 
 function submissionFileUploadUrl(assignment) {
-  return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${
-    assignment.env.currentUser.id
-  }/files`
+  return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
 }
 
 export default class FileUpload extends Component {
   static propTypes = {
-    assignment: AssignmentShape,
+    assignment: Assignment.shape,
     createSubmission: func,
     createSubmissionDraft: func,
-    submission: SubmissionShape,
+    submission: Submission.shape,
     updateSubmissionState: func,
     updateUploadState: func
   }
@@ -85,7 +84,7 @@ export default class FileUpload extends Component {
         await this.props.createSubmissionDraft({
           variables: {
             id: this.props.submission.id,
-            attempt: this.props.submission.attempt,
+            attempt: this.props.submission.attempt + 1,
             fileIds: this.getDraftAttachments()
               .map(file => file._id)
               .concat(newFiles.map(file => file.id))
@@ -208,6 +207,9 @@ export default class FileUpload extends Component {
                     <Text size="small">
                       {I18n.t('Drag and drop, or click to browse your computer')}
                     </Text>
+                    <div style={{display: 'block'}}>
+                      <Button margin="medium">{I18n.t('More Options')}</Button>
+                    </div>
                   </FlexItem>
                 </Flex>
               }

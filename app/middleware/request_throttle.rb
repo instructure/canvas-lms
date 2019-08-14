@@ -104,7 +104,7 @@ class RequestThrottle
     if whitelisted?(request)
       return true
     elsif blacklisted?(request)
-      Rails.logger.info("blocking request due to blacklist, client id: #{client_identifier(request)} ip: #{request.remote_ip}")
+      Rails.logger.info("blocking request due to blacklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
       InstStatsd::Statsd.increment("request_throttling.blacklisted")
       return false
     else
@@ -122,35 +122,31 @@ class RequestThrottle
   end
 
   def blacklisted?(request)
-    client_id = client_identifier(request)
-    (client_id && self.class.blacklist.include?(client_id)) ||
-      self.class.blacklist.include?("ip:#{request.remote_ip}")
+    client_identifiers(request).any? { |id| self.class.blacklist.include?(id) }
   end
 
   def whitelisted?(request)
-    client_id = client_identifier(request)
-    return false unless client_id
-    self.class.whitelist.include?(client_id)
-    # we don't check the whitelist for remote_ip, whitelist is primarily
-    # intended for grandfathering in some API users by access token
+    client_identifiers(request).any? { |id| self.class.whitelist.include?(id) }
+  end
+
+  def client_identifier(request)
+    client_identifiers(request).first
+  end
+
+  def tag_identifier(tag, identifier)
+    return unless identifier
+    "#{tag}:#{identifier}"
   end
 
   # This is cached on the request, so a theoretical change to the request
   # object won't be caught.
-  def client_identifier(request)
-    request.env['canvas.request_throttle.user_id'] ||= begin
-      if token_string = AuthenticationMethods.access_token(request, :GET).presence
-        identifier = AccessToken.hashed_token(token_string)
-        identifier = "token:#{identifier}"
-      elsif identifier = AuthenticationMethods.user_id(request).presence
-        identifier = "user:#{identifier}"
-      elsif identifier = session_id(request).presence
-        identifier = "session:#{identifier}"
-      elsif ip = request.ip
-        identifier = "ip:#{ip}"
-      end
-      identifier
-    end
+  def client_identifiers(request)
+    request.env['canvas.request_throttle.user_id'] ||= [
+        (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
+        tag_identifier("user", AuthenticationMethods.user_id(request).presence),
+        tag_identifier("session", session_id(request).presence),
+        tag_identifier("ip", request.ip)
+      ].compact
   end
 
   def session_id(request)

@@ -17,6 +17,9 @@
   "align_right_9bad3ac1": {
     "message": "Alinio i’r dde"
   },
+  "alignment_and_indentation_f7de34bf": {
+    "message": "Alinio a Mewnoli"
+  },
   "all_4321c3a1": {
     "message": "Y cyfan"
   },
@@ -55,6 +58,9 @@
   },
   "cancel_image_upload_2c771950": {
     "message": "Canslo''r broses llwytho delwedd i fyny"
+  },
+  "canvas_plugins_705a5016": {
+    "message": "Ategion Canvas"
   },
   "cc_attribution_f6de631f": {
     "message": "CC Attribution"
@@ -224,6 +230,9 @@
   "edit_link_7f53bebb": {
     "message": "Golygu Dolen"
   },
+  "editor_statusbar_26ac81fc": {
+    "message": "Bar Statws Golygydd"
+  },
   "embed_828fac4a": {
     "message": "Plannu"
   },
@@ -286,6 +295,9 @@
   },
   "folder_705fd2d7": {
     "message": "Ffolder"
+  },
+  "formatting_5b143aa8": {
+    "message": "Fformatio"
   },
   "generating_preview_45b53be0": {
     "message": "Wrthi’n creu rhagolwg..."
@@ -398,6 +410,9 @@
   "mic_a7f3d311": {
     "message": "Meicroffon"
   },
+  "miscellaneous_and_lti_5bac6583": {
+    "message": "Amrywiol ac LTI"
+  },
   "modules_c4325335": {
     "message": "Modiwlau"
   },
@@ -503,6 +518,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dewiswch ffolder i lwytho eich ffeil i fyny iddi"
   },
+  "selected_274ce24f": {
+    "message": "Wedi dewis"
+  },
   "show_embed_options_ef8d7ef": {
     "message": "Dangos opsiynau plannu"
   },
@@ -541,6 +559,9 @@
   },
   "start_recording_9a65141a": {
     "message": "Dechrau’r Recordiad"
+  },
+  "styles_2aa721ef": {
+    "message": "Arddulliau"
   },
   "subheader_2b87606d": {
     "message": "Isbennawd"

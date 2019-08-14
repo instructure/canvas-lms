@@ -19,6 +19,7 @@
 import React, {Fragment} from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 
+import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import Badge from '@instructure/ui-elements/lib/components/Badge'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -59,18 +60,20 @@ export default function FormContent({
     <Fragment>
       {unpostedCount > 0 && (
         <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
-          <Badge
-            count={unpostedCount}
-            countUntil={99}
-            margin="0 0 small large"
-            placement="start center"
-            type="count"
-            variant="danger"
-          >
-            <View as="div" margin="0 0 0 small">
-              <Text size="small">{I18n.t('Hidden')}</Text>
-            </View>
-          </Badge>
+          <AccessibleContent alt={I18n.t('%{count} hidden', {count: unpostedCount})}>
+            <Badge
+              count={unpostedCount}
+              countUntil={99}
+              margin="0 0 small large"
+              placement="start center"
+              type="count"
+              variant="danger"
+            >
+              <View as="div" margin="0 0 0 small">
+                <Text size="small">{I18n.t('Hidden')}</Text>
+              </View>
+            </Badge>
+          </AccessibleContent>
         </div>
       )}
 

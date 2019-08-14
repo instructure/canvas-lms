@@ -155,6 +155,11 @@ class EpubExport < ActiveRecord::Base
     self.content_export.attachment
   end
 
+  def self.fail_stuck_epub_exports(exports)
+    cutoff = Setting.get("epub_generation_expiration_minutes", "120").to_i.minutes.ago
+    exports.select{|e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
+  end
+
   def convert_to_epub
     begin
       set_locale

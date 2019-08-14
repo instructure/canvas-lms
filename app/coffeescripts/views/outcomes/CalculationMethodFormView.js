@@ -45,7 +45,7 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   attach() {
-    return this.model.on('change:calculation_method', this.render)
+    return this.model.on('change:calculation_method', this.render, this)
   }
 
   blur(e) {

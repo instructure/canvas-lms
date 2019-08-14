@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {render, fireEvent} from '@testing-library/react'
 import formatMessage from '../../../../../format-message';
 import Link from '../Link'
 

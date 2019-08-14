@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-
   const editorExtensions = {
     call(methodName, ...args) {
       // since exists? has a ? and cant be a regular function (yet we want
@@ -49,13 +47,13 @@ import _ from 'underscore'
 
   const polyfill = {
     wrapEditor(editor) {
-      let extensions = _.extend({}, editorExtensions, editor)
-      return _.extend(editor, extensions)
+      let extensions = {...editorExtensions, ...editor}
+      return Object.assign(editor, extensions)
     },
 
     wrapSidebar(sidebar) {
-      let extensions = _.extend({}, sidebarExtensions, sidebar)
-      return _.extend(sidebar, extensions)
+      let extensions = {...sidebarExtensions, ...sidebar}
+      return Object.assign(sidebar, extensions)
     }
   }
 

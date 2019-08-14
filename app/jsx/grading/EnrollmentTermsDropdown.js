@@ -28,10 +28,10 @@ class EnrollmentTermsDropdown extends React.Component {
   }
 
   sortedTerms = terms => {
-    const dated = _.select(terms, term => term.startAt)
+    const dated = _.filter(terms, term => term.startAt)
     const datedTermsSortedByStart = _.sortBy(dated, term => term.startAt).reverse()
 
-    const undated = _.select(terms, term => !term.startAt)
+    const undated = _.filter(terms, term => !term.startAt)
     const undatedTermsSortedByCreate = _.sortBy(undated, term => term.createdAt).reverse()
     return datedTermsSortedByStart.concat(undatedTermsSortedByCreate)
   }

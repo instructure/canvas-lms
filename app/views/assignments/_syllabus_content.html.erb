@@ -18,7 +18,7 @@
 
 <% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
 <% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
-<% @active_tab = "syllabus" %>
+<% set_active_tab "syllabus" %>
 <% course_home ||= false %>
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">

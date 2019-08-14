@@ -92,7 +92,7 @@ export default class ShowEventDetailsDialog {
     data.forEach(error => {
       if (error.message === 'participant has met per-participant limit') {
         errorHandled = true
-        error.past_appointments = _.all(
+        error.past_appointments = _.every(
           error.reservations,
           res => fcUtil.wrap(res.end_at) < fcUtil.now()
         )
@@ -207,7 +207,7 @@ export default class ShowEventDetailsDialog {
 
   cancelAppointment = $appt => {
     const url = $appt.data('url')
-    const event = _.detect(this.event.calendarEvent.child_events, e => e.url === url)
+    const event = _.find(this.event.calendarEvent.child_events, e => e.url === url)
     $('<div/>').confirmDelete({
       url,
       message: $(
