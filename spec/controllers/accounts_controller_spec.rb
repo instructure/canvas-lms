@@ -1388,7 +1388,7 @@ describe AccountsController do
       admin_logged_in(@account)
       get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "asc", search_by: "teacher", search_term: "teach"}
 
-      expect(JSON.parse(response.body.sub("while(1)\;", '')).length).to eq 2
+      expect(JSON.parse(response.body).length).to eq 2
     end
 
     it "should exclude teachers that don't have an active enrollment workflow state" do

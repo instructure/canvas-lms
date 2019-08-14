@@ -2203,11 +2203,6 @@ class ApplicationController < ActionController::Base
     bank
   end
 
-  def prepend_json_csrf?
-    requested_json = request.headers['Accept'] =~ %r{application/json}
-    request.get? && !requested_json && in_app?
-  end
-
   def in_app?
     !!(@current_user ? @pseudonym_session : session[:session_id])
   end
@@ -2259,12 +2254,6 @@ class ApplicationController < ActionController::Base
       json = options.delete(:json)
       unless json.is_a?(String)
         json = ActiveSupport::JSON.encode(json_cast(json))
-      end
-
-      # prepend our CSRF protection to the JSON response, unless this is an API
-      # call that didn't use session auth, or a non-GET request.
-      if prepend_json_csrf?
-        json = "while(1);#{json}"
       end
 
       # fix for some browsers not properly handling json responses to multipart

@@ -47,7 +47,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_id param" do
       user_session(@teacher)
       get :jwt_token, params: {course_id: @course.id, tool_id: @tool.id}
-      jwt = JSON.parse(response.body[9..-1])['jwt_token']
+      jwt = JSON.parse(response.body)['jwt_token']
       decoded_token = Canvas::Security.decode_jwt(jwt, [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
@@ -73,7 +73,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
       get :jwt_token, params: {course_id: @course.id, tool_launch_url: @tool.url}
-      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body[9..-1])['jwt_token'], [:skip_verification])
+      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body)['jwt_token'], [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
@@ -1794,7 +1794,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1814,7 +1814,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1837,7 +1837,7 @@ describe ExternalToolsController do
       get :generate_sessionless_launch, params: {course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id}
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1870,7 +1870,7 @@ describe ExternalToolsController do
       }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1916,7 +1916,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1944,7 +1944,7 @@ describe ExternalToolsController do
         module_item_id: @tg.id,
         content_type: 'ContextExternalTool'}
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1989,7 +1989,7 @@ describe ExternalToolsController do
 				controller.instance_variable_set :@access_token, login_pseudonym.user.access_tokens.create(purpose: 'test')
         get :generate_sessionless_launch, params: params
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+        json = JSON.parse(response.body)
         url = URI.parse(json['url'])
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
         expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
@@ -2230,7 +2230,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
 
       expect(controller).to receive(:log_asset_access).once

@@ -101,7 +101,7 @@ describe ContentSharesController do
         user_session @teacher_1
         get :index, params: { user_id: @teacher_1.id, list: 'sent' }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.length).to eq 1
         expect(json[0]['id']).to eq @sent_share.id
         expect(json[0]['name']).to eq 'booga'
@@ -122,7 +122,7 @@ describe ContentSharesController do
         user_session @teacher_1
 
         get :index, params: { user_id: 'self', list: 'sent', per_page: 1 }
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.length).to eq 1
         expect(json[0]['name']).to eq 'booga'
         expect(json[0]['content_type']).to eq 'assignment'
@@ -134,7 +134,7 @@ describe ContentSharesController do
         expect(link[:uri].query).to include 'per_page=1'
 
         get :index, params: { user_id: 'self', list: 'sent', per_page: 1, page: 2 }
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.length).to eq 1
         expect(json[0]['name']).to eq 'ooga'
         expect(json[0]['content_type']).to eq 'module_item'
@@ -147,7 +147,7 @@ describe ContentSharesController do
         user_session @teacher_2
         get :index, params: { user_id: @teacher_2.id, list: 'received' }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.length).to eq 2
         expect(json[1]['id']).to eq @received_share.id
         expect(json[1]['name']).to eq 'booga'
@@ -162,7 +162,7 @@ describe ContentSharesController do
       it "includes sender information" do
         user_session @teacher_2
         get :index, params: { user_id: @teacher_2.id, list: 'received', per_page: 1 }
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.map { |share| share['sender']['id'] }).to eq([@teacher_1.id])
       end
 
@@ -174,7 +174,7 @@ describe ContentSharesController do
         user_session @teacher_2
 
         get :index, params: { user_id: 'self', list: 'received', per_page: 2 }
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.length).to eq 2
         expect(json[0]['name']).to eq 'u read me'
         expect(json[0]['content_type']).to eq 'assignment'
@@ -186,7 +186,7 @@ describe ContentSharesController do
         expect(link[:uri].query).to include 'per_page=2'
 
         get :index, params: { user_id: 'self', list: 'received', per_page: 2, page: 2 }
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json.length).to eq 1
         expect(json[0]['name']).to eq 'ooga'
         expect(json[0]['content_type']).to eq 'module'
@@ -207,7 +207,7 @@ describe ContentSharesController do
         user_session @teacher_1
         get :show, params: { user_id: @teacher_1.id, id: @sent_share.id }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json['id']).to eq @sent_share.id
         expect(json['name']).to eq 'booga'
         expect(json['read_state']).to eq 'read'
@@ -256,7 +256,7 @@ describe ContentSharesController do
         user_session @teacher_1
         post :add_users, params: { user_id: @teacher_1.id, id: @sent_share.id, receiver_ids: [@teacher_3.id] }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json['receivers'].length).to eq 2
         expect(json['receivers'].map { |r| r['id'] }).to match_array([@teacher_2.id, @teacher_3.id])
         expect(@sent_share.receivers.pluck(:id)).to match_array([@teacher_2.id, @teacher_3.id])
@@ -266,7 +266,7 @@ describe ContentSharesController do
         user_session @teacher_1
         post :add_users, params: { user_id: @teacher_1.id, id: @sent_share.id, receiver_ids: [@teacher_2.id, @teacher_3.id] }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json['receivers'].length).to eq 2
         expect(json['receivers'].map { |r| r['id'] }).to match_array([@teacher_2.id, @teacher_3.id])
         expect(@sent_share.receivers.pluck(:id)).to match_array([@teacher_2.id, @teacher_3.id])
@@ -276,7 +276,7 @@ describe ContentSharesController do
         user_session @teacher_1
         post :add_users, params: { user_id: @teacher_1.id, id: @sent_share.id, receiver_ids: [@teacher_1.id, @teacher_3.id] }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json['receivers'].map { |r| r['id'] }).to match_array([@teacher_1.id, @teacher_2.id, @teacher_3.id])
         expect(@sent_share.receivers.pluck(:id)).to match_array([@teacher_1.id, @teacher_2.id, @teacher_3.id])
       end
@@ -313,7 +313,7 @@ describe ContentSharesController do
         user_session @teacher_2
         get :unread_count, params: { user_id: @teacher_2 }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json["unread_count"]).to eq 1
       end
     end
@@ -323,7 +323,7 @@ describe ContentSharesController do
         user_session @teacher_2
         put :update, params: { user_id: @teacher_2.id, id: @received_share.id, read_state: 'read' }
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        json = JSON.parse(response.body)
         expect(json['read_state']).to eq 'read'
         expect(json['content_export']).to be_present
         expect(@received_share.reload.read_state).to eq 'read'

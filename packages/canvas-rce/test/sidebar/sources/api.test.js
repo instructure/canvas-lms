@@ -211,21 +211,6 @@ describe('sources/api', () => {
       })
     })
 
-    it('can parse while-wrapped page data', () => {
-      const whileFakePageBody = 'while(1);' + fakePageBody
-      const uri = 'theURI'
-      fetchMock.mock(uri, whileFakePageBody)
-      return apiSource.fetchPage(uri).then(page => {
-        assert.deepEqual(page, {
-          bookmark: 'newBookmark',
-          links: [
-            {href: 'link1', title: 'Link 1'},
-            {href: 'link2', title: 'Link 2'}
-          ]
-        })
-      })
-    })
-
     it('retries once on 401 with a renewed token', () => {
       const uri = 'theURI'
 

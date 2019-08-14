@@ -2518,7 +2518,7 @@ describe UsersController do
       user_session(@user)
       get 'pandata_events_token'
       assert_status(400)
-      json = JSON.parse(response.body.gsub("while(1);", ""))
+      json = JSON.parse(response.body)
       expect(json['message']).to eq "Access token required"
     end
   end

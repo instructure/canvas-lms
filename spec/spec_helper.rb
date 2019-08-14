@@ -652,7 +652,7 @@ RSpec.configure do |config|
   end
 
   def json_parse(json_string = response.body)
-    JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
+    JSON.parse(json_string)
   end
 
   # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html

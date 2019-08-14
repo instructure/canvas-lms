@@ -243,7 +243,7 @@ describe GroupCategoriesController do
     it "should include group submissions if param is present" do
       user_session(@teacher)
       get 'users', params: {:course_id => @course.id, :group_category_id => @category.id, include: ['group_submissions']}
-      json = JSON.parse(response.body[9,response.body.length])
+      json = JSON.parse(response.body)
 
       expect(response).to be_successful
       expect(json.count).to be_equal 1
@@ -253,7 +253,7 @@ describe GroupCategoriesController do
     it "should not include group submissions if param is absent" do
       user_session(@teacher)
       get 'users', params: {:course_id => @course.id, :group_category_id => @category.id}
-      json = JSON.parse(response.body[9,response.body.length])
+      json = JSON.parse(response.body)
 
       expect(response).to be_successful
       expect(json.count).to be_equal 1

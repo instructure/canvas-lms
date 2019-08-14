@@ -69,15 +69,6 @@ describe "API Authentication", type: :request do
         expect(response).to be_successful
       end
 
-       it "should have anti-crsf meausre in normal session" do
-        get "/api/v1/courses.json", params: {}
-        # because this is a normal application session, the response is prepended
-        # with our anti-csrf measure
-        json = response.body
-        expect(json).to match(%r{^while\(1\);})
-        expect(JSON.parse(json.sub(%r{^while\(1\);}, '')).size).to eq 1
-      end
-
       it "should not allow post without authenticity token in application session" do
         post "/api/v1/courses/#{@course.id}/assignments.json",
              params: { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
@@ -943,41 +934,6 @@ describe "API Authentication", type: :request do
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
-    end
-  end
-
-  describe "CSRF protection" do
-    before :once do
-      course_with_teacher(:active_all => true)
-      @course1 = @course
-      course_with_student(:user => @user, :active_all => true)
-      @course2 = @course
-    end
-
-    it "should not prepend the CSRF protection to API requests" do
-      user_with_pseudonym(:user => @user)
-      raw_api_call(:get, "/api/v1/users/self/profile",
-                      :controller => "profile", :action => "settings", :user_id => "self", :format => "json")
-      expect(response).to be_successful
-      raw_json = response.body
-      expect(raw_json).not_to match(%r{^while\(1\);})
-      json = JSON.parse(raw_json)
-      expect(json['id']).to eq @user.id
-    end
-
-    it "should prepend the CSRF protection for API endpoints, when session auth is used" do
-      user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
-      allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
-      post "/login/canvas", params: {"pseudonym_session[unique_id]" => "test1@example.com",
-        "pseudonym_session[password]" => "test1234"}
-      assert_response 302
-      get "/api/v1/users/self/profile"
-      expect(response).to be_successful
-      raw_json = response.body
-      expect(raw_json).to match(%r{^while\(1\);})
-      expect { JSON.parse(raw_json) }.to raise_error(JSON::ParserError)
-      json = JSON.parse(raw_json.sub(%r{^while\(1\);}, ''))
-      expect(json['id']).to eq @user.id
     end
   end
 end

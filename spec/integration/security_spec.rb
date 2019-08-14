@@ -96,46 +96,6 @@ describe "security" do
     end
   end
 
-  it "should not prepend login json responses with protection" do
-    u = user_with_pseudonym :active_user => true,
-      :username => "nobody@example.com",
-      :password => "asdfasdf"
-    u.save!
-    post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
-      "pseudonym_session[password]" => "asdfasdf",
-      "pseudonym_session[remember_me]" => "1" },
-      headers: { 'HTTP_ACCEPT' => 'application/json' }
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).not_to match(%r{^while\(1\);})
-    json = JSON.parse response.body
-    expect(json['pseudonym']['unique_id']).to eq "nobody@example.com"
-  end
-
-  it "should prepend GET JSON responses with protection" do
-    course_with_teacher_logged_in
-    get "/courses.json"
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).to match(%r{^while\(1\);})
-  end
-
-  it "should not prepend GET JSON responses to Accept application/json requests with protection" do
-    course_with_teacher_logged_in
-    get "/courses.json", headers: { 'HTTP_ACCEPT' => 'application/json' }
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).not_to match(%r{^while\(1\);})
-  end
-
-  it "should not prepend non-GET JSON responses with protection" do
-    course_with_teacher_logged_in
-    delete "/dashboard/ignore_stream_item/1"
-    expect(response).to be_successful
-    expect(response['Content-Type']).to match(%r"^application/json")
-    expect(response.body).not_to match(%r{^while\(1\);})
-  end
-
   describe "remember me" do
     before do
       @u = user_with_pseudonym :active_all => true,

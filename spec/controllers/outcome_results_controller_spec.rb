@@ -152,7 +152,7 @@ describe OutcomeResultsController do
   end
 
   def parse_response(response)
-    JSON.parse(response.body.gsub("while(1);", ""))
+    JSON.parse(response.body)
   end
 
   describe "retrieving outcome results" do
@@ -197,7 +197,7 @@ describe OutcomeResultsController do
                         :user_ids => [@student.id],
                         :outcome_ids => [@outcome.id]},
                         format: "json"
-        json = JSON.parse(response.body.gsub("while(1);", ""))
+        json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
       end
 
@@ -227,7 +227,7 @@ describe OutcomeResultsController do
                         :user_ids => [@student.id],
                         :outcome_ids => [@outcome.id]},
                         format: "json"
-        json = JSON.parse(response.body.gsub("while(1);", ""))
+        json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
       end
 
