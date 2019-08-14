@@ -50,7 +50,7 @@ describe('RCE > Common > Incremental Loading', () => {
 
   function SpecComponent() {
     const {records} = loaderOptions
-    let lastItemRef = useRef(null)
+    const lastItemRef = useRef(null)
 
     const loader = useIncrementalLoading({...loaderOptions, lastItemRef})
 

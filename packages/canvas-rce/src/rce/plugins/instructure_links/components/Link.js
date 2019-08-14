@@ -21,7 +21,7 @@ import {func, oneOf, string} from 'prop-types'
 import {linkShape} from './propTypes'
 import {StyleSheet, css} from "aphrodite";
 import formatMessage from '../../../../format-message';
-import {renderLink as renderLinkHtml} from "../../../../rce/contentRendering";
+import {renderLink as renderLinkHtml} from "../../../contentRendering";
 import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
@@ -42,7 +42,7 @@ import {
 function IconBlank() {
   return (
     <SVGIcon name="IconBlank" viewBox="0 0 1920 1920">
-      <g role="presentation"></g>
+      <g role="presentation" />
     </SVGIcon>
   )
 }

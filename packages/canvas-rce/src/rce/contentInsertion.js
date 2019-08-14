@@ -20,7 +20,7 @@ import classnames from "classnames";
 import { renderLink, renderImage, renderLinkedImage } from "./contentRendering";
 import scroll from "../common/scroll";
 
-/*** generic content insertion ***/
+/** * generic content insertion ** */
 
 // when the editor is hidden, just replace the selected portion of the textarea
 // with the content. branching is for cross-browser
@@ -61,7 +61,7 @@ export function insertContent(editor, content) {
   }
 }
 
-/*** image insertion ***/
+/** * image insertion ** */
 
 function isElemImg(elem) {
   return elem && elem.nodeName.toLowerCase() === "img";
@@ -77,8 +77,8 @@ function isElemAnchor(elem) {
   surrounding
 */
 function shouldPreserveImgAnchor(editor) {
-  var selection = editor.selection;
-  var selectedRange = selection.getRng();
+  const selection = editor.selection;
+  const selectedRange = selection.getRng();
 
   return (
     isElemImg(selection.getNode()) &&
@@ -88,7 +88,7 @@ function shouldPreserveImgAnchor(editor) {
 }
 
 export function insertImage(editor, image) {
-  var content = "";
+  let content = "";
   if (shouldPreserveImgAnchor(editor)) {
     content = renderLinkedImage(
       editor.selection.getRng().startContainer,
@@ -100,7 +100,7 @@ export function insertImage(editor, image) {
   return insertContent(editor, content);
 }
 
-/*** link insertion ***/
+/** * link insertion ** */
 
 // checks if there's an existing anchor containing the cursor
 function currentLink(editor, link) {
@@ -127,7 +127,7 @@ export function existingContentToLink(editor, link) {
 }
 
 function selectionIsImg(editor) {
-  let selection = editor.selection.getContent();
+  const selection = editor.selection.getContent();
   return editor.dom.$(selection).is("img");
 }
 
@@ -137,7 +137,7 @@ export function existingContentToLinkIsImg(editor) {
 
 function decorateLinkWithEmbed(link) {
   const type = link.embed && link.embed.type
-  link["class"] = classnames(link["class"], {
+  link.class = classnames(link.class, {
     instructure_file_link: true,
     instructure_scribd_file: type == "scribd",
     instructure_image_thumbnail: type == "image",
@@ -148,7 +148,7 @@ function decorateLinkWithEmbed(link) {
   });
 
   if (link.embed.type == "video" || link.embed.type == "audio") {
-    link["id"] = `media_comment_${link.embed.id || "maybe"}`;
+    link.id = `media_comment_${link.embed.id || "maybe"}`;
   }
 }
 
@@ -163,8 +163,8 @@ export function insertLink(editor, link) {
 
 // link edit/create logic copied from tinymce/plugins/link/plugin.js
 function insertUndecoratedLink(editor, linkAttrs) {
-  var selectedElm = editor.selection.getNode();
-  var anchorElm = getAnchorElement(editor, selectedElm);
+  const selectedElm = editor.selection.getNode();
+  const anchorElm = getAnchorElement(editor, selectedElm);
   if (linkAttrs.target === '_blank') {
     linkAttrs.rel = 'noopener noreferrer'
   }
@@ -207,9 +207,9 @@ function createLink(editor, selectedElm, text, linkAttrs) {
   }
 };
 function linkImageFigure(editor, fig, attrs) {
-  var img = editor.dom.select('img', fig)[0];
+  const img = editor.dom.select('img', fig)[0];
   if (img) {
-    var a = editor.dom.create('a', attrs);
+    const a = editor.dom.create('a', attrs);
     img.parentNode.insertBefore(a, img);
     a.appendChild(img);
   }

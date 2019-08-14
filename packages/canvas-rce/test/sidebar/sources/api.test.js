@@ -63,7 +63,7 @@ describe('sources/api', () => {
     })
 
     it('bookmark omits host if not in props', () => {
-      let noHostProps = Object.assign({}, props, {host: undefined})
+      const noHostProps = { ...props, host: undefined}
       collection = apiSource.initializeCollection(endpoint, noHostProps)
       assert.equal(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
     })
@@ -81,30 +81,30 @@ describe('sources/api', () => {
 
   describe('URI construction', () => {
     it('uses a protocol relative url when no window', () => {
-      let uri = apiSource.baseUri('files', 'example.instructure.com', {})
+      const uri = apiSource.baseUri('files', 'example.instructure.com', {})
       assert.equal(uri, '//example.instructure.com/api/files')
     })
 
     it('uses a path for no-host url construction', () => {
-      let uri = apiSource.baseUri('files')
+      const uri = apiSource.baseUri('files')
       assert.equal(uri, '/api/files')
     })
 
     it('gets protocol from window if available', () => {
-      let fakeWindow = {location: {protocol: 'https:'}}
-      let uri = apiSource.baseUri('files', 'example.instructure.com', fakeWindow)
+      const fakeWindow = {location: {protocol: 'https:'}}
+      const uri = apiSource.baseUri('files', 'example.instructure.com', fakeWindow)
       assert.equal(uri, 'https://example.instructure.com/api/files')
     })
 
     it('never applies protocol to path', () => {
-      let fakeWindow = {location: {protocol: 'https:'}}
-      let uri = apiSource.baseUri('files', null, fakeWindow)
+      const fakeWindow = {location: {protocol: 'https:'}}
+      const uri = apiSource.baseUri('files', null, fakeWindow)
       assert.equal(uri, '/api/files')
     })
 
     it("will replace protocol if there's a mismatch from http to https", () => {
-      let fakeWindow = {location: {protocol: 'https:'}}
-      let uri = apiSource.normalizeUriProtocol('http://something.com', fakeWindow)
+      const fakeWindow = {location: {protocol: 'https:'}}
+      const uri = apiSource.normalizeUriProtocol('http://something.com', fakeWindow)
       assert.equal(uri, 'https://something.com')
     })
   })
@@ -154,7 +154,7 @@ describe('sources/api', () => {
     })
 
     it('can parse while-wrapped page data', () => {
-      let whileFakePageBody = 'while(1);' + fakePageBody
+      const whileFakePageBody = 'while(1);' + fakePageBody
       const uri = 'theURI'
       fetchMock.mock(uri, whileFakePageBody)
       return apiSource.fetchPage(uri).then(page => {
@@ -169,11 +169,11 @@ describe('sources/api', () => {
       const uri = 'theURI'
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, fakePageBody)
 
       return apiSource.fetchPage(uri, 'theJWT').then(page => {
@@ -240,8 +240,8 @@ describe('sources/api', () => {
 
   describe('preflightUpload', () => {
     const uri = '/api/upload'
-    let fileProps = {}
-    let apiProps = {}
+    const fileProps = {}
+    const apiProps = {}
 
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, '{}')
@@ -253,11 +253,11 @@ describe('sources/api', () => {
 
     it('retries once with fresh token on 401', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(response => {
@@ -267,11 +267,11 @@ describe('sources/api', () => {
 
     it('notifies a provided callback when a new token is fetched', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
@@ -439,7 +439,7 @@ describe('sources/api', () => {
     const id = 47
     const uri = `/api/file/${id}`
     const url = '/file/url'
-    let props = {}
+    const props = {}
 
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, {url})
@@ -451,12 +451,12 @@ describe('sources/api', () => {
 
     it('retries once with fresh token on 401', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock(
         (fetchUrl, opts) => {
-          return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+          return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
         },
         {upload: 'done', url}
       )
@@ -468,12 +468,12 @@ describe('sources/api', () => {
 
     it('notifies a provided callback when a new token is fetched', () => {
       fetchMock.mock((fetchUrl, opts) => {
-        return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer theJWT'
+        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
       }, 401)
 
       fetchMock.mock(
         (fetchUrl, opts) => {
-          return uri == fetchUrl && opts.headers['Authorization'] == 'Bearer freshJWT'
+          return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
         },
         {upload: 'done', url}
       )

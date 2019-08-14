@@ -134,7 +134,7 @@ export default function NavigationPanel(props) {
       <AccordionSection
         collection="navigation"
         onToggle={props.onChangeAccordion}
-        expanded={'navigation' === props.selectedAccordionIndex}
+        expanded={props.selectedAccordionIndex === 'navigation'}
         label={navigationSummary}
       >
         <LinkSet

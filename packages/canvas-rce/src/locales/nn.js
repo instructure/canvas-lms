@@ -18,4 +18,5 @@
 
 import formatMessage from "../format-message";
 import locale from "../../locales/nn.json";
+
 formatMessage.addLocale({ nn: locale });

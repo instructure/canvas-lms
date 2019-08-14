@@ -25,7 +25,7 @@ export function requestDocs() {
 }
 
 export function receiveDocs(docs) {
-  let { files, bookmark } = docs;
+  const { files, bookmark } = docs;
   return { type: RECEIVE_DOCS, files, bookmark };
 }
 
@@ -39,7 +39,7 @@ export function failDocs( error) {
 export function fetchDocs() {
   return (dispatch, getState) => {
     const { source, documents } = getState();
-    let bookmark = documents.bookmark;
+    const bookmark = documents.bookmark;
     dispatch(requestDocs());
     return source
       .fetchDocs(bookmark)

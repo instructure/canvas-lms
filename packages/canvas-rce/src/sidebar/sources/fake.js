@@ -727,7 +727,7 @@ export function setUsageRights(id, usageRights) {
 
 export function getFile(id) {
   return Promise.resolve({
-    id: id,
+    id,
     type: "text/plain",
     name: "Test File",
     url: "test.txt",

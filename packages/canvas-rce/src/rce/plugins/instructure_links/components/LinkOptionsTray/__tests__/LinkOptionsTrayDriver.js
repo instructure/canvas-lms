@@ -25,53 +25,68 @@ export default class LinkOptionsTrayDriver {
     }
     return new LinkOptionsTrayDriver($tray)
   }
+
   constructor($element) {
     this.$element = $element
   }
+
   get label() {
     return this.$element.getAttribute('aria-label')
   }
+
   get $textField() {
     return queryByLabelText(document.body, 'Text', {selector: 'input'})
   }
+
   get $linkField() {
     return queryByLabelText(document.body, 'Link', {selector: 'input'})
   }
+
   get $displayAsField() {
     return getAllByText(this.$element, 'Display Options')[0].closest('fieldset')
   }
+
   get $previewCheckbox() {
     return queryHelpers.queryByAttribute('name', this.$element, 'auto-preview')
   }
+
   get $disablePreviewCheckbox() {
     return queryHelpers.queryByAttribute('name', this.$element, 'disable-preview')
   }
+
   get $doneButton() {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
     )
   }
+
   get text() {
     return this.$textField.value
   }
+
   get link() {
     return this.$linkField.value
   }
+
   get autoPreview() {
     return this.$previewCheckbox.checked
   }
+
   setText(text) {
     fireEvent.change(this.$textField, {target: {value: text}})
   }
+
   setLink(text) {
     fireEvent.change(this.$linkField, {target: {value: text}})
   }
+
   setAutoPreview(value) {
     const $input = this.$previewCheckbox
     if ($input.checked !== value) {
       $input.click()
     }
   }
+
   setDisablePreview(value) {
     const $input = this.$disablePreviewCheckbox
     if ($input.checked !== value) {

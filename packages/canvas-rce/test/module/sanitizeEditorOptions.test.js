@@ -22,14 +22,14 @@ import sanitizeEditorOptions from "../../src/rce/sanitizeEditorOptions";
 describe("sanitizeEditorOptions", () => {
   describe("changing options that canvas has that we don't support", () => {
     it("changes nothing for inoffensive options", () => {
-      let rawOptions = {
+      const rawOptions = {
         plugins: ["link", "table"],
         toolbar: [
           "bold,italic,underline,indent,superscript,subscript,bullist,numlist",
           "table,link,unlink,instructure_image,ltr,rtl"
         ]
       };
-      let cleanOptions = sanitizeEditorOptions(rawOptions);
+      const cleanOptions = sanitizeEditorOptions(rawOptions);
       assert.equal(cleanOptions.plugins[1], "table");
       assert.equal(
         cleanOptions.toolbar[1],
@@ -57,17 +57,17 @@ describe("sanitizeEditorOptions", () => {
 
       it("doesnt put instructure_embed through as a plugin because we don't supply that functionality", () => {
         // it's functionality will be replaced by the sidebar component
-        let cleanOptions = sanitizeEditorOptions(rawOptions);
+        const cleanOptions = sanitizeEditorOptions(rawOptions);
         assert.equal(
-          cleanOptions.external_plugins["instructure_embed"],
+          cleanOptions.external_plugins.instructure_embed,
           undefined
         );
       });
 
       it("leaves other custom external plugins in the config", () => {
-        let cleanOptions = sanitizeEditorOptions(rawOptions);
+        const cleanOptions = sanitizeEditorOptions(rawOptions);
         assert.equal(
-          cleanOptions.external_plugins["some_other_plugin"],
+          cleanOptions.external_plugins.some_other_plugin,
           "http://example.com/custom/plugin"
         );
       });

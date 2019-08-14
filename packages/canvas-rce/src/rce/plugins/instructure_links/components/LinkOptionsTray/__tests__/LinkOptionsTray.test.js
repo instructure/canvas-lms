@@ -19,6 +19,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import LinkOptionsTray from '../../LinkOptionsTray'
 import LinkOptionsTrayDriver from './LinkOptionsTrayDriver'
+
 describe('RCE "Links" Plugin > LinkOptionsTray', () => {
   let props
   let tray

@@ -72,8 +72,8 @@ describe("Image actions", () => {
     });
 
     it("fetches if first render", () => {
-      let dispatchSpy = sinon.spy();
-      let getState = () => {
+      const dispatchSpy = sinon.spy();
+      const getState = () => {
         return {
           images: {
             records: [],
@@ -92,8 +92,8 @@ describe("Image actions", () => {
     });
 
     it("skips the fetch if subsequent renders", () => {
-      let dispatchSpy = sinon.spy();
-      let getState = () => {
+      const dispatchSpy = sinon.spy();
+      const getState = () => {
         return {
           images: {
             records: [{ one: "1" }, { two: "2" }, { three: "3" }],
@@ -112,8 +112,8 @@ describe("Image actions", () => {
     });
 
     it("fetches if requested and there are more to load", () => {
-      let dispatchSpy = sinon.spy();
-      let getState = () => {
+      const dispatchSpy = sinon.spy();
+      const getState = () => {
         return {
           images: {
             records: [{ one: "1" }, { two: "2" }, { three: "3" }],
@@ -132,8 +132,8 @@ describe("Image actions", () => {
     });
 
     it("does not fetch if requested but no more to load", () => {
-      let dispatchSpy = sinon.spy();
-      let getState = () => {
+      const dispatchSpy = sinon.spy();
+      const getState = () => {
         return {
           images: {
             records: [{ one: "1" }, { two: "2" }, { three: "3" }],

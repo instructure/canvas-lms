@@ -19,8 +19,8 @@
 import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Button} from '@instructure/ui-buttons'
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button,CloseButton} from '@instructure/ui-buttons'
+
 import {Heading} from '@instructure/ui-elements'
 import {Checkbox, RadioInput, RadioInputGroup, Select, TextArea} from '@instructure/ui-forms'
 import {IconQuestionLine} from '@instructure/ui-icons'

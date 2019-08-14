@@ -42,7 +42,7 @@ export default function register (editor){
 
       onAction: () => editor.execCommand('mceToggleFormat', false, key),
       onItemAction: () => editor.execCommand('mceToggleFormat', false, oppositeKey),
-      onSetup: function (api) {
+      onSetup (api) {
         const $button = editor.$(editor.editorContainer.querySelector(`.tox-split-button[aria-label="${superAndSub[key]}"]`))
         function onNodeChange() {
           const iMatch = editor.formatter.match(key)

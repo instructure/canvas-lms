@@ -64,39 +64,39 @@ describe("Sidebar data actions", () => {
 
   // defaults and reshapes the given props into the shape needed by the store
   function setupState(props) {
-    let { jwt, source, links, bookmark, loading } = Object.assign(
-      {},
-      defaults,
-      props
-    );
-    let collection = { links, bookmark, loading };
-    let collections = { [collectionKey]: collection };
+    const { jwt, source, links, bookmark, loading } = {
+      
+      ...defaults,
+      ...props
+    };
+    const collection = { links, bookmark, loading };
+    const collections = { [collectionKey]: collection };
     return { jwt, source, collections };
   }
 
   describe("fetchPage", () => {
     it("dispatches requestPage first", () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       store.dispatch(actions.fetchPage(collectionKey));
-      let callArgs = store.spy.getCall(1).args[0];
+      const callArgs = store.spy.getCall(1).args[0];
       assert.equal(callArgs.type, actions.REQUEST_PAGE);
       assert.equal(callArgs.key, collectionKey);
     });
 
     it("uses bookmark from store to call source.fetchPage", () => {
-      let source = stubbedSource();
-      let state = setupState({ source });
-      let store = spiedStore(state);
+      const source = stubbedSource();
+      const state = setupState({ source });
+      const store = spiedStore(state);
       store.dispatch(actions.fetchPage(collectionKey));
       assert.ok(source.fetchPage.calledWith(defaults.bookmark));
     });
 
     it("dispatches receivePage with page retrieved from source", done => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       store
         .dispatch(actions.fetchPage(collectionKey))
         .then(() => {
-          let callArgs = store.spy.lastCall.args[0];
+          const callArgs = store.spy.lastCall.args[0];
           assert.equal(callArgs.type, actions.RECEIVE_PAGE);
           assert.equal(callArgs.key, collectionKey);
           assert.equal(callArgs.links, successPage.links);
@@ -107,11 +107,11 @@ describe("Sidebar data actions", () => {
     });
 
     it("dispatches failPage on error retrieving page from source", done => {
-      let store = spiedStore(setupState({ source: brokenSource }));
+      const store = spiedStore(setupState({ source: brokenSource }));
       store
         .dispatch(actions.fetchPage(collectionKey))
         .then(() => {
-          let callArgs = store.spy.lastCall.args[0];
+          const callArgs = store.spy.lastCall.args[0];
           assert.equal(callArgs.type, actions.FAIL_PAGE);
           assert.equal(callArgs.key, collectionKey);
           assert.equal(callArgs.error, brokenError);
@@ -123,7 +123,7 @@ describe("Sidebar data actions", () => {
 
   describe("fetchNextPage", () => {
     it("fetches next page if collection has bookmark and is not loading", () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       store.dispatch(actions.fetchNextPage(collectionKey));
       assert.ok(
         store.spy.calledWith({ type: actions.REQUEST_PAGE, key: collectionKey })
@@ -131,7 +131,7 @@ describe("Sidebar data actions", () => {
     });
 
     it("skips fetching next page if collection has no bookmark", () => {
-      let store = spiedStore(setupState({ bookmark: null }));
+      const store = spiedStore(setupState({ bookmark: null }));
       store.dispatch(actions.fetchNextPage(collectionKey));
       assert.ok(
         store.spy.neverCalledWith({
@@ -142,7 +142,7 @@ describe("Sidebar data actions", () => {
     });
 
     it("skips fetching next page if collection is already loading", () => {
-      let store = spiedStore(setupState({ loading: true }));
+      const store = spiedStore(setupState({ loading: true }));
       store.dispatch(actions.fetchNextPage(collectionKey));
       assert.ok(
         store.spy.neverCalledWith({
@@ -155,7 +155,7 @@ describe("Sidebar data actions", () => {
 
   describe("fetchInitialPage", () => {
     it("fetches initial page if collection is empty, has bookmark, and is not loading", () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       store.dispatch(actions.fetchInitialPage(collectionKey));
       assert.ok(
         store.spy.calledWith({ type: actions.REQUEST_PAGE, key: collectionKey })
@@ -163,7 +163,7 @@ describe("Sidebar data actions", () => {
     });
 
     it("skips fetching initial page if collection is not empty", () => {
-      let store = spiedStore(
+      const store = spiedStore(
         setupState({ links: [{ href: "link", title: "A Link" }] })
       );
       store.dispatch(actions.fetchInitialPage(collectionKey));
@@ -176,7 +176,7 @@ describe("Sidebar data actions", () => {
     });
 
     it("skips fetching initial page if collection has no bookmark", () => {
-      let store = spiedStore(setupState({ bookmark: null }));
+      const store = spiedStore(setupState({ bookmark: null }));
       store.dispatch(actions.fetchInitialPage(collectionKey));
       assert.ok(
         store.spy.neverCalledWith({
@@ -187,7 +187,7 @@ describe("Sidebar data actions", () => {
     });
 
     it("skips fetching initial page if collection is already loading", () => {
-      let store = spiedStore(setupState({ loading: true }));
+      const store = spiedStore(setupState({ loading: true }));
       store.dispatch(actions.fetchInitialPage(collectionKey));
       assert.ok(
         store.spy.neverCalledWith({

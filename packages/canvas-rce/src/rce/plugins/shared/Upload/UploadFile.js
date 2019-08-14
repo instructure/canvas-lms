@@ -27,7 +27,7 @@ import indicatorRegion from '../../../indicatorRegion'
 import {isImage} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
-import {StoreProvider} from '../../shared/StoreContext'
+import {StoreProvider} from "../StoreContext"
 import RceApiSource from "../../../../sidebar/sources/api";
 import Bridge from '../../../../bridge'
 

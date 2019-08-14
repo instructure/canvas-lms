@@ -24,7 +24,7 @@ import { ScreenReaderContent } from '@instructure/ui-a11y'
 import { StyleSheet, css } from "aphrodite";
 
 function Loading(props) {
-  var className = (css(styles.loading) + " " + props.className).trim();
+  const className = (css(styles.loading) + " " + props.className).trim();
   return (
     <span className={className}>
       <ScreenReaderContent>{formatMessage("Loading...")}</ScreenReaderContent>

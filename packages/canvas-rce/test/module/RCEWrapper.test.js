@@ -42,15 +42,15 @@ function createBasicElement(opts) {
     // so RCEWrapper.mceInstance() works
     fakeTinyMCE.editors[0].id = opts.textareaId
   }
-  let props = Object.assign({ textareaId, tinymce: fakeTinyMCE }, opts);
+  const props = {textareaId, tinymce: fakeTinyMCE, ...opts};
   return new RCEWrapper(props);
 }
 
 function createdMountedElement(additionalProps = {}) {
-  let tree = sd.shallowRender(
+  const tree = sd.shallowRender(
     React.createElement(RCEWrapper, {
       defaultContent: "an example string",
-      textareaId: textareaId,
+      textareaId,
       tinymce: fakeTinyMCE,
       editorOptions: {},
       ...additionalProps
@@ -99,7 +99,7 @@ describe("RCEWrapper", () => {
         }
       },
       insertContent: contentToInsert => {
-        editor.content = editor.content + contentToInsert;
+        editor.content += contentToInsert;
       },
       getContainer: () => {
         return {};
@@ -239,7 +239,7 @@ describe("RCEWrapper", () => {
     });
 
     it("inserts links", () => {
-      let link = {};
+      const link = {};
       sinon.stub(contentInsertion, "insertLink");
       instance.insertLink(link);
       assert.ok(contentInsertion.insertLink.calledWith(editor, link));
@@ -381,7 +381,7 @@ describe("RCEWrapper", () => {
 
     describe("indicator", () => {
       it("does not indicate() if editor is hidden", () => {
-        let indicateDefaultStub = sinon.stub(indicateModule, "default");
+        const indicateDefaultStub = sinon.stub(indicateModule, "default");
         editor.hidden = true;
         sinon.stub(instance, "mceInstance");
         instance.mceInstance.returns(editor);
@@ -391,7 +391,7 @@ describe("RCEWrapper", () => {
       });
 
       it("waits until images are loaded to indicate", () => {
-        let image = { complete: false };
+        const image = { complete: false };
         sinon.spy(instance, "indicateEditor");
         sinon.stub(contentInsertion, "insertImage").returns(image);
         instance.insertImage(image);
@@ -404,7 +404,7 @@ describe("RCEWrapper", () => {
 
     describe("broken images", () => {
       it("calls checkImageLoadError when complete", () => {
-        let image = { complete: true };
+        const image = { complete: true };
         sinon.spy(instance, "checkImageLoadError");
         sinon.stub(contentInsertion, "insertImage").returns(image);
         instance.insertImage(image);
@@ -414,7 +414,7 @@ describe("RCEWrapper", () => {
       });
 
       it("sets an onerror handler when not complete", () => {
-        let image = { complete: false };
+        const image = { complete: false };
         sinon.spy(instance, "checkImageLoadError");
         sinon.stub(contentInsertion, "insertImage").returns(image);
         instance.insertImage(image);

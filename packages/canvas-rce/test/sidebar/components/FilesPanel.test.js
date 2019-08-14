@@ -26,8 +26,8 @@ describe("FilesPanel", () => {
   let files, folders, rootFolderId, toggleFolder, onLinkClick, props;
 
   beforeEach(() => {
-    let noop = () => {};
-    let upload = {
+    const noop = () => {};
+    const upload = {
       folders: {},
       uploading: false,
       formExpanded: false,
@@ -79,7 +79,7 @@ describe("FilesPanel", () => {
       rootFolderId,
       fetchFolders: noop,
       startUpload: noop,
-      upload: upload,
+      upload,
       toggleUploadForm: noop
     };
   });
@@ -115,13 +115,13 @@ describe("FilesPanel", () => {
   describe("renderUploadForm()", () => {
     it("does not render UploadForm if indicated", () => {
       const tree = sd.shallowRender(<FilesPanel {...props} />);
-      let uploadForm = tree.subTree("UploadForm");
+      const uploadForm = tree.subTree("UploadForm");
       assert.ok(!uploadForm);
     });
     it("renders UploadForm if indicated", () => {
-      let testProps = { ...props, withUploadForm: true };
+      const testProps = { ...props, withUploadForm: true };
       const tree = sd.shallowRender(<FilesPanel {...testProps} />);
-      let uploadForm = tree.subTree("UploadForm");
+      const uploadForm = tree.subTree("UploadForm");
       assert.ok(uploadForm);
     });
   });

@@ -32,7 +32,7 @@ import {
 } from '@instructure/ui-icons'
 
 import formatMessage from '../../../../format-message';
-import {renderLink as renderLinkHtml} from "../../../../rce/contentRendering";
+import {renderLink as renderLinkHtml} from "../../../contentRendering";
 import dragHtml from "../../../../sidebar/dragHtml";
 import {getIconFromType} from '../../shared/fileTypeUtils'
 import {isPreviewable} from '../../shared/Previewable'
@@ -42,7 +42,7 @@ export default function Link(props) {
   const {filename, display_name, content_type, published, date} = props
   const Icon = getIconFromType(content_type)
   const color = published ? 'success' : 'primary'
-  let dateString = formatMessage.date(Date.parse(date), 'long')
+  const dateString = formatMessage.date(Date.parse(date), 'long')
   const publishedMsg = published ? formatMessage('published') : formatMessage('unpublished')
 
   function linkAttrsFromDoc() {

@@ -40,7 +40,7 @@ export default function indicate(region, margin = MARGIN) {
   el.className = css(styles.indicator, styles.enter, styles.active);
 
   // fades out slowly after a half second
-  let to = setTimeout(() => {
+  const to = setTimeout(() => {
     el.className = css(styles.indicator, styles.leave);
   }, 900);
 

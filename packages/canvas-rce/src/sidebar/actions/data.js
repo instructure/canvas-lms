@@ -25,7 +25,7 @@ export function requestPage(key) {
 }
 
 export function receivePage(key, page) {
-  let { links, bookmark } = page;
+  const { links, bookmark } = page;
   return { type: RECEIVE_PAGE, key, links, bookmark };
 }
 
@@ -39,7 +39,7 @@ export function failPage(key, error) {
 export function fetchPage(key) {
   return (dispatch, getState) => {
     const { source, collections } = getState();
-    let bookmark = collections[key].bookmark;
+    const bookmark = collections[key].bookmark;
     dispatch(requestPage(key));
     return source
       .fetchPage(bookmark)

@@ -63,7 +63,7 @@ describe("RceModule", () => {
   });
 
   it("bridges newly rendered editors", done => {
-    let callback = rendered => {
+    const callback = rendered => {
       assert.equal(Bridge.activeEditor(), rendered);
       done();
     };

@@ -86,16 +86,16 @@ describe("Upload data actions", () => {
   };
 
   function setupState(props) {
-    let { jwt, source } = Object.assign({}, defaults, props);
+    const { jwt, source } = { ...defaults, ...props};
     return { jwt, source };
   }
 
 
   describe("fetchFolders", () => {
     it("fetches if there are no folders loaded yet", () => {
-      let baseState = setupState();
+      const baseState = setupState();
       baseState.upload = { folders: [] };
-      let store = spiedStore(baseState);
+      const store = spiedStore(baseState);
       return store.dispatch(actions.fetchFolders()).then(() => {
         assert.ok(
           store.spy.calledWith({
@@ -109,9 +109,9 @@ describe("Upload data actions", () => {
     });
 
     it("skips the fetch if there are folders already", () => {
-      let baseState = setupState();
+      const baseState = setupState();
       baseState.upload = { folders: [{ id: 1, name: "course files" }] };
-      let store = spiedStore(baseState);
+      const store = spiedStore(baseState);
       store.dispatch(actions.fetchFolders());
       assert.ok(
         store.spy.neverCalledWith({
@@ -139,12 +139,12 @@ describe("Upload data actions", () => {
         }
       };
 
-      let baseState = {
+      const baseState = {
         source: bookmarkSource,
         jwt: "theJWT",
         upload: { folders: [] }
       };
-      let store = spiedStore(baseState);
+      const store = spiedStore(baseState);
       return store.dispatch(actions.fetchFolders()).then(() => {
         assert.ok(
           store.spy.calledWith({
@@ -166,9 +166,9 @@ describe("Upload data actions", () => {
     });
 
     it("dispatches a batch action", () => {
-      let baseState = setupState();
+      const baseState = setupState();
       baseState.upload = { folders: [] };
-      let store = spiedStore(baseState);
+      const store = spiedStore(baseState);
       return store.dispatch(actions.fetchFolders()).then(() => {
         // folder is empty because we didn't actually process the action
         assert.ok(
@@ -212,8 +212,8 @@ describe("Upload data actions", () => {
         }
     }
     it('dispatches a uploadPreflight with the proper parentFolderId set', () => {
-      let baseState = setupState();
-      let store = spiedStore(baseState);
+      const baseState = setupState();
+      const store = spiedStore(baseState);
       return store.dispatch(actions.uploadToMediaFolder('images', fakeFileMetaData)).then(() => {
         assert.ok(
           store.spy.calledWith({ type: actions.START_FILE_UPLOAD, file: {
@@ -232,8 +232,8 @@ describe("Upload data actions", () => {
     })
 
     it('results in a START_MEDIA_UPLOADING action being fired', () => {
-      let baseState = setupState();
-      let store = spiedStore(baseState);
+      const baseState = setupState();
+      const store = spiedStore(baseState);
       return store.dispatch(actions.uploadToMediaFolder('images', fakeFileMetaData)).then(() => {
         sinon.assert.calledWith(store.spy, { type: 'START_MEDIA_UPLOADING', payload: fakeFileMetaData })
       })
@@ -271,13 +271,11 @@ describe("Upload data actions", () => {
 
     function getBaseState() {
       const baseState = setupState();
-      return Object.assign({}, baseState, {
-        contextId: 42,
+      return { ...baseState, contextId: 42,
         contextType: "course",
         ui: {
           selectedTabIndex: 2
-        }
-      });
+        }};
     }
 
     beforeEach(() => {
@@ -394,7 +392,7 @@ describe("Upload data actions", () => {
 
     it("inserts the image content through the bridge", () => {
       props.fileReader = fakeFileReader;
-      let bridgeSpy = sinon.spy(Bridge, "insertImage");
+      const bridgeSpy = sinon.spy(Bridge, "insertImage");
       successSource.uploadFRD.returns(
         Promise.resolve({
           "content-type": "image/jpeg",
@@ -410,8 +408,8 @@ describe("Upload data actions", () => {
 
     it("inserts the file content through the bridge", () => {
       props.fileReader = fakeFileReader;
-      let bridgeSpy = sinon.spy(Bridge, "insertLink");
-      let state = getBaseState();
+      const bridgeSpy = sinon.spy(Bridge, "insertLink");
+      const state = getBaseState();
       state.ui.selectedTabIndex = 1;
       store = spiedStore(state);
       successSource.uploadFRD.returns(
@@ -430,11 +428,11 @@ describe("Upload data actions", () => {
 
   describe("allUploadCompleteActions", () => {
     it("returns a list of actions", () => {
-      let fileMetaProps = {
+      const fileMetaProps = {
         pranetFolderId: 12
       };
-      let results = {};
-      let actionSet = actions.allUploadCompleteActions(results, fileMetaProps);
+      const results = {};
+      const actionSet = actions.allUploadCompleteActions(results, fileMetaProps);
       assert.equal(actionSet.length, 3);
     });
   });
@@ -550,14 +548,14 @@ describe("Upload data actions", () => {
 
   describe('activateMediaUpload', () => {
     it("inserts the placeholder through the bridge", () => {
-      let bridgeSpy = sinon.spy(Bridge, "insertImagePlaceholder");
-      let store = spiedStore({});
+      const bridgeSpy = sinon.spy(Bridge, "insertImagePlaceholder");
+      const store = spiedStore({});
       store.dispatch(actions.activateMediaUpload({}))
       sinon.assert.called(bridgeSpy)
     });
 
     it('dispatches a START_MEDIA_UPLOADING action', () => {
-      let store = spiedStore({});
+      const store = spiedStore({});
       store.dispatch(actions.activateMediaUpload({}))
       sinon.assert.calledWith(store.spy, { type: 'START_MEDIA_UPLOADING', payload: {} })
     })
@@ -565,14 +563,14 @@ describe("Upload data actions", () => {
 
   describe('removePlaceholdersFor', () => {
     it("removes the placeholder through the bridge", () => {
-      let bridgeSpy = sinon.spy(Bridge, "removePlaceholders");
-      let store = spiedStore({});
+      const bridgeSpy = sinon.spy(Bridge, "removePlaceholders");
+      const store = spiedStore({});
       store.dispatch(actions.removePlaceholdersFor('image1'))
       sinon.assert.calledWith(bridgeSpy, 'image1')
     });
 
     it('dispatches a STOP_MEDIA_UPLOADING action', () => {
-      let store = spiedStore({});
+      const store = spiedStore({});
       store.dispatch(actions.removePlaceholdersFor('image1'))
       sinon.assert.calledWith(store.spy, { type: 'STOP_MEDIA_UPLOADING' })
     })
@@ -580,7 +578,7 @@ describe("Upload data actions", () => {
 
   describe("saveMediaRecording", () => {
     it("dispatches startLoading when action is called", () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       return store.dispatch(actions.saveMediaRecording({}, {}, ()=>{})).then(() => {
         assert.ok(
           store.spy.calledWith({
@@ -591,7 +589,7 @@ describe("Upload data actions", () => {
     });
 
     it("dispatches failMediaUpload when error is caught", () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       return store.dispatch(actions.saveMediaRecording({}, {}, ()=>{})).then(() => {
         assert.ok(
           store.spy.args[2][0].type === "FAIL_MEDIA_UPLOAD"
@@ -600,7 +598,7 @@ describe("Upload data actions", () => {
     });
 
     it("dispatches failMediaUpload when k5.fileError is dispatched", () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       sinon.stub(K5Uploader.prototype, 'loadUiConf').callsFake(() => 'mock');
       return store.dispatch(actions.saveMediaRecording({}, {}, ()=>{})).then((uploader) => {
         uploader.dispatchEvent("K5.fileError", {error: "womp womp"}, uploader);
@@ -609,7 +607,7 @@ describe("Upload data actions", () => {
     });
 
     it('dispatches mediaUploadSuccess when K5.complete is dispatched', () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       return store.dispatch(actions.saveMediaRecording({}, {getBody: () =>{}, dom: {add: ()=>{}, setStyles: () => {}}}, ()=>{})).then( async (uploader) => {
         uploader.dispatchEvent("K5.complete", {data : "datatatatatatatat"}, uploader);
         await new Promise(setTimeout)
@@ -618,7 +616,7 @@ describe("Upload data actions", () => {
     });
 
     it('calls dismiss when upload to canvas has succeed during K5.complete is dispatched', () => {
-      let store = spiedStore(setupState());
+      const store = spiedStore(setupState());
       const fakeDismissDispatch = sinon.spy();
       return store.dispatch(actions.saveMediaRecording({}, {getBody: () =>{}, dom: {add: ()=>{}, setStyles: () =>{}}}, fakeDismissDispatch)).then( async (uploader) => {
         uploader.dispatchEvent("K5.complete", {data : "datatatatatatatat"}, uploader);

@@ -110,9 +110,9 @@ export function removePlaceholdersFor(name) {
 }
 
 export function allUploadCompleteActions(results, fileMetaProps) {
-  let actions = [];
+  const actions = [];
   actions.push(completeUpload(results));
-  let fileProps = {
+  const fileProps = {
     id: results.id,
     name: results.display_name,
     url: results.preview_url,
@@ -132,7 +132,7 @@ export function allUploadCompleteActions(results, fileMetaProps) {
 }
 
 export function embedUploadResult(results, selectedTabType) {
-  let embedData = fileEmbed(results);
+  const embedData = fileEmbed(results);
 
   if (
     selectedTabType == "images" &&
@@ -182,7 +182,7 @@ export function fetchFolders(bookmark) {
 
 function generateUploadOptions(mediatypes, sessionData) {
   const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
-  delete sessionDataCopy["kaltura_setting"]
+  delete sessionDataCopy.kaltura_setting
   return {
     kaltura_session: sessionDataCopy,
     allowedMediaTypes: mediatypes,

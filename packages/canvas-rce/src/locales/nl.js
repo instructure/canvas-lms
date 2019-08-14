@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/nl.json";
 import "../rce/languages/nl";
+
 formatMessage.addLocale({ nl: locale });

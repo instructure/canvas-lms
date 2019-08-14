@@ -24,7 +24,7 @@ export default function documentsReducer(state = {}, action) {
   switch (action.type) {
     case REQUEST_DOCS:
       // set loading flag to true
-      return Object.assign({}, state, { isLoading: true });
+      return { ...state, isLoading: true};
 
     case RECEIVE_DOCS:
       // add links to collection, store bookmark if more, resolve loading
@@ -36,14 +36,14 @@ export default function documentsReducer(state = {}, action) {
       };
 
     case FAIL_DOCS: {
-      let overrides = {
+      const overrides = {
         isLoading: false,
         error: action.error
       };
       if (state.files.length == 0) {
         overrides.bookmark = null;
       }
-      return Object.assign({}, state, overrides);
+      return { ...state, ...overrides};
     }
     default:
       return state;

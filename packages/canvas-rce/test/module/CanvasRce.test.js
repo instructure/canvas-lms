@@ -54,18 +54,16 @@ describe("CanvasRce", () => {
   });
 
   const renderCanvasRce = props => {
-    const mergedProps = Object.assign(
-      {
-        rceProps: {
+    const mergedProps = {
+      rceProps: {
           editorOptions: () => {
             return {};
           },
           textareaId: "someUniqueId",
           language: "en"
-        }
-      },
-      props
-    );
+        },
+      ...props
+    };
     ReactDOM.render(<CanvasRce {...mergedProps} />, target);
   };
 
@@ -74,7 +72,7 @@ describe("CanvasRce", () => {
   });
 
   it("bridges newly rendered editors", done => {
-    let renderCallback = rendered => {
+    const renderCallback = rendered => {
       assert.equal(Bridge.activeEditor(), rendered);
       done();
     };

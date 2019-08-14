@@ -25,7 +25,7 @@ import {getContentFromElement, VIDEO_EMBED_TYPE} from '../shared/ContentSelectio
 const trayController = new TrayController()
 
 tinymce.create("tinymce.plugins.InstructureRecord", {
-  init: function(ed) {
+  init(ed) {
     ed.addCommand("instructureRecord", clickCallback.bind(this, ed, document));
     ed.ui.registry.addMenuButton("instructure_record", {
       tooltip: htmlEscape(

@@ -22,7 +22,7 @@ import assert from "assert";
 import { fileEmbed, mimeClass } from "../../src/common/mimeClass";
 
 describe("fileEmbed", () => {
-  let base_file = { preview_url: "some_url" };
+  const base_file = { preview_url: "some_url" };
 
   function getBaseFile(...args) {
     return Object.assign({}, base_file, ...args);
@@ -33,8 +33,8 @@ describe("fileEmbed", () => {
   });
 
   it("uses content-type to identify video and audio", () => {
-    let video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
-    let audio = fileEmbed(getBaseFile({ "content-type": "audio/mpeg" }));
+    const video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
+    const audio = fileEmbed(getBaseFile({ "content-type": "audio/mpeg" }));
     assert.equal(video.type, "video");
     assert.equal(video.id, "maybe");
     assert.equal(audio.type, "audio");
@@ -42,7 +42,7 @@ describe("fileEmbed", () => {
   });
 
   it("returns media entry id if provided", () => {
-    let video = fileEmbed(
+    const video = fileEmbed(
       getBaseFile({
         "content-type": "video/mp4",
         media_entry_id: "42"
@@ -52,17 +52,17 @@ describe("fileEmbed", () => {
   });
 
   it("returns maybe in place of media entry id if not provided", () => {
-    let video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
+    const video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
     assert.equal(video.id, "maybe");
   });
 
   it("picks scribd if there is a preview_url", () => {
-    let scribd = fileEmbed(getBaseFile({ preview_url: "some-url" }));
+    const scribd = fileEmbed(getBaseFile({ preview_url: "some-url" }));
     assert.equal(scribd.type, "scribd");
   });
 
   it("uses content-type to identify images", () => {
-    let image = fileEmbed(
+    const image = fileEmbed(
       getBaseFile({
         "content-type": "image/png",
         canvadoc_session_url: "some-url"
@@ -74,8 +74,8 @@ describe("fileEmbed", () => {
 
 describe("mimeClass", () => {
   it("returns mime_class attribute if present", () => {
-    let mime_class = "wooper";
-    assert.equal(mimeClass({ mime_class: mime_class }), mime_class);
+    const mime_class = "wooper";
+    assert.equal(mimeClass({ mime_class }), mime_class);
   });
 
   it("returns value corresponding to provided `content-type`", () => {

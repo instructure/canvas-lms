@@ -361,11 +361,13 @@ class RCEWrapper extends React.Component {
   }
 
   contentTrayClosing = false
+
   handleContentTrayClosing = isClosing => {
     this.contentTrayClosing = isClosing
   }
 
   blurTimer = 0
+
   handleBlur(event) {
     if (this.blurTimer) return
 

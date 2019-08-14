@@ -32,7 +32,7 @@ describe("Collection reducer", () => {
   });
 
   describe("REQUEST_PAGE", () => {
-    let action = {
+    const action = {
       type: actions.REQUEST_PAGE
     };
 

@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/it.json";
 import "../rce/languages/it";
+
 formatMessage.addLocale({ it: locale });

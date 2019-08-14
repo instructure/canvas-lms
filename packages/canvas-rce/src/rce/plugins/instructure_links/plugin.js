@@ -22,6 +22,7 @@ import bridge from '../../../bridge'
 import {getContentFromElement, FILE_LINK_TYPE} from '../shared/ContentSelection'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
+
 const trayController = new LinkOptionsTrayController()
 
 const PLUGIN_KEY = 'links'
@@ -100,7 +101,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
         }
         callback(items)
       },
-      onSetup: function(api) {
+      onSetup(api) {
         function handleNodeChange(e) {
           api.setActive(!!getAnchorElement(ed, e.element))
         }

@@ -24,8 +24,8 @@ import sinon from "sinon";
 // creates a reducer that just alerts a spy on each action and leaves state
 // alone. the associated spy is hung off the returned reducer
 export function spiedReducer() {
-  let spy = sinon.spy();
-  let reducer = (state = {}, action) => {
+  const spy = sinon.spy();
+  const reducer = (state = {}, action) => {
     if (action.type !== "@@redux/INIT") {
       spy(action);
     }
@@ -38,8 +38,8 @@ export function spiedReducer() {
 // creates a store with the given state and with a spiedReducer; the spy from
 // the reducer is also hung off the returned store
 export function spiedStore(state) {
-  let reducer = spiedReducer();
-  let store = createStore(
+  const reducer = spiedReducer();
+  const store = createStore(
     batching(reducer),
     state,
     applyMiddleware(thunkMiddleware, batch)

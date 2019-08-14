@@ -64,7 +64,7 @@ describe("contentInsertion", () => {
       },
       focus: () => {},
       insertContent: content => {
-        editor.content = editor.content + content;
+        editor.content += content;
       },
       iframeElement: {
         getBoundingClientRect: () => {
@@ -142,14 +142,14 @@ describe("contentInsertion", () => {
 
   describe("insertContent", () => {
     it("accepts string content", () => {
-      let content = "Some Chunk Of Content";
+      const content = "Some Chunk Of Content";
       contentInsertion.insertContent(editor, content);
       assert.equal(editor.content, "Some Chunk Of Content");
     });
 
     it("calls replaceTextareaSelection() when editor is hidden", () => {
-      let content = "blah";
-      let elem = { selectionStart: 0, selectionEnd: 3, value: "subcontent" };
+      const content = "blah";
+      const elem = { selectionStart: 0, selectionEnd: 3, value: "subcontent" };
       editor.isHidden = () => {
         return true;
       };
@@ -195,12 +195,12 @@ describe("contentInsertion", () => {
           return "http://bogus.edu";
         }
       };
-      let ed = Object.assign({}, editor);
+      const ed = { ...editor};
       ed.insertContent = content => {
-        ed.content = ed.content + content;
+        ed.content += content;
       };
       ed.selection.getNode = () => {
-        return Object.assign({}, node, { nodeName: "IMG" });
+        return { ...node, nodeName: "IMG"};
       };
       ed.selection.getRng = () => ({
         startContainer: containerElem,

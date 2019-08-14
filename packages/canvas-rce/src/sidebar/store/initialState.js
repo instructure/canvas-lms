@@ -61,9 +61,9 @@ export default function(props = {}) {
   // default to API source
   if (source == null) {
     source = new RceApiSource({
-      jwt: jwt,
-      refreshToken: refreshToken,
-      host: host
+      jwt,
+      refreshToken,
+      host
     });
   }
 

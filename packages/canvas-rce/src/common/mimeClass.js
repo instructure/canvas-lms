@@ -17,8 +17,8 @@
  */
 
 export function fileEmbed(file) {
-  let fileMimeClass = mimeClass(file);
-  let fileMediaEntryId = mediaEntryId(file);
+  const fileMimeClass = mimeClass(file);
+  const fileMediaEntryId = mediaEntryId(file);
 
   if (fileMimeClass === "image") {
     return { type: "image" };
@@ -41,7 +41,7 @@ export function mimeClass(file) {
   if (file.mime_class) {
     return file.mime_class;
   } else {
-    let contentType = getContentType(file);
+    const contentType = getContentType(file);
 
     return (
       {

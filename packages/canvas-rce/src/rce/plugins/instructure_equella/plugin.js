@@ -21,7 +21,7 @@ import formatMessage from "../../../format-message";
 import clickCallback from "./clickCallback";
 
 tinymce.create("tinymce.plugins.InstructureEquella", {
-  init: function(ed) {
+  init(ed) {
     ed.addCommand("instructureEquella", clickCallback.bind(this, ed, document));
 
     ed.ui.registry.addButton("instructure_equella", {

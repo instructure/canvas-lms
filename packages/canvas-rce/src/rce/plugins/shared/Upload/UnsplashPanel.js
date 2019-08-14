@@ -19,12 +19,12 @@
 import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react'
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
-import {Flex} from '@instructure/ui-layout'
+import {Flex, View } from '@instructure/ui-layout'
 import {Avatar, Img, Spinner} from '@instructure/ui-elements'
 import { ScreenReaderContent } from '@instructure/ui-a11y'
 import { Alert } from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
-import { View } from '@instructure/ui-layout'
+
 import { Button } from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
@@ -144,7 +144,7 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
       )
     }
     return (
-      <Alert variant="info" transition="none" screenReaderOnly={true} liveRegion={liveRegion}>
+      <Alert variant="info" transition="none" screenReaderOnly liveRegion={liveRegion}>
         {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', { totalResults, numDisplayed: results[page].length })}
       </Alert>
     )

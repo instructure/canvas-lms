@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import bridge from '../../../../../bridge'
 import {getContentFromEditor} from '../../../shared/ContentSelection'
 import LinkOptionsTray from '.'
+
 export const CONTAINER_ID = 'instructure-link-options-tray-container'
 export default class LinkOptionsTrayController {
   constructor() {
@@ -29,6 +30,7 @@ export default class LinkOptionsTrayController {
     this._shouldOpen = false
     this._renderId = 0
   }
+
   get $container() {
     let $container = document.getElementById(CONTAINER_ID)
     if ($container == null) {
@@ -38,28 +40,34 @@ export default class LinkOptionsTrayController {
     }
     return $container
   }
+
   get isOpen() {
     return this._isOpen
   }
+
   showTrayForEditor(editor) {
     this._editor = editor
     this._shouldOpen = true
     this._renderTray()
   }
+
   hideTrayForEditor(editor) {
     if (this._editor === editor) {
       this._dismissTray()
     }
   }
+
   _applyLinkOptions(linkOptions) {
     this._dismissTray()
     bridge.insertLink(linkOptions)
   }
+
   _dismissTray() {
     this._shouldOpen = false
     this._renderTray()
     this._editor = null
   }
+
   _renderTray() {
     const content = getContentFromEditor(this._editor, true)
     if (this._shouldOpen) {

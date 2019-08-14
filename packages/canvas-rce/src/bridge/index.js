@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*eslint no-console: 0*/
+/* eslint no-console: 0 */
 
 import Bridge from './Bridge'
 

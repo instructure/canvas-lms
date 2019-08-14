@@ -1,0 +1,7 @@
+{
+  "extends": ["plugin:testcafe/recommended"],
+  "plugins": ["testcafe"],
+  "rules": {
+    "import/order": "off"
+  }
+}

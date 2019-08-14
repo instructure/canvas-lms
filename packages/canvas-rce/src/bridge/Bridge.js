@@ -18,7 +18,7 @@
 
 import K5Uploader from '@instructure/k5uploader'
 
-/*eslint no-console: 0*/
+/* eslint no-console: 0 */
 export default class Bridge {
   constructor() {
     this.focusedEditor = null

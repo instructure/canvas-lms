@@ -23,8 +23,8 @@ import sinon from "sinon";
 import sd from "skin-deep";
 
 describe("FlickrSearch", () => {
-  let noop = () => {};
-  let fakeEvent = {
+  const noop = () => {};
+  const fakeEvent = {
     preventDefault() {}
   };
   let flickr, defaultProps;
@@ -38,7 +38,7 @@ describe("FlickrSearch", () => {
     };
 
     defaultProps = {
-      flickr: flickr,
+      flickr,
       flickrSearch: noop,
       toggleFlickrForm: noop,
       onImageEmbed: noop
@@ -55,16 +55,16 @@ describe("FlickrSearch", () => {
   describe("form rendering", () => {
     it("renders form if expanded", () => {
       flickr.formExpanded = true;
-      let flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
-      let instance = flickrComp.getMountedInstance();
-      let searchForm = sd.shallowRender(instance.renderForm());
+      const flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
+      const instance = flickrComp.getMountedInstance();
+      const searchForm = sd.shallowRender(instance.renderForm());
       assert.ok(searchForm.subTree("form"));
     });
 
     it("is null if not expanded", () => {
       flickr.formExpanded = false;
-      let flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
-      let instance = flickrComp.getMountedInstance();
+      const flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
+      const instance = flickrComp.getMountedInstance();
       assert.equal(null, instance.renderForm());
     });
 
@@ -83,10 +83,10 @@ describe("FlickrSearch", () => {
     it("fires the handler when you click the expand link", () => {
       flickr.formExpanded = false;
       let clicked = false;
-      let toggleForm = () => {
+      const toggleForm = () => {
         clicked = true;
       };
-      let flickrComp = sd.shallowRender(
+      const flickrComp = sd.shallowRender(
         <FlickrSearch
           flickr={flickr}
           flickrSearch={noop}
@@ -94,7 +94,7 @@ describe("FlickrSearch", () => {
           onImageEmbed={noop}
         />
       );
-      let vdom = flickrComp.getRenderOutput();
+      const vdom = flickrComp.getRenderOutput();
       vdom.props.children[0].props.onClick(fakeEvent);
       assert.ok(clicked);
     });
@@ -117,8 +117,8 @@ describe("FlickrSearch", () => {
     });
 
     it("does not pass null/empty search term to search handler", () => {
-      let searchStub = sinon.stub();
-      let instance = sd
+      const searchStub = sinon.stub();
+      const instance = sd
         .shallowRender(
           <FlickrSearch
             flickr={flickr}
@@ -140,7 +140,7 @@ describe("FlickrSearch", () => {
 
     it("has no button if already searching", () => {
       flickr.searching = true;
-      let flickrComp = sd.shallowRender(
+      const flickrComp = sd.shallowRender(
         <FlickrSearch
           flickr={flickr}
           flickrSearch={noop}
@@ -148,8 +148,8 @@ describe("FlickrSearch", () => {
           onImageEmbed={noop}
         />
       );
-      let instance = flickrComp.getMountedInstance();
-      let searchForm = sd.shallowRender(instance.renderForm());
+      const instance = flickrComp.getMountedInstance();
+      const searchForm = sd.shallowRender(instance.renderForm());
       assert.ok(!searchForm.subTree("#flickr-search-submit-btn"));
     });
 
@@ -162,7 +162,7 @@ describe("FlickrSearch", () => {
       });
 
       it("renders results", () => {
-        let flickrComp = sd.shallowRender(
+        const flickrComp = sd.shallowRender(
           <FlickrSearch
             flickr={flickr}
             flickrSearch={noop}
@@ -170,14 +170,14 @@ describe("FlickrSearch", () => {
             onImageEmbed={noop}
           />
         );
-        let instance = flickrComp.getMountedInstance();
-        let searchForm = sd.shallowRender(instance.renderForm());
+        const instance = flickrComp.getMountedInstance();
+        const searchForm = sd.shallowRender(instance.renderForm());
         assert.ok(searchForm.subTree("img", { alt: "asdf" }));
         assert.ok(searchForm.subTree("img", { alt: "fdas" }));
       });
 
       it("adds a flickr thumbnail signal to href", () => {
-        let flickrComp = sd.shallowRender(
+        const flickrComp = sd.shallowRender(
           <FlickrSearch
             flickr={flickr}
             flickrSearch={noop}
@@ -185,17 +185,17 @@ describe("FlickrSearch", () => {
             onImageEmbed={noop}
           />
         );
-        let instance = flickrComp.getMountedInstance();
-        let searchForm = sd.shallowRender(instance.renderForm());
-        let flickrResult1 = searchForm.subTree("img", {
+        const instance = flickrComp.getMountedInstance();
+        const searchForm = sd.shallowRender(instance.renderForm());
+        const flickrResult1 = searchForm.subTree("img", {
           src: "asdf_s.jpg"
         });
         assert.ok(flickrResult1);
       });
 
       it("handles a result click through callback", () => {
-        let clickSpy = sinon.spy();
-        let flickrComp = sd.shallowRender(
+        const clickSpy = sinon.spy();
+        const flickrComp = sd.shallowRender(
           <FlickrSearch
             flickr={flickr}
             flickrSearch={noop}
@@ -203,18 +203,18 @@ describe("FlickrSearch", () => {
             onImageEmbed={clickSpy}
           />
         );
-        let instance = flickrComp.getMountedInstance();
-        let searchForm = sd.shallowRender(instance.renderForm());
-        let vdom = searchForm.getRenderOutput();
+        const instance = flickrComp.getMountedInstance();
+        const searchForm = sd.shallowRender(instance.renderForm());
+        const vdom = searchForm.getRenderOutput();
         vdom.props.children[1].props.children[0].props.onClick(fakeEvent); // click on a result
         assert.ok(clickSpy.called);
       });
 
       it("uses the correct image URL on the drag event", () => {
-        let flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
-        let instance = flickrComp.getMountedInstance();
+        const flickrComp = sd.shallowRender(<FlickrSearch {...defaultProps} />);
+        const instance = flickrComp.getMountedInstance();
         let imageData = null;
-        let dndEvent = {
+        const dndEvent = {
           dataTransfer: {
             getData: () => {
               return `<img src="http://canvas.docker/images/thumbnails/show/55/BI8re30hgKqgYgEYMf8AwTr7wvFjqFSdSZvNU96R">`;
@@ -224,7 +224,7 @@ describe("FlickrSearch", () => {
             }
           }
         };
-        let result = { href: "http://a.better.url", title: "image title" };
+        const result = { href: "http://a.better.url", title: "image title" };
         instance.flickrResultDrag(dndEvent, result);
         assert.equal(
           imageData,
