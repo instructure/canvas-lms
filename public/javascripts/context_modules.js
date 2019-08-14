@@ -728,10 +728,29 @@ function scrollTo ($thing, time = 500) {
         prereqsList += prereqs[i].name + ', ';
       }
       prereqsList = prereqsList.slice(0, -2)
-      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + prereqsList, 'class': 'prerequisites_message'});
+      const $prerequisitesMessage = $('<div />', {text: prerequisitesMessage(prereqsList), 'class': 'prerequisites_message'});
       $prerequisitesDiv.append($prerequisitesMessage);
 
     }
+  }
+
+  // after a module has been updated, update its name as used in other modules' prerequisite lists
+  var updateOtherPrerequisites = function(id, name) {
+    $('div.context_module .prerequisite_criterion .id').each(function(_, idNode) {
+      const $id = $(idNode)
+      const prereq_id = $id.text()
+      if (prereq_id == id) {
+        const $crit = $id.closest('.prerequisite_criterion')
+        $crit.find('.name').text(name)
+        const $prereqs = $id.closest('.prerequisites')
+        const names = $.makeArray($prereqs.find('.prerequisite_criterion .name')).map(el => $(el).text()).join(', ')
+        $prereqs.find('.prerequisites_message').text(prerequisitesMessage(names))
+      }
+    })
+  }
+
+  var prerequisitesMessage = function(list) {
+    return I18n.t('Prerequisites: %{list}', {list})
   }
 
   var newPillMessage = function($module, requirement_count) {
@@ -791,6 +810,7 @@ function scrollTo ($thing, time = 500) {
 
       $module.find(".unlock_details").showIf(data.context_module.unlock_at && Date.parse(data.context_module.unlock_at) > new Date());
       updatePrerequisites($module, data.context_module.prerequisites);
+      updateOtherPrerequisites(data.context_module.id, data.context_module.name);
 
       // Update requirement message pill
       if (data.context_module.completion_requirements.length === 0) {
