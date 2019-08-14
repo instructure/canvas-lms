@@ -22,7 +22,7 @@ import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassI
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
-import MoreOptions from '../MoreOptions'
+import MoreOptions from './MoreOptions'
 import React, {Component} from 'react'
 import {Submission} from '../../graphqlData/Submission'
 import {uploadFiles} from '../../../../shared/upload_file'
@@ -218,6 +218,7 @@ export default class FileUpload extends Component {
                     <MoreOptions
                       assignmentID={this.props.assignment._id}
                       courseID={this.props.assignment.env.courseId}
+                      userID={this.props.assignment.env.currentUser.id}
                     />
                   </FlexItem>
                 </Flex>

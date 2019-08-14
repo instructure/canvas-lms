@@ -84,41 +84,45 @@ class MoreOptions extends React.Component {
             {I18n.t('More Options')}
           </Button>
         </div>
-        <Modal
-          as="form"
-          data-testid="more-options-modal"
-          open={this.state.open}
-          onDismiss={this.handleModalClose}
-          size="large"
-          label="More Options"
-          shouldCloseOnDocumentClick
-        >
-          <ModalHeader>
-            {this.renderCloseButton()}
-            <Heading>{I18n.t('More Options')}</Heading>
-          </ModalHeader>
-          <ModalBody padding="0 small">
-            <ExternalToolsQuery
-              assignmentID={this.props.assignmentID}
-              courseID={this.props.courseID}
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={this.handleModalClose} margin="0 xx-small 0 0">
-              {I18n.t('Cancel')}
-            </Button>
-            <Button variant="primary" type="submit">
-              {I18n.t('Upload')}
-            </Button>
-          </ModalFooter>
-        </Modal>
+        {this.state.open && (
+          <Modal
+            as="form"
+            data-testid="more-options-modal"
+            open={this.state.open}
+            onDismiss={this.handleModalClose}
+            size="large"
+            label="More Options"
+            shouldCloseOnDocumentClick
+          >
+            <ModalHeader>
+              {this.renderCloseButton()}
+              <Heading>{I18n.t('More Options')}</Heading>
+            </ModalHeader>
+            <ModalBody padding="0 small">
+              <ExternalToolsQuery
+                assignmentID={this.props.assignmentID}
+                courseID={this.props.courseID}
+                userID={this.props.userID}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={this.handleModalClose} margin="0 xx-small 0 0">
+                {I18n.t('Cancel')}
+              </Button>
+              <Button variant="primary" type="submit">
+                {I18n.t('Upload')}
+              </Button>
+            </ModalFooter>
+          </Modal>
+        )}
       </>
     )
   }
 }
 MoreOptions.propTypes = {
   assignmentID: string.isRequired,
-  courseID: string.isRequired
+  courseID: string.isRequired,
+  userID: string.isRequired
 }
 
 export default MoreOptions

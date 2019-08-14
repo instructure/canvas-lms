@@ -87,7 +87,7 @@ module Types
         load_association(:groups),
         load_association(:group_memberships)
       ]).then do
-        object.groups
+        object.groups.active
       end
     end
 

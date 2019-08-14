@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {arrayOf, string} from 'prop-types'
-import {ExternalTool} from '../../graphqlData/ExternalTool'
+import CanvasFiles from './CanvasFiles'
+import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import React from 'react'
+import {UserGroups} from '../../../graphqlData/UserGroups'
 
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 
@@ -37,6 +39,9 @@ const iframeStyle = {
 
 const Tools = props => (
   <TabList defaultSelectedIndex={0} variant="minimal">
+    <TabPanel title="Canvas Files">
+      <CanvasFiles courseID={props.courseID} userGroups={props.userGroups.groups} />
+    </TabPanel>
     {props.tools.map(tool => (
       <TabPanel title={tool.name} key={tool._id}>
         <div style={iframeContainerStyle}>
@@ -53,7 +58,8 @@ const Tools = props => (
 Tools.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
-  tools: arrayOf(ExternalTool.shape)
+  tools: arrayOf(ExternalTool.shape),
+  userGroups: UserGroups.shape
 }
 
 const launchUrl = (assignmentID, courseID, tool) => {
