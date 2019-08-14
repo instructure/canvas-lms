@@ -18,15 +18,20 @@
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
 import I18n from 'i18n!assignments_2_text_entry'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
 import React, {useState} from 'react'
 import UploadMedia from '@instructure/canvas-media'
-import View from '@instructure/ui-layout/lib/components/View'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
+import View from '@instructure/ui-layout/lib/components/View'
 
 export default function MediaAttempt() {
   const [mediaModalOpen, setMediaModalOpen] = useState(false)
+
+  const languages = Object.keys(closedCaptionLanguages).map(key => {
+    return {id: key, label: closedCaptionLanguages[key]}
+  })
 
   return (
     <View as="div" borderWidth="small">
@@ -34,6 +39,8 @@ export default function MediaAttempt() {
         uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
         onDismiss={() => setMediaModalOpen(false)}
         open={mediaModalOpen}
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        languages={languages}
       />
       <Billboard
         heading={I18n.t('Add Media')}

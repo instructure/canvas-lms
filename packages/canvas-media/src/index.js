@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {bool, func} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import React, {Suspense} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -27,6 +27,7 @@ import {View} from '@instructure/ui-layout'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import translationShape from './translationShape'
 
+const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionPanel'))
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const EmbedPanel = React.lazy(() => import('./EmbedPanel'))
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
@@ -34,7 +35,8 @@ const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
 export const PANELS = {
   COMPUTER: 0,
   RECORD: 1,
-  EMBED: 2
+  EMBED: 2,
+  CLOSED_CAPTIONS: 3
 }
 
 export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecording, onDismiss) => {
@@ -57,6 +59,13 @@ export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecordi
 
 export default class UploadMedia extends React.Component {
   static propTypes = {
+    languages: arrayOf(
+      shape({
+        id: string,
+        label: string
+      })
+    ),
+    liveRegion: func,
     onDismiss: func,
     open: bool,
     uploadMediaTranslations: translationShape
@@ -80,6 +89,7 @@ export default class UploadMedia extends React.Component {
 
   renderModalBody = () => {
     const {
+      CLOSED_CAPTIONS_PANEL_TITLE,
       COMPUTER_PANEL_TITLE,
       DRAG_FILE_TEXT,
       EMBED_PANEL_TITLE,
@@ -135,6 +145,19 @@ export default class UploadMedia extends React.Component {
               label={EMBED_VIDEO_CODE_TEXT}
               embedCode={this.state.embedCode}
               setEmbedCode={embedCode => this.setState({embedCode})}
+            />
+          </Suspense>
+        </Tabs.Panel>
+
+        <Tabs.Panel
+          isSelected={this.state.selectedPanel === PANELS.CLOSED_CAPTIONS}
+          renderTitle={() => CLOSED_CAPTIONS_PANEL_TITLE}
+        >
+          <Suspense fallback={this.renderFallbackSpinner()}>
+            <ClosedCaptionPanel
+              languages={this.props.languages}
+              liveRegion={this.props.liveRegion}
+              uploadMediaTranslations={this.props.uploadMediaTranslations}
             />
           </Suspense>
         </Tabs.Panel>
