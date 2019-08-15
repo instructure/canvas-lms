@@ -74,6 +74,7 @@ module.exports = {
     'one-var': 'off',
     'prefer-destructuring': 'off',
     'prefer-rest-params': 'off',
+    'prefer-template': 'off', // AirBnB says 'error', we don't care
     'eslint-comments/disable-enable-pair': ['error', {allowWholeFile: true}], // We are okay with turning rules off for the entirety of a file (though use it sparingly)
     'import/prefer-default-export': 'off',
     'jsx-a11y/label-has-for': 'off',
