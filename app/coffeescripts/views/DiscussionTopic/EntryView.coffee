@@ -31,6 +31,7 @@ import EntryEditor from '../../discussions/EntryEditor'
 import htmlEscape from 'str/htmlEscape'
 import {publish} from 'vendor/jquery.ba-tinypubsub'
 import apiUserContent from '../../str/apiUserContent'
+import {isRTL} from 'jsx/shared/helpers/rtlHelper'
 import 'jst/_avatar'
 import 'jst/discussions/_reply_form'
 
@@ -176,6 +177,12 @@ class EntryView extends Backbone.View
 
   afterRender: ->
     super
+    directionToPad = if isRTL() then 'right' else 'left'
+    shouldPosition = @$el.find('.entry-content[data-should-position]')
+    level = shouldPosition.parents('li.entry').length
+    offset = (level - 1) * 30
+    shouldPosition.css("padding-#{directionToPad}", offset)
+    shouldPosition.find('.discussion-title').attr({role: 'heading', 'aria-level': level + 1})
     @collapse() if @options.collapsed
     @setToggleTooltip()
     @renderRating()
