@@ -26,33 +26,24 @@ import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import CourseLink from './CourseLink'
-
 export default function CoursesTray({courses, hasLoaded}) {
   return (
     <View as="div" padding="medium">
       <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
       <hr role="presentation"/>
-      <List variant="unstyled" itemSpacing="x-small" >
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           courses.map(course =>
-            <ListItem key={course.id} >
-              <CourseLink course={course} />
+            <ListItem key={course.id}>
+              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/courses/${course.id}`}>{course.name}</Button>
               {course.enrollment_term_id > 1 &&
-                <Text as="div" size="x-small" weight="light" lineHeight="fit">{course.term.name}</Text>
+                <Text as="div" size="x-small" weight="light">{course.term.name}</Text>
               }
             </ListItem>
           ).concat([
             <ListItem key="hr"><hr role="presentation"/></ListItem>,
             <ListItem key="all">
-              <Button
-                variant="link"
-                href="/courses"
-                fluidWidth
-                theme={{mediumPadding: '0'}}
-              >
-                {I18n.t('All Courses')}
-              </Button>
+              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/courses">{I18n.t('All Courses')}</Button>
             </ListItem>
           ])
         ) : (
@@ -62,11 +53,11 @@ export default function CoursesTray({courses, hasLoaded}) {
         )}
       </List>
       <br />
-        <View as="div">
+        <Text as="div">
           {I18n.t(
             'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
           )}
-        </View>
+        </Text>
     </View>
   )
 }
