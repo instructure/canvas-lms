@@ -145,6 +145,7 @@ export default class DiscussionsIndex extends Component {
               title={I18n.t('Pinned Discussions')}
               discussions={this.props.pinnedDiscussions}
               deleteDiscussion={this.openDeleteDiscussionsModal}
+              pinned
               renderContainerBackground={() =>
                 pinnedDiscussionBackground({
                   permissions: this.props.permissions
@@ -212,7 +213,6 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            pinned={false}
             closedState={false}
             renderContainerBackground={() =>
               unpinnedDiscussionsBackground({
@@ -228,7 +228,6 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            pinned={false}
             closedState
             renderContainerBackground={() =>
               closedDiscussionBackground({
