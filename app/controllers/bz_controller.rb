@@ -1612,8 +1612,11 @@ class BzController < ApplicationController
 
     account = Account.find(1)
 
-    if account.docusign_token_expiration < (DateTime.now + 1.days)
-      docusign_consume_refresh_token
+    # The expiration returned seems to be 8 hours. That could change. Let's get a new access token using the
+    # refresh token if we're 20 min away from expiration. See:
+    # https://developers.docusign.com/esign-rest-api/guides/authentication/oauth2-code-grant#using-refresh-tokens
+    if account.docusign_token_expiration < (DateTime.now + 20.minutes)
+      docusign_refresh_access_token_using_refresh_token
       account = Account.find(1)
     end
 
@@ -1676,12 +1679,14 @@ class BzController < ApplicationController
     end
   end
 
-  def docusign_consume_refresh_token
+  def docusign_refresh_access_token_using_refresh_token
     account = Account.find(1)
 
     url = URI.parse("https://#{BeyondZConfiguration.docusign_host}/oauth/token")
 
-    Rails.logger.error "The DocuSign token has expired. Go here to refresh it: <domain>/bz/docusign_authorize" if account.docusign_refresh_token.nil?
+    # This can happen if we never authorize DocuSign in the first place.
+    Rails.logger.error "The DocuSign refresh_token isn't set. Go here to refresh it: <domain>/bz/docusign_authorize" if account.docusign_refresh_token.nil?
+
     data = "grant_type=refresh_token&refresh_token=#{URI::encode(account.docusign_refresh_token)}"
 
     headers = {}
@@ -1695,6 +1700,10 @@ class BzController < ApplicationController
 
     response = http.request(request)
     answer = JSON.parse(response.body)
+
+    if answer["access_token"].blank? || answer["refresh_token"].blank? || answer["expires_in"].blank?
+      raise Exception.new "ERROR refreshing access token using refresh token. Go to #{HostUrl.default_host}/bz/docusign_authorize to fix it -- \n #{response.body}"
+    end
 
     account.docusign_access_token = answer["access_token"]
     account.docusign_refresh_token = answer["refresh_token"]
