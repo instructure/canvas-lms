@@ -1613,8 +1613,9 @@ class BzController < ApplicationController
     account = Account.find(1)
 
     # The expiration returned seems to be 8 hours. That could change. Let's get a new access token using the
-    # refresh token if we're 20 min away from expiration. See:
-    # https://developers.docusign.com/esign-rest-api/guides/authentication/oauth2-code-grant#using-refresh-tokens
+    # refresh token if we're 20 min away from expiration or it's already expired. Access tokens are good for 8 hours
+    # but refresh tokens are good for 30 days. After 30 days of inactivity, we need to re-authorize.
+    # See: https://developers.docusign.com/esign-rest-api/guides/authentication/oauth2-code-grant#using-refresh-tokens
     if account.docusign_token_expiration < (DateTime.now + 20.minutes)
       docusign_refresh_access_token_using_refresh_token
       account = Account.find(1)
@@ -1685,7 +1686,7 @@ class BzController < ApplicationController
     url = URI.parse("https://#{BeyondZConfiguration.docusign_host}/oauth/token")
 
     # This can happen if we never authorize DocuSign in the first place.
-    Rails.logger.error "The DocuSign refresh_token isn't set. Go here to refresh it: <domain>/bz/docusign_authorize" if account.docusign_refresh_token.nil?
+    Rails.logger.error "The DocuSign refresh_token isn't set. Go here to refresh it: #{HostUrl.default_host}/bz/docusign_authorize" if account.docusign_refresh_token.nil?
 
     data = "grant_type=refresh_token&refresh_token=#{URI::encode(account.docusign_refresh_token)}"
 
@@ -1705,8 +1706,8 @@ class BzController < ApplicationController
       raise Exception.new "ERROR refreshing access token using refresh token. Go to #{HostUrl.default_host}/bz/docusign_authorize to fix it -- \n #{response.body}"
     end
 
-    account.docusign_access_token = answer["access_token"]
-    account.docusign_refresh_token = answer["refresh_token"]
+    account.docusign_access_token = answer["access_token"] # This lasts for about 8 hours
+    account.docusign_refresh_token = answer["refresh_token"] # This lasts for about 30 days
     account.docusign_token_expiration = DateTime.now + answer["expires_in"].to_i.seconds
 
     account.save
