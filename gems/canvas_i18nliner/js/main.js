@@ -21,7 +21,7 @@ var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 
 var CoffeeScript = require("coffee-script");
-var babylon = require("babylon");
+var babylon = require("@babel/parser");
 var fs = require('fs');
 
 var JsProcessor = require("i18nliner/dist/lib/processors/js_processor").default;
