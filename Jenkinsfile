@@ -180,7 +180,6 @@ pipeline {
             // propagate set to false until we can get tests passing
             build(
               job: 'vendored-gems',
-              propagate: false,
               parameters: build_parameters
             )
           }
