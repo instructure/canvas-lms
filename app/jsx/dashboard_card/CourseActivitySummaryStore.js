@@ -20,6 +20,17 @@ import createStore from '../shared/helpers/createStore'
 
 const CourseActivitySummaryStore = createStore({streams: {}})
 
+// filter a response to raise an error on a 400+ status
+function checkStatus(response) {
+  if (response.status < 400) {
+    return response
+  } else {
+    const error = new Error(response.statusText)
+    error.response = response
+    throw error
+  }
+}
+
 CourseActivitySummaryStore.getStateForCourse = function(courseId) {
   if (typeof courseId === 'undefined') return CourseActivitySummaryStore.getState()
 
@@ -33,9 +44,10 @@ CourseActivitySummaryStore.getStateForCourse = function(courseId) {
 
 CourseActivitySummaryStore._fetchForCourse = function(courseId) {
   const fetch = window.fetchIgnoredByNewRelic || window.fetch // don't let this count against us in newRelic's SPA load time stats
-  fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, {
+  return fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, {
     headers: {Accept: 'application/json'}
   })
+    .then(checkStatus)
     .then(res => res.json())
     .then(stream => {
       const state = CourseActivitySummaryStore.getState()
