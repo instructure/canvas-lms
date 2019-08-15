@@ -121,7 +121,13 @@ import 'compiled/jquery/fixDialogButtons'
             data.points = less_points;
           }
         }
-        $td.fillTemplateData({data: data});
+        $td.fillTemplateData({
+          data: {
+            ...data,
+            min_points: rubricEditing.localizedPoints(data.min_points),
+            points: rubricEditing.localizedPoints(data.points),
+          }
+        });
         rubricEditing.flagInfinitesimalRating($td, $criterion.find('.criterion_use_range').attr('checked'));
         if(hasClassAddLeft) {
           $this.before($td);
@@ -203,7 +209,7 @@ import 'compiled/jquery/fixDialogButtons'
       var rating_points = -1;
       var points = numberHelper.parse($criterion.find(".criterion_points").val());
       const use_range = $criterion.find('.criterion_use_range').attr('checked')
-      if(isNaN(points)) {
+      if(Number.isNaN(points)) {
         points = 5;
       } else {
         points = round(points, 2);
@@ -227,7 +233,7 @@ import 'compiled/jquery/fixDialogButtons'
       if(baseOnRatings && rating_points > points) { points = rating_points; }
       $criterion.find(".criterion_points").val(rubricEditing.localizedPoints(points));
       $criterion.find(".display_criterion_points").text(rubricEditing.localizedPoints(points));
-      if(!$criterion.data('criterion_points') || numberHelper.parse($criterion.data('criterion_points')) != points) {
+      if(!$criterion.data('criterion_points') || numberHelper.parse($criterion.data('criterion_points')) !== points) {
         if(!$criterion.data('criterion_points')) {
           var max = $criterion.context.defaultValue;
           if (baseOnRatings) {
@@ -237,30 +243,33 @@ import 'compiled/jquery/fixDialogButtons'
         }
         var oldMax = $criterion.data('criterion_points');
         var newMax = points;
-        if (oldMax !== newMax) {
-          var $ratingList = $criterion.find(".rating");
-          $($ratingList[0]).find(".points").text(rubricEditing.localizedPoints(points));
-          var lastPts = points;
-          // From left to right, scale points proportionally to new range.
-          // So if originally they were 3,2,1 and now we increased the
-          // total possible to 9, they'd be 9,6,3
-          for(var i = 1; i < $ratingList.length - 1; i++) {
-            var pts = numberHelper.parse($($ratingList[i]).find(".points").text());
-            var newPts = (pts / oldMax) * newMax;
-            if(isNaN(pts) || (pts == 0 && lastPts > 0)) {
-              newPts = lastPts - Math.round(lastPts / ($ratingList.length - i));
-            }
-            if(newPts >= lastPts) {
-              newPts = lastPts - 1;
-            }
-            newPts = rubricEditing.localizedPoints(Math.max(0, newPts));
-            lastPts = newPts;
-            $($ratingList[i]).find(".points").text(newPts);
-            rubricEditing.flagInfinitesimalRating($($ratingList[i]), use_range);
-            if (i > 0) {
-              $($ratingList[i - 1]).find('.min_points').text(newPts);
-              rubricEditing.flagInfinitesimalRating($($ratingList[i - 1]), use_range);
-            }
+
+        var $ratingList = $criterion.find(".rating");
+        $($ratingList[0]).find(".points").text(rubricEditing.localizedPoints(points));
+        var lastPts = points;
+        // From left to right, scale points proportionally to new range.
+        // So if originally they were 3,2,1 and now we increased the
+        // total possible to 9, they'd be 9,6,3
+        for(var i = 1; i < $ratingList.length; i++) {
+          var pts = numberHelper.parse($($ratingList[i]).find(".points").text());
+          var newPts = (pts / oldMax) * newMax;
+          // if an element between [1, length - 1]
+          // is adjusting up from 0, evenly divide it within the range
+          if(Number.isNaN(pts) || (pts === 0 && lastPts > 0 && i < $ratingList.length - 1)) {
+            newPts = lastPts - Math.round(lastPts / ($ratingList.length - i));
+          }
+          if(Number.isNaN(newPts)){
+            newPts = 0;
+          } else if(newPts > lastPts) {
+            newPts = lastPts - 1;
+          }
+          newPts = rubricEditing.localizedPoints(Math.max(0, newPts));
+          lastPts = newPts;
+          $($ratingList[i]).find(".points").text(newPts);
+          rubricEditing.flagInfinitesimalRating($($ratingList[i]), use_range);
+          if (i > 0) {
+            $($ratingList[i - 1]).find('.min_points').text(newPts);
+            rubricEditing.flagInfinitesimalRating($($ratingList[i - 1]), use_range);
           }
         }
         $criterion.data('criterion_points', numberHelper.parse(points));
@@ -474,7 +483,7 @@ import 'compiled/jquery/fixDialogButtons'
 
       $rubric.find(".criterion:not(.blank) .ratings").empty();
       rubric.criteria.forEach(criterion => {
-        criterion.display_criterion_points = criterion.points;
+        criterion.display_criterion_points = rubricEditing.localizedPoints(criterion.points);
         criterion.criterion_id = criterion.id;
         var $criterion = $rubric.find(".criterion.blank:first").clone(true).show().removeAttr('id');
         $criterion.removeClass('blank');
@@ -500,15 +509,21 @@ import 'compiled/jquery/fixDialogButtons'
           rating.rating_long_description = rating.long_description;
           rating.min_points = 0
           if (count < criterion.ratings.length) {
-            rating.min_points = rubricEditing.localizedPoints(criterion.ratings[count].points)
+            rating.min_points = criterion.ratings[count].points
           }
           var $rating = $rating_template.clone(true);
           $rating.toggleClass('edge_rating', count === 1 || count === criterion.ratings.length);
           if (count === criterion.ratings.length) {
             $rating.find('.add_rating_link').remove()
           }
-          $rating.fillTemplateData({data: rating});
-          $rating.find('.range_rating').showIf(criterion.criterion_use_range === true && rating.min_points !== rating.points);
+          $rating.fillTemplateData({
+            data: {
+              ...rating,
+              min_points: rubricEditing.localizedPoints(rating.min_points),
+              points: rubricEditing.localizedPoints(rating.points),
+            }
+          });
+          $rating.find('.range_rating').showIf(criterion.criterion_use_range === true && numberHelper.parse(rating.min_points) !== numberHelper.parse(rating.points));
           $criterion.find(".ratings").append($rating);
         });
         if (criterion.learning_outcome_id) {
@@ -828,6 +843,7 @@ import 'compiled/jquery/fixDialogButtons'
       rubricEditing.flagInfinitesimalRating($rating, use_range)
       if($rating.prev(".rating").length === 0) {
         $criterion.find(".criterion_points").val(rubricEditing.localizedPoints(data.points));
+        $criterion.data('criterion_points', data.points);
       }
       if ($nextRating) {
         $nextRating.fillTemplateData({data: {points: data.min_points} })
@@ -1042,7 +1058,7 @@ import 'compiled/jquery/fixDialogButtons'
         var $rubric = $(this).parents(".rubric");
         $rubric.find(".rubric_title .title").text(data['rubric[title]']);
         $rubric.find(".rubric_table caption .title").text(data['rubric[title]']);
-        $rubric.find(".rubric_total").text(data['points_possible']);
+        $rubric.find(".rubric_total").text(rubricEditing.localizedPoints(data['points_possible']));
         $rubric.removeClass('editing');
         if($rubric.attr('id') == 'rubric_new') {
           $rubric.attr('id', 'rubric_adding');
@@ -1202,7 +1218,9 @@ import 'compiled/jquery/fixDialogButtons'
     $('.criterion_use_range').change(function () {
       const checked = $(this).attr('checked')
       $(this).parents('tr.criterion').find('.rating').each(function() {
-        const use_range = checked  && !$(this).hasClass("infinitesimal")
+        const use_range = checked &&
+          !$(this).hasClass("infinitesimal") &&
+          numberHelper.parse($(this).find('.points').text()) !== numberHelper.parse($(this).find('.min_points').text());
         $(this).find('.range_rating').showIf(use_range);
       });
     }).triggerHandler('change');
