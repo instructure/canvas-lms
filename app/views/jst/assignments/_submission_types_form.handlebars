@@ -12,9 +12,11 @@
         name="submission_type"
         aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
-        <option value="default_external_tool" {{selectedIf submissionType "default_external_tool"}}>
-          {{defaultToolName}}
-        </option>
+        {{#if defaultToolName}}
+          <option value="default_external_tool" {{selectedIf submissionType "default_external_tool"}}>
+            {{defaultToolName}}
+          </option>
+        {{/if}}
         <option value="none" {{selectedIf submissionType "none"}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
         </option>
