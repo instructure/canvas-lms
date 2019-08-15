@@ -58,6 +58,7 @@ describe('CourseActivitySummaryStore', () => {
 
       const spy = jest.spyOn(window, 'fetch').mockImplementation(() =>
         Promise.resolve().then(() => ({
+          status: 200,
           json: () => Promise.resolve().then(() => stream)
         }))
       )
@@ -65,6 +66,27 @@ describe('CourseActivitySummaryStore', () => {
       await wait(1)
       expect(spy).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState()).toEqual({streams: {1: {stream}}})
+    })
+
+    it('handes 401 errors correctly state based on API response', async () => {
+      expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined() // precondition
+
+      jest.spyOn(window, 'fetch').mockImplementation(() =>
+        Promise.resolve().then(() => ({
+          status: 401,
+          statusText: 'Unauthorized',
+          json: () =>
+            Promise.resolve().then(() => ({
+              status: 'unauthorized',
+              errors: [{message: 'user not authorized to perform that action'}]
+            }))
+        }))
+      )
+      const errorFn = jest.fn()
+      CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
+      await wait(1)
+      expect(errorFn).toHaveBeenCalled()
+      expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined()
     })
   })
 })
