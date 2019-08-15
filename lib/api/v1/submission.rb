@@ -308,8 +308,9 @@ module Api::V1::Submission
   end
 
   def provisional_grade_json(course:, assignment:, submission:, provisional_grade:, current_user:, avatars: false, includes: [])
-    json = provisional_grade.grade_attributes
-    json.merge!(speedgrader_url: speed_grader_url(submission, assignment, provisional_grade, current_user))
+    speedgrader_url = speed_grader_url(submission: submission, assignment: assignment, current_user: current_user)
+    json = provisional_grade.grade_attributes.merge(speedgrader_url: speedgrader_url)
+
     if includes.include?('submission_comments')
       json['submission_comments'] = anonymous_moderated_submission_comments_json(
         course: course,
@@ -320,6 +321,7 @@ module Api::V1::Submission
         avatars: avatars
       )
     end
+
     if assignment.can_view_other_grader_identities?(current_user)
       if includes.include?('rubric_assessment')
         json['rubric_assessments'] = provisional_grade.rubric_assessments.map do |ra|
@@ -335,6 +337,7 @@ module Api::V1::Submission
         provisional_grade.attachment_info(current_user, a)
       end
     end
+
     json
   end
 
@@ -365,19 +368,17 @@ module Api::V1::Submission
     submission.originality_reports.present?
   end
 
-  def speed_grader_url(submission, assignment, provisional_grade, current_user)
-    url_params = {
-      course_id: assignment.context.id,
-      assignment_id: assignment.id,
-      anchor: { provisional_grade_id: provisional_grade.id }.to_json
-    }
-    if assignment.can_view_student_names?(current_user)
-      url_params[:student_id] = submission.user_id
+  def speed_grader_url(submission:, assignment:, current_user:)
+    student_or_anonymous_id = if assignment.can_view_student_names?(current_user)
+      { student_id: submission.user_id }
     else
-      url_params[:anonymous_id] = submission.anonymous_id
+      { anonymous_id: submission.anonymous_id }
     end
 
-    speed_grader_course_gradebook_url(**url_params)
+    speed_grader_course_gradebook_url({
+      course_id: assignment.context_id,
+      assignment_id: assignment
+    }.merge(student_or_anonymous_id))
   end
 
   def quizzes_next_submission?(submission)

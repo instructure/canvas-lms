@@ -269,14 +269,25 @@ end
 RSpec::Matchers.define :and_query do |expected|
   match do |actual|
     query = Rack::Utils.parse_query(URI(actual).query)
-    values_match?(expected, query)
+
+    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
+    values_match?(expected_as_strings, query)
   end
 end
 
 RSpec::Matchers.define :and_fragment do |expected|
   match do |actual|
     fragment = JSON.parse(URI.decode_www_form_component(URI(actual).fragment))
-    values_match?(expected, fragment)
+    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
+    values_match?(expected_as_strings, fragment)
+  end
+end
+
+module RSpec::Matchers::Helpers
+  # allows for matchers to use symbols and literals even though URIs are always strings.
+  # i.e. `and_query({assignment_id: @assignment.id})`
+  def self.cast_to_strings(expected:)
+    expected.map {|k,v| [k.to_s, v.to_s]}.to_h
   end
 end
 
