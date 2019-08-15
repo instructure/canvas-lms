@@ -427,7 +427,7 @@ class GradebooksController < ApplicationController
         sections: sections_json(@context.active_course_sections, @current_user, session, [], allow_sis_ids: true),
         settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
         settings: gradebook_settings.fetch(@context.id, {}),
-        student_groups: group_categories_json(@context.group_categories, @current_user, session, {include: ['groups']}),
+        student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
         login_handle_name: @context.root_account.settings[:login_handle_name],
         sis_name: @context.root_account.settings[:sis_name],
         version: params.fetch(:version, nil),

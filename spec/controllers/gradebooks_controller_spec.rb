@@ -1098,6 +1098,13 @@ describe GradebooksController do
           expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id)
         end
 
+        it "does not include deleted group categories" do
+          category2.destroy!
+
+          get :show, params: {course_id: @course.id}
+          expect(group_categories_json.pluck("id")).to contain_exactly(category.id)
+        end
+
         it "includes the groups within each category" do
           get :show, params: {course_id: @course.id}
 

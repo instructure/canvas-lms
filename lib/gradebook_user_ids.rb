@@ -198,6 +198,6 @@ class GradebookUserIds
 
   def student_group_id
     return nil if @selected_student_group_id.nil? || ["0", "null"].include?(@selected_student_group_id)
-    @selected_student_group_id
+    Group.active.exists?(id: @selected_student_group_id) ? @selected_student_group_id : nil
   end
 end
