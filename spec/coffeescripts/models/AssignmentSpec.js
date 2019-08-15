@@ -95,6 +95,51 @@ test('returns false if record is discussion topic', () => {
   equal(assignment.isDiscussionTopic(), false)
 })
 
+QUnit.module('default submission types', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('defaultToNone returns true if submission type is "none"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['none'])
+  equal(assignment.defaultToNone(), true)
+})
+
+test('defaultToNone returns false if default tool configured and new assignment', () => {
+  const assignment = new Assignment()
+  equal(assignment.defaultToNone(), false)
+})
+
+test('defaultToOnline returns true if submission type is "online"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['online'])
+  equal(assignment.defaultToOnline(), true)
+})
+
+test('defaultToOnline returns false if default tool configured and new assignment', () => {
+  const assignment = new Assignment()
+  equal(assignment.defaultToOnline(), false)
+})
+
+test('defaultToOnPaper returns true if submission type is "on_paper"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['on_paper'])
+  equal(assignment.defaultToOnPaper(), true)
+})
+
+test('defaultToOnPaper returns false if default tool configured and new assignment', () => {
+  const assignment = new Assignment()
+  equal(assignment.defaultToOnPaper(), false)
+})
+
 QUnit.module('Assignment#isDefaultTool', {
   setup() {
     fakeENV.setup({

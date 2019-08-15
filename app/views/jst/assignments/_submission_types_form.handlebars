@@ -16,13 +16,13 @@
             {{defaultToolName}}
           </option>
         {{/if}}
-        <option value="none" {{selectedIf submissionType "none"}}>
+        <option value="none" {{selectedIf defaultToNone}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
         </option>
-        <option value="online" {{selectedIf submissionType "online"}}>
+        <option value="online" {{selectedIf defaultToOnline}}>
           {{#t "submission_types.online"}}Online{{/t}}
         </option>
-        <option value="on_paper" {{selectedIf submissionType "on_paper"}}>
+        <option value="on_paper" {{selectedIf defaultToOnPaper}}>
           {{#t "submission_types.on_paper"}}On Paper{{/t}}
         </option>
         <option value="external_tool" {{selectedIf isNonDefaultExternalTool}}>
