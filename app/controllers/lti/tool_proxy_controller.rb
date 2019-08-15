@@ -17,9 +17,12 @@
 #
 module Lti
   class ToolProxyController < ApplicationController
+    include SupportHelpers::ControllerHelpers
+
     before_action :require_context
     before_action :require_user
-    before_action :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update]
+    before_action :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update, :recreate_subscriptions]
+    before_action :require_site_admin, only: [:recreate_subscriptions]
 
     def destroy
       if authorized_action(@context, @current_user, :update)
@@ -87,6 +90,16 @@ module Lti
         CanvasHttp.delete(ack_url)
         render json: '{"status":"success"}'
       end
+    end
+
+    def recreate_subscriptions
+      if @tool_proxy.nil? || @tool_proxy.workflow_state != 'active'
+        render json: '{"status":"error", "error": "active tool proxy not found"}'
+        return
+      end
+
+      ToolProxyService.recreate_missing_subscriptions(@tool_proxy)
+      render json: '{"status":"success"}'
     end
 
     private
