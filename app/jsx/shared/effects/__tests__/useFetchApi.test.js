@@ -92,6 +92,17 @@ describe('useFetchApi', () => {
     expect(success).toHaveBeenCalledWith({bar: 'baz'})
   })
 
+  it('does not call convert if result is undefined', async () => {
+    const path = '/api/v1/blah'
+    fetchMock.mock(`path:${path}`, 200)
+    const convert = jest.fn()
+    const success = jest.fn()
+    renderHook(() => useFetchApi({success, path, convert}))
+    await fetchMock.flush(true)
+    expect(convert).not.toHaveBeenCalled()
+    expect(success).toHaveBeenCalledWith(undefined)
+  })
+
   it('fetches again if path has changed', async () => {
     const response = {key: 'value'}
     fetchMock.mock('end:blah', response, {repeat: 1})
@@ -185,6 +196,50 @@ describe('useFetchApi', () => {
     expect(fetchMock.done()).toBe(true)
     expect(success).toHaveBeenCalledTimes(1)
     expect(error).not.toHaveBeenCalled()
+  })
+
+  it('reports forceResult when specified, without calling fetch', () => {
+    const success = jest.fn()
+    renderHook(() => useFetchApi({success, path: '/blah', forceResult: {fake: 'news'}}))
+    expect(success).toHaveBeenCalledWith({fake: 'news'})
+  })
+
+  it('only reports forceResult once if it has not changed', () => {
+    const success = jest.fn()
+    const {rerender} = renderHook(props => useFetchApi(props), {initialProps: {success, path: '/blah', forceResult: {fake: 'news'}}})
+    expect(success).toHaveBeenCalledWith({fake: 'news'})
+    rerender({success, path: '/blah', forceResult: {fake: 'news'}})
+    expect(success).toHaveBeenCalledTimes(1)
+  })
+
+  it('reports new results if forceResult is changed', () => {
+    const success = jest.fn()
+    const {rerender} = renderHook(props => useFetchApi(props), {initialProps: {success, path: '/blah', forceResult: {fake: 'news'}}})
+    expect(success).toHaveBeenCalledWith({fake: 'news'})
+    rerender({success, path: '/blah', forceResult: {other: 'thing'}})
+    expect(success).toHaveBeenCalledTimes(2)
+    expect(success).toHaveBeenCalledWith({other: 'thing'})
+  })
+
+  it('invokes fetch if forceResult is changed to undefined', async () => {
+    const path = '/api/v1/blah'
+    fetchMock.mock(`path:${path}`, {fetch: 'result'})
+    const success = jest.fn()
+    const {rerender} = renderHook(props => useFetchApi(props), {initialProps: {success, path, forceResult: {fake: 'news'}}})
+    rerender({success, path})
+    await fetchMock.flush(true)
+    expect(success).toHaveBeenCalledWith({fetch: 'result'})
+  })
+
+  it('reports forceResult if changed from undefined', async () => {
+    const path = '/api/v1/blah'
+    fetchMock.mock(`path:${path}`, {fetch: 'result'})
+    const success = jest.fn()
+    const {rerender} = renderHook(props => useFetchApi(props), {initialProps: {success, path}})
+    await fetchMock.flush(true)
+    expect(fetchMock.done()).toBe(true)
+    rerender({success, path, forceResult: {force: 'value'}})
+    expect(success).toHaveBeenCalledWith({force: 'value'})
   })
 
   it('ignores first success results if another fetch starts before it finishes', async () => {

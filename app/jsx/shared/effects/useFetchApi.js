@@ -18,6 +18,7 @@
 
 import _ from 'lodash'
 import {useEffect, useRef} from 'react'
+import doFetchApi from './doFetchApi'
 
 // this is a nicety so we only run the search effect if the parameters have
 // deeply changed. If we didn't do this and the consumer of this effect wasn't
@@ -34,17 +35,7 @@ function useOldestUnchanged(nextParams) {
   return result
 }
 
-// turn a relative path into a URL based on the current location
-function constructRelativeUrl({path, params}) {
-  const esc = encodeURIComponent
-  const queryString = Object.entries(params)
-    .map(([key, value]) => `${esc(key)}=${esc(value)}`)
-    .join('&')
-  if (!queryString.length) return path
-  return `${path}?${queryString}`
-}
-
-// utility for making it easy to abort a fetch
+// utility for making it easy to abort the fetch
 function abortable({success, error}) {
   const aborter = new AbortController()
   let active = true
@@ -68,6 +59,7 @@ export default function useFetchApi({
   error,
   path,
   convert,
+  forceResult,
   params = {},
   headers = {},
   fetchOpts = {}
@@ -75,38 +67,26 @@ export default function useFetchApi({
   const oldestUnchangedParams = useOldestUnchanged(params)
   const oldestUnchangedHeaders = useOldestUnchanged(headers)
   const oldestUnchangedFetchOpts = useOldestUnchanged(fetchOpts)
+  const oldestForceResult = useOldestUnchanged(forceResult)
   useEffect(() => {
+    if (oldestForceResult !== undefined) {
+      success(oldestForceResult)
+      return
+    }
+
     // prevent sending results and errors from stale queries
     const {activeSuccess, activeError, abort, signal} = abortable({success, error})
-    const doFetch = async () => {
-      try {
-        const url = constructRelativeUrl({path, params: oldestUnchangedParams})
-        const response = await fetch(url, {
-          headers: {
-            Accept: 'application/json+canvas-string-ids, application/json',
-            ...oldestUnchangedHeaders
-          },
-          signal,
-          ...oldestUnchangedFetchOpts
-        })
-
-        if (response.ok) {
-          let json = await response.json()
-          if (convert) json = convert(json)
-          activeSuccess(json)
-        } else {
-          const err = new Error(
-            `useFetchApi received a bad response: ${response.status} ${response.statusText}`
-          )
-          // attach the response to the Error object just in case some error handler wants it
-          err.response = response
-          activeError(err)
-        }
-      } catch (e) {
-        activeError(e)
-      }
-    }
-    doFetch()
+    doFetchApi({
+      path,
+      headers: oldestUnchangedHeaders,
+      params: oldestUnchangedParams,
+      fetchOpts: {signal, ...oldestUnchangedFetchOpts}
+    })
+      .then(result => {
+        if (convert && result) result = convert(result)
+        activeSuccess(result)
+      })
+      .catch(err => activeError(err))
     return abort
   }, [
     success,
@@ -115,6 +95,7 @@ export default function useFetchApi({
     convert,
     oldestUnchangedHeaders,
     oldestUnchangedParams,
-    oldestUnchangedFetchOpts
+    oldestUnchangedFetchOpts,
+    oldestForceResult
   ])
 }

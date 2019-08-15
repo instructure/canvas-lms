@@ -519,7 +519,7 @@ export class DiscussionRow extends Component {
             <IconUserLine />
             &nbsp;&nbsp;{I18n.t('Send To...')}
           </span>,
-          I18n.t('Send {%title} to user', {title: discussionTitle})
+          I18n.t('Send %{title} to user', {title: discussionTitle})
         )
       )
       menuList.push(
@@ -529,7 +529,7 @@ export class DiscussionRow extends Component {
             <IconDuplicateLine />
             &nbsp;&nbsp;{I18n.t('Copy To...')}
           </span>,
-          I18n.t('Copy {%title} to course', {title: discussionTitle})
+          I18n.t('Copy %{title} to course', {title: discussionTitle})
         )
       )
     }

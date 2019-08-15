@@ -131,6 +131,7 @@
     "timezone": "^1.0.18",
     "tinycolor2": "1.4.1",
     "tinymce-a11y-checker": "3.0.0-rc1",
+    "use-debounce": "^3",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
