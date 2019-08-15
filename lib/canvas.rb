@@ -69,6 +69,17 @@ module Canvas
       end
     end
 
+    if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore)
+      Canvas::Redis.handle_redis_failure(nil, "none") do
+        redis = MultiCache.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:disconnect!)
+        else
+          redis.disconnect!
+        end
+      end
+    end
+
     return unless @redis
     # We're sharing redis connections between Canvas.redis and Rails.cache,
     # so don't call reconnect on the cache too.
