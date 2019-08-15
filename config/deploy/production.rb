@@ -11,6 +11,12 @@ role :db,  %w{deploy@172.31.17.65}
 
 set :branch, 'bz-master'
 
+# Default value for keep_releases is 5
+# Set it to 2 to free up space (2-3GB per release, plus 2-3GB overhead to compile npm assets on an 16GB server fills it up fast)
+# and realistically, we don't release until we're sure it's good.  
+set :keep_releases, 2
+
+
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server definition into the
@@ -28,7 +34,7 @@ set :branch, 'bz-master'
 # Global options
 # --------------
   set :ssh_options, {
-    keys: %w(/home/braven-admin/keys/id_rsa)
+    keys: %w(/home/braven-admin/agentkeys/id_rsa)
 #    forward_agent: false,
 #    auth_methods: %w(password)
   }

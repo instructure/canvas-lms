@@ -66,11 +66,6 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
-# Default value for keep_releases is 5
-# Set it to 1 to free up space (2-3GB per release, plus 2-3GB overhead to compile npm assets on an 16GB server fills it up fast)
-# and realistically, we don't release until we're sure it's good.  If we mess up, we can just revert in src ctrl and do
-# a new release.
-set :keep_releases, 1
 
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets app/views/jst spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
