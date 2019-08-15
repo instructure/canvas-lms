@@ -23,6 +23,7 @@ import { connect } from "react-redux";
 export function propsFromState(state) {
   const {
     ui,
+    containingContext,
     contextType,
     contextId,
     files,
@@ -48,19 +49,19 @@ export function propsFromState(state) {
   }
 
   return {
-    
+    containingContext,
     contextType,
-      contextId,
-      collections,
-      files,
-      images,
-      documents,
-      folders,
-      rootFolderId,
-      flickr,
-      upload,
-      session,
-      newPageLinkExpanded,
+    contextId,
+    collections,
+    files,
+    images,
+    documents,
+    folders,
+    rootFolderId,
+    flickr,
+    upload,
+    session,
+    newPageLinkExpanded,
     ...ui
   };
 }

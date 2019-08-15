@@ -128,10 +128,12 @@ class RceApiSource {
 
   initializeDocuments(props) {
     return {
-      files: [],
-      bookmark: this.uriFor('documents', props),
-      isLoading: false,
-      hasMore: true // there's always more when you haven't tried yet
+      [props.contextType]: {
+        files: [],
+        bookmark: null,
+        isLoading: false,
+        hasMore: true
+      }
     }
   }
 
@@ -148,7 +150,9 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
-  fetchDocs(uri) {
+  fetchDocs(props) {
+    const documents = props.documents[props.contextType]
+    const uri = documents.bookmark || this.uriFor('documents', props)
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
@@ -189,7 +193,13 @@ class RceApiSource {
   }
 
   fetchMediaFolder(props) {
-    return this.fetchPage(this.uriFor('folders/media', props))
+    let uri
+    if (props.contextType === 'user') {
+      uri = this.uriFor('folders', props)
+    } else {
+      uri = this.uriFor('folders/media', props)
+    }
+    return this.fetchPage(uri)
   }
 
   fetchMediaObjectIframe(mediaObjectId) {

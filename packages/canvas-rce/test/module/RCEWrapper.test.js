@@ -42,7 +42,7 @@ function createBasicElement(opts) {
     // so RCEWrapper.mceInstance() works
     fakeTinyMCE.editors[0].id = opts.textareaId
   }
-  const props = {textareaId, tinymce: fakeTinyMCE, ...opts};
+  const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...opts};
   return new RCEWrapper(props);
 }
 
@@ -53,11 +53,20 @@ function createdMountedElement(additionalProps = {}) {
       textareaId,
       tinymce: fakeTinyMCE,
       editorOptions: {},
-      trayProps: {},
+      ...trayProps(),
       ...additionalProps
     })
   );
   return tree;
+}
+
+function trayProps() {
+  return {
+    trayProps: {
+      contextType: 'course',
+      contextId: '17'
+    }
+  }
 }
 
 describe("RCEWrapper", () => {
@@ -139,7 +148,7 @@ describe("RCEWrapper", () => {
         const editor = {
           ui: { registry: { addIcon: () => {} } }
         };
-        const wrapper = new RCEWrapper({tinymce: fakeTinyMCE});
+        const wrapper = new RCEWrapper({tinymce: fakeTinyMCE, ...trayProps()});
         const options = wrapper.wrapOptions({});
         options.setup(editor);
         assert.equal(RCEWrapper.getByEditor(editor), wrapper);
