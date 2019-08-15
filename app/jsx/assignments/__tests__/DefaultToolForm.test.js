@@ -25,7 +25,8 @@ const newProps = (overrides = {}) => ({
   ...{
     toolUrl: 'https://www.default-tool.com/blti',
     courseId: 1,
-    toolName: 'Awesome Tool'
+    toolName: 'Awesome Tool',
+    previouslySelected: false
   },
   ...overrides
 })
@@ -52,7 +53,12 @@ describe('DefaultToolForm', () => {
 
   it('renders the information mesage', () => {
     wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('Alert').html()).toContain('Click the button above to add a WileyPLUS Question Set')
+    expect(wrapper.find('Alert').html()).toContain('Click the button above to add content')
+  })
+
+  it('sets the button text', () => {
+    wrapper = mount(<DefaultToolForm {...newProps()} />)
+    expect(wrapper.find('Button').html()).toContain('Add Content')
   })
 
   it('renders the success message if previouslySelected is true', () => {

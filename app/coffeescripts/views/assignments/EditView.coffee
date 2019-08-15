@@ -315,6 +315,8 @@ export default class EditView extends ValidatedFormView
       courseId: ENV.COURSE_ID,
       toolUrl: @defaultExternalToolUrl(),
       toolName: @defaultExternalToolName(),
+      toolButtonText: ENV.DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT,
+      toolInfoMessage: ENV.DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE,
       previouslySelected: @assignment.defaultToolSelected()
     }
 

@@ -71,7 +71,7 @@ const DefaultToolForm = props => {
   return (
     <View display="block" padding="medium none small small">
       <Button id="default-tool-launch-button" name="default-tool-launch-button" onClick={handleLaunchButton}>
-        {I18n.t('Add a Question Set')}
+        {props.toolButtonText}
       </Button>
 
       {toolMessageData || props.previouslySelected ? (
@@ -81,7 +81,7 @@ const DefaultToolForm = props => {
         </Alert>
       ) : (
         <Alert variant="info" margin="small small 0 0">
-          {I18n.t('Click the button above to add a WileyPLUS Question Set')}
+          {props.toolInfoMessage}
         </Alert>
       )}
 
@@ -105,7 +105,14 @@ DefaultToolForm.propTypes = {
   toolUrl: PropTypes.string.isRequired,
   courseId: PropTypes.number.isRequired,
   toolName: PropTypes.string.isRequired,
-  previouslySelected: PropTypes.bool.isRequired
+  previouslySelected: PropTypes.bool.isRequired,
+  toolButtonText: PropTypes.string,
+  toolInfoMessage: PropTypes.string
+}
+
+DefaultToolForm.defaultProps = {
+  toolButtonText: I18n.t('Add Content'),
+  toolInfoMessage: I18n.t('Click the button above to add content')
 }
 
 export default DefaultToolForm

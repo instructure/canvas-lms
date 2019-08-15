@@ -1226,10 +1226,14 @@ describe AssignmentsController do
       let(:root_account) { course.root_account }
       let(:default_url) { 'https://www.my-tool.com/blti' }
       let(:default_name) { 'Default Name' }
+      let(:button_text) { 'Click Me' }
+      let(:info_message) { 'Some information for you.' }
 
       before do
         root_account.settings[:default_assignment_tool_url] = default_url
         root_account.settings[:default_assignment_tool_name] = default_name
+        root_account.settings[:default_assignment_tool_button_text] = button_text
+        root_account.settings[:default_assignment_tool_info_message] = info_message
         root_account.save!
         user_session(@teacher)
         get :edit, params: { course_id: course.id, id: @assignment.id }
@@ -1241,6 +1245,14 @@ describe AssignmentsController do
 
       it 'sets "DEFAULT_ASSIGNMENT_TOOL_NAME"' do
         expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_NAME)).to eq default_name
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT)).to eq button_text
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE)).to eq info_message
       end
     end
 
