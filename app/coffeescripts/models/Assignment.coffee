@@ -155,8 +155,26 @@ export default class Assignment extends Model
     return @_submissionTypes() unless arguments.length > 0
     @set 'submission_types', submissionTypes
 
+  isNewAssignment: =>
+    !@name()
+
+  shouldShowDefaultTool: =>
+    return false if !@defaultToolUrl()
+    @defaultToolSelected() ||
+      @isQuickCreateDefaultTool() ||
+      @isNewAssignment()
+
   isDefaultTool: =>
-    @submissionType() == 'external_tool' && (@defaultToolSelected() || @isQuickCreateDefaultTool())
+    @submissionType() == 'external_tool' && @shouldShowDefaultTool()
+
+  defaultToNone: =>
+    @submissionType() == 'none' && !@shouldShowDefaultTool()
+
+  defaultToOnline: =>
+    @submissionType() == 'online' && !@shouldShowDefaultTool()
+
+  defaultToOnPaper: =>
+    @submissionType() == 'on_paper' && !@shouldShowDefaultTool()
 
   isQuickCreateDefaultTool: =>
     @submissionTypes().includes('default_external_tool')
@@ -479,7 +497,8 @@ export default class Assignment extends Model
       'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
       'submissionTypesFrozen', 'anonymousInstructorAnnotations',
       'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
-      'defaultToolName', 'isDefaultTool', 'isNonDefaultExternalTool'
+      'defaultToolName', 'isDefaultTool', 'isNonDefaultExternalTool', 'defaultToNone',
+      'defaultToOnline', 'defaultToOnPaper'
     ]
 
     hash =
