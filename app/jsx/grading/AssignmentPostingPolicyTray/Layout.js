@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import {bool, func} from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -89,7 +89,7 @@ export default function Layout(props) {
   }
 
   return (
-    <Fragment>
+    <>
       <View
         as="div"
         margin="small 0"
@@ -141,7 +141,7 @@ export default function Layout(props) {
           </FlexItem>
         </Flex>
       </View>
-    </Fragment>
+    </>
   )
 }
 

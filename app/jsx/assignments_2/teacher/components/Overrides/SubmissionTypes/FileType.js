@@ -84,7 +84,7 @@ export default class FileType extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <View
           borderWidth="small"
           borderRadius="medium"
@@ -124,7 +124,7 @@ export default class FileType extends React.Component {
             )}
           </Flex>
         </View>
-      </React.Fragment>
+      </>
     )
   }
 }

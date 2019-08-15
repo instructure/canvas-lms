@@ -205,7 +205,7 @@ export default class AttemptTab extends Component {
       case 'success':
       default:
         return (
-          <React.Fragment>
+          <>
             {this.renderSubmissionAlert()}
             <Mutation
               mutation={CREATE_SUBMISSION_DRAFT}
@@ -214,13 +214,13 @@ export default class AttemptTab extends Component {
               update={this.updateSubmissionDraftCache}
             >
               {createSubmissionDraft => (
-                <React.Fragment>
+                <>
                   {this.renderUploadAlert()}
                   {this.renderSubmissionByType(createSubmission, createSubmissionDraft)}
-                </React.Fragment>
+                </>
               )}
             </Mutation>
-          </React.Fragment>
+          </>
         )
     }
   }

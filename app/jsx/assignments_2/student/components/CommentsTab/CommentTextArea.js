@@ -139,7 +139,7 @@ export default class CommentTextArea extends Component {
 
   renderAlert(data, error) {
     return (
-      <React.Fragment>
+      <>
         {data && (
           <Alert
             screenReaderOnly
@@ -154,7 +154,7 @@ export default class CommentTextArea extends Component {
             {I18n.t('Error sending submission comment')}
           </Alert>
         )}
-      </React.Fragment>
+      </>
     )
   }
 

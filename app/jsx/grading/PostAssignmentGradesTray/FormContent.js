@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 
 import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
@@ -57,7 +57,7 @@ export default function FormContent({
   const hasSections = sections.length > 0
 
   return (
-    <Fragment>
+    <>
       {unpostedCount > 0 && (
         <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
           <AccessibleContent alt={I18n.t('%{count} hidden', {count: unpostedCount})}>
@@ -118,7 +118,7 @@ export default function FormContent({
           </FlexItem>
         </Flex>
       </View>
-    </Fragment>
+    </>
   )
 }
 

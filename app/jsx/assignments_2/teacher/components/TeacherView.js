@@ -407,7 +407,7 @@ export default class TeacherView extends React.Component {
               onError={this.handleSaveError}
             >
               {saveAssignment => (
-                <React.Fragment>
+                <>
                   <Header
                     assignment={assignment}
                     onChangeAssignment={this.handleChangeAssignment}
@@ -433,7 +433,7 @@ export default class TeacherView extends React.Component {
                       onPublish={() => this.handlePublish(saveAssignment)}
                     />
                   ) : null}
-                </React.Fragment>
+                </>
               )}
             </Mutation>
             <Portal open={this.state.isSaving}>

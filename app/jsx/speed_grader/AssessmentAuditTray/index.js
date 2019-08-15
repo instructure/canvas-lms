@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component, Fragment} from 'react'
+import React, {Component} from 'react'
 import {func, instanceOf} from 'prop-types'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -114,7 +114,7 @@ export default class AssessmentAuditTray extends Component {
           </Flex>
 
           {this.state.auditEventsLoaded ? (
-            <Fragment>
+            <>
               <View as="div" margin="small">
                 <AssessmentSummary
                   anonymityDate={this.state.auditTrail.anonymityDate}
@@ -128,7 +128,7 @@ export default class AssessmentAuditTray extends Component {
               <View as="div" margin="small">
                 <AuditTrail auditTrail={this.state.auditTrail} />
               </View>
-            </Fragment>
+            </>
           ) : (
             <Spinner title={I18n.t('Loading assessment audit trail')} />
           )}

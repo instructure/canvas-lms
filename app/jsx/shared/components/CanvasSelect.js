@@ -105,7 +105,7 @@ export default class CanvasSelect extends React.Component {
     const {id, label, value, onChange, children, noOptionsLabel, ...otherProps} = this.props
 
     return (
-      <React.Fragment>
+      <>
         <Select
           id={id}
           renderLabel={() => label}
@@ -128,7 +128,7 @@ export default class CanvasSelect extends React.Component {
         >
           {this.state.announcement}
         </Alert>
-      </React.Fragment>
+      </>
     )
   }
 

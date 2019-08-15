@@ -134,7 +134,7 @@ export default class StudentTray extends React.Component {
 
   renderActionLinks() {
     return (
-      <React.Fragment>
+      <>
         <Heading level="h4" as="h3" margin="medium auto auto auto">
           {I18n.t('Actions')}
         </Heading>
@@ -157,14 +157,14 @@ export default class StudentTray extends React.Component {
         >
           {I18n.t('Submit for Student')}
         </Button>
-      </React.Fragment>
+      </>
     )
   }
 
   renderOverrideActions() {
     const hasDueDate = this.props.assignment.dueAt !== null
     return (
-      <React.Fragment>
+      <>
         <View as="div" margin="medium auto auto auto">
           <DateTimeInput
             description={I18n.t('Extend Due Date')}
@@ -189,7 +189,7 @@ export default class StudentTray extends React.Component {
             onChange={this.onChangeAttempts}
           />
         </View>
-      </React.Fragment>
+      </>
     )
   }
 

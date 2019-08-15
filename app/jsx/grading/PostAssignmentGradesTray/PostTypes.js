@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import {bool, func, oneOf} from 'prop-types'
 
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
@@ -44,24 +44,24 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
     >
       <RadioInput
         label={
-          <Fragment>
+          <>
             <Text>{I18n.t('Everyone')}</Text>
             <br />
             <Text size="small">{I18n.t('Grades will be made visible to all students')}</Text>
-          </Fragment>
+          </>
         }
         value={EVERYONE}
       />
       <RadioInput
         disabled={anonymousGrading}
         label={
-          <Fragment>
+          <>
             <Text>{I18n.t('Graded')}</Text>
             <br />
             <Text size="small">
               {I18n.t('Grades will be made visible to students with graded submissions')}
             </Text>
-          </Fragment>
+          </>
         }
         value={GRADED}
       />

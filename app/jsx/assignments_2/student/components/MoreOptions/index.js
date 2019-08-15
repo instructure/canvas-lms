@@ -74,7 +74,7 @@ class MoreOptions extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <div style={{display: 'block'}}>
           <Button
             data-testid="more-options-button"
@@ -112,7 +112,7 @@ class MoreOptions extends React.Component {
             </Button>
           </ModalFooter>
         </Modal>
-      </React.Fragment>
+      </>
     )
   }
 }

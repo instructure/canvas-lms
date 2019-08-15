@@ -24,12 +24,12 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 
 const NewKeyFooter = props => {
   return (
-    <React.Fragment>
+    <>
       <Button onClick={props.onCancelClick} margin="0 small 0 0">{I18n.t('Cancel')}</Button>
       <Button onClick={props.onSaveClick} variant="primary" disabled={props.disable}>
         {I18n.t('Save Key')}
       </Button>
-    </React.Fragment>
+    </>
   )
 }
 

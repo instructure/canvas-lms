@@ -194,7 +194,7 @@ export default class StudentsSearcher extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         <Flex as="div" margin="0 0 medium 0" wrapItems>
           <FlexItem grow size="60%" margin="small 0 0 0">
             <TextInput
@@ -246,7 +246,7 @@ export default class StudentsSearcher extends React.Component {
             )
           }}
         </StudentSearchQuery>
-      </React.Fragment>
+      </>
     )
   }
 }

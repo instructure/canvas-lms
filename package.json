@@ -120,6 +120,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
+    "@babel/parser": "^7",
     "@babel/plugin-transform-react-inline-elements": "^7.2.0",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/ui-babel-preset": "^6",
@@ -227,7 +228,7 @@
     "webpack-manifest-plugin": "^2",
     "webpack-stats-plugin": "^0.2.1",
     "wsrun": "^3.6.4",
-    "xsslint": "https://github.com/claydiffrient/xsslint.git#master",
+    "xsslint": "ryankshaw/xsslint#babel7",
     "yaml-loader": "^0.5"
   },
   "optionalDependencies": {

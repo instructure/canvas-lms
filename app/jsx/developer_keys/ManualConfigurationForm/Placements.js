@@ -90,7 +90,7 @@ export default class Placements extends React.Component {
     const { validPlacements } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <Select
           label={I18n.t("Placements")}
           editable
@@ -120,7 +120,7 @@ export default class Placements extends React.Component {
             )
           )
         }
-      </React.Fragment>
+      </>
     )
   }
 }

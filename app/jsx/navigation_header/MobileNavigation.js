@@ -73,7 +73,7 @@ export default class MobileNavigation extends React.Component {
       </View>
     )
     return (
-      <React.Fragment>
+      <>
         <Tray
           size="large"
           label={I18n.t('Global Navigation')}
@@ -95,7 +95,7 @@ export default class MobileNavigation extends React.Component {
             <MobileContextMenu spinner={spinner} />
           </React.Suspense>
         )}
-      </React.Fragment>
+      </>
     )
   }
 }
