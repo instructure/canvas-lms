@@ -47,7 +47,8 @@ describe FileInContext do
 
     describe "usage rights required" do
       before do
-        @course.enable_feature! :usage_rights_required
+        @course.usage_rights_required = true
+        @course.save!
         @filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files a_file.txt)))
       end
 

@@ -305,6 +305,25 @@
                     </td>
                   </tr>
                 <% end %>
+
+                <%= settings.fields_for :usage_rights_required do |r| %>
+                  <% hash = @account.usage_rights_required %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :value, t("Copyright and license information must be provided for files before they are published.") %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
               <% end %>
             <% end %>
           </table>
@@ -519,6 +538,11 @@
               <div>
                 <%= settings.check_box :author_email_in_notifications, :checked => @account.author_email_in_notifications? %>
                 <%= settings.label     :author_email_in_notifications, :en => "Show the email address of sender for user interaction Notifications" %>
+              </div>
+
+              <div>
+                <%= settings.check_box :enable_course_catalog, :checked => @account.settings[:enable_course_catalog] %>
+                <%= settings.label     :enable_course_catalog, :en => "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled." %>
               </div>
 
             <% end %>

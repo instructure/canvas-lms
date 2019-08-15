@@ -1754,6 +1754,14 @@ describe CoursesController do
       expect(assigns[:course].lock_all_announcements).to be_falsey
     end
 
+    it "should update its usage_rights_required setting" do
+      user_session(@teacher)
+      @course.usage_rights_required = true
+      @course.save!
+      put 'update', params: {:id => @course.id, :course => { :usage_rights_required => 0 }}
+      expect(assigns[:course].usage_rights_required).to be_falsey
+    end
+
     it "should let sub-account admins move courses to other accounts within their sub-account" do
       subaccount = account_model(:parent_account => Account.default)
       sub_subaccount1 = account_model(:parent_account => subaccount)

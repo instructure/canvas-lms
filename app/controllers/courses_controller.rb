@@ -1289,7 +1289,8 @@ class CoursesController < ApplicationController
   #     "allow_student_organized_groups": true,
   #     "hide_final_grades": false,
   #     "hide_distribution_graphs": false,
-  #     "lock_all_announcements": true
+  #     "lock_all_announcements": true,
+  #     "usage_rights_required": false
   #   }
   def api_settings
     get_context
@@ -1392,6 +1393,9 @@ class CoursesController < ApplicationController
   # @argument lock_all_announcements [Boolean]
   #   Disable comments on announcements
   #
+  # @argument usage_rights_required [Boolean]
+  #   Copyright and license information must be provided for files before they are published.
+  #
   # @argument restrict_student_past_view [Boolean]
   #   Restrict students from viewing courses after end date
   #
@@ -1426,6 +1430,7 @@ class CoursesController < ApplicationController
       :hide_final_grades,
       :hide_distribution_graphs,
       :lock_all_announcements,
+      :usage_rights_required,
       :restrict_student_past_view,
       :restrict_student_future_view,
       :show_announcements_on_home_page,
@@ -2571,6 +2576,10 @@ class CoursesController < ApplicationController
         end
       end
 
+      if params[:course].key?(:usage_rights_required)
+        @course.usage_rights_required = value_to_boolean(params[:course].delete(:usage_rights_required))
+      end
+
       if params_for_update.has_key?(:locale) && params_for_update[:locale].blank?
         params_for_update[:locale] = nil
       end
@@ -3266,7 +3275,7 @@ class CoursesController < ApplicationController
       :syllabus_body, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
       :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,
-      :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates,
+      :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :use_rights_required,
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus,
       :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,

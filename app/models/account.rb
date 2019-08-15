@@ -248,6 +248,10 @@ class Account < ActiveRecord::Base
 
   add_setting :require_confirmed_email, :boolean => true, :root_only => true, :default => false
 
+  add_setting :enable_course_catalog, :boolean => true, :root_only => true, :default => false
+  add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
+
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -285,6 +289,10 @@ class Account < ActiveRecord::Base
 
   def product_name
     settings[:product_name] || t("#product_name", "Canvas")
+  end
+
+  def usage_rights_required?
+    usage_rights_required[:value]
   end
 
   def allow_global_includes?

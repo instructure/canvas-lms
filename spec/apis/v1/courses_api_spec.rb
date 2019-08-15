@@ -3583,14 +3583,16 @@ describe CoursesController, type: :request do
     end
 
     it "should create the file in unlocked state if :usage_rights_required is disabled" do
-      @course.disable_feature! 'usage_rights_required'
+      @course.usage_rights_required = false
+      @course.save!
       preflight({ :name => 'test' })
       attachment = Attachment.order(:id).last
       expect(attachment.locked).to be_falsy
     end
 
     it "should create the file in locked state if :usage_rights_required is enabled" do
-      @course.enable_feature! 'usage_rights_required'
+      @course.usage_rights_required = true
+      @course.save!
       preflight({ :name => 'test' })
       attachment = Attachment.order(:id).last
       expect(attachment.locked).to be_truthy
@@ -3626,6 +3628,7 @@ describe CoursesController, type: :request do
           'restrict_student_past_view' => false,
           'restrict_student_future_view' => false,
           'show_announcements_on_home_page' => false,
+          'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'image_url' => nil,
           'image_id' => nil,
@@ -3655,6 +3658,7 @@ describe CoursesController, type: :request do
           :hide_distribution_graphs => true,
           :hide_final_grades => true,
           :lock_all_announcements => true,
+          :usage_rights_required => true,
           :restrict_student_past_view => true,
           :restrict_student_future_view => true,
           :show_announcements_on_home_page => false,
@@ -3673,6 +3677,7 @@ describe CoursesController, type: :request do
           'hide_distribution_graphs' => true,
           'hide_final_grades' => true,
           'lock_all_announcements' => true,
+          'usage_rights_required' => true,
           'restrict_student_past_view' => true,
           'restrict_student_future_view' => true,
           'show_announcements_on_home_page' => false,
@@ -3689,6 +3694,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_organized_groups).to eq false
         expect(@course.hide_distribution_graphs).to eq true
         expect(@course.hide_final_grades).to eq true
+        expect(@course.usage_rights_required).to eq true
         expect(@course.lock_all_announcements).to eq true
         expect(@course.show_announcements_on_home_page).to eq false
         expect(@course.home_page_announcement_limit).to be_falsey
@@ -3723,6 +3729,7 @@ describe CoursesController, type: :request do
           'restrict_student_past_view' => false,
           'restrict_student_future_view' => false,
           'show_announcements_on_home_page' => false,
+          'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'image_url' => nil,
           'image_id' => nil,

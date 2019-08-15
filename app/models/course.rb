@@ -2351,7 +2351,7 @@ class Course < ActiveRecord::Base
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
       :organize_epub_by_content_type, :show_announcements_on_home_page,
-      :home_page_announcement_limit, :enable_offline_web_export,
+      :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates
     ]
   end
@@ -2971,6 +2971,8 @@ class Course < ActiveRecord::Base
   add_setting :timetable_data, :arbitrary => true
   add_setting :syllabus_master_template_id
   add_setting :syllabus_updated_at
+
+  add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

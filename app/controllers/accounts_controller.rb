@@ -806,6 +806,12 @@ class AccountsController < ApplicationController
   # @argument account[settings][lock_all_announcements][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
+  # @argument account[settings][usage_rights_required][value] [Boolean]
+  #   Copyright and license information must be provided for files before they are published.
+  #
+  # @argument account[settings][usage_rights_required][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
   # @argument account[settings][restrict_student_future_listing][value] [Boolean]
   #   Restrict students from viewing future enrollments in course list
   #
@@ -1413,7 +1419,7 @@ class AccountsController < ApplicationController
                                    :default_storage_quota, :default_storage_quota_mb,
                                    :default_group_storage_quota, :default_group_storage_quota_mb,
                                    :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
-                                   :edit_institution_email, :enable_alerts, :enable_eportfolios,
+                                   :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
                                    {:enable_offline_web_export => [:value]}.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
@@ -1437,6 +1443,7 @@ class AccountsController < ApplicationController
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
+                                   {:usage_rights_required => [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view].freeze
 
   def permitted_account_attributes

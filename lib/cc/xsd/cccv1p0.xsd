@@ -85,6 +85,7 @@
         <xs:element name="lock_all_announcements" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="usage_rights_required" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_editing" type="xs:boolean" minOccurs="0"/>
         <xs:element name="show_announcements_on_home_page" type="xs:boolean" minOccurs="0"/>

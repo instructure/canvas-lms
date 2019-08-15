@@ -360,6 +360,11 @@
           <% end %>
         </td>
       </tr><tr>
+        <td class="form-label"><%= f.blabel :usage_rights_required, :en => "File Copyright" %></td>
+        <td id="usage_rights_required"><%= f.check_box :usage_rights_required, :disabled => !can_manage || @context.account.usage_rights_required[:locked] %>
+          <%= f.label :usage_rights_required, t('Copyright and license information must be provided for files before they are published.') %>
+        </td>
+      </tr><tr>
         <td class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></td>
         <td colspan="3" id="course_visibility">
           <% if can_manage %>

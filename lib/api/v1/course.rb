@@ -39,6 +39,7 @@ module Api::V1::Course
     settings[:hide_final_grades] = course.hide_final_grades?
     settings[:hide_distribution_graphs] = course.hide_distribution_graphs?
     settings[:lock_all_announcements] = course.lock_all_announcements?
+    settings[:usage_rights_required] = course.usage_rights_required?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?
     settings[:restrict_student_future_view] = course.restrict_student_future_view?
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
