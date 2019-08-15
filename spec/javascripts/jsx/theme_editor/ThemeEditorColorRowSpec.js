@@ -101,7 +101,7 @@ test('inputChange', () => {
   )
 
   component.changedColor.returns(false)
-  props.onChange.reset()
+  props.onChange.resetHistory()
   component.inputChange(expected)
   ok(
     props.onChange.calledWith(expected, true),
@@ -110,7 +110,7 @@ test('inputChange', () => {
 
   component.changedColor.returns(true)
   component.invalidHexString.returns(true)
-  props.onChange.reset()
+  props.onChange.resetHistory()
   component.inputChange(expected)
   ok(
     props.onChange.calledWith(expected, true),

@@ -83,7 +83,7 @@ QUnit.module('StudentContextTray/Progress', (hooks) => {
 
         SubmissionProgressBars.displayGrade({...submission, grade: 'complete'})
         ok(spy.calledOnce)
-        spy.reset()
+        spy.resetHistory()
 
         SubmissionProgressBars.displayGrade({...submission, grade: 'incomplete'})
         ok(spy.calledOnce)

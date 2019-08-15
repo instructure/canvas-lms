@@ -218,7 +218,7 @@ test('validate always calls hideErrors', 2, function() {
   this.form.validate()
   ok(this.form.hideErrors.called, 'hideErrors called with no errors')
 
-  this.form.hideErrors.reset()
+  this.form.hideErrors.resetHistory()
   this.form.validateFormData.returns({
     errors: [
       {
@@ -239,7 +239,7 @@ test('validate always calls showErrors', 2, function() {
   this.form.validate()
   ok(this.form.showErrors.called, 'showErrors called with no errors')
 
-  this.form.showErrors.reset()
+  this.form.showErrors.resetHistory()
   this.form.validateFormData.returns({
     errors: [
       {
