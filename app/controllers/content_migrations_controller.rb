@@ -345,7 +345,7 @@ class ContentMigrationsController < ApplicationController
       user: @current_user,
       context: @context,
       migration_type: params[:migration_type],
-      initiated_source: :api
+      initiated_source: (in_app? ? :api_in_app : :api)
     )
     @content_migration.workflow_state = 'created'
     @content_migration.source_course = source_course if source_course

@@ -87,9 +87,9 @@ export const TEACHER_QUERY = gql`
       gid: id
       name
       description
-      dueAt
-      unlockAt
-      lockAt
+      dueAt(applyOverrides: false)
+      unlockAt(applyOverrides: false)
+      lockAt(applyOverrides: false)
       pointsPossible
       state
       needsGradingCount

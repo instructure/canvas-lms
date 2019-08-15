@@ -214,103 +214,142 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       }))
   })
 
-  QUnit.module('Loading Submissions', hooks => {
-    hooks.beforeEach(() => {
-      ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.submissions_url, {
-        response: [
-          {
-            submissions: [
-              {
-                assignment_id: '1',
-                assignment_visible: true,
-                cached_due_date: '2015-03-01T12:00:00Z',
-                score: 10,
-                user_id: '1'
-              },
-              {
-                assignment_id: '2',
-                assignment_visible: true,
-                cached_due_date: '2015-05-02T12:00:00Z',
-                score: 9,
-                user_id: '1'
-              }
-            ],
-            user_id: '01'
+  QUnit.module('Loading Submissions', () => {
+    QUnit.module('when everything has loaded', contextHooks => {
+      contextHooks.beforeEach(() => {
+        ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.submissions_url, {
+          response: [
+            {
+              submissions: [
+                {
+                  assignment_id: '1',
+                  assignment_visible: true,
+                  cached_due_date: '2015-03-01T12:00:00Z',
+                  score: 10,
+                  user_id: '1'
+                },
+                {
+                  assignment_id: '2',
+                  assignment_visible: true,
+                  cached_due_date: '2015-05-02T12:00:00Z',
+                  score: 9,
+                  user_id: '1'
+                }
+              ],
+              user_id: '01'
+            },
+            {
+              submissions: [
+                {
+                  assignment_id: '1',
+                  assignment_visible: true,
+                  cached_due_date: '2015-07-03T12:00:00Z',
+                  score: 8,
+                  user_id: '2'
+                }
+              ],
+              user_id: '2'
+            }
+          ],
+          jqXHR: {
+            getResponseHeader() {
+              return {}
+            }
           },
-          {
-            submissions: [
-              {
-                assignment_id: '1',
-                assignment_visible: true,
-                cached_due_date: '2015-07-03T12:00:00Z',
-                score: 8,
-                user_id: '2'
-              }
-            ],
-            user_id: '2'
-          }
-        ],
-        jqXHR: {
-          getResponseHeader() {
-            return {}
-          }
-        },
-        textStatus: 'success'
+          textStatus: 'success'
+        })
+
+        ENV.GRADEBOOK_OPTIONS.grading_period_set = {
+          id: '1501',
+          grading_periods: [
+            {
+              id: '1403',
+              close_date: '2015-07-08T12:00:00Z',
+              end_date: '2015-07-01T12:00:00Z',
+              is_closed: false,
+              start_date: '2015-05-01T12:00:00Z'
+            },
+            {
+              id: '1401',
+              close_date: '2015-03-08T12:00:00Z',
+              end_date: '2015-03-01T12:00:00Z',
+              is_closed: true,
+              start_date: '2015-01-01T12:00:00Z'
+            },
+            {
+              id: '1402',
+              close_date: '2015-05-08T12:00:00Z',
+              end_date: '2015-05-01T12:00:00Z',
+              is_closed: false,
+              start_date: '2015-03-01T12:00:00Z'
+            }
+          ],
+          weighted: true
+        }
+
+        return initializeApp()
       })
 
-      ENV.GRADEBOOK_OPTIONS.grading_period_set = {
-        id: '1501',
-        grading_periods: [
-          {
-            id: '1403',
-            close_date: '2015-07-08T12:00:00Z',
-            end_date: '2015-07-01T12:00:00Z',
-            is_closed: false,
-            start_date: '2015-05-01T12:00:00Z'
-          },
-          {
-            id: '1401',
-            close_date: '2015-03-08T12:00:00Z',
-            end_date: '2015-03-01T12:00:00Z',
-            is_closed: true,
-            start_date: '2015-01-01T12:00:00Z'
-          },
-          {
-            id: '1402',
-            close_date: '2015-05-08T12:00:00Z',
-            end_date: '2015-05-01T12:00:00Z',
-            is_closed: false,
-            start_date: '2015-03-01T12:00:00Z'
-          }
-        ],
-        weighted: true
-      }
+      test('updates effective due dates', () =>
+        asyncHelper.waitForRequests().then(() => {
+          const effectiveDueDates = srgb.get('effectiveDueDates.content')
+          deepEqual(Object.keys(effectiveDueDates), ['1', '2'])
+          deepEqual(Object.keys(effectiveDueDates[1]), ['1', '2'])
+          deepEqual(Object.keys(effectiveDueDates[2]), ['1'])
+        }))
 
-      return initializeApp()
+      test('updates effective due dates on related assignments', () =>
+        asyncHelper.waitForRequests().then(() => {
+          deepEqual(Object.keys(srgb.get('assignments').findBy('id', '1').effectiveDueDates), [
+            '1',
+            '2'
+          ])
+          deepEqual(Object.keys(srgb.get('assignments').findBy('id', '2').effectiveDueDates), ['1'])
+        }))
+
+      test('updates inClosedGradingPeriod on related assignments', () =>
+        asyncHelper.waitForRequests().then(() => {
+          strictEqual(srgb.get('assignments').findBy('id', '1').inClosedGradingPeriod, true)
+          strictEqual(srgb.get('assignments').findBy('id', '2').inClosedGradingPeriod, false)
+        }))
     })
 
-    test('updates effective due dates', () =>
-      asyncHelper.waitForRequests().then(() => {
-        const effectiveDueDates = srgb.get('effectiveDueDates.content')
-        deepEqual(Object.keys(effectiveDueDates), ['1', '2'])
-        deepEqual(Object.keys(effectiveDueDates[1]), ['1', '2'])
-        deepEqual(Object.keys(effectiveDueDates[2]), ['1'])
-      }))
+    QUnit.module('when assignment groups load after submissions', contextHooks => {
+      let student
 
-    test('updates effective due dates on related assignments', () =>
-      asyncHelper.waitForRequests().then(() => {
-        deepEqual(Object.keys(srgb.get('assignments').findBy('id', '1').effectiveDueDates), [
-          '1',
-          '2'
-        ])
-        deepEqual(Object.keys(srgb.get('assignments').findBy('id', '2').effectiveDueDates), ['1'])
-      }))
+      contextHooks.beforeEach(() => {
+        initializeApp()
+        return asyncHelper.waitForRequests().then(() => {
+          student = srgb.get('students.firstObject')
 
-    test('updates inClosedGradingPeriod on related assignments', () =>
-      asyncHelper.waitForRequests().then(() => {
-        strictEqual(srgb.get('assignments').findBy('id', '1').inClosedGradingPeriod, true)
-        strictEqual(srgb.get('assignments').findBy('id', '2').inClosedGradingPeriod, false)
-      }))
+          /*
+           * Set all submissions for the student as hidden.
+           * This would result in a zero grade for the student.
+           */
+          let submissions = srgb.submissionsForStudent(student)
+          submissions.forEach(submission => {
+            srgb.updateSubmission({...submission, hidden: true}, student)
+          })
+          submissions = srgb.submissionsForStudent(student)
+
+          // Clear the student's current grade.
+          Ember.set(student, 'total_grade', null)
+
+          // Simulate the assignments being determined again.
+          srgb.set('assignmentsFromGroups.isLoaded', false)
+          srgb.set('assignmentsFromGroups.isLoaded', true)
+        })
+      })
+
+      test('updates the hidden state of submissions', () => {
+        const [submission] = srgb.submissionsForStudent(student)
+        deepEqual(submission.hidden, false)
+      })
+
+      test('recalculates grades for students', () => {
+        deepEqual(student.total_grade, {score: 3, possible: 140})
+      })
+    })
   })
 
   QUnit.module('#gradesAreWeighted', hooks => {

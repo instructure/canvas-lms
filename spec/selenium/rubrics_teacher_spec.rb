@@ -90,6 +90,35 @@ describe "course rubrics" do
       expect(fj('.rubric_total')).to include_text "10" #avoid selenium caching
     end
 
+    it "should calculate ratings based on initial rating values" do
+      assignment_with_editable_rubric(10)
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+
+      f('#right-side .edit_rubric_link').click
+      replace_content(fj(".criterion_points:visible"), "50")
+      fj(".criterion_points:visible").send_keys(:return)
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["50", "15", "0"]
+
+      replace_content(fj(".criterion_points:visible"), "25")
+      fj(".criterion_points:visible").send_keys(:return)
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["25", "7.5", "0"]
+
+      replace_content(fj(".criterion_points:visible"), "10")
+      fj(".criterion_points:visible").send_keys(:return)
+      submit_form("#edit_rubric_form")
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["10", "3", "0"]
+    end
+
+    it "should not show an error when adjusting from 0 points" do
+      assignment_with_editable_rubric(0)
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+      f('#right-side .edit_rubric_link').click
+      replace_content(fj(".criterion_points:visible"), "10")
+      fj(".criterion_points:visible").send_keys(:return)
+      submit_form("#edit_rubric_form")
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["10", "5", "0"]
+    end
+
     it "should not display the edit form more than once" do
       rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
 

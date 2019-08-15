@@ -166,7 +166,8 @@ class WikiPagesController < ApplicationController
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
       :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
-      :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner)
+      :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner),
+      :DIRECT_SHARE_ENABLED => @domain_root_account&.feature_enabled?(:direct_share),
     }
     js_env(@wiki_pages_env)
     @wiki_pages_env

@@ -20,19 +20,20 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::PostAssignmentGrades do
+  include GraphQLSpecHelper
+
   let(:assignment) { course.assignments.create! }
   let(:course) { Course.create!(workflow_state: "available") }
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-  def mutation_str(assignment_id: nil, graded_only: nil)
+  def mutation_str(assignment_id: nil, **options)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
-    input_string += ", gradedOnly: #{graded_only}" unless graded_only.nil?
 
     <<~GQL
       mutation {
         postAssignmentGrades(input: {
-          #{input_string}
+          #{gql_arguments(input_string, **options)}
         }) {
           assignment {
             _id
@@ -139,6 +140,96 @@ describe Mutations::PostAssignmentGrades do
         expect(progress.results[:user_ids]).to match_array [student.id]
       end
 
+      describe "section_ids" do
+        let(:section1) { course.course_sections.create! }
+        let(:section2) { course.course_sections.create! }
+
+        before(:each) do
+          @section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
+          @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
+          @student1_submission = assignment.submissions.find_by(user: @section1_student)
+          @student2_submission = assignment.submissions.find_by(user: @section2_student)
+        end
+
+        it "posts submissions for listed sections" do
+          execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
+          post_submissions_job.invoke_job
+          expect(@student2_submission.reload).to be_posted
+        end
+
+        it "does not post submissions for unlisted sections" do
+          execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
+          post_submissions_job.invoke_job
+          expect(@student1_submission.reload).not_to be_posted
+        end
+
+        it "posts all the submissions if not present" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          post_submissions_job.invoke_job
+          expect(assignment.submissions).to all(be_posted)
+        end
+      end
+
+      describe "only_student_ids" do
+        let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+
+        before(:each) do
+          @student1_submission = assignment.submissions.find_by(user: student)
+          @student2_submission = assignment.submissions.find_by(user: student2)
+        end
+
+        it "posts submissions for listed users" do
+          execute_query(mutation_str(assignment_id: assignment.id, only_student_ids: [student2.id]), context)
+          post_submissions_job.invoke_job
+          expect(@student2_submission.reload).to be_posted
+        end
+
+        it "does not post submissions for unlisted users" do
+          execute_query(mutation_str(assignment_id: assignment.id, only_student_ids: [student2.id]), context)
+          post_submissions_job.invoke_job
+          expect(@student1_submission.reload).not_to be_posted
+        end
+
+        it "posts all the submissions if not present" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          post_submissions_job.invoke_job
+          expect(assignment.submissions).to all(be_posted)
+        end
+      end
+
+      describe "skip_student_ids" do
+        let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+
+        before(:each) do
+          @student1_submission = assignment.submissions.find_by(user: student)
+          @student2_submission = assignment.submissions.find_by(user: student2)
+        end
+
+        it "posts submissions for non-listed users" do
+          execute_query(mutation_str(assignment_id: assignment.id, skip_student_ids: [student2.id]), context)
+          post_submissions_job.invoke_job
+          expect(@student1_submission.reload).to be_posted
+        end
+
+        it "does not post submissions for listed users" do
+          execute_query(mutation_str(assignment_id: assignment.id, skip_student_ids: [student2.id]), context)
+          post_submissions_job.invoke_job
+          expect(@student2_submission.reload).not_to be_posted
+        end
+
+        it "posts all the submissions if empty" do
+          execute_query(mutation_str(assignment_id: assignment.id, skip_student_ids: []), context)
+          post_submissions_job.invoke_job
+          expect(assignment.submissions).to all(be_posted)
+        end
+
+        it "posts all the submissions if not present" do
+          execute_query(mutation_str(assignment_id: assignment.id), context)
+          post_submissions_job.invoke_job
+          expect(assignment.submissions).to all(be_posted)
+        end
+      end
+
       context "when the poster has limited visibility" do
         let(:secret_student) { User.create! }
         let(:secret_section) { course.course_sections.create! }
@@ -220,4 +311,5 @@ describe Mutations::PostAssignmentGrades do
       expect(assignment.submissions).to all(be_posted)
     end
   end
+
 end

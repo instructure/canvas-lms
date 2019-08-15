@@ -271,7 +271,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
       // For every float_valued input, localize the string before display
       $answer.find('input.float_value').each(function (idx, inputEl) {
-        answer[inputEl.name] = I18n.n(answer[inputEl.name]);
+        answer[inputEl.name] = I18n.n(numberHelper.parse(answer[inputEl.name]));
       });
 
       if (isNaN(answer.answer_weight)) {
@@ -1420,11 +1420,14 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       if (question.question_type != 'calculated_question') {
         // must use > in selector
         $question.find(".text > .answers .answer").each(function() {
-          var $answer = $(this);
-          var answerData = $answer.getTemplateData({
-            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_approximate', 'answer_precision', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
+          var numberValues = ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_approximate', 'answer_precision', 'answer_weight'];
+          var answerData = $(this).getTemplateData({
+            textValues: numberValues.concat(['numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment']),
             htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']
           });
+          for (var num in numberValues) {
+            answerData[num] = numberHelper.parse(answerData[num]);
+          }
           var answer = $.extend({}, quiz.defaultAnswerData, answerData);
           if (only_add_for_blank_ids && answer.blank_id && !blank_ids_hash[answer.blank_id]) {
             return;

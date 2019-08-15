@@ -16,10 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%
-  js_env ga_page_title: "Roster User"
-%>
-
 <% provide :page_title do %><%= join_title context_user_name(@context, @user), @context.name %><% end %>
 <% provide :right_side do %>
   <h2><%= t 'links.more_about_this_user', "More About This User" %></h2>

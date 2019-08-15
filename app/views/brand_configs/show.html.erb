@@ -254,8 +254,8 @@
   <div class="content-box">
     <div class="grid-row">
       <div class="col-xs-3">
-        <div class="list-view">
-          <nav aria-label="context" role="navigation">
+        <div class="<%= @domain_root_account.feature_enabled?(:a11y_left_menu) ? 'list-view-a11y-left-menu-flag' : 'list-view' %>">
+          <nav class="theme-preview" aria-label="context" role="navigation">
             <ul>
               <li><a href="#"><%= t('Context nav link') %></a></li>
               <li><a class="active" href="#"><%= t('Context nav link active') %></a></li>

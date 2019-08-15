@@ -18,7 +18,7 @@
 
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state,
-           :root_opt_in, :enable_at, :beta, :development,
+           :root_opt_in, :enable_at, :beta,
            :release_notes_url, :custom_transition_proc, :visible_on,
            :after_state_change_proc, :autoexpand, :touch_context].freeze
   attr_reader *ATTRS
@@ -27,7 +27,6 @@ class Feature
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
-      val = (Feature.production_environment? ? 'hidden' : 'allowed') if key == :state && val == 'hidden_in_prod'
       next if key == :state && !%w(hidden off allowed on).include?(val)
       instance_variable_set "@#{key}", val
     end
@@ -59,8 +58,22 @@ class Feature
     @state == 'hidden'
   end
 
+  def self.environment
+    if Rails.env.development?
+      :development
+    elsif Rails.env.test?
+      :ci
+    elsif ApplicationController.test_cluster_name == 'beta'
+      :beta
+    elsif ApplicationController.test_cluster_name == 'test'
+      :test
+    else
+      :production
+    end
+  end
+
   def self.production_environment?
-    Rails.env.production? && !ApplicationController.test_cluster?
+    self.environment == :production
   end
 
   # Register one or more features.  Must be done during application initialization.
@@ -71,18 +84,24 @@ class Feature
   #     display_name: -> { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
   #     description: -> { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
   #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-  #     state: 'allowed',     # or 'on', 'hidden', or 'hidden_in_prod'
+  #     state: 'allowed',     # or 'on', 'hidden', or 'disabled'
   #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
   #                           #   (in that context and below) to other users
-  #                           # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
+  #                           # - 'disabled' means the feature will not appear in the feature list and
+  #                           #   cannot be turned on. It is intended for use in environment state overrides.
   #     root_opt_in: false,   # if true, 'allowed' features in source or site admin
   #                           # will be inherited in "off" state by root accounts
   #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
   #     beta: false,          # 'beta' tag shown in UI
-  #     development: false,   # whether the feature is restricted to development / test / beta instances
-  #                           # setting `development: true` prevents the flag from being registered on production,
-  #                           # which means `context.feature_enabled?` calls for the feature will always return false.
   #     release_notes_url: 'http://example.com/',
+  #
+  #     # allow overriding feature definitions on a per-environment basis
+  #     # valid environments are development, production, beta, test, ci
+  #     environments: {
+  #       production: {
+  #         state: 'disabled'
+  #       }
+  #     }
   #
   #     # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
   #     # see lib/feature/draft_state.rb for example usage
@@ -97,17 +116,19 @@ class Feature
   #     # queue a delayed_job to perform any nontrivial processing
   #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
-  VALID_STATES = %w(on allowed hidden hidden_in_prod).freeze
+  VALID_STATES = %w(on allowed hidden disabled).freeze
   VALID_APPLIES_TO = %w(Course Account RootAccount User).freeze
+  VALID_ENVS = %i(development ci beta test production).freeze
 
   DISABLED_FEATURE = Feature.new.freeze
 
   def self.register(feature_hash)
     @features ||= {}
     feature_hash.each do |feature_name, attrs|
+      apply_environment_overrides!(feature_name, attrs)
       feature = feature_name.to_s
       validate_attrs(attrs, feature)
-      if attrs[:development] && production_environment?
+      if attrs[:state] == 'disabled'
         @features[feature] = DISABLED_FEATURE
       else
         @features[feature] = Feature.new({ feature: feature }.merge(attrs))
@@ -126,6 +147,17 @@ class Feature
     @features ||= {}
     @features.freeze unless @features.frozen?
     @features
+  end
+
+  def self.apply_environment_overrides!(feature_name, feature_hash)
+    environments = feature_hash.delete(:environments)
+    if environments
+      raise "invalid environment tag for feature #{feature_name}: must be one of #{VALID_ENVS}" unless (environments.keys - VALID_ENVS).empty?
+      env = self.environment
+      if environments.key?(env)
+        feature_hash.merge!(environments[env])
+      end
+    end
   end
 
   def applies_to_object(object)

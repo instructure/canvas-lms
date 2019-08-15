@@ -237,11 +237,6 @@ body:not(.course-menu-expanded) {
     min-height: 0;
     height: 100%;
   }
-
-  // HACK workaround for IE10 and IE11 flexbox bug
-  // https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { min-height: 93.5vh; }
-
 }
 
 .ic-Layout-watermark {

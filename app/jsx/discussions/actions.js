@@ -65,7 +65,9 @@ const types = [
   'DELETE_DISCUSSION_FAIL',
   'DELETE_FOCUS_PENDING',
   'DELETE_FOCUS_CLEANUP',
-  'CLEAN_DISCUSSION_FOCUS'
+  'CLEAN_DISCUSSION_FOCUS',
+  'SET_COPY_TO_OPEN',
+  'SET_SEND_TO_OPEN'
 ]
 
 const actions = Object.assign(createActions(...types), discussionActions.actionCreators)

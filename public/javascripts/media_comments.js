@@ -368,7 +368,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
 
         // give the dialog time to initialize or the recorder will
         // render funky in ie
-      }, INST.browser.ie ? 500 : 10);
+      }, 10);
 
       // **********************************************************************
       // Flash uploaders

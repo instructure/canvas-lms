@@ -124,6 +124,14 @@ class OutcomesController < ApplicationController
     end
     @results = LearningOutcomeResult.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
+
+    @google_analytics_page_title = t("Outcomes for Student")
+    @page_title = t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name
+
+    css_bundle :learning_outcomes
+    js_bundle :rubric_assessment
+
+    render stream: can_stream_template?
   end
 
   def list

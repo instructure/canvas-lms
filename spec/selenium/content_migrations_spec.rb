@@ -285,7 +285,7 @@ describe "content migrations", :non_parallel do
       cm = @course.content_migrations.last
       expect(cm.migration_settings["source_course_id"]).to eq @copy_from.id
       expect(cm.source_course).to eq @copy_from
-      expect(cm.initiated_source).to eq :api
+      expect(cm.initiated_source).to eq :api_in_app
 
       source_link = f('.migrationProgressItem .sourceLink a')
       expect(source_link.text).to eq @copy_from.name

@@ -173,16 +173,19 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
                   label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
                   data-address={missing.address}
                   onChange={this.onNewForMissingChange}
+                  value={missing.newUserInfo.name || ''}
                 />
               </td>
               <td>
                 <TextInput
                   required
                   name="email"
-                  type="email"placeholder={emailLabel}
+                  type="email"
+                  placeholder={emailLabel}
                   label={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
                   data-address={missing.address}
                   onChange={this.onNewForMissingChange}
+                  value={missing.newUserInfo.email || ''}
                 />
               </td>
               <th scope="row">{missing.address}</th>
@@ -245,7 +248,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
                   label={<ScreenReaderContent>{nameLabel}</ScreenReaderContent>}
                   data-address={missing.address}
                   onChange={this.onNewForMissingChange}
-                  value={missing.newUserInfo.name || null}
+                  value={missing.newUserInfo.name || ''}
                 />
               </td>
               <th scope="row">{missing.address}</th>

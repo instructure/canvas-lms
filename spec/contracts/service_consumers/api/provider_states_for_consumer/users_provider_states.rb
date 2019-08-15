@@ -40,5 +40,9 @@ PactConfig::Consumers::ALL.each do |consumer|
         @teacher.update(email: "pact-teacher@example.com")
       end
     end
+
+    provider_state 'user enrollments existing in canvas' do
+        no_op
+    end
   end
 end

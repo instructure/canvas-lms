@@ -162,6 +162,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   end
 
   scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
+  scope :active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) }
 
   scope :global, -> { where(:context_id => nil) }
 

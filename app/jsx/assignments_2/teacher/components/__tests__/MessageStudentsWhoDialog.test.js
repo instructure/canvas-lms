@@ -568,13 +568,12 @@ describe('MessageStudentsWhoDialog', () => {
       // verify new input
       expect(subjectInput.value).toEqual('Typing a subject here')
     })
+
     it('allows typing in a body', () => {
       const {getByTestId} = renderMessageStudentsWhoDialog(partialSubAssignment())
       const bodyInput = getByTestId('body-input')
       // default filter is unsubmitted so verify autofill text
       expect(bodyInput.value).toEqual('')
-      // change input
-      fireEvent.click(bodyInput)
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       // verify new input
       expect(bodyInput.value).toEqual('Typing some body text here')
@@ -587,7 +586,6 @@ describe('MessageStudentsWhoDialog', () => {
       // ensure body has text and subject is the only empty field
       const bodyInput = getByTestId('body-input')
       const subjectInput = getByTestId('subject-input')
-      fireEvent.click(bodyInput)
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       // clear the auto-filled subject
       fireEvent.click(subjectInput)
@@ -603,22 +601,22 @@ describe('MessageStudentsWhoDialog', () => {
       const sendButton = getByText('Send').closest('button')
       expect(sendButton.disabled).toEqual(true)
     })
+
     it('is disabled when no students are selected', () => {
       const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
       // ensure body has text and recipents is the only empty field
       const bodyInput = getByTestId('body-input')
-      fireEvent.click(bodyInput)
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const removeStudent1Button = getByText('Remove First Student').closest('button')
       fireEvent.click(removeStudent1Button)
       const sendButton = getByText('Send').closest('button')
       expect(sendButton.disabled).toEqual(true)
     })
+
     it('is enabled when there is a subject, body, and students to message', () => {
       const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
       // default unsubmitted filter auto-fills all fields except body
       const bodyInput = getByTestId('body-input')
-      fireEvent.click(bodyInput)
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const sendButton = getByText('Send').closest('button')
       expect(sendButton.disabled).toEqual(false)

@@ -21,7 +21,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     def initialize(mutation, context, arguments)
       @mutation = mutation
       @context = context
-      @params = filter_arguments(arguments)
+      @params = process_arguments(arguments)
 
       @dynamo = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
       @sequence = 0
@@ -101,8 +101,22 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
 
     private
 
-    def filter_arguments(arguments)
-      ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h)
+    def process_arguments(arguments)
+      params = ActionDispatch::Http::ParameterFilter.new(Rails.application.config.filter_parameters).filter(arguments[:input].to_h)
+      truncate_params!(params)
+    end
+
+    def truncate_params!(o)
+      case o
+      when Hash
+        o.each { |k,v| o[k] = truncate_params!(v) }
+      when Array
+        o.map! { |x| truncate_params!(x) }
+      when String
+        o.size > 256 ? o.slice(0, 256) : o
+      else
+        o
+      end
     end
   end
 

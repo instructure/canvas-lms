@@ -163,6 +163,22 @@ describe ExternalToolsController do
         expect(response).to be_successful
       end
 
+      context 'when required_permissions set' do
+        it "does not launch account tool for non-admins" do
+          user_session(@teacher)
+          tool = @course.account.context_external_tools.new(:name => "bob",
+                                                            :consumer_key => "bob",
+                                                            :shared_secret => "bob")
+          tool.url = "http://www.example.com/basic_lti"
+          tool.account_navigation = { enabled: true, required_permissions: 'manage_data_services' }
+          tool.save!
+
+          get :show, params: {:account_id => @course.account.id, id: tool.id}
+
+          expect(response).not_to be_successful
+        end
+      end
+
       it "generates the resource_link_id correctly for a course navigation launch" do
         user_session(@teacher)
         tool = @course.context_external_tools.new(:name => "bob",
@@ -659,7 +675,7 @@ describe ExternalToolsController do
       end
 
       before do
-        lti_1_3_tool.context.root_account.enable_feature!(:lti_1_3)
+        lti_1_3_tool
         user_session(@teacher)
       end
 

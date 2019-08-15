@@ -35,7 +35,7 @@ class SubmissionCommentsApiController < ApplicationController
   # including the new file id. The caller can then PUT the file_id to the
   # submission API to attach it to a comment
   def create_file
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = api_find(@context.students_visible_to(@current_user, include: :inactive),
                      params[:user_id])
 

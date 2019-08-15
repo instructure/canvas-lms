@@ -28,6 +28,7 @@ import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import {Submission} from '../graphqlData/Submission'
 import TextEntry from './TextEntry'
+import MediaAttempt from './AttemptType/MediaAttempt'
 
 export default class AttemptTab extends Component {
   static propTypes = {
@@ -46,11 +47,7 @@ export default class AttemptTab extends Component {
       variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id}
     })
 
-    // TODO: if we remove all of the attachments from a draft we should set it back to null
-    // we will need to update this to account for other submission types when we implement them.
-    const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft.attachments.length
-      ? mutationResult.data.createSubmissionDraft.submissionDraft
-      : null
+    const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
 
     cache.writeQuery({
@@ -136,49 +133,59 @@ export default class AttemptTab extends Component {
     }
   }
 
-  renderFileUpload = createSubmission => {
+  renderFileUpload = (createSubmission, createSubmissionDraft) => {
     return (
-      <Mutation
-        mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={() => this.updateUploadState('success')}
-        onError={() => this.updateUploadState('error')}
-        update={this.updateSubmissionDraftCache}
-      >
-        {createSubmissionDraft => (
-          <React.Fragment>
-            {this.renderUploadAlert()}
-            <FileUpload
-              assignment={this.props.assignment}
-              createSubmission={createSubmission}
-              createSubmissionDraft={createSubmissionDraft}
-              submission={this.props.submission}
-              updateSubmissionState={this.updateSubmissionState}
-              updateUploadState={this.updateUploadState}
-            />
-          </React.Fragment>
-        )}
-      </Mutation>
+      <FileUpload
+        assignment={this.props.assignment}
+        createSubmission={createSubmission}
+        createSubmissionDraft={createSubmissionDraft}
+        submission={this.props.submission}
+        updateSubmissionState={this.updateSubmissionState}
+        updateUploadState={this.updateUploadState}
+      />
     )
   }
 
-  renderFileAttempt = createSubmission => {
+  renderFileAttempt = (createSubmission, createSubmissionDraft) => {
     return this.props.submission.state === 'graded' ||
       this.props.submission.state === 'submitted' ? (
       <FilePreview key={this.props.submission.attempt} files={this.props.submission.attachments} />
     ) : (
-      this.renderFileUpload(createSubmission)
+      this.renderFileUpload(createSubmission, createSubmissionDraft)
     )
   }
 
-  renderSubmissionByType = createSubmission => {
+  renderTextAttempt = createSubmissionDraft => {
+    return (
+      <TextEntry
+        createSubmissionDraft={createSubmissionDraft}
+        submission={this.props.submission}
+        updateUploadState={this.updateUploadState}
+      />
+    )
+  }
+
+  renderMediaAttempt = createSubmissionDraft => {
+    return (
+      <MediaAttempt
+        createSubmissionDraft={createSubmissionDraft}
+        submission={this.props.submission}
+        updateUploadState={this.updateUploadState}
+      />
+    )
+  }
+
+  renderSubmissionByType = (createSubmission, createSubmissionDraft) => {
     // TODO: we need to ensure we handle multiple submission types eventually
     switch (this.props.assignment.submissionTypes[0]) {
+      case 'media_recording':
+        return this.renderMediaAttempt(createSubmission, createSubmissionDraft)
       case 'online_text_entry':
-        return <TextEntry />
+        return this.renderTextAttempt(createSubmissionDraft)
       case 'online_upload':
+        return this.renderFileAttempt(createSubmission, createSubmissionDraft)
       default:
-        // TODO: we should probably figure out what the default case should actually be
-        return this.renderFileAttempt(createSubmission)
+        throw new Error('submission type not yet supported in A2')
     }
   }
 
@@ -193,7 +200,19 @@ export default class AttemptTab extends Component {
         return (
           <React.Fragment>
             {this.renderSubmissionAlert()}
-            {this.renderSubmissionByType(createSubmission)}
+            <Mutation
+              mutation={CREATE_SUBMISSION_DRAFT}
+              onCompleted={() => this.updateUploadState('success')}
+              onError={() => this.updateUploadState('error')}
+              update={this.updateSubmissionDraftCache}
+            >
+              {createSubmissionDraft => (
+                <React.Fragment>
+                  {this.renderUploadAlert()}
+                  {this.renderSubmissionByType(createSubmission, createSubmissionDraft)}
+                </React.Fragment>
+              )}
+            </Mutation>
           </React.Fragment>
         )
     }

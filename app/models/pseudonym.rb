@@ -52,18 +52,29 @@ class Pseudonym < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :unique_id
 
-  validates_each :password, {:if => :require_password?}, &Canvas::PasswordPolicy.method("validate")
+  validates :unique_id, format: { with: /\A[[:print:]]+\z/ },
+            length: { within: 1..MAX_UNIQUE_ID_LENGTH },
+            uniqueness: {
+              case_sensitive: false,
+              scope: [:account_id, :workflow_state, :authentication_provider_id],
+              if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
+            }
+
+  validates :password,
+            confirmation: true,
+            if: :require_password?
+
+  validates_each :password, if: :require_password?,
+            &Canvas::PasswordPolicy.method("validate")
+  validates :password_confirmation,
+            presence: true,
+            if: :require_password?
+
   acts_as_authentic do |config|
-    config.validates_format_of_login_field_options = {:with => /\A[[:print:]]+\z/}
     config.login_field :unique_id
     config.perishable_token_valid_for = 30.minutes
-    config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
-    config.validates_uniqueness_of_login_field_options = {
-        case_sensitive: false,
-        scope: [:account_id, :workflow_state, :authentication_provider_id],
-        if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
-    }
-    config.crypto_provider = Authlogic::CryptoProviders::Sha512
+    config.crypto_provider = ScryptProvider.new("4000$8$1$")
+    config.transition_from_crypto_providers = [Authlogic::CryptoProviders::Sha512]
   end
 
   attr_writer :require_password

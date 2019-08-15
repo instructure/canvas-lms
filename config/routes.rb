@@ -1016,6 +1016,10 @@ CanvasRails::Application.routes.draw do
       get "brand_variables", action: :show
     end
 
+    scope(controller: :accounts) do
+      get "terms_of_service_custom_content", action: :terms_of_service_custom_content
+    end
+
     scope(controller: :tabs) do
       get "accounts/:account_id/tabs", action: :index, as: 'account_tabs'
       get "courses/:course_id/tabs", action: :index, as: 'course_tabs'

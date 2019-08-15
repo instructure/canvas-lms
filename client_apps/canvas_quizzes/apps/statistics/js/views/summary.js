@@ -23,13 +23,15 @@ define(function(require) {
   var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
   var round = require('canvas_quizzes/util/round');
   var formatNumber = require('../util/format_number');
+  var parseNumber = require('../util/parse_number');
   var ScorePercentileChart = require('jsx!./summary/score_percentile_chart');
   var Report = require('jsx!./summary/report');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var Spinner = require('jsx!canvas_quizzes/components/spinner');
-  var NA_LABEL = I18n.t('not_available_abbrev', 'N/A');
   var SectionSelect = require('jsx!./summary/section_select');
+
+  var NA_LABEL = I18n.t('not_available_abbrev', 'N/A');
 
   var Column = React.createClass({
     render: function() {
@@ -58,7 +60,7 @@ define(function(require) {
     },
 
     ratioFor: function(score) {
-      var quizPoints = parseFloat(this.props.pointsPossible);
+      var quizPoints = parseNumber(this.props.pointsPossible);
 
       if (quizPoints > 0) {
         return round(score / quizPoints * 100.0, 0, 0);

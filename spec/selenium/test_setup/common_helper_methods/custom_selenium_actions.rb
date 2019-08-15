@@ -415,6 +415,30 @@ module CustomSeleniumActions
     select.select_by(select_by, option_text)
   end
 
+  def INSTUI_select(elem_or_css)
+    if elem_or_css.is_a?(String) then fj(elem_or_css) else elem_or_css end
+  end
+
+  # implementation of click_option for use with INSTU's Select
+  # (tested with the CanvasSelect wrapper, untested with a raw instui Select)
+  def click_INSTUI_Select_option(select, option_text, select_by = :text)
+    cselect = INSTUI_select(select)
+    cselect.click # open the options list
+    option_list_id = cselect.attribute('aria-controls')
+    if select_by == :text
+      fj("##{option_list_id} [role='option']:contains(#{option_text})").click
+    else
+      f("##{option_list_id} [role='option'][#{select_by}='#{option_text}']").click
+    end
+  end
+
+  def INSTUI_Select_options(select)
+    cselect = INSTUI_select(select)
+    cselect.click # open the options list
+    option_list_id = cselect.attribute('aria-controls')
+    ff("##{option_list_id} [role='option']")
+  end
+
   def close_visible_dialog
     visible_dialog_element = fj('.ui-dialog:visible')
     visible_dialog_element.find_element(:css, '.ui-dialog-titlebar-close').click

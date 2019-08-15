@@ -22,15 +22,16 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconEye from '@instructure/ui-icons/lib/Line/IconEye'
 import IconOff from '@instructure/ui-icons/lib/Line/IconOff'
 import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!SpeedGraderPostGradesMenu'
 
 export default function SpeedGraderPostGradesMenu(props) {
   const menuTrigger = (
-    <Button variant="icon-inverse" icon={props.allowPostingGrades ? IconOff : IconEye}>
-      <ScreenReaderContent>{I18n.t('Post or Hide Grades')}</ScreenReaderContent>
-    </Button>
+    <Button
+      icon={props.allowPostingGrades ? IconOff : IconEye}
+      title={I18n.t('Post or Hide Grades')}
+      variant="icon-inverse"
+    />
   )
 
   return (

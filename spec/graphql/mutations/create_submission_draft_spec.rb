@@ -31,6 +31,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
   def mutation_str(
     submission_id: @submission.id,
     attempt: nil,
+    body: nil,
     file_ids: []
   )
     <<~GQL
@@ -38,6 +39,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
         createSubmissionDraft(input: {
           submissionId: "#{submission_id}"
           #{"attempt: #{attempt}" if attempt}
+          #{"body: \"#{body}\"" if body}
           fileIds: #{file_ids}
         }) {
           submissionDraft {
@@ -47,6 +49,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
               _id
               displayName
             }
+            body
           }
           errors {
             attribute
@@ -58,7 +61,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
   end
 
   def run_mutation(opts = {}, current_user = @student)
-    result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user})
+    result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user, request: ActionDispatch::TestRequest.create})
     result.to_h.with_indifferent_access
   end
 
@@ -97,6 +100,17 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     expect(
       first_result.dig(:data, :createSubmissionDraft, :submissionDraft, :submissionAttempt)
     ).to eq second_result.dig(:data, :createSubmissionDraft, :submissionDraft, :submissionAttempt)
+  end
+
+  it 'allows you to set a body on the submission draft' do
+    result = run_mutation(
+      submission_id: @submission.id,
+      attempt: @submission.attempt,
+      body: 'some text body'
+    )
+    expect(
+      result.dig(:data, :createSubmissionDraft, :submissionDraft, :body)
+    ).to eq 'some text body'
   end
 
   it 'returns an error if the attachments are not owned by the user' do
@@ -145,7 +159,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq 'submission draft cannot be more then one attempt ahead of the current submission'
   end
 
-  it "uses the submission attempt plus one if an explicit attempt isn't provided" do
+  it 'uses the submission attempt plus one if an explicit attempt is not provided' do
     result = run_mutation(
       submission_id: @submission.id,
       file_ids: [@attachments[0].id]

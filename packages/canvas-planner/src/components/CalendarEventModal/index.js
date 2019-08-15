@@ -20,13 +20,10 @@ import React from 'react';
 import {bool, func, shape, string} from 'prop-types';
 import { momentObj } from 'react-moment-proptypes';
 
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/components/Modal';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import View from '@instructure/ui-layout/lib/components/View';
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading, List, Text} from '@instructure/ui-elements'
+import {Modal} from '@instructure/ui-overlays'
+import {View} from '@instructure/ui-layout'
 
 import formatMessage from '../../format-message';
 import { dateString, dateTimeString, dateRangeString } from '../../utilities/dateUtils';
@@ -51,12 +48,12 @@ export default class CalendarEventModal extends React.Component {
   }
 
   renderRow (firstColumnContent, secondColumnContent) {
-    return <ListItem>
+    return <List.Item>
       <Text weight="bold">{firstColumnContent}</Text>
       <View margin="0 0 0 x-small">
         <Text>{secondColumnContent}</Text>
       </View>
-    </ListItem>;
+    </List.Item>;
   }
 
   renderTimeString () {
@@ -94,10 +91,10 @@ export default class CalendarEventModal extends React.Component {
   renderDetails () {
     if (this.props.details) {
       const convertedHtml = convertApiUserContent(this.props.details);
-      return <ListItem margin="large 0 0 0">
+      return <List.Item margin="large 0 0 0">
         <Text weight="bold">{formatMessage('Details:')}</Text>
         <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
-      </ListItem>;
+      </List.Item>;
     }
   }
 
@@ -109,7 +106,7 @@ export default class CalendarEventModal extends React.Component {
       onDismiss={this.props.requestClose}
       shouldCloseOnDocumentClick
     >
-      <ModalHeader>
+      <Modal.Header>
         <Heading>
           <Button
             variant="link"
@@ -126,8 +123,8 @@ export default class CalendarEventModal extends React.Component {
         >
           {formatMessage('Close')}
         </CloseButton>
-      </ModalHeader>
-      <ModalBody padding="medium">
+      </Modal.Header>
+      <Modal.Body padding="medium">
         <List variant="unstyled" itemSpacing="small">
           {this.renderCalendarRow()}
           {this.renderDateTimeRow()}
@@ -135,7 +132,7 @@ export default class CalendarEventModal extends React.Component {
           {this.renderAddressRow()}
           {this.renderDetails()}
         </List>
-      </ModalBody>
+      </Modal.Body>
     </Modal>;
   }
 }

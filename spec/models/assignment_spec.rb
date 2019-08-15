@@ -51,11 +51,6 @@ describe Assignment do
     expect(assignment.lti_context_id).to be_present
   end
 
-  it "allows assignment to be found by lti_context_id" do
-    assignment = @course.assignments.create!(assignment_valid_attributes)
-    expect(@course.assignments.api_id("lti_context_id:#{assignment.lti_context_id}")).to eq assignment
-  end
-
   it "should have a useful state machine" do
     assignment_model(course: @course)
     expect(@a.state).to eql(:published)
@@ -346,6 +341,16 @@ describe Assignment do
             }.not_to change { quiz.reload.updated_at }
           end
         end
+      end
+    end
+
+    describe 'sets root_account_id from Context' do
+      it 'sets root_account_id before_create' do
+        assignment = Assignment.create!(
+          course: @course,
+          name: 'some assignment',
+        )
+        expect(assignment.root_account_id).to eq @course.root_account_id
       end
     end
   end
@@ -8082,6 +8087,15 @@ describe Assignment do
           it_behaves_like 'line item and resource link existence check'
         end
       end
+    end
+  end
+
+  describe 'sis_source_id' do
+    it 'is unique' do
+      Assignment.create!(course: @course, name: 'some assignment', sis_source_id: 'BLAH')
+      expect {
+        Assignment.create!(course: @course, name: 'some assignment', sis_source_id: 'BLAH')
+      }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 

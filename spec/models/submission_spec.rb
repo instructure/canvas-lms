@@ -1155,6 +1155,17 @@ describe Submission do
       end
     end
 
+    it "does not apply the late policy more than once when working with decimals with a scale of more than 2" do
+      Timecop.freeze(3.days.ago(@date)) do
+        @course.late_policy.update!(late_submission_deduction: 2.35)
+        @assignment.submit_homework(@student, body: "a body")
+        @assignment.update!(points_possible: 10)
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        DueDateCacher.recompute(@assignment, update_grades: true)
+        expect(submission.score).to be 9.765
+      end
+    end
+
     it "does not change a previous grade when student submits ungraded work" do
       asg = @course.assignments.create!(points_possible: 1000, submission_types: "online_text_entry")
       Timecop.freeze(2.days.ago(@date)) do
@@ -6703,7 +6714,7 @@ describe Submission do
   end
 
   context "caching" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     def check_cache_clear
       key = @student.cache_key(:submissions)

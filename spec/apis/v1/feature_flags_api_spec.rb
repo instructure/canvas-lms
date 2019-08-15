@@ -64,7 +64,6 @@ describe "Feature Flags API", type: :request do
                 "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
           {"feature"=>"course_feature",
            "applies_to"=>"Course",
-           "development"=>true,
            "release_notes_url"=>"http://example.com",
            "display_name"=>"not localized",
            "description"=>"srsly",
@@ -357,7 +356,18 @@ describe "Feature Flags API", type: :request do
                                               enabled: true,
                                               applies_to_self: false,
                                               applies_to_descendants: true)
+          t_site_admin.role_overrides.create!(permission: 'view_feature_flags',
+                                              role: role,
+                                              enabled: true,
+                                              applies_to_self: true,
+                                              applies_to_descendants: true)
           @site_admin_member = site_admin_user(role: role)
+        end
+
+        it "should view a hidden feature" do
+          json = api_call_as_user(@site_admin_member, :get, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
+                           { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_site_admin.id.to_s, feature: 'hidden_feature' })
+          expect(json['state']).to eq 'hidden'
         end
 
         it "should not create a site admin feature flag" do

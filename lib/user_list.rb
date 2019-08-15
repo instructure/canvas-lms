@@ -92,6 +92,9 @@ class UserList
   def parse_single_user(path)
     return if path.blank?
 
+    unique_id_regex = Pseudonym.validators.
+      find { |v| v.attributes.include?(:unique_id) && v.is_a?(ActiveModel::Validations::FormatValidator) }.
+      options[:with]
     # look for phone numbers by searching for 10 digits, allowing
     # any non-word characters
     if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
@@ -99,7 +102,7 @@ class UserList
     elsif path.include?('@') && (email = parse_email(path))
       type = :email
       name, path = email
-    elsif path =~ Pseudonym.validates_format_of_login_field_options[:with]
+    elsif path =~ unique_id_regex
       type = :pseudonym
     else
       @errors << { :address => path, :details => :unparseable }

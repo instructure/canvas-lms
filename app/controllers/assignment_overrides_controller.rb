@@ -429,7 +429,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def require_assignment
-    @assignment = @course.active_assignments.find(params[:assignment_id])
+    @assignment = api_find(@course.active_assignments, params[:assignment_id])
   end
 
   def require_assignment_edit

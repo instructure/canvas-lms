@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if CANVAS_RAILS5_1
-  gem 'rails', '5.1.6.2'
-else
+if CANVAS_RAILS5_2
   gem 'rails', '5.2.3'
-end
     gem 'loofah', '2.2.3'
+else
+  gem 'rails', '6.0.0.rc2'
+end
 
 gem 'rack', '2.0.6'
 
@@ -34,14 +34,14 @@ gem 'tzinfo', '1.2.5'
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '4.0.1'
+gem 'authlogic', '5.0.2'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.14.3'
+gem 'switchman', '1.14.5'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
-  gem 'will_paginate', '3.1.6', require: false
+  gem 'will_paginate', '3.1.7', require: false
 
 gem 'addressable', '2.5.2', require: false
 gem "after_transaction_commit", '2.0.0'
@@ -65,7 +65,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.15.11'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.3.4'
+gem 'switchman-inst-jobs', '1.3.5'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.25.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
@@ -74,11 +74,7 @@ gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
 gem 'httparty', '0.16.1'
-if CANVAS_RAILS5_1
-  gem 'i18n', '0.9.5'
-else
-  gem 'i18n', '1.0.0'
-end
+gem 'i18n', '1.0.0'
 gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false
@@ -132,7 +128,7 @@ gem 'inst_statsd', '2.1.6'
 gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
-gem 'academic_benchmarks', '0.0.10', require: false
+gem 'academic_benchmarks', '0.0.11', require: false
 
 gem 'graphql', '1.9.7'
 gem 'graphql-batch', '0.4.1'

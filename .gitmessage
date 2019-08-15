@@ -1,3 +1,5 @@
+
+
 # 50-character subject line
 #
 # 72-character wrapped longer description. This should answer:
@@ -12,4 +14,4 @@
 #
 # closes/fixes/refs TICKET-XYZ
 #
-# flag: none (if there is a feature flag, use the name here)
+# flag = none (if there is a feature flag, use the name here)

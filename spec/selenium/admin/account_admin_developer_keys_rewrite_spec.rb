@@ -49,6 +49,7 @@ describe 'Developer Keys' do
       get "/accounts/#{Account.default.id}/developer_keys"
 
       find_button("Developer Key").click
+      find_button("API Key").click
       f("input[name='developer_key[name]']").send_keys("Cool Tool")
       f("input[name='developer_key[email]']").send_keys("admin@example.com")
       f("textarea[name='developer_key[redirect_uris]']").send_keys("http://example.com")
@@ -281,6 +282,7 @@ describe 'Developer Keys' do
       it "does not have enforce scopes toggle activated on initial dev key creation" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
+        find_button("API Key").click
         expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconX']")
         expect(f("form")).to contain_jqcss("h2:contains('When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.')")
       end
@@ -365,6 +367,7 @@ describe 'Developer Keys' do
       it "keeps all endpoints read only checkbox checked after save" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
+        find_button("API Key").click
         click_enforce_scopes
         click_select_all_readonly_checkbox
         find_button("Save Key").click
@@ -390,6 +393,7 @@ describe 'Developer Keys' do
       it "displays flash alert if scopes aren't selected when enforce scopes toggled" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
+        find_button("API Key").click
         wait_for_ajaximations
         click_enforce_scopes
         wait_for_ajaximations
@@ -408,6 +412,7 @@ describe 'Developer Keys' do
         driver.navigate.back
         wait_for_dev_key_modal_to_close
         find_button("Developer Key").click
+        find_button("API Key").click
         expect(f("input[name='developer_key[name]']").attribute('value')).not_to be_present
       end
 

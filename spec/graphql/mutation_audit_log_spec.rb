@@ -88,6 +88,23 @@ describe AuditLogFieldExtension::Logger do
     expect(logger.instance_variable_get(:@params)).to eq ({password: "[FILTERED]"})
   end
 
+  it "truncates long text" do
+    long_string = "Z" * 500
+    shortened_string = "Z" * 256
+    logger = AuditLogFieldExtension::Logger.new(mutation, {}, {
+      input: {
+        string: long_string,
+        array: [long_string],
+        nested_hash: {a: long_string}
+      }
+    })
+    expect(logger.instance_variable_get(:@params)).to eq ({
+      string: shortened_string,
+      array: [shortened_string],
+      nested_hash: {a: shortened_string}
+    })
+  end
+
   context "#log_entry_id" do
     it "uses #asset_string and includes the domain_root_account id for the object_id" do
       logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})

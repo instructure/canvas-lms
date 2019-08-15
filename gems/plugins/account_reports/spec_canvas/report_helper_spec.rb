@@ -144,6 +144,32 @@ describe "report helper" do
     end
   end
 
+  describe "#generate_and_run_report" do
+    context 'i18n' do
+      before do
+        account_report.save!
+        user.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
+        user.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+      end
+
+      it "Should not have byte order mark and semicolons when i18n compatibility disabled" do
+        file = report.generate_and_run_report(['h1', 'h2']) do |csv|
+          csv << ['val1', 'val2']
+        end
+        contents = File.read(file)
+        expect(contents).to eq "h1,h2\nval1,val2\n"
+      end
+
+      it "Should use i18n compatibility when enabled" do
+        file = report.generate_and_run_report(['h1', 'h2'], 'csv', true) do |csv|
+          csv << ['val1', 'val2']
+        end
+        contents = File.read(file)
+        expect(contents).to eq "\xEF\xBB\xBFh1;h2\nval1;val2\n"
+      end
+    end
+  end
+
   context 'Scopes' do
 
     before(:once) do

@@ -22,12 +22,9 @@ import { func, arrayOf, object, bool, string } from 'prop-types';
 import moment from 'moment-timezone';
 
 import formatMessage from '../../format-message';
-import List from '@instructure/ui-elements/lib/components/List';
-import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
-import View from '@instructure/ui-layout/lib/components/View';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import Text from '@instructure/ui-elements/lib/components/Text';
+import {List, Spinner, Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
 
 import { sidebarLoadInitialItems, sidebarCompleteItem } from '../../actions';
 import ToDoItem from './ToDoItem';
@@ -123,7 +120,7 @@ export class ToDoSidebar extends Component {
       <List id="planner-todosidebar-item-list" variant="unstyled">
         {
           this.state.visibleToDos.map((item, itemIndex) => (
-            <ListItem key={item.uniqueId}>
+            <List.Item key={item.uniqueId}>
               <ToDoItem
                 ref={component => {this.todoItemComponents[itemIndex] = component;}}
                 item={item}
@@ -132,7 +129,7 @@ export class ToDoSidebar extends Component {
                 locale={this.props.locale}
                 timeZone={this.props.timeZone}
               />
-            </ListItem>
+            </List.Item>
           ))
         }
       </List>
@@ -147,7 +144,7 @@ export class ToDoSidebar extends Component {
             {formatMessage('To Do')}
           </h2>
           <View as="div" textAlign="center">
-            <Spinner title={formatMessage('To Do Items Loading')} size="small" />
+            <Spinner renderTitle={() => formatMessage('To Do Items Loading')} size="small" />
           </View>
         </div>
       );

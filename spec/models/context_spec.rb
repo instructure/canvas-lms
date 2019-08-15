@@ -165,6 +165,11 @@ describe Context do
       expect(Context.find_asset_by_url("/groups/#{@group.id}/wiki/yo")).to eq @page
     end
 
+    it "should find weird wiki pages" do
+      wiki_page_model(context: @course, title: 'pagewitha+init')
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/pages/pagewitha+init")).to eq @page
+    end
+
     it 'should find discussion_topics' do
       discussion_topic_model(context: @course)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/discussion_topics/#{@topic.id}")).to eq @topic

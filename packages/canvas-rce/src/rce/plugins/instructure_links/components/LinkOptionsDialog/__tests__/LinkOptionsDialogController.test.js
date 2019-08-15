@@ -20,7 +20,10 @@ import ReactDOM from 'react-dom'
 
 import LinkOptionsDialogController, {CONTAINER_ID} from '../LinkOptionsDialogController'
 import FakeEditor from '../../../../shared/__tests__/FakeEditor'
+import bridge from '../../../../../../bridge'
 import LinkOptionsDialogDriver from './LinkOptionsDialogDriver'
+
+jest.mock('../../../../../../bridge')
 
 describe('RCE "Links" Plugin > LinkOptionsDialog > LinkOptionsDialogController', () => {
   let dialogController
@@ -72,6 +75,21 @@ describe('RCE "Links" Plugin > LinkOptionsDialog > LinkOptionsDialogController',
       // In effect, it does not explode.
       dialogController.hideDialog()
       expect(getDialog()).toBeNull()
+    })
+  })
+
+  describe('#_applyLinkOptions', () => {
+    it('dismisses the dialog', () => {
+      dialogController.showDialogForEditor(editor, 'create')
+      dialogController._applyLinkOptions({})
+      expect(getDialog()).toBeNull()
+
+    })
+
+    it('inserts the link', () => {
+      dialogController.showDialogForEditor(editor, 'create')
+      dialogController._applyLinkOptions({})
+      expect(bridge.insertLink).toHaveBeenCalledWith({}, false)
     })
   })
 })

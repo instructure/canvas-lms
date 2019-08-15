@@ -68,6 +68,8 @@ export default function generator ({ borders, colors, forms, shadows, spacing, t
     canvasFocusBorderColor: borders.brand,
     canvasFocusBorderWidth: borders.widthSmall, // canvas really uses widthMedium
     canvasFocusBoxShadow: `0 0 0 2px ${colors.brand}`,
+    canvasEnabledColor: borders.brand,
+    canvasEnabledBoxShadow: `inset 0 0 0.1875rem 0.0625rem ${darken(colors.borderLightest, 25)}`,
 
     canvasFontFamily: typography.fontFamily,
     canvasFontSize: '1rem',
@@ -100,6 +102,7 @@ generator['canvas'] = function(variables) {
 
     canvasFocusBorderColor: variables['ic-brand-primary'],
     canvasFocusBoxShadow: `0 0 0 2px ${variables['ic-brand-primary']}`,
+    canvasEnabledColor: variables['ic-brand-primary'],
 
     canvasPrimaryButtonBackground: variables['ic-brand-primary'],
     canvasPrimaryButtonColor: variables['ic-brand-button--primary-text'],

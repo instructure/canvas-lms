@@ -212,6 +212,11 @@ class UsersController < ApplicationController
       js_env :grades_for_student_url => grades_for_student_url
 
       ActiveRecord::Associations::Preloader.new.preload(@observed_enrollments, :course)
+
+      @page_title = t(:page_title, "Grades")
+      js_bundle :user_grades
+      css_bundle :user_grades
+      render stream: can_stream_template?
     end
   end
 
@@ -518,6 +523,7 @@ class UsersController < ApplicationController
       css_bundle :act_as_modal
 
       @page_title = t('Act as %{user_name}', user_name: @user.short_name)
+      @google_analytics_page_title = t('Act as user')
       js_env act_as_user_data: {
         user: {
           name: @user.name,
@@ -1260,6 +1266,7 @@ class UsersController < ApplicationController
 
         respond_to do |format|
           format.html do
+            @google_analytics_page_title = "User"
             js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
                    USER_ID: @user.id)
           end

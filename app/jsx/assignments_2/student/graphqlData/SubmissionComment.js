@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, bool, shape, string} from 'prop-types'
 import {SubmissionCommentFile} from './File'
 import gql from 'graphql-tag'
 import {MediaObject} from './MediaObject'
@@ -35,6 +35,7 @@ export const SubmissionComment = {
       mediaObject {
         ...MediaObject
       }
+      read
       updatedAt
     }
     ${MediaObject.fragment}
@@ -48,12 +49,14 @@ export const SubmissionComment = {
     author: SubmissionCommentAuthor.shape,
     comment: string,
     mediaObject: MediaObject.shape,
+    read: bool,
     updatedAt: string
   })
 }
 
 export const SubmissionCommentDefaultMocks = {
   SubmissionComment: () => ({
-    attachments: [{}]
+    attachments: [{}],
+    read: true
   })
 }

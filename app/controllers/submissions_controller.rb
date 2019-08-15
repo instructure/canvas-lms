@@ -126,6 +126,8 @@ class SubmissionsController < SubmissionsBaseController
     # via this controller's anonymous counterpart
     return render_unauthorized_action if @assignment.anonymous_peer_reviews? && @submission.peer_reviewer?(@current_user)
 
+    @google_analytics_page_title = "#{@assignment.title} Submission Details"
+
     super
   end
 
@@ -192,15 +194,36 @@ class SubmissionsController < SubmissionsBaseController
   # @argument submission[media_comment_type] [String, "audio"|"video"]
   #   The type of media comment being submitted.
   #
+  # @argument submission[user_id] [Integer]
+  #   Submit on behalf of the given user. Requires grading permission.
+  #
+  # @argument submission[submitted_at] [DateTime]
+  #   Choose the time the submission is listed as submitted at.  Requires grading permission.
+  
   def create
     params[:submission] ||= {}
+    user_id = params[:submission].delete(:user_id)
+    @submission_user = if user_id
+      get_user_considering_section(user_id)
+    else
+      @current_user
+    end
 
-    @assignment = @context.assignments.active.find(params[:assignment_id])
-    @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @submission_user)
 
-    return unless authorized_action(@assignment, @current_user, :submit)
+    return unless authorized_action(@assignment, @submission_user, :submit)
+    submit_at = params.dig(:submission, :submitted_at)
+    user_sub = @assignment.submissions.find_by(user: user_id)
+    return if (user_id || submit_at) && !authorized_action(user_sub, @current_user, :grade)
 
-    @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
+    if @assignment.locked_for?(@submission_user) && !@assignment.grants_right?(@current_user, :update)
+      flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
+
+    @group = @assignment.group_category.group_for(@submission_user) if @assignment.has_group_category?
 
     return unless valid_text_entry?
     return unless process_api_submission_params if api_request?
@@ -228,7 +251,7 @@ class SubmissionsController < SubmissionsBaseController
     end
 
     submission_params = params[:submission].permit(
-      :body, :url, :submission_type, :comment, :group_comment,
+      :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
       :attachment_ids => []
     )
@@ -236,7 +259,7 @@ class SubmissionsController < SubmissionsBaseController
     submission_params[:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
 
     begin
-      @submission = @assignment.submit_homework(@current_user, submission_params)
+      @submission = @assignment.submit_homework(@submission_user, submission_params)
     rescue ActiveRecord::RecordInvalid => e
       respond_to do |format|
         format.html {
@@ -278,7 +301,7 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def update
-    @assignment = @context.assignments.active.find(params.fetch(:assignment_id))
+    @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
     @user = @context.all_students.find(params.fetch(:id))
     @submission = @assignment.find_or_create_submission(@user)
 
@@ -347,7 +370,7 @@ class SubmissionsController < SubmissionsBaseController
     params[:submission][:attachments] = []
 
     attachment_ids.each do |id|
-      params[:submission][:attachments] << @current_user.attachments.active.where(id: id).first if @current_user
+      params[:submission][:attachments] << @submission_user.attachments.active.where(id: id).first if @submission_user
       params[:submission][:attachments] << @group.attachments.active.where(id: id).first if @group
       params[:submission][:attachments].compact!
     end
@@ -526,7 +549,7 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def always_permitted_create_params
-    always_permitted_params = [:eula_agreement_timestamp].freeze
+    always_permitted_params = [:eula_agreement_timestamp, :submitted_at].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params

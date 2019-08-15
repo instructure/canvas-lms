@@ -175,7 +175,7 @@ export default class MessageFormDialog extends DialogBaseView {
     // add attachment and media buttons to bottom bar
     this.$fullDialog
       .find('.ui-dialog-buttonpane')
-      .prepend(composeButtonBarTemplate({isIE10: INST.browser.ie10}))
+      .prepend(composeButtonBarTemplate({}))
 
     return (this.$addMediaComment = this.$fullDialog.find('.attach-media'))
   }
@@ -469,17 +469,7 @@ export default class MessageFormDialog extends DialogBaseView {
     this.appendAddAttachmentTemplate()
     this.updateAttachmentOverflow()
 
-    // Hacky crazyness for ie10.
-    // If you try to use javascript to 'click' on a file input element,
-    // when you go to submit the form it will give you an "access denied" error.
-    // So, for IE10, we make the paperclip icon a <label>  that references the input it automatically open the file input.
-    // But making it a <label> makes it so you can't tab to it. so for everyone else me make it a <button> and open the file
-    // input dialog with a javascript "click"
-    if (INST.browser.ie10) {
-      return this.focusAddAttachment()
-    } else {
-      return this.$fullDialog.find('.file_input:last').click()
-    }
+    return this.$fullDialog.find('.file_input:last').click()
   }
 
   appendAddAttachmentTemplate() {

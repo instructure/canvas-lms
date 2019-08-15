@@ -15,6 +15,7 @@ exports[`can handles no items 1`] = `
     as="span"
     letterSpacing="normal"
     size="small"
+    wrap="normal"
   >
     Nothing for now
   </Text>

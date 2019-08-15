@@ -67,6 +67,21 @@ describe ExternalContentController do
 
     end
 
+    it 'renders the deep_linking_response template if assignments_2 is enabled' do
+      Account.default.enable_feature!(:assignments_2)
+
+      c = course_factory
+      post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+           lti_version: 'LTI-1p0',
+           data: '',
+           content_items: File.read(Rails.root.join('spec', 'fixtures', 'lti', 'content_items.json')),
+           lti_msg: '',
+           lti_log: '',
+           lti_errormsg: '',
+           lti_errorlog: ''})
+      expect(response).to render_template('lti/ims/deep_linking/deep_linking_response')
+    end
+
     context 'external_tool service_id' do
       let(:test_course) {course_factory}
       let(:launch_url) {'http://test.com/launch'}

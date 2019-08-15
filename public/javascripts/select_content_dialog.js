@@ -27,6 +27,7 @@ import htmlEscape from 'str/htmlEscape'
 import { uploadFile } from 'jsx/shared/upload_file'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 import SelectContent from './lti/select_content'
+import setDefaultToolValues from './lti/setDefaultToolValues'
 import processSingleContentItem from 'jsx/deep_linking/processors/processSingleContentItem'
 import {findLinkForService, getUserServices} from './findLinkForService'
 import './jquery.instructure_date_and_time' /* datetime_field */
@@ -94,6 +95,9 @@ import './jquery.templateData'
   }
 
   SelectContentDialog.handleContentItemResult = function(result, tool) {
+    if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
+      setDefaultToolValues(result, tool)
+    }
     $("#external_tool_create_url").val(result.url)
     $("#external_tool_create_title").val(result.title || tool.name)
     $("#context_external_tools_select .domain_message").hide()
@@ -104,12 +108,12 @@ import './jquery.templateData'
       $("#context_external_tools_select .tools").on('click', '.tool', this.onContextExternalToolSelect);
     },
 
-    onContextExternalToolSelect : function(e) {
+    onContextExternalToolSelect : function(e, existingTool) {
       e.preventDefault();
-      var $tool = $(this);
+      var $tool = existingTool || $(this);
       var toolName = $tool.find('a').text();
-      if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) {
-        $(this).removeClass('selected');
+      if($tool.hasClass('selected') && !$tool.hasClass('resource_selection')) {
+        $tool.removeClass('selected');
         $("#external_tool_create_url").val('');
         $.screenReaderFlashMessage(I18n.t('Unselected external tool %{tool}', {tool: toolName}));
         return;
@@ -127,7 +131,6 @@ import './jquery.templateData'
         var width = placement.selection_width;
         var height = placement.selection_height;
         var $dialog = $("#resource_selection_dialog");
-
         if($dialog.length == 0) {
           $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
           $dialog.append(`<div class="before_external_content_info_alert screenreader-only" tabindex="0">

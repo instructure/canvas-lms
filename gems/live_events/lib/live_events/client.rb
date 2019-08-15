@@ -27,6 +27,7 @@ module LiveEvents
 
     def self.config
       res = LiveEvents.settings
+      return true if res['stub_kinesis']
       return nil unless res && !res['kinesis_stream_name'].blank? &&
                                (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
 

@@ -29,6 +29,11 @@ import ColumnHeaders from 'compiled/react_files/components/ColumnHeaders'
           return;
         }
         var isSortedCol = sort === column.property;
+        if (this.props.query.sort && isSortedCol && order) {
+          const direction = order === 'asc' ? 'ascending' : 'descending'
+          $.screenReaderFlashMessage(I18n.t("Sorted %{direction} by %{columnName}",
+            {direction, columnName: column.displayName}))
+        }
         var columnClassNameObj = {
           "current-filter": isSortedCol
         };

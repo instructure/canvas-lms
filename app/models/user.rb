@@ -56,6 +56,7 @@ class User < ActiveRecord::Base
   has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
   has_many :ignores
   has_many :planner_notes, :dependent => :destroy
+  has_many :viewed_submission_comments, :dependent => :destroy
 
   has_many :enrollments, :dependent => :destroy
 
@@ -865,6 +866,7 @@ class User < ActiveRecord::Base
       cc.user = self
     end
     cc.move_to_top
+    cc.workflow_state = 'unconfirmed' if cc.retired?
     cc.save!
     self.reload
     self.clear_email_cache!
@@ -1069,7 +1071,7 @@ class User < ActiveRecord::Base
     given { |user| user == self }
     can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
       can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
-      can :update_avatar and can :manage_feature_flags and can :api_show_user and
+      can :update_avatar and can :view_feature_flags and can :manage_feature_flags and can :api_show_user and
       can :read_email_addresses and can :view_user_logins and can :generate_observer_pairing_code
 
     given { |user| user == self && user.user_can_edit_name? }
@@ -1118,7 +1120,7 @@ class User < ActiveRecord::Base
       self.check_accounts_right?(user, :manage_user_logins) && self.adminable_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :update_avatar and can :remove_avatar and
-      can :manage_feature_flags
+      can :manage_feature_flags and can :view_feature_flags
 
     given{ |user| self.pseudonyms.shard(self).any?{ |p| p.grants_right?(user, :update) } }
     can :merge

@@ -20,8 +20,8 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import moment from 'moment-timezone';
 import { connect } from 'react-redux';
-import View from '@instructure/ui-layout/lib/components/View';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
+import {View} from '@instructure/ui-layout'
+import {Spinner} from '@instructure/ui-elements'
 import { arrayOf, oneOfType, shape, bool, object, string, number, func } from 'prop-types';
 import { userShape, sizeShape } from '../plannerPropTypes';
 import Day from '../Day';
@@ -163,7 +163,7 @@ export class PlannerApp extends Component {
       textAlign="center"
     >
       <Spinner
-        title={formatMessage('Loading planner items')}
+        renderTitle={() => formatMessage('Loading planner items')}
         size="medium"
       />
     </View>;

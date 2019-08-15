@@ -22,6 +22,8 @@ import bridge from '../../../../../bridge'
 import {getContentFromEditor} from '../../../shared/ContentSelection'
 import LinkOptionsDialog from './index'
 export const CONTAINER_ID = 'instructure-link-options-tray-container'
+export const CREATE_LINK = 'create'
+export const EDIT_LINK = 'edit'
 export default class LinkOptionsDialogController {
   constructor() {
     this._editor = null
@@ -52,7 +54,7 @@ export default class LinkOptionsDialogController {
   }
   _applyLinkOptions(linkOptions) {
     this._dismissDialog()
-    bridge.insertLink(linkOptions)
+    bridge.insertLink(linkOptions, false)
   }
   _dismissDialog = () => {
     this._shouldOpen = false
@@ -65,7 +67,7 @@ export default class LinkOptionsDialogController {
     this._editor = null
   }
   _renderDialog() {
-    const content = getContentFromEditor(this._editor)
+    const content = getContentFromEditor(this._editor, this._op === EDIT_LINK)
     if (this._shouldOpen) {
       /*
        * When the dialog is being opened again, it should be rendered fresh

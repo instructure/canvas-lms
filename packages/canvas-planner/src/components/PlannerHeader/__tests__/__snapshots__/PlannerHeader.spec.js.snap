@@ -248,11 +248,17 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   >
     <View
       as="div"
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="large large medium"
+      position="static"
+      shouldAnimateFocus={true}
     >
       <CloseButton
         buttonRef={[Function]}
@@ -280,6 +286,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     </View>
   </Tray>
   <Portal
+    elementRef={[Function]}
     insertAt="bottom"
     mountNode={<div />}
     onClose={[Function]}
@@ -550,11 +557,17 @@ exports[`new activity button shows when there is new activity 1`] = `
   >
     <View
       as="div"
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="large large medium"
+      position="static"
+      shouldAnimateFocus={true}
     >
       <CloseButton
         buttonRef={[Function]}
@@ -582,6 +595,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     </View>
   </Tray>
   <Portal
+    elementRef={[Function]}
     insertAt="bottom"
     mountNode={<div />}
     onClose={[Function]}
@@ -852,11 +866,17 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   >
     <View
       as="div"
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="large large medium"
+      position="static"
+      shouldAnimateFocus={true}
     >
       <CloseButton
         buttonRef={[Function]}
@@ -884,6 +904,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     </View>
   </Tray>
   <Portal
+    elementRef={[Function]}
     insertAt="bottom"
     mountNode={<div />}
     onClose={[Function]}

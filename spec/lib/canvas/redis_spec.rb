@@ -81,19 +81,10 @@ describe "Canvas::Redis" do
     end
 
     describe "redis failure" do
-      let(:cache) { ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234']) }
+      let(:cache) { ActiveSupport::Cache::RedisCacheStore.new(url: 'redis://localhost:1234') }
 
       before do
-        allow(cache.data._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError)
-      end
-
-      it "should fail if not ignore_redis_failures" do
-        Setting.set('ignore_redis_failures', 'false')
-        expect {
-          enable_cache(cache) {
-            expect(Rails.cache.read('blah')).to eq nil
-          }
-        }.to raise_error(Redis::TimeoutError)
+        allow(cache.redis._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError)
       end
 
       it "should not fail cache.read" do
@@ -123,7 +114,7 @@ describe "Canvas::Redis" do
       end
 
       it "should not fail cache.delete for a ring" do
-        enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234', 'redis://localhost:4567'])) do
+        enable_cache(ActiveSupport::Cache::RedisCacheStore.new(url: ['redis://localhost:1234', 'redis://localhost:4567'])) do
           expect(Rails.cache.delete('blah')).to eq 0
         end
       end
@@ -136,13 +127,13 @@ describe "Canvas::Redis" do
 
       it "should not fail cache.delete_matched" do
         enable_cache(cache) do
-          expect(Rails.cache.delete_matched('blah')).to eq false
+          expect(Rails.cache.delete_matched('blah')).to eq nil
         end
       end
 
       it "should fail separate servers separately" do
-        cache = ActiveSupport::Cache::RedisStore.new([Canvas.redis.id, 'redis://nonexistent:1234/0'])
-        client = cache.data
+        cache = ActiveSupport::Cache::RedisCacheStore.new(url: [Canvas.redis.id, 'redis://nonexistent:1234/0'])
+        client = cache.redis
         key2 = 2
         while client.node_for('1') == client.node_for(key2.to_s)
           key2 += 1
@@ -221,9 +212,7 @@ describe "Canvas::Redis" do
 
     context "rails caching" do
       let(:cache) do
-        ActiveSupport::Cache::RedisStore.new([]).tap do |cache|
-          cache.instance_variable_set(:@data, Canvas.redis.__getobj__)
-        end
+        ActiveSupport::Cache::RedisCacheStore.new(redis: Canvas.redis)
       end
 
       it "should log the cache fetch block generation time" do
@@ -291,10 +280,6 @@ describe "Canvas::Redis" do
   end
 
   describe "Canvas::RedisWrapper" do
-    it "should wrap redis connections" do
-      expect(Canvas.redis.class).to eq Canvas::RedisWrapper
-    end
-
     it "should raise on unsupported commands" do
       expect { Canvas.redis.keys }.to raise_error(Canvas::Redis::UnsupportedRedisMethod)
     end

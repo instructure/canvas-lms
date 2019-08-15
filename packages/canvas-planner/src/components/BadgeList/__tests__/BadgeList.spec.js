@@ -18,7 +18,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import BadgeList from '../index';
-import Pill from '@instructure/ui-elements/lib/components/Pill';
+import {Pill} from '@instructure/ui-elements'
 
 it('renders Pill components as list items', () => {
   const wrapper = shallow(

@@ -17,8 +17,10 @@
  */
 
 import {combineReducers} from 'redux'
+import {handleAction} from 'redux-actions'
 import {reduceNotifications} from '../shared/reduxNotifications'
 import {createPaginatedReducer} from '../shared/reduxPagination'
+import {actionTypes} from './actions'
 import allDiscussionsReducer from './reducers/allDiscussionsReducer'
 import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
 import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'
@@ -50,5 +52,8 @@ export default combineReducers({
   pinnedDiscussionIds: pinnedDiscussionReducer,
   roles: identity({}),
   unpinnedDiscussionIds: unpinnedDiscussionReducer,
-  userSettings: userSettingsReducer
+  userSettings: userSettingsReducer,
+  copyToOpen: handleAction(actionTypes.SET_COPY_TO_OPEN, (s, a) => a.payload, false),
+  sendToOpen: handleAction(actionTypes.SET_SEND_TO_OPEN, (s, a) => a.payload, false),
+  DIRECT_SHARE_ENABLED: identity(false)
 })

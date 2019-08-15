@@ -56,6 +56,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
 
     assignment = submission.assignment
     comment = assignment.add_submission_comment(submission.user, opts).first
+    comment.mark_read!(current_user)
     {submission_comment: comment}
   rescue ActiveRecord::RecordInvalid => invalid
     errors_for(invalid.record)

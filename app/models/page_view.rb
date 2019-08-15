@@ -276,7 +276,7 @@ class PageView < ActiveRecord::Base
         self.id
       end
     end
-    changes_applied unless CANVAS_RAILS5_1 # no longer a callback in 5.2.2
+    changes_applied
   end
 
   def _update_record(*args)
@@ -287,7 +287,7 @@ class PageView < ActiveRecord::Base
         true
       end
     end
-    changes_applied unless CANVAS_RAILS5_1
+    changes_applied
   end
 
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }

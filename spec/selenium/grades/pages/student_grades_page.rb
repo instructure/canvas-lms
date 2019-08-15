@@ -52,7 +52,7 @@ class StudentGradesPage
     end
 
     def hidden_eye_icon(scope:)
-      fxpath("//*[@title='Hidden']", scope)
+      fxpath("//*[@title='Instructor is working on grades']", scope)
     end
 
     def select_period_by_name(name)

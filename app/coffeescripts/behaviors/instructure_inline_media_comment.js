@@ -17,6 +17,7 @@
 
 import I18n from 'i18n!instructure_inline_media_comment'
 import $ from 'jquery'
+import {trackEvent} from 'jquery.google-analytics'
 import preventDefault from '../fn/preventDefault'
 import htmlEscape from 'str/htmlEscape'
 import '../jquery/mediaComment'
@@ -41,7 +42,7 @@ const inlineMediaComment = {
   collapseComment ($holder) {
     __guard__($holder.find('video,audio').data('mediaelementplayer'), x => x.pause())
     $holder.remove()
-    $.trackEvent('hide_embedded_content', 'hide_media')
+    trackEvent('hide_embedded_content', 'hide_media')
   },
 }
 
@@ -106,7 +107,7 @@ $(document).on('click', 'a.instructure_inline_media_comment', preventDefault(fun
     inlineMediaComment.collapseComment($holder)
   }))
 
-  $.trackEvent('show_embedded_content', 'show_media')
+  trackEvent('show_embedded_content', 'show_media')
   $holder.find('.innerholder').css('outline', 'none')
   $holder.find('.innerholder').on('focus', initialFocusInnerhold)
 }))

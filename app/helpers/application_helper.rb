@@ -448,9 +448,6 @@ module ApplicationHelper
                                     'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
                                     'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
-      :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
-      :http_status              => @status,
-      :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
@@ -1217,18 +1214,6 @@ module ApplicationHelper
         @context,
         'placements[]' => 'assignment_view'
       ))
-    end
-  end
-
-  if CANVAS_RAILS5_1
-    # this is for rails 5.1. it can be deleted when we upgrade to RAILS_5.2. rails 5.2 includes a preload_link_tag method
-    def preload_link_tag(source, options = {})
-      tag.link({
-        rel: "preload",
-        href: asset_path(source),
-        as: "script",
-        type: "text/javascript"
-      }.merge(options.symbolize_keys))
     end
   end
 

@@ -314,6 +314,7 @@ export default class AddPeople extends React.Component {
         shouldCloseOnDocumentClick={false}
         size="medium"
         tabIndex="-1"
+        liveRegion={getLiveRegion}
       >
         <ModalHeader>
           <CloseButton
@@ -361,4 +362,8 @@ export default class AddPeople extends React.Component {
       </Modal>
     )
   }
+}
+
+function getLiveRegion() {
+  return document.getElementById('flash_screenreader_holder')
 }

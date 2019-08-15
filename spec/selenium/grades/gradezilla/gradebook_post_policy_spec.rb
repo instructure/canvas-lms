@@ -146,7 +146,7 @@ describe 'Gradezilla Post Policy' do
         HideGradesTray.hide_grades
       end
 
-      it 'header has Hiddent icon', priority: '1', test_id: 3756682 do
+      it 'header has hidden icon', priority: '1', test_id: 3756682 do
         expect(Gradezilla.assignment_hidden_eye_icon(@manual_assignment.id)).to be_displayed
       end
 

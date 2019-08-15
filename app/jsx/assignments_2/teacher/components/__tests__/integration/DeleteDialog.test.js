@@ -40,7 +40,9 @@ describe('assignments 2 delete dialog', () => {
   })
 
   it('deletes the assignment and reloads', async () => {
-    const reloadSpy = jest.spyOn(window.location, 'reload')
+    delete window.location
+    window.location = {reload: jest.fn()}
+
     const assignment = mockAssignment()
     const {getByTestId} = await openDeleteDialog(assignment, [
       saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'})
@@ -49,7 +51,7 @@ describe('assignments 2 delete dialog', () => {
       getByTestId('delete-dialog-confirm-button')
     )
     fireEvent.click(reallyDeleteButton)
-    await wait(() => expect(reloadSpy).toHaveBeenCalled())
+    await wait(() => expect(window.location.reload).toHaveBeenCalled())
   })
 
   it('reports errors', async () => {

@@ -39,6 +39,7 @@ import IconBookmarkLine from '@instructure/ui-icons/lib/Line/IconBookmark'
 import IconBookmarkSolid from '@instructure/ui-icons/lib/Solid/IconBookmark'
 import IconCopySolid from '@instructure/ui-icons/lib/Solid/IconCopy'
 import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
+import IconDuplicate from '@instructure/ui-icons/lib/Line/IconDuplicate'
 import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
 import IconLtiLine from '@instructure/ui-icons/lib/Line/IconLti'
 import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
@@ -49,6 +50,7 @@ import IconTrashSolid from '@instructure/ui-icons/lib/Solid/IconTrash'
 import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
 import IconUnpublishedLine from '@instructure/ui-icons/lib/Line/IconUnpublished'
 import IconUpdownLine from '@instructure/ui-icons/lib/Line/IconUpdown'
+import IconUser from '@instructure/ui-icons/lib/Line/IconUser'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -113,6 +115,8 @@ export class DiscussionRow extends Component {
     connectDropTarget: func,
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
+    setCopyToOpen: func.isRequired,
+    setSendToOpen: func.isRequired,
     discussion: discussionShape.isRequired,
     discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     displayDeleteMenuItem: bool.isRequired,
@@ -132,7 +136,8 @@ export class DiscussionRow extends Component {
     moveCard: func,
     onMoveDiscussion: func,
     toggleSubscriptionState: func.isRequired,
-    updateDiscussion: func.isRequired
+    updateDiscussion: func.isRequired,
+    DIRECT_SHARE_ENABLED: bool.isRequired
   }
 
   static defaultProps = {
@@ -211,6 +216,13 @@ export class DiscussionRow extends Component {
           'manageMenu'
         )
         break
+      case 'copyTo':
+        this.props.setCopyToOpen(true)
+        break
+      case 'sendTo':
+        this.props.setSendToOpen(true)
+        break
+
       case 'masterypaths':
         window.location = `discussion_topics/${
           this.props.discussion.id
@@ -502,6 +514,29 @@ export class DiscussionRow extends Component {
       )
     }
 
+    if (this.props.DIRECT_SHARE_ENABLED) {
+      menuList.push(
+        this.createMenuItem(
+          'sendTo',
+          <span aria-hidden="true">
+            <IconUser />
+            &nbsp;&nbsp;{I18n.t('Send To...')}
+          </span>,
+          I18n.t('Send {%title} to user', {title: discussionTitle})
+        )
+      )
+      menuList.push(
+        this.createMenuItem(
+          'copyTo',
+          <span aria-hidden="true">
+            <IconDuplicate />
+            &nbsp;&nbsp;{I18n.t('Copy To...')}
+          </span>,
+          I18n.t('Copy {%title} to course', {title: discussionTitle})
+        )
+      )
+    }
+
     // This returns an empty struct if assignment_id is falsey
     if (this.props.displayMasteryPathsMenuItem) {
       menuList.push(
@@ -788,7 +823,9 @@ const mapDispatch = dispatch => {
     'cleanDiscussionFocus',
     'duplicateDiscussion',
     'toggleSubscriptionState',
-    'updateDiscussion'
+    'updateDiscussion',
+    'setCopyToOpen',
+    'setSendToOpen'
   ]
   return bindActionCreators(select(actions, actionKeys), dispatch)
 }
@@ -821,7 +858,8 @@ const mapState = (state, ownProps) => {
     displayManageMenu: discussion.permissions.delete,
     displayPinMenuItem: state.permissions.moderate,
     masterCourseData: state.masterCourseData,
-    isMasterCourse: masterCourse
+    isMasterCourse: masterCourse,
+    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
   }
   return Object.assign({}, ownProps, propsFromState)
 }

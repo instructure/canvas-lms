@@ -61,9 +61,11 @@ class Login::CanvasController < ApplicationController
     params[:pseudonym_session][:unique_id].try(:strip!)
 
     # Try to use authlogic's built-in login approach first
-    @pseudonym_session = @domain_root_account.pseudonym_sessions.new(params[:pseudonym_session].permit(:unique_id, :password, :remember_me).to_h)
-    @pseudonym_session.remote_ip = request.remote_ip
-    found = @pseudonym_session.save
+    found = @domain_root_account.pseudonyms.scoping do
+      @pseudonym_session = PseudonymSession.new(params[:pseudonym_session].permit(:unique_id, :password, :remember_me).to_h)
+      @pseudonym_session.remote_ip = request.remote_ip
+      @pseudonym_session.save
+    end
 
     # look for LDAP pseudonyms where we get the unique_id back from LDAP, or if we're doing JIT provisioning
     if !found && !@pseudonym_session.attempted_record
@@ -145,9 +147,6 @@ class Login::CanvasController < ApplicationController
     if mobile_device?
       @login_handle_name = @domain_root_account.login_handle_name_with_inference
       @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
-      js_env(
-        GOOGLE_ANALYTICS_KEY: Setting.get('google_analytics_key', nil),
-      )
       render :mobile_login, layout: 'mobile_auth', status: status
     else
       @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }

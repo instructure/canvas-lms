@@ -29,12 +29,14 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   # create the `SubmissionDraft` for an old attempt and not return it back in
   # subsequent graphql queries for submission drafts.
   argument :attempt, Integer, required: false
+  argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
 
   field :submission_draft, Types::SubmissionDraftType, null: true
   def resolve(input:)
     submission = find_submission(input[:submission_id])
+
     file_ids = (input[:file_ids] || []).compact.uniq
     attachments = get_and_verify_attachments!(file_ids)
     verify_allowed_extensions!(submission.assignment, attachments)
@@ -44,6 +46,10 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
       submission_attempt: input[:attempt] || (submission.attempt + 1)
     ).first_or_create!
     submission_draft.attachments = attachments
+    # for drafts we allow the body to be null or empty, so there's nothing to validate
+    submission_draft.body = input[:body]
+    submission_draft.save!
+
     {submission_draft: submission_draft}
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'

@@ -18,12 +18,10 @@
 import Backbone from 'Backbone'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import MutationAuditLog from 'jsx/audit_logs/MutationAuditLog'
 
 export default class GraphQLMutationContentView extends Backbone.View {
   render() {
-    ReactDOM.render(
-      <h1>Hi, I am a Mutation Log</h1>,
-      this.el
-    );
+    ReactDOM.render(<MutationAuditLog/>, this.el);
   }
 }

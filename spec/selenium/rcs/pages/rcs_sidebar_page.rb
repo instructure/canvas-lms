@@ -92,6 +92,26 @@ module RCSSidebarPage
     fj("aside [role='button']:contains('#{title}')")
   end
 
+  def sidebar
+    f('#right-side')
+  end
+
+  def sidebar_tabs
+    f('#editor_tabs')
+  end
+
+  def sidebar_files
+    ff('#right-side li')
+  end
+
+  def sidebar_images
+    ff("#right-side [role='button']")
+  end
+
+  def sidebar_image_tag
+    f('#right-side a img')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion

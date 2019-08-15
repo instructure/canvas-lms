@@ -42,7 +42,9 @@ export default class WikiPageIndexItemView extends Backbone.View {
       'click .delete-menu-item': 'deletePage',
       'click .use-as-front-page-menu-item': 'useAsFrontPage',
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
-      'click .duplicate-wiki-page': 'duplicateWikiPage'
+      'click .duplicate-wiki-page': 'duplicateWikiPage',
+      'click .send-wiki-page-to': 'sendWikiPageTo',
+      'click .copy-wiki-page-to': 'copyWikiPageTo'
     }
 
     this.optionProperty('indexView')
@@ -67,6 +69,8 @@ export default class WikiPageIndexItemView extends Backbone.View {
       // TODO: Consider allowing duplicating pages in other contexts
       DUPLICATE: !!this.WIKI_RIGHTS.manage && this.contextName === 'courses'
     }
+
+    json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED
 
     if (json.is_master_course_child_content && json.restricted_by_master_course) {
       json.cannot_delete_by_master_course = true
@@ -254,6 +258,16 @@ export default class WikiPageIndexItemView extends Backbone.View {
         $(cogs[curIndex]).focus()
       }
     })
+  }
+
+  sendWikiPageTo(ev) {
+    ev.preventDefault()
+    console.log(`send page ${this.model.get('page_id')} to user`)
+  }
+
+  copyWikiPageTo(ev) {
+    ev.preventDefault()
+    console.log(`copy page ${this.model.get('page_id')} to course`)
   }
 }
 WikiPageIndexItemView.initClass()

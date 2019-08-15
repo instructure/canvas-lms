@@ -20,7 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "Outcome Results API", type: :request do
-
   let_once(:outcome_course) do
     course_factory(active_all: true)
     @course
@@ -257,13 +256,32 @@ describe "Outcome Results API", type: :request do
         end
       end
 
-      it "returns a csv file" do
-        outcome_result
-        user_session @user
-        get "/courses/#{@course.id}/outcome_rollups.csv"
-        expect(response).to be_successful
-        expect(response.body).to eq "Student name,Student ID,new outcome result,new outcome mastery points\n"+
-          "User,#{outcome_student.id},3.0,3.0\n"
+      context "csv" do
+        it "returns a csv file" do
+          outcome_result
+          user_session @user
+          get "/courses/#{@course.id}/outcome_rollups.csv"
+          expect(response).to be_successful
+          expect(response.body).to eq <<~END
+            Student name,Student ID,new outcome result,new outcome mastery points
+            User,#{outcome_student.id},3.0,3.0
+          END
+        end
+
+        it "obeys csv i18n flags" do
+          outcome_course.root_account.enable_feature! :enable_i18n_features_in_outcomes_exports
+          @user.enable_feature! :include_byte_order_mark_in_gradebook_exports
+          @user.enable_feature! :use_semi_colon_field_separators_in_gradebook_exports
+
+          outcome_result
+          user_session @user
+          get "/courses/#{@course.id}/outcome_rollups.csv"
+          expect(response).to be_successful
+          expect(response.body).to eq <<~END
+            \xEF\xBB\xBFStudent name;Student ID;new outcome result;new outcome mastery points
+            User;#{outcome_student.id};3.0;3.0
+          END
+        end
       end
 
       describe "user_ids parameter" do

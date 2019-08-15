@@ -17,21 +17,16 @@
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import themeable from '@instructure/ui-themeable/lib';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
-import View from '@instructure/ui-layout/lib/components/View';
-import Portal from '@instructure/ui-portal/lib/components/Portal';
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus';
-import IconAlertsLine from '@instructure/ui-icons/lib/Line/IconAlerts';
-import IconGradebookLine from '@instructure/ui-icons/lib/Line/IconGradebook';
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover';
+import {themeable} from '@instructure/ui-themeable'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
+import {Portal} from '@instructure/ui-portal'
+import {IconPlusLine, IconAlertsLine, IconGradebookLine} from '@instructure/ui-icons'
+import {Popover, Tray} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types';
 import UpdateItemTray from '../UpdateItemTray';
-import Tray from '@instructure/ui-overlays/lib/components/Tray';
-import Badge from '@instructure/ui-elements/lib/components/Badge';
+import {Badge} from '@instructure/ui-elements'
 import Opportunities from '../Opportunities';
 import GradesDisplay from '../GradesDisplay';
 import StickyButton from '../StickyButton';
@@ -408,8 +403,8 @@ export class PlannerHeader extends Component {
           constrain="window"
           placement="bottom end"
         >
-          <PopoverTrigger>{this.renderOpportunitiesButton(buttonMargin)}</PopoverTrigger>
-          <PopoverContent>
+          <Popover.Trigger>{this.renderOpportunitiesButton(buttonMargin)}</Popover.Trigger>
+          <Popover.Content>
             <Opportunities
               togglePopover={this.closeOpportunitiesDropdown}
               newOpportunities={this.state.newOpportunities}
@@ -419,7 +414,7 @@ export class PlannerHeader extends Component {
               dismiss={this.props.dismissOpportunity}
               maxHeight={verticalRoom}
             />
-          </PopoverContent>
+          </Popover.Content>
         </Popover>
         <Tray
           open={this.state.trayOpen}

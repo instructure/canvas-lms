@@ -80,6 +80,16 @@ describe Mutations::CreateSubmissionComment do
     ).to eq SubmissionComment.last.id.to_s
   end
 
+  it 'creates a new submission comment and a Viewed Submission Commment for the user' do
+    result = run_mutation
+    expect(
+      result.dig(:data, :createSubmissionComment, :submissionComment, :_id)
+    ).to eq SubmissionComment.last.id.to_s
+    expect(ViewedSubmissionComment.count).to eq 1
+    expect(ViewedSubmissionComment.last.user).to eq @teacher
+    expect(ViewedSubmissionComment.last.submission_comment_id).to eq SubmissionComment.last.id
+  end
+
   it 'requires permission to comment on the submission' do
     @student2 = @course.enroll_student(User.create!, enrollment_state: 'active').user
     result = run_mutation({}, @student2)

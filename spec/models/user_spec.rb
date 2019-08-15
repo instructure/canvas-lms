@@ -1632,7 +1632,7 @@ describe User do
 
       it "should properly update when using new redis cache keys" do
         skip("requires redis") unless Canvas.redis_enabled?
-        enable_cache(:redis_store) do
+        enable_cache(:redis_cache_store) do
           user = User.create!
           course1 = Account.default.courses.create!(:workflow_state => "available")
           e1 = course1.enroll_student(user, :enrollment_state => "active")
@@ -1792,6 +1792,15 @@ describe User do
       @user = User.create!
       expect(-> {@user.email = ''}).to raise_error("Validation failed: Path can't be blank, Email is invalid")
       expect(@user.communication_channels.any?).to be_falsey
+    end
+
+    it "restores retired channels" do
+      @user = User.create!
+      path = 'john@example.com'
+      @user.communication_channels.create!(:path => path, :workflow_state => "retired")
+      @user.email = path
+      expect(@user.communication_channels.first).to be_unconfirmed
+      expect(@user.email).to eq 'john@example.com'
     end
   end
 

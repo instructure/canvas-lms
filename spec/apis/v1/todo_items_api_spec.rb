@@ -332,6 +332,7 @@ describe UsersController, type: :request do
         batch << {
           context_type: 'Course',
           context_id: @student_course.id,
+          root_account_id: @student_course.root_account_id,
           due_at: i.hours.from_now, # randomized due dates for the next 7ish days
           title: 'required work',
           submission_types: 'online_text_entry',
@@ -360,6 +361,7 @@ describe UsersController, type: :request do
         batch << {
           context_type: 'Course',
           context_id: @teacher_course.id,
+          root_account_id: @teacher_course.root_account_id,
           due_at: i.hours.from_now, # randomized due dates for the next 7ish days
           title: 'text',
           submission_types: 'online_text_entry',
@@ -431,6 +433,7 @@ describe UsersController, type: :request do
       18.times do
         batch << { :context_type => 'Course',
                    :context_id => @student_course.id,
+                   :root_account_id => @student_course.root_account_id,
                    :due_at => 6.days.from_now,
                    :title => 'required work',
                    :submission_types => 'online_text_entry',

@@ -311,8 +311,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     if authorized_action(@course.account, @current_user, :manage_courses)
       # note that I'm additionally requiring course management rights on the account
       # since (for now) we're only allowed to associate courses derived from it
-      ids_to_add = Array(params[:course_ids_to_add]).map(&:to_i)
-      ids_to_remove = Array(params[:course_ids_to_remove]).map(&:to_i)
+      ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
+      ids_to_remove = api_find_all(Course, Array(params[:course_ids_to_remove])).pluck(:id)
       if (ids_to_add & ids_to_remove).any?
         return render :json => {:message => "cannot add and remove a course at the same time"}, :status => :bad_request
       end
@@ -727,7 +727,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     # if we skipped it because it's deleted, there's no sense
     # in going on and seeing if they also edited it first
     return ['deleted'] if columns.include?("manually_deleted")
-    
+
     classes = []
     columns.each do |col|
       klass.restricted_column_settings.each do |k, v|

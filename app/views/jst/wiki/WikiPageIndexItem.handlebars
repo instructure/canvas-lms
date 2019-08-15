@@ -59,6 +59,22 @@
             </a>
           </li>
         {{/if}}
+        {{#if DIRECT_SHARE_ENABLED}}
+          <li>
+            <a
+              href="#"
+              class="send-wiki-page-to icon-user"
+              aria-label="{{#t}}Send page to another user{{/t}}"
+            >{{#t}}Send to...{{/t}}</a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="copy-wiki-page-to icon-duplicate"
+              aria-label="{{#t}}Copy page to another course{{/t}}"
+            >{{#t}}Copy to...{{/t}}</a>
+          </li>
+        {{/if}}
         {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
       </ul>
     </div>

@@ -19,7 +19,6 @@
 class GradebookExporter
   include GradebookSettingsHelpers
   include LocaleSelection
-  include CsvI18nHelpers
 
   # You may see a pattern in this file of things that look like `<< nil << nil`
   # to create 'buffer' cells for columns. Let's try to stop using that pattern
@@ -45,8 +44,8 @@ class GradebookExporter
       root_account: @course.root_account
     )
 
-    @options, bom = csv_i18n_settings(@user, @options)
-    csv_data.prepend(bom)
+    @options = CsvWithI18n.csv_i18n_settings(@user, @options)
+    csv_data
   end
 
   private
@@ -104,7 +103,7 @@ class GradebookExporter
     should_show_totals = show_totals?
     include_sis_id = @options[:include_sis_id]
 
-    CSV.generate(@options.slice(:encoding, :col_sep)) do |csv|
+    CsvWithI18n.generate(@options.slice(:encoding, :col_sep, :include_bom)) do |csv|
       # First row
       header = ["Student", "ID"]
       header << "SIS User ID" if include_sis_id

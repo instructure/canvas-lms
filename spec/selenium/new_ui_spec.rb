@@ -122,6 +122,19 @@ describe 'new ui' do
       expect(f('.profile_settings.active').css_value('background-color')).to eq('rgba(0, 142, 226, 1)')
     end
 
+    it 'should not override high contrast theme with new menu design', priority: "2", test_id: 244898 do
+      @course.account.enable_feature!(:a11y_left_menu)
+      BrandableCSS.save_default!('css') # make sure variable css file is up to date
+      get '/profile/settings'
+      f('.high_contrast .ic-Super-toggle__switch').click
+      wait_for_ajaximations
+      f = FeatureFlag.find_by(feature: 'high_contrast')
+      expect(f.state).to eq 'on'
+      menu_link = f('.profile_settings.active')
+      expect(menu_link.css_value('border-left')).to eq('2px solid rgb(45, 59, 69)')
+      expect(menu_link.css_value('color')).to eq('rgba(45, 59, 69, 1)')
+    end
+
     it 'should not break tiny mce css', priority: "2", test_id: 244891 do
       skip_if_chrome('Chrome does not get these values properly')
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"

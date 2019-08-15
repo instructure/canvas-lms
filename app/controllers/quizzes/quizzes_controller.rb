@@ -133,7 +133,8 @@ class Quizzes::QuizzesController < ApplicationController
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
-              @context.quiz_lti_tool.present?
+              @context.quiz_lti_tool.present?,
+          DIRECT_SHARE_ENABLED: can_manage && @domain_root_account&.feature_enabled?(:direct_share)
         },
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
         :SIS_NAME => sis_name,
@@ -272,6 +273,7 @@ class Quizzes::QuizzesController < ApplicationController
           log_asset_access(@quiz, "quizzes", "quizzes")
           js_bundle :quiz_show
           css_bundle :quizzes, :learning_outcomes
+          render stream: can_stream_template? unless @declined_reason
         end
       end
       @padless = true
@@ -360,7 +362,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       js_bundle :quizzes_bundle
       css_bundle :quizzes, :tinymce
-      render :new
+      render :new, stream: can_stream_template?
     end
   end
 
@@ -739,6 +741,8 @@ class Quizzes::QuizzesController < ApplicationController
           return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_history_url', @quiz.to_param, :viewing => "1", :version => params[:version]))
         end
         js_bundle :quiz_history
+        @google_analytics_page_title = @quiz.survey? ? "User's Survey History" : "User's Quiz History"
+        render stream: can_stream_template?
       end
     end
   end

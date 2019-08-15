@@ -28,7 +28,9 @@ describe('LoginActionPrompt', () => {
   })
 
   it('login button redirects towards login page', () => {
-    window.location.assign = jest.fn()
+    delete window.location
+    window.location = {assign: jest.fn()}
+
     const {getByText} = render(<LoginActionPrompt assignment={mockAssignment()} />)
     fireEvent.click(getByText('Log in'))
     expect(window.location.assign).toBeCalledWith('/login')

@@ -26,6 +26,7 @@ import {direction} from 'jsx/shared/helpers/rtlHelper'
 // answers on a quiz results page.
 export default class QuizArrowApplicator {
   constructor () {
+    this.idGenerator = 0;
     this.$questions = $('#questions.show_correct_answers:not(.survey_quiz)')
     this.rightAnswers = this.$questions.find('.selected_answer.correct_answer')
     this.wrongAnswers = this.$questions.find('.selected_answer.wrong_answer')

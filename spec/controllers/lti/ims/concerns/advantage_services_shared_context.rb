@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
 
 shared_context 'advantage services context' do
   let_once(:root_account) do
-    enable_1_3(Account.default)
+    Account.default
   end
   let_once(:developer_key) do
     dk = DeveloperKey.create!(account: root_account)
@@ -104,27 +104,5 @@ shared_context 'advantage services context' do
       split(' ').
       reject { |s| scopes_to_remove.include? s }.
       join(' ')
-  end
-
-  def enable_1_3(enableable)
-    if enableable.is_a?(ContextExternalTool)
-      enableable.use_1_3 = true
-    elsif enableable.is_a?(Account)
-      enableable.enable_feature!(:lti_1_3)
-    else raise "LTI 1.3/Advantage features not relevant for #{enableable.class}"
-    end
-    enableable.save!
-    enableable
-  end
-
-  def disable_1_3(enableable)
-    if enableable.is_a?(ContextExternalTool)
-      enableable.use_1_3 = false
-    elsif enableable.is_a?(Account)
-      enableable.disable_feature!(:lti_1_3)
-    else raise "LTI 1.3/Advantage features not relevant for #{enableable.class}"
-    end
-    enableable.save!
-    enableable
   end
 end

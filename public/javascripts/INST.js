@@ -16,16 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global ScriptEngineMajorVersion: false, escape: false */
 import $ from 'jquery'
-
-let addClasses = true
-
-function classifyIE (version) {
-  version = parseInt(version, 10)
-  INST.browser[`ie${version}`] = INST.browser.ie = true
-  INST.browser.version = version
-}
 
 // for backwards compat, this might be defined already but we expose
 // it as a module here
@@ -37,35 +28,8 @@ if (!('INST' in window)) window.INST = {}
 // ============================================================================================
 INST.browser = {}
 
-// Conditional comments were dropped as of IE10, so we need to sniff.
-//
-// See: http://msdn.microsoft.com/en-us/library/ie/hh801214(v=vs.85).aspx
-if (!INST.browser.ie) {
-  const userAgent = navigator.userAgent
-  const isIEGreaterThan10 = /\([^\)]*Trident[^\)]*rv:([\d\.]+)/.exec(userAgent)
-  if (isIEGreaterThan10) {
-    if ('ScriptEngineMajorVersion' in window && typeof ScriptEngineMajorVersion === 'function') {
-      classifyIE(ScriptEngineMajorVersion())
-    } else {
-      classifyIE(isIEGreaterThan10[1])
-    }
-
-    // don't add the special "ie" class for IE10+ because their renderer is
-    // not far behind Gecko and Webkit
-    addClasses = false
-  }
-  // need to eval here because the optimizer will strip any comments, so using
-  // /*@cc_on@*/ will not make it through:
-  else if (eval('/*@cc_on!@*/0')) {
-    classifyIE(10)
-    addClasses = false
-  }
-}
-
 // Test for WebKit.
-//
-// The IE test is needed because IE11+ defines this property too.
-if (window.devicePixelRatio && !INST.browser.ie) {
+if (window.devicePixelRatio) {
   INST.browser.webkit = true
 
   // from: http://www.byond.com/members/?command=view_post&post=53727
@@ -82,11 +46,9 @@ INST.browser['no-touch'] = !INST.browser.touch
 // now we have some degree of knowing which of the common browsers it is,
 // on dom ready, give the body those classes
 // so for example, if you were on IE6 the body would have the classes "ie" AND "ie6"
-if (addClasses) {
-  const classesToAdd = $.map(INST.browser, (v, k) => (v === true ? k : undefined)).join(' ')
-  $(function () {
-    $('body').addClass(classesToAdd)
-  })
-}
+const classesToAdd = $.map(INST.browser, (v, k) => (v === true ? k : undefined)).join(' ')
+$(function () {
+  $('body').addClass(classesToAdd)
+})
 
 export default INST

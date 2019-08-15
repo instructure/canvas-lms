@@ -172,7 +172,7 @@ describe "Feature.register" do
   end
 
   let(:t_dev_feature_hash) do
-    t_feature_hash.merge(development: true)
+    t_feature_hash.merge(environments: {production: {state: 'disabled'}})
   end
 
   it "should register a feature" do
@@ -211,7 +211,7 @@ describe "Feature.register" do
   end
 
   let(:t_hidden_in_prod_feature_hash) do
-    t_feature_hash.merge(state: 'hidden_in_prod')
+    t_feature_hash.merge(environments: {production: {state: 'hidden'}})
   end
 
   describe 'hidden_in_prod' do

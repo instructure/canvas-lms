@@ -244,6 +244,7 @@ module Api::V1::Assignment
     end
 
     if assignment.context.grants_any_right?(user, :read_sis, :manage_sis)
+      hash['sis_assignment_id'] = assignment.sis_source_id
       hash['integration_id'] = assignment.integration_id
       hash['integration_data'] = assignment.integration_data
     end
@@ -429,6 +430,7 @@ module Api::V1::Assignment
     grading_standard_id
     freeze_on_copy
     notify_of_update
+    sis_assignment_id
     integration_id
     omit_from_final_grade
     anonymous_instructor_annotations
@@ -667,6 +669,7 @@ module Api::V1::Assignment
       data = update_params['integration_data']
       update_params['integration_data'] = JSON.parse(data) if data.is_a?(String)
     else
+      update_params.delete('sis_assignment_id')
       update_params.delete('integration_id')
       update_params.delete('integration_data')
     end

@@ -108,7 +108,7 @@ function asText($element, editor) {
   return {
     $element,
     text,
-    type: 'TEXT_TYPE'
+    type: TEXT_TYPE
   }
 }
 
@@ -128,10 +128,16 @@ export function getContentFromElement($element, editor) {
   return content
 }
 
-export function getContentFromEditor(editor) {
+export function getContentFromEditor(editor, expandSelection = false) {
   let $element
   if (editor && editor.selection) {
-    $element = editor.selection.getNode()
+    // tinymce selects the element around the cursor, whether it's
+    // content is selected in the copy/paste sense or not.
+    // We want to include this content if it's _really_ selected,
+    // or if editing the surrounding link, but not if creating a new link
+    if (expandSelection || !editor.selection.isCollapsed()) {
+      $element = editor.selection.getNode()
+    }
   }
 
   if ($element == null) {

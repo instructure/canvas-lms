@@ -35,6 +35,11 @@ class PseudonymSession < Authlogic::Session::Base
     false
   end
 
+  # ditto
+  def cookie_credentials
+    nil
+  end
+
   secure CanvasRails::Application.config.session_options[:secure]
   httponly true
 

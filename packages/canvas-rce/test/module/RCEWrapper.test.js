@@ -26,7 +26,7 @@ import RCEWrapper from "../../src/rce/RCEWrapper";
 
 const textareaId = "myUniqId";
 
-let React, fakeTinyMCE, execCommandSpy, editorCommandSpy, sd, editor;
+let React, fakeTinyMCE, editorCommandSpy, sd, editor;
 
 // ====================
 //        HELPERS
@@ -38,6 +38,10 @@ function requireReactDeps() {
 }
 
 function createBasicElement(opts) {
+  if (opts && opts.textareaId) {
+    // so RCEWrapper.mceInstance() works
+    fakeTinyMCE.editors[0].id = opts.textareaId
+  }
   let props = Object.assign({ textareaId, tinymce: fakeTinyMCE }, opts);
   return new RCEWrapper(props);
 }
@@ -117,13 +121,11 @@ describe("RCEWrapper", () => {
       editors: [editor]
     };
 
-    execCommandSpy = sinon.spy(fakeTinyMCE, "execCommand");
     sinon.spy(editor, "insertContent");
   });
 
   afterEach(() => {
     jsdomify.destroy();
-    execCommandSpy.restore();
   });
 
   // ====================
@@ -163,7 +165,7 @@ describe("RCEWrapper", () => {
       element = createBasicElement({ textareaId: "myOtherUniqId" });
       element.focus();
       assert(
-        execCommandSpy.withArgs("mceFocus", false, "myOtherUniqId").called
+        editorCommandSpy.withArgs("mceFocus", false, "myOtherUniqId", undefined).called
       );
     });
 

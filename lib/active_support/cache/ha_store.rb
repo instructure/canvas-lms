@@ -18,10 +18,14 @@
 
 Bundler.require 'redis'
 
-class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
-  def initialize(*)
-    super
+class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
+  def initialize(consul_datacenters: nil,
+                 consul_event: nil,
+                 **additional_options)
+    super(additional_options)
     options[:lock_timeout] ||= 5
+    options[:consul_datacenters] = consul_datacenters
+    options[:consul_event] = consul_event
     @delif = Redis::Scripting::Script.new(File.expand_path("../delif.lua", __FILE__))
   end
 
@@ -31,7 +35,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
     # do it locally
     result = super
     # then if so configured, trigger consul
-    if options[:consul_event] && !options[:from_event]
+    if options[:consul_event]
       datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
       datacenters.each do |dc|
         Imperium::Events.fire(options[:consul_event], key, dc: dc)
@@ -91,7 +95,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
 
   def lock(key, options)
     nonce = SecureRandom.hex(20)
-    case data.set(key, nonce, raw: true, px: (options[:lock_timeout] * 1000).to_i, nx: true)
+    case redis.set(key, nonce, raw: true, px: (options[:lock_timeout] * 1000).to_i, nx: true)
     when true
       nonce
     when nil
@@ -105,8 +109,17 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisStore
 
   def unlock(key, nonce)
     raise ArgumentError("nonce can't be nil") unless nonce
-    node = data
-    node = data.node_for(key) if data.is_a?(Redis::DistributedStore)
+    node = redis
+    node = redis.node_for(key) if redis.is_a?(Redis::Distributed)
     @delif.run(node, [key], [nonce])
+  end
+
+  # vanilla Rails is weird, and assumes "race_condition_ttl" is 5 minutes; override that to actually do math
+  def write_entry(key, entry, unless_exist: false, raw: false, expires_in: nil, race_condition_ttl: nil, **options)
+    if race_condition_ttl
+      expires_in += race_condition_ttl
+      race_condition_ttl = nil
+    end
+    super
   end
 end

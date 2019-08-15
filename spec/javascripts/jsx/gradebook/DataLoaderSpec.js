@@ -22,7 +22,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 
 QUnit.module('Gradebook Data Loader', hooks => {
-  let savedTrackEvent
   let fakeXhr
   let XHRS, XHR_HANDLERS, handlerIndex
 
@@ -48,16 +47,11 @@ QUnit.module('Gradebook Data Loader', hooks => {
         }
       })
     }
-
-    // google analytics stuff :/
-    savedTrackEvent = $.trackEvent
-    $.trackEvent = () => {}
   })
 
   hooks.afterEach(() => {
     fakeXhr.restore()
     XHR_HANDLERS = null
-    $.trackEvent = savedTrackEvent
   })
 
   const callLoadGradebookData = opts => {

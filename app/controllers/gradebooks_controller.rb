@@ -65,6 +65,8 @@ class GradebooksController < ApplicationController
 
     js_bundle :grade_summary, :rubric_assessment
     css_bundle :grade_summary
+
+    @google_analytics_page_title = t("Grades for Student")
     render stream: can_stream_template?
   end
 
@@ -98,15 +100,20 @@ class GradebooksController < ApplicationController
       @presenter.assignment_stats
     end
 
-    submissions_json = @presenter.submissions.
-      select { |s| s.user_can_read_grade?(@current_user) }.
-      map do |s|
-      {
-        assignment_id: s.assignment_id,
-        score: s.score,
-        excused: s.excused?,
-        workflow_state: s.workflow_state,
+    submissions_json = @presenter.submissions.map do |submission|
+      json = {
+        assignment_id: submission.assignment_id
       }
+
+      if submission.user_can_read_grade?(@current_user)
+        json.merge!({
+          excused: submission.excused?,
+          score: submission.score,
+          workflow_state: submission.workflow_state
+        })
+      end
+
+      json
     end
 
     grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }

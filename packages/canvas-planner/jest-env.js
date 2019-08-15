@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@instructure/ui-themes/lib/canvas';
+import '@instructure/canvas-theme';
 import generateId from 'format-message-generate-id/underscored_crc32';
 import formatMessage from './src/format-message';
 import translations from './src/i18n/indexLocales';

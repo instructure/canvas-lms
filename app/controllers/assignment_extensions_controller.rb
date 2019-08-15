@@ -122,6 +122,6 @@ class AssignmentExtensionsController < ApplicationController
   private
 
   def require_assignment
-    @assignment = @context.active_assignments.find(params[:assignment_id])
+    @assignment = api_find(@context.active_assignments, params[:assignment_id])
   end
 end

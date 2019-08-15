@@ -17,7 +17,6 @@
  */
 
 import formatMessage from '../../../format-message'
-import {globalRegistry} from '../instructure-context-bindings/BindingRegistry'
 import {getContentFromElement, FILE_LINK_TYPE} from '../shared/ContentSelection'
 import EmbedTrayController from './EmbedOptionsTray/EmbedOptionsTrayController'
 
@@ -36,16 +35,9 @@ tinymce.create('tinymce.plugins.InstructureEmbedsPlugin', {
         trayController.showTrayForEditor(editor)
       },
 
-      onSetup(/* buttonApi */) {
-        globalRegistry.bindToolbarToEditor(editor, buttonAriaLabel)
-      },
-
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
     })
-
-    const defaultFocusSelector = `.tox-pop__dialog button[aria-label="${buttonAriaLabel}"]`
-    globalRegistry.addContextKeydownListener(editor, defaultFocusSelector)
 
     function isEmbeddable($element) {
       return getContentFromElement($element).type === FILE_LINK_TYPE

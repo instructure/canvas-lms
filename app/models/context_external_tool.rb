@@ -100,10 +100,6 @@ class ContextExternalTool < ActiveRecord::Base
       settings['content_migration'].key?('import_start_url')
   end
 
-  def lti_1_3_enabled?
-    use_1_3? && context.root_account.feature_enabled?(:lti_1_3)
-  end
-
   def extension_setting(type, property = nil)
     val = calclulate_extension_setting(type, property)
     if val && property == :icon_url
@@ -805,6 +801,10 @@ end
 
   def visible_with_permission_check?(launch_type, user, context, session=nil)
     return false unless self.class.visible?(self.extension_setting(launch_type, 'visibility'), user, context, session)
+    permission_given?(launch_type, user, context, session)
+  end
+
+  def permission_given?(launch_type, user, context, session=nil)
     if (required_permissions_str = self.extension_setting(launch_type, 'required_permissions'))
       # if configured with a comma-separated string of permissions, will only show the link
       # if all permissions are granted

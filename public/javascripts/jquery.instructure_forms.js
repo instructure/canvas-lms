@@ -26,7 +26,7 @@ import authenticity_token from 'compiled/behaviors/authenticity_token'
 import htmlEscape from './str/htmlEscape'
 import './jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
 import './jquery.disableWhileLoading'
-import './jquery.google-analytics' /* trackEvent */
+import {trackEvent} from 'jquery.google-analytics'
 import './jquery.instructure_date_and_time' /* date_field, time_field, datetime_field */
 import './jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import 'compiled/jquery.rails_flash_notifications'
@@ -886,7 +886,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
     }
     if(hasErrors) {
       $form.formErrors(errors, options);
-      $.trackEvent("Form Errors", this.attr('id') || this.attr('class') || document.title, JSON.stringify(errors));
+      trackEvent("Form Errors", this.attr('id') || this.attr('class') || document.title, JSON.stringify(errors));
       return false;
     }
     return true;

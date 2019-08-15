@@ -29,7 +29,8 @@ describe 'assignments' do
       @assignment = @course.assignments.create!(
         name: 'assignment',
         due_at: 5.days.ago,
-        points_possible: 10
+        points_possible: 10,
+        submission_types: 'online_upload'
       )
       preload_graphql_schema
     end

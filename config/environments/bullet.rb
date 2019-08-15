@@ -1,3 +1,5 @@
+if CANVAS_RAILS5_2
+
 require 'bullet'
 
 Bullet.enable = true
@@ -26,3 +28,5 @@ Object.prepend(Module.new do
     Shard.default.activate { super }
   end
 end)
+
+end

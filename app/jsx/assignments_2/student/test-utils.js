@@ -78,6 +78,7 @@ export function mockComments(overrides = {}) {
           comment: 'comment comment',
           mediaObject: null,
           updatedAt: '2019-03-05T23:09:36-07:00',
+          read: true,
           author: {
             __typename: 'User',
             avatarUrl: 'example.com',
@@ -185,6 +186,7 @@ export function commentGraphqlMock(comments) {
             submissionComment: {
               _id: '3',
               comment: 'lion',
+              read: true,
               updatedAt: new Date().toISOString(),
               attachments: [],
               author: {
@@ -218,6 +220,7 @@ export function commentGraphqlMock(comments) {
               comment: 'lion',
               updatedAt: new Date().toISOString(),
               attachments: mockMultipleAttachments(),
+              read: true,
               author: {
                 avatarUrl: 'whatever',
                 shortName: 'sent user',
@@ -247,6 +250,7 @@ export function mockSubmission(overrides = {}) {
           attachments: [],
           comment: 'comment comment',
           updatedAt: '2019-03-05T23:09:36-07:00',
+          read: true,
           author: {
             __typename: 'Author',
             avatarUrl: 'example.com',
@@ -262,6 +266,7 @@ export function mockSubmission(overrides = {}) {
     id: btoa('Submission-22'),
     latePolicyStatus: null,
     posted: true,
+    unreadCommentCount: 0,
     state: 'submitted',
     submissionDraft: null,
     submissionStatus: 'submitted',

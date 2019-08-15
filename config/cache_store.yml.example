@@ -1,7 +1,7 @@
 # Configure the cache_store by environment. Should be a hash at top level, one
 # key per environment, with configuration hashes as values.
 development:
-  # cache_store: redis_store
+  # cache_store: redis_cache_store
   #
   # # normally you'll want to define your redis servers in config/redis.yml and
   # # not here, so that they are used for data as well as cache storage.
@@ -9,18 +9,8 @@ development:
   # # the only reason to define a server list here is if you want to use a
   # # separate redis instance for cache and for data.
   #
-  # servers:
+  # url:
   # - localhost
   # database: 0
   #
   #
-  #
-  # # alternatively you can use memcached. however canvas requires redis for
-  # # some features, such as OAuth2, so it's simpler to just use redis for
-  # # caching as well.
-  #
-  # cache_store: mem_cache_store
-  #
-  # if no servers are specified, we'll look in config/memcache.yml
-  # servers:
-  # - localhost

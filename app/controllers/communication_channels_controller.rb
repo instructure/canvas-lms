@@ -143,6 +143,14 @@ class CommunicationChannelsController < ApplicationController
 
     return render_unauthorized_action unless has_api_permissions?
 
+    # We are doing the check here because it takes a lot of queries to get from
+    # the CC model to the domain_root_account, and 99% of the time that will end
+    # up being wasted work.
+    unless CommunicationChannel.user_can_have_more_channels?(@current_user, @domain_root_account)
+      error = t 'Maximum number of communication channels reached'
+      return render :json => { errors: { type: error } }, status: :bad_request
+    end
+
     params[:build_pseudonym] = false if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&

@@ -471,42 +471,58 @@
   }
   /* deleted all the .tox-statusbar rules, since we use our own custom statusbar */
   .tox .tox-tbtn {
-    border: 1px solid var(--canvasButtonBorderColor);
+    border-style: none;
     color: var(--canvasButtonColor);
+    position: relative;
   }
+
   .tox .tox-tbtn svg {
     fill: var(--canvasButtonColor);
   }
-  .tox .tox-tbtn--enabled {
-    background: #cbced1;
+
+  .tox .tox-tbtn.tox-tbtn--enabled {
+    background: inherit;
+  }
+
+  .tox .tox-tbtn:focus,
+  .tox .tox-split-button:focus {
+    background: var(--canvasBackgroundColor);
     color: var(--canvasButtonColor);
+    box-shadow: var(--canvasFocusBoxShadow);
   }
-  .tox .tox-tbtn--enabled svg {
-    fill: var(--canvasButtonColor);
-  }
-  .tox .tox-tbtn:hover {
+
+  .tox .tox-tbtn:hover,
+  .tox .tox-split-button:hover,
+  .tox .tox-tbtn.tox-tbtn--enabled:hover,
+  .tox .tox-split-button .tox-tbtn.tox-split-button__chevron:hover
+  {
     background: var(--toolbarButtonHoverBackground);
     color: var(--canvasButtonColor);
   }
-  .tox .tox-tbtn:hover svg {
-    fill: var(--canvasButtonColor);
+
+  .tox-tbtn.tox-split-button__chevron {
+    position: relative;
   }
-  .tox .tox-tbtn:focus {
-    background-color: transparent;
-    color: var(--canvasButtonColor);
-    border-color: var(--canvasBackgroundColor);
-    box-shadow: var(--canvasFocusBoxShadow);
+
+  /* styling lifted from instui Tabs */
+  .tox .tox-tbtn.tox-tbtn--enabled::after {
+    position: absolute;
+    top:-3px;
+    content: "\\25BC";
+    text-align: center;
+    height: 8px;
+    font-size: 8px;
+    width: 100%;
+    color: var(--canvasEnabledColor);
   }
-  .tox .tox-tbtn:focus svg {
-    fill: var(--canvasButtonColor);
+
+  /* the split button is not enabled and the chevron has been clicked to open the popup
+   * hide the enabled bar that's under just the chevron
+   */
+  .tox-tbtn.tox-split-button__chevron.tox-tbtn--enabled::after {
+    display: none;
   }
-  .tox .tox-tbtn:active {
-    background: #cbced1;
-    color: var(--canvasButtonColor);
-  }
-  .tox .tox-tbtn:active svg {
-    fill: var(--canvasButtonColor);
-  }
+
   .tox .tox-tbtn--disabled,
   .tox .tox-tbtn--disabled:hover,
   .tox .tox-tbtn:disabled,
@@ -523,17 +539,7 @@
   .tox .tox-tbtn__select-chevron svg {
     fill: var(--canvasButtonColor);
   }
-  .tox .tox-split-button:hover {
-    background: var(--toolbarButtonHoverBackground);
-    box-shadow: none;
-    color: var(--canvasButtonColor);
-  }
-  .tox .tox-split-button:focus {
-    background: transparent;
-    color: var(--canvasButtonColor);
-    border-color: var(--canvasBackgroundColor);
-    box-shadow: var(--canvasFocusBoxShadow);
-  }
+
   .tox .tox-split-button__chevron svg {
     fill: var(--canvasButtonColor);
   }
@@ -595,7 +601,9 @@
   }
   .tox .tox-toolbar .tox-toolbar__group,
   .tox .tox-toolbar-overlord .tox-toolbar__group,
-  .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
+  .tox-toolbar__overflow .tox-toolbar__group,
+  .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type),
+  .tox[dir=rtl] .tox-toolbar__group:not(:last-of-type) {
     border-style: none;
   }
   .tox-toolbar .tox-toolbar__group::after, /* regular toolbar */
@@ -623,21 +631,21 @@
     padding-inline-end: 0;
   }
 
-  /***************** new rules added to the skin *****************/
-
-  .tox .tox-tbtn {
+    .tox .tox-tbtn {
     box-sizing: border-box;
   }
 
-  .tox .tox-split-button {
-    border: 1px var(--canvasButtonBorderStyle) var(--canvasButtonBorderColor);
+  .tox .tox-tbtn,
+  .tox .tox-split-button,
+  .tox .tox-tbtn--select {
+    border-style: none;
+    margin: 2px 2px 3px;
   }
+
   .tox .tox-split-button .tox-tbtn {
-    border-inline-end-width: 0;
     margin-inline-end: 0;
   }
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
-    border-inline-start-width: 0;
     margin-inline-start: 0;
   }
 
@@ -647,19 +655,20 @@
   }
 
   .tox .tox-split-button .tox-tbtn {
-    border-width: 0;
     margin-inline-end: 0;
   }
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
-    border-width: 0;
     margin-inline-start: -6px;
     background-color: var(--canvasBackgroundColor);
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {
-    background-color: var(--tinySplitButtonChevronHoverBackground);
+    background: var(--canvasBackgroundColor);
+    color: var(--canvasButtonColor);
+    box-shadow: none
   }
 
+  .tox .tox-tbtn:hover.tox-split-button__chevron,
   .tox .tox-tbtn:focus.tox-split-button__chevron {
     box-shadow: none;
   }

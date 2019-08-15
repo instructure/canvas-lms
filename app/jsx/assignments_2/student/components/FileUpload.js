@@ -22,6 +22,7 @@ import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIcon
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
+import MoreOptions from './MoreOptions'
 import React, {Component} from 'react'
 import {Submission} from '../graphqlData/Submission'
 import {uploadFiles} from '../../../shared/upload_file'
@@ -59,6 +60,7 @@ export default class FileUpload extends Component {
 
   componentDidMount() {
     this._isMounted = true
+    window.addEventListener('message', this.handleLTIFiles)
   }
 
   componentWillUnmount() {
@@ -70,6 +72,12 @@ export default class FileUpload extends Component {
       this.props.submission.submissionDraft.attachments
       ? this.props.submission.submissionDraft.attachments
       : []
+  }
+
+  handleLTIFiles = async e => {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      this.handleDropAccepted(e.data.content_items)
+    }
   }
 
   handleDropAccepted = async files => {
@@ -84,7 +92,7 @@ export default class FileUpload extends Component {
         await this.props.createSubmissionDraft({
           variables: {
             id: this.props.submission.id,
-            attempt: this.props.submission.attempt + 1,
+            attempt: this.props.submission.attempt || 1,
             fileIds: this.getDraftAttachments()
               .map(file => file._id)
               .concat(newFiles.map(file => file.id))
@@ -207,9 +215,10 @@ export default class FileUpload extends Component {
                     <Text size="small">
                       {I18n.t('Drag and drop, or click to browse your computer')}
                     </Text>
-                    <div style={{display: 'block'}}>
-                      <Button margin="medium">{I18n.t('More Options')}</Button>
-                    </div>
+                    <MoreOptions
+                      assignmentID={this.props.assignment._id}
+                      courseID={this.props.assignment.env.courseId}
+                    />
                   </FlexItem>
                 </Flex>
               }

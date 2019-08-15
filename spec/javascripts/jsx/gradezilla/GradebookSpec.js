@@ -34,6 +34,7 @@ import DataLoader from 'jsx/gradezilla/DataLoader'
 import AnonymousSpeedGraderAlert from 'jsx/gradezilla/default_gradebook/components/AnonymousSpeedGraderAlert'
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
+import SubmissionCommentApi from 'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
 import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap'
 import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
 import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
@@ -6787,12 +6788,33 @@ QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
       gradebook.setStudentGroups(studentGroups)
     })
 
-    test('is true when filter_speed_grader_by_student_group is enabled and no group is selected', () => {
-      gradebook.options.course_settings.filter_speed_grader_by_student_group = true
-      gradebook.setSubmissionTrayState(true, '1101', '2301')
-      const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
-      strictEqual(props.requireStudentGroupForSpeedGrader, true)
-    })
+    QUnit.module(
+      'when filter_speed_grader_by_student_group is enabled and no group is selected',
+      noGroupSelectedHooks => {
+        noGroupSelectedHooks.beforeEach(() => {
+          gradebook.options.course_settings.filter_speed_grader_by_student_group = true
+          gradebook.setSubmissionTrayState(true, '1101', '2301')
+        })
+
+        test('is true when the current assignment is not a group assignment', () => {
+          const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+          strictEqual(props.requireStudentGroupForSpeedGrader, true)
+        })
+
+        test('is true when the current assignment is a group assignment and grades students individually', () => {
+          gradebook.getAssignment('2301').group_category_id = '1'
+          gradebook.getAssignment('2301').grade_group_students_individually = true
+          const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+          strictEqual(props.requireStudentGroupForSpeedGrader, true)
+        })
+
+        test('is false when the current assignment is a group assignment but does not grade individually', () => {
+          gradebook.getAssignment('2301').group_category_id = '1'
+          const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
+          strictEqual(props.requireStudentGroupForSpeedGrader, false)
+        })
+      }
+    )
 
     test('is false when filter_speed_grader_by_student_group is enabled and a group is selected', () => {
       gradebook.options.course_settings.filter_speed_grader_by_student_group = true
@@ -8442,62 +8464,113 @@ test('calls setSubmissionCommentsLoaded with an empty collection of comments', f
   strictEqual(setSubmissionCommentsLoadedStub.firstCall.args[0], false)
 })
 
-QUnit.module('#apiCreateSubmissionComment', {
-  setup() {
-    moxios.install()
-    this.gradebook = createGradebook()
-  },
-  teardown() {
-    moxios.uninstall()
-  }
-})
+QUnit.module('#apiCreateSubmissionComment', hooks => {
+  let assignment
+  let createSubmissionCommentStub
+  let gradebook
+  let student
 
-test('calls the success function on a successful call', function() {
-  const url = '/api/v1/courses/1/assignments/2/submissions/3'
-  moxios.stubRequest(url, {status: 200, response: {submission_comments: []}})
-
-  this.gradebook.setSubmissionTrayState(false, '3', '2')
-  const updateSubmissionCommentsStub = sandbox.stub(this.gradebook, 'updateSubmissionComments')
-  const promise = this.gradebook.apiCreateSubmissionComment('a comment')
-  return promise.then(function() {
-    strictEqual(updateSubmissionCommentsStub.callCount, 1)
+  hooks.beforeEach(() => {
+    assignment = {grade_group_students_individually: true, group_category_id: '2201', id: '2301'}
+    createSubmissionCommentStub = sinon.stub(SubmissionCommentApi, 'createSubmissionComment')
+    createSubmissionCommentStub.resolves()
+    gradebook = createGradebook()
+    student = {
+      enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
+      id: '1101',
+      name: 'Adam Jones'
+    }
+    gradebook.setAssignments({2301: assignment})
+    gradebook.gotChunkOfStudents([student])
   })
-})
 
-test('calls showFlashSuccess on a successful call', function() {
-  sinon.stub(this.gradebook, 'renderSubmissionTray')
-  const url = '/api/v1/courses/1/assignments/2/submissions/3'
-  moxios.stubRequest(url, {status: 200, response: {submission_comments: []}})
-
-  this.gradebook.setSubmissionTrayState(false, '3', '2')
-  const showFlashSuccessStub = sandbox.stub(FlashAlert, 'showFlashSuccess')
-  const promise = this.gradebook.apiCreateSubmissionComment('a comment')
-  return promise.then(function() {
-    strictEqual(showFlashSuccessStub.callCount, 1)
+  hooks.afterEach(() => {
+    createSubmissionCommentStub.restore()
   })
-})
 
-test('calls the success function on an unsuccessful call', function() {
-  const url = '/api/v1/courses/1/assignments/2/submissions/3'
-  moxios.stubRequest(url, {status: 401, response: []})
-
-  this.gradebook.setSubmissionTrayState(false, '3', '2')
-  const setCommentsUpdatingStub = sandbox.stub(this.gradebook, 'setCommentsUpdating')
-  const promise = this.gradebook.apiCreateSubmissionComment('a comment')
-  return promise.then(function() {
-    strictEqual(setCommentsUpdatingStub.callCount, 1)
+  test('calls the success function on a successful call', function() {
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    const updateSubmissionCommentsStub = sandbox.stub(gradebook, 'updateSubmissionComments')
+    const promise = gradebook.apiCreateSubmissionComment('a comment')
+    return promise.then(function() {
+      strictEqual(updateSubmissionCommentsStub.callCount, 1)
+    })
   })
-})
 
-test('calls showFlashError on an unsuccessful call', function() {
-  const url = '/api/v1/courses/1/assignments/2/submissions/3'
-  moxios.stubRequest(url, {status: 401, response: []})
+  test('calls showFlashSuccess on a successful call', function() {
+    sinon.stub(gradebook, 'renderSubmissionTray')
 
-  this.gradebook.setSubmissionTrayState(false, '3', '2')
-  const showFlashErrorStub = sandbox.stub(FlashAlert, 'showFlashError')
-  const promise = this.gradebook.apiCreateSubmissionComment('a comment')
-  return promise.then(function() {
-    strictEqual(showFlashErrorStub.callCount, 1)
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    const showFlashSuccessStub = sandbox.stub(FlashAlert, 'showFlashSuccess')
+    const promise = gradebook.apiCreateSubmissionComment('a comment')
+    return promise.then(function() {
+      strictEqual(showFlashSuccessStub.callCount, 1)
+    })
+  })
+
+  test('calls the success function on an unsuccessful call', function() {
+    createSubmissionCommentStub.rejects()
+
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    const setCommentsUpdatingStub = sandbox.stub(gradebook, 'setCommentsUpdating')
+    const promise = gradebook.apiCreateSubmissionComment('a comment')
+    return promise.then(function() {
+      strictEqual(setCommentsUpdatingStub.callCount, 1)
+    })
+  })
+
+  test('calls showFlashError on an unsuccessful call', function() {
+    createSubmissionCommentStub.rejects()
+
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    const showFlashErrorStub = sandbox.stub(FlashAlert, 'showFlashError')
+    const promise = gradebook.apiCreateSubmissionComment('a comment')
+    return promise.then(function() {
+      strictEqual(showFlashErrorStub.callCount, 1)
+    })
+  })
+
+  test('includes comment group_comment in call', () => {
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    gradebook.apiCreateSubmissionComment('a comment')
+    const commentData = createSubmissionCommentStub.firstCall.args[3]
+    strictEqual(commentData.group_comment, 0)
+  })
+
+  test('includes comment text_comment in call', () => {
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    gradebook.apiCreateSubmissionComment('a comment')
+    const commentData = createSubmissionCommentStub.firstCall.args[3]
+    strictEqual(commentData.text_comment, 'a comment')
+  })
+
+  test('includes assignment id in call', () => {
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    gradebook.apiCreateSubmissionComment('a comment')
+    const assignmentId = createSubmissionCommentStub.firstCall.args[1]
+    strictEqual(assignmentId, '2301')
+  })
+
+  QUnit.module('when assignment is a group assignment', contextHooks => {
+    contextHooks.beforeEach(() => {
+      assignment.grade_group_students_individually = false
+      assignment.group_category_id = '2201'
+    })
+
+    test('group_comment in call is 0 when grading individually', () => {
+      assignment.grade_group_students_individually = true
+      gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+      gradebook.apiCreateSubmissionComment('a comment')
+      const commentData = createSubmissionCommentStub.firstCall.args[3]
+      strictEqual(commentData.group_comment, 0)
+    })
+
+    test('group_comment in call is 1 when not grading individually', () => {
+      gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+      gradebook.apiCreateSubmissionComment('a comment')
+      const commentData = createSubmissionCommentStub.firstCall.args[3]
+      strictEqual(commentData.group_comment, 1)
+    })
   })
 })
 

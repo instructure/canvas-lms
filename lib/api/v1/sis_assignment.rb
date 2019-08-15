@@ -23,7 +23,7 @@ module Api::V1::SisAssignment
   end
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data include_in_final_grade).freeze,
+    only: %i(id created_at due_at unlock_at lock_at points_possible sis_assignment_id integration_id integration_data include_in_final_grade).freeze,
     methods: %i(name submission_types_array).freeze
   }.freeze
 
