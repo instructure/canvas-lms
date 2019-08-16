@@ -19,8 +19,9 @@
 import {Assignment} from '../../graphqlData/Assignment'
 import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
-import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
+import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import elideString from '../../../../shared/helpers/elideString'
+import {getFileThumbnail} from '../../../../shared/helpers/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import MoreOptions from './MoreOptions'
@@ -143,10 +144,6 @@ export default class FileUpload extends Component {
     document.getElementById(focusElement).focus()
   }
 
-  shouldDisplayThumbnail = file => {
-    return file.mimeClass === 'image' && file.thumbnailUrl
-  }
-
   renderUploadBox() {
     return (
       <div data-testid="upload-box">
@@ -202,18 +199,7 @@ export default class FileUpload extends Component {
       <Billboard
         heading={I18n.t('Uploaded')}
         headingLevel="h3"
-        hero={
-          this.shouldDisplayThumbnail(file) ? (
-            <img
-              alt={I18n.t('%{filename} preview', {filename: file.displayName})}
-              height="75"
-              src={file.thumbnailUrl}
-              width="75"
-            />
-          ) : (
-            getIconByType(file.mimeClass)
-          )
-        }
+        hero={getFileThumbnail(file, 'large')}
         message={
           <div>
             <span aria-hidden title={file.displayName}>

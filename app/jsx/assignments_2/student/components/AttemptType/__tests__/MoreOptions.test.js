@@ -17,13 +17,14 @@
  */
 
 import axios from 'axios'
-import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../graphqlData/Queries'
+import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
-import {mockQuery} from '../../mocks'
-import MoreOptions from '../AttemptType/MoreOptions'
+import {mockQuery} from '../../../mocks'
+import MoreOptions from '../MoreOptions'
 import React from 'react'
 
+jest.setTimeout(10000)
 jest.mock('axios')
 
 async function createGraphqlMocks(overrides = {}) {
@@ -59,24 +60,61 @@ async function createGraphqlMocks(overrides = {}) {
 
 beforeAll(() => {
   axios.get.mockImplementation(input => {
-    const resp = {headers: {}}
+    const resp = {headers: {}, data: []}
     if (input === '/api/v1/users/self/folders/root') {
       resp.data = {
         context_type: 'user',
-        id: 1,
-        name: 'my files'
+        id: '1',
+        name: 'my files',
+        created_at: '2019-08-13T16:38:42Z'
       }
     } else if (input === '/api/v1/courses/1/folders/root') {
       resp.data = {
         context_type: 'course',
-        id: 2,
-        name: 'course files'
+        id: '2',
+        name: 'course files',
+        created_at: '2019-08-13T16:38:42Z'
       }
     } else if (input === '/api/v1/groups/1/folders/root') {
       resp.data = {
         context_type: 'group',
-        id: 3,
-        name: 'group files'
+        id: '3',
+        name: 'group files',
+        created_at: '2019-08-13T16:38:42Z'
+      }
+    } else if (input === '/api/v1/folders/1/folders?include=user') {
+      resp.data = {
+        id: '4',
+        name: 'dank memes',
+        created_at: '2019-08-13T16:38:42Z',
+        locked: false,
+        parent_folder_id: '1'
+      }
+    } else if (input === '/api/v1/folders/4/files?include=user') {
+      resp.data = {
+        id: '10',
+        display_name: 'bad_luck_brian.png',
+        created_at: '2019-05-14T18:14:05Z',
+        updated_at: '2019-08-14T22:26:07Z',
+        user: {
+          display_name: 'Mr. Norton'
+        },
+        size: 1122994,
+        locked: false,
+        folder_id: '4'
+      }
+    } else if (input === '/api/v1/folders/1/files?include=user') {
+      resp.data = {
+        id: '11',
+        display_name: 'www.creedthoughts.gov.www/creedthoughts',
+        created_at: '2019-05-14T20:00:00Z',
+        updated_at: '2019-08-14T22:00:00Z',
+        user: {
+          display_name: 'Creed Bratton'
+        },
+        size: 1122994,
+        locked: false,
+        folder_id: '1'
       }
     }
     return Promise.resolve(resp)
@@ -90,7 +128,12 @@ describe('MoreOptions', () => {
   })
 
   it('renders the more options modal when the button is clicked', async () => {
-    const mocks = await createGraphqlMocks()
+    const overrides = {
+      ExternalToolConnection: () => ({
+        nodes: [{}]
+      })
+    }
+    const mocks = await createGraphqlMocks(overrides)
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <MoreOptions assignmentID="1" courseID="1" userID="1" />
@@ -111,7 +154,7 @@ describe('MoreOptions', () => {
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId, getAllByRole} = render(
-        <MockedProvider mocks={mocks} addTypename>
+        <MockedProvider mocks={mocks}>
           <MoreOptions assignmentID="1" courseID="1" userID="1" />
         </MockedProvider>
       )
@@ -131,7 +174,7 @@ describe('MoreOptions', () => {
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId, queryByTestId} = render(
-        <MockedProvider mocks={mocks} addTypename>
+        <MockedProvider mocks={mocks}>
           <MoreOptions assignmentID="1" courseID="1" userID="1" />
         </MockedProvider>
       )
@@ -154,12 +197,12 @@ describe('MoreOptions', () => {
     it('renders the canvas files tab', async () => {
       const overrides = {
         ExternalToolConnection: () => ({
-          nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
+          nodes: [{}]
         })
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId, getAllByRole} = render(
-        <MockedProvider mocks={mocks} addTypename>
+        <MockedProvider mocks={mocks}>
           <MoreOptions assignmentID="1" courseID="1" userID="1" />
         </MockedProvider>
       )
@@ -173,22 +216,78 @@ describe('MoreOptions', () => {
     it('renders user, group, and course folders', async () => {
       const overrides = {
         ExternalToolConnection: () => ({
-          nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
+          nodes: [{}]
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getByText, getByTestId} = render(
-        <MockedProvider mocks={mocks} addTypename>
+      const {getAllByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
           <MoreOptions assignmentID="1" courseID="1" userID="1" />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      expect(await waitForElement(() => getByText('my files'))).toBeInTheDocument()
-      expect(await waitForElement(() => getByText('course files'))).toBeInTheDocument()
+      expect(await waitForElement(() => getAllByText('my files')[0])).toBeInTheDocument()
+      expect(await waitForElement(() => getAllByText('course files')[0])).toBeInTheDocument()
       expect(
-        await waitForElement(() => getByText(mocks[2].result.data.legacyNode.groups[0].name))
+        await waitForElement(() => getAllByText(mocks[2].result.data.legacyNode.groups[0].name)[0])
+      ).toBeInTheDocument()
+    })
+
+    it('renders the folder contents when a folder is selected', async () => {
+      const overrides = {
+        ExternalToolConnection: () => ({
+          nodes: [{}]
+        })
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {getAllByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+        </MockedProvider>
+      )
+      const moreOptionsButton = getByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const myFilesButton = await waitForElement(() => getAllByText('my files')[0])
+      fireEvent.click(myFilesButton)
+
+      const fileSelect = await waitForElement(() => getByTestId('more-options-file-select'))
+      expect(fileSelect).toContainElement(await waitForElement(() => getAllByText('dank memes')[0]))
+      expect(fileSelect).toContainElement(
+        await waitForElement(() => getAllByText('www.creedthoughts.gov.www/creedthoughts')[0])
+      )
+    })
+
+    it('allows folder navigation through breadcrumbs', async () => {
+      const overrides = {
+        ExternalToolConnection: () => ({
+          nodes: [{}]
+        })
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {getAllByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+        </MockedProvider>
+      )
+      const moreOptionsButton = getByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const myFilesButton = await waitForElement(() => getAllByText('my files')[0])
+      fireEvent.click(myFilesButton)
+
+      const fileSelect = await waitForElement(() => getByTestId('more-options-file-select'))
+      expect(fileSelect).toContainElement(await waitForElement(() => getAllByText('dank memes')[0]))
+
+      const rootFolderBreadcrumbLink = await waitForElement(() => getAllByText('Root')[0])
+      fireEvent.click(rootFolderBreadcrumbLink)
+
+      expect(await waitForElement(() => getAllByText('my files')[0])).toBeInTheDocument()
+      expect(await waitForElement(() => getAllByText('course files')[0])).toBeInTheDocument()
+      expect(
+        await waitForElement(() => getAllByText(mocks[2].result.data.legacyNode.groups[0].name)[0])
       ).toBeInTheDocument()
     })
   })

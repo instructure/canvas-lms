@@ -23,13 +23,6 @@ import {UserGroups} from '../../../graphqlData/UserGroups'
 
 import {TabList, TabPanel} from '@instructure/ui-tabs'
 
-const iframeContainerStyle = {
-  maxWidth: '1366px',
-  height: '0',
-  paddingBottom: '55%',
-  position: 'relative'
-}
-
 const iframeStyle = {
   border: 'none',
   width: '100%',
@@ -37,14 +30,22 @@ const iframeStyle = {
   position: 'absolute'
 }
 
+const tabContentStyle = {
+  height: '0',
+  paddingBottom: '55%',
+  position: 'relative'
+}
+
 const Tools = props => (
   <TabList defaultSelectedIndex={0} variant="minimal">
-    <TabPanel title="Canvas Files">
-      <CanvasFiles courseID={props.courseID} userGroups={props.userGroups.groups} />
+    <TabPanel title="Canvas Files" padding="0">
+      <div style={tabContentStyle}>
+        <CanvasFiles courseID={props.courseID} userGroups={props.userGroups.groups} />
+      </div>
     </TabPanel>
     {props.tools.map(tool => (
       <TabPanel title={tool.name} key={tool._id}>
-        <div style={iframeContainerStyle}>
+        <div style={tabContentStyle}>
           <iframe
             style={iframeStyle}
             src={launchUrl(props.assignmentID, props.courseID, tool)}
