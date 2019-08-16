@@ -121,7 +121,7 @@ $(document).ready(function() {
         address = data.communication_channel_slack
       } else if (ENV.INTERNATIONAL_SMS_ENABLED && $('#communication_channel_sms_country').val() === 'undecided') {
         // Haven't selected a country yet
-        $(this).formErrors({communication_channel_sms_country: I18n.t("Country is required")});
+        $(this).formErrors({communication_channel_sms_country: I18n.t("Country or Region is required")});
         return false;
       } else if (!ENV.INTERNATIONAL_SMS_ENABLED || $('#communication_channel_sms_country option:selected').data('useEmail')) {
         // SMS channel using an email address

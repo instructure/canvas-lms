@@ -31,7 +31,7 @@ describe "international sms" do
     it 'shows a disclaimer for international numbers', priority: "1", test_id: 443930 do
       # All selections except those in this array should include the text messaging rate disclaimer
       no_disclaimer = Array[
-          'Select Country',
+          'Select Country or Region',
           'United States'
       ]
 
