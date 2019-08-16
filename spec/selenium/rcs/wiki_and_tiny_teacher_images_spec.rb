@@ -86,5 +86,27 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       wait_for_ajaximations
       expect(sidebar_images.count).to eq 150
     end
+
+    it "should show images uploaded on the files tab in the image list" do
+      wiki_page_tools_file_tree_setup(true, true)
+      click_files_tab
+      wait_for_ajaximations
+
+      expect(sidebar_files.length).to eq 4
+
+      wait_for_tiny(f("form.edit-form .edit-content"))
+      wiki_page_body = clear_wiki_rce
+
+      upload_image_to_files_in_rce
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.last
+      expect(sidebar_files.length).to eq 5
+      click_images_tab
+      wait_for_ajaximations
+
+      expect(fj("#right-side [role='button'] img:last").attribute('src')).to include "/thumbnails/#{@image.id}"
+      switch_editor_views(wiki_page_body)
+      expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
+    end
   end
 end

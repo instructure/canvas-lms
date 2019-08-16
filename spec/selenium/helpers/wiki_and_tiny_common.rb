@@ -172,6 +172,16 @@ module WikiAndTinyCommon
     wait_for_ajax_requests
   end
 
+  def upload_image_to_files_in_rce
+    fj('button:contains("Upload a new file")').click
+    name, path, data = get_file({:image => 'graded.png'}[:image])
+    f("input[type='file']").send_keys(path)
+    button = f("button[type='submit']")
+    keep_trying_until { button.displayed? }
+    button.click
+    wait_for_ajaximations
+  end
+
   def add_file_to_rce
     title = "text_file.txt"
     @root_folder = Folder.root_folders(@course).first
