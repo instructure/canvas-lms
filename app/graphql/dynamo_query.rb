@@ -34,7 +34,9 @@
 class DynamoQuery
   attr_reader :partition_key, :sort_key
 
-  def initialize(db, table, partition_key:, value:, sort_key:, scan_index_forward: true)
+  def initialize(db, table, partition_key:, key_condition_expression:,
+                 expression_attribute_values:, value:, sort_key:,
+                 scan_index_forward: true)
     @db = db
     @table = table
     @partition_key = partition_key
@@ -42,7 +44,8 @@ class DynamoQuery
     @sort_key = sort_key
     @scan_index_forward = scan_index_forward
     @key_condition_expression = "#{partition_key} = :id"
-    @expression_attribute_values = {":id" => value}
+    @key_condition_expression << " AND #{key_condition_expression}" if key_condition_expression
+    @expression_attribute_values = expression_attribute_values.merge(":id" => value)
   end
 
   def limit(limit)

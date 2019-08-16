@@ -546,6 +546,7 @@ type AuditLogs {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    endTime: DateTime
 
     """
     Returns the first _n_ elements from the list.
@@ -556,6 +557,7 @@ type AuditLogs {
     Returns the last _n_ elements from the list.
     """
     last: Int
+    startTime: DateTime
   ): MutationLogConnection
 }
 
