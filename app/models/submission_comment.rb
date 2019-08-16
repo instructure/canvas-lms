@@ -1,3 +1,4 @@
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -183,7 +184,7 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.assignment &&
       record.submission.assignment.context.available? &&
-      !record.submission.assignment.muted? &&
+      record.submission.posted? &&
       record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
       (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
@@ -367,7 +368,7 @@ class SubmissionComment < ActiveRecord::Base
     # id_changed? because new_record? is false in after_save callbacks
     if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
       return if submission.user_id == author_id
-      return if submission.assignment.deleted? || submission.assignment.muted?
+      return if submission.assignment.deleted? || !submission.posted?
       return if provisional_grade_id.present?
 
       self.class.connection.after_transaction_commit do
