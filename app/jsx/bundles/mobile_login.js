@@ -19,7 +19,7 @@
 import I18n from 'i18n!pseudonyms_mobile_login'
 import signupDialog from 'compiled/registration/signupDialog'
 
-const eventToBindTo = ('ontouchstart' in window) ? 'touchstart' : 'click'
+const eventToBindTo = 'click'
 setupForgotPassword()
 setupParentSignup()
 
