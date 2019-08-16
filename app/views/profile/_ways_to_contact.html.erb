@@ -211,10 +211,10 @@
 
     <% if @user.account.feature_enabled?(:international_sms) %>
       <div class="control-group">
-        <label for="communication_channel_sms_country" class='control-label'><%=t('labels.country', 'Country') %></label>
+        <label for="communication_channel_sms_country" class='control-label'><%=t('Country or Region') %></label>
         <div class="controls">
           <select class="user_selected country" id="communication_channel_sms_country" name="communication_channel_sms_country">
-            <option value="undecided">[<%= t('Select Country') %>]</option>
+            <option value="undecided">[<%= t('Select Country or Region') %>]</option>
             <% CommunicationChannel.country_codes.each do |(numeric_code, name, use_email)| %>
               <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %></option>
             <% end %>
