@@ -563,6 +563,16 @@ class CommunicationChannel < ActiveRecord::Base
 
   end
 
+  def self.user_can_have_more_channels?(user, domain_root_account)
+    max_allowed_channels = domain_root_account.settings[:max_communication_channels]
+    return true unless max_allowed_channels
+
+    number_channels = user.communication_channels.where(
+      "workflow_state <> 'retired' OR (workflow_state = 'retired' AND created_at > ?)", 1.hour.ago
+    ).count
+    number_channels < max_allowed_channels
+  end
+
   def e164_path
     return path if path =~ /^\+\d+$/
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
