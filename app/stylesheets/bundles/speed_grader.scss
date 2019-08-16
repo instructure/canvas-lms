@@ -586,6 +586,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   color: var(--ic-brand-global-nav-ic-icon-svg-fill);
 }
 
+.speedgrader-postgradesmenu-icon {
+  color: var(--ic-brand-global-nav-ic-icon-svg-fill) !important;
+}
+
 .ui-selectmenu-item-icon {
   top: 6px !important;
   margin-top: 0 !important;

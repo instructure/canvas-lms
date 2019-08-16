@@ -26,11 +26,12 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!SpeedGraderPostGradesMenu'
 
 export default function SpeedGraderPostGradesMenu(props) {
+  const Icon = props.allowPostingGrades ? IconOff : IconEye
   const menuTrigger = (
     <Button
-      icon={props.allowPostingGrades ? IconOff : IconEye}
+      icon={<Icon className="speedgrader-postgradesmenu-icon" />}
       title={I18n.t('Post or Hide Grades')}
-      variant="icon-inverse"
+      variant="icon"
     />
   )
 
