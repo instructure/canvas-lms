@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@instructure/canvas-theme": "^6.8.1",
-    "@instructure/media-capture": "^5",
+    "@instructure/media-capture": "^5.54.0",
     "@instructure/k5uploader": ">=1",
     "@instructure/ui-a11y": "^6.8.1",
     "@instructure/ui-alerts": "^6.8.1",
@@ -61,7 +61,7 @@
     "@instructure/ui-forms": "^6.8.1",
     "@instructure/ui-icons": "^6.8.1",
     "@instructure/ui-layout": "^6.8.1",
-    "@instructure/ui-media-player": "^5",
+    "@instructure/ui-media-player": "^5.54.0",
     "@instructure/ui-overlays": "^6.8.1",
     "@instructure/ui-pagination": "^6.8.1",
     "@instructure/ui-react-utils": "^6.8.1",
