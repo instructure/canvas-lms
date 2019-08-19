@@ -108,5 +108,34 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       switch_editor_views(wiki_page_body)
       expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
     end
+
+    it "should add image via url" do
+      get "/courses/#{@course.id}/pages/blank"
+      wait_for_ajaximations
+      f('a.edit-wiki').click
+      add_url_image(driver, 'https://via.placeholder.com/150.jpg', 'alt text')
+      f('form.edit-form button.submit').click
+      expect(f('#wiki_page_show')).to be_displayed
+      check_element_attrs(f('#wiki_page_show img'), :src => 'https://via.placeholder.com/150.jpg', :alt => 'alt text')
+    end
+
+    describe "canvas images" do
+      before do
+        @course_root = Folder.root_folders(@course).first
+        @course_attachment = @course_root.attachments.create! :uploaded_data => jpeg_data_frd,
+                                                              :filename => 'course.jpg',
+                                                              :display_name => 'course.jpg',
+                                                              :context => @course
+        get "/courses/#{@course.id}/pages/blank"
+        wait_for_ajaximations
+        f('a.edit-wiki').click
+      end
+
+      it "should add a course image" do
+        add_canvas_image(driver, 'Course files', 'course.jpg')
+        f('form.edit-form button.submit').click
+        expect(f('#wiki_page_show')).to be_displayed
+      end
+    end
   end
 end
