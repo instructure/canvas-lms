@@ -2186,6 +2186,12 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :content_shares) do
       post 'users/:user_id/content_shares', action: :create
+      get 'users/:user_id/content_shares/sent', action: :index, defaults: { list: 'sent' }, as: :user_sent_content_shares
+      get 'users/:user_id/content_shares/received', action: :index, defaults: { list: 'received' }, as: :user_received_content_shares
+      get 'users/:user_id/content_shares/:id', action: :show
+      delete 'users/:user_id/content_shares/:id', action: :destroy
+      post 'users/:user_id/content_shares/:id/add_users', action: :add_users
+      put 'users/:user_id/content_shares/:id', action: :update
     end
 
     scope(:controller => :csp_settings) do
