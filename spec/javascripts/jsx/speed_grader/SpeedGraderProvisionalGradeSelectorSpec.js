@@ -29,6 +29,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   hooks.beforeEach(() => {
     props = {
       detailsInitiallyVisible: true,
+      finalGraderId: '2',
       gradingType: 'points',
       onGradeSelected: () => {},
       pointsPossible: 123,
@@ -124,7 +125,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         .find('input')
         .first()
         .prop('value'),
-      '3'
+      '2'
     )
   })
 

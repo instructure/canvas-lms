@@ -36,6 +36,7 @@ const NEW_CUSTOM_GRADE = 'custom'
 
 export default class SpeedGraderProvisionalGradeSelector extends React.Component {
   static propTypes = {
+    finalGraderId: string.isRequired,
     gradingType: string.isRequired,
     onGradeSelected: func.isRequired,
     pointsPossible: number,
@@ -118,12 +119,17 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
     // The "Custom" button (representing the moderator's own grade) is always
     // rendered at the top. It needs some slightly special handling since the
     // moderator might not have actually issued a provisional grade yet.
-    const gradeIssuedByMe = provisionalGrades.find(grade => !grade.readonly)
-    this.moderatorGradeId = gradeIssuedByMe
-      ? gradeIssuedByMe.provisional_grade_id
+    const gradeIssuedByModerator = provisionalGrades.find(
+      grade => grade.scorer_id === this.props.finalGraderId
+    )
+
+    const moderatorGradeId = gradeIssuedByModerator
+      ? gradeIssuedByModerator.provisional_grade_id
       : NEW_CUSTOM_GRADE
 
-    const gradesIssuedByOthers = provisionalGrades.filter(grade => grade.readonly)
+    const gradesIssuedByOthers = provisionalGrades.filter(
+      grade => grade.provisional_grade_id !== moderatorGradeId
+    )
 
     let sortKey = 'scorer_id'
     if (gradesIssuedByOthers.length > 0 && gradesIssuedByOthers[0].anonymous_grader_id) {
@@ -149,7 +155,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
           size="small"
         >
           <RadioInput
-            value={this.moderatorGradeId}
+            value={moderatorGradeId}
             label={<Text size="small">{I18n.t('Custom')}</Text>}
           />
 

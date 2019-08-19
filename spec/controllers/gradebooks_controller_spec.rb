@@ -2197,6 +2197,12 @@ describe GradebooksController do
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env.fetch(:READ_AS_ADMIN)).to be true
       end
+
+      it "includes final_grader_id" do
+        @assignment.update!(final_grader: @teacher, grader_count: 2, moderated_grading: true)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env[:final_grader_id]).to eql @teacher.id
+      end
     end
 
     it 'sets disable_unmute_assignment to false if the assignment is not muted' do

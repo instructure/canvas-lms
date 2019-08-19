@@ -570,7 +570,8 @@ test('renders a generic grader name when graders cannot view other grader names'
           anonymous_grader_id: 'mry2b',
           final: false,
           provisional_grade_id: '53',
-          readonly: true
+          readonly: true,
+          scorer_id: '1101'
         }
       ],
       submission_comments: [
@@ -600,7 +601,8 @@ test('refreshes provisional grader display names when names are stale after swit
           anonymous_grader_id: 'mry2b',
           final: false,
           provisional_grade_id: '53',
-          readonly: true
+          readonly: true,
+          scorer_id: '1101'
         }
       ],
       submission_comments: [
@@ -623,7 +625,8 @@ test('refreshes provisional grader display names when names are stale after swit
           anonymous_grader_id: 'asdfg',
           final: false,
           provisional_grade_id: '54',
-          readonly: true
+          readonly: true,
+          scorer_id: '1102'
         }
       ],
       submission_comments: [
@@ -650,18 +653,30 @@ test('refreshes provisional grader display names when names are stale after swit
   strictEqual(authorName, 'Grader 1')
 })
 
-QUnit.module('SpeedGrader#handleGradeSubmit', {
-  setup() {
-    fakeENV.setup({
+QUnit.module('SpeedGrader#handleGradeSubmit', hooks => {
+  let env
+  let originalStudent
+  let originalWindowJSONData
+  let server
+
+  hooks.beforeEach(() => {
+    env = {
       assignment_id: '17',
       course_id: '29',
       grading_role: 'moderator',
       help_url: 'example.com/support',
       show_help_menu_item: false
-    })
-    sandbox.stub($, 'ajaxJSON')
+    }
+    fakeENV.setup(env)
     sandbox.spy($.fn, 'append')
-    this.originalWindowJSONData = window.jsonData
+    sandbox.spy($, 'ajaxJSON')
+    server = sinon.fakeServer.create({respondImmediately: true})
+    server.respondWith('POST', 'my_url.com', [
+      200,
+      {'Content-Type': 'application/json'},
+      '[{"submission": {}}]'
+    ])
+    originalWindowJSONData = window.jsonData
     setupFixtures(`
       <div id="iframe_holder"></div>
       <div id="multiple_submissions"></div>
@@ -695,7 +710,7 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
         4: SpeedGrader.EG.currentStudent
       }
     }
-    this.originalStudent = SpeedGrader.EG.currentStudent
+    originalStudent = SpeedGrader.EG.currentStudent
     SpeedGrader.EG.currentStudent = {
       id: 4,
       name: 'Guy B. Studying',
@@ -736,70 +751,115 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     }
 
     sinon.stub(SpeedGraderHelpers, 'reloadPage')
-  },
+  })
 
-  teardown() {
-    SpeedGrader.EG.currentStudent = this.originalStudent
-    window.jsonData = this.originalWindowJSONData
+  hooks.afterEach(() => {
+    SpeedGrader.EG.currentStudent = originalStudent
+    window.jsonData = originalWindowJSONData
     SpeedGrader.teardown()
     teardownFixtures()
     fakeENV.teardown()
     SpeedGraderHelpers.reloadPage.restore()
-  }
-})
+    server.restore()
+  })
 
-test('hasWarning and flashWarning are called', function() {
-  SpeedGrader.EG.jsonReady()
-  const flashWarningStub = sandbox.stub($, 'flashWarning')
-  sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15')
-  sandbox.stub(SpeedGrader.EG, 'setOrUpdateSubmission')
-  sandbox.stub(SpeedGrader.EG, 'refreshSubmissionsToView')
-  sandbox.stub(SpeedGrader.EG, 'updateSelectMenuStatus')
-  sandbox.stub(SpeedGrader.EG, 'showGrade')
-  SpeedGrader.EG.handleGradeSubmit(10, false)
-  const [, , , callback] = $.ajaxJSON.getCall(2).args
-  const submissions = [
-    {
-      submission: {user_id: 1, score: 15, excused: false}
-    }
-  ]
-  callback(submissions)
-  ok(flashWarningStub.calledOnce)
-})
+  QUnit.module('when assignment is moderated', contextHooks => {
+    let provisionalGrade
+    let provisionalSelectUrl
 
-test('handleGradeSubmit should submit score if using existing score', () => {
-  SpeedGrader.EG.jsonReady()
-  SpeedGrader.EG.handleGradeSubmit(null, true)
-  equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
-  equal($.ajaxJSON.getCall(2).args[1], 'POST')
-  const [, , formData] = $.ajaxJSON.getCall(2).args
-  equal(formData['submission[score]'], '7')
-  equal(formData['submission[grade]'], undefined)
-  equal(formData['submission[user_id]'], 4)
-})
+    contextHooks.beforeEach(() => {
+      const {submission} = SpeedGrader.EG.currentStudent
+      provisionalGrade = {
+        grade: '1',
+        provisional_grade_id: '1',
+        readonly: true,
+        scorer_id: '1101',
+        scorer_name: 'Thomas',
+        selected: false
+      }
+      provisionalSelectUrl = 'example.com/provisional_select_url'
+      submission.provisional_grades = [provisionalGrade]
+      fakeENV.setup({
+        ...env,
+        current_user_id: '1101',
+        final_grader_id: '1101',
+        grading_role: 'moderator',
+        provisional_select_url: provisionalSelectUrl
+      })
+      server.respondWith('POST', provisionalSelectUrl, [
+        200,
+        {'Content-Type': 'application/json'},
+        '{"selected_provisional_grade_id": "1"}'
+      ])
+      SpeedGrader.EG.jsonReady()
+    })
 
-test('handleGradeSubmit should submit grade if not using existing score', function() {
-  SpeedGrader.EG.jsonReady()
-  sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('56')
-  SpeedGrader.EG.handleGradeSubmit(null, false)
-  equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
-  equal($.ajaxJSON.getCall(2).args[1], 'POST')
-  const [, , formData] = $.ajaxJSON.getCall(2).args
-  equal(formData['submission[score]'], undefined)
-  equal(formData['submission[grade]'], '56')
-  equal(formData['submission[user_id]'], 4)
-  SpeedGraderHelpers.determineGradeToSubmit.restore()
-})
+    test('selects the provisional grade if the user is the final grader', () => {
+      SpeedGrader.EG.handleGradeSubmit(null, true)
+      strictEqual(provisionalGrade.selected, true)
+    })
 
-test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function() {
-  SpeedGrader.EG.jsonReady()
-  sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('')
-  window.jsonData.grading_type = 'pass_fail'
-  SpeedGrader.EG.currentStudent.submission.excused = true
-  SpeedGrader.EG.handleGradeSubmit(null, false)
-  const [, , formData] = $.ajaxJSON.getCall(2).args
-  strictEqual(formData['submission[excuse]'], false)
-  SpeedGraderHelpers.determineGradeToSubmit.restore()
+    test('does not select the provisional grade if the user is not the final grader', () => {
+      env.current_user_id = '1102'
+      fakeENV.setup(env)
+      SpeedGrader.EG.handleGradeSubmit(null, true)
+      strictEqual(provisionalGrade.selected, false)
+    })
+  })
+
+  test('hasWarning and flashWarning are called', function() {
+    SpeedGrader.EG.jsonReady()
+    const flashWarningStub = sandbox.stub($, 'flashWarning')
+    sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15')
+    sandbox.stub(SpeedGrader.EG, 'setOrUpdateSubmission')
+    sandbox.stub(SpeedGrader.EG, 'refreshSubmissionsToView')
+    sandbox.stub(SpeedGrader.EG, 'updateSelectMenuStatus')
+    sandbox.stub(SpeedGrader.EG, 'showGrade')
+    SpeedGrader.EG.handleGradeSubmit(10, false)
+    const [, , , callback] = $.ajaxJSON.getCall(2).args
+    const submissions = [
+      {
+        submission: {user_id: 1, score: 15, excused: false}
+      }
+    ]
+    callback(submissions)
+    ok(flashWarningStub.calledOnce)
+  })
+
+  test('handleGradeSubmit should submit score if using existing score', () => {
+    SpeedGrader.EG.jsonReady()
+    SpeedGrader.EG.handleGradeSubmit(null, true)
+    equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
+    equal($.ajaxJSON.getCall(2).args[1], 'POST')
+    const [, , formData] = $.ajaxJSON.getCall(2).args
+    equal(formData['submission[score]'], '7')
+    equal(formData['submission[grade]'], undefined)
+    equal(formData['submission[user_id]'], 4)
+  })
+
+  test('handleGradeSubmit should submit grade if not using existing score', function() {
+    SpeedGrader.EG.jsonReady()
+    sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('56')
+    SpeedGrader.EG.handleGradeSubmit(null, false)
+    equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
+    equal($.ajaxJSON.getCall(2).args[1], 'POST')
+    const [, , formData] = $.ajaxJSON.getCall(2).args
+    equal(formData['submission[score]'], undefined)
+    equal(formData['submission[grade]'], '56')
+    equal(formData['submission[user_id]'], 4)
+    SpeedGraderHelpers.determineGradeToSubmit.restore()
+  })
+
+  test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function() {
+    SpeedGrader.EG.jsonReady()
+    sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('')
+    window.jsonData.grading_type = 'pass_fail'
+    SpeedGrader.EG.currentStudent.submission.excused = true
+    SpeedGrader.EG.handleGradeSubmit(null, false)
+    const [, , formData] = $.ajaxJSON.getCall(2).args
+    strictEqual(formData['submission[excuse]'], false)
+    SpeedGraderHelpers.determineGradeToSubmit.restore()
+  })
 })
 
 QUnit.module('attachmentIframeContents', {
@@ -4670,13 +4730,14 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         <div id='grading_box_selected_grader'></div>
         <input type='text' id='grade' />
       `)
+      ENV.final_grader_id = '1101'
 
       SpeedGrader.setup()
       EG.currentStudent = {
         submission: {
           provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, grade: '1', scorer_name: 'Gradual'},
-            {provisional_grade_id: '2', readonly: true, grade: '2', scorer_name: 'Gradus'}
+            {provisional_grade_id: '1', readonly: true, grade: '1', scorer_id: '1101', scorer_name: 'Gradual'},
+            {provisional_grade_id: '2', readonly: true, grade: '2', scorer_id: '1102', scorer_name: 'Gradus'}
           ]
         }
       }
@@ -4709,6 +4770,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       strictEqual(ReactDOM.unmountComponentAtNode.callCount, 1)
     })
 
+    test('passes the final grader id to the component', () => {
+      EG.renderProvisionalGradeSelector()
+
+      const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
+      strictEqual(SpeedGraderProvisionalGradeSelector.props.finalGraderId, '1101')
+    })
+
     test('passes jsonData.points_possible to the component as pointsPossible', () => {
       window.jsonData.points_possible = 12
       EG.renderProvisionalGradeSelector()
@@ -4734,12 +4802,19 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       )
     })
 
+    test('passes "Custom" as the display name for the final grader', () => {
+      EG.renderProvisionalGradeSelector()
+
+      const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
+      strictEqual(SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames['1'], 'Custom')
+    })
+
     test('passes the hash of grader display names to the component', () => {
       EG.renderProvisionalGradeSelector()
 
       const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
       deepEqual(SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames, {
-        1: 'Gradual',
+        1: 'Custom',
         2: 'Gradus'
       })
     })
@@ -4770,11 +4845,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       EG.currentStudent = {
         submission: {
           provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
-            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22}
+            {provisional_grade_id: '1', readonly: true, scorer_id: '1101', scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_id: '1102', scorer_name: 'Gradus', grade: 22}
           ]
         }
       }
+      ENV.final_grader_id = '1101'
       EG.setupProvisionalGraderDisplayNames()
 
       submission = EG.currentStudent.submission
@@ -4807,10 +4883,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
     })
 
     test('calls setActiveProvisionalGradeFields with the selected label when selectedGrade is passed', () => {
-      EG.handleProvisionalGradeSelected({selectedGrade: submission.provisional_grades[0]})
+      EG.handleProvisionalGradeSelected({selectedGrade: submission.provisional_grades[1]})
 
       const {label} = EG.setActiveProvisionalGradeFields.firstCall.args[0]
-      strictEqual(label, 'Gradual')
+      strictEqual(label, 'Gradus')
     })
 
     test('calls setActiveProvisionalGradeFields with the label "Custom" when isNewGrade is passed', () => {
@@ -4850,11 +4926,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       EG.currentStudent = {
         submission: {
           provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
-            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22}
+            {provisional_grade_id: '1', readonly: true, scorer_id: '1101', scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_id: '1102', scorer_name: 'Gradus', grade: 22}
           ]
         }
       }
+      ENV.final_grader_id = '1101'
       EG.setupProvisionalGraderDisplayNames()
     })
 
@@ -4934,12 +5011,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         anonymous_id: 'abcde',
         submission: {
           provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
-            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22}
+            {provisional_grade_id: '1', readonly: true, scorer_id: '1101', scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_id: '1102', scorer_name: 'Gradus', grade: 22}
           ],
           updated_at: 'never'
         }
       }
+      ENV.final_grader_id = '1101'
       EG.setupProvisionalGraderDisplayNames()
       ENV.provisional_status_url = 'some_url_or_other'
 
@@ -5005,12 +5083,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         anonymous_id: 'abcde',
         submission: {
           provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
-            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22}
+            {provisional_grade_id: '1', readonly: true, scorer_id: '1101', scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_id: '1102', scorer_name: 'Gradus', grade: 22}
           ],
           updated_at: 'never'
         }
       }
+      ENV.final_grader_id = '1101'
       EG.setupProvisionalGraderDisplayNames()
 
       submission = EG.currentStudent.submission
@@ -5086,12 +5165,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         anonymous_id: 'abcde',
         submission: {
           provisional_grades: [
-            {provisional_grade_id: '1', readonly: true, scorer_name: 'Gradual', grade: 11},
-            {provisional_grade_id: '2', readonly: true, scorer_name: 'Gradus', grade: 22}
+            {provisional_grade_id: '1', readonly: true, scorer_id: '1101', scorer_name: 'Gradual', grade: 11},
+            {provisional_grade_id: '2', readonly: true, scorer_id: '1102', scorer_name: 'Gradus', grade: 22}
           ],
           updated_at: 'never'
         }
       }
+      ENV.final_grader_id = '1101'
       EG.setupProvisionalGraderDisplayNames()
 
       $.ajaxJSON.callsFake((url, method, params, success) => {

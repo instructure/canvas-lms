@@ -65,13 +65,11 @@ function studentsToPages(props) {
 
 export default class GradesGrid extends Component {
   static propTypes = {
-    /* eslint-disable react/no-unused-prop-types */
     anonymousStudents: bool.isRequired,
     assignment: shape({
       courseId: string.isRequired,
       id: string.isRequired
     }).isRequired,
-    /* eslint-enable react/no-unused-prop-types */
     disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired

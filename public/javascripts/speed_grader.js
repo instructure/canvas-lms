@@ -3076,7 +3076,10 @@ EG = {
           existingGrade.score = score
         }
 
-        EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade)
+        if (ENV.final_grader_id === ENV.current_user_id) {
+          EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade)
+        }
+
         EG.setActiveProvisionalGradeFields({
           grade: existingGrade,
           label: customProvisionalGraderLabel
@@ -3388,13 +3391,13 @@ EG = {
     const provisionalGrades = currentStudentProvisionalGrades()
 
     provisionalGrades.forEach(grade => {
-      if (grade.readonly) {
+      if (grade.scorer_id === ENV.final_grader_id) {
+        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel
+      } else {
         const displayName = grade.anonymous_grader_id
           ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName
-      } else {
-        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel
       }
     })
   },
@@ -3497,6 +3500,7 @@ EG = {
     }
 
     const props = {
+      finalGraderId: ENV.final_grader_id,
       gradingType: ENV.grading_type,
       onGradeSelected: params => {
         this.handleProvisionalGradeSelected(params)

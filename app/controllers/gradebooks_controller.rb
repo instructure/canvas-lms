@@ -660,6 +660,7 @@ class GradebooksController < ApplicationController
     respond_to do |format|
 
       format.html do
+        grading_role_for_user = grading_role(assignment: @assignment)
         rubric = @assignment&.rubric_association&.rubric
         @headers = false
         @outer_frame = true
@@ -673,7 +674,8 @@ class GradebooksController < ApplicationController
           new_gradebook_enabled: new_gradebook_enabled?,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,
-          grading_role: grading_role(assignment: @assignment),
+          final_grader_id: @assignment.final_grader_id,
+          grading_role: grading_role_for_user,
           grading_type: @assignment.grading_type,
           lti_retrieve_url: retrieve_course_external_tools_url(
             @context.id, assignment_id: @assignment.id, display: 'borderless'
@@ -689,7 +691,7 @@ class GradebooksController < ApplicationController
           help_url: help_link_url,
           outcome_proficiency: outcome_proficiency,
         }
-        if grading_role(assignment: @assignment) == :moderator
+        if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
         end
 
