@@ -4932,7 +4932,6 @@ en:
       labels:
         email_address: Email Address
         enable_login_for_email: I want to log in to Canvas using this email address
-        country: Country
         cell_number: Cell Number
         carrier: Carrier
         sms_email: SMS Email
@@ -11852,7 +11851,8 @@ en:
   add_contact_method_d2dfea03: Add Contact Method
   slack_email_9204e2ea: Slack Email
   register_slack_email_1f6d7e6d: Register Slack Email
-  select_country_d21cb85a: Select Country
+  country_or_region_26ea046c: Country or Region
+  select_country_or_region_4e9fb08e: Select Country or Region
   international_text_messaging_rates_may_apply_d4b4a97a: International text messaging rates may apply.
   other_carrier_45531207: Other Carrier
   we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: We emailed a confirmation link to %{email_address}. Click the link in that email to finish registering. Make sure to check your spam box in case it got filtered.
@@ -12738,7 +12738,7 @@ en:
   collaboration_was_deleted_9cf9934b: Collaboration was deleted
   collaboration_update_failed_eb6622f3: Collaboration update failed
   collaboration_creation_failed_95ff831f: Collaboration creation failed
-  country_is_required_b0afbf52: Country is required
+  country_or_region_is_required_86917b39: Country or Region is required
   email_is_required_736ac26b: Email is required
   email_is_invalid_e0d982eb: Email is invalid!
   cell_number_is_required_2edcee60: Cell Number is required
