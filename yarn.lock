@@ -1356,7 +1356,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-focusable@^6.9.0":
+"@instructure/ui-focusable@^6.8.1", "@instructure/ui-focusable@^6.9.0":
   version "6.9.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-focusable/-/ui-focusable-6.9.0.tgz#be4b0387001495b4d8814941f2c48de76cb42d29"
   integrity sha512-cVtol2wySrJGatpJrxxhQuEJZG40GgpKD20ljNfKnUxlumxcuCPyMD8/NW/DTtaPZ5lC0RMPiQL/suLyan9q6w==
