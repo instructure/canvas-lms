@@ -190,8 +190,12 @@ class ContentZipper
     @portfolio = @portfolio
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
-    av = ActionView::Base.new()
-    av.view_paths = ActionController::Base.view_paths
+    if CANVAS_RAILS5_2
+      av = ActionView::Base.new()
+      av.view_paths = ActionController::Base.view_paths
+    else
+      av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
+    end
     av.extend TextHelper
     res = av.render(:partial => "eportfolios/static_page", :locals => {:page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash})
     res

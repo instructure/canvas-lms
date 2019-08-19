@@ -1534,7 +1534,7 @@ class Enrollment < ActiveRecord::Base
       course_id: course,
       user_id: user,
       type: Array.wrap(types)
-    ).where.not(id: id, workflow_state: :deleted)
+    ).where.not(id: id).where.not(workflow_state: :deleted)
   end
 
   def remove_user_as_final_grader?
