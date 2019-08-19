@@ -36,4 +36,10 @@ export default function LogoutButton(props) {
     </form>
   )
 }
-LogoutButton.propTypes = Button.propTypes
+
+LogoutButton.propTypes = (() => {
+  // we pass on all the same propTypes as instUI Button except for 'children'
+  const {children, ...buttonpropTypes} = Button.propTypes
+  return buttonpropTypes
+})()
+
