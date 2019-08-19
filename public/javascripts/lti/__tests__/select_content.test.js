@@ -40,7 +40,7 @@ describe('isContentMessage',() => {
   it('returns false if no content placements or message types are present', () => {
     expect(
       SelectContent.isContentMessage({message_type: 'ResourceLinkRequest'}, {assignment_selection: {}})
-    ).toBeTruthy()
+    ).toBeFalsy()
   })
 
   it('returns false if placement is undefined', () => {

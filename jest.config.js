@@ -29,7 +29,7 @@ module.exports = {
     'node_modules-version-of-backbone': require.resolve('backbone'),
     "\\.svg$": "<rootDir>/jest/imageMock.js"
   },
-  roots: ['app/jsx', 'app/coffeescripts'],
+  roots: ['app/jsx', 'app/coffeescripts', 'public/javascripts'],
   moduleDirectories: [
     'node_modules',
     'public/javascripts',
