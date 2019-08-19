@@ -16,24 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {string, func} from 'prop-types'
-import {TextArea} from '@instructure/ui-forms'
-
-export default function EmbedPanel({embedCode, setEmbedCode, label}) {
-  return (
-    <TextArea
-      maxHeight="10rem"
-      label={label}
-      value={embedCode}
-      placeholder={label}
-      onChange={e => setEmbedCode(e.target.value)}
-    />
-  )
+const screenfull = {
+  on() {},
+  off() {}
 }
-
-EmbedPanel.propTypes = {
-  embedCode: string.isRequired,
-  label: string.isRequired,
-  setEmbedCode: func.isRequired
-}
+export default screenfull

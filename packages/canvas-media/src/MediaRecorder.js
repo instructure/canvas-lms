@@ -20,12 +20,14 @@ import React from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {canUseMediaCapture, MediaCapture} from '@instructure/media-capture'
-import {object, string} from 'prop-types'
+import {func, object, string} from 'prop-types'
+
+import saveMediaRecording from './saveMediaRecording'
 
 export default class MediaRecorder extends React.Component {
-  // saveFile = (file) => {
-  //   this.props.contentProps.saveMediaRecording(file, this.props.editor, this.props.dismiss)
-  // }
+  saveFile = file => {
+    saveMediaRecording(file, this.props.contextId, this.props.contextType, this.props.dismiss)
+  }
 
   render() {
     return (
@@ -43,6 +45,9 @@ export default class MediaRecorder extends React.Component {
 }
 
 MediaRecorder.propTypes = {
+  contextId: string,
+  contextType: string,
+  dismiss: func,
   errorMessage: string.isRequired,
   MediaCaptureStrings: object // eslint-disable-line react/forbid-prop-types
 }

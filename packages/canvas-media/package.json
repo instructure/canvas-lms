@@ -44,6 +44,7 @@
     "@instructure/ui-themes": "^6.8.1",
     "@instructure/ui-toggle-details": "^6.8.1",
     "@instructure/uid": "^6.8.1",
+    "axios": "^0.18.0",
     "prop-types": "^15",
     "react": "^16",
     "react-dom": "^16"

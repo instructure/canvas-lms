@@ -25,6 +25,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-layout'
 
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
+import saveMediaRecording from './saveMediaRecording'
 import translationShape from './translationShape'
 
 const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionPanel'))
@@ -39,24 +40,6 @@ export const PANELS = {
   CLOSED_CAPTIONS: 3
 }
 
-export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecording, onDismiss) => {
-  switch (selectedPanel) {
-    case PANELS.COMPUTER: {
-      const {theFile} = uploadData
-      saveMediaRecording(theFile, editor, onDismiss)
-      break
-    }
-    case PANELS.EMBED: {
-      const {embedCode} = uploadData
-      editor.insertContent(embedCode)
-      onDismiss()
-      break
-    }
-    default:
-      throw new Error('Selected Panel is invalid') // Should never get here
-  }
-}
-
 export default class UploadMedia extends React.Component {
   static propTypes = {
     languages: arrayOf(
@@ -66,8 +49,15 @@ export default class UploadMedia extends React.Component {
       })
     ),
     liveRegion: func,
+    contextId: string,
+    contextType: string,
     onDismiss: func,
     open: bool,
+    tabs: shape({
+      embed: bool,
+      record: bool,
+      upload: bool
+    }),
     uploadMediaTranslations: translationShape
   }
 
@@ -76,6 +66,26 @@ export default class UploadMedia extends React.Component {
     hasUploadedFile: false,
     selectedPanel: 0,
     theFile: null
+  }
+
+  handleSubmit = () => {
+    switch (this.state.selectedPanel) {
+      case PANELS.COMPUTER: {
+        saveMediaRecording(
+          this.state.theFile,
+          this.props.contextId,
+          this.props.contextType,
+          this.props.onDismiss
+        )
+        break
+      }
+      case PANELS.EMBED: {
+        this.props.onDismiss()
+        break
+      }
+      default:
+        throw new Error('Selected Panel is invalid') // Should never get here
+    }
   }
 
   renderFallbackSpinner = () => {
@@ -104,51 +114,56 @@ export default class UploadMedia extends React.Component {
         maxWidth="large"
         onRequestTabChange={(_, {index}) => this.setState({selectedPanel: index})}
       >
-        <Tabs.Panel
-          isSelected={this.state.selectedPanel === PANELS.COMPUTER}
-          renderTitle={() => COMPUTER_PANEL_TITLE}
-        >
-          <Suspense fallback={this.renderFallbackSpinner()}>
-            <ComputerPanel
-              theFile={this.state.theFile}
-              setFile={file => this.setState({theFile: file})}
-              hasUploadedFile={this.state.hasUploadedFile}
-              setHasUploadedFile={uploadFileState =>
-                this.setState({hasUploadedFile: uploadFileState})
-              }
-              label={DRAG_FILE_TEXT}
-              uploadMediaTranslations={this.props.uploadMediaTranslations}
-              accept={ACCEPTED_FILE_TYPES}
-            />
-          </Suspense>
-        </Tabs.Panel>
-
-        <Tabs.Panel
-          isSelected={this.state.selectedPanel === PANELS.RECORD}
-          renderTitle={() => RECORD_PANEL_TITLE}
-        >
-          <Suspense fallback={this.renderFallbackSpinner()}>
-            <MediaRecorder
-              MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
-              errorMessage={UPLOADING_ERROR}
-              dismiss={this.props.onDismiss}
-            />
-          </Suspense>
-        </Tabs.Panel>
-
-        <Tabs.Panel
-          isSelected={this.state.selectedPanel === PANELS.EMBED}
-          renderTitle={() => EMBED_PANEL_TITLE}
-        >
-          <Suspense fallback={this.renderFallbackSpinner()}>
-            <EmbedPanel
-              label={EMBED_VIDEO_CODE_TEXT}
-              embedCode={this.state.embedCode}
-              setEmbedCode={embedCode => this.setState({embedCode})}
-            />
-          </Suspense>
-        </Tabs.Panel>
-
+        {this.props.tabs.upload && (
+          <Tabs.Panel
+            isSelected={this.state.selectedPanel === PANELS.COMPUTER}
+            renderTitle={() => COMPUTER_PANEL_TITLE}
+          >
+            <Suspense fallback={this.renderFallbackSpinner()}>
+              <ComputerPanel
+                theFile={this.state.theFile}
+                setFile={file => this.setState({theFile: file})}
+                hasUploadedFile={this.state.hasUploadedFile}
+                setHasUploadedFile={uploadFileState =>
+                  this.setState({hasUploadedFile: uploadFileState})
+                }
+                label={DRAG_FILE_TEXT}
+                uploadMediaTranslations={this.props.uploadMediaTranslations}
+                accept={ACCEPTED_FILE_TYPES}
+              />
+            </Suspense>
+          </Tabs.Panel>
+        )}
+        {this.props.tabs.record && (
+          <Tabs.Panel
+            isSelected={this.state.selectedPanel === PANELS.RECORD}
+            renderTitle={() => RECORD_PANEL_TITLE}
+          >
+            <Suspense fallback={this.renderFallbackSpinner()}>
+              <MediaRecorder
+                MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
+                contextType={this.props.contextType}
+                contextId={this.props.contextId}
+                errorMessage={UPLOADING_ERROR}
+                dismiss={this.props.onDismiss}
+              />
+            </Suspense>
+          </Tabs.Panel>
+        )}
+        {this.props.tabs.embed && (
+          <Tabs.Panel
+            isSelected={this.state.selectedPanel === PANELS.EMBED}
+            renderTitle={() => EMBED_PANEL_TITLE}
+          >
+            <Suspense fallback={this.renderFallbackSpinner()}>
+              <EmbedPanel
+                label={EMBED_VIDEO_CODE_TEXT}
+                embedCode={this.state.embedCode}
+                setEmbedCode={embedCode => this.setState({embedCode})}
+              />
+            </Suspense>
+          </Tabs.Panel>
+        )}
         <Tabs.Panel
           isSelected={this.state.selectedPanel === PANELS.CLOSED_CAPTIONS}
           renderTitle={() => CLOSED_CAPTIONS_PANEL_TITLE}
@@ -178,7 +193,7 @@ export default class UploadMedia extends React.Component {
         <Button
           onClick={e => {
             e.preventDefault()
-            handleSubmit()
+            this.handleSubmit()
           }}
           variant="primary"
           type="submit"
