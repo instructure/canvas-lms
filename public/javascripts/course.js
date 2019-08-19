@@ -27,4 +27,12 @@ import $ from 'jquery'
         event.stopPropagation();
       }
     });
+
+    $('.sm-course-menu').on('click', 'nav #section-tabs .section a', function() {
+      ga('send', 'event', 
+        'Navigation', 
+        'clicked',
+        'Course Navigation'
+      );
+    });
   });
