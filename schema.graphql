@@ -2562,6 +2562,7 @@ type SubmissionDraft {
   _id: ID!
   attachments: [File!]
   body: String
+  meetsAssignmentCriteria: Boolean!
   submissionAttempt: Int!
 }
 

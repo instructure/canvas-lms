@@ -147,7 +147,7 @@ describe('the assignment is uploaded', () => {
     const assignment = mockAssignment()
     const submission = legacyMockSubmission()
     assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {_id: '3', attachments: [{id: '4'}]}
+    submission.submissionDraft = {id: '3', meetsAssignmentCriteria: true}
     submission.state = 'unsubmitted'
     const {getByTestId, getByText} = render(
       <StepContainer assignment={assignment} submission={submission} />
@@ -160,7 +160,7 @@ describe('the assignment is uploaded', () => {
     const assignment = mockAssignment()
     const submission = legacyMockSubmission()
     assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {_id: '3', attachments: [{id: '4'}]}
+    submission.submissionDraft = {id: '3', meetsAssignmentCriteria: true}
     submission.state = 'unsubmitted'
     const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
 

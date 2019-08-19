@@ -36,4 +36,20 @@ class SubmissionDraft < ActiveRecord::Base
     end
   end
   private :submission_attempt_matches_submission
+
+  def meets_assignment_criteria?
+    # we just need to meet draft criteria for a single type to be valid
+    submission_types = self.submission.assignment.submission_types.split(',')
+    submission_types.each do |type|
+      case type
+      when 'online_text_entry'
+        return true if self.body.present?
+      when 'online_upload'
+        return true if self.attachments.present?
+      end
+    end
+
+    # return false if we did not meet our draft requirements for any of the types
+    false
+  end
 end
