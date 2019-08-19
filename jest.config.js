@@ -29,7 +29,7 @@ module.exports = {
     "^timezone$": "<rootDir>/public/javascripts/timezone_core.js",
     'node_modules-version-of-backbone': require.resolve('backbone')
   },
-  roots: ['app/jsx', 'app/coffeescripts'],
+  roots: ['app/jsx', 'app/coffeescripts', 'public/javascripts'],
   moduleDirectories: [
     'node_modules',
     'public/javascripts',
