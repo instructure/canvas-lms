@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Assignment} from '../graphqlData/Assignment'
+import {Assignment} from '../../graphqlData/Assignment'
 import {chunk} from 'lodash'
-import {DEFAULT_ICON, getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
+import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
-import LoadingIndicator from '../../shared/LoadingIndicator'
-import MoreOptions from './MoreOptions'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
+import MoreOptions from '../MoreOptions'
 import React, {Component} from 'react'
-import {Submission} from '../graphqlData/Submission'
-import {uploadFiles} from '../../../shared/upload_file'
+import {Submission} from '../../graphqlData/Submission'
+import {uploadFiles} from '../../../../shared/upload_file'
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'

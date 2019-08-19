@@ -19,16 +19,16 @@
 import {Assignment} from '../graphqlData/Assignment'
 import AssignmentAlert from './AssignmentAlert'
 import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
-import FilePreview from './FilePreview'
-import FileUpload from './FileUpload'
+import FilePreview from './AttemptType/FilePreview'
+import FileUpload from './AttemptType/FileUpload'
 import I18n from 'i18n!assignments_2_content_upload_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
+import MediaAttempt from './AttemptType/MediaAttempt'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import {Submission} from '../graphqlData/Submission'
-import TextEntry from './TextEntry'
-import MediaAttempt from './AttemptType/MediaAttempt'
+import TextEntry from './AttemptType/TextEntry'
 
 export default class AttemptTab extends Component {
   static propTypes = {

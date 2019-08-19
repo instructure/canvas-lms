@@ -17,7 +17,7 @@
  */
 
 import {fireEvent, render} from '@testing-library/react'
-import {mockSubmission} from '../../mocks'
+import {mockSubmission} from '../../../mocks'
 import React from 'react'
 import TextEntry from '../TextEntry'
 

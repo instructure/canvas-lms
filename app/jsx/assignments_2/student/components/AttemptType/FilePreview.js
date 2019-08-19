@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SubmissionFile} from '../graphqlData/File'
-import {getIconByType} from '../../../shared/helpers/mimeClassIconHelper'
+import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
-import LoadingIndicator from '../../shared/LoadingIndicator'
-import previewUnavailable from '../SVG/PreviewUnavailable.svg'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
+import previewUnavailable from '../../SVG/PreviewUnavailable.svg'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
+import {SubmissionFile} from '../../graphqlData/File'
 
 import {Button} from '@instructure/ui-buttons/lib/components'
 import {Flex, FlexItem} from '@instructure/ui-layout'

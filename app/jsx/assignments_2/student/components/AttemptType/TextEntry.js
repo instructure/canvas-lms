@@ -20,7 +20,7 @@ import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2_text_entry'
 import React from 'react'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
-import {Submission} from '../graphqlData/Submission'
+import {Submission} from '../../graphqlData/Submission'
 
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'

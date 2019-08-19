@@ -17,14 +17,14 @@
  */
 
 import $ from 'jquery'
-import * as uploadFileModule from '../../../../shared/upload_file'
-import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
+import * as uploadFileModule from '../../../../../shared/upload_file'
+import {DEFAULT_ICON} from '../../../../../shared/helpers/mimeClassIconHelper'
 import FileUpload from '../FileUpload'
 import {fireEvent, render, wait} from '@testing-library/react'
-import {mockAssignmentAndSubmission} from '../../mocks'
+import {mockAssignmentAndSubmission} from '../../../mocks'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
-import {SubmissionMocks} from '../../graphqlData/Submission'
+import {SubmissionMocks} from '../../../graphqlData/Submission'
 
 async function makeProps(overrides) {
   const assignmentAndSubmission = await mockAssignmentAndSubmission(overrides)
