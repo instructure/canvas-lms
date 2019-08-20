@@ -35,14 +35,14 @@ describe('AuditLogForm', () => {
     const assetStringInput = getByLabelText(/Asset/)
     const submitButton = getByText(/Find/)
 
+    // doesn't fire when assetString is blank
     fireEvent.click(submitButton)
-    expect(cb.mock.calls.length).toBe(1)
-    expect(cb.mock.calls[0][0]).toEqual({assetString: ''})
+    expect(cb.mock.calls.length).toBe(0)
 
     fireEvent.change(assetStringInput, {target: {value: 'user_123'}})
     fireEvent.click(submitButton)
-    expect(cb.mock.calls.length).toBe(2)
-    expect(cb.mock.calls[1][0]).toEqual({assetString: 'user_123'})
+    expect(cb.mock.calls.length).toBe(1)
+    expect(cb.mock.calls[0][0]).toEqual({assetString: 'user_123', startDate: null, endDate: null})
   })
 })
 
@@ -53,6 +53,8 @@ describe('AuditLogResults', () => {
         query: MUTATION_LOG_QUERY,
         variables: {
           assetString: 'user_123',
+          startDate: undefined,
+          endDate: undefined,
           first: 1
         }
       },
@@ -73,7 +75,7 @@ describe('AuditLogResults', () => {
                   },
                   realUser: null,
                   params: {
-                    test: "I AM A PARAMETER",
+                    test: 'I AM A PARAMETER'
                   },
                   __typename: 'MutationLog'
                 }
@@ -95,6 +97,8 @@ describe('AuditLogResults', () => {
         query: MUTATION_LOG_QUERY,
         variables: {
           assetString: 'user_123',
+          startDate: undefined,
+          endDate: undefined,
           first: 1,
           after: 'cursor1'
         }
@@ -136,6 +140,8 @@ describe('AuditLogResults', () => {
         query: MUTATION_LOG_QUERY,
         variables: {
           assetString: 'user_456',
+          startDate: undefined,
+          endDate: undefined,
           first: 100
         }
       },
@@ -161,7 +167,9 @@ describe('AuditLogResults', () => {
         query: MUTATION_LOG_QUERY,
         variables: {
           assetString: 'error_1',
-          first: 100,
+          startDate: undefined,
+          endDate: undefined,
+          first: 100
         }
       },
       error: new Error('uh oh')
@@ -192,7 +200,7 @@ describe('AuditLogResults', () => {
     expect(loadMoreButton).toBeInTheDocument()
 
     fireEvent.click(loadMoreButton)
-    expect(await waitForElement(() => getByText("Doctor"))).toBeInTheDocument()
+    expect(await waitForElement(() => getByText('Doctor'))).toBeInTheDocument()
     expect(getByText(/No more/)).toBeInTheDocument()
   })
 
