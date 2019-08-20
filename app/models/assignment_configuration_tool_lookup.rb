@@ -46,6 +46,10 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     end
 
     def recreate_missing_subscriptions(account, message_handler)
+      Rails.logger.info do
+        "in: AssignmentConfigurationToolLookup::recreate_missing_subscriptions,"\
+        "account_id: #{account.id}, handler_id: #{message_handler.id}"
+      end
       Assignment.active.where(
         context_id: Course.not_deleted.where(account: account).pluck(:id)
       ).find_in_batches do |assignments|
@@ -56,6 +60,10 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     private
 
     def recreate_subscriptions(message_handler, assignments)
+      Rails.logger.info do
+        "in: AssignmentConfigurationToolLookup::recreate_subscriptions, "\
+        "handler_id: #{message_handler.id}, assignments_size: #{assignments.count}"
+      end
       by_message_handler(message_handler, assignments).each do |lookup|
         lookup.destroy_subscription
         lookup.create_subscription
@@ -79,6 +87,7 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
   end
 
   def destroy_subscription
+    Rails.logger.info { "in: AssignmentConfigurationToolLookup::destroy_subscription, tool_lookup_id: #{id}" }
     return unless lti_tool.instance_of? Lti::MessageHandler
     tool_proxy = lti_tool.resource_handler.tool_proxy
     Lti::AssignmentSubscriptionsHelper.new(tool_proxy).destroy_subscription(subscription_id)

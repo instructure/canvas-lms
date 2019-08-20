@@ -33,6 +33,10 @@ module Services
       end
 
       def create_tool_proxy_subscription(tool_proxy, subscription)
+        Rails.logger.info do
+          "in: LiveEventsSubscriptionService::create_tool_proxy_subscription, "\
+          "tool_proxy_id: #{tool_proxy.id}, subscription: #{subscription}"
+        end
         options = {
           headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
           body: subscription.to_json
@@ -49,6 +53,10 @@ module Services
       end
 
       def destroy_tool_proxy_subscription(tool_proxy, subscription_id)
+        Rails.logger.info do
+          "in: LiveEventsSubscriptionService::destroy_tool_proxy_subscription, "\
+          "tool_proxy_id: #{tool_proxy.id}, subscription_id: #{subscription_id}"
+        end
         options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
       end

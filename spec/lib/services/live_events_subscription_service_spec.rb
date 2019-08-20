@@ -87,6 +87,7 @@ module Services
 
       let(:tool_proxy) do
         tool_proxy = double()
+        allow(tool_proxy).to receive(:id).and_return('1')
         allow(tool_proxy).to receive(:guid).and_return('151b52cd-d670-49fb-bf65-6a327e3aaca0')
         allow(tool_proxy).to receive(:product_family).and_return(product_family)
         tool_proxy
