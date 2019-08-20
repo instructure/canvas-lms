@@ -31,13 +31,12 @@ import I18n from 'i18n!webzip_exports'
     constructor (props) {
       super(props)
       this.state = {completed: false}
-      this.onComplete = this.onComplete.bind(this)
     }
 
-    onComplete () {
+    onComplete = () => {
       this.setState({completed: true})
       this.props.loadExports(this.props.webzip.progressId)
-    }
+    };
 
     render () {
       if (!this.props.webzip || this.state.completed) {

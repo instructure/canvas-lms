@@ -24,12 +24,6 @@ export default class ZipUploader extends BaseUploader {
   constructor(fileOptions, folder, contextId, contextType) {
     super(fileOptions, folder)
 
-    this.onPreflightComplete = this.onPreflightComplete.bind(this)
-    this.onUploadPosted = this.onUploadPosted.bind(this)
-    this.getContentMigration = this.getContentMigration.bind(this)
-    this.pullMigrationProgress = this.pullMigrationProgress.bind(this)
-    this.trackProgress = this.trackProgress.bind(this)
-
     this.contextId = contextId
     this.contextType = contextType
     this.migrationProgress = 0
@@ -56,18 +50,18 @@ export default class ZipUploader extends BaseUploader {
     return `/api/v1/${this.contextType}/${this.contextId}/content_migrations`
   }
 
-  onPreflightComplete(data) {
+  onPreflightComplete = data => {
     this.uploadData = data.pre_attachment
     this.contentMigrationId = data.id
     return this._actualUpload()
-  }
+  };
 
-  onUploadPosted() {
+  onUploadPosted = () => {
     return this.getContentMigration()
-  }
+  };
 
   // get the content migration when ready and use progress api to pull migration progress
-  getContentMigration() {
+  getContentMigration = () => {
     return $.getJSON(
       `/api/v1/${this.contextType}/${this.contextId}/content_migrations/${this.contentMigrationId}`
     ).then(results => {
@@ -77,9 +71,9 @@ export default class ZipUploader extends BaseUploader {
         return this.pullMigrationProgress(results.progress_url)
       }
     })
-  }
+  };
 
-  pullMigrationProgress(url) {
+  pullMigrationProgress = url => {
     return $.getJSON(url).then(results => {
       this.trackMigrationProgress(results.completion || 0)
       if (results.workflow_state === 'failed') {
@@ -92,7 +86,7 @@ export default class ZipUploader extends BaseUploader {
         return this.onMigrationComplete()
       }
     })
-  }
+  };
 
   onMigrationComplete() {
     // reload to get new files to appear
@@ -101,10 +95,10 @@ export default class ZipUploader extends BaseUploader {
       .then(() => this.folder.files.fetch({reset: true}).then(() => this.deferred.resolve()))
   }
 
-  trackProgress(e) {
+  trackProgress = e => {
     this.progress = e.loaded / e.total
     return this.onProgress(this.progress, this.file)
-  }
+  };
 
   // migration progress is [0..100]
   trackMigrationProgress(value) {

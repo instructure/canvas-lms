@@ -19,15 +19,9 @@
 import React from 'react'
 
   class FlickrImage extends React.Component {
-    constructor (props) {
-      super(props);
-
-      this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick (event) {
+    handleClick = event => {
       this.props.selectImage(this.props.url);
-    }
+    };
 
     render () {
 

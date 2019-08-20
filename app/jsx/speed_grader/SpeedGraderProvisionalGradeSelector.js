@@ -59,16 +59,13 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
   constructor(props) {
     super(props)
     this.state = {detailsVisible: false}
-
-    this.onDetailsToggled = this.onDetailsToggled.bind(this)
-    this.handleGradeSelected = this.handleGradeSelected.bind(this)
   }
 
-  onDetailsToggled() {
+  onDetailsToggled = () => {
     this.setState(prevState => ({detailsVisible: !prevState.detailsVisible}))
-  }
+  };
 
-  handleGradeSelected(_event, value) {
+  handleGradeSelected = (_event, value) => {
     // If this is the current user's grade, we'll need to submit the changes
     // to the server
     if (value === NEW_CUSTOM_GRADE) {
@@ -79,7 +76,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
       )
       this.props.onGradeSelected({selectedGrade})
     }
-  }
+  };
 
   renderRadioInputLabel(grade) {
     const {pointsPossible} = this.props

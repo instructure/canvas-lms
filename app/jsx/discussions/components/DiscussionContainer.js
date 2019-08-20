@@ -90,7 +90,6 @@ export class DiscussionsContainer extends Component {
 
   constructor(props) {
     super(props)
-    this.moveCard = this.moveCard.bind(this)
     this.state = {
       discussions: props.discussions,
       expanded: true
@@ -139,7 +138,7 @@ export class DiscussionsContainer extends Component {
     this.toggleBtn = c && c.querySelector('button')
   }
 
-  moveCard(dragIndex, hoverIndex) {
+  moveCard = (dragIndex, hoverIndex) => {
     // Only pinned discussions can be repositioned, others are sorted by
     // recent activity
     if (!this.props.pinned) {
@@ -158,7 +157,7 @@ export class DiscussionsContainer extends Component {
       }
     })
     this.setState({discussions: newDiscussions.discussions})
-  }
+  };
 
   renderDiscussions() {
     return this.state.discussions.map(discussion =>

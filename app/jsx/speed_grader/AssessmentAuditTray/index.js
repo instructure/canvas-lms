@@ -47,9 +47,6 @@ export default class AssessmentAuditTray extends Component {
   constructor(props) {
     super(props)
 
-    this.dismiss = this.dismiss.bind(this)
-    this.show = this.show.bind(this)
-
     this.state = {
       auditEventsLoaded: false,
       auditTrail: buildAuditTrail({}),
@@ -57,11 +54,11 @@ export default class AssessmentAuditTray extends Component {
     }
   }
 
-  dismiss() {
+  dismiss = () => {
     this.setState({open: false})
-  }
+  };
 
-  show(context) {
+  show = context => {
     this.setState({
       ...context,
       auditEventsLoaded: false,
@@ -83,7 +80,7 @@ export default class AssessmentAuditTray extends Component {
         }
       })
     /* eslint-enable promise/catch-or-return */
-  }
+  };
 
   render() {
     if (!this.state.assignment) {

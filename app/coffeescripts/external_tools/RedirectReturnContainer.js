@@ -18,35 +18,28 @@
 import $ from 'jquery'
 
 export default class RedirectReturnContainer {
-  constructor() {
-    this._contentReady = this._contentReady.bind(this)
-    this._contentCancel = this._contentCancel.bind(this)
-    this.redirectToSuccessUrl = this.redirectToSuccessUrl.bind(this)
-    this.createMigration = this.createMigration.bind(this)
-  }
-
   attachLtiEvents() {
     $(window).on('externalContentReady', this._contentReady)
     $(window).on('externalContentCancel', this._contentCancel)
   }
 
-  _contentReady(event, data) {
+  _contentReady = (event, data) => {
     if (data && data.return_type === 'file') {
       return this.createMigration(data.url)
     } else {
       return this.redirectToSuccessUrl()
     }
-  }
+  };
 
-  _contentCancel(event, data) {
+  _contentCancel = (event, data) => {
     location.href = this.cancelUrl
-  }
+  };
 
-  redirectToSuccessUrl() {
+  redirectToSuccessUrl = () => {
     location.href = this.successUrl
-  }
+  };
 
-  createMigration(file_url) {
+  createMigration = file_url => {
     const data = {
       migration_type: 'canvas_cartridge_importer',
       settings: {
@@ -56,7 +49,7 @@ export default class RedirectReturnContainer {
 
     const migrationUrl = `/api/v1/courses/${ENV.course_id}/content_migrations`
     return $.ajaxJSON(migrationUrl, 'POST', data, this.redirectToSuccessUrl, this.handleError)
-  }
+  };
 
   handleError(data) {
     return $.flashError(data.message)

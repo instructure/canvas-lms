@@ -20,22 +20,15 @@ import React from 'react'
 import I18n from 'i18n!course_images'
 
 class UploadArea extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.handleFileChange = this.handleFileChange.bind(this)
-    this.uploadFile = this.uploadFile.bind(this)
-  }
-
-  handleFileChange(e) {
+  handleFileChange = e => {
     this.props.handleFileUpload(e, this.props.courseId)
     e.preventDefault()
     e.stopPropagation()
-  }
+  };
 
-  uploadFile() {
+  uploadFile = () => {
     this.refs.courseImagefileUpload.click()
-  }
+  };
 
   render() {
     return (

@@ -24,16 +24,10 @@ import LoadMore from '../shared/load-more'
 import store from './store/store'
 
   class CollaborationsList extends React.Component {
-
-    constructor (props) {
-      super(props);
-      this.loadMoreCollaborations = this.loadMoreCollaborations.bind(this);
-    }
-
-    loadMoreCollaborations () {
+    loadMoreCollaborations = () => {
       ReactDOM.findDOMNode(this.refs[`collaboration-${this.props.collaborationsState.list.length - 1}`]).focus();
       store.dispatch(this.props.getCollaborations(this.props.collaborationsState.nextPage));
-    }
+    };
 
     render () {
       return (
