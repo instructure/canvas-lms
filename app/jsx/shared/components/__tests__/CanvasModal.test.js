@@ -17,19 +17,25 @@
  */
 
 import React from 'react'
-import CanvasTray from '../CanvasTray'
 import {render, fireEvent} from '@testing-library/react'
+import CanvasModal from '../CanvasModal'
 
-describe('CanvasTray', () => {
-  it('renders header, close button, children', () => {
+describe('CanvasModal', () => {
+  it('renders a header, close button, and children', () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(
-      <CanvasTray open label="Do the thing" onDismiss={handleDismiss}>
-        Tray Content
-      </CanvasTray>
+      <CanvasModal
+        open
+        label="Do the thing"
+        onDismiss={handleDismiss}
+        footer={<span>The Footer</span>}
+      >
+        Dialog Content
+      </CanvasModal>
     )
     expect(getByText('Do the thing').tagName).toBe('H2')
-    expect(getByText('Tray Content')).toBeInTheDocument()
+    expect(getByText('Dialog Content')).toBeInTheDocument()
+    expect(getByText('The Footer')).toBeInTheDocument()
     const closeButton = getByText('Close').closest('button')
     expect(closeButton).toBeInTheDocument()
     fireEvent.click(closeButton)
@@ -52,9 +58,9 @@ describe('CanvasTray', () => {
       }
 
       const {getByText} = render(
-        <CanvasTray open label="Do the thing">
+        <CanvasModal open label="Do the thing">
           <ThrowError />
-        </CanvasTray>
+        </CanvasModal>
       )
       expect(getByText(/something broke/i)).toBeInTheDocument()
       // Header and close button should still be there

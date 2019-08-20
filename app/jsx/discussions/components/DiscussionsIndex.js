@@ -28,8 +28,8 @@ import {View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Spinner, Heading, Text} from '@instructure/ui-elements'
 
-import CanvasTray from 'jsx/shared/components/CanvasTray'
 import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 
 import {
   ConnectedDiscussionsContainer,
@@ -251,13 +251,10 @@ export default class DiscussionsIndex extends Component {
           />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <CanvasTray
+          <DirectShareUserModal
             open={this.props.sendToOpen}
-            label={I18n.t('Send To...')}
             onDismiss={() => this.props.setSendToOpen(false)}
-          >
-            TODO: Implement
-          </CanvasTray>
+          />
         )}{' '}
       </View>
     )
@@ -300,7 +297,7 @@ const connectState = (state, ownProps) => {
     sendToOpen: state.sendToOpen,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
   }
-  return Object.assign({}, ownProps, fromPagination, fromState)
+  return {...ownProps, ...fromPagination, ...fromState}
 }
 const connectActions = dispatch =>
   bindActionCreators(

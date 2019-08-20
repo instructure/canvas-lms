@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, string } from 'prop-types'
+import useFetchApi from './useFetchApi'
 
-const basicUser = shape({
-  id: string.isRequired,
-  display_name: string.isRequired,
-  avatar_image_url: string,
-  email: string
-})
-export default basicUser
+export default function useContentShareUserSearchApi(opts) {
+  const {courseId, ...fetchApiOpts} = opts
+  if (!courseId) throw new Error('courseId parameter is required for useContentShareUserSearchApi')
 
-// we might add more comprehensive user shapes in the future
-export const author = shape({
-  id: string.isRequired,
-  display_name: string.isRequired,
-  avatar_image_url: string,
-  html_url: string.isRequired,
-})
+  // need at least 3 characters for the search_term.
+  const searchTerm = fetchApiOpts.params.search_term || ''
+  let forceResult
+  if (searchTerm.length < 3) forceResult = null
+
+  useFetchApi({
+    path: `/api/v1/courses/${courseId}/content_share_users`,
+    forceResult,
+    ...fetchApiOpts
+  })
+}

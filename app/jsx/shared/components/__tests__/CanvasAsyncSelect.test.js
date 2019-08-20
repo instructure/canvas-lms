@@ -135,17 +135,4 @@ describe('CanvasAsyncSelect', () => {
     fireEvent.click(option)
     expect(domGetByText(ariaLive, /option selected.+bar.+list collapsed/i)).toBeInTheDocument()
   })
-
-  it('reports no selection if there was a selection and the input changes', () => {
-    const handleOptionSelected = jest.fn()
-    const {input, getByText} = renderSelect({
-      onOptionSelected: handleOptionSelected,
-      options: [{id: 'foo', label: 'bar'}]
-    })
-    fireEvent.click(input)
-    const option = getByText('bar')
-    fireEvent.click(option)
-    fireEvent.change(input, {target: {value: 'abc'}})
-    expect(handleOptionSelected).toHaveBeenCalledWith(expect.anything(), null)
-  })
 })

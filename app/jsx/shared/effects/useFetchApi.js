@@ -16,27 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
-import {useEffect, useRef} from 'react'
+import useImmediate from '../hooks/useImmediate'
 import doFetchApi from './doFetchApi'
 
-// this is a nicety so we only run the search effect if the parameters have
-// deeply changed. If we didn't do this and the consumer of this effect wasn't
-// careful about the identity of the params object they were passing in, we
-// could wind up redoing the search on every render. This also lets us safely
-// use `{}` as a default parameter
-function useOldestUnchanged(nextParams) {
-  const oldParamsRef = useRef(nextParams)
-  const shouldUpdate = !_.isEqual(oldParamsRef.current, nextParams)
-  const result = shouldUpdate ? nextParams : oldParamsRef.current
-  useEffect(() => {
-    oldParamsRef.current = result
-  })
-  return result
-}
+// useImmediate for deep comparisons and may help avoid browser flickering
 
 // utility for making it easy to abort the fetch
-function abortable({success, error}) {
+function abortable({success, error, loading}) {
   const aborter = new AbortController()
   let active = true
   return {
@@ -45,6 +31,9 @@ function abortable({success, error}) {
     },
     activeError: (...p) => {
       if (active && error) error(...p)
+    },
+    activeLoading: (...p) => {
+      if (active && loading) loading(...p)
     },
     abort: () => {
       active = false
@@ -57,6 +46,7 @@ function abortable({success, error}) {
 export default function useFetchApi({
   success,
   error,
+  loading,
   path,
   convert,
   forceResult,
@@ -64,38 +54,40 @@ export default function useFetchApi({
   headers = {},
   fetchOpts = {}
 }) {
-  const oldestUnchangedParams = useOldestUnchanged(params)
-  const oldestUnchangedHeaders = useOldestUnchanged(headers)
-  const oldestUnchangedFetchOpts = useOldestUnchanged(fetchOpts)
-  const oldestForceResult = useOldestUnchanged(forceResult)
-  useEffect(() => {
-    if (oldestForceResult !== undefined) {
-      success(oldestForceResult)
+  useImmediate(() => {
+    if (forceResult !== undefined) {
+      success(forceResult)
       return
     }
 
     // prevent sending results and errors from stale queries
-    const {activeSuccess, activeError, abort, signal} = abortable({success, error})
+    const {activeSuccess, activeError, activeLoading, abort, signal} = abortable({success, error, loading})
+    activeLoading(true)
     doFetchApi({
       path,
-      headers: oldestUnchangedHeaders,
-      params: oldestUnchangedParams,
-      fetchOpts: {signal, ...oldestUnchangedFetchOpts}
+      headers,
+      params,
+      fetchOpts: {signal, ...fetchOpts}
     })
       .then(result => {
         if (convert && result) result = convert(result)
+        activeLoading(false)
         activeSuccess(result)
       })
-      .catch(err => activeError(err))
+      .catch(err => {
+        activeLoading(false)
+        activeError(err)
+      })
     return abort
   }, [
     success,
     error,
+    loading,
     path,
     convert,
-    oldestUnchangedHeaders,
-    oldestUnchangedParams,
-    oldestUnchangedFetchOpts,
-    oldestForceResult
-  ])
+    headers,
+    params,
+    fetchOpts,
+    forceResult
+  ], {deep: true})
 }
