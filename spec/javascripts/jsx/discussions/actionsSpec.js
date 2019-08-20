@@ -177,7 +177,7 @@ test('handleDrop throws exception if updating a field that does not exist on the
   const dispatchSpy = sinon.spy()
 
   assert.throws(
-    function() {
+    () => {
       actions.handleDrop(discussion, updateFields, {})(dispatchSpy, () => state)
     },
     "field foobar does not exist in the discussion"

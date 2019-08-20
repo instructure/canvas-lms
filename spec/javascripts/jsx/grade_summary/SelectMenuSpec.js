@@ -19,7 +19,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import SelectMenu from 'jsx/grade_summary/SelectMenu'
 
-QUnit.module('SelectMenu', function(hooks) {
+QUnit.module('SelectMenu', hooks => {
   let props
   let wrapper
 
@@ -39,7 +39,7 @@ QUnit.module('SelectMenu', function(hooks) {
     return selectMenuOptions()[selectMenu().instance().selectedIndex]
   }
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(() => {
     const options = [
       {id: '3', name: 'Guy B. Studying', url: '/some/url/3'},
       {id: '14', name: 'Jane Doe', url: '/some/url/14'},
@@ -58,27 +58,27 @@ QUnit.module('SelectMenu', function(hooks) {
     }
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(() => {
     wrapper.unmount()
   })
 
-  test('initializes showing the option with the default value', function() {
+  test('initializes showing the option with the default value', () => {
     wrapper = mountComponent()
     strictEqual(selectedOption().innerText, 'Jane Doe')
   })
 
-  test('generates one option per item in the options prop', function() {
+  test('generates one option per item in the options prop', () => {
     wrapper = mountComponent()
     strictEqual(selectMenuOptions().length, 3)
   })
 
-  test('uses the textAttribute prop to determine the text for each option', function() {
+  test('uses the textAttribute prop to determine the text for each option', () => {
     props.textAttribute = 'url'
     wrapper = mountComponent()
     strictEqual(selectedOption().innerText, '/some/url/14')
   })
 
-  test('textAttribute can be a number that represents the index of the text attribute', function() {
+  test('textAttribute can be a number that represents the index of the text attribute', () => {
     props.defaultValue = 'due_date'
     props.options = [['Title', 'title'], ['Due Date', 'due_date']]
     props.textAttribute = 0
@@ -87,14 +87,14 @@ QUnit.module('SelectMenu', function(hooks) {
     strictEqual(selectedOption().innerText, 'Due Date')
   })
 
-  test('uses the valueAttribute prop to determine the value for each option', function() {
+  test('uses the valueAttribute prop to determine the value for each option', () => {
     props.defaultValue = '/some/url/14'
     props.valueAttribute = 'url'
     wrapper = mountComponent()
     strictEqual(selectedOption().value, '/some/url/14')
   })
 
-  test('valueAttribute can be a number that represents the index of the value attribute', function() {
+  test('valueAttribute can be a number that represents the index of the value attribute', () => {
     props.defaultValue = 'due_date'
     props.options = [['Title', 'title'], ['Due Date', 'due_date']]
     props.textAttribute = 0
@@ -103,7 +103,7 @@ QUnit.module('SelectMenu', function(hooks) {
     strictEqual(selectedOption().value, 'due_date')
   })
 
-  test('is disabled if passed disabled: true', function() {
+  test('is disabled if passed disabled: true', () => {
     props.disabled = true
     wrapper = mountComponent()
     strictEqual(
@@ -114,7 +114,7 @@ QUnit.module('SelectMenu', function(hooks) {
     )
   })
 
-  test('calls onChange when the menu is changed', function() {
+  test('calls onChange when the menu is changed', () => {
     props.onChange = sinon.stub()
     wrapper = mountComponent()
     selectMenu().simulate('change', {target: {value: '3'}})

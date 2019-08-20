@@ -22,7 +22,7 @@ import {allReducers} from 'jsx/gradebook-history/reducers/Reducer'
 
 QUnit.module('Reducer')
 
-test('should combine all the reducers available', function() {
+test('should combine all the reducers available', () => {
   const expectedReducers = {history, searchForm}
 
   deepEqual(allReducers(), expectedReducers)

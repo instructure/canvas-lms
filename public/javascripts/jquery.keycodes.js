@@ -59,7 +59,7 @@ $.fn.keycodes = function(options, fn) {
   var keyCodes = [];
   var originalCodes = [];
   var codes = options.keyCodes.split(" ");
-  $.each(codes, function(i, code) {
+  $.each(codes, (i, code) => {
     originalCodes.push(code);
     code = code.split("+").sort().join("+").toLowerCase();
     keyCodes.push(code);

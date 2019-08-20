@@ -38,7 +38,7 @@ import './jquery.templateData' /* fillTemplateData */
           $dialog.find(".loading_message").text(I18n.t('messages.loading_students', "Loading Students..."));
           $dialog.find(".student_options option:not(.blank)").remove();
           var url = $dialog.find(".student_url").attr('href');
-          $.ajaxJSON(url, 'GET', {}, function(data) {
+          $.ajaxJSON(url, 'GET', {}, data => {
             for(var idx in data) {
               var user = data[idx];
               var $option = $("<option/>");
@@ -57,7 +57,7 @@ import './jquery.templateData' /* fillTemplateData */
             link_enrollment.updateDialog($dialog, enrollment_id, current_user_id)
 
             $dialog.data('loaded', true);
-          }, function() {
+          }, () => {
             $dialog.find(".loading_message").text(I18n.t('errors.load_failed', "Loading Students Failed, please try again"));
           });
         } else {
@@ -83,10 +83,10 @@ import './jquery.templateData' /* fillTemplateData */
     };
   })();
   $(document).ready(function() {
-    $(document).bind('enrollment_added', function() {
+    $(document).bind('enrollment_added', () => {
       $("#link_student_dialog").data('loaded', false);
     });
-    $("#link_student_dialog .cancel_button").click(function() {
+    $("#link_student_dialog .cancel_button").click(() => {
       $("#link_student_dialog").dialog('close');
     });
     $("#link_student_dialog_form").formSubmit({

@@ -45,7 +45,7 @@ QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
   }
 });
 
-test('sets focus to the edit button when hide_edit occurs', function () {
+test('sets focus to the edit button when hide_edit occurs', () => {
   fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>');
   fixtures.create('<form id="edit_course_syllabus_form"></form>');
   SyllabusBehaviors.bindToEditSyllabus();
@@ -53,19 +53,19 @@ test('sets focus to the edit button when hide_edit occurs', function () {
   equal(document.activeElement, $('.edit_syllabus_link')[0]);
 });
 
-test('initializes sidebar when edit link present', function () {
+test('initializes sidebar when edit link present', () => {
   fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>');
   SyllabusBehaviors.bindToEditSyllabus();
   ok(Sidebar.init.called, 'foo');
 });
 
-test('skips initializing sidebar when edit link absent', function () {
+test('skips initializing sidebar when edit link absent', () => {
   equal(fixtures.find('.edit_syllabus_link').length, 0);
   SyllabusBehaviors.bindToEditSyllabus();
   ok(Sidebar.init.notCalled, 'bar');
 });
 
-test('sets syllabus_body data value on fresh node when showing edit form', function () {
+test('sets syllabus_body data value on fresh node when showing edit form', () => {
   const fresh = { val: sinon.spy() };
   sandbox.stub(RichContentEditor, 'freshNode').returns(fresh);
   sandbox.stub(RichContentEditor, 'loadNewEditor');
@@ -83,7 +83,7 @@ test('sets syllabus_body data value on fresh node when showing edit form', funct
   ok(fresh.val.calledWith(text));
 });
 
-test('sets course_syllabus_body after mce destruction', function () {
+test('sets course_syllabus_body after mce destruction', () => {
   sandbox.stub(RichContentEditor, 'destroyRCE').callsFake( ()=> {
      let elem = document.getElementById('course_syllabus_body');
      elem.parentNode.removeChild(elem);

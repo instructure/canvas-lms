@@ -119,9 +119,7 @@ function folderTree(state = {}, action) {
 
       for (const parentFolderId in tree) {
         const children = tree[parentFolderId];
-        children.sort(function(a, b) {
-          return folders[a].name.localeCompare(folders[b].name);
-        });
+        children.sort((a, b) => folders[a].name.localeCompare(folders[b].name));
       }
 
       return tree;

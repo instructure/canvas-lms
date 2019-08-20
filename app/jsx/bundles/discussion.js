@@ -200,15 +200,15 @@ filterModel.on('reset', () => EntryView.expandRootEntries())
 const canReadReplies = () => ENV.DISCUSSION.PERMISSIONS.CAN_READ_REPLIES
 
 // routes
-router.route('topic', 'topic', function () {
+router.route('topic', 'topic', () => {
   $container.scrollTop($('#discussion_topic'))
-  setTimeout(function () {
+  setTimeout(() => {
     $('#discussion_topic .author').focus()
     $container.one('scroll', () => router.navigate(''))
   }, 10)
 })
 router.route('entry-:id', 'id', entriesView.goToEntry.bind(entriesView))
-router.route('page-:page', 'page', function (page) {
+router.route('page-:page', 'page', page => {
   entriesView.render(page)
   // TODO: can get a little bouncy when the page isn't as tall as the previous
   scrollToTop()

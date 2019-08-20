@@ -35,7 +35,7 @@ import './jquery.instructure_misc_helpers' /* replaceTags */
         //  todo: replace .andSelf with .addBack when JQuery is upgraded.
         this.find("*").andSelf().each(function(){
           var $el = $(this);
-          $.each(["name", "id", "class"], function(i, attr){
+          $.each(["name", "id", "class"], (i, attr) => {
             if ( $el.attr(attr) ) {
               $el.attr(attr, $el.attr(attr).replace(/-iterator-/, options.iterator));
             }
@@ -128,7 +128,7 @@ import './jquery.instructure_misc_helpers' /* replaceTags */
     var result = {}, item, val;
     if(options.textValues) {
       var _this = this;
-      options.textValues.forEach(function(item) {
+      options.textValues.forEach(item => {
         var $item = _this.find("." + item.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ":first");
         val = $.trim($item.text());
         if($item.html() === "&nbsp;") { val = ""; }

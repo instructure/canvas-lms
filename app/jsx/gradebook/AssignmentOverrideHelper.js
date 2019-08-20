@@ -27,7 +27,7 @@ function studentIDCollections(students) {
   const sections = {}
   const groups = {}
 
-  _.each(students, function(student) {
+  _.each(students, student => {
     _.each(
       student.sections,
       sectionID => (sections[sectionID] = addStudentID(student, sections[sectionID]))
@@ -68,7 +68,7 @@ function effectiveDueDatesOnOverride(
 ) {
   const studentIDs = studentIDsOnOverride(override, studentIDsInSections, studentIDsInGroups)
 
-  _.each(studentIDs, function(studentID) {
+  _.each(studentIDs, studentID => {
     const existingDate = studentDueDateMap[studentID]
     const newDate = tz.parse(override.due_at)
     studentDueDateMap[studentID] = getLatestDefinedDate(newDate, existingDate)
@@ -86,7 +86,7 @@ function effectiveDueDatesForAssignment(assignment, overrides, students) {
     {}
   )
 
-  _.each(students, function(student) {
+  _.each(students, student => {
     if (dates[student.id] === undefined && !assignment.only_visible_to_overrides) {
       dates[student.id] = tz.parse(assignment.due_at)
     }

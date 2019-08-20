@@ -66,7 +66,7 @@ export default class ImageSearch extends React.Component {
         toFocus = this._imageSearchControlNext || this._imageSearchControlPrev || this._imageSearchInput
     }
     if (toFocus) {
-      setTimeout(function() { toFocus.focus() }, 0)
+      setTimeout(() => { toFocus.focus() }, 0)
     }
   }
 

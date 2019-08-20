@@ -120,7 +120,7 @@ import 'jqueryui/dialog'
           var $div = ("<div class='lock_reason_content'></div><div class='button-container'><button type='button' class='btn' >" +
                   htmlEscape(I18n.t('buttons.ok_thanks', "Ok, Thanks")) + "</button></div>");
           $dialog.append($div);
-          $dialog.find(".button-container .btn").click(function() {
+          $dialog.find(".button-container .btn").click(() => {
             $dialog.dialog('close');
           });
         }

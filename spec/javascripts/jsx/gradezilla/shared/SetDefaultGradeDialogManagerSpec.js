@@ -69,7 +69,7 @@ function createStudentsProp() {
 
 QUnit.module('SetDefaultGradeDialogManager#isDialogEnabled')
 
-test('returns true when submissions are loaded', function() {
+test('returns true when submissions are loaded', () => {
   const manager = new SetDefaultGradeDialogManager(
     createAssignmentProp(),
     createStudentsProp(),
@@ -82,7 +82,7 @@ test('returns true when submissions are loaded', function() {
   ok(manager.isDialogEnabled())
 })
 
-test('returns false when submissions are not loaded', function() {
+test('returns false when submissions are not loaded', () => {
   const manager = new SetDefaultGradeDialogManager(
     createAssignmentProp(),
     createStudentsProp(),

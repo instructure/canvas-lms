@@ -77,7 +77,7 @@ test('it should be accessible', assert => {
   assertions.isAccessible(courseFindSelectView, done, {a11yReport: true})
 })
 
-test('Triggers "course_changed" when course is found by its id', function() {
+test('Triggers "course_changed" when course is found by its id', () => {
   const courseFindSelectView = new CourseFindSelectView({model: new Backbone.Model()})
   const course = {id: 42}
   courseFindSelectView.courses = [course]

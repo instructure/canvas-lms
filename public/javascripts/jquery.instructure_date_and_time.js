@@ -204,7 +204,7 @@ import 'jqueryui/datepicker'
       picker.input.val(text).change();
     };
     if(!$.fn.datepicker.timepicker_initialized) {
-      $(document).delegate('.ui-datepicker-ok', 'click', function(event) {
+      $(document).delegate('.ui-datepicker-ok', 'click', event => {
         var cur = $.datepicker._curInst;
         var inst = cur;
         var sel = $('td.' + $.datepicker._dayOverClass +
@@ -253,7 +253,7 @@ import 'jqueryui/datepicker'
       $(document).delegate(".ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm", 'mousedown', function(event) {
         $(this).focus();
       });
-      $(document).delegate(".ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm", 'change keypress focus blur', function(event) {
+      $(document).delegate(".ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm", 'change keypress focus blur', event => {
         if(event.keyCode && event.keyCode == 13) {
           var cur = $.datepicker._curInst;
           var inst = cur;

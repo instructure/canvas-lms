@@ -47,7 +47,7 @@ test('returns false when assignment submssions have not been downloaded', () => 
 
 QUnit.module('ReuploadSubmissionsDialogManager#showDialog')
 
-test('sets form action to reupload url', function() {
+test('sets form action to reupload url', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
       id: 'the_id'
@@ -62,7 +62,7 @@ test('sets form action to reupload url', function() {
   ok(attr.calledWith('action', 'the_the_id_url'))
 })
 
-test('opens dialog', function() {
+test('opens dialog', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
       id: 'the_id'

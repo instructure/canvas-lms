@@ -20,10 +20,10 @@ import React from 'react'
 import {mount} from 'enzyme'
 import LatePolicyGrade from 'jsx/gradezilla/default_gradebook/components/LatePolicyGrade'
 
-QUnit.module('LatePolicyGrade', function(suiteHooks) {
+QUnit.module('LatePolicyGrade', suiteHooks => {
   let wrapper
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     wrapper.unmount()
   })
 
@@ -43,42 +43,42 @@ QUnit.module('LatePolicyGrade', function(suiteHooks) {
     wrapper = mount(<LatePolicyGrade {...defaultProps} {...props} />)
   }
 
-  test('includes the late penalty as a negative value', function() {
+  test('includes the late penalty as a negative value', () => {
     mountComponent()
     strictEqual(wrapper.find('#late-penalty-value').text(), '-3')
   })
 
-  test('includes the final grade', function() {
+  test('includes the final grade', () => {
     mountComponent()
     strictEqual(wrapper.find('#final-grade-value').text(), '70%')
   })
 
-  test('rounds the final grade when a decimal value', function() {
+  test('rounds the final grade when a decimal value', () => {
     mountComponent({submission: {score: 7.345, grade: '7.345', pointsDeducted: 3}})
     strictEqual(wrapper.find('#final-grade-value').text(), '7.35%')
   })
 
-  test('formats the final grade as points when enterGradesAs is set to points', function() {
+  test('formats the final grade as points when enterGradesAs is set to points', () => {
     mountComponent({submission: {score: 70.25}, enterGradesAs: 'points'})
     strictEqual(wrapper.find('#final-grade-value').text(), '70.25')
   })
 
-  test('formats the final grade as percentage when enterGradesAs is set to percent', function() {
+  test('formats the final grade as percentage when enterGradesAs is set to percent', () => {
     mountComponent({submission: {score: 70.25}, enterGradesAs: 'percent'})
     strictEqual(wrapper.find('#final-grade-value').text(), '70.25%')
   })
 
-  test('formats the final grade as a letter grade when enterGradesAs is set to gradingScheme', function() {
+  test('formats the final grade as a letter grade when enterGradesAs is set to gradingScheme', () => {
     mountComponent({submission: {score: 70.25}, enterGradesAs: 'gradingScheme'})
     strictEqual(wrapper.find('#final-grade-value').text(), 'C')
   })
 
-  test('formats the final grade as "Complete" when enterGradesAs is set to passFail and score > 0', function() {
+  test('formats the final grade as "Complete" when enterGradesAs is set to passFail and score > 0', () => {
     mountComponent({submission: {score: 70.25}, enterGradesAs: 'passFail'})
     strictEqual(wrapper.find('#final-grade-value').text(), 'Complete')
   })
 
-  test('formats the final grade as "Incomplete" when enterGradesAs is set to passFail and score == 0', function() {
+  test('formats the final grade as "Incomplete" when enterGradesAs is set to passFail and score == 0', () => {
     mountComponent({submission: {score: 0}, enterGradesAs: 'passFail'})
     strictEqual(wrapper.find('#final-grade-value').text(), 'Incomplete')
   })

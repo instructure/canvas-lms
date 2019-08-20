@@ -76,7 +76,7 @@ test('renders', () => {
   ok(view)
 })
 
-test('delete calls screenreader', function() {
+test('delete calls screenreader', () => {
   sandbox.stub(window, 'confirm').returns(true)
   ENV.context_asset_string = 'course_1'
   const server = sinon.fakeServer.create()
@@ -99,7 +99,7 @@ test('delete calls screenreader', function() {
   server.restore()
 })
 
-test('deleteRecordings calls screenreader', function() {
+test('deleteRecordings calls screenreader', () => {
   sandbox.stub(window, 'confirm').returns(true)
   ENV.context_asset_string = 'course_1'
   const server = sinon.fakeServer.create()
@@ -146,7 +146,7 @@ test('deleteRecordings calls screenreader', function() {
   ok(view)
 })
 
-test('renders adobe connect link', function() {
+test('renders adobe connect link', () => {
   ENV.context_asset_string = 'course_1'
   ENV.conference_type_details = [
     {

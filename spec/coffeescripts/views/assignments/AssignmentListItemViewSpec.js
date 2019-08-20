@@ -760,7 +760,7 @@ test('cannot duplicate when user is not admin', () => {
   equal(view.$('.duplicate_assignment').length, 0)
 })
 
-test('displays duplicating message when assignment is duplicating', function() {
+test('displays duplicating message when assignment is duplicating', () => {
   const model = buildAssignment({
     id: 2,
     title: 'Foo Copy',
@@ -771,7 +771,7 @@ test('displays duplicating message when assignment is duplicating', function() {
   ok(view.$el.text().includes('Making a copy of "Foo"'))
 })
 
-test('displays failed to duplicate message when assignment failed to duplicate', function() {
+test('displays failed to duplicate message when assignment failed to duplicate', () => {
   const model = buildAssignment({
     id: 2,
     title: 'Foo Copy',

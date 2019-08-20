@@ -41,9 +41,7 @@ import parseLinkHeader from 'compiled/fn/parseLinkHeader'
   // -------------------
 
   function studentEnrollments(student) {
-    return _.filter(student.enrollments, function(enrollment) {
-      return enrollment.type === "StudentEnrollment" || enrollment.type === "StudentViewEnrollment";
-    });
+    return _.filter(student.enrollments, enrollment => enrollment.type === "StudentEnrollment" || enrollment.type === "StudentViewEnrollment");
   }
 
   function sectionIDs(enrollments) {

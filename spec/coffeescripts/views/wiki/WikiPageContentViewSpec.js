@@ -23,7 +23,7 @@ import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 
 QUnit.module('WikiPageContentView')
 
-test('setModel causes a re-render', function() {
+test('setModel causes a re-render', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   sandbox.mock(contentView)
@@ -32,7 +32,7 @@ test('setModel causes a re-render', function() {
   contentView.setModel(wikiPage)
 })
 
-test('setModel binds to the model change:title trigger', function() {
+test('setModel binds to the model change:title trigger', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   contentView.setModel(wikiPage)
@@ -42,7 +42,7 @@ test('setModel binds to the model change:title trigger', function() {
   wikiPage.set('title', 'A New Title')
 })
 
-test('setModel binds to the model change:title trigger', function() {
+test('setModel binds to the model change:title trigger', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   contentView.setModel(wikiPage)
@@ -52,7 +52,7 @@ test('setModel binds to the model change:title trigger', function() {
   wikiPage.set('body', 'A New Body')
 })
 
-test('render publishes a "userContent/change" (to enhance user content)', function() {
+test('render publishes a "userContent/change" (to enhance user content)', () => {
   const contentView = new WikiPageContentView()
   subscribe('userContent/change', sandbox.mock().atLeast(1))
   contentView.render()

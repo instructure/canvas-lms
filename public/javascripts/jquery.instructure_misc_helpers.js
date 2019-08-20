@@ -24,7 +24,7 @@ import htmlEscape from './str/htmlEscape'
   // Return the first value which passes a truth test
   $.detect = function(collection, callback) {
     var result;
-    $.each(collection, function(index, value) {
+    $.each(collection, (index, value) => {
       if (callback.call(value, value, index, collection)) {
         result = value;
         return false; // we found it, break the $.each() loop iteration by returning false
@@ -101,7 +101,7 @@ import htmlEscape from './str/htmlEscape'
 
   $.titleize = function(string) {
     var res = (string || "").replace(/([A-Z])/g, " $1").replace(/_/g, " ").replace(/\s+/, " ").replace(/^\s/, "");
-    return $.map(res.split(/\s/), function(word) { return (word[0] || "").toUpperCase() + word.substring(1); }).join(" ");
+    return $.map(res.split(/\s/), word => (word[0] || "").toUpperCase() + word.substring(1)).join(" ");
   };
 
   $.fileSize = function(bytes) {

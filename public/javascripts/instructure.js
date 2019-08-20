@@ -112,7 +112,7 @@ function handleYoutubeLink () {
         $this.data('unenhanced_content_html', $this.html());
       })
       .find(".enhanceable_content").show()
-        .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE).ifExists(function($elements){
+        .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE).ifExists($elements => {
           var msg =
             "Deprecated use of magic jQueryUI widget markup detected:\n\n" +
             "You're relying on undocumented functionality where Canvas makes " +
@@ -128,7 +128,7 @@ function handleYoutubeLink () {
         .filter(".dialog").each(function(){
           var $dialog = $(this);
           $dialog.hide();
-          $dialog.closest(".user_content").find("a[href='#" + $dialog.attr('id') + "']").click(function(event) {
+          $dialog.closest(".user_content").find("a[href='#" + $dialog.attr('id') + "']").click(event => {
             event.preventDefault();
             $dialog.dialog();
           });
@@ -176,7 +176,7 @@ function handleYoutubeLink () {
       .not(".youtubed").each(handleYoutubeLink);
     $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
 
-    setTimeout(function() {
+    setTimeout(() => {
       $(".user_content form.user_content_post_form:not(.submitted)").submit().addClass('submitted');
     }, 10);
   }
@@ -216,7 +216,7 @@ function handleYoutubeLink () {
       const resizeBreadcrumb = () => {
         let maxWidth = 500
         $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible');
-        $breadcrumbEllipsis.ifExists(function(){
+        $breadcrumbEllipsis.ifExists(() => {
           $breadcrumbEllipsis.css('maxWidth', "");
           for (let i=0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) { // the i here is just to make sure we don't get into an ifinite loop somehow
             if (!addedEllipsisClass) {
@@ -286,7 +286,7 @@ function handleYoutubeLink () {
         $dialog.html("<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>" + htmlEscape(I18n.t('links.view_equella_content_in_new_window', "view the content in a new window")) + "</a>");
         $dialog.find("h2").text($(this).attr('title') || $(this).text() || I18n.t('titles.equella_content_preview', "Equella Content Preview"));
         var $iframe = $dialog.find("iframe");
-        setTimeout(function() {
+        setTimeout(() => {
           $iframe.css('background', '#fff');
         }, 2500);
         $("body").append($dialog);
@@ -322,7 +322,7 @@ function handleYoutubeLink () {
     // the :not clause is to not allow users access to this functionality in their content.
     $('.dialog_opener[aria-controls]:not(.user_content *)').live('click', function(event){
       var link = this;
-      $('#' + $(this).attr('aria-controls')).ifExists(function($dialog){
+      $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
         event.preventDefault();
 
         // if the linked dialog has not already been initialized, initialize it (passing in opts)
@@ -342,7 +342,7 @@ function handleYoutubeLink () {
       $("a.file_preview_link").live('click', function(event) {
         event.preventDefault();
         var $link = $(this).loadingImage({image_size: 'small'}).hide();
-        $.ajaxJSON($link.attr('href').replace(/\/download/, ""), 'GET', {}, function(data) {
+        $.ajaxJSON($link.attr('href').replace(/\/download/, ""), 'GET', {}, data => {
           var attachment = data && data.attachment;
           $link.loadingImage('remove');
           if (attachment &&
@@ -357,7 +357,7 @@ function handleYoutubeLink () {
                 attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
             var $minimizeLink = $('<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' + htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) + '</a>')
-              .click(function(event) {
+              .click(event => {
                 event.preventDefault();
                 $link.show();
                 $link.focus();
@@ -372,12 +372,12 @@ function handleYoutubeLink () {
             }
             trackEvent('show_embedded_content', 'show_file_preview');
           }
-        }, function() {
+        }, () => {
           $link.loadingImage('remove').hide();
         });
       });
     } else {
-      $("a.file_preview_link").live('click', function(event) {
+      $("a.file_preview_link").live('click', event => {
         event.preventDefault();
         alert(I18n.t('alerts.file_previews_disabled', 'File previews have been disabled for this Canvas site'));
       });
@@ -385,14 +385,14 @@ function handleYoutubeLink () {
 
     // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
     var enhanceUserContentTimeout;
-    $.subscribe('userContent/change', function(){
+    $.subscribe('userContent/change', () => {
       clearTimeout(enhanceUserContentTimeout);
       enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50);
     });
 
 
     $(document).bind('user_content_change', enhanceUserContent);
-    $(function () {
+    $(() => {
       setInterval(enhanceUserContent, 15000);
       setTimeout(enhanceUserContent, 15);
     })
@@ -445,7 +445,7 @@ function handleYoutubeLink () {
       $(document).triggerHandler('richTextStart', $("#" + id));
       $response.find("textarea:first").focus().select();
     });
-    $(document).bind('richTextStart', function(event, $editor) {
+    $(document).bind('richTextStart', (event, $editor) => {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
@@ -454,7 +454,7 @@ function handleYoutubeLink () {
         hide: function() { $('#sidebar_content').show() }
       })
       RichContentEditor.loadNewEditor($editor, { focus: true })
-    }).bind('richTextEnd', function(event, $editor) {
+    }).bind('richTextEnd', (event, $editor) => {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
@@ -741,11 +741,11 @@ function handleYoutubeLink () {
 
     var sequence_url = $('#sequence_footer .sequence_details_url').filter(':last').attr('href');
     if (sequence_url) {
-      $.ajaxJSON(sequence_url, 'GET', {}, function(data) {
+      $.ajaxJSON(sequence_url, 'GET', {}, data => {
         var $sequence_footer = $('#sequence_footer');
         if (data.current_item) {
           $('#sequence_details .current').fillTemplateData({data: data.current_item.content_tag});
-          $.each({previous:'.prev', next:'.next'}, function(label, cssClass) {
+          $.each({previous:'.prev', next:'.next'}, (label, cssClass) => {
             var $link = $sequence_footer.find(cssClass);
             if (data[label + '_item'] || data[label + '_module']) {
               var tag = (data[label + '_item']    && data[label + '_item'].content_tag) ||

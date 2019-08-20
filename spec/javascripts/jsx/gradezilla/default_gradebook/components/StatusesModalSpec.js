@@ -34,11 +34,11 @@ function defaultProps(props = {}) {
 }
 
 QUnit.module('StatusesModal', function(suiteHooks) {
-  suiteHooks.beforeEach(function() {
+  suiteHooks.beforeEach(() => {
     clock = sinon.useFakeTimers()
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     document.getElementById('fixtures').innerHTML = ''
     clock.restore()
   })
@@ -58,31 +58,31 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     }
   })
 
-  test('modal is initially closed', function() {
+  test('modal is initially closed', () => {
     strictEqual(modal.prop('open'), false)
   })
 
-  test('modal has a label of "Statuses"', function() {
+  test('modal has a label of "Statuses"', () => {
     equal(modal.prop('label'), 'Statuses')
   })
 
-  test('modal has a close button label of "Close"', function() {
+  test('modal has a close button label of "Close"', () => {
     equal(modal.find('CloseButton').prop('children'), 'Close')
   })
 
-  test('modal has an onDismiss function', function() {
+  test('modal has an onDismiss function', () => {
     equal(typeof modal.prop('onDismiss'), 'function')
   })
 
-  test('modal has an onExited function', function() {
+  test('modal has an onExited function', () => {
     equal(typeof modal.prop('onExited'), 'function')
   })
 
-  test('modal has a "Statuses" header', function() {
+  test('modal has a "Statuses" header', () => {
     equal(modal.find('Heading').prop('children'), 'Statuses')
   })
 
-  test('modal has a "Done" button', function() {
+  test('modal has a "Done" button', () => {
     equal(
       modal
         .find('Button')
@@ -92,7 +92,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     )
   })
 
-  test('modal opens', function() {
+  test('modal opens', () => {
     instance.open()
     strictEqual(
       wrapper
@@ -103,7 +103,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     )
   })
 
-  test('modal closes', function() {
+  test('modal closes', () => {
     instance.open()
     clock.tick(50) // wait for Modal to transition open
     instance.close()
@@ -117,7 +117,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     )
   })
 
-  test('on close prop is passed to Modal onExit', function() {
+  test('on close prop is passed to Modal onExit', () => {
     const onClose = sinon.stub()
     const wrapper = shallow(<StatusesModal {...defaultProps({onClose})} />)
     equal(
@@ -152,7 +152,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
 
   QUnit.module('StatusesModal#updateStatusColors')
 
-  test('it calls afterUpdateStatusColors', function() {
+  test('it calls afterUpdateStatusColors', () => {
     const afterUpdateStatusColors = sinon.stub()
     const wrapper = shallow(<StatusesModal {...defaultProps({afterUpdateStatusColors})} />)
     const instance = wrapper.instance()
@@ -161,7 +161,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     wrapper.unmount()
   })
 
-  test('it calls afterUpdateStatusColors with updated colors', function() {
+  test('it calls afterUpdateStatusColors with updated colors', () => {
     const afterUpdateStatusColors = sinon.stub()
     const color = '#000000'
     const expectedColors = {
@@ -179,7 +179,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     wrapper.unmount()
   })
 
-  test('it calls afterUpdateStatusColors with updated successFn', function() {
+  test('it calls afterUpdateStatusColors with updated successFn', () => {
     const successFn = sinon.stub()
     function afterUpdateStatusColors(_color, fn) {
       fn()
@@ -192,7 +192,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     wrapper.unmount()
   })
 
-  test('it calls afterUpdateStatusColors and sets openPopover to null', function() {
+  test('it calls afterUpdateStatusColors and sets openPopover to null', () => {
     const successFn = sinon.stub()
     function afterUpdateStatusColors(_color, fn) {
       fn()
@@ -205,7 +205,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
     wrapper.unmount()
   })
 
-  test('it calls afterUpdateStatusColors with updated failureFn', function() {
+  test('it calls afterUpdateStatusColors with updated failureFn', () => {
     const failureFn = sinon.stub()
     function afterUpdateStatusColors(_color, _fn, fn) {
       fn()
@@ -337,7 +337,7 @@ QUnit.module('StatusesModal', function(suiteHooks) {
   test(
     'selecting a color and clicking Apply in the color picker passes the ' +
       'color to afterUpdateStatusColors',
-    function() {
+    () => {
       const afterUpdateStatusColors = sinon.stub()
       const wrapper = mount(<StatusesModal {...defaultProps({afterUpdateStatusColors})} />)
       const instance = wrapper.instance()

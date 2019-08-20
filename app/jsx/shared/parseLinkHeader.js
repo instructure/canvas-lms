@@ -22,7 +22,7 @@ export default function (linkHeader) {
     }
     var retVal = {}
     linkHeader.split(',').map((partOfHeader) => partOfHeader.split('; '))
-    .forEach(function (link) {
+    .forEach(link => {
       var myUrl = link[0].substring(1, link[0].length - 1)
       var urlRel = link[1].split('=')
       urlRel = urlRel[1]

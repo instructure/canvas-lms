@@ -51,25 +51,25 @@ QUnit.module('basic functionality', {
   }
 })
 
-test('renders a textarea', function() {
+test('renders a textarea', () => {
   const textareaElements = document.querySelectorAll('#fixtures textarea')
 
   strictEqual(textareaElements.length, 1)
 })
 
-test('renders a Save button', function() {
+test('renders a Save button', () => {
   const saveButton = document.querySelectorAll('#fixtures button')[0]
 
   strictEqual(saveButton.textContent, 'Save')
 })
 
-test('renders a Cancel button', function() {
+test('renders a Cancel button', () => {
   const cancelButton = document.querySelectorAll('#fixtures button')[1]
 
   strictEqual(cancelButton.textContent, 'Cancel')
 })
 
-test('focuses the textarea on initial render', function() {
+test('focuses the textarea on initial render', () => {
   const textareaElement = document.querySelector('#fixtures textarea')
 
   strictEqual(document.activeElement, textareaElement)

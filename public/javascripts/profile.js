@@ -47,7 +47,7 @@ import 'compiled/jquery.rails_flash_notifications'
   return false;
   });
 
-  $profile_table.find(".cancel_button").click(function(event) {
+  $profile_table.find(".cancel_button").click(event => {
     $edit_settings_link.show();
     $profile_table
       .removeClass('editing')
@@ -115,7 +115,7 @@ import 'compiled/jquery.rails_flash_notifications'
         $edit_settings_link.click();
       }
     })
-    .find(".more_options_link").click(function() {
+    .find(".more_options_link").click(() => {
       $update_profile_form.find(".more_options_link_row").hide();
       $update_profile_form.find(".more_options_row").show();
       return false;
@@ -170,13 +170,13 @@ import 'compiled/jquery.rails_flash_notifications'
     $(this).removeClass('service-hover');
   });
   $("#show_user_services").change(function() {
-    $.ajaxJSON($("#update_profile_form").attr('action'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
-    }, function(data) {
+    $.ajaxJSON($("#update_profile_form").attr('action'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, data => {
+    }, data => {
     });
   });
   $("#disable_inbox").change(function() {
-    $.ajaxJSON("/profile/toggle_disable_inbox", 'POST', {'user[disable_inbox]': $(this).prop('checked')}, function(data) {
-    }, function(data) {
+    $.ajaxJSON("/profile/toggle_disable_inbox", 'POST', {'user[disable_inbox]': $(this).prop('checked')}, data => {
+    }, data => {
     });
   });
   $(".delete_pseudonym_link").click(function(event) {
@@ -210,7 +210,7 @@ import 'compiled/jquery.rails_flash_notifications'
       }
     });
   });
-  $("#add_access_token_dialog .cancel_button").click(function() {
+  $("#add_access_token_dialog .cancel_button").click(() => {
     $("#add_access_token_dialog").dialog('close');
   });
   $("#access_token_form").formSubmit({
@@ -255,7 +255,7 @@ import 'compiled/jquery.rails_flash_notifications'
     var url = $dialog.data('token_url');
     var $button = $(this);
     $button.text(I18n.t('buttons.regenerating_token', "Regenerating token...")).attr('disabled', true);
-    $.ajaxJSON(url, 'PUT', {'access_token[regenerate]': '1'}, function(data) {
+    $.ajaxJSON(url, 'PUT', {'access_token[regenerate]': '1'}, data => {
       data.created = $.datetimeString(data.created_at) || "--";
       data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', "never");
       data.used = $.datetimeString(data.last_used_at) || "--";
@@ -264,7 +264,7 @@ import 'compiled/jquery.rails_flash_notifications'
         .find(".full_token_warning").showIf(data.visible_token.length > 10);
       $token.data('token', data);
       $button.text(I18n.t('buttons.regenerate_token', "Regenerate Token")).attr('disabled', false);
-    }, function() {
+    }, () => {
       $button.text(I18n.t('errors.regenerating_token_failed', "Regenerating Token Failed")).attr('disabled', false);
     });
   });
@@ -293,14 +293,14 @@ import 'compiled/jquery.rails_flash_notifications'
     if(token) {
       tokenLoaded(token);
     } else {
-      $.ajaxJSON(url, 'GET', {}, function(data) {
+      $.ajaxJSON(url, 'GET', {}, data => {
         data.created = $.datetimeString(data.created_at) || "--";
         data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', "never");
         data.used = $.datetimeString(data.last_used_at) || "--";
         data.visible_token = data.visible_token || "protected";
         $token.data('token', data);
         tokenLoaded(data);
-      }, function() {
+      }, () => {
         $dialog.find(".error_loading_message").show().end()
           .find(".results,.loading_message").hide();
       });
@@ -318,7 +318,7 @@ import 'compiled/jquery.rails_flash_notifications'
       }
     }).fixDialogButtons();
   });
-  $(document).fragmentChange(function(event, hash) {
+  $(document).fragmentChange((event, hash) => {
     var type = hash.substring(1);
     if(type.match(/^register/)) {
       type = type.substring(9);
@@ -332,7 +332,7 @@ import 'compiled/jquery.rails_flash_notifications'
 
   $("#disable_mfa_link").click(function(event) {
     var $disable_mfa_link = $(this);
-    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', {}, function() {
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', {}, () => {
       $.flashMessage(I18n.t('notices.mfa_disabled', "Multi-factor authentication disabled"));
       $disable_mfa_link.remove();
       $('#otp_backup_codes_link').remove();

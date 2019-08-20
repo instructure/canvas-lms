@@ -19,12 +19,12 @@
 import _ from 'lodash'
 import StudentDatastore from 'jsx/gradezilla/default_gradebook/stores/StudentDatastore'
 
-QUnit.module('StudentDatastore', function(hooks) {
+QUnit.module('StudentDatastore', hooks => {
   let studentDatastore
   let userStudentMap
   let testStudentMap
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(() => {
     userStudentMap = {}
     testStudentMap = {}
     studentDatastore = new StudentDatastore(userStudentMap, testStudentMap)
@@ -32,7 +32,7 @@ QUnit.module('StudentDatastore', function(hooks) {
 
   QUnit.module('#listStudentIds')
 
-  test('returns the definitive list of known students', function() {
+  test('returns the definitive list of known students', () => {
     const studentIds = ['1101', '1102', '1103']
     studentDatastore.setStudentIds(studentIds)
     const storedStudentIds = studentDatastore.listStudentIds()
@@ -42,7 +42,7 @@ QUnit.module('StudentDatastore', function(hooks) {
 
   QUnit.module('#setStudentIds')
 
-  test('removes stored user students not represented in the list of student ids', function() {
+  test('removes stored user students not represented in the list of student ids', () => {
     const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
     studentDatastore.addUserStudents(students)
     studentDatastore.setStudentIds(['1102'])
@@ -51,7 +51,7 @@ QUnit.module('StudentDatastore', function(hooks) {
     equal(storedStudents[0].id, '1102')
   })
 
-  test('removes stored test students not represented in the list of student ids', function() {
+  test('removes stored test students not represented in the list of student ids', () => {
     const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
     studentDatastore.addTestStudents(students)
     studentDatastore.setStudentIds(['1102'])
@@ -62,7 +62,7 @@ QUnit.module('StudentDatastore', function(hooks) {
 
   QUnit.module('#listStudents')
 
-  test('returns the students stored in order of the saved student ids', function() {
+  test('returns the students stored in order of the saved student ids', () => {
     const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
     studentDatastore.addUserStudents(students)
     studentDatastore.setStudentIds(['1101', '1102', '1103'])
@@ -71,7 +71,7 @@ QUnit.module('StudentDatastore', function(hooks) {
     deepEqual(storedStudents, _.sortBy(students, 'id'))
   })
 
-  test('includes test students', function() {
+  test('includes test students', () => {
     const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
     studentDatastore.addUserStudents(students.slice(0, 2))
     studentDatastore.addTestStudents(students.slice(2, 3))
@@ -81,7 +81,7 @@ QUnit.module('StudentDatastore', function(hooks) {
     deepEqual(storedStudents, _.sortBy(students, 'id'))
   })
 
-  test('includes students stored directly into the original userStudentMap', function() {
+  test('includes students stored directly into the original userStudentMap', () => {
     studentDatastore.setStudentIds(['1101', '1102', '1103'])
     const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
     Object.assign(userStudentMap, _.keyBy(students, 'id'))
@@ -90,7 +90,7 @@ QUnit.module('StudentDatastore', function(hooks) {
     deepEqual(storedStudents, _.sortBy(students, 'id'))
   })
 
-  test('includes students stored directly into the original testStudentMap', function() {
+  test('includes students stored directly into the original testStudentMap', () => {
     studentDatastore.setStudentIds(['1101', '1102', '1103'])
     const students = [{id: '1103'}, {id: '1101'}, {id: '1102'}]
     Object.assign(testStudentMap, _.keyBy(students, 'id'))
@@ -99,7 +99,7 @@ QUnit.module('StudentDatastore', function(hooks) {
     deepEqual(storedStudents, _.sortBy(students, 'id'))
   })
 
-  test('includes placeholder students for student ids not matching a stored student object', function() {
+  test('includes placeholder students for student ids not matching a stored student object', () => {
     const students = [{id: '1103'}, {id: '1101'}]
     studentDatastore.addUserStudents(students)
     studentDatastore.setStudentIds(['1101', '1102', '1103'])

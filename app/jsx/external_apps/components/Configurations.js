@@ -40,7 +40,7 @@ export default class Configurations extends React.Component {
   }
 
   render() {
-    const appCenterLink = function() {
+    const appCenterLink = () => {
       if (!this.props.env.APP_CENTER.enabled) {
         return ''
       }
@@ -50,7 +50,7 @@ export default class Configurations extends React.Component {
           {I18n.t('View App Center')}
         </a>
       )
-    }.bind(this)
+    }
 
     return (
       <div className="Configurations">

@@ -38,7 +38,7 @@ QUnit.module('StatusPill', {
   }
 })
 
-test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', function() {
+test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', () => {
   const stubbedRender = sandbox.stub(ReactDOM, 'render')
   const spans = [1, 2, 3].map(() => addSpan('submission-missing-pill'))
   StatusPill.renderPills()
@@ -52,7 +52,7 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-missin
   })
 })
 
-test('renderPills mounts a <Pill /> with correct text to each .submission-late-pill', function() {
+test('renderPills mounts a <Pill /> with correct text to each .submission-late-pill', () => {
   const stubbedRender = sandbox.stub(ReactDOM, 'render')
   const spans = [1, 2, 3].map(() => addSpan('submission-late-pill'))
   StatusPill.renderPills()

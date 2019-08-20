@@ -89,7 +89,7 @@ export default class AsyncTracker {
 
       tracker.timeoutId = originalFunctions.setTimeout.call(
         window,
-        function() {
+        () => {
           try {
             if (typeof callback !== 'function') {
               // TODO: remove this after figuring out why it is happening

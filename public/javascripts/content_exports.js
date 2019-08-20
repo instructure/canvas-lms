@@ -54,7 +54,7 @@ $(document).ready(function(event) {
     var checkup = function() {
       var lastProgress = null;
       var waitTime = 1500;
-      $.ajaxJSON(location.href + "/" + current_id, 'GET', {}, function(data) {
+      $.ajaxJSON(location.href + "/" + current_id, 'GET', {}, data => {
         state = "updating";
         var content_export = data.content_export;
         var progress = 0;
@@ -83,7 +83,7 @@ $(document).ready(function(event) {
           lastProgress = progress;
           setTimeout(checkup, 1500);
         }
-      }, function() {
+      }, () => {
         setTimeout(checkup, 3000);
       });
     };

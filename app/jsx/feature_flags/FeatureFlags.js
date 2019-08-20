@@ -58,7 +58,7 @@ export default class FeatureFlags extends React.Component {
   revert = () => {
     const url = `/api/v1/accounts/${ window.ENV.ACCOUNT.id}/features/flags/new_features_ui`
     return axios.put(url, {state: 'off'})
-      .then(function () { window.location.reload(true) })
+      .then(() => { window.location.reload(true) });
   }
 
   renderFeatureRows() {

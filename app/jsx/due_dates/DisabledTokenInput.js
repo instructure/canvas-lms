@@ -36,13 +36,9 @@ import _ from 'underscore'
     }
 
     renderTokens() {
-      return _.map(this.props.tokens, function(token, index) {
-        return (
-          <li key={`token-${index}`} className="ic-token inline-flex">
-            <span className="ic-token-label" style={styles.label}>{token}</span>
-          </li>
-        );
-      });
+      return _.map(this.props.tokens, (token, index) => <li key={`token-${index}`} className="ic-token inline-flex">
+        <span className="ic-token-label" style={styles.label}>{token}</span>
+      </li>);
     }
 
     render() {

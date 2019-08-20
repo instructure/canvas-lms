@@ -24,7 +24,7 @@ import $ from 'jquery'
   ProgressStore.get = function(progress_id) {
     var url = "/api/v1/progress/" + progress_id;
 
-    $.getJSON(url, function(data) {
+    $.getJSON(url, data => {
       _progresses[data.id] = data;
       ProgressStore.setState(_progresses);
     });

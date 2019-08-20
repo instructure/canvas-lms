@@ -41,18 +41,18 @@ import $ from 'jquery'
           $list = $div.children("div.list");
       if (!$list.length) {
         $div = $("<div id='instructure_dropdown_list'><div class='list ui-widget-content'></div></div>").appendTo("body");
-        $(document).mousedown(function(event) {
+        $(document).mousedown(event => {
           if ($div.data('current_dropdown_initiator') && !$(event.target).closest("#instructure_dropdown_list").length) {
             $div.hide().data('current_dropdown_initiator', null);
           }
-        }).mouseup(function(event) {
+        }).mouseup(event => {
           if ($div.data('current_dropdown_initiator') && !$(event.target).closest("#instructure_dropdown_list").length) {
             $div.hide();
-            setTimeout(function() {
+            setTimeout(() => {
               $div.data('current_dropdown_initiator', null);
             }, 100);
           }
-        }).add(this).add($div).keydown(function(event) {
+        }).add(this).add($div).keydown(event => {
           if ($div.data('current_dropdown_initiator')) {
             var $current = $div.find(".ui-state-hover,.ui-state-active");
             if (event.keyCode == 38) { // up
@@ -84,7 +84,7 @@ import $ from 'jquery'
           }
         });
         $div.find(".option").removeClass('ui-state-hover ui-state-active').addClass('minimal');
-        $div.click(function(event) {
+        $div.click(event => {
           $div.hide().data('current_dropdown_initiator', null);
         });
         $list = $div.children("div.list");
@@ -97,7 +97,7 @@ import $ from 'jquery'
         $div.find(".list").css('maxHeight', options.height); 
       }
       $list.empty();
-      $.each(options.options, function(optionHtml, callback){
+      $.each(options.options, (optionHtml, callback) => {
         var $option = $("<div class='option minimal' style='cursor: pointer; padding: 2px 5px; overflow: hidden; white-space: nowrap;'>" +
                         "  <span tabindex='-1'>" + optionHtml + "</span>" +
                         "</div>").appendTo($list);

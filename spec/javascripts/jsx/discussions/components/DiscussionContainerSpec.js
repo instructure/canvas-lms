@@ -47,7 +47,7 @@ test('renders the component', () => {
   ok(node.exists())
 })
 
-QUnit.module('for pinned discussions', function() {
+QUnit.module('for pinned discussions', () => {
   test('renders the component Ordered by Recent Activity text', () => {
     const props = defaultProps()
     props.pinned = undefined

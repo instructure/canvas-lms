@@ -28,7 +28,7 @@ import $ from 'jquery'
     if(options === "hide" || options === "remove") {
       $obj.children(".loading_image").remove();
       list = $obj.data('loading_images') || [];
-      list.forEach(function(item) {
+      list.forEach(item => {
         if(item) {
           item.remove();
         }

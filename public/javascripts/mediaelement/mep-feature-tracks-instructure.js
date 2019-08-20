@@ -101,7 +101,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
       var lang = 'none';
       if (t.options.toggleCaptionsButtonWhenOnlyOne && subtitleCount == 1){
         // click
-        player.captionsButton.on('click',function() {
+        player.captionsButton.on('click',() => {
           if (player.selectedTrack === null) {
             lang = player.tracks[0].srclang;
           }
@@ -110,11 +110,11 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
       } else {
         // hover
         var hoverTimeout;
-        player.captionsButton.hover(function() {
+        player.captionsButton.hover(() => {
           clearTimeout(hoverTimeout);
           player.showCaptionsSelector();
-        }, function() {
-          hoverTimeout = setTimeout(function() {
+        }, () => {
+          hoverTimeout = setTimeout(() => {
             player.hideCaptionsSelector();
           }, t.options.menuTimeoutMouseLeave);
         })
@@ -151,10 +151,10 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
         })
 
         // close menu when tabbing away
-        .on('focusout', mejs.Utility.debounce(function (e) { // Safari triggers focusout multiple times
+        .on('focusout', mejs.Utility.debounce(e => { // Safari triggers focusout multiple times
           // Firefox does NOT support e.relatedTarget to see which element
           // just lost focus, so wait to find the next focused element
-          setTimeout(function () {
+          setTimeout(() => {
             var parent = $(document.activeElement).closest('.mejs-captions-selector');
             if (!parent.length) {
               // focus is outside the control; close menu
@@ -183,12 +183,12 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
       if (!player.options.alwaysShowControls) {
         // move with controls
         player.container
-          .bind('controlsshown', function () {
+          .bind('controlsshown', () => {
             // push captions above controls
             player.container.find('.mejs-captions-position').addClass('mejs-captions-position-hover');
 
           })
-          .bind('controlshidden', function () {
+          .bind('controlshidden', () => {
             if (!media.paused) {
               // move back to normal place
               player.container.find('.mejs-captions-position').removeClass('mejs-captions-position-hover');
@@ -217,25 +217,25 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
       // start loading tracks
       player.loadNextTrack();
 
-      media.addEventListener('timeupdate',function() {
+      media.addEventListener('timeupdate',() => {
         player.displayCaptions();
       }, false);
 
       if (player.options.slidesSelector !== '') {
         player.slidesContainer = $(player.options.slidesSelector);
 
-        media.addEventListener('timeupdate',function() {
+        media.addEventListener('timeupdate',() => {
           player.displaySlides();
         }, false);
 
       }
 
-      media.addEventListener('loadedmetadata', function() {
+      media.addEventListener('loadedmetadata', () => {
         player.displayChapters();
       }, false);
 
       player.container.hover(
-        function () {
+        () => {
           // chapters
           if (player.hasChapters) {
             player.chapters.removeClass('mejs-offscreen');
@@ -251,7 +251,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
           }
         });
 
-      t.container.on('controlsresize', function() {
+      t.container.on('controlsresize', () => {
         t.adjustLanguageBox();
       });
 
@@ -367,7 +367,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
             after();
 
             if (track.kind == 'chapters') {
-              t.media.addEventListener('play', function() {
+              t.media.addEventListener('play', () => {
                 if (t.media.duration > 0) {
                   t.displayChapters(track);
                 }
@@ -423,7 +423,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
       $('<a href="#" role="button" class="upload-track" tabindex="-1">Upload subtitles</a>')
         .appendTo(t.captionsButton.find('ul'))
         .wrap('<li>')
-        .click(function(e){
+        .click(e => {
           e.preventDefault();
           import('compiled/widget/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
 						new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
@@ -577,7 +577,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
 			if (typeof img == 'undefined' || typeof img.fadeIn == 'undefined') {
 
 				t.slides.entries.imgs[index] = img = $('<img src="' + url + '">')
-						.on('load', function() {
+						.on('load', () => {
 							img.appendTo(t.slidesContainer)
 								.hide()
 								.fadeIn()

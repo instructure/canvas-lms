@@ -50,7 +50,7 @@ QUnit.module('progressable', {
   }
 })
 
-test('set progress_url', function() {
+test('set progress_url', () => {
   const spy = sinon.spy()
   model.progressModel.on('complete', spy)
   model.on('progressResolved', spy)
@@ -62,7 +62,7 @@ test('set progress_url', function() {
   equal(model.get('csv'), 'one,two,three')
 })
 
-test('set progress.url', function() {
+test('set progress.url', () => {
   const spy = sinon.spy()
   model.progressModel.on('complete', spy)
   model.on('progressResolved', spy)

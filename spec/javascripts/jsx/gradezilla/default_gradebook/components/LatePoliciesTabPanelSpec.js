@@ -111,17 +111,17 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
     wrapper.unmount()
   })
 
-  test('initializes with an alert showing if passed showAlert: true', function() {
+  test('initializes with an alert showing if passed showAlert: true', () => {
     wrapper = mountComponent({}, {showAlert: true})
     strictEqual(gradedSubmissionsAlert(wrapper).length, 1)
   })
 
-  test('does not initialize with an alert showing if passed showAlert: false', function() {
+  test('does not initialize with an alert showing if passed showAlert: false', () => {
     wrapper = mountComponent()
     strictEqual(gradedSubmissionsAlert(wrapper).length, 0)
   })
 
-  test('focuses on the missing submission input when the alert closes', function() {
+  test('focuses on the missing submission input when the alert closes', () => {
     wrapper = mountComponent({}, {showAlert: true})
     const instance = wrapper.instance()
     const input = instance.missingSubmissionDeductionInput
@@ -131,7 +131,7 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
     input.focus.restore()
   })
 
-  test('does not focus on the missing submission checkbox when the alert closes', function() {
+  test('does not focus on the missing submission checkbox when the alert closes', () => {
     wrapper = mountComponent({}, {showAlert: true})
     const instance = wrapper.instance()
     const checkbox = instance.missingSubmissionCheckbox
@@ -144,7 +144,7 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
   test(
     'focuses on the missing submission checkbox when the alert closes if the' +
       'missing submission input is disabled',
-    function() {
+    () => {
       const data = {...latePolicyData, missingSubmissionDeductionEnabled: false}
       wrapper = mountComponent({data}, {showAlert: true})
       const instance = wrapper.instance()
@@ -159,7 +159,7 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
   test(
     'does not focus on the missing submission input when the alert closes if the' +
       'missing submission input is disabled',
-    function() {
+    () => {
       const data = {...latePolicyData, missingSubmissionDeductionEnabled: false}
       wrapper = mountComponent({data}, {showAlert: true})
       const instance = wrapper.instance()

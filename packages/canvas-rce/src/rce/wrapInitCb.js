@@ -32,7 +32,7 @@ export default function wrapInitCb(
     const attrs = mirroredAttrs || {};
     const el = ed.getElement();
     if (el) {
-      Object.keys(attrs).forEach(function(attr) {
+      Object.keys(attrs).forEach(attr => {
         el.setAttribute(attr, attrs[attr]);
       });
 

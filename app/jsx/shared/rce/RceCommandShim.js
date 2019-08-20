@@ -36,7 +36,7 @@ function delaySend ($target, methodName, ...args) {
       method_name: methodName,
       args: args
     },
-    function (e, remoteEditor) {
+    (e, remoteEditor) => {
       remoteEditor.call(e.data.method_name, ...(e.data.args))
     }
   )

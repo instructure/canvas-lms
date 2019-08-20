@@ -38,7 +38,7 @@ import './jquery.ajaxJSON'
           grading_period_id: gradingPeriodId,
           enrollment_id: enrollmentId
         },
-        function(totals) {
+        totals => {
           var $percentDisplay = $(this).closest('tr').children('.percent'),
               gradeToShow;
 
@@ -51,7 +51,7 @@ import './jquery.ajaxJSON'
           }
 
           $percentDisplay.text(gradeToShow);
-        }.bind(this));
+        });
 
     });
   });

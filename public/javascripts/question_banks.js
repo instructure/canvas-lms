@@ -27,7 +27,7 @@ import './jquery.loadingImg'
 import './jquery.templateData'
 
 $(document).ready(function() {
-  $(".add_bank_link").click(function(event) {
+  $(".add_bank_link").click(event => {
     event.preventDefault();
     var $bank = $("#question_bank_blank").clone(true).attr('id', 'question_bank_new');
     $("#questions").prepend($bank.show());
@@ -49,7 +49,7 @@ $(document).ready(function() {
     event.preventDefault();
     var $link = $(this);
     var $bank = $link.parents(".question_bank");
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
       $bank.find(".bookmark_bank_link").toggle();
       $bank.find(".bookmark_bank_link:visible:first").focus();
     });
@@ -119,10 +119,10 @@ $(document).ready(function() {
         hrefValues: ['id']
       })
       // if you can convince fillTemplateData to do this, please be my guest
-      $bank.find('.links a').each(function(_, link) {
+      $bank.find('.links a').each((_, link) => {
         link.setAttribute('title', link.getAttribute('title').replace('{{ title }}', bank.title));
       });
-      $bank.find('.links a span').each(function(_, span) {
+      $bank.find('.links a span').each((_, span) => {
         span.textContent = span.textContent.replace('{{ title }}', bank.title);
       });
       $bank.find('a.title')[0].focus()

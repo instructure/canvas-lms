@@ -18,45 +18,45 @@
 import $ from 'jquery';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 
-QUnit.module('JQuerySelectorCache', function (hooks) {
+QUnit.module('JQuerySelectorCache', hooks => {
   let selectorCache;
   let fixtures;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(() => {
     fixtures = document.getElementById('fixtures');
     fixtures.innerHTML = '<div id="foo">testing!</div>';
     selectorCache = new JQuerySelectorCache();
   });
 
-  hooks.afterEach(function () {
+  hooks.afterEach(() => {
     fixtures.innerHTML = '';
   });
 
-  QUnit.module('#get', function () {
-    test('returns a jquery selector', function () {
+  QUnit.module('#get', () => {
+    test('returns a jquery selector', () => {
       const response = selectorCache.get('#foo');
       strictEqual(response instanceof $, true);
     });
 
-    test('returns the selector for the given element', function () {
+    test('returns the selector for the given element', () => {
       const response = selectorCache.get('#foo');
       strictEqual(response.text(), 'testing!');
     });
 
-    test('returns a valid selector even if the element does not exist', function () {
+    test('returns a valid selector even if the element does not exist', () => {
       const response = selectorCache.get('#does_not_exist');
       strictEqual(response.length, 0);
     });
 
-    test('reuses the cached value on subsequent requests', function () {
+    test('reuses the cached value on subsequent requests', () => {
       const first = selectorCache.get('#foo');
       const second = selectorCache.get('#foo');
       strictEqual(first, second);
     });
   });
 
-  QUnit.module('#set', function () {
-    test('caches the value that subsequent `get` calls will use', function () {
+  QUnit.module('#set', () => {
+    test('caches the value that subsequent `get` calls will use', () => {
       selectorCache.set('#foo');
       sinon.stub(selectorCache, 'set');
       selectorCache.get('#foo');
@@ -65,7 +65,7 @@ QUnit.module('JQuerySelectorCache', function (hooks) {
       strictEqual(selectorCache.set.callCount, 0);
     });
 
-    test('stores the appropriate selector for the given value', function () {
+    test('stores the appropriate selector for the given value', () => {
       selectorCache.set('#foo');
       const value = selectorCache.get('#foo');
       strictEqual(value.text(), 'testing!');

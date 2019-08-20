@@ -45,7 +45,7 @@ QUnit.module('Collaborations', {
   }
 })
 
-test('shows a flash message when deletion is complete', function() {
+test('shows a flash message when deletion is complete', () => {
   sandbox.spy($, 'screenReaderFlashMessage')
   const e = {
     originalEvent: MouseEvent,
@@ -66,7 +66,7 @@ test('returns a collaboration url', () => {
   equal(url, `${window.location.toString()}/1`)
 })
 
-test('it calls updateCollaboration when a service id is in the data parameter', function() {
+test('it calls updateCollaboration when a service id is in the data parameter', () => {
   sandbox.stub(collaborations.Events, 'updateCollaboration')
   collaborations.Events.onExternalContentReady(
     {},
@@ -78,7 +78,7 @@ test('it calls updateCollaboration when a service id is in the data parameter', 
   equal(collaborations.Events.updateCollaboration.callCount, 1)
 })
 
-test('it calls createCollaboration', function() {
+test('it calls createCollaboration', () => {
   sandbox.stub(collaborations.Events, 'createCollaboration')
   collaborations.Events.onExternalContentReady({}, {contentItems: {}})
   equal(collaborations.Events.createCollaboration.callCount, 1)

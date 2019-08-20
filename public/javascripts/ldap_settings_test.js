@@ -32,7 +32,7 @@ import 'jqueryui/dialog'
     ENV.LDAP_TESTS[0].js_function();
   }
   function clearTestLDAP() {
-    $.each(ENV.LDAP_TESTS, function(i, test) {
+    $.each(ENV.LDAP_TESTS, (i, test) => {
       $("#ldap_" + test.test_type + "_result").html("");
       $("#ldap_" + test.test_type + "_help .server_error").remove();
       $("#ldap_" + test.test_type + "_help").hide();
@@ -40,13 +40,13 @@ import 'jqueryui/dialog'
     $("#ldap_login_result").html("");
     $("#ldap_login_form").hide();
   }
-  $.each(ENV.LDAP_TESTS, function(i, test) {
+  $.each(ENV.LDAP_TESTS, (i, test) => {
     test.js_function = function() {
       $("#ldap_" + test.test_type + "_result").html("<img src='/images/ajax-loader.gif'/>");
-      $.getJSON(test.url, function(data) {
+      $.getJSON(test.url, data => {
         var success = true;
         var server_error = "";
-        $.each(data, function(i, config) {
+        $.each(data, (i, config) => {
           if (!config['ldap_' + test.test_type + '_test']) {
             success = false;
             if(config['errors'][0] && config['errors'][0]['ldap_' + test.test_type + '_test']) {
@@ -69,7 +69,7 @@ import 'jqueryui/dialog'
           var $server_error = $('<p></p>').addClass("server_error").css("color", "red").text(server_error);
           $("#ldap_" + test.test_type + "_help").append($server_error);
 
-          $.each(ENV.LDAP_TESTS.slice(i + 1), function(i, next_test) {
+          $.each(ENV.LDAP_TESTS.slice(i + 1), (i, next_test) => {
             $("#ldap_" + next_test.test_type + "_result").html("<h4 style='color:red'>" + h(I18n.t('test_ldap_result_canceled', 'Canceled')) + "</h4>");
           });
           $("#ldap_login_result").html("<h4 style='color:red'>" + h(I18n.t('test_ldap_result_canceled', 'Canceled')) + "</h4>");
@@ -82,16 +82,16 @@ import 'jqueryui/dialog'
     $("#ldap_login_result").html("<img src='/images/ajax-loader.gif'/>");
     var username = $("#ldap_test_login_user").val();
     var password = $("#ldap_test_login_pass").val();
-    $.post(ENV.LOGIN_TEST_URL, {'username': username, 'password': password, authenticity_token: authenticity_token()}, function(data) {
+    $.post(ENV.LOGIN_TEST_URL, {'username': username, 'password': password, authenticity_token: authenticity_token()}, data => {
       var success = true;
       var message = "";
-      $.each(data, function(i, config) {
+      $.each(data, (i, config) => {
         if (!config['ldap_login_test']) {
           success = false;
         }
         if (config['errors']) {
-          $.each(config['errors'], function(i, m) {
-            $.each(m, function(err, msg) {
+          $.each(config['errors'], (i, m) => {
+            $.each(m, (err, msg) => {
               message += msg;
             })
           });
@@ -110,17 +110,17 @@ import 'jqueryui/dialog'
     });
   }
 
-  $(document).ready(function() {
-    $(".test_ldap_link").click(function(event) {
+  $(document).ready(() => {
+    $(".test_ldap_link").click(event => {
       event.preventDefault();
       // kick off our test
       testLDAP();
     });
-    $(".ldap_test_close").click(function(event) {
+    $(".ldap_test_close").click(event => {
       event.preventDefault();
       $("#test_ldap_dialog").dialog('close')
     });
-    $("#ldap_test_login_form").submit(function(event) {
+    $("#ldap_test_login_form").submit(event => {
       event.preventDefault();
       testLDAPLogin();
     });

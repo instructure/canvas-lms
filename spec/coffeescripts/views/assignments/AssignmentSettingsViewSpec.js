@@ -219,7 +219,7 @@ test('disables the Save and Cancel buttons', () => {
   view.remove()
 })
 
-test('disables the Save and Cancel button handlers', function() {
+test('disables the Save and Cancel button handlers', () => {
   const closed_group = group({any_assignment_in_closed_grading_period: true})
   const groups = new AssignmentGroupCollection([group(), closed_group])
   const view = createView({

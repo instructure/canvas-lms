@@ -55,8 +55,8 @@ let loadingPromise
       const renderingTarget = this.getRenderingTarget(textarea, tinyMCEInitOptions.getRenderingTarget)
       const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
-      this.loadRCE(function(RCE) {
-        RCE.renderIntoDiv(renderingTarget, propsForRCE, function(remoteEditor) {
+      this.loadRCE(RCE => {
+        RCE.renderIntoDiv(renderingTarget, propsForRCE, remoteEditor => {
           remoteEditor.mceInstance().on('init', () => callback(textarea, polyfill.wrapEditor(remoteEditor)))
         })
       })
@@ -69,8 +69,8 @@ let loadingPromise
 
       const props = getTrayProps()
 
-      this.loadRCE(function (RCE) {
-        RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {
+      this.loadRCE(RCE => {
+        RCE.renderSidebarIntoDiv(target, props, remoteSidebar => {
           callback(polyfill.wrapSidebar(remoteSidebar))
         })
       })

@@ -117,7 +117,7 @@ test('negative score returns negative points warning', function() {
   equal(outlierScore.warningMessage(), this.negativePointsWarning)
 })
 
-test('score within range returns null', function() {
+test('score within range returns null', () => {
   const outlierScore = new OutlierScoreHelper(100, 100)
   equal(outlierScore.warningMessage(), null)
 })

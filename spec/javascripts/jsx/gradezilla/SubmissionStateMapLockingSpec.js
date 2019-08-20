@@ -49,21 +49,21 @@ function createAndSetupMap(assignment, opts = {}) {
 
 QUnit.module('SubmissionStateMap without grading periods')
 
-test('submission in an unpublished assignment is locked', function() {
+test('submission in an unpublished assignment is locked', () => {
   const assignment = {id: '1', published: false, effectiveDueDates: {}}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, true)
 })
 
-test('submission in a published assignment is not locked', function() {
+test('submission in a published assignment is not locked', () => {
   const assignment = {id: '1', published: true, effectiveDueDates: {}}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, false)
 })
 
-test('submission is locked for a student without assignment visibility', function() {
+test('submission is locked for a student without assignment visibility', () => {
   const assignment = {
     id: '1',
     published: true,
@@ -75,7 +75,7 @@ test('submission is locked for a student without assignment visibility', functio
   equal(state.locked, true)
 })
 
-test('submission is unlocked for an assigned student', function() {
+test('submission is unlocked for an assigned student', () => {
   const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: null,

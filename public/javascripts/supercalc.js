@@ -77,10 +77,10 @@ import 'jqueryui/sortable'
       $table.find("tfoot tr:last td:first").append($input.hide());
       $entryBox.data('supercalc_options', options);
       $entryBox.data('supercalc_answer', $input);
-      $table.delegate('.save_formula_button', 'click', function() {
+      $table.delegate('.save_formula_button', 'click', () => {
         $displayBox.triggerHandler('keypress', true);
       });
-      $table.delegate('.delete_formula_row_link', 'click', function(event) {
+      $table.delegate('.delete_formula_row_link', 'click', event => {
         event.preventDefault();
         $(event.target).parents("tr").remove();
         $entryBox.triggerHandler('calculate');
@@ -91,7 +91,7 @@ import 'jqueryui/sortable'
           $entryBox.triggerHandler('calculate');
         }
       });
-      $table.delegate('.round', 'change', function() {
+      $table.delegate('.round', 'change', () => {
         $entryBox.triggerHandler('calculate');
       });
       $entryBox.bind('calculate', function(event, no_dom) {
@@ -137,7 +137,7 @@ import 'jqueryui/sortable'
           $entryBox.val("");
         }
       });
-      $displayBox.bind('keypress', function(event, enter) {
+      $displayBox.bind('keypress', (event, enter) => {
         $entryBox.val($displayBox.val());
         if(event.keyCode == 13 || enter && $displayBox.val()) {
           event.preventDefault();

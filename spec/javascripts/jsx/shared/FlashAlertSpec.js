@@ -18,14 +18,14 @@
 
 import { destroyContainer, showFlashAlert, showFlashError, showFlashSuccess } from 'jsx/shared/FlashAlert';
 
-QUnit.module('FlashAlert', function (hooks) {
+QUnit.module('FlashAlert', hooks => {
   let clock;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(() => {
     clock = sinon.useFakeTimers();
   });
 
-  hooks.afterEach(function () {
+  hooks.afterEach(() => {
     // ensure the automatic close timeout (10000ms) has elapsed
     // add 500ms for the animation
     // add 10ms for cushion
@@ -48,20 +48,20 @@ QUnit.module('FlashAlert', function (hooks) {
 
   QUnit.module('.showFlashAlert');
 
-  test('closes after 11 seconds', function () {
+  test('closes after 11 seconds', () => {
     callShowFlashAlert();
     clock.tick(11000);
     strictEqual(document.querySelector('#flashalert_message_holder').innerHTML, '');
   });
 
-  test('has no effect when the container element has been removed', function () {
+  test('has no effect when the container element has been removed', () => {
     callShowFlashAlert();
     destroyContainer();
     clock.tick(11000);
     ok('no error was thrown');
   });
 
-  test('applies the "clickthrough-container" class to the container element', function () {
+  test('applies the "clickthrough-container" class to the container element', () => {
     callShowFlashAlert();
     ok(document.getElementById('flashalert_message_holder').classList.contains('clickthrough-container'));
     clock.tick(11000);
@@ -69,7 +69,7 @@ QUnit.module('FlashAlert', function (hooks) {
 
   QUnit.module('.showFlashError');
 
-  test('renders an alert with a default message', function () {
+  test('renders an alert with a default message', () => {
     showFlashError()();
     clock.tick(600);
     const expectedText = 'An error occurred making a network request';
@@ -79,7 +79,7 @@ QUnit.module('FlashAlert', function (hooks) {
 
   QUnit.module('.showFlashSuccess');
 
-  test('renders an alert with a given message', function () {
+  test('renders an alert with a given message', () => {
     const expectedText = 'hello world';
     showFlashSuccess(expectedText)();
     clock.tick(600);
@@ -87,7 +87,7 @@ QUnit.module('FlashAlert', function (hooks) {
     clock.tick(500); // tick to close the alert with timeout
   });
 
-  test('renders an alert without "Details"', function () {
+  test('renders an alert without "Details"', () => {
     showFlashSuccess('yay!')({ body: 'a body' });
     clock.tick(600);
     strictEqual(document.querySelector('#flashalert_message_holder').innerText.includes('Details'), false);

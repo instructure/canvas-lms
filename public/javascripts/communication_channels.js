@@ -230,7 +230,7 @@ $(document).ready(function() {
       $channel.remove();
     }
   });
-  $("a.email_address_taken_learn_more").live('click', function(event) {
+  $("a.email_address_taken_learn_more").live('click', event => {
     event.preventDefault();
 
   });
@@ -264,13 +264,13 @@ $(document).ready(function() {
   });
   $(".channel_list .channel .reset_bounce_count_link").click(function(event) {
     event.preventDefault();
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
       $(this).parents('.channel').find('.bouncing-channel').remove();
       $(this).remove();
       $.flashMessage(I18n.t('Bounce count reset!'))
-    }.bind(this));
+    });
   });
-  $("#confirm_communication_channel .cancel_button").click(function(event) {
+  $("#confirm_communication_channel .cancel_button").click(event => {
     $("#confirm_communication_channel").dialog('close');
   });
   $(".email_channels .channel .path,.other_channels .channel .path").click(function(event) {
@@ -289,13 +289,13 @@ $(document).ready(function() {
       var data = $channel.getTemplateData({textValues: ['user_id', 'pseudonym_id', 'channel_id']});
       var path = $(this).text();
 
-      $.ajaxJSON(`/confirmations/${data.user_id}/limit_reached/${data.channel_id}`, 'GET', {}, function(data){
+      $.ajaxJSON(`/confirmations/${data.user_id}/limit_reached/${data.channel_id}`, 'GET', {}, data => {
         if(data.confirmation_limit_reached) {
           $box.find(".re_send_confirmation_link").css('visibility', 'hidden');
         } else {
           $box.find(".re_send_confirmation_link").css('visibility', 'visible');
         }
-      }, function(_) {});
+      }, _ => {});
 
       if(type == "sms number") {
         path = path.split("@")[0];
@@ -356,7 +356,7 @@ $(document).ready(function() {
     var formData = {
       'default_email_id': channel_id
     }
-    $.ajaxJSON($(this).attr('href'), 'PUT', formData, function(data) {
+    $.ajaxJSON($(this).attr('href'), 'PUT', formData, data => {
       var channel_id = data.user.communication_channel.id;
       $(".channel.default").removeClass('default').find('a.default_link span.screenreader-only.default_label').remove();
       $(".channel#channel_" + channel_id).addClass('default').find('a.default_link').append( $('<span class="screenreader-only" />').text(I18n.t("This is the default email address")) );
@@ -367,16 +367,16 @@ $(document).ready(function() {
     event.preventDefault();
     var $link = $(this);
     $link.text( I18n.t('links.resending_confirmation', "Re-Sending...") );
-    $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
+    $.ajaxJSON($link.attr('href'), 'POST', {}, data => {
       $link.text( I18n.t('links.resent_confirmation', "Done! Message may take a few minutes.") );
-    }, function(data) {
+    }, data => {
       $link.text( I18n.t('links.resend_confirmation_failed', "Request failed. Try again.") );
     });
   });
-  $("#communication_channels .cancel_button").click(function(event) {
+  $("#communication_channels .cancel_button").click(event => {
     $("#communication_channels").dialog('close');
   });
-  $("#confirm_email_channel .cancel_button").click(function() {
+  $("#confirm_email_channel .cancel_button").click(() => {
     $("#confirm_email_channel").dialog('close');
   });
 });

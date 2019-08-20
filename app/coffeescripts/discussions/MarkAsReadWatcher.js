@@ -65,7 +65,7 @@ class MarkAsReadWatcher {
     return this.checkForVisibleEntries()
   }
 
-  static checkForVisibleEntries = _.throttle(function () {
+  static checkForVisibleEntries = _.throttle(() => {
     const topOfViewport = $window.scrollTop()
     const bottomOfViewport = topOfViewport + $window.height()
     MarkAsReadWatcher.unread.forEach((entry) => {

@@ -140,7 +140,7 @@ export default class SyllabusView extends Backbone.View {
       }
 
       let override = null
-      _.each(json.assignment_overrides != null ? json.assignment_overrides : [], function(ov) {
+      _.each(json.assignment_overrides != null ? json.assignment_overrides : [], ov => {
         if (override == null) {
           override = {}
         }

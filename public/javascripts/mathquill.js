@@ -136,9 +136,7 @@ import htmlEscape from './str/htmlEscape'
     self.lastChild = newBlock;
   };
   _.latex = function() {
-    return this.foldChildren(this.cmd, function(latex, child) {
-      return latex + '{' + (child.latex() || ' ') + '}';
-    });
+    return this.foldChildren(this.cmd, (latex, child) => latex + '{' + (child.latex() || ' ') + '}');
   };
   _.text_template = [''];
   _.text = function() {
@@ -187,14 +185,10 @@ import htmlEscape from './str/htmlEscape'
   _.respace = $.noop; //placeholder for context-sensitive spacing
   _.placeCursor = function(cursor) {
     //append the cursor to the first empty child, or if none empty, the last one
-    cursor.appendTo(this.foldChildren(this.firstChild, function(prev, child) {
-      return prev.isEmpty() ? prev : child;
-    }));
+    cursor.appendTo(this.foldChildren(this.firstChild, (prev, child) => prev.isEmpty() ? prev : child));
   };
   _.isEmpty = function() {
-    return this.foldChildren(true, function(isEmpty, child) {
-      return isEmpty && child.isEmpty();
-    });
+    return this.foldChildren(true, (isEmpty, child) => isEmpty && child.isEmpty());
   };
   _.remove = function() {
     var self = this,
@@ -239,16 +233,12 @@ import htmlEscape from './str/htmlEscape'
   function MathBlock(){}
   _ = MathBlock.prototype = new MathElement;
   _.latex = function() {
-    return this.foldChildren('', function(latex, child) {
-      return latex + child.latex();
-    });
+    return this.foldChildren('', (latex, child) => latex + child.latex());
   };
   _.text = function() {
     return this.firstChild === this.lastChild ?
       this.firstChild.text() :
-      this.foldChildren('(', function(text, child) {
-        return text + child.text();
-      }) + ')';
+      this.foldChildren('(', (text, child) => text + child.text()) + ')';
   };
   _.isEmpty = function() {
     return this.firstChild === 0 && this.lastChild === 0;
@@ -282,7 +272,7 @@ import htmlEscape from './str/htmlEscape'
     self.prev = prev || 0; //so you can do 'new MathFragment(block)' without
     self.next = next || 0; //ending up with this.prev or this.next === undefined
 
-    self.jQinit(self.fold($(), function(jQ, child){ return child.jQ.add(jQ); }));
+    self.jQinit(self.fold($(), (jQ, child) => child.jQ.add(jQ)));
   }
   _ = MathFragment.prototype;
   _.remove = MathCommand.prototype.remove;
@@ -302,7 +292,7 @@ import htmlEscape from './str/htmlEscape'
     return fold;
   };
   _.latex = function() {
-    return this.fold('', function(latex, el){ return latex + el.latex(); });
+    return this.fold('', (latex, el) => latex + el.latex());
   };
   _.blockify = function() {
     var self = this,
@@ -327,7 +317,7 @@ import htmlEscape from './str/htmlEscape'
     newLastChild.next = self.next = 0;
 
     self.parent = newBlock;
-    self.each(function(el){ el.parent = newBlock; });
+    self.each(el => { el.parent = newBlock; });
 
     newBlock.jQ = self.jQ;
 
@@ -385,7 +375,7 @@ import htmlEscape from './str/htmlEscape'
     };
 
     //prevent native selection except textarea
-    jQ.bind('selectstart.mathquill', function(e) {
+    jQ.bind('selectstart.mathquill', e => {
       if (e.target !== textarea[0])
         e.preventDefault();
       e.stopPropagation();
@@ -393,7 +383,7 @@ import htmlEscape from './str/htmlEscape'
 
     //drag-to-select event handling
     var anticursor, blink = cursor.blink;
-    jQ.bind('mousedown.mathquill', function(e) {
+    jQ.bind('mousedown.mathquill', e => {
       cursor.blink = $.noop;
       cursor.seek($(e.target), e.pageX, e.pageY);
 
@@ -436,7 +426,7 @@ import htmlEscape from './str/htmlEscape'
     if (!editable) {
       jQ.bind('cut paste', false).bind('copy', setTextareaSelection)
         .prepend('<span class="selectable">$'+htmlEscape(root.latex())+'$</span>');
-      textarea.blur(function() {
+      textarea.blur(() => {
         cursor.clearSelection();
         setTimeout(function detach() {
           textareaSpan.detach();
@@ -454,7 +444,7 @@ import htmlEscape from './str/htmlEscape'
       jQ.addClass('mathquill-textbox');
 
     //focus and blur handling
-    textarea.focus(function(e) {
+    textarea.focus(e => {
       if (!cursor.parent)
         cursor.appendTo(root);
       cursor.parent.jQ.addClass('hasCursor');
@@ -465,16 +455,16 @@ import htmlEscape from './str/htmlEscape'
       else
         cursor.show();
       e.stopPropagation();
-    }).blur(function(e) {
+    }).blur(e => {
       cursor.hide().parent.blur();
       if (cursor.selection)
         cursor.selection.jQ.addClass('blur');
       e.stopPropagation();
     });
 
-    jQ.bind('focus.mathquill blur.mathquill', function(e) {
+    jQ.bind('focus.mathquill blur.mathquill', e => {
       textarea.trigger(e);
-    }).bind('mousedown.mathquill', function() {
+    }).bind('mousedown.mathquill', () => {
       setTimeout(focus);
     }).bind('click.mathquill', focus) //stupid Mobile Safari
     .blur();
@@ -483,16 +473,16 @@ import htmlEscape from './str/htmlEscape'
     }
 
     //clipboard event handling
-    jQ.bind('cut', function(e) {
+    jQ.bind('cut', e => {
       setTextareaSelection();
       if (cursor.selection)
-        setTimeout(function(){ cursor.deleteSelection(); cursor.redraw(); });
+        setTimeout(() => { cursor.deleteSelection(); cursor.redraw(); });
       e.stopPropagation();
-    }).bind('copy', function(e) {
+    }).bind('copy', e => {
       setTextareaSelection();
       skipTextInput = true;
       e.stopPropagation();
-    }).bind('paste', function(e) {
+    }).bind('paste', e => {
       skipTextInput = true;
       setTimeout(paste);
       e.stopPropagation();
@@ -511,12 +501,12 @@ import htmlEscape from './str/htmlEscape'
 
     //keyboard events and text input, see Wiki page "Keyboard Events"
     var lastKeydn, lastKeydnHappened, lastKeypressWhich, skipTextInput = false;
-    jQ.bind('keydown.mathquill', function(e) {
+    jQ.bind('keydown.mathquill', e => {
       lastKeydn = e;
       lastKeydnHappened = true;
       if (cursor.parent.keydown(e) === false)
         e.preventDefault();
-    }).bind('keypress.mathquill', function(e) {
+    }).bind('keypress.mathquill', e => {
       if (lastKeydnHappened)
         lastKeydnHappened = false;
       else {
@@ -613,14 +603,14 @@ import htmlEscape from './str/htmlEscape'
 
     var tabs = [];
     var panes = [];
-    $.each(button_tabs, function(index, tab){
+    $.each(button_tabs, (index, tab) => {
       tabs.push(
         '<li><a href="#' + htmlEscape(tab.name) + '_tab" role="tab" tabindex="-1" aria-controls="' + htmlEscape(tab.name) + '_tab">'
         + '  <span class="mathquill-rendered-math">' + htmlEscape(tab.example) + '</span>' + htmlEscape(tab.name) + '</a></li>'
       );
       var buttons = [];
-      $.each(tab.button_groups, function(index, group) {
-        $.each(group, function(index, cmd) {
+      $.each(tab.button_groups, (index, group) => {
+        $.each(group, (index, cmd) => {
           var obj = new LatexCmds[cmd](undefined, cmd);
            buttons.push('<li><a class="mathquill-rendered-math" href="#" title="' + htmlEscape(cmd.match(/^[a-z]+$/i) ? '\\' + cmd : cmd) + '">' +
                        $.raw(html_template_overrides[cmd] ? html_template_overrides[cmd] : '<span style="line-height: 1.5em">' + $.raw(obj.html_template.join('')) + '</span>') +
@@ -661,7 +651,7 @@ import htmlEscape from './str/htmlEscape'
       $($tabLinks.get(listIndex)).focus().click();
     });
     $('#mathquill-view .mathquill-tab-bar li:first-child a').click();
-    $('#mathquill-view a.mathquill-rendered-math').mousedown(function(e) {
+    $('#mathquill-view a.mathquill-rendered-math').mousedown(e => {
       e.stopPropagation();
     }).click(function(){
       root.cursor.writeLatex(this.title, true);
@@ -675,9 +665,7 @@ import htmlEscape from './str/htmlEscape'
     return MathBlock.prototype.latex.call(this).replace(/(\\[a-z]+) (?![a-z])/ig,'$1');
   };
   _.text = function() {
-    return this.foldChildren('', function(text, child) {
-      return text + child.text();
-    });
+    return this.foldChildren('', (text, child) => text + child.text());
   };
   _.renderLatex = function(latex) {
     this.jQ.children().slice(1).remove();
@@ -959,7 +947,7 @@ import htmlEscape from './str/htmlEscape'
       }
       calculateMarginRight();
       var intervalId = setInterval(calculateMarginRight);
-      $(window).load(function() {
+      $(window).load(() => {
         clearTimeout(intervalId);
         calculateMarginRight();
       });
@@ -1362,7 +1350,7 @@ import htmlEscape from './str/htmlEscape'
         cursor = textblock.cursor,
         next = textblock.next.firstChild;
 
-      next.eachChild(function(child){
+      next.eachChild(child => {
         child.parent = innerblock;
         child.jQ.appendTo(innerblock.jQ);
       });
@@ -1524,13 +1512,13 @@ import htmlEscape from './str/htmlEscape'
   _ = Vector.prototype = new MathCommand;
   _.html_template = ['<span class="array"></span>', '<span></span>'];
   _.latex = function() {
-    return '\\begin{matrix}' + this.foldChildren([], function(latex, child) {
+    return '\\begin{matrix}' + this.foldChildren([], (latex, child) => {
       latex.push(child.latex());
       return latex;
     }).join('\\\\') + '\\end{matrix}';
   };
   _.text = function() {
-    return '[' + this.foldChildren([], function(text, child) {
+    return '[' + this.foldChildren([], (text, child) => {
       text.push(child.text());
       return text;
     }).join() + ']';
@@ -2457,7 +2445,7 @@ import htmlEscape from './str/htmlEscape'
 
           cursor.insertNew(cmd);
         }
-        cmd.eachChild(function(child) {
+        cmd.eachChild(child => {
           cursor.appendTo(child);
           var token = latex.shift();
           if (!token) return false;
@@ -2529,10 +2517,10 @@ import htmlEscape from './str/htmlEscape'
       prev = gramp.prev,
       cursor = this;
 
-    gramp.eachChild(function(uncle) {
+    gramp.eachChild(uncle => {
       if (uncle.isEmpty()) return;
 
-      uncle.eachChild(function(cousin) {
+      uncle.eachChild(cousin => {
         cousin.parent = greatgramp;
         cousin.jQ.insertBefore(gramp.jQ.first());
       });
@@ -2872,7 +2860,7 @@ import htmlEscape from './str/htmlEscape'
 
   //on document ready, mathquill-ify all `<tag class="mathquill-*">latex</tag>`
   //elements according to their CSS class.
-  $(function() {
+  $(() => {
     $('.mathquill-editable:not(.mathquill-rendered-math)').mathquill('editable');
     $('.mathquill-editor').mathquill('editor');
     $('.mathquill-textbox:not(.mathquill-rendered-math)').mathquill('textbox');

@@ -20,7 +20,7 @@ import {mount} from 'enzyme'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import SubmissionCommentCreateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentCreateForm'
 
-QUnit.module('SubmissionCommentCreateForm', function(hooks) {
+QUnit.module('SubmissionCommentCreateForm', hooks => {
   let props
   let wrapper
 
@@ -44,7 +44,7 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     return wrapper.find('Button').at(1)
   }
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(() => {
     props = {
       cancelCommenting() {},
       createSubmissionComment() {},
@@ -53,84 +53,84 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     }
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(() => {
     wrapper.unmount()
   })
 
-  test('"Submit" button is not present if there is no text entered in the comment area', function() {
+  test('"Submit" button is not present if there is no text entered in the comment area', () => {
     wrapper = mountComponent()
     strictEqual(submitButton().length, 0)
   })
 
-  test('"Cancel" button is not present if there is no text entered in the comment area', function() {
+  test('"Cancel" button is not present if there is no text entered in the comment area', () => {
     wrapper = mountComponent()
     strictEqual(cancelButton().length, 0)
   })
 
-  test('"Submit" button is not present if the content is all spaces', function() {
+  test('"Submit" button is not present if the content is all spaces', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: '   '}})
     strictEqual(submitButton().length, 0)
   })
 
-  test('"Cancel" button is not present if the content is all spaces', function() {
+  test('"Cancel" button is not present if the content is all spaces', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: '   '}})
     strictEqual(cancelButton().length, 0)
   })
 
-  test('"Submit" button is present if there is text entered in the comment area', function() {
+  test('"Submit" button is present if there is text entered in the comment area', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(submitButton().length, 1)
   })
 
-  test('"Cancel" button is present if there is text entered in the comment area', function() {
+  test('"Cancel" button is present if there is text entered in the comment area', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(cancelButton().length, 1)
   })
 
-  test('"Submit" button is not disabled', function() {
+  test('"Submit" button is not disabled', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(submitButtonComponent().prop('disabled'), false)
   })
 
-  test('"Cancel" button is not disabled', function() {
+  test('"Cancel" button is not disabled', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(cancelButtonComponent().prop('disabled'), false)
   })
 
-  test('"Submit" button has the text "Submit"', function() {
+  test('"Submit" button has the text "Submit"', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(submitButton().text(), 'Submit')
   })
 
-  test('"Cancel" button has the text "Cancel"', function() {
+  test('"Cancel" button has the text "Cancel"', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(cancelButton().text(), 'Cancel')
   })
 
-  test('TextArea is empty', function() {
+  test('TextArea is empty', () => {
     wrapper = mountComponent()
     strictEqual(wrapper.find('TextArea').prop('value'), '')
   })
 
-  test('TextArea has a placeholder message', function() {
+  test('TextArea has a placeholder message', () => {
     wrapper = mountComponent()
     strictEqual(wrapper.find('TextArea').prop('placeholder'), 'Leave a comment')
   })
 
-  test('TextArea has a label', function() {
+  test('TextArea has a label', () => {
     wrapper = mountComponent()
     ok(wrapper.find('label').contains(<ScreenReaderContent>Leave a comment</ScreenReaderContent>))
   })
 
-  test('the default action is prevented when the button is clicked', function() {
+  test('the default action is prevented when the button is clicked', () => {
     props.createSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     const event = {
@@ -141,7 +141,7 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     strictEqual(event.preventDefault.callCount, 1)
   })
 
-  test('focuses on the textarea after a successful comment post', function() {
+  test('focuses on the textarea after a successful comment post', () => {
     props.createSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     const focusTextArea = sinon.stub(wrapper.instance().textarea, 'focus')
@@ -150,20 +150,20 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     strictEqual(focusTextArea.callCount, 1)
   })
 
-  test('"Submit" button is disabled while processing', function() {
+  test('"Submit" button is disabled while processing', () => {
     props.processing = true
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(submitButtonComponent().prop('disabled'), true)
   })
 
-  test('"Submit" button label reads "Submit Comment"', function() {
+  test('"Submit" button label reads "Submit Comment"', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     strictEqual(submitButton().prop('label'), 'Submit Comment')
   })
 
-  test('clicking the "Submit" button calls setProcessing', function() {
+  test('clicking the "Submit" button calls setProcessing', () => {
     props.createSubmissionComment = sinon.stub().resolves()
     props.setProcessing = sinon.stub()
     wrapper = mountComponent()
@@ -172,7 +172,7 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     strictEqual(props.setProcessing.callCount, 1)
   })
 
-  test('clicking the "Submit" button calls setProcessing with true', function() {
+  test('clicking the "Submit" button calls setProcessing with true', () => {
     props.createSubmissionComment = sinon.stub().resolves()
     props.setProcessing = sinon.stub()
     wrapper = mountComponent()
@@ -181,7 +181,7 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     strictEqual(props.setProcessing.firstCall.args[0], true)
   })
 
-  test('createSubmissionComment is called when the comment is valid and the "Submit" button is clicked', function() {
+  test('createSubmissionComment is called when the comment is valid and the "Submit" button is clicked', () => {
     props.createSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
@@ -189,7 +189,7 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     strictEqual(props.createSubmissionComment.callCount, 1)
   })
 
-  test('clicking the "Submit" button clears the comment field', function() {
+  test('clicking the "Submit" button clears the comment field', () => {
     props.createSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'a message'}})
@@ -197,7 +197,7 @@ QUnit.module('SubmissionCommentCreateForm', function(hooks) {
     strictEqual(wrapper.find('textarea').prop('value'), '')
   })
 
-  test('clicking the "Cancel" button triggers cancelCommenting', function() {
+  test('clicking the "Cancel" button triggers cancelCommenting', () => {
     props.cancelCommenting = sinon.stub()
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'a message'}})

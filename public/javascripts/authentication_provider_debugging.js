@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-  $(document).ready(function() {
+  $(document).ready(() => {
     var $start_debugging = $('.start_debugging'),
         $stop_debugging = $('.stop_debugging'),
         $refresh_debugging = $('.refresh_debugging');
@@ -39,7 +39,7 @@ import $ from 'jquery'
       if(new_debug_session){
         method = 'PUT';
       }
-      $.ajaxJSON(url, method, {}, function (data) {
+      $.ajaxJSON(url, method, {}, data => {
         if (data) {
           if (data.debugging) {
             debug_data = $link.closest('div.debugging').find('.debug_data');
@@ -52,7 +52,7 @@ import $ from 'jquery'
       });
     };
 
-    $start_debugging.click(function(event){
+    $start_debugging.click(event => {
       event.preventDefault();
       var $link = $(event.target)
       load_debug_data($link, true);
@@ -62,18 +62,18 @@ import $ from 'jquery'
       $container.find('.stop_debugging').show();
     });
 
-    $refresh_debugging.click(function(event){
+    $refresh_debugging.click(event => {
       event.preventDefault();
       load_debug_data($(event.target), false);
     });
 
-    $stop_debugging.click(function(event){
+    $stop_debugging.click(event => {
       event.preventDefault();
       var $link = $(event.target)
       stop_debugging($link);
 
       var url = $link.attr('href');
-      $.ajaxJSON(url, 'DELETE', {}, function (data) {
+      $.ajaxJSON(url, 'DELETE', {}, data => {
       });
     });
 

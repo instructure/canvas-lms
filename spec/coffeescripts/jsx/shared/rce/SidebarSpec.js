@@ -33,7 +33,7 @@ QUnit.module('Sidebar - init', {
   }
 })
 
-test('loads remote sidebar when feature flag on', function() {
+test('loads remote sidebar when feature flag on', () => {
   const remoteSidebar = {is_a: 'remote_sidebar'}
   sandbox.stub(RCELoader, 'loadSidebarOnTarget').callsArgWith(1, remoteSidebar)
   Sidebar.pendingShow = false

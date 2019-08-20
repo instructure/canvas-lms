@@ -203,8 +203,8 @@ import 'jqueryui/button'
       var $alert = $(this).parents('.alert');
       if(!$alert.hasClass('new')) {
         $alert.find('input[name="_method"]').attr('value', 'DELETE');
-        $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), function(data) {
-          $alert.slideUp(function() {
+        $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), data => {
+          $alert.slideUp(() => {
             $alert.remove();
             $list.find('.alert:first').prev('.alert_separator').remove();
             $list.find('.alert_separator + .alert_separator').remove();
@@ -212,7 +212,7 @@ import 'jqueryui/button'
           });
         });
       } else {
-        $alert.slideUp(function() {
+        $alert.slideUp(() => {
           $alert.remove();
           $list.find('.alert:first').prev('.alert_separator').remove();
           $list.find('.alert_separator + .alert_separator').remove();
@@ -224,7 +224,7 @@ import 'jqueryui/button'
       $(this).parent().hideErrors();
       var $alert = $(this).parents('.alert');
       if($alert.hasClass('new')) {
-        $alert.slideUp(function() {
+        $alert.slideUp(() => {
           $alert.remove();
           $list.find('.alert:first').prev('.alert_separator').remove();
           $list.find('.alert_separator + .alert_separator').remove();
@@ -270,7 +270,7 @@ import 'jqueryui/button'
         return false;
       }
 
-      $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), function(data, xhr) {
+      $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), (data, xhr) => {
         $alert.removeClass('new');
         $alert.attr('action', xhr.getResponseHeader('Location'));
         var $method = $alert.find('input[name="_method"]');
@@ -280,7 +280,7 @@ import 'jqueryui/button'
         $alert.toggleClass('editing', false);
         $alert.toggleClass('displaying', true);
         restoreAlert($alert, data);
-      }, function(data) {
+      }, data => {
         $alert.formErrors(data);
       });
       return false;
@@ -289,10 +289,10 @@ import 'jqueryui/button'
       var $add_link = $(this).parents('.alert').find('.add_recipient_link');
       addRecipientInOrder($add_link.prev(), createRecipient($li.data('value'), 'option'));
 
-      $li.slideUp(function() {
+      $li.slideUp(() => {
         $li.remove();
       });
-      $add_link.parent().slideDown(function() {
+      $add_link.parent().slideDown(() => {
         $add_link.parent().css('display', '');
       });
       return false;
@@ -303,7 +303,7 @@ import 'jqueryui/button'
       addRecipientInOrder($recipients, createRecipient(recipient, 'li')).toggle().slideDown();
       var $errorBox = $select.data('associated_error_box');
       if($errorBox) {
-        $errorBox.fadeOut('slow', function() {
+        $errorBox.fadeOut('slow', () => {
           $errorBox.remove();
         });
       }
@@ -319,10 +319,10 @@ import 'jqueryui/button'
       var $add_link = $(this).parents('.alert').find('.add_criterion_link');
       addRecipientInOrder($add_link.prev(), createCriterion($li.data('value'), 'option'));
 
-      $li.slideUp(function(){
+      $li.slideUp(() => {
         $li.remove();
       });
-      $add_link.parent().slideDown(function() {
+      $add_link.parent().slideDown(() => {
         $add_link.parent().css('display', '');
       });
       return false;
@@ -333,7 +333,7 @@ import 'jqueryui/button'
       addRecipientInOrder($criteria, createCriterion(criterion, 'li')).toggle().slideDown();
       var $errorBox = $select.data('associated_error_box');
       if($errorBox) {
-        $errorBox.fadeOut('slow', function() {
+        $errorBox.fadeOut('slow', () => {
           $errorBox.remove();
         });
       }
@@ -347,7 +347,7 @@ import 'jqueryui/button'
     }).delegate('input[name="repetition"]', 'click', function() {
       var $error_box = $(this).parents('.alert').find('input[name="alert[repetition]"]').data('associated_error_box');
       if($error_box) {
-        $error_box.fadeOut('slow', function() {
+        $error_box.fadeOut('slow', () => {
           $error_box.remove();
         });
       }

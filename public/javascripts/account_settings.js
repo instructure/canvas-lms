@@ -224,7 +224,7 @@ let reportsTabHasLoaded = false
       .show()
 
 
-    $(".add_ip_filter_link").click(function(event) {
+    $(".add_ip_filter_link").click(event => {
       event.preventDefault();
       var $filter = $(".ip_filter.blank:first").clone(true).removeClass('blank');
       $("#ip_filters").append($filter.show());
@@ -236,7 +236,7 @@ let reportsTabHasLoaded = false
     if($(".ip_filter:not(.blank)").length == 0) {
       $(".add_ip_filter_link").click();
     }
-    $(".ip_help_link").click(function(event) {
+    $(".ip_help_link").click(event => {
       event.preventDefault();
       $("#ip_filters_dialog").dialog({
         title: I18n.t('titles.what_are_quiz_ip_filters', "What are Quiz IP Filters?"),
@@ -244,7 +244,7 @@ let reportsTabHasLoaded = false
       });
     });
 
-    $(".open_registration_delegated_warning_link").click(function(event) {
+    $(".open_registration_delegated_warning_link").click(event => {
       event.preventDefault();
       $("#open_registration_delegated_warning_dialog").dialog({
         title: I18n.t('titles.open_registration_delegated_warning_dialog', "An External Identity Provider is Enabled"),
@@ -264,16 +264,14 @@ let reportsTabHasLoaded = false
 
     var $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
         uniqueCounter = 1000;
-    $(".add_custom_help_link").click(function(event) {
+    $(".add_custom_help_link").click(event => {
       event.preventDefault();
       var $newContainer = $blankCustomHelpLink.clone(true).appendTo('#custom_help_links').show(),
           newId = uniqueCounter++;
       // need to replace the unique id in the inputs so they get sent back to rails right,
       // chage the 'for' on the lables to match.
-      $.each(['id', 'name', 'for'], function(i, prop){
-        $newContainer.find('['+prop+']').attr(prop, function(i, previous){
-          return previous.replace(/\d+/, newId);
-        });
+      $.each(['id', 'name', 'for'], (i, prop) => {
+        $newContainer.find('['+prop+']').attr(prop, (i, previous) => previous.replace(/\d+/, newId));
       });
     });
 
@@ -312,7 +310,7 @@ let reportsTabHasLoaded = false
         $myFieldset.showIf(iAmChecked);
     }).change();
 
-    $(".turnitin_account_settings").change(function() {
+    $(".turnitin_account_settings").change(() => {
       $(".confirm_turnitin_settings_link").text(I18n.t('links.turnitin.confirm_settings', "confirm Turnitin settings"));
     });
 
@@ -335,13 +333,13 @@ let reportsTabHasLoaded = false
         turnitin_host: account.turnitin_host
       }
       $link.text(I18n.t('notices.turnitin.checking_settings', "checking Turnitin settings..."));
-      $.getJSON(url, turnitin_data, function(data) {
+      $.getJSON(url, turnitin_data, data => {
         if(data && data.success) {
           $link.text(I18n.t('notices.turnitin.setings_confirmed', "Turnitin settings confirmed!"));
         } else {
           $link.text(I18n.t('notices.turnitin.invalid_settings', "invalid Turnitin settings, please check your account id and shared secret from Turnitin"))
         }
-      }, function(data) {
+      }, data => {
         $link.text(I18n.t('notices.turnitin.invalid_settings', "invalid Turnitin settings, please check your account id and shared secret from Turnitin"))
       });
     });

@@ -52,7 +52,7 @@ QUnit.module('SelectContentDialog', {
   }
 })
 
-test('it creates a confirm alert before closing the modal', function() {
+test('it creates a confirm alert before closing the modal', () => {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
@@ -67,7 +67,7 @@ test('sets the iframe allowances', function() {
   equal($dialog.find('#resource_selection_iframe').attr('allow'), this.allowances.join('; '))
 })
 
-test('it removes the confirm alert if a selection is passed back', function() {
+test('it removes the confirm alert if a selection is passed back', () => {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')

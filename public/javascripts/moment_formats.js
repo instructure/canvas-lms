@@ -93,7 +93,7 @@ const moment_formats = {
     return _.flatten(arrayOfArrays)
   },
 
-  transformFormats: _.memoize(function (formats) {
+  transformFormats: _.memoize(formats => {
     const localeSpecificFormats = _.map(formats, moment_formats.i18nToMomentFormat)
     return _.union(moment_formats.basicMomentFormats, localeSpecificFormats)
   }),

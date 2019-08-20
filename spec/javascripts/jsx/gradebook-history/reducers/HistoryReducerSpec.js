@@ -56,12 +56,12 @@ const defaultPayload = () => ({
   link: parseLinkHeader(Fixtures.historyResponse().headers.link)
 })
 
-test('returns the current state by default', function() {
+test('returns the current state by default', () => {
   const initialState = defaultState()
   deepEqual(reducer(initialState, {}), initialState)
 })
 
-test('should handle FETCH_HISTORY_START', function() {
+test('should handle FETCH_HISTORY_START', () => {
   const initialState = {
     ...defaultState(),
     nextPage: null
@@ -75,7 +75,7 @@ test('should handle FETCH_HISTORY_START', function() {
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_START}), newState)
 })
 
-test('handles FETCH_HISTORY_SUCCESS', function() {
+test('handles FETCH_HISTORY_SUCCESS', () => {
   const payload = defaultPayload()
   const initialState = {
     ...defaultState(),
@@ -91,7 +91,7 @@ test('handles FETCH_HISTORY_SUCCESS', function() {
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_SUCCESS, payload}), newState)
 })
 
-test('handles FETCH_HISTORY_FAILURE', function() {
+test('handles FETCH_HISTORY_FAILURE', () => {
   const initialState = {
     ...defaultState(),
     fetchHistoryStatus: 'started'
@@ -105,7 +105,7 @@ test('handles FETCH_HISTORY_FAILURE', function() {
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_FAILURE}), newState)
 })
 
-test('handles FETCH_HISTORY_NEXT_PAGE_START', function() {
+test('handles FETCH_HISTORY_NEXT_PAGE_START', () => {
   const initialState = defaultState()
   const newState = {
     ...initialState,
@@ -116,7 +116,7 @@ test('handles FETCH_HISTORY_NEXT_PAGE_START', function() {
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_NEXT_PAGE_START}), newState)
 })
 
-test('handles FETCH_HISTORY_NEXT_PAGE_SUCCESS', function() {
+test('handles FETCH_HISTORY_NEXT_PAGE_SUCCESS', () => {
   const payload = defaultPayload()
   const initialState = {
     ...defaultState(),
@@ -142,7 +142,7 @@ test('handles FETCH_HISTORY_NEXT_PAGE_SUCCESS', function() {
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_NEXT_PAGE_SUCCESS, payload}), newState)
 })
 
-test('handles FETCH_HISTORY_NEXT_PAGE_FAILURE', function() {
+test('handles FETCH_HISTORY_NEXT_PAGE_FAILURE', () => {
   const initialState = defaultState()
   const newState = {
     ...initialState,

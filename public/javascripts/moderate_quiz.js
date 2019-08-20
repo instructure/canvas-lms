@@ -150,33 +150,33 @@ import './vendor/date' /* Date.parse */
       updating(true);
       var last_updated_at = moderation.lastUpdatedAt && moderation.lastUpdatedAt.toISOString();
 
-      $.ajaxJSON($.replaceTags(moderate_url, 'update', last_updated_at), 'GET', {}, function(data) {
+      $.ajaxJSON($.replaceTags(moderate_url, 'update', last_updated_at), 'GET', {}, data => {
         updating(false);
         if(repeat) {
           if(data.length || moderation.studentsCurrentlyTakingQuiz) {
-            setTimeout(function() { updateSubmissions(true); }, 60000);
+            setTimeout(() => { updateSubmissions(true); }, 60000);
           } else {
-            setTimeout(function() { updateSubmissions(true); }, 180000);
+            setTimeout(() => { updateSubmissions(true); }, 180000);
           }
         }
         for(var idx in data) {
           moderation.updateSubmission(data[idx], true);
         }
-      }, function(data) {
+      }, data => {
         updating(false);
         updateErrors++;
         if(updateErrors > 5) {
           $.flashMessage(I18n.t('errors.server_communication_failed', "There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page"));
           updateErrors = 0;
           if(repeat) {
-            setTimeout(function() { updateSubmissions(true); }, 300000);
+            setTimeout(() => { updateSubmissions(true); }, 300000);
           }
         } else if(repeat) {
-          setTimeout(function() { updateSubmissions(true); }, 120000);
+          setTimeout(() => { updateSubmissions(true); }, 120000);
         }
       });
     };
-    setTimeout(function() { updateSubmissions(true); }, 1000);
+    setTimeout(() => { updateSubmissions(true); }, 1000);
     function checkChange() {
       var cnt = $(".student_check:checked").length;
       $("#checked_count").text(cnt);
@@ -184,7 +184,7 @@ import './vendor/date' /* Date.parse */
     }
     $("#check_all").change(function() {
       var isChecked = $(this).is(":checked");
-      $(".student_check").each(function(index, elem) {
+      $(".student_check").each((index, elem) => {
         $(elem).prop("checked", isChecked);
       });
       checkChange();
@@ -242,7 +242,7 @@ import './vendor/date' /* Date.parse */
       openModerateStudentDialog($("#moderate_student_dialog"), DIALOG_WIDTH)
     });
 
-    $(".reload_link").click(function(event) {
+    $(".reload_link").click(event => {
       event.preventDefault();
       updateSubmissions();
     });
@@ -329,21 +329,21 @@ import './vendor/date' /* Date.parse */
       for(var idx in ids) {
         var id = ids[idx];
         var url = $.replaceTags($(".extension_url").attr('href'), 'user_id', id);
-        $.ajaxJSON(url, 'POST', formData, function(data) {
+        $.ajaxJSON(url, 'POST', formData, data => {
           finished++;
           moderation.updateSubmission(data);
           checkIfFinished();
-        }, function(data) {
+        }, data => {
           finished++;
           errors++;
           checkIfFinished();
         });
       }
     });
-    $("#moderate_student_dialog").find('.cancel_button').click(function() {
+    $("#moderate_student_dialog").find('.cancel_button').click(() => {
       $("#moderate_student_dialog").dialog('close');
     });
-    $(".extend_time_link").live('click', function(event) {
+    $(".extend_time_link").live('click', event => {
       event.preventDefault();
       var $row = $(event.target).parents(".student");
       var end_at = $.datetimeString($row.attr('data-end-at'));
@@ -362,9 +362,9 @@ import './vendor/date' /* Date.parse */
         width: DIALOG_WIDTH
       }).fixDialogButtons();
     });
-    $("#extend_time_dialog").find(".cancel_button").click(function() {
+    $("#extend_time_dialog").find(".cancel_button").click(() => {
       $("#extend_time_dialog").dialog('close');
-    }).end().find(".save_button").click(function() {
+    }).end().find(".save_button").click(() => {
       var $dialog = $("#extend_time_dialog");
       var data = $dialog.getFormData();
       var params = {};
@@ -377,11 +377,11 @@ import './vendor/date' /* Date.parse */
       params[data.time_type] = data.time;
       $dialog.find("button").attr('disabled', true).filter(".save_button").text(I18n.t('buttons.extending_time', "Extending Time..."));
       var url = $.replaceTags($(".extension_url").attr('href'), 'user_id', $dialog.data('row').attr('data-user-id'));
-      $.ajaxJSON(url, 'POST', params, function(data) {
+      $.ajaxJSON(url, 'POST', params, data => {
         $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.extend_time', "Extend Time"));
         moderation.updateSubmission(data);
         $dialog.dialog('close');
-      }, function(data) {
+      }, data => {
         $dialog.find("button").attr('disabled', false).filter(".save_button").text(I18n.t('buttons.time_extension_failed', "Extend Time Failed, please try again"));
       });
     });
@@ -423,7 +423,7 @@ import './vendor/date' /* Date.parse */
         this.dialog.animate({height: height + 'px'});
       },
       buildResultList: function(data) {
-        $.each(data["quiz_submissions"], function (index, qs) {
+        $.each(data["quiz_submissions"], (index, qs) => {
           var clone = $(".example_autosubmit_row").clone()
             .removeClass("example_autosubmit_row")
             .appendTo(".outstanding_submissions_list").show();
@@ -476,9 +476,9 @@ import './vendor/date' /* Date.parse */
         }).dialog('open').fixDialogButtons();
 
         // Set up button behaviors
-        $('#autosubmit_form_cancel_btn').on('click keyclick', function() {
+        $('#autosubmit_form_cancel_btn').on('click keyclick', () => {
           this.closeDialog();
-        }.bind(this));
+        });
         $("#autosubmit_form_submit_btn").on("click keyclick", this.submitOutstandings.bind(this));
 
         this.setFocusOnLoad();
