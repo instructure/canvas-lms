@@ -241,7 +241,7 @@ class Course < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name, :course_code, :start_at, :conclude_at,
                  :restrict_enrollments_to_course_dates, :enrollment_term_id,
-                 :workflow_state, :account_id
+                 :workflow_state, :account_id, :grade_passback_setting
 
   include FeatureFlags
 
