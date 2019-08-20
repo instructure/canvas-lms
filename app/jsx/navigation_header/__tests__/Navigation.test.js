@@ -27,6 +27,7 @@ describe('GlobalNavigation', () => {
   }
 
   beforeEach(() => {
+    console.log(fetch.toString())
     fetch.resetMocks()
 
     componentHolder = document.createElement('div')
