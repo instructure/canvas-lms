@@ -534,6 +534,12 @@ module Lti
       -> { @context.hide_distribution_graphs? },
       COURSE_GUARD
 
+    # returns grade passback setting for the course.
+    # @internal
+    register_expansion 'Canvas.course.gradePassbackSetting', [],
+      -> { @context.grade_passback_setting },
+      COURSE_GUARD
+
     # returns the current course's term start date.
     # @example
     #   ```

@@ -835,6 +835,13 @@ module Lti
           expect(exp_hash[:test]).to eq true
         end
 
+        it 'has substitution for $Canvas.course.gradePassbackSetting' do
+          course.grade_passback_setting = 'nightly sync'
+          exp_hash = {test: '$Canvas.course.gradePassbackSetting'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'nightly sync'
+        end
+
         it 'has substitution for $CourseSection.sourcedId' do
           course.sis_source_id = 'course1'
           exp_hash = {test: '$CourseSection.sourcedId'}
