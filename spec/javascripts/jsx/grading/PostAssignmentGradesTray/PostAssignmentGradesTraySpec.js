@@ -51,14 +51,16 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
     ReactDOM.render(<PostAssignmentGradesTray ref={bindRef} />, $container)
   })
 
-  suiteHooks.afterEach(async () => {
+  suiteHooks.afterEach(() => {
+    let thingToWaitOn
     if (getTrayElement()) {
       getCloseButton().click()
-      await waitForTrayClosed()
+      thingToWaitOn = waitForTrayClosed()
     }
-
-    ReactDOM.unmountComponentAtNode($container)
-    $container.remove()
+    return Promise.resolve(thingToWaitOn).then(() => {
+      ReactDOM.unmountComponentAtNode($container)
+      $container.remove()
+    })
   })
 
   function getTrayElement() {
@@ -155,14 +157,17 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
 
     test('resets the selected sections', async () => {
       const postAssignmentGradesForSectionsStub = sinon.stub(Api, 'postAssignmentGradesForSections')
-      getSectionToggleInput().click()
-      getInputByLabel('Sophomores').click()
-      await show()
-      getSectionToggleInput().click()
-      getInputByLabel('Freshmen').click()
-      getPostButton().click()
-      deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
-      postAssignmentGradesForSectionsStub.restore()
+      try {
+        getSectionToggleInput().click()
+        getInputByLabel('Sophomores').click()
+        await show()
+        getSectionToggleInput().click()
+        getInputByLabel('Freshmen').click()
+        getPostButton().click()
+        deepEqual(postAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
+      } finally {
+        postAssignmentGradesForSectionsStub.restore()
+      }
     })
   })
 
