@@ -143,7 +143,8 @@ module.exports = {
         // top of something already copyrighted by someone else.
         mustMatch: 'Copyright '
       }
-    ]
+    ],
+    'no-unused-expressions': ['error', {'allowShortCircuit': true}]
   },
   settings: {
     react: {
