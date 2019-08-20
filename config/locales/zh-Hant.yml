@@ -8017,6 +8017,7 @@ zh-Hant:
   email_e366fa29: 電子郵件
   email_is_invalid_e0d982eb: 電郵地址無效！
   email_is_invalid_or_in_use_4c3de5b9: 電子郵件地址無效或已在使用中
+  country_or_region_is_required_86917b39: 國家或地區必選
   email_is_required_736ac26b: 電郵地址為必填
   email_the_user_about_this_account_creation_e63f8759: 將有關此帳戶創建的資訊透過電子郵件發送給使用者
   embed_content_from_name_fb9e241a: "從 嵌入内容%{name}"
@@ -10875,6 +10876,8 @@ zh-Hant:
   interactions_report_47c1219e: 互動報告
   international_sms_9edb9868: 國際短訊息
   international_sms_send_from_recipient_s_country_43881ea4: "國際短消息 - 來自收件人的國家"
+  country_or_region_26ea046c: 國家或地區
+  select_country_or_region_4e9fb08e: 選擇國家或地區
   international_text_messaging_rates_may_apply_d4b4a97a: 可能產生國際短訊資費。
   internet2_254c6ca6: Internet2
   invalid_address_book_strategy_904a7ada: 無效的通訊錄策略。

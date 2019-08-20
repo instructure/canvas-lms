@@ -8003,6 +8003,7 @@ zh-Hans:
   email_e366fa29: 电子邮件
   email_is_invalid_e0d982eb: 电子邮件无效！
   email_is_invalid_or_in_use_4c3de5b9: 电子邮件是无效的或正在使用
+  country_or_region_is_required_86917b39: 国家或地区必选
   email_is_required_736ac26b: 电子邮件是必需的
   email_the_user_about_this_account_creation_e63f8759: 电邮用户有关此帐户的创建
   embed_content_from_name_fb9e241a: "从此来源嵌入内容%{name}"
@@ -10865,6 +10866,8 @@ zh-Hans:
   interactions_report_47c1219e: 互动报告
   international_sms_9edb9868: 国际短信
   international_sms_send_from_recipient_s_country_43881ea4: "国际短讯 - 从收件人所在国家或地区发送"
+  country_or_region_26ea046c: 国家或地区
+  select_country_or_region_4e9fb08e: 选择国家或地区
   international_text_messaging_rates_may_apply_d4b4a97a: 国际短信费率可能应用。
   internet2_254c6ca6: Internet2
   invalid_address_book_strategy_904a7ada: 无效地址簿策略。
