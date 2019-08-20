@@ -90,16 +90,16 @@ describe('CommentsTab', () => {
 
   it('renders the optimistic response with env current user', async () => {
     const basicMock = commentGraphqlMock(mockComments())
-    const {getByPlaceholderText, getByText} = render(
+    const {findByPlaceholderText, getByText, findByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
         <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await findByPlaceholderText('Submit a Comment')
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
 
-    expect(await waitForElement(() => getByText('optimistic user'))).toBeInTheDocument()
+    expect(await findByText('optimistic user')).toBeTruthy()
   })
 
   it('renders the message when sent', async () => {

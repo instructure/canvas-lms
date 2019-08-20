@@ -50,8 +50,8 @@
     "react-dom": "^16"
   },
   "devDependencies": {
-    "@testing-library/dom": "^5",
-    "@testing-library/react": "^8",
+    "@testing-library/dom": "^6",
+    "@testing-library/react": "^9",
     "@testing-library/user-event": "^4.1.0"
   }
 }
