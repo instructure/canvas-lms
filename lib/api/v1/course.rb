@@ -34,6 +34,7 @@ module Api::V1::Course
     settings[:filter_speed_grader_by_student_group] = course.filter_speed_grader_by_student_group?
     settings[:grading_standard_enabled] = course.grading_standard_enabled?
     settings[:grading_standard_id] = course.grading_standard_id
+    settings[:grade_passback_setting] = course.grade_passback_setting
     settings[:allow_student_organized_groups] = course.allow_student_organized_groups?
     settings[:hide_final_grades] = course.hide_final_grades?
     settings[:hide_distribution_graphs] = course.hide_distribution_graphs?
