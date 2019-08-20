@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from '../../graphqlData/Assignment'
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
@@ -31,6 +32,10 @@ const languages = Object.keys(closedCaptionLanguages).map(key => {
 })
 
 export default class MediaAttempt extends React.Component {
+  static propTypes = {
+    assignment: Assignment.shape
+  }
+
   state = {
     mediaModalOpen: false,
     mediaObjectUrl: null

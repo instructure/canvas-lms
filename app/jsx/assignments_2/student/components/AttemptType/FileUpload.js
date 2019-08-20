@@ -17,9 +17,9 @@
  */
 
 import {Assignment} from '../../graphqlData/Assignment'
+import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
-import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import MoreOptions from './MoreOptions'
@@ -35,7 +35,6 @@ import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import theme from '@instructure/ui-themes/lib/canvas/base'
 
 function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
@@ -44,16 +43,14 @@ function submissionFileUploadUrl(assignment) {
 export default class FileUpload extends Component {
   static propTypes = {
     assignment: Assignment.shape,
-    createSubmission: func,
     createSubmissionDraft: func,
     submission: Submission.shape,
-    updateSubmissionState: func,
-    updateUploadState: func
+    updateUploadingFiles: func,
+    uploadingFiles: bool
   }
 
   state = {
-    messages: [],
-    uploadingFiles: false
+    messages: []
   }
 
   _isMounted = false
@@ -82,31 +79,25 @@ export default class FileUpload extends Component {
 
   handleDropAccepted = async files => {
     if (this._isMounted) {
-      this.setState({uploadingFiles: true})
+      this.props.updateUploadingFiles(true)
     }
 
     if (files.length) {
-      try {
-        const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
+      const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
 
-        await this.props.createSubmissionDraft({
-          variables: {
-            id: this.props.submission.id,
-            attempt: this.props.submission.attempt || 1,
-            fileIds: this.getDraftAttachments()
-              .map(file => file._id)
-              .concat(newFiles.map(file => file.id))
-          }
-        })
-      } catch (err) {
-        if (this._isMounted) {
-          this.props.updateUploadState('error')
+      await this.props.createSubmissionDraft({
+        variables: {
+          id: this.props.submission.id,
+          attempt: this.props.submission.attempt || 1,
+          fileIds: this.getDraftAttachments()
+            .map(file => file._id)
+            .concat(newFiles.map(file => file.id))
         }
-      }
+      })
     }
 
     if (this._isMounted) {
-      this.setState({uploadingFiles: false})
+      this.props.updateUploadingFiles(false)
     }
   }
 
@@ -161,25 +152,6 @@ export default class FileUpload extends Component {
       return `${title.substr(0, 9)}${I18n.t('...')}${title.substr(-9)}`
     } else {
       return title
-    }
-  }
-
-  submitAssignment = async () => {
-    if (this._isMounted) {
-      this.props.updateSubmissionState('in-progress')
-    }
-
-    await this.props.createSubmission({
-      variables: {
-        assignmentLid: this.props.assignment._id,
-        submissionID: this.props.submission.id,
-        type: 'online_upload', // TODO: update to enable different submission types
-        fileIds: this.getDraftAttachments().map(file => file._id)
-      }
-    })
-
-    if (this._isMounted) {
-      this.setState({messages: []})
     }
   }
 
@@ -306,55 +278,6 @@ export default class FileUpload extends Component {
     )
   }
 
-  renderSubmitButton = () => {
-    const outerFooterStyle = {
-      position: 'fixed',
-      bottom: '0',
-      left: '0',
-      right: '0',
-      maxWidth: '1366px',
-      margin: '0 0 0 84px',
-      zIndex: '5'
-    }
-
-    // TODO: Delete this once the better global footers are implemented. This
-    //       is some pretty ghetto stuff to handle the fixed buttom bars (for
-    //       masquarading and beta instances) that would otherwise hide the
-    //       submit button.
-    let paddingOffset = 0
-    if (document.getElementById('masquerade_bar')) {
-      paddingOffset += 52
-    }
-    if (document.getElementById('element_toggler_0')) {
-      paddingOffset += 63
-    }
-
-    const innerFooterStyle = {
-      backgroundColor: theme.variables.colors.white,
-      borderColor: theme.variables.colors.borderMedium,
-      borderTop: `1px solid ${theme.variables.colors.borderMedium}`,
-      textAlign: 'right',
-      margin: `0 ${theme.variables.spacing.medium}`,
-      paddingBottom: `${paddingOffset}px`
-    }
-
-    return (
-      <div style={outerFooterStyle}>
-        <div style={innerFooterStyle}>
-          <Button
-            id="submit-button"
-            data-testid="submit-button"
-            variant="primary"
-            margin="xx-small 0"
-            onClick={() => this.submitAssignment()}
-          >
-            {I18n.t('Submit')}
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   render() {
     return (
       <div data-testid="upload-pane">
@@ -368,10 +291,7 @@ export default class FileUpload extends Component {
           </Grid>
         )}
 
-        {this.getDraftAttachments().length !== 0 &&
-          !this.state.uploadingFiles &&
-          this.renderSubmitButton()}
-        {this.state.uploadingFiles && <LoadingIndicator />}
+        {this.props.uploadingFiles && <LoadingIndicator />}
       </div>
     )
   }

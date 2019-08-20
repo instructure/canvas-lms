@@ -35,10 +35,9 @@ RichContentEditor.preloadRemoteModule()
 export default class TextEntry extends React.Component {
   static propTypes = {
     createSubmissionDraft: func,
-    shouldDisplayRCE: bool,
+    editingDraft: bool,
     submission: Submission.shape,
-    updateShouldDisplayRCE: func,
-    updateUploadState: func
+    updateEditingDraft: func
   }
 
   state = {
@@ -58,15 +57,15 @@ export default class TextEntry extends React.Component {
   componentDidMount() {
     this._isMounted = true
 
-    if (this.getDraftBody() !== null && this.props.shouldDisplayRCE && !this.state.editorLoaded) {
+    if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
       this.loadRCE()
     }
   }
 
   componentDidUpdate() {
-    if (this.getDraftBody() !== null && this.props.shouldDisplayRCE && !this.state.editorLoaded) {
+    if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
       this.loadRCE()
-    } else if (!this.props.shouldDisplayRCE && this.state.editorLoaded) {
+    } else if (!this.props.editingDraft && this.state.editorLoaded) {
       this.unloadRCE()
     }
   }
@@ -74,7 +73,7 @@ export default class TextEntry extends React.Component {
   componentWillUnmount() {
     this._isMounted = false
 
-    if (this.state.editorLoaded && !this.props.shouldDisplayRCE) {
+    if (this.state.editorLoaded && !this.props.editingDraft) {
       this.unloadRCE()
     }
   }
@@ -148,37 +147,33 @@ export default class TextEntry extends React.Component {
   }
 
   updateSubmissionDraft = async rceText => {
-    try {
-      await this.props.createSubmissionDraft({
-        variables: {
-          id: this.props.submission.id,
-          attempt: this.props.submission.attempt || 1,
-          body: rceText
-        }
-      })
-    } catch (err) {
-      this.props.updateUploadState('error')
-    }
+    await this.props.createSubmissionDraft({
+      variables: {
+        id: this.props.submission.id,
+        attempt: this.props.submission.attempt || 1,
+        body: rceText
+      }
+    })
   }
 
   handleStartButton = () => {
     if (this._isMounted) {
       this.updateSubmissionDraft('')
-      this.props.updateShouldDisplayRCE(true)
+      this.props.updateEditingDraft(true)
     }
   }
 
   handleSaveButton = () => {
     if (this._isMounted) {
       this.updateSubmissionDraft(this.getRCEText())
-      this.props.updateShouldDisplayRCE(false)
+      this.props.updateEditingDraft(false)
     }
   }
 
   handleCancelButton = () => {
     if (this._isMounted) {
       this.updateSubmissionDraft(null)
-      this.props.updateShouldDisplayRCE(false)
+      this.props.updateEditingDraft(false)
     }
   }
 
@@ -195,7 +190,7 @@ export default class TextEntry extends React.Component {
           data-testid="cancel-text-entry"
           margin="0 xx-small 0 0"
           onClick={() => {
-            this.props.updateShouldDisplayRCE(false)
+            this.props.updateEditingDraft(false)
           }}
         >
           {I18n.t('Cancel')}
@@ -229,7 +224,7 @@ export default class TextEntry extends React.Component {
               data-testid="edit-text-draft"
               margin="0 x-small 0 0"
               onClick={() => {
-                this.props.updateShouldDisplayRCE(true)
+                this.props.updateEditingDraft(true)
               }}
             >
               {I18n.t('Edit')}
@@ -267,7 +262,7 @@ export default class TextEntry extends React.Component {
     if (this.getDraftBody() === null) {
       return this.renderInitialBox()
     } else {
-      return this.props.shouldDisplayRCE ? this.renderEditor() : this.renderSavedDraft()
+      return this.props.editingDraft ? this.renderEditor() : this.renderSavedDraft()
     }
   }
 }

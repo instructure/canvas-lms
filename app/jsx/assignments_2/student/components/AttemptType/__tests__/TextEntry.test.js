@@ -32,9 +32,9 @@ async function makeProps(opts = {}) {
 
   return {
     createSubmissionDraft: jest.fn(),
-    shouldDisplayRCE: opts.shouldDisplayRCE || false,
+    editingDraft: opts.editingDraft || false,
     submission: mockedSubmission,
-    updateShouldDisplayRCE: jest.fn()
+    updateEditingDraft: jest.fn()
   }
 }
 
@@ -72,7 +72,7 @@ describe('TextEntry', () => {
         const editButton = getByTestId('edit-text-draft')
         fireEvent.click(editButton)
 
-        expect(props.updateShouldDisplayRCE).toHaveBeenCalledWith(true)
+        expect(props.updateEditingDraft).toHaveBeenCalledWith(true)
       })
 
       it('deletes the saved draft when the Delete button is clicked', async () => {
@@ -93,14 +93,14 @@ describe('TextEntry', () => {
 
     describe('with the RCE view enabled', () => {
       it('renders the RCE when the draft body is not null', async () => {
-        const props = await makeProps({shouldDisplayRCE: true})
+        const props = await makeProps({editingDraft: true})
         const {getByTestId} = render(<TextEntry {...props} />)
 
         expect(getByTestId('text-editor')).toBeInTheDocument()
       })
 
       it('renders the Cancel button when the RCE is loaded', async () => {
-        const props = await makeProps({shouldDisplayRCE: true})
+        const props = await makeProps({editingDraft: true})
         const {getByTestId, getByText} = render(<TextEntry {...props} />)
 
         const cancelButton = getByTestId('cancel-text-entry')
@@ -108,7 +108,7 @@ describe('TextEntry', () => {
       })
 
       it('renders the Save button when the RCE is loaded', async () => {
-        const props = await makeProps({shouldDisplayRCE: true})
+        const props = await makeProps({editingDraft: true})
         const {getByTestId, getByText} = render(<TextEntry {...props} />)
 
         const saveButton = getByTestId('save-text-entry')
@@ -116,7 +116,7 @@ describe('TextEntry', () => {
       })
 
       it('saves the text draft when the Save button is clicked', async () => {
-        const props = await makeProps({shouldDisplayRCE: true})
+        const props = await makeProps({editingDraft: true})
         const {getByTestId} = render(<TextEntry {...props} />)
 
         const saveButton = getByTestId('save-text-entry')
@@ -132,13 +132,13 @@ describe('TextEntry', () => {
       })
 
       it('stops displaying the RCE when the Cancel button is clicked', async () => {
-        const props = await makeProps({shouldDisplayRCE: true})
+        const props = await makeProps({editingDraft: true})
         const {getByTestId} = render(<TextEntry {...props} />)
 
         const cancelButton = getByTestId('cancel-text-entry')
         fireEvent.click(cancelButton)
 
-        expect(props.updateShouldDisplayRCE).toHaveBeenCalledWith(false)
+        expect(props.updateEditingDraft).toHaveBeenCalledWith(false)
       })
     })
   })
