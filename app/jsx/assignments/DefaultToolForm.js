@@ -68,6 +68,17 @@ const DefaultToolForm = props => {
     SelectContentDialog.Events.onContextExternalToolSelect(event, $('#default-tool'))
   }
 
+  if(!defaultToolData && launchDefinitions.length > 0) {
+    return(
+      <View display="block" padding="medium none small small">
+        <Alert variant="error" margin="small small 0 0">
+          <Text weight="bold">{I18n.t('Tool Not Found')}</Text><br/>
+          <Text>{I18n.t('The tool is not installed in the course or account')}</Text>
+        </Alert>
+      </View>
+    )
+  }
+
   return (
     <View display="block" padding="medium none small small">
       <Button id="default-tool-launch-button" name="default-tool-launch-button" onClick={handleLaunchButton}>
