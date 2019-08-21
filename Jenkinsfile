@@ -86,21 +86,17 @@ pipeline {
               '''
             })
 
-            // Todo: stop using Jenkins folder credential - its just a list we don't want in the open source repo
-            // Prefer a file that doesn't get synced to the public repo or a plain environment variable
-            withCredentials([string(credentialsId: 'CANVAS_DEFAULT_PLUGINS', variable: 'gem_list')]) {
-              gems = gem_list.split()
-              println "Plugin list: ${gems}"
-              /* fetch plugins */
-              gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
-              fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
-              fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
-              sh '''
-                mv gerrit_builder/canvas-lms/config/* config/
-                rmdir -p gerrit_builder/canvas-lms/config
-                cp docker-compose/config/selenium.yml config/
-              '''
-            }
+            fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+            gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
+            println "Plugin list: ${gems}"
+            /* fetch plugins */
+            gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
+            fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+            sh '''
+              mv gerrit_builder/canvas-lms/config/* config/
+              rmdir -p gerrit_builder/canvas-lms/config
+              cp docker-compose/config/selenium.yml config/
+            '''
           }
         }
       }
