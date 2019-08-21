@@ -161,7 +161,7 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   quiz: Quiz
   rubric: Rubric
   state: AssignmentState!
-  submissionTypes: [AssignmentSubmissionType!]
+  submissionTypes: [SubmissionType!]
 
   """
   submissions for this assignment
@@ -478,24 +478,6 @@ enum AssignmentState {
   deleted
   published
   unpublished
-}
-
-"""
-Types of submissions an assignment accepts
-"""
-enum AssignmentSubmissionType {
-  attendance
-  discussion_topic
-  external_tool
-  media_recording
-  none
-  not_graded
-  on_paper
-  online_quiz
-  online_text_entry
-  online_upload
-  online_url
-  wiki_page
 }
 
 interface AssignmentsConnectionInterface {
@@ -984,7 +966,7 @@ input CreateAssignmentInput {
   position: Int
   postToSis: Boolean
   state: AssignmentState
-  submissionTypes: [AssignmentSubmissionType!]
+  submissionTypes: [SubmissionType!]
   unlockAt: DateTime
 }
 
@@ -2903,6 +2885,24 @@ enum SubmissionState {
 }
 
 """
+Types of submissions an assignment accepts
+"""
+enum SubmissionType {
+  attendance
+  discussion_topic
+  external_tool
+  media_recording
+  none
+  not_graded
+  on_paper
+  online_quiz
+  online_text_entry
+  online_upload
+  online_url
+  wiki_page
+}
+
+"""
 statistics based on timeliness of student submissions
 """
 type TardinessBreakdown {
@@ -2991,7 +2991,7 @@ input UpdateAssignmentInput {
   position: Int
   postToSis: Boolean
   state: AssignmentState
-  submissionTypes: [AssignmentSubmissionType!]
+  submissionTypes: [SubmissionType!]
   unlockAt: DateTime
 }
 

@@ -54,7 +54,7 @@ module Types
     ].to_set
 
     class AssignmentSubmissionType < Types::BaseEnum
-      graphql_name "AssignmentSubmissionType"
+      graphql_name "SubmissionType"
       description "Types of submissions an assignment accepts"
       SUBMISSION_TYPES.each { |submission_type|
         value(submission_type)
