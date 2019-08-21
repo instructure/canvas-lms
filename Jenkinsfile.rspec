@@ -39,8 +39,7 @@ pipeline {
           sh 'printenv | sort'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
           sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-          // Todo: create script for rspec tests
-          // sh 'build/new-jenkins/rspec-tests.sh'
+          sh 'build/new-jenkins/rspec-tests.sh'
         }
       }
 
