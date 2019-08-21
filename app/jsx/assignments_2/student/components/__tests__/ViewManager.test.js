@@ -56,7 +56,7 @@ async function makeProps(opts = {}) {
   ]
   if (withDraft) {
     studentViewOverrides.push({
-      Submission: () => SubmissionMocks.draftWithAttachment
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
     })
   }
   const studentViewResult = await mockStudentViewResult(studentViewOverrides)

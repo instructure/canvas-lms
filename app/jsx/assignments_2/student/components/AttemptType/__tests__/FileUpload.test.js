@@ -69,7 +69,7 @@ describe('FileUpload', () => {
 
   it('renders the submission draft files if there are any', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.draftWithAttachment,
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: 'foobarbaz'})
     })
 
@@ -80,7 +80,7 @@ describe('FileUpload', () => {
 
   it('renders in an img tag if the file type is an image', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.draftWithAttachment,
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: 'foobarbaz', mimeClass: 'image'})
     })
     const {container, getByTestId} = render(<FileUpload {...props} />)
@@ -90,7 +90,7 @@ describe('FileUpload', () => {
 
   it('renders an icon if a non-image file is uploaded', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.draftWithAttachment,
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: 'foobarbaz', mimeClass: 'pdf'})
     })
 
@@ -209,7 +209,7 @@ describe('FileUpload', () => {
 
   it('renders a button to remove the file', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.draftWithAttachment,
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({_id: '1', displayName: 'foobarbaz'})
     })
 
@@ -241,7 +241,7 @@ describe('FileUpload', () => {
 
   it('ellides filenames for files greater than 21 characters', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.draftWithAttachment,
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: 'c'.repeat(22)})
     })
 
@@ -253,7 +253,7 @@ describe('FileUpload', () => {
   it('does not ellide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
     const props = await makeProps({
-      Submission: () => SubmissionMocks.draftWithAttachment,
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: filename})
     })
 

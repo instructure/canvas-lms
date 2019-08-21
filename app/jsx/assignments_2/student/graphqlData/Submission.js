@@ -42,9 +42,10 @@ export const SubmissionDefaultMocks = {
 }
 
 export const SubmissionMocks = {
-  draftWithAttachment: {
+  onlineUploadReadyToSubmit: {
     submissionDraft: {
-      attachments: [{}]
+      attachments: [{_id: '1'}],
+      meetsAssignmentCriteria: true
     }
   },
 

@@ -103,24 +103,29 @@ export default class SubmissionManager extends Component {
     })
   }
 
-  submitAssignment = submitMutation => {
+  submitAssignment = async submitMutation => {
+    if (this.state.submittingAssignment) {
+      return
+    }
     this.setState({submittingAssignment: true})
 
-    this.props.assignment.submissionTypes.forEach(type => {
-      switch (type) {
-        case 'online_upload':
-          if (
-            this.props.submission.submissionDraft &&
-            this.props.submission.submissionDraft.attachments &&
-            this.props.submission.submissionDraft.attachments.length > 0
-          ) {
-            this.submitFileUpload(submitMutation)
-          }
-          break
-        case 'online_text_entry':
-        // TODO: add the online text entry submission handler
-      }
-    })
+    await Promise.all(
+      this.props.assignment.submissionTypes.map(async type => {
+        switch (type) {
+          case 'online_upload':
+            if (
+              this.props.submission.submissionDraft &&
+              this.props.submission.submissionDraft.attachments &&
+              this.props.submission.submissionDraft.attachments.length > 0
+            ) {
+              return this.submitFileUpload(submitMutation)
+            }
+            break
+          case 'online_text_entry':
+          // TODO: add the online text entry submission handler
+        }
+      })
+    )
 
     this.setState({submittingAssignment: false})
   }
@@ -208,19 +213,15 @@ export default class SubmissionManager extends Component {
   }
 
   render() {
-    if (this.state.submittingAssignment) {
-      return <LoadingIndicator />
-    } else {
-      return (
-        <Mutation mutation={CREATE_SUBMISSION} update={this.clearSubmissionHistoriesCache}>
-          {createSubmission => (
-            <>
-              {this.renderAttemptTab()}
-              {this.shouldRenderSubmit() && this.renderSubmitButton(createSubmission)}
-            </>
-          )}
-        </Mutation>
-      )
-    }
+    return (
+      <Mutation mutation={CREATE_SUBMISSION} update={this.clearSubmissionHistoriesCache}>
+        {createSubmission => (
+          <>
+            {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
+            {this.shouldRenderSubmit() && this.renderSubmitButton(createSubmission)}
+          </>
+        )}
+      </Mutation>
+    )
   }
 }

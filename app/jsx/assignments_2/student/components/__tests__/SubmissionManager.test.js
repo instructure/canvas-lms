@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mockAssignmentAndSubmission} from '../../mocks'
+import {CREATE_SUBMISSION} from '../../graphqlData/Mutations'
+import {fireEvent, render} from '@testing-library/react'
+import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from 'react-apollo/test-utils'
 import React from 'react'
-import {render} from '@testing-library/react'
 import SubmissionManager from '../SubmissionManager'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 
 describe('SubmissionManager', () => {
   it('renders the AttemptTab', async () => {
@@ -47,11 +49,7 @@ describe('SubmissionManager', () => {
 
   it('renders a submit button when the draft criteria is met', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({
-        submissionDraft: {
-          meetsAssignmentCriteria: true
-        }
-      })
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
     })
     const {getByText} = render(
       <MockedProvider>
@@ -60,5 +58,35 @@ describe('SubmissionManager', () => {
     )
 
     expect(getByText('Submit')).toBeInTheDocument()
+  })
+
+  it('disables the submit button after it is pressed', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
+    })
+
+    const variables = {
+      assignmentLid: '1',
+      submissionID: '1',
+      type: 'online_upload',
+      fileIds: ['1']
+    }
+    const result = await mockQuery(CREATE_SUBMISSION, {}, variables)
+    const mocks = [
+      {
+        request: {query: CREATE_SUBMISSION, variables},
+        result
+      }
+    ]
+
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    const submitButton = getByText('Submit')
+    fireEvent.click(submitButton)
+    expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
   })
 })
