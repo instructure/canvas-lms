@@ -213,7 +213,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def submission
     unless @quiz.grants_right?(@current_user, session, :submit)
-      render_unauthorized_action
+      return render_unauthorized_action
     end
 
     quiz_submission = @quiz.quiz_submissions.where(user_id: @current_user).first(1)
