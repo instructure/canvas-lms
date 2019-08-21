@@ -83,3 +83,16 @@ export const CREATE_SUBMISSION_DRAFT = gql`
   ${Error.fragment}
   ${SubmissionDraft.fragment}
 `
+
+export const MARK_SUBMISISON_COMMENT_READ = gql`
+  mutation MarkSubmissionCommentsRead($commentIds: [ID!]!, $submissionId: ID!) {
+    markSubmissionCommentsRead(
+      input: {submissionCommentIds: $commentIds, submissionId: $submissionId}
+    ) {
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`
