@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
 import React from 'react'
 import {render} from '@testing-library/react'

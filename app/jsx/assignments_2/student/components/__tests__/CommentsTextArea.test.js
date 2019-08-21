@@ -24,7 +24,7 @@ import {
   mockMultipleAttachments
 } from '../../test-utils'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
 import CommentTextArea from '../CommentsTab/CommentTextArea'

@@ -19,7 +19,7 @@
 import {CREATE_SUBMISSION} from '../../graphqlData/Mutations'
 import {fireEvent, render} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import SubmissionManager from '../SubmissionManager'
 import {SubmissionMocks} from '../../graphqlData/Submission'

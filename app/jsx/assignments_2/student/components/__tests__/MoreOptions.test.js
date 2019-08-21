@@ -19,7 +19,7 @@
 import axios from 'axios'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../graphqlData/Queries'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
 import MoreOptions from '../AttemptType/MoreOptions'
 import React from 'react'
@@ -85,7 +85,11 @@ beforeAll(() => {
 
 describe('MoreOptions', () => {
   it('renders a button for more options', () => {
-    const {getByText} = render(<MoreOptions assignmentID="1" courseID="1" userID="1" />)
+    const {getByText} = render(
+      <MockedProvider>
+        <MoreOptions assignmentID="1" courseID="1" userID="1" />
+      </MockedProvider>
+    )
     expect(getByText('More Options')).toBeInTheDocument()
   })
 

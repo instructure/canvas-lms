@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {fireEvent, render, wait} from '@testing-library/react'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
 import range from 'lodash/range'
 import React from 'react'

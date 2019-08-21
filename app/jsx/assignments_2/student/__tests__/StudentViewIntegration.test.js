@@ -20,7 +20,7 @@ import * as uploadFileModule from '../../../shared/upload_file'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {createCache} from '../../../canvas-apollo'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../mocks'
 import React from 'react'
 import {

@@ -27,7 +27,7 @@ import {
   singleAttachment,
   singleComment
 } from '../../test-utils'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {render, waitForElement, fireEvent} from '@testing-library/react'
 
 describe('CommentsTab', () => {

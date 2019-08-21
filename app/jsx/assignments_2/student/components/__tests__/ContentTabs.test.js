@@ -18,7 +18,7 @@
 
 import ContentTabs from '../ContentTabs'
 import {mockAssignmentAndSubmission} from '../../mocks'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {SubmissionMocks} from '../../graphqlData/Submission'

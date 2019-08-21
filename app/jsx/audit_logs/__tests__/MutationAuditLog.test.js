@@ -17,7 +17,7 @@
  */
 
 import {AuditLogForm, AuditLogResults, MUTATION_LOG_QUERY} from '../MutationAuditLog'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
 

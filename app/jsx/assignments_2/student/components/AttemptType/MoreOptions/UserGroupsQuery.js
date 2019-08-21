@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, string} from 'prop-types'
+import {ApolloClient} from 'apollo-client'
+import {arrayOf, string, instanceOf} from 'prop-types'
 import errorShipUrl from '../../../SVG/ErrorShip.svg'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import GenericErrorPage from '../../../../../shared/components/GenericErrorPage/index'
@@ -29,7 +30,7 @@ import {USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
 
 const UserGroupsQuery = props => {
   return (
-    <Query query={USER_GROUPS_QUERY} variables={{userID: props.userID}}>
+    <Query query={USER_GROUPS_QUERY} variables={{userID: props.userID}} client={props.client}>
       {({loading, error, data}) => {
         if (loading) return <LoadingIndicator />
         if (error) {
@@ -58,7 +59,8 @@ UserGroupsQuery.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
   tools: arrayOf(ExternalTool.shape),
-  userID: string.isRequired
+  userID: string.isRequired,
+  client: instanceOf(ApolloClient)
 }
 
 export default UserGroupsQuery
