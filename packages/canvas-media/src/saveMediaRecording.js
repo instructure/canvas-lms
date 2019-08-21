@@ -48,7 +48,7 @@ function addUploaderFileErrorEventListeners(uploader, done) {
   })
 }
 
-function addUploaderFileCompleteEventListeners(uploader, context, done) {
+function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
   uploader.addEventListener('K5.complete', async mediaServerMediaObject => {
     mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
     mediaServerMediaObject.type = `${context.contextType}_${context.contextId}`
@@ -61,13 +61,13 @@ function addUploaderFileCompleteEventListeners(uploader, context, done) {
           ? 'audio'
           : 'video',
       context_code: mediaServerMediaObject.contextCode,
-      title: mediaServerMediaObject.title,
-      user_entered_title: mediaServerMediaObject.userTitle
+      title: file.name,
+      user_entered_title: file.name
     }
 
     try {
       const canvasMediaObject = await axios.post('/api/v1/media_objects', body)
-      done(canvasMediaObject.data)
+      done(null, canvasMediaObject.data)
     } catch (e) {
       done(e)
     }
@@ -86,7 +86,7 @@ export default async function saveMediaRecording(file, contextId, contextType, d
     const k5UploaderSession = new K5Uploader(session)
     addUploaderReadyEventListeners(k5UploaderSession, file)
     addUploaderFileErrorEventListeners(k5UploaderSession, done)
-    addUploaderFileCompleteEventListeners(k5UploaderSession, {contextId, contextType}, done)
+    addUploaderFileCompleteEventListeners(k5UploaderSession, {contextId, contextType}, file, done)
     return k5UploaderSession
   } catch (err) {
     done(err)

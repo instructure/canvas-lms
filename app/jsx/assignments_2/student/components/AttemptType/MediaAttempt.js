@@ -20,9 +20,12 @@ import {Assignment} from '../../graphqlData/Assignment'
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
-import I18n from 'i18n!assignments_2_text_entry'
+import elideString from '../../../../shared/helpers/elideString'
+import I18n from 'i18n!assignments_2_media_attempt'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
 import React from 'react'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import UploadMedia from '@instructure/canvas-media'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -31,6 +34,8 @@ const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}
 })
 
+export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
+
 export default class MediaAttempt extends React.Component {
   static propTypes = {
     assignment: Assignment.shape
@@ -38,17 +43,52 @@ export default class MediaAttempt extends React.Component {
 
   state = {
     mediaModalOpen: false,
-    mediaObjectUrl: null
+    mediaObject: null
   }
 
-  onDismiss = mediaObject => {
-    this.setState({mediaModalOpen: false, mediaObjectUrl: mediaObject.embedded_iframe_url})
+  onDismiss = (err, mediaObject) => {
+    this.setState({mediaModalOpen: false, mediaObject})
+  }
+
+  handleRemoveFile = () => {
+    this.setState({mediaObject: null})
+  }
+
+  renderMediaPlayer = () => {
+    const mediaObject = this.state.mediaObject.media_object
+    return (
+      <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+        <div style={{width: VIDEO_SIZE_OPTIONS.width, height: VIDEO_SIZE_OPTIONS.height}}>
+          <iframe
+            style={{width: '100%', height: '100%'}}
+            title={I18n.t('Media Submission')}
+            src={this.state.mediaObject.embedded_iframe_url}
+          />
+        </div>
+        <div>
+          <span aria-hidden title={mediaObject.title}>
+            {elideString(mediaObject.title)}
+          </span>
+          <ScreenReaderContent>{mediaObject.title}</ScreenReaderContent>
+          <Button
+            icon={IconTrash}
+            id={mediaObject.id}
+            margin="0 0 0 x-small"
+            onClick={this.handleRemoveFile}
+            size="small"
+          >
+            <ScreenReaderContent>
+              {I18n.t('Remove %{filename}', {filename: mediaObject.title})}
+            </ScreenReaderContent>
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   render() {
-    if (this.state.mediaObjectUrl) {
-      // TODO: figure out how the heck we want to style this thing.
-      return <iframe title="meidathings" src={this.state.mediaObjectUrl} />
+    if (this.state.mediaObject) {
+      return this.renderMediaPlayer()
     }
 
     return (
@@ -69,6 +109,7 @@ export default class MediaAttempt extends React.Component {
           message={
             <Button
               size="small"
+              data-testid="media-modal-launch-button"
               variant="primary"
               onClick={() => this.setState({mediaModalOpen: true})}
             >

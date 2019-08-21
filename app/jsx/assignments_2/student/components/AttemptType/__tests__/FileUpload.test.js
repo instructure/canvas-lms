@@ -239,7 +239,7 @@ describe('FileUpload', () => {
     })
   })
 
-  it('ellides filenames for files greater than 21 characters', async () => {
+  it('elides filenames for files greater than 21 characters', async () => {
     const props = await makeProps({
       Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: 'c'.repeat(22)})
@@ -250,7 +250,7 @@ describe('FileUpload', () => {
     expect(getByText(/^c+\.{3}c+$/)).toBeInTheDocument()
   })
 
-  it('does not ellide filenames for files less than or equal to 21 characters', async () => {
+  it('does not elide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
     const props = await makeProps({
       Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,

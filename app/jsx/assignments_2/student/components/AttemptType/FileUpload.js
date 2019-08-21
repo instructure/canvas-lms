@@ -20,6 +20,7 @@ import {Assignment} from '../../graphqlData/Assignment'
 import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
+import elideString from '../../../../shared/helpers/elideString'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import MoreOptions from './MoreOptions'
@@ -147,14 +148,6 @@ export default class FileUpload extends Component {
     return file.mimeClass === 'image' && file.thumbnailUrl
   }
 
-  ellideString = title => {
-    if (title.length > 21) {
-      return `${title.substr(0, 9)}${I18n.t('...')}${title.substr(-9)}`
-    } else {
-      return title
-    }
-  }
-
   renderUploadBox() {
     return (
       <div data-testid="upload-box">
@@ -225,7 +218,7 @@ export default class FileUpload extends Component {
         message={
           <div>
             <span aria-hidden title={file.displayName}>
-              {this.ellideString(file.displayName)}
+              {elideString(file.displayName)}
             </span>
             <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
             <Button
