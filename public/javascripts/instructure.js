@@ -170,6 +170,7 @@ import 'compiled/badge_counts'
 
   $(function() {
 
+    //StrongMind Added
     ga('create', ENV["analytics"]["ga_tracking_id"]);
     $('.sm-course-menu').on('click', 'nav #section-tabs .section a', function(event) {
       ga('send', 'event', 
