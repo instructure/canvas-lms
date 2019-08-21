@@ -56,6 +56,7 @@ function getProps(column, gradebook, options) {
   const students = visibleStudentsForAssignment.map(student => ({
     id: student.id,
     isInactive: student.isInactive,
+    isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
     name: student.name,
     sortableName: student.sortable_name,
     submission: getSubmission(student, assignmentId)

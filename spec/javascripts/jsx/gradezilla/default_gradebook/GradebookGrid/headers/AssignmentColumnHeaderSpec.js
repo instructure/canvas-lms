@@ -133,6 +133,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1001',
           isInactive: false,
+          isTestStudent: false,
           name: 'Adam Jones',
           sortableName: 'Jones, Adam',
           submission: {
@@ -147,6 +148,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1002',
           isInactive: false,
+          isTestStudent: false,
           name: 'Betty Ford',
           sortableName: 'Ford, Betty',
           submission: {
@@ -161,6 +163,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1003',
           isInactive: false,
+          isTestStudent: false,
           name: 'Charlie Xi',
           sortableName: 'Xi, Charlie',
           submission: {
@@ -824,6 +827,22 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         const [settings] = window.messageStudents.lastCall.args
         settings.onClose()
         strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('includes non-test students in the "settings" hash', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        const [settings] = window.messageStudents.lastCall.args
+        strictEqual(settings.students.length, 3)
+      })
+
+      test('excludes test students from the "settings" hash', () => {
+        props.students[0].isTestStudent = true
+
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        const [settings] = window.messageStudents.lastCall.args
+        deepEqual(settings.students.map(student => student.name), ['Betty Ford', 'Charlie Xi'])
       })
     })
   })

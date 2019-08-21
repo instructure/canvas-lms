@@ -156,8 +156,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     students: arrayOf(
       shape({
-        isInactive: bool.isRequired,
         id: string.isRequired,
+        isInactive: bool.isRequired,
+        isTestStudent: bool.isRequired,
         name: string.isRequired,
         sortableName: string.isRequired,
         submission: shape({
@@ -288,7 +289,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   }
 
   activeStudentDetails() {
-    const activeStudents = this.props.students.filter(student => !student.isInactive)
+    const activeStudents = this.props.students.filter(
+      student => !student.isInactive && !student.isTestStudent
+    )
     return activeStudents.map(student => {
       const {excused, latePolicyStatus, score, submittedAt} = student.submission
       return {
