@@ -2171,17 +2171,17 @@
     numeral "^2"
     prop-types "^15"
 
+"@instructure/uid@^5", "@instructure/uid@^5.52.3":
+  version "5.52.3"
+  resolved "https://registry.yarnpkg.com/@instructure/uid/-/uid-5.52.3.tgz#4a0f2a739598cef40feca6b18fcb8ce795f82f76"
+  integrity sha512-V4rPQuYa8Sw3SESd4c7gtQON9X8txiXVsPyRmxtYs2VCwltnCllxQFw02gT8weUYs75Vely+yWK7RWLV1BOJ7A==
+  dependencies:
+    "@babel/runtime" "^7"
+
 "@instructure/uid@6", "@instructure/uid@^6.8.1", "@instructure/uid@^6.9.0":
   version "6.9.0"
   resolved "https://registry.yarnpkg.com/@instructure/uid/-/uid-6.9.0.tgz#8a07f49a0f8becfd69fabbd081c66b8c189288d6"
   integrity sha512-pzBY46EXG9aqIxF2BTFHkLbwTtN2Uqw9WRcpgjClE7Tn0Q2JhVEqzMYCyO6pmhhWrgKngiQzWgFADsIpYxH5Rw==
-  dependencies:
-    "@babel/runtime" "^7"
-
-"@instructure/uid@^5.52.3":
-  version "5.52.3"
-  resolved "https://registry.yarnpkg.com/@instructure/uid/-/uid-5.52.3.tgz#4a0f2a739598cef40feca6b18fcb8ce795f82f76"
-  integrity sha512-V4rPQuYa8Sw3SESd4c7gtQON9X8txiXVsPyRmxtYs2VCwltnCllxQFw02gT8weUYs75Vely+yWK7RWLV1BOJ7A==
   dependencies:
     "@babel/runtime" "^7"
 
