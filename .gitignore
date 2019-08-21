@@ -93,3 +93,6 @@ docker-compose.override.yml
 
 # ignore tmp files from emacs
 *~
+
+# ignore cloud9 files
+.c9/*
