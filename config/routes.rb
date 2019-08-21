@@ -2338,6 +2338,11 @@ CanvasRails::Application.routes.draw do
       put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
     end
 
+    # Data Services Service
+    scope(controller: 'lti/data_services') do
+      post "/accounts/:account_id/data_services", action: :create, as: :data_services_create
+    end
+
     # Names and Roles Provisioning (NRPS) v2 Service
     scope(controller: 'lti/ims/names_and_roles') do
       get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles
