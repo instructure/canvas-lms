@@ -48,3 +48,23 @@ body {
         opacity: 0;
     }
 }
+
+.course-dates-nag {
+    background: #fedc94;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+
+    i {
+        margin-right: 1rem;
+    }
+
+    div {
+        span {
+            font-weight: bold;
+            display: block;
+        }
+    }
+}
