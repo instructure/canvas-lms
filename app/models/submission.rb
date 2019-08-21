@@ -1468,40 +1468,8 @@ class Submission < ActiveRecord::Base
   private :score_late_or_none
 
   def entered_score
-    score + late_points_deducted_on_saved_score if score
+    score + (points_deducted || 0) if score
   end
-
-  def late_points_deducted_on_saved_score
-    # This method should be used rather than the raw points_deducted, as
-    # points_deducted is stored rounded, but recalculating the points deducted
-    # each time is not necessarily correct to do either.
-    return 0 if points_deducted.blank?
-
-    # points_deducted is stored with 2 figures after the decimal, so it must
-    # be recalculated again here, otherwise #score_late_or_none would
-    # calculate a slightly off grade when points_deducted contains a rounded
-    # decimal, kicking off another late policy application and applying an
-    # unfair deduction.
-    recalculated_points_deducted = late_points_deducted(
-      score,
-      assignment.course.late_policy,
-      assignment.points_possible,
-      assignment.grading_type
-    )
-
-    # Round the values to 2 the same way that postgres stores the values.
-    rounded_points_deducted = BigDecimal.new(points_deducted).round(2)
-    rounded_recalculated_points_deducted = BigDecimal.new(recalculated_points_deducted).round(2)
-
-    # A problem is that recalculating the points deducted shows the points
-    # deduction that would occur if calculation happened _now_, rather than
-    # what it actually deducted when it ran previously. If there is a
-    # difference after rounding the recalculated value and diffing, assume that
-    # due dates have changed and use the stored value instead.
-    return recalculated_points_deducted if (rounded_recalculated_points_deducted - rounded_points_deducted).zero?
-    points_deducted
-  end
-  private :late_points_deducted_on_saved_score
 
   def entered_grade
     return grade if score == entered_score
@@ -1514,7 +1482,7 @@ class Submission < ActiveRecord::Base
 
     late_policy.points_deducted(
       score: raw_score, possible: points_possible, late_for: seconds_late, grading_type: grading_type
-    )
+    ).round(2)
   end
   private :late_points_deducted
 

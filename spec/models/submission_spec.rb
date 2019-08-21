@@ -270,6 +270,15 @@ describe Submission do
       submission.update(score: 100, points_deducted: 23)
       expect(submission.entered_score).to eql(123)
     end
+
+    it "returns the score without deduction when late policy is disabled" do
+      late_policy_factory(course: @course, deduct: 2.35, every: :day)
+      @assignment.update!(due_at: 1.hour.ago, points_possible: 10, submission_types: "online_text_entry")
+      @assignment.submit_homework(@student, body: "late submission")
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @course.late_policy.update!(late_submission_deduction_enabled: false)
+      expect(submission.entered_score).to eq 10.0
+    end
   end
 
   describe 'entered_grade' do
@@ -1162,7 +1171,7 @@ describe Submission do
         @assignment.update!(points_possible: 10)
         @assignment.grade_student(@student, grade: 10, grader: @teacher)
         DueDateCacher.recompute(@assignment, update_grades: true)
-        expect(submission.score).to be 9.765
+        expect(submission.score).to be 9.76
       end
     end
 
