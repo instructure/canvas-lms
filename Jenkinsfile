@@ -280,9 +280,7 @@ pipeline {
     }
 
     cleanup {
-      script {
-        sh 'docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all'
-      }
+        sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }
