@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import Select from '@instructure/ui-core/lib/components/Select'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import I18n from 'i18n!gradezillaindividualGradebookGradebookSelector'
+import I18n from 'i18n!gradezilla_individual_gradebook_gradebook_selector'
 
 const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook'
 const LEARNING_MASTERY = 'LearningMastery'
@@ -34,7 +34,14 @@ function isLearningMastery(state) {
 class GradebookSelector extends React.Component {
   static propTypes = {
     courseUrl: PropTypes.string.isRequired,
-    learningMasteryEnabled: PropTypes.bool.isRequired
+    learningMasteryEnabled: PropTypes.bool.isRequired,
+    navigate: PropTypes.func
+  }
+
+  static defaultProps = {
+    navigate(url) {
+      window.location = url
+    }
   }
 
   constructor(props) {
@@ -43,10 +50,6 @@ class GradebookSelector extends React.Component {
     this.state = {value: INDIVIDUAL_GRADEBOOK}
 
     this.handleOnChange = this.handleOnChange.bind(this)
-  }
-
-  setLocation(url) {
-    window.location = url
   }
 
   selectIndividualGradebook() {
@@ -64,11 +67,13 @@ class GradebookSelector extends React.Component {
   }
 
   selectGradebookHistory() {
-    this.setLocation(`${this.props.courseUrl}/gradebook/history`)
+    this.props.navigate(`${this.props.courseUrl}/gradebook/history`)
   }
 
   selectDefaultGradebook() {
-    this.setLocation(`${this.props.courseUrl}/gradebook/change_gradebook_version?version=default`)
+    this.props.navigate(
+      `${this.props.courseUrl}/gradebook/change_gradebook_version?version=default`
+    )
   }
 
   handleOnChange(e) {
