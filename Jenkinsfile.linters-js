@@ -18,35 +18,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def setDockerUp () {
+  timeout(time: 60) {
+    sh 'printenv | sort'
+    sh 'build/new-jenkins/docker-compose-build-up.sh'
+  }
+}
+
+def cleanupDocker () {
+  sh 'build/new-jenkins/docker-cleanup.sh'
+}
+
+
 pipeline {
-  agent none
+  agent { label 'docker' }
   options {
     ansiColor('xterm')
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
+    COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
-  // Todo: This will run all linters and js tests consecutively, still need to get parallel depending on runtime
   stages {
-    stage ('Linters and JS Tests') {
-      agent { label 'docker' }
+    stage('Setup') {
       steps {
         timeout(time: 60) {
           sh 'printenv | sort'
-          // Todo: create linters-js script
-          // sh 'build/new-jenkins/.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
         }
       }
+    }
+    stage('Linters') {
+      parallel {
+        stage('ESLint - JSX') {
+          steps {
+            sh 'build/new-jenkins/js/linter-eslint.sh'
+          }
+        }
+        stage('Stylelint') {
+          steps {
+            sh 'build/new-jenkins/js/linter-stylelint.sh'
+          }
+        }
+        stage('XSSLint') {
+          steps {
+            sh 'build/new-jenkins/js/linter-xss.sh'
+          }
+        }
+      }
+    }
+  }
 
-      post {
-        cleanup {
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
-      }
+  post {
+    cleanup {
+      cleanupDocker()
     }
   }
 }
