@@ -1,4 +1,14 @@
 <h1>{{#t "header"}}Import Content{{/t}}</h1>
+{{#if ENV.DUE_DATE_NAG}}
+  <div class="course-dates-nag">
+    <i class="icon-warning"></i>
+    <div>
+      <span>Course start and end date are not currently set.</span>
+      Dates are required before importing courses.
+      Please set start and end dates on the Settings page before proceeding. 
+    </div>
+  </div>
+{{/if}}
 <div class="control-group">
   <label class="control-label" for="chooseMigrationConverter"><strong>{{#t "import_from_label"}}Content Type{{/t}}</strong></label>
   <div class="controls">
