@@ -51,7 +51,7 @@ const renderComponent = props => TestUtils.renderIntoDocument(<IndexMenu {...pro
 const context = {}
 
 const beforeEach = () => {
-  context.sinon = sinon.sandbox.create()
+  context.sinon = sinon.createSandbox()
   context.sinon.stub(Actions, 'apiGetLaunches').returns({
     type: 'STUB_API_GET_TOOLS'
   })

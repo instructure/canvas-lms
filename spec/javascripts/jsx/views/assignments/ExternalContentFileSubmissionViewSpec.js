@@ -36,7 +36,7 @@ let view
 
 QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
   setup () {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     fakeENV.setup()
     window.ENV.COURSE_ID = 42
     window.ENV.current_user_id = 5

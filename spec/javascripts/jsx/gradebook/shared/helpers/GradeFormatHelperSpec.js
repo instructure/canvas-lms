@@ -196,7 +196,7 @@ test('returns input value when input is not a percent or point value', function(
 })
 
 test('returns non-localized point value when given a point value', function() {
-  const sandbox = sinon.sandbox.create()
+  const sandbox = sinon.createSandbox()
   sandbox.stub(numberHelper, 'parse').returns(123.45)
   equal(GradeFormatHelper.delocalizeGrade('123,45'), '123.45')
   ok(numberHelper.parse.calledWith('123,45'))
@@ -204,7 +204,7 @@ test('returns non-localized point value when given a point value', function() {
 })
 
 test('returns non-localized percent value when given a percent value', function() {
-  const sandbox = sinon.sandbox.create()
+  const sandbox = sinon.createSandbox()
   sandbox.stub(numberHelper, 'parse').returns(12.34)
   equal(GradeFormatHelper.delocalizeGrade('12,34%'), '12.34%')
   ok(numberHelper.parse.calledWith('12,34'))

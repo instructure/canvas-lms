@@ -28,7 +28,7 @@ export default class SinonSandbox {
   setup() {
     const {global, qunit} = this._options
 
-    this._sandbox = sinon.sandbox.create({
+    this._sandbox = sinon.createSandbox({
       ...sinon.defaultConfig,
       injectInto: global.sandbox,
       properties: ['clock', 'mock', 'spy', 'stub'],

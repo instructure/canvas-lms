@@ -96,7 +96,7 @@ test('changes the apply_assignment_group_weights flag', () => {
 })
 
 test('onSaveSuccess triggers weightedToggle event with expected argument', () => {
-  const sandbox = sinon.sandbox.create()
+  const sandbox = sinon.createSandbox()
   const stub1 = sandbox.stub()
   let view = createView({weighted: true})
   view.on('weightedToggle', stub1)

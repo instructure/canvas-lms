@@ -28,7 +28,7 @@ function getState() {
 let sandbox = []
 
 const mockApiClient = (method, res) => {
-  sandbox.push(sinon.sandbox.create())
+  sandbox.push(sinon.createSandbox())
   sandbox[sandbox.length - 1].stub(apiClient, method).returns(res)
 }
 

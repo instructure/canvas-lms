@@ -8527,7 +8527,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
 
 QUnit.module('#apiUpdateSubmissionComment', function(hooks) {
   let gradebook
-  const sandbox = sinon.sandbox.create()
+  const sandbox = sinon.createSandbox()
   const editedTimestamp = '2015-10-08T22:09:27Z'
 
   hooks.beforeEach(function() {

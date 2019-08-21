@@ -23,7 +23,7 @@ import IframesTableFix from "../../src/rce/IframesTableFix";
 let table,
   editor,
   ifr,
-  sandbox = sinon.sandbox.create();
+  sandbox = sinon.createSandbox();
 
 class MockMutationObserver {
   observe() {}

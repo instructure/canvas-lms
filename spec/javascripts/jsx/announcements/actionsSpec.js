@@ -22,7 +22,7 @@ import * as apiClient from 'jsx/announcements/apiClient'
 let sandbox = null
 
 const mockApiClient = (method, res) => {
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   sandbox.stub(apiClient, method).returns(res)
 }
 

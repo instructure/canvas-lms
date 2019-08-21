@@ -24,7 +24,7 @@ import MigrationStates from 'jsx/blueprint_courses/migrationStates'
 let sandbox = null
 
 const mockApiClient = (method, res) => {
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   sandbox.stub(apiClient, method).returns(res)
 }
 
