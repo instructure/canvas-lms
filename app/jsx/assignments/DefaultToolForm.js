@@ -25,10 +25,10 @@ import React, {useState, useEffect} from 'react'
 import SelectContentDialog from '../../../public/javascripts/select_content_dialog.js'
 import usePostMessage from './hooks/usePostMessage'
 
-import { Alert } from '@instructure/ui-alerts'
-import { Button } from '@instructure/ui-buttons'
-import { Text } from '@instructure/ui-elements'
-import { View } from '@instructure/ui-layout'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 export function toolSubmissionType(submissionType) {
   const toolTypes = ['default_external_tool']
@@ -68,30 +68,46 @@ const DefaultToolForm = props => {
     SelectContentDialog.Events.onContextExternalToolSelect(event, $('#default-tool'))
   }
 
-  if(!defaultToolData && launchDefinitions.length > 0) {
-    return(
+  if (!defaultToolData && launchDefinitions.length > 0) {
+    return (
       <View display="block" padding="medium none small small">
         <Alert variant="error" margin="small small 0 0">
-          <Text weight="bold">{I18n.t('Tool Not Found')}</Text><br/>
+          <Text weight="bold">{I18n.t('Tool Not Found')}</Text>
+          <br />
           <Text>{I18n.t('The tool is not installed in the course or account')}</Text>
         </Alert>
       </View>
     )
   }
 
+  if (toolMessageData) {
+    $.screenReaderFlashMessage(I18n.t('%{content} successfully added', {content: contentTitle()}))
+  }
+
   return (
     <View display="block" padding="medium none small small">
-      <Button id="default-tool-launch-button" name="default-tool-launch-button" onClick={handleLaunchButton}>
+      <Button
+        id="default-tool-launch-button"
+        name="default-tool-launch-button"
+        onClick={handleLaunchButton}
+      >
         {props.toolButtonText}
       </Button>
 
       {toolMessageData || props.previouslySelected ? (
-        <Alert variant="success" margin="small small 0 0">
-          <Text weight="bold">{contentTitle()}</Text><br/>
+        <Alert
+          variant="success"
+          margin="small small 0 0"
+        >
+          <Text weight="bold">{contentTitle()}</Text>
+          <br />
           <Text>{I18n.t('Successfully Added')}</Text>
         </Alert>
       ) : (
-        <Alert variant="info" margin="small small 0 0">
+        <Alert
+          variant="info"
+          margin="small small 0 0"
+        >
           {props.toolInfoMessage}
         </Alert>
       )}
