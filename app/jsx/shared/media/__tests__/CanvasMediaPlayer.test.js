@@ -17,9 +17,9 @@
  */
 
 import CanvasMediaPlayer from '../CanvasMediaPlayer'
-import moxios from 'moxios'
 import React from 'react'
 import {render} from '@testing-library/react'
+import waitForExpect from 'wait-for-expect'
 
 const defaultMediaObject = () => ({
   bitrate: '12345',
@@ -33,57 +33,62 @@ const defaultMediaObject = () => ({
   width: '12345'
 })
 
-
 describe('CanvasMediaPlayer', () => {
   beforeEach(() => {
-    moxios.install()
+    fetch.resetMocks()
   })
-  afterEach(() => {
-    moxios.uninstall()
-  })
-  test('renders the component', () => {
+
+  it('renders the component', () => {
     const {getByText} = render(
-      <CanvasMediaPlayer mediaSources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]} />
+      <CanvasMediaPlayer
+        media_id="dummy_media_id"
+        media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+      />
     )
     expect(getByText('Play')).toBeInTheDocument()
   })
 
-  test('renders loading if there are no media sources', () => {
-    const {getByText} = render(
-      <CanvasMediaPlayer mediaSources={[]} />
-    )
+  it('renders loading if there are no media sources', () => {
+    jest.spyOn(CanvasMediaPlayer.prototype, 'fetchSources').mockResolvedValue([])
+    const {getByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />)
     expect(getByText('Loading')).toBeInTheDocument()
+    expect(fetch.mock.calls.length).toEqual(0)
+    expect(CanvasMediaPlayer.prototype.fetchSources).toHaveBeenCalledTimes(1)
   })
 
-  test('make ajax call if no mediaSources are provided on load', (done) => {
-    const {getByText} = render(
-      <CanvasMediaPlayer mediaSources={[]} />
-    )
-    expect(getByText('Loading')).toBeInTheDocument()
-    moxios.stubRequest('http://localhost/media_objects//info', {
-      status: 200,
-      response: {media_sources: [defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]},
-    })
-    moxios.wait(() => {
-      expect(getByText('Play')).toBeInTheDocument()
-      done()
-    })
+  it('makes ajax call if no mediaSources are provided on load', async () => {
+    jest.spyOn(CanvasMediaPlayer.prototype, 'fetchSources')
+
+    fetch.mockResponseOnce(JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]}))
+
+    const {findByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
+    expect(await findByText('Play')).toBeInTheDocument()
+    expect(CanvasMediaPlayer.prototype.fetchSources).toHaveBeenCalledTimes(1)
+    expect(fetch.mock.calls.length).toEqual(1)
+    expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
   })
 
-  test('renders loading if we receive no info from backend', (done) => {
-    const {getByText} = render(
-      <CanvasMediaPlayer mediaSources={[]} />
+  it('retries ajax call if no mediaSources on first call', async () => {
+    fetch.mockResponses(
+      [JSON.stringify({media_sources: []}), {status: 503}],
+      [JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}]
     )
+
+    const {findByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
+
+    expect(await findByText('Play')).toBeInTheDocument()
+    expect(fetch.mock.calls.length).toEqual(2)
+  })
+
+  it('still says "Loading" if we receive no info from backend', async () => {
+    fetch.mockResponse(JSON.stringify({media_sources: []}))
+
+    const {getByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
+
+    // wait for at least one request
+    await waitForExpect(() => expect(fetch.mock.calls.length).toBeGreaterThan(0))
+
+    // even after the server response came back, it should still say Loading
     expect(getByText('Loading')).toBeInTheDocument()
-    moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request.respondWith({
-          status: 200,
-          response: {media_sources: []}
-        }).then(function () {
-          expect(getByText('Loading')).toBeInTheDocument()
-          done()
-        })
-    })
   })
 })
