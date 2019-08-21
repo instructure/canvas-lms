@@ -576,7 +576,6 @@ describe "RCE next tests" do
 
       it "should display lti icon with a tool enabled for the course" do
         # set up the lti tool
-        Account.default.enable_feature! :lor_for_account
         @tool = Account.default.context_external_tools.new({
            :name => "Commons",
            :domain => "canvaslms.com",

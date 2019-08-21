@@ -68,7 +68,6 @@ describe "courses/_settings_sidebar.html.erb" do
 
     describe "external tools" do
       def create_course_settings_sub_navigation_tool(options = {})
-          @course.root_account.enable_feature!(:lor_for_account)
           defaults = {
             name: options[:name] || "external tool",
             consumer_key: 'test',

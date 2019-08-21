@@ -139,14 +139,6 @@ allow_opt_out_of_inbox:
       on the Inbox, and hide the Conversation's notification preferences.
   applies_to: RootAccount
   root_opt_in: true
-lor_for_account:
-  state: hidden
-  display_name:
-    features.lor: LOR External Tools
-  description:
-    allow_lor_tools: Allow users to view and use external tools configured for LOR.
-  applies_to: RootAccount
-  root_opt_in: true
 course_catalog:
   state: allowed
   display_name: Public Course Index

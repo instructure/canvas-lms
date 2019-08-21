@@ -183,7 +183,6 @@ describe FilesController do
           :visibility => "admins"
         }
         @tool.save!
-        Account.default.enable_feature!(:lor_for_account)
       end
 
       before :each do

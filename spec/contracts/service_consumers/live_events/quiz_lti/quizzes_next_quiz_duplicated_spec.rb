@@ -28,7 +28,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
       )
     end
 
-    it 'keeps the contract' do
+    it 'keeps the contract', skip: 'QUIZ-6827' do
       live_event.emit_with do
         # arrange
         params = {
@@ -40,7 +40,6 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
           :privacy_level => 'public',
           :tool_id => 'Quizzes 2'
         }
-        Account.default.enable_feature!(:lor_for_account)
         Account.default.context_external_tools.create!(params)
         # Account.default.lti_context_id = 1
         # Account.default.save!
