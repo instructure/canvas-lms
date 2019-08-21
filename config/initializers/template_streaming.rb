@@ -102,3 +102,16 @@ module SkipEmptyTemplateConcats
   end
 end
 ActionView::StreamingBuffer.prepend(SkipEmptyTemplateConcats)
+
+module ActivateShardsOnRender
+  def render(view, *)
+    if active_shards = view.request&.env&.[]('canvas.active_shards')
+      Shard.activate(active_shards) do
+        super
+      end
+    else
+      super
+    end
+  end
+end
+ActionView::Template.prepend(ActivateShardsOnRender)
