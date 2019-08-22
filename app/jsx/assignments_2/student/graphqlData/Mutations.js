@@ -27,10 +27,11 @@ export const CREATE_SUBMISSION = gql`
     $assignmentLid: ID!
     $submissionID: ID!
     $type: OnlineSubmissionType!
+    $body: String
     $fileIds: [ID!]
   ) {
     createSubmission(
-      input: {assignmentId: $assignmentLid, submissionType: $type, fileIds: $fileIds}
+      input: {assignmentId: $assignmentLid, submissionType: $type, body: $body, fileIds: $fileIds}
     ) {
       submission {
         ...Submission

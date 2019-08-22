@@ -125,6 +125,8 @@ class Submission < ActiveRecord::Base
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
   validate :ensure_attempts_are_in_range
+  validate :submission_type_is_valid, :if => :require_submission_type_is_valid
+  attr_accessor :require_submission_type_is_valid
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :for_enrollments, -> (enrollments) { where(user_id: enrollments.select(:user_id)) }
@@ -1096,6 +1098,14 @@ class Submission < ActiveRecord::Base
     asset_data
   end
 
+  def submission_type_is_valid
+    case self.submission_type
+    when 'online_text_entry'
+      if self.body.blank?
+        errors.add(:body, 'Text entry submission cannot be empty')
+      end
+    end
+  end
 
   def resubmit_to_vericite
     reset_vericite_assets
