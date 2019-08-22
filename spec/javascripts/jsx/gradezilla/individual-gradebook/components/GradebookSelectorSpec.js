@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 
 import GradebookSelector from 'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
 
@@ -73,11 +73,20 @@ QUnit.module('Gradezilla > Individual Gradebook > Components > GradebookSelector
   }
 
   function getSelect() {
-    return $container.querySelector('select')
+    return $container.querySelector('input[type="text"]')
+  }
+
+  function clickToExpand() {
+    getSelect().click()
+  }
+
+  function getOptionsList() {
+    const optionsListId = getSelect().getAttribute('aria-controls')
+    return document.getElementById(optionsListId)
   }
 
   function getOptions() {
-    return [...$container.querySelectorAll('select option')]
+    return [...getOptionsList().querySelectorAll('[role="option"]')]
   }
 
   function getOptionLabels() {
@@ -89,30 +98,30 @@ QUnit.module('Gradezilla > Individual Gradebook > Components > GradebookSelector
   }
 
   function getSelectedOptionLabel() {
-    const optionId = getSelect().value
-    const $selectedOption = getOptions().find($option => $option.value === optionId)
-    return $selectedOption.textContent.trim()
+    return getSelect().value
   }
 
   function selectOption(optionLabel) {
-    const $option = getOption(optionLabel)
-    fireEvent.change(getSelect(), {target: {value: $option.value}})
+    getOption(optionLabel).click()
   }
 
   test('includes options for Gradebook pages', () => {
     renderComponent()
+    clickToExpand()
     deepEqual(getOptionLabels(), ['Individual View', 'Gradebook…', 'Gradebook History…'])
   })
 
   QUnit.module('"Gradebook…" option', () => {
     test('calls the .navigate callback when clicked', () => {
       renderComponent()
+      clickToExpand()
       selectOption('Gradebook…')
       strictEqual(props.navigate.callCount, 1)
     })
 
     test('includes the default gradebook url when calling the .navigate callback', () => {
       renderComponent()
+      clickToExpand()
       selectOption('Gradebook…')
       const [url] = props.navigate.lastCall.args
       equal(
@@ -125,12 +134,14 @@ QUnit.module('Gradezilla > Individual Gradebook > Components > GradebookSelector
   QUnit.module('"Gradebook History…" option', () => {
     test('calls the .navigate callback when clicked', () => {
       renderComponent()
+      clickToExpand()
       selectOption('Gradebook History…')
       strictEqual(props.navigate.callCount, 1)
     })
 
     test('includes the gradebook history url when calling the .navigate callback', () => {
       renderComponent()
+      clickToExpand()
       selectOption('Gradebook History…')
       const [url] = props.navigate.lastCall.args
       equal(url, 'https://localhost/courses/1201/gradebook/history')
@@ -145,24 +156,33 @@ QUnit.module('Gradezilla > Individual Gradebook > Components > GradebookSelector
     QUnit.module('"Individual View" option', () => {
       test('is selected by default', () => {
         renderComponent()
+        clickToExpand()
         equal(getSelectedOptionLabel(), 'Individual View')
       })
 
       test('does not call the .navigate callback when clicked', () => {
         renderComponent()
+        clickToExpand()
         selectOption('Individual View')
         strictEqual(props.navigate.callCount, 0)
       })
 
       test('clicks the first `ic-tab` when clicked', () => {
         renderComponent()
-        selectOption('Individual View')
+        // Select the second tab
+        clickToExpand()
+        selectOption('Learning Mastery…')
+        // Select the first tab
+        clickToExpand()
+        selectOption('Individual View…')
         strictEqual(tabsProps.onTab1Click.callCount, 1)
       })
 
       test('"Individual View" is selected when displayed', () => {
         renderComponent()
+        clickToExpand()
         selectOption('Learning Mastery…')
+        clickToExpand()
         selectOption('Individual View…')
         equal(getSelectedOptionLabel(), 'Individual View')
       })
@@ -171,23 +191,27 @@ QUnit.module('Gradezilla > Individual Gradebook > Components > GradebookSelector
     QUnit.module('"Learning Mastery" option', () => {
       test('is included', () => {
         renderComponent()
+        clickToExpand()
         ok(getOptionLabels().includes('Learning Mastery…'))
       })
 
       test('is selected when displayed', () => {
         renderComponent()
+        clickToExpand()
         selectOption('Learning Mastery…')
         equal(getSelectedOptionLabel(), 'Learning Mastery')
       })
 
       test('option clicks the second `ic-tab` when clicked', () => {
         renderComponent()
+        clickToExpand()
         selectOption('Learning Mastery…')
         strictEqual(tabsProps.onTab2Click.callCount, 1)
       })
 
       test('does not call the .navigate callback when clicked', () => {
         renderComponent()
+        clickToExpand()
         selectOption('Learning Mastery…')
         strictEqual(props.navigate.callCount, 0)
       })
