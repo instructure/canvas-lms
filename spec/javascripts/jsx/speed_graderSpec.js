@@ -353,40 +353,133 @@ QUnit.module('#showSubmissionDetails', function(hooks) {
   })
 })
 
-QUnit.module('SpeedGrader#refreshGrades', {
-  setup() {
+QUnit.module('SpeedGrader#refreshGrades', hooks => {
+  let originalWindowJSONData
+  let originalStudent
+
+  hooks.beforeEach(() => {
     fakeENV.setup()
     sandbox.spy($.fn, 'append')
-    this.originalWindowJSONData = window.jsonData
+    originalWindowJSONData = window.jsonData
+
     window.jsonData = {
-      id: 27,
+      id: '27',
       GROUP_GRADING_MODE: false,
-      points_possible: 10
+      points_possible: 10,
+      context: {
+        students: [
+          {
+            id: '4',
+            name: 'Guy B. Studying'
+          },
+          {
+            id: '5',
+            name: 'Disciple B. Lackadaisical'
+          }
+        ],
+        enrollments: [
+          {
+            user_id: '4',
+            workflow_state: 'active',
+            course_section_id: '1'
+          },
+          {
+            user_id: '5',
+            workflow_state: 'active',
+            course_section_id: '1'
+          }
+        ],
+        active_course_sections: ['1']
+      },
+      submissions: [
+        {
+          grade: 70,
+          score: 7,
+          user_id: '4'
+        },
+        {
+          grade: 10,
+          score: 1,
+          user_id: '5'
+        }
+      ]
     }
-    this.originalStudent = SpeedGrader.EG.currentStudent
-    SpeedGrader.EG.currentStudent = {
-      id: 4,
-      name: 'Guy B. Studying',
-      submission_state: 'graded',
-      submission: {
-        score: 7,
-        grade: 70
-      }
-    }
-    sinon.stub($, 'getJSON')
-  },
 
-  teardown() {
-    window.jsonData = this.originalWindowJSONData
-    SpeedGrader.EG.currentStudent = this.originalStudent
+    SpeedGrader.EG.jsonReady()
+    originalStudent = SpeedGrader.EG.currentStudent
+    SpeedGrader.EG.currentStudent = window.jsonData.studentMap[4]
+    sinon.stub($, 'getJSON').yields({user_id: '4', score: 2, grade: '20'})
+    sinon.stub(SpeedGrader.EG, 'updateSelectMenuStatus')
+    sinon.stub(SpeedGrader.EG, 'showGrade')
+  })
+
+  hooks.afterEach(() => {
+    window.jsonData = originalWindowJSONData
+    SpeedGrader.EG.currentStudent = originalStudent
     fakeENV.teardown()
+    SpeedGrader.EG.showGrade.restore()
+    SpeedGrader.EG.updateSelectMenuStatus.restore()
     $.getJSON.restore()
-  }
-})
+  })
 
-test('makes request to API', () => {
-  SpeedGrader.EG.refreshGrades()
-  ok($.getJSON.calledWithMatch('submission_history'))
+  test('makes request to API', () => {
+    SpeedGrader.EG.refreshGrades()
+    ok($.getJSON.calledWithMatch('submission_history'))
+  })
+
+  test('updates the submission for the requested student', () => {
+    SpeedGrader.EG.refreshGrades()
+    strictEqual(SpeedGrader.EG.currentStudent.submission.grade, '20')
+  })
+
+  test('updates the submission_state for the requested student', () => {
+    $.getJSON.yields({user_id: '4', workflow_state: 'unsubmitted'})
+    SpeedGrader.EG.refreshGrades()
+    strictEqual(SpeedGrader.EG.currentStudent.submission_state, 'not_submitted')
+  })
+
+  test('calls showGrade if the selected student has not changed', () => {
+    SpeedGrader.EG.refreshGrades()
+    strictEqual(SpeedGrader.EG.showGrade.callCount, 1)
+  })
+
+  test('does not call showGrade if a different student has been selected since the request', () => {
+    $.getJSON.restore()
+    sinon.stub($, 'getJSON').callsFake((url, successCallback) => {
+      SpeedGrader.EG.currentStudent = window.jsonData.studentMap['5']
+      successCallback({user_id: '4', score: 2, grade: '20'})
+    })
+
+    SpeedGrader.EG.refreshGrades()
+    strictEqual(SpeedGrader.EG.showGrade.callCount, 0)
+  })
+
+  test('calls updateSelectMenuStatus', () => {
+    SpeedGrader.EG.refreshGrades()
+    strictEqual(SpeedGrader.EG.updateSelectMenuStatus.callCount, 1)
+  })
+
+  test('passes the student to be refreshed to updateSelectMenuStatus', () => {
+    SpeedGrader.EG.refreshGrades()
+
+    const [student] = SpeedGrader.EG.updateSelectMenuStatus.firstCall.args
+    strictEqual(student.id, '4')
+  })
+
+  test('invokes the callback function if one is provided', () => {
+    const callback = sinon.fake()
+    SpeedGrader.EG.refreshGrades(callback)
+
+    strictEqual(callback.callCount, 1)
+  })
+
+  test('passes the received submission data to the callback', () => {
+    const callback = sinon.fake()
+    SpeedGrader.EG.refreshGrades(callback)
+
+    const [submission] = callback.firstCall.args
+    strictEqual(submission.user_id, '4')
+  })
 })
 
 let commentRenderingOptions

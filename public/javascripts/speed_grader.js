@@ -1166,24 +1166,23 @@ function initGroupAssignmentMode() {
   }
 }
 
-function refreshGrades(cb) {
+function refreshGrades(callback) {
   const courseId = ENV.course_id
   const assignmentId = EG.currentStudent.submission.assignment_id
   const studentId = EG.currentStudent.submission[anonymizableUserId]
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}.json?include[]=submission_history`
   const currentStudentIDAsOfAjaxCall = EG.currentStudent[anonymizableId]
   $.getJSON(url, submission => {
-    if (currentStudentIDAsOfAjaxCall === EG.currentStudent[anonymizableId]) {
-      EG.currentStudent.submission = submission
-      EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(
-        EG.currentStudent,
-        ENV.grading_role
-      )
+    const studentToRefresh = window.jsonData.studentMap[currentStudentIDAsOfAjaxCall]
+    EG.setOrUpdateSubmission(submission)
+
+    EG.updateSelectMenuStatus(studentToRefresh)
+    if (studentToRefresh === EG.currentStudent) {
       EG.showGrade()
-      EG.updateSelectMenuStatus(EG.currentStudent)
-      if (cb) {
-        cb(submission)
-      }
+    }
+
+    if (callback) {
+      callback(submission)
     }
   })
 }
