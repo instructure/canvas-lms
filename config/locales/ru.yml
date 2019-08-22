@@ -2338,8 +2338,10 @@ ru:
   an_error_ocurred_while_publishing_course_3760cf04: "Произошла ошибка при публикации курса"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Возникла ошибка при сохранении группы назначенных встреч"
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Существующий пользователь Canvas с SIS ID %{user_id} уже использует запрошенную %{other_user_id} user_id информацию для входа в систему, пропуск"
+  an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Пользователь Canvas с идентификатором SIS %{user_id} или логином %{login} уже существует, пропуск"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Существующий пользователь Canvas с %{user_id} уже использует запрошенную %{other_user_id} user_id информацию для входа в систему, пропуск"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Существующий пользователь Canvas с %{user_id} уже сделал запрос в отношении запрошенного идентификатора интеграции %{other_user_id} , пропуск"
+  an_existing_user_does_not_match_existing_user_ids__156c7a52: "Существующий пользователь не соответствует существующим идентификаторам пользователей, предоставленным для входа в систему с идентификатором SIS %{user_id}, пропуск"
   an_export_is_already_in_progress_54270f01: "Процесс экспорта уже идет."
   an_internal_error_occurred_83b8a685: "Возникла внутренняя ошибка."
   an_item_named_name_already_exists_in_this_location_147b7312: "Элемент с именем \"%{name}\" уже существует в этом месте.Хотите заменить существующий файл?"
@@ -4537,6 +4539,7 @@ ru:
   canvas_alert_comment_author_name_for_assignment_ti_871fd642: "Предупреждение Canvas - Комментарий: %{author_name} для %{assignment_title}, %{user_name}, %{course_name}."
   canvas_alert_grade_change_date_for_name_56f680ed: "Предупреждение Canvas Alert - Изменение оценки: %{date} для %{name}"
   canvas_alert_graded_assignment_context_for_name_459fdf31: "Предупреждение Canvas - Оценено: %{assignment}, %{context} для %{name}"
+  canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: "Предупреждение Canvas - В %{asset_link} учащиеся нажимают %{bad_link} для перехода к содержимому, к которому они не могут получить доступ."
   canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "Предупреждение Canvas - В %{asset_link} учащиеся нажимают %{bad_link} на несуществующую страницу в вашем курсе."
   canvas_alert_in_asset_link_students_are_clicking_b_da080154: "Предупреждение Canvas - В %{asset_link} учащиеся нажимают %{bad_link} на содержимое в другом курсе."
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Уведомление Canvas - приглашено: %{course} как %{role_type}"
@@ -4567,6 +4570,7 @@ ru:
   canvas_failed_to_complete_the_upload_864a4c0f: "Canvas не удается завершить отправку."
   canvas_failed_to_initiate_the_upload_8e3824d5: "Canvas не удается запустить отправку."
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Ознакомительное видео Canvas"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas пытается найти отправки. Проверьте еще раз позднее."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas не сконфигурировано для получения данных входа в систему из %{issuer}."
@@ -5909,7 +5913,7 @@ ru:
       message_actions: "Действия над сообщениями"
       more_options: "Дополнительные опции"
       no_subject: "Нет темы"
-      reply: Ответ
+      reply: Ответить
       reply_all: "Ответить всем"
     message_form_dialog: 
       body: "Текст сообщения"
@@ -5942,7 +5946,7 @@ ru:
       forward: Переслать
       message_actions: "Действия над сообщениями"
       more_options: "Дополнительные опции"
-      reply: Ответ
+      reply: Ответить
       reply_all: "Ответить всем"
     message_list: 
       messages: Сообщения
@@ -5996,6 +6000,7 @@ ru:
   costa_rica_97d66afe: Коста-Рика
   could_not_duplicate_discussion_953ed67f: "Дупликация дискуссии невозможна"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Не удается найти конфигурацию LTI для идентификатора клиента %{clientId}"
+  could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Не удалось найти существующего пользователя для входа в систему с идентификатором SIS %{user_id}, пропуск"
   could_not_save_chosencolor_741b74ce: "Не удалось сохранить '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Не удается настроить даты по заданию %{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Не удалось найти полномочия для обновления"
@@ -11409,6 +11414,7 @@ ru:
   importing_outcomes_e62a0375: "импортирование результатов"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "В %{asset_link} учащиеся нажимают %{bad_link} на несуществующую страницу в вашем курсе."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "В %{asset_link} учащиеся нажимают %{bad_link} на содержимое в другом курсе."
+  in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "В %{asset_link} учащиеся нажимают %{bad_link} для перехода к содержимому, к которому они не могут получить доступ."
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "В тех случаях, когда это доступно, загрузите RCE и боковую панель wiki  из обширной коллекции контент-услуг Canvas "
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "В тех случаях, когда это доступно, загрузите RCE из обширной коллекции контент-услуг Canvas "
   in_class_23eeca38: "В классе"
@@ -11781,6 +11787,7 @@ ru:
   json_url_adbee260: "URL JSON"
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Только обычные вопросы, комментарии, идеи или предложения"
   just_in_time_provisioning_382a0354: "Своевременное наполнение данными"
+  jwk_method_6d5d0c84: "* метод JWK"
   jwts_4f397c85: "Время ожидания задания (JWT)"
   k12_description: |-
       Характеристики, настройки и стили, которые более понятны именно в среде K-12. На данный момент это
@@ -11805,6 +11812,7 @@ ru:
   label_values_76f4b5fa: "Значения меток"
   labels: 
     lock_module_until: "Заблокировать до"
+  large_course_db3d58b: "Большой курс:"
   last_assessment_cd5659b6: "Последняя оценка: "
   last_changed_b544504d: "Последнее изменение:"
   last_changed_date_82f1ce56: "Последнее изменение: %{date}"
@@ -11864,6 +11872,7 @@ ru:
   latest_score_905aa87b: "Последняя оценка"
   launch_external_tool_672c0409: "Запуск внешнего инструмента"
   launch_registration_tool_38d4781: "Запустить инструмент регистрации"
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Запуск SpeedGrader отфильтрован по группам учащихся"
   launch_url_e150bd41: "URL-адрес запуска"
   layouts: 
     application: 
@@ -14918,6 +14927,7 @@ ru:
   no_due_date_6e6a23c1: "(нет даты выполнения)"
   no_e16d9132: Нет
   no_email_8585ad7e: "Электронная почта отсутствует"
+  no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Нет существующего пользователя для входа в систему с идентификатором SIS %{user_id}"
   no_exports_to_display_7f1b630b: "Экспортированных элементов для отображения нет"
   no_file_submitted_a879fa53: "Нет переданных файлов"
   no_final_grade_selected_3595c9c: "Отсутствует выбранная итоговая оценка"
@@ -16946,7 +16956,7 @@ ru:
     parent_signup: "Регистрация на родительском уровне"
   pts_51d69f4a: Баллы
   pts_699bd9aa: баллы
-  public_a749f507: Общедоступный
+  public_a749f507: Общедоступно
   public_course_index_59270e80: "Индекс Общедоступных Курсов"
   public_courses_title: "Общедоступные курсы"
   public_domain_112ed397: "Общедоступный домен"
@@ -16954,6 +16964,7 @@ ru:
   public_jwk_ee2d719d: "Публичный JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Публичный JWK json недействителен. Предоставьте правильно отформатированный JSON."
   public_jwk_url_694edf52: "* Публичный JWK URL"
+  public_jwk_url_b5564c1d: "Публичный JWK URL"
   public_message_students: 
     message_student: "Отправить сообщение студентам для %{course_name}"
     send_message: "Отправить сообщение"
@@ -18119,6 +18130,7 @@ ru:
           many: "%{count} минут"
           one: "1 минута"
           other: "%{count} минут"
+        unlimited: Неограниченно
         until: До
         view_responses: "Просмотреть ответы"
       quiz_submission: 
@@ -20573,6 +20585,7 @@ ru:
       group_categories: "Категории групп: %{group_categories_count}"
       group_enrollments: "Регистрации группы: %{group_enrollments_count}"
       groups: "Группы: %{group_count}"
+      logins: "Учетные данные для входа в систему: %{login_count}"
       sections: "Разделы: %{section_count}"
       terms: "Периоды: %{term_count}"
       user_observers: "Оценщики пользователя: %{user_observers_count}"
@@ -21337,8 +21350,8 @@ ru:
   taiwan_886_9a5b6bbf: "Тайвань (+886)"
   take_a_picture_d582acf1: "Использовать изображение"
   take_a_snapshot_now_5b622d85: "Сделать снэпшот"
-  take_the_quiz_87214d7e: "Принять контрольную работу"
-  take_the_quiz_again_8ea51a6c: "Снова принять контрольную работу"
+  take_the_quiz_87214d7e: "Пройти тест"
+  take_the_quiz_again_8ea51a6c: "Снова Пройти тест"
   take_the_survey_ada59508: "Принять опрос"
   take_the_survey_again_24ce22c2: "Снова принять опрос"
   target_link_uri_bbed67d1: "* Целевая ссылка на URL"
