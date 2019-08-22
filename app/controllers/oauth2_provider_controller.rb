@@ -144,7 +144,7 @@ class Oauth2ProviderController < ApplicationController
 
   private
   def oauth_error(exception)
-    if @should_not_redirect || params[:redirect_uri] == Canvas::Oauth::Provider::OAUTH2_OOB_URI
+    if @should_not_redirect || params[:redirect_uri] == Canvas::Oauth::Provider::OAUTH2_OOB_URI || params[:redirect_uri].blank?
       response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401
       return render(exception.to_render_data)
     else
