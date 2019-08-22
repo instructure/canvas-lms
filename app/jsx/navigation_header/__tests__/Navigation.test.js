@@ -55,6 +55,7 @@ describe('GlobalNavigation', () => {
   })
 
   it('renders', () => {
+    fetch.mockResponse(JSON.stringify({unread_count: 0}))
     expect(() => renderComponent()).not.toThrow()
   })
 
