@@ -66,6 +66,8 @@ export default class CreateAssignmentView extends DialogFormView
 
   getFormData: =>
     data = super
+    submission_type_select = document.querySelector('select[name="submission_types"]')
+
     unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
     data.due_at = @_getDueAt(unfudged) if unfudged?
     data.published = true if @shouldPublish
@@ -124,7 +126,8 @@ export default class CreateAssignmentView extends DialogFormView
       uniqLabel: uniqLabel
       disableDueAt: @disableDueAt()
       postToSISName: ENV.SIS_NAME
-      isInClosedPeriod: @model.inClosedGradingPeriod()
+      isInClosedPeriod: @model.inClosedGradingPeriod(),
+      defaultToolName: ENV.DEFAULT_ASSIGNMENT_TOOL_NAME
 
     # master_course_restrictions only apply if this is a child course
     # and is restricted by a master course.

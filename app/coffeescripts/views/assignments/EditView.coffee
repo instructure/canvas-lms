@@ -306,11 +306,18 @@ export default class EditView extends ValidatedFormView
   defaultExternalToolUrl: =>
     ENV.DEFAULT_ASSIGNMENT_TOOL_URL
 
+  defaultExternalToolName: =>
+    ENV.DEFAULT_ASSIGNMENT_TOOL_NAME
+
   renderDefaultExternalTool: =>
     props = {
       toolDialog: $("#resource_selection_dialog"),
       courseId: ENV.COURSE_ID,
-      toolUrl: @defaultExternalToolUrl()
+      toolUrl: @defaultExternalToolUrl(),
+      toolName: @defaultExternalToolName(),
+      toolButtonText: ENV.DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT,
+      toolInfoMessage: ENV.DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE,
+      previouslySelected: @assignment.defaultToolSelected()
     }
 
     ReactDOM.render(
@@ -685,8 +692,12 @@ export default class EditView extends ValidatedFormView
 
   _validateExternalTool: (data, errors) =>
     if data.submission_type == 'external_tool' && data.grading_type != 'not_graded' && $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
+      message = I18n.t 'External Tool URL cannot be left blank'
       errors["external_tool_tag_attributes[url]"] = [
-        message: I18n.t 'External Tool URL cannot be left blank'
+        message: message
+      ]
+      errors["default-tool-launch-button"] = [
+        message: message
       ]
     errors
 

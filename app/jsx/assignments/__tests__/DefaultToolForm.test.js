@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import axios from 'axios'
 import React from 'react'
 import {mount} from 'enzyme'
 import DefaultToolForm, { toolSubmissionType } from '../DefaultToolForm'
@@ -24,9 +25,22 @@ import SelectContentDialog from '../../../../public/javascripts/select_content_d
 const newProps = (overrides = {}) => ({
   ...{
     toolUrl: 'https://www.default-tool.com/blti',
-    courseId: 1
+    courseId: 1,
+    toolName: 'Awesome Tool',
+    previouslySelected: false
   },
   ...overrides
+})
+
+beforeAll(() => {
+  axios.get = jest.fn()
+  axios.get.mockImplementation(async () => {
+    return {data: []};
+  })
+})
+
+afterEach(() => {
+  axios.get.mockRestore()
 })
 
 describe('DefaultToolForm', () => {
@@ -51,7 +65,34 @@ describe('DefaultToolForm', () => {
 
   it('renders the information mesage', () => {
     wrapper = mount(<DefaultToolForm {...newProps()} />)
-    expect(wrapper.find('Alert').html()).toContain('Click the button above to add a WileyPLUS Question Set')
+    expect(wrapper.find('Alert').html()).toContain('Click the button above to add content')
+  })
+
+  it('sets the button text', () => {
+    wrapper = mount(<DefaultToolForm {...newProps()} />)
+    expect(wrapper.find('Button').html()).toContain('Add Content')
+  })
+
+  it('renders the success message if previouslySelected is true', () => {
+    wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
+    expect(wrapper.find('Alert').html()).toContain('Successfully Added')
+  })
+
+  describe('when the configured tool is not installed', () => {
+    beforeAll(() => {
+      axios.get.mockImplementation(async () => {
+        return {data: [{
+          placements: [{
+            url: 'foo'
+          }]
+        }]};
+      })
+    })
+
+    it('renders an error message', async () => {
+      wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
+      expect(wrapper.find('Alert').exists()).toEqual(true)
+    })
   })
 })
 

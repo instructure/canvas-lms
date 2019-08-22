@@ -545,7 +545,7 @@ module Api::V1::Assignment
     if assignment_params['submission_types'].present? &&
       !assignment_params['submission_types'].all? do |s|
         return false if s == 'wiki_page' && !self.context.try(:feature_enabled?, :conditional_release)
-        API_ALLOWED_SUBMISSION_TYPES.include?(s)
+        API_ALLOWED_SUBMISSION_TYPES.include?(s) || (s == 'default_external_tool' && assignment.unpublished?)
       end
         assignment.errors.add('assignment[submission_types]',
           I18n.t('assignments_api.invalid_submission_types',
