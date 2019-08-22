@@ -29,14 +29,12 @@ async function makeProps(overrides) {
   const assignmentAndSubmission = await mockAssignmentAndSubmission(overrides)
   const props = {
     ...assignmentAndSubmission,
-    createSubmissionDraft: jest.fn(),
-    updateUploadingFiles: jest.fn(),
+
+    // Make these return a promise that will resolve
+    createSubmissionDraft: jest.fn().mockResolvedValue({}),
+    updateUploadingFiles: jest.fn().mockResolvedValue({}),
     uploadingFiles: false
   }
-
-  // Make these return a promise that will resolve
-  props.createSubmissionDraft.mockResolvedValue({})
-  props.updateUploadingFiles.mockResolvedValue({})
   return props
 }
 
@@ -46,7 +44,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   window.URL.createObjectURL = jest.fn().mockReturnValue('perry_preview')
-  uploadFileModule.uploadFiles = jest.fn()
+  uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
 })
 
 describe('FileUpload', () => {
