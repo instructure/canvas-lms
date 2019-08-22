@@ -192,11 +192,11 @@ module Services
         it 'makes the expected request' do
           allow(tool_proxy).to receive(:context).and_return(root_account_context)
           allow(root_account_context).to receive(:root_account).and_return(root_account_object)
-          subscription = { 'my' => 'subscription' }
+          subscription = { 'my' => 'subscription', 'Id' => '1234' }
 
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:put)
-            expect(endpoint).to eq('http://example.com/api/subscriptions/subscription_id')
+            expect(endpoint).to eq('http://example.com/api/subscriptions/1234')
             expect(options[:headers]['Content-Type']).to eq('application/json')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt['DeveloperKey']).to eq('10000000000003')

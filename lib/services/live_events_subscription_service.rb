@@ -23,13 +23,11 @@ module Services
       end
 
       def tool_proxy_subscription(tool_proxy, subscription_id)
-        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
-        request(:get, "/api/subscriptions/#{subscription_id}", options)
+        show(tool_proxy_jwt_body(tool_proxy), subscription_id)
       end
 
       def tool_proxy_subscriptions(tool_proxy, optional_headers = {})
-        options = { headers: headers(tool_proxy_jwt_body(tool_proxy), optional_headers) }
-        request(:get, '/api/subscriptions', options)
+        index(tool_proxy_jwt_body(tool_proxy), optional_headers)
       end
 
       def create_tool_proxy_subscription(tool_proxy, subscription)
@@ -37,19 +35,11 @@ module Services
           "in: LiveEventsSubscriptionService::create_tool_proxy_subscription, "\
           "tool_proxy_id: #{tool_proxy.id}, subscription: #{subscription}"
         end
-        options = {
-          headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
-          body: subscription.to_json
-        }
-        request(:post, '/api/subscriptions', options)
+        create(tool_proxy_jwt_body(tool_proxy), subscription)
       end
 
-      def update_tool_proxy_subscription(tool_proxy, subscription_id, subscription)
-        options = {
-          headers: headers(tool_proxy_jwt_body(tool_proxy), { 'Content-Type' => 'application/json' }),
-          body: subscription.to_json
-        }
-        request(:put, "/api/subscriptions/#{subscription_id}", options)
+      def update_tool_proxy_subscription(tool_proxy, _subscription_id, subscription)
+        update(tool_proxy_jwt_body(tool_proxy), subscription)
       end
 
       def destroy_tool_proxy_subscription(tool_proxy, subscription_id)
@@ -57,8 +47,7 @@ module Services
           "in: LiveEventsSubscriptionService::destroy_tool_proxy_subscription, "\
           "tool_proxy_id: #{tool_proxy.id}, subscription_id: #{subscription_id}"
         end
-        options = { headers: headers(tool_proxy_jwt_body(tool_proxy)) }
-        request(:delete, "/api/subscriptions/#{subscription_id}", options)
+        destroy(tool_proxy_jwt_body(tool_proxy), subscription_id)
       end
 
       def destroy_all_tool_proxy_subscriptions(tool_proxy)
@@ -66,7 +55,39 @@ module Services
         request(:delete, "/api/subscriptions", options)
       end
 
+      def create(jwt_body, subscription)
+        options = {
+          headers: headers(jwt_body, { 'Content-Type' => 'application/json' }),
+          body: subscription.to_json
+        }
+        request(:post, '/api/subscriptions', options)
+      end
+
+      def show(jwt_body, subscription_id)
+        options = { headers: headers(jwt_body) }
+        request(:get, "/api/subscriptions/#{subscription_id}", options)
+      end
+
+      def update(jwt_body, subscription)
+        options = {
+          headers: headers(jwt_body, { 'Content-Type' => 'application/json' }),
+          body: subscription.to_json
+        }
+        request(:put, "/api/subscriptions/#{subscription['Id']}", options)
+      end
+
+      def destroy(jwt_body, subscription_id)
+        options = { headers: headers(jwt_body) }
+        request(:delete, "/api/subscriptions/#{subscription_id}", options)
+      end
+
+      def index(jwt_body, opts)
+        options = { headers: headers(jwt_body, opts) }
+        request(:get, '/api/subscriptions', options)
+      end
+
       private
+
       def request(method, endpoint, options = {})
         Canvas.timeout_protection("live-events-subscription-service-session", raise_on_timeout: true) do
           HTTParty.send(method, "#{settings['app-host']}#{endpoint}", options.merge(timeout: 10))
