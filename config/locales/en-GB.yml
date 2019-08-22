@@ -2314,8 +2314,10 @@ en-GB:
   an_error_ocurred_while_publishing_course_3760cf04: "An error occurred while publishing course"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "An error occurred while saving the appointment group"
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping"
+  an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "An existing Canvas user with the SIS ID %{user_id} or login of %{login} already exists, skipping"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping"
+  an_existing_user_does_not_match_existing_user_ids__156c7a52: "An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping"
   an_export_is_already_in_progress_54270f01: "An export is already in progress."
   an_internal_error_occurred_83b8a685: "An internal error occurred"
   an_item_named_name_already_exists_in_this_location_147b7312: "An item named \"%{name}\" already exists in this location. Do you wish to replace the existing file?"
@@ -4485,6 +4487,7 @@ en-GB:
   canvas_alert_comment_author_name_for_assignment_ti_871fd642: "Canvas Alert - Comment: %{author_name} for %{assignment_title}, %{user_name}, %{course_name}."
   canvas_alert_grade_change_date_for_name_56f680ed: "Canvas Alert - Grade Change: %{date} for %{name}"
   canvas_alert_graded_assignment_context_for_name_459fdf31: "Canvas Alert - Graded: %{assignment}, %{context} for %{name}"
+  canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: "Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content they cannot access."
   canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course."
   canvas_alert_in_asset_link_students_are_clicking_b_da080154: "Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content in a different course."
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas Alert - Invited: %{course} as %{role_type}"
@@ -4515,6 +4518,7 @@ en-GB:
   canvas_failed_to_complete_the_upload_864a4c0f: "Canvas failed to complete the upload."
   canvas_failed_to_initiate_the_upload_8e3824d5: "Canvas failed to initiate the upload."
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Canvas introduction video"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas is attempting to retrieve the submissions. Please check back again later."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas is not configured to receive logins from %{issuer}."
@@ -5939,6 +5943,7 @@ en-GB:
   costa_rica_97d66afe: "Costa Rica"
   could_not_duplicate_discussion_953ed67f: "Could not duplicate discussion"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Could not find an LTI configuration for client ID %{clientId}"
+  could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Could not find the existing user for login with SIS ID %{user_id}, skipping"
   could_not_save_chosencolor_741b74ce: "Could not save '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Couldn't adjust dates on assignment %{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Could not find an authority to update"
@@ -11190,6 +11195,7 @@ en-GB:
   importing_outcomes_e62a0375: "importing outcomes"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "In %{asset_link}, students are clicking %{bad_link} to content in a different course."
+  in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "In %{asset_link}, students are clicking %{bad_link} to content they cannot access."
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "In cases where it is available, load RCE and wiki sidebar from a canvas-rich content service"
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "In cases when available, load the RCE from a canvas-rich content service"
   in_class_23eeca38: "In Class"
@@ -11565,6 +11571,7 @@ en-GB:
   json_url_adbee260: "JSON URL"
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Just a casual question, comment, idea or suggestion"
   just_in_time_provisioning_382a0354: "Just-in-time provisioning"
+  jwk_method_6d5d0c84: "* JWK Method"
   jwts_4f397c85: JWTs
   k12_description: |-
       Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
@@ -11589,6 +11596,7 @@ en-GB:
   label_values_76f4b5fa: "Label Values"
   labels: 
     lock_module_until: "Lock until"
+  large_course_db3d58b: "Large Course:"
   last_assessment_cd5659b6: "Last assessment: "
   last_changed_b544504d: "Last changed:"
   last_changed_date_82f1ce56: "Last changed: %{date}"
@@ -11643,6 +11651,7 @@ en-GB:
   latest_score_905aa87b: "Latest Score"
   launch_external_tool_672c0409: "Launch external tool"
   launch_registration_tool_38d4781: "Launch Registration Tool"
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Launch SpeedGrader Filtered by Student Group"
   launch_url_e150bd41: "Launch URL"
   layouts: 
     application: 
@@ -14659,6 +14668,7 @@ en-GB:
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: "No"
   no_email_8585ad7e: "No email"
+  no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "No existing user provided for login with SIS ID %{user_id}"
   no_exports_to_display_7f1b630b: "No exports to display"
   no_file_submitted_a879fa53: "No File Submitted"
   no_final_grade_selected_3595c9c: "No final grade selected"
@@ -16688,6 +16698,7 @@ en-GB:
   public_jwk_ee2d719d: "Public JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Public JWK json is not valid. Please submit properly formatted json."
   public_jwk_url_694edf52: "* Public JWK URL"
+  public_jwk_url_b5564c1d: "Public JWK URL"
   public_message_students: 
     message_student: "Message students for %{course_name}"
     send_message: "Send message"
@@ -17805,6 +17816,7 @@ en-GB:
         time_limit: 
           one: "1 Minute"
           other: "%{count} Minutes"
+        unlimited: Unlimited
         until: Until
         view_responses: "View responses"
       quiz_submission: 
@@ -20187,6 +20199,7 @@ en-GB:
       group_categories: "Group categories: %{group_categories_count}"
       group_enrollments: "Group Enrolments: %{group_enrollments_count}"
       groups: "Groups: %{group_count}"
+      logins: "Logins: %{login_count}"
       sections: "Sections: %{section_count}"
       terms: "Terms: %{term_count}"
       user_observers: "User observers: %{user_observers_count}"
