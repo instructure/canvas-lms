@@ -2211,8 +2211,10 @@ is:
   an_error_ocurred_while_publishing_course_3760cf04: "Villa kom upp við birtingu námskeiðs"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Villa kom upp við vistun á stefnumótahópnum"
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Canvas-notandi með SIS auðkennið %{user_id} hefur þegar eignað sér innskráningarupplýsingar  %{other_user_id} user_id, sleppti"
+  an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Núverandi Canvas-notandi með SIS-auðkenni %{user_id} eða innskráningu %{login} er þegar til, hleyp yfir"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Canvas-notandi með %{user_id} hefur þegar eignað sér innskráningarupplýsingar  %{other_user_id} user_id, sleppti"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Núverandi Canvas-notandi með %{user_id} hefur þegar gert tilkall til samþættingar_auðkennis sem %{other_user_id}bað um, sleppi"
+  an_existing_user_does_not_match_existing_user_ids__156c7a52: "Núverandi notandi passar ekki við fyrirliggjandi notandaauðkenni sem gefin eru fyrir innskráningu með SIS-auðkenni %{user_id}, hleyp yfir"
   an_export_is_already_in_progress_54270f01: "Útflutningur er í gangi."
   an_internal_error_occurred_83b8a685: "Innri villa kom upp"
   an_item_named_name_already_exists_in_this_location_147b7312: "Atriðið \"%{name}\"  er til á þessum stað. Viltu skipta út skránni?"
@@ -4171,6 +4173,7 @@ is:
   canvas_alert_comment_author_name_for_assignment_ti_871fd642: "Canvas viðvörun - Athugasemd: %{author_name} fyrir %{assignment_title}, %{user_name}, %{course_name}."
   canvas_alert_grade_change_date_for_name_56f680ed: "Canvas viðvörun - breyting á einkunn: %{date} fyrir %{name}"
   canvas_alert_graded_assignment_context_for_name_459fdf31: "Canvas viðvörun - einkunn: %{assignment}, %{context} fyrir %{name}"
+  canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: "Canvas viðvörun - Í %{asset_link}, eru nemendur að smella á %{bad_link} til efnis sem þeir hafa ekki aðgang að."
   canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "Canvas viðvörun - Í %{asset_link}, eru nemendur að smella á %{bad_link} til síðu í námskeiði þínu sem er ekki til."
   canvas_alert_in_asset_link_students_are_clicking_b_da080154: "Canvas viðvörun - Í %{asset_link}, eru nemendur að smella á %{bad_link} til efnis í öðru námskeiði."
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-tilkynning - Boðið: %{course} sem %{role_type}"
@@ -4200,6 +4203,7 @@ is:
   canvas_failed_to_complete_the_upload_864a4c0f: "Canvas tókst ekki að klára upphalið"
   canvas_failed_to_initiate_the_upload_8e3824d5: "Canvas gat ekki byrjað upphalið."
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_id_f42f6ad: Canvas-auðkenni
   canvas_introduction_video_2d81f3ad: Canvas-kynningarmyndband
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas reynir að endurheimta innsendingar. Komdu aftur síðar."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ekki stillt til að taka við innskráningum frá %{issuer}."
@@ -5483,6 +5487,7 @@ is:
   costa_rica_506_d63d2ea1: "Kosta Ríka (+506)"
   could_not_duplicate_discussion_953ed67f: "Gat ekki afritað umræður"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Fann ekki LTI stillingu fyrir auðkenni umbjóðanda %{clientId}"
+  could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Fann ekki núverandi notanda með innskráningu SIS-auðkenni %{user_id}, hleyp yfir"
   could_not_save_chosencolor_741b74ce: "Gat ekki vistað '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Ekki var hægt að breyta dagsetningum á verkefni %{name} (auðkenni %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Fann ekki heimild til að uppfæra"
@@ -9734,6 +9739,7 @@ is:
   importing_outcomes_e62a0375: "Flytur inn niðurstöður"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "Í %{asset_link}, eru nemendur að smella á %{bad_link} til síðu í námskeiði þínu sem er ekki til."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "Í %{asset_link}, eru nemendur að smella á %{bad_link} til efnis í öðru námskeiði."
+  in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "Í %{asset_link}, eru nemendur að smella á %{bad_link} til efnis sem þeir hafa ekki aðgang að."
   in_class_23eeca38: "Í bekknum"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Til að ljúka ferlinu verður þér beint á innskráningarsíðu þar sem þú þarft að skrá þig inn með skilríkjum barns þíns."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Til að flytja inn mikið magn af niðurstöðum í einu, eða til að uppfæra fyrri niðurstöður þínar, vinsamlegast *farður eftir CSV sniðinu*."
@@ -10082,6 +10088,7 @@ is:
   json_url_adbee260: "JSON URL"
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Bara almenn spurning, athugasemd, hugmynd, tillaga"
   just_in_time_provisioning_382a0354: "Just in Time Provisioning"
+  jwk_method_6d5d0c84: "* JWK aðferð"
   jwts_4f397c85: JWT
   k12_description: |-
       Eiginleikar, stillingar og stílar sem virka betur sérstaklega í K-12 umhverfi. Núna, á þetta aðeins
@@ -10106,6 +10113,7 @@ is:
   label_values_76f4b5fa: "Gildi merkimiða"
   labels: 
     lock_module_until: "Læsa til"
+  large_course_db3d58b: "Stórt námskeið:"
   last_assessment_cd5659b6: "Síðasta mat: "
   last_changed_b544504d: "Síðast breytt"
   last_changed_date_82f1ce56: "Síðast breytt %{date}"
@@ -10160,6 +10168,7 @@ is:
   latest_score_905aa87b: "Nýjustu einkunnir"
   launch_external_tool_672c0409: "Nota ytra verkfæri"
   launch_registration_tool_38d4781: "Opna skráningartól"
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Ræsa SpeedGrader síað eftir nemendahópum"
   launch_url_e150bd41: "Opna vefslóð"
   layouts: 
     application: 
@@ -12782,6 +12791,7 @@ is:
   no_due_date_6e6a23c1: "(Enginn skiladagur)"
   no_e16d9132: Nei
   no_email_8585ad7e: "Ekkert netfang"
+  no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Enginn núverandi notandi gefinn fyrir innskráningu með SIS auðkenni %{user_id}"
   no_exports_to_display_7f1b630b: "Enginn útflutningur til að sýna"
   no_file_submitted_a879fa53: "Engin skrá innsend"
   no_grade_3fa326c: "engin einkunn"
@@ -14669,6 +14679,7 @@ is:
   public_jwk_ee2d719d: "Opinber JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Opinber JWK json er ekki gildur. Sendu inn almennilega forsniðið json."
   public_jwk_url_694edf52: "* Opinber JWK URL"
+  public_jwk_url_b5564c1d: "Opinbert JWK URL"
   public_message_students: 
     message_student: "Senda nemendum í námskeiðinu %{course_name} skilaboð"
     send_message: "Senda skilaboð"
@@ -15607,6 +15618,7 @@ is:
         time_limit: 
           one: "1 mínúta"
           other: "%{count} mínútur"
+        unlimited: Ótakmarkað
         until: "Þar til"
         view_responses: "Skoða svör"
       quiz_submission: 
@@ -17698,6 +17710,7 @@ is:
       group_categories: "Hópflokkar: %{group_categories_count}"
       group_enrollments: "Hópinnritanir: %{group_enrollments_count}"
       groups: "Hópar: %{group_count}"
+      logins: "Innskráningar: %{login_count}"
       sections: "Hlutar: %{section_count}"
       terms: "Annir: %{term_count}"
       user_observers: "Notanda athugendur: %{user_observers_count}"
@@ -20355,7 +20368,7 @@ is:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Varðveitir hæstu einkunnir þínar"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Varðveitir nýjustu einkunnir þínar"
   will_paginate: 
-    next_label: "Næst&#8594;"
+    next_label: "Næst &#8594;"
     page_entries_info: 
       multi_page: "Sýni %{model} %{from} - %{to} af %{count} alls"
       multi_page_html: "Sýni %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> af <b>%{count}</b> alls"
