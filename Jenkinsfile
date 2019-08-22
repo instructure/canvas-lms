@@ -50,11 +50,11 @@ pipeline {
 
   options {
     ansiColor('xterm')
-    parallelsAlwaysFailFast()
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
+    // include selenium while smoke is running locally
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
 
@@ -154,7 +154,8 @@ pipeline {
         stage('Smoke Test') {
           steps {
             timeout(time: 10) {
-              sh 'build/new-jenkins/docker-compose-build.sh'
+              sh 'build/new-jenkins/docker-compose-build-up.sh'
+              sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
               sh 'build/new-jenkins/smoke-test.sh'
             }
           }

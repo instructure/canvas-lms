@@ -36,7 +36,8 @@ pipeline {
       steps {
         timeout(time: 60) {
           sh 'printenv | sort'
-          sh 'build/new-jenkins/docker-compose-build.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
+          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
           // todo create contract tests script
           // sh 'build/new-jenkins/.sh'
         }

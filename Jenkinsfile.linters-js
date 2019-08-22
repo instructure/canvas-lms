@@ -36,7 +36,6 @@ pipeline {
       steps {
         timeout(time: 60) {
           sh 'printenv | sort'
-          sh 'build/new-jenkins/docker-compose-build.sh'
           // Todo: create linters-js script
           // sh 'build/new-jenkins/.sh'
         }
