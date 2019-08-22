@@ -36,6 +36,7 @@ shared_context 'advantage services context' do
        https://canvas.instructure.com/lti/data_services/scope/create
        https://canvas.instructure.com/lti/data_services/scope/show
        https://canvas.instructure.com/lti/data_services/scope/update
+       https://canvas.instructure.com/lti/data_services/scope/list
       ).join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }

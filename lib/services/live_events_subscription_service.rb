@@ -81,7 +81,7 @@ module Services
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
       end
 
-      def index(jwt_body, opts)
+      def index(jwt_body, opts = {})
         options = { headers: headers(jwt_body, opts) }
         request(:get, '/api/subscriptions', options)
       end

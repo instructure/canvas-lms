@@ -66,7 +66,8 @@ module Lti
     ACTION_SCOPE_MATCHERS = {
       create: all_of(TokenScopes::LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       show: all_of(TokenScopes::LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE),
-      update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE)
+      update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
+      index: all_of(TokenScopes::LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE)
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
@@ -150,6 +151,21 @@ module Lti
     # @returns DataServiceSubscription
     def show
       response = Services::LiveEventsSubscriptionService.show(jwt_body, params.require(:id))
+      forward_service_response(response)
+    end
+
+    # @API List all Data Services Event Subscriptions
+    #
+    # This endpoint returns a paginated list with a default limit of 100 items per result set.
+    # You can retrieve the next result set by setting a 'StartKey' header in your next request
+    # with the value of the 'EndKey' header in the response.
+    #
+    # Example use of a 'StartKey' header object:
+    #   { "Id":"71d6dfba-0547-477d-b41d-db8cb528c6d1","OwnerId":"domain.instructure.com" }
+    #
+    # @returns DataServiceSubscription
+    def index
+      response = Services::LiveEventsSubscriptionService.index(jwt_body)
       forward_service_response(response)
     end
 

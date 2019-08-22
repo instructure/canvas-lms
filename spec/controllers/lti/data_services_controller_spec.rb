@@ -60,7 +60,7 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/show"}
       let(:params_overrides) do
-        { subscription: subscription, account_id: root_account.id, id: 'testid' }
+        { account_id: root_account.id, id: 'testid' }
       end
     end
   end
@@ -72,6 +72,17 @@ describe Lti::DataServicesController do
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/update"}
       let(:params_overrides) do
         { subscription: subscription, account_id: root_account.id, id: 'testid' }
+      end
+    end
+  end
+
+  describe '#index' do
+    it_behaves_like 'lti services' do
+      let(:action) { :index }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/list"}
+      let(:params_overrides) do
+        { account_id: root_account.id }
       end
     end
   end
