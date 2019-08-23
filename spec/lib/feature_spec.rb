@@ -28,6 +28,7 @@ describe Feature do
   before do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
+        'SA' => Feature.new(feature: 'SA', applies_to: 'SiteAdmin', state: 'off'),
         'RA' => Feature.new(feature: 'RA', applies_to: 'RootAccount', state: 'hidden'),
         'A' => Feature.new(feature: 'A', applies_to: 'Account', state: 'on'),
         'C' => Feature.new(feature: 'C', applies_to: 'Course', state: 'off'),
@@ -36,8 +37,18 @@ describe Feature do
   end
 
   describe "applies_to_object" do
+    it "should work for SiteAdmin features" do
+      feature = Feature.definitions['SA']
+      expect(feature.applies_to_object(t_site_admin)).to be_truthy
+      expect(feature.applies_to_object(t_root_account)).to be_falsey
+      expect(feature.applies_to_object(t_sub_account)).to be_falsey
+      expect(feature.applies_to_object(t_course)).to be_falsey
+      expect(feature.applies_to_object(t_user)).to be_falsey
+    end
+
     it "should work for RootAccount features" do
       feature = Feature.definitions['RA']
+      expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_truthy
       expect(feature.applies_to_object(t_sub_account)).to be_falsey
       expect(feature.applies_to_object(t_course)).to be_falsey
@@ -46,6 +57,7 @@ describe Feature do
 
     it "should work for Account features" do
       feature = Feature.definitions['A']
+      expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_truthy
       expect(feature.applies_to_object(t_sub_account)).to be_truthy
       expect(feature.applies_to_object(t_course)).to be_falsey
@@ -54,6 +66,7 @@ describe Feature do
 
     it "should work for Course features" do
       feature = Feature.definitions['C']
+      expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_truthy
       expect(feature.applies_to_object(t_sub_account)).to be_truthy
       expect(feature.applies_to_object(t_course)).to be_truthy
@@ -72,7 +85,7 @@ describe Feature do
 
   describe "applicable_features" do
     it "should work for Site Admin" do
-      expect(Feature.applicable_features(t_site_admin).map(&:feature).sort).to eql %w(A C RA U)
+      expect(Feature.applicable_features(t_site_admin).map(&:feature).sort).to eql %w(A C RA SA U)
     end
 
     it "should work for RootAccounts" do
@@ -115,6 +128,13 @@ describe Feature do
   end
 
   describe "default_transitions" do
+    it "should enumerate SiteAdmin transitions" do
+      fd = Feature.definitions['SA']
+      expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'on')).to eql({"allowed"=>{"locked"=>true},'off'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'off')).to eql({"allowed"=>{"locked"=>true},'on'=>{'locked'=>false}})
+    end
+
     it "should enumerate RootAccount transitions" do
       fd = Feature.definitions['RA']
       expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})

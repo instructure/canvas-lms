@@ -49,6 +49,10 @@ module FeatureFlags
       [:display_name, :description].each do |field|
         definition[field] = wrap_translate_text(definition[field])
       end
+      definition[:state] = ensure_state_if_boolean(definition[:state]) if definition.key? :state
+      definition[:environments]&.each do |_env_name, env|
+        env[:state] = ensure_state_if_boolean(env[:state]) if env.key? :state
+      end
       Feature.register({ name => definition })
     end
 
@@ -68,6 +72,16 @@ module FeatureFlags
       definitions.each do |name, definition|
         self.load_definition(name, definition)
       end
+    end
+
+    # the state can be on/off, but those values are parsed as booleans. so to make sure
+    # we don't have to put quotes around on/off states in the definitions (which will probably
+    # create confusion), just check and transform here if needed
+    def self.ensure_state_if_boolean(value)
+      if value.is_a?(TrueClass) || value.is_a?(FalseClass)
+        return value ? "on" : "off"
+      end
+      return value
     end
   end
 end
