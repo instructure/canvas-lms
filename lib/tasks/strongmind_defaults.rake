@@ -47,7 +47,6 @@ namespace :strongmind_defaults do
         value: ".txt,.gif,.ppt,.pptx,.png,.zip,.m4v,.dot,.m4a,.csv,.jpeg,.jpg,.xlsx,.xls,.ods,.pdf,.mp4,.ogg,.rtf,.docx",
         object: "school"
       )
-    SettingsService.update_settings(id: '1', setting: "ga_tracking_id", value: "UA-36373320-13", object: "school")
     settings =  SettingsService.get_settings(object: "school", id: 1);
     puts "set default school settings: #{settings}"
   end
