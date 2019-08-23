@@ -102,7 +102,7 @@ function createMocks(overrides = []) {
  *       }
  *       ```
  */
-export async function mockQuery(query, overrides = [], variables = {}) {
+export function mockQuery(query, overrides = [], variables = {}) {
   // Turn the processed / normalized graphql-tag (gql) query back into a
   // string that can be used to make a query using graphql.js. Using gql is
   // super helpful for things like removing duplicate fragments, so we still

@@ -84,7 +84,7 @@ beforeAll(() => {
 })
 
 describe('MoreOptions', () => {
-  it('renders a button for more options', async () => {
+  it('renders a button for more options', () => {
     const {getByText} = render(<MoreOptions assignmentID="1" courseID="1" userID="1" />)
     expect(getByText('More Options')).toBeInTheDocument()
   })

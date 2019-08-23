@@ -46,7 +46,7 @@ class MoreOptions extends React.Component {
     this._isMounted = false
   }
 
-  handleIframeTask = async e => {
+  handleIframeTask = e => {
     if (e.data.messageType === 'LtiDeepLinkingResponse') {
       if (this._isMounted) {
         this.setState({open: false})

@@ -45,7 +45,7 @@ describe('CommentTextArea', () => {
     })
   }
 
-  it('renders the CommentTextArea by default', async () => {
+  it('renders the CommentTextArea by default', () => {
     const {getByText} = render(
       <MockedProvider>
         <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
@@ -54,7 +54,7 @@ describe('CommentTextArea', () => {
     expect(getByText('Attach a File')).toBeInTheDocument()
   })
 
-  it('renders the input for controlling file inputs', async () => {
+  it('renders the input for controlling file inputs', () => {
     const {container} = render(
       <MockedProvider>
         <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />

@@ -64,7 +64,7 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
       quizzes = [{id: '1101', name: 'Accessibility', role: 'grader'}]
     })
 
-    async function loadAssessmentAuditTrail() {
+    function loadAssessmentAuditTrail() {
       return api.loadAssessmentAuditTrail('1201', '2301', '2501')
     }
 

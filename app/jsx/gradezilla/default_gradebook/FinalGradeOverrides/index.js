@@ -93,7 +93,7 @@ export default class FinalGradeOverrides {
     }
   }
 
-  async loadFinalGradeOverrides() {
+  loadFinalGradeOverrides() {
     return getFinalGradeOverrides(this._gradebook.course.id).then(({finalGradeOverrides}) => {
       this.setGrades(finalGradeOverrides)
     })

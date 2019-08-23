@@ -117,7 +117,7 @@ const data = overrides => ({
   ...overrides
 })
 
-beforeEach(async () => {
+beforeEach(() => {
   originalSubmit = HTMLFormElement.prototype.submit
   submit = jest.fn()
   HTMLFormElement.prototype.submit = submit

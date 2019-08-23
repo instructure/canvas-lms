@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export async function waitFor(conditionFn, timeout = 200) {
+export function waitFor(conditionFn, timeout = 200) {
   return new Promise((resolve, reject) => {
     let timeoutId
 

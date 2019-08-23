@@ -32,15 +32,8 @@ const newProps = (overrides = {}) => ({
   ...overrides
 })
 
-beforeAll(() => {
-  axios.get = jest.fn()
-  axios.get.mockImplementation(async () => {
-    return {data: []};
-  })
-})
-
-afterEach(() => {
-  axios.get.mockRestore()
+beforeEach(() => {
+  jest.spyOn(axios, 'get').mockResolvedValue({data: []})
 })
 
 describe('DefaultToolForm', () => {
@@ -80,16 +73,16 @@ describe('DefaultToolForm', () => {
 
   describe('when the configured tool is not installed', () => {
     beforeAll(() => {
-      axios.get.mockImplementation(async () => {
-        return {data: [{
+      axios.get.mockResolvedValue({
+        data: [{
           placements: [{
             url: 'foo'
           }]
-        }]};
+        }]
       })
     })
 
-    it('renders an error message', async () => {
+    it('renders an error message', () => {
       wrapper = mount(<DefaultToolForm {...newProps({previouslySelected: true})} />)
       expect(wrapper.find('Alert').exists()).toEqual(true)
     })
