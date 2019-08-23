@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook_common')
+require_relative '../common'
+require_relative '../helpers/gradebook_common'
 
 
 describe 'Canvadoc' do
@@ -27,7 +27,8 @@ describe 'Canvadoc' do
     PluginSetting.create! :name => 'canvadocs',
       :settings => {"api_key" => "blahblahblahblahblah",
                     "base_url" => "http://example.com",
-                    "annotations_supported" => "1"}
+                    "annotations_supported" => "1",
+                    "account" => "Account.default"}
   end
 
   def turn_on_plugin_settings
@@ -47,6 +48,7 @@ describe 'Canvadoc' do
 
   context 'as an admin' do
     before :each do
+      stub_rcs_config
       site_admin_logged_in
       allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
     end
@@ -63,24 +65,20 @@ describe 'Canvadoc' do
       assert_flash_notice_message('Plugin settings successfully updated.')
     end
 
-    it "embed canvadocs in page", priority: "1", test_id: 126836 do
-      skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
-      turn_on_plugin_settings
-      f('.save_button').click
+    it "embed canvadocs in wiki page", priority: "1", test_id: 126836 do
       course_with_teacher_logged_in :account => @account, :active_all => true
       @course.wiki_pages.create!(title: 'Page1')
       file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
       file.context = @course
       file.save!
       get "/courses/#{@course.id}/pages/Page1/edit"
-      ff(".ui-tabs-anchor")[1].click
-      ff(".name.text")[0].click
+      fj('[role="presentation"]:contains("Files")').click
+      fj("aside li:contains('unfiled')").click
       wait_for_ajaximations
-      ff(".name.text")[1].click
-      wait_for_ajaximations
-      ff(".name.text")[2].click
+      fj("aside button:contains('some test file')").click
       wait_for_ajaximations
       f(".btn-primary").click
+      wait_for_ajaximations
       expect(f(".file_preview_link")).to be_present
     end
   end
