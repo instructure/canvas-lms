@@ -86,4 +86,15 @@ describe Lti::DataServicesController do
       end
     end
   end
+
+  describe '#destroy' do
+    it_behaves_like 'lti services' do
+      let(:action) { :destroy }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/destroy"}
+      let(:params_overrides) do
+        { account_id: root_account.id, id: 'testid' }
+      end
+    end
+  end
 end

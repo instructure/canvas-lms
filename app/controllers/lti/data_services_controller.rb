@@ -67,7 +67,8 @@ module Lti
       create: all_of(TokenScopes::LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       show: all_of(TokenScopes::LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
-      index: all_of(TokenScopes::LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE)
+      index: all_of(TokenScopes::LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE),
+      destroy: all_of(TokenScopes::LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE),
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
@@ -166,6 +167,16 @@ module Lti
     # @returns DataServiceSubscription
     def index
       response = Services::LiveEventsSubscriptionService.index(jwt_body)
+      forward_service_response(response)
+    end
+
+
+    # @API Destroy a Data Services Event Subscription
+    # Destroy existing Data Services Event Subscription
+    #
+    # @returns DataServiceSubscription
+    def destroy
+      response = Services::LiveEventsSubscriptionService.destroy(jwt_body, params.require(:id))
       forward_service_response(response)
     end
 

@@ -32,6 +32,7 @@ class TokenScopes
   LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/show".freeze
   LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/update".freeze
   LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list".freeze
+  LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/destroy".freeze
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
@@ -42,7 +43,8 @@ class TokenScopes
     LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can create subscription to data service data."),
     LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can show subscription to data service data."),
     LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can update subscription to data service data."),
-    LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data.")
+    LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data."),
+    LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data.")
   }.freeze
   LTI_AGS_SCOPES = [ LTI_AGS_LINE_ITEM_SCOPE, LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE, LTI_AGS_RESULT_READ_ONLY_SCOPE, LTI_AGS_SCORE_SCOPE ].freeze
 
