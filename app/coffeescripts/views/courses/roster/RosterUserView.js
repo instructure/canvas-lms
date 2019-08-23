@@ -58,7 +58,7 @@ export default class RosterUserView extends Backbone.View {
     this.model.currentRole = __guard__(this.model.get('enrollments')[0], x => x.role)
 
     this.$el.attr('id', `user_${options.model.get('id')}`)
-    return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.role))
+    return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.type))
   }
 
   toJSON() {
