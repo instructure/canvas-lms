@@ -50,7 +50,7 @@ describe "GradeChangeAudit API", type: :request do
 
       @assignment = @course.assignments.create!(title: 'Assignment', points_possible: 10)
       @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
-      @event = Auditors::GradeChange.record(@submission)
+      @event = Auditors::GradeChange.record(submission: @submission)
     end
 
     def fetch_for_context(context, options={})
@@ -221,7 +221,7 @@ describe "GradeChangeAudit API", type: :request do
         @student_in_new_section = User.create!
         @course.enroll_user(@student_in_new_section, "StudentEnrollment", enrollment_state: "active", section: new_section)
         submission = @assignment.grade_student(@student_in_new_section, grade: 8, grader: @teacher).first
-        @event_visible_to_ta = Auditors::GradeChange.record(submission)
+        @event_visible_to_ta = Auditors::GradeChange.record(submission: submission)
       end
 
       context "course" do
@@ -579,8 +579,8 @@ describe "GradeChangeAudit API", type: :request do
 
     describe "pagination" do
       before do
-        Auditors::GradeChange.record(@submission)
-        Auditors::GradeChange.record(@submission)
+        Auditors::GradeChange.record(submission: @submission)
+        Auditors::GradeChange.record(submission: @submission)
         @json = fetch_for_context(@student, per_page: 2, type: "student")
       end
 

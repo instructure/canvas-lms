@@ -1839,7 +1839,7 @@ class Submission < ActiveRecord::Base
   end
   private :validate_single_submission
 
-  def grade_change_audit(force_audit = self.assignment_changed_not_sub)
+  def grade_change_audit(force_audit: self.assignment_changed_not_sub, skip_insert: false)
     newly_graded = self.saved_change_to_workflow_state? && self.workflow_state == 'graded'
     grade_changed = (self.saved_changes.keys & %w(grade score excused)).present?
     return true unless newly_graded || grade_changed || force_audit
@@ -1847,7 +1847,9 @@ class Submission < ActiveRecord::Base
     if grade_change_event_author_id.present?
       self.grader_id = grade_change_event_author_id
     end
-    self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
+    self.class.connection.after_transaction_commit do
+      Auditors::GradeChange.record(skip_insert: skip_insert, submission: self)
+    end
   end
 
   scope :with_assignment, -> { joins(:assignment).merge(Assignment.active)}
@@ -2489,7 +2491,7 @@ class Submission < ActiveRecord::Base
   end
 
   def assignment_muted_changed
-    self.grade_change_audit(true)
+    self.grade_change_audit(force_audit: true, skip_insert: true)
   end
 
   def without_graded_submission?
