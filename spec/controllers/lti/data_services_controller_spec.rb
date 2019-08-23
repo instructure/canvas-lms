@@ -22,34 +22,45 @@ require File.expand_path(File.dirname(__FILE__) + '/ims/concerns/lti_services_sh
 require_dependency "lti/public_jwk_controller"
 
 describe Lti::DataServicesController do
+  include WebMock::API
+
+  include_context 'advantage services context'
+
+  let(:subscription) do
+    {
+      ContextId: root_account.uuid,
+      ContextType: 'root_account',
+      EventTypes: ['discussion_topic_created'],
+      Format: 'live-event',
+      TransportMetadata: { Url: 'sqs.example' },
+      TransportType: 'sqs'
+    }
+  end
+
+  before do
+    allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
+    allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
+    allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
+  end
+
   describe '#create' do
-    include WebMock::API
-
-    include_context 'advantage services context'
-
-    let(:subscription) do
-      {
-        ContextId: root_account.uuid,
-        ContextType: 'root_account',
-        EventTypes: ['discussion_topic_created'],
-        Format: 'live-event',
-        TransportMetadata: { Url: 'sqs.example' },
-        TransportType: 'sqs'
-      }
-    end
-
-    before do
-      allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
-      allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
-      allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
-    end
-
     it_behaves_like 'lti services' do
       let(:action) { :create }
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/create"}
       let(:params_overrides) do
         { subscription: subscription, account_id: root_account.id }
+      end
+    end
+  end
+
+  describe '#show' do
+    it_behaves_like 'lti services' do
+      let(:action) { :show }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/show"}
+      let(:params_overrides) do
+        { subscription: subscription, account_id: root_account.id, id: 'testid' }
       end
     end
   end
