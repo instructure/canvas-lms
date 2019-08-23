@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require_relative '../helpers/wiki_and_tiny_common'
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
   include_context "in-process server selenium tests"
@@ -25,6 +25,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     before(:each) do
       course_with_student_logged_in
+      stub_rcs_config
     end
 
     it "should not allow access to page when marked as hide from student" do
@@ -93,20 +94,21 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should not allow students to add links to new pages unless they can create pages" do
-      skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
       create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/test_page/edit"
+      fj('button:contains("Pages")').click
       wait_for_ajax_requests
 
-      expect(f("#content")).not_to contain_css('#new_page_link')
+      expect(f("#content")).not_to contain_css('#rcs-LinkToNewPage-btn-link')
 
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
 
       get "/courses/#{@course.id}/pages/somenewpage/edit" # page that doesn't exist
+      fj('button:contains("Pages")').click
       wait_for_ajax_requests
 
-      expect(f('#new_page_link')).to_not be_nil
+      expect(f('#rcs-LinkToNewPage-btn-link')).to_not be_nil
       expect_new_page_load { f('form.edit-form button.submit').click }
       new_page = @course.wiki_pages.last
       expect(new_page).to be_published
