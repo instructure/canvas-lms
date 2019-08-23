@@ -207,6 +207,22 @@ test('returns true if record is external tool', () => {
   equal(assignment.isExternalTool(), true)
 })
 
+QUnit.module('Assignment#defaultToolName', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool <a href="https://www.somethingbad.com">'
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('escapes the name retrieved from the js env', () => {
+  const assignment = new Assignment({name: 'foo'})
+  equal(assignment.defaultToolName(), 'Default Tool %3Ca href%3D%22https%3A//www.somethingbad.com%22%3E')
+})
+
 test('returns false if record is not external tool', () => {
   const assignment = new Assignment({name: 'foo'})
   assignment.submissionTypes(['on_paper'])

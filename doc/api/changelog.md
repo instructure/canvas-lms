@@ -10,6 +10,14 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 - This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
 <div class="changelog"></div>
+## 2019-09-21
+### Changes
+| Resources | Function |     |
+|----------------------|----------------------|--------------------------|
+| [Submissions API] | Upload a File Endpoint | Added validation for file type; if a submission is set to accept only specific file types, the endpoint rejects uploaded file types not included for submission uploads |
+
+[Submissions API]: submissions.html
+
 ## 2019-07-31
 ### Additions
 | OAuth2 | File |     |
@@ -90,22 +98,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 | [Users API] | List Users in Account Endpoint | Added enrollment_type parameter |
 
 [Users API]: Users.html
-
-
-## 2019-06-01
-### Additions
-| Resources | Function |  |
-|----------------------|----------------------|--------------------------|
-| [Files API] | Get Uploaded Media Folder for User Endpoint | Added endpoint |
-| [Originality Report API] | Create an Originality Report<br><br>Edit an Originality Report | Added originality_report[error_message] parameter
-|                     | Originality Report Object | Returns Error_report |
-
-[Files API]: files.html
-[Originality Report API]: originality_reports.html
-
-### Removals
-| Resources | Function |  |
-|----------------------|----------------------|--------------------------|
-| [File Uploads] | Uploading via POST Process | Step 3: Deprecated POST requests in favor of GET requests for forward compatibility
-
-[File Uploads]: file.file_uploads.html

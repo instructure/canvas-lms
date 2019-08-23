@@ -6,6 +6,24 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2019-06-01
+### Additions
+| Resources | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Files API] | Get Uploaded Media Folder for User Endpoint | Added endpoint |
+| [Originality Report API] | Create an Originality Report<br><br>Edit an Originality Report | Added originality_report[error_message] parameter
+|                     | Originality Report Object | Returns Error_report |
+
+[Files API]: files.html
+[Originality Report API]: originality_reports.html
+
+### Removals
+| Resources | Function |  |
+|----------------------|----------------------|--------------------------|
+| [File Uploads] | Uploading via POST Process | Step 3: Deprecated POST requests in favor of GET requests for forward compatibility
+
+[File Uploads]: file.file_uploads.html
+
 ## 2019-05-11
 ### Additions
 | Resources | Function |  |
