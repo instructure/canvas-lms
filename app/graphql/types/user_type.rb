@@ -83,12 +83,7 @@ module Types
 
     field :groups, [GroupType], null: true
     def groups
-      Promise.all([
-        load_association(:groups),
-        load_association(:group_memberships)
-      ]).then do
-        object.groups.active
-      end
+      load_association(:current_groups)
     end
 
     field :summary_analytics, StudentSummaryAnalyticsType, null: true do
