@@ -2348,6 +2348,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/data_services') do
       post "/accounts/:account_id/data_services", action: :create, as: :data_services_create
       get "/accounts/:account_id/data_services/:id", action: :show, as: :data_services_show
+      put "/accounts/:account_id/data_services/:id", action: :update, as: :data_services_update
     end
 
     # Names and Roles Provisioning (NRPS) v2 Service

@@ -64,7 +64,8 @@ module Lti
 
     ACTION_SCOPE_MATCHERS = {
       create: all_of(TokenScopes::LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
-      show: all_of(TokenScopes::LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE)
+      show: all_of(TokenScopes::LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE),
+      update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE)
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
@@ -78,7 +79,7 @@ module Lti
     before_action :verify_service_configured
 
     # @API Create a Data Services Event Subscription
-    # Creates a webook subscription for the specified event type and
+    # Creates a Data Service Event subscription for the specified event type and
     # context.
     #
     # @argument subscription[ContextId] [Required, String]
@@ -106,6 +107,39 @@ module Lti
       sub = params.require(:subscription)
       SubscriptionsValidator.validate_subscription_context!(sub)
       response = Services::LiveEventsSubscriptionService.create(jwt_body, sub.to_unsafe_h)
+      forward_service_response(response)
+    end
+
+    # @API Update a Data Services Event Subscription
+    # Updates a Data Service Event subscription for the specified event type and
+    # context.
+    #
+    # @argument subscription[ContextId] [Required, String]
+    #   The id of the context for the subscription.
+    #
+    # @argument subscription[ContextType] [Required, String]
+    #   The type of context for the subscription. Must be 'assignment',
+    #   'account', or 'course'.
+    #
+    # @argument subscription[EventTypes] [Required, Array]
+    #   Array of strings representing the event types for
+    #   the subscription.
+    #
+    # @argument subscription[Format] [Required, String]
+    #   Format to deliver the live events. Must be 'live-event' or 'caliper'.
+    #
+    # @argument subscription[TransportMetadata] [Required, Object]
+    #   An object with a single key: 'Url'. Example: { "Url": "sqs.example" }
+    #
+    # @argument subscription[TransportType] [Required, String]
+    #   Must be either 'sqs' or 'https'.
+    #
+    # @returns DataServiceSubscription
+    def update
+      sub = params.require(:subscription)
+      SubscriptionsValidator.validate_subscription_context!(sub)
+      updates = { 'Id': params[:id] }.merge(sub.to_unsafe_h)
+      response = Services::LiveEventsSubscriptionService.update(jwt_body, updates)
       forward_service_response(response)
     end
 

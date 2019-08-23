@@ -64,4 +64,15 @@ describe Lti::DataServicesController do
       end
     end
   end
+
+  describe '#update' do
+    it_behaves_like 'lti services' do
+      let(:action) { :update }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/update"}
+      let(:params_overrides) do
+        { subscription: subscription, account_id: root_account.id, id: 'testid' }
+      end
+    end
+  end
 end
