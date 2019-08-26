@@ -198,10 +198,12 @@ export default class StudentsSearcher extends React.Component {
         <Flex as="div" margin="0 0 medium 0" wrapItems>
           <FlexItem grow size="60%" margin="small 0 0 0">
             <TextInput
-              label={<ScreenReaderContent>{I18n.t('Search by student name')}</ScreenReaderContent>}
+              renderLabel={
+                <ScreenReaderContent>{I18n.t('Search by student name')}</ScreenReaderContent>
+              }
               placeholder={I18n.t('Search')}
               type="search"
-              inline
+              display="inline-block"
               width="70%"
               messages={searchMessages}
               onChange={this.handleNameFilterChange}
