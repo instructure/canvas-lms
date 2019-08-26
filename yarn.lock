@@ -1007,15 +1007,6 @@
   resolved "https://registry.yarnpkg.com/@instructure/config-loader/-/config-loader-6.10.0.tgz#75a3d8570c433789c358a8bc2b46e0aa3b3a358f"
   integrity sha512-fljxSaR0SuuexoTcQRiNLxmJQrX0a3vYHGZZ6odSo/YZjKp/Tdj5VqSRJEDtJMrJU9fp3ZdgAcC2SHjpwhR7Xw==
 
-"@instructure/console@^6.10.0":
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/@instructure/console/-/console-6.10.0.tgz#3faba88b49c3502d81b0109a0152090550ddae2d"
-  integrity sha512-LSKujxif6W9Nl5vt6EEC6ofUu7MZd0tI+aCpD+0SfO2xN8tROpNZTUQRJBlLybCmu+kdDpQoj0syl/+D5Qj1AQ==
-  dependencies:
-    "@babel/helper-annotate-as-pure" "^7.0.0"
-    "@babel/helper-module-imports" "^7.0.0"
-    babel-plugin-macros "^2.6.1"
-
 "@instructure/console@^5.52.3":
   version "5.52.3"
   resolved "https://registry.yarnpkg.com/@instructure/console/-/console-5.52.3.tgz#b3eba8c535010d57bff18bd5c1d18f1cf779023f"
@@ -1024,6 +1015,15 @@
     "@babel/helper-annotate-as-pure" "^7.0.0"
     "@babel/helper-module-imports" "^7.0.0"
     babel-plugin-macros "^2.5.1"
+
+"@instructure/console@^6.10.0":
+  version "6.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/console/-/console-6.10.0.tgz#3faba88b49c3502d81b0109a0152090550ddae2d"
+  integrity sha512-LSKujxif6W9Nl5vt6EEC6ofUu7MZd0tI+aCpD+0SfO2xN8tROpNZTUQRJBlLybCmu+kdDpQoj0syl/+D5Qj1AQ==
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.0.0"
+    "@babel/helper-module-imports" "^7.0.0"
+    babel-plugin-macros "^2.6.1"
 
 "@instructure/debounce@6", "@instructure/debounce@^6.10.0":
   version "6.10.0"
@@ -2081,19 +2081,19 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-testable@^6.10.0":
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-testable/-/ui-testable-6.10.0.tgz#70076a3877d1c6420881b2c45d2ac9e2c11747c7"
-  integrity sha512-446PfhkhlFTXnpkv/XCBBY5W0aw/TFBug4VbRgQsYxtF3bw6ikut+actMfjjKM5011xqtdw/W48EoG9q9xqv4A==
-  dependencies:
-    "@instructure/ui-decorator" "^6.10.0"
-
 "@instructure/ui-testable@^5.52.3":
   version "5.52.3"
   resolved "https://registry.yarnpkg.com/@instructure/ui-testable/-/ui-testable-5.52.3.tgz#62deb9fcbca77df3151444e1eeed699d42196fe9"
   integrity sha512-dFJyaHmGm4f3B7cfsH4l/sn6zMjuz3AIq/TGdc/beYZmziIac7x+G6l5Lvhx7uN29/megut+AQmYB7fIIuvhWA==
   dependencies:
     "@instructure/ui-decorator" "^5.52.3"
+
+"@instructure/ui-testable@^6.10.0":
+  version "6.10.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-testable/-/ui-testable-6.10.0.tgz#70076a3877d1c6420881b2c45d2ac9e2c11747c7"
+  integrity sha512-446PfhkhlFTXnpkv/XCBBY5W0aw/TFBug4VbRgQsYxtF3bw6ikut+actMfjjKM5011xqtdw/W48EoG9q9xqv4A==
+  dependencies:
+    "@instructure/ui-decorator" "^6.10.0"
 
 "@instructure/ui-text-input@6", "@instructure/ui-text-input@^6.10.0", "@instructure/ui-text-input@^6.8.1":
   version "6.10.0"

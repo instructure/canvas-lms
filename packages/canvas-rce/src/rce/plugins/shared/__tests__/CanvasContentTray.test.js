@@ -79,7 +79,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
     // course
     it('is labeled with "Course Images" when using the "images" content type', async () => {
-      await showTrayForPlugin('images')
+      await showTrayForPlugin('course_images')
       expect(getTrayLabel()).toEqual('Course Images')
     })
 
@@ -94,8 +94,8 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
 
     // user
-    it.skip('is labeled with "User Images" when using the "user_images" content type', async () => {
-      await showTrayForPlugin('images')
+    it('is labeled with "User Images" when using the "user_images" content type', async () => {
+      await showTrayForPlugin('user_images')
       expect(getTrayLabel()).toEqual('User Images')
     })
 

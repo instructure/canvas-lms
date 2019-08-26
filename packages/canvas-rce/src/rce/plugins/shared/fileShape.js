@@ -22,12 +22,13 @@ export const fileShape = {
   date: string.isRequired,
   display_name: string,
   filename: string.isRequired,
-  hidden_to_user: bool,
   href: string.isRequired,
   id: oneOfType([number, string]).isRequired,
+  thumbnail_url: string,
+  preview_url: string,
+  hidden_to_user: bool,
   lock_at: string,
+  unlock_at: string,
   locked_for_user: bool,
-  published: bool,
-  unlock_at: bool
- }
-
+  published: bool
+}

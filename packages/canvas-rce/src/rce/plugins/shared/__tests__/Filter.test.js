@@ -29,17 +29,17 @@ describe('RCE Plugins > Filter', () => {
     currentFilterSettings = null
   })
 
-  function FilterWithHooks() {
+  function FilterWithHooks(props={}) {
     const [filterSettings, setFilterSettings] = useFilterSettings()
     currentFilterSettings = filterSettings
 
     return (
-      <Filter {...filterSettings} onChange={setFilterSettings} />
+      <Filter {...filterSettings} onChange={setFilterSettings} {...props} />
     )
   }
 
-  function renderComponent() {
-    component = render(<FilterWithHooks />)
+  function renderComponent(props) {
+    component = render(<FilterWithHooks {...props} />)
   }
 
   function selectContentType(contentTypeLabel) {
@@ -87,7 +87,7 @@ describe('RCE Plugins > Filter', () => {
 
   describe('"Content Type" field', () => {
     beforeEach(() => {
-      renderComponent()
+      renderComponent({userContextType: 'course'})
     })
     it('sets content type to "user_files" when "My Files" is selected', () => {
       selectContentType('My Files')
@@ -122,7 +122,7 @@ describe('RCE Plugins > Filter', () => {
 
   describe('"Content Type" in context', () => {
     it('has "Course" options', () => {
-      renderComponent()
+      renderComponent({userContextType: 'course'})
 
       selectContentType('Course Files')
       expect(currentFilterSettings.contentType).toEqual('course_files')
@@ -130,11 +130,29 @@ describe('RCE Plugins > Filter', () => {
     })
 
     it('has "My" options', () => {
-      renderComponent()
+      renderComponent({userContextType: 'course'})
 
       selectContentType('My Files')
       expect(currentFilterSettings.contentType).toEqual('user_files')
       expect(component.getByLabelText('Content Type').value).toEqual('My Files')
+    })
+
+    it('includes the Course and My options in course context', () => {
+      renderComponent({userContextType: 'course'})
+      const contentTypeField = component.getByLabelText('Content Type')
+      fireEvent.click(contentTypeField)
+      expect(component.getByText('Links')).toBeInTheDocument()
+      expect(component.getByText('My Files')).toBeInTheDocument()
+      expect(component.getByText('Course Files')).toBeInTheDocument()
+    })
+
+    it('includes only My option in user context', () => {
+      renderComponent({userContextType: 'user'})
+      const contentTypeField = component.getByLabelText('Content Type')
+      fireEvent.click(contentTypeField)
+      expect(component.getByText('Links')).toBeInTheDocument()
+      expect(component.getByText('My Files')).toBeInTheDocument()
+      expect(component.queryByText('Course Files')).toBeNull()
     })
   })
 
@@ -188,7 +206,7 @@ describe('RCE Plugins > Filter', () => {
 
   describe('"Sort By" field', () => {
     beforeEach(() => {
-      renderComponent()
+      renderComponent({userContextType: 'course'})
       selectContentType('Course Files')
     })
 

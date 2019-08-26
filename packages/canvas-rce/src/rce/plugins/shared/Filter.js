@@ -59,8 +59,32 @@ function fileLabelFromContext(contextType) {
   }
 }
 
+// ui-forms/Select chokes if one of the options is
+// undefined, which happens if you conditionally
+// create one like {test && <option>...</option>}
+// so build the options list more carefully here
+function buildContentOptions(userContextType) {
+  const contentOptions = [
+    <option key="links" value="links" icon={IconLinkLine}>
+      {formatMessage('Links')}
+    </option>,
+    <option key="user_files" value="user_files" icon={IconFolderLine}>
+      {fileLabelFromContext('user')}
+    </option>
+  ]
+
+  if (userContextType === 'course') {
+    contentOptions.splice(1, 0,
+      <option value="course_files" icon={IconFolderLine}>
+        {fileLabelFromContext('course')}
+      </option>
+    )
+  }
+  return contentOptions
+}
+
 export default function Filter(props) {
-  const {contentType, contentSubtype, onChange, sortValue} = props
+  const {contentType, contentSubtype, onChange, sortValue, userContextType} = props
 
   // only run on mounting to trigger change to correct contextType
   useEffect(() => {
@@ -76,17 +100,7 @@ export default function Filter(props) {
         }}
         selectedOption={contentType}
       >
-        <option value="links" icon={IconLinkLine}>
-          {formatMessage('Links')}
-        </option>
-
-        <option value="course_files" icon={IconFolderLine}>
-          {fileLabelFromContext('course')}
-        </option>
-
-        <option value="user_files" icon={IconFolderLine}>
-          {fileLabelFromContext('user')}
-        </option>
+        {buildContentOptions(userContextType)}
       </Select>
 
       {contentType !== 'links' && (
@@ -165,5 +179,10 @@ Filter.propTypes = {
   /**
    * `contextType` is the context in which we are querying for files
    */
-  contextType: oneOf(['user', 'course', 'group'])
+  contextType: oneOf(['user', 'course']), // 'group' some day
+
+  /**
+   * The user's context
+   */
+  userContextType: oneOf(['user', 'course'])
 }

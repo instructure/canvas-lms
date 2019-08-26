@@ -43,13 +43,15 @@ function getTrayLabel({contentType, contentSubtype}) {
 
   switch (contentSubtype) {
     case 'images':
-      return formatMessage('Course Images')
+        return contentType === 'course_files' ?
+          formatMessage('Course Images') :
+          formatMessage('User Images')
     // case 'media':
     //   return formatMessage('Course Media')
     case 'documents':
       return contentType === 'course_files' ?
-      formatMessage('Course Documents') :
-      formatMessage('User Documents')
+        formatMessage('Course Documents') :
+        formatMessage('User Documents')
     default:
       return formatMessage('Tray') // Shouldn't ever get here
   }
@@ -79,7 +81,8 @@ function renderContentComponent({contentType, contentSubtype}, contentProps) {
 const FILTER_SETTINGS_BY_PLUGIN = {
   user_documents: {contextType: 'user', contentType: 'user_files', contentSubtype: 'documents', sortValue: 'date_added'},
   course_documents: {contextType: 'course', contentType: 'course_files', contentSubtype: 'documents', sortValue: 'date_added'},
-  images: {contextType: 'course', contentType: 'course_files', contentSubtype: 'images', sortValue: 'date_added'},
+  user_images: {contextType: 'user', contentType: 'user_files', contentSubtype: 'images', sortValue: 'date_added'},
+  course_images: {contextType: 'course', contentType: 'course_files', contentSubtype: 'images', sortValue: 'date_added'},
   links: {contextType: 'course', contentType: 'links', contentSubtype: 'all', sortValue: 'date_added'},
   // media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
 }
@@ -189,6 +192,7 @@ export default function CanvasContentTray(props) {
 
               <Filter
                 {...filterSettings}
+                userContextType={props.contextType}
                 onChange={(newFilter) => {
                   handleFilterChange(newFilter, contentProps.onChangeContext)
                 }}
