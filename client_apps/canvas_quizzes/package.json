@@ -68,8 +68,5 @@
     "requirejs": "~2.2.0",
     "react-tools": "0.11.2",
     "shelljs": "0.7.0"
-  },
-  "resolutions": {
-    "grunt-contrib-jasmine/jasmine-core": "2.6.4"
   }
 }
