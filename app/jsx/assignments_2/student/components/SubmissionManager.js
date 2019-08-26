@@ -92,13 +92,12 @@ export default class SubmissionManager extends Component {
     })
   }
 
-  submitFileUpload = async submitMutation => {
+  submitToGraphql = async (submitMutation, submitVars) => {
     await submitMutation({
       variables: {
         assignmentLid: this.props.assignment._id,
         submissionID: this.props.submission.id,
-        type: 'online_upload', // TODO: update to enable different submission types
-        fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id)
+        ...submitVars
       }
     })
   }
@@ -114,15 +113,25 @@ export default class SubmissionManager extends Component {
         switch (type) {
           case 'online_upload':
             if (
-              this.props.submission.submissionDraft &&
               this.props.submission.submissionDraft.attachments &&
               this.props.submission.submissionDraft.attachments.length > 0
             ) {
-              return this.submitFileUpload(submitMutation)
+              this.submitToGraphql(submitMutation, {
+                type,
+                fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id)
+              })
             }
             break
           case 'online_text_entry':
-          // TODO: add the online text entry submission handler
+            if (
+              this.props.submission.submissionDraft.body &&
+              this.props.submission.submissionDraft.body.length > 0
+            ) {
+              this.submitToGraphql(submitMutation, {
+                type,
+                body: this.props.submission.submissionDraft.body
+              })
+            }
         }
       })
     )
