@@ -334,6 +334,12 @@ class CalendarEventsApiController < ApplicationController
   #   underscore, followed by the context id. For example: course_42
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
+  # @argument submission_types[] [Array]
+  #   When type is "assignment", specifies the allowable submission types for returned assignments.
+  #   Ignored if type is not "assignment" or if exclude_submission_types is provided.
+  # @argument exclude_submission_types[] [Array]
+  #   When type is "assignment", specifies the submission types to be excluded from the returned
+  #   assignments. Ignored if type is not "assignment".
   #
   # @returns [CalendarEvent]
   def user_index
@@ -341,7 +347,16 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def render_events_for_user(user, route_url)
-    scope = @type == :assignment ? assignment_scope(user) : calendar_event_scope(user)
+    scope = if @type == :assignment
+      assignment_scope(
+        user,
+        submission_types: params.fetch(:submission_types, []),
+        exclude_submission_types: params.fetch(:exclude_submission_types, [])
+      )
+    else
+      calendar_event_scope(user)
+    end
+
     events = Api.paginate(scope, self, route_url)
     ActiveRecord::Associations::Preloader.new.preload(events, :child_events) if @type == :event
     if @type == :assignment
@@ -1084,7 +1099,7 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def assignment_scope(user)
+  def assignment_scope(user, submission_types: [], exclude_submission_types: [])
     collections = []
     bookmarker = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
     last_scope = nil
@@ -1096,6 +1111,11 @@ class CalendarEventsApiController < ApplicationController
       next unless scope
 
       scope = scope.active.order(:due_at, :id)
+      if exclude_submission_types.any?
+        scope = scope.where.not(submission_types: exclude_submission_types)
+      elsif submission_types.any?
+        scope = scope.where(submission_types: submission_types)
+      end
       scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
 
       last_scope = scope
