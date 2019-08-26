@@ -3,7 +3,7 @@ version: "2.1"
 services:
   web:
     # use master if NAME is unavailable
-    image: "starlord.inscloudgate.net/jenkins/canvas-lms:${NAME:-master}"
+    image: "${PATCHSET_TAG}"
     links:
       - postgres
       - redis
