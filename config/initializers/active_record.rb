@@ -612,9 +612,11 @@ class ActiveRecord::Base
       rescue ActiveRecord::RecordNotUnique
       end
     end
-    result = transaction(:requires_new => true) { uncached { yield(retries) } }
-    connection.clear_query_cache
-    result
+    Shackles.activate(:master) do
+      result = transaction(:requires_new => true) { uncached { yield(retries) } }
+      connection.clear_query_cache
+      result
+    end
   end
 
   def self.current_xlog_location
