@@ -215,9 +215,11 @@ module Canvas::Migration::Helpers
 
     # returns lists of available content from a source course
     def get_content_from_course(type=nil, source=nil)
-      content_list = []
       source ||= @migration.source_course || Course.find(@migration.migration_settings[:source_course_id]) if @migration
-      if source
+      return [] unless source
+
+      content_list = []
+      source.shard.activate do
         if type
           case type
             when 'assignments'
