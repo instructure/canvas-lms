@@ -17,6 +17,7 @@
 
 module Lti
   # @API Data Services
+  # @internal
   #
   # Data service api for tools.
   #
