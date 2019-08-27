@@ -17,12 +17,12 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import I18n from 'i18n!assignments_2_logged_out_tabs'
 import LoginActionPrompt from './LoginActionPrompt'
 import React from 'react'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {Text} from '@instructure/ui-elements'
 
 LoggedOutTabs.propTypes = {
   assignment: Assignment.shape

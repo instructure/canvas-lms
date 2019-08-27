@@ -30,7 +30,7 @@ import {
   waitForNoElement,
   initialTeacherViewGQLMocks
 } from '../../../test-utils'
-import {toLocaleString} from '@instructure/ui-i18n/lib/DateTime'
+import {DateTime} from '@instructure/ui-i18n'
 
 const locale = TeacherViewContextDefaults.locale
 const timeZone = TeacherViewContextDefaults.timeZone
@@ -97,7 +97,7 @@ describe('TeacherView', () => {
     await waitForElement(() => getByTestId('EditableDateTime-editor'))
 
     // edit the date
-    const dateDisplay = toLocaleString(override.lockAt, locale, timeZone, 'LL')
+    const dateDisplay = DateTime.toLocaleString(override.lockAt, locale, timeZone, 'LL')
     const dinput = getByDisplayValue(dateDisplay)
     dinput.focus()
     fireEvent.change(dinput, {target: {value: newOverrideLockAt}})

@@ -18,7 +18,7 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
@@ -26,7 +26,7 @@ import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import {Submission} from '../graphqlData/Submission'
-import theme from '@instructure/ui-themes/lib/canvas/base'
+import theme from '@instructure/canvas-theme'
 
 export default class SubmissionManager extends Component {
   static propTypes = {

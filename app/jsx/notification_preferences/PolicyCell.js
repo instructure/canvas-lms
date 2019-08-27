@@ -19,9 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default class PolicyCell extends React.Component {
   static renderAt (elt, props) {

@@ -24,7 +24,7 @@ import I18n from 'i18n!assignments_2'
 import parseLinkHeader from '../../../../../../shared/parseLinkHeader'
 import React from 'react'
 
-import TreeBrowser from '@instructure/ui-tree-browser/lib/components/TreeBrowser'
+import {TreeBrowser} from '@instructure/ui-tree-browser'
 
 class CanvasFiles extends React.Component {
   state = {

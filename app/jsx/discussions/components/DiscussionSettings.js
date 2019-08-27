@@ -20,14 +20,12 @@ import I18n from 'i18n!discussion_settings'
 import React, {Component} from 'react'
 import {func, bool} from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import CheckboxGroup from '@instructure/ui-forms/lib/components/CheckboxGroup'
-import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
+import {Button} from '@instructure/ui-buttons'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {Checkbox, CheckboxGroup} from '@instructure/ui-forms'
+import Modal from '../../shared/components/InstuiModal'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconSettingsLine} from '@instructure/ui-icons'
 import propTypes from '../propTypes'
 
 const STUDENT_SETTINGS = [
@@ -171,7 +169,7 @@ export default class DiscussionSettings extends Component {
           label={I18n.t('Edit Discussion Settings')}
           onExited={this.exited}
         >
-          <ModalBody>
+          <Modal.Body>
             <div className="discussion-settings-v2-modal-body-container">
               {this.props.isSavingSettings ? this.renderSpinner() : null}
               <Heading margin="0 0 medium 0" level="h3" as="h2">
@@ -188,8 +186,8 @@ export default class DiscussionSettings extends Component {
               />
               {this.renderTeacherOptions()}
             </div>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button disabled={this.props.isSavingSettings} onClick={this.props.toggleModalOpen}>
               {I18n.t('Cancel')}
             </Button>&nbsp;
@@ -204,7 +202,7 @@ export default class DiscussionSettings extends Component {
             >
               {I18n.t('Save Settings')}
             </Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </span>
     )

@@ -19,11 +19,9 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Heading} from '@instructure/ui-elements'
+import {Select, TextArea, TextInput} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-layout'
 
 import ManualConfigurationForm from './ManualConfigurationForm'
 

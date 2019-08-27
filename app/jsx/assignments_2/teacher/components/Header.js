@@ -21,8 +21,7 @@ import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
 
-import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Grid, GridRow, GridCol, View} from '@instructure/ui-layout'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import TeacherViewContext from './TeacherViewContext'

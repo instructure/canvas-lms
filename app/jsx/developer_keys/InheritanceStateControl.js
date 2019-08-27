@@ -19,9 +19,8 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default class DeveloperKeyStateControl extends React.Component {
   setBindingState = newValue => {

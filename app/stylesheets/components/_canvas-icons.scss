@@ -46,10 +46,10 @@ There are two weights to our icons: line or solid. Canvas defaults to solid, how
 ## Using as a React Component
 
 ```javascript
-import IconAdd from '@instructure/ui-icons/lib/Line/IconAdd'
+import {IconAddLine} from '@instructure/ui-icons'
 
 function MyComponent () {
-  return <IconAdd />
+  return <IconAddLine />
 }
 ```
 
@@ -76,8 +76,8 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 
 */
 
-@import "../../../node_modules/@instructure/ui-icons/lib/font/Line/InstructureIcons-Line_icon-map.scss";
-@import "../../../node_modules/@instructure/ui-icons/lib/font/Solid/InstructureIcons-Solid_icon-map.scss";
+@import "../../../node_modules/@instructure/ui-icons/es/font/Line/InstructureIcons-Line_icon-map.scss";
+@import "../../../node_modules/@instructure/ui-icons/es/font/Solid/InstructureIcons-Solid_icon-map.scss";
 
 $icon_default: "Line";
 

@@ -18,7 +18,7 @@
 import I18n from 'i18n!generic_error_page'
 import React from 'react'
 import {TextArea, TextInput} from '@instructure/ui-forms'
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {func, string} from 'prop-types'
 

@@ -20,7 +20,7 @@ import I18n from 'i18n!managed_course_selector'
 import React, {useState} from 'react'
 // import {func} from 'prop-types'
 
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
 

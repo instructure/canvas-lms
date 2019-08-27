@@ -24,11 +24,9 @@ import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Spinner, Heading, Text} from '@instructure/ui-elements'
 
 import CanvasTray from 'jsx/shared/components/CanvasTray'
 

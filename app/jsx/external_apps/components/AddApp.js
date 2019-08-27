@@ -27,9 +27,7 @@ import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
 import ExternalTool from 'compiled/models/ExternalTool'
 import 'jquery.disableWhileLoading'
 import 'compiled/jquery.rails_flash_notifications'
-import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
-import ModalFooter from '@instructure/ui-overlays/lib/components/Modal/ModalFooter';
-import Button from '@instructure/ui-buttons/lib/components/Button';
+import {Button} from '@instructure/ui-buttons'
 
 export default createReactClass({
     displayName: 'AddApp',
@@ -219,17 +217,17 @@ export default createReactClass({
             onDismiss={this.closeModal}
             label={I18n.t('Add App')}
           >
-            <ModalBody>
+            <Modal.Body>
                 {this.errorMessage()}
                 <form>
                   {this.configOptions()}
                 </form>
-            </ModalBody>
-            <ModalFooter>
+            </Modal.Body>
+            <Modal.Footer>
               <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
               &nbsp;
               <Button onClick={this.submit} variant="primary">{I18n.t('Add App')}</Button>
-            </ModalFooter>
+            </Modal.Footer>
           </Modal>
         </div>
       );

@@ -18,12 +18,11 @@
 
 import React, {Component} from 'react'
 import {func, instanceOf} from 'prop-types'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import View from '@instructure/ui-layout/lib/components/View'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {Tray} from '@instructure/ui-overlays'
+
 import I18n from 'i18n!speed_grader'
 
 import AssessmentSummary from './components/AssessmentSummary'
@@ -56,7 +55,7 @@ export default class AssessmentAuditTray extends Component {
 
   dismiss = () => {
     this.setState({open: false})
-  };
+  }
 
   show = context => {
     this.setState({
@@ -80,7 +79,7 @@ export default class AssessmentAuditTray extends Component {
         }
       })
     /* eslint-enable promise/catch-or-return */
-  };
+  }
 
   render() {
     if (!this.state.assignment) {

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
+import {Button} from '@instructure/ui-buttons'
+import {FormField} from '@instructure/ui-form-field'
 import I18n from 'i18n!eportfolio'
-import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
+import Modal from '../shared/components/InstuiModal'
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -99,15 +99,15 @@ class MoveToDialog extends React.Component {
         onDismiss={this.handleRequestClose}
         onClose={this.handleClose}
       >
-        <ModalBody>{this.renderBody()}</ModalBody>
-        <ModalFooter>
+        <Modal.Body>{this.renderBody()}</Modal.Body>
+        <Modal.Footer>
           <Button id="MoveToDialog__cancel" onClick={this.handleRequestClose}>
             {I18n.t('Cancel')}
           </Button>
           <Button id="MoveToDialog__move" variant="primary" onClick={this.handleMove}>
             {I18n.t('Move')}
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
     )
   }

@@ -21,14 +21,11 @@ import I18n from 'i18n!assignments_2_text_entry'
 import React from 'react'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import {Submission} from '../../graphqlData/Submission'
-
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
-import IconText from '@instructure/ui-icons/lib/Line/IconText'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -217,7 +214,7 @@ export default class TextEntry extends React.Component {
     return (
       <Billboard
         heading={I18n.t('Text Entry')}
-        hero={<IconDocument />}
+        hero={<IconDocumentLine />}
         message={
           <div>
             <Button
@@ -231,7 +228,7 @@ export default class TextEntry extends React.Component {
             </Button>
             <Button
               data-testid="delete-text-draft"
-              icon={IconTrash}
+              icon={IconTrashLine}
               onClick={this.handleCancelButton}
             >
               <ScreenReaderContent>{I18n.t('Remove submission draft')}</ScreenReaderContent>
@@ -247,7 +244,7 @@ export default class TextEntry extends React.Component {
       <View as="div" borderWidth="small" data-testid="text-entry">
         <Billboard
           heading={I18n.t('Text Entry')}
-          hero={<IconText color="brand" />}
+          hero={<IconTextLine color="brand" />}
           message={
             <Button data-testid="start-text-entry" onClick={this.handleStartButton}>
               {I18n.t('Start Entry')}

@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import customTypes from './PropTypes'
-import Modal, {ModalBody, ModalFooter} from 'jsx/shared/components/InstuiModal'
+import Modal from '../shared/components/InstuiModal'
 
 export default class SaveThemeButton extends Component {
   static propTypes = {
@@ -100,7 +100,7 @@ export default class SaveThemeButton extends Component {
           open={this.state.modalIsOpen}
           onDismiss={() => this.setState({modalIsOpen: false})}
         >
-          <ModalBody>
+          <Modal.Body>
             <div className="ic-Form-control">
               <label htmlFor="new_theme_theme_name" className="ic-Label">
                 {I18n.t('Theme Name')}
@@ -113,8 +113,8 @@ export default class SaveThemeButton extends Component {
                 onChange={e => this.setState({newThemeName: e.target.value})}
               />
             </div>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <button
               type="button"
               className="Button"
@@ -131,7 +131,7 @@ export default class SaveThemeButton extends Component {
             >
               {I18n.t('Save theme')}
             </button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </div>
     )

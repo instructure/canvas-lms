@@ -21,7 +21,7 @@ import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!student_groups'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import UserCollection from 'compiled/collections/UserCollection'
 import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
 import BackboneState from '../groups/mixins/BackboneState'
@@ -266,7 +266,7 @@ const StudentView = createReactClass({
             <Filter onChange={e => this.setState({filter: e.target.value})} />
             {this.state.loading ? (
               <div className="spinner-container">
-                <Spinner title="Loading" size="large" margin="0 0 0 medium" />
+                <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
               </div>
             ) : null}
             <PaginatedGroupList

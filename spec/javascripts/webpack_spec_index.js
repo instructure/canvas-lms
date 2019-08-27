@@ -17,7 +17,7 @@
  */
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { canvas } from '@instructure/ui-themes/lib'
+import {canvas} from '@instructure/ui-themes'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
 import setupRavenConsoleLoggingPlugin from '../../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin'

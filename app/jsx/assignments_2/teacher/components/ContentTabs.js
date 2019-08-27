@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
+import {TabList, TabPanel} from '@instructure/ui-tabs'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 import StudentsSearcher from './StudentsTab/StudentsSearcher'

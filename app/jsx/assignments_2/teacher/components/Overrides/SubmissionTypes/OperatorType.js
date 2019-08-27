@@ -20,8 +20,7 @@ import React from 'react'
 import {string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 
 export default class OperatorType extends React.Component {

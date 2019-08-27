@@ -28,14 +28,13 @@ import React, {Component} from 'react'
 import {Submission} from '../../graphqlData/Submission'
 import {uploadFiles} from '../../../../shared/upload_file'
 
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {FileDrop} from '@instructure/ui-forms'
+import {Flex, FlexItem, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {IconTrashLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 
 function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
@@ -222,7 +221,7 @@ export default class FileUpload extends Component {
             </span>
             <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
             <Button
-              icon={IconTrash}
+              icon={IconTrashLine}
               id={file._id}
               margin="0 0 0 x-small"
               onClick={this.handleRemoveFile}

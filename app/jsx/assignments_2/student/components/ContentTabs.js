@@ -18,7 +18,7 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import SubmissionManager from './SubmissionManager'
-import {Badge} from '@instructure/ui-elements'
+import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
@@ -27,10 +27,9 @@ import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {lazy, Suspense} from 'react'
 import {Submission} from '../graphqlData/Submission'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import GradeDisplay from './GradeDisplay'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {TabList, TabPanel} from '@instructure/ui-tabs'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
 const RubricTab = lazy(() => import('./RubricTab'))

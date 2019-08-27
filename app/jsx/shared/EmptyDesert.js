@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import InlineSVG from '@instructure/ui-svg-images/lib/components/InlineSVG'
+import {InlineSVG} from '@instructure/ui-svg-images'
 
 export default function EmptyDesert() {
   return (

@@ -23,7 +23,7 @@ import {Select} from '@instructure/ui-forms'
 
 import {OverrideShape} from '../../assignmentData'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
 export default class Filters extends React.Component {
   static propTypes = {

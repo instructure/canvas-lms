@@ -19,10 +19,9 @@
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Spinner} from '@instructure/ui-elements'
 
 import I18n from 'i18n!hide_assignment_grades_tray'
 

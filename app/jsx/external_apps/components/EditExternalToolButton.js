@@ -21,7 +21,6 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
-import {ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
 import 'compiled/jquery.rails_flash_notifications'
 import store from '../../external_apps/lib/ExternalAppsStore'
 import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
@@ -170,7 +169,7 @@ export default class EditExternalToolButton extends React.Component {
             open={this.state.modalIsOpen}
             onDismiss={this.closeModal}
           >
-            <ModalBody>{this.form()}</ModalBody>
+            <Modal.Body>{this.form()}</Modal.Body>
           </Modal>
         </li>
       )

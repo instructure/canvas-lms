@@ -115,5 +115,5 @@ it('renders unlinked result', () => {
   const props = defaultProps()
   props.result.assignment.html_url = ''
   const wrapper = mount(<AssignmentResult {...props}/>)
-  expect(wrapper.find('IconHighlighter').exists()).toBe(true)
+  expect(wrapper.find('IconHighlighterLine').exists()).toBe(true)
 })

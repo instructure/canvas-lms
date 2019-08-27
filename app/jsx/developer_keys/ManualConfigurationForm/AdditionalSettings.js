@@ -20,18 +20,11 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
-import View from '@instructure/ui-layout/lib/components/View'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
-import TextInput from '@instructure/ui-forms/lib/components/TextInput';
-import TextArea from '@instructure/ui-forms/lib/components/TextArea';
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import { ToggleDetails } from '@instructure/ui-toggle-details';
-import Grid from '@instructure/ui-layout/lib/components/Grid';
-import GridRow from '@instructure/ui-layout/lib/components/Grid/GridRow';
-import GridCol from '@instructure/ui-layout/lib/components/Grid/GridCol';
-
+import {View, Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {TextInput, TextArea, RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class AdditionalSettings extends React.Component {
   constructor (props) {

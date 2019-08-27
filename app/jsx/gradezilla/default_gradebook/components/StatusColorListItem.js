@@ -19,15 +19,12 @@
 import React from 'react'
 import {func, string, bool} from 'prop-types'
 import I18n from 'i18n!gradezilla'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Popover, {
-  PopoverTrigger,
-  PopoverContent
-} from '@instructure/ui-overlays/lib/components/Popover'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconMore from '@instructure/ui-icons/lib/Solid/IconMore'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
+import {Button} from '@instructure/ui-buttons'
+import {Popover} from '@instructure/ui-overlays'
+import {Text} from '@instructure/ui-elements'
+import {IconMoreSolid} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
 import ColorPicker from '../../../shared/ColorPicker'
 import {statusesTitleMap} from '../constants/statuses'
 import {defaultColors} from '../constants/colors'
@@ -97,18 +94,18 @@ class StatusColorListItem extends React.Component {
                 onToggle={colorPickerOnToggle}
                 contentRef={colorPickerContentRef}
               >
-                <PopoverTrigger>
+                <Popover.Trigger>
                   <Button buttonRef={colorPickerButtonRef} variant="icon" size="small">
                     <Text size="medium">
                       <ScreenReaderContent>
                         {I18n.t('%{status} Color Picker', {status})}
                       </ScreenReaderContent>
-                      <IconMore />
+                      <IconMoreSolid />
                     </Text>
                   </Button>
-                </PopoverTrigger>
+                </Popover.Trigger>
 
-                <PopoverContent>
+                <Popover.Content>
                   <ColorPicker
                     parentComponent="StatusColorListItem"
                     colors={colorPickerColors}
@@ -126,7 +123,7 @@ class StatusColorListItem extends React.Component {
                     withBoxShadow={false}
                     setStatusColor={this.setColor}
                   />
-                </PopoverContent>
+                </Popover.Content>
               </Popover>
             </GridCol>
           </GridRow>

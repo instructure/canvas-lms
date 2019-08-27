@@ -24,14 +24,13 @@ import ImageSearchActions from './actions/ImageSearchActions'
 import ImageSearchStore from './stores/ImageSearchStore'
 import ImageSearchItem from './ImageSearchItem'
 import SVGWrapper from './SVGWrapper'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import { TextInput } from '@instructure/ui-text-input'
-import { Button } from '@instructure/ui-buttons'
-import { IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine } from '@instructure/ui-icons'
-import { Text } from '@instructure/ui-elements'
-import { View, Flex, FlexItem } from '@instructure/ui-layout'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Spinner, Text} from '@instructure/ui-elements'
+import {TextInput} from '@instructure/ui-text-input'
+import {Button} from '@instructure/ui-buttons'
+import {IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
+import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {Alert} from '@instructure/ui-alerts'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 const unsplashParams = {
   w: 262,
@@ -115,7 +114,7 @@ export default class ImageSearch extends React.Component {
     if (this.state.searching) {
       return (
         <div className="ImageSearch__loading">
-          <Spinner title="Loading" />
+          <Spinner renderTitle="Loading" />
         </div>
       )
     } else if (!this.state.searching && this.state.searchResults.length) {

@@ -19,27 +19,21 @@
 import React from 'react'
 import {shape, object, func, string, oneOfType, arrayOf, node} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-
-import IconXLine from '@instructure/ui-icons/lib/Line/IconX'
-import IconAdminLine from '@instructure/ui-icons/lib/Line/IconAdmin'
-import IconCoursesLine from '@instructure/ui-icons/lib/Line/IconCourses'
-import IconGroupLine from '@instructure/ui-icons/lib/Line/IconGroup'
-import IconDashboardLine from '@instructure/ui-icons/lib/Line/IconDashboard'
-import IconLockLine from '@instructure/ui-icons/lib/Line/IconLock'
-import IconQuestionLine from '@instructure/ui-icons/lib/Line/IconQuestion'
-import IconInboxLine from '@instructure/ui-icons/lib/Line/IconInbox'
-import IconCalendarMonthLine from '@instructure/ui-icons/lib/Line/IconCalendarMonth'
-
+import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {Heading, List, ListItem, Spinner, Text, Avatar, Badge} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {
+  IconXLine,
+  IconAdminLine,
+  IconCoursesLine,
+  IconGroupLine,
+  IconDashboardLine,
+  IconLockLine,
+  IconQuestionLine,
+  IconInboxLine,
+  IconCalendarMonthLine
+} from '@instructure/ui-icons'
 import I18n from 'i18n!MobileNavigation'
 import HelpDialog from '../help_dialog/HelpDialog'
 import LogoutButton from './LogoutButton'

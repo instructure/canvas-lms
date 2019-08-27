@@ -20,10 +20,8 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!OutcomesImporter'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import { showFlashAlert } from '../shared/FlashAlert'
+import {Spinner, Heading, Text} from '@instructure/ui-elements'
+import {showFlashAlert} from '../shared/FlashAlert'
 import * as apiClient from './apiClient'
 
 const unmount = (mount) => () => ReactDOM.unmountComponentAtNode(mount)

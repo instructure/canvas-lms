@@ -20,17 +20,18 @@ import _ from 'lodash'
 import $ from 'jquery'
 import axios from 'axios'
 import minimatch from 'minimatch'
-import TreeBrowser from '@instructure/ui-tree-browser/lib/components/TreeBrowser'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Mask from '@instructure/ui-overlays/lib/components/Mask'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {TreeBrowser} from '@instructure/ui-tree-browser'
+import {Text, Spinner} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {Mask} from '@instructure/ui-overlays'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import splitAssetString from 'compiled/str/splitAssetString'
-import IconOpenFolderSolid from '@instructure/ui-icons/lib/Solid/IconOpenFolder'
-import IconFolderSolid from '@instructure/ui-icons/lib/Solid/IconFolder'
-import IconUploadSolid from '@instructure/ui-icons/lib/Solid/IconUpload'
-import IconImageSolid from '@instructure/ui-icons/lib/Solid/IconImage'
+import {
+  IconOpenFolderSolid,
+  IconFolderSolid,
+  IconUploadSolid,
+  IconImageSolid
+} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import { getRootFolder, uploadFile } from 'jsx/files/utils/apiFileUtils'
 import parseLinkHeader from '../parseLinkHeader'

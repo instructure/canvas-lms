@@ -22,8 +22,7 @@ import FlickrActions from './actions/FlickrActions'
 import FlickrStore from './stores/FlickrStore'
 import FlickrImage from './FlickrImage'
 import SVGWrapper from './SVGWrapper'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Spinner, Text} from '@instructure/ui-elements'
 
 export default class FlickrSearch extends React.Component {
   state = FlickrStore.getState()
@@ -112,7 +111,7 @@ export default class FlickrSearch extends React.Component {
           </div>
         ) : (
           <div className="FlickrSearch__loading">
-            <Spinner title="Loading" />
+            <Spinner renderTitle="Loading" />
           </div>
         )}
 

@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 
 import {TeacherAssignmentShape} from '../../assignmentData'
 import Override from './Override'

@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IconMiniArrowUp from '@instructure/ui-icons/lib/Solid/IconMiniArrowUp'
-import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import {IconMiniArrowUpSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-overlays'
 import React from 'react'
 import {string, func} from 'prop-types'
 import preventDefault from 'compiled/fn/preventDefault'
@@ -33,7 +32,7 @@ export default function CourseListHeader({sort, order, onChangeSort, id, label, 
         theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
       >
         {label}
-        {sort === id ? order === 'asc' ? <IconMiniArrowUp /> : <IconMiniArrowDown /> : ''}
+        {sort === id ? order === 'asc' ? <IconMiniArrowUpSolid /> : <IconMiniArrowDownSolid /> : ''}
       </Button>
     </Tooltip>
   )

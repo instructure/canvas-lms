@@ -19,8 +19,8 @@ import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
 const MAX_DISPLAYED_MODULES = 2
 

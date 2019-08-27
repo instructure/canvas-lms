@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!course_images'
 import _ from 'underscore'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import {Tabs} from '@instructure/ui-tabs'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
@@ -82,7 +82,7 @@ export default class CourseImagePicker extends React.Component {
           >
             {this.props.uploadingImage && (
               <div className="CourseImagePicker__Overlay">
-                <Spinner title="Loading" />
+                <Spinner renderTitle="Loading" />
               </div>
             )}
             {this.state.draggingFile && (

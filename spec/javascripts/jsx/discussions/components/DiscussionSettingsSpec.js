@@ -65,7 +65,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
     tree = mount(
       <DiscussionSettings {...makeProps({toggleModalOpen: modalOpenSpy})} />
     )
-    tree.find('Button').simulate('click')
+    tree.find('Button').at(0).simulate('click')
     equal(modalOpenSpy.callCount, 1)
   })
 

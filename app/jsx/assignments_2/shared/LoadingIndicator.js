@@ -17,8 +17,8 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 function LoadingIndicator() {
   return (

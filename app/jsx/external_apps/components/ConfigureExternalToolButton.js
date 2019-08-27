@@ -19,8 +19,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import {shape, func} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter}  from '../../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../shared/components/InstuiModal'
 import iframeAllowances from '../lib/iframeAllowances'
 
 export default class ConfigureExternalToolButton extends React.Component {
@@ -160,10 +160,10 @@ export default class ConfigureExternalToolButton extends React.Component {
           label={I18n.t('Configure %{tool} App?', {tool: this.props.tool.name})}
           size="large"
         >
-          <ModalBody>{this.renderIframe()}</ModalBody>
-          <ModalFooter>
+          <Modal.Body>{this.renderIframe()}</Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </li>
     )

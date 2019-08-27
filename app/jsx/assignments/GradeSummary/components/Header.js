@@ -19,10 +19,10 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, func, oneOf, shape, string} from 'prop-types'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Alert} from '@instructure/ui-alerts'
+import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Heading, Text} from '@instructure/ui-elements'
+
 import I18n from 'i18n!assignment_grade_summary'
 
 import * as AssignmentActions from '../assignment/AssignmentActions'

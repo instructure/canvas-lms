@@ -18,8 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Image from '@instructure/ui-elements/lib/components/Img'
+import {Heading, Img} from '@instructure/ui-elements'
 import SVGWrapper from '../../shared/SVGWrapper'
 
 const TutorialTrayContent = props => (
@@ -34,7 +33,7 @@ const TutorialTrayContent = props => (
       ? <div className="NewUserTutorialTray__ImageContainer" aria-hidden="true">
         {/\.svg$/.test(props.image)
         ? <SVGWrapper url={props.image} />
-        : <Image src={props.image} />}
+        : <Img src={props.image} />}
       </div>
       : null
     }

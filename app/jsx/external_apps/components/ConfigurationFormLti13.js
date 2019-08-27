@@ -18,9 +18,9 @@
 
 import React from 'react'
 import I18n from 'i18n!external_tools'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import IconLti from '@instructure/ui-icons/lib/Line/IconLti'
-import { View } from '@instructure/ui-layout/lib/components';
+import {TextInput} from '@instructure/ui-forms'
+import {IconLtiLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-layout'
 
 class ConfigurationFormLti13 extends React.Component {
   constructor(props) {
@@ -66,7 +66,7 @@ class ConfigurationFormLti13 extends React.Component {
           name="client_id"
           value={this.state.clientId}
           label={I18n.t('Client ID')}
-          icon={() => <IconLti />}
+          icon={() => <IconLtiLine />}
           ref={this.clientIdInput}
           onChange={this.setClientId}
           messages={

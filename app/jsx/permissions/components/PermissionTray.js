@@ -20,11 +20,11 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import IconX from '@instructure/ui-icons/lib/Solid/IconX'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import {Heading} from '@instructure/ui-elements'
+import {IconXSolid} from '@instructure/ui-icons'
+import {Tray} from '@instructure/ui-overlays'
 
 import actions from '../actions'
 import RoleTrayTable from './RoleTrayTable'
@@ -69,7 +69,7 @@ export default function PermissionTray(props) {
         margin="small 0 0 xx-small"
         onClick={props.hideTray}
       >
-        <IconX title={I18n.t('Close')} />
+        <IconXSolid title={I18n.t('Close')} />
       </Button>
 
       <View as="div" padding="small small x-large small">

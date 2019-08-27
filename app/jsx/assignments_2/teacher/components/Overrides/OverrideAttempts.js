@@ -19,13 +19,12 @@ import React from 'react'
 import {bool, oneOf, number} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {requiredIfDetail} from '../../assignmentData'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import {NumberInput} from '@instructure/ui-number-input'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Select} from '@instructure/ui-forms'
+import {Text} from '@instructure/ui-elements'
+
 import NumberHelper from '../../../../shared/helpers/numberHelper'
 
 export default class OverrideAttempts extends React.Component {

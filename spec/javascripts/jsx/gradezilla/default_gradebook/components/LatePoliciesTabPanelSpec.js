@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
+import {Alert} from '@instructure/ui-alerts'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import LatePoliciesTabPanel from 'jsx/gradezilla/default_gradebook/components/LatePoliciesTabPanel'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 
 const latePolicyData = {
   missingSubmissionDeductionEnabled: true,
@@ -90,7 +90,11 @@ function missingDeductionInput(wrapper) {
 }
 
 function gradedSubmissionsAlert(wrapper) {
-  return wrapper.find(Alert)
+  return wrapper
+    .find(Alert)
+    .filterWhere(n =>
+      n.text().includes('Changing the late policy will affect previously graded submissions')
+    )
 }
 
 function spinner(wrapper) {
@@ -252,21 +256,13 @@ test('missing submission input has label describing it', function() {
 
 test('enables the missing deduction input if the missing deduction checkbox is checked', function() {
   this.wrapper = mountComponent()
-  notOk(
-    missingDeductionInput(this.wrapper)
-      .instance()
-      .getAttribute('aria-disabled')
-  )
+  notOk(missingDeductionInput(this.wrapper).prop('disabled'))
 })
 
 test('disables the missing deduction input if the missing deduction checkbox is unchecked', function() {
   const data = {...latePolicyData, missingSubmissionDeductionEnabled: false}
   this.wrapper = mountComponent({data})
-  ok(
-    missingDeductionInput(this.wrapper)
-      .instance()
-      .getAttribute('aria-disabled')
-  )
+  ok(missingDeductionInput(this.wrapper).prop('disabled'))
 })
 
 test(
@@ -445,20 +441,12 @@ QUnit.module('LatePoliciesTabPanel: late submission deduction input', {
 test('disables the late deduction input if the late deduction checkbox is unchecked', function() {
   const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
   this.wrapper = mountComponent({data})
-  ok(
-    lateDeductionInput(this.wrapper)
-      .instance()
-      .getAttribute('aria-disabled')
-  )
+  ok(lateDeductionInput(this.wrapper).prop('disabled'))
 })
 
 test('enables the late deduction input if the late deduction checkbox is checked', function() {
   this.wrapper = mountComponent()
-  notOk(
-    lateDeductionInput(this.wrapper)
-      .instance()
-      .getAttribute('aria-disabled')
-  )
+  notOk(lateDeductionInput(this.wrapper).prop('disabled'))
 })
 
 test(
@@ -565,20 +553,12 @@ QUnit.module('LatePoliciesTabPanel: late submission deduction interval select', 
   test('disables the late deduction interval select if the late deduction checkbox is unchecked', () => {
     const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
     wrapper = mountComponent({data})
-    ok(
-      lateDeductionIntervalSelectInput(wrapper)
-        .instance()
-        .getAttribute('aria-disabled')
-    )
+    ok(lateDeductionIntervalSelectInput(wrapper).prop('disabled'))
   })
 
   test('enables the late deduction interval select if the late deduction checkbox is checked', () => {
     wrapper = mountComponent()
-    notOk(
-      lateDeductionIntervalSelectInput(wrapper)
-        .instance()
-        .getAttribute('aria-disabled')
-    )
+    notOk(lateDeductionIntervalSelectInput(wrapper).prop('disabled'))
   })
 
   test('calls the changeLatePolicy function when the late sumbmission deduction interval select is changed', () => {

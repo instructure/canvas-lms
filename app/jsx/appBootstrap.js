@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import canvasBaseTheme from '@instructure/ui-themes/lib/canvas/base'
-import canvasHighContrastTheme from '@instructure/ui-themes/lib/canvas/high-contrast'
+import canvasBaseTheme from '@instructure/canvas-theme'
+import canvasHighContrastTheme from '@instructure/canvas-high-contrast-theme'
 import moment from 'moment'
 import tz from 'timezone_core'
 import './fakeRequireJSFallback'

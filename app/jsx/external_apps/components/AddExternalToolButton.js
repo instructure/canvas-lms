@@ -27,7 +27,6 @@ import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
 import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
 import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateConfirmationForm'
 import 'compiled/jquery.rails_flash_notifications'
-import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
 import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
 import install13Tool from '../lib/install13Tool'
@@ -298,9 +297,9 @@ export default class AddExternalToolButton extends React.Component {
           label={I18n.t('Add App')}
           size="large"
         >
-          <ModalBody>
+          <Modal.Body>
             {this.renderForm()}
-          </ModalBody>
+          </Modal.Body>
         </Modal>
       </span>
     )

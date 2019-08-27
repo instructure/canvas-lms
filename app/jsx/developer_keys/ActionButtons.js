@@ -20,13 +20,10 @@ import I18n from 'i18n!react_developer_keys'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconEyeLine from '@instructure/ui-icons/lib/Line/IconEye'
-import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
-import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
+import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-overlays'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
 
 class DeveloperKeyActionButtons extends React.Component {
   makeVisibleLinkHandler = (event) => {

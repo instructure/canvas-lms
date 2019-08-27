@@ -21,7 +21,7 @@ import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import React from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
 
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
+import {TabList, TabPanel} from '@instructure/ui-tabs'
 
 const iframeContainerStyle = {
   maxWidth: '1366px',

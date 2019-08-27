@@ -20,11 +20,9 @@ import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
 import {bool} from 'prop-types'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {Heading, Text, TruncateText} from '@instructure/ui-elements'
 import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import {TruncateText} from '@instructure/ui-elements'
 
 function DateTitle(props) {
   const {assignment, isSticky} = props

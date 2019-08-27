@@ -22,13 +22,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import RemoveIcon from '@instructure/ui-icons/lib/Solid/IconX'
+import {Text, Table, Spinner} from '@instructure/ui-elements'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {Button} from '@instructure/ui-buttons'
+import {IconXSolid} from '@instructure/ui-icons'
 
 import propTypes from '../propTypes'
 import FocusManager from '../focusManager'
@@ -179,7 +176,7 @@ export default class AssociationsTable extends React.Component {
                 ref={focusNode.ref}
                 aria-label={label}
               >
-                <RemoveIcon />
+                <IconXSolid />
                 <ScreenReaderContent>{label}</ScreenReaderContent>
               </Button>
             </form>

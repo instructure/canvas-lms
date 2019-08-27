@@ -19,14 +19,12 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { Alert } from '@instructure/ui-alerts'
-import View from '@instructure/ui-layout/lib/components/View'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
-import TextInput from '@instructure/ui-forms/lib/components/TextInput';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import { ToggleDetails } from '@instructure/ui-toggle-details';
-import { RadioInputGroup } from '@instructure/ui-forms/lib/components';
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
+import {Alert} from '@instructure/ui-alerts'
+import {View} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {TextInput, RadioInputGroup, RadioInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class Placement extends React.Component {
   constructor (props) {

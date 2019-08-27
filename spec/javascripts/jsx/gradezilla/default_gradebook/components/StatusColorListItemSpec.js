@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconMore from '@instructure/ui-icons/lib/Solid/IconMore'
+import {Text} from '@instructure/ui-elements'
+import {IconMore} from '@instructure/ui-icons'
 import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem'
 
 function defaultProps(props = {}) {

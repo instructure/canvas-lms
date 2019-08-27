@@ -19,13 +19,10 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {List, ListItem, Text} from '@instructure/ui-elements'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
 
 import I18n from 'i18n!assignment_posting_policy_tray'
 

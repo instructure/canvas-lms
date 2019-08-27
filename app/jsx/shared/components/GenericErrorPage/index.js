@@ -20,11 +20,11 @@ import I18n from 'i18n!generic_error_page'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {Text, Spinner} from '@instructure/ui-elements'
 import axios from 'axios'
 import {string} from 'prop-types'
-import {Spinner} from '@instructure/ui-elements'
+
 import ErrorTextInputForm from './ErrorTextInputForm'
 import ErrorPageHeader from './ErrorPageHeader'
 

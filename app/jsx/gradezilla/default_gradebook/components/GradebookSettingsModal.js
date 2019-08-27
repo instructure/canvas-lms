@@ -19,10 +19,10 @@
 import React from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
 import _ from 'underscore'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-overlays'
+import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {View} from '@instructure/ui-layout'
 import I18n from 'i18n!gradezilla'
 
 import AdvancedTabPanel from './AdvancedTabPanel'
@@ -254,7 +254,7 @@ export default class GradebookSettingsModal extends React.Component {
         open={this.state.isOpen}
         size="large"
       >
-        <ModalBody>
+        <Modal.Body>
           <View as="div" height={MODAL_CONTENTS_HEIGHT}>
             <TabList defaultSelectedIndex={0}>
               <TabPanel title={I18n.t('Late Policies')}>
@@ -286,9 +286,9 @@ export default class GradebookSettingsModal extends React.Component {
               )}
             </TabList>
           </View>
-        </ModalBody>
+        </Modal.Body>
 
-        <ModalFooter>
+        <Modal.Footer>
           <Button id="gradebook-settings-cancel-button" onClick={this.close} margin="0 small">
             {I18n.t('Cancel')}
           </Button>
@@ -301,7 +301,7 @@ export default class GradebookSettingsModal extends React.Component {
           >
             {I18n.t('Update')}
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
     )
   }

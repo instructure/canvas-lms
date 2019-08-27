@@ -18,15 +18,11 @@
 
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
 import {filterLabels} from '../constants/ViewOptions'
 

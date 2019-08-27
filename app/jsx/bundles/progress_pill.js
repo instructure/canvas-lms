@@ -19,17 +19,16 @@
 import I18n from 'i18n!progress_pill'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
-import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
+import {Tooltip} from '@instructure/ui-overlays'
+import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
 
 const presenter = document.querySelectorAll(".assignment_presenter_for_submission")
 const progressIcon = (presenterObject) => {
   switch (presenterObject.innerText) {
     case 'pending':
-      return [<IconUpload />, I18n.t("Uploading Submission")]
+      return [<IconUploadLine />, I18n.t("Uploading Submission")]
     case 'failed':
-      return [<IconWarning />, I18n.t("Submission Failed to Submit")]
+      return [<IconWarningLine />, I18n.t("Submission Failed to Submit")]
     default:
       return null
   }

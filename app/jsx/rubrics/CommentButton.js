@@ -17,16 +17,16 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Button} from '@instructure/ui-buttons'
+import {IconFeedbackLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!edit_rubricCommentButton'
 
 const CommentButton = ({ onClick }) => (
   <div>
     <Button
       variant="icon"
-      icon={<IconFeedback />}
+      icon={<IconFeedbackLine />}
       margin="0 x-small 0 0"
       onClick={onClick}
     >

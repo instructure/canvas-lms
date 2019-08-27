@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!gradezilla'
 
 import CompleteIncompleteGradeInput from './CompleteIncompleteGradeInput'

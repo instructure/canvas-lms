@@ -18,14 +18,11 @@
 
 import I18n from 'i18n!PeopleSearch'
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
+import {Text} from '@instructure/ui-elements'
+import {RadioInputGroup, RadioInput, TextArea, Checkbox} from '@instructure/ui-forms'
 import CanvasSelect from '../../shared/components/CanvasSelect'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import IconUserSolid from '@instructure/ui-icons/lib/Solid/IconUser'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconUserSolid} from '@instructure/ui-icons'
 import {courseParamsShape, inputParamsShape} from './shapes'
 import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
 

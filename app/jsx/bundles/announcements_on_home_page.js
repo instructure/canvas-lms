@@ -20,9 +20,8 @@ import I18n from 'i18n!announcements_on_home_page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Spinner, Heading} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 import AnnouncementRow from '../shared/components/AnnouncementRow'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {

@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {number, shape, string} from 'prop-types'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {PresentationContent} from '@instructure/ui-a11y'
+import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Pill, Text} from '@instructure/ui-elements'
+
 import I18n from 'i18n!speed_grader'
 
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'

@@ -21,13 +21,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
-import IconArrowOpenDownSolid from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Grid, { GridRow, GridCol } from '@instructure/ui-layout/lib/components/Grid'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-elements'
+import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
 
 import { IconLock, IconUnlock } from './BlueprintLocks'
 import LockCheckList from './LockCheckList'
@@ -91,7 +89,7 @@ export default class ExpandableLockOptions extends React.Component {
   }
 
   renderIndicatorIcon () {
-    const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenEnd
+    const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenEndSolid
     return (
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
         <Button variant="icon" onClick={this.toggle} >

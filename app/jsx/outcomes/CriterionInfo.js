@@ -17,13 +17,11 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconQuestion from '@instructure/ui-icons/lib/Line/IconQuestion'
-import Modal, { ModalHeader, ModalBody } from '@instructure/ui-overlays/lib/components/Modal'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading, Text} from '@instructure/ui-elements'
+import {IconQuestionLine} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-overlays'
 import I18n from 'i18n!outcomesCriterionInfo'
 
 const spiel = () => I18n.t(`
@@ -71,13 +69,13 @@ export default class CriterionInfo extends React.Component {
           label={I18n.t('Criterion Ratings')}
           shouldCloseOnDocumentClick
         >
-          <ModalHeader>
+          <Modal.Header>
             {this.renderCloseButton()}
             <Heading>{I18n.t('Criterion Ratings')}</Heading>
-          </ModalHeader>
-          <ModalBody>
+          </Modal.Header>
+          <Modal.Body>
             <Text lineHeight="double">{spiel()}</Text>
-          </ModalBody>
+          </Modal.Body>
         </Modal>
       )
     }
@@ -88,7 +86,7 @@ export default class CriterionInfo extends React.Component {
       <span>
         <Button
           variant="icon"
-          icon={<IconQuestion />}
+          icon={<IconQuestionLine />}
           onClick={this.handleButtonClick}
         >
           <ScreenReaderContent>{I18n.t('More Information About Ratings')}</ScreenReaderContent>

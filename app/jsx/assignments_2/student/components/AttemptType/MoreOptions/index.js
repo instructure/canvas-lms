@@ -23,14 +23,9 @@ import React from 'react'
 import {string, instanceOf} from 'prop-types'
 import {withApollo} from 'react-apollo'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Modal, {
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from '@instructure/ui-overlays/lib/components/Modal'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-elements'
+import {Modal} from '@instructure/ui-overlays'
 
 class MoreOptions extends React.Component {
   state = {
@@ -96,26 +91,26 @@ class MoreOptions extends React.Component {
             label="More Options"
             shouldCloseOnDocumentClick
           >
-            <ModalHeader>
+            <Modal.Header>
               {this.renderCloseButton()}
               <Heading>{I18n.t('More Options')}</Heading>
-            </ModalHeader>
-            <ModalBody padding="0 small">
+            </Modal.Header>
+            <Modal.Body padding="0 small">
               <ExternalToolsQuery
                 assignmentID={this.props.assignmentID}
                 courseID={this.props.courseID}
                 userID={this.props.userID}
                 client={this.props.client}
               />
-            </ModalBody>
-            <ModalFooter>
+            </Modal.Body>
+            <Modal.Footer>
               <Button onClick={this.handleModalClose} margin="0 xx-small 0 0">
                 {I18n.t('Cancel')}
               </Button>
               <Button variant="primary" type="submit">
                 {I18n.t('Upload')}
               </Button>
-            </ModalFooter>
+            </Modal.Footer>
           </Modal>
         )}
       </>

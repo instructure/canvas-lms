@@ -25,10 +25,9 @@ import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Checkbox, TextArea} from '@instructure/ui-forms'
+import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import actions from '../actions'
 import propTypes from '../propTypes'

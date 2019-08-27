@@ -19,7 +19,7 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import Rating from 'jsx/context_cards/Rating'
-import InstUIRating from '@instructure/ui-elements/lib/components/Rating'
+import {Rating as InstUIRating} from '@instructure/ui-elements'
 
 QUnit.module('StudentContextTray/Rating', () => {
   let subject

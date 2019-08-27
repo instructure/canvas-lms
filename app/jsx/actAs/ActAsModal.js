@@ -22,14 +22,11 @@ import React from 'react';
 import keycode from 'keycode'
 import I18n from 'i18n!act_as'
 
-import Modal, {ModalBody} from '../shared/components/InstuiModal'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
+import Modal from '../shared/components/InstuiModal'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
+import {Text, Avatar, Spinner, Table} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 
 import ActAsMask from './ActAsMask'
 import ActAsPanda from './ActAsPanda'
@@ -170,7 +167,7 @@ export default class ActAsModal extends React.Component {
           label={I18n.t('Act as User')}
           open
         >
-          <ModalBody>
+          <Modal.Body>
             {this.state.isLoading ?
               <div className="ActAs__loading">
                 <Spinner title={I18n.t('Loading')} />
@@ -266,7 +263,7 @@ export default class ActAsModal extends React.Component {
                 </div>
               </div>
             }
-          </ModalBody>
+          </Modal.Body>
         </Modal>
       </div>
     )

@@ -20,7 +20,7 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 
 const NewKeyFooter = props => {
   return (

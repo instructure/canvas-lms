@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
+import {Pagination, PaginationButton} from '@instructure/ui-pagination'
 
 const Paginator = ({loadPage, page, pageCount}) => {
   if (pageCount <= 1) {

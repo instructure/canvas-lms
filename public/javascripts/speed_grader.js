@@ -19,10 +19,10 @@
 /* global jsonData */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextArea} from '@instructure/ui-forms'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
 import StatusPill from 'jsx/grading/StatusPill'
@@ -40,11 +40,13 @@ import {isGraded, isHidden} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
-import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
-import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
+import {Tooltip} from '@instructure/ui-overlays'
+import {
+  IconUploadLine,
+  IconWarningLine,
+  IconCheckMarkIndeterminateLine
+} from '@instructure/ui-icons'
+import {Pill} from '@instructure/ui-elements'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
@@ -720,15 +722,15 @@ function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
   const iconAndTipMap = {
     pending: {
-      icon: <IconUpload />,
+      icon: <IconUploadLine />,
       tip: I18n.t('Uploading Submission')
     },
     failed: {
-      icon: <IconWarning />,
+      icon: <IconWarningLine />,
       tip: I18n.t('Submission Failed to Submit')
     },
     default: {
-      icon: <IconCheckMarkIndeterminate />,
+      icon: <IconCheckMarkIndeterminateLine />,
       tip: I18n.t('No File Submitted')
     }
   }

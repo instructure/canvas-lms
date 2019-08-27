@@ -68,7 +68,7 @@ describe('FileUpload', () => {
 
     expect(emptyRender).toContainElement(getByText('Upload File'))
     expect(emptyRender).toContainElement(
-      container.querySelector(`svg[name=${DEFAULT_ICON.type.displayName}]`)
+      container.querySelector(`svg[name=${DEFAULT_ICON.type.displayName.replace('Line', '')}]`)
     )
   })
 

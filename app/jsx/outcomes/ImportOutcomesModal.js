@@ -20,13 +20,12 @@ import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {instanceOf} from 'prop-types'
 import I18n from 'i18n!ImportOutcomesModal'
-import Modal, { ModalBody } from '../shared/components/InstuiModal'
-import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import View from '@instructure/ui-layout/lib/components/View'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import Modal from '../shared/components/InstuiModal'
+import {FileDrop} from '@instructure/ui-forms'
+import {Billboard} from '@instructure/ui-billboard'
+import {Text, Link} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
+import {PresentationContent} from '@instructure/ui-a11y'
 import SVGWrapper from '../shared/SVGWrapper'
 
 export function showImportOutcomesModal (props) {
@@ -92,7 +91,7 @@ export default class ImportOutcomesModal extends Component {
         size="fullscreen"
         label={I18n.t('Import Outcomes')}
       >
-        <ModalBody>
+        <Modal.Body>
           <FileDrop
             accept=".csv, .json"
             onDrop={(acceptedFile, rejectedFile) =>
@@ -115,7 +114,7 @@ export default class ImportOutcomesModal extends Component {
           <View as="div" margin="large auto" textAlign='center'>
             <Link href="/doc/api/file.outcomes_csv.html">{I18n.t('Outcomes CSV Format')}</Link>
           </View>
-        </ModalBody>
+        </Modal.Body>
       </Modal>
     )
   }
