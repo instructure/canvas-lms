@@ -17,6 +17,7 @@
  */
 
 import ScoreToGradeHelper from '../gradebook/shared/helpers/ScoreToGradeHelper'
+import round from 'compiled/util/round'
 
 const equivalentToNull = [undefined, null, '', 0]
 const intervalTypes = ['day', 'hour']
@@ -112,7 +113,7 @@ function missingScore(submission, assignment, latePolicy) {
 }
 
 function processLateSubmission(submission, assignment, gradingScheme, latePolicy) {
-  const pointsDeducted = latePenalty(submission, assignment, latePolicy)
+  const pointsDeducted = round(latePenalty(submission, assignment, latePolicy), 2)
   const score =
     submission.entered_score != null ? submission.entered_score - (pointsDeducted || 0) : null
   const grade = ScoreToGradeHelper.scoreToGrade(score, assignment, gradingScheme)
