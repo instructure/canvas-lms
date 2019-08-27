@@ -40,6 +40,7 @@ namespace :strongmind_defaults do
   task :create_school_settings => :environment do
     SettingsService.update_settings(id: '1', setting: 'lti_keep_highest_score', value: true, object: "school")
     SettingsService.update_settings(id: '1', setting: 'pipeline_sqs_url', value: "https://sqs.us-west-2.amazonaws.com/448312246740/production-pipeline-queue", object: "school")
+    SettingsService.update_settings(id: '1', setting: "ga_tracking_id", value: "UA-36373320-13", object: "school")
     SettingsService.update_settings(id: '1', setting: 'publish_page_views', value: true, object: "school")
     SettingsService.update_settings(
         id: '1',
