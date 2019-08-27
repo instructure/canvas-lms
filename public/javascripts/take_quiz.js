@@ -322,7 +322,7 @@ import 'compiled/behaviors/quiz_selectmenu'
       },
 
       updateFinalSubmitButtonState: function() {
-        var allQuestionsAnswered = ($("#question_list li:not(.answered)").length == 0);
+        var allQuestionsAnswered = ($("#question_list li:not(.answered, .text_only)").length == 0);
         var lastQuizPage = ($("#submit_quiz_form").hasClass('last_page'));
         var thisQuestionAnswered = ($("div.question.answered").length > 0);
         var oneAtATime = quizSubmission.oneAtATime;
