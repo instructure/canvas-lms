@@ -299,36 +299,40 @@ const FLICKR_RESULTS = {
   ]
 };
 
-const DOCUMENTS = {
-  documents1: {
-    files: [1,2,3].map(i => {
-      return {
-        id: i,
-        filename: `file${i}.txt`,
-        content_type: 'text/plain',
-        display_name: `file${i}`,
-        href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`,
-      }
-    }),
-    bookmark: 'documents2',
-    hasMore: true
-  },
-  documents2: {
-    files: [4,5,6].map(i => {
-      return {
-        id: i,
-        filename: `file${i}.txt`,
-        content_type: 'text/plain',
-        display_name: `file${i}`,
-        href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`,
-      }
-    }),
-    bookmark: null,
-    hasMore: false
+function makeFiles(bookmark_base, extension, content_type) {
+  return {
+    [`${bookmark_base}1`]: {
+      files: [1,2,3].map(i => {
+        return {
+          id: i,
+          filename: `file${i}.${extension}`,
+          content_type,
+          display_name: `file${i}`,
+          href: `http://the.net/${i}`,
+          date: `2019-05-25T13:0${i}:00Z`,
+        }
+      }),
+      bookmark: `${bookmark_base}2`,
+      hasMore: true
+    },
+    [`${bookmark_base}2`]: {
+      files: [4,5,6].map(i => {
+        return {
+          id: i,
+          filename: `file${i}.${extension}`,
+          content_type,
+          display_name: `file${i}`,
+          href: `http://the.net/${i}`,
+          date: `2019-05-25T13:0${i}:00Z`,
+        }
+      }),
+      bookmark: null,
+      hasMore: false
+    }
   }
 }
+const DOCUMENTS = makeFiles('documents', 'txt', 'text/plain')
+const MEDIA = makeFiles('media', 'mp3', 'audio/mp3')
 
 const UNSPLASH_RESULTS = {
   kittens1: {
@@ -609,11 +613,25 @@ export function initializeCollection(endpoint) {
   };
 }
 
-export function initializeDocuments() {
+export function initializeDocuments(props) {
   return {
-    files: [],
-    bookmark: 'documents1',
-    isLoading: false
+    [props.contextType]: {
+      files: [],
+      bookmark: 'documents1',
+      isLoading: false,
+      hasMore: true
+    }
+  }
+}
+
+export function initializeMedia(props) {
+  return {
+    [props.contextType]: {
+      files: [],
+      bookmark: 'media1',
+      isLoading: false,
+      hasMore: true
+    }
   }
 }
 
@@ -737,12 +755,32 @@ export function getFile(id) {
   });
 }
 
-export function fetchDocs(bookmark) {
+export function fetchDocs(state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
+      const bookmark = state.documents[state.contextType] && state.documents[state.contextType].bookmark
       if (bookmark) {
         response = DOCUMENTS[bookmark]
+      }
+
+      if (response) {
+        resolve(response)
+      } else {
+        reject(new Error('Invalid bookmark'))
+      }
+    }, FAKE_TIMEOUT)
+  });
+}
+
+
+export function fetchMedia(state) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      let response
+      const bookmark = state.media[state.contextType] && state.media[state.contextType].bookmark
+      if (bookmark) {
+        response = MEDIA[bookmark]
       }
 
       if (response) {

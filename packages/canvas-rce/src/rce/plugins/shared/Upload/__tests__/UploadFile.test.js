@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, waitForElement, prettyDOM} from '@testing-library/react'
+import {render, fireEvent, act, waitForElement} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {UploadFile, handleSubmit} from '../UploadFile'
 
@@ -31,7 +31,8 @@ describe('UploadFile', () => {
         initializeUpload () {},
         initializeFlickr () {},
         initializeImages() {},
-        initializeDocuments() {}
+        initializeDocuments() {},
+        initializeMedia() {}
       }
     }
     fakeEditor = {}

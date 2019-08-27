@@ -131,6 +131,10 @@ class RceApiSource {
     }
   }
 
+  initializeMedia(props) {
+    return this.initializeDocuments(props)
+  }
+
   initializeFlickr() {
     return {
       searchResults: [],
@@ -147,6 +151,12 @@ class RceApiSource {
   fetchDocs(props) {
     const documents = props.documents[props.contextType]
     const uri = documents.bookmark || this.uriFor('documents', props)
+    return this.apiFetch(uri, headerFor(this.jwt))
+  }
+
+  fetchMedia(props) {
+    const media = props.media[props.contextType]
+    const uri = media.bookmark || this.uriFor('media', props)
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
@@ -369,9 +379,8 @@ class RceApiSource {
         this.alertFunc({
           text: formatMessage('Something went wrong uploading, check your connection and try again.'),
           variant: 'error'
-      })
-       // eslint-disable-next-line no-console
-        console.error(e)
+        })
+        console.error(e) // eslint-disable-line no-console
       })
     }
 

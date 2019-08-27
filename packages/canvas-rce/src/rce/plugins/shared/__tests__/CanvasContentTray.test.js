@@ -110,6 +110,31 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
   })
 
+  describe('content panel', () => {
+    beforeEach(() => {
+      renderComponent()
+    })
+    it('is the links panel for links content types', async () => {
+      await showTrayForPlugin('links')
+      expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+    })
+
+    it('is the documents panel for document content types', async () => {
+      await showTrayForPlugin('course_documents')
+      expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
+    })
+
+    it('is the images panel for image content types', async () => {
+      await showTrayForPlugin('images')
+      expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+    })
+
+    it.only('is the media panel for media content types', async () => {
+      await showTrayForPlugin('course_media')
+      expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
+    })
+  })
+
   describe('focus', () => {
     beforeEach(() => {
       renderComponent()

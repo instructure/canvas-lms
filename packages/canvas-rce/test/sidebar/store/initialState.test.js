@@ -39,6 +39,9 @@ describe("Sidebar initialState", () => {
       },
       initializeDocuments() {
         return {}
+      },
+      initializeMedia() {
+        return {}
       }
     };
     apiSource = new RceApiSource();

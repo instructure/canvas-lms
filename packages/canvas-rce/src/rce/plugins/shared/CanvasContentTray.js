@@ -63,7 +63,7 @@ const thePanels = {
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
-  media: React.lazy(() => import('./UnknownFileTypePanel')),
+  media: React.lazy(() => import('../instructure_record/MediaPanel')),
   unknown: React.lazy(() => import('./UnknownFileTypePanel'))
 }
 /**
