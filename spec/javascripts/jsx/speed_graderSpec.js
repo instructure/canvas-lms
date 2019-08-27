@@ -2715,15 +2715,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         strictEqual(setOrUpdateSubmission.callCount, 1)
       })
 
-      test('afterUpdateSubmissions calls showGrade', () => {
-        strictEqual(showGrade.callCount, 1)
-      })
-
-      test('afterUpdateSubmissions calls renders SpeedGraderPostGradesMenu', () => {
+      test('updateSubmissions re-renders SpeedGraderPostGradesMenu', () => {
         const callCount = render.getCalls().filter(call =>
           call.args[0].type.name === 'SpeedGraderPostGradesMenu'
         ).length
         strictEqual(callCount, 1)
+      })
+
+      test('afterUpdateSubmissions calls showGrade', () => {
+        strictEqual(showGrade.callCount, 1)
       })
     })
 
@@ -4202,6 +4202,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
     })
 
     QUnit.module('#setOrUpdateSubmission', hooks => {
+      function getPostOrHideGradesButton() {
+        return document.querySelector('#speed_grader_post_grades_menu_mount_point button[title="Post or Hide Grades"]')
+      }
+
       hooks.beforeEach(() => {
         fakeENV.setup({
           ...ENV,
@@ -4228,6 +4232,44 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       test('fetches student via anonymous_id', () => {
         const {submission} = SpeedGrader.EG.setOrUpdateSubmission(alphaSubmission)
         deepEqual(submission, alphaSubmission)
+      })
+
+      QUnit.module('when ENV.post_policies_enabled is true', postPolicyHooks => {
+        function getPostGradesMenuItem() {
+          getPostOrHideGradesButton().click()
+
+          const $trigger = getPostOrHideGradesButton()
+          const $menuContent = document.querySelector(`[aria-labelledby="${$trigger.id}"]`)
+          return $menuContent.querySelector('[role="menuitem"][name="postGrades"]')
+        }
+
+        postPolicyHooks.beforeEach(() => {
+          ENV.post_policies_enabled = true
+        })
+
+        postPolicyHooks.afterEach(() => {
+          delete ENV.post_policies_enabled
+        })
+
+        test('renders the post/hide grades menu if the updated submission matches an existing one', () => {
+          SpeedGrader.EG.setOrUpdateSubmission({anonymous_id: alphaStudent.anonymous_id, posted_at: new Date().toISOString()})
+          strictEqual(getPostGradesMenuItem().textContent, 'All Grades Posted')
+        })
+
+        test('updates the menu items based on the state of loaded submissions', () => {
+          SpeedGrader.EG.setOrUpdateSubmission({anonymous_id: alphaStudent.anonymous_id, posted_at: null})
+          strictEqual(getPostGradesMenuItem().textContent, 'Post Grades')
+        })
+
+        test('does not render the post/hide grades menu if the updated submission does not find a match', () => {
+          SpeedGrader.EG.setOrUpdateSubmission({anonymous_id: 'aahhh', posted_at: new Date().toISOString()})
+          notOk(getPostOrHideGradesButton())
+        })
+      })
+
+      test('does not attempt to render a hypothetical post/hide grades menu if post policies is not enabled', () => {
+        SpeedGrader.EG.setOrUpdateSubmission({user_id: alphaStudent.id, posted_at: new Date().toISOString()})
+        notOk(getPostOrHideGradesButton())
       })
     })
 

@@ -509,7 +509,6 @@ function setupPostPolicies() {
     sections: jsonData.context.active_course_sections,
     updateSubmission: EG.setOrUpdateSubmission,
     afterUpdateSubmission() {
-      renderPostGradesMenu()
       EG.showGrade()
     }
   })
@@ -2997,6 +2996,10 @@ EG = {
         prov_grade.rubric_assessments = student.rubric_assessments
         prov_grade.submission_comments = submission.submission_comments
       }
+    }
+
+    if (ENV.post_policies_enabled) {
+      renderPostGradesMenu()
     }
 
     return student
