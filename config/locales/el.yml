@@ -15,6 +15,44 @@ el:
     title: "Δεν επιτρέπεται η πρόσβαση"
   558x270_png_jpg_gif_c3faa839: "558x270 png, jpg, gif"
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif (1.8x είναι το κανονικό μέγεθος πλακιδίου, επομένως μπορεί να αυξηθεί και να μειωθεί ανάλογα με τις ανάγκες)"
+  AssignmentGroupCreateDialog: 
+    titles: 
+      add_assignment_group: "Προσθήκη Ομάδας Υποβολής"
+  AssignmentGroupListItemView: 
+    never_drop_rule: "Να υπολογίζεται πάντα %{assignment_name}"
+    toggle_message: "εναλλαγή προβολής/εμφάνισης εργασίας"
+  AssignmentKeyBindingsMixin: 
+    keyboard_add_item: "Προσθήκη εργασίας στην επιλεγμένη ομάδα"
+    keyboard_close_menu: "Κλείστε το ενεργό παράθυρο διαλόγου"
+    keyboard_del_item: "Διαγραφή της τρέχουσας εργασίας ή ομάδας"
+    keyboard_edit_item: "Επεξεργασία της τρέχουσας εργασίας ή ομάδας"
+    keyboard_next_item: "Εστίαση στην επόμενη εργασία ή ομάδα"
+    keyboard_prev_item: "Εστίαση στην προηγούμενη εργασία ή ομάδα"
+    keyboard_show_assign: "Προβολή πλήρους προεπισκόπησης της επιλεγμένης εργασίας"
+    keycodes: 
+      add_item: a
+      close_menu: esc
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
+  AssignmentListItemView: 
+    complete: Ολοκληρωμένο
+    grade_gpa_scale_screenreader: "Βαθμός: %{grade}"
+    grade_letter_grade_screenreader: "Βαθμός: %{grade}"
+    grade_pass_fail_screenreader: "Βαθμός: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "Βαθμός: %{grade}%"
+    incomplete: "Μη ολοκληρωμένο"
+  CollectionView: 
+    no_items: "Δεν υπάρχουν στοιχεία."
+  CreateAssignmentView: 
+    name_is_required: "Απαιτείται όνομα!"
+    points_possible_number: "Τα πιθανά μόρια πρέπει να είναι αριθμός"
+  DeleteGroupView: 
+    cannot_delete_group: "Πρέπει να έχετε τουλάχιστον μία Ομάδα Υποβολής"
+    confirm_delete_group: "Είστε σίγουρος/η ότι θέλετε να διαγράψετε αυτή την Ομάδα Υποβολής;"
   EditAppointmentGroupDetails: 
     affect_reservations: "Πως αυτή η ενέργεια θα επηρεάσει τις κρατήσεις;"
     and_n_contexts: "και %{n} άλλοι"
@@ -23,6 +61,24 @@ el:
     bad_per_slot: "Πρέπει να επιτρέψετε τουλάγιστον ένα ραντεβού ανά χρονοθυρίδα"
     context_required: "Πρέπει να επιλέξετε ένα ημερολόγιο"
     select_calendars: "Επιλογή Ημερολογίων"
+  EditRubricPage: 
+    titles: 
+      find_outcomes: "Εύρεση Αποτελεσμάτων"
+  EditorToggle: 
+    done: 
+      title: "Κάντε κλικ για να ολοκληρώσετε την επεξεργασία της περιοχής rich text."
+    done_as_in_finished: Ολοκληρώθηκε
+  EquationEditorView: 
+    button: 
+      insert_equation: "Εισαγωγή Εξίσωσης"
+    cannot_render_equation: "Αυτή η εξίσωση δεν είναι δυνατό να αναπαραχθεί στην Βασική Μορφή"
+    equation_editor_title: "Χρησιμοποιήστε τις γραμμές εργαλείων εδώ ή επιλέξτε Αλλαγή Εμφάνισης σε Προχωρημένη για να πληκτρολογήσετε/επικολλήσετε στο LaTeX"
+  ExternalContentFileSubmissionView: 
+    file_retrieval_error: "Η Ανάκτηση του Αρχείου Απέτυχε"
+    getting_file: "Γίνεται Ανάκτηση του Αρχείου..."
+    invalid_file_retrieval: "Υπήρξε πρόβλημα με την ανάκτηση του αρχείου που στάλθηκε από αυτό το εργαλείο."
+  ExternalToolsPlugin: 
+    more_external_tools: "Περισσότερα Εξωτερικά Εργαλεία"
   GroupDetailView: 
     delete_confirm: "Είστε βέβαιοι ότι επιθυμείτε να αφαιρέσετε αυτή την ομάδα;"
     flash: 
@@ -37,9 +93,54 @@ el:
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ΕΙΔΟΠΟΙΗΣΗ: Ο/Η %{user} είναι ήδη μέλος της ομάδας %{group}"
+  InsertUpdateImageView: 
+    titles: 
+      insert_edit_image: "Εισαγωγή / Eπεξεργασία Εικόνας"
+  KeyboardNavDialog: 
+    titles: 
+      keyboard_shortcuts: "Συντομεύσεις πληκτρολογίου"
   LongTextEditor: 
     cancel: Ακύρωση
     save: Αποθήκευση
+  OutcomeContentBase: 
+    blank_error: "Δεν πρέπει να παραμείνει κενό"
+    confirm: 
+      delete: "Είστε σίγουροι ότι θέλετε να το αφαιρέσετε;"
+    flash: 
+      addSuccess: "Επιτυχής δημιουργία"
+      deleteError: "Κάτι δεν πήγε σωστά. Η διαγραφή δεν είναι, αυτή τη στιγμή, δυνατή."
+      deleteSuccess: "Επιτυχής διαγραφή"
+      error: "Παρουσιάστηκε σφάλμα. Παρακαλώ ανανεώστε τη σελίδα και δοκιμάστε ξανά."
+      updateSuccess: "Επιτυχής ενημέρωση"
+    length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
+  OutcomeView: 
+    length_error: "Πρέπει να έχει μήκος 255 χαρακτήρες ή λιγότερο"
+    mastery_error: "Πρέπει να είναι μεγαλύτερο ή ίσο από 0"
+  OutcomesDirectoryView: 
+    flash: 
+      error: "Παρουσιάστηκε σφάλμα. Παρακαλώ ανανεώστε τη σελίδα και δοκιμάστε ξανά."
+      updateSuccess: "Επιτυχής ενημέρωση"
+  ResendInvitationsView: 
+    error_sending_invitations: "<mrk mid=\"6720\" mtype=\"seg\">Σφάλμα αποστολής πρόσκλησης.</mrk> <mrk mid=\"6721\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
+    invitations_re_sent: "Οι προσκλήσεις στάλθηκαν επιτυχώς"
+  RosterDialogMixin: 
+    updating: "Ενημέρωση σε εξέλιξη..."
+  RosterUserView: 
+    flash: 
+      removeError: "Υπήρξε αδύνατη η αφαίρεση του χρήστη. Παρακαλ΄ψ, δοκιμάστε ξανά αργότερα"
+    nobody: κανείς
+    observing_user: "<mrk mid=\"6722\" mtype=\"seg\">Παρατηρεί:</mrk> <mrk mid=\"6723\" mtype=\"seg\">%{user_name}</mrk>"
+  RosterView: 
+    greater_than_three: "Παρακαλώ εισαγάγετε κάποιον όρο αναζήτησης με τρεις ή περισσότερους χαρακτήρες"
+    unknown_error: "Κάτι δεν πήγε σωστά με την εύρεσή σας, παρακαλώ δοκιμάστε ξανά."
+  SwitchEditorControl: 
+    switch_editor_html: "Επεξεργαστής HTML"
+    switch_editor_rich_text: "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
+  UploadMediaTrackForm: 
+    cancel: Ακύρωση
+    track_uploaded_successfully: "Το κομμάτι μεταφορτώθηκε επιτυχώς, παρακαλώ ανανεώστε τον φυλλομετρητή σας."
+    upload: Μεταφόρτωση
+    uploading: "Γίνεται μεταφόρτωση..."
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- Στο κάτω μέρος --"
   _b4455c8b: "%"
@@ -1488,6 +1589,8 @@ el:
     announcements_crumb: Ανακοινώσεις
     error_draft_state: "Αυτό το θέμα δεν είναι δυνατό να τεθεί σε κατάσταση προσχεδίου επειδή τυγχάνει να είναι ανακοίνωση"
     feed_name: "Τροφοδοσία Ανακοινώσεων Μαθήματος %{course}"
+    feed_title_course: "Τροφοδοσία Atom Ανακοινώσεων Μαθήματος"
+    feed_title_group: "Τροφοδοσία Atom Ανακοινώσεων Ομάδας"
     index: 
       feed_title_course: "Τροφοδοσία Atom Ανακοινώσεων Μαθήματος"
       feed_title_group: "Τροφοδοσία Atom Ανακοινώσεων Ομάδας"
@@ -1510,6 +1613,8 @@ el:
     podcast_feed_description_course: "Τυχόν συνδεδεμένα ή ενσωματωμένα αρχεία πολυμέσων σε ανακοινώσεις στο μάθημα «%{course}» θα εμφανιστούν σε αυτή την τροφοδοσία."
     podcast_feed_description_group: "Τυχόν συνδεδεμένα ή ενσωματωμένα αρχεία πολυμέσων σε ανακοινώσεις στην ομάδα «%{group}» θα εμφανιστούν σε αυτή την τροφοδοσία."
     podcast_feed_name: "Τροφοδοσία Podcast Ανακοινώσεων Μαθήματος %{course}"
+    podcast_title_course: "Τροφοδοσία Podcast Ανακοινώσεων Μαθήματος"
+    podcast_title_group: "Τροφοδοσία Podcast Ανακοινώσεων Ομάδας"
   announcements_a4b8ed4a: Ανακοινώσεις
   anonymous_e1b8ad27: Ανώνυμο
   anonymous_grading_ccb5045c: "Ανώνυμη Βαθμολόγηση"
@@ -1677,6 +1782,10 @@ el:
     titles: 
       gpa_scale_explainer: "Τι είναι η Κλίμακα Βαθμολόγησης GPA;"
       grading_scheme_info: "Προβολή/Τροποποίηση Κανονισμού Βαθμολόγησης"
+  assignmentRubricDialog: 
+    loading: Φόρτωση...
+    titles: 
+      assignment_rubric_details: "Λεπτομέρειες Ρουμπρίκας Εργασίας"
   assignment_976578a8: Εργασία
   assignment_comments_e43ed898: "Σχόλια για αυτή την Εργασία"
   assignment_created_assignment_name_course_name_324a5639: "Η Εργασία Δημιουργήθηκε - %{assignment_name}, %{course_name}"
@@ -1936,6 +2045,7 @@ el:
     multiple_due_dates: "Πολλαπλές Καταληκτικές Ημερομηνίες"
     name_is_required: "Απαιτείται όνομα!"
     never_drop_rule: "Να υπολογίζεται πάντα %{assignment_name}"
+    new_assignment: "Νέα Εργασία"
     no_assignments_list_item: 
       no_assignments_in_this_group: "Δεν υπάρχουν εργασίες σε αυτήν την ομάδα"
     no_assignments_search: 
@@ -2203,8 +2313,18 @@ el:
         originality_report_visible_after_due_date: "Έπειτα απο την Καταληκτική Ημερομηνία"
         originality_report_visible_after_grading: "Μετά τη βαθμολόγηση της εργασίας"
         originality_report_visible_immediately: Αμέσως
+  assignmentsNeverDrop: 
+    remove_never_drop_rule: "Αφαίρεση του κανόνα \"να υπολογίζεται πάντα\""
+    remove_unsaved_never_drop_rule: "Αφαίρεση του μη αποθηκευμένου κανόνα \"να υπολογίζεται πάντα\""
+  assignmentsToggleShowByView: 
+    overdue_assignments: "Εκπρόθεσμες Εργασίες"
+    past_assignments: "Προηγούμενες Εργασίες"
+    undated_assignments: "Μη Χρονολογημένες Εργασίες"
+    upcoming_assignments: "Επερχόμενες Εργασίες"
   assignments_1e02582c: Εργασίες
   assignments_2: 
+    attempts: 
+      filter: Προσπάθειες
     submission_attempts: Προσπάθειες
   assignments_api: 
     invalid_date_time: "Μη έγκυρη ημερομηνία/ώρα για το %{attribute}"
@@ -2447,6 +2567,9 @@ el:
       upload_failed: "Η μεταφόρτωση απέτυχε, παρακαλώ δοκιμάστε ξανά"
     messages: 
       uploading_button: "Μεταφόρτωση αρχείου CSV..."
+  bundles_quesiton_bank: 
+    titles: 
+      find_outcomes: "Εύρεση Αποτελεσμάτων"
   button: 
     submit_assignment: "Υποβολή Εργασίας"
   buttons: 
@@ -2788,6 +2911,7 @@ el:
     event: 
       due: προθεσμία
       event_title: "<mrk mid=\"310\" mtype=\"seg\">καταληκτική ημερ/νία:</mrk> <mrk mid=\"311\" mtype=\"seg\">%{event_title}</mrk>"
+    feed_title: "Τροφοδοσία Atom Ημερολογίου Μαθήματος"
     show: 
       calendar_feed: "Τροφοδοσία Ημερολογίου"
       calendar_feed_instructions: "Αντιγράψτε τον παρακάτω σύνδεσμο και επικολλήστε τον στην εφαρμογή ημερολογίου που δέχεται τροφοδοτήσεις iCal (Google Calendar, iCal, Outlook, κ.λπ.)"
@@ -2894,6 +3018,7 @@ el:
     by_sa: "Αναφορά Δημιουργού-Παρόμοια Διανομή CC "
     private: "Ιδιωτική (Προστατευόμενη)"
     public_domain: "Δημόσιος Τομέας"
+  cell_number_69a7c309: "Αριθμός Κινητού"
   cell_number_is_invalid_bd6faee0: "Μη έγκυρος Αριθμός Κινητού!"
   cell_number_is_required_2edcee60: "Απαιτείται Αριθμός Κινητού!"
   certificate_fingerprint_b376df90: "Αποτύπωμα ψηφιακού πιστοποιητικού"
@@ -2931,6 +3056,7 @@ el:
   click_to_set_this_answer_as_correct_1326e3fd: "Κάνετε κλικ για να ορίσετε αυτήν την απάντηση ως σωστή"
   click_to_test_dropdown_b950974d: "Κάντε κλικ για να δοκιμάσετε το dropdown"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Κάνοντας κλικ στις επικεφαλίδες των στηλών θα ταξινομήσετε τις σειρές κατά στήλη."
+  client_id_cb2502af: "ID Πελάτη"
   clone_group_set_c2a40e15: "Κλωνοποίηση Σετ Ομάδων"
   close_17f50799: κλείσιμο
   close_and_return_to_canvas_80544344: "Κλείσιμο και επιστροφή στο Canvas"
@@ -3679,6 +3805,29 @@ el:
       new_tab: "Αυτή η ιστοσελίδα πρέπει να ανοιχτεί σε νέο παράθυρο στον φυλλομετρητή."
   context_modules_api: 
     invalid_position: "Μη έγκυρη τοποθεσία"
+  context_modulespublic: 
+    buttons: 
+      add: "Προσθήκη Ενότητας"
+      add_item: "Προσθήκη Αντικειμένου"
+      update: "Ενημέρωση Αρθρώματος"
+    confirm: 
+      delete: "Είσαστε σίγουροι οτι επιθυμείτε να αφαιρέστε αυτό το άρθρωμα;"
+      delete_item: "Είστε σίγουρος/η ότι επιθυμείτε να αφαιρέσετε αυτό το στοιχείο από την ενότητα;"
+    errors: 
+      reorder: "Η ηχογράφηση απέτυχε, παρακαλώ δοκιμάστε ξανά."
+    optgroup: 
+      assignments: Εργασίες
+      discussion_topics: Συζητήσεις
+      external_tools: "Εξωτερικά Εργαλεία"
+      external_urls: "Εξωτερικά URL"
+      files: Αρχεία
+      quizzes: Κουίζ
+    points_possible_short: "%{points} μόρια"
+    titles: 
+      add: "Προσθήκη Ενότητας"
+      add_item: "Πρόσθεση Στοιχείου στο %{module}"
+      edit: "Τροποποίηση Ρυθμίσεων Ενότητας"
+      edit_item: "Επεξεργασία Λεπτομερειών Αντικειμένου"
   context_nav_link_8d15d95: "Σύνδεσμος πλοήγησης στο περιεχόμενο"
   context_nav_link_active_78adb0fa: "Ενεργός σύνδεσμος πλοήγησης στο περιεχόμενο"
   continue_ac067716: Συνέχεια
@@ -4488,6 +4637,8 @@ el:
         hide_specific_dates: "Απόκρυψη τομέα, ομάδας και ημερομηνιών που αφορούν το άτομο"
         show_specific_dates: "Εμφάνιση τομέα, ομάδας και ημερομηνιών που αφορούν το άτομο"
     titles: 
+      rss: 
+        course_announcements: "Τροφοδοσία Atom Ανακοινώσεων Μαθήματος"
       rss_feed: "Τροφοδοσία %{course} "
     to_do_list: 
       headings: 
@@ -4928,6 +5079,8 @@ el:
     saving: Αποθήκευση...
   different_course_b875770e: "διαφορετικό μάθημα"
   diigo_993c4646: Diigo
+  disableWhileLoading: 
+    loading: Φόρτωση...
   disable_a5c05db3: Απενεργοποίηση
   disable_and_lock_7d0ef0e8: "Απενεργοποίηση και Κλείδωμα"
   disabled_18c33a73: (απενεργοποιημένο/α)
@@ -4973,14 +5126,17 @@ el:
     confirm_delete_discussion_topic: 
       one: "Είστε σίγουρος/η ότι θέλετε να διαγράψετε αυτό το θέμα συζήτησης;"
       other: "Είστε σίγουρος/η ότι θέλετε να διαγράψετε αυτά τα %{count} θέματα συζήτησης;"
+    course_discussions_atom_feed_title: "Τροφοδοσία Atom Συζητήσεων Μαθήματος"
     create_new_crumb: "Δημιουργία νέας"
     default_discussion_title: "Δεν υπάρχει Τίτλος"
     deleted_topic_notice: "Το θέμα έχει διαγραφεί"
+    discussion_atom_feed_title: "Τροφοδοσία Atom Συζήτησης"
     discussion_feed_title: "Τροφοδοσία Συζήτησης %{title}"
     discussion_list: 
       no_pinned_discussions: "Δεν έχετε καρφιτσωμένες συζητήσεις προς το παρόν"
       pinned_instructions: "Για να καρφιτσώσετε μια συζήτηση στο επάνω μέρος της σελίδας, σύρετε τη συζήτηση εδώ ή επιλέξτε Καρφίτσωμα από το μενού ρυθμίσεων της συζήτησης."
       there_are_no_discussions_show: "Δεν υπάρχουν συζητήσεις σε αυτόν τον τομέα."
+    discussion_podcast_feed_title: "Τροφοδοσία Podcast Συζήτησης"
     discussions_settings_view: 
       allow_student_discussion_editing: "Επεξεργασία και διαγραφή των δικών τους δημοσιεύσεων"
       allow_student_topics: "Δημιουργία θεμάτων συζητήσεων"
@@ -5592,6 +5748,8 @@ el:
         skip_navigation: "Παράλειψη Πλοήγησης"
       logo: λογότυπο
     title: "Τροφοδότηση %{portfolio_name}"
+    titles: 
+      feed: "Τροφοδοσία Atom ePortfolio"
     user_index: 
       buttons: 
         add_eportfolio: "Δημιουργία ePortfolio"
@@ -5801,9 +5959,12 @@ el:
       load_failure_title: "Αποτυχία φόρτωσης εργαλείου"
       load_success_message: "Μπορείτε να απομακρυνθείτε ελεύθερα από αυτή τη σελίδα."
       load_success_title: "Η Χρήση του Εργαλείου Ολοκληρώθηκε"
+  external_toolsHomeworkSubmissionLtiContainer: 
+    no_tools_found: "Δεν βρέθηκαν εργαλεία"
   external_tools_6e77821: "Εξωτερικά Εργαλεία"
   external_url_e9b87215: "Εξωτερικό Url"
   failed_307449e1: "Απέτυχε:"
+  failed_please_report_the_following_error_code_to_y_42248d60: "Σφάλμα, παρακαλώ αναφέρετε τον ακόλουθο κωδικό σφάλματος στον διαχειριστή των υπολογιστικών συστημάτων σας: ErrorReport:%{error}"
   failed_to_create_webhook_b766cf5c: "Αποτυχία δημιουργίας webhook."
   failed_to_import_media_objects_4c1fcb4f: "Η εισαγωγή αντικειμένων πολυμέσων απέτυχε"
   failed_to_log_in_7ceec561: "Η Σύνδεση Απέτυχε"
@@ -5894,6 +6055,19 @@ el:
   filter_discussions_by_unread_6c48322: "φιλτράρισμα συζητήσεων με βάση τις μη αναγνωσμένες"
   filter_e3398407: Φίλτρο
   filter_replies_by_unread_342e8e90: "Φιλτράρισμα απαντήσεων με βάση τις μη αναγνωσμένες"
+  findLinkForService: 
+    buttons: 
+      search: Αναζήτηση
+      search_by_tag: "Αναζήτηση βάσει Ετικέτας"
+    errors: 
+      search_failed: "Η αναζήτηση απέτυχε, παρακαλώ δοκιμάστε ξανά."
+    no_description: "Δεν υπάρχει περιγραφή"
+    no_results_found: "Δεν βρέθηκαν αποτελέσματα"
+    status: 
+      diigo_search_throttling: "<mrk mid=\"1417\" mtype=\"seg\">Το Diigo περιορίζει τους χρήστες σε μία αναζήτηση ανά δέκα δευτερόλεπτα.</mrk>  <mrk mid=\"1418\" mtype=\"seg\">Παρακαλώ περιμένετε...</mrk>"
+      searching: Αναζήτηση...
+    titles: 
+      bookmark_search: "<mrk mid=\"1431\" mtype=\"seg\">Αναζήτηση Σελιδοδείκτη:</mrk> <mrk mid=\"1432\" mtype=\"seg\">%{service_name}</mrk>"
   find_8d605019: Εύρεση
   find_an_existing_grading_scheme_d836ea: "Εύρεση Υπάρχοντος Κανονισμού Βαθμολόγησης"
   find_flickr_image_view: 
@@ -5911,6 +6085,7 @@ el:
   finished_19aaf6f5: Ολοκληρώθηκε
   finland_358_abeffc8a: "Φινλανδία (+358)"
   flash_6afbf65a: Flash
+  flickr_9bed633e: Flickr
   folder: 
     default_folder_name: "Νέος Φάκελος"
     errors: 
@@ -5929,6 +6104,7 @@ el:
   for: για
   for_974cbb84: Για
   for_all_devices_1f603968: "Για όλες τις Συσκευές"
+  for_title_69d92b3a: "για %{title}"
   forgot_password_f0c3fbac: "Δεν γνωρίζω τον κωδικό πρόσβασής μου"
   forgot_password_url_3f9c04b: "URL του \"Ξέχασα το Συνθηματικό μου\""
   form_background_fb654518: "Δημιουργία Φόντου"
@@ -6058,12 +6234,24 @@ el:
     turnitin: 
       resubmitting: Επανυποβολή...
     unmute_assignment: "Επαναφορά Εργασίας από Σίγαση"
+  gradebookHeaderFilterView: 
+    course_average: "Μέσος Όρος Μαθήματος"
+    course_median: "Διάμεσος μαθήματος"
+  gradebookHeaderMenu: 
+    errors: 
+      upload_as_zip: "Παρακαλώ μεταφορτώστε αρχεία ως .zip μορφή"
+  gradebookOutcomeGradebookGrid: 
+    learning_outcome: "Αποτέλεσμα Εκμάθησης"
+  gradebookSectionMenuView: 
+    all_sections: "Όλα τα Τμήματα"
   gradebook_1620a0aa: "Βιβλίο βαθμών"
   gradebook_5fd8ef0: "Βιβλίο βαθμών..."
   gradebook_csvs: 
     grades_filename: Βαθμοί
   gradebook_export_started_723461b9: "Η διεργασία Εξαγωγής Βαθμών ξεκίνησε"
   gradebook_uploads: 
+    errors: 
+      select_an_option: "Παρακαλώ διαλέξτε μια επιλογή"
     no_file_attached: "<mrk mid=\"7474\" mtype=\"seg\">Δεν εντοπίστηκε αρχείο CSV για μεταφόρτωση.</mrk> <mrk mid=\"7475\" mtype=\"seg\">Παρακαλώ επιλέξτε ένα CSV για μεταφόρτωση και υποβάλετε ξανά.</mrk>"
     show: 
       assignment_answer: "Η εργασία είναι"
@@ -6087,6 +6275,19 @@ el:
       student_answer: "Αυτό το άτομο είναι πραγματικά"
       student_example: Κάποιος
       student_question: "Ενδιαφερόμενος σπουδαστής"
+    student: "Μαθητής "
+  gradebookold: 
+    hide_notes: "Απόκρυψη Στήλης Σημειώσεων"
+    hide_student_names: "Απόκρυψη Ονομάτων των Μαθητών"
+    no_assignments_have_points_warning: "Η βαθμολογία δεν μπορεί να υπολογιστεί μέχρι η εργασία να έχει πιθανά μόρια"
+    notes: Σημειώσεις
+    percent_of_grade: "%{percentage} του βαθμού"
+    points_out_of: "απο %{points_possible}"
+    secondary_id: "Εφεδρικό ID"
+    show_notes: "Εμφάνιση Στήλης Σημειώσεων"
+    show_student_names: "Εμφάνιση των Ονομάτων των Μαθητών"
+    student_name: "Όνομα Σπουδαστή"
+    total: Σύνολο
   gradebooks: 
     blank_submission: 
       no_submission: "Καμία υποβολή"
@@ -6246,6 +6447,25 @@ el:
     keyboard_assignment_desc: "Μεταβείτε στη σελίδα λεπτομερειών της τρέχουσας εργασίας"
     outcome_gradebook: 
       toggle_sidebar: "Εναλλαγή πλευρικής μπάρας"
+  gradezillaGradeDisplayWarningDialog: 
+    grade_display_warning: 
+      cancel: Ακύρωση
+      continue: Συνέχεια
+      percent_text: "Οι σπουδαστές θα μπορούν επίσης να δουν τον τελικό βαθμό τους σε μορφή τοις εκατό. Είσαστε σίγουροι πως θέλετε να συνεχίσετε;"
+      points_text: "Οι μαθητές θα δουν επίσης τον τελικό τους βαθμό σαν αριθμητικά μόρια. Είσαστε σίγουροι/ες πως θέλετε να συνεχίσετε;"
+  gradezillaGradebookKeyboardNav: 
+    keyboard_assignment_desc: "Μεταβείτε στη σελίδα λεπτομερειών της τρέχουσας εργασίας"
+    keyboard_sort_desc: "Ταξινόμηση δικτύου στην τρέχουσα ενεργή στήλη"
+    keycodes: 
+      close_menu: esc
+      goto_assignment: g
+      menu: m
+      sort: s
+  gradezillaHeaderFilterView: 
+    course_average: "Μέσος Όρος Μαθήματος"
+    course_median: "Διάμεσος μαθήματος"
+  gradezillaOutcomeGradebookGrid: 
+    learning_outcome: "Αποτέλεσμα Εκμάθησης"
   grading_aa6de9: Βαθμολόγηση
   grading_cell: 
     grade_complete: Ολοκληρωμένο
@@ -6392,6 +6612,7 @@ el:
     flash: 
       removeError: "<mrk mid=\"6109\" mtype=\"seg\">Η αφαίρεση του σετ ομάδων δεν ήταν δυνατή.</mrk> <mrk mid=\"6110\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
       removed: "Το σετ ομάδων αφαιρέθηκε επιτυχώς."
+    group_atom_feed: "Τροφοδοσία Atom Ομάδας"
     group_limit_number: "Το όριο της ομάδας πρέπει να είναι αριθμός"
     index: 
       heading_current_groups: "Τρέχουσες Ομάδες"
@@ -6820,6 +7041,39 @@ el:
       preview_document: "Προεπισκόπιση αρχείου"
     tooltips: 
       enter_search_terms: "εισαγωγή όρων αναζήτησης"
+  instructure_inline_media_comment: 
+    alerts: 
+      kaltura_disabled: "Το Kaltura είναι απενεργοποιημένο για αυτή την ιστοσελίδα Canvas"
+    links: 
+      minimize_embedded_kaltura_content: "Ελαχιστοποίηση ενσωματωμένου περιεχομένου"
+  instructure_js: 
+    alerts: 
+      file_previews_disabled: "Οι προεπισκοπήσεις αρχείων είναι απενεργοποιημένες για αυτή την ιστοσελίδα Canvas"
+    buttons: 
+      next_module: "Επόμενη Ενότητα"
+      previous_module: "Προηγούμενη Ενότητα"
+    draft: Προσχέδιο
+    errors: 
+      posting_message_failed: "Η Δημοσίευση Απέτυχε. Δοκιμάστε Ξανά."
+    links: 
+      minimize_file_preview: "Ελαχιστοποίηση Προεπισκόπησης Αρχείου"
+      minimize_youtube_video: "Ελαχιστοποίηση Βίντεο"
+      view_equella_content_in_new_window: "Προβολή του περιεχομένου σε νέο παράθυρο"
+    status: 
+      posting_message: "Δημοσίευση Μηνύματος..."
+    switched_roles_message: 
+      designer: "<mrk mid=\"1421\" mtype=\"seg\">Έχετε αλλάξει προσωρινά ρόλους για αυτό το μάθημα και τώρα βλέπετε αυτό το μάθημα ως σχεδιαστής.</mrk>  <mrk mid=\"1422\" mtype=\"seg\">Μπορείτε να επαναφέρετε τον ρόλο και τα δικαιώματά σας από την αρχική σελίδα του μαθήματος.</mrk>"
+      observer: "<mrk mid=\"1423\" mtype=\"seg\">Έχετε αλλάξει προσωρινά ρόλους για αυτό το μάθημα και τώρα βλέπετε αυτό το μάθημα ως παρατηρητής.</mrk>  <mrk mid=\"1424\" mtype=\"seg\">Μπορείτε να επαναφέρετε τον ρόλο και τα δικαιώματά σας από την αρχική σελίδα του μαθήματος.</mrk>"
+      student: "<mrk mid=\"1425\" mtype=\"seg\">Έχετε αλλάξει προσωρινά ρόλους για αυτό το μάθημα και τώρα βλέπετε αυτό το μάθημα ως σπουδαστής.</mrk>  <mrk mid=\"1426\" mtype=\"seg\">Μπορείτε να επαναφέρετε τον ρόλο και τα δικαιώματά σας από την αρχική σελίδα του μαθήματος.</mrk>"
+      ta: "<mrk mid=\"1427\" mtype=\"seg\">Έχετε αλλάξει προσωρινά ρόλους για αυτό το μάθημα και τώρα βλέπετε αυτό το μάθημα ως βοηθός διδασκαλίας.</mrk>  <mrk mid=\"1428\" mtype=\"seg\">Μπορείτε να επαναφέρετε τον ρόλο και τα δικαιώματά σας από την αρχική σελίδα του μαθήματος.</mrk>"
+      teacher: "<mrk mid=\"1429\" mtype=\"seg\">Έχετε αλλάξει προσωρινά ρόλους για αυτό το μάθημα και τώρα βλέπετε αυτό το μάθημα ως καθηγητής.</mrk>  <mrk mid=\"1430\" mtype=\"seg\">Μπορείτε να επαναφέρετε τον ρόλο και τα δικαιώματά σας από την αρχική σελίδα του μαθήματος.</mrk>"
+    titles: 
+      equella_content_preview: "Προεπισκόπιση Περιεχομένου του Equella"
+      external_link: "Σύνδεσμοι σε εξωτερική ιστοσελίδα."
+      preview_document: "Προεπισκόπιση αρχείου"
+  instructure_misc_plugins: 
+    confirms: 
+      default_delete_thing: "Είστε σίγουρος/η ότι επιθυμείτε να το διαγράψετε;"
   integration_id_int_id_is_already_in_use_f30f03b5: "To ID ενσωμάτωσης «%{int_id}» χρησιμοποιείται ήδη"
   international_sms_9edb9868: "Διεθνή SMS"
   international_text_messaging_rates_may_apply_d4b4a97a: "Ενδέχεται να εφαρμόζεται χρέωση διεθνών μηνυμάτων κειμένου."
@@ -6915,6 +7169,15 @@ el:
     module_sequence_footer: 
       next: Επόμενη
       previous: Προηγούμενο
+  jquery_doc_previews: 
+    errors: 
+      cannot_view_document_in_canvas: "Αυτό το έγγραφο δεν μπορεί να εμφανιστεί μέσα στο Canvas."
+      document_preview_processing: "<mrk mid=\"5994\" mtype=\"seg\">Η προεπισκόπηση του εγγράφου δημιουργείται αυτή τη στιγμή.</mrk> <mrk mid=\"5995\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
+  jquery_media_comments: 
+    loading: "Φόρτωση πολυμέσων..."
+    media_still_converting: "Αυτή τη στιγμή γίνεται μετατροπή του αρχείου πολυμέσων, παρακαλώ δοκιμάστε ξανά σε πολύ λίγο."
+    titles: 
+      play_comment: "Αναπαραγωγή Πολυμεσικού Σχολίου"
   just_in_time_provisioning_382a0354: "Παροχή τη στιγμή που απαιτείται (JIT)"
   k12_description: |-
       <mrk mid="1613" mtype="seg">Λειτουργίες, ρυθμίσεις και εμφανίσεις που ταιριάζουν περισσότερο, ιδίως στο περιβάλλον του K-12.</mrk> <mrk mid="1614" mtype="seg">Προς το παρόν, μόνο αυτό
@@ -7263,6 +7526,11 @@ el:
   max_users_groups_per_appointment_867c505b: "Μέγιστος αριθμός χρηστών/ομάδων ανά εργασία"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Μέγιστος αριθμός εργασιών στις οποίες μπορεί να παρευρεθεί κάποιος συμμετέχων"
   media_af190855: Δεδομένα
+  media_comment_dialog_manager: 
+    messages: 
+      loading: Φόρτωση...
+    titles: 
+      record_upload_media_comment: "Ηχογράφηση/Μεταφόρτωση Πολυμεσικού Σχολίου"
   media_comments: 
     alerts: 
       kaltura_disabled: "Το Kaltura είναι απενεργοποιημένο για αυτή την ιστοσελίδα Canvas"
@@ -7299,6 +7567,35 @@ el:
     track_uploaded_successfully: "Το κομμάτι μεταφορτώθηκε επιτυχώς, παρακαλώ ανανεώστε τον φυλλομετρητή σας."
     upload: Μεταφόρτωση
     uploading: "Γίνεται μεταφόρτωση..."
+  media_comments_publicjs: 
+    buttons: 
+      submit: "Υποβολή Αρχείου Πολυμέσων"
+    errors: 
+      file_too_large: "*Αυτό το αρχείο είναι πολύ μεγάλο.* Το μέγιστο μέγεθος είναι %{size} MB."
+      load_failed: "<mrk mid=\"4936\" mtype=\"seg\">Η φόρτωση της Εφαρμογής Πολυμεσικών Σχολίων απέτυχε.</mrk>  <mrk mid=\"4937\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
+      media_comment_installation_broken: "<mrk mid=\"3453\" mtype=\"seg\">Η μεταφόρτωση του πολυμεσικού σχολίου δεν έχει ρυθμιστεί σωστά.</mrk> <mrk mid=\"3454\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή σας.</mrk>"
+      must_be_logged_in: "Πρέπει να είστε συνδεδεμένοι για την ηχογράφηση αρχείου πολυμέσων."
+      persistent_problem: "Αν το πρόβλημα εξακολουθεί, ίσως θέλετε να δοκιμάσετε να ηχογραφήσετε το αρχείο πολυμέσων σας τοπικά και στη συνέχεια να μεταφορτώσετε το αποθηκευμένο αρχείο."
+      save_failed: "<mrk mid=\"1569\" mtype=\"seg\">Φαίνεται ότι η αποθήκευση απέτυχε.</mrk>  <mrk mid=\"1570\" mtype=\"seg\">Παρακαλώ κλείστε το αναδυόμενο παράθυρο για να δοκιμάσετε ξανά.</mrk>"
+      save_failed_try_again: "<mrk mid=\"1571\" mtype=\"seg\">Η αποθήκευση της καταχώρισης απέτυχε.</mrk>  <mrk mid=\"1572\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
+      upload_failed: "Η μεταφόρτωση απέτυχε με το σφάλμα:"
+    messages: 
+      flash_required_record_audio: "Απαιτείται Flash για την ηχογράφηση αρχείου ήχου."
+      flash_required_upload_audio: "Απαιτείται Flash για τη μεταφόρτωση αρχείου ήχου."
+      flash_required_upload_video: "Απαιτείται Flash για τη μεταφόρτωση αρχείου βίντεο."
+      loading: Φόρτωση...
+      submitted: "Έγινε Υποβολή Αρχείου Πολυμέσων!"
+      submitting: "Γίνεται Υποβολή Αρχείου Πολυμέσων..."
+    titles: 
+      media_contribution: "Πολυμεσική Συνεισφορά "
+      record_upload_media_comment: "Ηχογράφηση/Μεταφόρτωση Πολυμεσικού Σχολίου"
+  media_comments_upload_view_manager: 
+    errors: 
+      media_comment_installation_broken: "<mrk mid=\"3453\" mtype=\"seg\">Η μεταφόρτωση του πολυμεσικού σχολίου δεν έχει ρυθμιστεί σωστά.</mrk> <mrk mid=\"3454\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή σας.</mrk>"
+    file_size_error: "Το μέγεθος του αρχείου %{file} είναι μεγαλύτερο από το μέγιστο %{max} επιτρεπόμενο μέγεθος αρχείου."
+    file_type_error: "Το αρχείο %{file} δεν είναι επιτρεπόμενο αρχείο %{type}."
+    messages: 
+      submitting: "Γίνεται Υποβολή Αρχείου Πολυμέσων..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Το αρχείο πολυμέσων έχει προστεθεί στην ουρά για μετατροπή, παρακαλώ δοκιμάστε ξανά σε πολύ λίγο."
   media_recording_77cddc52: "Ηχογράφηση Αρχείου Πολυμέσων"
   media_recording_submission_b7fd1491: "Υποβολή Ηχογράφησης Αρχείου Πολυμέσων"
@@ -7315,18 +7612,25 @@ el:
   message_5c38209d: Μήνυμα
   message_896d2ed0: "%{message}"
   message_body_1f782712: "Κύριο Μέρος Μηνύματος"
+  message_groups_who_1ba736f: "Στείλτε μήνυμα στις ομάδες που..."
+  message_sent_5e328899: "Μήνυμα Εστάλη!"
   message_sent_9ff3a79d: "Μήνυμα εστάλη!"
   message_sent_f4cba0c: "Μήνυμα εστάλη."
   message_students: 
     message_student: "Αποστολή μηνύματος στους Σπουδαστές για το μάθημα %{course_name}"
     send_message: "Αποστολή Μηνύματος"
+  message_students_37ba5dd5: "Αποστολή μηνύματος στους μαθητές"
   message_students_cecc3f83: "Στείλτε Μήνυμα στους Φοιτητές/τριες"
   message_students_dialog: 
     recipients: "Παραλήπτες:"
+  message_students_for_context_ee62ff92: "Αποστολή μηνύματος στους σπουδαστές για %{context}"
+  message_students_for_course_name_e55f8077: "Αποστολή μηνύματος στους Σπουδαστές για το μάθημα %{course_name}"
   message_students_who_369b8488: "Στείλτε Μήνυμα στους Σπουδαστές Που..."
   message_students_who_57f07a41: "Στείλτε μήνυμα στους φοιτητές/ιες που..."
+  message_students_who_b9f2bf20: "Στείλτε μήνυμα στους φοιητές/ιες που..."
   message_text_5f692459: "Αποστολή Μηνύματος Κειμένου"
   message_this_student_6d14043d: "Αποστολή μηνύματος σε αυτόν τον σπουδαστή"
+  message_type_480e7b89: "Είδος Μηνύματος"
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Το μήνυμα θα αποσταλεί σε όλους τους Καθηγητές/βοηθούς διδασκαλίας του μαθήματος."
   messages: 
     account_suspended: 
@@ -8894,6 +9198,24 @@ el:
   missing_percent_94534638: "<mrk mid=\"1112\" mtype=\"seg\">Απομένει:</mrk> <mrk mid=\"1113\" mtype=\"seg\">%{percent}</mrk>"
   mobile_homescreen_icon_f85d6b63: "Εικονίδιο Οθόνης Αφετηρίας (Homescreen) Κινητού Τηλεφώνου"
   model_is_already_located_in_newgroup_e5cea361: "Το %{model} βρίσκεται ήδη στην ομάδα %{newGroup}"
+  modelsOutcome: 
+    criteria: 
+      does_not_meet_expectations: "Δεν Ικανοποιεί τις Προσδοκίες"
+      exceeds_expectations: "Ξεπερνά τις Προσδοκίες"
+      meets_expectations: "Ικανοποιεί τις Προσδοκίες"
+  modelsPageView: 
+    browsers: 
+      unrecognized: "Μη Αναγνωρισμένος Φυλλομετρητής"
+  modelsQuiz: 
+    cant_unpublish_when_students_submit: "Δεν γίνεται να αναιρεθεί η δημοσίευση αν υπάρχουν υποβολές σπουδαστών"
+  modelsSection: 
+    overrides: 
+      everyone: Όλοι/ες
+  models_DateGroup: 
+    everyone_else: "Όλοι οι άλλοι"
+  models_conversations: 
+    cannot_be_empty: "Το μήνυμα δεν μπορεί να είναι κενό."
+    no_recipients_choose_another_group: "Δεν υπάρχουν παραλήπτες σε αυτή την ομάδα. Παρακαλώ διαλέξτε μια άλλη ομάδα."
   moderate_assignment_ccb00173: "Συντονισμός %{assignment}"
   moderate_assignment_name_cf59e0a7: "Συντονισμός %{assignment_name}"
   moderate_d0c85e92: Συντονισμός
@@ -8946,6 +9268,7 @@ el:
   more_info_at_course_name_56dc8c10: "Περισσότερες πληροφορίες στο %{course_name}"
   more_info_at_web_address_dba7e187: "Περισσότερες πληροφορίες στο %{web_address}"
   more_information_3dfb76b5: "Περισσότερες πληροφορίες"
+  more_options_272b4953: "Περισσότερες Επιλογές"
   more_than_a19b440: "%{more_than}+"
   most_recent_score_13a87e8c: "Πιο Πρόσφατη Βαθμολογία"
   move_abf00365: Μετακίνησε
@@ -8980,6 +9303,7 @@ el:
     submission_comments: "Σχόλια υποβολής"
     sure_you_want_to_mute: "<mrk mid=\"2210\" mtype=\"seg\">Είστε σίγουρος/η ότι επιθυμείτε να θέσετε αυτή την εργασία σε κατάσταση σίγασης;</mrk> <mrk mid=\"2211\" mtype=\"seg\">Για όσο η εργασία είναι σε σίγαση, οι σπουδαστές δεν θα λαμβάνουν νέες σχετικές ειδοποιήσεις ούτε θα μπορούν να βλέπουν:</mrk>"
   muted_283cfa0f: "(σε σίγαση)"
+  my_dashboard_8983c283: "Η Εργαλειοθήκη μου"
   my_dashboard_b724020: "Η εργαλειοθήκη μου"
   my_files_2f621040: "Τα αρχεία μου"
   my_settings_2ff35329: "Οι ρυθμίσεις μου"
@@ -9356,6 +9680,18 @@ el:
   ok_c47544a2: ΟΚ
   ok_ff1b646a: οκ
   okay_1772bbeb: Εντάξει
+  oldgradebookgradebookKeyboardNav: 
+    keyboard_assignment_desc: "Μεταβείτε στη σελίδα λεπτομερειών της τρέχουσας εργασίας"
+    keyboard_close_menu: "Κλείστε το τρέχον ενεργό μενού εργασιών"
+    keyboard_comment_desc: "Σχολιάστε την ενεργή υποβολή"
+    keyboard_menu_desc: "Ανοίξτε το μενού για την εργασία της ενεργής στήλης"
+    keyboard_sort_desc: "Ταξινόμηση δικτύου στην τρέχουσα ενεργή στήλη"
+    keycodes: 
+      close_menu: esc
+      comment: c
+      goto_assignment: g
+      menu: m
+      sort: s
   on_8f7190e5: Ενεργοποίηση
   on_paper_46d0ba36: Χειρόγραφο/Δακτυλογραφημένο
   on_time_17ca5ad9: Εγκαίρως
@@ -9503,6 +9839,7 @@ el:
       attempt_info: "Προσπάθεια #%{attempt_number}, %{attempt_date}"
       outcome_mastered: μαεστρία
       scoring: "%{points} από %{possible_points}"
+    outcomes_for: "Αποτελέσματα για τον χρήστη %{user_name}"
     show: 
       no_aligned_items: "Δεν υπάρχουν ευθυγραμμισμένα στοιχεία"
       no_artifacts: "Δεν υπάρχουν αντικείμενα"
@@ -9534,6 +9871,25 @@ el:
         average_percent: "Μέσο Ποσοστό"
         latest_score: "Πιο Πρόσφατη Βαθμολογία"
         outcome: Αποτέλεσμα
+  outcomesFindDialog: 
+    confirm: 
+      import_group: "Εισαγωγή της ομάδας «%{group}» στην ομάδα «%{target}»;"
+      import_outcome: "Εισαγωγή αποτελέσματος «%{outcome}» στην ομάδα «%{target}»;"
+    dont_import: "Δεν είναι δυνατή η εισαγωγή αυτής της ομάδας."
+    flash: 
+      importError: "Παρουσιάστηκε σφάλμα κατά την εισαγωγή. Παρακαλώ δοκιμάστε ξανά αργότερα."
+      importSuccess: "Η Εισαγωγή ήταν επιτυχής"
+    top_level: "%{context} Ανώτατο Επίπεδο"
+  outcomesFindDirectoryVew: 
+    account_standards: "Πρότυπα Λογαριασμού"
+    account_standards_description: "Αριστερά θα παρατηρήσετε τα πρότυπα που έχει δημιουργήσει για εσάς το ίδρυμά σας για να τα χρησιμοποιήσετε στα μαθήματά σας."
+    common_core: "Common Core Πρότυπα "
+    common_core_description: "Αριστερά είναι η οικεία δομή του φακέλου αποτελεσμάτων εκμάθησης για κάθε ομαδοποίηση Common Core State Standards. Αυτό θα σας επιτρέψει να περιλάβετε αβίαστα στο μάθημά σας οποιοδήποτε από τα Common Core Standards για τη βαθμολόγηση."
+    state_standards: "Πρότυπα της Πολιτείας"
+    state_standards_description: "Αριστερά θα δείτε έναν φάκελο για κάθε πολιτεία με τα ενημερωμένα state standards. Αυτό σας επιτρέπει να περιλάβετε εύκολα στο μάθημά σας state standards για την βαθμολόγηση."
+  outcomesSidebarView: 
+    titles: 
+      find_outcomes: "Εύρεση Αποτελεσμάτων"
   outcomes_d1b18d33: Αποτελέσματα
   overrides: 
     everyone: Όλοι/ες
@@ -10107,6 +10463,7 @@ el:
       updated_profile: "Οι ρυθμίσεις ενημερώθηκαν επιτυχώς"
     observees: 
       page_title: "Σπουδαστές υπό Παρατήρηση"
+    page_title: "Σπουδαστές υπό Παρατήρηση"
     please_select_an_option: "Παρακαλώ διαλέξτε μια επιλογή"
     profile: 
       approved_integrations: "Αυτές είναι οι τρίτες εφαρμογές στις οποίες έχετε δώσει εξουσιοδότηση πρόσβασης στην ιστοσελίδα του Canvas εκ μέρους σας:"
@@ -10380,6 +10737,8 @@ el:
   public_course_index_59270e80: "Ευρετήριο Δημόσιων Μαθημάτων"
   public_courses_title: "Δημόσια Μαθήματα"
   public_domain_112ed397: "Δημόσιος Τομέας"
+  public_message_students: 
+    send_message: "Αποστολή Μηνύματος"
   publish_5211dca3: Δημοσίευση
   publish_aa888e3c: "Δημοσίευση:"
   publish_btn_module: 
@@ -10397,6 +10756,7 @@ el:
   publishing_is_disabled_for_this_item_efa7803f: "Η δημοσίευση έχει απενεργοποιηθεί για αυτό το στοιχείο"
   publishing_item_name_is_disabled_8207a9e7: "Η δημοσίευση του %{item_name} έχει απενεργοποιηθεί"
   purple_7678a9fc: Μοβ
+  push_notification_a6532ff3: "Ειδοποίηση Push"
   qti_display: QTI
   qti_file_description: "αρχείο QTI .zip"
   qti_img_matching_question: "Η ερώτηση αντιστοίχισης που εισήχθη περιλαμβάνει εικόνες και στις δύο πλευρές και δεν υποστηρίζεται"
@@ -11271,6 +11631,7 @@ el:
         time_limit: 
           one: "1 Λεπτό"
           other: "%{count} Λεπτά"
+        unlimited: "Χωρίς Περιορισμούς"
         until: Μέχρι
         view_responses: "Προβολή Απαντήσεων"
       quiz_submission: 
@@ -11500,6 +11861,116 @@ el:
     ? "true"
     : Σωστό
   quizzes_7e598f57: Κουίζ
+  quizzes_index: 
+    headers: 
+      assignment_quizzes: "Κουίζ Εργασιών"
+      practice_quizzes: "Εξάσκηση στα Κουίζ"
+      surveys: Δημοσκοπήσεις
+    toggle_message: "εναλλαγή προβολής/εμφάνισης quiz"
+  quizzes_public: 
+    alerts: 
+      no_valid_combinations: "Το σύστημα δεν μπόρεσε να δημιουργήσει έγκυρους συνδυασμούς για τις παραμέτρους που έχουν οριστεί"
+    answer_comments: "Απάντηση σε σχόλια"
+    answer_text: "Απάντηση σε κείμενο"
+    at_the_bottom: "-- στο κάτω μέρος --"
+    before_quiz_item: "πριν %{name}"
+    buttons: 
+      add_selected_questions: "Προσθήκη Επιλεγμένων Ερωτήσεων"
+      adding_questions: "Γίνεται προσθήκη ερωτήσεων..."
+      create_group: "Δημιουργία Ομάδας"
+      create_question: "Δημιουργία Ερώτησης"
+      creating_group: "Γίνεται δημιουργία Ομάδας..."
+      generating: Δημιουργία...
+      generating_combinations_progress: "<mrk mid=\"2593\" mtype=\"seg\">Δημιουργία...</mrk> <mrk mid=\"2594\" mtype=\"seg\">(%{done}/%{total})</mrk>"
+      save: Αποθήκευση
+      save_and_publish: "Αποθήκευση και Δημοσίευση"
+      saved: Αποθηκεύτηκε!
+      saving: Αποθήκευση...
+      update_group: "Ενημέρωση Ομάδας"
+      update_question: "Ενημέρωση Ερώτησης"
+    choose_option: "[ Επιλογή ]"
+    confirms: 
+      delete_answer: "<mrk mid=\"7706\" mtype=\"seg\">Είστε σίγουροι;</mrk> <mrk mid=\"7707\" mtype=\"seg\">Η διαγραφή απαντήσεων από κάποια ερώτηση με υποβολές απενεργοποιεί την επιλογή αναβαθμολόγησης της ερώτησης αυτής.</mrk>"
+      delete_question: "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτή την ερώτηση;"
+      delete_quiz: "Είσαστε σίγουροι πως θέλετε να αφαιρέσετε αυτό το quiz;"
+      scrap_and_restart: "Απόρριψη αυτού του κουίζ και δημιουργία νέου από την αρχή;"
+    default_answer_comments: "Απάντηση αν ο σπουδαστής επιλέξει αυτή την απάντηση"
+    default_answer_comments_on_match: "Απάντηση αν ο σπουδαστής επιλέξει τη σωστή απάντηση"
+    default_comments_on_wrong_match: "Απάντηση αν ο σπουδαστής επιλέξει λάθος απάντηση"
+    default_quesiton_name: Ερώτημα
+    default_question_name: Ερώτημα
+    default_quiz_title: Κουίζ
+    default_response_to_essay: "Απάντηση για προβολή στον σπουδαστή αφού ο τελευταίος υποβάλει κάποια απάντηση"
+    default_response_to_file_upload: "Απάντηση για προβολή στον σπουδαστή αφού ο τελευταίος υποβάλει κάποια απάντηση"
+    enter_answer_variable_above: "[ Εισαγωγή Μεταβλητών των Απαντήσεων Παραπάνω ]"
+    errors: 
+      adding_questions_failed: "Η Προσθήκη Ερωτήσεων Απέτυχε, παρακαλώ δοκιμάστε ξανά"
+      creating_group_failed: "Η Δημιουργία Ομάδας Απέτυχε, Παρακαλώ Δοκιμάστε Ξανά"
+      field_is_required: "Αυτό το πεδίο είναι υποχρεωτικό"
+      invalid_show_correct_answers_range: "Η ημερομηνία απόκρυψης δεν μπορεί να είναι πριν την ημερομηνία εμφάνισης."
+      loading_banks_failed: "Αποτυχία φόρτωσης Τραπεζών, παρακαλώ δοκιμάστε ξανά"
+      loading_more_questions_failed: "Αποτυχία φόρτωσης περισσότερων ερωτήσεων"
+      loading_question_failed: "Η Φόρτωση Ερώτησης Απέτυχε..."
+      loading_questions_failed: "Αποτυχία φόρτωσης ερωτήσεων, παρακαλώ ξαναδοκιμάστε"
+      missing_access_code: "Πρέπει να εισαγάγετε κωδικό πρόσβασης"
+      missing_ip_filter: "Πρέπει να εισαγάγετε έγκυρη Διεύθυνση IP"
+      no_answer: "Παρακαλώ προσθέστε τουλάχιστον μια απάντηση"
+      no_correct_answer: "Παρακαλώ επιλέξτε μια σωστή απάντηση"
+      no_possible_solution: "Παρακαλώ δημιουργήστε τουλάχιστον μια πιθανή λύση"
+      quiz_score_not_a_number: "Το σκορ πρέπει να είναι ένας αριθμός μεταξύ του 0 και 2,000,000,000."
+      quiz_score_too_long: "Το σκορ πρέπει να΄ναι λιγότερο από 2,000,000,000."
+      quiz_score_too_short: "Το σκορ πρέπει να΄ναι μεγαλύτερο από 0."
+      retrieving_filters_failed: "Η Ανάκτηση Φίλτρων Απέτυχε"
+    ? "false"
+    : Λάθος
+    final_answer: "Τελική Απάντηση"
+    label: 
+      answer: 
+        text: "Κείμενο απάντησης, περιοχή rich text"
+      question: 
+        instructions: "Οδηγίες ερώτησης, περιοχή rich text"
+      quiz: 
+        instructions: "Οδηγίες κουίζ, περιοχή rich text"
+    labels: 
+      answer_text: "Απάντηση σε κείμενο"
+      comments_on_answer: "Σχόλια, αν ο σπουδαστής επιλέξει αυτή την απάντηση"
+      comments_on_question: "Σχόλια για την ερώτηση"
+      comments_on_wrong_match: "Σχόλια αν ο σπουδαστής επιλέξει λάθος απάντηση"
+      correct_answer: "Σωστή Απάντηση"
+      message_text: "Αποστολή Μηνύματος Κειμένου"
+      other_incorrect_matches: "Άλλες Λανθασμένες Επιλογές Απάντησης"
+      possible_answer: "Πιθανή Απάντηση"
+    loading_more_questions: "φόρτωση περισσότερων ερωτήσεων..."
+    loading_question: "Φόρτωση Ερώτησης..."
+    loading_question_banks: "Φόρτωση Τραπεζών Ερωτήσεων..."
+    loading_questions: "Φόρτωση Ερωτήσεων..."
+    more_questions: "περισσότερες ερωτήσεις"
+    no_filters_found: "Δεν βρέθηκαν φίλτρα"
+    question: 
+      positive_points: "Πρέπει να είναι μηδέν ή μεγαλύτερο"
+    question_colon: "Ερώτηση:"
+    question_limit_reached: |-
+        <mrk mid="2634" mtype="seg">Φτάσατε τον μέγιστο αριθμό επιτρεπόμενων ερωτήσεων για ένα κουίζ (%{count}/%{limit}).</mrk>
+        
+        <mrk mid="2635" mtype="seg">Ως πιθανή λύση, εξετάστε το ενδεχόμενο να κατανείμετε το περιεχόμενο σε περισσότερα κουίζ.</mrk>
+    quiz_attempts_length_error: "Οι προσπάθειες για το κουίζ περιορίζονται σε 3 ψηφία. Αν θέλετε να δώσετε στους σπουδαστές τη δυνατότητα απεριόριστων προσπαθειών, μην τσεκάρετε το κουτάκι Να Επιτρέπονται Πολλαπλές Προσπάθειες αριστερά"
+    quiz_attempts_nan_error: "Οι προσπάθειες για κάποιο κουίζ μπορούν να εκφράζονται μόνο σε αριθμούς"
+    quiz_short_answer_length_error: "Οι απαντήσεις, για την συμπλήρωση των κενών ερωτήσεων, δεν πρέπει να ξεπερνούν τους 80 χαρακτήρες "
+    retrieving_filters: "Ανάκτηση Φίλτρων..."
+    titles: 
+      add_questions_as_group: "Προσθήκη Ερωτήσεων ως Ομάδα"
+      click_to_enter_comments_on_answer: "Κάντε κλικ για να εισαγάγετε σχόλια για τον σπουδαστή αν επιλέξει αυτή την απάντηση"
+      click_to_enter_comments_on_wrong_match: "Κάντε κλικ για να εισαγάγετε σχόλια για τον σπουδαστή αν επιλέξει λάθος απάντηση"
+      click_to_set_as_correct: "Κάνετε κλικ για να ορίσετε αυτήν την απάντηση ως σωστή"
+      click_to_unset_as_correct: "Κάνετε κλικ για να αποεπιλέξετε αυτήν την απάντηση ως σωστή"
+      find_question_bank: "Βρείτε μια τράπεζα ερωτήσεων"
+      find_quiz_question: "Βρείτε μια Ερώτηση Quiz"
+      help_with_formulas: "Βοήθεια με εξισώσεις που αφορούν ερώτηση Quiz"
+      ip_address_filtering: "Φιλτράρισμα Διεύθυνσης IP"
+      set_as_correct: "Αυτή η ερώτηση έχει οριστεί ως σωστή"
+    top_level: "-- Ανώτατο επίπεδο --"
+    ? "true"
+    : Σωστό
   radio_button_option_1_a8ec51f9: "Κουμπί επιλογής - επιλογή 1"
   radio_button_option_2_31e50043: "Κουμπί επιλογής - επιλογή 2"
   range_56b2f310: Εύρος
@@ -11569,6 +12040,8 @@ el:
     sections_count: 
       one: "1 τομέας"
       other: "%{count} τομείς"
+  recipients_a69b5e55: "Παραλήπτες:"
+  record_7c9448b: Ηχογράφηση
   record_media_6637ff19: "Ηχογράφηση Αρχείου Πολυμέσων"
   record_with_microphone_only_e4ee07aa: "Ηχογράφηση Μόνο με Μικρόφωνο"
   record_with_webcam_af21e07c: "Ηχογράφηση με Ψηφιακή Κάμερα"
@@ -11580,6 +12053,7 @@ el:
   regenerate_epub_395c8e56: "Εκ νέου δημιουργία ePub"
   region_47e29025: "Περιοχή:"
   region_939f2a6c: Περιοχή
+  register_email_efc06d59: "Εγγραφή Ηλεκτρονικής Διεύθυνσης"
   registration: 
     get_started: Ξεκινήστε
     incomplete_registration_warning: 
@@ -11641,6 +12115,12 @@ el:
   remove_user_from_section_5556f465: "Αφαίρεση Χρήστη από τον Τομέα"
   rename_45608f54: Μετανόμασε
   rename_this_page_554f0583: "Μετονομασία Σελίδας"
+  renderDatepickerTime: 
+    datepicker: 
+      titles: 
+        am_pm: π.μ./μ.μ.
+        hour: ωρ
+        minute: λεπ
   replace_e61834a7: Αντικατάσταση
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Αντικαθιστά το τρέχον δέντρο φακέλων με νέο προσβάσιμο και με περισσότερες λειτουργίες δέντρο φακέλων."
   reply_389d6fb9: Απάντηση
@@ -11671,6 +12151,7 @@ el:
         enabled: "Ενεργοποιημένο (απαιτείται και η ενεργοποίηση του Μετατροπέα QTI)"
   restart_link_validation_b61286fc: "Επανέναρξη Επικύρωσης Συνδέσμου"
   restricted_access_d3e99a39: "Περιορισμένη Πρόσβαση"
+  result_8f971a09: Αποτέλεσμα
   resume_quiz_afeceb87: "Συνέχεια Κουίζ"
   resume_survey_58dce775: "Συνέχεια Δημοσκόπησης"
   retrieve_timeout: "δεν ήταν δυνατή η ανάκτηση των ρυθμίσεων, η απόκριση του διακομιστή υπερέβη το χρονικό της όριο"
@@ -11822,6 +12303,10 @@ el:
     observing_user: "<mrk mid=\"6722\" mtype=\"seg\">Παρατηρεί:</mrk> <mrk mid=\"6723\" mtype=\"seg\">%{user_name}</mrk>"
     unknown_error: "Κάτι δεν πήγε σωστά με την εύρεσή σας, παρακαλώ δοκιμάστε ξανά."
     updating: "Ενημέρωση σε εξέλιξη..."
+  roster_publicjs: 
+    filter_multiple_users_found: "βρέθηκαν %{userCount} χρήστες ."
+    filter_no_users_found: "Δεν βρέθηκαν χρήστες που να ανταποκρίνονται στην αναζήτησή σας."
+    filter_one_user_found: "Βρέθηκε ένας -1- χρήστης"
   rubric: 
     context_name_rubric: "%{course_name} Ρουμπρίκα"
     no_description: "Δεν υπάρχει περιγραφή"
@@ -12118,6 +12603,7 @@ el:
   select_input_3dbd73c1: "Επιλογή εισαγωγής καταχώρισης"
   select_itemname_f70db487: "Επιλογή %{itemName}"
   select_navigation_links_68e1e924: "Επιλογή Συνδέσμων Πλοήγησης"
+  select_one_8e0af564: "Επιλέξτε Ένα"
   select_students_for_review_6e004a12: "Επιλογή σπουδαστών για αναθεώρηση"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Επιλέξτε το αρχείο που θέλετε να συνδέσετε ή προσθέστε ένα αρχείο επιλέγοντας «Νέο Αρχείο»."
   select_video_file_35b61d4e: "Επιλογή Αρχείου Βίντεο"
@@ -12166,6 +12652,7 @@ el:
       not_available_yet: "Θα λάβετε σύντομα ένα email πριν ξεκινήσει το μάθημα."
   self_registration_156392d6: Αυτο-εγγραφή
   send_e3bd0ed0: Αποστολή
+  sent_f4ee89ec: Εστάλη!
   sent_fe0a1eb4: Απεστάλη
   sequence_footer: 
     next_module: "Επόμενη Ενότητα:"
@@ -12409,6 +12896,7 @@ el:
       sample_course_code: Μάθημα-101
       start_a_new_course: "Ξεκινήστε Νέο Μάθημα"
     new_nav_header: 
+      default_page_title: "Σύστημα Διαχείρισης Εκπαιδευτικού Περιεχομένου Canvas"
       links: 
         dashboard: Εργαλειοθήκη
         skip_to_content: "Μεταφορά προς το Περιεχόμενο"
@@ -12701,6 +13189,10 @@ el:
         images: Εικόνες
         links: Σύνδεσμοι
       uploading_file: "Γίνεται φόρτωση *αρχείου*..."
+  sharedCurveGradesDialog: 
+    errors: 
+      no_points_possible: "Δεν είναι δυνατή η αναπροσαρμογή χωρίς πιθανά μόρια"
+      none_to_update: "Δεν υπάρχουν δεδομένα προς ενημέρωση"
   shared_secret_892c88f2: "Διαμοιρασμένο Μυστικό"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "θα πρέπει να είναι αυταπόδεικτο, το ID στο Canvas του χρήστη που αναφέρει το σφάλμα"
   show_and_hide_courses_menu_9e09d1d0: "Εμφάνιση και απόκρυψη μενού μαθημάτων"
@@ -12774,6 +13266,7 @@ el:
   skipped_file_filename_due_to_error_94f0194: "Παραλήφθηκε το αρχείο %{filename} λόγω σφάλματος"
   skipping_unknown_file_type_cd1086ee: "Παράλειψη άγνωστου τύπου αρχείου"
   skype_18850ba7: Skype
+  sms_f0ddceeb: sms
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Μερικές συνεδρίες σε αυτή τη σελίδα είναι κρυφές λόγω σφαλμάτων κατά την ανάκτηση της κατάστασής τους"
   someone: Κάποιος
   someone_bbbc538b: Κάποιος
@@ -12784,11 +13277,51 @@ el:
   space_ec476863: Χώρος
   specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: "Καθορίστε τη διαφάνεια της εικόνας του φόντου του υδατογραφήματος."
   speed_grader: 
+    alerts: 
+      no_active_students: "Λυπούμαστε, είτε δεν υπάρχουν ενεργοί σπουδαστές σε αυτό το μάθημα είτε δεν έχουν βαθμολογηθεί από εσάς."
+      no_students_in_groups_back: "<mrk mid=\"508\" mtype=\"seg\">Λυπούμαστε, δεν είναι δυνατή η βαθμολόγηση των υποβολών για αυτή την εργασία στο Speedgrader γιατί δεν έχουν οριστεί χρήστες. </mrk> <mrk mid=\"509\" mtype=\"seg\">Παρακαλώ ορίστε χρήστες σε αυτό το σετ ομάδων και δοκιμάστε ξανά.</mrk> <mrk mid=\"510\" mtype=\"seg\">Κάντε κλικ στο «ΟΚ» για επιστροφή.</mrk>"
+      no_students_in_groups_close: "<mrk mid=\"511\" mtype=\"seg\">Λυπούμαστε, δεν είναι δυνατή η βαθμολόγηση των υποβολών για αυτή την εργασία στο Speedgrader γιατί δεν έχουν οριστεί χρήστες.</mrk> <mrk mid=\"512\" mtype=\"seg\">Παρακαλώ ορίστε χρήστες σε αυτό το σετ ομάδων και δοκιμάστε ξανά.</mrk> <mrk mid=\"513\" mtype=\"seg\">Κάντε κλικ στο «ΟΚ» για να κλείσετε αυτό το παράθυρο.</mrk>"
+      no_students_in_section: "Η εύρεση σπουδαστών σε αυτόν τον τομέα απέτυχε, επιστροφή στην προβολή όλων των τομέων."
+    allow_message: "Κάντε κλικ στο κουμπί «Να επιτρέπεται» για να ξεκινήσετε την ηχογράφηση."
+    begin_record_prompt: "Κάντε κλικ στο κουμπί «Ηχογράφηση» για να ξεκινήσετε."
+    buttons: 
+      dialog_buttons: Ακύρωση
+      saving_settings: "Αποθήκευση Ρυθμίσεων..."
+      submitting: "Γίνεται υποβολή..."
+    cancel_button: Ακύρωση
+    crocodoc_expiring: "<mrk mid=\"6896\" mtype=\"seg\">Η συνεδρία σας στο Crocodoc λήγει σύντομα.</mrk>  <mrk mid=\"6897\" mtype=\"seg\">Παρακαλώ επαναφορτώστε το παράθυρο για να αποφύγετε να χάσετε δουλειά που έχετε κάνει.</mrk>"
+    dialog_button: 
+      aria_record: "Κάντε κλικ για ηχογράφηση"
+      aria_record_reset: "Κάντε κλικ για ηχογράφηση"
+      aria_stop: "Πατήστε «Τερματισμός» για να τερματίσετε την ηχογράφηση."
+    edit_view_rubric: "Εμφάνιση Ρουμπρίκας Αξιολόγισης"
+    group: Όμαδα
+    mute_assignment: "Σίγαση Εργασίας"
+    no_submission_time: "δεν είναι ώρα για υποβολή"
+    nodetect_message: "<mrk mid=\"6291\" mtype=\"seg\">Δεν εντοπίστηκε ομιλία.</mrk> <mrk mid=\"6292\" mtype=\"seg\">Ίσως χρειάζεται να προσαρμόσετε τις ρυθμίσεις του μικροφώνου σας.</mrk>"
+    portion_graded: "%{x} / %{y} Βαθμολογήθηκε"
+    recording_expired_message: "<mrk mid=\"6293\" mtype=\"seg\">Η φωνητική αναγνώριση έχει λήξει λόγω αδράνειας.</mrk> <mrk mid=\"6294\" mtype=\"seg\">Κάντε κλικ στο κουμπί «Τερματισμός» για να χρησιμοποιήσετε το τρέχον κείμενο ως σχόλιο ή στην «Ακύρωση» για απόρριψη.</mrk>"
+    recording_message: Ηχογράφηση...
+    student: "Μαθητής "
     submissions_dropdown: 
       grade: "<mrk mid=\"32\" mtype=\"seg\">(βαθμός:</mrk> <mrk mid=\"33\" mtype=\"seg\">%{grade})</mrk>"
       see_all_quiz_attempts: "Δείτε όλες τις προσπάθειες για την λύση των quiz"
       submission_to_view: "Υποβολή για προβολή:"
       submitted: "<mrk mid=\"35\" mtype=\"seg\">*Υποβλήθηκαν:*</mrk> <mrk mid=\"36\" mtype=\"seg\">%{submittedAt}</mrk>"
+    submit: Υποβολή
+    titles: 
+      click_to_record: "Εφαρμογή Speech to Text"
+    unmute_assignment: "Επαναφορά Εργασίας από Σίγαση"
+    vericite: 
+      resubmitting: Επανυποβολή...
+  speed_grader_helpers: 
+    graded: βαθμολογήθηκε/αν
+    graded_then_resubmitted: "βαθμολογήθηκε, κατόπιν επανυποβλήθηκε (%{when})"
+    not_graded: "δεν έχει βαθμολογηθεί"
+    not_submitted: "δεν έχει υποβληθεί"
+    turnitin: 
+      resubmitting: Επανυποβολή...
+  speedgrader_d9a6fa90: Speedgrader
   speedgrader_de0affa6: SpeedGrader
   speedgrader_tm_44688790: SpeedGrader™
   spreadsheet_6d622119: "Λογιστικό φύλλο"
@@ -12851,6 +13384,7 @@ el:
   student_5da6bfd1: "Μαθητής "
   student_921b864d: σπουδαστής
   student_assignment_outcome_map_title: "Ικανότητες Σπουδαστή"
+  student_groups_863201c1: "Ομάδες Μαθητών"
   student_id: "Αναγνωριστικό -ID- Σπουδαστή/ιας"
   student_interactions_report_7717b685: "Αναφορά Αλληλεπιδράσεων Σπουδαστή"
   student_must_complete_one_of_these_requirements_6046eb3a: "Ο σπουδαστής θα πρέπει να ολοκληρώσει μία από αυτές τις απαιτήσεις"
@@ -12970,6 +13504,8 @@ el:
     finished_redirecting: "<mrk mid=\"3115\" mtype=\"seg\">Ολοκληρώθηκε!</mrk>  <mrk mid=\"3116\" mtype=\"seg\">Ανακατεύθυνση στο Αρχείο...</mrk>"
     gathering_files: "Συγκέντρωση Αρχείων (%{progress})..."
     gathering_files_progress: "Συγκέντρωση Αρχείων (%{progress})..."
+    originality_score: 
+      see_vericite_results: "Προβολή των αποτελεσμάτων του VeriCite"
     see_attached_files: "Δείτε τα επισυναπτόμενα αρχεία"
     show: 
       allowed_attempts: "Επιτρεπόμενες Προσπάθειες"
@@ -13038,12 +13574,32 @@ el:
   submissions_11e96106: Υποβολές
   submissions_base: 
     assignment_submitted: "Η εργασία υποβλήθηκε."
+    crumbs: 
+      assignments: Εργασίες
     errors: 
       no_report: "Δεν ήταν δυνατή η εύρεση αναφοράς για αυτό το στοιχείο υποβολής"
     errors_update_failed: "Η Ενημέρωση Απέτυχε"
   submit_a3cc6859: Υποβολή
   submit_a_feature_idea_2d4baa3d: "Υποβολή Δικής Σας Ιδέας"
+  submit_assignment: 
+    buttons: 
+      submit_assignment: "Υποβάλετε την εργασία"
+    file_retrieval_error: "Η Ανάκτηση του Αρχείου Απέτυχε"
+    getting_file: "Γίνεται Ανάκτηση του Αρχείου..."
+    invalid_file_retrieval: "Υπήρξε πρόβλημα με την ανάκτηση του αρχείου που στάλθηκε από αυτό το εργαλείο."
+    messages: 
+      not_submitted_yet: "Δεν έχετε ολοκληρώσει την υποβολή της εργασίας σας. Χρειάζεται ακόμη να πατήσετε «Υποβολή» για να ολοκληρώσετε την υποβολή σας. Θέλετε, παρόλα αυτά, να απομακρυνθείτε από αυτή τη σελίδα;"
+      now_overdue: "Αυτή η εργασία είναι τώρα εκπρόθεσμη. Τυχόν νέες υποβολές θα επισημανθούν ως εκπρόθεσμες. Θέλετε, παρόλα αυτά, να συνεχίσετε;"
+      overdue: "Αυτή η εργασία είναι εκπρόθεσμη. Θέλετε, παρόλα αυτά, να την υποβάλετε;"
+      record_before_submitting: "Εγγραφή Ήχου/Βίντεο Πριν από την Υποβολή"
+      submit_failed: "Η Υποβολή Απέτυχε, παρακαλώ δοκιμάστε ξανά"
+      submitting: "Γίνεται υποβολή..."
+    titles: 
+      uploading: "Γίνεται Μεταφόρτωση της Υποβολής"
   submit_assignment_5799b4e3: "Υποβολή Εργασίας"
+  submit_assignment_helper: 
+    messages: 
+      agree_to_pledge: "Πρέπει να συμφωνήσετε με τη δέσμευση υποβολής πριν υποβάλετε αυτή την εργασία."
   submit_media_file_f334c1ba: "Υποβολή Αρχείου Πολυμέσων"
   submitted_318fad53: Υποβλήθηκαν
   submitted_datetime_fa2e9287: "<mrk mid=\"1154\" mtype=\"seg\">Υποβλήθηκε:</mrk> <mrk mid=\"1155\" mtype=\"seg\">%{dateTime}</mrk>"
@@ -13449,6 +14005,7 @@ el:
     yakutsk: Yakutsk
     yerevan: Γερεβάν
     zagreb: Ζάγκρεμπ
+  timestamp_865fa6b7: Χρονοσήμανση
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Περιγράψτε την εικόνα για βελτίωση της προσβασιμότητας"
@@ -13472,6 +14029,7 @@ el:
   title_52b8638d: "Τίτλος:"
   title_is_off_6c823e2d: "%{title} είναι απενεργοποιημένο "
   title_is_on_2b72a9b7: "%{title} έχει ενεργοποιηθεί"
+  title_is_too_long_b192a46a: "Ο τίτλος είναι πολύ μεγάλος"
   title_separator: ":"
   titles: 
     aligned_items: "Ευθυγραμμισμένα Στοιχεία"
@@ -13606,6 +14164,7 @@ el:
   uploading_19e8a4e7: "Γίνεται φόρτωση..."
   uploading_submission_4c8d944b: "Γίνεται Μεταφόρτωση της Υποβολής"
   upper_limit_of_range_c454a8f2: "Υψηλότερο όριο εύρους"
+  url_22a5f3b8: URL
   url_cc9398ca: "URL:"
   url_preview_5d1f4a4e: "Προεπισκόπηση URL"
   url_type_3ece27d2: "Είδος URL"
@@ -13928,6 +14487,7 @@ el:
       terms_of_use: "Όροι Χρήσης"
     no_self_registration: "Δεν έχει ενεργοποιηθεί η αυτο-εγγραφή για αυτόν τον λογαριασμό"
     oauth_fail: "<mrk mid=\"3339\" mtype=\"seg\">Το Αίτημα OAuth απέτυχε.</mrk> <mrk mid=\"3340\" mtype=\"seg\">Η εύρεση έγκυρου αιτήματος δεν ήταν δυνατή</mrk>"
+    page_title: Βαθμοί
     scheduled_conference: 
       current_conference_text: "<mrk mid=\"3440\" mtype=\"seg\">Έχετε προσκληθεί να συμμετάσχετε στη %{conference}.</mrk> <mrk mid=\"3441\" mtype=\"seg\">Ξεκινάει στις %{starts_at}.</mrk>"
     service_not_enabled: "Αυτή η υπηρεσία δεν έχει ενεργοποιηθεί"
@@ -13969,6 +14529,7 @@ el:
       title: "Αναφορά Δραστηριότητας Καθηγητή"
     twitter_added: "Η πρόσβαση στο Twitter είναι εξουσιοδοτημένη!"
     twitter_fail_whale: "<mrk mid=\"3715\" mtype=\"seg\">Η εξουσιοδότηση του Twitter απέτυχε.</mrk> <mrk mid=\"3716\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά</mrk>"
+    user_atom_feed: "Τροφοδοσία Atom Χρήστη (Όλα τα Μαθήματα)"
     user_dashboard: 
       user_atom_feed: "Τροφοδοσία Atom Χρήστη (Όλα τα Μαθήματα)"
     user_merge_fail: "<mrk mid=\"3718\" mtype=\"seg\">Η συγχώνευση χρήστη απέτυχε.</mrk> <mrk mid=\"3719\" mtype=\"seg\">Παρακαλώ βεβαιωθείτε ότι έχετε την απαιτούμενη εξουσιοδότηση και δοκιμάστε ξανά.</mrk>"
@@ -14007,6 +14568,11 @@ el:
   view_user_groups_d2bfa855: "Δείτε τις ομάδες χρηστών"
   viewed_6b75c21e: "Έγινε Προβολή"
   viewing_folders_is_not_available_798a15e1: "Η προβολή φακέλων δεν είναι διαθέσιμη"
+  viewsContextModules: 
+    context_module: 
+      unpublish: "Απενεργοποιήστε τη Δημοσίευση"
+    context_modules: 
+      publish: Δημοσίευση
   visit_864b4060: Επίσκεψη
   visit_group_group_name_7a816081: "Επισκεφθείτε την ομάδα %{group_name}"
   waiting_for_attempted_login_6d00cb49: "Σε αναμονή για την προσπάθεια σύνδεσης"
@@ -14250,6 +14816,7 @@ el:
   you_may_not_see_all_comments_right_now_because_the_96cf2051: "Δεν μπορείτε να δείτε όλα τα σχόλια τώρα επειδή αυτή η εργασία βαθμολογείται αυτήν την στιγμή."
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "<mrk mid=\"4376\" mtype=\"seg\">Ίσως θέλετε να ορίσετε κάποιους βοηθούς διδασκαλίας για να σας βοηθήσουν με το μάθημα.</mrk>  <mrk mid=\"4377\" mtype=\"seg\">Οι βοηθοί διδασκαλίας μπορούν να βαθμολογήσουν τις υποβολές των μαθητών, να βοηθήσουν στον συντονισμό των συζητήσεων, ακόμη και να ενημερώσουν τις καταληκτικές ημερομηνίες και τις λεπτομέρειες κάποιας εργασίας αντί για εσάς.</mrk>"
   you_must_agree_to_the_terms_99723f97: "Πρέπει να συμφωνήσετε με αυτούς τους όρους"
+  you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Πρέπει να επισυνάψετε τουλάγιστον ένα αρχείο σε αυτήν την εργασία"
   you_must_have_a_student_or_section_selected_a99e45df: "Θα πρέπει να έχετε επιλέξει κάποιον σπουδαστή ή κάποια ενότητα"
   you_must_log_in_to_view_replies_9ccd4da0: "Πρέπει να είσαστε συνδεδεμένοι για να δείτε τις απαντήσεις"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Πρέπει να επιλέξετε ένα μάθημα απ' το οποίο θα γίνει αντιγραφή περιεχομένου"
