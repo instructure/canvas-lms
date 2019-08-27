@@ -86,15 +86,16 @@ export default function LinkOptionsTray(props) {
       <Flex direction="column" height="100vh">
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
+            <Flex.Item grow shrink>
+              <Heading as="h2">
+                {formatMessage('Link Options')}
+              </Heading>
+            </Flex.Item>
+
             <Flex.Item>
               <CloseButton placement="static" variant="icon" onClick={props.onRequestClose}>
                 {formatMessage('Close')}
               </CloseButton>
-            </Flex.Item>
-            <Flex.Item grow shrink>
-              <Heading as="h2" margin="none none none medium">
-                {formatMessage('Link Options')}
-              </Heading>
             </Flex.Item>
           </Flex>
         </Flex.Item>

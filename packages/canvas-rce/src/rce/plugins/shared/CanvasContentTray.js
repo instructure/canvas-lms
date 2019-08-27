@@ -179,14 +179,14 @@ export default function CanvasContentTray(props) {
           <Flex direction="column" display="block" height="100vh" overflowY="hidden">
             <Flex.Item padding="medium" shadow="above">
               <Flex margin="none none medium none">
+                <Flex.Item grow shrink>
+                  <Heading level="h2">{formatMessage('Add')}</Heading>
+                </Flex.Item>
+
                 <Flex.Item>
                   <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
                     {formatMessage('Close')}
                   </CloseButton>
-                </Flex.Item>
-
-                <Flex.Item grow shrink>
-                  <Heading level="h2" margin="none none none medium">{formatMessage('Add')}</Heading>
                 </Flex.Item>
               </Flex>
 
