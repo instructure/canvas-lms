@@ -946,13 +946,15 @@
     "@instructure/canvas-theme" "^6.9.0"
     "@instructure/ui-themeable" "^6.9.0"
 
-"@instructure/canvas-rce-old@4.1.4":
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/@instructure/canvas-rce-old/-/canvas-rce-old-4.1.4.tgz#5ebbedd948452433bc79f2b37d59ff891557fb70"
-  integrity sha512-myOvsW0/5rGOSoD4SQZhCt2nU/UliUSTkVX76C2UqwssFGDo1vPKY4s8SUW7Xl7MYveYHckUVL/qqvG2TmWhHQ==
+"@instructure/canvas-rce-old@4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@instructure/canvas-rce-old/-/canvas-rce-old-4.1.5.tgz#20482cd317e660f5e8a5c3e1a1c0fa313e4a707d"
+  integrity sha512-Q+NJm0tbq1FY8FEo/QR2plhhcj5jdgK/vTqmT2tfwdZIrzWTNwhS/dIgYaT6ALWMqDllMRUqzO031Mi3LYNe0A==
   dependencies:
     "@instructure/ui-a11y" "^5"
+    "@instructure/ui-alerts" "^5"
     "@instructure/ui-buttons" "^5"
+    "@instructure/ui-core" "^5"
     "@instructure/ui-elements" "^5"
     "@instructure/ui-forms" "^5"
     "@instructure/ui-icons" "^5"
@@ -963,6 +965,8 @@
     "@instructure/ui-toggle-details" "^5"
     aphrodite "^2"
     bloody-offset "0.0.0"
+    classnames "^2"
+    escape-html "^1"
     format-message "^6"
     format-message-generate-id "^6"
     isomorphic-fetch "2.2.1"
