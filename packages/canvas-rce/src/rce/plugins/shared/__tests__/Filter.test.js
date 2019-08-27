@@ -181,7 +181,7 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.contentSubtype).toEqual('documents')
     })
 
-    it.skip('sets content subtype to "media" when "Media" is selected', () => {
+    it('sets content subtype to "media" when "Media" is selected', () => {
       selectContentSubtype('Media')
       expect(currentFilterSettings.contentSubtype).toEqual('media')
     })
@@ -192,13 +192,15 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.contentSubtype).toEqual('all')
     })
 
-    it.skip('does not change content type when changed', () => {
+    it('does not change content type when changed', () => {
+      expect(currentFilterSettings.contentType).toEqual('user_files')
       selectContentSubtype('Media')
-      expect(currentFilterSettings.contentType).toEqual('files')
+      expect(currentFilterSettings.contentType).toEqual('user_files')
     })
 
-    it.skip('does not change sort value when changed', () => {
+    it('does not change sort value when changed', () => {
       selectSortBy('Date Published')
+      expect(currentFilterSettings.sortValue).toEqual('date_published')
       selectContentSubtype('Media')
       expect(currentFilterSettings.sortValue).toEqual('date_published')
     })

@@ -483,6 +483,7 @@ describe "RCE next tests" do
     end
 
     it "should open upload media modal when clicking upload option" do
+      skip('Unskip after adding upload option back COREFE-268')
       visit_front_page_edit(@course)
 
       click_more_toolbar_button

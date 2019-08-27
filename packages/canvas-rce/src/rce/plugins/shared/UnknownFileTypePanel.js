@@ -17,11 +17,14 @@
  */
 
 import React from 'react'
+import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
+import formatMessage from "../../../format-message";
 
-/**
- * TEMPORARY
- */
-
-export default function FakeComponent() {
-  return <div>This is fake and is only for demo now</div>
+export default function UnknownFileTypePanel() {
+  return (
+    <View as="div" margin="medium">
+      <Text color="error">{formatMessage("Something went wrong and I don't know what to show you.")}</Text>
+    </View>
+  )
 }
