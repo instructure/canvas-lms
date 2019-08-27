@@ -48,6 +48,13 @@ if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN)
   setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console'})
 }
 
+if (process.env.NODE_ENV !== 'production') {
+  const {
+    filterUselessConsoleMessages
+  } = require('@instructure/js-utils/lib/filterUselessConsoleMessages')
+  filterUselessConsoleMessages(console)
+}
+
 // setup the inst-ui default theme
 if (ENV.use_high_contrast) {
   canvasHighContrastTheme.use()

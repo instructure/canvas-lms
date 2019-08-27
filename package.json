@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@instructure/canvas-rce-old": "4.1.4",
+    "@instructure/js-utils": ">=1",
     "@instructure/media-capture": "^5.54.0",
     "@instructure/react-crop": "^5.0.1",
     "@instructure/ui-alerts": "^5",
