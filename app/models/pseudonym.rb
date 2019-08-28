@@ -73,6 +73,11 @@ class Pseudonym < ActiveRecord::Base
   acts_as_authentic do |config|
     config.login_field :unique_id
     config.perishable_token_valid_for = 30.minutes
+    # if changing this to a new provider, add the _new_ provider to the transition
+    # list for a full deploy first before moving it to primary, so that
+    # a) there won't be any possibility of split brain where old-still-running code
+    #   can't understand the new hash in the db from new code, and
+    # b) if we have to roll back to old code, users won't be locked out
     config.crypto_provider = ScryptProvider.new("4000$8$1$")
     config.transition_from_crypto_providers = [Authlogic::CryptoProviders::Sha512]
   end
