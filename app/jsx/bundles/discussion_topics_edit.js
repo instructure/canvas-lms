@@ -27,6 +27,8 @@ import SectionCollection from 'compiled/collections/SectionCollection'
 import splitAssetString from 'compiled/str/splitAssetString'
 import LockManager from 'jsx/blueprint_courses/apps/LockManager'
 import 'grading_standards'
+import ExcludeStudents from 'compiled/views/assignments/ExcludeStudents'
+import ExcludeStudentList from 'compiled/models/ExcludeStudentList'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'discussion_topic', page: 'edit' })
@@ -40,6 +42,7 @@ const assignment = model.get('assignment')
 
 const sectionList = new SectionCollection(ENV.SECTION_LIST)
 const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sectionList, assignment)
+const excludeStudentList = new ExcludeStudentList([])
 
 const [contextType] = splitAssetString(ENV.context_asset_string)
 const view = new EditView({
@@ -47,6 +50,11 @@ const view = new EditView({
   permissions: ENV.DISCUSSION_TOPIC.PERMISSIONS,
   contextType,
   views: {
+    'js-exclude-students': new ExcludeStudents(
+      {
+        model: excludeStudentList
+      }
+    ),
     'js-assignment-overrides': new OverrideView({
       model: dueDateList,
       views: {},

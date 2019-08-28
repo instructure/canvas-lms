@@ -15,12 +15,12 @@ class StudentExemptions extends React.Component {
 
     lmsData(props){
       return {
-        input: '',
-        loading: false,
-        options: [],
-        students: props['students'],
-        exemptions: props['exemptions']
-      }
+          input: '',
+          loading: false,
+          options: [],
+          students: props['students'],
+          exemptions: props['exemptions']
+        }
     }
 
     // Use this to set test state if you aren't connecting to
@@ -30,14 +30,14 @@ class StudentExemptions extends React.Component {
         input: '',
         loading: false,
         options: [],
-        students: 
+        students:
           [
             { name: 'chris', id: 1},
             { name: 'conrad', id: 4},
             { name: 'joe', id: 2},
             { name: 'pete', id: 3}
           ],
-        exemptions: 
+        exemptions:
           [
             { name: 'pete', id: 3 }
           ]
@@ -68,7 +68,7 @@ class StudentExemptions extends React.Component {
 
     findStudentName(userInput){
       var filter = new RegExp('^'+userInput, 'i');
-      return this.names().find((name) => 
+      return this.names().find((name) =>
         filter.test(name)
       )
     }
@@ -76,7 +76,7 @@ class StudentExemptions extends React.Component {
     filterTags(userInput) {
       if (userInput === '') return this.setState({options: []});
       this.setState({
-        options: this.names().filter((name) => 
+        options: this.names().filter((name) =>
           new RegExp('^'+userInput, 'i').test(name)
         )
       })
@@ -94,7 +94,7 @@ class StudentExemptions extends React.Component {
     }
 
     handleTokenRemove(token) {
-      this.setState({exemptions: this.state.exemptions.filter((student) =>  
+      this.setState({exemptions: this.state.exemptions.filter((student) =>
         student.id !== token.id
       )});
     }
@@ -140,7 +140,7 @@ class StudentExemptions extends React.Component {
         padding: '15px'
       })
     }
-    
+
     render() {
         this.props.syncWithBackbone(this.state.exemptions)
         if(!this.state.exemptions){return <ul></ul>}
