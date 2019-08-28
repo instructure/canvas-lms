@@ -17,7 +17,9 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import $ from 'jquery'
+import axios from 'axios'
+import {render, fireEvent, waitForElement} from '@testing-library/react'
 import MessageStudentsWhoDialog from '../MessageStudentsWhoDialog'
 import {mockAssignment, mockUser, mockSubmission} from '../../test-utils'
 import {
@@ -30,8 +32,8 @@ function renderMessageStudentsWhoDialog(assignment = mockAssignment(), propsOver
     assignment,
     open: true,
     busy: false,
-    onSend: () => {},
-    onClose: () => {},
+    handleSend: () => 'Your Messages were sent!',
+    handleClose: () => 'The dialog is gone!',
     ...propsOverride
   }
   return render(<MessageStudentsWhoDialog {...props} />)
@@ -624,7 +626,24 @@ describe('MessageStudentsWhoDialog', () => {
   })
 
   describe('sending messages', () => {
-    it('displays success and closes the dialog when the api call succeeds', async () => {})
+    jest.mock('axios')
+
+    beforeAll(() => {
+      window.URL.createObjectURL = jest.fn()
+      $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+    })
+
+    it('displays loading state when message is being sent', async () => {
+      const postSpy = jest.spyOn(axios, 'post')
+      const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
+      const bodyInput = getByTestId('body-input')
+      fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
+      const sendButton = getByText('Send').closest('button')
+      fireEvent.click(sendButton)
+      expect(await waitForElement(() => getByText('Sending messages'))).toBeInTheDocument()
+      expect(postSpy).toHaveBeenCalled()
+    })
+
     it('displays an error and closes the dialog when the api call fails', async () => {})
   })
 })
