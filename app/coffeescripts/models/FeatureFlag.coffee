@@ -51,7 +51,7 @@ export default class FeatureFlag extends Backbone.Model
     @flag().hidden
 
   isLocked: ->
-    @flag().locked
+    ENV.PERMISSIONS?.manage_feature_flags == false || @flag().locked
 
   isSiteAdmin: ->
     !!ENV.ACCOUNT?.site_admin

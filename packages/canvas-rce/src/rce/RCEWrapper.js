@@ -91,27 +91,11 @@ function focusFirstMenuButton(el) {
   $firstMenu && $firstMenu.focus()
 }
 
-function initKeyboardShortcuts(el, editor) {
-  // hide the menubar
-  showMenubar(el, false)
-
-  // when typed w/in the editor's edit area
-  editor.addShortcut('Alt+F9', '', () => {
-    showMenubar(el, true)
-  })
-  // when typed somewhere else w/in RCEWrapper
-  el.addEventListener('keyup', e => {
-    if (e.altKey && e.code === 'F9') {
-      showMenubar(el, true)
-    }
-  })
-
-  // toolbar help
-  el.addEventListener('keyup', e => {
-    if (e.altKey && e.code === 'F10') {
-      focusToolbar(el)
-    }
-  })
+function focusContextToolbar() {
+  const $focusable = document.querySelector('.tox-tinymce-aux .tox-toolbar button')
+  if ($focusable) {
+    $focusable.focus()
+  }
 }
 
 @themeable(theme, styles)
@@ -153,6 +137,7 @@ class RCEWrapper extends React.Component {
     this.indicator = false;
 
     this._elementRef = null;
+    this._showOnFocusButton = null;
 
     injectTinySkin()
 
@@ -294,14 +279,14 @@ class RCEWrapper extends React.Component {
     return editors.filter(ed => ed.id === this.props.textareaId)[0];
   }
 
-  onTinyMCEInstance(command) {
-    if (command == "mceRemoveEditor") {
-      let editor = this.mceInstance();
-      if (editor) {
+  onTinyMCEInstance(command, args) {
+    const editor = this.mceInstance();
+    if (editor) {
+      if (command == "mceRemoveEditor") {
         editor.execCommand("mceNewDocument");
       } // makes sure content can't persist past removal
+      editor.execCommand(command, false, this.props.textareaId, args);
     }
-    this.props.tinymce.execCommand(command, false, this.props.textareaId);
   }
 
   destroy() {
@@ -401,9 +386,10 @@ class RCEWrapper extends React.Component {
           return
         }
 
-        if (document.activeElement.getAttribute('class').includes('tox-')) {
+        const activeClass = document.activeElement && document.activeElement.getAttribute('class')
+        if (activeClass && activeClass.includes('tox-')) {
           // if a toolbar button has focus, then the user clicks on the "more" button
-          // focus jumps to the body, then eventually to the popped pup toolbar. This
+          // focus jumps to the body, then eventually to the popped up toolbar. This
           // catches that case, but could also fail to blur an rce if the user clicked from
           // one rce on the page to another.  I think this is the lesser of the 2 evils
           return
@@ -467,9 +453,46 @@ class RCEWrapper extends React.Component {
     return this[methodName](...args);
   }
 
+  initKeyboardShortcuts(el, editor) {
+    // hide the menubar
+    showMenubar(el, false)
+
+    // when typed w/in the editor's edit area
+    editor.addShortcut('Alt+F9', '', () => {
+      showMenubar(el, true)
+    })
+    // when typed somewhere else w/in RCEWrapper
+    el.addEventListener('keydown', e => {
+      if (e.altKey && e.code === 'F9') {
+        event.preventDefault()
+        event.stopPropagation()
+        showMenubar(el, true)
+      }
+    })
+
+    // toolbar help
+    el.addEventListener('keydown', e => {
+      if (e.altKey && e.code === 'F10') {
+        event.preventDefault()
+        event.stopPropagation()
+        focusToolbar(el)
+      }
+    })
+
+    editor.on('keydown', this.handleShortcutKeyShortcut)
+    editor.on('keydown', event => {
+      // Alt+F7 is used to "enter into" the context's popover.
+      if (event.keyCode === 118 && event.altKey) {
+        event.preventDefault()
+        event.stopPropagation()
+        focusContextToolbar()
+      }
+    })
+  }
+
   onInit(_e, editor) {
     editor.rceWrapper = this;
-    initKeyboardShortcuts(this._elementRef, editor)
+    this.initKeyboardShortcuts(this._elementRef, editor)
     if(document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
@@ -481,8 +504,6 @@ class RCEWrapper extends React.Component {
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
-    editor.on('KeyDown', this.handleShortcutKeyShortcut) // keyUp puts the char in the editor
-
     editor.on('Change', this.doAutoResize)
   }
 
@@ -516,19 +537,23 @@ class RCEWrapper extends React.Component {
   }
 
   onResize = (_e, coordinates) => {
-    const container = this.mceInstance().getContainer()
-    const currentContainerHeight = Number.parseInt(container.style.height, 10)
-    if (isNaN(currentContainerHeight)) return
-    const modifiedHeight = currentContainerHeight + coordinates.deltaY
-    const newHeight = `${modifiedHeight}px`
-    container.style.height = newHeight
-    this.getTextarea().style.height = newHeight
-    // play nice and send the same event that the silver theme would send
-    this.mceInstance().fire('ResizeEditor')
+    const editor = this.mceInstance()
+    if (editor) {
+      const container = editor.getContainer()
+      if (!container) return
+      const currentContainerHeight = Number.parseInt(container.style.height, 10)
+      if (isNaN(currentContainerHeight)) return
+      const modifiedHeight = currentContainerHeight + coordinates.deltaY
+      const newHeight = `${modifiedHeight}px`
+      container.style.height = newHeight
+      this.getTextarea().style.height = newHeight
+      // play nice and send the same event that the silver theme would send
+      editor.fire('ResizeEditor')
+    }
   }
 
   onA11yChecker = () => {
-    this.onTinyMCEInstance('openAccessibilityChecker', {'data-canvas-component': true})
+    this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
   }
 
   handleShortcutKeyShortcut = (event) => {
@@ -548,8 +573,10 @@ class RCEWrapper extends React.Component {
   }
 
   KBShortcutModalClosed = () => {
-    if(Bridge.activeEditor() === this) {
-      Bridge.focusActiveEditor(false)
+    // when the modal is opened from the showOnFocus button, focus doesn't
+    // get automatically returned to the button like it should.
+    if (this._showOnFocusButton && document.activeElement === document.body) {
+      this._showOnFocusButton.focus()
     }
   }
 
@@ -686,6 +713,7 @@ class RCEWrapper extends React.Component {
             icon: IconKeyboardShortcutsLine,
             margin: 'xx-small'
           }}
+          ref={el => this._showOnFocusButton = el}
         >
           {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
         </ShowOnFocusButton>

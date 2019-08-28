@@ -112,7 +112,7 @@ export default class GradebookKeyboardNav
 
     gotoAssignment: =>
       return unless @currentColumnType() == 'assignment'
-      url = @getHeaderFromActiveCell().querySelector('.assignment-name a').href
+      url = @getHeaderFromActiveCell().querySelector('a .assignment-name').closest('a').href
       window.location = url
 
     showSubmissionTray: =>

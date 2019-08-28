@@ -35,13 +35,6 @@ describe DiscussionEntry do
       entry
       expect(discussion_topic_participant.reload.subscribed).to be_truthy
     end
-
-    it "should not subscribe the author on create outside of the #subscribe_author method" do
-      discussion_topic_participant = topic.discussion_topic_participants.create!(user: @teacher, subscribed: false)
-      allow_any_instance_of(DiscussionEntry).to receive_messages(subscribe_author: true)
-      entry
-      expect(discussion_topic_participant.reload.subscribed).to be_falsey
-    end
   end
 
   it "should not be marked as deleted when parent is deleted" do

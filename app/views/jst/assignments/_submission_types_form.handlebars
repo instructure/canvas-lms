@@ -6,22 +6,26 @@
   </div>
   <div class="form-column-right">
     <div class="border border-trbl border-round">
-
       {{!-- Submission type accepted --}}
       <select id="assignment_submission_type"
         name="submission_type"
         aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
-        <option value="none" {{selectedIf submissionType "none"}}>
+        {{#if defaultToolName}}
+          <option value="default_external_tool" {{selectedIf isDefaultTool}}>
+            {{defaultToolName}}
+          </option>
+        {{/if}}
+        <option value="none" {{selectedIf defaultToNone}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
         </option>
-        <option value="online" {{selectedIf submissionType "online"}}>
+        <option value="online" {{selectedIf defaultToOnline}}>
           {{#t "submission_types.online"}}Online{{/t}}
         </option>
-        <option value="on_paper" {{selectedIf submissionType "on_paper"}}>
+        <option value="on_paper" {{selectedIf defaultToOnPaper}}>
           {{#t "submission_types.on_paper"}}On Paper{{/t}}
         </option>
-        <option value="external_tool" {{selectedIf submissionType "external_tool"}}>
+        <option value="external_tool" {{selectedIf isNonDefaultExternalTool}}>
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
       </select>
@@ -159,6 +163,10 @@
             </a>
           </div>
         </div>
+      </div>
+
+      {{!-- Default external tool configuration --}}
+      <div id="default_external_tool_container" data-component="DefaultToolForm" style="{{hiddenUnless isExternalTool}}">
       </div>
 
       {{!-- External tool submissions --}}

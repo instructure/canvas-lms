@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import './jquery.google-analytics'
+import {trackEvent} from 'jquery.google-analytics'
 import 'compiled/jquery/ModuleSequenceFooter'
 import MarkAsDone from 'compiled/util/markAsDone'
 import ToolLaunchResizer from './lti/tool_launch_resizer'
@@ -86,7 +86,7 @@ switch($toolForm.data('tool-launch-type')){
 var toolName = $toolForm.data('tool-id') || "unknown";
 var toolPath = $toolForm.data('tool-path');
 var messageType = $toolForm.data('message-type') || 'tool_launch';
-$.trackEvent(messageType, toolName, toolPath);
+trackEvent(messageType, toolName, toolPath);
 
 //Iframe resize handler
 var $tool_content_wrapper;

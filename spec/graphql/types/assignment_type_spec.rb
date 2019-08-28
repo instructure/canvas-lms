@@ -364,6 +364,26 @@ describe Types::AssignmentType do
       expect(overridden_assignment_type.resolve("lockAt", current_user: student)).to eq @overridden_lock_at.iso8601
       expect(overridden_assignment_type.resolve("unlockAt", current_user: student)).to eq @overridden_unlock_at.iso8601
     end
+
+    it "allows opting out of overrides" do
+      # need to make the assignment due sooner so we can tell that the teacher
+      # is getting the un-overridden date (not the most lenient date)
+      @overridden_assignment.update(due_at: 1.hour.from_now)
+      expect(
+        overridden_assignment_type.resolve("dueAt(applyOverrides: false)", current_user: @teacher)
+      ).to eq @overridden_assignment.without_overrides.due_at.iso8601
+
+      # students still get overrides
+      expect(
+        overridden_assignment_type.resolve("dueAt(applyOverrides: false)", current_user: @student)
+      ).to eq @overridden_due_at.iso8601
+      expect(
+        overridden_assignment_type.resolve("lockAt(applyOverrides: false)", current_user: @student)
+      ).to eq @overridden_lock_at.iso8601
+      expect(
+        overridden_assignment_type.resolve("unlockAt(applyOverrides: false)", current_user: @student)
+      ).to eq @overridden_unlock_at.iso8601
+    end
   end
 
   describe Types::AssignmentOverrideType do

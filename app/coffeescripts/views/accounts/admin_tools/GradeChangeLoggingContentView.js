@@ -25,58 +25,52 @@ import GradeChangeLoggingItemView from './GradeChangeLoggingItemView'
 import GradeChangeLoggingCollection from '../../../collections/GradeChangeLoggingCollection'
 import template from 'jst/accounts/admin_tools/gradeChangeLoggingContent'
 import gradeChangeLoggingResultsTemplate from 'jst/accounts/admin_tools/gradeChangeLoggingResults'
+import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
-export default class GradeChangeLoggingContentView extends Backbone.View {
-  static initClass() {
-    this.mixin(ValidatedMixin)
+_inherits(GradeChangeLoggingContentView, Backbone.View)
 
-    this.child('resultsView', '#gradeChangeLoggingSearchResults')
-    this.child('dateRangeSearch', '#gradeChangeDateRangeSearch')
-    this.child('graderSearch', '#gradeChangeGraderSearch')
-    this.child('studentSearch', '#gradeChangeStudentSearch')
+export default function GradeChangeLoggingContentView(options) {
+  this.fetch = this.fetch.bind(this)
+  this.onFail = this.onFail.bind(this)
+  this.options = options
+  this.collection = new GradeChangeLoggingCollection()
+  Backbone.View.apply(this,arguments)
+  this.dateRangeSearch = new DateRangeSearchView({
+    name: 'gradeChangeLogging'
+  })
+  this.graderSearch = new AutocompleteView({
+    collection: this.options.users,
+    fieldName: 'grader_id',
+    placeholder: 'Grader'
+  })
+  this.studentSearch = new AutocompleteView({
+    collection: this.options.users,
+    fieldName: 'student_id',
+    placeholder: 'Student'
+  })
+  this.resultsView = new PaginatedCollectionView({
+    template: gradeChangeLoggingResultsTemplate,
+    itemView: GradeChangeLoggingItemView,
+    collection: this.collection
+  })
+}
 
-    this.prototype.els = {
-      '#gradeChangeLoggingSearch': '$gradeChangeLogginSearch',
-      '#gradeChangeLoggingForm': '$form'
-    }
+GradeChangeLoggingContentView.mixin(ValidatedMixin)
 
-    this.prototype.template = template
+GradeChangeLoggingContentView.child('resultsView', '#gradeChangeLoggingSearchResults')
+GradeChangeLoggingContentView.child('dateRangeSearch', '#gradeChangeDateRangeSearch')
+GradeChangeLoggingContentView.child('graderSearch', '#gradeChangeGraderSearch')
+GradeChangeLoggingContentView.child('studentSearch', '#gradeChangeStudentSearch')
 
-    this.prototype.events = {'submit #gradeChangeLoggingForm': 'onSubmit'}
-  }
+Object.assign(GradeChangeLoggingContentView.prototype, {
+  els: {
+    '#gradeChangeLoggingSearch': '$gradeChangeLogginSearch',
+    '#gradeChangeLoggingForm': '$form'
+  },
 
-  constructor(options) {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/_this\d*/)[0];
-      eval(`${thisName} = this;`);
-    }
-    this.fetch = this.fetch.bind(this)
-    this.onFail = this.onFail.bind(this)
-    this.options = options
-    this.collection = new GradeChangeLoggingCollection()
-    super(...arguments)
-    this.dateRangeSearch = new DateRangeSearchView({
-      name: 'gradeChangeLogging'
-    })
-    this.graderSearch = new AutocompleteView({
-      collection: this.options.users,
-      fieldName: 'grader_id',
-      placeholder: 'Grader'
-    })
-    this.studentSearch = new AutocompleteView({
-      collection: this.options.users,
-      fieldName: 'student_id',
-      placeholder: 'Student'
-    })
-    this.resultsView = new PaginatedCollectionView({
-      template: gradeChangeLoggingResultsTemplate,
-      itemView: GradeChangeLoggingItemView,
-      collection: this.collection
-    })
-  }
+  template,
+
+  events: {'submit #gradeChangeLoggingForm': 'onSubmit'},
 
   onSubmit(event) {
     event.preventDefault()
@@ -84,7 +78,7 @@ export default class GradeChangeLoggingContentView extends Backbone.View {
     if (this.validate(json)) {
       return this.updateCollection(json)
     }
-  }
+  },
 
   updateCollection(json) {
     // Update the params (which fetches the collection)
@@ -121,7 +115,7 @@ export default class GradeChangeLoggingContentView extends Backbone.View {
     }
 
     return this.collection.setParams(params)
-  }
+  },
 
   validate(json) {
     if (!json) {
@@ -140,15 +134,15 @@ export default class GradeChangeLoggingContentView extends Backbone.View {
     }
     this.showErrors(errors)
     return $.isEmptyObject(errors)
-  }
+  },
 
   attach() {
     return this.collection.on('setParams', this.fetch)
-  }
+  },
 
   fetch() {
     return this.collection.fetch({error: this.onFail})
-  }
+  },
 
   onFail(collection, xhr) {
     // Received a 404, empty the collection and don't let the paginated
@@ -183,5 +177,4 @@ export default class GradeChangeLoggingContentView extends Backbone.View {
       if (!$.isEmptyObject(errors)) return this.showErrors(errors)
     }
   }
-}
-GradeChangeLoggingContentView.initClass()
+})

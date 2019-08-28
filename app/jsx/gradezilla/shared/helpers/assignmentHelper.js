@@ -93,6 +93,10 @@ const assignmentHelper = {
       return diffOfAssignmentPosition
     }
     return diffOfAssignmentGroupPosition
+  },
+
+  gradeByGroup(assignment) {
+    return !!assignment.group_category_id && !assignment.grade_group_students_individually
   }
 }
 

@@ -46,6 +46,30 @@ describe "RCE next tests" do
       end
     end
 
+    def create_wiki_page_with_content(page_title)
+      @root_folder = Folder.root_folders(@course).first
+      content = <<-HTML
+      <p>
+        <table style="border-collapse: collapse; width: 100%;" border="1">
+          <tbody>
+          <tr>
+          <td style="width: 50%;">cell 1</td>
+          <td style="width: 50%;">cell 2</td>
+          </tr>
+          </tbody>
+        </table>
+      </p><p>
+        <a class="instructure_file_link" title="Link"
+        href="/files/719/download"
+        target="_blank" rel="noopener noreferrer">a.html</a>
+      </p>
+      HTML
+      @course.wiki_pages.create!(
+        title: page_title,
+        body: content
+      )
+    end
+
     it "should click on sidebar wiki page to create link in body", ignore_js_errors: true do
       title = "test_page"
       unpublished = false
@@ -136,7 +160,7 @@ describe "RCE next tests" do
       end
     end
 
-    it "should click on sidebar modules page to create link in body" do
+    it "should click on sidebar modules page to create link in body", ignore_js_errors: true do
       title = "Module-Title"
       @module = @course.context_modules.create!(:name => title)
 
@@ -495,6 +519,87 @@ describe "RCE next tests" do
       driver.action.drag_and_drop(source, dest).perform
 
       expect(f('body')).not_to contain_css('[data-testid="CanvasContentTray"]')
+    end
+
+    describe "keyboard shortcuts" do
+      it "should open keyboard shortcut modal with alt-f8" do
+        visit_front_page_edit(@course)
+        rce = f('.tox-edit-area__iframe')
+        rce.send_keys [:alt, :f8]
+
+        expect(keyboard_shortcut_modal).to be_displayed
+      end
+
+      it "should focus the menubar with alt-f9" do
+        visit_front_page_edit(@course)
+        rce = f('.tox-edit-area__iframe')
+        expect(f('.tox-menubar')).not_to be_displayed
+        rce.send_keys [:alt, :f9]
+
+        expect(f('.tox-menubar')).to be_displayed
+        expect(fj('.tox-menubar button:contains("File")')).to eq(driver.switch_to.active_element)
+      end
+
+      it "should focus the toolbar with alt-f10" do
+        visit_front_page_edit(@course)
+        rce = f('.tox-edit-area__iframe')
+        rce.send_keys [:alt, :f10]
+
+        expect(fj('.tox-toolbar__primary button:contains("12pt")')).to eq(driver.switch_to.active_element)
+      end
+
+      it "should focus table context toolbar with alt-f7" do
+        page_title = "Page-with-table"
+        create_wiki_page_with_content(page_title)
+
+        visit_existing_wiki_edit(@course, page_title)
+        driver.switch_to.frame('wiki_page_body_ifr')
+        f('table td').click # put the cursor in the table
+        f('body').send_keys [:alt, :f7]
+
+        driver.switch_to.default_content
+        expect(f('.tox-pop__dialog button[title="Table properties"]')).to eq(driver.switch_to.active_element)
+      end
+
+      it "should focus course file link context toolbar with alt-f7" do
+        page_title = "Page-with-link"
+        create_wiki_page_with_content(page_title)
+
+        visit_existing_wiki_edit(@course, page_title)
+        driver.switch_to.frame('wiki_page_body_ifr')
+        f('a').click # put the cursor in the table
+        f('body').send_keys [:alt, :f7]
+
+        driver.switch_to.default_content
+        expect(f('.tox-pop__dialog button[title="Show link options"]')).to eq(driver.switch_to.active_element)
+      end
+
+      it "should display lti icon with a tool enabled for the course" do
+        # set up the lti tool
+        Account.default.enable_feature! :lor_for_account
+        @tool = Account.default.context_external_tools.new({
+           :name => "Commons",
+           :domain => "canvaslms.com",
+           :consumer_key => '12345',
+           :shared_secret => 'secret'
+        })
+        @tool.set_extension_setting(:editor_button, {
+           :message_type => "ContentItemSelectionRequest",
+           :url => "http://www.example.com",
+           :icon_url => "https://lor.instructure.com/img/icon_commons.png",
+           :text => "Commons Favorites",
+           :enabled => "true",
+           :use_tray => "true"
+        })
+        @tool.save!
+
+        page_title = "Page1"
+        create_wiki_page_with_embedded_image(page_title)
+
+        visit_existing_wiki_edit(@course, page_title)
+
+        expect(lti_tools_button).to be_displayed
+      end
     end
   end
 end

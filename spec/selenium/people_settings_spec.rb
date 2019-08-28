@@ -37,8 +37,8 @@ describe "course people" do
     add_button.click
     wait_for_ajaximations
 
-    click_option("#peoplesearch_select_role", type)
-    click_option("#peoplesearch_select_section", section_name) if section_name
+    click_INSTUI_Select_option("#peoplesearch_select_role", type)
+    click_INSTUI_Select_option("#peoplesearch_select_section", section_name) if section_name
     replace_content(f(".addpeople__peoplesearch textarea"), email)
 
     f("#addpeople_next").click
@@ -356,7 +356,7 @@ describe "course people" do
         add_button = f('#addUsers')
         keep_trying_until { expect(add_button).to be_displayed }
         add_button.click
-        click_option('#role_id', type)
+        click_INSTUI_Select_option('#role_id', type)
       end
 
       %w[student teacher ta designer observer].each do |base_type|

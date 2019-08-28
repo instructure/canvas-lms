@@ -214,6 +214,30 @@ describe DiscussionTopicsController do
       expect(parsed_topic["delayed_post_at"].to_json).to eq delayed_post_time.to_json
       expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
     end
+
+    it "sets DIRECT_SHARE_ENABLED when enabled" do
+      @course.account.enable_feature!(:direct_share)
+      user_session(@teacher)
+      get 'index', params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(true)
+    end
+
+    it "does not set DIRECT_SHARE_ENABLED if the user does not have manage_content" do
+      @course.account.enable_feature!(:direct_share)
+      user_session(@student)
+      get 'index', params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
+    end
+
+    it "does not set DIRECT_SHARE_ENABLED when disabled" do
+      user_session(@teacher)
+      get 'index', params: {course_id: @course.id}
+      expect(response).to be_successful
+      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
+    end
+
   end
 
   describe "GET 'show'" do
@@ -1504,7 +1528,7 @@ describe DiscussionTopicsController do
     it "triggers module progression recalculation if undoing section specificness" do
       section1 = @course.course_sections.create!(name: "Section")
       section2 = @course.course_sections.create!(name: "Section2")
-      topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher, 
+      topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher,
         is_section_specific: true, course_sections: [section2])
       mod = @course.context_modules.create!
       tag = mod.add_item({:id => topic.id, :type => 'discussion_topic'})

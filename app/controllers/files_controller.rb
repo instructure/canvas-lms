@@ -332,6 +332,9 @@ class FilesController < ApplicationController
 
         url = @context ? context_files_url : api_v1_list_files_url(@folder)
         @files = Api.paginate(scope, self, url)
+
+        log_asset_access(['files', @context], 'files')
+
         render json: attachments_json(@files, @current_user, {}, {
           can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
           context: @context || @folder.context,
@@ -702,7 +705,12 @@ class FilesController < ApplicationController
     user = @current_user
     user ||= api_find(User, session['file_access_user_id']) if session['file_access_user_id'].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
-    log_asset_access(@attachment, "files", "files") unless params[:preview]
+
+    if params[:preview].blank?
+      log_asset_access(@attachment, "files", "files")
+      Canvas::LiveEvents.asset_access(@attachment, 'files', nil, nil) if @current_user.blank?
+    end
+
     render_or_redirect_to_stored_file(
       attachment: attachment,
       verifier: params[:verifier],
@@ -898,9 +906,10 @@ class FilesController < ApplicationController
 
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
+      submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
 
-      # If the attachment is for an Assignment's upload_via_url, submit it
-      if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment)
+      # If the attachment is for an Assignment's upload_via_url and the submit_assignment flag is set, submit it
+      if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment) && submit_assignment
         homework_service = Services::SubmitHomeworkService.new(@attachment, progress)
 
         begin
@@ -922,7 +931,7 @@ class FilesController < ApplicationController
     if Array(params[:include]).include?('preview_url')
       includes << 'preview_url'
     # only use implicit enhanced_preview_url if there is no explicit preview_url
-    elsif @context.is_a?(User) || @context.is_a?(Course)
+    elsif @context.is_a?(User) || @context.is_a?(Course) || @context.is_a?(Group)
       includes << 'enhanced_preview_url'
     end
 
@@ -1243,7 +1252,7 @@ class FilesController < ApplicationController
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).map(&:context).compact
     return true if submissions.any? { |submission| submission.grants_right?(user, session, :read) }
 
-    course = Assignment.find(params[:assignment_id]).course unless params[:assignment_id].nil?
+    course = api_find(Assignment, params[:assignment_id]).course unless params[:assignment_id].nil?
     return true if course&.grants_right?(user, session, :read)
 
     authorized_action(attachment, user, :read)

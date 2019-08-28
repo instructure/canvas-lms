@@ -102,16 +102,20 @@ class AccountReport < ActiveRecord::Base
       begin
         AccountReports.generate_report(self)
       rescue
-        self.workflow_state = :error
-        self.save
+        mark_as_errored
       end
     else
-      self.workflow_state = :error
-      self.save
+      mark_as_errored
     end
   end
   handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY, max_attempts: 1,
-                        n_strand: proc {|ar| ['account_reports', ar.account.root_account.global_id]}
+                        n_strand: proc {|ar| ['account_reports', ar.account.root_account.global_id]},
+                        on_permanent_failure: :mark_as_errored
+
+  def mark_as_errored
+    self.workflow_state = :error
+    self.save
+  end
 
   def has_parameter?(key)
     self.parameters.is_a?(Hash) && self.parameters[key].presence

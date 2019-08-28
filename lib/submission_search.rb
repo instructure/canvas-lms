@@ -79,6 +79,19 @@ class SubmissionSearch
       search_scope = @options[:late] ? search_scope.late : search_scope.not_late
     end
 
+    if @options[:grading_status].present?
+      case @options[:grading_status]
+      when "needs_grading"
+        search_scope = search_scope.where(Submission.needs_grading_conditions)
+      when "excused"
+        search_scope = search_scope.where(excused: true)
+      when "needs_review"
+        search_scope = search_scope.where(workflow_state: 'pending_review')
+      when "graded"
+        search_scope = search_scope.where(workflow_state: 'graded')
+      end
+    end
+
     search_scope
   end
 

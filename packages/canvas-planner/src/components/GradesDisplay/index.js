@@ -17,17 +17,15 @@
  */
 
 import React from 'react';
-import themeable from '@instructure/ui-themeable/lib';
+import {themeable} from '@instructure/ui-themeable'
 import {bool, string, arrayOf, shape} from 'prop-types';
 import { courseShape } from '../plannerPropTypes';
 import formatMessage from '../../format-message';
 import ErrorAlert from '../ErrorAlert';
 
-import View from '@instructure/ui-layout/lib/components/View';
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
-import Text from '@instructure/ui-elements/lib/components/Text';
+import {View} from '@instructure/ui-layout'
+import {Heading, Spinner, Text} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 
 import styles from './styles.css';
 import theme from './theme.js';
@@ -56,7 +54,7 @@ export class GradesDisplay extends React.Component {
       margin="0 0 large 0"
     >
       <Spinner
-        title={formatMessage("Grades are loading")}
+        renderTitle={() => formatMessage("Grades are loading")}
         size="small"
       />
     </View>;

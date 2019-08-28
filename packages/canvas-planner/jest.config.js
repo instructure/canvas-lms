@@ -56,5 +56,6 @@ module.exports = {
       lines: 85,
       statements: 85
     }
-  }
+  },
+  testEnvironment: 'jest-environment-jsdom-fourteen',
 };

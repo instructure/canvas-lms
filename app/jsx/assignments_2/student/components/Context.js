@@ -20,10 +20,11 @@ import React from 'react'
 
 export const StudentViewContextDefaults = {
   // Controls for moving back and forth between displayed submissions
-  prevButtonEnabled: false,
+  nextButtonAction: () => {},
   nextButtonEnabled: false,
   prevButtonAction: () => {},
-  nextButtonAction: () => {},
+  prevButtonEnabled: false,
+  startNewAttemptAction: () => {},
 
   // Used to display the most current grade in the header, regardless of the
   // current attempt being displayed in the student view

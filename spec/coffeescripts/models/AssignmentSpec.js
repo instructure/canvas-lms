@@ -95,12 +95,132 @@ test('returns false if record is discussion topic', () => {
   equal(assignment.isDiscussionTopic(), false)
 })
 
+QUnit.module('default submission types', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('defaultToNone returns true if submission type is "none"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['none'])
+  equal(assignment.defaultToNone(), true)
+})
+
+test('defaultToNone returns false if default tool configured and new assignment', () => {
+  const assignment = new Assignment()
+  equal(assignment.defaultToNone(), false)
+})
+
+test('defaultToOnline returns true if submission type is "online"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['online'])
+  equal(assignment.defaultToOnline(), true)
+})
+
+test('defaultToOnline returns false if default tool configured and new assignment', () => {
+  const assignment = new Assignment()
+  equal(assignment.defaultToOnline(), false)
+})
+
+test('defaultToOnPaper returns true if submission type is "on_paper"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['on_paper'])
+  equal(assignment.defaultToOnPaper(), true)
+})
+
+test('defaultToOnPaper returns false if default tool configured and new assignment', () => {
+  const assignment = new Assignment()
+  equal(assignment.defaultToOnPaper(), false)
+})
+
+QUnit.module('Assignment#isDefaultTool', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('returns true if submissionType is "external_tool" and default tool is selected', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    external_tool_tag_attributes: {
+      url: 'https://www.test.com/blti?foo'
+    }
+  })
+  assignment.submissionTypes(['external_tool'])
+  equal(assignment.isDefaultTool(), true)
+})
+
+QUnit.module('Assignment#isNonDefaultExternalTool', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('returns true if submissionType is "default_external_tool"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['default_external_tool'])
+  equal(assignment.isDefaultTool(), true)
+})
+
+test('returns true when submissionType is "external_tool" and non default tool is selected', () => {
+  const assignment = new Assignment({
+    name: 'foo',
+    external_tool_tag_attributes: {
+      url: 'https://www.non-default.com/blti?foo'
+    }
+  })
+  assignment.submissionTypes(['external_tool'])
+  equal(assignment.isNonDefaultExternalTool(), true)
+})
+
+test('returns true when submissionType is "external_tool"', () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.submissionTypes(['external_tool'])
+  equal(assignment.isNonDefaultExternalTool(), true)
+})
+
+
 QUnit.module('Assignment#isExternalTool')
 
 test('returns true if record is external tool', () => {
   const assignment = new Assignment({name: 'foo'})
   assignment.submissionTypes(['external_tool'])
   equal(assignment.isExternalTool(), true)
+})
+
+QUnit.module('Assignment#defaultToolName', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool <a href="https://www.somethingbad.com">'
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('escapes the name retrieved from the js env', () => {
+  const assignment = new Assignment({name: 'foo'})
+  equal(assignment.defaultToolName(), 'Default Tool %3Ca href%3D%22https%3A//www.somethingbad.com%22%3E')
 })
 
 test('returns false if record is not external tool', () => {

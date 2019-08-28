@@ -140,7 +140,35 @@ describe('FileUpload', () => {
     expect(filesRender).toContainElement(getByText('Loading'))
   })
 
-  it('creates a submission draft with the attempt one larger then the current submisison', async () => {
+  // Byproduct of how the dummy submissions are being handled. Check out ViewManager
+  // for some context around this
+  it('creates a submission draft for the current attempt when not on attempt 0', async () => {
+    const props = await makeProps({
+      Submission: () => ({attempt: 2})
+    })
+    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
+
+    const {container} = render(
+      <MockedProvider>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    uploadFiles(fileInput, [file])
+
+    await wait(() => {
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          attempt: 2,
+          fileIds: ['1']
+        }
+      })
+    })
+  })
+
+  it('creates a submission draft for attempt one when on attempt 0', async () => {
     const props = await makeProps({
       Submission: () => ({attempt: 0})
     })
@@ -247,6 +275,45 @@ describe('FileUpload', () => {
     const emptyRender = getByTestId('upload-box')
 
     expect(emptyRender).toContainElement(getByText('More Options'))
+  })
+
+  it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
+    const props = await makeProps({
+      Submission: () => ({attempt: 0})
+    })
+    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
+
+    render(
+      <MockedProvider>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'LtiDeepLinkingResponse',
+          content_items: [
+            {
+              url: 'http://lemon.com',
+              title: 'LemonRules.txt',
+              mediaType: 'plain/txt'
+            }
+          ]
+        }
+      })
+    )
+
+    await wait(() => {
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          attempt: 1,
+          fileIds: ['1']
+        }
+      })
+    })
   })
 
   it('displays allowed extensions in the upload box', async () => {

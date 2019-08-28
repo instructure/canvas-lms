@@ -19,7 +19,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import themeable from '@instructure/ui-themeable/lib';
+import {themeable} from '@instructure/ui-themeable'
 import MissingIndicator from './MissingIndicator';
 import NewActivityIndicator from './NewActivityIndicator';
 import { sizeShape } from '../plannerPropTypes';

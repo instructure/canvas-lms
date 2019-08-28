@@ -1482,7 +1482,7 @@ class Submission < ActiveRecord::Base
 
     late_policy.points_deducted(
       score: raw_score, possible: points_possible, late_for: seconds_late, grading_type: grading_type
-    )
+    ).round(2)
   end
   private :late_points_deducted
 

@@ -26,18 +26,21 @@ export const SubmissionDraft = {
       attachments {
         ...SubmissionDraftFile
       }
+      body
     }
     ${SubmissionDraftFile.fragment}
   `,
 
   shape: shape({
     _id: string,
-    attachments: arrayOf(SubmissionDraftFile.shape)
+    attachments: arrayOf(SubmissionDraftFile.shape),
+    body: string
   })
 }
 
 export const SubmissionDraftDefaultMocks = {
   SubmissionDraft: () => ({
-    attachments: () => []
+    attachments: () => [],
+    body: null
   })
 }

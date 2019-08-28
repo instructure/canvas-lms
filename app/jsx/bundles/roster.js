@@ -80,9 +80,10 @@ const resendInvitationsView = new ResendInvitationsView({
   canResend: ENV.permissions.manage_students || ENV.permissions.manage_admin_users
 })
 
-const groupCategories = new (GroupCategoryCollection.extend({
-  url: `/api/v1/courses/${ENV.course && ENV.course.id}/group_categories?per_page=50`
-}))()
+class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
+GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${ENV.course && ENV.course.id}/group_categories?per_page=50`
+
+const groupCategories = new GroupCategoryCollectionForThisCourse()
 
 const rosterTabsView = new RosterTabsView({collection: groupCategories})
 

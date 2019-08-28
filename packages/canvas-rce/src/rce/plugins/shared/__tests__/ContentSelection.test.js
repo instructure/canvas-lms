@@ -21,6 +21,7 @@ import {
   FILE_LINK_TYPE,
   IMAGE_EMBED_TYPE,
   NONE_TYPE,
+  TEXT_TYPE,
   getContentFromEditor,
   getContentFromElement
 } from '../ContentSelection'
@@ -220,7 +221,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       expect(getContentFromEditor(editor).type).toEqual(FILE_LINK_TYPE)
     })
 
-    it('returns content of type "image embed" when a file link is selected', () => {
+    it('returns content of type "image embed" when an image is selected', () => {
       const $selectedNode = document.createElement('img')
       $selectedNode.src = 'https://www.fillmurray.com/200/200'
       editor.setSelectedNode($selectedNode)
@@ -230,6 +231,29 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
     it('returns content of type "none" when the editor has no selection', () => {
       delete editor.selection
       expect(getContentFromEditor(editor).type).toEqual(NONE_TYPE)
+    })
+
+    it('returns content of type "none" when expandCollapsed is false and the selection is collapased', () => {
+      const $selectedNode = document.createElement('p')
+      $selectedNode.innerHTML = 'some text'
+      editor.setSelectedNode($selectedNode)
+      editor.selection.collapse()
+      expect(getContentFromEditor(editor, false).type).toEqual(NONE_TYPE)
+    })
+
+    it('returns content of type "text" when expandCollapsed is true and the selection is collapased', () => {
+      const $selectedNode = document.createElement('p')
+      $selectedNode.innerHTML = 'some text'
+      editor.setSelectedNode($selectedNode)
+      editor.selection.collapse()
+      expect(getContentFromEditor(editor, true).type).toEqual(TEXT_TYPE)
+    })
+
+    it('returns content of type "text" when expandCollapsed is false and the selection is not collapased', () => {
+      const $selectedNode = document.createElement('p')
+      $selectedNode.innerHTML = 'some text'
+      editor.setSelectedNode($selectedNode)
+      expect(getContentFromEditor(editor, false).type).toEqual(TEXT_TYPE)
     })
   })
 })

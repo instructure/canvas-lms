@@ -291,7 +291,7 @@
   # @returns [SubmissionVersion]
   def feed
     student = api_find(User, params[:user_id]) if params[:user_id]
-    assignment = Assignment.find(params[:assignment_id]) if params[:assignment_id]
+    assignment = api_find(Assignment, params[:assignment_id]) if params[:assignment_id]
 
     # construct scope of interesting submission versions using index table
     indexed_versions = SubmissionVersion.

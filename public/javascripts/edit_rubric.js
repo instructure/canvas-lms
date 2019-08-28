@@ -134,7 +134,7 @@ import 'compiled/jquery/fixDialogButtons'
           $previousRating.fillTemplateData({data: {min_points: data.points} })
         }
         rubricEditing.hideCriterionAdd($rubric);
-        rubricEditing.updateCriterionPoints($criterion);
+        rubricEditing.updateCriterionPoints($criterion, true);
         rubricEditing.sizeRatings($criterion);
         setTimeout(function() {
           $.screenReaderFlashMessageExclusive(I18n.t("New Rating Created"));
@@ -229,10 +229,13 @@ import 'compiled/jquery/fixDialogButtons'
       $criterion.find(".display_criterion_points").text(rubricEditing.localizedPoints(points));
       if(!$criterion.data('criterion_points') || numberHelper.parse($criterion.data('criterion_points')) != points) {
         if(!$criterion.data('criterion_points')) {
-          var pts = $criterion.find(".rating:first .points").text();
-          $criterion.data('criterion_points', numberHelper.parse(pts));
+          var max = $criterion.context.defaultValue;
+          if (baseOnRatings) {
+            max = $criterion.find(".rating:first .points").text();
+          }
+          $criterion.data('criterion_points', numberHelper.parse(max));
         }
-        var oldMax = numberHelper.parse($criterion.data('criterion_points'));
+        var oldMax = $criterion.data('criterion_points');
         var newMax = points;
         if (oldMax !== newMax) {
           var $ratingList = $criterion.find(".rating");
@@ -243,24 +246,24 @@ import 'compiled/jquery/fixDialogButtons'
           // total possible to 9, they'd be 9,6,3
           for(var i = 1; i < $ratingList.length - 1; i++) {
             var pts = numberHelper.parse($($ratingList[i]).find(".points").text());
-            var newPts = Math.round((pts / oldMax) * newMax);
+            var newPts = (pts / oldMax) * newMax;
             if(isNaN(pts) || (pts == 0 && lastPts > 0)) {
               newPts = lastPts - Math.round(lastPts / ($ratingList.length - i));
             }
             if(newPts >= lastPts) {
               newPts = lastPts - 1;
             }
-            newPts = Math.max(0, newPts);
+            newPts = rubricEditing.localizedPoints(Math.max(0, newPts));
             lastPts = newPts;
-            $($ratingList[i]).find(".points").text(rubricEditing.localizedPoints(newPts));
+            $($ratingList[i]).find(".points").text(newPts);
             rubricEditing.flagInfinitesimalRating($($ratingList[i]), use_range);
             if (i > 0) {
-              $($ratingList[i - 1]).find('.min_points').text(rubricEditing.localizedPoints(newPts));
+              $($ratingList[i - 1]).find('.min_points').text(newPts);
               rubricEditing.flagInfinitesimalRating($($ratingList[i - 1]), use_range);
             }
           }
         }
-        $criterion.data('criterion_points', points);
+        $criterion.data('criterion_points', numberHelper.parse(points));
       }
       rubricEditing.updateRubricPoints($criterion.parents(".rubric"));
     },
@@ -513,7 +516,8 @@ import 'compiled/jquery/fixDialogButtons'
           $criterion.find(".rating .links").remove();
         }
         $rubric.find(".summary").before($criterion);
-        $criterion.find(".criterion_points").val(criterion.points).blur();
+        $criterion.find(".criterion_points").val(rubricEditing.localizedPoints(criterion.points));
+        $criterion.data('criterion_points', numberHelper.parse(criterion.points));
       });
       $rubric.find(".criterion:not(.blank)")
         .find(".ratings").showIf(!rubric.free_form_criterion_comments).end()
@@ -1066,7 +1070,11 @@ import 'compiled/jquery/fixDialogButtons'
           $("#assignment_show .points_possible").text(rubric.points_possible);
           var discussion_points_text = I18n.t('discussion_points_possible',
                                           {one: '%{count} point possible', other: '%{count} points possible' },
-                                          {count: rubric.points_possible || 0})
+                                          {
+                                            count: rubric.points_possible || 0,
+                                            precision: 2,
+                                            strip_insignificant_zeros: true
+                                          })
           $(".discussion-title .discussion-points").text(discussion_points_text);
         }
         if(!limitToOneRubric) {

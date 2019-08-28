@@ -17,12 +17,11 @@
  */
 
 import $ from 'jquery'
-import INST from './INST'
 
 export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBookmarkingOverride) {
 
     if (enableBookmarkingOverride == undefined) {
-      var enableBookmarking = !!INST.browser.ie;
+      var enableBookmarking = false;
     } else {
       var enableBookmarking = enableBookmarkingOverride;
     }

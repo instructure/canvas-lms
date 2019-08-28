@@ -17,22 +17,12 @@
  */
 import React, { Component } from 'react';
 import classnames from 'classnames';
-import themeable from '@instructure/ui-themeable/lib';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import Checkbox, {CheckboxFacade} from '@instructure/ui-forms/lib/components/Checkbox';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
-import Pill from '@instructure/ui-elements/lib/components/Pill';
-import Avatar from '@instructure/ui-elements/lib/components/Avatar';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import Assignment from '@instructure/ui-icons/lib/Line/IconAssignment';
-import Quiz from '@instructure/ui-icons/lib/Line/IconQuiz';
-import Announcement from '@instructure/ui-icons/lib/Line/IconAnnouncement';
-import Discussion from '@instructure/ui-icons/lib/Line/IconDiscussion';
-import Calendar from '@instructure/ui-icons/lib/Line/IconCalendarMonth';
-import Page from '@instructure/ui-icons/lib/Line/IconDocument';
-import Edit from '@instructure/ui-icons/lib/Line/IconEdit';
-import PeerReview from '@instructure/ui-icons/lib/Line/IconPeerReview';
+import {themeable, ApplyTheme} from '@instructure/ui-themeable'
+import {Text, Pill, Avatar} from '@instructure/ui-elements'
+import {Checkbox, CheckboxFacade} from '@instructure/ui-forms'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {Button} from '@instructure/ui-buttons'
+import {IconAssignmentLine, IconQuizLine, IconAnnouncementLine, IconDiscussionLine, IconCalendarMonthLine, IconDocumentLine, IconEditLine, IconPeerReviewLine} from '@instructure/ui-icons'
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
 import CalendarEventModal from '../CalendarEventModal';
@@ -45,7 +35,6 @@ import { showPillForOverdueStatus } from '../../utilities/statusUtils';
 import { momentObj } from 'react-moment-proptypes';
 import formatMessage from '../../format-message';
 import {animatable} from '../../dynamic-ui';
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme';
 
 export class PlannerItem extends Component {
   static propTypes = {
@@ -264,19 +253,19 @@ export class PlannerItem extends Component {
 
     switch(this.props.associated_item) {
         case "Assignment":
-          return <Assignment />;
+          return <IconAssignmentLine />;
         case "Quiz":
-          return <Quiz />;
+          return <IconQuizLine />;
         case "Discussion":
-          return <Discussion />;
+          return <IconDiscussionLine />;
         case "Announcement":
-          return <Announcement />;
+          return <IconAnnouncementLine />;
         case "Calendar Event":
-          return <Calendar />;
+          return <IconCalendarMonthLine />;
         case "Page":
-          return <Page />;
+          return <IconDocumentLine />;
         case "Peer Review":
-          return <PeerReview />;
+          return <IconPeerReviewLine />;
         default:
           return <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />;
     }
@@ -362,7 +351,7 @@ export class PlannerItem extends Component {
           <ApplyTheme theme={{
             [Button.theme]: {iconColor: this.props.color}
           }}>
-            <Button variant='icon' icon={Edit} onClick={this.toDoLinkClick}>
+            <Button variant='icon' icon={IconEditLine} onClick={this.toDoLinkClick}>
               <ScreenReaderContent>{formatMessage('Edit')}</ScreenReaderContent>
             </Button>
           </ApplyTheme>

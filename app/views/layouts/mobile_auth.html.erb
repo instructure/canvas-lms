@@ -85,13 +85,8 @@
       }
 
     })( this );
-
-    // GOOGLE ANALYTICS
-    var _gaq=[["_setAccount",ENV.GOOGLE_ANALYTICS_KEY],["_trackPageview"]];
-    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-    g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
-    s.parentNode.insertBefore(g,s)}(document,"script"));
   </script>
+  <%= render partial: 'layouts/google_analytics_snippet' %>
   <%= include_js_bundles %>
   <%= include_account_js %>
 </body>

@@ -35,19 +35,13 @@ module Canvas
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
     if redis_config == 'cache_store' || redis_config.is_a?(Hash) && redis_config['servers'] == 'cache_store'
-      raw_redis = Rails.cache.data
-      wrapped_redis = raw_redis.instance_variable_get(:@wrapped_redis)
-      unless wrapped_redis
-        wrapped_redis = RedisWrapper.new(raw_redis)
-        raw_redis.instance_variable_set(:@wrapped_redis, wrapped_redis)
-      end
-      return wrapped_redis
+      return Rails.cache.redis
     end
     @redis ||= begin
-      Bundler.require 'redis'
       Canvas::Redis.patch
       settings = ConfigFile.load('redis')
-      Canvas::RedisConfig.from_settings(settings).redis
+      settings['url'] = settings['servers'] if settings['servers']
+      ActiveSupport::Cache::RedisCacheStore.build_redis(settings.to_h.symbolize_keys)
     end
   end
 
@@ -59,18 +53,29 @@ module Canvas
     @redis_enabled ||= redis_config.present?
   end
 
-  # technically this is jsut disconnect_redis, because new connections are created lazily,
+  # technically this is just disconnect_redis, because new connections are created lazily,
   # but I didn't want to rename it when there are several uses of it
   def self.reconnect_redis
     if Rails.cache &&
-      defined?(ActiveSupport::Cache::RedisStore) &&
-      Rails.cache.is_a?(ActiveSupport::Cache::RedisStore)
+      defined?(ActiveSupport::Cache::RedisCacheStore) &&
+      Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
       Canvas::Redis.handle_redis_failure(nil, "none") do
-        store = Rails.cache.data
-        if store.respond_to?(:nodes)
-          store.nodes.each(&:disconnect!)
+        redis = Rails.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:disconnect!)
         else
-          store.disconnect!
+          redis.disconnect!
+        end
+      end
+    end
+
+    if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore)
+      Canvas::Redis.handle_redis_failure(nil, "none") do
+        redis = MultiCache.cache.redis
+        if redis.respond_to?(:nodes)
+          redis.nodes.each(&:disconnect!)
+        else
+          redis.disconnect!
         end
       end
     end
@@ -78,7 +83,7 @@ module Canvas
     return unless @redis
     # We're sharing redis connections between Canvas.redis and Rails.cache,
     # so don't call reconnect on the cache too.
-    return if Rails.cache.respond_to?(:data) && @redis.__getobj__ == Rails.cache.data
+    return if Rails.cache.respond_to?(:redis) && @redis == Rails.cache.redis
     @redis = nil
   end
 
@@ -92,31 +97,24 @@ module Canvas
 
   def self.lookup_cache_store(config, cluster)
     config = {'cache_store' => 'nil_store'}.merge(config)
+    if config['cache_store'] == 'redis_store'
+      ActiveSupport::Deprecation.warn("`redis_store` is no longer supported. Please change to `redis_cache_store`, and change `servers` to `url`.")
+      config['cache_store'] = 'redis_cache_store'
+      config['url'] = config['servers'] if config['servers']
+    end
+
     case config.delete('cache_store')
-    when 'redis_store'
-      Bundler.require 'redis'
-      require_dependency 'canvas/redis'
+    when 'redis_cache_store'
       Canvas::Redis.patch
       # if cache and redis data are configured identically, we want to share connections
       if config == {} && cluster == Rails.env && Canvas.redis_enabled?
-        # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
-        store = ActiveSupport::Cache::RedisStore.new([])
-        store.instance_variable_set(:@data, Canvas.redis.__getobj__)
-        # yes, this would appear to be a no-op, but it allows switchman to add per-shard namespacing
-        ActiveSupport::Cache.lookup_store(store)
+        ActiveSupport::Cache.lookup_store(:redis_cache_store, redis: Canvas.redis)
       else
         # merge in redis.yml, but give precedence to cache_store.yml
-        #
-        # the only options currently supported in redis-cache are the list of
-        # servers, not key prefix or database names.
         redis_config = (ConfigFile.load('redis', cluster) || {})
         config = redis_config.merge(config) if redis_config.is_a?(Hash)
-        config_options = config.symbolize_keys.except(:key, :servers, :database)
-        servers = config.delete('servers')
-        if servers
-          servers = servers.map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
-          ActiveSupport::Cache.lookup_store(:redis_store, servers, config.symbolize_keys)
-        end
+        # config has to be a vanilla hash, with symbol keys, to auto-convert to kwargs
+        ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end
     when 'memory_store'
       ActiveSupport::Cache.lookup_store(:memory_store)

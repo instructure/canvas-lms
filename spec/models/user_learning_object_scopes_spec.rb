@@ -681,7 +681,8 @@ describe UserLearningObjectScopes do
           submission_types: 'online_text_entry',
           workflow_state: "available",
           context_type: "Course",
-          context_id: @course1.id
+          context_id: @course1.id,
+          root_account_id: @course1.root_account_id,
         }
       end)
       create_records(Submission, assignment_ids.map do |id|

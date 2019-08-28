@@ -189,6 +189,32 @@ describe Quizzes::QuizzesController do
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
+
+    context 'DIRECT_SHARE_ENABLED' do
+      before :once do
+        course_quiz()
+      end
+
+      it "js_env DIRECT_SHARE_ENABLED is true when feature flag is on" do
+        Account.default.enable_feature!(:direct_share)
+        user_session(@teacher)
+        get 'index', params: {course_id: @course.id}
+        expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(true)
+      end
+
+      it "js_env DIRECT_SHARE_ENABLED is false when feature flag is off" do
+        user_session(@teacher)
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
+      end
+
+      it "js_env DIRECT_SHARE_ENABLED is false when user does not have manage" do
+        Account.default.enable_feature!(:direct_share)
+        user_session(@student)
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
+      end
+    end
   end
 
   describe "POST 'new'" do

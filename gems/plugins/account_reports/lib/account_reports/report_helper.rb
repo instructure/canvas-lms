@@ -20,7 +20,6 @@ require 'csv'
 
 module AccountReports::ReportHelper
   include ::Api
-  include CsvI18nHelpers
 
   def parse_utc_string(datetime)
     if datetime.is_a? String
@@ -269,12 +268,11 @@ module AccountReports::ReportHelper
 
   def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false)
     file = AccountReports.generate_file(@account_report, extension)
-    options, bom = {}, ''
+    options = {}
     if enable_i18n_features
-      options, bom = csv_i18n_settings(@account_report.user)
+      options = CsvWithI18n.csv_i18n_settings(@account_report.user)
     end
-    ExtendedCSV.open(file, "w", options.slice(:col_sep, :encoding)) do |csv|
-      csv.to_io.write(bom)
+    ExtendedCSV.open(file, "w", options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
       Shackles.activate(:slave) { yield csv } if block_given?
@@ -433,7 +431,7 @@ module AccountReports::ReportHelper
     end
   end
 
-  class ExtendedCSV < CSV
+  class ExtendedCSV < CsvWithI18n
     def <<(row)
       if lineno % 1_000 == 0
         Shackles.activate(:master) do

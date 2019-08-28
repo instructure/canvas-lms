@@ -51,6 +51,34 @@ RSpec.describe SubmissionComment do
     end
   end
 
+  describe 'viewed submission comments' do
+    it 'returns read if the submission is read' do
+      comment = @submission.submission_comments.create!(valid_attributes)
+      @submission.mark_read(@user)
+      expect(comment).to be_read(@user)
+    end
+
+    it 'returns read if there is a viewed submission comment' do
+      comment = @submission.submission_comments.create!(valid_attributes)
+      comment.viewed_submission_comments.create!(user: @user)
+      expect(comment).to be_read(@user)
+    end
+
+    it 'creates a viewed submission comment if mark_read! is called' do
+      comment = @submission.submission_comments.create!(valid_attributes)
+      comment.mark_read!(@user)
+      expect(comment).to be_read(@user)
+      expect(ViewedSubmissionComment.count).to be(1)
+      expect(ViewedSubmissionComment.last.user).to eq(@user)
+      expect(ViewedSubmissionComment.last.submission_comment).to eq(comment)
+    end
+
+    it 'returns false if the submission is not read and no viewed submission comments' do
+      comment = @submission.submission_comments.create!(valid_attributes)
+      expect(comment).not_to be_read(@user)
+    end
+  end
+
   describe 'notifications' do
     before(:once) do
       @student_ended = user_model

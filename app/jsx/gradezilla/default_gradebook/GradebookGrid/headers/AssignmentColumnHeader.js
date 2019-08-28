@@ -304,17 +304,15 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     const assignment = this.props.assignment
 
     return (
-      <span className="assignment-name">
-        <Button
-          size="small"
-          variant="link"
-          theme={{smallPadding: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
-          ref={this.bindAssignmentLink}
-          href={assignment.htmlUrl}
-        >
-          {assignment.name}
-        </Button>
-      </span>
+      <Button
+        size="small"
+        variant="link"
+        theme={{smallPadding: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
+        ref={this.bindAssignmentLink}
+        href={assignment.htmlUrl}
+      >
+        <span className="assignment-name">{assignment.name}</span>
+      </Button>
     )
   }
 

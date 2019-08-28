@@ -21,7 +21,6 @@ describe "section tabs on the left side" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-
     it "should highlight which tab is active" do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
       course_with_teacher_logged_in
@@ -32,6 +31,20 @@ describe "section tabs on the left side" do
         # make sure to mouse off the link so the :hover and :focus styles do not apply
         driver.action.move_to(element_that_is_not_left_side).perform
         expect(driver.execute_script(js)).to eq('rgb(0, 142, 226)')
+      end
+    end
+
+    it "should highlight which tab is active with new menu design" do
+      BrandableCSS.save_default!('css') # make sure variable css file is up to date
+      course_with_teacher_logged_in
+      @course.account.enable_feature!(:a11y_left_menu)
+      %w{assignments quizzes settings}.each do |feature|
+        get "/courses/#{@course.id}/#{feature}"
+        element_that_is_not_left_side = f('#content')
+        # make sure to mouse off the link so the :hover and :focus styles do not apply
+        driver.action.move_to(element_that_is_not_left_side).perform
+        menu_link = f("#section-tabs .#{feature}")
+        expect(menu_link.css_value('border-left')).to eq('2px solid rgb(45, 59, 69)')
       end
     end
   end

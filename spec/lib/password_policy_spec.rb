@@ -45,6 +45,14 @@ describe Canvas::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
+    it "validates confirmation matches" do
+      pseudonym_with_policy({})
+
+      @pseudonym.password = "abcdefgh"
+      expect(@pseudonym).not_to be_valid
+
+    end
+
     it "should enforce minimum length" do
       pseudonym_with_policy(:min_length => 10)
       @pseudonym.password = @pseudonym.password_confirmation = "asdfg"

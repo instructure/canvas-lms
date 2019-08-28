@@ -136,9 +136,7 @@ end
 namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do
-    migrations = CANVAS_RAILS5_1 ?
-      ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths) :
-      ActiveRecord::Base.connection.migration_context.migrations
+    migrations = ActiveRecord::Base.connection.migration_context.migrations
     pending_migrations = ActiveRecord::Migrator.new(:up, migrations).pending_migrations
     pending_migrations.each do |pending_migration|
       tags = pending_migration.tags
@@ -149,9 +147,7 @@ namespace :db do
 
   desc "Shows skipped db migrations."
   task :skipped_migrations => :environment do
-    migrations = CANVAS_RAILS5_1 ?
-      ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths) :
-      ActiveRecord::Base.connection.migration_context.migrations
+    migrations = ActiveRecord::Base.connection.migration_context.migrations
     skipped_migrations = ActiveRecord::Migrator.new(:up, migrations).skipped_migrations
     skipped_migrations.each do |skipped_migration|
       tags = skipped_migration.tags
@@ -163,9 +159,7 @@ namespace :db do
   namespace :migrate do
     desc "Run all pending predeploy migrations"
     task :predeploy => [:environment, :load_config] do
-      migrations = CANVAS_RAILS5_1 ?
-        ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths) :
-        ActiveRecord::Base.connection.migration_context.migrations
+      migrations = ActiveRecord::Base.connection.migration_context.migrations
       migrations = migrations.select { |m| m.tags.include?(:predeploy) }
       ActiveRecord::Migrator.new(:up, migrations).migrate
     end

@@ -48,6 +48,9 @@ const makeProps = (props = {}) => merge({
   },
   canPublish: false,
   masterCourseData: {},
+  setCopyToOpen: () => {},
+  setSendToOpen: () => {},
+  DIRECT_SHARE_ENABLED: false
 }, props)
 
 test('renders the DiscussionRow component', () => {
@@ -355,6 +358,64 @@ test('manage menu items do appear upon click', () => {
   // within the popover menu or even the discussion row
   const menuItemNode = document.querySelector('#moveTo-discussion-menu-option')
   ok(menuItemNode.textContent.includes('Move To'))
+  tree.unmount()
+})
+
+test('does not render sharing menu options if not DIRECT_SHARE_ENABLED', () => {
+  const props = makeProps({displayManageMenu: true, DIRECT_SHARE_ENABLED: false})
+  const tree = mount(<DiscussionRow {...props} />)
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
+  notOk(document.querySelector('#copyTo-discussion-menu-option'))
+  notOk(document.querySelector('#sendTo-discussion-menu-option'))
+  tree.unmount()
+})
+
+test('renders sharing menu options if DIRECT_SHARE_ENABLED', () => {
+  const props = makeProps({displayManageMenu: true, DIRECT_SHARE_ENABLED: true})
+  const tree = mount(<DiscussionRow {...props} />)
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
+  ok(document.querySelector('#copyTo-discussion-menu-option'))
+  ok(document.querySelector('#sendTo-discussion-menu-option'))
+  tree.unmount()
+})
+
+test('opens the copyTo tray when menu item is selected', () => {
+  const copySpy = sinon.spy()
+  const props = makeProps({
+    displayManageMenu: true,
+    DIRECT_SHARE_ENABLED: true,
+    setCopyToOpen: copySpy,
+  })
+  const tree = mount(<DiscussionRow {...props} />)
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
+  document.querySelector('#copyTo-discussion-menu-option').click()
+  ok(copySpy.calledOnce)
+  tree.unmount()
+})
+
+test('opens the sendTo tray when menu item is selected', () => {
+  const sendSpy = sinon.spy()
+  const props = makeProps({
+    displayManageMenu: true,
+    DIRECT_SHARE_ENABLED: true,
+    setSendToOpen: sendSpy
+  })
+  const tree = mount(<DiscussionRow {...props} />)
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
+  document.querySelector('#sendTo-discussion-menu-option').click()
+  ok(sendSpy.calledOnce)
   tree.unmount()
 })
 

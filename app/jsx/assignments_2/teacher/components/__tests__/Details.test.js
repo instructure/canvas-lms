@@ -21,8 +21,30 @@ import {render} from '@testing-library/react'
 import {mockAssignment, mockOverride} from '../../test-utils'
 import Details from '../Details'
 
-const override1 = {lid: '18', title: 'Section A', set: {sectionName: 'Section A'}}
-const override2 = {lid: '19', title: 'Section B', set: {sectionName: 'Section B'}}
+const override1 = {
+  lid: '18',
+  title: 'Section A',
+  dueAt: '2019-09-01T23:59:59-06:00',
+  lockAt: '2019-09-03T23:59:59-06:00',
+  unlockAt: '2019-08-28T00:00:00-06:00',
+  set: {
+    lid: '2',
+    sectionName: 'Section A',
+    __typename: 'Section'
+  }
+}
+const override2 = {
+  lid: '19',
+  title: 'Section B',
+  dueAt: '2019-10-01T23:59:59-06:00',
+  lockAt: '2019-10-03T23:59:59-06:00',
+  unlockAt: '2019-09-28T00:00:00-06:00',
+  set: {
+    lid: '3',
+    sectionName: 'Section B',
+    __typename: 'Section'
+  }
+}
 
 function renderDetails(assignment, props = {}) {
   return render(
@@ -35,7 +57,7 @@ function renderDetails(assignment, props = {}) {
     />
   )
 }
-describe('Assignent Details', () => {
+describe('Assignment Details', () => {
   it('renders', () => {
     const assignment = mockAssignment()
     const {getByText, getAllByText, getByTestId} = renderDetails(assignment)
@@ -71,6 +93,42 @@ describe('Assignent Details', () => {
     expect(queryAllByText('Everyone', {exact: false})).toHaveLength(1)
   })
 
+  it('renders all override dates', () => {
+    const assignment = mockAssignment({
+      dueAt: '2019-08-01T23:59:59-06:00',
+      lockAt: '2019-08-03T23:59:59-06:00',
+      unlockAt: '2019-07-28T00:00:00-06:00',
+      assignmentOverrides: {
+        nodes: [mockOverride(override1), mockOverride(override2)]
+      }
+    })
+    const {getByText} = renderDetails(assignment)
+
+    // Everyone else
+    const everyoneElseOverrideSummary = getByText('Everyone else').closest(
+      `div[data-testid="OverrideSummary"]`
+    )
+    expect(getByText('8/2/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Due Date
+    expect(getByText('7/28/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Available from
+    expect(getByText('8/4/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Available to
+
+    // Section A
+    const sectionAOverrideSummary = getByText('Section A').closest(
+      `div[data-testid="OverrideSummary"]`
+    )
+    expect(getByText('9/2/2019', sectionAOverrideSummary)).toBeInTheDocument() // Due Date
+    expect(getByText('8/28/2019', sectionAOverrideSummary)).toBeInTheDocument() // Available from
+    expect(getByText('9/4/2019', sectionAOverrideSummary)).toBeInTheDocument() // Available to
+
+    // Section B
+    const sectionBOverrideSummary = getByText('Section B').closest(
+      `div[data-testid="OverrideSummary"]`
+    )
+    expect(getByText('10/2/2019', sectionBOverrideSummary)).toBeInTheDocument() // Due Date
+    expect(getByText('9/28/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available from
+    expect(getByText('10/4/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available to
+  })
+
   it('renders the Add Override button if !readOnly', () => {
     const assignment = mockAssignment({
       dueAt: null,
@@ -83,7 +141,7 @@ describe('Assignent Details', () => {
     expect(getByTestId('AddHorizontalRuleButton')).toBeInTheDocument()
   })
 
-  it('does notrender the Add Override button if readOnly', () => {
+  it('does not render the Add Override button if readOnly', () => {
     const assignment = mockAssignment({
       dueAt: null,
       assignmentOverrides: {

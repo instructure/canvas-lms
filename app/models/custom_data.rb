@@ -48,6 +48,14 @@ class CustomData < ActiveRecord::Base
     hash_data_from_scope(data_frd, "d/#{scope}")
   end
 
+  def lock_and_save
+    transaction do
+      self.lock!
+      yield
+      self.destroyed? || save
+    end
+  end
+
   def set_data(scope, val)
     set_hash_data_from_scope(data_frd, "d/#{scope}", val)
   end

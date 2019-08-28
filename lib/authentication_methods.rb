@@ -84,6 +84,15 @@ module AuthenticationMethods
     end
   end
 
+  ALLOWED_SCOPE_INCLUDES = %w{uuid}
+
+  def filter_includes(key)
+    # no funny business
+    params.delete(key) unless params[key].class == Array
+    return unless params.key?(key)
+    params[key] &= ALLOWED_SCOPE_INCLUDES
+  end
+
   def validate_scopes
     if @access_token
       developer_key = @access_token.developer_key
@@ -92,8 +101,8 @@ module AuthenticationMethods
       if developer_key.try(:require_scopes)
         scope_patterns = @access_token.url_scopes_for_method(request_method).concat(AccessToken.always_allowed_scopes)
         if scope_patterns.any? { |scope| scope =~ request.path }
-          params.delete :include
-          params.delete :includes
+          filter_includes(:include)
+          filter_includes(:includes)
         else
           raise AccessTokenScopeError
         end

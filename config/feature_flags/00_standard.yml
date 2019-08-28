@@ -232,14 +232,12 @@ notification_service:
   description: Allow the ability to send notifications through our dispatch queue
   applies_to: RootAccount
   root_opt_in: true
-  development: false
 better_scheduler:
   state: hidden
   display_name: Use the new scheduler
   description: Uses the new scheduler and its functionality
   applies_to: RootAccount
   root_opt_in: true
-  development: false
 course_card_images:
   state: allowed
   display_name: Enable Dashboard Images for Courses
@@ -254,7 +252,9 @@ responsive_layout:
   applies_to: RootAccount
   root_opt_in: true
   beta: true
-  development: true
+  environments:
+    production:
+      state: disabled
 force_rtl:
   state: hidden
   display_name: Turn on RTL Even For Non-RTL Languages
@@ -262,7 +262,9 @@ force_rtl:
     how pages would look in a RTL environment, without having to change your language
     to one that is normally RTL
   applies_to: User
-  development: true
+  environments:
+    production:
+      state: disabled
 enable_i18n_features_in_outcomes_exports:
   state: hidden
   display_name: Enable i18n features in outcomes exports
@@ -311,7 +313,6 @@ conditional_release:
     results.
   applies_to: Course
   root_opt_in: true
-  development: false
   after_state_change_proc: conditional_release_after_state_change_hook
 wrap_calendar_event_titles:
   state: allowed
@@ -327,7 +328,6 @@ new_collaborations:
     tools to use to collaborate
   applies_to: Course
   root_opt_in: true
-  development: false
   touch_context: true
 student_context_cards:
   state: allowed
@@ -363,21 +363,21 @@ encrypted_sourcedids:
 quizzes_next:
   state: allowed
   display_name:
-    features.quizzes.next: Quizzes.Next
-  description: Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.
+    features.quizzes.next: New Quizzes
+  description: Create assessments with New Quizzes and migrate existing Canvas Quizzes.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
 quizzes_next_submission_history:
   state: 'on'
-  display_name: Quizzes.Next submission history
-  description: If enabled, submission history for Quizzes.Next quizzes is dealt with
+  display_name: New Quizzes submission history
+  description: If enabled, submission history for New Quizzes quizzes is dealt with
     separately.
   applies_to: RootAccount
   root_opt_in: true
 import_to_quizzes_next:
   state: allowed
-  display_name: Quizzes.Next Importing
-  description: Allow importing of QTI and Common Cartridge into Quizzes.Next.
+  display_name: New Quizzes Importing
+  description: Allow importing of QTI and Common Cartridge into New Quizzes.
   applies_to: RootAccount
   root_opt_in: true
 common_cartridge_page_conversion:
@@ -393,13 +393,6 @@ non_scoring_rubrics:
   description: If enabled, the option will be presented to have non-scoring rubrics.
   applies_to: RootAccount
   root_opt_in: true
-lti_1_3:
-  state: allowed
-  display_name: LTI 1.3 and LTI Advantage
-  description: If enabled, access to LTI 1.3 and LTI Advantage will be enabled.
-  applies_to: RootAccount
-  root_opt_in: true
-  beta: true
 assignments_2:
   state: hidden
   display_name: Assignments 2
@@ -407,37 +400,46 @@ assignments_2:
   applies_to: Course
   root_opt_in: true
   beta: true
-  development: true
+  environments:
+    production:
+      state: disabled
 slack_notifications:
   state: hidden
   display_name: Slack Notifications
   description: The ability for users to receive notifications from slack
   applies_to: RootAccount
-  root_opt_in: true
-  beta: true
-  development: true
+  environments:
+      production:
+        state: disabled
 javascript_csp:
-  state: hidden_in_prod
+  state: allowed
   display_name: Content Security Policy
   description: Enable the Security tab on the settings page to adjust CSP settings
   applies_to: RootAccount
   root_opt_in: true
   beta: true
+  environments:
+    production:
+      state: hidden
 restrict_students_from_annotating:
   state: allowed
   display_name: Restrict Students from Annotating
   description: Prevents students from leaving annotations in assignments. Does not
     apply to peer-reviewed assignments.
   applies_to: Course
-  development: true
+  environments:
+    production:
+      state: disabled
 rce_enhancements:
-  state: hidden_in_prod
+  state: allowed
   display_name: RCE Enhancements
   description: Allow switching to the enhanced RCE
   applies_to: Course
   root_opt_in: true
   beta: true
-  development: true
+  environments:
+    production:
+      state: disabled
 new_features_ui:
   state: hidden
   applies_to: RootAccount
@@ -445,7 +447,9 @@ new_features_ui:
   description: This feature creates a SiteAdmin Release Flag tab to be able
     to release features to users through the UI. It also reworks the UI for
     the old Feature Options tabs.
-  development: true
+  environments:
+    production:
+      state: disabled
 direct_share:
   state: hidden
   applies_to: RootAccount
@@ -453,12 +457,17 @@ direct_share:
   description: This feature allows teachers to easily copy single items from
     one course to another, and to share a single item of content with other
     users so they can import those items into their courses as well.
-  development: true
+  environments:
+    production:
+      state: disabled
 filter_speed_grader_by_student_group:
-  state: hidden_in_prod
+  state: allowed
   applies_to: RootAccount
   display_name: Filter SpeedGrader by Student Group
   description: Allows users to enable the "Launch SpeedGrader Filtered by Student Group"
     option for courses on the course settings page. When active and a student group has
     been selected in New Gradebook, SpeedGrader will only load students in the selected
     group.
+  environments:
+    production:
+      state: hidden

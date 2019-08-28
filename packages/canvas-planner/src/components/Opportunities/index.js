@@ -16,22 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, { Component } from 'react';
-import themeable from '@instructure/ui-themeable/lib';
+import {themeable} from '@instructure/ui-themeable'
 import {animatable} from '../../dynamic-ui';
 import {specialFallbackFocusId} from '../../dynamic-ui/util';
-import scopeTab from '@instructure/ui-a11y/lib/utils/scopeTab';
+import {scopeTab, AccessibleContent} from '@instructure/ui-a11y'
 import keycode from 'keycode';
 
 import Opportunity from '../Opportunity';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList';
-import AccessibleContent from   '@instructure/ui-a11y/lib/components/AccessibleContent';
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import { findDOMNode } from 'react-dom';
+import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {CloseButton} from '@instructure/ui-buttons'
 import { array, string, func, number, oneOfType} from 'prop-types';
 import formatMessage from '../../format-message';
-
-import IconXLine from '@instructure/ui-icons/lib/Line/IconX';
 
 import styles from './styles.css';
 import theme from './theme.js';
@@ -101,7 +96,7 @@ export class Opportunities extends Component {
     return course[attr];
   }
 
-  // the only place on the TabList heirarchy where we can set a maxHeight is on 
+  // the only place on the TabList heirarchy where we can set a maxHeight is on
   // TabPanel, which puts the style on it's child content-holding div.
   // To keep the scrolling area w/in the TabPanel's content so that
   // the TabList doesn't outgrow its parent and the user winds up scrolling the tabs
@@ -121,7 +116,7 @@ export class Opportunities extends Component {
     this.setState({innerMaxHeight: mxht});
   }
 
-  // the parent of the <ol> holding the opportunities is the div TabPanel will assign 
+  // the parent of the <ol> holding the opportunities is the div TabPanel will assign
   // TabPanel's maxHeight prop to.
    getTabPanelContentDivRefFromList = (ol) => {
     this.tabPanelContentDiv = ol && ol.parentElement;

@@ -37,8 +37,6 @@ export default class DeveloperKeyModalTrigger extends React.Component {
     this.props.store.dispatch(this.props.actions.developerKeysModalOpen('lti'))
   }
 
-  isLti13Enabled = ENV.LTI_1_3_ENABLED
-
   developerKeyMenuItem(title, onClick) {
     return (
       <MenuItem onClick={onClick} type="button">
@@ -59,7 +57,6 @@ export default class DeveloperKeyModalTrigger extends React.Component {
     return (
       <Button
         variant="primary"
-        onClick={this.isLti13Enabled ? () => {} : this.showCreateDeveloperKey}
         buttonRef={this.props.setAddKeyButtonRef}
         icon={IconPlusLine}
       >
@@ -70,15 +67,12 @@ export default class DeveloperKeyModalTrigger extends React.Component {
   }
 
   developerKeyTrigger() {
-    if (this.isLti13Enabled) {
-      return (
-        <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect>
-          {this.developerKeyMenuItem(I18n.t('API Key'), this.showCreateDeveloperKey)}
-          {this.developerKeyMenuItem(I18n.t('LTI Key'), this.showCreateLtiKey)}
-        </Menu>
-      )
-    }
-    return this.triggerButton()
+    return (
+      <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect>
+        {this.developerKeyMenuItem(I18n.t('API Key'), this.showCreateDeveloperKey)}
+        {this.developerKeyMenuItem(I18n.t('LTI Key'), this.showCreateLtiKey)}
+      </Menu>
+    )
   }
 
   render() {

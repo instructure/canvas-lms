@@ -69,6 +69,9 @@ class AssignmentsController < ApplicationController
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
           DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
         }
+
+        set_default_tool_env!(@context, hash)
+
         js_env(hash)
 
         respond_to do |format|
@@ -83,7 +86,14 @@ class AssignmentsController < ApplicationController
 
   def show
     Shackles.activate(:slave) do
-      if @context.feature_enabled?(:assignments_2) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+      @assignment ||= @context.assignments.find(params[:id])
+      a2_enabled = @context.feature_enabled?(:assignments_2) &&
+                   (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+
+      # We will need to do some additional work here about figuring out when we
+      # can short-circuit to A2 vs when we need to go through the rest of the
+      # method here.
+      if a2_enabled && @assignment.submission_types != 'external_tool'
         unless can_do(@context, @current_user, :read_as_admin)
           assignment_prereqs = context_module_sequence_items_by_asset_id(params[:id], "Assignment")
           js_env({
@@ -98,7 +108,6 @@ class AssignmentsController < ApplicationController
         end
       end
 
-      @assignment ||= @context.assignments.find(params[:id])
 
       if @assignment.deleted?
         flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
@@ -209,11 +218,20 @@ class AssignmentsController < ApplicationController
           SIMILARITY_PLEDGE: @similarity_pledge
         })
 
-        env[:SETTINGS][:filter_speed_grader_by_student_group] = @context.filter_speed_grader_by_student_group?
+        env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
-          env[:group_categories] = group_categories_json(@context.group_categories, @current_user, session, {include: ['groups']})
-          env[:selected_student_group_id] = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+          eligible_categories = @context.group_categories
+          eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
+          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
+
+          selected_group_id = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+          # If this is a group assignment and we had previously filtered by a
+          # group that isn't part of this assignment's group set, behave as if
+          # no group is selected.
+          if selected_group_id.present? && Group.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
+            env[:selected_student_group_id] = selected_group_id
+          end
         end
 
         if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?
@@ -249,7 +267,7 @@ class AssignmentsController < ApplicationController
         render locals: {
           eula_url: tool_eula_url,
           show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
-        }
+        }, stream: can_stream_template?
       end
     end
   end
@@ -598,6 +616,8 @@ class AssignmentsController < ApplicationController
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
 
+      set_default_tool_env!(@context, hash)
+
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
@@ -624,7 +644,7 @@ class AssignmentsController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   # @returns Assignment
   def destroy
-    @assignment = @context.assignments.active.api_id(params[:id])
+    @assignment = api_find(@context.assignments.active, params[:id])
     if authorized_action(@assignment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@assignment)
 
@@ -640,6 +660,16 @@ class AssignmentsController < ApplicationController
   end
 
   protected
+
+  def set_default_tool_env!(context, hash)
+    root_account_settings = context.root_account.settings
+    if root_account_settings[:default_assignment_tool_url] && root_account_settings[:default_assignment_tool_name]
+      hash[:DEFAULT_ASSIGNMENT_TOOL_URL] = root_account_settings[:default_assignment_tool_url]
+      hash[:DEFAULT_ASSIGNMENT_TOOL_NAME] = root_account_settings[:default_assignment_tool_name]
+      hash[:DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT] = root_account_settings[:default_assignment_tool_button_text]
+      hash[:DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE] = root_account_settings[:default_assignment_tool_info_message]
+    end
+  end
 
   def show_moderate_env
     can_view_grader_identities = @assignment.can_view_other_grader_identities?(@current_user)
@@ -692,7 +722,7 @@ class AssignmentsController < ApplicationController
         :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
         :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
         :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-        :only_visible_to_overrides, :post_to_sis, :integration_id, :moderated_grading,
+        :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
         :omit_from_final_grade, :intra_group_peer_reviews,
         :allowed_extensions => strong_anything,
         :turnitin_settings => strong_anything,
@@ -733,5 +763,12 @@ class AssignmentsController < ApplicationController
     @context.feature_enabled?(:quizzes_next) &&
       quiz_lti_tool.present? &&
       quiz_lti_tool.url != 'http://void.url.inseng.net'
+  end
+
+  def filter_speed_grader_by_student_group?
+    # Group assignments only need to filter if they show individual students
+    return false if @assignment.group_category? && !@assignment.grade_group_students_individually?
+
+    @context.filter_speed_grader_by_student_group?
   end
 end

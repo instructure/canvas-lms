@@ -451,4 +451,17 @@ describe FilesController do
     get response['Location']
     expect(response).to be_successful
   end
+
+  it "shouldn't expose arbitary context names" do
+    allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
+
+    some_course = Course.create!
+    some_file = attachment_model(:context => some_course, :content_type => 'text/html',
+      :uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
+    secret_user = User.create!(:name => "secret user name gasp")
+
+    # course and file don't match
+    get "http://files-test.host/users/#{secret_user.id}/files/#{some_file.id}?verifier=#{some_file.uuid}"
+    expect(response.body).to_not include(secret_user.name)
+  end
 end

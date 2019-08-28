@@ -19,10 +19,9 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import moment from 'moment-timezone';
-import themeable from '@instructure/ui-themeable/lib';
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import View from '@instructure/ui-layout/lib/components/View';
+import {themeable} from '@instructure/ui-themeable'
+import {Heading, Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 import { shape, string, number, arrayOf, func } from 'prop-types';
 import { userShape, itemShape } from '../plannerPropTypes';
 import styles from './styles.css';

@@ -44,6 +44,7 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :viewed_submission_comments, dependent: :destroy
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
@@ -113,6 +114,16 @@ class SubmissionComment < ActiveRecord::Base
 
   def provisional
     !!self.provisional_grade_id
+  end
+
+  def read?(current_user)
+    self.submission.read?(current_user) || self.viewed_submission_comments.where(user: current_user).exists?
+  end
+
+  def mark_read!(current_user)
+    ViewedSubmissionComment.unique_constraint_retry do
+      self.viewed_submission_comments.where(user: current_user).first_or_create!
+    end
   end
 
   def media_comment?

@@ -15,14 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<%
-  if @quiz.survey? 
-    js_env ga_page_title: "User's Survey History"
-  else
-    js_env ga_page_title: "User's Quiz History"
-  end
-%>
 <%
   hide_student_name = params[:hide_student_name]&.to_i&.nonzero?
   user_name = if hide_student_name || @quiz.anonymous_survey?

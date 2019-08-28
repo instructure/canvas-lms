@@ -142,6 +142,10 @@ module RCENextPage
     possibly_hidden_toolbar_button('button[aria-label="Documents"]')
   end
 
+  def lti_tools_button
+    possibly_hidden_toolbar_button('button[aria-label="LTI Tools"')
+  end
+
   def course_images
     f('[role="menuitem"][title="Course Images"]')
   end

@@ -101,7 +101,7 @@ class StepItem extends Component {
         case 'New Attempt':
           return this.renderButton(
             IconPlus,
-            () => console.log('New Attempt'),
+            context.startNewAttemptAction,
             I18n.t('Create New Attempt')
           )
         default:

@@ -104,7 +104,8 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_lti_tool_tabs(tabs, user, opts)
-    tools = opts[:root_account].context_external_tools.active.having_setting('user_navigation')
+    tools = opts[:root_account].context_external_tools.active.having_setting('user_navigation').
+      select { |t| t.permission_given?(:user_navigation, user, opts[:root_account]) }
     tabs.concat(
       Lti::ExternalToolTab.new(user, :user_navigation, tools, opts[:language]).
       tabs.
@@ -128,4 +129,3 @@ class UserProfile < ActiveRecord::Base
     end
   end
 end
-

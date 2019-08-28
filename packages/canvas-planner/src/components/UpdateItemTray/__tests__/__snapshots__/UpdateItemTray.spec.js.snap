@@ -6,11 +6,17 @@ exports[`renders the item to update if provided 1`] = `
 >
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="large medium medium"
+    position="static"
+    shouldAnimateFocus={true}
   >
     <FormFieldGroup
       as="fieldset"
@@ -29,15 +35,16 @@ exports[`renders the item to update if provided 1`] = `
       vAlign="middle"
     >
       <TextInput
-        disabled={false}
-        inline={false}
+        display="block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
-        label="Title"
-        layout="stacked"
+        interaction="enabled"
+        isRequired={false}
         messages={Array []}
+        onBlur={[Function]}
         onChange={[Function]}
-        readOnly={false}
-        required={false}
+        onFocus={[Function]}
+        renderLabel={[Function]}
         size="medium"
         textAlign="start"
         type="text"
@@ -127,11 +134,17 @@ exports[`renders the item to update if provided 1`] = `
     </FormFieldGroup>
     <View
       as="div"
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
       textAlign="end"
     >
       <Button
@@ -172,11 +185,17 @@ exports[`updates state when new note is passed in 1`] = `
 >
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="large medium medium"
+    position="static"
+    shouldAnimateFocus={true}
   >
     <FormFieldGroup
       as="fieldset"
@@ -195,15 +214,16 @@ exports[`updates state when new note is passed in 1`] = `
       vAlign="middle"
     >
       <TextInput
-        disabled={false}
-        inline={false}
+        display="block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
-        label="Title"
-        layout="stacked"
+        interaction="enabled"
+        isRequired={false}
         messages={Array []}
+        onBlur={[Function]}
         onChange={[Function]}
-        readOnly={false}
-        required={false}
+        onFocus={[Function]}
+        renderLabel={[Function]}
         size="medium"
         textAlign="start"
         type="text"
@@ -299,11 +319,17 @@ exports[`updates state when new note is passed in 1`] = `
     </FormFieldGroup>
     <View
       as="div"
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
       textAlign="end"
     >
       <Button
@@ -344,11 +370,17 @@ exports[`updates state when new note is passed in 2`] = `
 >
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="large medium medium"
+    position="static"
+    shouldAnimateFocus={true}
   >
     <FormFieldGroup
       as="fieldset"
@@ -367,15 +399,16 @@ exports[`updates state when new note is passed in 2`] = `
       vAlign="middle"
     >
       <TextInput
-        disabled={false}
-        inline={false}
+        display="block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
-        label="Title"
-        layout="stacked"
+        interaction="enabled"
+        isRequired={false}
         messages={Array []}
+        onBlur={[Function]}
         onChange={[Function]}
-        readOnly={false}
-        required={false}
+        onFocus={[Function]}
+        renderLabel={[Function]}
         size="medium"
         textAlign="start"
         type="text"
@@ -471,11 +504,17 @@ exports[`updates state when new note is passed in 2`] = `
     </FormFieldGroup>
     <View
       as="div"
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
       textAlign="end"
     >
       <Button

@@ -558,7 +558,7 @@ describe RoleOverride do
   end
 
   describe "caching" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     it "should only calculate role overrides once for all courses across an account" do
       enrollment1 = student_in_course(:active_all => true)

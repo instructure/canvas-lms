@@ -121,5 +121,21 @@ describe("Editor/Sidebar bridge", () => {
         }
       });
     });
+
+    it("calls hideTray when necessary", () => {
+      const hideTray = sinon.spy()
+      Bridge.attachController({hideTray})
+      Bridge.focusEditor(editor)
+      Bridge.insertLink({})
+      assert(hideTray.calledOnce)
+    })
+
+    it("does not call hideTray when it shouldn't", () => {
+      const hideTray = sinon.spy()
+      Bridge.attachController({hideTray})
+      Bridge.focusEditor(editor)
+      Bridge.insertLink({}, false)
+      assert(hideTray.callCount === 0)
+    })
   });
 });

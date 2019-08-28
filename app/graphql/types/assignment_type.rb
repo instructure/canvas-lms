@@ -128,35 +128,31 @@ module Types
       null: true
     field :points_possible, Float, "the assignment is out of this many points",
       null: true
-    field :due_at, DateTimeType,
-      "when this assignment is due",
-      null: true
-    def due_at
-      overridden_field(:due_at)
-    end
 
-    field :lock_at, DateTimeType,
-      "the lock date (assignment is locked after this date).",
-      null: true
-    def lock_at
-      overridden_field(:lock_at)
-    end
+    def self.overridden_field(field_name, description)
+      field field_name, DateTimeType, description, null: true do
+        argument :apply_overrides, Boolean, <<~DOC, required: false, default_value: true
+          When true, return the overridden dates.
 
-    field :unlock_at, DateTimeType,
-      "the unlock date (assignment is unlocked after this date)",
-      null: true
-    def unlock_at
-      overridden_field(:unlock_at)
-    end
+          Not all roles have permission to view un-overridden dates (in which
+          case the overridden dates will be returned)
+        DOC
+      end
 
-    ##
-    # use this method to get overridden dates
-    # (all_day_date/all_day  should use this if/when we add them to gql)
-    def overridden_field(field)
-      load_association(:assignment_overrides).then do
-        OverrideAssignmentLoader.for(current_user).load(assignment).then &field
+      define_method(field_name) do |apply_overrides:|
+        load_association(:context).then do |course|
+          if !apply_overrides && course.grants_right?(current_user, :manage_assignments)
+            assignment.send(field_name)
+          else
+            OverrideAssignmentLoader.for(current_user).load(assignment).then &field_name
+          end
+        end
       end
     end
+
+    overridden_field :due_at, "when this assignment is due"
+    overridden_field :lock_at, "the lock date (assignment is locked after this date)"
+    overridden_field :unlock_at, "the unlock date (assignment is unlocked after this date)"
 
     class OverrideAssignmentLoader < GraphQL::Batch::Loader
       def initialize(current_user)
@@ -268,17 +264,6 @@ module Types
       )
     end
 
-    class AttachmentPreloader < GraphQL::Batch::Loader
-      def initialize(context)
-        @context = context
-      end
-
-      def perform(htmls)
-        as = Api.api_bulk_load_user_content_attachments(htmls, @context)
-        htmls.each { |html| fulfill(html, as) }
-      end
-    end
-
     field :description, String, null: true
     def description
       return nil if assignment.description.blank?
@@ -286,8 +271,7 @@ module Types
       load_locked_for do |lock_info|
         # some (but not all) locked assignments allow viewing the description
         next nil if lock_info && !assignment.include_description?(current_user, lock_info)
-        AttachmentPreloader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
-
+        Loaders::ApiContentAttachmentLoader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
             GraphQLHelpers::UserContent.process(assignment.description,
                                                 request: context[:request],
                                                 context: assignment.context,

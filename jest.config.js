@@ -58,6 +58,8 @@ module.exports = {
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
   restoreMocks: true,
 
+  testEnvironment: 'jest-environment-jsdom-fourteen',
+
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',

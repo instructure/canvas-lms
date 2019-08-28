@@ -62,7 +62,11 @@ describe('saveLtiToolConfiguration', () => {
 
     it('prepends the developer key to the list', () => {
       expect(dispatch).toBeCalledWith(
-        developerKeysActions.listDeveloperKeysPrepend({id: 100000000087, name: 'test key', tool_configuration: {test: "config"}})
+        developerKeysActions.listDeveloperKeysPrepend({
+          id: 100000000087,
+          name: 'test key',
+          tool_configuration: {test: 'config'}
+        })
       )
     })
   })
@@ -78,7 +82,7 @@ describe('ltiKeysUpdateCustomizations', () => {
   })
 
   const scopes = ['https://www.test.com/scope']
-  const redirectUris = "https://www.test.com"
+  const redirectUris = 'https://www.test.com'
   const disabledPlacements = ['account_navigation', 'course_navigaiton']
   const developerKeyId = 123
   const toolConfiguration = {}

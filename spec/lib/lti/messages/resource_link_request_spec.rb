@@ -23,10 +23,6 @@ describe Lti::Messages::ResourceLinkRequest do
 
   let(:tool_override) { nil }
 
-  before(:each) do
-    course.root_account.enable_feature!(:lti_1_3)
-    course.root_account.save!
-  end
   # rubocop:enable RSpec/ScatteredLet
 
   shared_examples 'disabled rlid claim group check' do

@@ -34,10 +34,11 @@ describe('ContentTabs', () => {
     expect(getAllByTestId('assignment-2-student-content-tabs')).toHaveLength(1)
   })
 
-  it('renders the tabs in the correct order', async () => {
+  it('renders the tabs in the correct order when the assignment has a rubric', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: () => ({attempt: 1})
     })
+
     const {getAllByRole, getByText, getAllByText} = render(
       <MockedProvider>
         <ContentTabs {...props} />
@@ -49,6 +50,23 @@ describe('ContentTabs', () => {
     expect(tabs[0]).toContainElement(getByText('Attempt 1'))
     expect(tabs[1]).toContainElement(getAllByText('Comments')[0])
     expect(tabs[2]).toContainElement(getAllByText('Rubric')[0])
+  })
+
+  it('does not render the Rubric tab when the assignment has no rubric', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: () => ({rubric: null})
+    })
+
+    const {getAllByRole, getByText, getAllByText} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+    const tabs = getAllByRole('tab')
+
+    expect(tabs).toHaveLength(2)
+    expect(tabs[0]).toContainElement(getByText('Attempt 1'))
+    expect(tabs[1]).toContainElement(getAllByText('Comments')[0])
   })
 
   it('titles the attempt tab as Attempt 1 on a brand new submission', async () => {
@@ -151,6 +169,27 @@ describe('ContentTabs', () => {
       getByText(
         'You may not see all comments right now because the assignment is currently being graded.'
       )
+    ).toBeInTheDocument()
+  })
+
+  it('does not let you create comments if a dummy submission is being displayed', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => ({
+        attempt: 2,
+        state: 'unsubmitted'
+      })
+    })
+
+    const {getAllByText, queryByTestId, getByText} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+    fireEvent.click(getAllByText('Comments')[0])
+
+    expect(queryByTestId('assignments_2_comment_attachment')).not.toBeInTheDocument()
+    expect(
+      getByText('You cannot leave leave comments until you submit the assignment')
     ).toBeInTheDocument()
   })
 })

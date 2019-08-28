@@ -739,55 +739,123 @@ describe AssignmentsController do
         user_session @teacher
       end
 
-      it "includes filter_speed_grader_by_student_group in SETTINGS hash" do
-        get :show, params: {course_id: @course.id, id: @assignment.id}
-        expect(assigns[:js_env][:SETTINGS]).to have_key :filter_speed_grader_by_student_group
-      end
-
-      context "when filter_speed_grader_by_student_group? is true" do
-        before :once do
-          @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
-          @course.enable_feature!(:new_gradebook)
-          @course.update!(filter_speed_grader_by_student_group: true)
-        end
-
-        it "includes the course group categories" do
-          @course.group_categories.create!(name: "category")
+      describe "filter_speed_grader_by_student_group" do
+        it "is included in the SETTINGS hash" do
           get :show, params: {course_id: @course.id, id: @assignment.id}
-          group_categories_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
-          expect(group_categories_ids).to eq @course.group_categories.map(&:id)
+          expect(assigns[:js_env][:SETTINGS]).to have_key :filter_speed_grader_by_student_group
         end
 
-        it "includes the gradebook settings student group id" do
-          @teacher.preferences[:gradebook_settings] = {
-            @course.id => {
-              'filter_rows_by' => {
-                'student_group_id' => '23'
+        describe "setting value" do
+          context "when the course has the 'Filter SpeedGrader by Student Group' setting enabled" do
+            before(:once) do
+              @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+              @course.enable_feature!(:new_gradebook)
+              @course.update!(filter_speed_grader_by_student_group: true)
+
+              category = @course.group_categories.create!(name: "category")
+              category.create_groups(2)
+            end
+
+            let(:category) { @course.group_categories.first }
+            let(:group_filter_setting) { assigns[:js_env][:SETTINGS][:filter_speed_grader_by_student_group] }
+
+            it "is set to true for non-group assignments" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(group_filter_setting).to be true
+            end
+
+            it "is set to true for group assignments that grade students individually" do
+              @assignment.update!(group_category: category, grade_group_students_individually: true)
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(group_filter_setting).to be true
+            end
+
+            it "is set to false for non-group assignments that do not grade students individually" do
+              @assignment.update!(group_category: category)
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(group_filter_setting).to be false
+            end
+          end
+        end
+
+        context "when filter_speed_grader_by_student_group? is true" do
+          before :once do
+            @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+            @course.enable_feature!(:new_gradebook)
+            @course.update!(filter_speed_grader_by_student_group: true)
+
+            category = @course.group_categories.create!(name: "category")
+            category.create_groups(2)
+          end
+
+          it "includes all group categories for the course if the assignment does not belong to a specific category" do
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+            expect(group_category_ids).to eq @course.group_categories.map(&:id)
+          end
+
+          it "includes only the relevant group category if the assignment is a group assignment" do
+            assignment_category = @course.group_categories.create!(name: "special category")
+            @assignment.update!(group_category: assignment_category, grade_group_students_individually: true)
+
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+            expect(group_category_ids).to contain_exactly(assignment_category.id)
+          end
+
+          it "includes the gradebook settings student group id if the group is valid for this assignment" do
+            first_group_id = @course.groups.first.id.to_s
+            @teacher.preferences[:gradebook_settings] = {
+              @course.id => {
+                'filter_rows_by' => {
+                  'student_group_id' => first_group_id
+                }
               }
             }
-          }
-          get :show, params: {course_id: @course.id, id: @assignment.id}
-          expect(assigns[:js_env][:selected_student_group_id]).to eq "23"
-        end
-      end
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env][:selected_student_group_id]).to eq first_group_id
+          end
 
-      context "when filter_speed_grader_by_student_group? is false" do
-        it "does not include the course group categories" do
-          @course.group_categories.create!(name: "category")
-          get :show, params: {course_id: @course.id, id: @assignment.id}
-          expect(assigns[:js_env]).not_to have_key :group_categories
-        end
-
-        it "does not include the gradebook settings student group id" do
-          @teacher.preferences[:gradebook_settings] = {
-            @course.id => {
-              'filter_rows_by' => {
-                'student_group_id' => '23'
+          it "does not set selected_student_group_id if the selected group is not eligible for this assignment" do
+            @teacher.preferences[:gradebook_settings] = {
+              @course.id => {
+                'filter_rows_by' => {
+                  'student_group_id' => @course.groups.first.id.to_s
+                }
               }
             }
-          }
-          get :show, params: {course_id: @course.id, id: @assignment.id}
-          expect(assigns[:js_env]).not_to have_key :selected_student_group_id
+
+            assignment_category = @course.group_categories.create!(name: "special category")
+            @assignment.update!(group_category: assignment_category)
+
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).not_to include(:selected_student_group_id)
+          end
+
+          it "does not set selected_student_group_id if no group is selected" do
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).not_to include(:selected_student_group_id)
+          end
+        end
+
+        context "when filter_speed_grader_by_student_group? is false" do
+          it "does not include the course group categories" do
+            @course.group_categories.create!(name: "category")
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).not_to have_key :group_categories
+          end
+
+          it "does not include the gradebook settings student group id" do
+            @teacher.preferences[:gradebook_settings] = {
+              @course.id => {
+                'filter_rows_by' => {
+                  'student_group_id' => '23'
+                }
+              }
+            }
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).not_to have_key :selected_student_group_id
+          end
         end
       end
 
@@ -1133,6 +1201,59 @@ describe AssignmentsController do
       user_session(@teacher)
       get :edit, params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
+    end
+
+    context 'when the root account does not have a default tool url set' do
+      let(:course) { @course }
+      let(:root_account) { course.root_account }
+
+      before do
+        user_session(@teacher)
+        get :edit, params: { course_id: course.id, id: @assignment.id }
+      end
+
+      it 'does not set "DEFAULT_ASSIGNMENT_TOOL_URL"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_URL)).to be_nil
+      end
+
+      it 'does not set "DEFAULT_ASSIGNMENT_TOOL_NAME"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_NAME)).to be_nil
+      end
+    end
+
+    context 'when the root account has a default tool url and name set' do
+      let(:course) { @course }
+      let(:root_account) { course.root_account }
+      let(:default_url) { 'https://www.my-tool.com/blti' }
+      let(:default_name) { 'Default Name' }
+      let(:button_text) { 'Click Me' }
+      let(:info_message) { 'Some information for you.' }
+
+      before do
+        root_account.settings[:default_assignment_tool_url] = default_url
+        root_account.settings[:default_assignment_tool_name] = default_name
+        root_account.settings[:default_assignment_tool_button_text] = button_text
+        root_account.settings[:default_assignment_tool_info_message] = info_message
+        root_account.save!
+        user_session(@teacher)
+        get :edit, params: { course_id: course.id, id: @assignment.id }
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_URL"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_URL)).to eq default_url
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_NAME"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_NAME)).to eq default_name
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT)).to eq button_text
+      end
+
+      it 'sets "DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE"' do
+        expect(assigns.dig(:js_env, :DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE)).to eq info_message
+      end
     end
 
     describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do

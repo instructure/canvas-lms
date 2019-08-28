@@ -885,7 +885,7 @@ describe Account do
       tool.settings[:account_navigation] = account_navigation
       tool.save!
 
-      tabs = @account.external_tool_tabs({})
+      tabs = @account.external_tool_tabs({}, User.new)
 
       expect(tabs.first[:label]).to eq "English Label"
     end
@@ -1721,7 +1721,7 @@ describe Account do
   end
 
   context "fancy redis caching" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     describe "cached_account_users_for" do
       before :each do

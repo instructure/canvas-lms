@@ -62,6 +62,9 @@ const store = {
     roles: ['user', 'teacher'],
     unpinnedDiscussionIds: [],
     userSettings: {collapse_global_nav: false, manual_mark_as_read: false},
+    copyToOpen: false,
+    sendToOpen: false,
+    DIRECT_SHARE_ENABLED: false
   }),
   // we only need to define these functions so that we match the react-redux contextTypes
   // shape for a store otherwise react-redux thinks our store is invalid

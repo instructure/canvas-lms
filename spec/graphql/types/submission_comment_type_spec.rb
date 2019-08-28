@@ -42,6 +42,40 @@ describe Types::SubmissionCommentType do
     ).to eq [@comment3.id.to_s]
   end
 
+  describe 'Submission Comment Read' do
+    it 'returns the correct read state' do
+      expect(
+        submission_type.resolve('commentsConnection { nodes { read }}')
+      ).to eq [false]
+    end
+
+    it 'returns the correct read state when submission is read' do
+      @submission.mark_read(@teacher)
+      expect(
+        submission_type.resolve('commentsConnection { nodes { read }}')
+      ).to eq [true]
+      expect(
+        submission_type.resolve(
+          'commentsConnection { nodes { read }}',
+          current_user: @student1
+        )
+      ).to eq [false]
+    end
+
+    it 'returns the correct read state when submission comment is read' do
+      @comment3.mark_read!(@teacher)
+      expect(
+        submission_type.resolve('commentsConnection { nodes { read }}')
+      ).to eq [true]
+      expect(
+        submission_type.resolve(
+          'commentsConnection { nodes { read }}',
+          current_user: @student1
+        )
+      ).to eq [false]
+    end
+  end
+
   it 'returns all the comments if allComments is true' do
     expect(
       submission_type.resolve('commentsConnection(filter: {allComments: true}) { nodes { _id }}')

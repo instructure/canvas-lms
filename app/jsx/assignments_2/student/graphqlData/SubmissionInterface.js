@@ -39,6 +39,7 @@ export const SubmissionInterface = {
       }
       submissionStatus
       submittedAt
+      unreadCommentCount
     }
     ${SubmissionFile.fragment}
     ${SubmissionDraft.fragment}
@@ -56,7 +57,8 @@ export const SubmissionInterface = {
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
-    submittedAt: string
+    submittedAt: string,
+    unreadCommentCount: number.isRequired
   })
 }
 
@@ -73,6 +75,7 @@ export const SubmissionInterfaceDefaultMocks = {
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',
-    submittedAt: null
+    submittedAt: null,
+    unreadCommentCount: 0
   })
 }

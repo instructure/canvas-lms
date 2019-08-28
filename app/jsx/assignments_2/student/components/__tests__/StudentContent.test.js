@@ -104,23 +104,23 @@ describe('Assignment Student Content View', () => {
   })
 
   it('renders Comments', async () => {
-    const {getByText} = render(
+    const {getAllByText, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
         <StudentContent {...makeProps()} />
       </MockedProvider>
     )
-    fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
+    fireEvent.click(getAllByText('Comments')[0])
 
     expect(await waitForElement(() => getByText('Send Comment'))).toBeInTheDocument()
   })
 
   it('renders spinner while lazy loading comments', () => {
-    const {getByTitle, getByText} = render(
+    const {getByTitle, getAllByText} = render(
       <MockedProvider mocks={mocks} addTypename>
         <StudentContent {...makeProps()} />
       </MockedProvider>
     )
-    fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
+    fireEvent.click(getAllByText('Comments')[0])
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
 })

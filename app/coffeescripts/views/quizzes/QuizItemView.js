@@ -46,7 +46,9 @@ export default class ItemView extends Backbone.View {
     this.prototype.events = {
       click: 'clickRow',
       'click .delete-item': 'onDelete',
-      'click .migrate': 'migrateQuiz'
+      'click .migrate': 'migrateQuiz',
+      'click .quiz-copy-to': 'copyQuizTo',
+      'click .quiz-send-to': 'sendQuizTo',
     }
 
     this.prototype.messages = {
@@ -165,6 +167,16 @@ export default class ItemView extends Backbone.View {
     })
   }
 
+  copyQuizTo(ev) {
+    ev.preventDefault()
+    console.log(`copy quiz ${this.model.get('id')} to course`)
+  }
+
+  sendQuizTo(ev) {
+    ev.preventDefault()
+    console.log(`send quiz ${this.model.get('id')} to user`)
+  }
+
   observeModel() {
     this.model.on('change:published', this.updatePublishState, this)
     return this.model.on('change:loadingOverrides', this.render, this)
@@ -201,6 +213,9 @@ export default class ItemView extends Backbone.View {
     base.is_locked =
       this.model.get('is_master_course_child_content') &&
       this.model.get('restricted_by_master_course')
+
+    base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
+
     return base
   }
 }

@@ -22,7 +22,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from './str/htmlEscape'
 import './jquery.ajaxJSON'
-import './jquery.google-analytics' /* trackEvent */
+import {trackEvent} from 'jquery.google-analytics'
 import './jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
 import './jquery.loadingImg'
 import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
@@ -84,7 +84,7 @@ import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
           $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, function() { }, function() { });
-          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'canvadoc_session_url']));
+          trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'canvadoc_session_url']));
         }
       }
 

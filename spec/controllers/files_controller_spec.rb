@@ -277,6 +277,12 @@ describe FilesController do
         get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => verifier}, :format => 'json'
         expect(response).to be_successful
       end
+
+      it "should emit an asset_accessed live event" do
+        allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
+        expect(Canvas::LiveEvents).to receive(:asset_access).with(@file, 'files', nil, nil)
+        get 'show', params: {:course_id => @course.id, :id => @file.id, :verifier => @file.uuid, download: 1}, :format => 'json'
+      end
     end
 
     it "should assign variables" do
@@ -1339,6 +1345,7 @@ describe FilesController do
               tap(&:start).
               tap(&:save!)
           end
+
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
@@ -1352,9 +1359,19 @@ describe FilesController do
             allow(homework_service).to receive(:queue_email)
           end
 
-          it 'should submit the attachment' do
+          it 'should submit the attachment if the submit_assignment flag is not provided' do
             expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
             request
+          end
+
+          it 'should submit the attachment if the submit_assignment param is set to true' do
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
+            post "api_capture", params: progress_params.merge(submit_assignment: true)
+          end
+
+          it 'should not submit the attachment if the submit_assignment param is set to false' do
+            expect(homework_service).not_to receive(:submit)
+            post "api_capture", params: progress_params.merge(submit_assignment: false)
           end
 
           it 'should save the eula_agreement_timestamp' do

@@ -163,11 +163,6 @@ $ic-Expand-link-size: $ic-sp*4;
     text-transform: uppercase;
     overflow: hidden;
 
-    // HACK because IE10 can't get the transforms right. Once we stop supporting IE10, we can remove this
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-      transform: translateX(0);
-    }
-
     &:hover, &:focus {
       @include ic-Expand-link-active-state;
       text-decoration: none;
@@ -215,11 +210,6 @@ $ic-Expand-link-size: $ic-sp*4;
 
     .ic-Expand-link__trigger {
       transform: translateX(100%) translateX( -($ic-Expand-link-size) );
-
-      // HACK because IE10 can't get the transforms right. Once we stop supporting IE10, we can remove this
-      @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        transform: translateX(0);
-      }
 
       &:hover, &:focus {
         @include ic-Expand-link-active-state;

@@ -579,7 +579,7 @@ en:
     lor: LOR External Tools
     gradebook_list_students_by_sortable_name: Gradebook - List Students by Sortable Name
     quizzes:
-      next: Quizzes.Next
+      next: New Quizzes
     quiz_log_auditing: Quiz Log Auditing
   google_docs_domain_restriction_description: |-
     Google Docs Domain Restriction allows Google Docs submissions and collaborations
@@ -691,17 +691,15 @@ en:
   specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: Specify max and min points to clarify boundaries of a rubric criterion rating.
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: Encrypted Sourcedids for Basic Outcomes
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.
-  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: Create assessments with Quizzes.Next and migrate existing Canvas Quizzes.
-  quizzes_next_submission_history_c0f7cd20: Quizzes.Next submission history
-  if_enabled_submission_history_for_quizzes_next_qui_fd70161: If enabled, submission history for Quizzes.Next quizzes is dealt with separately.
-  quizzes_next_importing_75e63f67: Quizzes.Next Importing
-  allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: Allow importing of QTI and Common Cartridge into Quizzes.Next.
+  create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: Create assessments with New Quizzes and migrate existing Canvas Quizzes.
+  new_quizzes_submission_history_d81b477b: New Quizzes submission history
+  if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: If enabled, submission history for New Quizzes quizzes is dealt with separately.
+  new_quizzes_importing_c167dce0: New Quizzes Importing
+  allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: Allow importing of QTI and Common Cartridge into New Quizzes.
   common_cartridge_html_file_to_page_conversion_7bf9678: Common Cartridge HTML File to Page Conversion
   if_enabled_common_cartridge_importers_will_convert_9bffff09: If enabled, Common Cartridge importers will convert HTML files into Pages
   non_scoring_rubrics_9f2033ad: Non-scoring Rubrics
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: If enabled, the option will be presented to have non-scoring rubrics.
-  lti_1_3_and_lti_advantage_b81c3d6c: LTI 1.3 and LTI Advantage
-  if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: If enabled, access to LTI 1.3 and LTI Advantage will be enabled.
   assignments_2_e88d7a26: Assignments 2
   use_the_new_assignments_page_dd292b9d: Use the new assignments page
   slack_notifications_3a0288e6: Slack Notifications
@@ -716,6 +714,8 @@ en:
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: This feature creates a SiteAdmin Release Flag tab to be able to release features to users through the UI. It also reworks the UI for the old Feature Options tabs.
   direct_share_80afd4a7: Direct Share
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: This feature allows teachers to easily copy single items from one course to another, and to share a single item of content with other users so they can import those items into their courses as well.
+  filter_speedgrader_by_student_group_53683142: Filter SpeedGrader by Student Group
+  allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: Allows users to enable the "Launch SpeedGrader Filtered by Student Group" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -729,6 +729,12 @@ en:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
     Allows admins to view a log containing information about all recently run
     GraphQL mutations
+  accessible_sidebar_menu_b30baf97: Accessible Sidebar Menu
+  improve_accessibility_of_left_hand_menu_through_be_908fb002: Improve accessibility of left-hand menu through better use of color plus visual and screenreader indicators of inactive menu items.
+  check_submission_file_type_b3dbf3fd: Check Submission File Type
+  this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
+    This feature makes the submissions file upload api check the filetype against
+    the allowed extensions of the associated assignment.
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -2442,6 +2448,7 @@ en:
       buttons:
         cancel: Cancel
         update: Update collaboration
+  maximum_number_of_communication_channels_reached_70c4d2f9: Maximum number of communication channels reached
   communication_channels:
     profile:
       notices:
@@ -2450,7 +2457,6 @@ en:
       login_to_confirm: Please log in to confirm your e-mail address
       registration_confirmed: Registration confirmed!
     confirm:
-      page_title: Register %{email}
       titles:
         welcome_aboard: Welcome Aboard!
       details:
@@ -2681,11 +2687,11 @@ en:
         upload_to: Upload to
         default_select_folder: Select Folder
       import_quizzes_next_view:
-        import_quizzes_Next: Import assessment content as Quizzes.Next
-        import_quizzesNext_help_label: Import assessment as Quizzes.Next Help Icon
-        import_quizzesNext_help_title_icon: Import assessment as Quizzes.Next Help Icon
-        import_quizzesNext_help_title: Quizzes.Next
-        import_quizzesNext_help_text: Quizzes.Next is the new assessment engine for Canvas.%{p_p}To learn more please contact your system administrator or visit
+        import_new_quizzes: Import assessment content as New Quizzes
+        import_quizzesNext_help_label: Import assessment as New Quizzes Help Icon
+        import_quizzesNext_help_title_icon: Import assessment as New Quizzes Help Icon
+        import_quizzesNext_help_title: New Quizzes
+        import_new_quizzes_help_text: New Quizzes is the new assessment engine for Canvas.%{p_p}To learn more please contact your system administrator or visit
       overwrite_assessment_content:
         overwrite_assessment_content: Overwrite assessment content with matching IDs
         assessment_help_label: Overwrite Assessment Help Icon
@@ -3907,6 +3913,7 @@ en:
     student: Student
     errors:
       select_an_option: Please select an option
+  grades_for_student_d4adfb55: Grades for Student
   gradebook_history_a3e8e0b4: Gradebook History
   gradebooks:
     notices:
@@ -3956,8 +3963,6 @@ en:
         details: Details
         submission_progress_status: Submission Progress Status
       click_to_change: Click to test a different score
-      student_mute_notification: Instructor is working on grades
-      grading_in_progress: Instructor is working on grades
       total: Total
       titles:
         vericite_score: VeriCite similarity score -- more information
@@ -4356,7 +4361,9 @@ en:
   invalid_content_type_utf_8_required_bd458b78: Invalid content type, UTF-8 required
   outcome_results:
     outcomes_filename: Outcomes
+  outcomes_for_student_9f91d4d: Outcomes for Student
   outcomes:
+    outcomes_for: Outcomes for %{user_name}
     successful_outcome_creation: Outcome successfully created!
     failed_outcome_creation: Outcome creation failed
     successful_outcome_update: Outcome successfully updated!
@@ -4373,9 +4380,9 @@ en:
       no_aligned_items: No aligned items
       no_artifacts: No artifacts
     user_outcome_results:
-      outcomes_for: Outcomes for %{user_name}
       labels:
         see_results: See %{user_name}'s results for
+      outcomes_for: Outcomes for %{user_name}
       short_title:
         outcome: Outcome
         attempts: Attempts
@@ -4889,6 +4896,7 @@ en:
       updated_profile: Settings successfully updated
       contact_confirmed: Contact successfully confirmed!
       mfa_disabled: Multi-factor authentication disabled
+    page_title: Students Being Observed
     access_token:
       default_app_name: No App
       labels:
@@ -4951,8 +4959,6 @@ en:
         notification_preferences: Notification Preferences
       confirm_email_instructions: Before you can receive any notifications, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box.
       weekly_notification_range: Your weekly notifications will be sent %{weekday} between %{start_time} and %{end_time}.
-    observees:
-      page_title: Students Being Observed
     profile:
       links:
         edit_settings: Edit Settings
@@ -6058,6 +6064,9 @@ en:
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: The specified user (%{id}) is not a student in this course
   invalid_datetime_for_submitted_since_a238f3a6: Invalid datetime for submitted_since
   invalid_datetime_for_graded_since_884cce5: Invalid datetime for graded_since
+  unable_to_find_filetype_7b620f02: unable to find filetype
+  unable_to_find_extension_3fe61b3c: unable to find extension
+  filetype_not_allowed_40556acb: filetype not allowed
   submissions_base:
     crumbs:
       assignments: Assignments
@@ -6069,6 +6078,7 @@ en:
   successfully_resubmitted_to_turnitin_c908de0f: Successfully resubmitted to turnitin.
   submissions:
     errors:
+      can_not_submit_locked_assignment: You can't submit an assignment when it is locked
       media_file_attached: There was no media recording in the submission
       assignment_submit_fail: Assignment failed to submit
       no_attached_file: You must attach at least one file to this assignment
@@ -6265,6 +6275,7 @@ en:
     crumbs:
       grades: Grades
       profile: "%{user}'s profile"
+    page_title: Grades
     service_not_enabled: That service has not been enabled
     google_drive_added: Google Drive account successfully added!
     oauth_fail: OAuth Request failed. Couldn't find valid request
@@ -6418,7 +6429,6 @@ en:
     index:
       crumbs:
         users: Users
-      search_for_user: User Search results for %{user_name}
       all_users: All Users
       buttons:
         user_groups: View User Groups
@@ -6474,6 +6484,7 @@ en:
     confirms:
       unenroll_user: Are you sure you want to unenroll this user?
   act_as_user_name_5581cdbb: Act as %{user_name}
+  act_as_user_77dda176: Act as user
   nothing_to_split_off_of_this_user_28ba9dd5: Nothing to split off of this user
   wiki_pages_api:
     cannot_delete_front_page: The front page cannot be deleted
@@ -6500,9 +6511,9 @@ en:
   no_attachments_found_for_the_following_ids_ids_49c9192f: 'No attachments found for the following ids: %{ids}'
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: You must attach at least one file to this assignment
   invalid_file_type_881cc9b2: Invalid file type
+  a_and_b_cannot_be_used_together_77ee6a2a: "{a} and {b} cannot be used together"
   anonymous_assignments_must_be_manually_posted_a13d2ca5: Anonymous assignments must be manually posted
   moderated_assignments_must_be_manually_posted_unti_39545855: Moderated assignments must be manually posted until grades are released
-  everyone_else_cc5f6888: Everyone else
   global_message_icons:
     information: information
     error: error
@@ -6656,6 +6667,10 @@ en:
   context_navigation_menu_514c5889: Context Navigation Menu
   disabled_in_course_settings_d15ee35d: "* Disabled in Course Settings"
   no_content_has_been_added_f36bab43: "* No content has been added"
+  disabled_not_visible_to_students_48d4a90d: Disabled. Not visible to students
+  no_content_not_visible_to_students_b59f4867: No content. Not visible to students
+  label_disabled_not_visible_to_students_da093eec: "%{label}. Disabled. Not visible to students"
+  label_no_content_not_visible_to_students_84345d2f: "%{label}. No content. Not visible to students"
   for: for
   you_do_not_have_access_to_the_requested_resource_316ce49a: You do not have access to the requested resource.
   previous_page_928fc112: Previous Page
@@ -7709,6 +7724,7 @@ en:
       manage_announcements: Manage global announcements
       manage_catalog: Manage catalog
       manage_: 'Manage ( add / edit / delete ) '
+      manage_data_services: Manage data services
       manage_developer_keys: Manage developer keys
       manage_feature_flags: Enable or disable features at an account level
       manage_frozen_assignment: Manage (edit / delete) frozen assignments
@@ -7777,7 +7793,10 @@ en:
   global_announcements_add_edit_delete_843ca4d2: Global Announcements - add / edit / delete
   catalog_manage_f57e50f3: Catalog - manage
   courses_add_edit_delete_aa2b55d3: Courses - add / edit / delete
+  data_services_manage_9b8f96da: 'Data Services - manage '
   developer_keys_manage_806da2d: 'Developer Keys - manage '
+  view_feature_settings_at_an_account_level_ec7f5e10: View feature settings at an account level
+  feature_options_view_a170e80c: Feature Options - view
   feature_options_enable_disable_7e748054: Feature Options - enable / disable
   blueprint_courses_create_edit_associate_delete_bf41988e: Blueprint Courses (create / edit / associate / delete)
   blueprint_courses_add_edit_associate_delete_bc26d5c2: Blueprint Courses - add / edit / associate / delete
@@ -11286,6 +11305,7 @@ en:
     authorize_google_drive: 'Before you can collaborate on documents, you need to authorize Canvas to access your Google Drive account:'
   the_following_content_is_partner_provided_ed1da756: The following content is partner provided
   the_preceding_content_is_partner_provided_d753928c: The preceding content is partner provided
+  register_email_efc06d59: Register Email
   i_agree_to_the_34aa16ce: I agree to the
   if_you_keep_having_problems_click_the_link_link_be_a4d695eb: If you keep having problems, click the "%{link}" link below to search the guides or to let us know what's going on.
   new_conferences_a020a8a9: New Conferences
@@ -11338,6 +11358,7 @@ en:
   requirement_f5b75da1: Requirement
   mark_as_done_779556d7: mark as done
   minimum_score_e6d1c134: Minimum Score
+  toggle_module_visibility_781a2f6c: toggle module visibility
   complete_one_item_90e5fb03: Complete One Item
   complete_all_items_e1779257: Complete All Items
   completed_19711ce7: Completed
@@ -11357,6 +11378,10 @@ en:
   duplicate_module_name_ab26e5c3: Duplicate %{module_name}
   duplicate_this_module_79ca8243: Duplicate this module
   duplicate_31cec192: Duplicate
+  send_this_module_to_another_user_50cb27c8: Send this module to another user...
+  send_to_b940900a: Send To...
+  copy_this_module_to_a_course_ddd12cc7: Copy this module to a course...
+  copy_to_64f8456b: Copy To...
   up_c553575d: Up
   previous_module_item_2bb5e499: Previous Module/Item
   down_5831a426: Down
@@ -11415,6 +11440,8 @@ en:
   move_to_dde1a5e1: Move to...
   remove_this_item_from_the_module_4b2ceab7: Remove this item from the module
   remove_f47dc62a: Remove
+  send_this_module_item_to_another_user_14d4fd60: Send this module item to another user...
+  copy_this_module_item_to_a_course_790a0cf4: Copy this module item to a course...
   prerequisites_49659f16: 'Prerequisites:'
   open_title_in_a_new_window_b29fed77: Open %{title} in a new window
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: You are trying to launch insecure content from within a secure site (canvas). Some web browsers may prevent this content from loading.
@@ -11562,8 +11589,7 @@ en:
   late_penalty_78099d18: 'Late Penalty:'
   final_grade_6e94d99e: 'Final Grade:'
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.
-  hidden_14a032a7: Hidden
-  muted_3ff94739: Muted
+  instructor_is_working_on_grades_135388d2: Instructor is working on grades
   show_saved_what_if_scores_358bfe5f: Show Saved "What-If" Scores
   note_this_is_not_your_official_score_f2d4582f: "*NOTE*: This is NOT your official score."
   revert_to_actual_score_f665eea9: Revert to Actual Score
@@ -12171,6 +12197,7 @@ en:
   late_penalty_817fff4e: 'Late penalty:'
   final_grade_6938dca8: 'Final grade:'
   this_is_a_media_comment_click_here_to_view_c297bf62: This is a media comment, *click here to view*.
+  submission_preview_383473ec: Submission Preview
   url_preview_5d1f4a4e: URL Preview
   assignment_assignment_submission_paper_view_8a4c9776: Assignment %{assignment} submission Paper View
   paper_view_7405eeab: Paper View
@@ -12193,6 +12220,7 @@ en:
   clear_user_cache_ef079f7f: Clear User Cache
   view_grades_8d3bae6c: View Grades
   send_a_message_to_the_teacher_1ae115b6: Send a Message to the Teacher
+  user_search_results_3af96217: User Search results
   academic_benchmark:
     plugin_settings:
       description: You will need access to an [Academic Benchmark](%{url}) account.
@@ -13323,6 +13351,7 @@ en:
   uploading_submission_4c8d944b: Uploading Submission
   submission_failed_to_submit_8de4efcd: Submission Failed to Submit
   no_file_submitted_a879fa53: No File Submitted
+  hidden_14a032a7: Hidden
   add_a_comment_872470ac: Add a Comment
   download_submission_comments_2a6c0395: Download Submission Comments
   similarity_score_see_detailed_report_a113dac0: Similarity Score - See detailed report
@@ -14545,7 +14574,7 @@ en:
   select_content: Select Content
   you_must_select_a_course_to_copy_content_from_e7bd9e09: You must select a course to copy content from
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: You must select a folder to upload your migration to
-  this_option_is_not_compatible_with_quizzes_next_6dacd0c1: This option is not compatible with Quizzes.Next
+  this_option_is_not_compatible_with_new_quizzes_ed489d7c: This option is not compatible with New Quizzes
   select_content_checkbox:
     select_content_error: You must choose a content option
   viewsContextModules:
@@ -14786,7 +14815,7 @@ en:
   course_name_is_required_90919349: Course name is required
   reference_code_is_required_c32c757f: Reference code is required
   course_name_successfully_added_48116a50: "%{course_name} successfully added!"
-  something_went_wrong_creating_course_please_try_ag_5198931d: Something went wrong creating course. Please try again.
+  something_went_wrong_creating_the_course_please_tr_431adff5: Something went wrong creating the course. Please try again.
   course_name_63b973d1: Course Name
   reference_code_3e8355dd: Reference Code
   subaccount_91f4c279: Subaccount
@@ -14956,6 +14985,9 @@ en:
   error_retrieving_similarity_detection_tools_d6d4f9e9: Error retrieving similarity detection tools
   error_retrieving_assignment_external_tools_9102d343: Error retrieving assignment external tools
   external_tool_tool_id_6028b3b1: External Tool %{tool_id}
+  add_a_question_set_11e49ba: Add a Question Set
+  successfully_added_fb3e6008: Successfully Added
+  click_the_button_above_to_add_a_wileyplus_question_1d260444: Click the button above to add a WileyPLUS Question Set
   grader_that_determines_final_grade_cc55f20: Grader that determines final grade
   select_grader_782af48: Select Grader
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: Grades were successfully released to the gradebook.
@@ -15032,6 +15064,8 @@ en:
   submission_draft_updated_e953166a: Submission draft updated
   error_sending_submission_d32dc075: Error sending submission
   submission_sent_3f0d2ee1: Submission sent
+  add_media_cfa37b54: Add Media
+  record_upload_35dfb2ab: Record/Upload
   send_a_comment_to_your_instructor_about_this_assig_83fd5960: Send a comment to your instructor about this assignment.
   at_791460b3: at
   submission_comment_sent_3f2af3d0: Submission comment sent
@@ -15044,6 +15078,7 @@ en:
   send_comment_4e05f2fb: Send Comment
   submitted_318fad53: Submitted
   not_submitted_fff47f17: Not submitted
+  you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: You cannot leave leave comments until you submit the assignment
   attempt_attempt_d3911720: Attempt %{attempt}
   comments_e07bcbe3: Comments
   rubric_fc39da76: Rubric
@@ -15055,7 +15090,6 @@ en:
   upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
-  more_options_272b4953: More Options
   uploaded_285a2bfb: Uploaded
   ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
   ungraded_147a0dce: ungraded
@@ -15084,13 +15118,17 @@ en:
   assignment_locked_with_prerequisite_5b8cb148: Assignment Locked with Prerequisite
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
   go_to_prerequisite_175c1f3f: Go to Prerequisite
+  course_external_tools_query_error_d5110efe: Course external tools query error
+  assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
+  more_options_272b4953: More Options
   upload_8b403d05: Upload
+  assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
   not_graded_yet_82f63c67: Not Graded Yet
   unavailable_46d2c344: Unavailable
   new_attempt_57eae3d9: New Attempt
-  assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
-  assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
   failed_to_laod_more_submissions_990aacee: Failed to laod more submissions
+  text_entry_e1808b2f: Text Entry
+  start_entry_4b491f60: Start Entry
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
   points_must_0_3bff353: Points must >= 0
@@ -15145,6 +15183,7 @@ en:
   remove_studentname_16ba8c3a: Remove %{studentName}
   subject_1bc03dea: 'Subject:'
   body_f48fe5cd: 'Body:'
+  everyone_else_cc5f6888: Everyone else
   everyone_854554dd: Everyone
   click_to_hide_details_f7d353d9: Click to hide details
   click_to_show_details_310154eb: Click to show details
@@ -15191,7 +15230,6 @@ en:
   file_c851020d: File
   media_af190855: Media
   non_canvas_11f36d4a: Non Canvas
-  text_entry_e1808b2f: Text Entry
   url_22a5f3b8: URL
   add_submission_type_8690db4b: Add submission type
   submission_type_a925fc5f: Submission Type
@@ -15242,6 +15280,16 @@ en:
   assignments_2_teacher_view_error_page_8e45dedc: Assignments 2 Teacher View Error Page
   saving_assignment_fb958949: Saving assignment
   delete_assignment_5d3f3f15: delete assignment
+  asset_string_ddeaf719: Asset String
+  user1_masquerading_as_user2_4fa5bb55: "%{user1} masquerading as %{user2}"
+  something_went_wrong_89195131: Something went wrong.
+  mutations_on_search_e5a62790: mutations on %{search}
+  timestamp_865fa6b7: Timestamp
+  mutation_f0ac253f: Mutation
+  performed_by_70b3ce96: Performed by
+  parameters_a13374ec: Parameters
+  no_results_found_e4b686bd: No results found.
+  graphql_mutation_activity_5a47678b: GraphQL Mutation Activity
   add_an_identity_provider_to_this_account_c2644478: 'Add an identity provider to this account:'
   no_attributes_locked_611c5cc: no attributes locked
   an_error_occurred_while_loading_changes_9851b56f: An error occurred while loading changes
@@ -15809,6 +15857,8 @@ en:
   move_to_25d7ef11: Move To
   move_discussion_title_93ea7be1: Move discussion %{title}
   duplicate_discussion_title_6537ef4d: Duplicate discussion %{title}
+  send_title_to_user_526320bb: Send {%title} to user
+  copy_title_to_course_ac71981a: Copy {%title} to course
   delete_discussion_title_a28df8b6: Delete discussion %{title}
   unread_c14cb06f: unread,
   due_date_2c6e4cfb: Due %{date}
@@ -15903,10 +15953,10 @@ en:
   config_url_e96ceaf3: Config URL
   example_https_example_com_config_xml_be5f36ac: 'Example: https://example.com/config.xml'
   xml_configuration_5ea1b942: XML Configuration
-  by_client_id_4f2fe02c: By Client ID
   configuration_type_25a084a4: Configuration Type
   by_url_a163275e: By URL
   paste_xml_cda3a64e: Paste XML
+  by_client_id_4f2fe02c: By Client ID
   by_lti_2_registration_url_e421e523: By LTI 2 Registration URL
   tool_configuration_63cd43b0: Tool Configuration
   configure_toolname_app_651371be: Configure %{toolName} App
@@ -15991,6 +16041,7 @@ en:
   info_8f47054a: Info
   preview_removal_998101a9: Preview Removal
   level_5fdf654a: Level
+  sorted_direction_by_columnname_d049ac44: Sorted %{direction} by %{columnName}
   info_panel_displayed_51d481cc: Info panel displayed
   info_panel_hidden_bf7c3b7b: Info panel hidden
   view_previous_file_b846db4f: View previous file
@@ -16100,7 +16151,6 @@ en:
   more_results_were_added_at_the_bottom_of_the_page_dc323877: More results were added at the bottom of the page.
   loading_more_gradebook_history_results_810f6d2e: Loading more gradebook history results.
   loading_results_769c8819: Loading Results
-  no_results_found_e4b686bd: No results found.
   no_more_results_to_load_6774fb1c: No more results to load.
   anonymously_graded_59149570: Anonymously graded
   not_anonymously_graded_87574f91: Not anonymously graded
@@ -16150,6 +16200,7 @@ en:
     other: Score does not include %{groups} because they have no points possible
   can_t_compute_score_until_an_assignment_has_points_f34dd600: Can't compute score until an assignment has points possible
   out_of_pointspossible_3fb5ee20: Out of %{pointsPossible}
+  muted_3ff94739: Muted
   no_grades_to_post_91425bfd: No grades to post
   post_grades_3e692d46: Post grades
   all_grades_posted_616a85ab: All grades posted
@@ -16333,7 +16384,6 @@ en:
   enter_a_what_if_score_668c91a3: Enter a What-If score.
   this_is_a_what_if_score_cbdc04f9: This is a What-If score
   click_to_test_a_different_score_2e0bb6f0: Click to test a different score
-  instructor_is_working_on_grades_135388d2: Instructor is working on grades
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: Based on What-If scores, the new total is now %{grade}
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: This assignment is dropped and will not be considered in the total calculation
   hide_all_details_61d7ebb: Hide All Details
@@ -16380,7 +16430,7 @@ en:
   hide_e057ff36: Hide
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: Hiding grades is not allowed because grades have not been released for this assignment.
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: Hiding grades will refresh your browser. This may take a moment.
-  grades_can_only_be_hidden_for_everyone_when_the_as_36a614a9: Grades can only be hidden for everyone when the assignment is anonymous. Anonymity will be enabled.
+  when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.
   hide_grades_585e63b4: Hide Grades
   at_least_one_section_must_be_selected_to_hide_grad_f88c946f: At least one section must be selected to hide grades by section.
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: Success! Grades have been hidden for the selected sections of %{assignmentName}.
@@ -16395,7 +16445,7 @@ en:
   post_1e445890: Post
   posting_grades_is_not_allowed_because_grades_have__229d9c9e: Posting grades is not allowed because grades have not been released for this assignment.
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: Posting grades will refresh your browser. This may take a moment.
-  grades_can_only_be_posted_to_everyone_when_the_ass_b866ca05: Grades can only be posted to everyone when the assignment is anonymous. Anonymity will be removed.
+  when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed.
   select_whether_to_post_for_all_submissions_or_only_b18d681f: Select whether to post for all submissions, or only graded ones.
   post_types_93ff86d9: Post types
   grades_will_be_made_visible_to_all_students_1cc4d67e: Grades will be made visible to all students
@@ -17498,6 +17548,14 @@ en:
   count_users_374d6e47: "(%{count} Users)"
   speedgrader_tm_44688790: SpeedGrader™
   select_one_8e0af564: Select One
+  loading_media_32847745: Loading Media
+  drag_a_file_here_39357b48: Drag a File Here
+  record_7c9448b: Record
+  embed_828fac4a: Embed
+  upload_media_ce31135a: Upload Media
+  clear_selected_file_82388e50: Clear selected file
+  embed_video_code_703e10f2: Embed Video Code
+  error_uploading_video_audio_recording_16d9730a: Error uploading video/audio recording
   delayed_until_58b7af4b: 'Delayed until:'
   posted_on_e1010e1e: 'Posted on:'
   reply_389d6fb9: Reply
@@ -17505,6 +17563,11 @@ en:
   disallow_comments_6d04b47a: Disallow Comments
   allow_comments_for_title_7ac9e00: Allow comments for %{title}
   disallow_comments_for_title_21f9c653: Disallow comments for %{title}
+  use_arrow_keys_to_navigate_options_2021cc50: Use arrow keys to navigate options.
+  list_collapsed_9ac35920: List collapsed.
+  list_expanded_efec2d0: List expanded.
+  list_collapsed_dde87718: List collapsed
+  option_selected_list_collapsed_70a356b4: "%{option} selected. List collapsed."
   filter_conversations_by_type_1ce8c064: Filter conversations by type
   manage_options_for_name_83278ad0: Manage options for %{name}
   username_saved_successfully_they_should_receive_an_877e31e: "*%{userName}* saved successfully! They should receive an email confirmation shortly."
@@ -17886,7 +17949,6 @@ en:
   keyboard_nav_dialog:
     esc_key_notification: Press the escape key before using keyboard shortcuts when navigating the gradebook grid.
   record_media_6637ff19: Record Media
-  upload_media_ce31135a: Upload Media
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: This recorder uses Flash. As a result, you may find it easier to make a recording on your local machine, and then use the media uploader tab to upload it.
   record_with_webcam_af21e07c: Record with Webcam
   record_with_microphone_only_e4ee07aa: Record with Microphone Only
@@ -18273,6 +18335,8 @@ en:
   options_for_title_label_17f821ff: Options for %{title_label}
   migrate_quiz_5d0f777: Migrate Quiz
   migrate_67c9f753: Migrate
+  send_quiz_to_user_e8c47177: Send Quiz to User
+  copy_quiz_to_course_74f9c8c1: Copy Quiz to Course
   re_upload_submissions_form:
     reupload_submission_files: Re-Upload Submission Files
     upload_info: If you made changes to the student submission files you downloaded before, just zip them back up and upload the zip with the form below. Students will see the modified files in their comments for the submission.
@@ -18327,6 +18391,8 @@ en:
   master_lock_590266b6: Master Lock
   remove_as_front_page_2698aa12: Remove as Front Page
   use_as_front_page_274a488b: Use as Front Page
+  send_page_to_another_user_6ef5a7c1: Send page to another user
+  copy_page_to_another_course_405cc07c: Copy page to another course
   screenreader_gradebook:
     assignment_information:
       actions:

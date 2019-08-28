@@ -3927,8 +3927,40 @@ describe 'Submissions API', type: :request do
           api_url: "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
           request_params: { user_id: @student2.to_param }
         )
-
         assert_status(401)
+      end
+
+      it "allows a teacher to upload files for a student" do
+        @user = @teacher
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
+      end
+
+      it "allows any filetype when there are no restrictions on type" do
+        @assignment.root_account.enable_feature!(:check_submission_file_type)
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
+      end
+
+      it "rejects uploading files when filetype is not allowed" do
+        @assignment.root_account.enable_feature!(:check_submission_file_type)
+        @assignment.update_attributes(:allowed_extensions => ['doc'])
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(400)
+      end
+
+      it "allows filetype when restricted and is correct filetype" do
+        @assignment.root_account.enable_feature!(:check_submission_file_type)
+        @assignment.update_attributes(:allowed_extensions => ['txt'])
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
+      end
+
+      it "will allow you to upload any type when feature not enabled" do
+        @assignment.root_account.disable_feature!(:check_submission_file_type)
+        @assignment.update_attributes(:allowed_extensions => ['doc'])
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        assert_status(200)
       end
 
       it "uploads to a student's Submissions folder" do
@@ -4029,6 +4061,13 @@ describe 'Submissions API', type: :request do
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::SubmitWorker.name
         end
+
+        it 'should enqueue the copy job when the submit_assignment parameter is false' do
+          preflight(url: 'http://example.com/test', filename: 'test.txt', submit_assignment: false)
+          JSON.parse(response.body)
+          job = Delayed::Job.order(:id).last
+          expect(job.handler).to include Services::SubmitHomeworkService::CopyWorker.name
+        end
       end
     end
 
@@ -4041,6 +4080,24 @@ describe 'Submissions API', type: :request do
       a1 = attachment_model(:context => @course)
       json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_upload", :file_ids => [a1.id] } }, {}, :expected_status => 400)
       expect(json['message']).to eq 'No valid file ids given'
+    end
+
+    it "allows a grader to submit for a student and set submitted_at" do
+      submitted_at = 1.day.ago.change(usec: 0)
+      @user = course_with_teacher(:course => @course).user
+      api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "www.example.com", :user_id => @student.id, submitted_at: submitted_at } }, {}, :expected_status => 201)
+      submission = Submission.last
+      expect(submission.submitted_at).to eq submitted_at
+    end
+
+    it "rejects submissions for one student from another" do
+      @student1 = @student
+      @user = course_with_student(:course => @course).user
+      api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "www.example.com", :user_id => @student1.id } }, {}, :expected_status => 401)
+    end
+
+    it 'prevents a student from sending submitted_at for their own submission' do
+      api_call(:post, @url, @args, {submissions: {submission_type: 'online_url', url: 'www.example.com', user_id: @student.id, submitted_at: 1.day.ago}}, {}, expected_status: 400)
     end
   end
 

@@ -18,10 +18,19 @@
 
 module Types
   class RubricType < ApplicationObjectType
-    graphql_name "Rubric"
+    graphql_name 'Rubric'
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", method: :id, null: false
+    field :_id, ID, 'legacy canvas id', method: :id, null: false
+    field :context_id, String, null: false
+
+    field :criteria, [CriterionType], null: false
+    def criteria
+      object.data
+    end
+
     field :free_form_criterion_comments, Boolean, null: true
+    field :points_possible, Int, null: false
+    field :title, String, null: false
   end
 end

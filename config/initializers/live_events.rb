@@ -15,6 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+class StubbedClient
+  def self.put_records(records:, stream_name:)
+    events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
+    puts "Events #{events} put to stream #{stream_name}: #{records}"
+  end
+
+  def self.stream_name
+    'stubbed_kinesis_stream'
+  end
+end
+
 Rails.configuration.to_prepare do
   LiveEvents.logger = Rails.logger
   LiveEvents.cache = Rails.cache
@@ -24,8 +35,11 @@ Rails.configuration.to_prepare do
     plugin_settings = Canvas::Plugin.find(:live_events)&.settings
     if plugin_settings && Canvas::Plugin.value_to_boolean(plugin_settings['use_consul'])
       Canvas::DynamicSettings.find('live-events', default_ttl: 2.hours)
+    elsif ENV['STUB_LIVE_EVENTS_KINESIS']
+      plugin_settings.merge('stub_kinesis' => true)
     else
       plugin_settings
     end
   }
+  LiveEvents.stream_client = StubbedClient if ENV['STUB_LIVE_EVENTS_KINESIS']
 end

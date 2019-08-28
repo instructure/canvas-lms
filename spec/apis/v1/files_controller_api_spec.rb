@@ -414,6 +414,35 @@ describe "Files API", type: :request do
         )
       )
       expect(redirect_params['include']).to include('preview_url')
+      expect(redirect_params['include']).not_to include('enhanced_preview_url')
+    end
+
+    it "includes enhanced_preview_url in course context" do
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{base_params.to_query}",
+        base_params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json"
+        )
+      )
+      expect(redirect_params['include']).to include('enhanced_preview_url')
+    end
+
+    it "includes enhanced_preview_url in group context" do
+      group = @course.groups.create!
+      params = base_params.merge(context_type: Group, context_id: group.id)
+      raw_api_call(
+        :post,
+        "/api/v1/files/capture?#{params.to_query}",
+        params.merge(
+          controller: "files",
+          action: "api_capture",
+          format: "json"
+        )
+      )
+      expect(redirect_params['include']).to include('enhanced_preview_url')
     end
   end
 
@@ -582,36 +611,74 @@ describe "Files API", type: :request do
       ]
     end
 
-    it "should include user even for user files" do
-      my_root_folder = Folder.root_folders(@user).first
-      my_file = Attachment.create! :filename => 'ztest.txt',
-                                   :display_name => "ztest.txt",
-                                   :position => 1,
-                                   :uploaded_data => StringIO.new('file'),
-                                   :folder => my_root_folder,
-                                   :context => @user,
-                                   :user => @user
-
-      json = api_call(:get, "/api/v1/folders/#{my_root_folder.id}/files?include[]=user", {
-        :controller => "files",
-        :action => "api_index",
-        :format => "json",
-        :id => my_root_folder.id.to_param,
-        :include => ['user']
-      })
-      expect(json.map{|f|f['user']}).to eql [
-        {
-          "id" => @user.id,
-          "display_name" => @user.short_name,
-          "avatar_image_url" => User.avatar_fallback_url(nil, request),
-          "html_url" => "http://www.example.com/about/#{@user.id}"
-        }
-      ]
-    end
-
     it "includes an instfs_uuid if ?include[]-ed" do
       json = api_call(:get, @files_path, @files_path_options.merge(include: ['instfs_uuid']))
       expect(json[0].key? "instfs_uuid").to be true
+    end
+
+    context 'when the context is a user' do
+      subject do
+        api_call(:get, request_url, request_params)
+      end
+
+      let(:user) { @user }
+      let(:root_folder) { Folder.root_folders(user).first }
+      let(:request_url) { "/api/v1/folders/#{root_folder.id}/files?include[]=user" }
+      let(:file) do
+        Attachment.create!(
+          :filename => 'ztest.txt',
+          :display_name => "ztest.txt",
+          :position => 1,
+          :uploaded_data => StringIO.new('file'),
+          :folder => root_folder,
+          :context => user,
+          :user => user
+        )
+      end
+      let(:request_params) do
+        {
+          :controller => "files",
+          :action => "api_index",
+          :format => "json",
+          :id => root_folder.id.to_param,
+          :include => ['user']
+        }
+      end
+
+      before { file }
+
+      it "should include user even for user files" do
+        expect(subject.map{|f|f['user']}).to eql [
+          {
+            "id" => user.id,
+            "display_name" => user.short_name,
+            "avatar_image_url" => User.avatar_fallback_url(nil, request),
+            "html_url" => "http://www.example.com/about/#{user.id}"
+          }
+        ]
+      end
+
+      context 'when the request url contains the user id' do
+        let(:request_url) { "/api/v1/users/#{user.id}/files" }
+        let(:request_params) do
+          {
+            :controller => "files",
+            :action => "api_index",
+            :format => "json",
+            :user_id => user.to_param
+          }
+        end
+
+        it 'triggers a user asset access live event' do
+          expect(Canvas::LiveEvents).to receive(:asset_access).with(
+            ['files', user],
+            'files',
+            'User',
+            nil
+          )
+          subject
+        end
+      end
     end
 
   end

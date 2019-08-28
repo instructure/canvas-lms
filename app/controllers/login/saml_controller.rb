@@ -127,7 +127,9 @@ class Login::SamlController < ApplicationController
 
     if pseudonym
       # Successful login and we have a user
-      @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
+      @domain_root_account.pseudonyms.scoping do
+        PseudonymSession.create!(pseudonym, false)
+      end
       user = pseudonym.login_assertions_for_user
 
       if debugging

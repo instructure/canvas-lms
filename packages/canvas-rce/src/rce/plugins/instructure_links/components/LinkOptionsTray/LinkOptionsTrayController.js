@@ -61,7 +61,7 @@ export default class LinkOptionsTrayController {
     this._editor = null
   }
   _renderTray() {
-    const content = getContentFromEditor(this._editor)
+    const content = getContentFromEditor(this._editor, true)
     if (this._shouldOpen) {
       /*
        * When the tray is being opened again, it should be rendered fresh

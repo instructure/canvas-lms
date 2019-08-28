@@ -24,8 +24,8 @@ import $ from 'jquery'
 import ConditionalRelease from 'jsx/shared/conditional_release/ConditionalRelease'
 
 let editor = null
-window.conditional_release_module = {
-  ConditionalReleaseEditor: env => {
+class ConditionalReleaseEditor {
+  constructor(env) {
     editor = {
       attach: sinon.stub(),
       updateAssignment: sinon.stub(),
@@ -37,6 +37,7 @@ window.conditional_release_module = {
     return editor
   }
 }
+window.conditional_release_module = {ConditionalReleaseEditor}
 
 let component = null
 const createComponent = submitCallback => {

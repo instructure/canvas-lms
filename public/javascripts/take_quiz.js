@@ -19,6 +19,7 @@
 import FileUploadQuestionView from 'compiled/views/quizzes/FileUploadQuestionView'
 import File from 'compiled/models/File'
 import I18n from 'i18n!quizzes.take_quiz'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
 import $ from 'jquery'
 import autoBlurActiveInput from 'compiled/behaviors/autoBlurActiveInput'
 import _ from 'underscore'
@@ -515,12 +516,12 @@ import 'compiled/behaviors/quiz_selectmenu'
       .delegate(":text,textarea,select", 'change', function(event, update) {
         var $this = $(this);
         if ($this.hasClass('numerical_question_input')) {
-          var val = parseFloat($this.val().replace(/,/g, ''));
-          $this.val(isNaN(val) ? "" : val.toFixed(4).replace(/\.?0+(e.*)?$/,"$1"));
+          var val = numberHelper.parse($this.val());
+          $this.val(isNaN(val) ? "" : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}))
         }
         if ($this.hasClass('precision_question_input')) {
-          var val = parseFloat($this.val().replace(/,/g, ''));
-          $this.val(isNaN(val) ? "" : val.toPrecision(16).replace(/\.?0+(e.*)?$/,"$1"));
+          var val = numberHelper.parse($this.val());
+          $this.val(isNaN(val) ? "" : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true}))
         }
         if (update !== false) {
           quizSubmission.updateSubmission();
@@ -529,10 +530,10 @@ import 'compiled/behaviors/quiz_selectmenu'
       .delegate(".numerical_question_input", {
         keyup: function(event) {
           var $this = $(this);
-          var val = $this.val().replace(/,/g, '');
+          var val = $this.val() + '';
           var $errorBox = $this.data('associated_error_box');
 
-          if (val.match(/^$|^-$/) || !isNaN(parseFloat(val))) {
+          if (val.match(/^$|^-$/) || numberHelper.validate(val)) {
             if ($errorBox) {
               $this.triggerHandler('click');
             }

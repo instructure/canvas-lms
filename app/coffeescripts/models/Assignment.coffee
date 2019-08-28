@@ -29,6 +29,7 @@ import GradingPeriodsHelper from 'jsx/grading/helpers/GradingPeriodsHelper'
 import tz from 'timezone'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import PandaPubPoller from '../util/PandaPubPoller'
+import { matchingToolUrls } from './LtiAssignmentHelpers'
 
 isAdmin = () ->
   _.includes(ENV.current_user_roles, 'admin')
@@ -63,6 +64,9 @@ export default class Assignment extends Model
   isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
   isPage: => @_hasOnlyType 'wiki_page'
   isExternalTool: => @_hasOnlyType 'external_tool'
+
+  defaultToolName: => escape(ENV.DEFAULT_ASSIGNMENT_TOOL_NAME).replace(/%20/g, ' ')
+  defaultToolUrl: => ENV.DEFAULT_ASSIGNMENT_TOOL_URL
   isNotGraded: => @_hasOnlyType 'not_graded'
   isAssignment: =>
     ! _.includes @_submissionTypes(), 'online_quiz', 'discussion_topic',
@@ -151,11 +155,47 @@ export default class Assignment extends Model
     return @_submissionTypes() unless arguments.length > 0
     @set 'submission_types', submissionTypes
 
+  isNewAssignment: =>
+    !@name()
+
+  shouldShowDefaultTool: =>
+    return false if !@defaultToolUrl()
+    @defaultToolSelected() ||
+      @isQuickCreateDefaultTool() ||
+      @isNewAssignment()
+
+  isDefaultTool: =>
+    @submissionType() == 'external_tool' && @shouldShowDefaultTool()
+
+  defaultToNone: =>
+    @submissionType() == 'none' && !@shouldShowDefaultTool()
+
+  defaultToOnline: =>
+    @submissionType() == 'online' && !@shouldShowDefaultTool()
+
+  defaultToOnPaper: =>
+    @submissionType() == 'on_paper' && !@shouldShowDefaultTool()
+
+  isQuickCreateDefaultTool: =>
+    @submissionTypes().includes('default_external_tool')
+
+  defaultToolSelected: =>
+    matchingToolUrls(
+      @defaultToolUrl(),
+      @externalToolUrl()
+    )
+
+  isNonDefaultExternalTool: =>
+    # The assignment is type 'external_tool' and the default tool is not selected
+    # or chosen from the "quick create" assignment index modal.
+    @submissionType() == 'external_tool' && !@isDefaultTool()
+
   submissionType: =>
     submissionTypes = @_submissionTypes()
     if _.includes(submissionTypes, 'none') || submissionTypes.length == 0 then 'none'
     else if _.includes submissionTypes, 'on_paper' then 'on_paper'
     else if _.includes submissionTypes, 'external_tool' then 'external_tool'
+    else if _.includes submissionTypes, 'default_external_tool' then 'external_tool'
     else 'online'
 
   expectsSubmission: =>
@@ -456,7 +496,9 @@ export default class Assignment extends Model
       'isImporting', 'failedToImport',
       'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
       'submissionTypesFrozen', 'anonymousInstructorAnnotations',
-      'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox'
+      'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
+      'defaultToolName', 'isDefaultTool', 'isNonDefaultExternalTool', 'defaultToNone',
+      'defaultToOnline', 'defaultToOnPaper'
     ]
 
     hash =

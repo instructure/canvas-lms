@@ -42,7 +42,10 @@ function testSchema() {
 }
 
 function mockClient({query, variables, schema = testSchema()} = {}) {
-  const mocks = [{request: {query, variables}, result: {}}]
+  const mocks = []
+  if (query) {
+    mocks.push({request: {query, variables}, result: {}})
+  }
   return new ValidatedApolloClient({schema, mocks})
 }
 

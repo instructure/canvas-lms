@@ -61,7 +61,7 @@ export default function Layout({
       {gradesPublished && hasSections && anonymousGrading && (
         <Alert margin="x-small" variant="info">
           {I18n.t(
-            'Grades can only be hidden for everyone when the assignment is anonymous. Anonymity will be enabled.'
+            'When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.'
           )}
         </Alert>
       )}

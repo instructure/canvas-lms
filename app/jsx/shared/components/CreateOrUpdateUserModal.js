@@ -213,7 +213,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         onSubmit={preventDefault(this.onSubmit)}
         open={this.state.open}
         onDismiss={this.close}
-        size="small"
+        size="medium"
         label={
           this.props.createOrUpdate === 'create' ? (
             I18n.t('Add a New User')

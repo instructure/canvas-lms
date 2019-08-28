@@ -233,7 +233,7 @@ describe Canvas::CacheRegister do
   end
 
   context "batch fetch" do
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     def check_cache
       some_key = "some_base_key/withstuff"
@@ -353,7 +353,7 @@ describe Canvas::CacheRegister do
 
   context "redis node lookup and sharding" do
     specs_require_sharding
-    specs_require_cache(:redis_store)
+    specs_require_cache(:redis_cache_store)
 
     before :each do
       @user = @shard1.activate { User.create! }

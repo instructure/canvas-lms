@@ -632,13 +632,3 @@ $te-footer-height: 72px;
 .Theme-editor-progress-list-item__bar {
   flex: 1;
 }
-
-// ***HACK*** to make IE10 and 11 properly scale SVGs inside Theme Editor sidebar
-// (Also affects other image types because our user-uploaded image URLs do
-// not have filetype suffixes. This should be ok, though, because most
-// institutions' images should be at least 75px wide.)
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .Theme__editor-upload .Theme__editor_preview-img-container .Theme__editor_preview-img img {
-    min-width: 75px;
-  }
-}

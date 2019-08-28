@@ -28,7 +28,7 @@ class Account < ActiveRecord::Base
   include BrandConfigHelpers
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
-  authenticates_many :pseudonym_sessions
+
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_one :terms_of_service, :dependent => :destroy
@@ -1446,8 +1446,9 @@ class Account < ActiveRecord::Base
   TAB_JOBS = 15
   TAB_DEVELOPER_KEYS = 16
 
-  def external_tool_tabs(opts)
+  def external_tool_tabs(opts, user)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
+      .select { |t| t.permission_given?(:account_navigation, user, self) }
     Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
@@ -1489,7 +1490,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id }
     end
 
-    tabs += external_tool_tabs(opts)
+    tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
     tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }

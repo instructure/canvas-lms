@@ -15,6 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class SubmissionCommentReadLoader < GraphQL::Batch::Loader
+  def initialize(current_user)
+    @current_user = current_user
+  end
+
+  def perform(submission_comments)
+    vsc = ViewedSubmissionComment.
+      where(submission_comment_id: submission_comments, user: @current_user).
+      pluck('submission_comment_id').
+      to_set
+
+    submission_comments.each do |sc|
+      fulfill(sc, vsc.include?(sc.id))
+    end
+  end
+end
 
 module Types
   class SubmissionCommentType < ApplicationObjectType
@@ -36,9 +52,7 @@ module Types
         load_association(:submission).then do |submission|
           Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
         end
-      ]).then {
-        object.author if object.grants_right?(current_user, :read_author)
-      }
+      ]).then { object.author if object.grants_right?(current_user, :read_author) }
     end
 
     field :attachments, [Types::FileType], null: true
@@ -54,6 +68,19 @@ module Types
             # as an array. Flatten them so we are not returning nested arrays here.
             attachments.flatten.compact
           end
+        end
+      end
+    end
+
+    field :read, Boolean, null: false
+    def read
+      load_association(:submission).then do |submission|
+        Promise.all([
+          Loaders::AssociationLoader.for(Submission, :content_participations).load(submission),
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+        ]).then do
+          next true if submission.read?(current_user)
+          SubmissionCommentReadLoader.for(current_user).load(object)
         end
       end
     end

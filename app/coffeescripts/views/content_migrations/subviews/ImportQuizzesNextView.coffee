@@ -33,7 +33,7 @@ export default class ImportQuizzesNextView extends Backbone.View
     checked = @$el.find('#importQuizzesNext').is(':checked')
     settings.import_quizzes_next = checked
     @questionBank.setEnabled(!checked,
-      I18n.t('This option is not compatible with Quizzes.Next'))
+      I18n.t('This option is not compatible with New Quizzes'))
     @model.set('settings', settings)
 
   toJSON: -> @options

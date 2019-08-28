@@ -14,6 +14,29 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
+class UnreadCommentCountLoader < GraphQL::Batch::Loader
+  def initialize(current_user)
+    @current_user = current_user
+  end
+
+  def perform(submissions)
+    unread_count_hash = Submission.
+      where(id: submissions).
+      joins(:submission_comments).
+      where(
+        'NOT EXISTS (?)',
+        ViewedSubmissionComment.
+          where('viewed_submission_comments.submission_comment_id=submission_comments.id').
+          where(:user_id => @current_user)
+      ).
+      group(:submission_id).
+      count
+
+    submissions.each { |s| fulfill(s, unread_count_hash[s.id] || 0) }
+  end
+end
+
 module Interfaces::SubmissionInterface
   include GraphQL::Schema::Interface
   description 'Types for submission or submission history'
@@ -42,6 +65,17 @@ module Interfaces::SubmissionInterface
   field :assignment, Types::AssignmentType, null: true
   def assignment
     load_association(:assignment)
+  end
+
+  field :unread_comment_count, Integer, null: false
+  def unread_comment_count
+    Promise.all([
+      load_association(:content_participations),
+      load_association(:assignment)
+    ]).then do
+      next 0 if object.read?(current_user)
+      UnreadCommentCountLoader.for(current_user).load(object)
+    end
   end
 
   field :user, Types::UserType, null: true
@@ -126,7 +160,7 @@ module Interfaces::SubmissionInterface
     end
   end
 
-  field :grading_status, String, null: true
+  field :grading_status, Types::SubmissionGradingStatusType, null: true
   field :late_policy_status, LatePolicyStatusType, null: true
   field :late, Boolean, method: :late?, null: true
   field :missing, Boolean, method: :missing?, null: true

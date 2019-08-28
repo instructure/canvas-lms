@@ -89,12 +89,12 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
     return document.getElementById($label.htmlFor)
   }
 
-  async function show() {
+  function show() {
     tray.show(context)
-    await waitForElement(getTrayElement)
+    return waitForElement(getTrayElement)
   }
 
-  async function waitForTrayClosed() {
+  function waitForTrayClosed() {
     return wait(() => {
       if (context.onExited.callCount > 0) {
         return
@@ -197,9 +197,7 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
   })
 
   QUnit.module('"Close" Button', hooks => {
-    hooks.beforeEach(async () => {
-      await show()
-    })
+    hooks.beforeEach(show)
 
     test('closes the tray', async () => {
       getCloseButton().click()
@@ -209,9 +207,7 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
   })
 
   QUnit.module('"Cancel" button', hooks => {
-    hooks.beforeEach(async () => {
-      await show()
-    })
+    hooks.beforeEach(show)
 
     test('closes the tray', async () => {
       getCancelButton().click()
@@ -245,14 +241,15 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
     let setAssignmentPostPolicyStub
     let showFlashAlertStub
 
-    hooks.beforeEach(async () => {
-      await show()
-      getInputByLabel('Manually').click()
+    hooks.beforeEach(() => {
+      return show().then(() => {
+        getInputByLabel('Manually').click()
 
-      showFlashAlertStub = sinon.stub(FlashAlert, 'showFlashAlert')
-      setAssignmentPostPolicyStub = sinon
-        .stub(Api, 'setAssignmentPostPolicy')
-        .resolves({assignmentId: '2301', postManually: true})
+        showFlashAlertStub = sinon.stub(FlashAlert, 'showFlashAlert')
+        setAssignmentPostPolicyStub = sinon
+          .stub(Api, 'setAssignmentPostPolicy')
+          .resolves({assignmentId: '2301', postManually: true})
+      })
     })
 
     hooks.afterEach(() => {

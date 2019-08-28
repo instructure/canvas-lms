@@ -18,13 +18,10 @@
 
 <% add_crumb t('crumbs.users', "Users") %>
 <% set_active_tab "users" %>
-<% if @query %>
-  <% js_env ga_page_title: "User Search Results" %>
-<% end %>
 
 <% provide :page_title do %>
   <% if @query %>
-    <%= t('search_for_user', 'User Search results for %{user_name}', :user_name => (params[:user][:name] rescue '')) %>
+    <%= t('User Search results') %>
   <% else %>
     <%= t('all_users', 'All Users') %>
   <% end %>

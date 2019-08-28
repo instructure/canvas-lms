@@ -454,13 +454,13 @@ describe("Upload data actions", () => {
       it("inserts link with display_name as title", () => {
         const expected = "foo";
         actions.embedUploadResult({ display_name: expected });
-        sinon.assert.calledWithMatch(Bridge.insertLink, { title: expected });
+        sinon.assert.calledWithMatch(Bridge.insertLink, { title: expected }, false);
       });
 
       it("inserts link with url as href", () => {
         const expected = "http://github.com";
         actions.embedUploadResult({ url: expected });
-        sinon.assert.calledWithMatch(Bridge.insertLink, { href: expected });
+        sinon.assert.calledWithMatch(Bridge.insertLink, { href: expected }, false);
       });
 
       it("inserts link with data-canvas-previewable if the content-type is previewable by canvas", () => {
@@ -474,7 +474,7 @@ describe("Upload data actions", () => {
           'data-canvas-previewable': true,
           title: uploadResult.display_name,
           href: uploadResult.url
-        })
+        }, false)
       })
 
       it("delegates to fileEmbed for embed data", () => {

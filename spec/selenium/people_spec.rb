@@ -425,8 +425,8 @@ describe "people" do
 
       expect(f(".addpeople")).to be_displayed
       replace_content(f(".addpeople__peoplesearch textarea"),'student@example.com')
-      click_option('#peoplesearch_select_role', ta_role.id.to_s, :value)
-      click_option('#peoplesearch_select_section', 'Unnamed Course', :text)
+      click_INSTUI_Select_option('#peoplesearch_select_role', ta_role.id.to_s, :value)
+      click_INSTUI_Select_option('#peoplesearch_select_section', 'Unnamed Course', :text)
       f('#addpeople_next').click
       wait_for_ajaximations
 
@@ -434,11 +434,11 @@ describe "people" do
       f('#addpeople_back').click
       wait_for_ajaximations
 
-      #verify form and options have not changed
+      # verify form and options have not changed
       expect(f('.addpeople__peoplesearch')).to be_displayed
       expect(f('.addpeople__peoplesearch textarea').text).to eq 'student@example.com'
-      expect(first_selected_option(f('#peoplesearch_select_role')).text).to eq 'TA'
-      expect(first_selected_option(f('#peoplesearch_select_section')).text).to eq 'Unnamed Course'
+      expect(f('#peoplesearch_select_role').attribute('value')).to eq 'TA'
+      expect(f('#peoplesearch_select_section').attribute('value')).to eq 'Unnamed Course'
     end
 
     it "should add a student to a section", priority: "1", test_id: 296460 do
@@ -458,16 +458,16 @@ describe "people" do
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
-     @student = user_factory
-     @course.enroll_student(@student, allow_multiple_enrollments: true)
-     @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
-     get "/courses/#{@course.id}/users"
-     f(".StudentEnrollment .icon-more").click
-     fln("Edit Sections").click
-     fln("Remove user from section2").click
-     ff('.ui-button-text')[1].click
-     wait_for_ajaximations
-     expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
+      @student = user_factory
+      @course.enroll_student(@student, allow_multiple_enrollments: true)
+      @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
+      get "/courses/#{@course.id}/users"
+      f(".StudentEnrollment .icon-more").click
+      fln("Edit Sections").click
+      fln("Remove user from section2").click
+      ff('.ui-button-text')[1].click
+      wait_for_ajaximations
+      expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
     it "should edit a designer's sections" do

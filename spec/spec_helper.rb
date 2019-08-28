@@ -86,6 +86,9 @@ end
 ActionController::Base.set_callback(:process_action, :around,
   ->(_r, block) { SpecTransactionWrapper.wrap_block_in_transaction(block) })
 
+ActionController::Base.set_callback(:process_action, :before,
+  ->(_r) { @streaming_template = false })
+
 module RSpec::Core::Hooks
 class AfterContextHook < Hook
   def run(example)
@@ -475,7 +478,7 @@ RSpec.configure do |config|
     Canvas.redis_used = false
   end
 
-  if Bullet.enable?
+  if CANVAS_RAILS5_2 && Bullet.enable?
     config.before(:each) do |example|
       Bullet.start_request
       # we walk the example group chain until we reach one that actually recorded something
@@ -618,7 +621,7 @@ RSpec.configure do |config|
 
   def specs_require_cache(new_cache=:memory_store)
     before :each do
-      skip "redis required" if new_cache == :redis_store && !Canvas.redis_enabled?
+      skip "redis required" if new_cache == :redis_cache_store && !Canvas.redis_enabled?
       new_cache = ActiveSupport::Cache.lookup_store(new_cache)
       allow(Rails).to receive(:cache).and_return(new_cache)
       allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)

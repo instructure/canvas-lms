@@ -29,7 +29,7 @@ import './instructure_helper'
 import 'jqueryui/draggable'
 import './jquery.ajaxJSON'
 import './jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */
-import './jquery.google-analytics' /* trackEvent */
+import {trackEvent} from 'jquery.google-analytics'
 import './jquery.instructure_date_and_time' /* datetimeString, dateString, fudgeDateForProfileTimezone */
 import './jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
@@ -89,16 +89,16 @@ function handleYoutubeLink () {
       $video.find(".hide_youtube_embed_link").click(preventDefault(() => {
         $video.remove()
         $after.show()
-        $.trackEvent('hide_embedded_content', 'hide_you_tube')
+        trackEvent('hide_embedded_content', 'hide_you_tube')
       }))
       $(this).after($video).hide()
     }))
-    $.trackEvent('show_embedded_content', 'show_you_tube')
+    trackEvent('show_embedded_content', 'show_you_tube')
     $link.addClass('youtubed').after($after)
   }
 }
 
-  $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
+  trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
 
   var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs';
@@ -108,7 +108,7 @@ function handleYoutubeLink () {
     $(".user_content.unenhanced:visible")
       .each(function() {
         var $this = $(this);
-        $this.find("img").css('maxWidth', '100%');
+        $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
         $this.data('unenhanced_content_html', $this.html());
       })
       .find(".enhanceable_content").show()
@@ -203,36 +203,35 @@ function handleYoutubeLink () {
       }
     }
 
-    ///////////// START layout related stuff
-
     // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
-    var $breadcrumbs = $("#breadcrumbs"),
-        $breadcrumbEllipsis,
-        addedEllipsisClass = false;
-    function resizeBreadcrumb(){
-      var maxWidth = 500,
-          // we want to make sure that the breadcrumb doesnt wrap multiple lines, the way we are going to check if it is one line
-          // is by grabbing the first (which should be the home crumb) and checking to see how high it is, the * 1.5 part is
-          // just in case to ever handle any padding or margin.
-          hightOfOneBreadcrumb = $breadcrumbs.find('li:visible:first').height() * 1.5;
-      $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible');
-      $breadcrumbEllipsis.css('maxWidth', "");
-      $breadcrumbEllipsis.ifExists(function(){
-        for (var i=0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) { //the i here is just to make sure we don't get into an ifinite loop somehow
-          if (!addedEllipsisClass) {
-            addedEllipsisClass = true;
-            $breadcrumbEllipsis.addClass('ellipsis');
+    const $breadcrumbs = $("#breadcrumbs")
+    if ($breadcrumbs.length) {
+      let $breadcrumbEllipsis
+      let addedEllipsisClass = false
+      // we want to make sure that the breadcrumb doesnt wrap multiple lines, the way we are going to check if it is one line
+      // is by grabbing the first (which should be the home crumb) and checking to see how high it is, the * 1.5 part is
+      // just in case to ever handle any padding or margin.
+      const hightOfOneBreadcrumb = $breadcrumbs.find('li:visible:first').height() * 1.5;
+
+      const resizeBreadcrumb = () => {
+        let maxWidth = 500
+        $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible');
+        $breadcrumbEllipsis.ifExists(function(){
+          $breadcrumbEllipsis.css('maxWidth', "");
+          for (let i=0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) { // the i here is just to make sure we don't get into an ifinite loop somehow
+            if (!addedEllipsisClass) {
+              addedEllipsisClass = true;
+              $breadcrumbEllipsis.addClass('ellipsis');
+            }
+            $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20));
           }
-          $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20));
-        }
-      });
+        });
+      }
+      resizeBreadcrumb(); // force it to run once right now
+      $(window).resize(resizeBreadcrumb);
+      // end breadcrumb ellipsis
     }
-    resizeBreadcrumb(); //force it to run once right now
-    $(window).resize(resizeBreadcrumb);
-    // end breadcrumb ellipsis
 
-
-    //////////////// END layout related stuff
 
     KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')});
 
@@ -363,7 +362,7 @@ function handleYoutubeLink () {
                 $link.show();
                 $link.focus();
                 $div.remove();
-                $.trackEvent('hide_embedded_content', 'hide_file_preview');
+                trackEvent('hide_embedded_content', 'hide_file_preview');
               });
             $div.prepend($minimizeLink);
             if (Object.prototype.hasOwnProperty.call(event, "originalEvent")) {
@@ -371,7 +370,7 @@ function handleYoutubeLink () {
               // If it was triggered by our auto_open stuff it shouldn't focus here.
               $minimizeLink.focus();
             }
-            $.trackEvent('show_embedded_content', 'show_file_preview');
+            trackEvent('show_embedded_content', 'show_file_preview');
           }
         }, function() {
           $link.loadingImage('remove').hide();
@@ -510,7 +509,7 @@ function handleYoutubeLink () {
         $.flashMessage('Message Sent!');
         $(document).triggerHandler('user_content_change');
         if(location.pathname === '/') {
-          $.trackEvent('dashboard_comment', 'create');
+          trackEvent('dashboard_comment', 'create');
         }
       },
       error: function(data) {
@@ -563,7 +562,7 @@ function handleYoutubeLink () {
         $(document).triggerHandler('user_content_change');
         $(this).remove();
         if(location.href.match(/dashboard/)) {
-          $.trackEvent('dashboard_comment', 'create');
+          trackEvent('dashboard_comment', 'create');
         }
       },
       error: function(data) {

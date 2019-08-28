@@ -256,6 +256,9 @@ module Context
       object ||= context.attachments.find_by_id(file_id) # attachments.find_by_id uses the replacement hackery
     when 'wiki_pages'
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
+      if !object && params[:id].to_s.include?("+") # maybe it really is a "+"
+        object = context.wiki.find_page(CGI.unescape(params[:id].to_s.gsub("+", "%2B")), include_deleted: true)
+      end
     when 'external_tools'
       if params[:action] == "retrieve"
         tool_url = CGI.parse(URI.parse(url).query)["url"].first rescue nil

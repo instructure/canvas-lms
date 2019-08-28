@@ -22,7 +22,7 @@ import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import axios from 'axios'
-import {setupCache} from 'axios-cache-adapter'
+import {setupCache} from 'axios-cache-adapter/src/index'
 import 'jqueryui/tabs'
 import globalAnnouncements from './global_announcements'
 import './jquery.ajaxJSON'
@@ -409,26 +409,25 @@ let reportsTabHasLoaded = false
     if ($rce_container.length > 0) {
       const $textarea = $rce_container.find('textarea');
       RichContentEditor.preloadRemoteModule();
-      if ($("#account_terms_of_service_terms_type").find(":selected").text() === 'Custom') {
-        $('#terms_of_service_modal').show()
-        $rce_container.show();
-        setTimeout (() => {
-          RichContentEditor.loadNewEditor($textarea, { manageParent: true, defaultContent: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT || ''})
-        }, 1000);
-      }
-      $( "#account_terms_of_service_terms_type" ).change(function() {
-        if (this.value === 'custom') {
+      const $terms_type = $( "#account_terms_of_service_terms_type" ).change(onTermsTypeChange)
+      async function onTermsTypeChange() {
+        if ($terms_type.val() === 'custom') {
           $('#terms_of_service_modal').show()
           $rce_container.show();
+
+          const url = '/api/v1/terms_of_service_custom_content'
+          const defaultContent = await (await fetch(url)).text()
+
           RichContentEditor.loadNewEditor($textarea, {
             focus: true,
             manageParent: true,
-            defaultContent: ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT || ''
+            defaultContent
           });
         } else {
           $rce_container.hide();
           $('#terms_of_service_modal').hide()
         }
-      });
+      }
+      onTermsTypeChange()
     }
   });

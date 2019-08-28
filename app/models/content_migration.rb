@@ -143,7 +143,9 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def n_strand
-    ["migrations:import_content", self.root_account.try(:global_id) || "global"]
+    account_identifier = self.root_account.try(:global_id) || "global"
+    type = self.for_master_course_import? ? "master_course" : self.initiated_source
+    ["migrations:import_content", "#{type}_#{account_identifier}"]
   end
 
   def migration_ids_to_import=(val)

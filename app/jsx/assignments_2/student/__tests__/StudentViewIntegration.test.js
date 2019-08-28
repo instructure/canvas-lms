@@ -23,38 +23,15 @@ import {createCache} from '../../../canvas-apollo'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {mockQuery} from '../mocks'
 import React from 'react'
-import {STUDENT_VIEW_QUERY, SUBMISSION_ID_QUERY} from '../graphqlData/Queries'
+import {
+  STUDENT_VIEW_QUERY,
+  SUBMISSION_HISTORIES_QUERY,
+  SUBMISSION_ID_QUERY
+} from '../graphqlData/Queries'
 import SubmissionIDQuery from '../components/SubmissionIDQuery'
+import {SubmissionMocks} from '../graphqlData/Submission'
 
-async function createGraphqlMocks(overrides = {}) {
-  const mocks = [
-    {
-      query: SUBMISSION_ID_QUERY,
-      variables: {assignmentLid: '1'}
-    },
-    {
-      query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: '1', submissionID: '1'}
-    },
-    {
-      query: CREATE_SUBMISSION_DRAFT,
-      variables: {id: '1', attempt: 1, fileIds: ['1']}
-    }
-  ]
-
-  const mockResults = await Promise.all(
-    mocks.map(async ({query, variables}) => {
-      const result = await mockQuery(query, overrides, variables)
-      return {
-        request: {query, variables},
-        result
-      }
-    })
-  )
-  return mockResults
-}
-
-describe('SubmissionIDQuery', () => {
+describe('student view integration tests', () => {
   beforeEach(() => {
     window.ENV = {
       context_asset_string: 'test_1',
@@ -64,68 +41,204 @@ describe('SubmissionIDQuery', () => {
     }
   })
 
-  // TODO: These three tests could be moved to the SubmissionIDQuery unit test file
-  it('renders normally', async () => {
-    const mocks = await createGraphqlMocks()
-    const {getByTestId} = render(
-      <MockedProvider mocks={mocks} cache={createCache()}>
-        <SubmissionIDQuery assignmentLid="1" />
-      </MockedProvider>
-    )
-    expect(
-      await waitForElement(() => getByTestId('assignments-2-student-view'))
-    ).toBeInTheDocument()
-  })
+  describe('SubmissionIDQuery', () => {
+    async function createGraphqlMocks(overrides = {}) {
+      const mocks = [
+        {
+          query: SUBMISSION_ID_QUERY,
+          variables: {assignmentLid: '1'}
+        },
+        {
+          query: STUDENT_VIEW_QUERY,
+          variables: {assignmentLid: '1', submissionID: '1'}
+        },
+        {
+          query: CREATE_SUBMISSION_DRAFT,
+          variables: {id: '1', attempt: 1, fileIds: ['1']}
+        }
+      ]
 
-  it('renders loading', async () => {
-    const mocks = await createGraphqlMocks()
-    const {getByTitle} = render(
-      <MockedProvider mocks={mocks} cache={createCache()}>
-        <SubmissionIDQuery assignmentLid="1" />
-      </MockedProvider>
-    )
+      const mockResults = await Promise.all(
+        mocks.map(async ({query, variables}) => {
+          const result = await mockQuery(query, overrides, variables)
+          return {
+            request: {query, variables},
+            result
+          }
+        })
+      )
+      return mockResults
+    }
 
-    expect(getByTitle('Loading')).toBeInTheDocument()
-  })
-
-  it('renders error', async () => {
-    const mocks = await createGraphqlMocks()
-    mocks[1].error = new Error('aw shucks')
-    const {getByText} = render(
-      <MockedProvider mocks={mocks} cache={createCache()}>
-        <SubmissionIDQuery assignmentLid="1" />
-      </MockedProvider>
-    )
-
-    expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
-  })
-
-  // This cannot be tested at the <AttemptTab> because the new file being
-  // displayed happens as a result of a cache write and these higher level
-  // components re-rendering
-  it('displays the new file after it has been uploaded', async () => {
-    window.URL.createObjectURL = jest.fn()
-    uploadFileModule.uploadFiles = jest.fn()
-    uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
-    $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-
-    const mocks = await createGraphqlMocks({
-      CreateSubmissionDraftPayload: () => ({
-        submissionDraft: () => ({attachments: [{displayName: 'test.jpg'}]})
-      })
+    // TODO: These three tests could be moved to the SubmissionIDQuery unit test file
+    it('renders normally', async () => {
+      const mocks = await createGraphqlMocks()
+      const {getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+      expect(
+        await waitForElement(() => getByTestId('assignments-2-student-view'))
+      ).toBeInTheDocument()
     })
 
-    const {container, getAllByText} = render(
-      <MockedProvider mocks={mocks} cache={createCache()}>
-        <SubmissionIDQuery assignmentLid="1" />
-      </MockedProvider>
-    )
+    it('renders loading', async () => {
+      const mocks = await createGraphqlMocks()
+      const {getByTitle} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
 
-    const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="inputFileDrop"]')
-    )
-    fireEvent.change(fileInput, {target: {files}})
-    expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
+      expect(getByTitle('Loading')).toBeInTheDocument()
+    })
+
+    it('renders error', async () => {
+      const mocks = await createGraphqlMocks()
+      mocks[1].error = new Error('aw shucks')
+      const {getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+
+      expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
+    })
+
+    // This cannot be tested at the <AttemptTab> because the new file being
+    // displayed happens as a result of a cache write and these higher level
+    // components re-rendering
+    it('displays the new file after it has been uploaded', async () => {
+      window.URL.createObjectURL = jest.fn()
+      uploadFileModule.uploadFiles = jest.fn()
+      uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
+      $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+
+      const mocks = await createGraphqlMocks({
+        CreateSubmissionDraftPayload: () => ({
+          submissionDraft: () => ({attachments: [{displayName: 'test.jpg'}]})
+        })
+      })
+
+      const {container, getAllByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+
+      const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
+      const fileInput = await waitForElement(() =>
+        container.querySelector('input[id="inputFileDrop"]')
+      )
+      fireEvent.change(fileInput, {target: {files}})
+      expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
+    })
+  })
+
+  describe('loading more submission histories', () => {
+    async function createSubmissionHistoryMocks() {
+      const mocks = [
+        {
+          query: SUBMISSION_ID_QUERY,
+          variables: {assignmentLid: '1'},
+          overrides: {}
+        },
+        {
+          query: STUDENT_VIEW_QUERY,
+          variables: {assignmentLid: '1', submissionID: '1'},
+          overrides: {
+            Submission: () => ({
+              ...SubmissionMocks.graded,
+              attempt: 5
+            })
+          }
+        },
+        {
+          query: SUBMISSION_HISTORIES_QUERY,
+          variables: {submissionID: '1'},
+          overrides: {
+            Node: () => ({__typename: 'Submission'}),
+            PageInfo: () => ({hasPreviousPage: true}),
+            SubmissionHistoryConnection: () => ({
+              nodes: [{attempt: 3}, {attempt: 4}]
+            })
+          }
+        }
+      ]
+
+      const mockResults = await Promise.all(
+        mocks.map(async ({query, variables, overrides}) => {
+          const result = await mockQuery(query, overrides, variables)
+          return {
+            request: {query, variables},
+            result
+          }
+        })
+      )
+      return mockResults
+    }
+
+    it('Displays the previous submission after loading more paginated histories', async () => {
+      const mocks = await createSubmissionHistoryMocks()
+
+      const {getAllByText, findByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+
+      const prevButton = await findByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(await waitForElement(() => getAllByText('Attempt 4')[0])).toBeInTheDocument()
+    })
+  })
+
+  describe('the submission is a text entry', () => {
+    async function createTextMocks(overrides = {}) {
+      const mocks = [
+        {
+          query: SUBMISSION_ID_QUERY,
+          variables: {assignmentLid: '1'}
+        },
+        {
+          query: STUDENT_VIEW_QUERY,
+          variables: {assignmentLid: '1', submissionID: '1'}
+        },
+        {
+          query: CREATE_SUBMISSION_DRAFT,
+          variables: {id: '1', attempt: 1, body: ''}
+        }
+      ]
+
+      const mockResults = await Promise.all(
+        mocks.map(async ({query, variables}) => {
+          const result = await mockQuery(query, overrides, variables)
+          return {
+            request: {query, variables},
+            result
+          }
+        })
+      )
+      return mockResults
+    }
+
+    it('opens the RCE when the Start Entry button is clicked', async () => {
+      const mocks = await createTextMocks({
+        Assignment: () => ({submissionTypes: ['online_text_entry']}),
+        SubmissionDraft: () => ({body: ''})
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <SubmissionIDQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+
+      const startButton = await waitForElement(() => getByTestId('start-text-entry'))
+      fireEvent.click(startButton)
+
+      expect(await waitForElement(() => getByTestId('text-editor'))).toBeInTheDocument()
+    })
   })
 })

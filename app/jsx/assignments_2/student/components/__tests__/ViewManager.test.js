@@ -39,19 +39,26 @@ async function mockSubmissionHistoriesResult(overrides = {}) {
 
 async function makeProps(opts = {}) {
   const currentAttempt = opts.currentAttempt
+  const hasPreviousPage = !!opts.hasPreviousPage
   const numSubmissionHistories =
     opts.numSubmissionHistories === undefined ? currentAttempt - 1 : opts.numSubmissionHistories
-  const hasPreviousPage = !!opts.hasPreviousPage
+  const withDraft = !!opts.withDraft
 
   // Mock the current submission
+  const submittedStateOverrides = currentAttempt === 0 ? {} : SubmissionMocks.submitted
   const studentViewOverrides = [
     {
       Submission: () => ({
-        ...SubmissionMocks.submitted,
+        ...submittedStateOverrides,
         attempt: currentAttempt
       })
     }
   ]
+  if (withDraft) {
+    studentViewOverrides.push({
+      Submission: () => SubmissionMocks.draftWithAttachment
+    })
+  }
   const studentViewResult = await mockStudentViewResult(studentViewOverrides)
 
   // Mock the submission histories, as needed.
@@ -95,6 +102,28 @@ describe('ViewManager', () => {
         </MockedProvider>
       )
       expect(queryByText('View Next Submission')).not.toBeInTheDocument()
+    })
+
+    it('is not displayed if we are on attempt 0 with a draft', async () => {
+      const props = await makeProps({currentAttempt: 0, withDraft: true})
+      const {queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('View Next Submission')).not.toBeInTheDocument()
+    })
+
+    it('is displayed if we are on attempt x with a draft for attempt x+1', async () => {
+      const props = await makeProps({currentAttempt: 1, withDraft: true})
+      const {getByText, queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(queryByText('View Next Submission')).toBeInTheDocument()
     })
 
     it('is displayed if we are not at the most current submission', async () => {
@@ -147,7 +176,7 @@ describe('ViewManager', () => {
   })
 
   describe('Previous Submission Button', () => {
-    it('is not displayed if we are at submission 0', async () => {
+    it('is not displayed if we are on attempt 0', async () => {
       const props = await makeProps({currentAttempt: 0})
       const {queryByText} = render(
         <MockedProvider>
@@ -157,7 +186,17 @@ describe('ViewManager', () => {
       expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
     })
 
-    it('is not displayed if we are at submission 1', async () => {
+    it('is not displayed if we are on attempt 0 with a draft', async () => {
+      const props = await makeProps({currentAttempt: 0, withDraft: true})
+      const {queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
+    })
+
+    it('is not displayed if we are on attempt 1', async () => {
       const props = await makeProps({currentAttempt: 1})
       const {queryByText} = render(
         <MockedProvider>
@@ -165,6 +204,16 @@ describe('ViewManager', () => {
         </MockedProvider>
       )
       expect(queryByText('View Previous Submission')).not.toBeInTheDocument()
+    })
+
+    it('is displayed if we are on a resubmit attempt with a draft', async () => {
+      const props = await makeProps({currentAttempt: 1, withDraft: true})
+      const {queryByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('View Previous Submission')).toBeInTheDocument()
     })
 
     it('is displayed if we are not at the earliest submission', async () => {
@@ -221,6 +270,20 @@ describe('ViewManager', () => {
       expect(getAllByText('Attempt 1')[0]).toBeInTheDocument()
     })
 
+    it('can navigate backwords from a dummy submission', async () => {
+      const props = await makeProps({currentAttempt: 1})
+      const {getAllByText, getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const newAttemptButton = getByText('Create New Attempt')
+      fireEvent.click(newAttemptButton)
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      expect(getAllByText('Attempt 1')[0]).toBeInTheDocument()
+    })
+
     it('does not call loadMoreSubmissionHistories() when the previous item is already fetched', async () => {
       const props = await makeProps({currentAttempt: 2})
       const {getByText} = render(
@@ -266,6 +329,107 @@ describe('ViewManager', () => {
       fireEvent.click(prevButton)
       fireEvent.click(prevButton)
       expect(props.loadMoreSubmissionHistories).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('New Attempt Button', () => {
+    describe('behaves correctly', () => {
+      it('by creating a new dummy submission when clicked', async () => {
+        const props = await makeProps({currentAttempt: 1})
+        const {getAllByText, getByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        const newAttemptButton = getByText('Create New Attempt')
+        fireEvent.click(newAttemptButton)
+        expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
+      })
+
+      it('by not displaying the new attempt button on a dummy submission', async () => {
+        const props = await makeProps({currentAttempt: 1})
+        const {queryByText, getByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        const newAttemptButton = getByText('Create New Attempt')
+        fireEvent.click(newAttemptButton)
+        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when a submission draft exists', () => {
+      it('is not displayed when the draft is the selected', async () => {
+        const props = await makeProps({currentAttempt: 1, withDraft: true})
+        const {queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+      })
+
+      it('is not displayed when the most recent submitted attempt is selected', async () => {
+        const props = await makeProps({currentAttempt: 1, withDraft: true})
+        const {getByText, queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+
+        // The draft should be displayed by default on render, so we have to go
+        // back one to get to the most recent submitted attempt
+        const prevButton = getByText('View Previous Submission')
+        fireEvent.click(prevButton)
+        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when there is no submission draft', () => {
+      it('is not displayed on attempt 0', async () => {
+        const props = await makeProps({currentAttempt: 0})
+        const {queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+      })
+
+      it('is displayed on the latest submitted attempt', async () => {
+        const props = await makeProps({currentAttempt: 1})
+        const {queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        expect(queryByText('Create New Attempt')).toBeInTheDocument()
+      })
+
+      it('is not displayed if you are not on the latest submission attempt', async () => {
+        const props = await makeProps({currentAttempt: 3})
+        const {getByText, queryByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+        const prevButton = getByText('View Previous Submission')
+        fireEvent.click(prevButton)
+        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Submission Drafts', () => {
+    it('are initially displayed if they exist', async () => {
+      const props = await makeProps({currentAttempt: 1, withDraft: true})
+      const {getAllByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
     })
   })
 })

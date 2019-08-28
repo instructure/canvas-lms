@@ -54,6 +54,7 @@ class Types::MutationType < Types::ApplicationObjectType
   DESC
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :update_assignment, mutation: Mutations::UpdateAssignment
+  field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
   field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule

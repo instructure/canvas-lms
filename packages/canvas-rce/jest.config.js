@@ -37,5 +37,6 @@ module.exports = {
   modulePathIgnorePatterns: [
     "<rootDir>/lib",
     "<rootDir>/canvas"
-  ]
+  ],
+  testEnvironment: 'jest-environment-jsdom-fourteen',
 }

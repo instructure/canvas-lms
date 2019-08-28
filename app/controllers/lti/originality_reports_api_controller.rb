@@ -290,7 +290,7 @@ module Lti
     end
 
     def assignment
-      @_assignment ||= Assignment.find(params[:assignment_id])
+      @_assignment ||= api_find(Assignment, params[:assignment_id])
     end
 
     def submission

@@ -17,20 +17,10 @@
  */
 
 import React from 'react';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import List from '@instructure/ui-elements/lib/components/List';
-import ListItem from '@instructure/ui-elements/lib/components/List/ListItem';
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Text, List} from '@instructure/ui-elements'
 
-import AssignmentIcon from   '@instructure/ui-icons/lib/Line/IconAssignment';
-import QuizIcon from         '@instructure/ui-icons/lib/Line/IconQuiz';
-import AnnouncementIcon from '@instructure/ui-icons/lib/Line/IconAnnouncement';
-import DiscussionIcon from   '@instructure/ui-icons/lib/Line/IconDiscussion';
-import NoteIcon from         '@instructure/ui-icons/lib/Line/IconNote';
-import CalendarIcon from     '@instructure/ui-icons/lib/Line/IconCalendarMonth';
-import PageIcon from         '@instructure/ui-icons/lib/Line/IconDocument';
-import PeerReviewIcon from '@instructure/ui-icons/lib/Line/IconPeerReview';
+import {IconAssignmentLine, IconQuizLine, IconAnnouncementLine, IconDiscussionLine, IconNoteLine, IconCalendarMonthLine, IconDocumentLine, IconPeerReviewLine} from '@instructure/ui-icons'
 
 import { dateTimeString } from '../../utilities/dateUtils';
 import formatMessage from '../../format-message';
@@ -39,21 +29,21 @@ import { func, shape, object, arrayOf, number, string } from 'prop-types';
 const getIconComponent = (itemType) => {
   switch (itemType) {
     case 'Assignment':
-      return <AssignmentIcon label={formatMessage('Assignment')} className="ToDoSidebarItem__Icon" />;
+      return <IconAssignmentLine label={formatMessage('Assignment')} className="ToDoSidebarItem__Icon" />;
     case 'Quiz':
-      return <QuizIcon label={formatMessage('Quiz')} className="ToDoSidebarItem__Icon" />;
+      return <IconQuizLine label={formatMessage('Quiz')} className="ToDoSidebarItem__Icon" />;
     case 'Discussion':
-      return <DiscussionIcon label={formatMessage('Discussion')} className="ToDoSidebarItem__Icon" />;
+      return <IconDiscussionLine label={formatMessage('Discussion')} className="ToDoSidebarItem__Icon" />;
     case 'Announcement':
-      return <AnnouncementIcon label={formatMessage('Announcement')} className="ToDoSidebarItem__Icon" />;
+      return <IconAnnouncementLine label={formatMessage('Announcement')} className="ToDoSidebarItem__Icon" />;
     case 'Calendar Event':
-      return <CalendarIcon label={formatMessage('Calendar Event')} className="ToDoSidebarItem__Icon" />;
+      return <IconCalendarMonthLine label={formatMessage('Calendar Event')} className="ToDoSidebarItem__Icon" />;
     case 'Page':
-      return <PageIcon label={formatMessage('Page')} className="ToDoSidebarItem__Icon" />;
+      return <IconDocumentLine label={formatMessage('Page')} className="ToDoSidebarItem__Icon" />;
     case 'Peer Review':
-      return <PeerReviewIcon label={formatMessage('Peer Review')} className="ToDoSidebarItem__Icon" />;
+      return <IconPeerReviewLine label={formatMessage('Peer Review')} className="ToDoSidebarItem__Icon" />;
     default:
-      return <NoteIcon label={formatMessage('To Do')} className="ToDoSidebarItem__Icon" />;
+      return <IconNoteLine label={formatMessage('To Do')} className="ToDoSidebarItem__Icon" />;
   }
 };
 
@@ -76,16 +66,16 @@ export default class ToDoItem extends React.Component {
     const toDisplay = [];
     if (points) {
       toDisplay.push(
-        <ListItem key="points">
+        <List.Item key="points">
           {formatMessage('{numPoints} points', { numPoints: points })}
-        </ListItem>
+        </List.Item>
       );
     }
 
     toDisplay.push(
-      <ListItem key="date">
+      <List.Item key="date">
         {dateTimeString(dueAt, this.props.timeZone)}
-      </ListItem>
+      </List.Item>
     );
     return toDisplay;
   }

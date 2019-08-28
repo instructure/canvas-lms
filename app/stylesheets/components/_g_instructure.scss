@@ -30,7 +30,7 @@
   position: fixed;
   top: 10px;
   #{direction(left)}: 50px;
-  z-index: 9999;
+  z-index: 99999;
   background-color: #fff;
   border: 2px solid #888;
 }
@@ -140,10 +140,6 @@
     text-decoration: underline;
   }
 
-  h3, .h3 {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
   table:not([cellpadding]) {
     margin-#{direction(left)}: 5px;
     td {
@@ -151,6 +147,7 @@
     }
   }
 }
+
 
 .user_content iframe,
 .user_content video
@@ -1797,6 +1794,11 @@ form.user_content_post_form {
   text-indent: -10000px;
   white-space: nowrap;
   width: 0;
+}
+
+.nav-icon {
+  @include ic-badge-maker(18px, $ic-content-background-color, $ic-color-dark);
+  float: direction(right);
 }
 
 .nav-badge {

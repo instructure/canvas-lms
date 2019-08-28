@@ -103,7 +103,7 @@ import './vendor/date' /* Date.parse */
         attempt: submission.attempt || '--',
         extra_time: submission.extra_time,
         extra_attempts: submission.extra_attempts,
-        score: submission.kept_score
+        score: I18n.n(submission.kept_score)
       };
       if(submission.attempts_left == -1) {
         data.attempts_left = '--';

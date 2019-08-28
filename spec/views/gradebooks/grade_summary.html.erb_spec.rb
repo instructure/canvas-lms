@@ -390,17 +390,17 @@ describe "/gradebooks/grade_summary" do
           expect(response).to have_tag(".assignment_score i[@class='icon-off']")
         end
 
-        it "adds the 'Hidden' title to the icon" do
+        it 'adds the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@title='Hidden']")
+          expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
         end
 
         context "when submissions are posted" do
           before { assignment.post_submissions(submission_ids: submission.id) }
 
-          it "does not add the 'Hidden' title to the icon" do
+          it 'does not add the "hidden" title to the icon' do
             render "gradebooks/grade_summary"
-            expect(response).not_to have_tag(".assignment_score i[@title='Hidden']")
+            expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
           end
 
           it "does not display the 'hidden' icon" do
@@ -415,9 +415,9 @@ describe "/gradebooks/grade_summary" do
           assignment.ensure_post_policy(post_manually: false)
         end
 
-        it "does not add the 'Hidden' title to the icon" do
+        it 'does not add the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).not_to have_tag(".assignment_score i[@title='Hidden']")
+          expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
         end
 
         it "does not display the 'hidden' icon" do
@@ -431,9 +431,9 @@ describe "/gradebooks/grade_summary" do
             assignment.hide_submissions(submission_ids: submission.id)
           end
 
-          it "adds the 'Hidden' title to the icon" do
+          it 'adds the "hidden" title to the icon' do
             render "gradebooks/grade_summary"
-            expect(response).to have_tag(".assignment_score i[@title='Hidden']")
+            expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
           end
 
           it "displays the 'hidden' icon" do
@@ -453,9 +453,9 @@ describe "/gradebooks/grade_summary" do
           expect(response).to have_tag(".assignment_score i[@class='icon-muted']")
         end
 
-        it "adds the 'Muted' title to the icon" do
+        it 'adds the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@title='Muted']")
+          expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
         end
       end
 

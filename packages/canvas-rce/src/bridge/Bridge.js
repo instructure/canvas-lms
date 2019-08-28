@@ -115,7 +115,7 @@ export default class Bridge {
     return false;
   }
 
-  insertLink(link) {
+  insertLink(link, fromTray = true) {
     if (this.focusedEditor) {
       const { selection } = this.focusedEditor.props.tinymce.get(
         this.focusedEditor.props.textareaId
@@ -128,7 +128,7 @@ export default class Bridge {
         link.text = link.title || link.href
       }
       this.focusedEditor.insertLink(link);
-      if (this.controller) {
+      if (fromTray && this.controller) {
         this.controller.hideTray()
       }
     } else {

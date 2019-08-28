@@ -31,11 +31,7 @@ describe Autoextend do
 
       # not found via autoloading? maybe it's a migration
       if !extension.used
-        if CANVAS_RAILS5_1
-          ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths).map(&:disable_ddl_transaction)
-        else
-          ActiveRecord::Base.connection.migration_context.migrations.map(&:disable_ddl_transaction)
-        end
+        ActiveRecord::Base.connection.migration_context.migrations.map(&:disable_ddl_transaction)
       end
 
       extension_name = if extension.module.is_a?(Module)

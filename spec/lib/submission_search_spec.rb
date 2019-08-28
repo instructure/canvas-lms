@@ -103,6 +103,36 @@ describe SubmissionSearch do
     expect(results).to eq [submission]
   end
 
+  it 'filters by needs_grading' do
+    submission = assignment.submit_homework(amanda, body: 'asdf')
+    results = SubmissionSearch.new(assignment, teacher, nil, grading_status: 'needs_grading').search
+    expect(results).to eq [submission]
+  end
+
+  it 'filters by excused' do
+    submission = Submission.find_by(user: jonah)
+    submission.excused = true
+    submission.save!
+    results = SubmissionSearch.new(assignment, teacher, nil, grading_status: 'excused').search
+    expect(results).to eq [submission]
+  end
+
+  it 'filters by needs_review' do
+    submission = Submission.find_by(user: peter)
+    submission.workflow_state = 'pending_review'
+    submission.save!
+    results = SubmissionSearch.new(assignment, teacher, nil, grading_status: 'needs_review').search
+    expect(results).to eq [submission]
+  end
+
+  it 'filters by graded' do
+    submission = Submission.find_by(user: mandy)
+    submission.workflow_state = 'graded'
+    submission.save!
+    results = SubmissionSearch.new(assignment, teacher, nil, grading_status: 'graded').search
+    expect(results).to eq [submission]
+  end
+
   it "limits results to just the user's submission if the user is a student" do
     results = SubmissionSearch.new(assignment, amanda, nil, {}).search
     expect(results).to eq [Submission.find_by(user: amanda)]

@@ -17,10 +17,9 @@
  */
 import React, { Component } from 'react';
 import {bool, func, string} from 'prop-types';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
-import Text from '@instructure/ui-elements/lib/components/Text';
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
+import {Spinner, Text} from '@instructure/ui-elements'
 import ErrorAlert from '../ErrorAlert';
 import formatMessage from '../../format-message';
 
@@ -70,7 +69,7 @@ export default class LoadingFutureIndicator extends Component {
   renderLoading () {
     if (this.props.loadingFuture && !this.props.allFutureItemsLoaded) {
       return <View>
-        <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading...')} />
+        <Spinner size="small" margin="0 x-small 0 0" renderTitle={() => formatMessage('Loading...')} />
         <Text size="small" color="secondary">
           {formatMessage('Loading...')}</Text>
       </View>;

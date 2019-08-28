@@ -1406,7 +1406,7 @@ describe ContextExternalTool do
 
     it "should update the visibility cache if enrollments are updated or user is touched" do
       time = Time.now
-      enable_cache(:redis_store) do
+      enable_cache(:redis_cache_store) do
         Timecop.freeze(time) do
           course_with_student(:account => @account, :active_all => true)
           expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'
@@ -1606,49 +1606,6 @@ describe ContextExternalTool do
         expect(tool.grants_right?(@designer, :update_manually)).to be_truthy
         expect(tool.grants_right?(@ta, :update_manually)).to be_truthy
         expect(tool.grants_right?(@student, :update_manually)).to be_falsey
-      end
-    end
-  end
-
-  describe '#lti_1_3_enabled?' do
-
-    context 'when the tool is not configured for LTI 1.3 but the account is' do
-      let(:tool) do
-        @root_account.enable_feature!(:lti_1_3)
-        @root_account.save!
-        @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com")
-      end
-
-      it 'returns false' do
-        expect(tool).to_not be_lti_1_3_enabled
-      end
-    end
-
-    context 'when the account is not configured for LTI 1.3 but the tool is' do
-      let(:tool) do
-        tool = @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com")
-        tool.use_1_3 = true
-        tool.save!
-        tool
-      end
-
-      it 'returns false' do
-        expect(tool).to_not be_lti_1_3_enabled
-      end
-    end
-
-    context 'when both the tool and account are configured for LTI 1.3' do
-      let(:tool) do
-        @root_account.enable_feature!(:lti_1_3)
-        @root_account.save!
-        tool = @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com")
-        tool.settings['use_1_3'] = true
-        tool.save!
-        tool
-      end
-
-      it 'returns true' do
-        expect(tool).to be_lti_1_3_enabled
       end
     end
   end

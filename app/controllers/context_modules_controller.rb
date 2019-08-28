@@ -103,6 +103,7 @@ class ContextModulesController < ApplicationController
       log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
+      js_env(DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share))
       set_tutorial_js_env
 
       if @is_student
@@ -113,6 +114,7 @@ class ContextModulesController < ApplicationController
       add_body_class('padless-content')
       js_bundle :context_modules
       css_bundle :content_next, :context_modules2
+      render stream: can_stream_template?
     end
   end
 

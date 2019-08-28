@@ -33,6 +33,7 @@ module Services
         filename: 'Some File'
       )
     end
+    let(:submit_assignment) { true }
     let(:failure_email) do
       OpenStruct.new(
         from_name: 'notifications@instructure.com',
@@ -74,7 +75,7 @@ module Services
     describe '.submit_job' do
       let(:service) { described_class.new(attachment, progress) }
       let(:worker) do
-        described_class.submit_job(attachment, progress, eula_agreement_timestamp, executor)
+        described_class.submit_job(attachment, progress, eula_agreement_timestamp, executor, submit_assignment)
       end
 
       before do
@@ -82,9 +83,20 @@ module Services
         allow(worker).to receive(:attachment).and_return(attachment)
       end
 
-      it 'should clone and submit the url' do
+      it 'should clone and submit the url when submit_assignment is true' do
         expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
         expect(service).to receive(:submit).with(eula_agreement_timestamp)
+        worker.perform
+
+        expect(progress.reload.workflow_state).to eq 'completed'
+      end
+
+      it 'should clone and not submit the url when submit_assignment is false' do
+        worker = described_class.submit_job(attachment, progress, eula_agreement_timestamp, executor, false)
+        allow(worker).to receive(:homework_service).and_return(service)
+        allow(worker).to receive(:attachment).and_return(attachment)
+        expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
+        expect(service).not_to receive(:submit)
         worker.perform
 
         expect(progress.reload.workflow_state).to eq 'completed'

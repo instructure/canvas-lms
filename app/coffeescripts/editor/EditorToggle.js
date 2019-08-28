@@ -39,33 +39,33 @@ const nextID = () => `editor-toggle-${(_nextID += 1)}`
 
 // #
 // Toggles an element between a rich text editor and itself
-class EditorToggle {
-  options = {
+
+// @param {jQueryEl} @el - the element containing html to edit
+// @param {Object} options
+export default function EditorToggle(elem, options) {
+  this.editingElement(elem)
+  this.options = {
     // text to display in the "done" button
     doneText: I18n.t('done_as_in_finished', 'Done'),
     // whether or not a "Switch Views" link should be provided to edit the
     // raw html
-    switchViews: true
+    switchViews: true,
+    ...options
   }
+  if (this.options.view) this.view = this.options.view
+  this.textArea = this.createTextArea()
+  this.textAreaContainer = $('<div/>').append(this.textArea)
 
-  // #
-  // @param {jQueryEl} @el - the element containing html to edit
-  // @param {Object} options
-  constructor(elem, options) {
-    this.editingElement(elem)
-    this.options = $.extend({}, this.options, options)
-    this.textArea = this.createTextArea()
-    this.textAreaContainer = $('<div/>').append(this.textArea)
-
-    if (this.options.switchViews) {
-      this.switchViews = this.createSwitchViews()
-    }
-    this.done = this.createDone()
-    this.content = this.getContent()
-    this.editing = false
+  if (this.options.switchViews) {
+    this.switchViews = this.createSwitchViews()
   }
+  this.done = this.createDone()
+  this.content = this.getContent()
+  this.editing = false
+}
 
-  // #
+Object.assign(EditorToggle.prototype, Backbone.Events, {
+// #
   // Toggles between editing the content and displaying it
   // @api public
   toggle() {
@@ -74,7 +74,7 @@ class EditorToggle {
     } else {
       return this.display()
     }
-  }
+  },
 
   // #
   // Compiles the options for the RichContentEditor
@@ -91,7 +91,7 @@ class EditorToggle {
       opts.tinyOptions.aria_label = this.options.editorBoxLabel
     }
     return opts
-  }
+  },
 
   // #
   // Converts the element to an editor
@@ -117,7 +117,7 @@ class EditorToggle {
     this.textArea = RichContentEditor.freshNode(this.textArea)
     this.editing = true
     return this.trigger('edit')
-  }
+  },
 
   replaceTextArea() {
     this.el.insertBefore(this.textAreaContainer)
@@ -128,7 +128,7 @@ class EditorToggle {
     this.textArea = this.createTextArea()
     this.textAreaContainer.append(this.textArea)
     return this.textAreaContainer.detach()
-  }
+  },
 
   // #
   // Converts the editor to an element
@@ -147,7 +147,7 @@ class EditorToggle {
     this.done.detach()
     this.editing = false
     return this.trigger('display')
-  }
+  },
 
   // #
   // Assign/re-assign the jQuery element to to edit.
@@ -156,7 +156,7 @@ class EditorToggle {
   // @api public
   editingElement(elem) {
     return (this.el = elem)
-  }
+  },
 
   // #
   // method to get the content for the editor
@@ -166,7 +166,7 @@ class EditorToggle {
     const content = $('<div></div>').append(this.el.html())
     content.find('.hidden-readable').remove()
     return $.trim(content.html())
-  }
+  },
 
   // #
   // creates the textarea tinymce uses for the editor
@@ -183,7 +183,7 @@ class EditorToggle {
         .addClass('editor-toggle')
         .attr('id', nextID())
     )
-  }
+  },
 
   // #
   // creates the "done" button used to exit the editor
@@ -204,7 +204,7 @@ class EditorToggle {
             })
           )
       )
-  }
+  },
 
   // #
   // create the switch views links to go between rich text and a textarea
@@ -215,8 +215,4 @@ class EditorToggle {
     ReactDOM.render(component, $container[0])
     return $container
   }
-}
-
-_.extend(EditorToggle.prototype, Backbone.Events)
-
-export default EditorToggle
+})

@@ -35,13 +35,11 @@ export default class ConfigurationForm extends React.Component {
     showConfigurationSelector: PropTypes.bool,
     hideComponent: PropTypes.bool,
     membershipServiceFeatureFlagEnabled: PropTypes.bool,
-    lti13Enabled: PropTypes.bool,
     children: PropTypes.node
   }
 
   static defaultProps = {
     showConfigurationSelector: true,
-    lti13Enabled: false
   }
 
   constructor(props, context) {
@@ -226,7 +224,6 @@ export default class ConfigurationForm extends React.Component {
           ref="configurationTypeSelector"
           handleChange={this.handleSwitchConfigurationType}
           configurationType={this.props.configurationType}
-          lti13Enabled={this.props.lti13Enabled}
         />
       )
     }

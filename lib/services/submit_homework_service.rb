@@ -112,8 +112,8 @@ module Services
         CloneUrlExecutor.new(url, duplicate_handling, check_quota, opts)
       end
 
-      def submit_job(attachment, progress, eula_agreement_timestamp, executor)
-        if progress.context.is_a? Assignment
+      def submit_job(attachment, progress, eula_agreement_timestamp, executor, submit_assignment)
+        if progress.context.is_a?(Assignment) && submit_assignment
           SubmitWorker.
             new(attachment.id, progress.id, eula_agreement_timestamp, executor).
             tap { |worker| enqueue_attachment_job(worker) }

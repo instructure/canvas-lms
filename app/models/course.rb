@@ -1464,7 +1464,7 @@ class Course < ActiveRecord::Base
     # Active admins (Teacher/TA/Designer)
     given { |user| (self.available? || self.created? || self.claimed?) && user &&
       fetch_on_enrollments("has_active_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.active_by_date.exists? } }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user| !self.deleted? && !self.sis_source_id && user &&
@@ -1526,7 +1526,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin and can :view_unpublished_items
 
     given { |user| self.account_membership_allows(user, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags
+    can :read_as_admin and can :manage and can :update and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
 
     given { |user| self.account_membership_allows(user, :manage_courses) && self.grants_right?(user, :change_course_state) }
     can :delete
@@ -2120,7 +2120,7 @@ class Course < ActiveRecord::Base
 
   def resubmission_for(asset)
     asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
-    instructors.touch_all
+    instructors.clear_cache_keys(:todo_list)
   end
 
   def grading_standard_enabled
@@ -2723,9 +2723,10 @@ class Course < ActiveRecord::Base
     return tab && tab[:hidden]
   end
 
-  def external_tool_tabs(opts)
+  def external_tool_tabs(opts, user)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
+    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 
@@ -2745,7 +2746,7 @@ class Course < ActiveRecord::Base
       tabs = self.tab_configuration.compact
       settings_tab = default_tabs[-1]
       external_tabs = if opts[:include_external]
-                        external_tool_tabs(opts) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                        external_tool_tabs(opts, user) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
                       else
                         []
                       end
