@@ -15,7 +15,7 @@ use. Once it's up, make sure you have the `aws` cli installed, and run
 the following command to create a stream (with canvas running):
 
 ```bash
-AWS_ACCESS_KEY_ID=key AWS_SECRET_ACCESS_KEY=secret aws --endpoint-url http://kinesis.canvaslms.docker/ kinesis create-stream --stream-name=live-events --shard-count=1 --region=us-east-1
+AWS_ACCESS_KEY_ID=key AWS_SECRET_ACCESS_KEY=secret aws --endpoint-url http://kinesis.docker/ kinesis create-stream --stream-name=live-events --shard-count=1 --region=us-east-1
 ```
 
 Once the stream is created, configure your Canvas (by going to the /plugins url on your running Canvas) to use
