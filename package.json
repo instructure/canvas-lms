@@ -25,6 +25,7 @@
     "@instructure/js-utils": ">=1",
     "@instructure/media-capture": "^5.54.0",
     "@instructure/react-crop": "^5.0.1",
+    "@instructure/ui-a11y": "^5",
     "@instructure/ui-alerts": "^5",
     "@instructure/ui-billboard": "^5",
     "@instructure/ui-breadcrumb": "^5",
