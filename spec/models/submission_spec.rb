@@ -910,6 +910,46 @@ describe Submission do
       end
     end
 
+    describe "posting of missing submissions" do
+      before(:once) do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+        late_policy_factory(course: @course, missing: 50)
+      end
+
+      context "when the submission was not previously posted" do
+        context "for an automatically-posted assignment" do
+          it "posts a previously-unscored submission if deducting points for missing submissions" do
+            submission.update!(late_policy_status: :missing)
+            expect(submission.posted_at).not_to be nil
+          end
+
+          it "does not post the submission if missing submission deduction is not enabled" do
+            @course.late_policy.update!(missing_submission_deduction_enabled: false)
+            expect {
+              submission.update!(late_policy_status: :missing)
+            }.not_to change { submission.reload.posted_at }
+          end
+
+          it "does not update the posted-at date of an already-posted submission" do
+            @assignment.post_submissions
+
+            expect {
+              submission.update!(late_policy_status: :missing)
+            }.not_to change { submission.reload.posted_at }
+          end
+        end
+
+        it "does not post submissions if the assignment is manually posted" do
+          @assignment.post_policy.update!(post_manually: true)
+
+          expect {
+            submission.update!(late_policy_status: :missing)
+          }.not_to change { submission.reload.posted_at }
+        end
+      end
+    end
+
     it "does not change the score of a missing submission if it already has one" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, grade: 1000, grader: @teacher)

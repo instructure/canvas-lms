@@ -1461,9 +1461,12 @@ class Submission < ActiveRecord::Base
       self.points_deducted = nil
     end
 
-    if late_policy&.missing_submission_deduction_enabled && self.score.nil?
-      self.score = late_policy.points_for_missing(points_possible, grading_type)
-      self.workflow_state = "graded"
+    if late_policy&.missing_submission_deduction_enabled?
+      if score.nil?
+        self.score = late_policy.points_for_missing(points_possible, grading_type)
+        self.workflow_state = "graded"
+      end
+      self.posted_at ||= Time.zone.now unless assignment.post_manually?
     end
   end
   private :score_missing
