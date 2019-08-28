@@ -120,7 +120,7 @@ nn:
       delete: "Er du sikker på at du vil slette?"
     flash: 
       addSuccess: Oppretta
-      deleteError: "Noko gjekk feil. Kan ikkje slette akkurat no."
+      deleteError: "Noko gjekk gale. Kan ikkje slette akkurat no."
       deleteSuccess: Sletta
       error: "Det oppstod ein feil. Oppdater sida og prøv på nytt."
       updateSuccess: Oppdatert
@@ -3717,6 +3717,7 @@ nn:
     update: Oppdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursliste"
+  by_client_id_4f2fe02c: "Av klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til seksjonar som er utan innhald.  Dersom du f.eks. ikkje har oppretta quizar, er ikkje koplinga til quizar synleg. Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       Som standard kan studentar opprette grupper; for å hindre studentar i å opprette
@@ -4321,6 +4322,7 @@ nn:
   chat_2153c6b7: Chat
   check_back_later_c4234dbc: "Kom tilbake seinare"
   check_services_to_enable_8877c451: "Sjekk tenester for å aktivere"
+  check_submission_file_type_b3dbf3fd: "Sjekk innleveringsfiltype"
   check_to_add_a_user_for_loginid_6cd25597: "Merk av for å legge til ein brukar for %{loginid}"
   check_to_select_all_98e484f1: "Merk for å velje alt"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Merk av for å ikkje legge til ein brukar for %{loginid}"
@@ -4406,6 +4408,7 @@ nn:
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "Å hake av i sjekkboksen fører til at tabellen viser nedanfor "
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "Å hake av i sjekkboksen kan føre til at tabellen nedanfor forsvinn"
   client_id_cb2502af: Klient-ID
+  client_id_is_required_1afd54d1: "Klient-ID er obligatorisk"
   clone_group_set_c2a40e15: "Klon gruppesett"
   close_17f50799: lukk
   close_and_return_to_canvas_80544344: "Lukk og returner til Canvas"
@@ -6632,6 +6635,7 @@ nn:
       student: 
         count: "Feil studenttal"
         ratio: "Feil studenttettleik"
+  csv_de77e441: CSV
   csv_file_8061540e: CSV-fil
   csv_or_json_formats_only_d8ba36d: "Kun CSV- eller JSON-format"
   current_367624e9: Gjeldande
@@ -7481,6 +7485,7 @@ nn:
   divide_into_equal_time_slots_in_minutes_234312fa: "Del inn i like tidsluker (i minutt"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ikkje tel med denne oppgåva i sluttresultatet"
   do_nothing_9672b478: "Gjer ingenting"
+  doc_50924b72: DOC
   docviewer_area_created_37502a31: "Docviewer-område er oppretta"
   docviewer_area_deleted_6e56d3ba: "Docviewer-område er sletta"
   docviewer_area_updated_43f60b7e: "Docviewer-område er oppdatert"
@@ -7642,6 +7647,7 @@ nn:
   edit_criterion_description_5828919: "Rediger skildring av kriterium"
   edit_current_message_da650d4c: "Rediger denne meldinga"
   edit_developer_key_d8fa33c4: "Rediger utviklarnøkkel"
+  edit_disabled_e6a5ea0a: "Endre (slått av)"
   edit_discussion_settings_1bbb03d: "Rediger diskusjonsinnstillingar"
   edit_grading_period_e39af45d: "Rediger karaktersetjingsperiode"
   edit_grading_period_set_c548f4df: "Rediger sett med karaktersetjingsperiodar"
@@ -8170,6 +8176,7 @@ nn:
   error_saving_discussion_settings_3360661d: "Det oppstod ein feil under lagring av innstillingar for diskusjon"
   error_sending_messages_13c874eb: "Feil oppstod under sending av meldingar"
   error_sending_submission_comment_dc15d24f: "Det oppstod ein feil under sending av innleveringskommentar"
+  error_updating_submission_draft_1d40ade7: "Det oppstod ein feil under oppdatering av innleveringsutkast"
   error_uploading_file_e2d31b56: "Feil under opplasting av fil."
   error_uploading_video_audio_recording_16d9730a: "Feil under opplasting av video-/lydinnspeling"
   error_while_importing_csv_please_contact_support_e_57e6b3b: "Feil under import av CSV. Ta kontakt med brukarstøtte. (Feilrapport %{number})"
@@ -8418,6 +8425,7 @@ nn:
   feature_options_37a2c317: Funksjonsval
   feature_options_account_settings_294a39f8: "Funksjonsval (kontoinnstillingar)"
   feature_options_enable_disable_7e748054: "Funksjonsval - tillat/ikkje tillat"
+  feature_options_view_a170e80c: "Funksjonsval - vis"
   features: 
     allow_opt_out_of_inbox: "Tillat brukarar å velje vekk innboksen."
     canvas_parent_display_name: "Canvas Parent"
@@ -8642,6 +8650,7 @@ nn:
   from_from_to_to_e31f6422: "Frå %{from} til %{to}"
   from_gravatar_58372d5a: "Frå Gravatar"
   front_page_must_be_set_first_4dbbfdbe: "Startsida må fastsettast først"
+  front_page_must_be_set_first_c5246f7d: "Forside må fastsettast først"
   full_article_9296bb6f: "Fullstendig artikkel"
   full_name_14c958f7: "Fulstendig namn:"
   full_name_23fdfb6d: "Fullstendig namn"
@@ -10258,6 +10267,7 @@ nn:
   ignore_until_new_mark_935e00a2: "Sjå bort frå fram til ny karakter"
   ignore_until_new_submission_90ba19b7: "Sjå bort frå fram til ny innlevering"
   illegal_element_focus_request_b3cea847: "Førespurnad om ugyldig element i fokus"
+  ilumno_grade_export_251bc4b5: "Ilumno vurderingseksport"
   image_8ad06: Bilde
   image_id_is_not_a_valid_id_7dd6bad6: "image_id er ikkje gyldig ID"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "kan ikkje setje både image_url og image_id."
@@ -11304,7 +11314,7 @@ nn:
       record_upload_media_comment: "Spel inn / last opp mediekommentar"
   media_comments_upload_view_manager: 
     errors: 
-      media_comment_installation_broken: "Opplasting av mediekommentarar er ikkje rett installert. Kontakt administrator."
+      media_comment_installation_broken: "Funksjonaliteten for opplasting av mediekommentarar er ikkje sett opp rett. Kontakt administrator."
     file_size_error: "Storleiken på %{file} er større enn lovleg maksgrense på %{max} MB."
     file_type_error: "%{file} er ikkje ei godkjend %{type} fil."
     messages: 
@@ -13284,6 +13294,7 @@ nn:
   name_unposted_current_score_e98e95fd: "%{name} gjeldande resultat er ikkje posta"
   name_unposted_final_score_124708d2: "%{name}sluttresultat ikkje posta"
   name_user_e44eebed: "%{name}  Brukar"
+  names_and_role_ebff0149: "Namn og rolle"
   nav_avatar_border_3246beb1: "Navigasjonsramme, avatar"
   nav_background_fd299145: Navigeringsbakgrunn
   nav_badge_3c67de17: Navigeringsmerke
@@ -13384,6 +13395,7 @@ nn:
   no_collaboration_apps_3bbd30ce: "Ingen samarbeids-app-er"
   no_content_5dbc9acf: "Utan innhald"
   no_content_has_been_added_f36bab43: "* Innhald er ikkje lagt til"
+  no_content_not_visible_to_students_b59f4867: "Utan innhald. Ikkje synleg for studentar"
   no_courses_found_12d68a74: "Finn ikkje emne"
   no_date_bfeb2df7: "Ingen dato"
   no_description_c2554c25: "Inga skildring"
@@ -13404,6 +13416,7 @@ nn:
   no_grade_for_assignmenttitle_83baad53: "Inga vurdering for %{assignmentTitle}"
   no_graded_submissions_e40c957a: "Ingen innleveringar som er vurderte"
   no_graders_with_that_name_found_d8204d90: "Finn ikkje vurderar med det namnet"
+  no_grades_to_hide_6f51fc5b: "ingen vurderingar å skjule"
   no_grading_periods_configured_for_this_term_ca22393e: "ingen karaktersetjingsperiodar er konfigurert for dette semesteret "
   no_grading_periods_set_up_a20a8819: "Ingen karaktersetjingsperiodar er sett opp"
   no_grading_schemes_to_display_8b0e92e7: "Ingen karaktersetjingsskjema å vise"
@@ -13470,6 +13483,7 @@ nn:
   not_factored_into_grading_455dcf6a: "Ikkje faktorisert til karaktersetjing"
   not_graded_e027c866: "Ikkje vurdert"
   not_graded_e78bcd50: "Ikkje karaktersett"
+  not_graded_yet_82f63c67: "Ikkje vurdert enno"
   not_installed_37a21a76: "Ikkje installert"
   not_mastered_5c2f9968: "Ikkje meistra"
   not_published_73f7079: "Ikkje publisert"
@@ -14242,6 +14256,7 @@ nn:
   panama_fa454c86: Panama
   paper_view_7405eeab: Utskriftvising
   paraguay_595_ca58b83a: "Paraguay (+595)"
+  parameters_a13374ec: Parameterar
   parent_of_a_canvas_user_afba1624: "Forelder til ein Canvas-brukar?"
   parent_references_not_found_prior_to_this_row_miss_31723438: "Ingen overordna referanser funne før denne raden: %{missing}"
   parent_signup_b7c6bf0a: "Registrering for foreldre"
@@ -14722,6 +14737,9 @@ nn:
       labels: 
         consumer_key: Forbrukarnøkkel
         consumer_secret: Forbrukarhemmelegheit
+    unsplash_settings: 
+      labels: 
+        access_key: Tilgangsnøkkel
     uuid_provisioner: 
       description: "Dette slår på eksport av UUID-er til Quiz.Next-tenester."
       name: UUID-leverandør
@@ -17146,6 +17164,7 @@ nn:
   save_learning_mastery_82889d8b: "Lagre meistringsbasert læring"
   save_publish_36440725: "Lagre og publiser"
   save_settings_cafe79a5: "Lagre innstillingar"
+  save_successful_b2f64da4: Lagra
   save_theme_36c73e6a: "Lagre tema"
   save_theme_f706116e: "Lagre tema"
   save_this_comment_for_reuse_5eda0b70: "Lagre denne kommentarer for seinare bruk"
@@ -18715,6 +18734,7 @@ nn:
   student_details_49901ceb: Studentdetaljar
   student_extensions_d35a907: "Utvidingar for studentar"
   student_grades_4cbc59a1: "Vurderingar for student"
+  student_group_filter_185fb085: "Filter for studentgrupper"
   student_groups_863201c1: Studentgrupper
   student_id: Student-ID
   student_id_236970d8: student_id
@@ -18874,10 +18894,12 @@ nn:
   submission_failed_to_submit_8de4efcd: "Innlevering mislukkast"
   submission_in_another_grading_period_e754b329: "Innlevering i annan karaktersetjingsperiode"
   submission_index_e960f9bf: "Innlevering %{index}"
+  submission_items_b2db1b8d: Innleveringselement
   submission_locked_a6074f8b: "Innlevering låst"
   submission_locked_image_93aced38: "Innlevering låst-bilde"
   submission_requirement_8ba1ee08: "Krav til innlevering"
   submission_score_b7a291e8: "resultat innlevering"
+  submission_sent_3f0d2ee1: "Innlevering er sendt"
   submission_tray_429ac3df: Innleveringsmeny
   submission_type_a925fc5f: Innleveringstype
   submission_updated_8897f3b7: "Innlevering oppdatert"
@@ -20270,7 +20292,7 @@ nn:
   upper_limit_of_range_c454a8f2: "Øvre grense i området"
   upper_lower_56cad16c: "%{upper} - %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
-  url_22a5f3b8: URL-adresse
+  url_22a5f3b8: URL
   url_8c4ff7d2: URL
   url_cc9398ca: "URL-adresse:"
   url_is_required_4689ed84: "URL er obligatorisk"
@@ -20856,7 +20878,7 @@ nn:
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Åtvaring! Du er i ferd med å endre på medlemsamansettinga i gruppa. *Endringa vil påverke eksisterande gruppeinnleveringar, merknader, kommentarar og vurderingar og føre til tap av data frå BÅDE denne gruppa og frå gruppa du har flytta studenten frå.*** For å hindre uønska konsekvensar for eksisterande gruppeinnleveringar må du opprette eit nytt gruppesett for for framtidige innleveringar.**"
   warnings: 
     test_install: 
-      periodic_message: "Denne Canvas-installasjonen er berre for testing og blir tilbakestilt med jamne mellomrom."
+      periodic_message: "Denne Canvas-installasjonen er berre for testing og blir *tilbakestilt med jamne mellomrom*."
       title: "Canvas testinstallasjon"
       weekly_message: 
         one: "Denne Canvas-installasjonen er berre for testing og blir til tilbakestilt kvar veke."
