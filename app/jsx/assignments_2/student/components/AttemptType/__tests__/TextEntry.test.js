@@ -91,7 +91,8 @@ describe('TextEntry', () => {
       })
     })
 
-    describe.skip('with the RCE view enabled', () => { // TODO: get this to work with latest @testing-library
+    describe.skip('with the RCE view enabled', () => {
+      // TODO: get this to work with latest @testing-library
       it('renders the RCE when the draft body is not null', async () => {
         const props = await makeProps({editingDraft: true})
         const {getByTestId} = render(<TextEntry {...props} />)
@@ -131,7 +132,8 @@ describe('TextEntry', () => {
         })
       })
 
-      it.skip('stops displaying the RCE when the Cancel button is clicked', async () => { // TODO: get this to work with latest @testing-library
+      it.skip('stops displaying the RCE when the Cancel button is clicked', async () => {
+        // TODO: get this to work with latest @testing-library
         const props = await makeProps({editingDraft: true})
         const {getByTestId} = render(<TextEntry {...props} />)
 
@@ -141,5 +143,33 @@ describe('TextEntry', () => {
         expect(props.updateEditingDraft).toHaveBeenCalledWith(false)
       })
     })
+  })
+
+  it('displays the submitted text body when the text has been submitted', async () => {
+    const mockedSubmission = await mockSubmission({
+      Submission: () => ({
+        body: '<p>thundercougarfalconbird</p>',
+        state: 'submitted'
+      })
+    })
+    const props = await makeProps({submission: mockedSubmission})
+    const {getByTestId, getByText} = render(<TextEntry {...props} />)
+
+    expect(getByTestId('text-submission')).toBeInTheDocument()
+    expect(getByText('thundercougarfalconbird')).toBeInTheDocument()
+  })
+
+  it('displays the submitted text body when the submission has been graded', async () => {
+    const mockedSubmission = await mockSubmission({
+      Submission: () => ({
+        body: '<p>thundercougarfalconbird</p>',
+        state: 'graded'
+      })
+    })
+    const props = await makeProps({submission: mockedSubmission})
+    const {getByTestId, getByText} = render(<TextEntry {...props} />)
+
+    expect(getByTestId('text-submission')).toBeInTheDocument()
+    expect(getByText('thundercougarfalconbird')).toBeInTheDocument()
   })
 })

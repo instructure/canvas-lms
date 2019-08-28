@@ -210,6 +210,14 @@ export default class TextEntry extends React.Component {
     )
   }
 
+  renderSubmission() {
+    return (
+      <View as="div" borderWidth="small" padding="xx-small" data-testid="text-submission">
+        <div dangerouslySetInnerHTML={{__html: this.props.submission.body}} />
+      </View>
+    )
+  }
+
   renderSavedDraft() {
     return (
       <Billboard
@@ -256,7 +264,9 @@ export default class TextEntry extends React.Component {
   }
 
   render() {
-    if (this.getDraftBody() === null) {
+    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+      return this.renderSubmission()
+    } else if (this.getDraftBody() === null) {
       return this.renderInitialBox()
     } else {
       return this.props.editingDraft ? this.renderEditor() : this.renderSavedDraft()

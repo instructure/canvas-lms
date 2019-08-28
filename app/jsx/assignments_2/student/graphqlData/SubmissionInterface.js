@@ -27,6 +27,7 @@ export const SubmissionInterface = {
         ...SubmissionFile
       }
       attempt
+      body
       deductedPoints
       enteredGrade
       grade
@@ -48,6 +49,7 @@ export const SubmissionInterface = {
   shape: shape({
     attachments: arrayOf(SubmissionFile.shape),
     attempt: number.isRequired,
+    body: string,
     deductedPoints: number,
     enteredGrade: string,
     grade: string,
@@ -66,6 +68,7 @@ export const SubmissionInterfaceDefaultMocks = {
   SubmissionInterface: () => ({
     attachments: () => [],
     attempt: 0,
+    body: null,
     deductedPoints: null,
     enteredGrade: null,
     grade: null,
