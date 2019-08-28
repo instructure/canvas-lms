@@ -63,6 +63,29 @@ function teardownFixtures() {
   while (fixtures.firstChild) fixtures.removeChild(fixtures.firstChild)
 }
 
+QUnit.module('SpeedGrader', rootHooks => {
+  let history
+
+  rootHooks.beforeEach(() => {
+    let documentLocation = ''
+    let documentLocationHash = ''
+
+    history = {
+      back: sinon.stub(),
+      length: 1,
+      popState: sinon.stub(),
+      pushState: sinon.stub(),
+      replaceState: sinon.stub()
+    }
+
+    sandbox.stub(SpeedGraderHelpers, 'getHistory').returns(history)
+    sandbox.stub(SpeedGraderHelpers, 'setLocation').callsFake(url => documentLocation = url)
+    sandbox.stub(SpeedGraderHelpers, 'getLocation').callsFake(() => documentLocation)
+    sandbox.stub(SpeedGraderHelpers, 'setLocationHash').callsFake(hash => documentLocationHash = hash)
+    sandbox.stub(SpeedGraderHelpers, 'getLocationHash').callsFake(() => documentLocationHash)
+    sandbox.stub(SpeedGraderHelpers, 'reloadPage')
+  })
+
 QUnit.module('SpeedGrader#showDiscussion', {
   setup() {
     const commentBlankHtml = `
@@ -842,8 +865,6 @@ QUnit.module('SpeedGrader#handleGradeSubmit', hooks => {
       assessment_type: 'grading',
       assessor_id: 1
     }
-
-    sinon.stub(SpeedGraderHelpers, 'reloadPage')
   })
 
   hooks.afterEach(() => {
@@ -852,7 +873,6 @@ QUnit.module('SpeedGrader#handleGradeSubmit', hooks => {
     SpeedGrader.teardown()
     teardownFixtures()
     fakeENV.teardown()
-    SpeedGraderHelpers.reloadPage.restore()
     server.restore()
   })
 
@@ -4004,58 +4024,42 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         teardownFixtures()
       })
 
-      QUnit.module('when a behavior of "push" is specified', pushHooks => {
-        pushHooks.beforeEach(() => {
-          sinon.stub(window.history, 'pushState')
-        })
-
-        pushHooks.afterEach(() => {
-          window.history.pushState.restore()
-        })
-
+      QUnit.module('when a behavior of "push" is specified', () => {
         test('pushes a URL containing the current assignment and student IDs', () => {
           SpeedGrader.EG.updateHistoryForCurrentStudent('push')
-          const url = window.history.pushState.firstCall.args[2]
+          const url = history.pushState.firstCall.args[2]
           strictEqual(url, currentStudentUrl)
         })
 
         test('pushes an empty string for the title', () => {
           SpeedGrader.EG.updateHistoryForCurrentStudent('push')
-          const title = window.history.pushState.firstCall.args[1]
+          const title = history.pushState.firstCall.args[1]
           strictEqual(title, '')
         })
 
         test('pushes a state hash containing the current student ID', () => {
           SpeedGrader.EG.updateHistoryForCurrentStudent('push')
-          const hash = window.history.pushState.firstCall.args[0]
+          const hash = history.pushState.firstCall.args[0]
           deepEqual(hash, currentStudentState)
         })
       })
 
-      QUnit.module('when a behavior of "replace" is specified', replaceHooks => {
-        replaceHooks.beforeEach(() => {
-          sinon.stub(window.history, 'replaceState')
-        })
-
-        replaceHooks.afterEach(() => {
-          window.history.replaceState.restore()
-        })
-
+      QUnit.module('when a behavior of "replace" is specified', () => {
         test('sets a URL containing the current assignment and student IDs', () => {
           SpeedGrader.EG.updateHistoryForCurrentStudent('replace')
-          const url = window.history.replaceState.firstCall.args[2]
+          const url = history.replaceState.firstCall.args[2]
           strictEqual(url, currentStudentUrl)
         })
 
         test('sets an empty string for the title', () => {
           SpeedGrader.EG.updateHistoryForCurrentStudent('replace')
-          const title = window.history.replaceState.firstCall.args[1]
+          const title = history.replaceState.firstCall.args[1]
           strictEqual(title, '')
         })
 
         test('sets a state hash containing the current student ID', () => {
           SpeedGrader.EG.updateHistoryForCurrentStudent('replace')
-          const hash = window.history.replaceState.firstCall.args[0]
+          const hash = history.replaceState.firstCall.args[0]
           deepEqual(hash, currentStudentState)
         })
       })
@@ -5415,21 +5419,21 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       })
 
       test('selects the student given in the hash fragment if specified', () => {
-        document.location.hash = '#{"student_id":"10"}'
+        SpeedGraderHelpers.setLocationHash('#{"student_id":"10"}')
         SpeedGrader.EG.setInitiallyLoadedStudent()
         strictEqual(SpeedGrader.EG.currentStudent.id, '10')
       })
 
       test('accepts non-string student IDs in the hash', () => {
-        document.location.hash = '#{"student_id":10}'
+        SpeedGraderHelpers.setLocationHash('#{"student_id":"10"}')
         SpeedGrader.EG.setInitiallyLoadedStudent()
         strictEqual(SpeedGrader.EG.currentStudent.id, '10')
       })
 
       test('clears the hash fragment if it is non-empty', () => {
-        document.location.hash = '#not_actually_a_hash'
+        SpeedGraderHelpers.setLocationHash('#not_actually_a_hash')
         SpeedGrader.EG.setInitiallyLoadedStudent()
-        strictEqual(document.location.hash, '')
+        strictEqual(SpeedGraderHelpers.getLocationHash(), '')
       })
 
       test('selects the representative for the specified student if one exists', () => {
@@ -5477,7 +5481,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       })
 
       test('selects the student given in the hash fragment if specified', () => {
-        document.location.hash = '#{"anonymous_id":"fffff"}'
+        SpeedGraderHelpers.setLocationHash('#{"anonymous_id":"fffff"}')
         SpeedGrader.EG.setInitiallyLoadedStudent()
         strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'fffff')
       })
@@ -5590,7 +5594,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       }
 
       sandbox.stub($, 'post').yields()
-      sandbox.stub(SpeedGraderHelpers, 'reloadPage')
       sandbox.stub(userSettings, 'contextSet')
       sandbox.stub(userSettings, 'contextRemove')
       sandbox.stub(userSettings, 'contextGet').returns('3')
@@ -5600,7 +5603,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       userSettings.contextGet.restore()
       userSettings.contextRemove.restore()
       userSettings.contextSet.restore()
-      SpeedGraderHelpers.reloadPage.restore()
       $.post.restore()
       delete $.fn.menu
 
@@ -6595,4 +6597,5 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       ok(avatarImageSrc.includes('/path/to/a/second/image'))
     })
   })
+})
 })

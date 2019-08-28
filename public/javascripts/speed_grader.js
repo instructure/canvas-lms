@@ -1344,7 +1344,7 @@ EG = {
     mergeStudentsAndSubmission()
 
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
-      if (window.history.length === 1) {
+      if (SpeedgraderHelpers.getHistory().length === 1) {
         alert(
           I18n.t(
             'alerts.no_students_in_groups_close',
@@ -1359,7 +1359,7 @@ EG = {
             "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
           )
         )
-        window.history.back()
+        SpeedgraderHelpers.getHistory().back()
       }
     } else if (!jsonData.studentsWithSubmissions.length) {
       alert(
@@ -1368,7 +1368,7 @@ EG = {
           'Sorry, there are either no active students in the course or none are gradable by you.'
         )
       )
-      window.history.back()
+      SpeedgraderHelpers.getHistory().back()
     } else {
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
@@ -1389,10 +1389,10 @@ EG = {
     const queryParams = EG.parseDocumentQuery()
     if (queryParams && queryParams[anonymizableStudentId]) {
       initialStudentId = queryParams[anonymizableStudentId]
-    } else if (document.location.hash !== '') {
-      initialStudentId = extractStudentIdFromHash(document.location.hash)
+    } else if (SpeedgraderHelpers.getLocationHash() !== '') {
+      initialStudentId = extractStudentIdFromHash(SpeedgraderHelpers.getLocationHash())
     }
-    document.location.hash = ''
+    SpeedgraderHelpers.setLocationHash('')
 
     const attemptParam = utils.getParam('attempt')
     if (attemptParam) {
@@ -1499,9 +1499,9 @@ EG = {
     )
 
     if (behavior === HISTORY_PUSH) {
-      window.history.pushState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().pushState(stateHash, '', url)
     } else {
-      window.history.replaceState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().replaceState(stateHash, '', url)
     }
   },
 

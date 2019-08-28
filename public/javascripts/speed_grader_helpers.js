@@ -51,6 +51,26 @@ export function setupAnonymizableAuthorId(isAnonymous) {
 }
 
 const speedGraderHelpers = {
+  getHistory() {
+    return window.history
+  },
+
+  getLocation() {
+    return document.location
+  },
+
+  getLocationHash() {
+    return document.location.hash
+  },
+
+  setLocation(url) {
+    document.location = url
+  },
+
+  setLocationHash(hash) {
+    document.location.hash = hash
+  },
+
   urlContainer(submission, defaultEl, originalityReportEl) {
     if (submission.has_originality_report) {
       return originalityReportEl
