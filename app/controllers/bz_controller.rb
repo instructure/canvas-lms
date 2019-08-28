@@ -1755,6 +1755,8 @@ class BzController < ApplicationController
     preaccel_students = []
     postaccel_students = []
 
+    # TODO: need to update this logic where it will re-set up the qualtrics link if the survey ID has changed in the SF template.
+    # Right now, it only happens the first time they are synced.
     course.students.active.each do |student|
       unless preaccel_id.blank?
         r = RetainedData.get_for_course(course_id, student.id, "qualtrics_link_preaccelerator_survey")
@@ -1779,6 +1781,7 @@ class BzController < ApplicationController
     end
 
 
+    # BTODO: this should only create a single list for the campaign being synced, not a new list per sync.
     # create the list for this sync
     # see: https://api.qualtrics.com/reference#create-mailing-lists
     data = {}
@@ -1802,7 +1805,7 @@ class BzController < ApplicationController
     if obj["meta"]["httpStatus"] != '200 - OK'
       raise Exception.new response.body
     end
-    Rails.logger.info response.body
+    Rails.logger.info "### new Qualtrics mailing list API call response: #{response.inspect} - #{response.body}"
 
     mailing_list_id = obj["result"]["id"]
 
@@ -1822,10 +1825,12 @@ class BzController < ApplicationController
       s["language"] = "EN"
 
       ed = {}
-      if additional_data_from_join_server[student.id]
-        ed["Site"] = additional_data_from_join_server[student.id]["site"]
-        ed["Student ID"] = additional_data_from_join_server[student.id]["student_id"]
-        ed["Salesforce ID"] = additional_data_from_join_server[student.id]["salesforce_id"]
+      if additional_data_from_join_server[student.id.to_s]
+        ed["Site"] = additional_data_from_join_server[student.id.to_s]["site"]
+        ed["Student ID"] = additional_data_from_join_server[student.id.to_s]["student_id"]
+        ed["Salesforce ID"] = additional_data_from_join_server[student.id.to_s]["salesforce_id"]
+      else
+        Rails.logger.info "### no additional_data_from_join_server for student.id = #{student.id} was found. Didn't set embeddedData for Qualtrics."
       end
 
       s["embeddedData"] = ed
@@ -1842,14 +1847,14 @@ class BzController < ApplicationController
 
     request = Net::HTTP::Post.new(url.request_uri, headers)
     request.body = sync.to_json
-
+    Rails.logger.info "### sending contacts to Qualtrics with embedded data: #{request.inspect} - #{request.body}"
     response = http.request(request)
     obj = JSON.parse(response.body)
     if obj["meta"]["httpStatus"] != '200 - OK'
       raise Exception.new response.body
     end
 
-      Rails.logger.info response.body
+    Rails.logger.info "###: received response from qualtrics API for sending contact information: #{response.body}"
 
     # now create the links for the people...
     # see https://api.qualtrics.com/reference#distribution-create-1
@@ -1875,7 +1880,7 @@ class BzController < ApplicationController
       raise Exception.new response.body
     end
 
-    Rails.logger.info response.body
+    Rails.logger.info "### Fetched Qualtrics links for survey_id = #{survey_id}: #{response.body}"
 
     obj
   end
@@ -1906,7 +1911,7 @@ class BzController < ApplicationController
         raise Exception.new response.body
       end
 
-      Rails.logger.info response.body
+      Rails.logger.info "### Created Qualtrics Distribution list for survey_id = #{survey_id}, mailing_list_id = #{mailing_list_id}: #{response.body}"
 
       create_id = obj["result"]["id"]
 
@@ -1936,7 +1941,7 @@ class BzController < ApplicationController
           raise Exception.new response.body
         end
 
-        Rails.logger.info response.body
+        Rails.logger.info "### Handling new Qualtrics page for the above Distribution list: #{response.body}"
 
         handle_qualtrics_page(obj, students_list, course_id, magic_field_name)
       end
