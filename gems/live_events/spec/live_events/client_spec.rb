@@ -53,10 +53,10 @@ describe LiveEvents::Client do
   end
 
   let(:test_stream_name) { 'my_stream' }
+  let(:fclient) { FakeStreamClient.new(test_stream_name) }
 
   before(:each) do
     stub_config
-    fclient = FakeStreamClient.new(test_stream_name)
     LiveEvents.logger = LELogger.new
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.stream_client = fclient
