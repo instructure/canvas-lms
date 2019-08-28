@@ -1534,39 +1534,76 @@ describe Submission do
         expect(submission.messages_sent.keys).to eq ['Group Assignment Submitted Late']
       end
 
-      context "Assignment Unmuted" do
+      context "Submission Posted" do
         let(:submission) { @assignment.submissions.find_by!(user: @student) }
+        let(:submission_posted_messages) do
+          Message.where(
+            communication_channel: @student.email_channel,
+            notification: @submission_posted_notification
+          )
+        end
 
         before(:once) do
-          @assignment_unmuted_notification = Notification.create!(name: "Assignment Unmuted")
+          @submission_posted_notification = Notification.find_or_create_by(
+            category: "Grading",
+            name: "Submission Posted"
+          )
           @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
           @student.update!(email: "fakeemail@example.com")
           @student.email_channel.update!(workflow_state: :active)
         end
 
-        it "sends a notification when a submission is posted and assignment posts manually" do
-          @assignment.ensure_post_policy(post_manually: true)
-
-          expect {
-            @assignment.post_submissions(submission_ids: [submission.id])
-          }.to change {
-            DelayedMessage.where(
-              communication_channel: @student.email_channel,
-              notification: @assignment_unmuted_notification
-            ).count
-          }.by(1)
+        it "does not send a notification when a submission is not being posted" do
+          expect { submission.update!(body: "hello") }.not_to change { submission_posted_messages.count }
         end
 
-        it "does not send a notification when a submission is posted and assignment posts automatically" do
-          expect {
-            @assignment.grade_student(@student, grader: @teacher, score: 10)
-          }.not_to change {
-            DelayedMessage.where(
-              communication_channel: @student.email_channel,
-              notification: @assignment_unmuted_notification
-            ).count
-          }
+        context "when grade_posting_in_progress is true" do
+          before(:each) do
+            submission.grade_posting_in_progress = true
+          end
+
+          it "sends a notification when a submission is posted and assignment posts manually" do
+            @assignment.ensure_post_policy(post_manually: true)
+
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.to change {
+              submission_posted_messages.count
+            }.by(1)
+          end
+
+          it "sends a notification when a submission is posted and assignment posts automatically" do
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.to change {
+              submission_posted_messages.count
+            }.by(1)
+          end
+        end
+
+        context "when grade_posting_in_progress is false" do
+          before(:each) do
+            submission.grade_posting_in_progress = false
+          end
+
+          it "does not send a notification when a submission is posted and assignment posts manually" do
+            @assignment.ensure_post_policy(post_manually: true)
+
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.not_to change {
+              submission_posted_messages.count
+            }
+          end
+
+          it "does not send a notification when a submission is posted and assignment posts automatically" do
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.not_to change {
+              submission_posted_messages.count
+            }
+          end
         end
       end
     end
