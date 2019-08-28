@@ -5,6 +5,9 @@ cd gems
 
 for test_script in $(find . -name test.sh); do
   pushd `dirname $test_script` > /dev/null
+  echo -e "--format doc" >> ./.rspec
+  echo -e "--format html" >> ./.rspec
+  echo -e "--out ../../tmp/spec_results/$(basename `dirname $test_script`)_results.html" >> ./.rspec
   echo "################ $(basename `dirname $test_script`) ################"
   ./test.sh
   let gem_result=$?

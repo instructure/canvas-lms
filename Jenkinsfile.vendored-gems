@@ -43,6 +43,27 @@ pipeline {
       }
 
       post {
+        always {
+          // copy the test results from the container
+          sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
+          script {
+            def htmlFiles
+            // find all results files
+            dir ('spec_results') {
+              htmlFiles = findFiles glob: '*_results.html'
+            }
+            // publish html
+            publishHTML target: [
+              allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: true,
+              reportDir: "spec_results",
+              reportFiles: htmlFiles.join(','),
+              reportName: 'Test Report'
+              ]
+          }
+        }
+
         cleanup {
           sh 'build/new-jenkins/docker-cleanup.sh'
         }
