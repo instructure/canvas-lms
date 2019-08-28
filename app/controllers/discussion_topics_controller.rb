@@ -492,6 +492,8 @@ class DiscussionTopicsController < ApplicationController
       if context.is_a?(Course)
         js_hash[:allow_self_signup] = true  # for group creation
         js_hash[:group_user_type] = 'student'
+        js_hash['EXCLUDED_STUDENTS'] = ExcusedService.excused_students(@assignment)
+        js_hash['ALL_STUDENTS'] = ExcusedService.students_in_course(@context)
       end
       js_env(js_hash)
 

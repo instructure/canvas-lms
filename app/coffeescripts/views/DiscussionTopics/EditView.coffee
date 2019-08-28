@@ -110,6 +110,8 @@ define [
       @assignment = @model.get("assignment")
       @initialPointsPossible = @assignment.pointsPossible()
       @dueDateOverrideView = options.views['js-assignment-overrides']
+      @excludeStudentsView = options.views['js-exclude-students']
+
       @on 'success', =>
         @unwatchUnload()
         @redirectAfterSave()
@@ -286,6 +288,7 @@ define [
       data.sort_by_rating = false unless data.allow_rating is '1'
       data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
       data.todo_date = null unless data.allow_todo_date is '1'
+      data.excluded_students = @excludeStudentsView.getExcludedStudents()
 
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
