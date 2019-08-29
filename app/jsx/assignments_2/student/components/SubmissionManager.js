@@ -49,10 +49,17 @@ export default class SubmissionManager extends Component {
   }
 
   updateSubmissionDraftCache = (cache, mutationResult) => {
-    const {assignment} = cache.readQuery({
-      query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id}
-    })
+    const {assignment} = JSON.parse(
+      JSON.stringify(
+        cache.readQuery({
+          query: STUDENT_VIEW_QUERY,
+          variables: {
+            assignmentLid: this.props.assignment._id,
+            submissionID: this.props.submission.id
+          }
+        })
+      )
+    )
 
     const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft

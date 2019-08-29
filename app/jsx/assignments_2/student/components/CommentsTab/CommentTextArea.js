@@ -81,7 +81,7 @@ export default class CommentTextArea extends Component {
   }
 
   updateSubmissionCommentCache = (cache, submission) => {
-    const {submissionComments} = cache.readQuery(this.queryVariables())
+    const {submissionComments} = JSON.parse(JSON.stringify(cache.readQuery(this.queryVariables())))
     submissionComments.commentsConnection.nodes = submissionComments.commentsConnection.nodes.concat(
       [submission.data.createSubmissionComment.submissionComment]
     )
