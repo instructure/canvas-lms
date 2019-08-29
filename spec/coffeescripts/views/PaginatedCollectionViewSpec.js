@@ -125,7 +125,7 @@ test('fetches the next page on scroll', () => {
   assertItemRendered('4')
 })
 
-test("doesn't fetch if already fetching", function() {
+test("doesn't fetch if already fetching", () => {
   sandbox.spy(collection, 'fetch')
   sandbox.spy(view, 'hideLoadingIndicator')
   collection.fetch()

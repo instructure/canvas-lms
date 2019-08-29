@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var aphrodite = require('aphrodite')
+const aphrodite = require('aphrodite')
 
 function pseudochild (selector, baseSelector, generateSubtreeStyles) {
-  var regex = /^#:(?:\w|-)+\s{1}\w+$/im
+  const regex = /^#:(?:\w|-)+\s{1}\w+$/im
   if (!selector.match(regex)) {
     return null
   }
 
-  var pseudo = selector.slice(1).split(' ')[0]
-  var parentsel = '.' + selector.split(' ')[1]
+  const pseudo = selector.slice(1).split(' ')[0]
+  const parentsel = '.' + selector.split(' ')[1]
   return generateSubtreeStyles(baseSelector + pseudo + ' ' + parentsel)
 }
 
-var myExtension = {selectorHandler: pseudochild}
+const myExtension = {selectorHandler: pseudochild}
 
 module.exports = aphrodite.StyleSheet.extend([myExtension])

@@ -27,7 +27,7 @@ import Grid from '../../gradezilla/OutcomeGradebookGrid'
 import userSettings from '../../userSettings'
 import CheckboxView from './CheckboxView'
 import SectionMenuView from '../gradebook/SectionMenuView'
-import SectionFilter from 'jsx/gradezilla/default_gradebook/components/SectionFilter'
+import SectionFilter from 'jsx/gradezilla/default_gradebook/components/content-filters/SectionFilter'
 import template from 'jst/gradezilla/outcome_gradebook'
 import 'vendor/jquery.ba-tinypubsub'
 import '../../jquery.rails_flash_notifications'
@@ -272,9 +272,9 @@ export default class OutcomeGradebookView extends View
         selectedSectionId = @gradebook.getFilterRowsBySetting('sectionId') || '0'
         Grid.section = selectedSectionId
         props =
-          items: sectionList
+          sections: sectionList
           onSelect: @updateCurrentSection
-          selectedItemId: selectedSectionId
+          selectedSectionId: selectedSectionId
           disabled: false
 
         component = React.createElement(SectionFilter, props)

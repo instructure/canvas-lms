@@ -23,9 +23,6 @@ require_relative 'address_book/messageable_user'
 module AddressBook
   STRATEGIES = {
     'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda{ I18n.t('MessageableUser library') } }.freeze,
-    'microservice' => { implementation: AddressBook::Service, label: lambda{ I18n.t('AddressBook microservice') } }.freeze,
-    'performance_tap' => { implementation: AddressBook::PerformanceTap, label: lambda{ I18n.t('AddressBook performance tap') } }.freeze,
-    'empty' => { implementation: AddressBook::Empty, label: lambda{ I18n.t('Empty stub (for testing only)') } }.freeze
   }.freeze
   DEFAULT_STRATEGY = 'messageable_user'
 
@@ -35,13 +32,7 @@ module AddressBook
 
   # choose the implementation of address book according to the plugin setting
   def self.strategy
-    strategy = Canvas::Plugin.find('address_book').settings[:strategy]
-    unless STRATEGIES.has_key?(strategy)
-      # plugin setting specifies an invalid strategy. (TODO: logger.warn or
-      # something.) gracefully fall back on default
-      strategy = DEFAULT_STRATEGY
-    end
-    strategy
+    DEFAULT_STRATEGY
   end
 
   def self.implementation

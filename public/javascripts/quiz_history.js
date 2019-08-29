@@ -199,9 +199,7 @@ import 'compiled/behaviors/quiz_selectmenu'
     },
 
     questions: function(){
-      return $('.question_holder').map(function(index, el) {
-        return $(el).position().top - 320;
-      }).toArray();
+      return $('.question_holder').map((index, el) => $(el).position().top - 320).toArray();
     },
 
     onScroll: function(){
@@ -440,17 +438,17 @@ import 'compiled/behaviors/quiz_selectmenu'
       scoringSnapshot.jumpToQuestion(questionId);
     });
 
-    $('#nav-prev').click(function(e){
+    $('#nav-prev').click(e => {
       e.preventDefault();
       quizNavBar.previousQuestionBlock();
     });
 
-    $('#nav-next').click(function(e){
+    $('#nav-next').click(e => {
       e.preventDefault();
       quizNavBar.nextQuestionBlock();
     });
 
-    $(window).resize(function () {
+    $(window).resize(() => {
       quizNavBar.updateWindowSize();
       quizNavBar.setScrollWindowPosition(quizNavBar.index);
       gradingForm.onWindowResize();
@@ -458,7 +456,7 @@ import 'compiled/behaviors/quiz_selectmenu'
   });
 
   if (ENV.SCORE_UPDATED) {
-    $(document).ready(function() {
+    $(document).ready(() => {
       if(parentWindow.respondsTo('refreshGrades')) {
         window.parent.INST.refreshGrades();
       }

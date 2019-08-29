@@ -22,7 +22,7 @@ const globby = require('gglobby')
 const fs = require('fs')
 const CoffeeScript = require('coffee-script')
 const glob = require('glob')
-const babylon = require('babylon')
+const babylon = require('@babel/parser')
 
 XSSLint.configure({
   'xssable.receiver.whitelist': ['formData'],

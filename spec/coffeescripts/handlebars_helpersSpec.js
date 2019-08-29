@@ -69,7 +69,7 @@ const testCheckbox = function(context, prop, hash = {}) {
 
 test('simple case', () => testCheckbox(context, 'human'))
 
-test('custom hash attributes', function() {
+test('custom hash attributes', () => {
   const hash = {
     class: 'foo bar baz',
     id: 'custom_id'
@@ -84,7 +84,7 @@ test('nested property', () =>
     checked: context.likes.tacos
   }))
 
-test('checkboxes - hidden input values', function() {
+test('checkboxes - hidden input values', () => {
   const hiddenInput = function({disabled}) {
     const inputs = helpers.checkbox.call(context, 'blah', {hash: {disabled}})
     const div = $(`<div>${inputs}</div>`)
@@ -95,7 +95,7 @@ test('checkboxes - hidden input values', function() {
   ok(hiddenInput({disabled: true}).prop('disabled'))
 })
 
-test('titleize', function() {
+test('titleize', () => {
   equal(helpers.titleize('test_string'), 'Test String')
   equal(helpers.titleize(null), '')
   equal(helpers.titleize('test_ _string'), 'Test String')
@@ -105,19 +105,19 @@ test('toPrecision', () => equal(helpers.toPrecision(3.6666666, 2), '3.7'))
 
 QUnit.module('truncate')
 
-test('default truncates 30 characters', function() {
+test('default truncates 30 characters', () => {
   const text = 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf'
   const truncText = helpers.truncate(text)
   equal(truncText.length, 30, 'Truncates down to 30 letters')
 })
 
-test('expects options for max (length)', function() {
+test('expects options for max (length)', () => {
   const text = 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf'
   const truncText = helpers.truncate(text, 10)
   equal(truncText.length, 10, 'Truncates down to 10 letters')
 })
 
-test('supports truncation left', function() {
+test('supports truncation left', () => {
   const text = 'going to the store'
   const truncText = helpers.truncate_left(text, 15)
   equal(truncText, '...to the store', 'Reverse truncates')
@@ -179,7 +179,7 @@ QUnit.module('contextSensitive FriendlyDatetime', {
   }
 })
 
-test('displays both zones data from an ISO string', function() {
+test('displays both zones data from an ISO string', () => {
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', {
     hash: {pubDate: false, contextSensitive: true}
   }).string
@@ -187,7 +187,7 @@ test('displays both zones data from an ISO string', function() {
   return contains(timeTag, 'Course: Dec 31, 1969 at 6pm')
 })
 
-test('displays both zones data from a date object', function() {
+test('displays both zones data from a date object', () => {
   const timeTag = helpers.friendlyDatetime(new Date(0), {
     hash: {pubDate: false, contextSensitive: true}
   }).string
@@ -195,7 +195,7 @@ test('displays both zones data from a date object', function() {
   return contains(timeTag, 'Course: Dec 31, 1969 at 6pm')
 })
 
-test('should parse non-qualified string relative to both timezones', function() {
+test('should parse non-qualified string relative to both timezones', () => {
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00', {
     hash: {pubDate: false, contextSensitive: true}
   }).string
@@ -203,7 +203,7 @@ test('should parse non-qualified string relative to both timezones', function() 
   return contains(timeTag, 'Course: Dec 31, 1969 at 11pm')
 })
 
-test('reverts to friendly display when there is no contextual timezone', function() {
+test('reverts to friendly display when there is no contextual timezone', () => {
   ENV.CONTEXT_TIMEZONE = null
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', {
     hash: {pubDate: false, contextSensitive: true}
@@ -227,7 +227,7 @@ QUnit.module('contextSensitiveDatetimeTitle', {
   }
 })
 
-test('just passes through to datetime string if there is no contextual timezone', function() {
+test('just passes through to datetime string if there is no contextual timezone', () => {
   ENV.CONTEXT_TIMEZONE = null
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
     hash: {justText: true}
@@ -235,14 +235,14 @@ test('just passes through to datetime string if there is no contextual timezone'
   equal(titleText, 'Dec 31, 1969 at 7pm')
 })
 
-test('splits title text to both zones', function() {
+test('splits title text to both zones', () => {
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
     hash: {justText: true}
   })
   equal(titleText, 'Local: Dec 31, 1969 at 7pm<br>Course: Dec 31, 1969 at 6pm')
 })
 
-test('properly spans day boundaries', function() {
+test('properly spans day boundaries', () => {
   ENV.TIMEZONE = 'America/Chicago'
   tz.changeZone(chicago, 'America/Chicago')
   ENV.CONTEXT_TIMEZONE = 'America/New_York'
@@ -252,7 +252,7 @@ test('properly spans day boundaries', function() {
   equal(titleText, 'Local: Dec 31, 1969 at 11:30pm<br>Course: Jan 1, 1970 at 12:30am')
 })
 
-test('stays as one title when the timezone is no different', function() {
+test('stays as one title when the timezone is no different', () => {
   ENV.TIMEZONE = 'America/Detroit'
   ENV.CONTEXT_TIMEZONE = 'America/Detroit'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
@@ -261,7 +261,7 @@ test('stays as one title when the timezone is no different', function() {
   equal(titleText, 'Dec 31, 1969 at 7pm')
 })
 
-test('stays as one title when the time is no different even if timezone names differ', function() {
+test('stays as one title when the time is no different even if timezone names differ', () => {
   ENV.TIMEZONE = 'America/Detroit'
   ENV.CONTEXT_TIMEZONE = 'America/New_York'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
@@ -270,7 +270,7 @@ test('stays as one title when the time is no different even if timezone names di
   equal(titleText, 'Dec 31, 1969 at 7pm')
 })
 
-test('produces the html attributes if you dont specify just_text', function() {
+test('produces the html attributes if you dont specify just_text', () => {
   ENV.CONTEXT_TIMEZONE = null
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
     hash: {justText: undefined}
@@ -287,14 +287,14 @@ QUnit.module('datetimeFormatted', {
   }
 })
 
-test('should parse and format relative to profile timezone', function() {
+test('should parse and format relative to profile timezone', () => {
   tz.changeZone(detroit, 'America/Detroit')
   equal(helpers.datetimeFormatted('1970-01-01 00:00:00'), 'Jan 1, 1970 at 12am')
 })
 
 QUnit.module('ifSettingIs')
 
-test('it runs primary case if setting matches', function() {
+test('it runs primary case if setting matches', () => {
   ENV.SETTINGS = {key: 'value'}
   let semaphore = false
   const funcs = {
@@ -309,7 +309,7 @@ test('it runs primary case if setting matches', function() {
   equal(semaphore, true)
 })
 
-test('it runs inverse case if setting does not match', function() {
+test('it runs inverse case if setting does not match', () => {
   ENV.SETTINGS = {key: 'NOTvalue'}
   let semaphore = false
   const funcs = {
@@ -324,7 +324,7 @@ test('it runs inverse case if setting does not match', function() {
   equal(semaphore, true)
 })
 
-test('it runs inverse case if setting does not exist', function() {
+test('it runs inverse case if setting does not exist', () => {
   ENV.SETTINGS = {}
   let semaphore = false
   const funcs = {
@@ -343,24 +343,24 @@ QUnit.module('accessible date pickers')
 
 test('it provides a format', () => equal(typeof helpers.accessibleDateFormat(), 'string'))
 
-test('it can shorten the format for dateonly purposes', function() {
+test('it can shorten the format for dateonly purposes', () => {
   const shortForm = helpers.accessibleDateFormat('date')
   equal(shortForm.indexOf('hh:mm'), -1)
   ok(shortForm.indexOf('YYYY') > -1)
 })
 
-test('it can shorten the format for time-only purposes', function() {
+test('it can shorten the format for time-only purposes', () => {
   const shortForm = helpers.accessibleDateFormat('time')
   ok(shortForm.indexOf('hh:mm') > -1)
   equal(shortForm.indexOf('YYYY'), -1)
 })
 
-test('it provides a common format prompt wrapped around the format', function() {
+test('it provides a common format prompt wrapped around the format', () => {
   const formatPrompt = helpers.datepickerScreenreaderPrompt()
   ok(formatPrompt.indexOf(helpers.accessibleDateFormat()) > -1)
 })
 
-test('it passes format info through to date format', function() {
+test('it passes format info through to date format', () => {
   const shortFormatPrompt = helpers.datepickerScreenreaderPrompt('date')
   equal(shortFormatPrompt.indexOf(helpers.accessibleDateFormat()), -1)
   ok(shortFormatPrompt.indexOf(helpers.accessibleDateFormat('date')) > -1)

@@ -308,21 +308,20 @@ module Gradezilla
     section = section.name if section.is_a?(CourseSection)
     section ||= ''
     section_dropdown.click
-    # section_menu_item = ff('option', section_dropdown).find { |opt| opt.text == section }
-    # section_menu_item.click
     filter_menu_item(section).click
-    section_dropdown.click
     wait_for_ajaximations
   end
 
   def self.select_grading_period(grading_period_name)
-    click_option(grading_period_dropdown_selector, grading_period_name, :text)
+    grading_period_dropdown.click
+    filter_menu_item(grading_period_name).click
     wait_for_ajaximations
   end
 
   def self.select_student_group(student_group)
     student_group = student_group.name if student_group.is_a?(Group)
-    click_option(student_group_dropdown, student_group, :text)
+    student_group_dropdown.click
+    filter_menu_item(student_group).click
     wait_for_ajaximations
   end
 
@@ -512,23 +511,28 @@ module Gradezilla
   end
 
   def self.grading_period_dropdown_selector
-    '#grading-periods-filter-container select'
+    '#grading-periods-filter-container [role="combobox"]'
+  end
+
+  def self.grading_period_dropdown
+    f(grading_period_dropdown_selector)
   end
 
   def self.section_dropdown
-    f('#sections-filter-container select')
+    f('#sections-filter-container [role="combobox"]')
   end
 
   def self.module_dropdown
-    f('#modules-filter-container select')
+    f('#modules-filter-container [role="combobox"]')
   end
 
   def self.student_group_dropdown
-    f('#student-group-filter-container select')
+    f('#student-group-filter-container [role="combobox"]')
   end
 
   def self.filter_menu_item(menu_item_name)
-    fj("option:contains(\"#{menu_item_name}\")")
+    wait_for_animations
+    fj("[role=\"option\"]:contains(\"#{menu_item_name}\")")
   end
 
   def self.gradebook_dropdown_item_click(menu_item_name)

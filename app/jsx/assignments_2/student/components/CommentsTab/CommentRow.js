@@ -30,7 +30,7 @@ import {VideoPlayer} from '@instructure/ui-media-player'
 function CommentRow(props) {
   const {author, mediaObject, read} = props.comment
   if (mediaObject) {
-    mediaObject.mediaSources.forEach(function(mediaSource) {
+    mediaObject.mediaSources.forEach(mediaSource => {
       mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
     })
   }

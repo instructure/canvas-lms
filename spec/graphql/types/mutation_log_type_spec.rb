@@ -32,7 +32,9 @@ describe Types::MutationLogType do
     account_admin_user
     @asset_string = @assignment.asset_string
 
-    make_log_entry(current_user: @teacher)
+    Timecop.freeze(1.week.ago) do
+      make_log_entry(current_user: @teacher)
+    end
     make_log_entry(current_user: @teacher, real_current_user: @admin)
   end
 
@@ -111,5 +113,35 @@ describe Types::MutationLogType do
       dig("data", "auditLogs", "mutationLogs")
     expect(result.dig("pageInfo", "hasNextPage")).to eq false
     expect(result.dig("nodes").size).to eq 1
+  end
+
+  it "supports date ranges" do
+    result = audit_log_query({
+      assetString: @asset_string,
+      startTime: 1.day.ago.iso8601,
+    }, current_user: @admin).dig("data", "auditLogs", "mutationLogs")
+
+    expect(result["nodes"].size).to eq 1
+    expect(result.dig("nodes", 0, "timestamp")).to be > 1.day.ago
+
+    result = audit_log_query({
+      assetString: @asset_string,
+      endTime: 1.day.ago.iso8601,
+    }, current_user: @admin)
+      .tap { |x| pp x }
+      .dig("data", "auditLogs", "mutationLogs")
+
+    expect(result["nodes"].size).to eq 1
+    expect(result.dig("nodes", 0, "timestamp")).to be < 1.day.ago
+
+    result = audit_log_query({
+      assetString: @asset_string,
+      startTime: 2.years.ago.iso8601,
+      endTime: 1.years.ago.iso8601,
+    }, current_user: @admin)
+      .tap { |x| pp x }
+      .dig("data", "auditLogs", "mutationLogs")
+
+    expect(result["nodes"].size).to eq 0
   end
 end

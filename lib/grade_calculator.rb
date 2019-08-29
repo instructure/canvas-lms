@@ -753,11 +753,8 @@ class GradeCalculator
     Rails.logger.debug "GRADES: dropping assignments! #{rules.inspect}"
 
     cant_drop = []
-    if never_drop_ids.present? || @ignore_muted
-      cant_drop, submissions = submissions.partition do |submission|
-        assignment = submission[:assignment]
-        ignore_submission?(submission: submission[:submission], assignment: assignment) || never_drop_ids.include?(assignment.id)
-      end
+    if never_drop_ids.present?
+      cant_drop, submissions = submissions.partition { |submission| never_drop_ids.include?(submission[:assignment].id) }
     end
 
     # fudge the drop rules if there aren't enough submissions

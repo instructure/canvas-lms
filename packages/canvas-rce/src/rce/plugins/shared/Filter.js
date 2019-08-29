@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {func, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {func, oneOf, string} from 'prop-types'
 import {Flex, View} from '@instructure/ui-layout'
 import formatMessage from '../../../format-message'
 import {Select} from '@instructure/ui-forms'
@@ -46,8 +46,26 @@ export function useFilterSettings() {
   return [filterSettings, updateFilterSettings]
 }
 
+function fileLabelFromContext(contextType) {
+  switch(contextType) {
+    case 'user':
+      return formatMessage('My Files')
+    case 'course':
+      return formatMessage('Course Files')
+    case 'group':
+      return formatMessage('Group Files')
+    default:
+      return formatMessage('Files')
+  }
+}
+
 export default function Filter(props) {
   const {contentType, contentSubtype, onChange, sortValue} = props
+
+  // only run on mounting to trigger change to correct contextType
+  useEffect(() => {
+    onChange({contentType})
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <View display="block" direction="column">
@@ -62,12 +80,16 @@ export default function Filter(props) {
           {formatMessage('Links')}
         </option>
 
-        <option value="files" icon={IconFolderLine}>
-          {formatMessage('Files')}
+        <option value="course_files" icon={IconFolderLine}>
+          {fileLabelFromContext('course')}
+        </option>
+
+        <option value="user_files" icon={IconFolderLine}>
+          {fileLabelFromContext('user')}
         </option>
       </Select>
 
-      {contentType === 'files' && (
+      {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item grow shrink margin="none xx-small none none">
             <Select
@@ -128,7 +150,7 @@ Filter.propTypes = {
   /**
    * `contentType` is the primary filter setting (e.g. links, files)
    */
-  contentType: string.isRequired,
+  contentType: oneOf(['links', 'user_files', 'course_files']).isRequired,
 
   /**
    * `onChange` is called when any of the Filter settings are changed
@@ -138,5 +160,10 @@ Filter.propTypes = {
   /**
    * `sortValue` defines how items in the CanvasContentTray are sorted
    */
-  sortValue: string.isRequired
+  sortValue: string.isRequired,
+
+  /**
+   * `contextType` is the context in which we are querying for files
+   */
+  contextType: oneOf(['user', 'course', 'group'])
 }

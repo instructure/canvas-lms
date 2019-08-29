@@ -179,8 +179,9 @@ module SIS
         end
 
         if grade_passback_setting
-          grade_passback_setting = nil if grade_passback_setting == 'not_set'
-          if grade_passback_setting != course.grade_passback_setting
+          grade_passback_setting_stuck = course.stuck_sis_fields.include?(:grade_passback_setting)
+          unless grade_passback_setting_stuck
+            grade_passback_setting = nil if grade_passback_setting == 'not_set'
             course.grade_passback_setting = grade_passback_setting
           end
         end

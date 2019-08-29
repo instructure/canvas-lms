@@ -28,10 +28,11 @@ module Lti
         @tool = external_tool_model(context: @course)
         @tool.allow_membership_service_access = true
         @tool.save!
+        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       end
 
       it 'returns the members' do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
         consumer = OAuth::Consumer.new(@tool.consumer_key, @tool.shared_secret, :site => "http://www.example.com/")
         path = "/api/lti/courses/#{@course.id}/membership_service"
         req = consumer.create_signed_request(:get, path)
@@ -43,7 +44,6 @@ module Lti
       end
 
       it 'returns unauthorized if the tool is not found' do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
         consumer = OAuth::Consumer.new(@tool.consumer_key+"1", @tool.shared_secret, :site => "http://www.example.com/")
         path = "/api/lti/courses/#{@course.id}/membership_service"
         req = consumer.create_signed_request(:get, path)
@@ -52,7 +52,6 @@ module Lti
       end
 
       it 'returns unauthorized if the tool does not have access to the api' do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
         @tool.allow_membership_service_access = false
         @tool.save!
         consumer = OAuth::Consumer.new(@tool.consumer_key, @tool.shared_secret, :site => "http://www.example.com/")
@@ -63,6 +62,7 @@ module Lti
       end
 
       it 'returns unauthorized if the membership service access feature flag is disabled' do
+        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(false)
         consumer = OAuth::Consumer.new(@tool.consumer_key, @tool.shared_secret, :site => "http://www.example.com/")
         path = "/api/lti/courses/#{@course.id}/membership_service"
         req = consumer.create_signed_request(:get, path)

@@ -8,9 +8,7 @@ function FileFilter(params) {
 }
 
 FileFilter.prototype.parseExtensions = function(extString) {
-  return extString.split(';').map(function(ext){
-    return ext.substring(2);
-  });
+  return extString.split(';').map(ext => ext.substring(2));
 };
 
 FileFilter.prototype.includesExtension = function(extension) {

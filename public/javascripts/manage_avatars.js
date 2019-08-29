@@ -35,7 +35,7 @@ $(document).ready(function() {
     var $td = $link.parents("td");
     var url = $td.find(".user_avatar_url").attr('href');
     $td.find(".progress").text(I18n.t('messages.updating', "Updating...")).css('visibility', 'visible');
-    $.ajaxJSON(url, 'PUT', {'avatar[state]': $link.attr('data-state')}, function(data) {
+    $.ajaxJSON(url, 'PUT', {'avatar[state]': $link.attr('data-state')}, data => {
       $td
         .find(".lock_avatar_link").showIf(data.avatar_state != 'locked').end()
         .find(".unlock_avatar_link").showIf(data.avatar_state == 'locked').end()
@@ -46,7 +46,7 @@ $(document).ready(function() {
       }
       $td.parents("tr").attr('class', data.avatar_state);
       $td.find(".progress").css('visibility', 'hidden');
-    }, function(data) {
+    }, data => {
       $td.find(".progress").text(I18n.t('errors.update_failed', "Update failed, please try again")).css('visibility', 'visible');
     });
   });

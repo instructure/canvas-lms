@@ -336,14 +336,14 @@ describe('Gradebook StudentContentDataLoader', () => {
 
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
-          .beforeRespond(async request => {
+          .beforeRespond(request => {
             events.push(`request submissions:${joinRequestIds(request, 'student_ids')}`)
           })
           .afterRespond(submissionPromises[0].resolve)
           .respond([{status: 200, body: exampleData.submissions.slice(0, 1)}])
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
-          .beforeRespond(async request => {
+          .beforeRespond(request => {
             events.push(`request submissions:${joinRequestIds(request, 'student_ids')}`)
           })
           .afterRespond(submissionPromises[1].resolve)
@@ -427,7 +427,7 @@ describe('Gradebook StudentContentDataLoader', () => {
 
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
-          .beforeRespond(async request => {
+          .beforeRespond(request => {
             events.push(`request submissions page ${getPage(request)}`)
           })
           .afterRespond(submissionPromises[0].resolve)
@@ -438,7 +438,7 @@ describe('Gradebook StudentContentDataLoader', () => {
           ])
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
-          .beforeRespond(async request => {
+          .beforeRespond(request => {
             events.push(`request submissions:${joinRequestIds(request, 'student_ids')}`)
           })
           .afterRespond(submissionPromises[1].resolve)

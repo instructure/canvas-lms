@@ -99,18 +99,18 @@ export default {
     event.preventDefault()
     return moveStuff(this.itemsToDrag(), destinationFolder)
       .then(
-        function() {
+        () => {
           if (callback) {
             return callback({success: true, event})
           }
         },
-        function() {
+        () => {
           if (callback) {
             return callback({success: false, event})
           }
         }
       )
-      .done(this.clearSelectedItems)
+      .done(this.clearSelectedItems);
   }
 }
 //      @clearSelectedItems()

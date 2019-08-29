@@ -61,7 +61,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
         id: "homework_selection_iframe",
         tabindex: '0'
       }).css({width, height}))
-        .bind('selection', function(selectionEvent, _data) {
+        .bind('selection', (selectionEvent, _data) => {
           submitContentItem(selectionEvent.contentItems[0])
           $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
           $div.dialog('close')
@@ -197,7 +197,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
         if(ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
           var subButton = $(this).find('button[type=submit]');
           var badExt = false;
-          $.each(uploadedAttachmentIds.split(","), function(index, id) {
+          $.each(uploadedAttachmentIds.split(","), (index, id) => {
             if (id.length > 0) {
               var ext = $("#submission_attachment_ids").data(String(id)).split('.').pop().toLowerCase();
               if ($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
@@ -244,14 +244,14 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
       }
     });
 
-    $(window).on('beforeunload', function(e) {
+    $(window).on('beforeunload', e => {
       if($("#submit_assignment:visible").length > 0 && !submitting) {
         e.returnValue = I18n.t('messages.not_submitted_yet', "You haven't finished submitting your assignment.  You still need to click \"Submit\" to finish turning it in.  Do you want to leave this page anyway?");
         return e.returnValue;
       }
     });
 
-    $(document).fragmentChange(function(event, hash) {
+    $(document).fragmentChange((event, hash) => {
       if(hash && hash.indexOf("#submit") == 0) {
         $(".submit_assignment_link").triggerHandler('click', true);
         if(hash == "#submit_google_doc") {
@@ -293,7 +293,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
       $(this).siblings(".switch_text_entry_submission_views").andSelf().toggle();
     });
 
-    $(".submit_assignment_form .cancel_button").click(function() {
+    $(".submit_assignment_form .cancel_button").click(() => {
       $("#submit_assignment").hide();
       $(".submit_assignment_link").show();
     });
@@ -352,7 +352,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
         useContextAssets={false}
       />);
 
-    $(".toggle_uploaded_files_link").click(function(event) {
+    $(".toggle_uploaded_files_link").click(event => {
       event.preventDefault();
       const fileEl = $("#uploaded_files")
       if (fileEl.is(":hidden")) {
@@ -380,12 +380,12 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
 
     function listGoogleDocs(){
       var url = window.location.pathname + "/list_google_docs";
-      $.get(url,{}, function(data, textStatus){
+      $.get(url,{}, (data, textStatus) => {
 
         var tree = new GoogleDocsTreeView({model: data});
         $('div#google_docs_container').html(tree.el);
         tree.render();
-        tree.on('activate-file', function(file_id){
+        tree.on('activate-file', file_id => {
           $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
           var submitButton = $("#submit_google_doc_form").find("[disabled].btn-primary");
           if(submitButton) {
@@ -417,7 +417,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
 
     function reauth(auth_url) {
       var modal = window.open(auth_url, "Authorize Google Docs", 'menubar=no,directories=no,location=no,height=500,width=500');
-      $(window).on("message", function (event){
+      $(window).on("message", event => {
         event = event.originalEvent;
         if(!event || !event.data || event.origin !== window.location.protocol + "//" + window.location.host) return;
 
@@ -462,7 +462,7 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
     });
   });
 
-  $("#submit_google_doc_form").submit(function() {
+  $("#submit_google_doc_form").submit(() => {
     // make sure we have a document selected
     if (!$("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val()){
       return false
@@ -478,11 +478,11 @@ import FileBrowser from 'jsx/shared/rce/FileBrowser'
     });
   });
 
-  $(document).ready(function() {
+  $(document).ready(() => {
     $("#submit_media_recording_form .submit_button").attr('disabled', true).text(I18n.t('messages.record_before_submitting', "Record Before Submitting"));
-    $("#media_media_recording_submission_holder .record_media_comment_link").click(function(event) {
+    $("#media_media_recording_submission_holder .record_media_comment_link").click(event => {
       event.preventDefault();
-      $("#media_media_recording_submission").mediaComment('create', 'any', function(id, type) {
+      $("#media_media_recording_submission").mediaComment('create', 'any', (id, type) => {
         $("#submit_media_recording_form .submit_button").attr('disabled', false).text(I18n.t('buttons.submit_assignment', "Submit Assignment"));
         $("#submit_media_recording_form .media_comment_id").val(id);
         $("#submit_media_recording_form .media_comment_type").val(type);

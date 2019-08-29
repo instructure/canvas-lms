@@ -20,11 +20,11 @@ import {mount, shallow} from 'enzyme'
 
 import SelectMenuGroup from 'jsx/grade_summary/SelectMenuGroup'
 
-QUnit.module('SelectMenuGroup', function(suiteHooks) {
+QUnit.module('SelectMenuGroup', suiteHooks => {
   let props
   let wrapper
 
-  suiteHooks.beforeEach(function() {
+  suiteHooks.beforeEach(() => {
     const assignmentSortOptions = [
       ['Assignment Group', 'assignment_group'],
       ['Due Date', 'due_date'],
@@ -60,22 +60,22 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     }
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     wrapper.unmount()
     document.getElementById('fixtures').innerHTML = ''
   })
 
-  test('renders a student select menu if the students prop has more than 1 student', function() {
+  test('renders a student select menu if the students prop has more than 1 student', () => {
     wrapper = shallow(<SelectMenuGroup {...props} />)
     strictEqual(wrapper.find('#student_select_menu').length, 1)
   })
 
-  test('does not render a student select menu if the students prop has only 1 student', function() {
+  test('does not render a student select menu if the students prop has only 1 student', () => {
     wrapper = shallow(<SelectMenuGroup {...props} students={[{id: '11', name: 'Jane Doe'}]} />)
     strictEqual(wrapper.find('#student_select_menu').length, 0)
   })
 
-  test('disables the student select menu if the course select menu has changed', function() {
+  test('disables the student select menu if the course select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper
       .find('#course_select_menu')
@@ -88,12 +88,12 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(menu.getAttribute('aria-disabled'), 'true')
   })
 
-  test('renders a grading period select menu if passed any grading periods', function() {
+  test('renders a grading period select menu if passed any grading periods', () => {
     wrapper = shallow(<SelectMenuGroup {...props} />)
     strictEqual(wrapper.find('#grading_period_select_menu').length, 1)
   })
 
-  test('includes "All Grading Periods" as an option in the grading period select menu', function() {
+  test('includes "All Grading Periods" as an option in the grading period select menu', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     strictEqual(
       wrapper
@@ -104,23 +104,23 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     )
   })
 
-  test('does not render a grading period select menu if passed no grading periods', function() {
+  test('does not render a grading period select menu if passed no grading periods', () => {
     wrapper = shallow(<SelectMenuGroup {...props} gradingPeriods={[]} />)
     strictEqual(wrapper.find('#grading_period_select_menu').length, 0)
   })
 
-  test('disables the grading period select menu if the course select menu has changed', function() {
+  test('disables the grading period select menu if the course select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper.find('select#course_select_menu').simulate('change', {target: {value: '14'}})
     strictEqual(wrapper.find('select#grading_period_select_menu').prop('aria-disabled'), 'true')
   })
 
-  test('renders a course select menu if the courses prop has more than 1 course', function() {
+  test('renders a course select menu if the courses prop has more than 1 course', () => {
     wrapper = shallow(<SelectMenuGroup {...props} />)
     strictEqual(wrapper.find('#course_select_menu').length, 1)
   })
 
-  test('does not render a course select menu if the courses prop has only 1 course', function() {
+  test('does not render a course select menu if the courses prop has only 1 course', () => {
     wrapper = shallow(
       <SelectMenuGroup
         {...props}
@@ -130,19 +130,19 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(wrapper.find('#course_select_menu').length, 0)
   })
 
-  test('disables the course select menu if the student select menu has changed', function() {
+  test('disables the course select menu if the student select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper.find('select#student_select_menu').simulate('change', {target: {value: '7'}})
     strictEqual(wrapper.find('select#course_select_menu').prop('aria-disabled'), 'true')
   })
 
-  test('disables the course select menu if the grading period select menu has changed', function() {
+  test('disables the course select menu if the grading period select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper.find('select#grading_period_select_menu').simulate('change', {target: {value: '12'}})
     strictEqual(wrapper.find('select#course_select_menu').prop('aria-disabled'), 'true')
   })
 
-  test('disables the course select menu if the assignment sort order select menu has changed', function() {
+  test('disables the course select menu if the assignment sort order select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper
       .find('select#assignment_sort_order_select_menu')
@@ -150,12 +150,12 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(wrapper.find('select#course_select_menu').prop('aria-disabled'), 'true')
   })
 
-  test('renders an assignment sort order select menu', function() {
+  test('renders an assignment sort order select menu', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     strictEqual(wrapper.find('select#assignment_sort_order_select_menu').length, 1)
   })
 
-  test('disables the assignment sort order select menu if the course select menu has changed', function() {
+  test('disables the assignment sort order select menu if the course select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper
       .find('#course_select_menu')
@@ -168,18 +168,18 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(menu.getAttribute('aria-disabled'), 'true')
   })
 
-  test('renders a submit button', function() {
+  test('renders a submit button', () => {
     wrapper = shallow(<SelectMenuGroup {...props} />)
     strictEqual(wrapper.find('#apply_select_menus').length, 1)
   })
 
-  test('disables the submit button if no select menu options have changed', function() {
+  test('disables the submit button if no select menu options have changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     const submitButton = wrapper.find('Button[id="apply_select_menus"]')
     strictEqual(submitButton.prop('disabled'), true)
   })
 
-  test('enables the submit button if a select menu options is changed', function() {
+  test('enables the submit button if a select menu options is changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper
       .find('#student_select_menu')
@@ -189,7 +189,7 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(submitButton.prop('disabled'), false)
   })
 
-  test('disables the submit button after it is clicked', function() {
+  test('disables the submit button after it is clicked', () => {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper
       .find('#student_select_menu')
@@ -202,7 +202,7 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(wrapper.find('Button[id="apply_select_menus"]').prop('disabled'), true)
   })
 
-  test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', function() {
+  test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', () => {
     const stub = sinon.stub().resolves()
     wrapper = shallow(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />)
     wrapper
@@ -213,7 +213,7 @@ QUnit.module('SelectMenuGroup', function(suiteHooks) {
     strictEqual(stub.callCount, 1)
   })
 
-  test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', function() {
+  test('does not call saveAssignmentOrder when the button is clicked, if assignment is unchanged', () => {
     props.saveAssignmentOrder = sinon.stub().resolves()
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper

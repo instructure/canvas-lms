@@ -19,13 +19,13 @@
 import React, {useState} from 'react'
 import {func, oneOf, string} from 'prop-types'
 import {linkShape} from './propTypes'
-import {StyleSheet, css} from "aphrodite";
 import formatMessage from '../../../../format-message';
-import {renderLink as renderLinkHtml} from "../../../../rce/contentRendering";
+import {renderLink as renderLinkHtml} from "../../../contentRendering";
 import dragHtml from "../../../../sidebar/dragHtml";
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
+import {Focusable} from '@instructure/ui-focusable'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {
   IconDragHandleLine,
@@ -42,7 +42,7 @@ import {
 function IconBlank() {
   return (
     <SVGIcon name="IconBlank" viewBox="0 0 1920 1920">
-      <g role="presentation"></g>
+      <g role="presentation" />
     </SVGIcon>
   )
 }
@@ -135,51 +135,57 @@ export default function Link(props) {
       onMouseLeave={handleHover}
       style={{position: 'relative'}}
     >
-      <View
-        className={css(styles.link)}
-        as="div"
-        role="button"
-        tabIndex="0"
-        background="default"
-        display="block"
-        width="100%"
-        borderWidth="0 0 small 0"
-        padding="x-small"
-        aria-describedby={props.describedByID}
-        onClick={handleLinkClick}
-        onKeyDown={handleLinkKey}
-        elementRef={props.elementRef}
-      >
-        <div style={{pointerEvents: 'none'}}>
-          <Flex>
-            <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
-              {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
-            </Flex.Item>
-            <Flex.Item grow shrink>
+      <Focusable>
+        {({focused}) => (
+          <View
+            focused={focused}
+            focusPosition="inset"
+            position="relative"
+            as="div"
+            role="button"
+            tabIndex="0"
+            background="default"
+            display="block"
+            width="100%"
+            borderWidth="0 0 small 0"
+            padding="x-small"
+            aria-describedby={props.describedByID}
+            onClick={handleLinkClick}
+            onKeyDown={handleLinkKey}
+            elementRef={props.elementRef}
+          >
+            <div style={{pointerEvents: 'none'}}>
               <Flex>
-                <Flex.Item padding="0 x-small 0 0">
-                  <Text color={color}>
-                    <Icon size="x-small" inline={false} />
-                  </Text>
+                <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
+                  {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
                 </Flex.Item>
-                <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
-                  <View as="div" margin="0">{title}</View>
-                  {dateString ? (<View as="div">{dateString}</View>) : null}
-                </Flex.Item>
-                {'published' in props.link && (
-                  <Flex.Item>
-                    <AccessibleContent alt={publishedMsg}>
+                <Flex.Item grow shrink>
+                  <Flex>
+                    <Flex.Item padding="0 x-small 0 0">
                       <Text color={color}>
-                        {published ? <IconPublishSolid inline={false}/> : <IconUnpublishedSolid inline={false} />}
+                        <Icon size="x-small" inline={false} />
                       </Text>
-                    </AccessibleContent>
-                  </Flex.Item>
-                )}
+                    </Flex.Item>
+                    <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
+                      <View as="div" margin="0">{title}</View>
+                      {dateString ? (<View as="div">{dateString}</View>) : null}
+                    </Flex.Item>
+                    {'published' in props.link && (
+                      <Flex.Item>
+                        <AccessibleContent alt={publishedMsg}>
+                          <Text color={color}>
+                            {published ? <IconPublishSolid inline={false}/> : <IconUnpublishedSolid inline={false} />}
+                          </Text>
+                        </AccessibleContent>
+                      </Flex.Item>
+                    )}
+                  </Flex>
+                </Flex.Item>
               </Flex>
-            </Flex.Item>
-          </Flex>
-        </div>
-      </View>
+            </div>
+          </View>
+        )}
+      </Focusable>
     </div>
   )
 }
@@ -194,11 +200,3 @@ Link.propTypes = {
   describedByID: string.isRequired,
   elementRef: func
 }
-
-const styles = StyleSheet.create({
-  link: {
-    ':focus': {
-      'outline-offset': '-4px'
-    }
-  }
-});

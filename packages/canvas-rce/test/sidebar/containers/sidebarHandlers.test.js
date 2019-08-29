@@ -25,6 +25,8 @@ import * as images from "../../../src/sidebar/actions/images";
 import * as upload from "../../../src/sidebar/actions/upload";
 import * as flickr from "../../../src/sidebar/actions/flickr";
 import * as files from "../../../src/sidebar/actions/files";
+import * as documents from "../../../src/sidebar/actions/documents";
+import * as context from "../../../src/sidebar/actions/context";
 
 describe("sidebarHandlers", () => {
   let handlers, dispatch;
@@ -91,5 +93,17 @@ describe("sidebarHandlers", () => {
 
   it("ties media up;load to store", () => {
     testHandler("startMediaUpload", upload, "uploadToMediaFolder", "images", {})
+  })
+
+  it("ties documents fetch initial documents to store", () => {
+    testHandler("fetchInitialDocs", documents, "fetchInitialDocs")
+  })
+
+  it("ties documents fetch nest documents to store", () => {
+    testHandler("fetchNextDocs", documents, "fetchNextDocs")
+  })
+
+  it("ties context change context to store", () => {
+    testHandler("onChangeContext", context, "changeContext", "newContext")
   })
 });

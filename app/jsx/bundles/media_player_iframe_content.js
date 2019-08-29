@@ -16,19 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import canvasBaseTheme from '@instructure/ui-themes/lib/canvas/base'
-import canvasHighContrastTheme from '@instructure/ui-themes/lib/canvas/high-contrast'
 import CanvasMediaPlayer from '../shared/media/CanvasMediaPlayer'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-if (ENV.use_high_contrast) {
-  canvasHighContrastTheme.use()
-} else {
-  canvasBaseTheme.use()
-}
-const mountNode = document.body.appendChild(document.createElement('div'))
+// get the media_id from something like `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu`
+const media_id = window.location.pathname.split('media_objects_iframe/').pop()
+
 ReactDOM.render(
-  <CanvasMediaPlayer mediaSources={ENV.media_sources} />,
-  mountNode
+  <CanvasMediaPlayer media_id={media_id} media_sources={ENV.media_sources} />,
+  document.body.appendChild(document.createElement('div'))
 )

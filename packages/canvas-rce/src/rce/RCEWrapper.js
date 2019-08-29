@@ -19,10 +19,12 @@
 import PropTypes from "prop-types";
 import React from "react";
 import {Editor} from "@tinymce/tinymce-react";
+import uniqBy from 'lodash/uniqBy'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Alert} from '@instructure/ui-alerts'
 
 import formatMessage from "../format-message";
 import * as contentInsertion from "./contentInsertion";
@@ -35,6 +37,9 @@ import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
 import {isImage} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
+import AlertMessageArea from './AlertMessageArea'
+import alertHandler from './alertHandler'
+import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
@@ -98,6 +103,19 @@ function focusContextToolbar() {
   }
 }
 
+function isElementWithinTable(node) {
+  let elem = node
+  while(elem) {
+    if (elem.tagName === 'TABLE' || elem.tagName === 'TD' || elem.tagName === 'TH') {
+      return true
+    }
+    elem = elem.parentElement
+  }
+  return false
+}
+
+let alertIdValue = 0;
+
 @themeable(theme, styles)
 class RCEWrapper extends React.Component {
   static getByEditor(editor) {
@@ -107,7 +125,7 @@ class RCEWrapper extends React.Component {
   static propTypes = {
     confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
-    editorOptions: PropTypes.object,
+    editorOptions: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     handleUnmount: PropTypes.func,
     language: PropTypes.string,
     onFocus: PropTypes.func,
@@ -115,7 +133,7 @@ class RCEWrapper extends React.Component {
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
     textareaId: PropTypes.string,
-    tinymce: PropTypes.object,
+    tinymce: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     trayProps
   };
 
@@ -146,8 +164,12 @@ class RCEWrapper extends React.Component {
       wordCount: 0,
       isHtmlView: false,
       KBShortcutModalOpen: false,
-      focused: false
+      focused: false,
+      messages: [],
+      announcement: null
     }
+
+    alertHandler.alertFunc = this.addAlert;
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -282,7 +304,7 @@ class RCEWrapper extends React.Component {
   onTinyMCEInstance(command, args) {
     const editor = this.mceInstance();
     if (editor) {
-      if (command == "mceRemoveEditor") {
+      if (command === "mceRemoveEditor") {
         editor.execCommand("mceNewDocument");
       } // makes sure content can't persist past removal
       editor.execCommand(command, false, this.props.textareaId, args);
@@ -361,11 +383,13 @@ class RCEWrapper extends React.Component {
   }
 
   contentTrayClosing = false
+
   handleContentTrayClosing = isClosing => {
     this.contentTrayClosing = isClosing
   }
 
   blurTimer = 0
+
   handleBlur(event) {
     if (this.blurTimer) return
 
@@ -438,7 +462,7 @@ class RCEWrapper extends React.Component {
     this.handleFocus()
   }
 
-  handleBlurEditor() {
+  handleBlurEditor(event) {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.remove('active')
     this.handleBlur(event)
@@ -462,8 +486,8 @@ class RCEWrapper extends React.Component {
       showMenubar(el, true)
     })
     // when typed somewhere else w/in RCEWrapper
-    el.addEventListener('keydown', e => {
-      if (e.altKey && e.code === 'F9') {
+    el.addEventListener('keydown', event => {
+      if (event.altKey && event.code === 'F9') {
         event.preventDefault()
         event.stopPropagation()
         showMenubar(el, true)
@@ -471,8 +495,8 @@ class RCEWrapper extends React.Component {
     })
 
     // toolbar help
-    el.addEventListener('keydown', e => {
-      if (e.altKey && e.code === 'F10') {
+    el.addEventListener('keydown', event => {
+      if (event.altKey && event.code === 'F10') {
         event.preventDefault()
         event.stopPropagation()
         focusToolbar(el)
@@ -480,14 +504,6 @@ class RCEWrapper extends React.Component {
     })
 
     editor.on('keydown', this.handleShortcutKeyShortcut)
-    editor.on('keydown', event => {
-      // Alt+F7 is used to "enter into" the context's popover.
-      if (event.keyCode === 118 && event.altKey) {
-        event.preventDefault()
-        event.stopPropagation()
-        focusContextToolbar()
-      }
-    })
   }
 
   onInit(_e, editor) {
@@ -505,6 +521,43 @@ class RCEWrapper extends React.Component {
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
     editor.on('Change', this.doAutoResize)
+
+    this.announceContextToolbars(editor)
+  }
+
+  announcing = 0
+
+  announceContextToolbars(editor) {
+    editor.on('NodeChange', () => {
+      const node = editor.selection.getNode()
+      if (isImageEmbed(node)) {
+        if (this.announcing !== 1) {
+          this.setState({
+            announcement: formatMessage('type Control F9 to access image options. {text}', {text: node.getAttribute('alt')})
+          })
+          this.announcing = 1
+        }
+      } else if(isFileLink(node)) {
+        if (this.announcing !== 2) {
+          this.setState({
+            announcement: formatMessage('type Control F9 to access link options. {text}', {text: node.textContent})
+          })
+          this.announcing = 2
+        }
+      } else if(isElementWithinTable(node)) {
+        if (this.announcing !== 3) {
+          this.setState({
+            announcement: formatMessage('type Control F9 to access table options. {text}', {text: node.textContent})
+          })
+          this.announcing = 3
+        }
+      } else {
+        this.setState({
+          announcement: null
+        })
+        this.announcing = 0
+      }
+    })
   }
 
   doAutoResize = (e) => {
@@ -542,7 +595,7 @@ class RCEWrapper extends React.Component {
       const container = editor.getContainer()
       if (!container) return
       const currentContainerHeight = Number.parseInt(container.style.height, 10)
-      if (isNaN(currentContainerHeight)) return
+      if (isNaN(currentContainerHeight)) return // eslint-disable-line no-restricted-globals
       const modifiedHeight = currentContainerHeight + coordinates.deltaY
       const newHeight = `${modifiedHeight}px`
       container.style.height = newHeight
@@ -640,7 +693,9 @@ class RCEWrapper extends React.Component {
       // tiny's external link create/edit dialog config
       target_list: false,  // don't show the target list when creating/editing links
       link_title: false,   // don't show the title input when creating/editing links
-      default_link_target: '_blank'
+      default_link_target: '_blank',
+
+      canvas_rce_user_context: {type: this.props.trayProps.contextType, id: this.props.trayProps.contextId}
     }
   }
 
@@ -695,6 +750,33 @@ class RCEWrapper extends React.Component {
     }
   }
 
+  addAlert = alert => {
+    alert.id = alertIdValue++;
+    this.setState(state => {
+      let messages = state.messages.concat(alert);
+      messages = uniqBy(messages, 'text'); // Don't show the same message twice
+      return { messages };
+    });
+  };
+
+
+  removeAlert = (messageId) => {
+    this.setState(state => {
+      const messages = state.messages.filter(message => message.id !== messageId);
+      return { messages };
+    })
+  }
+
+  /**
+   * Used for reseting the value during tests
+   */
+  resetAlertId = () => {
+    if (this.state.messages.length > 0) {
+      throw new Error('There are messages currently, you cannot reset when they are non-zero')
+    }
+    alertIdValue = 0;
+  }
+
   render() {
     const {trayProps, ...mceProps} = this.props
     mceProps.editorOptions.statusbar = false
@@ -717,6 +799,7 @@ class RCEWrapper extends React.Component {
         >
           {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
         </ShowOnFocusButton>
+        <AlertMessageArea messages={this.state.messages} liveRegion={trayProps.liveRegion} afterDismiss={this.removeAlert} />
         <Editor
           id={mceProps.textareaId}
           textareaName={mceProps.name}
@@ -746,6 +829,12 @@ class RCEWrapper extends React.Component {
           onDismiss={this.closeKBShortcutModal}
           open={this.state.KBShortcutModalOpen}
         />
+        <Alert
+          screenReaderOnly
+          liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          >
+          {this.state.announcement}
+        </Alert>
       </div>
     );
   }

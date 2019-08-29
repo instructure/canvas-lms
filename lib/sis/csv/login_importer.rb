@@ -62,6 +62,7 @@ module SIS
           integration_id: row['integration_id'],
           lineno: row['lineno'],
           csv: csv,
+          row: row,
           authentication_provider_id: row['authentication_provider_id']
         )
       end

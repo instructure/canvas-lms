@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/tr.json";
 import "../rce/languages/tr_TR";
+
 formatMessage.addLocale({ tr: locale });

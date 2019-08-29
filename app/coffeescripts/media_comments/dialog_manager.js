@@ -25,19 +25,14 @@ import ReactDOM from 'react-dom'
  */
 
 export default class DialogManager {
-  constructor() {
-    this.hide = this.hide.bind(this)
-    this.setCloseOption = this.setCloseOption.bind(this)
-  }
-
   initialize() {
     this.dialog = $('#media_comment_dialog')
     return this.createLoadingWindow()
   }
 
-  hide() {
+  hide = () => {
     $('#media_comment_dialog').dialog('close')
-  }
+  };
 
   createLoadingWindow() {
     if (this.dialog.length === 0) {
@@ -74,7 +69,7 @@ export default class DialogManager {
     })
   }
 
-  setCloseOption(opts) {
+  setCloseOption = opts => {
     return this.dialog.dialog('option', 'close', () => {
       ReactDOM.unmountComponentAtNode(document.getElementById('record_media_tab'))
       $('#audio_record')
@@ -87,7 +82,7 @@ export default class DialogManager {
         return opts.close.call(this.$dialog)
       }
     })
-  }
+  };
 
   setupTypes(mediaType) {
     if (mediaType === 'video') {

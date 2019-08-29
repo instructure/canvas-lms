@@ -525,7 +525,6 @@ describe "content migrations", :non_parallel do
   context "importing LTI content" do
     let(:import_course) {
       account = account_model
-      account.enable_feature!(:lor_for_account)
       course_with_teacher_logged_in(:account => account).course
     }
     let(:import_tool) do

@@ -38,14 +38,14 @@ describe("LinksPanel", () => {
     defaultProps = {
       contextType: "course",
       contextId: "1",
-      collections: collections,
+      collections,
       toggleNewPageForm: noop
     };
   });
 
   it("binds collection name into child LinkSets' fetchInitialPage", () => {
-    let spy = sinon.spy();
-    let tree = sd.shallowRender(
+    const spy = sinon.spy();
+    const tree = sd.shallowRender(
       <LinksPanel {...defaultProps} fetchInitialPage={spy} />
     );
     const wikiPages = tree
@@ -56,8 +56,8 @@ describe("LinksPanel", () => {
   });
 
   it("binds collection name into child LinkSets' fetchNextPage", () => {
-    let spy = sinon.spy();
-    let tree = sd.shallowRender(
+    const spy = sinon.spy();
+    const tree = sd.shallowRender(
       <LinksPanel {...defaultProps} fetchNextPage={spy} />
     );
     const wikiPages = tree
@@ -95,11 +95,11 @@ describe("LinksPanel", () => {
     });
 
     it("has 'link to new page' in Pages links", () => {
-      let pagesTabTree = tree.subTree(
+      const pagesTabTree = tree.subTree(
         "CollectionPanel",
         n => n.props.summary === "Pages"
       );
-      let linkToNewPage = pagesTabTree.dive([
+      const linkToNewPage = pagesTabTree.dive([
         "CollectionPanel",
         "LinkToNewPage"
       ]);
@@ -107,7 +107,7 @@ describe("LinksPanel", () => {
     });
 
     it("does not have 'link to new page' in Quizzes links", () => {
-      let quizzesTabTree = tree.subTree(
+      const quizzesTabTree = tree.subTree(
         "CollectionPanel",
         n => n.props.summary === "Quizzes"
       );
@@ -121,7 +121,7 @@ describe("LinksPanel", () => {
       tree = sd.shallowRender(
         <LinksPanel {...defaultProps} canCreatePages={false} />
       );
-      let pagesTabTree = tree.subTree(
+      const pagesTabTree = tree.subTree(
         "CollectionPanel",
         n => n.props.summary === "Pages"
       );
@@ -135,7 +135,7 @@ describe("LinksPanel", () => {
   describe("group context", () => {
     let tree;
     before(() => {
-      let props = { ...defaultProps, contextType: "group" };
+      const props = { ...defaultProps, contextType: "group" };
       tree = sd.shallowRender(<LinksPanel {...props} />);
     });
 
@@ -156,11 +156,11 @@ describe("LinksPanel", () => {
     });
 
     it("has 'link to new page' in Pages links", () => {
-      let pagesTabTree = tree.subTree(
+      const pagesTabTree = tree.subTree(
         "CollectionPanel",
         n => n.props.summary === "Pages"
       );
-      let linkToNewPage = pagesTabTree.dive([
+      const linkToNewPage = pagesTabTree.dive([
         "CollectionPanel",
         "LinkToNewPage"
       ]);
@@ -171,7 +171,7 @@ describe("LinksPanel", () => {
   describe("user context", () => {
     let tree;
     before(() => {
-      let props = { ...defaultProps, contextType: "user" };
+      const props = { ...defaultProps, contextType: "user" };
       tree = sd.shallowRender(<LinksPanel {...props} />);
     });
 
@@ -194,7 +194,7 @@ describe("LinksPanel", () => {
     });
 
     it("does not have 'link to new page' in CourseNavigation links", () => {
-      let pagesTabTree = tree.subTree(
+      const pagesTabTree = tree.subTree(
         "CollectionPanel",
         n => n.props.summary === "Pages"
       );

@@ -19,6 +19,6 @@
 import jQuery from 'jquery'
 import './jquery.instructure_misc_plugins' /* fillWindowWithMe */
 
-jQuery(function($) {
+jQuery($ => {
   $("#file_content").css('width', '100%').fillWindowWithMe();
 });

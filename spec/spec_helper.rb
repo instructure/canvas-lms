@@ -907,7 +907,7 @@ RSpec.configure do |config|
       scope = klass.order("id DESC").limit(records.size)
       if return_type == :record
         records = scope.to_a.reverse
-        if Bullet.enable?
+        if CANVAS_RAILS5_2 && Bullet.enable?
           records.each { |record| Bullet::Detector::NPlusOneQuery.add_impossible_object(record) }
         end
         records

@@ -89,7 +89,7 @@ test('setColor sets li style, even with no octothorpe', function() {
 
 QUnit.module('StatusColorListItem afterSetColor')
 
-test('setColor calls afterSetColor', function() {
+test('setColor calls afterSetColor', () => {
   const afterSetColor = sinon.stub()
   const wrapper = shallow(<StatusColorListItem {...defaultProps({afterSetColor})} />)
   const instance = wrapper.instance()

@@ -153,7 +153,7 @@ export default class ExternalToolDialog extends React.Component {
     const frameHeight = Math.max(Math.min(win.height - 100, 550), 100)
     const Overlay = button.use_tray ? ExternalToolDialogTray : ExternalToolDialogModal
     return (
-      <React.Fragment>
+      <>
         <form
           ref={ref => (this.formRef = ref)}
           method="POST"
@@ -217,7 +217,7 @@ export default class ExternalToolDialog extends React.Component {
             </div>
           </FlexItem>
         </Overlay>
-      </React.Fragment>
+      </>
     )
   }
 }

@@ -26,8 +26,8 @@ import formatMessage from "../../format-message";
 import Loading from "../../common/components/Loading";
 import { Button } from '@instructure/ui-buttons'
 import { TextInput } from '@instructure/ui-forms'
-import { IconSearchSolid } from '@instructure/ui-icons'
-import { IconMinimizeSolid } from '@instructure/ui-icons'
+import { IconSearchSolid , IconMinimizeSolid } from '@instructure/ui-icons'
+
 import { StyleSheet, css } from "aphrodite";
 
 class FlickrSearch extends Component {
@@ -43,7 +43,7 @@ class FlickrSearch extends Component {
   handleSubmit(e) {
     e.preventDefault();
     if (this.state && this.state.searchTerm) {
-      let term = this.state.searchTerm.trim();
+      const term = this.state.searchTerm.trim();
       if (term.length > 0) {
         this.props.flickrSearch(term);
       }
@@ -122,10 +122,10 @@ class FlickrSearch extends Component {
   }
 
   flickrLink() {
-    let message = this.props.flickr.formExpanded
+    const message = this.props.flickr.formExpanded
       ? formatMessage("Close Flickr form")
       : formatMessage("Search Flickr");
-    let icon = this.props.flickr.formExpanded ? (
+    const icon = this.props.flickr.formExpanded ? (
       <IconMinimizeSolid className={css(styles.icon)} />
     ) : (
       <IconSearchSolid className={css(styles.icon)} />

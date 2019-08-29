@@ -137,9 +137,7 @@ import Section from 'compiled/models/Section'
     },
 
     removeForType(selector, tokenToRemove, overridesFromRow){
-      var overrideToRemove = _.find(overridesFromRow, function(override){
-        return override.get(selector) == tokenToRemove[selector]
-      })
+      var overrideToRemove = _.find(overridesFromRow, override => override.get(selector) == tokenToRemove[selector])
 
       return _.difference(overridesFromRow, [overrideToRemove])
     },

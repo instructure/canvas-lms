@@ -22,18 +22,18 @@ import Bridge from "../../src/bridge";
 
 describe("Sidebar normalizeProps", () => {
   it("defaults onLinkClick to Bridge.insertLink", () => {
-    let normalized = normalizeProps({});
+    const normalized = normalizeProps({});
     assert.equal(normalized.onLinkClick, Bridge.insertLink);
   });
 
   it("allows overriding onLinkClick", () => {
-    let onLinkClick = () => {};
-    let normalized = normalizeProps({ onLinkClick });
+    const onLinkClick = () => {};
+    const normalized = normalizeProps({ onLinkClick });
     assert.equal(normalized.onLinkClick, onLinkClick);
   });
 
   it("retains other props", () => {
-    let normalized = normalizeProps({ canUploadFiles: true });
+    const normalized = normalizeProps({ canUploadFiles: true });
     assert.ok(normalized.canUploadFiles);
   });
 });

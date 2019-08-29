@@ -33,7 +33,7 @@ var launchToolManually = function(){
 
   // Firefox remembers disabled state after page reloads
   $button.attr('disabled', false);
-  setTimeout(function() {
+  setTimeout(() => {
     // LTI links have a time component in the signature and will
     // expire after a few minutes.
     $button.attr('disabled', true).text($button.data('expired_message'));
@@ -67,13 +67,13 @@ switch($toolForm.data('tool-launch-type')){
       $toolForm.submit();
     } catch(e){}
 
-    $("#tool_content").bind("load", function(){
+    $("#tool_content").bind("load", () => {
       if(document.location.protocol !== "https:" || $("#tool_form")[0].action.indexOf("https:") > -1) {
         $('#insecure_content_msg').hide();
         $toolForm.hide();
       }
     });
-    setTimeout(function(){
+    setTimeout(() => {
       if($('#insecure_content_msg').is(":visible")){
         $('#load_failure').show()
         launchToolInNewTab();
@@ -118,7 +118,7 @@ $(function() {
   // Only calculate height on resize if body does not have
   // .ic-full-screen-lti-tool class
   if ( $tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool') ) {
-    $window.resize(function () {
+    $window.resize(() => {
       if (!$tool_content_wrapper.data('height_overridden')) {
         toolResizer.resize_tool_content_wrapper($window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
       }

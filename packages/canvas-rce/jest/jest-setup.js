@@ -19,6 +19,9 @@
  // Several components use aphrodite, which tries to manipulate the dom
  // on a timer which expires after the test completes and the document no longer exists
 import {StyleSheetTestUtils} from 'aphrodite'
+import {filterUselessConsoleMessages} from '@instructure/js-utils'
+
+filterUselessConsoleMessages(console)
 StyleSheetTestUtils.suppressStyleInjection()
 
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element

@@ -47,7 +47,7 @@ describe("wrapInitCb", () => {
   });
 
   it("tries to add attributes to el in cb", () => {
-    let newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
     newEdOpts.init_instance_callback(fakeEditor);
     assert.ok(setAttrStub.calledWith("foo", "bar"));
   });
@@ -55,13 +55,13 @@ describe("wrapInitCb", () => {
   it("sets rich_text on el", () => {
     elStub.dataset.rich_text = false;
     assert.ok(!elStub.dataset.rich_text);
-    let newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
     newEdOpts.init_instance_callback(fakeEditor);
     assert.ok(elStub.dataset.rich_text);
   });
 
   it("still calls old cb", () => {
-    let newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
     newEdOpts.init_instance_callback(fakeEditor);
     assert.ok(origInitCB.calledWith(fakeEditor));
   });

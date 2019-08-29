@@ -297,7 +297,8 @@ describe "accounts/settings.html.erb" do
 
       it "should show quota options" do
         render
-        expect(@controller.js_env.include?(:ACCOUNT)).to be_truthy
+        expect(@controller.js_env).to include :ACCOUNT
+        expect(@controller.js_env[:ACCOUNT]).to include 'default_storage_quota_mb'
         expect(response).to have_tag '#tab-quotas-link'
         expect(response).to have_tag '#tab-quotas'
       end
@@ -312,7 +313,8 @@ describe "accounts/settings.html.erb" do
 
       it "should not show quota options" do
         render
-        expect(@controller.js_env.include?(:ACCOUNT)).to be_falsey
+        expect(@controller.js_env).to include :ACCOUNT
+        expect(@controller.js_env[:ACCOUNT]).not_to include 'default_storage_quota_mb'
         expect(response).not_to have_tag '#tab-quotas-link'
         expect(response).not_to have_tag '#tab-quotas'
       end

@@ -221,7 +221,7 @@ class AssignmentsController < ApplicationController
         env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
 
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
-          eligible_categories = @context.group_categories
+          eligible_categories = @context.group_categories.active
           eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
           env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
 
@@ -229,7 +229,7 @@ class AssignmentsController < ApplicationController
           # If this is a group assignment and we had previously filtered by a
           # group that isn't part of this assignment's group set, behave as if
           # no group is selected.
-          if selected_group_id.present? && Group.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
+          if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
             env[:selected_student_group_id] = selected_group_id
           end
         end

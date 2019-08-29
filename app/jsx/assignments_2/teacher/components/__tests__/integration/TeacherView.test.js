@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent, waitForElement} from '@testing-library/react'
 import TeacherView from '../../TeacherView'
 import {TeacherViewContextDefaults} from '../../TeacherViewContext'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {
   closest,
   mockAssignment,

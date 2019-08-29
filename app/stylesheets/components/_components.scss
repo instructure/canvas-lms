@@ -151,7 +151,7 @@
         display: block;
         text-decoration: none;
         border-radius: $baseBorderRadius;
-        padding: ($ic-sp - 4) 0 ($ic-sp - 4) $ic-sp;
+        padding: ($ic-sp - 4) 0 ($ic-sp - 4) ($ic-sp / 2);
         overflow-wrap: break-word;
         word-wrap: break-word;
         hyphens: auto;
@@ -194,7 +194,7 @@
     border-radius: 0px;
     font-weight: bold;
     color: $ic-color-dark;
-    padding-#{direction(left)}: ($ic-sp - 2);
+    padding-#{direction(left)}: ($ic-sp / 2 - 2);
 
     .nav-badge {
       background: $ic-color-light;

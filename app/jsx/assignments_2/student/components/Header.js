@@ -107,7 +107,7 @@ class Header extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <div
           data-testid={
             this.state.isSticky
@@ -192,7 +192,7 @@ class Header extends React.Component {
             style={{height: `${this.state.nonStickyHeaderheight - this.props.scrollThreshold}px`}}
           />
         )}
-      </React.Fragment>
+      </>
     )
   }
 }

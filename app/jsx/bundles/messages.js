@@ -34,14 +34,12 @@ function showDialog (e) {
 
 // Manage state on a new message modal.
 class MessageModal {
-
   // Create a new MessageModal.
   //
   // $message - A wrapped li.message object.
   // {secureId, messageId} - An object containing secureId and messageId
   //   keys corresponding to the given message object.
   constructor ($message, {secureId, messageId}) {
-    this.sendMessage = this.sendMessage.bind(this)
     this.tpl = sendForm({
       location: window.location.href,
       secureId,
@@ -76,14 +74,14 @@ class MessageModal {
   // e - Event object.
   //
   // Returns nothing.
-  sendMessage (e) {
+  sendMessage = e => {
     e.preventDefault()
     this.close()
     $.post(this.$el.attr('action'), this.$el.serialize()).fail(() =>
       $.flashError(I18n.t('messages.failure', 'There was an error sending your email. Please reload the page and try again.'))
     )
     $.flashMessage(I18n.t('messages.success', 'Your email is being delivered.'))
-  }
+  };
 }
 
 // Options passed to $(...).dialog()

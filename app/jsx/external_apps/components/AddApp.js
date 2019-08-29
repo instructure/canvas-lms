@@ -74,7 +74,7 @@ export default createReactClass({
         };
       }
 
-      this.props.app.config_options.map(function(opt) {
+      this.props.app.config_options.map(opt => {
         fields[opt.name] = {
           type: opt.param_type,
           value: opt.default_value,
@@ -105,7 +105,7 @@ export default createReactClass({
 
     validateConfig() {
       var invalidFields = _.compact(
-        _.map(this.state.fields, function(v, k) {
+        _.map(this.state.fields, (v, k) => {
           if (v.required && _.isEmpty(v.value)) {
             return k;
           }
@@ -132,7 +132,7 @@ export default createReactClass({
 
     configSettings() {
       var queryParams = {};
-      _.map(this.state.fields, function(v, k) {
+      _.map(this.state.fields, (v, k) => {
         if(v.type == "checkbox") {
           if(!v.value) return;
           queryParams[k] = '1';
@@ -151,9 +151,7 @@ export default createReactClass({
       newTool.on('error', this.onSaveFail, this);
       if (!_.isEmpty(this.state.invalidFields)){
         var fields = this.state.fields
-        var invalidFieldNames = _.map(this.state.invalidFields, function(k){
-          return fields[k].description
-        }).join(', ');
+        var invalidFieldNames = _.map(this.state.invalidFields, k => fields[k].description).join(', ');
         this.setState({
           errorMessage: I18n.t('The following fields are invalid: %{fields}', {fields: invalidFieldNames})
         });
@@ -192,20 +190,16 @@ export default createReactClass({
     },
 
     configOptions() {
-      return _.map(this.state.fields, function(v, k) {
-        return (
-          <ConfigOptionField
-            name={k}
-            type={v.type}
-            ref={'option_' + k}
-            key={'option_' + k}
-            value={v.value}
-            required={v.required}
-            aria-required={v.required}
-            description={v.description}
-            handleChange={this.handleChange} />
-        );
-      }.bind(this));
+      return _.map(this.state.fields, (v, k) => <ConfigOptionField
+        name={k}
+        type={v.type}
+        ref={'option_' + k}
+        key={'option_' + k}
+        value={v.value}
+        required={v.required}
+        aria-required={v.required}
+        description={v.description}
+        handleChange={this.handleChange} />);
     },
 
     errorMessage: function() {

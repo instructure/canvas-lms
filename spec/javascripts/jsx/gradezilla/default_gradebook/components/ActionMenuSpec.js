@@ -79,20 +79,20 @@ QUnit.module('ActionMenu - Basic Rendering', {
   }
 })
 
-test('renders the Import menu item', function() {
+test('renders the Import menu item', () => {
   const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="import"]')
 
   equal(specificMenuItem.textContent, 'Import')
 })
 
-test('renders the Export menu item', function() {
+test('renders the Export menu item', () => {
   const specificMenuItem = document.querySelector('[role="menuitem"] [data-menu-id="export"]')
 
   equal(specificMenuItem.textContent, 'Export')
   equal(specificMenuItem.parentElement.getAttribute('aria-disabled'), null)
 })
 
-test('renders the Previous export menu item', function() {
+test('renders the Previous export menu item', () => {
   const specificMenuItem = document.querySelector(
     '[role="menuitem"] [data-menu-id="previous-export"]'
   )
@@ -100,7 +100,7 @@ test('renders the Previous export menu item', function() {
   equal(specificMenuItem.textContent, 'Previous Export (Jan 20, 2009 at 5pm)')
 })
 
-test('renders the Sync Grades LTI menu items', function() {
+test('renders the Sync Grades LTI menu items', () => {
   const specificMenuItem = document.querySelector(
     '[role="menuitem"] [data-menu-id="post_grades_lti_1"]'
   )
@@ -108,7 +108,7 @@ test('renders the Sync Grades LTI menu items', function() {
   equal(specificMenuItem.textContent, 'Sync to Pinnacle')
 })
 
-test('renders no Post Grades feature menu item when disabled', function() {
+test('renders no Post Grades feature menu item when disabled', () => {
   const specificMenuItem = document.querySelector(
     '[role="menuitem"] [data-menu-id="post_grades_feature_tool"]'
   )
@@ -652,7 +652,7 @@ test('Invokes the onSelect prop when selected', function() {
   strictEqual(this.props.postGradesLtis[0].onSelect.called, true)
 })
 
-test('Draws with "Sync to" label', function() {
+test('Draws with "Sync to" label', () => {
   const label = document.querySelector('[data-menu-id="post_grades_lti_1"]').textContent
 
   strictEqual(label.includes('Sync to Pinnacle'), true)
@@ -672,13 +672,13 @@ QUnit.module('ActionMenu - Post Grade Feature', {
   }
 })
 
-test('launches the PostGrades App when selected', function(assert) {
+test('launches the PostGrades App when selected', assert => {
   const done = assert.async()
   sandbox.stub(PostGradesApp, 'AppLaunch')
 
   document.querySelector('[data-menu-id="post_grades_feature_tool"]').click()
 
-  setTimeout(function() {
+  setTimeout(() => {
     strictEqual(PostGradesApp.AppLaunch.called, true)
     done()
   }, 15)
@@ -695,7 +695,7 @@ QUnit.module('ActionMenu - Publish grades to SIS', {
   }
 })
 
-test('Does not render menu item when isEnabled is false and publishToSisUrl is undefined', function() {
+test('Does not render menu item when isEnabled is false and publishToSisUrl is undefined', () => {
   const menuItem = document.querySelector(
     '[role="menuitem"] [data-menu-id="publish-grades-to-sis"]'
   )

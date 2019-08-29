@@ -39,7 +39,7 @@ export function createAddImage({
 }
 
 export function requestImages(bookmark) {
-  return { type: REQUEST_IMAGES, bookmark: bookmark };
+  return { type: REQUEST_IMAGES, bookmark };
 }
 
 export function receiveImages(response) {
@@ -57,7 +57,7 @@ export function failImagesLoad(error) {
 // gets images to embed for context
 export function fetchImages(fetchEvent) {
   return (dispatch, getState) => {
-    var calledFromRender = fetchEvent.calledFromRender;
+    const calledFromRender = fetchEvent.calledFromRender;
     const { source, images, host, contextId, contextType } = getState();
     if (!images.requested) {
       dispatch(requestImages(images.bookmark));

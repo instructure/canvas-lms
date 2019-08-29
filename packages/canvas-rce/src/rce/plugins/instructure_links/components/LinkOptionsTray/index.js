@@ -17,8 +17,8 @@
  */
 import React, {useState} from 'react'
 import {bool, func, oneOf, shape, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button,CloseButton} from '@instructure/ui-buttons'
+
 import {Heading} from '@instructure/ui-elements'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-forms'
@@ -41,7 +41,7 @@ export default function LinkOptionsTray(props) {
 
   function handleSave(event) {
     event.preventDefault()
-    let embedType = content.isPreviewable ? 'scribd' : null
+    const embedType = content.isPreviewable ? 'scribd' : null
 
     const linkAttrs = {
       embed: embedType ? {

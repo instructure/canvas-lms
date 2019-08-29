@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/en_AU.json";
 import "../rce/languages/en_GB";
+
 formatMessage.addLocale({ "en-AU": locale });

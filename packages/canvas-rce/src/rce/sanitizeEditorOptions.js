@@ -33,7 +33,7 @@ const extPluginsToRemove = ["instructure_embed"];
 
 function sanitizeExternalPlugins(external_plugins) {
   if (external_plugins !== undefined) {
-    let cleanExternalPlugins = {};
+    const cleanExternalPlugins = {};
     Object.keys(external_plugins).forEach(key => {
       if (external_plugins.hasOwnProperty(key)) {
         if (extPluginsToRemove.indexOf(key) == -1) {

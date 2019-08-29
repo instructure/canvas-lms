@@ -105,7 +105,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
   })
 
   test('invokes onRequestClose prop when window receives externalContentReady event', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const stub = sandbox.stub()
     const props = generateProps({onRequestClose: stub})
 
@@ -118,7 +118,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
   })
 
   test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
-    const sandbox = sinon.sandbox.create()
+    const sandbox = sinon.createSandbox()
     const stub = sandbox.stub()
     const props = generateProps({onRequestClose: stub})
 

@@ -69,7 +69,7 @@ $(document).ready(function() {
       $(this).formErrors(errors);
     }
   });
-  $("#edit_pseudonym_form .cancel_button").click(function() {
+  $("#edit_pseudonym_form .cancel_button").click(() => {
     $form.dialog('close');
   });
   $("#login_information").delegate('.login_details_link', 'click', function(event) {
@@ -117,7 +117,7 @@ $(document).ready(function() {
     });
     $form.dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
       .find(".submit_button").text(I18n.t('buttons.update_login', "Update Login"));
-    $form.dialog('option', 'beforeClose', function(){
+    $form.dialog('option', 'beforeClose', () => {
       $('.error_box:visible').click();
     })
     var $unique_id = $(this).parents(".login").find(".unique_id");
@@ -159,7 +159,7 @@ $(document).ready(function() {
   $(".reset_mfa_link").click(function(event) {
     event.preventDefault();
     var $disable_mfa_link = $(this);
-    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', {}, function() {
+    $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', {}, () => {
       $.flashMessage(I18n.t('notices.mfa_reset', "Multi-factor authentication reset"));
       $disable_mfa_link.parent().remove();
     });

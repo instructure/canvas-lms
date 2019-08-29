@@ -19,10 +19,11 @@
 import {head, tail} from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Select from '@instructure/ui-core/lib/components/Select'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import I18n from 'i18n!gradezillaindividualGradebookGradebookSelector'
+import I18n from 'i18n!gradezilla_individual_gradebook_gradebook_selector'
+
+import CanvasSelect from '../../../shared/components/CanvasSelect'
 
 const INDIVIDUAL_GRADEBOOK = 'IndividualGradebook'
 const LEARNING_MASTERY = 'LearningMastery'
@@ -34,7 +35,14 @@ function isLearningMastery(state) {
 class GradebookSelector extends React.Component {
   static propTypes = {
     courseUrl: PropTypes.string.isRequired,
-    learningMasteryEnabled: PropTypes.bool.isRequired
+    learningMasteryEnabled: PropTypes.bool.isRequired,
+    navigate: PropTypes.func
+  }
+
+  static defaultProps = {
+    navigate(url) {
+      window.location = url
+    }
   }
 
   constructor(props) {
@@ -43,10 +51,6 @@ class GradebookSelector extends React.Component {
     this.state = {value: INDIVIDUAL_GRADEBOOK}
 
     this.handleOnChange = this.handleOnChange.bind(this)
-  }
-
-  setLocation(url) {
-    window.location = url
   }
 
   selectIndividualGradebook() {
@@ -64,21 +68,23 @@ class GradebookSelector extends React.Component {
   }
 
   selectGradebookHistory() {
-    this.setLocation(`${this.props.courseUrl}/gradebook/history`)
+    this.props.navigate(`${this.props.courseUrl}/gradebook/history`)
   }
 
   selectDefaultGradebook() {
-    this.setLocation(`${this.props.courseUrl}/gradebook/change_gradebook_version?version=default`)
+    this.props.navigate(
+      `${this.props.courseUrl}/gradebook/change_gradebook_version?version=default`
+    )
   }
 
-  handleOnChange(e) {
+  handleOnChange(_event, value) {
     const valueFunctionMap = {
-      'individual-gradebook': this.selectIndividualGradebook.bind(this),
-      'learning-mastery': this.selectLearningMastery.bind(this),
+      [INDIVIDUAL_GRADEBOOK]: this.selectIndividualGradebook.bind(this),
+      [LEARNING_MASTERY]: this.selectLearningMastery.bind(this),
       'default-gradebook': this.selectDefaultGradebook.bind(this),
       'gradebook-history': this.selectGradebookHistory.bind(this)
     }
-    valueFunctionMap[e.target.value]()
+    valueFunctionMap[value]()
   }
 
   renderOptions() {
@@ -108,41 +114,43 @@ class GradebookSelector extends React.Component {
   }
 
   renderIndividualGradebookOption(selected = false) {
-    const key = 'individual-gradebook'
     const label = selected ? I18n.t('Individual View') : I18n.t('Individual View…')
     return (
-      <option value={key} key={key}>
+      <CanvasSelect.Option
+        id={INDIVIDUAL_GRADEBOOK}
+        key={INDIVIDUAL_GRADEBOOK}
+        value={INDIVIDUAL_GRADEBOOK}
+      >
         {label}
-      </option>
+      </CanvasSelect.Option>
     )
   }
 
   renderLearningMasteryOption(selected = false) {
     if (!this.props.learningMasteryEnabled) return null
-    const key = 'learning-mastery'
     const label = selected ? I18n.t('Learning Mastery') : I18n.t('Learning Mastery…')
     return (
-      <option value={key} key={key}>
+      <CanvasSelect.Option id={LEARNING_MASTERY} value={LEARNING_MASTERY} key={LEARNING_MASTERY}>
         {label}
-      </option>
+      </CanvasSelect.Option>
     )
   }
 
   renderDefaultGradebookOption() {
     const key = 'default-gradebook'
     return (
-      <option value={key} key={key}>
+      <CanvasSelect.Option id={key} value={key} key={key}>
         {I18n.t('Gradebook…')}
-      </option>
+      </CanvasSelect.Option>
     )
   }
 
   renderGradebookHistoryOption() {
     const key = 'gradebook-history'
     return (
-      <option value={key} key={key}>
+      <CanvasSelect.Option id={key} value={key} key={key}>
         {I18n.t('Gradebook History…')}
-      </option>
+      </CanvasSelect.Option>
     )
   }
 
@@ -151,13 +159,13 @@ class GradebookSelector extends React.Component {
       <div style={{display: 'flex', alignItems: 'center'}}>
         <Text>{I18n.t('Gradebook')}</Text>
         &nbsp;
-        <Select
+        <CanvasSelect
           onChange={this.handleOnChange}
           label={<ScreenReaderContent>{I18n.t('Gradebook')}</ScreenReaderContent>}
           value={this.state.value}
         >
           {this.renderOptions()}
-        </Select>
+        </CanvasSelect>
       </div>
     )
   }

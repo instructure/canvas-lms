@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/fa.json";
 import "../rce/languages/fa_IR";
+
 formatMessage.addLocale({ fa: locale });

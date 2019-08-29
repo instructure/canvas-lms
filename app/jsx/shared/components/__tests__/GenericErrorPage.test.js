@@ -59,7 +59,7 @@ describe('GenericErrorPage component', () => {
     })
     fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
-    moxios.wait(async () => {
+    moxios.wait(() => {
       expect(getByText('Comment submitted!')).toBeInTheDocument()
       done()
     })

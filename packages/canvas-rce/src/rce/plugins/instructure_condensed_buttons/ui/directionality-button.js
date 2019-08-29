@@ -22,7 +22,7 @@ export default function(editor) {
   // pretty much copied from the directionality plugin
   function generateSelector(dir) {
     const selector = 'h1 h2 h3 h4 h5 h6 div p'.split(' ').map(name => {
-      return name + `[dir=${dir}]`
+      return `${name}[dir=${dir}]`
     })
     return selector.join(',')
   }

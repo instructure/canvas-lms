@@ -38,6 +38,17 @@ describe "outcome gradezilla" do
       clear_local_storage
     end
 
+    def section_filter
+      f('[data-component="SectionFilter"] [role="combobox"]')
+    end
+
+    def select_section(menu_item_name)
+      section_filter.click
+      wait_for_animations
+      fj("[role=\"option\"]:contains(\"#{menu_item_name}\")").click
+      wait_for_ajaximations
+    end
+
     it "should not be visible by default" do
       Gradezilla.visit(@course)
       expect(f("#content")).not_to contain_css('.gradebook-navigation')
@@ -62,25 +73,22 @@ describe "outcome gradezilla" do
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
-        click_option('[data-component="SectionFilter"] select', 'All Sections')
-        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
-        expect(selected_section_name).to include_text("All Sections")
+        select_section('All Sections')
+        expect(section_filter).to have_value("All Sections")
 
-        click_option('[data-component="SectionFilter"] select', @other_section.name)
-        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
-        expect(selected_section_name).to include_text(@other_section.name)
+        select_section(@other_section.name)
+        expect(section_filter).to have_value(@other_section.name)
 
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
         Gradezilla.visit(@course)
-        selected_section_name = ff('option', f('[data-component="SectionFilter"] select')).find(&:selected?)
-        expect(selected_section_name).to include_text(@other_section.name)
+        expect(section_filter).to have_value(@other_section.name)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # now verify that you can set it back
 
-        click_option('[data-component="SectionFilter"] select', 'All Sections')
+        select_section('All Sections')
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
       end

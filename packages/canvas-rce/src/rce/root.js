@@ -38,7 +38,7 @@ export function renderIntoDiv(target, props, renderCallback) {
 
   formatMessage.setup({ locale: props.language });
   // render the editor to the target element
-  let renderedComponent = render(
+  const renderedComponent = render(
     <RCEWrapper
       {...props}
       handleUnmount={() => unmountComponentAtNode(target)}

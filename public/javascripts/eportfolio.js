@@ -93,7 +93,7 @@ import 'jqueryui/sortable'
     var order = valid_ids.join(",");
     var data = {order: order};
     $(parent).loadingImage({image_size: 'small'});
-    $.ajaxJSON($(anchor).attr('href'), 'POST', data, function(data) {
+    $.ajaxJSON($(anchor).attr('href'), 'POST', data, data => {
       $(parent).loadingImage('remove');
     });
   }
@@ -120,13 +120,13 @@ import 'jqueryui/sortable'
       triggerElement={triggerElement}
       header={dialogLabel}
       onClose={function() {
-        setTimeout(function() { ReactDOM.unmountComponentAtNode(modalRoot) })
+        setTimeout(() => { ReactDOM.unmountComponentAtNode(modalRoot) })
       }}
       onMove={onMove} />, modalRoot)
   }
 
   $(document).ready(function() {
-    $(".portfolio_settings_link").click(function(event) {
+    $(".portfolio_settings_link").click(event => {
       event.preventDefault();
       $("#edit_eportfolio_form").dialog({
         width: "auto",
@@ -141,7 +141,7 @@ import 'jqueryui/sortable'
         $(this).find(":text:first").focus().select();
       });
     });
-    $("#add_eportfolio_form .cancel_button").click(function() {
+    $("#add_eportfolio_form .cancel_button").click(() => {
       $("#add_eportfolio_form").slideToggle();
       $("#whats_an_eportfolio").slideToggle();
     });
@@ -153,7 +153,7 @@ import 'jqueryui/sortable'
       }
     });
     // Edit ePortfolio related
-    $("#edit_eportfolio_form .cancel_button").click(function(event) {
+    $("#edit_eportfolio_form .cancel_button").click(event => {
       $("#edit_eportfolio_form").dialog('close');
     });
     $("#edit_eportfolio_form").formSubmit($.extend(ePortfolioValidations, {
@@ -199,7 +199,7 @@ import 'jqueryui/sortable'
     $("#edit_page_form").find(".allow_comments").change(function() {
       $("#edit_page_form .show_comments_box").showIf($(this).attr('checked'));
     }).change();
-    $("#edit_page_sidebar .submit_button").click(function(event) {
+    $("#edit_page_sidebar .submit_button").click(event => {
       $("#edit_page_form").submit();
     });
     $("#edit_page_form,#edit_page_sidebar").find("button.preview_button").click(function(){
@@ -220,7 +220,7 @@ import 'jqueryui/sortable'
           $section.find(".section_content").after($preview);
         }
       });
-    }).end().find(".keep_editing_button").click(function() {
+    }).end().find(".keep_editing_button").click(() => {
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('previewing');
       $("#page_content .preview_section").remove();
     }).end().find(".cancel_button").click(function() {
@@ -320,7 +320,7 @@ import 'jqueryui/sortable'
         $richText.attr('id', 'edit_' + $section.attr('id'));
         RichContentEditor.loadNewEditor($richText, {focus: true, defaultContent: ""})
       }
-      $section.hide().slideDown('fast', function() {
+      $section.hide().slideDown('fast', () => {
         $("html,body").scrollTo($section);
         if (section_type == "html") {
           $edit.find(".edit_section").focus().select();
@@ -523,7 +523,7 @@ import 'jqueryui/sortable'
         }).fixDialogButtons();
       }
     });
-    $("#add_submission_form .cancel_button").click(function() {
+    $("#add_submission_form .cancel_button").click(() => {
       $("#add_submission_form").dialog('close');
     });
     $("#add_submission_form").formSubmit({
@@ -574,13 +574,13 @@ import 'jqueryui/sortable'
         }
       });
     });
-    $(".delete_eportfolio_link").click(function(event) {
+    $(".delete_eportfolio_link").click(event => {
       event.preventDefault();
-      $("#delete_eportfolio_form").toggle(function() {
+      $("#delete_eportfolio_form").toggle(() => {
         $("html,body").scrollTo($("#delete_eportfolio_form"));
       });
     });
-    $(document).blur(function() {
+    $(document).blur(() => {
     });
   });
 
@@ -648,7 +648,7 @@ import 'jqueryui/sortable'
     }
     $obj.data('event_pending', true);
     $obj.addClass('event_pending');
-    $.ajaxJSON(url, method, data, function(data) {
+    $.ajaxJSON(url, method, data, data => {
       $obj.removeClass('event_pending');
       $obj.removeClass('unsaved');
       var obj = data[object_name];
@@ -667,7 +667,7 @@ import 'jqueryui/sortable'
       countObjects(type);
     },
     // error callback
-    function(data, xhr, textStatus, errorThrown){
+    (data, xhr, textStatus, errorThrown) => {
       $obj.removeClass('event_pending');
       $obj.data('event_pending', false);
       var name_message = I18n.t("errors.section_name_invalid", "Section name is not valid")
@@ -716,14 +716,14 @@ import 'jqueryui/sortable'
   }
   $(document).ready(function() {
     countObjects('page');
-    $(document).bind('page_deleted', function(event, data) {
+    $(document).bind('page_deleted', (event, data) => {
       if(!data) { return; }
       var entry = data.eportfolio_entry;
       $("#page_" + entry.id).remove();
       $("#structure_entry_" + entry.id).remove();
       countObjects('page');
     });
-    $(document).bind('page_added page_updated', function(event, data) {
+    $(document).bind('page_added page_updated', (event, data) => {
       var entry = data.eportfolio_entry;
       var $page = $("#page_" + entry.id);
       if($page.length === 0) {
@@ -764,7 +764,7 @@ import 'jqueryui/sortable'
       }
       countObjects('page');
     });
-    $(".manage_pages_link,#section_pages .done_editing_button").click(function(event) {
+    $(".manage_pages_link,#section_pages .done_editing_button").click(event => {
       event.preventDefault();
       if($("#page_list").hasClass('editing')) {
         $("#page_list").removeClass('editing');
@@ -799,7 +799,7 @@ import 'jqueryui/sortable'
         editObject($li, 'page');
       }
     });
-    $(".add_page_link").click(function(event) {
+    $(".add_page_link").click(event => {
       event.preventDefault();
       var $page = $("#page_blank").clone(true).attr('id', 'page_new');
       $("#page_list").append($page.show());
@@ -820,7 +820,7 @@ import 'jqueryui/sortable'
         }
       });
     });
-    $(".move_page_link").click(function(event) {
+    $(".move_page_link").click(event => {
       event.preventDefault();
 
       var page = $(event.target).closest('.page')
@@ -829,10 +829,10 @@ import 'jqueryui/sortable'
         label: page.find('.name').text()
       }
       var otherPages = $('#page_list .page').not(page).not('#page_blank').toArray()
-      var destinations = otherPages.map(function(otherPage) { return {
+      var destinations = otherPages.map(otherPage => ({
         id: $(otherPage).attr('id'),
         label: $(otherPage).find('.name').text()
-      }})
+      }))
 
       var triggerElement = page.find('.page_settings_menu .al-trigger')
       var dialogLabel = I18n.t('Move Page')
@@ -874,11 +874,11 @@ import 'jqueryui/sortable'
   }
 
   var pathname = window.location.pathname;
-  $(".close_wizard_link").click(function(event) {
+  $(".close_wizard_link").click(event => {
     event.preventDefault();
     userSettings.set('hide_wizard_' + pathname, true);
 
-    $wizard_box.slideUp('fast', function() {
+    $wizard_box.slideUp('fast', () => {
       $(".wizard_popup_link").slideDown('fast');
       $('.wizard_popup_link').focus();
       setWizardSpacerBoxDisplay('hide');
@@ -886,10 +886,10 @@ import 'jqueryui/sortable'
 
   });
 
-  $(".wizard_popup_link").click(function(event) {
+  $(".wizard_popup_link").click(event => {
     event.preventDefault();
     $(".wizard_popup_link").slideUp('fast');
-    $wizard_box.slideDown('fast', function() {
+    $wizard_box.slideDown('fast', () => {
       $wizard_box.triggerHandler('wizard_opened');
       $wizard_box.focus();
       $([document, window]).triggerHandler('scroll');
@@ -898,7 +898,7 @@ import 'jqueryui/sortable'
 
   $wizard_box.ifExists(function($wizard_box){
 
-    $wizard_box.bind('wizard_opened', function() {
+    $wizard_box.bind('wizard_opened', () => {
       var $wizard_options = $wizard_box.find(".wizard_options"),
           height = $wizard_options.height();
       $wizard_options.height(height);
@@ -932,7 +932,7 @@ import 'jqueryui/sortable'
       }
       $details.hide().fadeIn('fast');
     });
-    setTimeout(function() {
+    setTimeout(() => {
       if(!userSettings.get('hide_wizard_' + pathname)) {
         $(".wizard_popup_link.auto_open:first").click();
       }
@@ -942,13 +942,13 @@ import 'jqueryui/sortable'
 
   $(document).ready(function() {
     countObjects('section');
-    $(document).bind('section_deleted', function(event, data) {
+    $(document).bind('section_deleted', (event, data) => {
       var category = data.eportfolio_category;
       $("#section_" + category.id).remove();
       $("#structure_category_" + category.id).remove();
       countObjects('section');
     });
-    $(document).bind('section_added section_updated', function(event, data) {
+    $(document).bind('section_added section_updated', (event, data) => {
       var category = data.eportfolio_category;
       var $section = $("#section_" + category.id);
       if($section.length === 0) {
@@ -980,7 +980,7 @@ import 'jqueryui/sortable'
         .val(category.id).text(category.name);
       countObjects('section');
     });
-    $(".manage_sections_link,#section_list_manage .done_editing_button").click(function(event) {
+    $(".manage_sections_link,#section_list_manage .done_editing_button").click(event => {
       event.preventDefault();
       if($("#section_list").hasClass('editing')) {
         $("#section_list").sortable('destroy');
@@ -1007,7 +1007,7 @@ import 'jqueryui/sortable'
         $("#section_list .name").attr('title', I18n.t('titles.section_list', "Drag to Arrange, Click to Edit"));
       }
     });
-    $(".add_section_link").click(function(event) {
+    $(".add_section_link").click(event => {
       event.preventDefault();
       var $section = $("#section_blank").clone(true).attr('id', 'section_new');
       $("#section_list").append($section.show());
@@ -1029,7 +1029,7 @@ import 'jqueryui/sortable'
         }
       });
     });
-    $(".move_section_link").click(function(event) {
+    $(".move_section_link").click(event => {
       event.preventDefault();
 
       var section = $(event.target).closest('.section')
@@ -1038,10 +1038,10 @@ import 'jqueryui/sortable'
         label: section.find('.name').text()
       }
       var otherSections = $('#section_list .section').not(section).not('#section_blank').toArray()
-      var destinations = otherSections.map(function(otherSection) { return {
+      var destinations = otherSections.map(otherSection => ({
         id: $(otherSection).attr('id'),
         label: $(otherSection).find('.name').text()
-      }})
+      }))
       var dialogLabel = I18n.t('Move Section')
 
       var triggerElement = section.find('.section_settings_menu .al-trigger')
@@ -1103,7 +1103,7 @@ import 'jqueryui/sortable'
         if (first) {
           req_url = url + "?compile=1";
         }
-        $.ajaxJSON(req_url, 'GET', {}, function(data) {
+        $.ajaxJSON(req_url, 'GET', {}, data => {
           if(data.attachment && data.attachment.file_state && data.attachment.file_state == "available") {
             $("#export_progress").progressbar('option', 'value', 100);
             location.href = url + ".zip";
@@ -1115,7 +1115,7 @@ import 'jqueryui/sortable'
             $("#export_progress").progressbar('option', 'value', Math.min($("#export_progress").progressbar('option', 'value') + .1, 90));
           }
           setTimeout(check, 2000);
-        }, function(data) {
+        }, data => {
           errorCount++;
           if(errorCount > 5) {
             $box.find(".message").text(I18n.t('errors.compiling', "There was an error compiling your eportfolio.  Please try again in a little while."));
@@ -1126,7 +1126,7 @@ import 'jqueryui/sortable'
       };
       check(true);
     });
-    $(".download_eportfolio_link").click(function(event) {
+    $(".download_eportfolio_link").click(event => {
       $("#downloading_eportfolio_dialog").dialog({
         title: I18n.t('titles.download_eportfolio', "Download ePortfolio")
       });

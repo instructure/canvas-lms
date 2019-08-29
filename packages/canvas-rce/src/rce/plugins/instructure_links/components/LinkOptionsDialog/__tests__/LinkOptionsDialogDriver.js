@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {fireEvent, queryByLabelText} from '@testing-library/dom'
+
 export default class LinkOptionsDialogDriver {
   static find(op) {
     const label = op === 'create' ? 'Insert Link' : 'Edit Link'
@@ -25,32 +26,41 @@ export default class LinkOptionsDialogDriver {
     }
     return new LinkOptionsDialogDriver($tray)
   }
+
   constructor($element) {
     this.$element = $element
   }
+
   get label() {
     return this.$element.getAttribute('aria-label')
   }
+
   get $textField() {
     return queryByLabelText(document.body, 'Text', {selector: 'input'})
   }
+
   get $linkField() {
     return queryByLabelText(document.body, 'Link', {selector: 'input'})
   }
+
   get $doneButton() {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
     )
   }
+
   get text() {
     return this.$textField.value
   }
+
   get link() {
     return this.$linkField.value
   }
+
   setText(text) {
     fireEvent.change(this.$textField, {target: {value: text}})
   }
+
   setLink(text) {
     fireEvent.change(this.$linkField, {target: {value: text}})
   }

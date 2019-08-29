@@ -45,7 +45,7 @@ describe("Flickr reducer", () => {
     });
 
     it("sets term from action", () => {
-      assert(flickr(state, action).searchTerm == "chess");
+      assert(flickr(state, action).searchTerm === "chess");
     });
   });
 
@@ -85,7 +85,7 @@ describe("Flickr reducer", () => {
     });
 
     it("empties the search results", () => {
-      assert(flickr(state, action).searchResults.length == 0);
+      assert(flickr(state, action).searchResults.length === 0);
     });
 
     it("leaves the form state as it is", () => {

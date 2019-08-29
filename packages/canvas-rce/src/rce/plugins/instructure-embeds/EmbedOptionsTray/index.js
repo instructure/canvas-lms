@@ -18,8 +18,8 @@
 
 import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button,CloseButton} from '@instructure/ui-buttons'
+
 import {Heading} from '@instructure/ui-elements'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
 import {TextInput} from '@instructure/ui-text-input'

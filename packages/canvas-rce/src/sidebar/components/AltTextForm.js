@@ -59,23 +59,23 @@ export default class AltTextForm extends Component {
   }
 
   render() {
-    let altScreenreaderMessage = formatMessage(
+    const altScreenreaderMessage = formatMessage(
       "Enter the alternative text for this image"
     );
-    let altLabelText = formatMessage("Alternative text:");
-    let alt_label = (
+    const altLabelText = formatMessage("Alternative text:");
+    const alt_label = (
       <span>
-        <span aria-hidden={true}>{altLabelText}</span>
+        <span aria-hidden>{altLabelText}</span>
         <ScreenReaderContent>{altScreenreaderMessage}</ScreenReaderContent>
       </span>
     );
-    let decorativeScreenreaderMessage = formatMessage(
+    const decorativeScreenreaderMessage = formatMessage(
       "Check if the image is decorative"
     );
-    let decorativeLabelText = formatMessage("Decorative image");
-    let decorative_label = (
+    const decorativeLabelText = formatMessage("Decorative image");
+    const decorative_label = (
       <span>
-        <span aria-hidden={true}>{decorativeLabelText}</span>
+        <span aria-hidden>{decorativeLabelText}</span>
         <ScreenReaderContent>
           {decorativeScreenreaderMessage}
         </ScreenReaderContent>

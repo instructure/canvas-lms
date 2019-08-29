@@ -72,7 +72,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
         context_code: contextCode,
         title: entry.title,
         user_entered_title: entry.userTitle
-      }, function(data) {
+      }, data => {
         pubsub.publish('media_object_created', data);
       }, $.noop);
     }
@@ -231,7 +231,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
       $("#media_upload_progress").progressbar('option', 'value', 100);
       var entry = entries[0];
       $("#media_upload_submit").text(I18n.t('messages.submitted', "Submitted Media File!"));
-      setTimeout(function() {
+      setTimeout(() => {
         $("#media_comment_dialog").dialog('close');
       }, 1500);
       if(type == 'audio') {
@@ -261,7 +261,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
   var reset_selectors = false;
   var lastInit = null;
   $.mediaComment.init = function(mediaType, opts) {
-  require.ensure([], function () {
+  require.ensure([], () => {
     var swfobject = require('swfobject');
 
     lastInit = lastInit || new Date();
@@ -289,7 +289,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
         height: 475,
         modal: true
       });
-      $dialog.dialog('option', 'close', function() {
+      $dialog.dialog('option', 'close', () => {
         $("#audio_record").before("<div id='audio_record'/>").remove();
         $("#video_record").before("<div id='video_record'/>").remove();
         if(opts && opts.close && $.isFunction(opts.close)) {
@@ -324,7 +324,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
       // **********************************************************************
       // Flash audio video record (and upload)
       // **********************************************************************
-      setTimeout(function() {
+      setTimeout(() => {
         var recordVars = {
           host:location.protocol + "//" + INST.kalturaSettings.domain,
           rtmpHost:"rtmp://" + (INST.kalturaSettings.rtmp_domain || INST.kalturaSettings.domain),
@@ -419,7 +419,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
           var $video_record_holder, $video_record, $video_record_meter;
           var video_record_counter, current_video_level, video_has_volume = false;
           reset_selectors = true;
-          setInterval(function() {
+          setInterval(() => {
             if(reset_selectors) {
               $audio_record_holder = $("#audio_record_holder");
               $audio_record = $("#audio_record");
@@ -450,7 +450,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
               audio_level = Math.max(audio_level, current_audio_level);
               if(audio_level > -1 && !$audio_record_holder.hasClass('with_volume')) {
                 $audio_record_meter.css('display', 'none');
-                $("#audio_record_holder").addClass('with_volume').animate({'width': 420}, function() {
+                $("#audio_record_holder").addClass('with_volume').animate({'width': 420}, () => {
                   $audio_record_meter.css('display', '');
                 });
               }
@@ -467,7 +467,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
               video_level = Math.max(video_level, current_video_level);
               if(video_level > -1 && !$video_record_holder.hasClass('with_volume')) {
                 $video_record_meter.css('display', 'none');
-                $("#video_record_holder").addClass('with_volume').animate({'width': 420}, function() {
+                $("#video_record_holder").addClass('with_volume').animate({'width': 420}, () => {
                   $video_record_meter.css('display', '');
                 });
               }
@@ -531,10 +531,10 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
       // **********************************************************************
       // load kaltura_session
       // **********************************************************************
-      $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, function(data) {
+      $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, data => {
         $div.data('ks', data.ks);
         $div.data('uid', data.uid);
-      }, function(data) {
+      }, data => {
         if(data.logged_in == false) {
           $div.data('ks-error', I18n.t('errors.must_be_logged_in', "You must be logged in to record media."));
         } else {
@@ -568,7 +568,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
   } // End of init function
 
   $(document).ready(function() {
-    $(document).bind('reset_media_comment_forms', function() {
+    $(document).bind('reset_media_comment_forms', () => {
       $("#audio_record_holder_message,#video_record_holder_message").removeClass('saving')
         .find(".recorder_message").html("Saving Recording...<img src='/images/media-saving.gif'/>");
       $("#audio_record_holder").stop(true, true).clearQueue().css('width', '').removeClass('with_volume');
@@ -586,7 +586,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
         $("#video_upload")[0].removeFiles(0, files.length - 1);
       }
    });
-    $("#media_upload_submit").live('click', function(event) {
+    $("#media_upload_submit").live('click', event => {
       $.mediaComment.upload_delegate.submit();
     });
     $("#video_record_option,#audio_record_option").live('click', function(event) {
@@ -604,7 +604,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
       }
     });
   });
-  $(document).bind('media_recording_error', function() {
+  $(document).bind('media_recording_error', () => {
     $("#audio_record_holder_message,#video_record_holder_message").find(".recorder_message").html(
             htmlEscape(I18n.t('errors.save_failed', "Saving appears to have failed.  Please close this popup to try again.")) +
             "<div style='font-size: 0.8em; margin-top: 20px;'>" +
@@ -621,7 +621,7 @@ const getDefaultExport = mod => mod.default ? mod.default : mod
   window.beforeAddEntry = function() {
     var attemptId = Math.random();
     $.mediaComment.lastAddAttemptId = attemptId;
-    setTimeout(function() {
+    setTimeout(() => {
       if($.mediaComment.lastAddAttemptId == attemptId) {
         $(document).triggerHandler('media_recording_error');
       }

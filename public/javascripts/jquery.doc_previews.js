@@ -83,7 +83,7 @@ import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
       function tellAppIViewedThisInline(serviceUsed){
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
-          $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, function() { }, function() { });
+          $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, () => { }, () => { });
           trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'canvadoc_session_url']));
         }
       }
@@ -98,7 +98,7 @@ import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
             id: opts.id
         });
         iframe.appendTo($this);
-        iframe.load(function() {
+        iframe.load(() => {
           tellAppIViewedThisInline('crocodoc');
           if ($.isFunction(opts.ready))
             opts.ready();
@@ -119,7 +119,7 @@ import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
           id: opts.id
         });
         iframe.appendTo(canvadocWrapper)
-        iframe.load(function() {
+        iframe.load(() => {
           tellAppIViewedThisInline('canvadocs');
           if ($.isFunction(opts.ready))
             opts.ready();
@@ -135,7 +135,7 @@ import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
           if (!opts.ajax_valid || opts.ajax_valid()){
             $('<iframe src="' + htmlEscape(googleDocPreviewUrl) + '" height="' + opts.height  + '" width="100%" />')
               .appendTo($this)
-              .load(function(){
+              .load(() => {
                 tellAppIViewedThisInline('google');
                 if ($.isFunction(opts.ready)) {
                   opts.ready();
@@ -151,7 +151,7 @@ import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
             url += '?' + $.param({ submission_id: opts.submission_id });
           }
           $this.loadingImage();
-          $.ajaxJSON(url, 'GET', {}, function(data){
+          $.ajaxJSON(url, 'GET', {}, data => {
             $this.loadingImage('remove');
             if (data && data.public_url) {
               $.extend(opts, data);

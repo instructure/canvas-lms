@@ -17,7 +17,7 @@
  */
 
 import {AuditLogForm, AuditLogResults, MUTATION_LOG_QUERY} from '../MutationAuditLog'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
 
@@ -35,14 +35,14 @@ describe('AuditLogForm', () => {
     const assetStringInput = getByLabelText(/Asset/)
     const submitButton = getByText(/Find/)
 
+    // doesn't fire when assetString is blank
     fireEvent.click(submitButton)
-    expect(cb.mock.calls.length).toBe(1)
-    expect(cb.mock.calls[0][0]).toEqual({assetString: ''})
+    expect(cb.mock.calls.length).toBe(0)
 
     fireEvent.change(assetStringInput, {target: {value: 'user_123'}})
     fireEvent.click(submitButton)
-    expect(cb.mock.calls.length).toBe(2)
-    expect(cb.mock.calls[1][0]).toEqual({assetString: 'user_123'})
+    expect(cb.mock.calls.length).toBe(1)
+    expect(cb.mock.calls[0][0]).toEqual({assetString: 'user_123', startDate: null, endDate: null})
   })
 })
 
@@ -52,7 +52,10 @@ describe('AuditLogResults', () => {
       request: {
         query: MUTATION_LOG_QUERY,
         variables: {
-          assetString: 'user_123'
+          assetString: 'user_123',
+          startDate: undefined,
+          endDate: undefined,
+          first: 1
         }
       },
       result: {
@@ -71,10 +74,17 @@ describe('AuditLogResults', () => {
                     __typename: 'User'
                   },
                   realUser: null,
-                  params: {},
+                  params: {
+                    test: 'I AM A PARAMETER'
+                  },
                   __typename: 'MutationLog'
                 }
               ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor1',
+                __typename: 'PageInfo'
+              },
               __typename: 'MutationLogConnection'
             },
             __typename: 'AuditLogs'
@@ -86,7 +96,53 @@ describe('AuditLogResults', () => {
       request: {
         query: MUTATION_LOG_QUERY,
         variables: {
-          assetString: 'user_456'
+          assetString: 'user_123',
+          startDate: undefined,
+          endDate: undefined,
+          first: 1,
+          after: 'cursor1'
+        }
+      },
+      result: {
+        data: {
+          auditLogs: {
+            mutationLogs: {
+              nodes: [
+                {
+                  assetString: 'user_123',
+                  mutationId: 'ZXCVZXCV',
+                  mutationName: 'FooBarBaz',
+                  timestamp: new Date().toISOString(),
+                  user: {
+                    _id: '2',
+                    name: 'Doctor',
+                    __typename: 'User'
+                  },
+                  realUser: null,
+                  params: {},
+                  __typename: 'MutationLog'
+                }
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'cursor2',
+                __typename: 'PageInfo'
+              },
+              __typename: 'MutationLogConnection'
+            },
+            __typename: 'AuditLogs'
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: MUTATION_LOG_QUERY,
+        variables: {
+          assetString: 'user_456',
+          startDate: undefined,
+          endDate: undefined,
+          first: 100
         }
       },
       result: {
@@ -94,6 +150,11 @@ describe('AuditLogResults', () => {
           auditLogs: {
             mutationLogs: {
               nodes: [],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'endCursor',
+                __typename: 'PageInfo'
+              },
               __typename: 'MutationLogConnection'
             },
             __typename: 'AuditLogs'
@@ -105,7 +166,10 @@ describe('AuditLogResults', () => {
       request: {
         query: MUTATION_LOG_QUERY,
         variables: {
-          assetString: 'error_1'
+          assetString: 'error_1',
+          startDate: undefined,
+          endDate: undefined,
+          first: 100
         }
       },
       error: new Error('uh oh')
@@ -115,7 +179,7 @@ describe('AuditLogResults', () => {
   it('renders', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <AuditLogResults assetString="user_123" />
+        <AuditLogResults assetString="user_123" pageSize={1} />
       </MockedProvider>
     )
 
@@ -126,10 +190,24 @@ describe('AuditLogResults', () => {
     expect(await waitForElement(() => getByText('Professor'))).toBeInTheDocument()
   })
 
+  it('paginates', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <AuditLogResults assetString="user_123" pageSize={1} />
+      </MockedProvider>
+    )
+    const loadMoreButton = await waitForElement(() => getByText(/load more/i))
+    expect(loadMoreButton).toBeInTheDocument()
+
+    fireEvent.click(loadMoreButton)
+    expect(await waitForElement(() => getByText('Doctor'))).toBeInTheDocument()
+    expect(getByText(/No more/)).toBeInTheDocument()
+  })
+
   it('says when there are no results', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <AuditLogResults assetString="user_456" />
+        <AuditLogResults assetString="user_456" pageSize={100} />
       </MockedProvider>
     )
 
@@ -139,10 +217,29 @@ describe('AuditLogResults', () => {
   it('handles errors', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
-        <AuditLogResults assetString="error_1" />
+        <AuditLogResults assetString="error_1" pageSize={100} />
       </MockedProvider>
     )
 
     expect(await waitForElement(() => getByText(/went wrong/))).toBeInTheDocument()
+  })
+
+  it('expands parameters', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <AuditLogResults assetString="user_123" pageSize={1} />
+      </MockedProvider>
+    )
+
+    const showParamsBtn = await waitForElement(() => getByText('Show params'))
+    expect(showParamsBtn).toBeInTheDocument()
+
+    fireEvent.click(showParamsBtn)
+    const shownParameters = getByText(/A PARAMETER/)
+    expect(shownParameters).toBeInTheDocument()
+
+    const hideParamsBtn = getByText('Hide params')
+    fireEvent.click(hideParamsBtn)
+    expect(shownParameters).not.toBeInTheDocument()
   })
 })

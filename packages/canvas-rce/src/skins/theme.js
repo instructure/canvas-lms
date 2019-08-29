@@ -93,7 +93,7 @@ export default function generator ({ borders, colors, forms, shadows, spacing, t
   return vars
 }
 
-generator['canvas'] = function(variables) {
+generator.canvas = function(variables) {
   return {
     canvasLinkColor: variables['ic-link-color'],
     canvasLinkDecoration: variables['ic-link-decoration'],

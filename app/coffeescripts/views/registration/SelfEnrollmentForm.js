@@ -145,9 +145,9 @@ export default class SelfEnrollmentForm extends Backbone.View {
   }
 
   logOut(refresh = false) {
-    return $.ajaxJSON('/logout', 'DELETE', {}, function() {
+    return $.ajaxJSON('/logout', 'DELETE', {}, () => {
       if (refresh) location.reload(true)
-    })
+    });
   }
 
   logOutAndRefresh(e) {

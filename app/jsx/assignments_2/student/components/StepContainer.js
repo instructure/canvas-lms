@@ -171,12 +171,8 @@ function selectStepContainer(props, context) {
     return gradedStepContainer({isCollapsed, assignment, submission}, context)
   } else if (submission.state === 'submitted') {
     return submittedStepContainer({isCollapsed, assignment, submission}, context)
-  } else if (submission.submissionDraft) {
-    if (props.submission.submissionDraft.attachments) {
-      if (props.submission.submissionDraft.attachments.length) {
-        return uploadedStepContainer({isCollapsed}, context)
-      }
-    }
+  } else if (submission.submissionDraft && submission.submissionDraft.meetsAssignmentCriteria) {
+    return uploadedStepContainer({isCollapsed}, context)
   }
   return availableStepContainer({isCollapsed}, context)
 }

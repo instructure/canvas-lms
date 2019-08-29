@@ -16,6 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
+import 'jquery.scrollToVisible'
 import tz from 'timezone'
 import _ from 'underscore'
 import Backbone from 'Backbone'
@@ -123,7 +124,7 @@ export default class WikiPageView extends Backbone.View {
         $anchor = $(`#wiki_page_show .user_content a[name='${anchor_name}']`)
       }
       if ($anchor.length) {
-        $('html, body').scrollTo($anchor)
+        $('html, body').scrollToVisible($anchor)
       }
     }
   }

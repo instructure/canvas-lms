@@ -117,7 +117,6 @@ module SIS
         return unless any_left_to_process?
         while !@batched_users.empty?
           user_row = @batched_users.shift
-          info = login_only ? user_row.login_row_info : user_row.row_info
           @logger.debug("Processing User #{user_row.inspect}")
 
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
@@ -131,19 +130,19 @@ module SIS
             id_message = pseudo_by_integration.sis_user_id ? I18n.t('SIS ID') : I18n.t('Canvas ID')
             user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
             message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
             next
           end
 
           if pseudo
             if login_only
               message = I18n.t("An existing Canvas user with the SIS ID %{user_id} or login of %{login} already exists, skipping", user_id: user_row.user_id, login: user_row.login_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
             if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
               message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
             if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
@@ -151,7 +150,7 @@ module SIS
               id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
               message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
 
@@ -176,11 +175,11 @@ module SIS
               pseudo = existing_login(user_row, root_account)
               if pseudo.nil?
                 message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
                 next
               elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
                 message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
                 next
               else
                 user = pseudo.user
@@ -210,7 +209,7 @@ module SIS
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
 
@@ -232,7 +231,7 @@ module SIS
             end
             unless (pseudo.authentication_provider = @authentication_providers[user_row.authentication_provider_id])
               message = "unrecognized authentication provider #{user_row.authentication_provider_id} for #{user_row.user_id}, skipping"
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
           else
@@ -287,14 +286,14 @@ module SIS
               end
             end
           rescue ImportError
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
             next
           rescue => e
             # something broke
             error = Canvas::Errors.capture_exception(:sis_import, e)
             er = error[:error_report]
             message = generate_user_warning("Something broke with this user. Contact Support with ErrorReport id: #{er}", user_row.user_id, user_row.login_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, backtrace: e.backtrace, row_info: info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, backtrace: e.backtrace, row_info: user_row.row)
             next
           end
 
@@ -374,7 +373,7 @@ module SIS
             end
           elsif user_row.email.present? && EmailAddressValidator.valid?(user_row.email) == false
             message = "The email address associated with user '#{user_row.user_id}' is invalid (email: '#{user_row.email}')"
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: info)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
             next
           end
 
@@ -426,7 +425,7 @@ module SIS
           where.not(workflow_state: 'deleted').select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
         if enrollments.any?
           Enrollment.where(id: enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-          EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
+          EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)
           e_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: enrollments, updated_state: 'deleted')
           @roll_back_data.push(*e_data) if e_data
         end
@@ -437,7 +436,7 @@ module SIS
           observer_enrollments = observers.map{|o| student_enrollments.map{|se| se.linked_enrollment_for(o) }}.flatten.compact
           if observer_enrollments.any?
             Enrollment.where(id: observer_enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-            EnrollmentState.where(enrollment_id: observer_enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
+            EnrollmentState.where(enrollment_id: observer_enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)
             oe_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: observer_enrollments, updated_state: 'deleted')
             @roll_back_data.push(*oe_data) if oe_data
           end

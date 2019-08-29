@@ -23,7 +23,7 @@ const fileContexts = ENV.FILES_CONTEXTS || []
 
 const filesEnv = {
   contexts: fileContexts,
-  contextsDictionary: fileContexts.reduce(function(dict, context) {
+  contextsDictionary: fileContexts.reduce((dict, context) => {
     const [contextType, contextId] = Array.from(splitAssetString(context.asset_string))
     context.contextType = contextType
     context.contextId = contextId
@@ -33,7 +33,7 @@ const filesEnv = {
   showingAllContexts: window.location.pathname.match(/^\/files/),
   contextType: fileContexts[0] != null ? fileContexts[0].contextType : undefined,
   contextId: fileContexts[0] != null ? fileContexts[0].contextId : undefined,
-  rootFolders: fileContexts.map(function(contextData) {
+  rootFolders: fileContexts.map(contextData => {
     if (ENV.current_user_id) {
       const folder = new Folder({
         custom_name: contextData.name,

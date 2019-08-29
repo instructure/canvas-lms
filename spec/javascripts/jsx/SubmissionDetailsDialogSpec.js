@@ -66,7 +66,7 @@ test('flashWarning is called when score is 150% points possible', function() {
   ok(flashWarningStub.calledOnce)
 })
 
-test('display name by default', function() {
+test('display name by default', () => {
   const submissionDetailsDialog = new SubmissionDetailsDialog(assignment, student, options)
   const submissionData = {
     submission_comments: [
@@ -86,7 +86,7 @@ test('display name by default', function() {
   strictEqual(document.querySelector('address').innerText.includes('Some Author'), true)
 })
 
-test("when anonymous hides student's name from address section", function() {
+test("when anonymous hides student's name from address section", () => {
   options.anonymous = true
   const submissionDetailsDialog = new SubmissionDetailsDialog(assignment, student, options)
   const submissionData = {
@@ -108,7 +108,7 @@ test("when anonymous hides student's name from address section", function() {
   submissionDetailsDialog.dialog.dialog('destroy')
 })
 
-test("when anonymous does not hide the user's name", function() {
+test("when anonymous does not hide the user's name", () => {
   options.anonymous = true
   const submissionDetailsDialog = new SubmissionDetailsDialog(assignment, student, options)
   const submissionData = {

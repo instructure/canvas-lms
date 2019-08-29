@@ -33,7 +33,7 @@
  * @returns {string} a well formed url
  */
 export function cleanUrl(input) {
-  var url = input;
+  let url = input;
   if (input.match(/@/) && !input.match(/\//) && !input.match(/^mailto:/)) {
     url = "mailto:" + input;
   } else if (

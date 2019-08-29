@@ -353,6 +353,28 @@ module Types
       SubmissionSearch.new(assignment, current_user, session, filter).search
     end
 
+    field :group_submissions_connection, SubmissionType.connection_type, null: true do
+      description "returns submissions grouped to one submission object per group"
+      argument :filter, SubmissionSearchFilterInputType, required: false
+      argument :order_by, [SubmissionSearchOrderInputType], required: false
+    end
+    def group_submissions_connection(filter: nil, order_by: nil)
+      return nil if current_user.nil? || assignment.group_category_id.nil?
+
+      filter = filter.to_h
+      order_by ||= []
+      filter[:states] ||= DEFAULT_SUBMISSION_STATES
+      filter[:order_by] = order_by.map(&:to_h)
+      scope = SubmissionSearch.new(assignment, current_user, session, filter).search
+      Promise.all([
+        Loaders::AssociationLoader.for(Assignment, :submissions).load(assignment),
+        Loaders::AssociationLoader.for(Assignment, :context).load(assignment)
+      ]).then do
+        students = assignment.representatives(user: current_user)
+        scope.where(user_id: students)
+      end
+    end
+
     field :post_policy, PostPolicyType, null: true
     def post_policy
       load_association(:context).then do |course|

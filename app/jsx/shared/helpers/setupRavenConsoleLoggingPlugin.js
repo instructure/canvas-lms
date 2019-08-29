@@ -37,7 +37,11 @@ export default function setupRavenConsoleLoggingPlugin(client, options) {
           }
         };
 
+        // make raven think window.fetch is unavailable so it doesn't use the mocked one
+        const fetch = window.fetch
+        delete window.fetch
         client.captureMessage(msg, data);
+        window.fetch = fetch
       }
     }
   });

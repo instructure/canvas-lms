@@ -192,7 +192,7 @@ describe('api actions', () => {
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.updateRoleName('1', 'steven', 'StudentRoll')(mockDispatch, getState)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request
         .respondWith({

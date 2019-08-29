@@ -18,8 +18,8 @@
 
 import React, { Component } from "react";
 import formatMessage from "../../format-message";
-import { Select } from '@instructure/ui-forms'
-import { TextInput } from '@instructure/ui-forms'
+import { Select , TextInput } from '@instructure/ui-forms'
+
 import { Alert } from '@instructure/ui-alerts'
 
 const usageRightsValues = {

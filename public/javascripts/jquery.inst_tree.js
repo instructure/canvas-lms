@@ -137,11 +137,11 @@ import 'jqueryui/droppable'
           ddover = $(this);
         });
 
-        tree.find('li.separator').bind('dropout', function(event, ui) {
+        tree.find('li.separator').bind('dropout', (event, ui) => {
           ddover = null;
         });
 
-        tree.find('span.text').bind('dragstop', function(event, ui) {
+        tree.find('span.text').bind('dragstop', (event, ui) => {
           var lvlok = true;
 
           if (ddover) {
@@ -445,7 +445,7 @@ import 'jqueryui/droppable'
           }
         });
 
-        tree.dblclick(function(e) {
+        tree.dblclick(e => {
           var clicked = $(e.target);
 
           if (clicked.is('span.text')) {

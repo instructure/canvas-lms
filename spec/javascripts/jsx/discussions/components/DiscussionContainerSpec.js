@@ -17,13 +17,17 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import moment from 'moment'
 
-import { DiscussionsContainer, mapState, discussionTarget } from 'jsx/discussions/components/DiscussionContainer'
+import {
+  DiscussionsContainer,
+  mapState,
+  discussionTarget
+} from 'jsx/discussions/components/DiscussionContainer'
 
 const defaultProps = () => ({
-  title: "discussions",
+  title: 'discussions',
   closeForComments: () => {},
   permissions: {create: false, manage_content: false, moderate: false},
   discussions: [{id: 1, filtered: false, permissions: {delete: true}}],
@@ -31,8 +35,8 @@ const defaultProps = () => ({
   isLoadingDiscussions: false,
   hasLoadedDiscussions: false,
   getDiscussions: () => {},
-  roles: ["student", "user"],
-  renderContainerBackground: () => {},
+  roles: ['student', 'user'],
+  renderContainerBackground: () => {}
 })
 
 QUnit.module('DiscussionsContainer component')
@@ -41,6 +45,24 @@ test('renders the component', () => {
   const tree = shallow(<DiscussionsContainer {...defaultProps()} />)
   const node = tree.find('.discussions-container__wrapper')
   ok(node.exists())
+})
+
+QUnit.module('for pinned discussions', () => {
+  test('renders the component Ordered by Recent Activity text', () => {
+    const props = defaultProps()
+    props.pinned = undefined
+    const tree = shallow(<DiscussionsContainer {...props} />)
+    const node = tree.find('.recent-activity-text-container')
+    ok(node.exists())
+  })
+
+  test('will not render the component Ordered by Recent Activity text', () => {
+    const props = defaultProps()
+    props.pinned = true
+    const tree = shallow(<DiscussionsContainer {...defaultProps()} />)
+    const node = tree.find('.recent-activity-text-container')
+    ok(node.exists())
+  })
 })
 
 test('renders passed in component when renderContainerBackground is present', () => {
@@ -73,7 +95,7 @@ test('renders a draggable discussion row when user has moderate permissions', ()
 
 test('discussionTarget canDrop returns false if assignment due_at is in the past', () => {
   const assignment = {due_at: '2017-05-13T00:59:59Z'}
-  const getItem = function () {
+  const getItem = function() {
     return {assignment}
   }
   const mockMonitor = {getItem}
@@ -82,7 +104,7 @@ test('discussionTarget canDrop returns false if assignment due_at is in the past
 
 test('discussionTarget canDrop returns true if not dragging to closed state', () => {
   const assignment = {due_at: '2018-05-13T00:59:59Z'}
-  const getItem = function () {
+  const getItem = function() {
     return {assignment}
   }
   const mockMonitor = {getItem}
@@ -92,7 +114,7 @@ test('discussionTarget canDrop returns true if not dragging to closed state', ()
 test('discussionTarget canDrop returns true if assignment due_at is in the future', () => {
   const dueAt = moment().add(7, 'days')
   const assignment = {due_at: dueAt.format()}
-  const getItem = function () {
+  const getItem = function() {
     return {assignment}
   }
   const mockMonitor = {getItem}
@@ -102,10 +124,7 @@ test('discussionTarget canDrop returns true if assignment due_at is in the futur
 test('connected mapStateToProps filters out filtered discussions', () => {
   const state = {}
   const ownProps = {
-    discussions: [
-      {id: 1, filtered: true},
-      {id: 2, filtered: false}
-    ],
+    discussions: [{id: 1, filtered: true}, {id: 2, filtered: false}]
   }
   const connectedProps = mapState(state, ownProps)
   deepEqual(connectedProps.discussions, [{id: 2, filtered: false}])

@@ -20,26 +20,20 @@ import _ from 'underscore'
 import I18n from 'i18n!publishable'
 
 export default class Publishable extends Backbone.Model {
-  constructor(...args) {
-    super(...args)
-    this.publish = this.publish.bind(this)
-    this.unpublish = this.unpublish.bind(this)
-  }
-
   initialize(attributes, options) {
     this._root = options.root
     return this.set('unpublishable', true)
   }
 
-  publish() {
+  publish = () => {
     this.set('published', true)
     return this.save()
-  }
+  };
 
-  unpublish() {
+  unpublish = () => {
     this.set('published', false)
     return this.save()
-  }
+  };
 
   disabledMessage() {
     return I18n.t('cant_unpublish', "Can't unpublish")

@@ -30,7 +30,12 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
     props = {
       imageOptions: {
         altText: '',
-        isDecorativeImage: false
+        appliedHeight: 300,
+        appliedWidth: 150,
+        isDecorativeImage: false,
+        naturalHeight: 200,
+        naturalWidth: 100,
+        url: 'https://www.fillmurray.com/200/100'
       },
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
@@ -138,9 +143,9 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   })
 
   describe('"Size" field', () => {
-    it('is set to "Medium" by default', () => {
+    it('is set using the given image options', () => {
       renderComponent()
-      expect(tray.size).toEqual('Medium')
+      expect(tray.size).toEqual('Custom')
     })
 
     it('can be set to "Small"', async () => {
@@ -164,6 +169,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
 
     it('can be set to "Custom"', async () => {
       renderComponent()
+      await tray.setSize('Small')
       await tray.setSize('Custom')
       expect(tray.size).toEqual('Custom')
     })
@@ -264,11 +270,18 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
           expect(displayAs).toEqual('link')
         })
 
-        it('includes the Size', async () => {
+        it('includes the width to be applied', async () => {
           await tray.setSize('Large')
           tray.$doneButton.click()
-          const [{imageSize}] = props.onSave.mock.calls[0]
-          expect(imageSize).toEqual('large')
+          const [{appliedWidth}] = props.onSave.mock.calls[0]
+          expect(appliedWidth).toEqual(200)
+        })
+
+        it('includes the height to be applied', async () => {
+          await tray.setSize('Large')
+          tray.$doneButton.click()
+          const [{appliedHeight}] = props.onSave.mock.calls[0]
+          expect(appliedHeight).toEqual(400)
         })
       })
     })

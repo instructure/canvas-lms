@@ -59,9 +59,9 @@ export default class AssignmentDescription extends React.Component {
         <ToggleDetails
           defaultExpanded
           summary={
-            <React.Fragment>
+            <>
               <Text>{I18n.t('Description')}</Text>
-            </React.Fragment>
+            </>
           }
         >
           <EditableRichText

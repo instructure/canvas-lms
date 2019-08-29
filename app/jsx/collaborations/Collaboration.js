@@ -28,30 +28,26 @@ import store from '../collaborations/store/store'
     constructor (props) {
       super(props);
       this.state = { deleteConfirmationOpen: false };
-
-      this.openConfirmation = this.openConfirmation.bind(this);
-      this.closeConfirmation = this.closeConfirmation.bind(this);
-      this.deleteCollaboration = this.deleteCollaboration.bind(this);
     }
 
-    openConfirmation () {
+    openConfirmation = () => {
       this.setState({
         deleteConfirmationOpen: true
       });
-    }
+    };
 
-    closeConfirmation () {
+    closeConfirmation = () => {
       this.setState({
         deleteConfirmationOpen: false
       }, () => {
         ReactDOM.findDOMNode(this.refs.deleteButton).focus()
       });
-    }
+    };
 
-    deleteCollaboration () {
+    deleteCollaboration = () => {
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
       store.dispatch(this.props.deleteCollaboration(context, contextId, this.props.collaboration.id));
-    }
+    };
 
     render () {
       let { collaboration } = this.props;

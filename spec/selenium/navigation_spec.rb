@@ -83,7 +83,6 @@ describe 'Global Navigation' do
 
     describe 'LTI Tools' do
       it 'should show a custom logo/link for LTI tools' do
-        Account.default.enable_feature! :lor_for_account
         @tool = Account.default.context_external_tools.new({
           :name => "Commons",
           :domain => "canvaslms.com",

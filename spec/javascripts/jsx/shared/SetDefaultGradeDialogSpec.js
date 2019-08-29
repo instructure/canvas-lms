@@ -41,7 +41,7 @@ function closeDialog() {
 QUnit.module('SetDefaultGradeDialog', () => {
   let dialog
 
-  test('#gradeIsExcused returns true if grade is EX', function() {
+  test('#gradeIsExcused returns true if grade is EX', () => {
     dialog = new SetDefaultGradeDialog({assignment})
     dialog.show()
     deepEqual(dialog.gradeIsExcused('EX'), true)
@@ -51,7 +51,7 @@ QUnit.module('SetDefaultGradeDialog', () => {
     closeDialog()
   })
 
-  test('#gradeIsExcused returns false if grade is not EX', function() {
+  test('#gradeIsExcused returns false if grade is not EX', () => {
     dialog = new SetDefaultGradeDialog({assignment})
     dialog.show()
     deepEqual(dialog.gradeIsExcused('14'), false)
@@ -61,14 +61,14 @@ QUnit.module('SetDefaultGradeDialog', () => {
     closeDialog()
   })
 
-  test('#show text', function() {
+  test('#show text', () => {
     dialog = new SetDefaultGradeDialog({assignment})
     dialog.show()
     ok(document.getElementById('default_grade_description').innerText.includes('same grade'))
     closeDialog()
   })
 
-  test('#show changes text for grading percent', function() {
+  test('#show changes text for grading percent', () => {
     const percentAssignmentParams = {...assignment, grading_type: 'percent'}
     dialog = new SetDefaultGradeDialog({assignment: percentAssignmentParams})
     dialog.show()

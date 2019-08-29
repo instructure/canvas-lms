@@ -1166,24 +1166,23 @@ function initGroupAssignmentMode() {
   }
 }
 
-function refreshGrades(cb) {
+function refreshGrades(callback) {
   const courseId = ENV.course_id
   const assignmentId = EG.currentStudent.submission.assignment_id
   const studentId = EG.currentStudent.submission[anonymizableUserId]
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}.json?include[]=submission_history`
   const currentStudentIDAsOfAjaxCall = EG.currentStudent[anonymizableId]
   $.getJSON(url, submission => {
-    if (currentStudentIDAsOfAjaxCall === EG.currentStudent[anonymizableId]) {
-      EG.currentStudent.submission = submission
-      EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(
-        EG.currentStudent,
-        ENV.grading_role
-      )
+    const studentToRefresh = window.jsonData.studentMap[currentStudentIDAsOfAjaxCall]
+    EG.setOrUpdateSubmission(submission)
+
+    EG.updateSelectMenuStatus(studentToRefresh)
+    if (studentToRefresh === EG.currentStudent) {
       EG.showGrade()
-      EG.updateSelectMenuStatus(EG.currentStudent)
-      if (cb) {
-        cb(submission)
-      }
+    }
+
+    if (callback) {
+      callback(submission)
     }
   })
 }
@@ -1345,7 +1344,7 @@ EG = {
     mergeStudentsAndSubmission()
 
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
-      if (window.history.length === 1) {
+      if (SpeedgraderHelpers.getHistory().length === 1) {
         alert(
           I18n.t(
             'alerts.no_students_in_groups_close',
@@ -1360,7 +1359,7 @@ EG = {
             "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
           )
         )
-        window.history.back()
+        SpeedgraderHelpers.getHistory().back()
       }
     } else if (!jsonData.studentsWithSubmissions.length) {
       alert(
@@ -1369,7 +1368,7 @@ EG = {
           'Sorry, there are either no active students in the course or none are gradable by you.'
         )
       )
-      window.history.back()
+      SpeedgraderHelpers.getHistory().back()
     } else {
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
@@ -1390,10 +1389,10 @@ EG = {
     const queryParams = EG.parseDocumentQuery()
     if (queryParams && queryParams[anonymizableStudentId]) {
       initialStudentId = queryParams[anonymizableStudentId]
-    } else if (document.location.hash !== '') {
-      initialStudentId = extractStudentIdFromHash(document.location.hash)
+    } else if (SpeedgraderHelpers.getLocationHash() !== '') {
+      initialStudentId = extractStudentIdFromHash(SpeedgraderHelpers.getLocationHash())
     }
-    document.location.hash = ''
+    SpeedgraderHelpers.setLocationHash('')
 
     const attemptParam = utils.getParam('attempt')
     if (attemptParam) {
@@ -1500,9 +1499,9 @@ EG = {
     )
 
     if (behavior === HISTORY_PUSH) {
-      window.history.pushState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().pushState(stateHash, '', url)
     } else {
-      window.history.replaceState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().replaceState(stateHash, '', url)
     }
   },
 
@@ -3076,7 +3075,10 @@ EG = {
           existingGrade.score = score
         }
 
-        EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade)
+        if (ENV.final_grader_id === ENV.current_user_id) {
+          EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade)
+        }
+
         EG.setActiveProvisionalGradeFields({
           grade: existingGrade,
           label: customProvisionalGraderLabel
@@ -3388,13 +3390,13 @@ EG = {
     const provisionalGrades = currentStudentProvisionalGrades()
 
     provisionalGrades.forEach(grade => {
-      if (grade.readonly) {
+      if (grade.scorer_id === ENV.final_grader_id) {
+        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel
+      } else {
         const displayName = grade.anonymous_grader_id
           ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName
-      } else {
-        provisionalGraderDisplayNames[grade.provisional_grade_id] = customProvisionalGraderLabel
       }
     })
   },
@@ -3497,6 +3499,7 @@ EG = {
     }
 
     const props = {
+      finalGraderId: ENV.final_grader_id,
       gradingType: ENV.grading_type,
       onGradeSelected: params => {
         this.handleProvisionalGradeSelected(params)

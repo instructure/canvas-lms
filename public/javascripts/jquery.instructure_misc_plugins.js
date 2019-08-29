@@ -31,7 +31,7 @@ import './vendor/jquery.scrollTo'
       options = [];
     }
 
-    options.forEach( function(opt) {
+    options.forEach( opt => {
       var optHtml = htmlEscape(opt);
       result += "<option value=\"" + optHtml + "\">" + optHtml + "</option>";
     });
@@ -108,16 +108,16 @@ import './vendor/jquery.scrollTo'
       if (options.url) {
         if (!options.success) {
           options.success = function(data) {
-            $object.fadeOut('slow', function() {
+            $object.fadeOut('slow', () => {
               $object.remove();
             });
           };
         }
         var data = options.prepareData ? options.prepareData.call($object, $dialog) : {};
         data.authenticity_token = authenticity_token();
-        $.ajaxJSON(options.url, "DELETE", data, function(data) {
+        $.ajaxJSON(options.url, "DELETE", data, data => {
           options.success.call($object, data);
-        }, function(data, request, status, error) {
+        }, (data, request, status, error) => {
           if (options.error && $.isFunction(options.error)) {
             options.error.call($object, data, request, status, error);
           } else {
@@ -127,7 +127,7 @@ import './vendor/jquery.scrollTo'
       } else {
         if (!options.success) {
           options.success = function() {
-            $object.fadeOut('slow', function() {
+            $object.fadeOut('slow', () => {
               $object.remove();
             });
           };
@@ -199,7 +199,7 @@ import './vendor/jquery.scrollTo'
         });
       }
       $(window).bind('hashchange', $._checkFragments);
-      setTimeout(function() {
+      setTimeout(() => {
         if(query_hash && query_hash.length > 0) {
           $doc.triggerHandler('document_fragment_change', query_hash);
         } else if($doc && $doc[0] && $doc[0].location && $doc[0].location.hash.length > 0) {
@@ -375,7 +375,7 @@ import './vendor/jquery.scrollTo'
         }),
         check = function() {
 
-          setTimeout(function() {
+          setTimeout(() => {
             if (val === (val = input.val())) {return;}
 
             // Enter new content into testSubject

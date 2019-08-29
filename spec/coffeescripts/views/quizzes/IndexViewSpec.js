@@ -86,40 +86,40 @@ QUnit.module('IndexView', {
     fixtures.empty()
   }
 })
-test('#hasNoQuizzes if assignment and open quizzes are empty', function() {
+test('#hasNoQuizzes if assignment and open quizzes are empty', () => {
   const assignments = new QuizCollection([])
   const open = new QuizCollection([])
   const view = indexView(assignments, open)
   ok(view.options.hasNoQuizzes)
 })
-test('#hasNoQuizzes to false if has assignement quizzes', function() {
+test('#hasNoQuizzes to false if has assignement quizzes', () => {
   const assignments = new QuizCollection([{id: 1}])
   const open = new QuizCollection([])
   const view = indexView(assignments, open)
   ok(!view.options.hasNoQuizzes)
 })
-test('#hasNoQuizzes to false if has open quizzes', function() {
+test('#hasNoQuizzes to false if has open quizzes', () => {
   const assignments = new QuizCollection([])
   const open = new QuizCollection([{id: 1}])
   const view = indexView(assignments, open)
   ok(!view.options.hasNoQuizzes)
 })
-test('#hasAssignmentQuizzes if has assignment quizzes', function() {
+test('#hasAssignmentQuizzes if has assignment quizzes', () => {
   const assignments = new QuizCollection([{id: 1}])
   const view = indexView(assignments, null, null)
   ok(view.options.hasAssignmentQuizzes)
 })
-test('#hasOpenQuizzes if has open quizzes', function() {
+test('#hasOpenQuizzes if has open quizzes', () => {
   const open = new QuizCollection([{id: 1}])
   const view = indexView(null, open, null)
   ok(view.options.hasOpenQuizzes)
 })
-test('#hasSurveys if has surveys', function() {
+test('#hasSurveys if has surveys', () => {
   const surveys = new QuizCollection([{id: 1}])
   const view = indexView(null, null, surveys)
   ok(view.options.hasSurveys)
 })
-test('should render the view', function() {
+test('should render the view', () => {
   const assignments = new QuizCollection([
     {
       id: 1,
@@ -143,7 +143,7 @@ test('should render the view', function() {
   const view = indexView(assignments, open)
   equal(view.$el.find('.collectionViewItems li').length, 4)
 })
-test('should filter by search term', function() {
+test('should filter by search term', () => {
   const assignments = new QuizCollection([
     {
       id: 1,

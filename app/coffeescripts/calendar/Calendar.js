@@ -57,49 +57,6 @@ const $styleContainer = $('<div id="calendar_color_style_overrides" />').appendT
 
 export default class Calendar {
   constructor(selector, contexts, manageContexts, dataSource, options) {
-    this.today = this.today.bind(this)
-    this.getEvents = this.getEvents.bind(this)
-    this.windowResize = this.windowResize.bind(this)
-    this.eventRender = this.eventRender.bind(this)
-    this.eventAfterRender = this.eventAfterRender.bind(this)
-    this.eventDragStart = this.eventDragStart.bind(this)
-    this.eventResizeStart = this.eventResizeStart.bind(this)
-    this.eventDrop = this.eventDrop.bind(this)
-    this.eventResize = this.eventResize.bind(this)
-    this.addEventClick = this.addEventClick.bind(this)
-    this.eventClick = this.eventClick.bind(this)
-    this.dayClick = this.dayClick.bind(this)
-    this.viewRender = this.viewRender.bind(this)
-    this.enableExternalDrags = this.enableExternalDrags.bind(this)
-    this.drawNowLine = this.drawNowLine.bind(this)
-    this.setDateTitle = this.setDateTitle.bind(this)
-    this.drop = this.drop.bind(this)
-    this.fragmentChange = this.fragmentChange.bind(this)
-    this.reloadClick = this.reloadClick.bind(this)
-    this.updateEvent = this.updateEvent.bind(this)
-    this.eventDeleting = this.eventDeleting.bind(this)
-    this.eventDeleted = this.eventDeleted.bind(this)
-    this.handleUnreserve = this.handleUnreserve.bind(this)
-    this.eventSaving = this.eventSaving.bind(this)
-    this.eventSaved = this.eventSaved.bind(this)
-    this.eventSaveFailed = this.eventSaveFailed.bind(this)
-    this.updateOverrides = this.updateOverrides.bind(this)
-    this.visibleContextListChanged = this.visibleContextListChanged.bind(this)
-    this.ajaxStarted = this.ajaxStarted.bind(this)
-    this.ajaxEnded = this.ajaxEnded.bind(this)
-    this.refetchEvents = this.refetchEvents.bind(this)
-    this.gotoDate = this.gotoDate.bind(this)
-    this.navigateDate = this.navigateDate.bind(this)
-    this.loadView = this.loadView.bind(this)
-    this.renderDateRange = this.renderDateRange.bind(this)
-    this.schedulerSingleDoneClick = this.schedulerSingleDoneClick.bind(this)
-    this.colorizeContexts = this.colorizeContexts.bind(this)
-    this.dataFromDocumentHash = this.dataFromDocumentHash.bind(this)
-    this.onSchedulerStateChange = this.onSchedulerStateChange.bind(this)
-    this.findAppointmentModeGroups = this.findAppointmentModeGroups.bind(this)
-    this.visibleDateRange = this.visibleDateRange.bind(this)
-    this.findNextAppointment = this.findNextAppointment.bind(this)
-
     this.contexts = contexts
     this.manageContexts = manageContexts
     this.dataSource = dataSource
@@ -306,12 +263,12 @@ export default class Calendar {
     return I18n.lookup('time.formats.tiny_on_the_hour') === "%k:%M" ? "HH:mm" : null
   }
 
-  today() {
+  today = () => {
     return this.gotoDate(fcUtil.now())
-  }
+  };
 
   // FullCalendar callbacks
-  getEvents(start, end, timezone, donecb, datacb) {
+  getEvents = (start, end, timezone, donecb, datacb) => {
     this.gettingEvents = true
     const contexts = this.visibleContextList.concat(this.findAppointmentModeGroups())
 
@@ -341,7 +298,7 @@ export default class Calendar {
     if (datacb) _datacb = events => datacb(calendarEventFilter(this.displayAppointmentEvents, events, this.schedulerState))
 
     return this.dataSource.getEvents(start, end, contexts, _donecb, _datacb)
-  }
+  };
 
 
   // Close all event details popup on the page and have them cleaned up.
@@ -355,12 +312,12 @@ export default class Calendar {
     })
   }
 
-  windowResize(view) {
+  windowResize = view => {
     this.closeEventPopups()
     this.drawNowLine()
-  }
+  };
 
-  eventRender(event, element, view) {
+  eventRender = (event, element, view) => {
     const $element = $(element)
 
     const startDate = event.startDate()
@@ -416,9 +373,9 @@ export default class Calendar {
     $element.find('.fc-title').toggleClass('calendar__event--completed', event.isCompleted())
     element.find('.fc-content').prepend($('<i />', {class: `icon-${event.iconType()}`}))
     return true
-  }
+  };
 
-  eventAfterRender(event, element, view) {
+  eventAfterRender = (event, element, view) => {
     this.enableExternalDrags(element)
     if (event.isDueAtMidnight()) {
       // show the actual time instead of the midnight fudged time
@@ -456,23 +413,23 @@ export default class Calendar {
         view
       )
     }
-  }
+  };
 
-  eventDragStart(event, jsEvent, ui, view) {
+  eventDragStart = (event, jsEvent, ui, view) => {
     $('.fc-highlight-skeleton').remove()
     this.lastEventDragged = event
     this.closeEventPopups()
-  }
+  };
 
-  eventResizeStart(event, jsEvent, ui, view) {
+  eventResizeStart = (event, jsEvent, ui, view) => {
     this.closeEventPopups()
-  }
+  };
 
   // event triggered by items being dropped from within the calendar
-  eventDrop(event, delta, revertFunc, jsEvent, ui, view) {
+  eventDrop = (event, delta, revertFunc, jsEvent, ui, view) => {
     const minuteDelta = delta.asMinutes()
     return this._eventDrop(event, minuteDelta, event.allDay, revertFunc)
-  }
+  };
 
   _eventDrop(event, minuteDelta, allDay, revertFunc) {
     let endDate, startDate
@@ -526,9 +483,9 @@ export default class Calendar {
     return true
   }
 
-  eventResize(event, delta, revertFunc, jsEvent, ui, view) {
+  eventResize = (event, delta, revertFunc, jsEvent, ui, view) => {
     return event.saveDates(null, revertFunc)
-  }
+  };
 
   activeContexts() {
     const allowedContexts =
@@ -536,7 +493,7 @@ export default class Calendar {
     return _.filter(this.contexts, c => _.includes(allowedContexts, c.asset_string))
   }
 
-  addEventClick(event, jsEvent, view) {
+  addEventClick = (event, jsEvent, view) => {
     if (this.displayAppointmentEvents) {
       // Don't allow new event creation while in scheduler mode
       return
@@ -546,9 +503,9 @@ export default class Calendar {
     event = commonEventFactory(null, this.activeContexts())
     event.date = this.getCurrentDate()
     return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
-  }
+  };
 
-  eventClick(event, jsEvent, view) {
+  eventClick = (event, jsEvent, view) => {
     const $event = $(jsEvent.currentTarget)
     if (!$event.hasClass('event_pending')) {
       if (event.can_change_context) {
@@ -558,9 +515,9 @@ export default class Calendar {
       $event.data('showEventDetailsDialog', detailsDialog)
       return detailsDialog.show(jsEvent)
     }
-  }
+  };
 
-  dayClick(date, jsEvent, view) {
+  dayClick = (date, jsEvent, view) => {
     if (this.displayAppointmentEvents) {
       // Don't allow new event creation while in scheduler mode
       return
@@ -571,7 +528,7 @@ export default class Calendar {
     event.date = date
     event.allDay = !date.hasTime()
     return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
-  }
+  };
 
   updateFragment(opts) {
     const replaceState = !!opts.replaceState
@@ -597,12 +554,12 @@ export default class Calendar {
     }
   }
 
-  viewRender(view) {
+  viewRender = view => {
     this.setDateTitle(view.title)
     this.drawNowLine()
-  }
+  };
 
-  enableExternalDrags(eventEl) {
+  enableExternalDrags = eventEl => {
     return $(eventEl).draggable({
       zIndex: 999,
       revert: true,
@@ -613,7 +570,7 @@ export default class Calendar {
       // clone doesn't seem to work :(
       helper: 'clone'
     })
-  }
+  };
 
   isSameWeek(date1, date2) {
     const week1 = fcUtil
@@ -627,7 +584,7 @@ export default class Calendar {
     return +week1 === +week2
   }
 
-  drawNowLine() {
+  drawNowLine = () => {
     if (this.currentView !== 'week') {
       return
     }
@@ -648,15 +605,15 @@ export default class Calendar {
     const secondHeight =
       (($('.fc-time-grid').css('height') || '').replace('px', '') || 0) / 24 / 60 / 60
     this.$nowLine.css('top', `${seconds * secondHeight}px`)
-  }
+  };
 
-  setDateTitle(title) {
+  setDateTitle = title => {
     this.header.setHeaderText(title)
     return this.schedulerNavigator.setTitle(title)
-  }
+  };
 
   // event triggered by items being dropped from outside the calendar
-  drop(date, jsEvent, ui) {
+  drop = (date, jsEvent, ui) => {
     const eventId = $(ui.helper).data('event-id')
     const event = $(`[data-event-id=${eventId}]`).data('calendarEvent')
     if (!event) {
@@ -670,7 +627,7 @@ export default class Calendar {
       return
     }
     return this.calendar.fullCalendar('renderEvent', event)
-  }
+  };
 
   // callback from minicalendar telling us an event from here was dragged there
   dropOnMiniCalendar(date, allDay, jsEvent, ui) {
@@ -706,7 +663,7 @@ export default class Calendar {
 
   // DOM callbacks
 
-  fragmentChange(event, hash) {
+  fragmentChange = (event, hash) => {
     const data = this.dataFromDocumentHash()
     if ($.isEmptyObject(data)) {
       return
@@ -717,9 +674,9 @@ export default class Calendar {
     }
 
     return this.gotoDate(this.getCurrentDate())
-  }
+  };
 
-  reloadClick(event) {
+  reloadClick = event => {
     if (event != null) {
       event.preventDefault()
     }
@@ -730,11 +687,11 @@ export default class Calendar {
       }
       return this.calendar.fullCalendar('refetchEvents')
     }
-  }
+  };
 
   // Subscriptions
 
-  updateEvent(event) {
+  updateEvent = event => {
     // fullcalendar.js expects the argument to updateEvent to be an instance
     // of the event that it's manipulated into having _start and _end fields.
     // the event passed in here isn't necessarily one of those, but may be our
@@ -748,22 +705,22 @@ export default class Calendar {
       event._end = event.end ? fcUtil.clone(event.end) : null
     }
     return this.calendar.fullCalendar('updateEvent', event)
-  }
+  };
 
-  eventDeleting(event) {
+  eventDeleting = event => {
     event.addClass('event_pending')
     return this.updateEvent(event)
-  }
+  };
 
-  eventDeleted(event) {
+  eventDeleted = event => {
     if (event.isAppointmentGroupEvent() && event.calendarEvent.parent_event_id) {
       this.handleUnreserve(event)
     }
     return this.calendar.fullCalendar('removeEvents', event.id)
-  }
+  };
 
   // when an appointment event was deleted, clear the reserved flag and increment the available slot count on the parent
-  handleUnreserve(event) {
+  handleUnreserve = event => {
     const parentEvent = this.dataSource.eventWithId(
       `calendar_event_${event.calendarEvent.parent_event_id}`
     )
@@ -781,9 +738,9 @@ export default class Calendar {
 
       return this.refetchEvents()
     }
-  }
+  };
 
-  eventSaving(event) {
+  eventSaving = event => {
     if (!event.start) {
       return
     } // undated events can't be rendered
@@ -793,9 +750,9 @@ export default class Calendar {
     } else {
       return this.updateEvent(event)
     }
-  }
+  };
 
-  eventSaved(event) {
+  eventSaved = event => {
     event.removeClass('event_pending')
 
     // If we just saved a new event then the id field has changed from what it
@@ -811,65 +768,65 @@ export default class Calendar {
     // to dated, and in that case we don't know whether to just update it or
     // add it. Some new state would need to be kept to track that.
     this.closeEventPopups()
-  }
+  };
 
-  eventSaveFailed(event) {
+  eventSaveFailed = event => {
     event.removeClass('event_pending')
     if (event.isNewEvent()) {
       return this.calendar.fullCalendar('removeEvents', event.id)
     } else {
       return this.updateEvent(event)
     }
-  }
+  };
 
   // When an assignment event is updated, update its related overrides.
-  updateOverrides(event) {
+  updateOverrides = event => {
     _.each(this.dataSource.cache.contexts[event.contextCode()].events, (override, key) => {
       if (key.match(/override/) && event.assignment.id === override.assignment.id) {
         override.updateAssignmentTitle(event.title)
       }
     })
-  }
+  };
 
-  visibleContextListChanged(newList) {
+  visibleContextListChanged = newList => {
     this.visibleContextList = newList
     if (this.currentView === 'agenda') {
       this.loadAgendaView()
     }
     return this.calendar.fullCalendar('refetchEvents')
-  }
+  };
 
-  ajaxStarted() {
+  ajaxStarted = () => {
     this.activeAjax += 1
     return this.header.animateLoading(true)
-  }
+  };
 
-  ajaxEnded() {
+  ajaxEnded = () => {
     this.activeAjax -= 1
     return this.header.animateLoading(this.activeAjax > 0)
-  }
+  };
 
-  refetchEvents() {
+  refetchEvents = () => {
     return this.calendar.fullCalendar('refetchEvents')
-  }
+  };
 
   // Methods
 
   // expects a fudged Moment object (use fcUtil
   // before calling if you must coerce)
-  gotoDate(date) {
+  gotoDate = date => {
     this.calendar.fullCalendar('gotoDate', date)
     if (this.currentView === 'agenda') {
       this.agendaViewFetch(date)
     }
     this.setCurrentDate(date)
     this.drawNowLine()
-  }
+  };
 
-  navigateDate(d) {
+  navigateDate = d => {
     const date = fcUtil.wrap(d)
     this.gotoDate(date)
-  }
+  };
 
   handleArrow(type) {
     let start
@@ -942,7 +899,7 @@ export default class Calendar {
     }
   }
 
-  loadView(view) {
+  loadView = view => {
     if (view === this.currentView) {
       return
     }
@@ -982,7 +939,7 @@ export default class Calendar {
       this.scheduler.hide()
       return this.header.hidePrevNext()
     }
-  }
+  };
 
   loadAgendaView() {
     const date = this.getCurrentDate()
@@ -1004,7 +961,7 @@ export default class Calendar {
     )
   }
 
-  renderDateRange(start, end) {
+  renderDateRange = (start, end) => {
     this.agendaStart = fcUtil.unwrap(start)
     this.agendaEnd = fcUtil.unwrap(end)
     this.setDateTitle(
@@ -1023,7 +980,7 @@ export default class Calendar {
         })
       )
     }, 500)
-  }
+  };
 
   showSchedulerSingle(group) {
     this.agenda.viewingGroup = group
@@ -1031,14 +988,14 @@ export default class Calendar {
     return this.header.showDoneButton()
   }
 
-  schedulerSingleDoneClick() {
+  schedulerSingleDoneClick = () => {
     this.agenda.viewingGroup = null
     this.scheduler.doneClick()
     this.header.showSchedulerTitle()
     return this.schedulerNavigator.hide()
-  }
+  };
 
-  colorizeContexts() {
+  colorizeContexts = () => {
     // Get any custom colors that have been set
     $.getJSON(`/api/v1/users/${this.options.userId}/colors/`, data => {
       const customColors = data.custom_colors
@@ -1076,9 +1033,9 @@ export default class Calendar {
 
       $styleContainer.html(`<style>${html}</style>`)
     })
-  }
+  };
 
-  dataFromDocumentHash() {
+  dataFromDocumentHash = () => {
     let data = {}
     try {
       const fragment = location.hash.substring(1)
@@ -1092,9 +1049,9 @@ export default class Calendar {
       data = {}
     }
     return data
-  }
+  };
 
-  onSchedulerStateChange() {
+  onSchedulerStateChange = () => {
     const newState = this.schedulerStore.getState()
     const changed = this.schedulerState.inFindAppointmentMode !== newState.inFindAppointmentMode
     this.schedulerState = newState
@@ -1108,9 +1065,9 @@ export default class Calendar {
         return this.loadAgendaView()
       }
     }
-  }
+  };
 
-  findAppointmentModeGroups() {
+  findAppointmentModeGroups = () => {
     if (this.schedulerState.inFindAppointmentMode && this.schedulerState.selectedCourse) {
       return (
         this.reservable_appointment_groups[this.schedulerState.selectedCourse.asset_string] || []
@@ -1118,13 +1075,13 @@ export default class Calendar {
     } else {
       return []
     }
-  }
+  };
 
   ensureCourseVisible(course) {
     $.publish('Calendar/ensureCourseVisible', course.asset_string)
   }
 
-  visibleDateRange() {
+  visibleDateRange = () => {
     const range = {}
     if (this.currentView === 'agenda') {
       range.start = this.agendaStart
@@ -1135,9 +1092,9 @@ export default class Calendar {
       range.end = fcUtil.unwrap(view.intervalEnd)
     }
     return range
-  }
+  };
 
-  findNextAppointment() {
+  findNextAppointment = () => {
     // determine whether any reservable appointment slots are visible
     const range = this.visibleDateRange()
     // FIXME attempted optimization, except these events aren't in the cache yet;
@@ -1176,5 +1133,5 @@ export default class Calendar {
         }
       }
     )
-  }
+  };
 }

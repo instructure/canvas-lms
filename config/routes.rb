@@ -416,7 +416,6 @@ CanvasRails::Application.routes.draw do
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
     resources :outcomes do
-      post 'alignments/reorder' => 'outcomes#reorder_alignments', as: :reorder_alignments
       get 'alignments/:id' => 'outcomes#alignment_redirect', as: :alignment_redirect
       post 'alignments' => 'outcomes#align', as: :align
       delete 'alignments/:id' => 'outcomes#remove_alignment', as: :remove_alignment
@@ -485,7 +484,7 @@ CanvasRails::Application.routes.draw do
   get 'media_objects/:id/redirect' => 'context#media_object_redirect', as: :media_object_redirect
   get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
   get 'media_objects/:media_object_id/info' => 'media_objects#show', as: :media_object_info
-  get 'media_objects_iframe/:id' => 'media_objects#iframe_media_player', as: :media_object_iframe
+  get 'media_objects_iframe/:media_object_id' => 'media_objects#iframe_media_player', as: :media_object_iframe
   get 'media_objects/:media_object_id/media_tracks/:id' => 'media_tracks#show', as: :show_media_tracks
   post 'media_objects/:media_object_id/media_tracks' => 'media_tracks#create', as: :create_media_tracks
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks
@@ -1288,6 +1287,9 @@ CanvasRails::Application.routes.draw do
                as: "#{context}_dismiss_update_tool_proxy"
         put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :accept_update,
             as: "#{context}_accept_update_tool_proxy"
+
+        get "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/recreate_subscriptions", action: :recreate_subscriptions,
+            as: "#{context}_recreate_subscriptions_tool_proxy"
       end
     end
 
@@ -2182,6 +2184,10 @@ CanvasRails::Application.routes.draw do
       delete 'planner_notes/:id', action: :destroy
     end
 
+    scope(controller: :content_shares) do
+      post 'users/:user_id/content_shares', action: :create
+    end
+
     scope(:controller => :csp_settings) do
       %w(course account).each do |context|
         get "#{context.pluralize}/:#{context}_id/csp_settings", :action => :get_csp_settings
@@ -2336,6 +2342,15 @@ CanvasRails::Application.routes.draw do
     # Public JWK Service
     scope(controller: 'lti/public_jwk') do
       put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
+    end
+
+    # Data Services Service
+    scope(controller: 'lti/data_services') do
+      post "/accounts/:account_id/data_services", action: :create, as: :data_services_create
+      get "/accounts/:account_id/data_services/:id", action: :show, as: :data_services_show
+      put "/accounts/:account_id/data_services/:id", action: :update, as: :data_services_update
+      get "/accounts/:account_id/data_services", action: :index, as: :data_services_index
+      delete "/accounts/:account_id/data_services/:id", action: :destroy, as: :data_services_destroy
     end
 
     # Names and Roles Provisioning (NRPS) v2 Service

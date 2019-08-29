@@ -79,7 +79,7 @@ test('#loadValue escapes html', function() {
   equal(this.cell.$input[0].defaultValue, escapedDangerousHTML)
 })
 
-test('#class.formatter rounds numbers if they are numbers', function() {
+test('#class.formatter rounds numbers if they are numbers', () => {
   sandbox
     .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('0.67')
@@ -88,7 +88,7 @@ test('#class.formatter rounds numbers if they are numbers', function() {
   equal(formattedResponse, 'ok')
 })
 
-test('#class.formatter gives the value to the formatter if submission.grade isnt a parseable number', function() {
+test('#class.formatter gives the value to the formatter if submission.grade isnt a parseable number', () => {
   sandbox
     .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('happy')
@@ -97,7 +97,7 @@ test('#class.formatter gives the value to the formatter if submission.grade isnt
   equal(formattedResponse, 'ok')
 })
 
-test('#class.formatter adds a percent symbol for assignments with a percent grading_type', function() {
+test('#class.formatter adds a percent symbol for assignments with a percent grading_type', () => {
   sandbox
     .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('73%')
@@ -220,7 +220,7 @@ test("#class.formatter, isConcluded doesn't have grayed-out", () => {
   equal(submissionCellResponse.indexOf('grayed-out'), -1)
 })
 
-test('#letter_grade.formatter, shows EX when submission is excused', function() {
+test('#letter_grade.formatter, shows EX when submission is excused', () => {
   sandbox
     .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('EX')
@@ -229,7 +229,7 @@ test('#letter_grade.formatter, shows EX when submission is excused', function() 
   equal(formattedResponse, 'ok')
 })
 
-test('#letter_grade.formatter, shows the score and letter grade', function() {
+test('#letter_grade.formatter, shows the score and letter grade', () => {
   sandbox
     .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs("F<span class='letter-grade-points'>0</span>")
@@ -247,7 +247,7 @@ test('#letter_grade.formatter, shows the score and letter grade', function() {
   equal(formattedResponse, 'ok')
 })
 
-test('#letter_grade.formatter, shows the letter grade', function() {
+test('#letter_grade.formatter, shows the letter grade', () => {
   sandbox
     .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('B')

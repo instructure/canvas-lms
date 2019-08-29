@@ -170,9 +170,9 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     return document.querySelector('[role="dialog"][aria-label="Gradebook Settings"]')
   }
 
-  async function openModal() {
+  function openModal() {
     component.open()
-    await wait(() => {
+    return wait(() => {
       if (props.onEntered.callCount > 0) {
         return
       }
@@ -180,24 +180,25 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
   }
 
-  async function mountAndOpen() {
+  function mountAndOpen() {
     mountComponent()
-    await openModal()
+    return openModal()
   }
 
-  async function mountOpenAndLoad() {
-    await mountAndOpen()
-    fetchLatePolicyPromise.resolve()
-    await wait(() => !getSpinner())
+  function mountOpenAndLoad() {
+    return mountAndOpen()
+      .then(() => fetchLatePolicyPromise.resolve())
+      .then(() => wait(() => !getSpinner()))
   }
 
-  async function mountOpenLoadAndSelectTab(tabLabel) {
-    await mountOpenAndLoad()
-    findTab(tabLabel).click()
+  function mountOpenLoadAndSelectTab(tabLabel) {
+    return mountOpenAndLoad().then(() => {
+      findTab(tabLabel).click()
+    })
   }
 
-  async function waitForModalClosed() {
-    await wait(() => {
+  function waitForModalClosed() {
+    return wait(() => {
       if (props.onClose.callCount > 0) {
         return
       }
@@ -205,10 +206,12 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
   }
 
-  async function ensureModalIsClosed() {
+  function ensureModalIsClosed() {
     if (getModalElement()) {
       component.close()
-      await waitForModalClosed()
+      return  waitForModalClosed()
+    } else {
+      return Promise.resolve()
     }
   }
 
@@ -631,11 +634,11 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
           return waitForModalClosed()
         })
 
-        test('displays a flash alert', async () => {
+        test('displays a flash alert', () => {
           strictEqual(FlashAlert.showFlashAlert.callCount, 1)
         })
 
-        test('uses the "success" type for the flash alert', async () => {
+        test('uses the "success" type for the flash alert', () => {
           const [{type}] = FlashAlert.showFlashAlert.lastCall.args
           equal(type, 'success')
         })

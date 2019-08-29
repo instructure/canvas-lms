@@ -28,6 +28,7 @@ describe FeatureFlags do
   before do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
+      'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'allowed'),
       'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'off'),
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on'),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed'),
@@ -47,6 +48,7 @@ describe FeatureFlags do
 
   describe "#feature_allowed?" do
     it "returns true if the feature is 'on' or 'allowed', and false otherwise" do
+      expect(t_site_admin.feature_allowed?(:site_admin_feature)).to be_truthy
       expect(t_sub_account.feature_allowed?(:account_feature)).to be_truthy
       expect(t_root_account.feature_allowed?(:root_account_feature)).to be_falsey
       expect(t_course.feature_allowed?(:course_feature)).to be_truthy
@@ -89,7 +91,7 @@ describe FeatureFlags do
       expect(t_user.lookup_feature_flag('user_feature')).to be_default
     end
 
-    context "site admin flags" do
+    context "overrides at site admin" do
       it "should ignore site admin settings if definition doesn't allow override" do
         t_site_admin.feature_flags.create! feature: 'root_account_feature', state: 'allowed'
         expect(t_root_account.lookup_feature_flag('root_account_feature')).to be_default
@@ -109,6 +111,15 @@ describe FeatureFlags do
         expect(t_root_account.lookup_feature_flag('course_feature').context).to eql t_site_admin
         t_course.instance_variable_set(:@feature_flag_cache, nil)
         expect(t_course.feature_enabled?('course_feature')).to be_falsey
+      end
+    end
+
+    context "site admin flags" do
+      it "should work for site admin overrides" do
+        expect(t_site_admin.feature_enabled?('site_admin_feature')).to be_falsey
+        t_site_admin.feature_flags.create! feature: 'site_admin_feature', state: 'on'
+        t_site_admin.instance_variable_set(:@feature_flag_cache, nil)
+        expect(t_site_admin.feature_enabled?('site_admin_feature')).to be_truthy
       end
     end
 

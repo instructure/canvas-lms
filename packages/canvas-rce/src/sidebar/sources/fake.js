@@ -617,7 +617,7 @@ export function initializeDocuments() {
 }
 
 export function fetchFolders() {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     setTimeout(() => {
       resolve({ folders: FOLDERS });
     }, 1000);
@@ -629,7 +629,7 @@ export function fetchFiles(uri = "files") {
 }
 
 export function fetchImages(props) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
       if (props.bookmark) {
@@ -652,7 +652,7 @@ export function fetchMediaFolder() {
 }
 
 export function preflightUpload() {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     setTimeout(() => {
       resolve({});
     }, FAKE_TIMEOUT);
@@ -660,7 +660,7 @@ export function preflightUpload() {
 }
 
 export function uploadFRD() {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     setTimeout(() => {
       resolve(images[0]);
     }, 250);
@@ -681,7 +681,7 @@ export function fetchRootFolder(props) {
 }
 
 export function fetchPage(uri) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (PAGES[uri]) {
         resolve(PAGES[uri]);
@@ -693,7 +693,7 @@ export function fetchPage(uri) {
 }
 
 export function searchFlickr(term) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (FLICKR_RESULTS[term]) {
         resolve(FLICKR_RESULTS[term]);
@@ -705,7 +705,7 @@ export function searchFlickr(term) {
 }
 
 export function searchUnsplash(term) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (UNSPLASH_RESULTS[term]) {
         resolve(UNSPLASH_RESULTS[term])
@@ -713,7 +713,7 @@ export function searchUnsplash(term) {
         reject('No search results!')
       }
     }, 1000)
-  })
+  });
 }
 
 export function pingbackUnsplash() {
@@ -727,7 +727,7 @@ export function setUsageRights(id, usageRights) {
 
 export function getFile(id) {
   return Promise.resolve({
-    id: id,
+    id,
     type: "text/plain",
     name: "Test File",
     url: "test.txt",
@@ -736,7 +736,7 @@ export function getFile(id) {
 }
 
 export function fetchDocs(bookmark) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
       if (bookmark) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useEffect, useState} from 'react'
+import React, {Suspense, useCallback, useEffect, useState} from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -47,7 +47,9 @@ function getTrayLabel({contentType, contentSubtype}) {
     // case 'media':
     //   return formatMessage('Course Media')
     case 'documents':
-      return formatMessage('Course Documents')
+      return contentType === 'course_files' ?
+      formatMessage('Course Documents') :
+      formatMessage('User Documents')
     default:
       return formatMessage('Tray') // Shouldn't ever get here
   }
@@ -75,9 +77,10 @@ function renderContentComponent({contentType, contentSubtype}, contentProps) {
 }
 
 const FILTER_SETTINGS_BY_PLUGIN = {
-  documents: {contentType: 'files', contentSubtype: 'documents', sortValue: 'date_added'},
-  images: {contentType: 'files', contentSubtype: 'images', sortValue: 'date_added'},
-  links: {contentType: 'links', contentSubtype: 'all', sortValue: 'date_added'},
+  user_documents: {contextType: 'user', contentType: 'user_files', contentSubtype: 'documents', sortValue: 'date_added'},
+  course_documents: {contextType: 'course', contentType: 'course_files', contentSubtype: 'documents', sortValue: 'date_added'},
+  images: {contextType: 'course', contentType: 'course_files', contentSubtype: 'images', sortValue: 'date_added'},
+  links: {contextType: 'course', contentType: 'links', contentSubtype: 'all', sortValue: 'date_added'},
   // media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
 }
 
@@ -89,8 +92,16 @@ export default function CanvasContentTray(props) {
   const [isOpen, setIsOpen] = useState(false)
   const [openCount, setOpenCount] = useState(0)
 
-
   const [filterSettings, setFilterSettings] = useFilterSettings()
+
+  const onTrayClosing = props.onTrayClosing
+
+  const handleDismissTray = useCallback(
+    () => {
+      onTrayClosing && onTrayClosing(true) // tell RCEWrapper we're closing
+      setIsOpen(false)
+    }, [onTrayClosing]
+  )
 
   useEffect(() => {
     const controller = {
@@ -108,12 +119,7 @@ export default function CanvasContentTray(props) {
     return () => {
       props.bridge.detachController()
     }
-  }, [props.bridge])
-
-  function handleDismissTray() {
-    props.onTrayClosing && props.onTrayClosing(true) // tell RCEWrapper we're closing
-    setIsOpen(false)
-  }
+  }, [props.bridge, handleDismissTray, setFilterSettings])
 
   function handleExitTray() {
     props.onTrayClosing && props.onTrayClosing(true) // tell RCEWrapper we're closing
@@ -128,6 +134,24 @@ export default function CanvasContentTray(props) {
     props.onTrayClosing && props.onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
+  function handleFilterChange(newFilter, onChangeContext) {
+    setFilterSettings(newFilter)
+    if (newFilter.contentType) {
+      let contextType, contextId
+      switch (newFilter.contentType) {
+        case 'user_files':
+          contextType = 'user'
+          contextId = props.containingContext.userId
+          break;
+        case 'course_files':
+        case 'links':
+          contextType = 'course'
+          contextId = props.containingContext.contextId
+      }
+      onChangeContext({contextType, contextId})
+    }
+  }
+
   function renderLoading() {
     return formatMessage('Loading')
   }
@@ -138,7 +162,7 @@ export default function CanvasContentTray(props) {
         <Tray
           data-mce-component
           data-testid="CanvasContentTray"
-          label={getTrayLabel(filterSettings)}
+          label={getTrayLabel(filterSettings, contentProps.contextType)}
           open={isOpen}
           placement="end"
           size="regular"
@@ -163,7 +187,12 @@ export default function CanvasContentTray(props) {
                 </Flex.Item>
               </Flex>
 
-              <Filter {...filterSettings} onChange={setFilterSettings} />
+              <Filter
+                {...filterSettings}
+                onChange={(newFilter) => {
+                  handleFilterChange(newFilter, contentProps.onChangeContext)
+                }}
+              />
             </Flex.Item>
 
             <Flex.Item grow shrink margin="xx-small 0 0 0">
@@ -188,8 +217,8 @@ function requiredWithoutSource(props, propName, componentName) {
 
 const trayPropsMap = {
   canUploadFiles: bool.isRequired,
-  contextId: string.isRequired,
-  contextType: string.isRequired,
+  contextId: string.isRequired, // initial value indicating the user's context (e.g. student v teacher), not the tray's
+  contextType: string.isRequired, // initial value indicating the user's context, not the tray's
   filesTabDisabled: bool,
   host: requiredWithoutSource,
   jwt: requiredWithoutSource,

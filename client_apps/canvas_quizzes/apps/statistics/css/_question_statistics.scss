@@ -48,46 +48,17 @@
   .question-top-right {
     align-items: center;
   }
+
+  .question-bottom-right {
+    align-items: center;
+  }
   
   .question-left {
   }
 
   .correct-answer-ratio-section {
-    text-align: center;
-    padding-bottom: 24px;
-
-    .chart, .auxiliary {
-      display: inline-block;
-      vertical-align: top;
-    }
-
-    .chart {
-      width: 120px;
-      height: 120px;
-
-      .background {
-        fill: $borderColor;
-      }
-
-      .foreground {
-        fill: $highlightColor;
-      }
-
-      text {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 125%;
-        font-weight: bold;
-      }
-
-      tspan.subcaption {
-        font-size: small;
-      }
-    }
-
-    .auxiliary {
-      margin-left: 20px;
-      width: 160px;
-    }
+    width: 50%;
+    padding: 0 0 24px 10%;
   }
 
   .answer-distribution-section {

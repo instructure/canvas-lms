@@ -25,13 +25,13 @@ const fixtures = document.getElementById('fixtures')
 
 QUnit.module('gradebook_uploads#createGeneralFormatter')
 
-test('formatter returns expected lookup value', function() {
+test('formatter returns expected lookup value', () => {
   const formatter = gradebook_uploads.createGeneralFormatter('foo')
   const formatted = formatter(null, null, {foo: 'bar'})
   equal(formatted, 'bar')
 })
 
-test('formatter returns empty string when lookup value missing', function() {
+test('formatter returns empty string when lookup value missing', () => {
   const formatter = gradebook_uploads.createGeneralFormatter('foo')
   const formatted = formatter(null, null, null)
   equal(formatted, '')
@@ -127,13 +127,13 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
 
 QUnit.module('grade_summary#createNumberFormatter')
 
-test('number formatter returns empty string when value missing', function() {
+test('number formatter returns empty string when value missing', () => {
   const formatter = gradebook_uploads.createNumberFormatter('foo')
   const formatted = formatter(null, null, null)
   equal(formatted, '')
 })
 
-test('number formatter delegates to GradeFormatHelper#formatGrade', function() {
+test('number formatter delegates to GradeFormatHelper#formatGrade', () => {
   const formatGradeSpy = sandbox.spy(GradeFormatHelper, 'formatGrade')
   const formatter = gradebook_uploads.createNumberFormatter('foo')
   formatter(null, null, {})

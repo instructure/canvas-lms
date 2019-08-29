@@ -27,7 +27,7 @@ import 'compiled/jquery.rails_flash_notifications'
 import './jquery.templateData'
 
 $(document).ready(function() {
-  $("#name_and_email").delegate('.edit_user_link', 'click', function(event) {
+  $("#name_and_email").delegate('.edit_user_link', 'click', event => {
     event.preventDefault();
     $("#edit_student_dialog").dialog({
       width: 450
@@ -50,7 +50,7 @@ $(document).ready(function() {
         .filter(".submit_button").text(I18n.t('errors.updating_user_details_failed', "Updating user details failed, please try again"));
     }
   });
-  $("#edit_student_dialog .cancel_button").click(function() {
+  $("#edit_student_dialog .cancel_button").click(() => {
     $("#edit_student_dialog").dialog('close');
   });
   $(".remove_avatar_picture_link").click(function(event) {
@@ -59,10 +59,10 @@ $(document).ready(function() {
     var result = confirm(I18n.t('confirms.remove_profile_picture', "Are you sure you want to remove this user's profile picture?"));
     if(!result) { return; }
     $link.text(I18n.t('messages.removing_image', "Removing image..."));
-    $.ajaxJSON($link.attr('href'), 'PUT', {'avatar[state]': 'none'}, function(data) {
+    $.ajaxJSON($link.attr('href'), 'PUT', {'avatar[state]': 'none'}, data => {
       $link.parents("tr").find(".avatar_image").remove();
       $link.remove();
-    }, function(data) {
+    }, data => {
       $link.text(I18n.t('errors.failed_to_remove_image', "Failed to remove the image, please try again"));
     });
   });
@@ -71,19 +71,19 @@ $(document).ready(function() {
     event.preventDefault();
     var $link = $(this);
     $link.text(I18n.t('messages.reporting_image', "Reporting image..."));
-    $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
+    $.ajaxJSON($link.attr('href'), 'POST', {}, data => {
       $link.after(htmlEscape(I18n.t('notices.image_reported', "This image has been reported")));
       $link.remove();
-    }, function(data) {
+    }, data => {
       $link.text(I18n.t('errors.failed_to_report_image', "Failed to report the image, please try again"));
     });
   });
   $(".clear_user_cache_link").click(function(event) {
     event.preventDefault();
     const $link = $(this);
-    $.ajaxJSON($link.attr('href'), 'POST', {}, function(_data) {
+    $.ajaxJSON($link.attr('href'), 'POST', {}, _data => {
       $.flashMessage(I18n.t("Cache cleared successfully"));
-    }, function(_data) {
+    }, _data => {
       $.flashMessage(I18n.t("Failed to clear cache"));
     });
   });

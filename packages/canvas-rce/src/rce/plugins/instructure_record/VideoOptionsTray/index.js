@@ -17,8 +17,8 @@
  */
 
 import {bool, func, shape, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
-import {CloseButton} from '@instructure/ui-buttons'
+import {Button,CloseButton} from '@instructure/ui-buttons'
+
 import {Flex} from '@instructure/ui-layout'
 import {Heading} from '@instructure/ui-elements'
 import React from 'react'

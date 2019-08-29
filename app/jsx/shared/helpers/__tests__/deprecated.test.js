@@ -27,10 +27,7 @@ describe('deprecated', () => {
   let originalFn
   beforeEach(() => {
     originalFn = jest.fn()
-    jest.spyOn(global.console, 'warn').mockImplementation()
-  })
-  afterEach(() => {
-    global.console.warn.mockRestore()
+    jest.spyOn(console, 'warn').mockImplementation()
   })
 
   it('only logs deprecation message once', () => {

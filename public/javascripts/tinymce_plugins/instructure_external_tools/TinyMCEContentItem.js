@@ -140,11 +140,11 @@ const TinyMCEPayloadGenerators = {
 
 function TinyMCEContentItem(contentItem) {
   this.contentItem = contentItem
-  const decorate = function(prop, getFunc) {
+  const decorate = (prop, getFunc) => {
     Object.defineProperty(this, prop, {
       get: getFunc.bind(this)
     })
-  }.bind(this)
+  }
 
   exportPropsToSelf.call(this, contentItem, Object.getOwnPropertyNames)
 

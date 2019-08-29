@@ -47,5 +47,9 @@ renderIntoDiv(document.getElementById('content'), {
       ],
       menubar: true
     }
+  },
+  trayProps: {
+    contextType: 'course',
+    contextId: '17'
   }
 })

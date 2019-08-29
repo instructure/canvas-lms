@@ -20,27 +20,20 @@ import $ from 'jquery'
 import processMigrationContentItem from '../processMigrationContentItem'
 
 const oldEnv = window.ENV
-const oldFlashMessage = $.flashMessage
-const oldFlashError = $.flashError
 
 beforeAll(() => {
   window.ENV = {
     DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com'
   }
+})
 
-  $.flashMessage = jest.fn()
-  $.flashError = jest.fn()
+beforeEach(() => {
+  jest.spyOn($, 'flashMessage').mockImplementation(() => {})
+  jest.spyOn($, 'flashError').mockImplementation(() => {})
 })
 
 afterAll(() => {
   window.ENV = oldEnv
-  $.flashMessage = oldFlashMessage
-  $.flashError = oldFlashError
-})
-
-afterEach(() => {
-  $.flashMessage.mockClear()
-  $.flashError.mockClear()
 })
 
 function event(overrides) {
@@ -97,10 +90,12 @@ describe('when the message type is not "LtiDeepLinkingResponse"', () => {
 
 describe('when the content item type is not "file"', () => {
   beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
     processMigrationContentItem(event({type: 'unkown_type'}))
   })
 
   it('displays a warning to the user', () => {
+    expect(console.error).toHaveBeenCalled()
     expect($.flashError).toHaveBeenCalledWith('Error retrieving content')
   })
 })

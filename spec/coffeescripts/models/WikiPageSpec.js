@@ -103,7 +103,7 @@ test('present includes the context information', () => {
   equal(json.contextId, 31, 'contextId')
 })
 
-test('publish convenience method', 3, function() {
+test('publish convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
     ok(attributes, 'attributes present')
@@ -113,7 +113,7 @@ test('publish convenience method', 3, function() {
   wikiPage.publish()
 })
 
-test('unpublish convenience method', 3, function() {
+test('unpublish convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
     ok(attributes, 'attributes present')
@@ -123,7 +123,7 @@ test('unpublish convenience method', 3, function() {
   return wikiPage.unpublish()
 })
 
-test('setFrontPage convenience method', 3, function() {
+test('setFrontPage convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
     ok(attributes, 'attributes present')
@@ -133,7 +133,7 @@ test('setFrontPage convenience method', 3, function() {
   wikiPage.setFrontPage()
 })
 
-test('unsetFrontPage convenience method', 3, function() {
+test('unsetFrontPage convenience method', 3, () => {
   const wikiPage = new WikiPage(wikiPageObj())
   sandbox.stub(wikiPage, 'save').callsFake((attributes, options) => {
     ok(attributes, 'attributes present')

@@ -19,6 +19,7 @@ import ReactDOM from 'react-dom'
 import LinkOptionsTrayController, {CONTAINER_ID} from '../LinkOptionsTrayController'
 import FakeEditor from '../../../../shared/__tests__/FakeEditor'
 import LinkOptionsTrayDriver from './LinkOptionsTrayDriver'
+
 describe('RCE "Links" Plugin > LinkOptionsTray > LinkOptionsTrayController', () => {
   let editors
   let trayController

@@ -223,7 +223,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       curIndex = $allCogs.index($curCog)
     }
 
-    return this.model.unsetFrontPage(function() {
+    return this.model.unsetFrontPage(() => {
       // Here's the aforementioned magic and index stuff
       if (curIndex != null) {
         const cogs = $('.collectionViewItems')
@@ -231,7 +231,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
           .find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
-    })
+    });
   }
 
   useAsFrontPage(ev) {
@@ -251,13 +251,13 @@ export default class WikiPageIndexItemView extends Backbone.View {
       curIndex = $allCogs.index($curCog)
     }
 
-    return this.model.setFrontPage(function() {
+    return this.model.setFrontPage(() => {
       // Here's the aforementioned magic and index stuff
       if (curIndex != null) {
         const cogs = $('.collectionViewItems').find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
-    })
+    });
   }
 
   sendWikiPageTo(ev) {

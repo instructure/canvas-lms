@@ -75,11 +75,11 @@ import 'jsx/context_cards/StudentContextCardTrigger'
           $edit_section_form.hide();
         }
       }).end()
-    .find(".cancel_button").click(function() {
+    .find(".cancel_button").click(() => {
       $edit_section_form.hide();
     });
 
-    $edit_section_link.click(function(event) {
+    $edit_section_link.click(event => {
       event.preventDefault();
       $edit_section_form.toggle();
       $("#edit_section_form :text:visible:first").focus().select();
@@ -98,18 +98,18 @@ import 'jsx/context_cards/StudentContextCardTrigger'
       });
     });
     $(".datetime_field").datetime_field();
-    $(".uncrosslist_link").click(function(event) {
+    $(".uncrosslist_link").click(event => {
       event.preventDefault();
       $("#uncrosslist_form").dialog({
         width: 400
       });
     });
-    $("#uncrosslist_form .cancel_button").click(function(event) {
+    $("#uncrosslist_form .cancel_button").click(event => {
       $("#uncrosslist_form").dialog('close');
     }).submit(function() {
       $(this).find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('status.removing_crosslisting_of_section', "De-Cross-Listing Section..."));
     });
-    $(".crosslist_link").click(function(event) {
+    $(".crosslist_link").click(event => {
       event.preventDefault();
       $("#crosslist_course_form").dialog({
         width: 450
@@ -133,11 +133,11 @@ import 'jsx/context_cards/StudentContextCardTrigger'
       $("#course_autocomplete_id_lookup").val("");
       $("#crosslist_course_form").triggerHandler('id_entered', {id: $(this).val()});
     });
-    $("#crosslist_course_form .cancel_button").click(function() {
+    $("#crosslist_course_form .cancel_button").click(() => {
       $("#crosslist_course_form").dialog('close');
     });
     var latest_course_id = null;
-    $("#crosslist_course_form").bind('id_entered', function(event, course) {
+    $("#crosslist_course_form").bind('id_entered', (event, course) => {
       if(course.id == latest_course_id) { return; }
       $("#crosslist_course_form .submit_button").attr('disabled', true);
       $("#course_autocomplete_id").val("");
@@ -156,7 +156,7 @@ import 'jsx/context_cards/StudentContextCardTrigger'
       var url = $.replaceTags($("#course_confirm_crosslist_url").attr('href'), 'id', course.id);
       latest_course_id = course.id;
       var course_id_before_get = latest_course_id;
-      $.ajaxJSON(url, 'GET', {}, function(data) {
+      $.ajaxJSON(url, 'GET', {}, data => {
         if(course_id_before_get != latest_course_id) { return; }
         if(data && data.allowed) {
           var template_data = {
@@ -177,7 +177,7 @@ import 'jsx/context_cards/StudentContextCardTrigger'
           $.screenReaderFlashError(errorText);
           $("#sis_id_holder,#account_name_holder").hide();
         }
-      }, function(data) {
+      }, data => {
         $("#course_autocomplete_name").text(I18n.t('errors.confirmation_failed', "Confirmation Failed"));
       });
     });

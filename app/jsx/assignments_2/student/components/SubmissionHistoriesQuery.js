@@ -105,7 +105,7 @@ class SubmissionHistoriesQuery extends React.Component {
         {queryResults => {
           const {data, error, loading} = queryResults
           return (
-            <React.Fragment>
+            <>
               {error && (
                 <AssignmentAlert errorMessage={I18n.t('Failed to laod more submissions')} />
               )}
@@ -114,7 +114,7 @@ class SubmissionHistoriesQuery extends React.Component {
                 submissionHistoriesQueryData={loading ? null : data}
                 loadMoreSubmissionHistories={this.generateOnLoadMore(queryResults)}
               />
-            </React.Fragment>
+            </>
           )
         }}
       </Query>

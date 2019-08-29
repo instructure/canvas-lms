@@ -40,7 +40,7 @@ tinymce.create("tinymce.plugins.InstructureEquation", {
       ),
       onAction: () => ed.execCommand("instructureEquation"),
       icon: "equation",
-      onSetup: function(buttonApi) {
+      onSetup(buttonApi) {
         const toggleActive = eventApi => {
           buttonApi.setActive(
             eventApi.element.nodeName.toLowerCase() === "IMG" &&

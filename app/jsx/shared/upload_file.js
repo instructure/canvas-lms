@@ -192,7 +192,7 @@ export function completeUpload(preflightResponse, file, options={}) {
  * @returns an array of attachment objects. The attachment objects contain ids
  * that a submissions comment can link to
  */
-export async function submissionCommentAttachmentsUpload(files, courseId, assignmentId) {
+export function submissionCommentAttachmentsUpload(files, courseId, assignmentId) {
   const preflightFileUploadUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/self/comments/files`
   const uploadPromises = files.map(currentFile => {
     const preflightFileData = {
@@ -210,7 +210,7 @@ export async function submissionCommentAttachmentsUpload(files, courseId, assign
  *
  * @returns an array of attachment objects.
  */
-export async function uploadFiles(files, uploadUrl) {
+export function uploadFiles(files, uploadUrl) {
   // We differentiate between a normal file and an lti content item
   // based on the existence of a url attribute on the object. Then we invoke
   // the uploadFile function with different parameters based on whether its a

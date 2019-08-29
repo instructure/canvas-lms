@@ -19,7 +19,7 @@ module SIS
   module Models
     class User
       attr_accessor :user_id, :login_id, :status, :first_name, :last_name,
-                    :email, :password, :ssha_password, :integration_id,
+                    :email, :password, :ssha_password, :integration_id, :row,
                     :short_name, :full_name, :sortable_name, :lineno, :csv,
                     :authentication_provider_id, :sis_batch_id, :existing_user_id,
                     :existing_integration_id, :existing_canvas_user_id, :root_account_id
@@ -30,7 +30,7 @@ module SIS
                      sortable_name: nil, authentication_provider_id: nil,
                      sis_batch_id: nil, lineno: nil, csv: nil, existing_user_id: nil,
                      existing_integration_id: nil, existing_canvas_user_id: nil,
-                     root_account_id: nil)
+                     root_account_id: nil, row: nil)
         self.user_id = user_id
         self.login_id = login_id
         self.status = status
@@ -51,6 +51,7 @@ module SIS
         self.existing_integration_id = existing_integration_id
         self.existing_canvas_user_id = existing_canvas_user_id
         self.root_account_id = root_account_id
+        self.row = row
       end
 
       def login_hash

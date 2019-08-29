@@ -21,8 +21,9 @@ import sidebarHandlers from "./sidebarHandlers";
 import { connect } from "react-redux";
 
 export function propsFromState(state) {
-  let {
+  const {
     ui,
+    containingContext,
     contextType,
     contextId,
     files,
@@ -36,9 +37,9 @@ export function propsFromState(state) {
     newPageLinkExpanded
   } = state;
 
-  let collections = {};
+  const collections = {};
   for (const key in state.collections) {
-    let collection = state.collections[key];
+    const collection = state.collections[key];
     collections[key] = {
       links: collection.links,
       lastError: collection.error,
@@ -47,24 +48,22 @@ export function propsFromState(state) {
     };
   }
 
-  return Object.assign(
-    {},
-    {
-      contextType,
-      contextId,
-      collections,
-      files,
-      images,
-      documents,
-      folders,
-      rootFolderId,
-      flickr,
-      upload,
-      session,
-      newPageLinkExpanded
-    },
-    ui
-  );
+  return {
+    containingContext,
+    contextType,
+    contextId,
+    collections,
+    files,
+    images,
+    documents,
+    folders,
+    rootFolderId,
+    flickr,
+    upload,
+    session,
+    newPageLinkExpanded,
+    ...ui
+  };
 }
 
 export default connect(propsFromState, sidebarHandlers)(Sidebar);

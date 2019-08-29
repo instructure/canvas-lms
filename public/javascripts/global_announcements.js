@@ -31,10 +31,10 @@ import './jquery.instructure_misc_plugins'
   // used for working with the Announcements tab
 export default {
     bindDomEvents: function(){
-      $(".add_notification_toggle_focus").click(function() {
+      $(".add_notification_toggle_focus").click(() => {
         var aria_expanded = $('add_notification_form').attr('aria-expanded') === "true";
         if(!aria_expanded) {
-          setTimeout(function() {$('#account_notification_subject').focus()}, 100);
+          setTimeout(() => {$('#account_notification_subject').focus()}, 100);
         }
       });
 
@@ -43,11 +43,11 @@ export default {
         var form_id = '#edit_notification_form_' + id;
         var aria_expanded = $(form_id).attr('aria-expanded') === "true";
         if(!aria_expanded) {
-          setTimeout(function() {$('#account_notification_subject_' + id).focus()}, 100);
+          setTimeout(() => {$('#account_notification_subject_' + id).focus()}, 100);
         }
       });
 
-      $(".add_notification_cancel_focus").click(function() {
+      $(".add_notification_cancel_focus").click(() => {
         $("#add_announcement_button").focus();
       });
 

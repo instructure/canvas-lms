@@ -71,12 +71,12 @@ function postMessageEvent(data, source) {
   }
 }
 
-QUnit.module('Messages', function (suiteHooks) {
-  suiteHooks.beforeEach(function () {
+QUnit.module('Messages', suiteHooks => {
+  suiteHooks.beforeEach(() => {
     clock = sinon.useFakeTimers();
   });
 
-  suiteHooks.afterEach(function () {
+  suiteHooks.afterEach(() => {
     clock.restore();
     ltiToolWrapperFixture.empty()
   });

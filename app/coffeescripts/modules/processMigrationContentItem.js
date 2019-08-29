@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import I18n from 'i18n!content_migrations'
 import processSingleContentItem from 'jsx/deep_linking/processors/processSingleContentItem'
+import '../jquery.rails_flash_notifications'
 
 export default function processMigrationContentItem(event) {
   if (

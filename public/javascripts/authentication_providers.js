@@ -22,7 +22,7 @@ import 'jquery.instructure_misc_helpers'
   var authenticationProviders = {
     hideAllNewAuthTypeForms: function(){
       var newForms = document.querySelectorAll(".auth-form-container--new");
-      Array.prototype.forEach.call(newForms, function(el, id){
+      Array.prototype.forEach.call(newForms, (el, id) => {
         el.style.display = "none";
       });
     },
@@ -32,7 +32,7 @@ import 'jquery.instructure_misc_helpers'
       var form =  document.getElementById(formId);
       if(form !== null){
         form.style.display = "";
-        setTimeout(function(){
+        setTimeout(() => {
           $(form).find(":focusable:first").focus();
           form.scrollIntoView();
         }, 100);

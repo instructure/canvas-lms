@@ -472,6 +472,21 @@ describe "context modules" do
           to eq(['Delete prerequisite First module', 'Delete prerequisite Second module'])
     end
 
+    it "updates the name of edited prerequisite modules" do
+      add_modules_and_set_prerequisites
+      get "/courses/#{@course.id}/modules"
+      get "/courses/#{@course.id}/modules"
+      move_to_click("#context_module_#{@module1.id}")
+      f("#context_module_#{@module1.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{@module1.id} .edit_module_link").click
+      add_form = f('#add_context_module_form')
+      expect(add_form).to be_displayed
+      replace_content(f('#context_module_name'), 'FRIST!!')
+      f('#add_context_module_form .submit_button').click
+      wait_for_ajaximations
+      expect(f("#context_module_#{@module3.id} .prerequisites_message").text).to include 'FRIST!!, Second module'
+    end
+
     it "does not have a prerequisites section when creating the first module" do
       get "/courses/#{@course.id}/modules"
 

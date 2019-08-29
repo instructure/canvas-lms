@@ -146,6 +146,9 @@ class User < ActiveRecord::Base
   has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
+  has_many :content_shares, dependent: :destroy
+  has_many :received_content_shares
+  has_many :sent_content_shares
   has_many :account_reports, inverse_of: :user
   has_many :stream_item_instances, :dependent => :delete_all
   has_many :all_conversations, -> { preload(:conversation) }, class_name: 'ConversationParticipant'

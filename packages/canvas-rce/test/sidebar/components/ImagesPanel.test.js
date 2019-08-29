@@ -22,8 +22,8 @@ import ImagesPanel from "../../../src/sidebar/components/ImagesPanel";
 import sd from "skin-deep";
 
 describe("ImagesPanel", () => {
-  let noop = () => {};
-  let defaultProps = {
+  const noop = () => {};
+  const defaultProps = {
     withUploadForm: true,
     upload: { folders: [], uploading: false, formExpanded: false },
     images: { records: [], isLoading: false, hasMore: false },
@@ -39,18 +39,18 @@ describe("ImagesPanel", () => {
 
   describe("rendering", () => {
     it("includes upload form if withUploadForm", () => {
-      let panel = sd.shallowRender(
-        <ImagesPanel {...defaultProps} withUploadForm={true} />
+      const panel = sd.shallowRender(
+        <ImagesPanel {...defaultProps} withUploadForm />
       );
-      let instance = panel.getMountedInstance();
+      const instance = panel.getMountedInstance();
       assert(instance.renderUploadForm() != null);
     });
 
     it("excludes upload form if withUploadForm is false", () => {
-      let panel = sd.shallowRender(
+      const panel = sd.shallowRender(
         <ImagesPanel {...defaultProps} withUploadForm={false} />
       );
-      let instance = panel.getMountedInstance();
+      const instance = panel.getMountedInstance();
       assert(instance.renderUploadForm() == null);
     });
   });

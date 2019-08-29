@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
@@ -27,7 +27,7 @@ export default function SpecificSections(props) {
   const {checked, disabled, onCheck, sections, sectionSelectionChanged, selectedSectionIds} = props
 
   return (
-    <Fragment>
+    <>
       <View as="div" margin="small 0 small" padding="0 medium">
         <Checkbox
           checked={checked}
@@ -74,7 +74,7 @@ export default function SpecificSections(props) {
           </List>
         </View>
       )}
-    </Fragment>
+    </>
   )
 }
 

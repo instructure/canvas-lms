@@ -25,7 +25,7 @@ module LiveEvents
       {
         url: @external_tool.url,
         domain: @external_tool.domain,
-        name: @external_tool.name
+        asset_name: @external_tool.name
       }.compact
     end
   end

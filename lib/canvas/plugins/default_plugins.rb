@@ -407,4 +407,3 @@ Canvas::Plugin.register('unsplash', nil, {
   settings: { access_key: nil },
   settings_partial: 'plugins/unsplash_settings'
 })
-require_dependency 'canvas/plugins/address_book'

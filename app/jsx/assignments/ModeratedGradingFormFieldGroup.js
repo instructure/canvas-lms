@@ -50,7 +50,6 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
 
   constructor(props) {
     super(props)
-    this.handleModeratedGradingChange = this.handleModeratedGradingChange.bind(this)
     this.state = {
       moderatedGradingChecked: props.moderatedGradingEnabled
     }
@@ -62,9 +61,9 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     }
   }
 
-  handleModeratedGradingChange(moderatedGradingChecked) {
+  handleModeratedGradingChange = moderatedGradingChecked => {
     this.setState({moderatedGradingChecked})
-  }
+  };
 
   render() {
     return (

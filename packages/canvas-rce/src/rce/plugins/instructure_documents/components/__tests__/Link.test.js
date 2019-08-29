@@ -33,7 +33,7 @@ function renderComponent(props) {
       id={469}
       lock_at={null}
       locked_for_user={false}
-      published={true}
+      published
       unlock_at={null}
       onClick={() => {}}
       {...props}
@@ -113,7 +113,7 @@ describe('RCE "Documents" Plugin > Document', () => {
   describe('handles input', () => {
     it('calls onClick when clicked', () => {
       const onClick = jest.fn()
-      const {getByText} = renderComponent({display_name: 'click me', onClick: onClick})
+      const {getByText} = renderComponent({display_name: 'click me', onClick})
 
       const btn = getByText('click me')
       btn.click()
@@ -122,7 +122,7 @@ describe('RCE "Documents" Plugin > Document', () => {
 
     it('calls onClick on <Enter>', () => {
       const onClick = jest.fn()
-      const {getByText} = renderComponent({display_name: 'click me', onClick: onClick})
+      const {getByText} = renderComponent({display_name: 'click me', onClick})
 
       const btn = getByText('click me')
       fireEvent.keyDown(btn, {keyCode: 13})
@@ -131,7 +131,7 @@ describe('RCE "Documents" Plugin > Document', () => {
 
     it('calls onClick on <Space>', () => {
       const onClick = jest.fn()
-      const {getByText} = renderComponent({display_name: 'click me', onClick: onClick})
+      const {getByText} = renderComponent({display_name: 'click me', onClick})
 
       const btn = getByText('click me')
       fireEvent.keyDown(btn, {keyCode: 32})

@@ -65,7 +65,7 @@ class LoadMore extends Component {
         {this.props.hasMore &&
           !this.props.isLoading && (
             <div className={css(styles.button)}>
-              <Button variant="link" onClick={this.loadMore} fluidWidth={true}>
+              <Button variant="link" onClick={this.loadMore} fluidWidth>
                 {formatMessage("Load more results")}
               </Button>
             </div>

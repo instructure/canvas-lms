@@ -101,7 +101,7 @@ test('it has dark yellow as a default color', function() {
 
 QUnit.module('GridColor css rules')
 
-test('rules are for .gradebook-cell and .`statuses`', function() {
+test('rules are for .gradebook-cell and .`statuses`', () => {
   const props = defaultProps({statuses: ['late']})
   const wrapper = mount(<GridColor {...props} />)
   equal(
@@ -115,7 +115,7 @@ test('rules are for .gradebook-cell and .`statuses`', function() {
   wrapper.unmount()
 })
 
-test('multiple state rules are concatenated', function() {
+test('multiple state rules are concatenated', () => {
   const props = defaultProps({statuses: ['late', 'missing']})
   const wrapper = shallow(<GridColor {...props} />)
   const expected = (

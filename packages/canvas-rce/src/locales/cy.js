@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/cy.json";
 import "../rce/languages/cy";
+
 formatMessage.addLocale({ cy: locale });

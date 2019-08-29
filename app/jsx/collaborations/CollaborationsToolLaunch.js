@@ -33,9 +33,6 @@ class CollaborationsToolLaunch extends React.Component {
     }
 
     main = document.querySelector('#main')
-    this.handleAlertFocus = this.handleAlertFocus.bind(this)
-    this.handleAlertBlur = this.handleAlertBlur.bind(this)
-    this.setHeight = this.setHeight.bind(this)
   }
 
   componentDidMount () {
@@ -51,13 +48,13 @@ class CollaborationsToolLaunch extends React.Component {
     window.removeEventListener('resize', this.setHeight)
   }
 
-  setHeight () {
+  setHeight = () => {
     this.setState({
       height: main.getBoundingClientRect().height - 48
     })
-  }
+  };
 
-  handleAlertFocus (event) {
+  handleAlertFocus = event => {
     const newState = {
       iframeStyle: { border: '2px solid #008EE2', width: `${(this.iframe.offsetWidth - 4)}px` }
     }
@@ -67,9 +64,9 @@ class CollaborationsToolLaunch extends React.Component {
       newState.afterExternalContentAlertClass = ''
     }
     this.setState(newState)
-  }
+  };
 
-  handleAlertBlur (event) {
+  handleAlertBlur = event => {
     const newState = {
       iframeStyle: { border: 'none', width: '100%' }
     }
@@ -79,7 +76,7 @@ class CollaborationsToolLaunch extends React.Component {
       newState.afterExternalContentAlertClass = 'screenreader-only'
     }
     this.setState(newState)
-  }
+  };
 
   render () {
     const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`

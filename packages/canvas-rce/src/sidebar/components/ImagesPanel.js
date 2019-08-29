@@ -47,7 +47,7 @@ class ImagesPanel extends Component {
             collapse: formatMessage("Cancel image upload"),
             collapseScreenreader: formatMessage("Image Upload Form")
           }}
-          showAltTextForm={true}
+          showAltTextForm
         />
       );
     }

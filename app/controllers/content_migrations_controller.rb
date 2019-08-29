@@ -248,6 +248,10 @@ class ContentMigrationsController < ApplicationController
   #
   # @argument settings[file_url] [string] A URL to download the file from. Must not require authentication.
   #
+  # @argument settings[content_export_id] [String]
+  #   The id of a ContentExport to import. This allows you to import content previously exported from Canvas
+  #   without needing to download and re-upload it.
+  #
   # @argument settings[source_course_id] [String]
   #   The course to copy from for a course copy migration. (required if doing
   #   course copy)
@@ -330,8 +334,8 @@ class ContentMigrationsController < ApplicationController
 
     settings = @plugin.settings || {}
     if settings[:requires_file_upload]
-      if !(params[:pre_attachment] && params[:pre_attachment][:name].present?) && !(params[:settings] && params[:settings][:file_url].present?)
-        return render(:json => {:message => t('must_upload_file', "File upload or url is required")}, :status => :bad_request)
+      if params.dig(:pre_attachment, :name).blank? && params.dig(:settings, :file_url).blank? && params.dig(:settings, :content_export_id).blank?
+        return render(:json => {:message => t("File upload, file_url, or content_export_id is required")}, :status => :bad_request)
       end
     end
     source_course = lookup_sis_source_course
@@ -522,8 +526,14 @@ class ContentMigrationsController < ApplicationController
         end
         @content_migration.save!
         @content_migration.reset_job_progress
-      elsif !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
-        @content_migration.queue_migration(@plugin)
+      else
+        if params.dig(:settings, :content_export_id).present?
+          return false unless link_content_export_attachment
+        end
+
+        if !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
+          @content_migration.queue_migration(@plugin)
+        end
       end
 
       render :json => content_migration_json(@content_migration, @current_user, session, preflight_json)
@@ -539,5 +549,23 @@ class ContentMigrationsController < ApplicationController
       course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses.count }.sum
       course_count <= 100
     end
+  end
+
+  def link_content_export_attachment
+    ret = false
+    export = ContentExport.find_by_id(params[:settings][:content_export_id])
+    if export && export.grants_right?(@current_user, session, :read)
+      if export.workflow_state == 'exported' && export.attachment
+        @content_migration.attachment = export.attachment.clone_for(@content_migration)
+        ret = true
+      else
+        render(:json => { :message => "content export is incomplete" }, :status => :bad_request)
+      end
+    else
+      render(:json => { :message => "invalid content export" }, :status => :bad_request)
+    end
+    @content_migration.workflow_state = 'pre_process_error' unless ret
+    @content_migration.save!
+    ret
   end
 end

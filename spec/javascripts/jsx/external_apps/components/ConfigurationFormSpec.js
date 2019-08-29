@@ -163,7 +163,7 @@ test('saves manual form with trimmed props', () => {
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
-  handleSubmitSpy.reset()
+  handleSubmitSpy.resetHistory()
   strictEqual(formData.name, 'My App')
   strictEqual(formData.consumerKey, 'key')
   strictEqual(formData.sharedSecret, 'secret')
@@ -192,7 +192,7 @@ test('saves url form with trimmed props', () => {
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
-  handleSubmitSpy.reset()
+  handleSubmitSpy.resetHistory()
   strictEqual(formData.name, 'My App')
   strictEqual(formData.consumerKey, 'key')
   strictEqual(formData.sharedSecret, 'secret')
@@ -219,7 +219,7 @@ test('saves xml form with trimmed props', () => {
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
-  handleSubmitSpy.reset()
+  handleSubmitSpy.resetHistory()
   strictEqual(formData.name, 'My App')
   strictEqual(formData.consumerKey, 'key')
   strictEqual(formData.sharedSecret, 'secret')
@@ -241,7 +241,7 @@ test('saves lti2 form with trimmed props', () => {
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
-  handleSubmitSpy.reset()
+  handleSubmitSpy.resetHistory()
   strictEqual(formData.registrationUrl, 'https://lti-tool-provider-example..com/register')
 })
 

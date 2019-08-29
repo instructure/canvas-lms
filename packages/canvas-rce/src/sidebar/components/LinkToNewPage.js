@@ -30,7 +30,7 @@ import { StyleSheet, css } from "aphrodite";
 class LinkToNewPage extends Component {
   validScrollTarget(target, parents) {
     return (
-      parents.scrolled < 1 && //only want to scroll 1 parent
+      parents.scrolled < 1 && // only want to scroll 1 parent
       (target === window || // top window passes // as does scrollable items
         // the style check(s) is to determine if it's potentially scrollable
         (target.style && target.style.overflow === "auto"))
@@ -39,7 +39,7 @@ class LinkToNewPage extends Component {
 
   componentDidUpdate() {
     if (this.props.newPageLinkExpanded && this.pageInput) {
-      let formElem =
+      const formElem =
         this.pageInput.parentElement &&
         this.pageInput.parentElement.parentElement
           ? this.pageInput.parentElement.parentElement
@@ -90,8 +90,8 @@ class LinkToNewPage extends Component {
   handleSubmit(e) {
     e.preventDefault();
     if (this.state && this.state.newPageTitle) {
-      let newPageTitle = this.state.newPageTitle.trim();
-      let newPageHref =
+      const newPageTitle = this.state.newPageTitle.trim();
+      const newPageHref =
         this.getContextHref() +
         encodeURIComponent(newPageTitle) +
         "?titleize=0";

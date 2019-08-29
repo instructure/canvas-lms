@@ -38,7 +38,7 @@ test('creates a display message based on fileOptions ', () => {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(zFOF).parentNode)
 })
 
-test('handleExpandClick expands zip', function() {
+test('handleExpandClick expands zip', () => {
   const zipOptionsResolvedStub = sinon.stub()
   const props = {
     fileOptions: {file: 'the_file_obj'},
@@ -59,7 +59,7 @@ test('handleExpandClick expands zip', function() {
 // skip if webpack: CNVS-33471
 // note: does not fail when only this spec is run
 if (window.hasOwnProperty('define')) {
-  test('handleUploadClick uploads zip', function() {
+  test('handleUploadClick uploads zip', () => {
     const zipOptionsResolvedStub = sinon.stub()
     const props = {
       fileOptions: {file: 'the_file_obj'},

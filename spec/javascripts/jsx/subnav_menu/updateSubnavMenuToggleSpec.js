@@ -37,7 +37,7 @@ QUnit.module('SubnavMenuToggle', {
   }
 })
 
-test('it should toggle the title and aria-label text correctly for show and hide on click', function() {
+test('it should toggle the title and aria-label text correctly for show and hide on click', () => {
   const subnavMenuToggle = $('#courseMenuToggle')
   subnavMenuToggle.click(() => {
     $('body').toggleClass('course-menu-expanded')
@@ -53,7 +53,7 @@ test('it should toggle the title and aria-label text correctly for show and hide
   equal(subnavMenuToggle.attr('aria-label'), 'Show Navigation Menu')
 })
 
-test('it should correctly generate title and aria-label text based on the pathname', function() {
+test('it should correctly generate title and aria-label text based on the pathname', () => {
   const subnavMenuToggle = $('#courseMenuToggle')
 
   subnavMenuToggle.click(updateSubnavMenuToggle('/profile/communication'))

@@ -24,10 +24,12 @@ module Lti
 
     class << self
       def delete_subscriptions(tool_proxy)
+        Rails.logger.info { "in: ToolProxyService::delete_subscriptions, tool_proxy_id: #{tool_proxy.id}" }
         self.new.delete_subscriptions_for(tool_proxy)
       end
 
       def recreate_missing_subscriptions(tool_proxy)
+        Rails.logger.info { "in: ToolProxyService::recreate_missing_subscriptions, tool_proxy_id: #{tool_proxy.id}" }
         tool_proxy&.message_handlers&.each(&:recreate_missing_subscriptions)
       end
     end
@@ -81,6 +83,7 @@ module Lti
     end
 
     def delete_subscriptions_for(tool_proxy)
+      Rails.logger.info { "in: ToolProxyService::delete_subscriptions_for, tool_id: #{tool_proxy.id}" }
       product_family = tool_proxy.product_family
       subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
       lookups = AssignmentConfigurationToolLookup.where(tool_product_code: product_family.product_code,

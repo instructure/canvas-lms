@@ -24,8 +24,8 @@ import sinon from "sinon";
 import scroll from "../../../src/common/scroll";
 
 describe("LinkToNewPage", () => {
-  let noop = () => {};
-  let fakeEvent = {
+  const noop = () => {};
+  const fakeEvent = {
     preventDefault() {}
   };
   let defaultProps;
@@ -43,31 +43,31 @@ describe("LinkToNewPage", () => {
 
   describe("form rendering", () => {
     it("renders form if expanded", () => {
-      let props = { ...defaultProps, newPageLinkExpanded: true };
-      let flickrComp = sd.shallowRender(<LinkToNewPage {...props} />);
-      let instance = flickrComp.getMountedInstance();
-      let searchForm = sd.shallowRender(instance.renderForm());
+      const props = { ...defaultProps, newPageLinkExpanded: true };
+      const flickrComp = sd.shallowRender(<LinkToNewPage {...props} />);
+      const instance = flickrComp.getMountedInstance();
+      const searchForm = sd.shallowRender(instance.renderForm());
       assert.ok(searchForm.subTree("#new_page_drop_down"));
     });
 
     it("is null if not expanded", () => {
-      let props = { ...defaultProps, newPageLinkExpanded: false };
-      let flickrComp = sd.shallowRender(<LinkToNewPage {...props} />);
-      let instance = flickrComp.getMountedInstance();
+      const props = { ...defaultProps, newPageLinkExpanded: false };
+      const flickrComp = sd.shallowRender(<LinkToNewPage {...props} />);
+      const instance = flickrComp.getMountedInstance();
       assert.equal(null, instance.renderForm());
     });
 
     it("fires the handler when you click the expand link", () => {
       let clicked = false;
-      let props = {
+      const props = {
         ...defaultProps,
         newPageLinkExpanded: false,
         toggleNewPageForm: () => {
           clicked = true;
         }
       };
-      let linkToNewComp = sd.shallowRender(<LinkToNewPage {...props} />);
-      let vdom = linkToNewComp.getRenderOutput();
+      const linkToNewComp = sd.shallowRender(<LinkToNewPage {...props} />);
+      const vdom = linkToNewComp.getRenderOutput();
       vdom.props.children[0].props.onClick(fakeEvent);
       assert.ok(clicked);
     });
@@ -80,16 +80,16 @@ describe("LinkToNewPage", () => {
 
     it("passes search page name to link embeder for courses", () => {
       let link = null;
-      let linkClick = ln => {
+      const linkClick = ln => {
         link = ln;
       };
-      let props = {
+      const props = {
         ...defaultProps,
         onLinkClick: linkClick
       };
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
-      let instance = newLinkComp.getMountedInstance();
-      let pageNameForm = sd.shallowRender(instance.renderForm());
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
+      const instance = newLinkComp.getMountedInstance();
+      const pageNameForm = sd.shallowRender(instance.renderForm());
       pageNameForm
         .subTree("#new-page-name-input")
         .props.onChange({ target: { value: "page-name" } });
@@ -103,17 +103,17 @@ describe("LinkToNewPage", () => {
 
     it("passes search page name to link embeder for groups", () => {
       let link = null;
-      let linkClick = ln => {
+      const linkClick = ln => {
         link = ln;
       };
-      let props = {
+      const props = {
         ...defaultProps,
         onLinkClick: linkClick,
         contextType: "group"
       };
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
-      let instance = newLinkComp.getMountedInstance();
-      let pageNameForm = sd.shallowRender(instance.renderForm());
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
+      const instance = newLinkComp.getMountedInstance();
+      const pageNameForm = sd.shallowRender(instance.renderForm());
       pageNameForm
         .subTree("#new-page-name-input")
         .props.onChange({ target: { value: "page-name" } });
@@ -136,28 +136,28 @@ describe("LinkToNewPage", () => {
     });
 
     it("returns if elem is not expanded", () => {
-      let focusSpy = sinon.spy();
-      let props = { ...defaultProps, newPageLinkExpanded: false };
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
-      let instance = newLinkComp.getMountedInstance();
+      const focusSpy = sinon.spy();
+      const props = { ...defaultProps, newPageLinkExpanded: false };
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...props} />);
+      const instance = newLinkComp.getMountedInstance();
       instance.pageInput = { focus: focusSpy };
       instance.componentDidUpdate();
       assert.ok(!focusSpy.calledWith());
     });
 
     it("returns if pageInput not defined", () => {
-      let focusSpy = sinon.spy();
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
+      const focusSpy = sinon.spy();
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
       instance.componentDidUpdate();
       assert.ok(!focusSpy.calledWith());
     });
 
     it("focuses and scrolls on component update", () => {
-      let focusSpy = sinon.spy();
-      //window = {innerWidth:0,innerHeight:0}
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
+      const focusSpy = sinon.spy();
+      // window = {innerWidth:0,innerHeight:0}
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
       instance.pageInput = {
         focus: focusSpy,
         parentElement: { parentElement: {} }
@@ -168,8 +168,8 @@ describe("LinkToNewPage", () => {
     });
 
     it("does not scroll on no form", () => {
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
       instance.pageInput = { focus: () => {} };
       instance.componentDidUpdate();
       assert.ok(scroll.scrollIntoViewWDelay.neverCalledWith());
@@ -178,34 +178,34 @@ describe("LinkToNewPage", () => {
 
   describe("scroll target validator", () => {
     it("passes with target is scroll component", () => {
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
-      let target = { style: { overflow: "auto" } };
-      let parents = { scrolled: 0 };
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
+      const target = { style: { overflow: "auto" } };
+      const parents = { scrolled: 0 };
       assert.ok(instance.validScrollTarget(target, parents));
     });
 
     it("passes with target is window", () => {
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
-      let target = window;
-      let parents = { scrolled: 0 };
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
+      const target = window;
+      const parents = { scrolled: 0 };
       assert.ok(instance.validScrollTarget(target, parents));
     });
 
     it("fails with parents already scrolled", () => {
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
-      let target = window;
-      let parents = { scrolled: 1 };
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
+      const target = window;
+      const parents = { scrolled: 1 };
       assert.ok(!instance.validScrollTarget(target, parents));
     });
 
     it("fails with no valid target", () => {
-      let newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
-      let instance = newLinkComp.getMountedInstance();
-      let target = {};
-      let parents = { scrolled: 0 };
+      const newLinkComp = sd.shallowRender(<LinkToNewPage {...defaultProps} />);
+      const instance = newLinkComp.getMountedInstance();
+      const target = {};
+      const parents = { scrolled: 0 };
       assert.ok(!instance.validScrollTarget(target, parents));
     });
   });

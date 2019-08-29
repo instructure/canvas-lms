@@ -576,7 +576,6 @@ en:
     post_grades: Post Grades to SIS
     k12: K-12 Specific Features
     allow_opt_out_of_inbox: Allow Users to Opt-out of the Inbox
-    lor: LOR External Tools
     gradebook_list_students_by_sortable_name: Gradebook - List Students by Sortable Name
     quizzes:
       next: New Quizzes
@@ -620,15 +619,12 @@ en:
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: New Gradebook enables an early release of new Gradebook enhancements.
   final_grade_override_be8a21cd: Final Grade Override
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: Enable ability to alter the final grade for the entire course without changing scores for assignments.
-  k12_description: |-
-    Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
-    applies some style changes, but more K-12 specific things may be added in the future.
+  k12_description: Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment.
   duplicating_calendar_events_9932cd37: Duplicating Calendar Events
   allows_the_duplication_of_calendar_events_7bb0d6c5: Allows the duplication of Calendar Events
   duplicate_modules_8ea35557: Duplicate Modules
   allows_the_duplicating_of_modules_in_canvas_2e15b444: Allows the duplicating of modules in Canvas
   allow_opt_out_of_inbox: Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
-  allow_lor_tools: Allow users to view and use external tools configured for LOR.
   public_course_index_59270e80: Public Course Index
   display_course_catalog: Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
   enable_gradebook_list_students_by_sortable_name: List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
@@ -716,6 +712,8 @@ en:
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: This feature allows teachers to easily copy single items from one course to another, and to share a single item of content with other users so they can import those items into their courses as well.
   filter_speedgrader_by_student_group_53683142: Filter SpeedGrader by Student Group
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: Allows users to enable the "Launch SpeedGrader Filtered by Student Group" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group.
+  remove_null_values_from_live_event_payloads_3c826f: Remove null values from live event payloads
+  canvas_will_remove_keys_with_null_values_from_live_6d7e3091: Canvas will remove keys with null values from live event payloads if this feature is enabled.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -735,6 +733,10 @@ en:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
     This feature makes the submissions file upload api check the filetype against
     the allowed extensions of the associated assignment.
+  this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
+  this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
+  custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
+  use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -2596,7 +2598,6 @@ en:
   content_migrations:
     bad_migration_type: Invalid migration_type
     unsupported_migration_type: Unsupported migration_type for context
-    must_upload_file: File upload or url is required
     index:
       page_title: Import Content
     no_day_substitutions: No Day Substitutions Added
@@ -2733,6 +2734,7 @@ en:
       no_files_help_title_icon: More Information for 'Do not download files' option
       no_files_help_title: '"More Information for not ''Do not download files'' option"'
       no_files_help_text: Downloading files from WebCT courses can take a long time, and may cause the migration process to fail. Instead, you can manually copy the files and then choose this option to migrate the rest of the content.
+  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: File upload, file_url, or content_export_id is required
   context:
     media_objects_not_configured: Media Objects not configured
     roster:
@@ -3470,6 +3472,7 @@ en:
   invalid_restrictions_316cd740: Invalid restrictions
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: There was an error saving the changes to the course
   exported_package_history_bfca44b9: Exported Package History
+  invalid_grade_passback_setting_a1d209d1: Invalid grade_passback_setting
   the_grading_period_cannot_be_found_646a8a24: The Grading Period cannot be found
   discussion_entries:
     deleted_entry_notice: That entry has been deleted
@@ -4480,9 +4483,6 @@ en:
     uuid_provisioner:
       name: UUID provisioner
       description: This enables exporting UUIDs into Quiz.Next services.
-    address_book:
-      name: Address Book
-      description: Configure how to answer address book queries.
     clever:
       description: Clever Login
     facebook:
@@ -4763,7 +4763,7 @@ en:
         consumer_key: Consumer Key
         consumer_secret: Consumer Secret
     unsplash_settings:
-      description: You will need to register a [new app on Unsplash](%{unsplash_url}).
+      description: Please [follow the steps](%{unsplash_wiki_url}) to setup a new application on Unsplash.
       labels:
         access_key: Access Key
         application_name: Application Name
@@ -5276,6 +5276,7 @@ en:
           possible_solutions: Possible Solutions
           solution_answer: Answer
         show_ansers_for_variable: Show Answers for %{variable}
+        group_of_answer_choices: Group of answer choices
         you_left_this_blank: "(You left this blank)"
         titles:
           question_correct_comment: Students will see this comment if they get the question correct
@@ -8922,9 +8923,6 @@ en:
   user_avatars_e4fc4ed3: User Avatars
   account_surveys_b0039876: Account Surveys
   messageableuser_library_767eed20: MessageableUser library
-  addressbook_microservice_a4940422: AddressBook microservice
-  addressbook_performance_tap_98ddf67: AddressBook performance tap
-  empty_stub_for_testing_only_37aad38: Empty stub (for testing only)
   assignments_api:
     invalid_submission_types: Invalid submission types
     invalid_date_time: Invalid datetime for %{attribute}
@@ -8974,6 +8972,7 @@ en:
   content_exports_e5a66f6a: Content Exports
   content_migrations_c2841e9f: Content Migrations
   content_security_policy_settings_3e87fcb2: Content Security Policy Settings
+  content_shares_e1e1: Content Shares
   conversations_69a8dc26: Conversations
   course_audit_log_77407457: Course Audit log
   course_quiz_extensions_4102f98f: Course Quiz Extensions
@@ -10664,7 +10663,6 @@ en:
   canvas_error_report_ff678539: Canvas Error Report
   canvas_ticketing_web_post_connector_11158897: Canvas Ticketing Web Post Connector
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: pick an endpoint, we'll post your error reports there
-  invalid_address_book_strategy_904a7ada: Invalid address book strategy.
   invalid_aws_configuration_e8a6ae0f: Invalid AWS Configuration
   course_exports:
     unknown_titles:
@@ -10814,6 +10812,11 @@ en:
   can_create_and_update_submission_results_for_assig_51e7033d: Can create and update submission results for assignments associated with the tool.
   can_retrieve_user_data_associated_with_the_context_c5ec482c: Can retrieve user data associated with the context the tool is installed in.
   can_update_public_jwk_for_lti_services_26037129: Can update public jwk for LTI services.
+  can_create_subscription_to_data_service_data_bb2874f2: Can create subscription to data service data.
+  can_show_subscription_to_data_service_data_688ce3: Can show subscription to data service data.
+  can_update_subscription_to_data_service_data_374a0c89: Can update subscription to data service data.
+  can_list_subscriptions_to_data_service_data_b52d5e37: Can list subscriptions to data service data.
+  can_destroy_subscription_to_data_service_data_b8dfca27: Can destroy subscription to data service data.
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: An error occurred while attempting to contact Turnitin.
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.
   update_your_notification_settings_ed9564f3: Update your notification settings
@@ -11836,7 +11839,6 @@ en:
   canvas_multi_factor_authentication_backup_codes_4bd08f93: Canvas Multi-factor Authentication Backup Codes
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: These backup codes can be used if your multi-factor authentication device is unavailable. Please print them out and keep them in a safe location, like your wallet.
   regenerate_3e4679f8: Regenerate
-  answer_address_book_queries_through_76842372: Answer address book queries through
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: App Center will appear in the "Apps" tab on the settings page of either a course or account. The URL provided below should point to a valid App Center endpoint (for example, %{url} -- be sure to omit the trailing slash
   sample_data_e4fd01ff: Sample Data
   you_will_need_to_register_an_application_on_clever_f412c7b8: |-
@@ -12508,6 +12510,7 @@ en:
         setings_confirmed: Turnitin settings confirmed!
         invalid_settings: invalid Turnitin settings, please check your account id and shared secret from Turnitin
     custom_text_blank: "[Custom Text]"
+    siteadmin: Site Admin
     account: Account
     course: Course
     user: User
@@ -12844,6 +12847,7 @@ en:
   must_contribute_to_the_page_fff632c: Must contribute to the page
   must_score_at_least_a_score_3b4f813d: Must score at least a %{score}
   not_yet_completed_345a0bca: Not yet completed
+  prerequisites_list_62d66d12: 'Prerequisites: %{list}'
   delete_prerequisite_title_19741947: Delete prerequisite %{title}
   delete_requirement_item_type_d7453a69: Delete requirement %{item} (%{type})
   duplicating_module_this_may_take_some_time_eef73720: Duplicating Module, this may take some time
@@ -14985,9 +14989,12 @@ en:
   error_retrieving_similarity_detection_tools_d6d4f9e9: Error retrieving similarity detection tools
   error_retrieving_assignment_external_tools_9102d343: Error retrieving assignment external tools
   external_tool_tool_id_6028b3b1: External Tool %{tool_id}
-  add_a_question_set_11e49ba: Add a Question Set
+  tool_not_found_f6366382: Tool Not Found
+  the_tool_is_not_installed_in_the_course_or_account_1be7230b: The tool is not installed in the course or account
+  content_successfully_added_395c906f: "%{content} successfully added"
   successfully_added_fb3e6008: Successfully Added
-  click_the_button_above_to_add_a_wileyplus_question_1d260444: Click the button above to add a WileyPLUS Question Set
+  add_content_58b4305a: Add Content
+  click_the_button_above_to_add_content_4c7024a: Click the button above to add content
   grader_that_determines_final_grade_cc55f20: Grader that determines final grade
   select_grader_782af48: Select Grader
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: Grades were successfully released to the gradebook.
@@ -15060,12 +15067,24 @@ en:
   more_modules_d9a9f003: More Modules
   attempt_current_attempt_ef626179: Attempt %{current_attempt}
   attempt_current_attempt_of_max_attempts_427ed508: Attempt %{current_attempt} of %{max_attempts}
-  error_updating_submission_draft_1d40ade7: Error updating submission draft
-  submission_draft_updated_e953166a: Submission draft updated
-  error_sending_submission_d32dc075: Error sending submission
-  submission_sent_3f0d2ee1: Submission sent
+  preview_unavailable_aacd459a: Preview Unavailable
+  download_c7ffdfb9: Download
+  no_submission_fb131a40: No Submission
+  upload_file_fd2361b8: Upload File
+  file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
+  drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
+  uploaded_285a2bfb: Uploaded
+  media_submission_464829f0: Media Submission
   add_media_cfa37b54: Add Media
   record_upload_35dfb2ab: Record/Upload
+  assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
+  course_external_tools_query_error_d5110efe: Course external tools query error
+  user_groups_query_error_bba6a6b7: User groups query error
+  more_options_272b4953: More Options
+  upload_8b403d05: Upload
+  text_entry_e1808b2f: Text Entry
+  remove_submission_draft_f5c7f58b: Remove submission draft
+  start_entry_4b491f60: Start Entry
   send_a_comment_to_your_instructor_about_this_assig_83fd5960: Send a comment to your instructor about this assignment.
   at_791460b3: at
   submission_comment_sent_3f2af3d0: Submission comment sent
@@ -15083,14 +15102,6 @@ en:
   comments_e07bcbe3: Comments
   rubric_fc39da76: Rubric
   due_5d7267be: 'Due:'
-  preview_unavailable_aacd459a: Preview Unavailable
-  download_c7ffdfb9: Download
-  no_submission_fb131a40: No Submission
-  _5a374287: "..."
-  upload_file_fd2361b8: Upload File
-  file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
-  drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
-  uploaded_285a2bfb: Uploaded
   ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
   ungraded_147a0dce: ungraded
   points_e63de520: " Points"
@@ -15118,17 +15129,11 @@ en:
   assignment_locked_with_prerequisite_5b8cb148: Assignment Locked with Prerequisite
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
   go_to_prerequisite_175c1f3f: Go to Prerequisite
-  course_external_tools_query_error_d5110efe: Course external tools query error
-  assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
-  more_options_272b4953: More Options
-  upload_8b403d05: Upload
   assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
   not_graded_yet_82f63c67: Not Graded Yet
   unavailable_46d2c344: Unavailable
   new_attempt_57eae3d9: New Attempt
   failed_to_laod_more_submissions_990aacee: Failed to laod more submissions
-  text_entry_e1808b2f: Text Entry
-  start_entry_4b491f60: Start Entry
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
   points_must_0_3bff353: Points must >= 0
@@ -15281,7 +15286,15 @@ en:
   saving_assignment_fb958949: Saving assignment
   delete_assignment_5d3f3f15: delete assignment
   asset_string_ddeaf719: Asset String
+  start_date_e937be8a: Start Date
+  previous_month_bb1e3c84: Previous Month
+  next_month_749b1778: Next Month
+  end_date_e0093ed7: End Date
   user1_masquerading_as_user2_4fa5bb55: "%{user1} masquerading as %{user2}"
+  load_more_a36f9cf9: Load more
+  no_more_results_17c4f108: No more results
+  hide_params_eadf0961: Hide params
+  show_params_3401895b: Show params
   something_went_wrong_89195131: Something went wrong.
   mutations_on_search_e5a62790: mutations on %{search}
   timestamp_865fa6b7: Timestamp
@@ -16142,10 +16155,6 @@ en:
   loading_graders_f6a76142: Loading Graders
   loading_assignments_352ec769: Loading Assignments
   dates_6e416047: Dates
-  start_date_e937be8a: Start Date
-  previous_month_bb1e3c84: Previous Month
-  next_month_749b1778: Next Month
-  end_date_e0093ed7: End Date
   before_44c686b4: Before
   after_4c71e718: After
   more_results_were_added_at_the_bottom_of_the_page_dc323877: More results were added at the bottom of the page.
@@ -16243,8 +16252,6 @@ en:
   unable_to_access_specific_student_go_to_assignment_585e05e9: Unable to access specific student. Go to assignment in SpeedGrader?
   open_speedgrader_11604608: Open SpeedGrader
   anonymous_mode_on_2dd9b94a: Anonymous Mode On
-  assignment_group_filter_c03f8a1d: Assignment Group Filter
-  all_assignment_groups_a65e9e46: All Assignment Groups
   grade_out_of_points_d401b79d: Grade out of %{points}
   grade_out_of_percentage_1972bf52: Grade out of %{percentage}
   this_assignment_is_not_graded_576f1244: This assignment is not graded.
@@ -16263,8 +16270,6 @@ en:
   score_change_notifications_6b94f27f: Score change notifications
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: Once a grade is posted manually, it will automatically send new notifications and be visible to students.
   individual_assignment_grade_posting_d8322b99: Individual Assignment Grade Posting
-  item_filter_ca3987d7: Item Filter
-  all_items_a49b66c7: All Items
   gradebook_5fd8ef0: Gradebook…
   individual_view_d60b9132: Individual View…
   gradebook_history_b03f8524: Gradebook History…
@@ -16276,7 +16281,6 @@ en:
   an_error_occurred_while_updating_late_policies_a95b707f: An error occurred while updating late policies
   late_policies_42bac80: Late Policies
   advanced_36b35b8: Advanced
-  grading_period_filter_e1bf635a: Grading Period Filter
   missing_submission_grade_must_be_numeric_1a142ef2: Missing submission grade must be numeric
   missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: Missing submission grade must be between 0 and 100
   late_submission_deduction_must_be_numeric_5b3f468e: Late submission deduction must be numeric
@@ -16294,12 +16298,8 @@ en:
   day_9d999bec: Day
   hour_34d02553: Hour
   lowest_possible_grade_percent_20474418: Lowest possible grade percent
-  module_filter_63b17d11: Module Filter
-  all_modules_20c9a1c8: All Modules
   status_color_picker_9ea0156b: "%{status} Color Picker"
   statuses_f41543d8: Statuses
-  all_student_groups_f74cd6c3: All Student Groups
-  student_group_filter_185fb085: Student Group Filter
   cancel_submitting_comment_2666e98b: Cancel Submitting Comment
   submit_comment_e5cc2718: Submit Comment
   leave_a_comment_7991725b: Leave a comment
@@ -16336,6 +16336,14 @@ en:
   statuses_497dfa15: Statuses…
   columns_464bd055: Columns
   unpublished_assignments_9cdbcc87: Unpublished Assignments
+  all_assignment_groups_a65e9e46: All Assignment Groups
+  assignment_group_filter_c03f8a1d: Assignment Group Filter
+  use_arrow_keys_to_navigate_options_2021cc50: Use arrow keys to navigate options.
+  grading_period_filter_e1bf635a: Grading Period Filter
+  all_modules_20c9a1c8: All Modules
+  module_filter_63b17d11: Module Filter
+  all_student_groups_f74cd6c3: All Student Groups
+  student_group_filter_185fb085: Student Group Filter
   student_groups_863201c1: Student Groups
   resubmitted_2080646f: Resubmitted
   first_last_name_9820d256: First, Last Name
@@ -17556,6 +17564,67 @@ en:
   clear_selected_file_82388e50: Clear selected file
   embed_video_code_703e10f2: Embed Video Code
   error_uploading_video_audio_recording_16d9730a: Error uploading video/audio recording
+  cc_subtitles_a0d16ff6: CC/Subtitles
+  language_6b3e2c7c: Language
+  subtitle_ee60ca78: Subtitle
+  add_subtitle_9f660cc: Add Subtitle
+  choose_file_8d89ccab: Choose File
+  select_language_7c93a900: Select Language
+  afrikaans_da0fe6ee: Afrikaans
+  albanian_21ed929e: Albanian
+  arabic_c5c87acd: Arabic
+  belarusian_b2f19c76: Belarusian
+  bulgarian_feccab7e: Bulgarian
+  catalan_16f6b78f: Catalan
+  chinese_111d37f6: Chinese
+  chinese_simplified_7f0bd370: Chinese Simplified
+  chinese_traditional_8a7f759d: Chinese Traditional
+  croatian_d713d655: Croatian
+  czech_9aa2cbe4: Czech
+  danish_c18cdac8: Danish
+  dutch_6d05cee5: Dutch
+  english_c60612e2: English
+  estonian_5e8e2fa4: Estonian
+  filipino_33339264: Filipino
+  finnish_4df2923d: Finnish
+  french_33881544: French
+  galician_7e4508b5: Galician
+  german_3ec99bbb: German
+  greek_65c5b3f7: Greek
+  haitian_creole_7eb4195b: Haitian Creole
+  hebrew_88fbf778: Hebrew
+  hindi_9bcd4b34: Hindi
+  hungarian_fc7d30c9: Hungarian
+  icelandic_9d6d35de: Icelandic
+  indonesian_5f6accd6: Indonesian
+  irish_567e109f: Irish
+  italian_bd3c792d: Italian
+  japanese_b5721ca7: Japanese
+  korean_da812d9: Korean
+  latvian_2bbb6aab: Latvian
+  lithuanian_5adcbe24: Lithuanian
+  macedonian_6ed541af: Macedonian
+  malay_f5dddce4: Malay
+  maltese_916925e8: Maltese
+  norwegian_53f391ec: Norwegian
+  persian_a8cadb95: Persian
+  polish_4cf2ecaf: Polish
+  portuguese_9c212cf4: Portuguese
+  romanian_13670c1e: Romanian
+  russian_1e3e197: Russian
+  serbian_7187f1f2: Serbian
+  slovak_69f48e1b: Slovak
+  slovenian_30ae5208: Slovenian
+  spanish_de9de5d6: Spanish
+  swahili_5caeb4ba: Swahili
+  swedish_59a593ca: Swedish
+  tagalog_74906db7: Tagalog
+  thai_8f9bc548: Thai
+  turkish_5b69578b: Turkish
+  ukrainian_945b00b7: Ukrainian
+  vietnamese_e7a76583: Vietnamese
+  welsh_42ab94b1: Welsh
+  yiddish_f96986df: Yiddish
   delayed_until_58b7af4b: 'Delayed until:'
   posted_on_e1010e1e: 'Posted on:'
   reply_389d6fb9: Reply
@@ -17563,7 +17632,6 @@ en:
   disallow_comments_6d04b47a: Disallow Comments
   allow_comments_for_title_7ac9e00: Allow comments for %{title}
   disallow_comments_for_title_21f9c653: Disallow comments for %{title}
-  use_arrow_keys_to_navigate_options_2021cc50: Use arrow keys to navigate options.
   list_collapsed_9ac35920: List collapsed.
   list_expanded_efec2d0: List expanded.
   list_collapsed_dde87718: List collapsed
@@ -17592,6 +17660,7 @@ en:
   report_issue_b5f1db0e: Report Issue
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_submitted_d9934b: Comment submitted!
+  searching_for_courses_8cc5f904: Searching for courses...
   common_timezones_2b00baba: Common Timezones
   all_timezones_5e8afa7b: All Timezones
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
@@ -17608,6 +17677,7 @@ en:
   yyyy_mm_dd_hh_mm_a01b6081: YYYY-MM-DD hh:mm
   other_1c6d9c79: Other
   wiki_6603e81b: Wiki
+  _5a374287: "..."
   load_more_results_460f49a9: Load more results
   course_files_a31f97fc: Course files
   group_files_82e5dcdb: Group files

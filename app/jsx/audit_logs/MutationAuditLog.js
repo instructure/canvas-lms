@@ -19,6 +19,7 @@ import {ApolloProvider, Query, gql, createClient} from 'jsx/canvas-apollo'
 import React, {useState} from 'react'
 import I18n from 'i18n!mutationActivity'
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import DateInput from '@instructure/ui-forms/lib/components/DateInput'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
@@ -28,10 +29,17 @@ import View from '@instructure/ui-layout/lib/components/View'
 
 const AuditLogForm = ({onSubmit}) => {
   const [assetString, setAssetString] = useState('')
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
+  const makeDateHandler = setter => (_e, isoDate, _raw, conversionFailed) => {
+    if (!conversionFailed) setter(isoDate)
+  }
+  const formDisabled = assetString.length === 0
 
   const submit = e => {
     e.preventDefault()
-    onSubmit({assetString})
+    if (formDisabled) return
+    onSubmit({assetString, startDate, endDate})
   }
 
   return (
@@ -44,9 +52,29 @@ const AuditLogForm = ({onSubmit}) => {
           onChange={e => {
             setAssetString(e.target.value)
           }}
+          required
         />
+        <br />
 
-        <Button variant="primary" type="submit" margin="small 0 0">
+        <DateInput
+          label={I18n.t('Start Date')}
+          previousLabel={I18n.t('Previous Month')}
+          nextLabel={I18n.t('Next Month')}
+          onDateChange={makeDateHandler(setStartDate)}
+          dateValue={startDate}
+        />
+        <br />
+
+        <DateInput
+          label={I18n.t('End Date')}
+          previousLabel={I18n.t('Previous Month')}
+          nextLabel={I18n.t('Next Month')}
+          onDateChange={makeDateHandler(setEndDate)}
+          dateValue={endDate}
+        />
+        <br />
+
+        <Button variant="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
           {I18n.t('Find')}
         </Button>
       </form>
@@ -60,9 +88,21 @@ const User = ({user, realUser}) =>
     : user.name
 
 const MUTATION_LOG_QUERY = gql`
-  query searchMutationLog($assetString: String!) {
+  query searchMutationLog(
+    $assetString: String!
+    $startDate: DateTime
+    $endDate: DateTime
+    $first: Int!
+    $after: String
+  ) {
     auditLogs {
-      mutationLogs(assetString: $assetString) {
+      mutationLogs(
+        assetString: $assetString
+        startTime: $startDate
+        endTime: $endDate
+        first: $first
+        after: $after
+      ) {
         nodes {
           assetString
           mutationId
@@ -78,25 +118,72 @@ const MUTATION_LOG_QUERY = gql`
           }
           params
         }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
       }
     }
   }
 `
+const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
+  <tr>
+    <td colSpan={4}>
+      {hasNextPage ? (
+        <Button onClick={onClick}>{I18n.t('Load more')}</Button>
+      ) : (
+        I18n.t('No more results')
+      )}
+    </td>
+  </tr>
+)
 
-const AuditLogResults = ({assetString}) => {
+const LogEntry = ({logEntry}) => {
+  const [showingParams, setShowingParams] = useState(false)
+
+  return (
+    <>
+      <tr>
+        <td>{logEntry.timestamp}</td>
+        <td>{logEntry.mutationName}</td>
+        <td>
+          <User user={logEntry.user} realUser={logEntry.realUser} />
+        </td>
+        <td>
+          <Button variant="link" onClick={() => setShowingParams(!showingParams)}>
+            {showingParams ? I18n.t('Hide params') : I18n.t('Show params')}
+          </Button>
+        </td>
+      </tr>
+      {showingParams ? (
+        <tr>
+          <td colSpan={4}>
+            <pre>{JSON.stringify(logEntry.params, null, 2)}</pre>
+          </td>
+        </tr>
+      ) : null}
+    </>
+  )
+}
+
+const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
   if (!assetString) return null
 
   return (
-    <Query query={MUTATION_LOG_QUERY} variables={{assetString}}>
-      {({loading, error, data}) => {
+    <Query
+      query={MUTATION_LOG_QUERY}
+      variables={{assetString, startDate, endDate, first: pageSize}}
+    >
+      {({loading, error, data, fetchMore}) => {
         if (error) {
-          return <p>{I18n.t("Something went wrong.")}</p>
+          return <p>{I18n.t('Something went wrong.')}</p>
         }
         if (loading || !data) {
           return <Spinner title={I18n.t('Loading...')} />
         }
 
-        const logEntries = data.auditLogs.mutationLogs.nodes
+        const {nodes: logEntries, pageInfo} = data.auditLogs.mutationLogs
+
         if (logEntries.length) {
           return (
             <Table
@@ -116,17 +203,37 @@ const AuditLogResults = ({assetString}) => {
               </thead>
               <tbody>
                 {logEntries.map(logEntry => (
-                  <tr key={logEntry.mutationId}>
-                    <td>
-                      {logEntry.timestamp}
-                    </td>
-                    <td>{logEntry.mutationName}</td>
-                    <td>
-                      <User user={logEntry.user} realUser={logEntry.realUser} />
-                    </td>
-                    <td>...{/* TODO */}</td>
-                  </tr>
+                  <LogEntry key={logEntry.mutationId} logEntry={logEntry} />
                 ))}
+                <LoadMoreButton
+                  pageInfo={data.auditLogs.mutationLogs.pageInfo}
+                  onClick={() => {
+                    return fetchMore({
+                      variables: {
+                        assetString,
+                        startDate,
+                        endDate,
+                        first: pageSize,
+                        after: pageInfo.endCursor
+                      },
+                      updateQuery: (prevData, {fetchMoreResult: newData}) => {
+                        return {
+                          auditLogs: {
+                            __typename: prevData.auditLogs.__typename,
+                            mutationLogs: {
+                              __typename: prevData.auditLogs.mutationLogs.__typename,
+                              nodes: [
+                                ...prevData.auditLogs.mutationLogs.nodes,
+                                ...newData.auditLogs.mutationLogs.nodes
+                              ],
+                              pageInfo: newData.auditLogs.mutationLogs.pageInfo
+                            }
+                          }
+                        }
+                      }
+                    })
+                  }}
+                />
               </tbody>
             </Table>
           )
@@ -139,7 +246,11 @@ const AuditLogResults = ({assetString}) => {
 }
 
 const AuditLogApp = () => {
-  const [assetString, setAssetString] = useState(null)
+  const [auditParams, setAuditParams] = useState({
+    assetString: null,
+    startDate: null,
+    endDate: null
+  })
 
   return (
     <ApolloProvider client={createClient()}>
@@ -147,9 +258,9 @@ const AuditLogApp = () => {
         {I18n.t('GraphQL Mutation Activity')}
       </Heading>
 
-      <AuditLogForm onSubmit={({assetString}) => setAssetString(assetString)} />
+      <AuditLogForm onSubmit={auditParams => setAuditParams(auditParams)} />
 
-      <AuditLogResults assetString={assetString} />
+      <AuditLogResults {...auditParams} pageSize={250} />
     </ApolloProvider>
   )
 }

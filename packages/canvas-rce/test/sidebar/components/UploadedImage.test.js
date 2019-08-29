@@ -23,8 +23,8 @@ import sinon from "sinon";
 import sd from "skin-deep";
 
 describe("UploadedImage", () => {
-  let noop = () => {};
-  let fakeEvent = {
+  const noop = () => {};
+  const fakeEvent = {
     preventDefault() {}
   };
   let image;
@@ -41,14 +41,14 @@ describe("UploadedImage", () => {
   });
 
   it("renders an img for the result", () => {
-    let imageComp = sd.shallowRender(
+    const imageComp = sd.shallowRender(
       <UploadedImage image={image} onImageEmbed={noop} />
     );
     assert.equal(imageComp.subTree("img").props.src, image.thumbnail_url);
   });
 
   it("handles drag start on link for firefox", () => {
-    let imageComp = sd.shallowRender(
+    const imageComp = sd.shallowRender(
       <UploadedImage image={image} onImageEmbed={noop} />
     );
     assert.equal(
@@ -58,18 +58,18 @@ describe("UploadedImage", () => {
   });
 
   it("calls back to provided function on click", () => {
-    let clickSpy = sinon.spy();
-    let imageComp = sd.shallowRender(
+    const clickSpy = sinon.spy();
+    const imageComp = sd.shallowRender(
       <UploadedImage image={image} onImageEmbed={clickSpy} />
     );
-    let vdom = imageComp.getRenderOutput();
+    const vdom = imageComp.getRenderOutput();
     vdom.props.onClick(fakeEvent);
     assert.ok(clickSpy.called);
   });
 
   it("uses the right url on drag events", () => {
     let imageData = null;
-    let dndEvent = {
+    const dndEvent = {
       dataTransfer: {
         getData: () => {
           return `<img src="http://canvas.docker/images/thumbnails/show/55/BI8re30hgKqgYgEYMf8AwTr7wvFjqFSdSZvNU96R">`;
@@ -79,16 +79,16 @@ describe("UploadedImage", () => {
         }
       }
     };
-    let imageComp = sd.shallowRender(
+    const imageComp = sd.shallowRender(
       <UploadedImage image={image} onImageEmbed={noop} />
     );
-    let instance = imageComp.getMountedInstance();
+    const instance = imageComp.getMountedInstance();
     instance.onDrag(dndEvent);
     assert.equal(imageData, `<img alt="Image Name" src="/big/image"/>`);
   });
 
   it("uses display_name in image alt", () => {
-    let imageComp = sd.shallowRender(
+    const imageComp = sd.shallowRender(
       <UploadedImage image={image} onImageEmbed={noop} />
     );
     const img = imageComp.subTree("img");
@@ -96,7 +96,7 @@ describe("UploadedImage", () => {
   });
 
   it("uses display_name in image title", () => {
-    let imageComp = sd.shallowRender(
+    const imageComp = sd.shallowRender(
       <UploadedImage image={image} onImageEmbed={noop} />
     );
     const img = imageComp.subTree("img");

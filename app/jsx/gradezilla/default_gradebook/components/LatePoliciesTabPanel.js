@@ -21,15 +21,15 @@ import {bool, func, number, shape, string} from 'prop-types'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import View from '@instructure/ui-layout/lib/components/View'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
-import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
+import NumberInput from '@instructure/ui-number-input/lib/components/NumberInput'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Select from '@instructure/ui-core/lib/components/Select'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 
+import CanvasSelect from '../../../shared/components/CanvasSelect'
 import NumberHelper from '../../../shared/helpers/numberHelper'
 
 import Round from 'compiled/util/round'
@@ -190,8 +190,8 @@ class LatePoliciesTabPanel extends React.Component {
     this.props.changeLatePolicy({...this.props.latePolicy, ...updates})
   }
 
-  changeLateSubmissionInterval = ({target: {value}}) => {
-    const changes = this.calculateChanges({lateSubmissionInterval: value})
+  changeLateSubmissionInterval = (_event, selectedOption) => {
+    const changes = this.calculateChanges({lateSubmissionInterval: selectedOption})
     this.props.changeLatePolicy({...this.props.latePolicy, changes})
   }
 
@@ -330,16 +330,20 @@ class LatePoliciesTabPanel extends React.Component {
                     </View>
                   </GridCol>
                   <GridCol width="auto">
-                    <Select
-                      id="late-submission-interval"
+                    <CanvasSelect
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      id="late-submission-interval"
                       label={I18n.t('Late submission deduction interval')}
-                      value={data.lateSubmissionInterval}
                       onChange={this.changeLateSubmissionInterval}
+                      value={data.lateSubmissionInterval}
                     >
-                      <option value="day">{I18n.t('Day')}</option>
-                      <option value="hour">{I18n.t('Hour')}</option>
-                    </Select>
+                      <CanvasSelect.Option key="day" id="day" value="day">
+                        {I18n.t('Day')}
+                      </CanvasSelect.Option>
+                      <CanvasSelect.Option key="hour" id="hour" value="hour">
+                        {I18n.t('Hour')}
+                      </CanvasSelect.Option>
+                    </CanvasSelect>
                   </GridCol>
                 </GridRow>
                 <GridRow>

@@ -20,6 +20,6 @@ import exampleSpecHelper from './exampleSpecHelper'
 
 QUnit.module('Example JSX Spec')
 
-test('this is true', function() {
+test('this is true', () => {
   equal(exampleSpecHelper.text, 'Example Text')
 })

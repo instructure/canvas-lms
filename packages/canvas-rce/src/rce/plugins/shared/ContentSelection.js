@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {fromImageEmbed} from '../instructure_image/ImageEmbedOptions'
+
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
 export const LINK_TYPE = 'link'
@@ -29,25 +31,22 @@ export const DISPLAY_AS_EMBED = 'embed'
 export const DISPLAY_AS_EMBED_DISABLED = 'embed-disabled'
 
 
-function asImageEmbed($element) {
+export function asImageEmbed($element) {
   const nodeName = $element.nodeName.toLowerCase()
   if (nodeName !== 'img') {
     return null
   }
 
-  const altText = $element.alt || ''
-
   return {
+    ...fromImageEmbed($element),
     $element,
-    altText,
-    isDecorativeImage: altText === '' && $element.getAttribute('data-is-decorative') === 'true',
-    type: IMAGE_EMBED_TYPE,
-    url: $element.src
+    type: IMAGE_EMBED_TYPE
   }
 }
 
-function asLink($element, editor) {
-  if (!$element) {
+export function asLink($element, editor) {
+  const nodeName = $element.nodeName.toLowerCase()
+  if (nodeName !== 'a' || !$element.href) {
     return null
   }
 
@@ -145,4 +144,16 @@ export function getContentFromEditor(editor, expandSelection = false) {
   }
 
   return getContentFromElement($element, editor)
+}
+
+export function isFileLink($element, editor) {
+  return !!asLink($element, editor)
+}
+
+export function isImageEmbed($element) {
+  return !!asImageEmbed($element)
+}
+
+export function isVideoElement($element) {
+  return !!asVideoElement($element)
 }

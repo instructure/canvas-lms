@@ -113,7 +113,7 @@ test('renders groupUsers', () => {
   ok(view.$('.set-as-leader').length === 1)
 })
 
-test('removes the group after successful deletion', function() {
+test('removes the group after successful deletion', () => {
   const url = `/api/v1/groups/${view.model.get('id')}`
   const server = sinon.fakeServer.create()
   server.respondWith(url, [200, {'Content-Type': 'application/json'}, JSON.stringify({})])

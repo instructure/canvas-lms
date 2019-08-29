@@ -126,7 +126,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
         strictEqual(option.hasClass('graded'), true)
       })
 
-      test('updates to not_graded', function() {
+      test('updates to not_graded', () => {
         const student = students[1]
         student.submission_state = 'not_graded'
         const isCurrentStudent = false
@@ -157,7 +157,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
 
       // We really never go to not_submitted, but a background update
       // *could* potentially do this, so we should handle it.
-      test('updates to not_submitted', function() {
+      test('updates to not_submitted', () => {
         const student = students[0]
         student.submission_state = 'not_submitted'
         selectMenu.updateSelectMenuStatus(student, false, 'Guy B. Studying – not submitted')
@@ -191,7 +191,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
 
       // We really never go to resubmitted, but a backgroud update *could*
       // potentially do this, so we should handle it.
-      test('updates to resubmitted', function() {
+      test('updates to resubmitted', () => {
         const student = students[1]
         student.submission_state = 'resubmitted'
         student.submission.submitted_at = '2017-07-10T17:00:00Z'
@@ -226,7 +226,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
 
       // We really never go to not_gradable, but a backgroud update *could*
       // potentially do this, so we should handle it.
-      test('updates to not_gradable', function() {
+      test('updates to not_gradable', () => {
         const student = students[0]
         student.submission_state = 'not_gradeable'
         student.submission.submitted_at = '2017-07-10T17:00:00Z'

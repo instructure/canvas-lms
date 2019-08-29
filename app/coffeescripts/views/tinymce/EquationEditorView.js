@@ -55,7 +55,7 @@ export default class EquationEditorView extends Backbone.View {
   //   thing in the editor to turn into an equation
   static getEquationText(elems) {
     const self = this
-    return _.map(elems, function(elem) {
+    return _.map(elems, elem => {
       // Get the text from text nodes and CDATA nodes
       if ([3, 4].includes(elem.nodeType)) {
         if (elem.nodeValue.match(/^<img/)) {
@@ -78,7 +78,7 @@ export default class EquationEditorView extends Backbone.View {
       } else if (elem.nodeType !== 8) {
         return self.getEquationText(elem.childNodes)
       }
-    }).join('')
+    }).join('');
   }
 
   getEquationText(elems) {
@@ -97,7 +97,7 @@ export default class EquationEditorView extends Backbone.View {
     }
 
     this.cacheEls()
-    this.$el.click(preventDefault(function() {}))
+    this.$el.click(preventDefault(() => {}))
     return this.$el.dialog({
       minWidth: 670,
       minHeight: 290,

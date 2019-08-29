@@ -77,6 +77,33 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   groupSet: GroupSet
 
   """
+  returns submissions grouped to one submission object per group
+  """
+  groupSubmissionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionSearchFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    orderBy: [SubmissionSearchOrder!]
+  ): SubmissionConnection
+
+  """
   If true, the assignment has been submitted to by at least one student
   """
   hasSubmittedSubmissions: Boolean
@@ -501,6 +528,7 @@ type AuditLogs {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    endTime: DateTime
 
     """
     Returns the first _n_ elements from the list.
@@ -511,6 +539,7 @@ type AuditLogs {
     Returns the last _n_ elements from the list.
     """
     last: Int
+    startTime: DateTime
   ): MutationLogConnection
 }
 
@@ -2562,6 +2591,7 @@ type SubmissionDraft {
   _id: ID!
   attachments: [File!]
   body: String
+  meetsAssignmentCriteria: Boolean!
   submissionAttempt: Int!
 }
 
@@ -2987,6 +3017,7 @@ type User implements Node & Timestamped {
     """
     courseId: ID
   ): [Enrollment!]!
+  groups: [Group!]
   id: ID!
   name: String
 

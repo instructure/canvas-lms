@@ -191,7 +191,7 @@ test('does not disable the submit button when only to date is entered', function
   )
 })
 
-test('calls getGradebookHistory prop on mount', function() {
+test('calls getGradebookHistory prop on mount', () => {
   const props = {getGradebookHistory: sinon.stub()}
   const wrapper = mount(<SearchFormComponent {...defaultProps()} {...props} />)
   strictEqual(props.getGradebookHistory.callCount, 1)

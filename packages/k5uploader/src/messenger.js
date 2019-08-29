@@ -29,7 +29,7 @@ Messenger.prototype.destroy = function() {
 
 Messenger.prototype.dispatchEvent = function(eventName, data, context) {
   if(this.events[eventName]) {
-    this.events[eventName].forEach(function(eventHandler){
+    this.events[eventName].forEach(eventHandler => {
       eventHandler.call(context, data);
     });
   }
@@ -50,13 +50,13 @@ Messenger.prototype.removeEventListener = function(eventName, targetMethod) {
   if(this.events[eventName]) {
     var eventHandlers = this.events[eventName];
     var removalQueue = []
-    this.events[eventName].forEach(function(eventHandler, index){
+    this.events[eventName].forEach((eventHandler, index) => {
       if(eventHandler === targetMethod) {
         removalQueue.push(index);
       }
     });
     if(removalQueue.length > 0) {
-      removalQueue.forEach(function(element) {
+      removalQueue.forEach(element => {
         eventHandlers.splice(element, 1);
       });
     }

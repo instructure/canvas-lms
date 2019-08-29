@@ -58,14 +58,14 @@ function createAndSetupMap(assignment, opts = {}) {
 
 QUnit.module('SubmissionStateMap without grading periods')
 
-test('submission has no tooltip for a student without assignment visibility', function() {
+test('submission has no tooltip for a student without assignment visibility', () => {
   const assignment = {id: '1', effectiveDueDates: {}, only_visible_to_overrides: true}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   equal(state.tooltip, tooltipKeys.NONE)
 })
 
-test('submission has no tooltip for a student with visibility', function() {
+test('submission has no tooltip for a student with visibility', () => {
   const assignment = {id: '1', effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: null,

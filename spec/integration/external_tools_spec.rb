@@ -170,7 +170,6 @@ describe "External Tools" do
 
   context 'global navigation' do
     before :once do
-      Account.default.enable_feature!(:lor_for_account)
       @admin_tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @admin_tool.global_navigation = {:visibility => 'admins', :url => "http://www.example.com", :text => "Example URL"}
       @admin_tool.save!

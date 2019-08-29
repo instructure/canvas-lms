@@ -687,9 +687,7 @@ describe CoursesController do
 
     it "should assign active course_settings_sub_navigation external tools" do
       user_session(@teacher)
-      Account.default.enable_feature!(:lor_for_account)
       shared_settings = { consumer_key: 'test', shared_secret: 'secret', url: 'http://example.com/lti' }
-      other_tool = @course.context_external_tools.create(shared_settings.merge(name: 'other', course_navigation: {enabled: true}))
       inactive_tool = @course.context_external_tools.create(shared_settings.merge(name: 'inactive', course_settings_sub_navigation: {enabled: true}))
       active_tool = @course.context_external_tools.create(shared_settings.merge(name: 'active', course_settings_sub_navigation: {enabled: true}))
       inactive_tool.workflow_state = 'deleted'
@@ -1356,7 +1354,6 @@ describe CoursesController do
 
     context "course_home_sub_navigation" do
       before :once do
-        @course.root_account.enable_feature!(:lor_for_account)
         @tool = @course.context_external_tools.create(consumer_key: 'test', shared_secret: 'secret', url: 'http://example.com/lti',
           name: 'tool', course_home_sub_navigation: {enabled: true, visibility: 'admins'})
       end

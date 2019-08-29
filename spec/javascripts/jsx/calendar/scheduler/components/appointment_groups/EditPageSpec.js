@@ -130,7 +130,7 @@ test('clicking message users button opens message students modal', () => {
 
 QUnit.module('Delete Group', {
   setup: () => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     moxios.install()
   },
   teardown: () => {
@@ -195,7 +195,7 @@ test('handleCheckboxChange updates the boolean flag based on the name property',
 
 QUnit.module('Save Group', {
   setup () {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     moxios.install()
   },
   teardown () {

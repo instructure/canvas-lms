@@ -74,7 +74,7 @@ export default function deleteStuff(filesAndFolders, args) {
     })
   )
 
-  return $.when(...Array.from(promises || [])).then(function() {
+  return $.when(...Array.from(promises || [])).then(() => {
     $.flashMessage(
       I18n.t(
         {
@@ -90,5 +90,5 @@ export default function deleteStuff(filesAndFolders, args) {
     if (args && args.returnFocusTo) {
       $(args.returnFocusTo).focus()
     }
-  })
+  });
 }

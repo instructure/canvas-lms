@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/bg.json";
 import "../rce/languages/bg_BG";
+
 formatMessage.addLocale({ bg: locale });

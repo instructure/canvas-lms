@@ -69,14 +69,14 @@ QUnit.module('Gradebook#groupTotalFormatter', {
   }
 })
 
-test('calculates percentage from given  score and possible values', function() {
+test('calculates percentage from given  score and possible values', () => {
   const gradebook = new Gradebook({settings: {}, sections: {}})
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, {score: 9, possible: 10}, {})
   ok(groupTotalOutput.includes('9 / 10'))
   ok(groupTotalOutput.includes('90%'))
 })
 
-test('displays percentage as "-" when group total score is positive infinity', function() {
+test('displays percentage as "-" when group total score is positive infinity', () => {
   const gradebook = new Gradebook({settings: {}, sections: {}})
   sandbox.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(Number.POSITIVE_INFINITY)
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, {score: 9, possible: 0}, {})
@@ -84,7 +84,7 @@ test('displays percentage as "-" when group total score is positive infinity', f
   ok(groupTotalOutput.includes('-'))
 })
 
-test('displays percentage as "-" when group total score is negative infinity', function() {
+test('displays percentage as "-" when group total score is negative infinity', () => {
   const gradebook = new Gradebook({settings: {}, sections: {}})
   sandbox.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(Number.NEGATIVE_INFINITY)
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, {score: 9, possible: 0}, {})
@@ -92,7 +92,7 @@ test('displays percentage as "-" when group total score is negative infinity', f
   ok(groupTotalOutput.includes('-'))
 })
 
-test('displays percentage as "-" when group total score is not a number', function() {
+test('displays percentage as "-" when group total score is not a number', () => {
   const gradebook = new Gradebook({settings: {}, sections: {}})
   sandbox.stub(gradebook, 'calculateAndRoundGroupTotalScore').returns(NaN)
   const groupTotalOutput = gradebook.groupTotalFormatter(0, 0, {score: 9, possible: 0}, {})
@@ -102,7 +102,7 @@ test('displays percentage as "-" when group total score is not a number', functi
 
 QUnit.module('Gradebook#getFrozenColumnCount')
 
-test('returns number of columns in frozen section', function() {
+test('returns number of columns in frozen section', () => {
   const gradebook = new Gradebook({settings: {}, sections: {}})
   gradebook.parentColumns = [{id: 'student'}, {id: 'secondary_identifier'}]
   gradebook.customColumns = [{id: 'custom_col_1'}]

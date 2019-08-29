@@ -27,7 +27,7 @@ import {
   singleAttachment,
   singleComment
 } from '../../test-utils'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import {render, waitForElement, fireEvent} from '@testing-library/react'
 
 describe('CommentsTab', () => {
@@ -90,16 +90,16 @@ describe('CommentsTab', () => {
 
   it('renders the optimistic response with env current user', async () => {
     const basicMock = commentGraphqlMock(mockComments())
-    const {getByPlaceholderText, getByText} = render(
+    const {findByPlaceholderText, getByText, findByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
         <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await findByPlaceholderText('Submit a Comment')
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
 
-    expect(await waitForElement(() => getByText('optimistic user'))).toBeInTheDocument()
+    expect(await findByText('optimistic user')).toBeTruthy()
   })
 
   it('renders the message when sent', async () => {
@@ -118,7 +118,7 @@ describe('CommentsTab', () => {
     expect(await waitForElement(() => getByText('sent user'))).toBeInTheDocument()
   })
 
-  it('renders loading indicator when loading query', async () => {
+  it('renders loading indicator when loading query', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByTitle} = render(
       <MockedProvider mocks={basicMock} addTypename>
@@ -208,7 +208,7 @@ describe('CommentsTab', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders comment rows when provided', async () => {
+  it('renders comment rows when provided', () => {
     const comments = [singleComment({_id: '6'}), singleComment()]
     const {getAllByTestId} = render(<CommentContent comments={comments} />)
     const rows = getAllByTestId('comment-row')
@@ -216,12 +216,12 @@ describe('CommentsTab', () => {
     expect(rows).toHaveLength(comments.length)
   })
 
-  it('renders shortname when shortname is provided', async () => {
+  it('renders shortname when shortname is provided', () => {
     const {getAllByText} = render(<CommentContent comments={[singleComment()]} />)
     expect(getAllByText('bob builder')).toHaveLength(1)
   })
 
-  it('renders Anonymous when author is not provided', async () => {
+  it('renders Anonymous when author is not provided', () => {
     const comment = singleComment()
     comment.author = null
     const {getAllByText, queryAllByText} = render(<CommentContent comments={[comment]} />)
@@ -230,7 +230,7 @@ describe('CommentsTab', () => {
     expect(getAllByText('Anonymous')).toHaveLength(1)
   })
 
-  it('displays a single attachment', async () => {
+  it('displays a single attachment', () => {
     const comment = singleComment()
     const attachment = singleAttachment()
     comment.attachments = [attachment]
@@ -241,7 +241,7 @@ describe('CommentsTab', () => {
     expect(renderedAttachment).toContainElement(getByText(attachment.displayName))
   })
 
-  it('displays multiple attachments', async () => {
+  it('displays multiple attachments', () => {
     const comment = singleComment()
     const attachment1 = singleAttachment()
     const attachment2 = singleAttachment({
@@ -261,14 +261,14 @@ describe('CommentsTab', () => {
     expect(renderedAttachment2).toContainElement(getByText(attachment2.displayName))
   })
 
-  it('does not display attachments if there are none', async () => {
+  it('does not display attachments if there are none', () => {
     const comment = singleComment()
     const {container} = render(<CommentContent comments={[comment]} />)
 
     expect(container.querySelector('a[href]')).toBeNull()
   })
 
-  it('displays the comments in reverse chronological order', async () => {
+  it('displays the comments in reverse chronological order', () => {
     const comments = [
       ['2019-03-01T14:32:37-07:00', 'last comment'],
       ['2019-03-03T14:32:37-07:00', 'first comment'],
@@ -293,7 +293,7 @@ describe('CommentsTab', () => {
     expect(rows[2]).toHaveTextContent('Fri Mar 1, 2019 9:32pm')
   })
 
-  it('includes an icon on an attachment', async () => {
+  it('includes an icon on an attachment', () => {
     const comment = singleComment()
     const attachment = singleAttachment()
     comment.attachments = [attachment]

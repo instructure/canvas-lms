@@ -101,11 +101,22 @@ export default class CanvasSelect extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.value !== prevProps.value) {
+      const option = this.getOptionByFieldValue('value', this.props.value)
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        inputValue: option ? option.props.children : '',
+        selectedOptionId: option ? option.props.id : ''
+      })
+    }
+  }
+
   render() {
     const {id, label, value, onChange, children, noOptionsLabel, ...otherProps} = this.props
 
     return (
-      <React.Fragment>
+      <>
         <Select
           id={id}
           renderLabel={() => label}
@@ -128,7 +139,7 @@ export default class CanvasSelect extends React.Component {
         >
           {this.state.announcement}
         </Alert>
-      </React.Fragment>
+      </>
     )
   }
 
@@ -223,7 +234,7 @@ export default class CanvasSelect extends React.Component {
   }
 
   /* eslint-disable react/no-access-state-in-setstate */
-  // Beause handleShowOptions sets state.isShowingOptions:true
+  // Because handleShowOptions sets state.isShowingOptions:true
   // it's already in the value of state passed to the setState(updater)
   // by the time handleHighlightOption is called we miss the transition,
   // this.state still has the previous value as of the last render

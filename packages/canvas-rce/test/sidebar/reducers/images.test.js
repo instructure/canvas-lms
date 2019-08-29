@@ -84,7 +84,7 @@ describe("Images reducer", () => {
 
   describe("RECEIVE_IMAGES", () => {
     it("appends new records to the existing array", () => {
-      let action = {
+      const action = {
         type: actions.RECEIVE_IMAGES,
         imageRecords: [{ id: 1 }, { id: 2 }]
       };
@@ -92,7 +92,7 @@ describe("Images reducer", () => {
     });
 
     it("hasMore if there's a bookmark", () => {
-      let action = {
+      const action = {
         type: actions.RECEIVE_IMAGES,
         imageRecords: [{ id: 1 }, { id: 2 }],
         bookmark: "some bookmark"
@@ -102,7 +102,7 @@ describe("Images reducer", () => {
 
     it("clears isLoading state", () => {
       state.isLoading = true;
-      let action = {
+      const action = {
         type: actions.RECEIVE_IMAGES,
         imageRecords: [{ id: 1 }, { id: 2 }]
       };
@@ -112,12 +112,12 @@ describe("Images reducer", () => {
 
   describe("REQUEST_IMAGES", () => {
     it("marks images as loading", () => {
-      let action = { type: actions.REQUEST_IMAGES };
+      const action = { type: actions.REQUEST_IMAGES };
       assert(images(state, action).isLoading);
     });
 
     it("sets requested to true", () => {
-      let action = { type: actions.REQUEST_IMAGES };
+      const action = { type: actions.REQUEST_IMAGES };
       assert(images(state, action).requested);
     });
   });

@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/nb.json";
 import "../rce/languages/nb_NO";
+
 formatMessage.addLocale({ nb: locale });

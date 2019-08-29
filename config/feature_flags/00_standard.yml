@@ -107,18 +107,15 @@ final_grades_override:
   applies_to: Course
   root_opt_in: true
   custom_transition_proc: final_grades_override_custom_transition_hook
-  beta: true
 k12:
   state: hidden
   display_name:
     features.k12: K-12 Specific Features
   description:
     k12_description: |-
-      Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
-      applies some style changes, but more K-12 specific things may be added in the future.
+      Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment.
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
 recurring_calendar_events:
   state: hidden
   display_name: Duplicating Calendar Events
@@ -140,14 +137,6 @@ allow_opt_out_of_inbox:
       will cause all conversation messages and notifications to be sent as ASAP notifications
       to the user's primary email, hide the Conversation's Inbox unread messages badge
       on the Inbox, and hide the Conversation's notification preferences.
-  applies_to: RootAccount
-  root_opt_in: true
-lor_for_account:
-  state: hidden
-  display_name:
-    features.lor: LOR External Tools
-  description:
-    allow_lor_tools: Allow users to view and use external tools configured for LOR.
   applies_to: RootAccount
   root_opt_in: true
 course_catalog:
@@ -471,3 +460,9 @@ filter_speed_grader_by_student_group:
   environments:
     production:
       state: hidden
+compact_live_event_payloads:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Remove null values from live event payloads
+  description: Canvas will remove keys with null values from
+    live event payloads if this feature is enabled.

@@ -241,7 +241,7 @@ class Course < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name, :course_code, :start_at, :conclude_at,
                  :restrict_enrollments_to_course_dates, :enrollment_term_id,
-                 :workflow_state, :account_id
+                 :workflow_state, :account_id, :grade_passback_setting
 
   include FeatureFlags
 
@@ -1003,7 +1003,7 @@ class Course < ActiveRecord::Base
             EnrollmentState.transaction do
               locked_ids = EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
               EnrollmentState.where(:enrollment_id => locked_ids).
-                update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1", 'completed', true, false])
+                update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'completed', true, false, Time.now.utc])
             end
             EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_info.map(&:id)) # recalculate access
           end
@@ -1022,7 +1022,7 @@ class Course < ActiveRecord::Base
               EnrollmentState.transaction do
                 locked_ids = EnrollmentState.where(:enrollment_id => enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
                 EnrollmentState.where(:enrollment_id => locked_ids).
-                  update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
+                  update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'deleted', true, Time.now.utc])
               end
             end
             User.send_later_if_production(:update_account_associations, user_ids)
@@ -1312,7 +1312,7 @@ class Course < ActiveRecord::Base
       SisBatchRollBackData.bulk_insert_roll_back_data(data) if data
       Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
       EnrollmentState.where(:enrollment_id => e_batch.map(&:id)).
-        update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1", 'deleted', true])
+        update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'deleted', true, Time.now.utc])
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
       User.send_later_if_production(:update_account_associations, user_ids) if user_ids.any?
     end
@@ -2014,7 +2014,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
 
-    role = opts[:role] || Enrollment.get_built_in_role_for_type(type)
+    role = opts[:role] || self.shard.activate { Enrollment.get_built_in_role_for_type(type) }
 
     start_at = opts[:start_at]
     end_at = opts[:end_at]
@@ -3010,7 +3010,8 @@ class Course < ActiveRecord::Base
       new_course = Course.new
       keys_to_copy = Course.column_names - [
         :id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view,
-        :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id
+        :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id,
+        :grading_standard_id
       ].map(&:to_s)
       self.attributes.each do |key, val|
         new_course.write_attribute(key, val) if keys_to_copy.include?(key)

@@ -39,7 +39,7 @@ import 'jqueryui/effects/drop'
         status = request.status;
         text = request.responseText;
       } catch(e) {}
-      $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, function() {
+      $.ajaxJSON(location.protocol + '//' + location.host + "/simple_response.json?rnd=" + Math.round(Math.random() * 9999999), 'GET', {}, () => {
         if ($.ajaxJSON.isUnauthenticated(request)) {
           var message = htmlEscape(I18n.t('errors.logged_out', "You are not currently logged in, possibly due to a long period of inactivity."))
           message += "<br\/><a href='/login' id='inactivity_login_link' target='_new'>" + htmlEscape(I18n.t('links.login', 'Login')) + "<\/a>";
@@ -48,7 +48,7 @@ import 'jqueryui/effects/drop'
         } else if (status != 409) {
           ajaxErrorFlash(I18n.t('errors.unhandled', "Oops! The last request didn't work out."), request);
         }
-      }, function() {
+      }, () => {
         ajaxErrorFlash(I18n.t('errors.connection_lost', "Connection to %{host} was lost.  Please make sure you're connected to the Internet and try again.", {host: location.host}), request);
       }, {skipDefaultError: true});
       var $obj = $(this);
@@ -98,12 +98,12 @@ import 'jqueryui/effects/drop'
         $("body").append("<img style='position: absolute; left: -1000px; top: 0;' src='" + htmlEscape(INST.ajaxErrorURL + txt.substring(0, 2000)) + "' />");
       }
     });
-    $(".last_error_details_link").live('click', function(event) {
+    $(".last_error_details_link").live('click', event => {
       event.preventDefault();
       event.stopPropagation();
       $("#instructure_ajax_error_box").show();
     });
-    $(".close_instructure_ajax_error_box_link").click(function(event) {
+    $(".close_instructure_ajax_error_box_link").click(event => {
       event.preventDefault();
       $("#instructure_ajax_error_box").hide();
     });

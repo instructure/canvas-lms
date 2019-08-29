@@ -44,8 +44,8 @@ export function updateAlignments (alignments) {
         params['assessment_question_bank[alignments]'] = '';
       }
       var url = $(".edit_bank_link:last").attr('href');
-      $.ajaxJSON(url, 'PUT', params, function(data) {
-        var alignments = data.assessment_question_bank.learning_outcome_alignments.sort(function(a, b) {
+      $.ajaxJSON(url, 'PUT', params, data => {
+        var alignments = data.assessment_question_bank.learning_outcome_alignments.sort((a, b) => {
           var a_name = ((a.content_tag && a.content_tag.learning_outcome && a.content_tag.learning_outcome.short_description) || 'none').toLowerCase();
           var b_name = ((b.content_tag && b.content_tag.learning_outcome && b.content_tag.learning_outcome.short_description) || 'none').toLowerCase();
           if(a_name < b_name) { return -1; }
@@ -69,7 +69,7 @@ export function updateAlignments (alignments) {
             });
             $outcomes.append($outcome.show());
         }
-      }, function(data) {
+      }, data => {
         $(".add_outcome_text").text(I18n.t("update_outcomes_fail", "Updating Outcomes Failed")).attr('disabled', false);
       });
     }
@@ -98,13 +98,13 @@ export function attachPageEvents(e) {
       if($("#more_questions").length > 0) {
         $(".display_question .move").remove();
         var url = $.replaceTags($("#bank_urls .more_questions_url").attr('href'), 'page', 1);
-        $.ajaxJSON(url, 'GET', {}, function(data) {
+        $.ajaxJSON(url, 'GET', {}, data => {
           for(var idx in data.questions) {
             var question = data.questions[idx].assessment_question;
             var $teaser = $("#question_teaser_" + question.id);
             $teaser.data('question', question);
           }
-        }, function(data) {
+        }, data => {
         });
       }
       $(".more_questions_link").click(function(event) {
@@ -117,7 +117,7 @@ export function attachPageEvents(e) {
         var url = $(this).attr('href');
         url = $.replaceTags(url, 'page', currentPage + 1);
         $link.text("loading more questions...").addClass('loading');
-        $.ajaxJSON(url, 'GET', {}, function(data) {
+        $.ajaxJSON(url, 'GET', {}, data => {
           $link.text(I18n.t('links.more_questions', "more questions")).removeClass('loading');
           $more_questions.attr('data-current-page', currentPage + 1);
           $more_questions.showIf(currentPage + 1 < totalPages);
@@ -139,7 +139,7 @@ export function attachPageEvents(e) {
             $("#questions").append($question);
             $question.show();
           }
-        }, function() {
+        }, () => {
           $link.text(I18n.t('loading_more_fail', "loading more questions fails, please try again")).removeClass('loading');
         });
       });
@@ -157,14 +157,14 @@ export function attachPageEvents(e) {
         event.preventDefault();
         var $link = $(this);
         $link.find(".message").text(I18n.t('bookmarking', "Bookmarking..."));
-        $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+        $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
           $link.find('.message').text(I18n.t('already_bookmarked', 'Already Bookmarked'));
           $link.attr('disabled', true);
-        }, function() {
+        }, () => {
           $link.find(".message").text(I18n.t('bookmark_failed', "Bookmark Failed"));
         });
       });
-      $(".edit_bank_link").click(function(event) {
+      $(".edit_bank_link").click(event => {
         event.preventDefault();
         var val = $("#edit_bank_form h2").text();
         $("#edit_bank_form").find(".displaying").hide().end()
@@ -178,7 +178,7 @@ export function attachPageEvents(e) {
           $("#edit_bank_form").submit();
         }
       });
-      $("#edit_bank_form .bank_name_box").blur(function() {
+      $("#edit_bank_form .bank_name_box").blur(() => {
         $("#edit_bank_form").find(".displaying").show().end()
           .find(".editing").hide();
       });
@@ -254,7 +254,7 @@ export function attachPageEvents(e) {
           ids.push($(this).val());
         });
         var save = function(data) {
-          $.ajaxJSON(url, 'POST', data, function(data) {
+          $.ajaxJSON(url, 'POST', data, data => {
             $dialog.find("button").attr('disabled', false);
             $dialog.find(".submit_button").text("Move/Copy Question");
             if(move) {
@@ -270,7 +270,7 @@ export function attachPageEvents(e) {
               }
             }
             $dialog.dialog('close');
-          }, function(data) {
+          }, data => {
             $dialog.find("button").attr('disabled', false);
             var failedText = null;
             if(move){
@@ -283,12 +283,12 @@ export function attachPageEvents(e) {
         }
         if(data.assessment_question_bank_id == "new") {
           var create_url = $("#bank_urls .assessment_question_banks_url").attr('href');
-          $.ajaxJSON(create_url, 'POST', {'assessment_question_bank[title]': data.assessment_question_bank_name}, function(bank_data) {
+          $.ajaxJSON(create_url, 'POST', {'assessment_question_bank[title]': data.assessment_question_bank_name}, bank_data => {
             addBank(bank_data.assessment_question_bank);
             data['assessment_question_bank_id'] = bank_data.assessment_question_bank.id;
             $dialog.find(".new_question_bank_name").hide();
             save(data);
-          }, function(data) {
+          }, data => {
             $dialog.find("button").attr('disabled', false);
             var submitAgainText = null;
             if(move){
@@ -302,7 +302,7 @@ export function attachPageEvents(e) {
           save(data);
         }
       });
-      $("#move_question_dialog .cancel_button").click(function() {
+      $("#move_question_dialog .cancel_button").click(() => {
         $("#move_question_dialog").dialog('close');
       });
       $("#move_question_dialog :radio").change(function() {

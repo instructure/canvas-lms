@@ -187,7 +187,7 @@ test('when there are no availableValues, the add assignment link is not rendered
   equal($('#fixtures').find('.add_never_drop').length, 0)
 })
 
-test("when there are no takenValues, the add assignment says 'add an assignment'", function() {
+test("when there are no takenValues, the add assignment says 'add an assignment'", () => {
   const text = $('#fixtures')
     .find('.add_never_drop')
     .text()

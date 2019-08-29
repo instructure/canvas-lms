@@ -836,6 +836,20 @@ describe AssignmentsController do
             get :show, params: {course_id: @course.id, id: @assignment.id}
             expect(assigns[:js_env]).not_to include(:selected_student_group_id)
           end
+
+          it "does not set selected_student_group_id if the selected group has been deleted" do
+            @teacher.preferences[:gradebook_settings] = {
+              @course.id => {
+                'filter_rows_by' => {
+                  'student_group_id' => @course.groups.second.id.to_s
+                }
+              }
+            }
+            @course.groups.second.destroy!
+
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).not_to include(:selected_student_group_id)
+          end
         end
 
         context "when filter_speed_grader_by_student_group? is false" do

@@ -109,7 +109,7 @@ describe('UploadFile: ComputerPanel', () => {
           <ComputerPanel
             theFile={aFile}
             setFile={handleSetFile}
-            hasUploadedFile={true}
+            hasUploadedFile
             setHasUploadedFile={handleSetHasUploadedFile}
             accept="image/*"
           />
@@ -129,7 +129,7 @@ describe('UploadFile: ComputerPanel', () => {
           <ComputerPanel
             theFile={aFile}
             setFile={handleSetFile}
-            hasUploadedFile={true}
+            hasUploadedFile
             setHasUploadedFile={handleSetHasUploadedFile}
             accept="text/*"
             label="Upload File"
@@ -150,7 +150,7 @@ describe('UploadFile: ComputerPanel', () => {
           <ComputerPanel
             theFile={aFile}
             setFile={handleSetFile}
-            hasUploadedFile={true}
+            hasUploadedFile
             setHasUploadedFile={handleSetHasUploadedFile}
             accept="text/*"
             label="Upload File"
@@ -171,7 +171,7 @@ describe('UploadFile: ComputerPanel', () => {
           <ComputerPanel
             theFile={aFile}
             setFile={handleSetFile}
-            hasUploadedFile={true}
+            hasUploadedFile
             setHasUploadedFile={handleSetHasUploadedFile}
             accept="text/*"
             label="Upload File"
@@ -196,7 +196,7 @@ describe('UploadFile: ComputerPanel', () => {
           <ComputerPanel
             theFile={aFile}
             setFile={handleSetFile}
-            hasUploadedFile={true}
+            hasUploadedFile
             setHasUploadedFile={handleSetHasUploadedFile}
             accept="mp4"
             label="Upload File"

@@ -18,19 +18,15 @@
 
 import K5Uploader from '@instructure/k5uploader'
 
-/*eslint no-console: 0*/
+/* eslint no-console: 0 */
 export default class Bridge {
   constructor() {
     this.focusedEditor = null
     this.resolveEditorRendered = null
 
-    this.embedImage = this.embedImage.bind(this)
-
     this._editorRendered = new Promise(resolve => {
       this.resolveEditorRendered = resolve
     })
-
-    this.insertLink = this.insertLink.bind(this)
 
     this.trayProps = new WeakMap();
   }
@@ -115,7 +111,7 @@ export default class Bridge {
     return false;
   }
 
-  insertLink(link, fromTray = true) {
+  insertLink = (link, fromTray = true) => {
     if (this.focusedEditor) {
       const { selection } = this.focusedEditor.props.tinymce.get(
         this.focusedEditor.props.textareaId
@@ -134,7 +130,7 @@ export default class Bridge {
     } else {
       console.warn("clicked sidebar link without a focused editor");
     }
-  }
+  };
 
   insertImage(image) {
     if (this.focusedEditor) {
@@ -161,7 +157,7 @@ export default class Bridge {
     }
   }
 
-  embedImage(image) {
+  embedImage = image => {
     if (
       this.existingContentToLink() &&
       !this.existingContentToLinkIsImg()
@@ -174,5 +170,5 @@ export default class Bridge {
     } else {
       this.insertImage(image);
     }
-  }
+  };
 }

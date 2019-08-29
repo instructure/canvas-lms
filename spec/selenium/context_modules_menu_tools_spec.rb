@@ -24,7 +24,6 @@ describe "context modules" do
   context "menu tools", priority: "1" do
       before do
         course_with_teacher_logged_in
-        Account.default.enable_feature!(:lor_for_account)
 
         @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
         @tool.assignment_menu = {:url => "http://www.example.com", :text => "Export Assignment"}
@@ -65,14 +64,6 @@ describe "context modules" do
         @course.save!
         get "/courses/#{@course.id}"
         should_have_menu_tool_link_in_gear
-      end
-
-      it "should not render tool links unless the lor flag is enabled" do
-        Account.default.disable_feature!(:lor_for_account)
-        get "/courses/#{@course.id}/modules"
-        gear = f("#context_module_#{@module1.id} .header .al-trigger")
-        gear.click
-        expect(f("#context_module_#{@module1.id} .header")).not_to contain_css("li a.menu_tool_link")
       end
 
       it "should show tool launch links in the gear for exportable module items" do

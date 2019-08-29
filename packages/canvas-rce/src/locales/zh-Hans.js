@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/zh.json";
 import "../rce/languages/zh_CN";
+
 formatMessage.addLocale({ "zh-Hans": locale });

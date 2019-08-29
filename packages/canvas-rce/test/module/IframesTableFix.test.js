@@ -23,7 +23,7 @@ import IframesTableFix from "../../src/rce/IframesTableFix";
 let table,
   editor,
   ifr,
-  sandbox = sinon.sandbox.create();
+  sandbox = sinon.createSandbox();
 
 class MockMutationObserver {
   observe() {}
@@ -107,13 +107,13 @@ describe("IframesTableFix - for CNVS-37129", () => {
         return "iframe";
       }
     };
-    const td = { children: [elem], innerHTML: innerHTML };
+    const td = { children: [elem], innerHTML };
     sandbox
       .stub(editor.dom, "select")
       .withArgs("td")
       .returns([td]);
     ifr.fixIframes(editor);
-    assert(td.innerHTML == "<div>" + innerHTML + "</div>");
+    assert(td.innerHTML === `<div>${  innerHTML  }</div>`);
   });
 
   it("ensure fixIframes does not fix non-iframes", () => {
@@ -124,12 +124,12 @@ describe("IframesTableFix - for CNVS-37129", () => {
         return "iframe";
       }
     };
-    const td = { children: [elem], innerHTML: innerHTML };
+    const td = { children: [elem], innerHTML };
     sandbox
       .stub(editor.dom, "select")
       .withArgs("td")
       .returns([td]);
     ifr.fixIframes(editor);
-    assert(td.innerHTML == innerHTML);
+    assert(td.innerHTML === innerHTML);
   });
 });

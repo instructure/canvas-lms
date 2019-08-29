@@ -21,46 +21,48 @@ import {wait} from '@testing-library/react'
 
 const oldEnv = window.ENV
 
-afterEach(() => {
-  window.ENV = oldEnv
-})
+describe('setupCSP', () => {
+  afterEach(() => {
+    window.ENV = oldEnv
+  })
 
-it('does nothing when there is no CSP policy defined on the rootElement', () => {
-  const iframe = document.createElement('iframe')
-  iframe.className = 'attachment-html-iframe'
-  document.body.appendChild(iframe)
-  setupCSP(document)
-  expect(iframe.getAttribute('csp')).toBeNull()
-})
+  it('does nothing when there is no CSP policy defined on the rootElement', () => {
+    const iframe = document.createElement('iframe')
+    iframe.className = 'attachment-html-iframe'
+    document.body.appendChild(iframe)
+    setupCSP(document)
+    expect(iframe.getAttribute('csp')).toBeNull()
+  })
 
-it('adds csp policies to iframes existing on the page when called', async () => {
-  const cspContentAttribute =
-    'default-src https://cdn.example.net; child-src "none"; object-src "none"'
-  window.ENV = {csp: cspContentAttribute}
-  const iframe = document.createElement('iframe')
-  iframe.className = 'attachment-html-iframe'
-  document.body.appendChild(iframe)
-  setupCSP(document)
-  await wait(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
-})
+  it('adds csp policies to iframes existing on the page when called', () => {
+    const cspContentAttribute =
+      'default-src https://cdn.example.net; child-src "none"; object-src "none"'
+    window.ENV = {csp: cspContentAttribute}
+    const iframe = document.createElement('iframe')
+    iframe.className = 'attachment-html-iframe'
+    document.body.appendChild(iframe)
+    setupCSP(document)
+    return wait(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
+  })
 
-it('adds the csp policy to iframes that get added to the page after initial load', async () => {
-  const cspContentAttribute =
-    'default-src https://cdn.example.net; child-src "none"; object-src "none"'
-  window.ENV = {csp: cspContentAttribute}
-  setupCSP(document)
-  const iframe = document.createElement('iframe')
-  iframe.className = 'attachment-html-iframe'
-  document.body.appendChild(iframe)
-  await wait(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
-})
+  it('adds the csp policy to iframes that get added to the page after initial load', () => {
+    const cspContentAttribute =
+      'default-src https://cdn.example.net; child-src "none"; object-src "none"'
+    window.ENV = {csp: cspContentAttribute}
+    setupCSP(document)
+    const iframe = document.createElement('iframe')
+    iframe.className = 'attachment-html-iframe'
+    document.body.appendChild(iframe)
+    return wait(() => expect(iframe.getAttribute('csp')).toBe(cspContentAttribute))
+  })
 
-it("doesn't add the csp policy to untagged iframes", async () => {
-  const cspContentAttribute =
-    'default-src https://cdn.example.net; child-src "none"; object-src "none"'
-  window.ENV = {csp: cspContentAttribute}
-  const iframe = document.createElement('iframe')
-  document.body.appendChild(iframe)
-  setupCSP(document)
-  await wait(() => expect(iframe.getAttribute('csp')).toBe(null))
+  it("doesn't add the csp policy to untagged iframes", () => {
+    const cspContentAttribute =
+      'default-src https://cdn.example.net; child-src "none"; object-src "none"'
+    window.ENV = {csp: cspContentAttribute}
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    setupCSP(document)
+    return wait(() => expect(iframe.getAttribute('csp')).toBe(null))
+  })
 })

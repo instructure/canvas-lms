@@ -41,7 +41,7 @@ QUnit.module('GradebookExportManager - constructor', {
   }
 })
 
-test('sets the polling interval with a sensible default', function() {
+test('sets the polling interval with a sensible default', () => {
   const manager = new GradebookExportManager(exportingUrl, currentUserId, undefined, 5000)
 
   equal(manager.pollingInterval, 5000)
@@ -51,7 +51,7 @@ test('sets the polling interval with a sensible default', function() {
   equal(anotherManager.pollingInterval, GradebookExportManager.DEFAULT_POLLING_INTERVAL)
 })
 
-test('sets the existing export if it is not already completed or failed', function() {
+test('sets the existing export if it is not already completed or failed', () => {
   ;['completed', 'failed'].forEach(workflowState => {
     const existingExport = {
       progressId: workingExport.progressId,

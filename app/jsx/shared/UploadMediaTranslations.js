@@ -52,7 +52,15 @@ const UploadMediaStrings = {
   INVALID_FILE_TEXT: I18n.t('Invalid file type'),
   DRAG_DROP_CLICK_TO_BROWSE: I18n.t('Drag and drop, or click to browse your computer'),
   EMBED_VIDEO_CODE_TEXT: I18n.t('Embed Video Code'),
-  UPLOADING_ERROR: I18n.t('Error uploading video/audio recording')
+  UPLOADING_ERROR: I18n.t('Error uploading video/audio recording'),
+  CLOSED_CAPTIONS_PANEL_TITLE: I18n.t('CC/Subtitles'),
+  CLOSED_CAPTIONS_LANGUAGE_HEADER: I18n.t('Language'),
+  CLOSED_CAPTIONS_FILE_NAME_HEADER: I18n.t('File Name'),
+  CLOSED_CAPTIONS_ACTIONS_HEADER: I18n.t('Actions'),
+  CLOSED_CAPTIONS_ADD_SUBTITLE: I18n.t('Subtitle'),
+  CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER: I18n.t('Add Subtitle'),
+  CLOSED_CAPTIONS_CHOOSE_FILE: I18n.t('Choose File'),
+  CLOSED_CAPTIONS_SELECT_LANGUAGE: I18n.t('Select Language')
 }
 
 export {MediaCaptureStrings, UploadMediaStrings}

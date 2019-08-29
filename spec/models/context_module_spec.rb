@@ -273,6 +273,22 @@ describe ContextModule do
       expect(@module2.prerequisites).to be_is_a(Array)
       expect(@module2.prerequisites).to be_empty
     end
+
+    it "returns the current name of prerequisite modules" do
+      course_module
+      @module2 = @course.context_modules.create!(:name => "next module", :workflow_state => 'unpublished')
+
+      @module3 = @course.context_modules.build(:name => "next next module")
+      @module3.prerequisites = "module_#{@module.id},module_#{@module2.id}"
+      @module3.save!
+
+      @module.update_attribute(:name, "new name 1")
+      @module2.update_attribute(:name, "new name 2")
+
+      @module3 = ContextModule.find(@module3.id)
+      expect(@module3.prerequisites).to match_array([{:id => @module.id, :type => 'context_module', :name => 'new name 1'}, {:id => @module2.id, :type => 'context_module', :name => "new name 2"}])
+      expect(@module3.active_prerequisites).to match_array([{:id => @module.id, :type => 'context_module', :name => "new name 1"}])
+    end
   end
 
   describe "add_item" do

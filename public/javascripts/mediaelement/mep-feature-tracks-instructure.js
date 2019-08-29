@@ -11,6 +11,7 @@
 
 import I18n from 'i18n!mepfeaturetracksinstructure'
 import htmlEscape from 'str/htmlEscape'
+import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
 
 (function($) {
 
@@ -100,7 +101,7 @@ import htmlEscape from 'str/htmlEscape'
       var lang = 'none';
       if (t.options.toggleCaptionsButtonWhenOnlyOne && subtitleCount == 1){
         // click
-        player.captionsButton.on('click',function() {
+        player.captionsButton.on('click',() => {
           if (player.selectedTrack === null) {
             lang = player.tracks[0].srclang;
           }
@@ -109,11 +110,11 @@ import htmlEscape from 'str/htmlEscape'
       } else {
         // hover
         var hoverTimeout;
-        player.captionsButton.hover(function() {
+        player.captionsButton.hover(() => {
           clearTimeout(hoverTimeout);
           player.showCaptionsSelector();
-        }, function() {
-          hoverTimeout = setTimeout(function() {
+        }, () => {
+          hoverTimeout = setTimeout(() => {
             player.hideCaptionsSelector();
           }, t.options.menuTimeoutMouseLeave);
         })
@@ -150,10 +151,10 @@ import htmlEscape from 'str/htmlEscape'
         })
 
         // close menu when tabbing away
-        .on('focusout', mejs.Utility.debounce(function (e) { // Safari triggers focusout multiple times
+        .on('focusout', mejs.Utility.debounce(e => { // Safari triggers focusout multiple times
           // Firefox does NOT support e.relatedTarget to see which element
           // just lost focus, so wait to find the next focused element
-          setTimeout(function () {
+          setTimeout(() => {
             var parent = $(document.activeElement).closest('.mejs-captions-selector');
             if (!parent.length) {
               // focus is outside the control; close menu
@@ -182,12 +183,12 @@ import htmlEscape from 'str/htmlEscape'
       if (!player.options.alwaysShowControls) {
         // move with controls
         player.container
-          .bind('controlsshown', function () {
+          .bind('controlsshown', () => {
             // push captions above controls
             player.container.find('.mejs-captions-position').addClass('mejs-captions-position-hover');
 
           })
-          .bind('controlshidden', function () {
+          .bind('controlshidden', () => {
             if (!media.paused) {
               // move back to normal place
               player.container.find('.mejs-captions-position').removeClass('mejs-captions-position-hover');
@@ -216,25 +217,25 @@ import htmlEscape from 'str/htmlEscape'
       // start loading tracks
       player.loadNextTrack();
 
-      media.addEventListener('timeupdate',function() {
+      media.addEventListener('timeupdate',() => {
         player.displayCaptions();
       }, false);
 
       if (player.options.slidesSelector !== '') {
         player.slidesContainer = $(player.options.slidesSelector);
 
-        media.addEventListener('timeupdate',function() {
+        media.addEventListener('timeupdate',() => {
           player.displaySlides();
         }, false);
 
       }
 
-      media.addEventListener('loadedmetadata', function() {
+      media.addEventListener('loadedmetadata', () => {
         player.displayChapters();
       }, false);
 
       player.container.hover(
-        function () {
+        () => {
           // chapters
           if (player.hasChapters) {
             player.chapters.removeClass('mejs-offscreen');
@@ -250,7 +251,7 @@ import htmlEscape from 'str/htmlEscape'
           }
         });
 
-      t.container.on('controlsresize', function() {
+      t.container.on('controlsresize', () => {
         t.adjustLanguageBox();
       });
 
@@ -366,7 +367,7 @@ import htmlEscape from 'str/htmlEscape'
             after();
 
             if (track.kind == 'chapters') {
-              t.media.addEventListener('play', function() {
+              t.media.addEventListener('play', () => {
                 if (t.media.duration > 0) {
                   t.displayChapters(track);
                 }
@@ -422,7 +423,7 @@ import htmlEscape from 'str/htmlEscape'
       $('<a href="#" role="button" class="upload-track" tabindex="-1">Upload subtitles</a>')
         .appendTo(t.captionsButton.find('ul'))
         .wrap('<li>')
-        .click(function(e){
+        .click(e => {
           e.preventDefault();
           import('compiled/widget/UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
 						new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
@@ -576,7 +577,7 @@ import htmlEscape from 'str/htmlEscape'
 			if (typeof img == 'undefined' || typeof img.fadeIn == 'undefined') {
 
 				t.slides.entries.imgs[index] = img = $('<img src="' + url + '">')
-						.on('load', function() {
+						.on('load', () => {
 							img.appendTo(t.slidesContainer)
 								.hide()
 								.fadeIn()
@@ -683,64 +684,7 @@ import htmlEscape from 'str/htmlEscape'
 
 
 	mejs.language = {
-		codes:  {
-			af:'Afrikaans',
-			sq:'Albanian',
-			ar:'Arabic',
-			be:'Belarusian',
-			bg:'Bulgarian',
-			ca:'Catalan',
-			zh:'Chinese',
-			'zh-cn':'Chinese Simplified',
-			'zh-tw':'Chinese Traditional',
-			hr:'Croatian',
-			cs:'Czech',
-			da:'Danish',
-			nl:'Dutch',
-			en:'English',
-			et:'Estonian',
-			fl:'Filipino',
-			fi:'Finnish',
-			fr:'French',
-			gl:'Galician',
-			de:'German',
-			el:'Greek',
-			ht:'Haitian Creole',
-			iw:'Hebrew',
-			hi:'Hindi',
-			hu:'Hungarian',
-			is:'Icelandic',
-			id:'Indonesian',
-			ga:'Irish',
-			it:'Italian',
-			ja:'Japanese',
-			ko:'Korean',
-			lv:'Latvian',
-			lt:'Lithuanian',
-			mk:'Macedonian',
-			ms:'Malay',
-			mt:'Maltese',
-			no:'Norwegian',
-			fa:'Persian',
-			pl:'Polish',
-			pt:'Portuguese',
-			// 'pt-pt':'Portuguese (Portugal)',
-			ro:'Romanian',
-			ru:'Russian',
-			sr:'Serbian',
-			sk:'Slovak',
-			sl:'Slovenian',
-			es:'Spanish',
-			sw:'Swahili',
-			sv:'Swedish',
-			tl:'Tagalog',
-			th:'Thai',
-			tr:'Turkish',
-			uk:'Ukrainian',
-			vi:'Vietnamese',
-			cy:'Welsh',
-			yi:'Yiddish'
-		}
+		codes: closedCaptionLanguages
 	};
 
 	/*

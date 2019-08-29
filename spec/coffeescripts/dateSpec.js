@@ -63,7 +63,7 @@ test('Date.parse', () => {
   })()
 })
 
-test('date.getUTCOffset', function() {
+test('date.getUTCOffset', () => {
   const examples = {
     // Mountain
     ' 360': '-0600',

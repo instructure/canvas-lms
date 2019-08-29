@@ -104,10 +104,10 @@ export default class StudentsTable extends React.Component {
   renderNameColumn(student) {
     const displayName = student.shortName || student.name || I18n.t('User')
     return (
-      <React.Fragment>
+      <>
         <Avatar name={student.name} src={student.avatarUrl} size="small" margin="0 small 0 0" />
         {displayName}
-      </React.Fragment>
+      </>
     )
   }
 

@@ -632,6 +632,23 @@ describe SpeedGrader::Assignment do
               expect(json_students).to match_array(group_students)
             end
           end
+
+          context "when the group the user is filtering by has been deleted" do
+            let(:group) { @second_group }
+
+            it "returns all students rather than attempting to filter by the deleted group" do
+              @teacher.preferences.deep_merge!(gradebook_settings: {
+                @course.id => {'filter_rows_by' => {'student_group_id' => group.id.to_s}}
+              })
+              group.destroy!
+
+              json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+              json_students = json.fetch(:context).fetch(:students).map {|s| s.except(:rubric_assessments)}
+              course_students = @course.students.as_json(include_root: false, only: [:id, :name, :sortable_name])
+              StringifyIds.recursively_stringify_ids(course_students)
+              expect(json_students).to match_array(course_students)
+            end
+          end
         end
       end
     end

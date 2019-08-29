@@ -21,7 +21,7 @@ import _ from 'underscore'
   _.flattenObjects = function(array, key, backward, output) {
     if (!_.isArray(array)) {array = [array];}
     if (!_.isArray(output)) {output = [];}
-    _.each(array, function(object) {
+    _.each(array, object => {
       output.push(object);
       if (object[key]) {
         var children = object[key]

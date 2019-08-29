@@ -122,7 +122,7 @@ describe("LoadMore", () => {
 
   describe("Load more results button", () => {
     it("renders if hasMore", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={noop}>
           Results
         </LoadMore>
@@ -131,7 +131,7 @@ describe("LoadMore", () => {
     });
 
     it("doesn't render if not hasMore", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore={false} loadMore={noop}>
           Results
         </LoadMore>
@@ -140,7 +140,7 @@ describe("LoadMore", () => {
     });
 
     it("doesn't render if isLoading", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore isLoading loadMore={noop}>
           Results
         </LoadMore>
@@ -149,8 +149,8 @@ describe("LoadMore", () => {
     });
 
     it("calls loadMore when clicked", () => {
-      let loadMore = sinon.spy();
-      let tree = sd.shallowRender(
+      const loadMore = sinon.spy();
+      const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={loadMore}>
           Results
         </LoadMore>
@@ -162,7 +162,7 @@ describe("LoadMore", () => {
 
   describe("Loading indicator", () => {
     it("renders if non-empty and hasMore", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
@@ -171,7 +171,7 @@ describe("LoadMore", () => {
     });
 
     it("doesn't render if not hasMore", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore={false} loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
@@ -180,28 +180,28 @@ describe("LoadMore", () => {
     });
 
     it("doesn't render if empty", () => {
-      let tree = sd.shallowRender(<LoadMore hasMore loadMore={noop} />);
+      const tree = sd.shallowRender(<LoadMore hasMore loadMore={noop} />);
       assert.ok(!tree.subTree("." + css(styles.loader)));
     });
 
     it("visible if isLoading", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore isLoading loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
       );
-      let loader = tree.subTree("." + css(styles.loader));
+      const loader = tree.subTree("." + css(styles.loader));
       assert.ok(!loader.props["aria-hidden"]);
       assert.equal(loader.props.style.opacity, 1);
     });
 
     it("hidden if not isLoading", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
       );
-      let loader = tree.subTree("." + css(styles.loader));
+      const loader = tree.subTree("." + css(styles.loader));
       assert.ok(loader.props["aria-hidden"]);
       assert.equal(loader.props.style.opacity, 0);
     });

@@ -32,8 +32,8 @@ export function renderLink(data, contents) {
   const children = contents || linkAttrs.text || linkAttrs.title;
   delete linkAttrs.selectionDetails
   delete linkAttrs.text
-  linkAttrs.className = linkAttrs['class']
-  delete linkAttrs['class']
+  linkAttrs.className = linkAttrs.class
+  delete linkAttrs.class
 
   // renderToStaticMarkup isn't happy with bool attributes
   Object.keys(linkAttrs).forEach(attr => {

@@ -25,7 +25,7 @@ import {
 } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import SlickGridSpecHelper from './GradebookGrid/GridSupport/SlickGridSpecHelper'
 
-QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
+QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
   let $fixture
   let gridSpecHelper
   let gradebook
@@ -182,7 +182,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
   }
 
-  suiteHooks.beforeEach(function() {
+  suiteHooks.beforeEach(() => {
     $fixture = document.createElement('div')
     document.body.appendChild($fixture)
     setFixtureHtml($fixture)
@@ -210,7 +210,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     createCustomColumns()
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     gradebook.destroy()
     DataLoader.loadGradebookData.restore()
     DataLoader.getDataForColumn.restore()
@@ -218,18 +218,18 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     $fixture.remove()
   })
 
-  QUnit.module('with unpublished assignments', function(hooks) {
+  QUnit.module('with unpublished assignments', hooks => {
     function setShowUnpublishedAssignments(show) {
       gradebook.gridDisplaySettings.showUnpublishedAssignments = show
     }
 
-    hooks.beforeEach(function() {
+    hooks.beforeEach(() => {
       assignments.homework[1].published = false
       assignments.quizzes[1].published = false
       createGradebookWithAllFilters()
     })
 
-    test('optionally shows all unpublished assignment columns at initial render', function() {
+    test('optionally shows all unpublished assignment columns at initial render', () => {
       setShowUnpublishedAssignments(true)
       addDataAndInitialize()
       const expectedColumns = [
@@ -244,7 +244,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally hides all unpublished assignment columns at initial render', function() {
+    test('optionally hides all unpublished assignment columns at initial render', () => {
       setShowUnpublishedAssignments(false)
       addDataAndInitialize()
       const expectedColumns = [
@@ -257,7 +257,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows all unpublished assignment columns', function() {
+    test('optionally shows all unpublished assignment columns', () => {
       setShowUnpublishedAssignments(false)
       addDataAndInitialize()
       gradebook.toggleUnpublishedAssignments()
@@ -273,7 +273,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally hides all unpublished assignment columns', function() {
+    test('optionally hides all unpublished assignment columns', () => {
       setShowUnpublishedAssignments(true)
       addDataAndInitialize()
       gradebook.toggleUnpublishedAssignments()
@@ -287,7 +287,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after showing unpublished assignment columns', function() {
+    test('sorts all scrollable columns after showing unpublished assignment columns', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -308,7 +308,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listColumnIds(), customOrder)
     })
 
-    test('sorts all scrollable columns after hiding unpublished assignment columns', function() {
+    test('sorts all scrollable columns after hiding unpublished assignment columns', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -339,18 +339,18 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('with attendance assignments', function(hooks) {
+  QUnit.module('with attendance assignments', hooks => {
     function setShowAttendance(show) {
       gradebook.show_attendance = show
     }
 
-    hooks.beforeEach(function() {
+    hooks.beforeEach(() => {
       assignments.homework[0].submission_types = ['attendance']
       assignments.homework[1].submission_types = ['attendance']
       createGradebookWithAllFilters()
     })
 
-    test('optionally shows all attendance assignment columns at initial render', function() {
+    test('optionally shows all attendance assignment columns at initial render', () => {
       setShowAttendance(true)
       addDataAndInitialize()
       const expectedColumns = [
@@ -365,7 +365,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally hides all attendance assignment columns at initial render', function() {
+    test('optionally hides all attendance assignment columns at initial render', () => {
       setShowAttendance(false)
       addDataAndInitialize()
       const expectedColumns = [
@@ -379,7 +379,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     })
   })
 
-  test('does not show "not graded" assignments', function() {
+  test('does not show "not graded" assignments', () => {
     assignments.homework[1].submission_types = ['not_graded']
     assignments.quizzes[1].submission_types = ['not_graded']
     createGradebookWithAllFilters()
@@ -394,12 +394,12 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
   })
 
-  QUnit.module('with multiple assignment groups', function(hooks) {
-    hooks.beforeEach(function() {
+  QUnit.module('with multiple assignment groups', hooks => {
+    hooks.beforeEach(() => {
       createGradebookWithAllFilters()
     })
 
-    test('optionally shows assignment columns for all assignment groups at initial render', function() {
+    test('optionally shows assignment columns for all assignment groups at initial render', () => {
       addDataAndInitialize()
       gradebook.updateCurrentAssignmentGroup('0')
       const expectedColumns = [
@@ -414,7 +414,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows only assignment columns for the selected assignment group at initial render', function() {
+    test('optionally shows only assignment columns for the selected assignment group at initial render', () => {
       addDataAndInitialize()
       gradebook.updateCurrentAssignmentGroup('2201')
       const expectedColumns = [
@@ -427,7 +427,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows assignment columns for all assignment groups', function() {
+    test('optionally shows assignment columns for all assignment groups', () => {
       addDataAndInitialize()
       gradebook.updateCurrentAssignmentGroup('0')
       const expectedColumns = [
@@ -442,7 +442,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows only assignment columns for the selected assignment group', function() {
+    test('optionally shows only assignment columns for the selected assignment group', () => {
       addDataAndInitialize()
       gradebook.updateCurrentAssignmentGroup('2202')
       const expectedColumns = [
@@ -455,7 +455,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after selecting an assignment group', function() {
+    test('sorts all scrollable columns after selecting an assignment group', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -484,7 +484,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after deselecting an assignment group', function() {
+    test('sorts all scrollable columns after deselecting an assignment group', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -505,8 +505,8 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('with grading periods', function(hooks) {
-    hooks.beforeEach(function() {
+  QUnit.module('with grading periods', hooks => {
+    hooks.beforeEach(() => {
       createGradebookWithAllFilters({
         grading_period_set: {
           id: '1501',
@@ -516,7 +516,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       })
     })
 
-    test('optionally shows assignment columns for all grading periods at initial render', function() {
+    test('optionally shows assignment columns for all grading periods at initial render', () => {
       gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
       addDataAndInitialize()
       const expectedColumns = [
@@ -531,7 +531,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows only assignment columns for the selected grading period at initial render', function() {
+    test('optionally shows only assignment columns for the selected grading period at initial render', () => {
       gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401')
       addDataAndInitialize()
       const expectedColumns = [
@@ -544,7 +544,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows assignment columns for all grading periods', function() {
+    test('optionally shows assignment columns for all grading periods', () => {
       addDataAndInitialize()
       gradebook.updateCurrentGradingPeriod('0')
       const expectedColumns = [
@@ -559,7 +559,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows only assignment columns for the selected grading period', function() {
+    test('optionally shows only assignment columns for the selected grading period', () => {
       addDataAndInitialize()
       gradebook.updateCurrentGradingPeriod('1402')
       const expectedColumns = [
@@ -572,7 +572,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally hides assignment group and total grade columns when filtering at initial render', function() {
+    test('optionally hides assignment group and total grade columns when filtering at initial render', () => {
       gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = false
       addDataAndInitialize()
       gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
@@ -585,7 +585,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally hides assignment group and total grade columns when filtering', function() {
+    test('optionally hides assignment group and total grade columns when filtering', () => {
       gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = false
       addDataAndInitialize()
       gradebook.updateCurrentGradingPeriod('0')
@@ -598,7 +598,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after selecting a grading period', function() {
+    test('sorts all scrollable columns after selecting a grading period', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -627,7 +627,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after deselecting a grading period', function() {
+    test('sorts all scrollable columns after deselecting a grading period', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -648,12 +648,12 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('with multiple context modules', function(hooks) {
-    hooks.beforeEach(function() {
+  QUnit.module('with multiple context modules', hooks => {
+    hooks.beforeEach(() => {
       createGradebookWithAllFilters()
     })
 
-    test('optionally shows assignment columns for all context modules at initial render', function() {
+    test('optionally shows assignment columns for all context modules at initial render', () => {
       gradebook.setFilterColumnsBySetting('contextModuleId', '0')
       addDataAndInitialize()
       const expectedColumns = [
@@ -668,7 +668,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows only assignment columns for the selected context module at initial render', function() {
+    test('optionally shows only assignment columns for the selected context module at initial render', () => {
       gradebook.setFilterColumnsBySetting('contextModuleId', '2601')
       addDataAndInitialize()
       const expectedColumns = [
@@ -681,7 +681,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows assignment columns for all context modules', function() {
+    test('optionally shows assignment columns for all context modules', () => {
       addDataAndInitialize()
       gradebook.updateCurrentModule('0')
       const expectedColumns = [
@@ -696,7 +696,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('optionally shows only assignment columns for the selected context module', function() {
+    test('optionally shows only assignment columns for the selected context module', () => {
       addDataAndInitialize()
       gradebook.updateCurrentModule('2602')
       const expectedColumns = [
@@ -708,7 +708,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after selecting a context module', function() {
+    test('sorts all scrollable columns after selecting a context module', () => {
       const customOrder = [
         'student',
         'custom_col_2401',
@@ -737,7 +737,7 @@ QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
 
-    test('sorts all scrollable columns after deselecting a context module', function() {
+    test('sorts all scrollable columns after deselecting a context module', () => {
       const customOrder = [
         'student',
         'custom_col_2401',

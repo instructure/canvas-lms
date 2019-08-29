@@ -76,19 +76,19 @@ function defaultResponse() {
 
 QUnit.module('HistoryActions')
 
-test('fetchHistoryStart creates an action with type FETCH_HISTORY_START', function() {
+test('fetchHistoryStart creates an action with type FETCH_HISTORY_START', () => {
   const expectedValue = {
     type: FETCH_HISTORY_START
   }
   deepEqual(fetchHistoryStart(), expectedValue)
 })
 
-test('fetchHistorySuccess creates an action with type FETCH_HISTORY_SUCCESS', function() {
+test('fetchHistorySuccess creates an action with type FETCH_HISTORY_SUCCESS', () => {
   const response = defaultResponse()
   strictEqual(fetchHistorySuccess(response.data, response.headers).type, FETCH_HISTORY_SUCCESS)
 })
 
-test('fetchHistorySuccess creates an action with history items in payload', function() {
+test('fetchHistorySuccess creates an action with history items in payload', () => {
   const response = defaultResponse()
   const expectedItems = [
     {
@@ -115,7 +115,7 @@ test('fetchHistorySuccess creates an action with history items in payload', func
   deepEqual(fetchHistorySuccess(response.data, response.headers).payload.items, expectedItems)
 })
 
-test('fetchHistorySuccess returns "0" pointsPossibleCurrent when an assignment is zero', function() {
+test('fetchHistorySuccess returns "0" pointsPossibleCurrent when an assignment is zero', () => {
   const response = {
     data: {
       events: [{links: {}}],
@@ -132,7 +132,7 @@ test('fetchHistorySuccess returns "0" pointsPossibleCurrent when an assignment i
   strictEqual(pointsPossibleCurrent, '0')
 })
 
-test('fetchHistorySuccess returns "–" pointsPossibleCurrent when an assignment has no points possible', function() {
+test('fetchHistorySuccess returns "–" pointsPossibleCurrent when an assignment has no points possible', () => {
   const response = {
     data: {
       events: [{links: {}}],
@@ -149,7 +149,7 @@ test('fetchHistorySuccess returns "–" pointsPossibleCurrent when an assignment
   strictEqual(pointsPossibleCurrent, '–')
 })
 
-test('fetchHistorySuccess returns "–" pointsPossibleAfter when an assignment now has no points possible', function() {
+test('fetchHistorySuccess returns "–" pointsPossibleAfter when an assignment now has no points possible', () => {
   const response = {
     data: {
       events: [{points_possible_after: null, links: {}}],
@@ -166,7 +166,7 @@ test('fetchHistorySuccess returns "–" pointsPossibleAfter when an assignment n
   strictEqual(pointsPossibleAfter, '–')
 })
 
-test('fetchHistorySuccess returns "–" pointsPossibleBefore when an assignment had no points possible', function() {
+test('fetchHistorySuccess returns "–" pointsPossibleBefore when an assignment had no points possible', () => {
   const response = {
     data: {
       events: [{points_possible_before: null, links: {}}],
@@ -183,7 +183,7 @@ test('fetchHistorySuccess returns "–" pointsPossibleBefore when an assignment 
   strictEqual(pointsPossibleBefore, '–')
 })
 
-test('fetchHistorySuccess creates an action with history next page link in payload', function() {
+test('fetchHistorySuccess creates an action with history next page link in payload', () => {
   const response = defaultResponse()
   const expectedUrl = 'http://example.com/3?&page=bookmark:asdf'
   strictEqual(
@@ -192,21 +192,21 @@ test('fetchHistorySuccess creates an action with history next page link in paylo
   )
 })
 
-test('fetchHistoryFailure creates an action with type FETCH_HISTORY_FAILURE', function() {
+test('fetchHistoryFailure creates an action with type FETCH_HISTORY_FAILURE', () => {
   const expectedValue = {
     type: FETCH_HISTORY_FAILURE
   }
   deepEqual(fetchHistoryFailure(), expectedValue)
 })
 
-test('fetchHistoryNextPageStart creates an action with type FETCH_HISTORY_NEXT_PAGE_START', function() {
+test('fetchHistoryNextPageStart creates an action with type FETCH_HISTORY_NEXT_PAGE_START', () => {
   const expectedValue = {
     type: FETCH_HISTORY_NEXT_PAGE_START
   }
   deepEqual(fetchHistoryNextPageStart(), expectedValue)
 })
 
-test('fetchHistoryNextPageSuccess creates an action with type FETCH_HISTORY_NEXT_PAGE_SUCCESS', function() {
+test('fetchHistoryNextPageSuccess creates an action with type FETCH_HISTORY_NEXT_PAGE_SUCCESS', () => {
   const response = defaultResponse()
   strictEqual(
     fetchHistoryNextPageSuccess(response.data, response.headers).type,
@@ -214,7 +214,7 @@ test('fetchHistoryNextPageSuccess creates an action with type FETCH_HISTORY_NEXT
   )
 })
 
-test('fetchHistoryNextPageSuccess creates an action with history items in payload', function() {
+test('fetchHistoryNextPageSuccess creates an action with history items in payload', () => {
   const response = defaultResponse()
   const expectedItems = [
     {
@@ -244,7 +244,7 @@ test('fetchHistoryNextPageSuccess creates an action with history items in payloa
   )
 })
 
-test('fetchHistoryNextPageSuccess creates an action with history next page link in payload', function() {
+test('fetchHistoryNextPageSuccess creates an action with history next page link in payload', () => {
   const response = defaultResponse()
   const expectedUrl = 'http://example.com/3?&page=bookmark:asdf'
   strictEqual(
@@ -253,7 +253,7 @@ test('fetchHistoryNextPageSuccess creates an action with history next page link 
   )
 })
 
-test('fetchHistoryNextPageFailure creates an action with type FETCH_HISTORY_NEXT_PAGE_FAILURE', function() {
+test('fetchHistoryNextPageFailure creates an action with type FETCH_HISTORY_NEXT_PAGE_FAILURE', () => {
   const expectedValue = {
     type: FETCH_HISTORY_NEXT_PAGE_FAILURE
   }

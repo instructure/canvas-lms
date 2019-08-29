@@ -71,7 +71,7 @@ test('throws error if option is not set', () =>
     this.$testEl.moduleSequenceFooter()
   }, 'throws error when no options are passed in'))
 
-test('generatess a url based on the course_id', function() {
+test('generatess a url based on the course_id', () => {
   const msf = new $.fn.moduleSequenceFooter.MSFClass({
     courseID: 42,
     assetType: 'Assignment',

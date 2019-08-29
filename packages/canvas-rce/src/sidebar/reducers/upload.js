@@ -106,10 +106,10 @@ function folderTree(state = {}, action) {
   switch (action.type) {
     case PROCESSED_FOLDER_BATCH: {
       const folders = action.folders;
-      let tree = {};
+      const tree = {};
 
-      for (let folderId in folders) {
-        let folder = folders[folderId];
+      for (const folderId in folders) {
+        const folder = folders[folderId];
         tree[folder.id] = tree[folder.id] || [];
         if (folder.parentId) {
           tree[folder.parentId] = tree[folder.parentId] || [];
@@ -117,11 +117,9 @@ function folderTree(state = {}, action) {
         }
       }
 
-      for (let parentFolderId in tree) {
-        let children = tree[parentFolderId];
-        children.sort(function(a, b) {
-          return folders[a].name.localeCompare(folders[b].name);
-        });
+      for (const parentFolderId in tree) {
+        const children = tree[parentFolderId];
+        children.sort((a, b) => folders[a].name.localeCompare(folders[b].name));
       }
 
       return tree;

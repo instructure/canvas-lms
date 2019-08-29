@@ -40,18 +40,18 @@ QUnit.module('LDBLoginPopup', {
   }
 })
 
-test('it should exec', 1, function() {
+test('it should exec', 1, () => {
   whnd = popup.exec()
 
   ok(whnd, 'popup window is created')
 })
 
-test('it should inject styleSheets', 1, function() {
+test('it should inject styleSheets', 1, () => {
   whnd = popup.exec()
   strictEqual($(whnd.document).find('link[href]').length, $('link').length)
 })
 
-test('it should trigger the @open and @close events', function() {
+test('it should trigger the @open and @close events', () => {
   const onOpen = sinon.spy()
   const onClose = sinon.spy()
 
@@ -65,14 +65,14 @@ test('it should trigger the @open and @close events', function() {
   ok(onClose.called, '@close handler gets called')
 })
 
-test('it should close after a successful login', 1, function() {
+test('it should close after a successful login', 1, () => {
   const onClose = sinon.spy()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [200, {}, 'OK'])
 
   popup.on('close', onClose)
-  popup.on('open', function(e, document) {
+  popup.on('open', (e, document) => {
     $(document)
       .find('.btn-primary')
       .click()
@@ -83,14 +83,14 @@ test('it should close after a successful login', 1, function() {
   whnd = popup.exec()
 })
 
-test('it should trigger the @login_success event', 1, function() {
+test('it should trigger the @login_success event', 1, () => {
   const onSuccess = sinon.spy()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [200, {}, 'OK'])
 
   popup.on('login_success', onSuccess)
-  popup.on('open', function(e, document) {
+  popup.on('open', (e, document) => {
     $(document)
       .find('.btn-primary')
       .click()
@@ -101,14 +101,14 @@ test('it should trigger the @login_success event', 1, function() {
   whnd = popup.exec()
 })
 
-test('it should trigger the @login_failure event', 1, function() {
+test('it should trigger the @login_failure event', 1, () => {
   const onFailure = sinon.spy()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [401, {}, 'Bad Request'])
 
   popup.on('login_failure', onFailure)
-  popup.on('open', function(e, document) {
+  popup.on('open', (e, document) => {
     $(document)
       .find('.btn-primary')
       .click()
@@ -141,7 +141,7 @@ test('it should pop back in if student closes it', function(assert) {
   popup.on('login_failure', onFailure)
   popup.on('open', onOpen)
   popup.on('close', onClose)
-  popup.one('open', function(e, document) {
+  popup.one('open', (e, document) => {
     $(document)
       .find('.btn-primary')
       .click()
@@ -152,7 +152,7 @@ test('it should pop back in if student closes it', function(assert) {
 
     popup.one('close', () =>
       // we need to defer because #open will not be called in the close handler
-      defer(function() {
+      defer(() => {
         ok(onOpen.calledTwice, 'popup popped back in')
         ok(onClose.calledOnce, 'popup closed')
 

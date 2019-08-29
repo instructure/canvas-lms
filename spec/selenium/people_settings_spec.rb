@@ -374,7 +374,7 @@ describe "course people" do
       add_user(@teacher.name, "Mentor")
       teacher_row = f("#user_#{@teacher.id}")
       expect(teacher_row).to have_class("TeacherEnrollment")
-      expect(teacher_row).to have_class("Mentor")
+      expect(teacher_row).to_not have_class("Mentor")
     end
   end
 

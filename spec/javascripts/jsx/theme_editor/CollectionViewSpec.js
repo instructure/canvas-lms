@@ -64,7 +64,7 @@ QUnit.module('CollectionView', {
   }
 })
 
-test('brandVariableValue', function() {
+test('brandVariableValue', () => {
   const c = new CollectionView(props)
   equal(
     c.brandVariableValue({variables: {foo: 'bar'}}, 'foo'),
@@ -88,7 +88,7 @@ test('brandVariableValue', function() {
   )
 })
 
-test('startEditing: from scratch', function() {
+test('startEditing: from scratch', () => {
   // chrome doesn't let you stub window.sessionStorage.removeItem so we just have to check manually
   window.sessionStorage.setItem('sharedBrandConfigBeingEdited', 'blah')
 
@@ -101,7 +101,7 @@ test('startEditing: from scratch', function() {
   )
 })
 
-test('startEditing: working on existing saved theme', function() {
+test('startEditing: working on existing saved theme', () => {
   window.sessionStorage.removeItem('sharedBrandConfigBeingEdited')
   sandbox.stub(jQuery.fn, 'submit') // prevent reloading the page :(
 
@@ -116,7 +116,7 @@ test('startEditing: working on existing saved theme', function() {
   )
 })
 
-test('deteteSharedBrandConfig', function() {
+test('deteteSharedBrandConfig', () => {
   const id = 'abc123'
   sandbox
     .mock(jQuery)
@@ -126,7 +126,7 @@ test('deteteSharedBrandConfig', function() {
   c.deleteSharedBrandConfig(id)
 })
 
-test('isActiveBrandConfig', function() {
+test('isActiveBrandConfig', () => {
   let c = new CollectionView(props)
   ok(
     c.isActiveBrandConfig({md5: props.activeBrandConfig.md5}),
@@ -146,7 +146,7 @@ test('isActiveBrandConfig', function() {
   )
 })
 
-test('showsTooltipOnCopiedThemes', function() {
+test('showsTooltipOnCopiedThemes', () => {
   const twoSameConfigs = JSON.parse(JSON.stringify(props))
   twoSameConfigs.sharedBrandConfigs.push({
     account_id: 123,
@@ -180,7 +180,7 @@ test('showsTooltipOnCopiedThemes', function() {
   )
 })
 
-test('isDeletable', function() {
+test('isDeletable', () => {
   const c = new CollectionView(props)
   const config = props.sharedBrandConfigs[0]
   config.account_id = 'different'
@@ -195,7 +195,7 @@ test('isDeletable', function() {
   ok(c.isDeletable(config), 'true if not active and has the same account id')
 })
 
-test('thingsToShow always includes the active theme', function() {
+test('thingsToShow always includes the active theme', () => {
   let c = new CollectionView(props)
   equal(
     c.thingsToShow().accountSpecificThemes.length,
@@ -212,7 +212,7 @@ test('thingsToShow always includes the active theme', function() {
   )
 })
 
-test('thingsToShow includes a default global theme', function() {
+test('thingsToShow includes a default global theme', () => {
   const c = new CollectionView(props)
   ok(
     c.thingsToShow().globalThemes.filter(t => t.name === 'Default Template')[0],
@@ -230,7 +230,7 @@ test('thingsToShow groups themes with the same account id as account specific', 
   )
 })
 
-test('thingsToShow groups themes with different account id as global', function() {
+test('thingsToShow groups themes with different account id as global', () => {
   props.sharedBrandConfigs.forEach(bc => bc.account_id == 'otheraccount')
   const c = new CollectionView(props)
   equal(
@@ -240,7 +240,7 @@ test('thingsToShow groups themes with different account id as global', function(
   )
 })
 
-test('thingsToShow returns the active brand config first', function() {
+test('thingsToShow returns the active brand config first', () => {
   const c = new CollectionView(props)
   props.sharedBrandConfigs.account_id = props.accountID
   props.sharedBrandConfigs.unshift({
@@ -257,7 +257,7 @@ test('thingsToShow returns the active brand config first', function() {
   )
 })
 
-test('renderCard renders a ThemeCard', function() {
+test('renderCard renders a ThemeCard', () => {
   const c = new CollectionView(props)
   const config = {
     name: 'Test Theme',
@@ -269,7 +269,7 @@ test('renderCard renders a ThemeCard', function() {
   equal(card.props.name, config.name, 'passes name prop')
 })
 
-test('renderCard properly indicates which theme is active', function() {
+test('renderCard properly indicates which theme is active', () => {
   const systemTheme = {
     account_id: null, // system themes have a 'null' account_id
     name: 'System-shared Theme',

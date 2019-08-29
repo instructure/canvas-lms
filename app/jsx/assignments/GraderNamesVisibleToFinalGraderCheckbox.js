@@ -25,13 +25,12 @@ export default class GraderNamesVisibleToFinalGraderCheckbox extends React.Compo
 
   constructor(props) {
     super(props)
-    this.handleChange = this.handleChange.bind(this)
     this.state = {checked: props.checked}
   }
 
-  handleChange({target: checkbox}) {
+  handleChange = ({target: checkbox}) => {
     this.setState({checked: checkbox.checked})
-  }
+  };
 
   render() {
     return (

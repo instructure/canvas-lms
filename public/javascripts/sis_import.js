@@ -120,7 +120,7 @@ $(document).ready(function(event) {
     var checkup = function() {
       var lastProgress = null;
       var waitTime = 1500;
-      $.ajaxJSON(location.href, 'GET', {}, function(data) {
+      $.ajaxJSON(location.href, 'GET', {}, data => {
         state = "updating";
         var sis_batch = data;
         var progress = 0;
@@ -163,7 +163,7 @@ $(document).ready(function(event) {
           lastProgress = progress;
           setTimeout(checkup, 1500);
         }
-      }, function() {
+      }, () => {
         setTimeout(checkup, 3000);
       });
     };
@@ -193,7 +193,7 @@ $(document).ready(function(event) {
 
   function check_if_importing() {
       state = "checking";
-      $.ajaxJSON(location.href, 'GET', {}, function(data) {
+      $.ajaxJSON(location.href, 'GET', {}, data => {
         state = "nothing";
         var sis_batch = data;
         var progress = 0;

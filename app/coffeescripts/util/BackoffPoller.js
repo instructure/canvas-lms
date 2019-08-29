@@ -29,8 +29,6 @@ import 'jquery.ajaxJSON'
 
 export default class BackoffPoller {
   constructor (url, handler, opts = {}) {
-    this.poll = this.poll.bind(this)
-    this.handle = this.handle.bind(this)
     this.url = url
     this.handler = handler
     this.baseInterval = opts.baseInterval != null ? opts.baseInterval : 1000
@@ -65,15 +63,15 @@ export default class BackoffPoller {
     delete this.callbacks
   }
 
-  poll () {
+  poll = () => {
     this.running = true
     this.attempts++
     return jQuery.ajaxJSON(this.url, 'GET', {}, this.handle, (data, xhr) =>
       this.handleErrors ? this.handle(data, xhr) : this.stop()
     )
-  }
+  };
 
-  handle (data, xhr) {
+  handle = (data, xhr) => {
     switch (this.handler(data, xhr)) {
       case 'continue':
         return this.nextPoll()
@@ -84,7 +82,7 @@ export default class BackoffPoller {
       default:
         return this.stop()
     }
-  }
+  };
 
   nextPoll (reset = false) {
     if (reset) {

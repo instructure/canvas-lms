@@ -23,7 +23,7 @@ import I18n from 'i18n!gradezilla'
 import {createClient, gql} from '../../../canvas-apollo'
 import {showFlashAlert} from '../../../shared/FlashAlert'
 
-export async function getFinalGradeOverrides(courseId) {
+export function getFinalGradeOverrides(courseId) {
   const url = `/courses/${courseId}/gradebook/final_grade_overrides`
 
   return axios
@@ -60,7 +60,7 @@ export async function getFinalGradeOverrides(courseId) {
     })
 }
 
-export async function updateFinalGradeOverride(enrollmentId, gradingPeriodId, grade) {
+export function updateFinalGradeOverride(enrollmentId, gradingPeriodId, grade) {
   const gradingPeriodQuery = gradingPeriodId ? `gradingPeriodId: ${gradingPeriodId}` : ''
 
   const mutation = gql`

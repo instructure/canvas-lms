@@ -23,6 +23,8 @@ class ContentExport < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_one :sent_content_share
+  has_many :received_content_shares
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
@@ -92,6 +94,10 @@ class ContentExport < ActiveRecord::Base
     # non-admins can create zip or user-data exports, but not other types
     given { |user, session| [ZIP, USER_DATA].include?(self.export_type) && self.context.grants_right?(user, session, :read) }
     can :create
+
+    # users can read exports that are shared with them
+    given { |user| ContentShare.where(user: user, content_export: self).exists? }
+    can :read
   end
 
   def set_global_identifiers

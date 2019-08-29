@@ -24,7 +24,7 @@ export default function(state = {}, action) {
   switch (action.type) {
     case REQUEST_PAGE:
       // set loading flag to true
-      return Object.assign({}, state, { loading: true });
+      return { ...state, loading: true};
 
     case RECEIVE_PAGE:
       // add links to collection, store bookmark if more, resolve loading
@@ -35,14 +35,14 @@ export default function(state = {}, action) {
       };
 
     case FAIL_PAGE: {
-      let overrides = {
+      const overrides = {
         loading: false,
         error: action.error
       };
       if (state.links.length == 0) {
         overrides.bookmark = null;
       }
-      return Object.assign({}, state, overrides);
+      return { ...state, ...overrides};
     }
     default:
       return state;

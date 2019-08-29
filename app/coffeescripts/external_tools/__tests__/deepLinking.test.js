@@ -63,24 +63,22 @@ describe('handleDeepLinkingError', () => {
     }
   }
   const reloadTool = jest.fn()
-  const flashError = $.flashError
 
   beforeEach(() => {
     reloadTool.mockReset()
-    $.flashError = jest.fn()
-
+    jest.spyOn($, 'flashError').mockImplementation()
+    jest.spyOn(console, 'error').mockImplementation()
     handleDeepLinkingError(error, contentView, reloadTool)
   })
 
-  afterEach(() => {
-    $.flashError = flashError
-  })
 
   it('displays an error to the user', () => {
+    expect(console.error).toHaveBeenCalled()
     expect($.flashError).toHaveBeenCalledWith('Error retrieving content')
   })
 
   it('reloads the tool', () => {
+    expect(console.error).toHaveBeenCalled()
     expect(reloadTool).toHaveBeenCalledWith(contentView.model.id)
   })
 })

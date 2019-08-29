@@ -237,7 +237,7 @@ export default class Navigation extends React.Component {
     count = parseInt(count, 10)
     this.setState({unread_count: count}, this.props.onDataRecieved)
     ReactDOM.render(
-      <React.Fragment>
+      <>
         <ScreenReaderContent>
           {I18n.t(
             {
@@ -248,7 +248,7 @@ export default class Navigation extends React.Component {
           )}
         </ScreenReaderContent>
         <PresentationContent>{count}</PresentationContent>
-      </React.Fragment>,
+      </>,
       this.unreadCountElement()
     )
     const badgeElements = [this.unreadCountElement(), document.getElementById('mobileHeaderInboxUnreadBadge')]

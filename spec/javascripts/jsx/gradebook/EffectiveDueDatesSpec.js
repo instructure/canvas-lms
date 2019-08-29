@@ -20,8 +20,8 @@ import _ from 'underscore'
 import timezone from 'timezone'
 import {scopeToUser, updateWithSubmissions} from 'jsx/gradebook/EffectiveDueDates'
 
-QUnit.module('EffectiveDueDates', function() {
-  QUnit.module('.scopeToUser', function() {
+QUnit.module('EffectiveDueDates', () => {
+  QUnit.module('.scopeToUser', () => {
     const exampleDueDatesData = {
       201: {
         101: {
@@ -73,11 +73,11 @@ QUnit.module('EffectiveDueDates', function() {
     })
   })
 
-  QUnit.module('.updateWithSubmissions', function(hooks) {
+  QUnit.module('.updateWithSubmissions', hooks => {
     let effectiveDueDates
     let submissions
 
-    hooks.beforeEach(function() {
+    hooks.beforeEach(() => {
       effectiveDueDates = {
         2301: {
           1101: {
@@ -130,7 +130,7 @@ QUnit.module('EffectiveDueDates', function() {
       }
     ]
 
-    test('sets the due_at for each effective due date', function() {
+    test('sets the due_at for each effective due date', () => {
       effectiveDueDates = {}
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
       equal(effectiveDueDates[2301][1101].due_at, '2015-02-01T12:00:00Z')
@@ -138,7 +138,7 @@ QUnit.module('EffectiveDueDates', function() {
       equal(effectiveDueDates[2302][1102].due_at, '2015-04-02T12:00:00Z')
     })
 
-    test('sets the grading_period_id for each effective due date', function() {
+    test('sets the grading_period_id for each effective due date', () => {
       effectiveDueDates = {}
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
       strictEqual(effectiveDueDates[2301][1101].grading_period_id, '1401')
@@ -146,7 +146,7 @@ QUnit.module('EffectiveDueDates', function() {
       strictEqual(effectiveDueDates[2302][1102].grading_period_id, '1402')
     })
 
-    test('sets in_closed_grading_period for each effective due date', function() {
+    test('sets in_closed_grading_period for each effective due date', () => {
       effectiveDueDates = {}
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
       strictEqual(effectiveDueDates[2301][1101].in_closed_grading_period, true)
@@ -154,28 +154,28 @@ QUnit.module('EffectiveDueDates', function() {
       strictEqual(effectiveDueDates[2302][1102].in_closed_grading_period, false)
     })
 
-    test('updates existing effective due dates for students', function() {
+    test('updates existing effective due dates for students', () => {
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
       equal(effectiveDueDates[2301][1101].due_at, '2015-02-01T12:00:00Z')
       strictEqual(effectiveDueDates[2301][1101].grading_period_id, '1401')
       strictEqual(effectiveDueDates[2301][1101].in_closed_grading_period, true)
     })
 
-    test('preserves effective due dates for unrelated students', function() {
+    test('preserves effective due dates for unrelated students', () => {
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
       equal(effectiveDueDates[2301][1103].due_at, '2015-02-02T12:00:00Z')
       strictEqual(effectiveDueDates[2301][1103].grading_period_id, '1401')
       strictEqual(effectiveDueDates[2301][1103].in_closed_grading_period, true)
     })
 
-    test('preserves effective due dates for unrelated assignments', function() {
+    test('preserves effective due dates for unrelated assignments', () => {
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
       equal(effectiveDueDates[2303][1101].due_at, '2015-04-02T12:00:00Z')
       strictEqual(effectiveDueDates[2303][1101].grading_period_id, '1402')
       strictEqual(effectiveDueDates[2303][1101].in_closed_grading_period, false)
     })
 
-    test('uses the last grading period when the cached due date is null', function() {
+    test('uses the last grading period when the cached due date is null', () => {
       effectiveDueDates = {}
       submissions[0].cached_due_date = null
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
@@ -184,7 +184,7 @@ QUnit.module('EffectiveDueDates', function() {
       strictEqual(effectiveDueDates[2301][1101].in_closed_grading_period, false)
     })
 
-    test('uses no grading period when the cached due date is outside any grading period', function() {
+    test('uses no grading period when the cached due date is outside any grading period', () => {
       effectiveDueDates = {}
       submissions[0].cached_due_date = '2015-07-02T12:00:00Z'
       updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods)
@@ -193,7 +193,7 @@ QUnit.module('EffectiveDueDates', function() {
       strictEqual(effectiveDueDates[2301][1101].in_closed_grading_period, false)
     })
 
-    test('uses no grading period when not given any grading periods', function() {
+    test('uses no grading period when not given any grading periods', () => {
       effectiveDueDates = {}
       updateWithSubmissions(effectiveDueDates, submissions, undefined)
       strictEqual(effectiveDueDates[2301][1101].due_at, '2015-02-01T12:00:00Z')

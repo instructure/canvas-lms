@@ -548,27 +548,27 @@ describe "RCE next tests" do
         expect(fj('.tox-toolbar__primary button:contains("12pt")')).to eq(driver.switch_to.active_element)
       end
 
-      it "should focus table context toolbar with alt-f7" do
+      it "should focus table context toolbar with ctrl-f9" do
         page_title = "Page-with-table"
         create_wiki_page_with_content(page_title)
 
         visit_existing_wiki_edit(@course, page_title)
         driver.switch_to.frame('wiki_page_body_ifr')
         f('table td').click # put the cursor in the table
-        f('body').send_keys [:alt, :f7]
+        f('body').send_keys [:control, :f9]
 
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Table properties"]')).to eq(driver.switch_to.active_element)
       end
 
-      it "should focus course file link context toolbar with alt-f7" do
+      it "should focus course file link context toolbar with ctrl-f9" do
         page_title = "Page-with-link"
         create_wiki_page_with_content(page_title)
 
         visit_existing_wiki_edit(@course, page_title)
         driver.switch_to.frame('wiki_page_body_ifr')
         f('a').click # put the cursor in the table
-        f('body').send_keys [:alt, :f7]
+        f('body').send_keys [:control, :f9]
 
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Show link options"]')).to eq(driver.switch_to.active_element)
@@ -576,7 +576,6 @@ describe "RCE next tests" do
 
       it "should display lti icon with a tool enabled for the course" do
         # set up the lti tool
-        Account.default.enable_feature! :lor_for_account
         @tool = Account.default.context_external_tools.new({
            :name => "Commons",
            :domain => "canvaslms.com",

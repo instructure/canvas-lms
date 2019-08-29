@@ -28,10 +28,17 @@ shared_context 'advantage services context' do
     dk
   end
   let(:access_token_scopes) do
-    %w(https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+    %w(
+       https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
        https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
        https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
-       https://canvas.instructure.com/lti/public_jwk/scope/update).join(' ')
+       https://canvas.instructure.com/lti/public_jwk/scope/update
+       https://canvas.instructure.com/lti/data_services/scope/create
+       https://canvas.instructure.com/lti/data_services/scope/show
+       https://canvas.instructure.com/lti/data_services/scope/update
+       https://canvas.instructure.com/lti/data_services/scope/list
+       https://canvas.instructure.com/lti/data_services/scope/destroy
+      ).join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }
   let(:test_request_host) { 'test.host' }

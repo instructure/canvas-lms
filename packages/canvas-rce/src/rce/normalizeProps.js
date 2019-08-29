@@ -22,7 +22,7 @@ import normalizeLocale from "./normalizeLocale";
 import editorLanguage from "./editorLanguage";
 
 export default function(props, tinymce, MutationObserver) {
-  let initialEditorOptions = props.editorOptions(tinymce),
+  const initialEditorOptions = props.editorOptions(tinymce),
     sanitizedEditorOptions = sanitizeEditorOptions(initialEditorOptions),
     editorOptions = wrapInitCb(
       props.mirroredAttrs,

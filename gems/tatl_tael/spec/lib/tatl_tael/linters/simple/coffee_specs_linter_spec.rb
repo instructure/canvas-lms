@@ -10,11 +10,6 @@ describe TatlTael::Linters::Simple::CoffeeSpecsLinter do
                      Consts::APP_COFFEE_PATH,
                      Consts::COFFEE_SPEC_PATH
 
-    context "bundles" do
-      include_examples "does not comment",
-                       [{path: Consts::APP_COFFEE_BUNDLE_PATH, status: "added"}]
-    end
-
     context "with jsx spec changes" do
       include_examples "change combos",
                        Consts::APP_COFFEE_PATH,

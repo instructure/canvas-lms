@@ -56,7 +56,7 @@ import 'rubricEditBinding' // event handler for rubricEditDataReady
       } else {
         var $loading = quizRubric.buildLoadingDialog();
         if(preloadedHtml === undefined || preloadedHtml === null){
-          $.get(url, function(html) {
+          $.get(url, html => {
             quizRubric.replaceLoadingDialog(html, $loading);
           });
         } else {

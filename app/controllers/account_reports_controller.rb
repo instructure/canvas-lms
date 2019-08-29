@@ -315,8 +315,7 @@ class AccountReportsController < ApplicationController
 #
   def index
     if authorized_action(@context, @current_user, :read_reports)
-
-      reports = Api.paginate(type_scope.active.most_recent, self, url_for({action: :index, controller: :account_reports}))
+      reports = Api.paginate(type_scope.active.most_recent.except(:limit), self, url_for({action: :index, controller: :account_reports}))
 
       render :json => account_reports_json(reports, @current_user)
     end

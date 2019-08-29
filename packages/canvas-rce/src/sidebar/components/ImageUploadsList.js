@@ -24,7 +24,7 @@ import UploadedImage from "./UploadedImage";
 
 class ImageUploadsList extends Component {
   componentWillMount() {
-    var fetchEvent = { calledFromRender: true };
+    const fetchEvent = { calledFromRender: true };
     this.props.fetchImages(fetchEvent);
   }
 

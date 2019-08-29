@@ -49,21 +49,21 @@ function createAndSetupMap(assignment, opts = {}) {
 
 QUnit.module('SubmissionStateMap without grading periods')
 
-test('submission in an unpublished assignment is hidden', function() {
+test('submission in an unpublished assignment is hidden', () => {
   const assignment = {id: '1', published: false, effectiveDueDates: {}}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, true)
 })
 
-test('submission in a published assignment is not hidden', function() {
+test('submission in a published assignment is not hidden', () => {
   const assignment = {id: '1', published: true, effectiveDueDates: {}}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, false)
 })
 
-test('submission has grade hidden for a student without assignment visibility', function() {
+test('submission has grade hidden for a student without assignment visibility', () => {
   const assignment = {
     id: '1',
     published: true,
@@ -75,7 +75,7 @@ test('submission has grade hidden for a student without assignment visibility', 
   equal(state.hideGrade, true)
 })
 
-test('submission has grade visible for a student with assignment visibility', function() {
+test('submission has grade visible for a student with assignment visibility', () => {
   const assignment = {id: '1', published: true, effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: null,

@@ -17,8 +17,10 @@
  */
 
 import 'isomorphic-fetch'
-import {downloadToWrap} from '../../common/fileUrl'
 import {parse} from 'url'
+import {downloadToWrap} from '../../common/fileUrl'
+import formatMessage from '../../format-message'
+import alertHandler from '../../rce/alertHandler'
 
 function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -29,7 +31,7 @@ function checkStatus(response) {
   if (response.status < 400) {
     return response
   } else {
-    var error = new Error(response.statusText)
+    const error = new Error(response.statusText)
     error.response = response
     throw error
   }
@@ -68,14 +70,13 @@ function normalizeFileData(file) {
 
 function throwConnectionError (error) {
     if (error.name === 'TypeError') {
-      throw new Error(`Failed to fetch from the canvas-rce-api.
-        Did you forget to start it or configure it?
-        Details can be found at https://github.com/instructure/canvas-rce-api
-      `)
-    } else {
-      throw error
+      //eslint-disable-next-line no-console
+      console.error(`Failed to fetch from the canvas-rce-api.
+      Did you forget to start it or configure it?
+      Details can be found at https://github.com/instructure/canvas-rce-api
+    `)
     }
-
+    throw error
 }
 
 class RceApiSource {
@@ -84,6 +85,7 @@ class RceApiSource {
     this.host = options.host
     this.refreshToken = options.refreshToken || defaultRefreshTokenHandler
     this.hasSession = false
+    this.alertFunc = options.alertFunc || alertHandler.handleAlert
   }
 
   getSession() {
@@ -126,10 +128,12 @@ class RceApiSource {
 
   initializeDocuments(props) {
     return {
-      files: [],
-      bookmark: this.uriFor('documents', props),
-      isLoading: false,
-      hasMore: true // there's always more when you haven't tried yet
+      [props.contextType]: {
+        files: [],
+        bookmark: null,
+        isLoading: false,
+        hasMore: true
+      }
     }
   }
 
@@ -146,7 +150,9 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
-  fetchDocs(uri) {
+  fetchDocs(props) {
+    const documents = props.documents[props.contextType]
+    const uri = documents.bookmark || this.uriFor('documents', props)
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
@@ -181,13 +187,19 @@ class RceApiSource {
 
   // fetches folders for the given context to upload files to
   fetchFolders(props, bookmark) {
-    let headers = headerFor(this.jwt)
-    let uri = bookmark || this.uriFor('folders/all', props)
+    const headers = headerFor(this.jwt)
+    const uri = bookmark || this.uriFor('folders/all', props)
     return this.apiFetch(uri, headers)
   }
 
   fetchMediaFolder(props) {
-    return this.fetchPage(this.uriFor('folders/media', props))
+    let uri
+    if (props.contextType === 'user') {
+      uri = this.uriFor('folders', props)
+    } else {
+      uri = this.uriFor('folders/media', props)
+    }
+    return this.fetchPage(uri)
   }
 
   fetchMediaObjectIframe(mediaObjectId) {
@@ -198,16 +210,16 @@ class RceApiSource {
     if (props.bookmark) {
       return this.apiFetch(props.bookmark, headerFor(this.jwt))
     } else {
-      let headers = headerFor(this.jwt)
-      let uri = this.uriFor('images', props)
+      const headers = headerFor(this.jwt)
+      const uri = this.uriFor('images', props)
       return this.apiFetch(uri, headers)
     }
   }
 
   preflightUpload(fileProps, apiProps) {
-    let headers = headerFor(this.jwt)
-    let uri = this.baseUri('upload', apiProps.host)
-    let body = {
+    const headers = headerFor(this.jwt)
+    const uri = this.baseUri('upload', apiProps.host)
+    const body = {
       contextId: apiProps.contextId,
       contextType: apiProps.contextType,
       file: fileProps,
@@ -217,12 +229,12 @@ class RceApiSource {
   }
 
   uploadFRD(fileDomObject, preflightProps) {
-    var data = new window.FormData()
+    const data = new window.FormData()
     Object.keys(preflightProps.upload_params).forEach(uploadProp => {
       data.append(uploadProp, preflightProps.upload_params[uploadProp])
     })
     data.append('file', fileDomObject)
-    let fetchOptions = {method: 'POST', body: data}
+    const fetchOptions = {method: 'POST', body: data}
     if (!preflightProps.upload_params['x-amz-signature']) {
       // _not_ an S3 upload, include the credentials in the upload POST
       fetchOptions.credentials = 'include'
@@ -234,6 +246,14 @@ class RceApiSource {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
       .then(normalizeFileData)
+      .catch((e) => {
+        this.alertFunc({
+          text: formatMessage('Something went wrong uploading, check your connection and try again.'),
+          variant: 'error'
+        })
+        // eslint-disable-next-line no-console
+        console.error(e)
+      })
   }
 
   finalizeUpload(preflightProps, uploadResults) {
@@ -248,14 +268,14 @@ class RceApiSource {
       // response. we can't just fetch the location as would be intended because
       // it requires Canvas authentication. we also don't have an RCE API
       // endpoint to forward it through.
-      let {pathname} = parse(uploadResults.location)
-      let matchData = pathname.match(/^\/api\/v1\/files\/(\d+)$/)
+      const {pathname} = parse(uploadResults.location)
+      const matchData = pathname.match(/^\/api\/v1\/files\/(\d+)$/)
       if (!matchData) {
-        let error = new Error('cannot determine file ID from location')
+        const error = new Error('cannot determine file ID from location')
         error.location = uploadResults.location
         throw error
       }
-      let fileId = matchData[1]
+      const fileId = matchData[1]
       return this.getFile(fileId)
     } else {
       // local-storage upload, this _is_ the attachment information
@@ -264,37 +284,37 @@ class RceApiSource {
   }
 
   setUsageRights(fileId, usageRights) {
-    let headers = headerFor(this.jwt)
-    let uri = this.baseUri('usage_rights')
-    let body = {fileId, ...usageRights}
+    const headers = headerFor(this.jwt)
+    const uri = this.baseUri('usage_rights')
+    const body = {fileId, ...usageRights}
     return this.apiPost(uri, headers, body)
   }
 
   searchFlickr(term, apiProps) {
-    let headers = headerFor(this.jwt)
-    let base = this.baseUri('flickr_search', apiProps.host)
-    let uri = `${base}?term=${encodeURIComponent(term)}`
+    const headers = headerFor(this.jwt)
+    const base = this.baseUri('flickr_search', apiProps.host)
+    const uri = `${base}?term=${encodeURIComponent(term)}`
     return this.apiFetch(uri, headers)
   }
 
   searchUnsplash(term, page) {
-    let headers = headerFor(this.jwt)
-    let base = this.baseUri('unsplash/search')
-    let uri = `${base}?term=${encodeURIComponent(term)}&page=${page}&per_page=12`
+    const headers = headerFor(this.jwt)
+    const base = this.baseUri('unsplash/search')
+    const uri = `${base}?term=${encodeURIComponent(term)}&page=${page}&per_page=12`
     return this.apiFetch(uri, headers)
   }
 
   pingbackUnsplash(id) {
-    let headers = headerFor(this.jwt)
-    let base = this.baseUri('unsplash/pingback')
-    let uri = `${base}?id=${id}`
+    const headers = headerFor(this.jwt)
+    const base = this.baseUri('unsplash/pingback')
+    const uri = `${base}?id=${id}`
     return this.apiFetch(uri, headers, { skipParse: true })
   }
 
   getFile(id) {
-    let headers = headerFor(this.jwt)
-    let base = this.baseUri('file')
-    let uri = `${base}/${id}`
+    const headers = headerFor(this.jwt)
+    const base = this.baseUri('file')
+    const uri = `${base}/${id}`
     return this.apiFetch(uri, headers).then(normalizeFileData)
   }
 
@@ -322,16 +342,21 @@ class RceApiSource {
       .then(checkStatus)
       .then(options.skipParse ? () => {} : parseResponse)
       .catch(throwConnectionError)
+      .catch((e) => {
+        this.alertFunc({
+          text: formatMessage('Something went wrong, try again after refreshing the page'),
+          variant: 'error'
+        })
+        throw e;
+      })
   }
 
   // @private
   apiPost(uri, headers, body) {
-    headers = Object.assign({}, headers, {
-      'Content-Type': 'application/json'
-    })
-    let fetchOptions = {
+    headers = { ...headers, 'Content-Type': 'application/json'}
+    const fetchOptions = {
       method: 'POST',
-      headers: headers,
+      headers,
       body: JSON.stringify(body)
     }
     uri = this.normalizeUriProtocol(uri)
@@ -340,9 +365,7 @@ class RceApiSource {
         if (response.status == 401) {
           // retry once with fresh token
           return this.buildRetryHeaders(fetchOptions.headers).then(newHeaders => {
-            let newOptions = Object.assign({}, fetchOptions, {
-              headers: newHeaders
-            })
+            const newOptions = { ...fetchOptions, headers: newHeaders}
             return fetch(uri, newOptions)
           })
         } else {
@@ -352,11 +375,19 @@ class RceApiSource {
       .then(checkStatus)
       .then(parseResponse)
       .catch(throwConnectionError)
-  }
+      .catch((e) => {
+        this.alertFunc({
+         text: formatMessage('Something went wrong uploading, check your connection and try again.'),
+         variant: 'error'
+       })
+       // eslint-disable-next-line no-console
+       console.error(e)
+      })
+    }
 
   // @private
   normalizeUriProtocol(uri, windowOverride) {
-    let windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
+    const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
     if (windowHandle && windowHandle.location && windowHandle.location.protocol == 'https:') {
       return uri.replace('http://', 'https://')
     }
@@ -368,8 +399,8 @@ class RceApiSource {
     return new Promise(resolve => {
       this.refreshToken(freshToken => {
         this.jwt = freshToken
-        let freshHeader = headerFor(freshToken)
-        let mergedHeaders = Object.assign({}, headers, freshHeader)
+        const freshHeader = headerFor(freshToken)
+        const mergedHeaders = { ...headers, ...freshHeader}
         resolve(mergedHeaders)
       })
     })
@@ -383,7 +414,7 @@ class RceApiSource {
       host = ''
     } else if (host && host.substr(0, 4) !== 'http') {
       host = `//${host}`
-      let windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
+      const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
       if (
         host.length > 0 &&
         windowHandle &&
@@ -394,7 +425,7 @@ class RceApiSource {
       }
     }
     const sharedEndpoints = ['media', 'documents', 'all']
-    let endpt = sharedEndpoints.includes(endpoint) ? 'documents' : endpoint
+    const endpt = sharedEndpoints.includes(endpoint) ? 'documents' : endpoint
     return `${host}/api/${endpt}`
   }
 
@@ -404,7 +435,7 @@ class RceApiSource {
   //   //rce.docker/api/wikiPages?context_type=course&context_id=42
   //
   uriFor(endpoint, props) {
-    let {host, contextType, contextId} = props
+    const {host, contextType, contextId} = props
     let extra = ''
     switch(endpoint) {
       // images will eventually work, but it has to be looking for files, not images in the response

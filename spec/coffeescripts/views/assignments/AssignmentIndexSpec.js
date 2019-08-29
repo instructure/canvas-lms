@@ -189,7 +189,7 @@ QUnit.module('student index view', {
   }
 })
 
-test('should clear search on toggle', function() {
+test('should clear search on toggle', () => {
   const clear_spy = sandbox.spy(IndexView.prototype, 'clearSearch')
   const view = assignmentIndex()
   view.$('#search_term').val('something')

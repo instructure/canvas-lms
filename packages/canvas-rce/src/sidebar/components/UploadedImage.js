@@ -40,10 +40,10 @@ class UploadedImage extends Component {
   };
 
   renderImg() {
-    let image = this.props.image;
+    const image = this.props.image;
     return (
       <img
-        draggable={true}
+        draggable
         onDragStart={this.onDrag}
         src={image.thumbnail_url}
         alt={image.display_name}
@@ -54,7 +54,7 @@ class UploadedImage extends Component {
   }
 
   render() {
-    let title = formatMessage("Click to embed image");
+    const title = formatMessage("Click to embed image");
     return (
       <a
         href={this.props.image}

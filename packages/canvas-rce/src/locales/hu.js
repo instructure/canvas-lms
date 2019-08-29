@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/hu.json";
 import "../rce/languages/hu_HU";
+
 formatMessage.addLocale({ hu: locale });

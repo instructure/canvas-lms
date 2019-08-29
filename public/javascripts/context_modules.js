@@ -115,13 +115,13 @@ function scrollTo ($thing, time = 500) {
         })
         const url = `${ENV.CONTEXT_URL_ROOT}/modules/reorder`
         $("#context_modules").loadingImage();
-        $.ajaxJSON(url, 'POST', {order: ids.join(",")}, function(data) {
+        $.ajaxJSON(url, 'POST', {order: ids.join(",")}, data => {
           $("#context_modules").loadingImage('remove');
           for(var idx in data) {
             var module = data[idx];
             $("#context_module_" + module.context_module.id).triggerHandler('update', module);
           }
-        }, function(data) {
+        }, data => {
           $("#context_modules").loadingImage('remove');
         });
       },
@@ -136,7 +136,7 @@ function scrollTo ($thing, time = 500) {
         });
         $module.find(".context_module_items.ui-sortable").sortable('disable');
         $module.disableWhileLoading(
-          $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
+          $.ajaxJSON(url, 'POST', {order: items.join(",")}, data => {
             if(data && data.context_module && data.context_module.content_tags) {
               for(var idx in data.context_module.content_tags) {
                 var tag = data.context_module.content_tags[idx].content_tag;
@@ -146,7 +146,7 @@ function scrollTo ($thing, time = 500) {
               }
             }
             $module.find(".context_module_items.ui-sortable").sortable('enable');
-          }, function(data) {
+          }, data => {
             $module.find(".content").loadingImage('remove');
             $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
           })
@@ -213,14 +213,14 @@ function scrollTo ($thing, time = 500) {
             }
           }
           nextProgression();
-        }, function() {
+        }, () => {
           if(callback) { callback(); }
         });
       },
 
       updateAssignmentData: function(callback) {
-        return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
-          $.each(data, function(id, info) {
+        return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, data => {
+          $.each(data, (id, info) => {
             var $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
@@ -251,7 +251,7 @@ function scrollTo ($thing, time = 500) {
           });
           vddTooltip();
           if (callback) { callback(); }
-        }, function() {
+        }, () => {
           if (callback) { callback(); }
         });
       },
@@ -259,18 +259,18 @@ function scrollTo ($thing, time = 500) {
       loadMasterCourseData: function(tag_id) {
         if (ENV.MASTER_COURSE_SETTINGS) {
           // Grab the stuff for master courses if needed
-          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, function (data) {
+          $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', {tag_id: tag_id}, data => {
             if (data.tag_restrictions) {
-              $.each(data.tag_restrictions, function (id, restriction) {
+              $.each(data.tag_restrictions, (id, restriction) => {
                 var $item = $('#context_module_item_' + id).not('.master_course_content');
                 $item.addClass('master_course_content');
-                if (Object.keys(restriction).some(function (r) { return restriction[r] })) {
+                if (Object.keys(restriction).some(r => restriction[r])) {
                   $item.attr('data-master_course_restrictions', JSON.stringify(restriction));  // need it if user selects Edit from cog menu
                 }
                 this.initMasterCourseLockButton($item, restriction);
-              }.bind(this));
+              });
             }
-          }.bind(this));
+          });
         }
       },
 
@@ -358,7 +358,7 @@ function scrollTo ($thing, time = 500) {
         }
 
 
-        $module.fadeIn('fast', function() {
+        $module.fadeIn('fast', () => {
         });
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
@@ -609,9 +609,7 @@ function scrollTo ($thing, time = 500) {
           var $icon_container = $mod_item.find('.module-item-status-icon');
           var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
 
-          var completed = _.some(reqs_met, function(req) {
-            return (req.id == mod_id && $mod_item.hasClass(req.type + "_requirement"));
-          });
+          var completed = _.some(reqs_met, req => req.id == mod_id && $mod_item.hasClass(req.type + "_requirement"));
           if (completed)  {
             $mod_item.addClass('completed_item');
             addIcon($icon_container, 'icon-check', I18n.t('Completed'));
@@ -665,7 +663,7 @@ function scrollTo ($thing, time = 500) {
 
         var isMasterCourseMasterContent = !!('moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_MASTER_COURSE);
         var isMasterCourseChildContent = !!('moduleItemId' in data && ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE);
-        var restricted = !!('moduleItemId' in data && Object.keys(tagRestriction).some(function (r) { return tagRestriction[r] }));
+        var restricted = !!('moduleItemId' in data && Object.keys(tagRestriction).some(r => tagRestriction[r]));
 
         var model = new MasterCourseModuleLock({
           is_master_course_master_content: isMasterCourseMasterContent,
@@ -684,7 +682,7 @@ function scrollTo ($thing, time = 500) {
         var view = new LockIconView(viewOptions);
         view.render();
       }
-    }
+    };
   })();
 
   var addIcon = function($icon_container, css_class, message) {
@@ -728,10 +726,29 @@ function scrollTo ($thing, time = 500) {
         prereqsList += prereqs[i].name + ', ';
       }
       prereqsList = prereqsList.slice(0, -2)
-      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + prereqsList, 'class': 'prerequisites_message'});
+      const $prerequisitesMessage = $('<div />', {text: prerequisitesMessage(prereqsList), 'class': 'prerequisites_message'});
       $prerequisitesDiv.append($prerequisitesMessage);
 
     }
+  }
+
+  // after a module has been updated, update its name as used in other modules' prerequisite lists
+  var updateOtherPrerequisites = function(id, name) {
+    $('div.context_module .prerequisite_criterion .id').each(function(_, idNode) {
+      const $id = $(idNode)
+      const prereq_id = $id.text()
+      if (prereq_id == id) {
+        const $crit = $id.closest('.prerequisite_criterion')
+        $crit.find('.name').text(name)
+        const $prereqs = $id.closest('.prerequisites')
+        const names = $.makeArray($prereqs.find('.prerequisite_criterion .name')).map(el => $(el).text()).join(', ')
+        $prereqs.find('.prerequisites_message').text(prerequisitesMessage(names))
+      }
+    })
+  }
+
+  var prerequisitesMessage = function(list) {
+    return I18n.t('Prerequisites: %{list}', {list})
   }
 
   var newPillMessage = function($module, requirement_count) {
@@ -773,7 +790,7 @@ function scrollTo ($thing, time = 500) {
     }).triggerHandler('change');
 
     // -------- BINDING THE UPDATE EVENT -----------------
-    $(".context_module").bind('update', function(event, data) {
+    $(".context_module").bind('update', (event, data) => {
       data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at);
       data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at);
       var $module = $("#context_module_" + data.context_module.id);
@@ -791,6 +808,7 @@ function scrollTo ($thing, time = 500) {
 
       $module.find(".unlock_details").showIf(data.context_module.unlock_at && Date.parse(data.context_module.unlock_at) > new Date());
       updatePrerequisites($module, data.context_module.prerequisites);
+      updateOtherPrerequisites(data.context_module.id, data.context_module.name);
 
       // Update requirement message pill
       if (data.context_module.completion_requirements.length === 0) {
@@ -1027,7 +1045,7 @@ function scrollTo ($thing, time = 500) {
       $option.closest('.criterion').find('.delete_criterion_link').attr('aria-label', I18n.t('Delete requirement %{item} (%{type})', { item: itemName, type: reqType }))
     });
 
-    $("#add_context_module_form .requirement-count-radio .ic-Radio input").change(function() {
+    $("#add_context_module_form .requirement-count-radio .ic-Radio input").change(() => {
       if ($('#context_module_requirement_count_').prop('checked')) {
         $('.require-sequential').show();
       } else {
@@ -1137,17 +1155,17 @@ function scrollTo ($thing, time = 500) {
       var indent = modules.currentIndent($item);
       indent = Math.max(Math.min(indent + (do_indent ? 1 : -1), 5), 0);
       $item.loadingImage({image_size: 'small'});
-      $.ajaxJSON($(this).attr('href'), "PUT", {'content_tag[indent]': indent}, function(data) {
+      $.ajaxJSON($(this).attr('href'), "PUT", {'content_tag[indent]': indent}, data => {
         $item.loadingImage('remove');
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items.ui-sortable").sortable('refresh');
         modules.updateAssignmentData();
 
-      }, function(data) {
-      }).done (function() {
+      }, data => {
+      }).done (() => {
         if (elemID) {
-          setTimeout(function() {;
+          setTimeout(() => {;
             var $activeElemClass = "." + $(activeElem).attr('class').split(' ').join(".");
             $(elemID).find($activeElemClass).focus();
           }, 0);
@@ -1183,7 +1201,7 @@ function scrollTo ($thing, time = 500) {
         minWidth: 320
       }).fixDialogButtons();
     });
-    $("#edit_item_form .cancel_button").click(function(event) {
+    $("#edit_item_form .cancel_button").click(event => {
       $("#edit_item_form").dialog('close');
     });
     $("#edit_item_form").formSubmit({
@@ -1379,11 +1397,11 @@ function scrollTo ($thing, time = 500) {
       renderTray(moveTrayProps, document.getElementById('not_right_side'))
     })
 
-    $('.drag_and_drop_warning').on('focus', function (event) {
+    $('.drag_and_drop_warning').on('focus', event => {
       $(event.currentTarget).removeClass('screenreader-only');
     })
 
-    $('.drag_and_drop_warning').on('blur', function (event) {
+    $('.drag_and_drop_warning').on('blur', event => {
       $(event.currentTarget).addClass('screenreader-only');
     })
 
@@ -1392,7 +1410,7 @@ function scrollTo ($thing, time = 500) {
       modules.editModule($(this).parents(".context_module"))
     });
 
-    $(".add_module_link").live('click', function(event) {
+    $(".add_module_link").live('click', event => {
       event.preventDefault();
       modules.addModule();
     });
@@ -1403,7 +1421,7 @@ function scrollTo ($thing, time = 500) {
       $trigger.blur();
       var $module = $(this).closest(".context_module");
       if($module.hasClass('collapsed_module')) {
-        $module.find(".expand_module_link").triggerHandler('click', function() {
+        $module.find(".expand_module_link").triggerHandler('click', () => {
           $module.find(".add_module_item_link").click();
         });
         return;
@@ -1429,7 +1447,7 @@ function scrollTo ($thing, time = 500) {
           $module.find(".context_module_items.ui-sortable").sortable('refresh').sortable('disable');
           var url = $module.find(".add_module_item_link").attr('rel');
           $module.disableWhileLoading(
-            $.ajaxJSON(url, 'POST', item_data, function(data) {
+            $.ajaxJSON(url, 'POST', item_data, data => {
               $item.remove();
               data.content_tag.type = item_data['item[type]'];
               $item = modules.addItemToModule($module, data.content_tag);
@@ -1503,7 +1521,7 @@ function scrollTo ($thing, time = 500) {
       console.log('send module item to user')
     })
 
-    $("#add_module_prerequisite_dialog .cancel_button").click(function() {
+    $("#add_module_prerequisite_dialog .cancel_button").click(() => {
       $("#add_module_prerequisite_dialog").dialog('close');
     });
 
@@ -1525,7 +1543,7 @@ function scrollTo ($thing, time = 500) {
 
       $criterion.dim();
 
-      $.ajaxJSON(url, 'PUT', data, function(data) {
+      $.ajaxJSON(url, 'PUT', data, data => {
         $("#context_module_" + data.context_module.id).triggerHandler('update', data);
       });
     });
@@ -1541,11 +1559,11 @@ function scrollTo ($thing, time = 500) {
       });
       var url = $module.find(".edit_module_link").attr('href');
       var data = {'context_module[prerequisites]': prereqs.join(",")}
-      $.ajaxJSON(url, 'PUT', data, function(data) {
+      $.ajaxJSON(url, 'PUT', data, data => {
         $("#add_module_prerequisite_dialog").loadingImage('remove');
         $("#add_module_prerequisite_dialog").dialog('close');
         $("#context_module_" + data.context_module.id).triggerHandler('update', data);
-      }, function(data) {
+      }, data => {
         $("#add_module_prerequisite_dialog").loadingImage('remove');
         $("#add_module_prerequisite_dialog").formErrors(data);
       });
@@ -1574,7 +1592,7 @@ function scrollTo ($thing, time = 500) {
         width: 400
       });
     });
-    $("#add_context_module_form .cancel_button").click(function(event) {
+    $("#add_context_module_form .cancel_button").click(event => {
       modules.hideEditModule(true);
     });
     setTimeout(function() {
@@ -1720,7 +1738,7 @@ function scrollTo ($thing, time = 500) {
     var overrideModuleModel = function(model) {
       var publish = model.publish, unpublish = model.unpublish;
       model.publish = function() {
-        return publish.apply(model, arguments).done(function(data) {
+        return publish.apply(model, arguments).done(data => {
           if (data.publish_warning) {
             $.flashWarning(I18n.t('Some module items could not be published'))
           }
@@ -1728,17 +1746,17 @@ function scrollTo ($thing, time = 500) {
           relock_modules_dialog.renderIfNeeded(data);
           model
             .fetch({data: {include: 'items'}})
-            .done(function(attrs) {
+            .done(attrs => {
               for (var i = 0; i < attrs.items.length; i++)
                 updateModuleItem(attrs.items[i], model);
             });
         });
       };
       model.unpublish = function() {
-        return unpublish.apply(model, arguments).done(function() {
+        return unpublish.apply(model, arguments).done(() => {
           model
             .fetch({data: {include: 'items'}})
-            .done(function(attrs) {
+            .done(attrs => {
               for (var i = 0; i < attrs.items.length; i++)
                 updateModuleItem(attrs.items[i], model);
             });
@@ -1748,12 +1766,12 @@ function scrollTo ($thing, time = 500) {
     var overrideItemModel = function(model) {
       var publish = model.publish, unpublish = model.unpublish;
       model.publish = function() {
-        return publish.apply(model, arguments).done(function(attrs) {
+        return publish.apply(model, arguments).done(attrs => {
           updateModuleItem($.extend({published:true}, attrs), model);
         });
       };
       model.unpublish = function() {
-        return unpublish.apply(model, arguments).done(function(attrs) {
+        return unpublish.apply(model, arguments).done(attrs => {
           updateModuleItem($.extend({published:false}, attrs), model);
         });
       };
@@ -1769,7 +1787,7 @@ function scrollTo ($thing, time = 500) {
       moduleItems[contentKey].push({model: model, view: view});
     };
 
-    $('.publish-icon').each(function(index, el) {
+    $('.publish-icon').each((index, el) => {
       var $el = $(el);
       if ($el.data('id')) {
         var view = initPublishButton($el);
@@ -1777,7 +1795,7 @@ function scrollTo ($thing, time = 500) {
       }
     });
 
-    $('.module-publish-link').each(function(i, element){
+    $('.module-publish-link').each((i, element) => {
       var $el = $(element);
       var model = new Publishable({ published: $el.hasClass('published'), id: $el.attr('data-id') }, { url: $el.attr('data-url'), root: 'module' });
       var view = new PublishButtonView({model: model, el: $el});
@@ -1862,7 +1880,7 @@ function scrollTo ($thing, time = 500) {
     if(goSlow) {
       url = $module.find(".edit_module_link").attr('href');
     }
-    $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, function(data) {
+    $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, data => {
       if(goSlow) {
         $module.loadingImage('remove');
         var items = data;
@@ -1890,7 +1908,7 @@ function scrollTo ($thing, time = 500) {
           modules.updateProgressionState($module);
         }
       }
-    }, function(data) {
+    }, data => {
       $module.loadingImage('remove');
     });
     if(collapse == '1' || !reload_entries) {
@@ -1925,7 +1943,7 @@ function scrollTo ($thing, time = 500) {
       $(this).addClass('context_module_item_hover');
     })
 
-    $('.context_module_item').each(function (i, $item) {
+    $('.context_module_item').each((i, $item) => {
       modules.evaluateItemCyoe($item)
     });
 
@@ -1974,7 +1992,7 @@ function scrollTo ($thing, time = 500) {
     // Keyboard Shortcuts:
     // "k" and "up arrow" move the focus up between modules and module items
     var $document = $(document);
-    $document.keycodes('k up', function(event) {
+    $document.keycodes('k up', event => {
       var params = {
                     selectWhenModuleFocused: {
                       item: $currentElem && $currentElem.prev(".context_module").find(".context_module_item:visible:last"),
@@ -1991,7 +2009,7 @@ function scrollTo ($thing, time = 500) {
     });
 
     // "j" and "down arrow" move the focus down between modules and module items
-    $document.keycodes('j down', function(event) {
+    $document.keycodes('j down', event => {
        var params = {
                     selectWhenModuleFocused: {
                       item: $currentElem && $currentElem.find(".context_module_item:visible:first"),
@@ -2010,7 +2028,7 @@ function scrollTo ($thing, time = 500) {
     // "e" opens up Edit Module Settings form if focus is on Module or Edit Item Details form if focused on Module Item
     // "d" deletes module or module item
     // "space" opens up Move Item or Move Module form depending on which item is focused
-    $document.keycodes('e d space', function(event) {
+    $document.keycodes('e d space', event => {
       if (!$currentElem) return;
 
       var $elem = getClosestModuleOrItem($currentElem);
@@ -2035,14 +2053,14 @@ function scrollTo ($thing, time = 500) {
     });
 
     // "n" opens up the Add Module form
-    $document.keycodes('n', function(event) {
+    $document.keycodes('n', event => {
       $(".add_module_link:visible:first").click();
       event.preventDefault();
     });
 
     // "i" indents module item
     // "o" outdents module item
-    $document.keycodes('i o', function(event) {
+    $document.keycodes('i o', event => {
       if (!$currentElem) return;
 
       var $currentElemID = $currentElem.attr('id');
@@ -2053,7 +2071,7 @@ function scrollTo ($thing, time = 500) {
         $currentElem.find(".outdent_item_link:first").trigger("click", [$currentElem, document.activeElement]);
       }
 
-      $document.ajaxStop(function() {
+      $document.ajaxStop(() => {
         $currentElem = $('#' + $currentElemID);
       });
     });
@@ -2064,8 +2082,8 @@ function scrollTo ($thing, time = 500) {
     }
 
     // need the assignment data to check past due state
-    modules.updateAssignmentData(function() {
-      modules.updateProgressions(function() {
+    modules.updateAssignmentData(() => {
+      modules.updateProgressions(() => {
         if (window.location.hash && !window.location.hash.startsWith('#!')) {
           try {
             scrollTo($(window.location.hash))
@@ -2079,7 +2097,7 @@ function scrollTo ($thing, time = 500) {
     });
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', toggleModuleCollapse);
-    $(document).fragmentChange(function(event, hash) {
+    $(document).fragmentChange((event, hash) => {
       if (hash == '#student_progressions') {
         $(".module_progressions_link").trigger('click');
       } else if (!hash.startsWith('#!')) {
@@ -2113,7 +2131,7 @@ function scrollTo ($thing, time = 500) {
         foundModules.push($(this));
       }
     });
-    $("#context_modules").bind('slow_load', function() {
+    $("#context_modules").bind('slow_load', () => {
       var $module = foundModules.shift();
       if($module) {
         $module.find(".expand_module_link:first").triggerHandler('click', true);

@@ -75,7 +75,7 @@ class Enrollment::BatchStateUpdater
     updates = {workflow_state: 'deleted', updated_at: Time.now.utc}
     updates[:sis_batch_id] = sis_batch.id if sis_batch
     Enrollment.where(id: batch).update_all(updates)
-    EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil)
+    EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil, updated_at: Time.now.utc)
     Score.where(enrollment_id: batch).order(:id).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
     data
   end
@@ -128,8 +128,8 @@ class Enrollment::BatchStateUpdater
 
   def self.disassociate_cross_shard_users(user_ids); end
 
-  def self.update_linked_enrollments(students)
-    students.each(&:update_linked_enrollments)
+  def self.update_linked_enrollments(students, restore: false)
+    students.each{|e| e.update_linked_enrollments(restore: restore)}
   end
 
   def self.touch_all_graders_if_needed(students)
@@ -204,7 +204,7 @@ class Enrollment::BatchStateUpdater
     root_account ||= courses.first.root_account
     return unless root_account
     touch_and_update_associations(user_ids)
-    update_linked_enrollments(students)
+    update_linked_enrollments(students, restore: true)
     needs_grading_count_updated(courses)
     recache_all_course_grade_distribution(courses)
     update_cached_due_dates(students, root_account)

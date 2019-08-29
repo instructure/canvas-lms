@@ -57,7 +57,7 @@ describe('Gradebook FinalGradeOverrideApi', () => {
       server.for(url).respond({status: 200, body: responseData})
     })
 
-    async function getFinalGradeOverrides() {
+    function getFinalGradeOverrides() {
       return FinalGradeOverrideApi.getFinalGradeOverrides('1201')
     }
 

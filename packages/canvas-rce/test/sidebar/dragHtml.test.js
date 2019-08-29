@@ -20,7 +20,7 @@ import sinon from "sinon";
 import dragHtml from "../../src/sidebar/dragHtml";
 import * as browser from "../../src/common/browser";
 
-let exampleHtml = "<span>my html</span>";
+const exampleHtml = "<span>my html</span>";
 
 describe("Sidebar dragHtml", () => {
   let ev;

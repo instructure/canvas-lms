@@ -21,6 +21,9 @@ import { canvas } from '@instructure/ui-themes/lib'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
 import setupRavenConsoleLoggingPlugin from '../../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin'
+import {filterUselessConsoleMessages} from '@instructure/js-utils'
+
+filterUselessConsoleMessages(console)
 
 Enzyme.configure({ adapter: new Adapter() })
 

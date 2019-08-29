@@ -15,7 +15,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 describe Attachments::GarbageCollector do
   describe 'FolderContextType' do
@@ -163,6 +163,23 @@ describe Attachments::GarbageCollector do
       expect(att.reload).not_to be_deleted
       expect(att2.reload).not_to be_deleted
       expect(att3.reload).to be_deleted
+    end
+
+    it "doesn't delete if content export is from a direct share" do
+      export = course.content_exports.create!
+      att = attachment_model(
+        context: export,
+        folder: nil,
+        root_attachment_id: nil,
+        uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
+      )
+      export.attachment = att
+      export.save
+      Attachment.where(id: att.id).update_all(created_at: 1.year.ago)
+      SentContentShare.create!(name: 'content export', read_state: 'read', user: user_model, content_export: export)
+
+      gc.delete_content
+      expect(att.reload).not_to be_deleted
     end
 
     it "nulls out ContentExport attachment_ids" do
