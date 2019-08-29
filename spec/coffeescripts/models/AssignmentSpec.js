@@ -223,6 +223,22 @@ test('escapes the name retrieved from the js env', () => {
   equal(assignment.defaultToolName(), 'Default Tool %3Ca href%3D%22https%3A//www.somethingbad.com%22%3E')
 })
 
+QUnit.module('Assignment#defaultToolName', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: undefined
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('does not convert undefined to string', () => {
+  const assignment = new Assignment({name: 'foo'})
+  equal(assignment.defaultToolName(), undefined)
+})
+
 test('returns false if record is not external tool', () => {
   const assignment = new Assignment({name: 'foo'})
   assignment.submissionTypes(['on_paper'])
