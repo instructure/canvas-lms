@@ -83,7 +83,7 @@ module Services
 
       def index(jwt_body, opts = {})
         options = { headers: headers(jwt_body, opts) }
-        request(:get, '/api/subscriptions', options)
+        request(:get, '/api/root_account_subscriptions', options)
       end
 
       private

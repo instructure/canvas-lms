@@ -207,7 +207,7 @@ module Lti
     end
 
     def context
-      Account.active.find(params[:account_id])
+      Account.active.find_by(lti_context_id: params[:account_id])
     end
   end
 end
