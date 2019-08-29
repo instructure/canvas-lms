@@ -1755,6 +1755,8 @@ class BzController < ApplicationController
     preaccel_students = []
     postaccel_students = []
 
+    # TODO: need to update this logic where it will re-set up the qualtrics link if the survey ID has changed in the SF template.
+    # Right now, it only happens the first time they are synced.
     course.students.active.each do |student|
       unless preaccel_id.blank?
         r = RetainedData.get_for_course(course_id, student.id, "qualtrics_link_preaccelerator_survey")
@@ -1778,38 +1780,68 @@ class BzController < ApplicationController
       return
     end
 
-
-    # create the list for this sync
+    # create or update the mailing list for this sync
     # see: https://api.qualtrics.com/reference#create-mailing-lists
-    data = {}
-    data["libraryId"] = BeyondZConfiguration.qualtrics_library_id
-    data["name"] = "#{course.course_code} via sync #{DateTime.now}"
- 
+    mailing_list_name = "#{course.course_code} via sync"
+    mailing_list_id = nil
+
     url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
-
     headers = {}
-    headers["Content-Type"] = "application/json"
     headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
-
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
-    request = Net::HTTP::Post.new(url.request_uri, headers)
-    request.body = data.to_json
 
-    response = http.request(request)
-    obj = JSON.parse(response.body)
+    # Use existing mailing list if it's already been created and this is a subsequent Sync To LMS
+    Rails.logger.info "### Looking for existing Qualtrics mailing list called '#{mailing_list_name}'"
+    obj = fetch_qualtrics_mailing_lists(http)
 
     if obj["meta"]["httpStatus"] != '200 - OK'
       raise Exception.new response.body
-    end
-    Rails.logger.info response.body
+    else
+      # No clue what is going on, but sometimes the response isn't populated even though it says 200 OK.
+      # Just retry a couple times.
+      tries = 0
+      while tries < 5 && obj["result"]["elements"].empty?
+        tries += 1
+        sleep(tries * 2) # sleep longer and longer so we don't over-poll
+        obj = fetch_qualtrics_mailing_lists(http)
+      end
 
-    mailing_list_id = obj["result"]["id"]
+      obj["result"]["elements"].select {|k,v| mailing_list_id = k["id"] if k["name"] ==  mailing_list_name}
+      Rails.logger.info "### Found existing mailing list. name=#{mailing_list_name}, id=#{mailing_list_id}" unless mailing_list_id.blank?
+
+    end
+
+    if mailing_list_id.blank?
+      url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
+      headers = {}
+      headers["Content-Type"] = "application/json"
+      headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      Rails.logger.info "### Creating new Qualtrics mailing list called '#{mailing_list_name}' since we didn't find one."
+      data = {}
+      data["libraryId"] = BeyondZConfiguration.qualtrics_library_id
+      data["name"] = mailing_list_name
+      request = Net::HTTP::Post.new(url.request_uri, headers)
+      request.body = data.to_json
+
+      response = http.request(request)
+      obj = JSON.parse(response.body)
+
+      if obj["meta"]["httpStatus"] != '200 - OK'
+        raise Exception.new response.body
+      end
+      Rails.logger.info "### Qualtrics API call response for creating new mailing list: #{response.inspect} - #{response.body}"
+
+      mailing_list_id = obj["result"]["id"]
+    end
 
     # add the necessary students to this list
     # see: https://api.qualtrics.com/reference#create-contacts-import
 
     additional_data_from_join_server = JSON.parse(params[:additional_data])
+    Rails.logger.debug "### Qualtrics additional_data_from_join_server = #{additional_data_from_join_server.to_json}"
 
     sync = {}
     sync["contacts"] = []
@@ -1822,10 +1854,12 @@ class BzController < ApplicationController
       s["language"] = "EN"
 
       ed = {}
-      if additional_data_from_join_server[student.id]
-        ed["Site"] = additional_data_from_join_server[student.id]["site"]
-        ed["Student ID"] = additional_data_from_join_server[student.id]["student_id"]
-        ed["Salesforce ID"] = additional_data_from_join_server[student.id]["salesforce_id"]
+      if additional_data_from_join_server[student.id.to_s]
+        ed["Site"] = additional_data_from_join_server[student.id.to_s]["site"]
+        ed["Student ID"] = additional_data_from_join_server[student.id.to_s]["student_id"]
+        ed["Salesforce ID"] = additional_data_from_join_server[student.id.to_s]["salesforce_id"]
+      else
+        Rails.logger.info "### No Qualtrics additional_data_from_join_server for student.id = #{student.id} was found. Didn't set embeddedData"
       end
 
       s["embeddedData"] = ed
@@ -1842,6 +1876,7 @@ class BzController < ApplicationController
 
     request = Net::HTTP::Post.new(url.request_uri, headers)
     request.body = sync.to_json
+    Rails.logger.debug "### Sending contact to qualtrics with embedded data: #{request.inspect} - #{request.body}"
 
     response = http.request(request)
     obj = JSON.parse(response.body)
@@ -1849,7 +1884,7 @@ class BzController < ApplicationController
       raise Exception.new response.body
     end
 
-      Rails.logger.info response.body
+      Rails.logger.info "###: Received response from qualtrics API for sending contact information: #{response.body}"
 
     # now create the links for the people...
     # see https://api.qualtrics.com/reference#distribution-create-1
@@ -1875,11 +1910,29 @@ class BzController < ApplicationController
       raise Exception.new response.body
     end
 
-    Rails.logger.info response.body
+    Rails.logger.info "### Fetched Qualtrics links for survey_id = #{survey_id}: #{response.body}"
 
     obj
   end
 
+  # Gets an object populated with the response to: https://api.qualtrics.com/reference#list-mailing-lists-1
+  def fetch_qualtrics_mailing_lists(http)
+    url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
+    headers = {}
+    headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
+
+    request = Net::HTTP::Get.new(url.request_uri, headers)
+    response = http.request(request)
+    obj = JSON.parse(response.body)
+
+    if obj["meta"]["httpStatus"] != '200 - OK'
+      raise Exception.new response.body
+    else
+      Rails.logger.debug "### Qualtrics mailing list lookup API call response: #{response.body}"
+    end
+
+    obj
+  end
 
   def do_qualtrics_list(course_id, http, mailing_list_id, students_list, survey_id, magic_field_name, distrib_name)
     if students_list.any?
@@ -1906,7 +1959,7 @@ class BzController < ApplicationController
         raise Exception.new response.body
       end
 
-      Rails.logger.info response.body
+      Rails.logger.info "### Created Qualtrics Distribution list for survey_id = #{survey_id}, mailing_list_id = #{mailing_list_id}: #{response.body}"
 
       create_id = obj["result"]["id"]
 
@@ -1936,7 +1989,7 @@ class BzController < ApplicationController
           raise Exception.new response.body
         end
 
-        Rails.logger.info response.body
+        Rails.logger.info "### Handling new Qualtrics page for the above Distribution list: #{response.body}"
 
         handle_qualtrics_page(obj, students_list, course_id, magic_field_name)
       end
