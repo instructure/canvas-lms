@@ -1080,6 +1080,32 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Search for content share users
+  #
+  # Returns a paginated list of users you can share content with.  Requires the content share
+  # feature and the user must have the manage content permission for the course.
+  #
+  # @argument search_term [Required, String]
+  #   Term used to find users.  Will search available share users with the search term in their name.
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #          https://<canvas>/api/v1/courses/<course_id>/content_share_users \
+  #          -d 'search_term=smith'
+  #
+  # @returns [User]
+  def content_share_users
+    get_context
+    return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
+    reject!('Search term required') unless params[:search_term]
+    return unless authorized_action(@context, @current_user, :manage_content)
+    users = UserSearch.for_user_in_context(params[:search_term], @context.root_account,
+      @current_user, session, {enrollment_type: ['Ta', 'Teacher', 'Designer']}).
+      where.not(id: @current_user.id)
+    users = Api.paginate(users, self, api_v1_course_content_share_users_url)
+    render :json => users.map { |u| user_display_json(u, @context.root_account) }
+  end
+
   include Api::V1::PreviewHtml
   # @API Preview processed html
   #
