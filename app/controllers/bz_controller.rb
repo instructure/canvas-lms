@@ -1916,8 +1916,6 @@ class BzController < ApplicationController
   end
 
   # Gets an object populated with the response to: https://api.qualtrics.com/reference#list-mailing-lists-1
-  #
-  # Note: Sometimes the response isn't populated even though it says 200 OK. Just try a couple times.
   def fetch_qualtrics_mailing_lists(http)
     url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
     headers = {}
