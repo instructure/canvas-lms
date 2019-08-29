@@ -65,7 +65,7 @@ export default class Assignment extends Model
   isPage: => @_hasOnlyType 'wiki_page'
   isExternalTool: => @_hasOnlyType 'external_tool'
 
-  defaultToolName: => escape(ENV.DEFAULT_ASSIGNMENT_TOOL_NAME).replace(/%20/g, ' ')
+  defaultToolName: => ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && escape(ENV.DEFAULT_ASSIGNMENT_TOOL_NAME).replace(/%20/g, ' ')
   defaultToolUrl: => ENV.DEFAULT_ASSIGNMENT_TOOL_URL
   isNotGraded: => @_hasOnlyType 'not_graded'
   isAssignment: =>
