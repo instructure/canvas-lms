@@ -172,14 +172,16 @@ import 'compiled/badge_counts'
 
 
     // StrongMind Added
-    ga('create', ENV["analytics"]["ga_tracking_id"]);
-    $('.sm-course-menu').on('click', 'nav #section-tabs .section a', function(event) {
-      ga('send', 'event', 
-        'Course Navigation', 
-        'clicked',
-        $(this).text()
-      );
-    });
+    if(typeof ga === 'function') {
+      ga('create', ENV["analytics"]["ga_tracking_id"]);
+      $('.sm-course-menu').on('click', 'nav #section-tabs .section a', function(event) {
+        ga('send', 'event', 
+          'Course Navigation', 
+          'clicked',
+          $(this).text()
+        );
+      });
+    }
     // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
     if (window._earlyClick) {
 
