@@ -409,6 +409,44 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(body['published_score']).to be nil
       end
 
+      context "when assignment has anonymous peer reviewers" do
+        before(:each) do
+          @assignment.update!(peer_reviews: true, anonymous_peer_reviews: true)
+          @peer_reviewer = @course.enroll_student(User.create!, enrollment_state: :active).user
+          peer_reviewer_submission = @assignment.submissions.find_by(user: @peer_reviewer)
+          AssessmentRequest.create!(
+            assessor: @peer_reviewer,
+            assessor_asset: peer_reviewer_submission,
+            asset: @submission,
+            user: @student
+          )
+        end
+
+        it "does not return submission user_id when user is a peer reviewer" do
+          user_session(@peer_reviewer)
+          @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @student.id }
+          @params = { course_id: @course.id, assignment_id: @assignment.id, submission: {student_entered_score: '2'} }.merge(@resource_pair)
+          put :update, params: @params, format: :json
+          expect(body).not_to have_key "user_id"
+        end
+
+        it "returns submission user_id when user is a teacher" do
+          user_session(@teacher)
+          @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @student.id }
+          @params = { course_id: @course.id, assignment_id: @assignment.id, submission: {student_entered_score: '2'} }.merge(@resource_pair)
+          put :update, params: @params, format: :json
+          expect(body).to have_key "user_id"
+        end
+
+        it "returns submission user_id when user owns the submission" do
+          user_session(@student)
+          @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @student.id }
+          @params = { course_id: @course.id, assignment_id: @assignment.id, submission: {student_entered_score: '2'} }.merge(@resource_pair)
+          put :update, params: @params, format: :json
+          expect(body).to have_key "user_id"
+        end
+      end
+
       describe "comments" do
         before(:once) do
           @course = Course.create!
