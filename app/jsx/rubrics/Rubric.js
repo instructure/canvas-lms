@@ -119,25 +119,31 @@ const Rubric = (props) => {
     }
   }
 
+  const headingCells = [
+    <th scope="col" className="rubric-criteria">
+      {I18n.t('Criteria')}
+    </th>,
+    <th scope="col" className="ratings">{I18n.t('Ratings')}</th>,
+    showPointsColumn() ? (
+      <th className="rubric-points" scope="col">{I18n.t('Pts')}</th>
+    ) : null
+  ]
+
   return (
     <div className="react-rubric" style={minSize()}>
       <Table caption={<ScreenReaderContent>{rubric.title}</ScreenReaderContent>}>
         <thead>
+          {/* This row is a hack to force the fixed layout to render as if the title does not exist */}
+          <tr style={{visibility: 'collapse'}}>
+            {headingCells}
+          </tr>
           <tr>
             <th colSpan="3" scope="colgroup" className="rubric-title">
               {rubric.title}
             </th>
           </tr>
           <tr>
-            <th scope="col" className="rubric-criteria">
-              {I18n.t('Criteria')}
-            </th>
-            <th scope="col" className="ratings">{I18n.t('Ratings')}</th>
-            {
-              showPointsColumn() && (
-                <th className="rubric-points" scope="col">{I18n.t('Pts')}</th>
-              )
-            }
+            {headingCells}
           </tr>
         </thead>
         <tbody className="criterions">
