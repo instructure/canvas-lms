@@ -2597,6 +2597,20 @@ describe AssignmentsApiController, type: :request do
         expect(json["errors"]&.keys).to eq ['title']
         expect(json["errors"]["title"].first["message"]).to eq("The title cannot be longer than 10 characters")
       end
+
+      it 'caches overrides correctly' do
+        enable_cache(:redis_cache_store) do
+          sec1 = @course.course_sections.create! name: 'sec1'
+          sec2 = @course.course_sections.create! name: 'sec2'
+          json = api_create_assignment_in_course(@course,
+                     { name: 'test', post_to_sis: true, assignment_overrides: [
+                       { course_section_id: sec1.id, due_at: 1.week.from_now },
+                       { course_section_id: sec2.id, due_at: 2.weeks.from_now }]})
+          assignment = Assignment.find(json['id'])
+          cached_overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @teacher)
+          expect(cached_overrides.map(&:set)).to match_array([sec1, sec2])
+        end
+      end
     end
   end
 

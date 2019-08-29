@@ -460,6 +460,7 @@ module Api::V1::AssignmentOverride
       prepared_overrides[:overrides_to_create].size + prepared_overrides[:overrides_to_update].size
 
     assignment.touch # invalidate cached list of overrides for the assignment
+    assignment.assignment_overrides.reset # unload the obsolete association
     assignment.run_if_overrides_changed_later!(updating_user: updating_user)
   end
 
