@@ -120,6 +120,16 @@ describe("contentRendering", () => {
       assert.equal(rendered, '<img alt="foo" src="/some/path"/>');
     });
 
+    it("includes optional other attributes", () => {
+      image.foo = "bar"
+      image.style={
+        maxWidth: "100px",
+        maxHeight: "17rem"
+      }
+      const rendered = contentRendering.renderImage(image);
+      assert.equal(rendered, '<img alt="Here Be Images" src="/some/path" foo="bar" style="max-width:100px;max-height:17rem"/>');
+    })
+
     it("builds linked image html from linked image data", () => {
       const linkElem = {
         getAttribute: () => {

@@ -19,6 +19,8 @@
 import classnames from "classnames";
 import { renderLink, renderImage, renderLinkedImage } from "./contentRendering";
 import scroll from "../common/scroll";
+import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
+
 
 /** * generic content insertion ** */
 
@@ -95,7 +97,8 @@ export function insertImage(editor, image) {
       image
     );
   } else {
-    content = renderImage(image);
+    // render the image, constraining its size on insertion
+    content = renderImage({...image, style: {maxWidth: `${defaultImageSize}px`, maxHeight: `${defaultImageSize}px`}});
   }
   return insertContent(editor, content);
 }

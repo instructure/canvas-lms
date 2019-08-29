@@ -175,7 +175,7 @@ describe("contentInsertion", () => {
       contentInsertion.insertImage(editor, image);
       assert.equal(
         editor.content,
-        '<img alt="Here Be Images" src="/some/path"/>'
+        '<img alt="Here Be Images" src="/some/path" style="max-width:320px;max-height:320px"/>'
       );
     });
 
@@ -184,7 +184,7 @@ describe("contentInsertion", () => {
       contentInsertion.insertImage(editor, image);
       assert.equal(
         editor.content,
-        '<img alt="Here Be Images" src="/other/path"/>'
+        '<img alt="Here Be Images" src="/other/path" style="max-width:320px;max-height:320px"/>'
       );
     });
 

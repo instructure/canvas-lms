@@ -76,6 +76,7 @@
     "@instructure/ui-themes": "6",
     "@instructure/ui-toggle-details": "6",
     "@instructure/uid": "6",
+    "@instructure/ui-utils": "6",
     "@tinymce/tinymce-react": "^3.0.1",
     "aphrodite": "^2",
     "bloody-offset": "0.0.0",

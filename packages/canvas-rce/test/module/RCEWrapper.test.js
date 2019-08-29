@@ -294,7 +294,7 @@ describe("RCEWrapper", () => {
     describe('insertImagePlaceholder', () => {
       let globalImage
       let contentInsertionStub
-      function mockImage() {
+      function mockImage(props) {
         // jsdom doesn't support Image
         // mock enough for RCEWrapper.insertImagePlaceholder
         globalImage = global.Image
@@ -302,7 +302,8 @@ describe("RCEWrapper", () => {
           return {
             src: null,
             width: '10',
-            height: '10'
+            height: '10',
+            ...props
           }
         }
       }
@@ -333,6 +334,52 @@ describe("RCEWrapper", () => {
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="green_square"
       style="width: 10px; height: 10px; border: solid 1px #8B969E;"
+    />`;
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
+        restoreImage()
+      })
+
+      it('resizes the placeholder image for a large, landscape image', () => {
+        mockImage({width: 640, height: 200})
+        const greenSquare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'green_square',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="green_square"
+      style="width: 320px; height: 100px; border: solid 1px #8B969E;"
+    />`;
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
+        restoreImage()
+      })
+
+      it('resizes the placeholder image for a large, portrait image', () => {
+        mockImage({width: 200, height: 640})
+        const greenSquare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'green_square',
+          domObject: {
+            preview: greenSquare
+          },
+          contentType: 'image/png'
+        }
+
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="green_square"
+      style="width: 100px; height: 320px; border: solid 1px #8B969E;"
     />`;
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)

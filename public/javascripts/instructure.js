@@ -108,7 +108,9 @@ function handleYoutubeLink () {
     $(".user_content.unenhanced:visible")
       .each(function() {
         var $this = $(this);
-        $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
+        $this.find("img").each((i, img) => {
+          $(img).css('maxWidth', Math.min($content.width(), $this.width(), $(img).width()));
+        })
         $this.data('unenhanced_content_html', $this.html());
       })
       .find(".enhanceable_content").show()
