@@ -229,11 +229,11 @@ test('uploadFile dispatches prepareSetImage when successful', assert => {
 
   const fakeDragonDropEvent = {
     dataTransfer: {
-      files: [{
+      files: [new File(["fake"], "fake.jpg", {
         name: 'test file',
         size: 12345,
         type: 'image/jpeg'
-      }]
+      })]
     },
     preventDefault: () => {}
   };
