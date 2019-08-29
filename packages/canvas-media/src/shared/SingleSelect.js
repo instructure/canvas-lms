@@ -42,7 +42,8 @@ export default class SingleSelect extends React.Component {
         label: string
       })
     ),
-    renderLabel: element
+    renderLabel: element,
+    selectedOption: func
   }
 
   getOptionById(queryId) {
@@ -84,6 +85,10 @@ export default class SingleSelect extends React.Component {
 
   handleSelectOption = (event, {id}) => {
     const option = this.getOptionById(id).label
+    this.props.selectedOption({
+      selectedOptionId: id,
+      inputValue: option
+    })
     this.setState({
       selectedOptionId: id,
       inputValue: option,

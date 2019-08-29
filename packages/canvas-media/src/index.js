@@ -19,16 +19,15 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import React, {Suspense} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading, Spinner} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-elements'
 import {Modal} from '@instructure/ui-overlays'
 import {Tabs} from '@instructure/ui-tabs'
-import {View} from '@instructure/ui-layout'
 
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
+import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording from './saveMediaRecording'
 import translationShape from './translationShape'
 
-const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionPanel'))
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const EmbedPanel = React.lazy(() => import('./EmbedPanel'))
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
@@ -88,22 +87,13 @@ export default class UploadMedia extends React.Component {
     }
   }
 
-  renderFallbackSpinner = () => {
-    const {LOADING_MEDIA} = this.props.uploadMediaTranslations.UploadMediaStrings
-    return (
-      <View as="div" height="100%" width="100%" textAlign="center">
-        <Spinner renderTitle={() => LOADING_MEDIA} size="large" margin="0 0 0 medium" />
-      </View>
-    )
-  }
-
   renderModalBody = () => {
     const {
-      CLOSED_CAPTIONS_PANEL_TITLE,
       COMPUTER_PANEL_TITLE,
       DRAG_FILE_TEXT,
       EMBED_PANEL_TITLE,
       EMBED_VIDEO_CODE_TEXT,
+      LOADING_MEDIA,
       RECORD_PANEL_TITLE,
       UPLOADING_ERROR
     } = this.props.uploadMediaTranslations.UploadMediaStrings
@@ -119,7 +109,7 @@ export default class UploadMedia extends React.Component {
             isSelected={this.state.selectedPanel === PANELS.COMPUTER}
             renderTitle={() => COMPUTER_PANEL_TITLE}
           >
-            <Suspense fallback={this.renderFallbackSpinner()}>
+            <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
               <ComputerPanel
                 theFile={this.state.theFile}
                 setFile={file => this.setState({theFile: file})}
@@ -130,6 +120,8 @@ export default class UploadMedia extends React.Component {
                 label={DRAG_FILE_TEXT}
                 uploadMediaTranslations={this.props.uploadMediaTranslations}
                 accept={ACCEPTED_FILE_TYPES}
+                languages={this.props.languages}
+                liveRegion={this.props.liveRegion}
               />
             </Suspense>
           </Tabs.Panel>
@@ -139,7 +131,7 @@ export default class UploadMedia extends React.Component {
             isSelected={this.state.selectedPanel === PANELS.RECORD}
             renderTitle={() => RECORD_PANEL_TITLE}
           >
-            <Suspense fallback={this.renderFallbackSpinner()}>
+            <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
               <MediaRecorder
                 MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
                 contextType={this.props.contextType}
@@ -155,7 +147,7 @@ export default class UploadMedia extends React.Component {
             isSelected={this.state.selectedPanel === PANELS.EMBED}
             renderTitle={() => EMBED_PANEL_TITLE}
           >
-            <Suspense fallback={this.renderFallbackSpinner()}>
+            <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
               <EmbedPanel
                 label={EMBED_VIDEO_CODE_TEXT}
                 embedCode={this.state.embedCode}
@@ -164,18 +156,6 @@ export default class UploadMedia extends React.Component {
             </Suspense>
           </Tabs.Panel>
         )}
-        <Tabs.Panel
-          isSelected={this.state.selectedPanel === PANELS.CLOSED_CAPTIONS}
-          renderTitle={() => CLOSED_CAPTIONS_PANEL_TITLE}
-        >
-          <Suspense fallback={this.renderFallbackSpinner()}>
-            <ClosedCaptionPanel
-              languages={this.props.languages}
-              liveRegion={this.props.liveRegion}
-              uploadMediaTranslations={this.props.uploadMediaTranslations}
-            />
-          </Suspense>
-        </Tabs.Panel>
       </Tabs>
     )
   }
