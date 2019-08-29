@@ -58,6 +58,7 @@ module.exports = {
     'func-names': 'off',
     'global-require': 'off', // every time we did this, we meant to
     'guard-for-in': 'off',
+    'max-classes-per-file': 'off',
     'no-continue': 'off',
     'no-else-return': 'off',
     'no-multi-assign': 'off',
