@@ -172,7 +172,7 @@ import 'compiled/badge_counts'
 
 
     // StrongMind Added
-    if(typeof ga == 'function') {
+    if(typeof ga === 'function') {
       ga('create', ENV["analytics"]["ga_tracking_id"]);
       $('.sm-course-menu').on('click', 'nav #section-tabs .section a', function(event) {
         ga('send', 'event', 
