@@ -80,7 +80,7 @@ describe('TeacherView', () => {
     // calls matches the mocked mutation, which we know includes the
     // AssignmentOverrides array. So we can infer that TeacherView is
     // sending the overrides with the save.
-    const {getAllByText, getByText, getByTestId, getByDisplayValue} = render(
+    const {getAllByText, getByText, getByTestId, getByDisplayValue, findByTestId} = render(
       <MockedProvider mocks={mocks()} addTypename={false}>
         <TeacherView assignment={assignment} />
       </MockedProvider>
@@ -89,12 +89,12 @@ describe('TeacherView', () => {
     // open the override detail
     const expandButton = getAllByText('Click to show details')[0]
     fireEvent.click(expandButton)
-    await waitForElement(() => getByTestId('OverrideDetail'))
+    await findByTestId('OverrideDetail')
 
     // open the Until date editor
     const editButton = closest(getByText('Edit Until'), 'button')
     editButton.click()
-    await waitForElement(() => getByTestId('EditableDateTime-editor'))
+    await findByTestId('EditableDateTime-editor')
 
     // edit the date
     const dateDisplay = DateTime.toLocaleString(override.lockAt, locale, timeZone, 'LL')
@@ -104,10 +104,10 @@ describe('TeacherView', () => {
 
     // blur to show the footer
     dinput.blur()
-    await waitForElement(() => getByTestId('TeacherFooter'))
+    await findByTestId('TeacherFooter')
 
     const saveButton = closest(getByText('Save'), 'button')
     saveButton.click()
     expect(await waitForNoElement(() => getByTestId('TeacherFooter'))).toBe(true)
-  })
+  }, 10000 /* giving this a 10sec timeout since for some reason it is timing out in jenkins */)
 })
