@@ -94,9 +94,17 @@ pipeline {
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv gerrit_builder/canvas-lms/config/* config/
+              mv config/knapsack_rspec_report.json ./
               rm config/cache_store.yml
               rmdir -p gerrit_builder/canvas-lms/config
               cp docker-compose/config/selenium.yml config/
+              cp docker-compose/config/database.yml.new-jenkins config/database.yml
+              cp docker-compose/config/cassandra.yml.new-jenkins config/cassandra.yml
+              cp config/delayed_jobs.yml.example config/delayed_jobs.yml
+              cp config/domain.yml.example config/domain.yml
+              cp config/external_migration.yml.example config/external_migration.yml
+              cp config/outgoing_mail.yml.example config/outgoing_mail.yml
+              cp config/security.yml.example config/security.yml
             '''
           }
         }
