@@ -242,22 +242,6 @@ describe('ViewManager', () => {
       expect(getByText('View Previous Submission')).toBeInTheDocument()
     })
 
-    it('is not displayed if we are at the earliest submission and pagination is exhausted', async () => {
-      const props = await makeProps({
-        currentAttempt: 3,
-        hasPreviousPage: false,
-        numSubmissionHistories: 1
-      })
-      const {getByText, queryByText} = render(
-        <MockedProvider>
-          <ViewManager {...props} />
-        </MockedProvider>
-      )
-      const prevButton = getByText('View Previous Submission')
-      fireEvent.click(prevButton)
-      await wait(() => expect(queryByText('View Previous Submission')).not.toBeInTheDocument())
-    })
-
     it('changes the currently displayed submission to the previous one when clicked', async () => {
       const props = await makeProps({currentAttempt: 2})
       const {getAllByText, getByText} = render(
