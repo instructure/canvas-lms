@@ -22,6 +22,32 @@ exports[`the Rubric component hides the score total when needed 1`] = `
     size="medium"
   >
     <thead>
+      <tr
+        style={
+          Object {
+            "visibility": "collapse",
+          }
+        }
+      >
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
+          Criteria
+        </th>
+        <th
+          className="ratings"
+          scope="col"
+        >
+          Ratings
+        </th>
+        <th
+          className="rubric-points"
+          scope="col"
+        >
+          Pts
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-title"
@@ -206,6 +232,32 @@ exports[`the Rubric component renders as expected 1`] = `
     size="medium"
   >
     <thead>
+      <tr
+        style={
+          Object {
+            "visibility": "collapse",
+          }
+        }
+      >
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
+          Criteria
+        </th>
+        <th
+          className="ratings"
+          scope="col"
+        >
+          Ratings
+        </th>
+        <th
+          className="rubric-points"
+          scope="col"
+        >
+          Pts
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-title"
@@ -413,6 +465,32 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
     size="medium"
   >
     <thead>
+      <tr
+        style={
+          Object {
+            "visibility": "collapse",
+          }
+        }
+      >
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
+          Criteria
+        </th>
+        <th
+          className="ratings"
+          scope="col"
+        >
+          Ratings
+        </th>
+        <th
+          className="rubric-points"
+          scope="col"
+        >
+          Pts
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-title"
@@ -589,6 +667,32 @@ exports[`the Rubric component updates the total score when an individual criteri
     size="medium"
   >
     <thead>
+      <tr
+        style={
+          Object {
+            "visibility": "collapse",
+          }
+        }
+      >
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
+          Criteria
+        </th>
+        <th
+          className="ratings"
+          scope="col"
+        >
+          Ratings
+        </th>
+        <th
+          className="rubric-points"
+          scope="col"
+        >
+          Pts
+        </th>
+      </tr>
       <tr>
         <th
           className="rubric-title"

@@ -107,7 +107,7 @@ describe('the Rubric component', () => {
           {...otherProps}
         />
       )
-      expect(el.find('th')).toHaveLength(expected ? 4 : 3)
+      expect(el.find('th')).toHaveLength(expected ? 7 : 5)
       expect(el.find('Criterion').at(0).prop('hasPointsColumn')).toBe(expected)
     }
 

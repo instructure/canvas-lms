@@ -529,6 +529,7 @@ nn:
         checking_settings: "kontrollerer Turnitin-innstillingar..."
         invalid_settings: "ugyldige Turnitin-innstillingar, kontroller konto-ID-en og delt hemmelegheit frå Turnitin"
         setings_confirmed: "Turnitin-innstillingar er stadfesta."
+    siteadmin: Områdeadministrator
     titles: 
       configure_report: "Konfigurer rapport"
       open_registration_delegated_warning_dialog: "Ein ekstern  identitetsleverandør er aktivert"
@@ -1719,6 +1720,7 @@ nn:
     default_name: "Utan namn"
   add_collaboration_da9665ac: "Legg til samarbeid"
   add_contact_method_d2dfea03: "Legg til kontaktmetode"
+  add_content_58b4305a: "Legg til innhald"
   add_content_to_module_name_589a8d54: "Legg innhald til %{module_name}"
   add_course_406cb773: "Legg til emne"
   add_course_assignments_628ed6d0: "Legg til emneoppgåver"
@@ -9560,6 +9562,7 @@ nn:
   graphql_api_af4deb45: "GraphQL API"
   graphs_89fcfeb: Grafar
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Flott, du har eit emne. Kva skjer no? Før du publiserer bør du kontrollere at du har det grunnleggande i orden. Gå gjennom lista til venstre og sjekk at emnet er klart for bruk."
+  greek_65c5b3f7: Gresk
   green_15af4778: Grønt
   group: 
     greater_than_1: "Må vere større enn 1"
@@ -10711,6 +10714,7 @@ nn:
   label_values_76f4b5fa: "Merk verdiar"
   labels: 
     lock_module_until: "Lås til"
+  language_6b3e2c7c: Språk
   last_assessment_cd5659b6: "Siste innlevering:"
   last_changed_b544504d: "Sist endra:"
   last_day_attended_b72d623c: "Dato for siste deltaking"
@@ -10981,6 +10985,7 @@ nn:
     error_loading_banks: "Feil under lasting av bankar"
     loading_banks: "Lastar inn bankar..."
   load_more_9ca37ccc: "Last opp meir..."
+  load_more_a36f9cf9: "Last opp meir"
   load_more_results_460f49a9: "Last fleire resultat"
   loaded_more_collaborations_13f1d630: "Lasta fleire samarbeid"
   loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "Lasta fleire utviklarnøklar. Fokus flytta til sletteknappen til den siste innlasta utviklarnøkkelen på lista."
@@ -11359,6 +11364,7 @@ nn:
   media_recording_77cddc52: Medieinnspeling
   media_recording_submission_b7fd1491: "Innsending av medieinnspeling"
   media_recordings_749aef6d: Medieinnspelingar
+  media_submission_464829f0: Medieinnlevering
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
   meets_expectations_bb179565: "Innfrir forventningar"

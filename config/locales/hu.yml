@@ -473,6 +473,7 @@ hu:
         checking_settings: "Turnitinbeállítások ellenőrzése..."
         invalid_settings: "Hibás Turnitinbeállítások, kérjük, ellenőrizze a fiókazonosítóját és a Turnitinnel megosztott titkos kódját"
         setings_confirmed: "Turnitinbeállítások jóváhagyva!"
+    siteadmin: rendszeradminisztrátor
     titles: 
       configure_report: "Riport konfigurálása"
       open_registration_delegated_warning_dialog: "Egy külső identitás szolgáltató engedélyezve van"
@@ -1530,6 +1531,7 @@ hu:
     default_name: Névtelen
   add_collaboration_da9665ac: "Együttműködés hozzáadása"
   add_contact_method_d2dfea03: "Kapcsolatfelvétei mód hozzáadása"
+  add_content_58b4305a: "Tartalom hozzáadása "
   add_content_to_module_name_589a8d54: "Tartalom hozzáadása a következő modulhoz: %{module_name} "
   add_course_406cb773: "Kurzus hozzáadása"
   add_course_assignments_628ed6d0: "Kurzusfeladat hozzáadása"
@@ -7219,6 +7221,7 @@ hu:
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "A grafikon megmutatja az időben feltöltött feladatok beadási idejét."
   graphs_89fcfeb: Grafikonok
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Szuper, most már van egy kurzusa! Mi a következő lépés? Nos, mielőtt publikálja a kurzusát, érdemes ellenőriznie, hogy megfelelően előkészítette-e azt. A bal oldali lista segít annak eldöntésében, hogy a kurzusa készen áll-e a használatra."
+  greek_65c5b3f7: Görög
   green_15af4778: Zöld
   group: 
     greater_than_1: "1-nél nagyobbnak kell lennie"
@@ -7962,6 +7965,7 @@ hu:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Zárolva eddig"
+  language_6b3e2c7c: Nyelv
   last_enrollment_activity_10fe15ba: "Legutóbbi beiratkozási tevékenység"
   last_export_899a04c5: "Utolsó export:"
   last_first_name_95a078f5: "Vezetéknév, keresztnév"
@@ -8153,6 +8157,7 @@ hu:
   load_bank: 
     error_loading_banks: "Hiba lépett fel a bankok betöltése közben"
     loading_banks: "Bankok betöltése..."
+  load_more_a36f9cf9: "Továbbiak betöltése"
   load_more_results_460f49a9: "Load more results"
   loaded_more_collaborations_13f1d630: "Több együttműködés betöltve"
   loading_25990131: Töltődik...
@@ -8433,6 +8438,7 @@ hu:
   media_recording_77cddc52: "Médiatartalom felvétele"
   media_recording_submission_b7fd1491: Médiafelvétel-beadás
   media_recordings_749aef6d: Médiafelvételek
+  media_submission_464829f0: Médiabeadás
   median_ed291842: Medián
   median_score_4657e907: "Medián: %{score}"
   meets_expectations_bb179565: "Megfelel az elvárásoknak"

@@ -435,6 +435,7 @@ el:
         checking_settings: "έλεγχος ρυθμίσεων Turnitin..."
         invalid_settings: "μη έγκυρες ρυθμίσεις για το Turnitin, παρακαλώ ελέγξτε το id του λογαριασμού σας και το διαμοιρασμένο μυστικό κλειδί - secret - απο το Turnitin"
         setings_confirmed: "Επιβεβαιώθηκαν οι ρυθμίσεις του Turnitin!"
+    siteadmin: "Διαχειριστής Ιστοτόπου"
     titles: 
       configure_report: "Ρύθμιση Αναφοράς"
       open_registration_delegated_warning_dialog: "Ένας εξωτερικός πάροχος αναγνωριστικού ταυτότητας έχει ενεργοποιηθεί"
@@ -1398,6 +1399,7 @@ el:
     default_name: "Δεν υπάρχει Όνομα"
   add_collaboration_da9665ac: "Πρόσθεση Συνεργασίας"
   add_contact_method_d2dfea03: "Προσθέστε Τρόπο Επικοινωνίας"
+  add_content_58b4305a: "Προσθέστε περιεχόμενο"
   add_content_to_module_name_589a8d54: "Προσθήκη Περιεχομένου σε %{module_name}"
   add_course_406cb773: "Προσθήκη Μαθήματος"
   add_course_assignments_628ed6d0: "Προσθήκη Εργασιών Μαθήματος"
@@ -6513,6 +6515,7 @@ el:
   graph_of_grades_for_each_assignment_4c44d4d1: "Γράφημα των βαθμών για κάθε εργασία"
   graphs_89fcfeb: Γραφήματα
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "<mrk mid=\"4301\" mtype=\"seg\">Τέλεια, έχετε, λοιπόν, μάθημα.</mrk> <mrk mid=\"4302\" mtype=\"seg\">Και τώρα;</mrk> <mrk mid=\"4303\" mtype=\"seg\">Πριν το δημοσιεύσετε στο κοινό, μπορείτε να ελέγξετε και να βεβαιωθείτε ότι έχετε ολοκληρώσει τουλάχιστον τα βασικά χαρακτηριστικά.</mrk>  <mrk mid=\"4304\" mtype=\"seg\">Ελέγξτε τη λίστα στα αριστερά για να βεβαιωθείτε ότι το μάθημά σας είναι έτοιμο για χρήση.</mrk>"
+  greek_65c5b3f7: Ελληνικά
   green_15af4778: Πράσινο
   group: 
     greater_than_1: "Πρέπει να είναι μεγαλύτερο από 1"
@@ -7192,6 +7195,7 @@ el:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Κλειδωμένο έως"
+  language_6b3e2c7c: Γλώσσα
   last_enrollment_activity_10fe15ba: "Δραστηριότητα Τελευταίας Εγγραφής"
   last_export_899a04c5: "Τελευταία Εξαγωγή"
   last_item_79583712: "<mrk mid=\"5897\" mtype=\"seg\">Τελευταίο Στοιχείο:</mrk> "
@@ -7357,6 +7361,7 @@ el:
   links_14b70841: Σύνδεσμοι
   load_bank: 
     loading_banks: "Φόρτωση τραπεζών θεμάτων"
+  load_more_a36f9cf9: "Φόρτωση περισσότερων"
   load_more_results_460f49a9: "Φόρτωση περισσότερων αποτελεσμάτων"
   loading_25990131: Φόρτωση...
   loading_725811ca: φόρτωση
@@ -7600,6 +7605,7 @@ el:
   media_recording_77cddc52: "Ηχογράφηση Αρχείου Πολυμέσων"
   media_recording_submission_b7fd1491: "Υποβολή Ηχογράφησης Αρχείου Πολυμέσων"
   media_recordings_749aef6d: "Ηχογραφήσεις αρχείων πολυμέσων"
+  media_submission_464829f0: "Υποβολή Πολυμέσων"
   median_ed291842: Διάμεσος
   median_score_4657e907: "<mrk mid=\"1110\" mtype=\"seg\">Διάμεσος:</mrk> <mrk mid=\"1111\" mtype=\"seg\">%{score}</mrk>"
   meets_expectations_bb179565: "Ικανοποιεί τις Προσδοκίες"
