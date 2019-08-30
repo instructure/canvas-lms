@@ -91,7 +91,7 @@ export default class GraderCountNumberInput extends React.Component {
         <NumberInput
           id="grader_count"
           value={this.state.graderCount.toString()}
-          label={label}
+          renderLabel={label}
           locale={this.props.locale}
           max={this.props.availableGradersCount.toString()}
           messages={this.state.messages}

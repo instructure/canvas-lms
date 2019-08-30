@@ -96,7 +96,7 @@ export default class BlueprintAssociations extends React.Component {
     const { hasUnsyncedChanges, existingAssociations, addedAssociations } = this.props
     if (hasUnsyncedChanges && existingAssociations.length > 0 && addedAssociations.length > 0) {
       return (
-        <Alert variant="warning" closeButtonLabel={I18n.t('Close')} margin="0 0 large">
+        <Alert variant="warning" renderCloseButtonLabel={I18n.t('Close')} margin="0 0 large">
           <p style={{margin: '0 -10px'}}>
             <Text weight="bold">{I18n.t('Warning:')}</Text>&nbsp;
             <Text>{I18n.t('You have unsynced changes that will sync to all associated courses when a new association is saved.')}</Text>

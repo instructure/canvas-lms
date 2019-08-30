@@ -197,7 +197,7 @@ export default class TimeBlockSelector extends React.Component {
           messages={this.state.slotMessage}
         >
           <NumberInput
-            label={I18n.t('Divide into equal slots (value is in minutes)')}
+            renderLabel={I18n.t('Divide into equal slots (value is in minutes)')}
             value={this.state.slotValue}
             onChange={this.handleSlotValueChange}
             onIncrement={this.handleSlotValueIncrement}
