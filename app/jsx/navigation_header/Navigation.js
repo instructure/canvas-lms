@@ -200,9 +200,6 @@ export default class Navigation extends React.Component {
     this.unread_count_attempts = (this.unread_count_attempts || 0) + 1
     if (this.unread_count_attempts > 5) return
 
-    // don't let this count against us in newRelic's SPA load time stats
-    const fetch = window.fetchIgnoredByNewRelic || window.fetch
-
     try {
       const {unread_count} = await (await fetch('/api/v1/conversations/unread_count', {
         headers: {Accept: 'application/json'}
