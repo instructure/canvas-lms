@@ -514,6 +514,7 @@ he:
         checking_settings: "בודק הגדרות Turnitin..."
         invalid_settings: "הגדרות Turnitin לא תקינות, אנא בדוק את מזהה החשבון ואת הערך הסודי המשותף מ- Turnitin"
         setings_confirmed: "הגדרות Turnitin אושרו!"
+    siteadmin: "מנהל אתר"
     titles: 
       configure_report: "הגדרת דו\"ח"
       open_registration_delegated_warning_dialog: "מנגנון הזדהות חיצוני מופעל"
@@ -1707,6 +1708,7 @@ he:
     default_name: "אין שם"
   add_collaboration_da9665ac: "הוספת שיתוף פעולה"
   add_contact_method_d2dfea03: "הוספת אופן התקשרות"
+  add_content_58b4305a: "הוספת תוכן"
   add_content_to_module_name_589a8d54: "הוספת תוכן ל %{module_name}"
   add_course_406cb773: "הוספת קורס"
   add_course_assignments_628ed6d0: "הוספת משימות קורס"
@@ -8967,6 +8969,7 @@ he:
   graphql_api_af4deb45: "GraphQL API"
   graphs_89fcfeb: גרפים
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "מצויין, כעת יש לך קורס. מה הלאה? ובכן, לפני שמפרסמים אותו לעולם, כדאי לוודא שהבסיס טופל כהלכה. מוצע לעבור על רשימת התיוג שבצד הדף כדי לוודא שהקורס מוכן לשימוש."
+  greek_65c5b3f7: יוונית
   green_15af4778: ירוק
   group: 
     greater_than_1: "חייב להיות גדול מ 1"
@@ -9962,6 +9965,7 @@ he:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "נעילה עד"
+  language_6b3e2c7c: שפה
   last_enrollment_activity_10fe15ba: "פעילות הרשמה אחרונה"
   last_export_899a04c5: "ייצוא אחרון:"
   last_first_name_95a078f5: "שם משפחה, פרטי"
@@ -10195,6 +10199,7 @@ he:
     error_loading_banks: "שגיאה בטעינת מאגרים"
     loading_banks: "טוען מאגרים..."
   load_more_9ca37ccc: "טעינה של עוד..."
+  load_more_a36f9cf9: "טענו עוד"
   load_more_results_460f49a9: "טעינת תוצאות נוספות"
   loaded_more_collaborations_13f1d630: "נטענו שיתופים נוספים"
   loading_25990131: טוען...
@@ -10534,6 +10539,7 @@ he:
   media_recording_77cddc52: "הקלטת מדיה"
   media_recording_submission_b7fd1491: "הגשת הקלטת מדיה"
   media_recordings_749aef6d: "הקלטות מדיה"
+  media_submission_464829f0: "הגשת מדיה"
   median_ed291842: חציון
   median_score_4657e907: "חציון: %{score}"
   meets_expectations_bb179565: "עונה על הציפיות"
