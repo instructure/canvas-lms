@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ApolloClient} from 'apollo-client'
 import ExternalToolsQuery from './ExternalToolsQuery'
 import I18n from 'i18n!assignments_2_initial_query'
 import React from 'react'
-import {string, instanceOf} from 'prop-types'
-import {withApollo} from 'react-apollo'
+import {string} from 'prop-types'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-elements'
@@ -100,7 +98,6 @@ class MoreOptions extends React.Component {
                 assignmentID={this.props.assignmentID}
                 courseID={this.props.courseID}
                 userID={this.props.userID}
-                client={this.props.client}
               />
             </Modal.Body>
             <Modal.Footer>
@@ -120,8 +117,7 @@ class MoreOptions extends React.Component {
 MoreOptions.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
-  userID: string.isRequired,
-  client: instanceOf(ApolloClient)
+  userID: string.isRequired
 }
 
-export default withApollo(MoreOptions)
+export default MoreOptions
