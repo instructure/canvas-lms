@@ -142,7 +142,7 @@ export function UploadMedia(props) {
           </Modal.Header>
           <Modal.Body>
             {loadingErrorSuccess(contentProps.upload)}
-            <Tabs focus size="large" selectedIndex={selectedPanel} onChange={newIndex => setSelectedPanel(newIndex)}>
+            <Tabs shouldFocusOnRender size="large" selectedIndex={selectedPanel} onRequestTabChange={newIndex => setSelectedPanel(newIndex)}>
               <Tabs.Panel title={formatMessage('Computer')}>
                 <Suspense fallback={
                   <View as="div" height="100%" width="100%" textAlign="center">

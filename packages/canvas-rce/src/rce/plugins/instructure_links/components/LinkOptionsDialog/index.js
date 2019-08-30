@@ -87,7 +87,7 @@ export default function LinkOptionsDialog(props) {
       <Modal.Body>
         <View as="div" margin="small">
           <TextInput
-            label={formatMessage('Text')}
+            renderLabel={formatMessage('Text')}
             name="linktext"
             onChange={handleTextChange}
             value={text}
@@ -95,7 +95,7 @@ export default function LinkOptionsDialog(props) {
         </View>
         <View as="div" margin="small">
           <TextInput
-            label={formatMessage('Link')}
+            renderLabel={formatMessage('Link')}
             name="linklink"
             onChange={handleLinkChange}
             value={url}
