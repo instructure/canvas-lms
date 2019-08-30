@@ -19,6 +19,7 @@
 class Types::LegacyNodeType < Types::BaseEnum
   graphql_name "NodeType"
 
+  value "Account"
   value "Assignment"
   value "AssignmentGroup"
   value "Course"

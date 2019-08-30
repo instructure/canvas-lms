@@ -6,6 +6,9 @@
         "name": "Node",
         "possibleTypes": [
           {
+            "name": "Account"
+          },
+          {
             "name": "Assignment"
           },
           {

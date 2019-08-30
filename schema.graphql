@@ -1,3 +1,9 @@
+type Account implements Node {
+  _id: ID!
+  id: ID!
+  name: String
+}
+
 """
 A list of students that an `AssignmentOverride` applies to
 """
@@ -1928,6 +1934,7 @@ interface Node {
 }
 
 enum NodeType {
+  Account
   Assignment
   AssignmentGroup
   Course
@@ -2188,6 +2195,13 @@ enum ProgressState {
 }
 
 type Query {
+  account(
+    """
+    a graphql or legacy id
+    """
+    id: ID!
+  ): Account
+
   """
   All courses viewable by the current user
   """

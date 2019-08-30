@@ -31,6 +31,14 @@ module Types
       GraphQLNodeLoader.load(type, _id, context)
     end
 
+    field :account, Types::AccountType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+    end
+    def account
+      GraphQLNodeLoader.load("Account", id, context)
+    end
+
     field :course, Types::CourseType, null: true do
       argument :id, ID, "a graphql or legacy id", required: true,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
