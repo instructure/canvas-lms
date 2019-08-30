@@ -339,6 +339,7 @@ ko:
         checking_settings: "Turnitin 설정 검사 중..."
         invalid_settings: "유효하지 않은 Turnitin 설정입니다. Turnitin에서 계정 ID와 공유 시크릿을 확인하시기 바랍니다."
         setings_confirmed: "Turnitin 설정을 확인했습니다."
+    siteadmin: "사이트 관리자"
     titles: 
       configure_report: "구성 보고서"
       open_registration_delegated_warning_dialog: "외부 ID 공급자를 사용함"
@@ -1186,6 +1187,7 @@ ko:
   activity_13915493: 활동
   add_8523c19b: 추가
   add_app_baf540f: "앱 추가"
+  add_content_58b4305a: "내용 추가"
   add_course_assignments_628ed6d0: "과목 과제 추가"
   add_course_calendar_events_146154a5: "과목 행사 추가"
   add_external_feed_6d437a28: "외부 피드 추가"
@@ -4963,6 +4965,7 @@ ko:
   end_date_cannot_be_before_start_date_eb62ed6d: "종료일은 시작일보다 이전일 수 없습니다."
   end_date_e0093ed7: 종료일
   end_time_250391e8: "종료 시각"
+  english_c60612e2: 영어
   enrollment: 
     default_course_name: 과목
     default_email: "이메일 없음"
@@ -6048,6 +6051,7 @@ ko:
     titles: 
       grading_scheme_info: "평가 구성표 보기/편집"
   grading_standards_b73bfa72: "평가 기준"
+  greek_65c5b3f7: "그리스 문자"
   group: 
     greater_than_1: "1보다 커야 함"
     memeber: 구성원
@@ -6684,6 +6688,7 @@ ko:
       play_comment: "미디어 설명 재생"
   key_name_7311d22: "키 이름:"
   key_settings_44df6a41: "키 설정"
+  language_6b3e2c7c: 언어
   late_assignment_user_name_assignment_name_2df32e01: "지연된 과제: %{user_name}, %{assignment_name}"
   latest_f604a75: 최신
   latest_score_905aa87b: "최종 점수"
@@ -6815,6 +6820,7 @@ ko:
       feedback: "여기를 클릭하고 어떤 일이 발생했는지 알려주십시오."
     show_me_where: "위치 표시"
   links_14b70841: 링크
+  load_more_a36f9cf9: "더 로드"
   load_more_results_460f49a9: "Load more results"
   loading_25990131: "로드하는 중..."
   loading_more_results_1d437202: "더 많은 결과 로드 중"
