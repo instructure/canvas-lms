@@ -455,6 +455,7 @@ hy:
         checking_settings: "Turnitin կարգաբերումների ստուգում..."
         invalid_settings: "Turnitin կարգաբերումների սխալ, խնդրում ենք ստուգել ձեր հաշվի նույնականացուցիչը և Turnitin ընդհանուր գաղտնի բանալին"
         setings_confirmed: "Turnitin կարգաբերումները հաստատվել են"
+    siteadmin: "Կայքի ադմինիստրատոր"
     titles: 
       configure_report: "Կարգաբերել հաշվետվությունը"
       open_registration_delegated_warning_dialog: "Արտաքին նույնականացման պրովայդերը միացվել է"
@@ -1420,6 +1421,7 @@ hy:
   add_an_identity_provider_to_this_account_c2644478: "Այս հաշվին ավելացնել նույնականացման տեղեկություններ տրամադրողին՝IdP "
   add_app_baf540f: "Ավելացնել հավելված"
   add_attachment_93868828: "Ավելացնել ներդիր"
+  add_content_58b4305a: "Ավելացնել բովանդակությունը"
   add_content_to_module_name_589a8d54: "%{module_name} մոդուլին ավելացնել բովանդակություն"
   add_course_406cb773: "Ավելացնել դասընթաց"
   add_course_assignments_628ed6d0: "Ավելացնել դասընթացի հանձնարարություններ"
@@ -7347,6 +7349,7 @@ hy:
   grading_standards_b73bfa72: "Գնահատման ստանդարտներ"
   grading_type_type_7d8b42d7: "Գնահատման տեսակ. %{type}"
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Գերազանց է, դուք այժմ դասընթաց ունեք: Այժմ ի՞նչ անել: Նախքան այն աշխարհի համար հրապարակելը դուք կարող եք ստուգել, թե արդյոք  հիմնական դրույթները ներառված են: Աշխատեք ձախ կողմի ցուցակի վրա համոզվելու, որ դասընթացը պատրաստ է օգտագործման համար: "
+  greek_65c5b3f7: Հունարեն
   green_15af4778: Կանաչ
   group: 
     greater_than_1: "Պետք է մեկից ավելի լինի"
@@ -8169,6 +8172,7 @@ hy:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Արգելափակել մինչև"
+  language_6b3e2c7c: Լեզուն
   last_enrollment_activity_10fe15ba: "Վերջին գրանցման հետ կապված գործողություն"
   last_item_79583712: "Վերջին տարրը՝"
   last_login_54565109: "Վերջին մուտք"
@@ -8335,6 +8339,7 @@ hy:
     show_me_where: "Ցույց տվեք որտեղ"
   links_14b70841: Հղումներ
   load_more_9ca37ccc: "Բեռնել ավելին..."
+  load_more_a36f9cf9: "Բեռնել լրացուցիչ"
   load_more_results_460f49a9: "Load more results"
   loading_25990131: "Բեռնում է..."
   loading_bde52856: "Բեռնում է"
@@ -8589,6 +8594,7 @@ hy:
       submitting: "Մուլտիմեդիա ֆայլի ուղարկում..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Մուլտիմեդիան հերթագրված է փոխակերպման համար, խնդրում ենք փորձել նորից մի փոքր ավելի ուշ:"
   media_recordings_749aef6d: "Մուլտիմեդիա տվյալների գրանցում"
+  media_submission_464829f0: "Մուլտիմեդիա տվյալների ուղարկում"
   median_score_4657e907: "Միջին՝ %{score}"
   meets_expectations_bb179565: "Համապատասխանում է սպասումներին"
   meets_mastery_754e1c06: "Համապատասխանում է անցողիկ միավորին"
