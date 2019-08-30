@@ -86,6 +86,11 @@ module Services
         request(:get, '/api/root_account_subscriptions', options)
       end
 
+      def event_types_index(jwt_body, opts = {})
+        options = { headers: headers(jwt_body, opts) }
+        request(:get, '/api/event_types', options)
+      end
+
       private
 
       def request(method, endpoint, options = {})
