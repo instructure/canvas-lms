@@ -74,8 +74,8 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, "legacy canvas id", method: :id, null: false
     global_id_field :id
     field :name, String, null: false
     field :course_code, String, "course short name", null: true

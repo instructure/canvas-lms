@@ -14,23 +14,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+module Interfaces::LegacyIDInterface
+  include GraphQL::Schema::Interface
 
-module Types
-  class ExternalUrlType < ApplicationObjectType
-    graphql_name "ExternalUrl"
-
-    implements Interfaces::TimestampInterface
-    implements Interfaces::ModuleItemInterface
-    implements Interfaces::LegacyIDInterface
-
-    field :title, String, null: true
-    field :url, String, null: true
-
-    # Override the default module item interface implementation. External URLs
-    # do not have a separate content table in the database.
-    def modules
-      load_association(:context_module).then { |mod| [mod] }
-    end
-  end
+  field :_id, ID, "legacy canvas id", method: :id, null: false
 end

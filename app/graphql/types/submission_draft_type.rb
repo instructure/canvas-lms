@@ -20,7 +20,7 @@ module Types
   class SubmissionDraftType < ApplicationObjectType
     graphql_name 'SubmissionDraft'
 
-    field :_id, ID, 'legacy canvas id', null: false, method: :id
+    implements Interfaces::LegacyIDInterface
 
     field :attachments, [Types::FileType], null: true
     def attachments
