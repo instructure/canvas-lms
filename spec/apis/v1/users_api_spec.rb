@@ -857,7 +857,7 @@ describe "Users API", type: :request do
       @account.all_users.order(:sortable_name).each_with_index do |user, i|
         next unless users.find { |u| u == user }
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-               { :controller => 'users', :action => 'index', :account_id => @account.id.to_param, :format => 'json' },
+               { :controller => 'users', :action => 'api_index', :account_id => @account.id.to_param, :format => 'json' },
                { :per_page => 1, :page => i + 1 })
         expect(json).to eq [{
           'name' => user.name,
@@ -879,21 +879,21 @@ describe "Users API", type: :request do
         user = User.create(:name => "u#{n}")
         user.pseudonyms.create!(:unique_id => "u#{n}@example.com", :account => @account)
       end
-      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 2
+      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 2
       Setting.set('api_max_per_page', '1')
-      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 1
+      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 1
     end
 
     it "should return unauthorized for users without permissions" do
       @account = @student.account
       @user    = @student
-      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => "json")
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => "json")
       expect(response.code).to eql "401"
     end
 
     it "returns an error when search_term is fewer than 3 characters" do
       @account = Account.default
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'ab'}, {}, :expected_status => 400)
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'ab'}, {}, :expected_status => 400)
       error = json["errors"].first
       verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
     end
@@ -908,7 +908,7 @@ describe "Users API", type: :request do
         users[i].pseudonyms.create!(:unique_id => u[1], :account => @account) { |p| p.sis_user_id = u[1] }
       end
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'test3@example.com'})
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'test3@example.com'})
 
       expect(json.count).to eq 1
       json.each do |user|
@@ -920,13 +920,13 @@ describe "Users API", type: :request do
     it "doesn't kersplode when filtering by role and sorting" do
       @account = Account.default
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { :role_filter_id => student_role.id.to_s, :sort => "sis_id"})
 
       expect(json.map{|r| r['id']}).to eq [@student.id]
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { :role_filter_id => student_role.id.to_s, :sort => "email"})
 
       expect(json.map{|r| r['id']}).to eq [@student.id]
@@ -939,19 +939,19 @@ describe "Users API", type: :request do
       p.current_login_at = Time.now.utc
       p.save!
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
       expect(json.count).to eq 1
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
 
       # it should sort too
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { include: ['last_login'], sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
 
       # it should include automatically when sorting by
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
     end
@@ -961,10 +961,10 @@ describe "Users API", type: :request do
       u = User.create!(name: 'test user')
       p = u.pseudonyms.create!(account: @account, unique_id: 'user')
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
       expect(json.length).to eq 1
       expect(response.headers['Link']).to include("rel=\"next\"")
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '2' })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '2' })
       expect(json).to be_empty
       expect(response.headers['Link']).to_not include("rel=\"next\"")
     end

@@ -1347,7 +1347,7 @@ CanvasRails::Application.routes.draw do
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
       post 'accounts/:account_id/self_registration', action: :create_self_registered_user
-      get 'accounts/:account_id/users', action: :index, as: 'account_users'
+      get 'accounts/:account_id/users', action: :api_index, as: 'account_users'
 
       get 'users/:id', action: :api_show
       put 'users/:id', action: :update
