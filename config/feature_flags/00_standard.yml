@@ -171,13 +171,6 @@ lti2_rereg:
   applies_to: RootAccount
   root_opt_in: true
   beta: true
-quizzes_lti:
-  state: hidden
-  display_name: Quiz LTI Plugin
-  description: Use the new quiz LTI tool in place of regular canvas quizzes
-  applies_to: Course
-  root_opt_in: true
-  beta: true
 disable_lti_post_only:
   state: hidden
   display_name: Don't Move LTI Query Params to POST Body
