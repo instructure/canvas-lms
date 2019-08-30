@@ -497,6 +497,7 @@ fa:
         checking_settings: "در حال بررسی تنظیمات Turnitin"
         invalid_settings: "تنظیمات Turnitin معتبر نیست، لطفا شناسه حساب و رمز مشترک Turnitin را بررسی کنید"
         setings_confirmed: "تنظیمات Turnitin تأیید شد!"
+    siteadmin: "مدیر تارنما"
     titles: 
       configure_report: "پیکربندی گزارش"
       open_registration_delegated_warning_dialog: "یک ارائه دهنده بیرونی هویت فعال شده است"
@@ -1678,6 +1679,7 @@ fa:
     default_name: "نام موجود نیست"
   add_collaboration_da9665ac: "افزودن همکاری"
   add_contact_method_d2dfea03: "افزودن روش تماس"
+  add_content_58b4305a: "افزودن محتوا"
   add_content_to_module_name_589a8d54: "افزودن محتوا به  %{module_name}"
   add_course_406cb773: "افزودن درس"
   add_course_assignments_628ed6d0: "افزودن تکلیف های درس"
@@ -7214,6 +7216,7 @@ fa:
   ending_date_e1ea13a4: "تاریخ پایان"
   ends_4fcb632: "پایان می‌یابد:"
   ends_at_9a62b528: "پایان می یابد در"
+  english_c60612e2: انگلیسی
   enrolled_a6a517cd: "ثبت نام شده"
   enrolled_as_272da3b9: "ثبت نام شده به عنوان"
   enrollment: 
@@ -8902,6 +8905,7 @@ fa:
   graphql_api_af4deb45: "رابط برنامه نویسی برنامه GraphQL"
   graphs_89fcfeb: نمودارها
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "عالیه، یک درس در اختیار دارید. حالا باید چه کار کرد؟ قبل از اینکه اقدام به انتشار آن کنید، ممکن است بخواهید بررسی کنید و مطمئن شوید که مقدمات کار را فراهم کرده اید یا خیر. روی فهرست سمت چپ کار کنید تا مطمئن شوید که درس شما برای استفاده آماده است."
+  greek_65c5b3f7: یونانی
   green_15af4778: سبز
   group: 
     greater_than_1: "باید بزرگتر از 1 باشد"
@@ -9890,6 +9894,7 @@ fa:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "قفل کردن تا تاریخ"
+  language_6b3e2c7c: زبان
   last_e159dbd: آخرین
   last_enrollment_activity_10fe15ba: "آخرین فعالیت ثبت نام"
   last_export_899a04c5: "آخرین صدور:"
@@ -10122,6 +10127,7 @@ fa:
     error_loading_banks: "خطا در بارگزاری مخزن ها"
     loading_banks: "در حال بارگذاری مخزن ها..."
   load_more_9ca37ccc: "بارگذاری بیشتر..."
+  load_more_a36f9cf9: "بارگذاری بیشتر"
   load_more_results_460f49a9: "Load more results"
   loaded_more_collaborations_13f1d630: "همکاری های بیشتر بارگذاری شد."
   loading_25990131: "در حال بارگذاری..."
@@ -10473,6 +10479,7 @@ fa:
   media_recording_77cddc52: "ضبط رسانه ای"
   media_recording_submission_b7fd1491: "ارسال ضبط رسانه"
   media_recordings_749aef6d: "ضبط های رسانه"
+  media_submission_464829f0: "ارسال رسانه"
   median_ed291842: میانه
   median_score_4657e907: "میانه: %{score}"
   meets_expectations_bb179565: "مطابق با انتظارات"
