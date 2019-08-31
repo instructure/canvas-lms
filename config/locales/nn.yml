@@ -4960,10 +4960,10 @@ nn:
         default_select_folder: "Vel mappe"
         upload_to: "Last opp til"
       import_quizzes_next_view: 
-        import_quizzesNext_help_label: "Import vurderingsinnhald som Quizzes.Next hjelp-ikon"
+        import_quizzesNext_help_label: "Importer vurdering som New Quizzes-hjelpeikon"
         import_quizzesNext_help_text: "Quizzes.Next er den nye vurderingsmotoren i Canvas.%{p_p} For å vite meir, kontakt systemadministrator eller oppsøk"
-        import_quizzesNext_help_title: Quizzes.Next
-        import_quizzesNext_help_title_icon: "Import vurderingsinnhald som Quizzes.Next hjelp-ikon"
+        import_quizzesNext_help_title: "New Quizzes"
+        import_quizzesNext_help_title_icon: "Importer vurdering som New Quizzes-hjelpeikon"
         import_quizzes_Next: "Importer vurderingsinnhald som Quizzes.Next"
       overwrite_assessment_content: 
         assessment_help_label: "Hjelp-ikon for overskriving av vurdering"
@@ -5575,6 +5575,7 @@ nn:
   costa_rica_506_d63d2ea1: "Costa Rica (+506)"
   could_not_duplicate_discussion_953ed67f: "Kunne ikkje duplisere diskusjon"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Kunne ikkje finne LTI-konfigurasjon for klient-ID %{clientId}"
+  could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Kunne ikkje finne eksisterande brukar for innlogging med SIS-ID %{user_id}, hoppar over"
   could_not_save_chosencolor_741b74ce: "Kunne ikkje lagre '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Kunne ikkje justere datoar for oppgåve %{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Finn ikkje autoritet å oppdatere"
@@ -7059,6 +7060,7 @@ nn:
   denmark_311bddc2: Danmark
   denmark_45_929d5d34: "Danmark (+45)"
   deployment_id_for_tool_app_cb59335: "Utrullings-ID for %{tool}-appen"
+  deployment_id_for_toolname_app_e54a7364: "Utrullings-ID for %{toolName}-appen"
   description_436c48d7: Skildring
   details_98a31b68: Detaljar
   details_a6f427c3: "Detaljar:"
@@ -8460,6 +8462,8 @@ nn:
     multiple_grading_periods: "Mange periodar for karaktersetjing"
     post_grades: "Send vurderingar til SIS"
     quiz_log_auditing: "Overvaking av quizlogg"
+    quizzes: 
+      next: "New Quizzes"
     student_outcome_gradebook: "Vurderingsoversikt for meistringsbasert læring for studentar "
   features_2581da: Funksjonar
   federated_attributes_5cbe6441: "Felles attributter"
