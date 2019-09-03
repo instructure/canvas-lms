@@ -103,12 +103,6 @@ if (process.env.JSPEC_PATH) {
     requireAll(require.context(`../../${process.env.JSPEC_PATH}`))
   }
 } else {
-  // run all the gradebook/grading/gradezilla tests on their own
-  // Try running them first, so that if someone else is polluting, they don't get blamed
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsg')) {
-    requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/g.*Spec/))
-  }
-
   if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'coffee')) {
     // run specs for ember screenreader gradebook
     requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.js$/))
@@ -120,6 +114,10 @@ if (process.env.JSPEC_PATH) {
   // Run the js tests in 3 different groups for speed but also for isolating pollution from other specs
   if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsa')) {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[a-f].*Spec$/))
+  }
+  // run all the gradebook/grading/gradezilla tests on their own
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsg')) {
+    requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/g.*Spec/))
   }
   if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsh')) {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[h-z].*Spec/))
