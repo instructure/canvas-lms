@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-req_bundler_version_floor, req_bundler_version_ceiling = '1.8.0', '1.11.2'
+req_bundler_version_floor, req_bundler_version_ceiling = '1.8.0', '1.15.2'
 bundler_requirements = [">=#{req_bundler_version_floor}",
                         "<=#{req_bundler_version_ceiling}"]
 gem 'bundler', bundler_requirements
@@ -49,7 +49,7 @@ elsif RUBY_VERSION >= "2.3.1" && RUBY_VERSION < "2.4"
   puts "Ruby 2.3 support is untested"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
-  ruby '2.1.6', :engine => 'ruby', :engine_version => '2.1.6'
+  ruby '2.1.9', :engine => 'ruby', :engine_version => '2.1.9'
 end
 
 # force a different lockfile for rails 4.2

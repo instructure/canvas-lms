@@ -19,7 +19,7 @@ group :test do
 
   gem 'rubocop', require: false
   gem 'rubocop-rspec', require: false
-  gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
+  gem 'rubocop-canvas', require: false, path: '../gems/rubocop-canvas'
 
   gem 'once-ler', '0.0.15'
 
@@ -28,7 +28,7 @@ group :test do
   gem 'selenium-webdriver', '2.53.0'
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
-  gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
+    gem 'selinimum', '0.0.1', require: false, path: '../gems/selinimum'
   gem 'test_after_commit', '0.4.2'
   gem 'testrailtagging', '~> 0.3.7', git: 'https://github.com/instructure/testrailtagging', ref: 'master', require: false
 

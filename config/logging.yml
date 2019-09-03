@@ -1,0 +1,22 @@
+development:
+  logger: rails
+  log_context: false
+# (log_context defaults to true)
+  log_level: debug
+# (defaults to debug. if using syslog, you can also use its built in log level
+# filtering. however, setting the log_level here instead allows canvas to
+# change the log level on the fly for specific requests)
+
+test:
+  logger: rails
+
+production:
+  #  logger: rails
+  # TODO: fixme, temporarily hardcoding this. For some reason, when deployed to Heroku, even with teh ENV var LOG_LEVEL set, it was saying:
+  # Unable to load application: NameError: wrong constant name <%= ENV['LOG_LEVEL'] %>
+  # <date> app[web.1]: /app/config/application.rb:62:in `const_get': wrong constant name <%= ENV['LOG_LEVEL'] %> (NameError)
+  logger: syslog
+  app_ident: canvas-lms
+  facilities:
+    - user
+#  - local3

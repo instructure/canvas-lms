@@ -1,0 +1,28 @@
+common: &common
+  adapter: postgresql
+  encoding: utf8
+  timeout: 5000
+  prepared_statements: false
+
+development:
+  <<: *common
+  host: canvasdb
+  username: canvas
+  database: canvas
+  open: true
+
+test:
+  <<: *common
+  host: canvasdb
+  username: canvas
+  database: canvas_test_rails3_<%= ENV['TEST_ENV_NUMBER'] %>
+  shard1: canvas_test_rails3_shard1
+  shard2: canvas_test_rails3_shard2
+  test_shard_1: canvas_test_rails3_shard1
+  test_shard_2: canvas_test_rails3_shard2
+production:
+  <<: *common
+  host: <%= ENV['DATABASE_HOST'] %>
+  database: <%= ENV['DATABASE_NAME'] %>
+  username: <%= ENV['DATABASE_USERNAME'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>

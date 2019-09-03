@@ -1,0 +1,20 @@
+# For database provisioning, see: https://devcenter.heroku.com/articles/ruby-database-provisioning
+# As a PoC, clone the staging RDS database and try pointing this app at it using: heroku config:set DATABASE_URL=<scheme>://<username>:<password>@<host>
+# Reference the DATABASE_URL in config/database.yml? Right now, that file doesn't exist. Generally, we need to add the configs into heroku.
+# If i check it into src control... will that impact the currect env? I don't think so, but need to check how capistrano would deal if those files were checked in.
+
+# Runtime scripts, addons, ENV vars, et. Not available at build time.
+setup:
+  config:
+    RAILS_ENV: production
+    DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
+
+# Note that config values in here are only available at Build time, not runtime. Use setup: section for runtime vars.
+build:
+  docker:
+    web: Dockerfile
+  config:
+    RAILS_ENV: production
+    DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
+run:
+  web: bundle exec puma -C config/puma.rb

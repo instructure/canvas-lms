@@ -3,3 +3,7 @@ test:
 
 development:
   domain: "canvasweb"
+
+production:
+  domain: <%= ENV['DOMAIN'] %>
+
