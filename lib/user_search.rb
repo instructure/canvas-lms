@@ -29,7 +29,6 @@ module UserSearch
 
     context.shard.activate do
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
-
       users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
       users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
       roles_scope(users_scope, context, options.slice(:enrollment_type, :enrollment_role,
@@ -175,15 +174,21 @@ module UserSearch
   end
 
   def self.login_sql(users_scope, params)
-    users_scope.select("users.*, MAX(current_login_at) as last_login").
+    users_scope.select("users.*, MAX(logins.current_login_at) as last_login").
       joins(:pseudonyms).
+      joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
+        AND logins.account_id = #{User.connection.quote(params[:account])}
+        AND logins.workflow_state = 'active'").
       where(pseudonyms: {account_id: params[:account], workflow_state: 'active'}).
       where(like_condition('pseudonyms.unique_id'), pattern: params[:pattern])
   end
 
   def self.sis_sql(users_scope, params)
-    users_scope.select("users.*, MAX(current_login_at) as last_login").
+    users_scope.select("users.*, MAX(logins.current_login_at) as last_login").
       joins(:pseudonyms).
+      joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
+        AND logins.account_id = #{User.connection.quote(params[:account])}
+        AND logins.workflow_state = 'active'").
       where(pseudonyms: {account_id: params[:account], workflow_state: 'active'}).
       where(like_condition('pseudonyms.sis_user_id'), pattern: params[:pattern])
   end

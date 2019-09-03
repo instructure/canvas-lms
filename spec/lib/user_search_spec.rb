@@ -214,6 +214,14 @@ describe UserSearch do
             users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'sis_id')
             expect(users.map(&:name)).to eq ['Tyler Pickett', 'Rose Tyler', 'Tyler Teacher']
           end
+
+          it 'does not return users twice if it matches their name and an old login' do
+            tyler = User.find_by(name: 'Tyler Pickett')
+            tyler.pseudonyms.create!(unique_id: 'Yo', account_id: course.root_account_id, current_login_at: Time.zone.now)
+            tyler.pseudonyms.create!(unique_id: 'Pickett', account_id: course.root_account_id, current_login_at: 1.week.ago)
+            users = UserSearch.for_user_in_context('Pickett', course, user, nil, sort: 'username')
+            expect(users.map(&:name)).to eq ['Tyler Pickett']
+          end
         end
 
         describe 'searching on emails' do
