@@ -916,6 +916,10 @@ RSpec.configure do |config|
       end
     end
   end
+
+  def skip_if_prepended_class_method_stubs_broken
+    skip("stubbing prepended class methods is broken in this version of ruby") if %w{2.4.6 2.5.1 2.6.2}.include?(RUBY_VERSION)
+  end
 end
 
 class I18n::Backend::Simple
