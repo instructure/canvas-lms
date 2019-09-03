@@ -254,6 +254,9 @@ class ExternalToolsController < ApplicationController
     end
 
     launch_settings = JSON.parse(launch_settings)
+    if tool = ContextExternalTool.find_external_tool(launch_settings['launch_url'], @context)
+      log_asset_access(tool, "external_tools", "external_tools", overwrite: false)
+    end
 
     @lti_launch = Lti::Launch.new
     @lti_launch.params = launch_settings['tool_settings']
