@@ -710,6 +710,7 @@ nn:
         authentication: "På- og avloggingsaktivitet"
         course: Emneaktivitet
         grade_change: Vurderingsendringsaktivitet
+        mutations: GraphQL-mutasjonsaktivitet
         select_default: "Vel ein loggtype"
         select_label: "Vel ei loggtype å søke etter."
       page_title: "Administratorverktøy for %{account}"
@@ -1926,6 +1927,7 @@ nn:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
   allow_final_grade_override_8cf4336b: "Tillat å overstyre sluttvurdering"
   allow_final_grade_override_a21a79ee: "Tillat å overstyre sluttvurdering"
+  allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tillat import av QTI og Common Cartridge til New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat import av QTI og Common Cartridge til Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Tillat i meistringsstiane"
   allow_intra_group_peer_reviews_53f1e455: "Tillat fagfellevurdering innad i gruppa"
@@ -9564,6 +9566,7 @@ nn:
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "Graf som viser resultatfordeling ved instituttet/avdelinga"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "Graf som viser andel innleveringar innan frist per oppgåve"
   graphql_api_af4deb45: "GraphQL API"
+  graphql_mutation_activity_5a47678b: GraphQL-mutasjonsaktivitet
   graphs_89fcfeb: Grafar
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Flott, du har eit emne. Kva skjer no? Før du publiserer bør du kontrollere at du har det grunnleggande i orden. Gå gjennom lista til venstre og sjekk at emnet er klart for bruk."
   greek_65c5b3f7: Gresk
@@ -10302,6 +10305,7 @@ nn:
   ilumno_grade_export_251bc4b5: "Ilumno vurderingseksport"
   image_8ad06: Bilde
   image_id_is_not_a_valid_id_7dd6bad6: "image_id er ikkje gyldig ID"
+  image_search_b0944fc2: Bildesøk
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "kan ikkje setje både image_url og image_id."
   image_url_is_not_a_valid_url_4e31c8b0: "image_url er ikkje gyldig URL"
   images: 
@@ -13401,6 +13405,7 @@ nn:
   new_question_9107c469: "Nytt spørsmål"
   new_question_group_d9306280: "Ny spørsmålsgruppe"
   new_quiz_34aacba6: "Ny quiz"
+  new_quizzes_submission_history_d81b477b: "New Quizzes-innleveringshistorikk"
   new_rating_canceled_eed3c4ff: "Ny rangering er avbrote"
   new_rating_created_54125331: "Ny rangering oppretta"
   new_sis_integrations: |-
@@ -13947,6 +13952,10 @@ nn:
   on_paper_46d0ba36: "På papir"
   on_time_17ca5ad9: "I tide"
   on_time_percent_eebffe38: "På tid: %{percent}"
+  once_a_grade_is_posted_manually_it_will_automatica_26aff290: |-
+      
+      Med ein gong ei vurdering er posta manuelt, sendast det automatisk eit varsel og den er synleg for studentane.
+      Framtidige resultatendringar for vurderingar som allereie er posta, treng ikkje å postast manuelt.
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Med ein gong ei vurdering er posta manuelt sendast det automatisk eit varsel og den er synleg for studentane."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Når denne funksjonen er slått på, kan den ikkje slåast av igjen. Ver sikker på at du er klar for å aktivere innleveringsmappa før du går vidare. "
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har levert eit svar, kan du ikkje endre på det seinare. Du kan ikkje lenger sjå førre spørsmål."
@@ -17576,6 +17585,7 @@ nn:
       find_links_using_service: "Finn lenker som brukar %{service}"
   select_conversation_subject_3f36074a: "Vel samtale %{subject}"
   select_country_d21cb85a: "Vel land"
+  select_country_or_region_4e9fb08e: "Vel land eller region."
   select_course_5cf89177: "Vel emne"
   select_course_a_selection_is_required_before_recip_f622d9df: "Vel emne: eit utval er nødvendig for å aktivere mottakarfeltet"
   select_course_color_cad8e62b: "Vel emnefarge"
@@ -17598,6 +17608,7 @@ nn:
   select_prerequisite_module_57894963: "Vel modulen som er føresetnad"
   select_prerequite_module_e9042bb0: "Vel modulen som er føresetnad"
   select_rubric_2aa2ffa2: "Vel vurderingsskjema"
+  select_student_group_c0be9f3e: "Vel studentgruppe"
   select_student_name_caaff244: "Vel student %{name}"
   select_studentname_e7b7908d: "Vel %{studentName}"
   select_students_for_review_6e004a12: "Vel studentar for vurdering"
@@ -17677,6 +17688,7 @@ nn:
   send_message_to_name_c8ac05fc: "Send melding til %{name}"
   send_notification_81773687: "Send varsel"
   send_only_to_the_following_types_of_users_d8465c11: "Send berre til følgande brukartypar:"
+  send_page_to_another_user_6ef5a7c1: "Send side til annan brukar"
   send_this_announcement_to_unenrolled_users_4ea549d7: "Send melding til brukarar som ikkje er påmeldt"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Send meldinga til brukarar med kontorolle %{role}"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Send kunngjeringa til brukarar med kontorolle %{role}"
@@ -19357,6 +19369,7 @@ nn:
       kan ta litt tid for store emne. Du kan forlate
       sida og får ein e-post når nedlastinga
       er fullført.
+  the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: "Sluttdatointervall som emnerapporten viser treff innanfor"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stabelsporing, om gjeldande"
   the_field_field_is_required_56512820: "Feltet \"%{field}\" er obligatorisk"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet \"%{field}\" kan ikkje innehalde mellomrom"
@@ -20008,6 +20021,7 @@ nn:
       For å sjå kolonna for brukar-SIS-ID i CSV-fila til quizelementanalyse, må 'SIS-data - les' òg vere slått på.
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "For å moderere ein quiz må 'Vurderingar - endre' òg vere slått på."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "For å moderere vurderingar må 'Vurderingar - vel moderering av sluttvurdering' òg  vere slått på."
+  to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "For å få ein klient-ID, må kontoadministrator generere ein LTI-utviklarnøkkel."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Dersom du vil feste ein diskusjon øvst på sida, kan du dra ein diskusjon dit eller velje Fest i innstillingsmenyen."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -20896,6 +20910,7 @@ nn:
   view_ba339f93: Vis
   view_course_analytics_eefe6b2: "Vis emneanalyse"
   view_faculty_journals_ad0e8c8f: "Vis faglærarprotokollar"
+  view_feature_settings_at_an_account_level_ec7f5e10: "Vis funksjonsinnstillingar på kontonivå"
   view_file_8a1c62e5: "Vis fil"
   view_gradebook_history_a9272918: "Vis vurderingshistorikk"
   view_grades_8d3bae6c: "Vis vurderingar"
