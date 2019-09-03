@@ -31,6 +31,8 @@ import {
 import SubmissionIDQuery from '../components/SubmissionIDQuery'
 import {SubmissionMocks} from '../graphqlData/Submission'
 
+jest.setTimeout(10000) // TODO: figure out why these tests are so slow
+
 describe('student view integration tests', () => {
   beforeEach(() => {
     window.ENV = {
