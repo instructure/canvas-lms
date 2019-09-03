@@ -66,7 +66,8 @@ module Lti
           "name" => student.name,
           "sortable_name" => student.sortable_name,
           "short_name" => student.short_name,
-          "lti_id" =>  student.lti_context_id
+          "lti_id" =>  student.lti_context_id,
+          "email" => student.email
         }
       end
 
@@ -169,7 +170,7 @@ module Lti
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expected_json = group.users.map do |user|
-          user_json(user, user, nil, %w(email lti_id), group.context)
+          user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
         end
         expect(parsed_body).to eq(expected_json)
       end
@@ -203,7 +204,7 @@ module Lti
         get group_index_endpoint, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expected_json = group.users.map do |user|
-          user_json(user, user, nil, %w(email lti_id), group.context)
+          user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
         end
         expect(parsed_body).to eq(expected_json)
       end

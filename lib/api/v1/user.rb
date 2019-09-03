@@ -44,7 +44,7 @@ module Api::V1::User
     end
   end
 
-  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil)
+  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil, tool_includes: [])
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
@@ -85,7 +85,7 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses)
+      if tool_includes.include?('email') || (includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses))
         json[:email] = user.email
       end
 
@@ -139,7 +139,7 @@ module Api::V1::User
         json[:time_zone] = zone.name
       end
 
-      if includes.include?('lti_id')
+      if tool_includes.include?('lti_id') || includes.include?('lti_id')
         json[:lti_id] = Lti::Asset.old_id_for_user_in_context(user, context) || user.lti_context_id
       end
 
