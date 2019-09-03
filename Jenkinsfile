@@ -223,11 +223,11 @@ pipeline {
           }
         }
 
-        stage('Linters and JS') {
+        stage('Frontend') {
           steps {
             // propagate set to false until we can get tests passing
             build(
-              job: 'linters-and-js',
+              job: 'frontend',
               propagate: false,
               parameters: build_parameters
             )
