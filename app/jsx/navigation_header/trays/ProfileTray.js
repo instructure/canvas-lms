@@ -27,7 +27,7 @@ import LogoutButton from '../LogoutButton'
 function ProfileTab({id, html_url, label}) {
   return (
     <ListItem key={id}>
-      <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href={html_url}>
+      <Button variant="link" margin="none" href={html_url}>
         {label}
       </Button>
     </ListItem>
@@ -55,10 +55,10 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tab
         <Heading level="h3" as="h2">
           {userDisplayName}
         </Heading>
-        <LogoutButton size="small" margin="medium 0" />
+        <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List variant="unstyled" margin="0" itemSpacing="small">
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} />)
         ) : (
