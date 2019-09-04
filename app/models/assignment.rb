@@ -1823,6 +1823,7 @@ class Assignment < ActiveRecord::Base
       submission.workflow_state = "graded"
     end
     submission.group = group
+    submission.grade_posting_in_progress = opts.fetch(:grade_posting_in_progress, false)
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
     submission.audit_grade_changes = false
 

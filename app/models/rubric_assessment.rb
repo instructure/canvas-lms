@@ -157,14 +157,20 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def update_artifact
-    return unless artifact.present? && rubric_association&.use_for_grading? && artifact.score != score
+    return if artifact.blank? || !rubric_association&.use_for_grading? || artifact.score == score
 
     case artifact_type
     when "Submission"
       assignment = rubric_association.association_object
       return unless assignment.grants_right?(assessor, :grade)
 
-      assignment.grade_student(artifact.student, score: score, grader: assessor, graded_anonymously: @graded_anonymously_set)
+      assignment.grade_student(
+        artifact.student,
+        score: score,
+        grader: assessor,
+        graded_anonymously: @graded_anonymously_set,
+        grade_posting_in_progress: artifact.grade_posting_in_progress
+      )
       artifact.reload
     when "ModeratedGrading::ProvisionalGrade"
       artifact.update!(score: score)
