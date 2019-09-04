@@ -3,7 +3,8 @@
   <label class="control-label"><strong>{{#t "content"}}Content{{/t}}</strong></label>
   <div class="controls selectContent"></div>
 </div>
-<div class="control-group options">
+
+<div class="control-group options" {{#if ENV.AUTO_DUE_DATES}}style="display:none"{{/if}}>
   <label class="control-label"><strong>{{#t "options"}}Options{{/t}}</strong></label>
   <div class="dateShift"></div>
 </div>

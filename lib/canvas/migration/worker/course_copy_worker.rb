@@ -67,6 +67,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
             cm.import_content
             cm.workflow_state = :imported
             cm.save
+            AssignmentsService.distribute_due_dates(course: cm.context)
             cm.update_import_progress(100)
           end
         else
