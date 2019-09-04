@@ -606,8 +606,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   QUnit.module('when updating the course post policy', hooks => {
     hooks.beforeEach(() => {
       sandbox.spy(FlashAlert, 'showFlashAlert')
-      sandbox.spy(props.postPolicies, 'setCoursePostPolicy')
-      sandbox.spy(props.postPolicies, 'setAssignmentPostPolicies')
+      sinon.spy(props.postPolicies, 'setCoursePostPolicy')
+      sinon.spy(props.postPolicies, 'setAssignmentPostPolicies')
 
       return mountOpenLoadAndSelectTab('Grade Posting Policy').then(() => {
         getManuallyPostGradesOption().click()
@@ -616,7 +616,6 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
 
     hooks.afterEach(() => {
-      props.postPolicies.setCoursePostPolicy.restore()
       FlashAlert.destroyContainer()
     })
 
