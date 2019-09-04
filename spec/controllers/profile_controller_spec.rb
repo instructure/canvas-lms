@@ -216,4 +216,42 @@ describe ProfileController do
       ]
     end
   end
+
+  describe "content_shares" do
+    before :once do
+      teacher_in_course(:active_all => true)
+      student_in_course(:active_all => true)
+    end
+
+    describe "direct_share flag is enabled" do
+      before :once do
+        @teacher.account.enable_feature!(:direct_share)
+      end
+
+      it "should show if user has any non-student enrollments" do
+        user_session(@teacher)
+        get 'content_shares', params: {user_id: @teacher.id}
+        expect(response).to render_template('content_shares')
+      end
+
+      it "should 404 if user has only student enrollments" do
+        user_session(@student)
+        get 'content_shares', params: {user_id: @student.id}
+        expect(response).to be_not_found
+      end
+    end
+
+    describe "direct_share flag is disabled" do
+      before :once do
+        @user.account.disable_feature!(:direct_share)
+      end
+
+      it "should 404 even if user has non-student enrollments" do
+        teacher_in_course(:active_all => true)
+        user_session(@teacher)
+        get 'content_shares', params: {user_id: @teacher.id}
+        expect(response).to be_not_found
+      end
+    end
+  end
 end

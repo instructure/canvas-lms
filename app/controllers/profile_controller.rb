@@ -470,4 +470,15 @@ class ProfileController < ApplicationController
 
     render html: '', layout: true
   end
+
+  def content_shares
+    raise not_found if !@domain_root_account.feature_enabled?(:direct_share) || !@current_user.non_student_enrollment?
+
+    @user ||= @current_user
+    set_active_tab 'content_shares'
+    @context = @user.profile
+
+    js_env({})
+    render :content_shares
+  end
 end

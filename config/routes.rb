@@ -844,6 +844,7 @@ CanvasRails::Application.routes.draw do
       get :communication
       put :communication_update
       get :settings
+      get :content_shares
       get :observees
     end
   end
