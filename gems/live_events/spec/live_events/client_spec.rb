@@ -63,6 +63,7 @@ describe LiveEvents::Client do
     LiveEvents.clear_context!
 
     @client = LiveEvents::Client.new nil, fclient, test_stream_name
+    LiveEvents.worker.start!
   end
 
   def expect_put_records(payload, stream_client = LiveEvents.stream_client)
@@ -79,6 +80,7 @@ describe LiveEvents::Client do
       })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
+      LiveEvents.worker.stop!
     end
   end
 

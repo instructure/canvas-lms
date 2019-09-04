@@ -77,7 +77,7 @@ module LiveEvents
           logger.warn "Starting new LiveEvents worker thread due to fork."
         end
 
-        @worker = LiveEvents::AsyncWorker.new(stream_client: client.stream_client, stream_name: client.stream_name)
+        @worker = LiveEvents::AsyncWorker.new(stream_client: @stream_client, stream_name: @stream_client&.stream_name)
         @launched_pid = Process.pid
       end
 
@@ -95,7 +95,7 @@ module LiveEvents
       if @client && !new_client?
         @client
       else
-        @client = LiveEvents::Client.new(LiveEvents::Client.config, @stream_client, @stream_client&.stream_name)
+        @client = LiveEvents::Client.new(LiveEvents::Client.config, @stream_client, @stream_client&.stream_name, worker: @worker)
       end
     end
 
