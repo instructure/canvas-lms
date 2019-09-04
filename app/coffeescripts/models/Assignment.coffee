@@ -372,6 +372,12 @@ export default class Assignment extends Model
     return 'WikiPage' if @isPage()
     return 'Assignment'
 
+  objectTypeDisplayName: ->
+    return I18n.t('Quiz') if @isQuiz()
+    return I18n.t('Discussion Topic') if @isDiscussionTopic()
+    return I18n.t('Page') if @isPage()
+    return I18n.t('Assignment')
+
   htmlUrl: =>
     @get 'html_url'
 
@@ -498,7 +504,7 @@ export default class Assignment extends Model
       'submissionTypesFrozen', 'anonymousInstructorAnnotations',
       'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
       'defaultToolName', 'isDefaultTool', 'isNonDefaultExternalTool', 'defaultToNone',
-      'defaultToOnline', 'defaultToOnPaper'
+      'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName'
     ]
 
     hash =
