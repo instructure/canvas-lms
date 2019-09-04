@@ -59,7 +59,8 @@ module Schemas::Lti
               "https://canvas.instructure.com/lti/data_services/scope/show",
               "https://canvas.instructure.com/lti/data_services/scope/update",
               "https://canvas.instructure.com/lti/data_services/scope/list",
-              "https://canvas.instructure.com/lti/data_services/scope/destroy"
+              "https://canvas.instructure.com/lti/data_services/scope/destroy",
+              "https://canvas.instructure.com/lti/data_services/scope/list_event_types"
             ].freeze
           }
         }.freeze,
