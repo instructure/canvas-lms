@@ -21,7 +21,9 @@
   <meta charset="utf-8">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet">
-  <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
+  <% unless params && params[:controller]&.starts_with?('login/') # some windows apps need to do the oauth login dance from an ie11 webview %>
+    <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
+  <% end %>
   <%=
     # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
     polyfill_url = "/ie11-polyfill.js"
