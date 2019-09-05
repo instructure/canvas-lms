@@ -514,8 +514,11 @@ describe Api::V1::Submission do
         expect(json.fetch('posted_at')).to eq posted_at
       end
 
-      it "is not included if the owning course does not have post policies enabled" do
-        expect(json).not_to have_key('posted_at')
+      it "is included if the owning course does not have post policies enabled" do
+        posted_at = Time.zone.now
+        submission.update!(posted_at: posted_at)
+
+        expect(json.fetch('posted_at')).to eq posted_at
       end
     end
   end
