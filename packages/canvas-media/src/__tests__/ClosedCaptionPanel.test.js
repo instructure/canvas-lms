@@ -34,7 +34,8 @@ function makeProps() {
         CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose File',
         CLOSED_CAPTIONS_SELECT_LANGUAGE: 'Select Language'
       }
-    }
+    },
+    updateSubtitles: () => {}
   }
 }
 

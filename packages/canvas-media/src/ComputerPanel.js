@@ -43,7 +43,8 @@ export default function ComputerPanel({
   setFile,
   setHasUploadedFile,
   theFile,
-  uploadMediaTranslations
+  uploadMediaTranslations,
+  updateSubtitles
 }) {
   const {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES,
@@ -92,6 +93,7 @@ export default function ComputerPanel({
               languages={languages}
               liveRegion={liveRegion}
               uploadMediaTranslations={uploadMediaTranslations}
+              updateSubtitles={updateSubtitles}
             />
           </Suspense>
         )}
@@ -145,5 +147,6 @@ ComputerPanel.propTypes = {
   setFile: func.isRequired,
   setHasUploadedFile: func.isRequired,
   theFile: instanceOf(File),
-  uploadMediaTranslations: translationShape
+  uploadMediaTranslations: translationShape,
+  updateSubtitles: func.isRequired
 }

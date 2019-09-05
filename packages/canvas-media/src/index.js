@@ -25,7 +25,7 @@ import {Tabs} from '@instructure/ui-tabs'
 
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
-import saveMediaRecording from './saveMediaRecording'
+import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 import translationShape from './translationShape'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
@@ -74,7 +74,7 @@ export default class UploadMedia extends React.Component {
           this.state.theFile,
           this.props.contextId,
           this.props.contextType,
-          this.props.onDismiss
+          this.saveMediaCallback
         )
         break
       }
@@ -84,6 +84,19 @@ export default class UploadMedia extends React.Component {
       }
       default:
         throw new Error('Selected Panel is invalid') // Should never get here
+    }
+  }
+
+  saveMediaCallback = async (err, data) => {
+    if (err) {
+      // handle error
+    } else {
+      try {
+        await saveClosedCaptions(data.media_object.media_id, this.subtitles)
+        this.props.onDismiss(data)
+      } catch (_) {
+        // Handle error
+      }
     }
   }
 
@@ -102,7 +115,10 @@ export default class UploadMedia extends React.Component {
       <Tabs
         shouldFocusOnRender
         maxWidth="large"
-        onRequestTabChange={(_, {index}) => this.setState({selectedPanel: index})}
+        onRequestTabChange={(_, {index}) => {
+          this.subtitles = []
+          this.setState({selectedPanel: index})
+        }}
       >
         {this.props.tabs.upload && (
           <Tabs.Panel
@@ -122,6 +138,7 @@ export default class UploadMedia extends React.Component {
                 accept={ACCEPTED_FILE_TYPES}
                 languages={this.props.languages}
                 liveRegion={this.props.liveRegion}
+                updateSubtitles={subtitles => (this.subtitles = subtitles)}
               />
             </Suspense>
           </Tabs.Panel>
