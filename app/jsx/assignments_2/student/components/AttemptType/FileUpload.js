@@ -83,32 +83,33 @@ export default class FileUpload extends Component {
     }
   }
 
-  handleDropAccepted = async files => {
-    if (this._isMounted) {
-      this.props.updateUploadingFiles(true)
+  handleCanvasFiles = async fileID => {
+    if (!fileID) {
+      this.context.setOnFailure(I18n.t('Error adding canvas file to submission draft'))
+      return
     }
-
-    if (files.length) {
+    this.updateUploadingFiles(async () => {
       try {
-        const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
-
-        await this.props.createSubmissionDraft({
-          variables: {
-            id: this.props.submission.id,
-            attempt: this.props.submission.attempt || 1,
-            fileIds: this.getDraftAttachments()
-              .map(file => file._id)
-              .concat(newFiles.map(file => file.id))
-          }
-        })
+        await this.createSubmissionDraft([fileID])
       } catch (err) {
         this.context.setOnFailure(I18n.t('Error updating submission draft'))
       }
-    }
+    })
+  }
 
-    if (this._isMounted) {
-      this.props.updateUploadingFiles(false)
+  handleDropAccepted = async files => {
+    if (!files.length) {
+      this.context.setOnFailure(I18n.t('Error adding files to submission draft'))
+      return
     }
+    this.updateUploadingFiles(async () => {
+      try {
+        const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
+        await this.createSubmissionDraft(newFiles.map(file => file.id))
+      } catch (err) {
+        this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      }
+    })
   }
 
   handleDropRejected = () => {
@@ -119,6 +120,28 @@ export default class FileUpload extends Component {
           type: 'error'
         }
       ]
+    })
+  }
+
+  updateUploadingFiles = async wrappedFunc => {
+    if (this._isMounted) {
+      this.props.updateUploadingFiles(true)
+    }
+    await wrappedFunc()
+    if (this._isMounted) {
+      this.props.updateUploadingFiles(false)
+    }
+  }
+
+  createSubmissionDraft = async fileIDs => {
+    await this.props.createSubmissionDraft({
+      variables: {
+        id: this.props.submission.id,
+        attempt: this.props.submission.attempt || 1,
+        fileIds: this.getDraftAttachments()
+          .map(file => file._id)
+          .concat(fileIDs)
+      }
     })
   }
 
@@ -137,9 +160,11 @@ export default class FileUpload extends Component {
       }
     })
 
-    this.setState({
-      messages: []
-    })
+    if (this._isMounted) {
+      this.setState({
+        messages: []
+      })
+    }
 
     const focusElement =
       this.getDraftAttachments().length === 0 || fileIndex === 0
@@ -187,6 +212,7 @@ export default class FileUpload extends Component {
                     <MoreOptions
                       assignmentID={this.props.assignment._id}
                       courseID={this.props.assignment.env.courseId}
+                      handleCanvasFiles={this.handleCanvasFiles}
                       userID={this.props.assignment.env.currentUser.id}
                     />
                   </Flex.Item>

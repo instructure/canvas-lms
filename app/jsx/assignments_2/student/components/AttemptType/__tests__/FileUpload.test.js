@@ -181,6 +181,28 @@ describe('FileUpload', () => {
     })
   })
 
+  it('creates an error alert when given no file id through the Lti response', async () => {
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    render(
+      <AlertManagerContext.Provider value={{setOnFailure}}>
+        <FileUpload {...props} />
+      </AlertManagerContext.Provider>
+    )
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'A2ExternalContentReady',
+          content_items: []
+        }
+      })
+    )
+
+    expect(setOnFailure).toHaveBeenCalledWith('Error adding files to submission draft')
+  })
+
   // Byproduct of how the dummy submissions are being handled. Check out ViewManager
   // for some context around this
   it('creates a submission draft for the current attempt when not on attempt 0', async () => {
