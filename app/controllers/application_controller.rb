@@ -1252,6 +1252,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def log_api_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
+    return if in_app? # don't log duplicate accesses for API calls made by the Canvas front-end
+    return if params[:page].to_i > 1 # don't log duplicate accesses for pages after the first
+    log_asset_access(asset, asset_category, asset_group, level, membership_type, overwrite: overwrite)
+  end
+
   def log_page_view
     return true if !page_views_enabled?
 

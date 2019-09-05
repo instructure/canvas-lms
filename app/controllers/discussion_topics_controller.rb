@@ -434,6 +434,7 @@ class DiscussionTopicsController < ApplicationController
         render html: '', layout: true
       end
       format.json do
+        log_api_asset_access([ "topics", @context ], 'topics', 'other')
         if @context.grants_right?(@current_user, session, :moderate_forum)
           mc_status = setup_master_course_restrictions(@topics, @context)
         end

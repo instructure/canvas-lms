@@ -945,6 +945,7 @@ class CoursesController < ApplicationController
     Shackles.activate(:slave) do
       get_context
       if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+        log_api_asset_access([ "roster", @context ], 'roster', 'other')
         #backcompat limit param
         params[:per_page] ||= params[:limit]
 

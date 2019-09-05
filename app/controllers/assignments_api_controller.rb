@@ -712,6 +712,7 @@ class AssignmentsApiController < ApplicationController
 
   def get_assignments(user)
     if authorized_action(@context, user, :read)
+      log_api_asset_access([ "assignments", @context ], "assignments", "other")
       scope = Assignments::ScopedToUser.new(@context, user).scope.
         eager_load(:assignment_group).
         preload(:rubric_association, :rubric).
@@ -848,6 +849,7 @@ class AssignmentsApiController < ApplicationController
 
       locked = @assignment.locked_for?(@current_user, :check_policies => true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
+      log_api_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
       render :json => assignment_json(@assignment, @current_user, session,
                   submission: submissions,

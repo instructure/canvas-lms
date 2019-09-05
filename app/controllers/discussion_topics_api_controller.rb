@@ -55,6 +55,7 @@ class DiscussionTopicsApiController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   def show
     include_params = Array(params[:include])
+    log_asset_access(@topic, 'topics', 'topics')
     render(json: discussion_topics_api_json([@topic], @context,
                                             @current_user, session,
                                             include_all_dates: include_params.include?('all_dates'),
@@ -121,6 +122,7 @@ class DiscussionTopicsApiController < ApplicationController
   #   }
   def view
     return unless authorized_action(@topic, @current_user, :read_replies)
+    log_asset_access(@topic, 'topics', 'topics')
 
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
