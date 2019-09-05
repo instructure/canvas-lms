@@ -200,7 +200,7 @@ module Lti
     #
     # @returns DataServiceEventTypes
     def event_types_index
-      response = Services::LiveEventsSubscriptionService.event_types_index(jwt_body)
+      response = Services::LiveEventsSubscriptionService.event_types_index(jwt_body, message_type)
       forward_service_response(response)
     end
 
@@ -232,6 +232,10 @@ module Lti
 
     def context
       @context ||= Account.active.find_by(lti_context_id: params[:account_id])
+    end
+
+    def message_type
+      params[:message_type] || 'live-event'
     end
   end
 end
