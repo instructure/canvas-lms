@@ -68,45 +68,6 @@ GIT
       activemodel (>= 3.2)
 
 PATH
-  remote: gems/plugins/academic_benchmark
-  specs:
-    academic_benchmark (1.1.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/account_reports
-  specs:
-    account_reports (1.1.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/moodle_importer
-  specs:
-    moodle_importer (1.0.0)
-      moodle2cc (= 0.2.33)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/qti_exporter
-  specs:
-    qti_exporter (1.0.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/respondus_soap_endpoint
-  specs:
-    respondus_soap_endpoint (1.1.0)
-      rails (>= 3.2, < 4.3)
-      soap4r-middleware (= 0.8.3)
-      soap4r-ruby1.9 (= 2.0.0)
-
-PATH
-  remote: gems/plugins/simply_versioned
-  specs:
-    simply_versioned (1.0.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
   remote: gems/activesupport-suspend_callbacks
   specs:
     activesupport-suspend_callbacks (0.0.1)
@@ -383,6 +344,45 @@ PATH
     paginated_collection (1.0.0)
       folio-pagination (= 0.0.11)
       will_paginate (= 3.0.7)
+
+PATH
+  remote: gems/plugins/academic_benchmark
+  specs:
+    academic_benchmark (1.1.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/account_reports
+  specs:
+    account_reports (1.1.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/moodle_importer
+  specs:
+    moodle_importer (1.0.0)
+      moodle2cc (= 0.2.33)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/qti_exporter
+  specs:
+    qti_exporter (1.0.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/respondus_soap_endpoint
+  specs:
+    respondus_soap_endpoint (1.1.0)
+      rails (>= 3.2, < 4.3)
+      soap4r-middleware (= 0.8.3)
+      soap4r-ruby1.9 (= 2.0.0)
+
+PATH
+  remote: gems/plugins/simply_versioned
+  specs:
+    simply_versioned (1.0.0)
+      rails (>= 3.2, < 4.3)
 
 PATH
   remote: gems/rubocop-canvas
@@ -685,6 +685,7 @@ GEM
     net-ssh (3.2.0)
     netaddr (1.5.0)
     netrc (0.11.0)
+    newrelic_rpm (6.6.0.358)
     oauth-instructure (0.4.10)
     oauth2 (1.0.0)
       faraday (>= 0.8, < 0.10)
@@ -1062,6 +1063,7 @@ DEPENDENCIES
   net-ldap (= 0.10.1)
   net-ssh (= 3.2.0)
   netaddr (= 1.5.0)
+  newrelic_rpm
   nokogiri (= 1.6.6.2.20150813143452)!
   nokogiri-xmlsec-me-harder (= 0.9.3pre)!
   oauth-instructure (= 0.4.10)
