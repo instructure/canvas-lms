@@ -18,10 +18,10 @@
 import {arrayOf, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
-import React from 'react'
+import React, {useState} from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
 
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 
 const iframeStyle = {
   border: 'none',
@@ -36,26 +36,40 @@ const tabContentStyle = {
   position: 'relative'
 }
 
-const Tools = props => (
-  <TabList defaultSelectedIndex={0} variant="minimal">
-    <TabPanel title="Canvas Files" padding="0">
-      <div style={tabContentStyle}>
-        <CanvasFiles courseID={props.courseID} userGroups={props.userGroups.groups} />
-      </div>
-    </TabPanel>
-    {props.tools.map(tool => (
-      <TabPanel title={tool.name} key={tool._id}>
+const Tools = props => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const handleTabChange = (_, {index}) => {
+    setSelectedIndex(index)
+  }
+
+  return (
+    <Tabs onRequestTabChange={handleTabChange}>
+      <Tabs.Panel isSelected={selectedIndex === 0} padding="0" renderTitle="Canvas Files">
         <div style={tabContentStyle}>
-          <iframe
-            style={iframeStyle}
-            src={launchUrl(props.assignmentID, props.courseID, tool)}
-            title={tool.name}
-          />
+          <CanvasFiles courseID={props.courseID} userGroups={props.userGroups.groups} />
         </div>
-      </TabPanel>
-    ))}
-  </TabList>
-)
+      </Tabs.Panel>
+      {props.tools.map((tool, i) => (
+        <Tabs.Panel
+          isSelected={selectedIndex === i + 1}
+          key={tool._id}
+          padding="0"
+          renderTitle={tool.name}
+        >
+          <div style={tabContentStyle}>
+            <iframe
+              style={iframeStyle}
+              src={launchUrl(props.assignmentID, props.courseID, tool)}
+              title={tool.name}
+            />
+          </div>
+        </Tabs.Panel>
+      ))}
+    </Tabs>
+  )
+}
+
 Tools.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
