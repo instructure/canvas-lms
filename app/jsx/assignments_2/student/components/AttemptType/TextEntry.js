@@ -51,6 +51,7 @@ export default class TextEntry extends React.Component {
 
   componentDidMount() {
     this._isMounted = true
+    window.addEventListener('beforeunload', this.beforeunload.bind(this))
 
     if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
       this.loadRCE()
@@ -67,9 +68,18 @@ export default class TextEntry extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('beforeunload', this.beforeunload.bind(this))
 
     if (this.state.editorLoaded && !this.props.editingDraft) {
       this.unloadRCE()
+    }
+  }
+
+  // Warn the user if they are attempting to leave the page with unsaved data
+  beforeunload(e) {
+    if (this.state.editorLoaded && this.getDraftBody() !== this.getRCEText()) {
+      e.preventDefault()
+      e.returnValue = true
     }
   }
 

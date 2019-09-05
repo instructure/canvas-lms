@@ -19,6 +19,7 @@
 import {fireEvent, render} from '@testing-library/react'
 import {mockSubmission} from '../../../mocks'
 import React from 'react'
+import sinon from 'sinon'
 import TextEntry from '../TextEntry'
 
 async function makeProps(opts = {}) {
@@ -171,5 +172,14 @@ describe('TextEntry', () => {
 
     expect(getByTestId('text-submission')).toBeInTheDocument()
     expect(getByText('thundercougarfalconbird')).toBeInTheDocument()
+  })
+
+  it('sets up beforeunload handler', async () => {
+    sinon.spy(window, 'addEventListener')
+
+    const props = await makeProps()
+    render(<TextEntry {...props} />)
+
+    expect(window.addEventListener.lastCall.args).toContain('beforeunload')
   })
 })
