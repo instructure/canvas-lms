@@ -2168,6 +2168,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :planner) do
       get 'planner/items', action: :index, as: :planner_items
+      get 'users/:user_id/planner/items', action: :index, as: :user_planner_items
     end
 
     scope(controller: :planner_overrides) do
