@@ -9694,7 +9694,7 @@ ru:
   grade_percentage_for_missing_submissions_dc7ccac: "Процент оценок для отсутствующих отправок"
   grade_point_average_2976cc59: "Средний балл"
   grade_posting_policy_42c8a94b: "Политика публикации оценок"
-  grade_posting_policy_name_a6d6f178: "«Политика публикации оценок» %{name}'"
+  grade_posting_policy_name_a6d6f178: "Политика публикации оценок» %{name}"
   grade_posting_policy_tray_c929cfd: "Лоток политики публикации оценок"
   grade_saved_ab539b53: "Оценка сохранена."
   grade_selection_table_dcf9d1ea: "Таблица выбора оценок"
