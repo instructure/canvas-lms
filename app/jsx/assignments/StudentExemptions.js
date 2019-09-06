@@ -132,12 +132,18 @@ class StudentExemptions extends React.Component {
         'borderBottomRightRadius': 0,
         'borderBottom': 'none'
       })
-    };
+    }
 
     containerStyle(){
       return({
         borderBottom: '1px solid #ccc',
         padding: '15px'
+      })
+    }
+
+    messageStyle() {
+      return({
+        fontSize: '11px'
       })
     }
 
@@ -147,20 +153,25 @@ class StudentExemptions extends React.Component {
         if(!this.state.students){return <ul></ul>}
 
         return(
-          <div style={this.rowStyle()}>
-            <div style={this.containerStyle()}>
-              <div id="exempt-label" class="ic-Label" title="Exempt these students" aria-label="Exempt these students">
-                Exempt these students
+          <div>
+            <div style={this.rowStyle()}>
+              <div style={this.containerStyle()}>
+                <div id="exempt-label" class="ic-Label" title="Exempt these students" aria-label="Exempt these students">
+                  Exempt these students
+                </div>
+                <TokenInput
+                    menuContent = {this.renderComboboxOptions()}
+                    selected    = {this.state.exemptions}
+                    onInput     = {this.handleInput}
+                    onSelect    = {this.handleTokenAdd}
+                    onRemove    = {this.handleTokenRemove}
+                    value       = {true}
+                    ref         = "TokenInput"
+                />
               </div>
-              <TokenInput
-                  menuContent = {this.renderComboboxOptions()}
-                  selected    = {this.state.exemptions}
-                  onInput     = {this.handleInput}
-                  onSelect    = {this.handleTokenAdd}
-                  onRemove    = {this.handleTokenRemove}
-                  value       = {true}
-                  ref         = "TokenInput"
-              />
+            </div>
+            <div style={this.messageStyle()}>
+              <p>Note: It may take up to 15 minutes for the excuse tag to show in all student areas.</p>
             </div>
           </div>
         )
