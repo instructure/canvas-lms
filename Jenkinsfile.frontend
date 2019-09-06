@@ -29,6 +29,10 @@ def cleanupDocker () {
   sh 'build/new-jenkins/docker-cleanup.sh'
 }
 
+def isMerge () {
+  return env.GERRIT_EVENT_TYPE == 'change-merged'
+}
+
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -74,10 +78,11 @@ pipeline {
       steps {
         setDockerUp() 
       }
-    }  
+    }
     stage('Tests') {
       environment {
         COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
+        COVERAGE = isMerge()
       }
       parallel {
         stage('Jest') {
