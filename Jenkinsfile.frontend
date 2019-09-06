@@ -31,7 +31,7 @@ def cleanupDocker () {
 
 
 pipeline {
-  agent { label 'docker' }
+  agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
   }

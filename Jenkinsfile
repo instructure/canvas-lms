@@ -46,7 +46,7 @@ def build_parameters = [
 ]
 
 pipeline {
-  agent { label 'docker' }
+  agent { label 'canvas-docker' }
 
   options {
     ansiColor('xterm')

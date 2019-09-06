@@ -35,7 +35,7 @@ pipeline {
     stage ('Run Tests Parallel') {
       parallel {
         stage('Selenium Tests') {
-          agent { label 'docker' }
+          agent { label 'canvas-docker' }
           steps {
             timeout(time: 60) {
               sh 'printenv | sort'
