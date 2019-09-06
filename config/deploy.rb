@@ -205,9 +205,17 @@ namespace :deploy do
            # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
            # "canvasadmin" group.
            info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
-           execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
+           execute :npm, 'cache clean -f' # Was getting "npm ERR! cb() never called!".
+           # Compile assets runs this in the section labelled: "Making sure node_modules are up to date" of lib/tasks/canvas.rake
+           # so I'm commenting this out. Actually, I think the real problem was network connection related where on subsequent
+           # installs, the timing happened such that npm packages were downloading with a 200 OK response, but the content was corrupt
+           # and so tar unpack failed. On the machine, I ran the following to configure npm to make it more likely that network connection
+           # issues wouldn't happen:
+           #   npm config set registry http://registry.npmjs.org/
+           #   npm config set strict-ssl false
+           #   npm set maxsockets 25
            #execute :npm, 'install', '--silent'
-           execute :npm, '-dd install' # print debug log of npm install
+           #execute :npm, '-dd install' # print debug log of npm install
            execute :rake, 'canvas:compile_assets', '--trace'
           end
         end
