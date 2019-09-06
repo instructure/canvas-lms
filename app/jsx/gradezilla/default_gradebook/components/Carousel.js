@@ -78,7 +78,7 @@ export default class Carousel extends Component {
           {this.props.displayLeftArrow && leftArrow}
         </div>
 
-        <div style={{flex: 1}}>{this.props.children}</div>
+        <div style={{flex: 1, minWidth: 0}}>{this.props.children}</div>
 
         <div className="right-arrow-button-container">
           {this.props.displayRightArrow && rightArrow}
