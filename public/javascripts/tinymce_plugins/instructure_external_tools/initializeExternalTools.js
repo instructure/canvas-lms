@@ -82,9 +82,10 @@ const ExternalToolsPlugin = {
       }
     }
     if (ltiButtons.length && ENV.use_rce_enhancements) {
-      ed.ui.registry.addMenuButton('lti_tool_dropdown', {
-        fetch(callback) {
-          callback(ltiButtons)
+      ed.ui.registry.addButton('lti_tool_dropdown', {
+        onAction: () => {
+          const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
+          document.dispatchEvent(ev)
         },
         icon: 'lti',
         tooltip: 'LTI Tools'

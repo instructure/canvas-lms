@@ -54,7 +54,8 @@ export default class ExternalToolDialog extends React.Component {
       selection: PropTypes.shape({
         getContent: PropTypes.func.isRequired
       }),
-      getContent: PropTypes.func.isRequired
+      getContent: PropTypes.func.isRequired,
+      focus: PropTypes.func.isRequired
     }).isRequired,
     contextAssetString: PropTypes.string.isRequired,
     iframeAllowances: PropTypes.string.isRequired,
@@ -140,6 +141,7 @@ export default class ExternalToolDialog extends React.Component {
 
   handleRemove = () => {
     this.setState({button: EMPTY_BUTTON})
+    this.props.editor.focus()
   }
 
   handleInfoAlertFocus = ev => this.setState({infoAlert: ev.target})

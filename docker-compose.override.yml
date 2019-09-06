@@ -43,6 +43,7 @@ services:
     environment:
       <<: *BASE-ENV
       VIRTUAL_HOST: .canvas.docker
+      HTTPS_METHOD: noredirect
 
   postgres:
     volumes:

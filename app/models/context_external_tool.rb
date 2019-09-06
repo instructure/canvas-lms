@@ -873,6 +873,7 @@ end
 
   def self.editor_button_json(tools, context, user, session=nil)
     tools.select! {|tool| visible?(tool.editor_button['visibility'], user, context, session)}
+    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({link_attributes: {target: '_blank'}}))
     tools.map do |tool|
       {
           :name => tool.label_for(:editor_button, I18n.locale),
@@ -882,7 +883,12 @@ end
           :canvas_icon_class => tool.editor_button(:canvas_icon_class),
           :width => tool.editor_button(:selection_width),
           :height => tool.editor_button(:selection_height),
-          :use_tray => tool.editor_button(:use_tray) == "true"
+          :use_tray => tool.editor_button(:use_tray) == "true",
+          :description => if tool.description
+                            Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
+                          else
+                            ""
+                          end
       }
     end
   end

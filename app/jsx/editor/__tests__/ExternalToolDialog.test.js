@@ -68,7 +68,8 @@ function fakeEditor() {
     selection: {
       getContent: jest.fn()
     },
-    getContent: jest.fn()
+    getContent: jest.fn(),
+    focus: () => {}
   }
 }
 
