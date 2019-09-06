@@ -619,30 +619,35 @@ RSpec.configure do |config|
     importer
   end
 
+  def set_cache(new_cache)
+    cache_opts = {}
+    if new_cache == :redis_cache_store
+      if Canvas.redis_enabled?
+        cache_opts[:redis] = Canvas.redis
+      else
+        skip "redis required"
+      end
+    end
+    new_cache ||= :null_store
+    new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)
+    allow(Rails).to receive(:cache).and_return(new_cache)
+    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
+    allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
+    MultiCache.reset
+  end
+
   def specs_require_cache(new_cache=:memory_store)
     before :each do
-      skip "redis required" if new_cache == :redis_cache_store && !Canvas.redis_enabled?
-      new_cache = ActiveSupport::Cache.lookup_store(new_cache)
-      allow(Rails).to receive(:cache).and_return(new_cache)
-      allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-      allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-      allow(ActionController::Base).to receive(:perform_caching).and_return(true)
-      allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
-      MultiCache.reset
+      set_cache(new_cache)
     end
   end
 
   def enable_cache(new_cache=:memory_store)
-    new_cache ||= :null_store
-    new_cache = ActiveSupport::Cache.lookup_store(new_cache)
     previous_cache = Rails.cache
-    allow(Rails).to receive(:cache).and_return(new_cache)
-    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-    allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
     previous_perform_caching = ActionController::Base.perform_caching
-    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
-    allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
-    MultiCache.reset
+    set_cache(new_cache)
     if block_given?
       begin
         yield
