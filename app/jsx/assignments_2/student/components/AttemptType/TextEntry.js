@@ -27,8 +27,6 @@ import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-ico
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View} from '@instructure/ui-layout'
 
-RichContentEditor.preloadRemoteModule()
-
 export default class TextEntry extends React.Component {
   static propTypes = {
     createSubmissionDraft: func,
