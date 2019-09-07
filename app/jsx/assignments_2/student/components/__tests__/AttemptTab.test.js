@@ -32,7 +32,7 @@ describe('ContentTabs', () => {
       })
 
       const {getByTestId} = render(<AttemptTab {...props} />)
-      expect(getByTestId('upload-pane')).toBeInTheDocument()
+      expect(await waitForElement(() => getByTestId('upload-pane'))).toBeInTheDocument()
     })
 
     it('renders the file preview tab when the submission is submitted', async () => {
@@ -44,8 +44,8 @@ describe('ContentTabs', () => {
         })
       })
 
-      const {getByTestId} = render(<AttemptTab {...props} />)
-      expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
+      const {findByTestId} = render(<AttemptTab {...props} />)
+      expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
     describe('Uploading a file', () => {
@@ -83,8 +83,8 @@ describe('ContentTabs', () => {
           Assignment: () => ({submissionTypes: ['online_text_entry']})
         })
 
-        const {getByTestId} = render(<AttemptTab {...props} />)
-        expect(getByTestId('text-entry')).toBeInTheDocument()
+        const {findByTestId} = render(<AttemptTab {...props} />)
+        expect(await findByTestId('text-entry')).toBeInTheDocument()
       })
     })
   })
