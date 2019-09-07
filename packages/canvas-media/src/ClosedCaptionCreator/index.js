@@ -100,32 +100,38 @@ export default class ClosedCaptionPanel extends Component {
     return (
       <div>
         <Flex direction="column">
-          <ClosedCaptionHeader
-            CLOSED_CAPTIONS_LANGUAGE_HEADER={CLOSED_CAPTIONS_LANGUAGE_HEADER}
-            CLOSED_CAPTIONS_FILE_NAME_HEADER={CLOSED_CAPTIONS_FILE_NAME_HEADER}
-            CLOSED_CAPTIONS_ACTIONS_HEADER={CLOSED_CAPTIONS_ACTIONS_HEADER}
-          />
+          <Flex.Item>
+            <ClosedCaptionHeader
+              CLOSED_CAPTIONS_LANGUAGE_HEADER={CLOSED_CAPTIONS_LANGUAGE_HEADER}
+              CLOSED_CAPTIONS_FILE_NAME_HEADER={CLOSED_CAPTIONS_FILE_NAME_HEADER}
+              CLOSED_CAPTIONS_ACTIONS_HEADER={CLOSED_CAPTIONS_ACTIONS_HEADER}
+            />
+          </Flex.Item>
           {this.state.subtitles.map(cc => (
-            <ClosedCaptionRow key={cc.id} closedCaption={cc} />
+            <Flex.Item key={cc.id} overflowY="visible" padding="small 0 0 0">
+              <ClosedCaptionRow closedCaption={cc} />
+            </Flex.Item>
           ))}
           {this.state.addingNewClosedCaption ? (
-            <ClosedCaptionCreatorRow
-              uploadMediaTranslations={this.props.uploadMediaTranslations}
-              onOptionSelected={this.onOptionSelected}
-              liveRegion={this.props.liveRegion}
-              onFileSelected={this.onFileSelected}
-              languages={this.props.languages}
-              selectedFileName={this.state.newSelectedFile ? this.state.newSelectedFile.name : ''}
-              fileSelected={this.state.newSelectedFile}
-              renderTrashButton={this.state.subtitles.length > 0}
-              trashButtonOnClick={() =>
-                this.setState({
-                  addingNewClosedCaption: false,
-                  newSelectedFile: null,
-                  newSelectedLanguage: null
-                })
-              }
-            />
+            <Flex.Item overflowY="visible" padding="small 0 0 0">
+              <ClosedCaptionCreatorRow
+                uploadMediaTranslations={this.props.uploadMediaTranslations}
+                onOptionSelected={this.onOptionSelected}
+                liveRegion={this.props.liveRegion}
+                onFileSelected={this.onFileSelected}
+                languages={this.props.languages}
+                selectedFileName={this.state.newSelectedFile ? this.state.newSelectedFile.name : ''}
+                fileSelected={this.state.newSelectedFile}
+                renderTrashButton={this.state.subtitles.length > 0}
+                trashButtonOnClick={() =>
+                  this.setState({
+                    addingNewClosedCaption: false,
+                    newSelectedFile: null,
+                    newSelectedLanguage: null
+                  })
+                }
+              />
+            </Flex.Item>
           ) : null}
         </Flex>
         <AddClosedCaptionButton

@@ -38,60 +38,58 @@ export default class ClosedCaptionCreatorRow extends Component {
     ]
 
     return (
-      <Flex.Item overflowY="visible" padding="small 0 0 0">
-        <Flex justifyItems="space-between">
-          <Flex.Item size="200px">
-            <div style={{paddingRight: '10px'}}>
-              <SingleSelect
-                liveRegion={this.props.liveRegion}
-                options={selectOptions}
-                selectedOption={this.props.onOptionSelected}
-                renderLabel={
-                  <ScreenReaderContent>{CLOSED_CAPTIONS_SELECT_LANGUAGE}</ScreenReaderContent>
-                }
+      <Flex justifyItems="space-between">
+        <Flex.Item size="200px">
+          <div style={{paddingRight: '10px'}}>
+            <SingleSelect
+              liveRegion={this.props.liveRegion}
+              options={selectOptions}
+              selectedOption={this.props.onOptionSelected}
+              renderLabel={
+                <ScreenReaderContent>{CLOSED_CAPTIONS_SELECT_LANGUAGE}</ScreenReaderContent>
+              }
+            />
+          </div>
+        </Flex.Item>
+        <Flex.Item textAlign="start">
+          {!this.props.fileSelected ? (
+            <>
+              <input
+                id="attachmentFile"
+                accept=".vtt, .srt"
+                ref={element => {
+                  this.fileInput = element
+                }}
+                onChange={this.props.onFileSelected}
+                style={{
+                  display: 'none'
+                }}
+                type="file"
               />
-            </div>
-          </Flex.Item>
-          <Flex.Item textAlign="start">
-            {!this.props.fileSelected ? (
-              <>
-                <input
-                  id="attachmentFile"
-                  accept=".vtt, .srt"
-                  ref={element => {
-                    this.fileInput = element
-                  }}
-                  onChange={this.props.onFileSelected}
-                  style={{
-                    display: 'none'
-                  }}
-                  type="file"
-                />
-                <Button
-                  id="attachmentFileButton"
-                  onClick={() => {
-                    this.fileInput.click()
-                  }}
-                  ref={element => {
-                    this.attachmentFileButton = element
-                  }}
-                >
-                  {CLOSED_CAPTIONS_CHOOSE_FILE}
-                </Button>
-              </>
-            ) : (
-              <Text>{this.props.selectedFileName}</Text>
-            )}
-          </Flex.Item>
-          <Flex.Item textAlign="end" shrink grow>
-            {this.props.renderTrashButton && (
-              <Button variant="icon" onClick={this.props.trashButtonOnClick} icon={IconTrashLine}>
-                <ScreenReaderContent>Delete Row</ScreenReaderContent>
+              <Button
+                id="attachmentFileButton"
+                onClick={() => {
+                  this.fileInput.click()
+                }}
+                ref={element => {
+                  this.attachmentFileButton = element
+                }}
+              >
+                {CLOSED_CAPTIONS_CHOOSE_FILE}
               </Button>
-            )}
-          </Flex.Item>
-        </Flex>
-      </Flex.Item>
+            </>
+          ) : (
+            <Text>{this.props.selectedFileName}</Text>
+          )}
+        </Flex.Item>
+        <Flex.Item textAlign="end" shrink grow>
+          {this.props.renderTrashButton && (
+            <Button variant="icon" onClick={this.props.trashButtonOnClick} icon={IconTrashLine}>
+              <ScreenReaderContent>Delete Row</ScreenReaderContent>
+            </Button>
+          )}
+        </Flex.Item>
+      </Flex>
     )
   }
 }

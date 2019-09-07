@@ -41,7 +41,7 @@ function renderContentBaseOnAvailability({assignment, submission}) {
       <>
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
-          fallback={<Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
+          fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
         >
           <LoggedOutTabs assignment={assignment} />
         </Suspense>

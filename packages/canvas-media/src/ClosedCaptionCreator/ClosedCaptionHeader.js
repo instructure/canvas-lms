@@ -26,20 +26,18 @@ export default function ClosedCaptionHeader({
   CLOSED_CAPTIONS_ACTIONS_HEADER
 }) {
   return (
-    <Flex.Item>
-      <div style={{borderBottom: '1px solid grey'}}>
-        <Flex justifyItems="space-between" padding="medium 0 xx-small 0">
-          <Flex.Item textAlign="start" size="200px">
-            <Text weight="bold">{CLOSED_CAPTIONS_LANGUAGE_HEADER}</Text>
-          </Flex.Item>
-          <Flex.Item textAlign="start">
-            <Text weight="bold">{CLOSED_CAPTIONS_FILE_NAME_HEADER}</Text>
-          </Flex.Item>
-          <Flex.Item textAlign="end" shrink grow>
-            <Text weight="bold">{CLOSED_CAPTIONS_ACTIONS_HEADER}</Text>
-          </Flex.Item>
-        </Flex>
-      </div>
-    </Flex.Item>
+    <div style={{borderBottom: '1px solid grey'}}>
+      <Flex justifyItems="space-between" padding="medium 0 xx-small 0">
+        <Flex.Item textAlign="start" size="200px">
+          <Text weight="bold">{CLOSED_CAPTIONS_LANGUAGE_HEADER}</Text>
+        </Flex.Item>
+        <Flex.Item textAlign="start">
+          <Text weight="bold">{CLOSED_CAPTIONS_FILE_NAME_HEADER}</Text>
+        </Flex.Item>
+        <Flex.Item textAlign="end" shrink grow>
+          <Text weight="bold">{CLOSED_CAPTIONS_ACTIONS_HEADER}</Text>
+        </Flex.Item>
+      </Flex>
+    </div>
   )
 }

@@ -25,23 +25,21 @@ import {Text} from '@instructure/ui-elements'
 
 export default function ClosedCaptionRow({closedCaption}) {
   return (
-    <Flex.Item overflowY="visible" padding="small 0 0 0">
-      <Flex justifyItems="space-between">
-        <Flex.Item textAlign="start" size="200px">
-          <Text>{closedCaption.language.inputValue}</Text>
-        </Flex.Item>
-        <Flex.Item textAlign="start">
-          <Text>{closedCaption.file.name}</Text>
-        </Flex.Item>
-        <Flex.Item textAlign="end" shrink grow>
-          <Button variant="icon" icon={IconDownloadLine}>
-            <ScreenReaderContent>Download {closedCaption.file.name}</ScreenReaderContent>
-          </Button>
-          <Button variant="icon" icon={IconTrashLine}>
-            <ScreenReaderContent>Delete {closedCaption.file.name}</ScreenReaderContent>
-          </Button>
-        </Flex.Item>
-      </Flex>
-    </Flex.Item>
+    <Flex justifyItems="space-between">
+      <Flex.Item textAlign="start" size="200px">
+        <Text>{closedCaption.language.inputValue}</Text>
+      </Flex.Item>
+      <Flex.Item textAlign="start">
+        <Text>{closedCaption.file.name}</Text>
+      </Flex.Item>
+      <Flex.Item textAlign="end" shrink grow>
+        <Button variant="icon" icon={IconDownloadLine}>
+          <ScreenReaderContent>Download {closedCaption.file.name}</ScreenReaderContent>
+        </Button>
+        <Button variant="icon" icon={IconTrashLine}>
+          <ScreenReaderContent>Delete {closedCaption.file.name}</ScreenReaderContent>
+        </Button>
+      </Flex.Item>
+    </Flex>
   )
 }
