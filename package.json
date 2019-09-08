@@ -94,7 +94,7 @@
     "immutability-helper": "^3",
     "immutable": "^3.8.2",
     "is-valid-domain": "^0.0.11",
-    "jquery": "https://github.com/ryankshaw/jquery.git#dadf794ebc4c4dcf94c344dab7d9341d46bc17cc",
+    "jquery": "https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "jquery-getscrollbarwidth": "^1.0.0",
     "jquery-ui-touch-punch": "^0.2.3",
     "jquery.cookie": "^1.4.1",
@@ -301,7 +301,7 @@
     "upgrade-instructure-ui": "script/upgrade-instructure-ui"
   },
   "resolutions": {
-    "jquery": "https://github.com/ryankshaw/jquery.git#dadf794ebc4c4dcf94c344dab7d9341d46bc17cc",
+    "jquery": "https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
     "graphael": "https://github.com/ryankshaw/graphael.git",
     "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
