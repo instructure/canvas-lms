@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import { findKey } from 'lodash'
 
 const KeyCodes = {
   ENTER: 13,
@@ -69,10 +68,8 @@ MediaElementKeyActionHandler.prototype._targetControl = function (selector) {
 };
 
 MediaElementKeyActionHandler.prototype.handlerKey = function () {
-  const self = this;
-
   // Check whether one of the controls was the event target
-  const target = findKey(controlSelectors, selector => self._targetControl(selector).length);
+  const target = Object.keys(controlSelectors).find(key => this._targetControl(controlSelectors[key]).length)
 
   // If none of the controls were the target, then let the player handle it
   return target || 'player';
