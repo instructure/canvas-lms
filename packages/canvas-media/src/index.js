@@ -67,6 +67,11 @@ export default class UploadMedia extends React.Component {
     theFile: null
   }
 
+  constructor() {
+    super()
+    this.subtitles = []
+  }
+
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
       case PANELS.COMPUTER: {
@@ -92,8 +97,10 @@ export default class UploadMedia extends React.Component {
       // handle error
     } else {
       try {
-        await saveClosedCaptions(data.media_object.media_id, this.subtitles)
-        this.props.onDismiss(data)
+        if (this.subtitles.lenth > 0) {
+          await saveClosedCaptions(data.media_object.media_id, this.subtitles)
+        }
+        this.props.onDismiss(null, data)
       } catch (_) {
         // Handle error
       }
