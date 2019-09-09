@@ -85,7 +85,7 @@ module Lti
         expect(response).to be_unauthorized
       end
 
-      it 'does not grant access if the tool and the user have not associated assignments' do
+      it 'does not grant access if the tool and the user have no associated assignments' do
         assignment.destroy!
         get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
         expect(response).to be_unauthorized
@@ -115,6 +115,14 @@ module Lti
           get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
+        end
+
+
+        it 'does not grant access if the course is inactive and the user has no associated assignments' do
+          id = student.id
+          course.destroy!
+          get canvas_id_endpoint, params: {id: id}, headers: request_headers
+          expect(response).to be_unauthorized
         end
       end
 

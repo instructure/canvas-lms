@@ -94,11 +94,16 @@ module Lti
     end
 
     def user_in_context
-      user_assignments = user.enrollments.active.preload(:course).map(&:course).map do |c|
-        Assignments::ScopedToUser.new(c, user).scope
-      end.flatten
-      tool_assignments = AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)
-      render_unauthorized_action if (tool_assignments & user_assignments).blank?
+      tool_proxy_assignments = AssignmentConfigurationToolLookup.by_tool_proxy_scope(tool_proxy).select(:assignment_id)
+      user_visible_to_proxy = user.enrollments
+        .joins(course: :assignments)
+        .where(assignments: {id: tool_proxy_assignments})
+        .where.not(
+          courses: {workflow_state: 'deleted'},
+          assignments: {workflow_state: 'deleted'}
+        )
+        .exists?
+      render_unauthorized_action unless user_visible_to_proxy
     end
   end
 end
