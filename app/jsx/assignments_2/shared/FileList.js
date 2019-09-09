@@ -25,7 +25,7 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {List, Text} from '@instructure/ui-elements'
+import {Link, List, Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 const getIcon = file => {
@@ -44,7 +44,7 @@ const getIcon = file => {
 }
 
 const FileList = props => {
-  const {canRemove, files, previewHandler, removeFileHandler} = props
+  const {canRemove, files, removeFileHandler} = props
   const refsMap = {}
 
   return (
@@ -64,14 +64,14 @@ const FileList = props => {
               <Text size="x-small">{file.name}</Text>
             </Flex.Item>
             <Flex.Item>
-              <Button variant="link" size="small" onClick={previewHandler}>
+              <Link href={file.embedded_iframe_url} target="_blank">
                 <span aria-hidden title={I18n.t('Preview')}>
                   {I18n.t('Preview')}
                 </span>
                 <ScreenReaderContent>
                   {I18n.t('Preview %{filename}', {filename: file.name})}
                 </ScreenReaderContent>
-              </Button>
+              </Link>
             </Flex.Item>
             {canRemove && (
               <Flex.Item padding="0 small 0 x-small">
@@ -107,7 +107,6 @@ FileList.propTypes = {
       type: PropTypes.string.isRequired
     })
   ).isRequired,
-  previewHandler: PropTypes.func,
   removeFileHandler: PropTypes.func
 }
 

@@ -44,6 +44,7 @@ function addUploaderReadyEventListeners(uploader, file) {
 
 function addUploaderFileErrorEventListeners(uploader, done) {
   uploader.addEventListener('K5.fileError', error => {
+    uploader.destroy()
     done(error)
   })
 }
@@ -67,8 +68,10 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
 
     try {
       const canvasMediaObject = await axios.post('/api/v1/media_objects', body)
+      uploader.destroy()
       done(null, canvasMediaObject.data)
     } catch (e) {
+      uploader.destroy()
       done(e)
     }
   })

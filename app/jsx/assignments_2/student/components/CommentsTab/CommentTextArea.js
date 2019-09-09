@@ -16,22 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '../../../../shared/components/AlertManager'
-import {Assignment} from '../../graphqlData/Assignment'
-import {Button} from '@instructure/ui-buttons'
-import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
-import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
-import FileList from '../../../shared/FileList'
 import I18n from 'i18n!assignments_2'
-import {IconAudioLine, IconMediaLine} from '@instructure/ui-icons'
-import LoadingIndicator from '../../../shared/LoadingIndicator'
+import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextArea} from '@instructure/ui-forms'
+import UploadMedia from '@instructure/canvas-media'
+
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
+import {Assignment} from '../../graphqlData/Assignment'
+import {Button} from '@instructure/ui-buttons'
+import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
+import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
+import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
+import FileList from '../../../shared/FileList'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {submissionCommentAttachmentsUpload} from '../../../../shared/upload_file'
 import {Submission} from '../../graphqlData/Submission'
-import {TextArea} from '@instructure/ui-forms'
+import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
+
+const languages = Object.keys(closedCaptionLanguages).map(key => {
+  return {id: key, label: closedCaptionLanguages[key]}
+})
 
 export default class CommentTextArea extends Component {
   static propTypes = {
@@ -43,6 +51,8 @@ export default class CommentTextArea extends Component {
     commentText: '',
     currentFiles: [],
     hasError: false,
+    mediaModalOpen: false,
+    mediaObject: null,
     uploadingComments: false
   }
 
@@ -93,8 +103,36 @@ export default class CommentTextArea extends Component {
     })
   }
 
-  onTextChange = e => {
-    this.setState({commentText: e.target.value})
+  onMediaModalDismiss = (err, mediaObject) => {
+    if (!err && !mediaObject) {
+      this.setState({mediaModalOpen: false})
+    } else if (err) {
+      // TODO handle error
+      throw new Error(err)
+    } else {
+      mediaObject.type = 'video/mp4'
+      mediaObject.name = mediaObject.media_object.title
+      let currIndex = this.state.currentFiles.length
+        ? this.state.currentFiles[this.state.currentFiles.length - 1].id
+        : 0
+      mediaObject.id = ++currIndex
+      this.setState(prevState => ({
+        mediaModalOpen: false,
+        mediaObject,
+        currentFiles: [...prevState.currentFiles, mediaObject]
+      }))
+    }
+  }
+
+  onFileSelected = event => {
+    let currIndex = this.state.currentFiles.length
+      ? this.state.currentFiles[this.state.currentFiles.length - 1].id
+      : 0
+    const selectedFiles = [...event.currentTarget.files]
+    selectedFiles.forEach(file => {
+      file.id = ++currIndex
+    })
+    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles]}))
   }
 
   onSendComment = createSubmissionComment => {
@@ -129,15 +167,8 @@ export default class CommentTextArea extends Component {
     })
   }
 
-  onFileSelected = event => {
-    let currIndex = this.state.currentFiles.length
-      ? this.state.currentFiles[this.state.currentFiles.length - 1].id
-      : 0
-    const filesArray = [...event.currentTarget.files]
-    filesArray.forEach(file => {
-      file.id = ++currIndex
-    })
-    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...filesArray]}))
+  onTextChange = e => {
+    this.setState({commentText: e.target.value})
   }
 
   handleRemoveFile = refsMap => e => {
@@ -228,12 +259,25 @@ export default class CommentTextArea extends Component {
                 >
                   <ScreenReaderContent>{I18n.t('Attach a File')}</ScreenReaderContent>
                 </Button>
-                <Button icon={IconMediaLine} margin="0 x-small 0 0" size="small" variant="icon">
-                  <ScreenReaderContent>{I18n.t('Record Video')}</ScreenReaderContent>
+                <Button
+                  onClick={() => this.setState({mediaModalOpen: true})}
+                  icon={IconAttachMediaLine}
+                  margin="0 x-small 0 0"
+                  size="small"
+                  variant="icon"
+                >
+                  <ScreenReaderContent>{I18n.t('Record Audio/Video')}</ScreenReaderContent>
                 </Button>
-                <Button icon={IconAudioLine} margin="0 x-small 0 0" size="small" variant="icon">
-                  <ScreenReaderContent>{I18n.t('Record Audio')}</ScreenReaderContent>
-                </Button>
+                <UploadMedia
+                  onDismiss={this.onMediaModalDismiss}
+                  contextId={this.props.assignment.env.courseId}
+                  contextType="course"
+                  open={this.state.mediaModalOpen}
+                  tabs={{embed: false, record: true, upload: true}}
+                  uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+                  liveRegion={() => document.getElementById('flash_screenreader_holder')}
+                  languages={languages}
+                />
                 <Button
                   disabled={
                     this.state.commentText.length === 0 && this.state.currentFiles.length === 0
