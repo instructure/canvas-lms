@@ -196,7 +196,7 @@ class ContextController < ApplicationController
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
       js_env({
-        :CUSTOM_PLACEMENT => SettingsService.get_settings(object: :school, id: 1)['enable_custom_placement'] == true,
+        :CUSTOM_PLACEMENT => custom_placement_enabled?,
         :ALL_ROLES => all_roles,
         :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name} },
         :CONCLUDED_SECTIONS => concluded_sections,

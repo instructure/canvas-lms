@@ -7,7 +7,22 @@ RSpec.describe 'As a Teacher I can force advance student module progress', type:
 
   before(:each) do
     # enable feature flags
-    allow(SettingsService).to receive(:get_settings).with(object: :school, id: 1).and_return('auto_due_dates' => 'on', 'auto_enrollment_due_dates' => 'on', 'enable_custom_placement' => true)
+    Permissions.register(
+      {
+        :custom_placement => {
+          :label => lambda { "Apply Custom Placement to Courses" },
+          :available_to => [
+            'TaEnrollment',
+            'TeacherEnrollment',
+            'AccountAdmin',
+          ],
+          :true_for => [
+            'AccountAdmin',
+            'TeacherEnrollment'
+          ]
+        }
+      }
+    )
 
     course_with_teacher_logged_in
     @course.update_attribute :conclude_at, 1.month.from_now

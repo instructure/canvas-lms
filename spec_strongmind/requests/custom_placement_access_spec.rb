@@ -16,7 +16,22 @@ RSpec.describe 'Enrollments API Controller - Custom Placement', type: :request d
   context 'when custom placement setting turned off' do
     describe 'access based on settings service' do
       it "doesnt process the action and returns error code with message" do
-        allow(SettingsService).to receive(:get_settings).with(object: :school, id: 1).and_return('enable_custom_placement' => false)
+        Permissions.register(
+          {
+            :custom_placement => {
+              :label => lambda { "Apply Custom Placement to Courses" },
+              :available_to => [
+                'TaEnrollment',
+                'TeacherEnrollment',
+                'AccountAdmin',
+              ],
+              :true_for => [
+                'AccountAdmin',
+                'TeacherEnrollment'
+              ]
+            }
+          }
+      )
 
         post custom_placement_path(course_id: @course.id, id: @enrollment.id), xhr: true, params: { content_tag: { id: 1 } }
 
@@ -32,7 +47,22 @@ RSpec.describe 'Enrollments API Controller - Custom Placement', type: :request d
   context 'when custom placement setting turned on' do
     describe 'access based on settings service' do
       it "it processes the action and return success status" do
-        allow(SettingsService).to receive(:get_settings).with(object: :school, id: 1).and_return('enable_custom_placement' => true)
+        Permissions.register(
+          {
+            :custom_placement => {
+              :label => lambda { "Apply Custom Placement to Courses" },
+              :available_to => [
+                'TaEnrollment',
+                'TeacherEnrollment',
+                'AccountAdmin',
+              ],
+              :true_for => [
+                'AccountAdmin',
+                'TeacherEnrollment'
+              ]
+            }
+          }
+        )
 
         content_tag = instance_double(ContentTag)
         expect(ContentTag).to receive(:find).with(anything).and_return(content_tag)

@@ -128,31 +128,6 @@ class RoleOverride < ActiveRecord::Base
         :restrict_future_enrollments => true,
         :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
       },
-
-      # StrongMind added
-      :delete_inbox_messages => {
-        :label => lambda { "Delete inbox messages" },
-        :available_to => [
-          'StudentEnrollment',
-          'TaEnrollment',
-          'TeacherEnrollment',
-          'DesignerEnrollment',
-          'TeacherlessStudentEnrollment',
-          'ObserverEnrollment',
-          'AccountAdmin',
-          'AccountMembership'
-        ],
-        :true_for => [
-          'StudentEnrollment',
-          'TaEnrollment',
-          'TeacherEnrollment',
-          'DesignerEnrollment',
-          'TeacherlessStudentEnrollment',
-          'ObserverEnrollment',
-          'AccountAdmin',
-          'AccountMembership'
-        ]
-      },
       :moderate_forum => {
         :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
         :available_to => [

@@ -24,7 +24,22 @@ RSpec.describe 'As a System with custom placement behind feature flag', type: :f
     end
 
     # Turn on feature flag!
-    allow(SettingsService).to receive(:get_settings).with(object: :school, id: 1).and_return('enable_custom_placement' => true)
+    Permissions.register(
+      {
+        :custom_placement => {
+          :label => lambda { "Apply Custom Placement to Courses" },
+          :available_to => [
+            'TaEnrollment',
+            'TeacherEnrollment',
+            'AccountAdmin',
+          ],
+          :true_for => [
+            'AccountAdmin',
+            'TeacherEnrollment'
+          ]
+        }
+      }
+    )
 
     visit "/courses/#{@course.id}"
 
