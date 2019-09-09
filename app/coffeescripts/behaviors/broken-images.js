@@ -44,9 +44,7 @@ export function attachErrorHandler(imgElement) {
 }
 
 export function getImagesAndAttach () {
-  $('img[src!=""]')
-    .toArray()
-    .forEach(attachErrorHandler)
+  Array.from(document.querySelectorAll('img:not([src=""])')).forEach(attachErrorHandler)
 }
 
 // this behavior will set up all broken images on the page with an error handler that
