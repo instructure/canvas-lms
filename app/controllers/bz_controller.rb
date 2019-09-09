@@ -1780,62 +1780,43 @@ class BzController < ApplicationController
       return
     end
 
-    # create or update the mailing list for this sync
+    # create the mailing list for this sync
     # see: https://api.qualtrics.com/reference#create-mailing-lists
-    mailing_list_name = "#{course.course_code} via sync"
+    #
+    # Note that we create a new mailing list for each sync when ideally we would
+    # have a single mailing list per course. We do this b/c the mailing list is what we
+    # use to create the Distribution List (which creates the survey links tied to each person)
+    # and if we use a single mailing list and update it on subsequent sync, it *could* invalidate
+    # the existing survey links for people synced before. Also, it was just a huge pain in the neck
+    # trying to update a single mailing list on subsequent syncs b/c the API would return OK before the people
+    # where actually in the list and then when we tried to create the distribution list immediatly after,
+    # they would be missing. The logic to keep polling the list until they are actually in there is
+    # harder than simply waiting for the newly created list to be populated.
+    mailing_list_name = "#{course.course_code} via sync #{DateTime.now}"
     mailing_list_id = nil
 
     url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
     headers = {}
+    headers["Content-Type"] = "application/json"
     headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
+    Rails.logger.info "### Creating new Qualtrics mailing list called '#{mailing_list_name}'"
+    data = {}
+    data["libraryId"] = BeyondZConfiguration.qualtrics_library_id
+    data["name"] = mailing_list_name
+    request = Net::HTTP::Post.new(url.request_uri, headers)
+    request.body = data.to_json
 
-    # Use existing mailing list if it's already been created and this is a subsequent Sync To LMS
-    Rails.logger.info "### Looking for existing Qualtrics mailing list called '#{mailing_list_name}'"
-    obj = fetch_qualtrics_mailing_lists(http)
+    response = http.request(request)
+    obj = JSON.parse(response.body)
 
     if obj["meta"]["httpStatus"] != '200 - OK'
       raise Exception.new response.body
-    else
-      # No clue what is going on, but sometimes the response isn't populated even though it says 200 OK.
-      # Just retry a couple times.
-      tries = 0
-      while tries < 5 && obj["result"]["elements"].empty?
-        tries += 1
-        sleep(tries * 2) # sleep longer and longer so we don't over-poll
-        obj = fetch_qualtrics_mailing_lists(http)
-      end
-
-      obj["result"]["elements"].select {|k,v| mailing_list_id = k["id"] if k["name"] ==  mailing_list_name}
-      Rails.logger.info "### Found existing mailing list. name=#{mailing_list_name}, id=#{mailing_list_id}" unless mailing_list_id.blank?
-
     end
+    Rails.logger.info "### Qualtrics API call response for creating new mailing list: #{response.inspect} - #{response.body}"
 
-    if mailing_list_id.blank?
-      url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
-      headers = {}
-      headers["Content-Type"] = "application/json"
-      headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
-      http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true
-      Rails.logger.info "### Creating new Qualtrics mailing list called '#{mailing_list_name}' since we didn't find one."
-      data = {}
-      data["libraryId"] = BeyondZConfiguration.qualtrics_library_id
-      data["name"] = mailing_list_name
-      request = Net::HTTP::Post.new(url.request_uri, headers)
-      request.body = data.to_json
-
-      response = http.request(request)
-      obj = JSON.parse(response.body)
-
-      if obj["meta"]["httpStatus"] != '200 - OK'
-        raise Exception.new response.body
-      end
-      Rails.logger.info "### Qualtrics API call response for creating new mailing list: #{response.inspect} - #{response.body}"
-
-      mailing_list_id = obj["result"]["id"]
-    end
+    mailing_list_id = obj["result"]["id"]
 
     # add the necessary students to this list
     # see: https://api.qualtrics.com/reference#create-contacts-import
@@ -1915,25 +1896,6 @@ class BzController < ApplicationController
     obj
   end
 
-  # Gets an object populated with the response to: https://api.qualtrics.com/reference#list-mailing-lists-1
-  def fetch_qualtrics_mailing_lists(http)
-    url = URI.parse("https://#{BeyondZConfiguration.qualtrics_host}/API/v3/mailinglists")
-    headers = {}
-    headers["X-API-TOKEN"] = BeyondZConfiguration.qualtrics_api_token
-
-    request = Net::HTTP::Get.new(url.request_uri, headers)
-    response = http.request(request)
-    obj = JSON.parse(response.body)
-
-    if obj["meta"]["httpStatus"] != '200 - OK'
-      raise Exception.new response.body
-    else
-      Rails.logger.debug "### Qualtrics mailing list lookup API call response: #{response.body}"
-    end
-
-    obj
-  end
-
   def do_qualtrics_list(course_id, http, mailing_list_id, students_list, survey_id, magic_field_name, distrib_name)
     if students_list.any?
       create_command = {}
@@ -1965,6 +1927,8 @@ class BzController < ApplicationController
 
       obj = fetch_qualtrics_links(http, create_id, survey_id)
 
+      # The mailing list takes a little bit to actually be populated so we can create the distribution list off of it
+      # but the API just returns OK so we have to poll the result here until it actually returns content.
       tries = 0
       while tries < 10 && obj["result"]["elements"].empty?
         tries += 1
