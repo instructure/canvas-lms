@@ -42,7 +42,10 @@ class MoreOptions extends React.Component {
   }
 
   handleIframeTask = e => {
-    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+    if (
+      e.data.messageType === 'LtiDeepLinkingResponse' ||
+      e.data.messageType === 'A2ExternalContentReady'
+    ) {
       if (this._isMounted) {
         this.setState({open: false})
       }

@@ -47,6 +47,20 @@ function dataReady(data, service_id) {
   }
 }
 
+// Handles lti 1.0 responses for Assignments 2 which expects a
+// vanilla JS event from LTI tools in the following form.
+function a2DataReady(data) {
+  parentWindow.postMessage({
+    messageType: 'A2ExternalContentReady',
+    content_items: data,
+    msg: ENV.message,
+    log: ENV.log,
+    errormsg: ENV.error_message,
+    errorlog: ENV.error_log,
+    ltiEndpoint: ENV.lti_endpoint
+  }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+}
+
 const {lti_response_messages} = ENV
 const {service_id} = ENV
 const data = ENV.retrieved_data
@@ -88,4 +102,5 @@ if (ENV.oembed) {
   )
 } else {
   dataReady(data, service_id)
+  a2DataReady(data)
 }
