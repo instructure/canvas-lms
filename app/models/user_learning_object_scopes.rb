@@ -259,11 +259,11 @@ module UserLearningObjectScopes
         merge(Assignment.published.where(peer_reviews: true))
 
       if due_before
-        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) <= ?", due_before)
+        ar_scope = ar_scope.where("assessor_asset.cached_due_date <= ?", due_before)
       end
 
       if due_after
-        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) > ?", due_after)
+        ar_scope = ar_scope.where("assessor_asset.cached_due_date > ?", due_after)
       end
 
       if scope_only

@@ -210,7 +210,7 @@ describe PlannerController do
       it "should show peer review tasks for the user" do
         @current_user = @student
         reviewee = course_with_student(course: @course, active_all: true).user
-        assignment_model(course: @course, peer_reviews: true, only_visible_to_overrides: true)
+        assignment_model(course: @course, peer_reviews: true)
         submission_model(assignment: @assignment, user: reviewee)
         assessment_request = @assignment.assign_peer_review(@current_user, reviewee)
         get :index

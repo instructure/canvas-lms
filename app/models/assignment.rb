@@ -502,7 +502,6 @@ class Assignment < ActiveRecord::Base
               :update_grading_standard,
               :update_submittable,
               :update_submissions_later,
-              :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
               :apply_late_policy,
@@ -510,6 +509,8 @@ class Assignment < ActiveRecord::Base
               :ensure_manual_posting_if_anonymous,
               :ensure_manual_posting_if_moderated,
               :create_default_post_policy
+
+  after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
   with_options if: -> { auditable? && @updating_user.present? } do
     after_create :create_assignment_created_audit_event!
@@ -607,24 +608,28 @@ class Assignment < ActiveRecord::Base
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
     return unless needs_auto_peer_reviews_scheduled?
 
-    reviews_due_at = self.peer_reviews_assign_at || self.due_at
-    return if reviews_due_at.blank?
+    # When saving the assignment set the @next_auto_peer_review_date variable,
+    # use it as the run_at date for the next job. Otherwise, use the method
+    # of the same name to get the next automatic peer review date based on
+    # this assignment's configuration.
+    run_at = @next_auto_peer_review_date || next_auto_peer_review_date
+    return if run_at.blank?
 
     self.send_later_enqueue_args(:do_auto_peer_review, {
-      :run_at => reviews_due_at,
+      :run_at => run_at,
       :on_conflict => :overwrite,
       :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
     })
   end
 
   attr_accessor :skip_schedule_peer_reviews
-  alias_method :skip_schedule_peer_reviews?, :skip_schedule_peer_reviews
+  alias skip_schedule_peer_reviews? skip_schedule_peer_reviews
   def needs_auto_peer_reviews_scheduled?
     !skip_schedule_peer_reviews? && peer_reviews? && automatic_peer_reviews? && !peer_reviews_assigned?
   end
 
   def do_auto_peer_review
-    assign_peer_reviews if needs_auto_peer_reviews_scheduled? && overdue?
+    assign_peer_reviews if needs_auto_peer_reviews_scheduled?
   end
 
   def touch_assignment_group
@@ -865,8 +870,6 @@ class Assignment < ActiveRecord::Base
       ensure_assignment_group(false)
     end
     self.submission_types ||= "none"
-    self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
-    # have to use peer_reviews_due_at here because it's the column name
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     [
       :all_day, :could_be_locked, :grade_group_students_individually,
@@ -2339,8 +2342,9 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    reviews_due_at = self.peer_reviews_assign_at || self.due_at
-    if reviews_due_at && reviews_due_at < Time.zone.now
+    # When all peer reviews have been assigned, indicate this on the assignment field.
+    @next_auto_peer_review_date = next_auto_peer_review_date(Time.zone.now) if automatic_peer_reviews?
+    unless @next_auto_peer_review_date
       self.peer_reviews_assigned = true
     end
     self.save
@@ -2351,7 +2355,11 @@ class Assignment < ActiveRecord::Base
     # we track existing assessment requests, and the ones we create here, so
     # that we don't have to constantly re-query the db.
     student_ids = students_with_visibility(context.students.not_fake_student).pluck(:id)
-    submissions = self.submissions.having_submission.include_assessment_requests.for_user(student_ids)
+
+    submissions = self.submissions.having_submission.include_assessment_requests
+    submissions = submissions.due_in_past if automatic_peer_reviews? && peer_reviews_assign_at.blank?
+    submissions = submissions.for_user(student_ids)
+
     { student_ids: student_ids,
       submissions: submissions,
       submission_ids: Set.new(submissions.pluck(:id)),
@@ -2402,6 +2410,39 @@ class Assignment < ActiveRecord::Base
       end
     end
     candidate_set
+  end
+
+  def next_auto_peer_review_date(current_auto_peer_review_date = nil)
+    if current_auto_peer_review_date.present?
+      auto_peer_review_dates.detect do |date|
+        date > current_auto_peer_review_date
+      end
+    else
+      auto_peer_review_dates.first
+    end
+  end
+
+  def auto_peer_review_dates
+    # When a date is specified for assigning peer reviews, that is the ONLY
+    # date that should be used.
+    return [self.peer_reviews_assign_at] if self.peer_reviews_assign_at.present?
+
+    # When the `due_at` on the assignment applies to some assignees, it should
+    # be used as one of the dates for automatic peer review assignment.
+    dates = []
+    dates.push(self.due_at) unless self.due_at.blank? || self.only_visible_to_overrides?
+
+    # Each unique override date is likely a time at which peer reviews will
+    # need to be assigned.
+    override_dates = self.assignment_overrides.
+      active.
+      where(due_at_overridden: true).
+      where.not(due_at: nil).
+      distinct.
+      pluck(:due_at)
+
+    # Return all of the unique dates from above in chronological order.
+    (dates + override_dates).sort.uniq
   end
 
   # TODO: on a future deploy, rename the column peer_reviews_due_at
