@@ -40,8 +40,11 @@ export function loadMathJax (configFile, cb = null) {
 }
 
 export function isMathMLOnPage () {
-  const mathElements = $('math:visible').toArray();
-  return mathElements.some(elem => $(elem).parent('.hidden-readable').length <= 0);
+  const mathElements = document.getElementsByTagName('math')
+  for (let i = 0; i < mathElements.length; i++) {
+    const $el = $(mathElements[i])
+    if ($el.is(':visible') && $el.parent('.hidden-readable').length <= 0) return true
+  }
 }
 
 export function isMathJaxLoaded () {
