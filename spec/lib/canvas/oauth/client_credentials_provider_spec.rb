@@ -40,7 +40,9 @@ module Canvas::Oauth
     let(:jws) { JSON::JWT.new(jwt).sign(signing_key, alg).to_s }
     let(:dev_key) { DeveloperKey.create! public_jwk: rsa_key_pair.public_jwk }
 
-    before { Rails.application.routes.default_url_options[:host] = 'example.com' }
+    before {
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
+    }
 
     describe 'using public jwk url' do
       subject { provider.valid? }

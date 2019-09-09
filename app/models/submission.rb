@@ -1283,13 +1283,13 @@ class Submission < ActiveRecord::Base
           submit_to_canvadocs = true
           a.create_canvadoc! unless a.canvadoc
           a.shard.activate do
-            CanvadocsSubmission.find_or_create_by(submission: self, canvadoc: a.canvadoc)
+            CanvadocsSubmission.find_or_create_by(submission_id: self.id, canvadoc_id: a.canvadoc.id)
           end
         elsif a.crocodocable?
           submit_to_canvadocs = true
           a.create_crocodoc_document! unless a.crocodoc_document
           a.shard.activate do
-            CanvadocsSubmission.find_or_create_by(submission: self, crocodoc_document: a.crocodoc_document)
+            CanvadocsSubmission.find_or_create_by(submission_id: self.id, crocodoc_document_id: a.crocodoc_document.id)
           end
         end
 

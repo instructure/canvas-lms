@@ -163,7 +163,7 @@ describe Moodle::Converter do
       # add warnings because these question types seem to be ambiguously structured in moodle
       warnings = @cm.migration_issues.select{|w|
         w.description == "Possible answers will need to be regenerated for Formula question" &&
-            w.fix_issue_html_url.include?("question_#{question.assessment_question_id}")
+            w.fix_issue_html_url.include?("question_#{question.assessment_question_id}_question_text")
       }
       expect(warnings.count).to eq 1
     end
