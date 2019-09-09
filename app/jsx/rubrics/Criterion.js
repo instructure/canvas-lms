@@ -244,7 +244,7 @@ export default class Criterion extends React.Component {
             !(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null
           }
         </th>
-        <td className="ratings">
+        <td className="ratings" colSpan={isSummary ? "2" : null}>
           {ratings}
         </td>
         {
