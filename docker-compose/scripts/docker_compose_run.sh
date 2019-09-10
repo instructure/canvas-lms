@@ -32,13 +32,8 @@ cp -a /app/docker-compose/config/* /app/config/
 bundle exec rake db:reset_encryption_key_hash
 
 # TODO: check if the database is already setup and if not, download and load the latest dev db.
-bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
-
-#TODO: check if everything is setup and if not run this automatically. This stuff takes awhile and we only want to do it once, or if necessary.
-#echo ""
-#echo "Note: If this is the first time you're starting this container, you may have to run the following:"
-#echo ""
-#echo "    bundle exec rake canvas:compile_assets"
+#bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
+echo "If you are building this fresh and don't have a dev database setup/loaded, run: ./docker-compose/scripts/dbrefresh.sh to initialize the database! Then restart."
 
 echo "Starting the rails app using puma"
 #bundle exec bin/rails s -p 3000 -b '0.0.0.0'
