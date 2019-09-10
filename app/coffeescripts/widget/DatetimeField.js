@@ -330,9 +330,16 @@ export default class DatetimeField {
       showMonthAfterYear: I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y' // "month year" or "year month"
     }
   }
+
+  get parseError() {
+    return I18n.t('errors.not_a_date', "That's not a date!")
+  }
+
+  get courseLabel() {
+    return `${I18n.t('#helpers.course', 'Course')}: `
+  }
+
+  get localLabel() {
+    return `${I18n.t('#helpers.local', 'Local')}: `
+  }
 }
-
-
-DatetimeField.prototype.parseError = I18n.t('errors.not_a_date', "That's not a date!")
-DatetimeField.prototype.courseLabel = `${I18n.t('#helpers.course', 'Course')}: `
-DatetimeField.prototype.localLabel = `${I18n.t('#helpers.local', 'Local')}: `

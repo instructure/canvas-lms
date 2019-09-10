@@ -17,25 +17,46 @@
  */
 
 import I18n from 'i18n!subnav_menu_toggle'
+
+const subnavMenuTranslations = {
+  hide: {
+    get default() {
+      return I18n.t('Hide Navigation Menu')
+    },
+    get account() {
+      return I18n.t('Hide Account Navigation Menu')
+    },
+    get admin() {
+      return I18n.t('Hide Admin Navigation Menu')
+    },
+    get courses() {
+      return I18n.t('Hide Courses Navigation Menu')
+    },
+    get groups() {
+      return I18n.t('Hide Groups Navigation Menu')
+    }
+  },
+  show: {
+    get default() {
+      return I18n.t('Show Navigation Menu')
+    },
+    get account() {
+      return I18n.t('Show Account Navigation Menu')
+    },
+    get admin() {
+      return I18n.t('Show Admin Navigation Menu')
+    },
+    get courses() {
+      return I18n.t('Show Courses Navigation Menu')
+    },
+    get groups() {
+      return I18n.t('Show Groups Navigation Menu')
+    }
+  }
+}
+
   const updateSubnavMenuToggle = function (pathname = window.location.pathname) {
     // update subnav menu toggle for accessibility
-    const subnavMenuTranslations = {
-      hide: {
-        default: I18n.t('Hide Navigation Menu'),
-        account: I18n.t('Hide Account Navigation Menu'),
-        admin: I18n.t('Hide Admin Navigation Menu'),
-        courses: I18n.t('Hide Courses Navigation Menu'),
-        groups: I18n.t('Hide Groups Navigation Menu')
-      },
-      show: {
-        default: I18n.t('Show Navigation Menu'),
-        account: I18n.t('Show Account Navigation Menu'),
-        admin: I18n.t('Show Admin Navigation Menu'),
-        courses: I18n.t('Show Courses Navigation Menu'),
-        groups: I18n.t('Show Groups Navigation Menu')
-      }
-    }
-
     const subnavMenuExpanded = document.body.classList.contains('course-menu-expanded')
     const subnavMenuAction = subnavMenuExpanded ? 'hide' : 'show'
     let subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].default
