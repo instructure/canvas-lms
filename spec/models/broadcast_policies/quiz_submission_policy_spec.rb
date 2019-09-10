@@ -50,6 +50,7 @@ module BroadcastPolicies
     let(:quiz_submission) do
       double("Quizzes::QuizSubmission",
              quiz: quiz,
+             posted?: true,
              submission: submission,
              user: user,
              context: course
@@ -92,12 +93,6 @@ module BroadcastPolicies
 
       context "with post policies" do
         before { allow(course).to receive(:post_policies_enabled?).and_return true }
-
-        specify do
-          wont_send_when do
-            allow(submission).to receive(:posted?).and_return false
-          end
-        end
 
         it 'is true when the dependent inputs are true' do
           expect(policy).to be_should_dispatch_submission_graded
@@ -170,7 +165,7 @@ module BroadcastPolicies
       context "with post policies" do
         before { allow(course).to receive(:post_policies_enabled?).and_return true }
 
-        specify { wont_send_when { allow(submission).to receive(:posted?).and_return false } }
+        specify { wont_send_when { allow(quiz_submission).to receive(:posted?).and_return false } }
 
         it 'is true when the dependent inputs are true' do
           expect(policy).to be_should_dispatch_submission_grade_changed
