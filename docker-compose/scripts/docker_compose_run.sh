@@ -31,7 +31,7 @@ cp -a /app/docker-compose/config/* /app/config/
 # an error saying i have to run this.  So just do it.
 bundle exec rake db:reset_encryption_key_hash
 
-# TODO: check if everything is setup and skip this step if so.
+# TODO: check if the database is already setup and if not, download and load the latest dev db.
 bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
 
 #TODO: check if everything is setup and if not run this automatically. This stuff takes awhile and we only want to do it once, or if necessary.
