@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 import ClosedCaptionRow from '../ClosedCaptionRow'
@@ -30,7 +30,8 @@ function makeProps() {
       file: {
         name: 'bestfileever.webvtt'
       }
-    }
+    },
+    trashButtonOnClick: () => {}
   }
 }
 
@@ -41,5 +42,15 @@ describe('ClosedCaptionRow', () => {
     expect(getByText('bestfileever.webvtt')).toBeInTheDocument()
     expect(getByText('Download bestfileever.webvtt')).toBeInTheDocument()
     expect(getByText('Delete bestfileever.webvtt')).toBeInTheDocument()
+  })
+
+  it('calls trashButtonOnClick when the delete button is clicked', () => {
+    const props = makeProps()
+    const callback = jest.fn()
+    props.trashButtonOnClick = callback
+    const {getByText} = render(<ClosedCaptionRow {...props} />)
+    fireEvent.click(getByText('Delete bestfileever.webvtt'))
+
+    expect(callback).toHaveBeenCalledTimes(1)
   })
 })

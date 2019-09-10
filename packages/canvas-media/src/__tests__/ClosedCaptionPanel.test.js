@@ -120,6 +120,38 @@ describe('ClosedCaptionPanel', () => {
       fireEvent.click(deleteRowButton)
       expect(queryByText('Choose File')).not.toBeInTheDocument()
     })
+
+    it('deletes subtitle row when trash is clicked', async () => {
+      const {getByText, getByDisplayValue, queryByText, container} = render(
+        <ClosedCaptionCreator {...makeProps()} />
+      )
+      expect(getByText('Choose File')).toBeInTheDocument()
+      const file1 = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
+      const file2 = new File(['foo'], 'file2.vtt', {type: 'application/vtt'})
+      const fileInput1 = container.querySelector('input[type="file"]')
+
+      // Add first subtitle
+      selectFile(fileInput1, [file1])
+      fireEvent.click(getByDisplayValue('Select Language'))
+      fireEvent.click(getByText('French'))
+      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
+
+      const addButton = getByText('Add Subtitle').closest('button')
+      fireEvent.click(addButton)
+
+      // Add second subtitle
+      const fileInput2 = container.querySelector('input[type="file"]')
+      selectFile(fileInput2, [file2])
+      fireEvent.click(getByDisplayValue('Select Language'))
+      fireEvent.click(getByText('English'))
+      expect(await waitForElement(() => getByText('file2.vtt'))).toBeInTheDocument()
+
+      // Delete first subtitle
+      const deleteRowButton = getByText('Delete file1.vtt').closest('button')
+      fireEvent.click(deleteRowButton)
+
+      expect(queryByText('file1.vtt')).not.toBeInTheDocument()
+    })
   })
 
   /*

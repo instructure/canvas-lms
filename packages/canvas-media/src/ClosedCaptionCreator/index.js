@@ -89,6 +89,17 @@ export default class ClosedCaptionPanel extends Component {
     }
   }
 
+  onRowDelete = subtitle => {
+    this.setState(prevState => {
+      const subtitles = prevState.subtitles.filter(s => s.id !== subtitle.id)
+      this.props.updateSubtitles(subtitles)
+      return {
+        subtitles,
+        addingNewClosedCaption: subtitles.length > 0 ? prevState.addingNewClosedCaption : true
+      }
+    })
+  }
+
   render() {
     const {
       CLOSED_CAPTIONS_LANGUAGE_HEADER,
@@ -109,7 +120,7 @@ export default class ClosedCaptionPanel extends Component {
           </Flex.Item>
           {this.state.subtitles.map(cc => (
             <Flex.Item key={cc.id} overflowY="visible" padding="small 0 0 0">
-              <ClosedCaptionRow closedCaption={cc} />
+              <ClosedCaptionRow closedCaption={cc} trashButtonOnClick={this.onRowDelete} />
             </Flex.Item>
           ))}
           {this.state.addingNewClosedCaption ? (

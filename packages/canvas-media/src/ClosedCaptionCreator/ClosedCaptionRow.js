@@ -23,7 +23,10 @@ import {IconDownloadLine, IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
 
-export default function ClosedCaptionRow({closedCaption}) {
+export default function ClosedCaptionRow({closedCaption, trashButtonOnClick}) {
+  const onRowDelete = () => {
+    trashButtonOnClick(closedCaption)
+  }
   return (
     <Flex justifyItems="space-between">
       <Flex.Item textAlign="start" size="200px">
@@ -36,7 +39,7 @@ export default function ClosedCaptionRow({closedCaption}) {
         <Button variant="icon" icon={IconDownloadLine}>
           <ScreenReaderContent>Download {closedCaption.file.name}</ScreenReaderContent>
         </Button>
-        <Button variant="icon" icon={IconTrashLine}>
+        <Button variant="icon" icon={IconTrashLine} onClick={onRowDelete}>
           <ScreenReaderContent>Delete {closedCaption.file.name}</ScreenReaderContent>
         </Button>
       </Flex.Item>
