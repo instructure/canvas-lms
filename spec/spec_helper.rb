@@ -331,6 +331,7 @@ end
 RSpec::Expectations.configuration.on_potential_false_positives = :raise
 
 RSpec.configure do |config|
+  config.example_status_persistence_file_path = Rails.root.join('tmp', 'rspec')
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root.join('spec', 'fixtures')
