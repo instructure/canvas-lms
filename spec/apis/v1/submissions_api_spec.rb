@@ -3284,6 +3284,56 @@ describe 'Submissions API', type: :request do
     expect(submission.submission_comments.order("id DESC").first).to be_hidden
   end
 
+  context "with post policies enabled" do
+    let_once(:course) { Course.create! }
+    let_once(:assignment) { course.assignments.create! }
+    let_once(:student) { course.enroll_student(User.create!, enrollment_state: :active).user }
+    let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: :active).user }
+    let_once(:submission) { assignment.submissions.find_by!(user: student) }
+
+    before(:once) do
+      PostPolicy.enable_feature!
+      course.enable_feature!(:new_gradebook)
+      @user = teacher
+    end
+
+    it "hides comments when the assignment posts manually and submission is not posted" do
+      assignment.ensure_post_policy(post_manually: true)
+      api_call(
+        :put,
+        "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: course.to_param,
+          assignment_id: assignment.to_param,
+          user_id: student.to_param
+        },
+        { comment: { text_comment: "a comment!" } }
+      )
+      expect(submission.submission_comments.order("id DESC").first).to be_hidden
+    end
+
+    it "does not hide comments when the submission is already posted" do
+      submission.update!(posted_at: Time.zone.now)
+      api_call(
+        :put,
+        "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: course.to_param,
+          assignment_id: assignment.to_param,
+          user_id: student.to_param
+        },
+        { comment: { text_comment: "a comment!" } }
+      )
+      expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    end
+  end
+
   it "does not hide student comments on muted assignments" do
     course_with_teacher(:active_all => true)
     student    = user_factory(active_all: true)
