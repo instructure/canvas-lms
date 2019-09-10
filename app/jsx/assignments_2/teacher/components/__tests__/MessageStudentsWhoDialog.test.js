@@ -17,9 +17,8 @@
  */
 
 import React from 'react'
-import $ from 'jquery'
 import axios from 'axios'
-import {render, fireEvent, waitForElement} from '@testing-library/react'
+import {cleanup, render, fireEvent, waitForElement} from '@testing-library/react'
 import MessageStudentsWhoDialog from '../MessageStudentsWhoDialog'
 import {mockAssignment, mockUser, mockSubmission} from '../../test-utils'
 import {
@@ -27,19 +26,23 @@ import {
   variedSubmissionTypes
 } from '../../../shared/__tests__/fixtures/AssignmentMockup'
 
+jest.mock('axios')
+
 function renderMessageStudentsWhoDialog(assignment = mockAssignment(), propsOverride = {}) {
   const props = {
     assignment,
     open: true,
     busy: false,
     handleSend: () => 'Your Messages were sent!',
-    handleClose: () => 'The dialog is gone!',
+    onClose: () => 'The dialog is gone!',
     ...propsOverride
   }
   return render(<MessageStudentsWhoDialog {...props} />)
 }
 
 describe('MessageStudentsWhoDialog', () => {
+  afterEach(cleanup)
+
   describe('filters', () => {
     // assignment is of type no-submission
     it('does not show the not submitted yet filter when the assignment is of type no submissions', () => {
@@ -626,24 +629,43 @@ describe('MessageStudentsWhoDialog', () => {
   })
 
   describe('sending messages', () => {
-    jest.mock('axios')
-
-    beforeAll(() => {
-      window.URL.createObjectURL = jest.fn()
-      $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-    })
-
     it('displays loading state when message is being sent', async () => {
-      const postSpy = jest.spyOn(axios, 'post')
       const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
       const bodyInput = getByTestId('body-input')
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const sendButton = getByText('Send').closest('button')
+      axios.post.mockResolvedValue(() => Promise.resolve({status: 202, data: []}))
       fireEvent.click(sendButton)
+
       expect(await waitForElement(() => getByText('Sending messages'))).toBeInTheDocument()
-      expect(postSpy).toHaveBeenCalled()
     })
 
-    it('displays an error and closes the dialog when the api call fails', async () => {})
+    it('handles success', async () => {
+      const {getByTestId, getAllByText, getByText} = renderMessageStudentsWhoDialog(
+        partialSubAssignment()
+      )
+      const bodyInput = getByTestId('body-input')
+      fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
+      const sendButton = getByText('Send').closest('button')
+      axios.post.mockResolvedValue(() => Promise.resolve({status: 202, data: []}))
+      fireEvent.click(sendButton)
+
+      expect(await waitForElement(() => getAllByText('Messages sent')[0])).toBeInTheDocument()
+    })
+
+    it('handles error', async () => {
+      const {getByTestId, getAllByText, getByText} = renderMessageStudentsWhoDialog(
+        partialSubAssignment()
+      )
+      const bodyInput = getByTestId('body-input')
+      fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
+      const sendButton = getByText('Send').closest('button')
+      axios.post.mockRejectedValue(() => Promise.reject(new Error('something bad happened')))
+      fireEvent.click(sendButton)
+
+      expect(
+        await waitForElement(() => getAllByText('Error sending messages')[0])
+      ).toBeInTheDocument()
+    })
   })
 })
