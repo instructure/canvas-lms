@@ -68,7 +68,7 @@ set :linked_dirs, %w{log tmp/pids public/system}
 
 
 # set the locations that we will look for changed assets to determine whether to precompile
-set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets app/views/jst spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
+set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets app/views/jst spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb npm-shrinkwrap.json gems/canvas_i18nliner/npm-shrinkwrap.json client_apps/canvas_quizzes/npm-shrinkwrap.json)
 #
 # Capistrano runs as the deploy user, but Canvas is setup to be owned by another user.
 # Rollbacks and cleanups of more than :keep_releases fail with permissions errors. 
