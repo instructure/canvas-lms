@@ -4823,6 +4823,24 @@ describe Submission do
 
       expect(subject).to eq([other_assessment])
     end
+
+    context "attempt argument" do
+      before(:once) do
+        @submission2 = @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+      end
+
+      it 'returns an empty list if no rubric assessments exist for the desired attempt' do
+        expect(
+          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission2.attempt)
+        ).to be_empty
+      end
+
+      it 'can find historic rubric assessments of older attempts' do
+        expect(
+          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission.attempt)
+        ).to contain_exactly(@teacher_assessment, @student_assessment)
+      end
+    end
   end
 
   describe '#add_comment' do

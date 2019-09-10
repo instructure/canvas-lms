@@ -63,27 +63,5 @@ module Types
         histories.select{ |h| states.include?(h.workflow_state) }
       end
     end
-
-    # TODO: In the context of a versionable backed submission history, this will
-    #       need to look up the correct rubric assessment from their versionable
-    #       entries. This will probably suck a lot, and as such can happen in a
-    #       different ticket. Will probably need to duplicate some of the logic
-    #       around the visible_rubric_assessments_for crap to get it workable
-    #       for versionable backed rubric assessments.
-    field :rubric_assessments_connection, RubricAssessmentType.connection_type, null: true
-    def rubric_assessments_connection
-      Promise.all([
-        load_association(:assignment),
-        load_association(:rubric_assessments)
-      ]).then do
-        Promise.all([
-          Loaders::AssociationLoader.for(Assignment, :rubric_association).load(submission.assignment),
-          Loaders::AssociationLoader.for(RubricAssessment, :rubric_association).
-            load_many(submission.rubric_assessments)
-        ]).then do
-          submission.visible_rubric_assessments_for(current_user)
-        end
-      end
-    end
   end
 end

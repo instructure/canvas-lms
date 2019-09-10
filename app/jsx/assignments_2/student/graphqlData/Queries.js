@@ -39,16 +39,15 @@ export const EXTERNAL_TOOLS_QUERY = gql`
   ${ExternalTool.fragment}
 `
 
-// TODO: Move proficiencyRatings stuff into it's own fragment
 export const RUBRIC_QUERY = gql`
-  query GetRubric($rubricID: ID!, $submissionID: ID!, $courseID: ID!) {
+  query GetRubric($rubricID: ID!, $submissionID: ID!, $courseID: ID!, $submissionAttempt: Int!) {
     rubric: node(id: $rubricID) {
       ... on Rubric {
         ...Rubric
       }
     }
     submission(id: $submissionID) {
-      rubricAssessmentsConnection {
+      rubricAssessmentsConnection(filter: {forAttempt: $submissionAttempt}) {
         nodes {
           ...RubricAssessment
         }

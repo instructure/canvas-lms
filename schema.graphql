@@ -2439,11 +2439,11 @@ type RubricAssessmentEdge {
 """
 An assessment for a specific criteria in a rubric
 """
-type RubricAssessmentRating implements LegacyIDInterface {
+type RubricAssessmentRating {
   """
   legacy canvas id
   """
-  _id: ID!
+  _id: ID
   comments: String
 
   """
@@ -2709,6 +2709,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    filter: SubmissionRubricAssessmentFilterInput = {}
 
     """
     Returns the first _n_ elements from the list.
@@ -2942,6 +2943,28 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   The canvas legacy id of the root submission this history belongs to
   """
   rootId: ID!
+  rubricAssessmentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionRubricAssessmentFilterInput = {}
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): RubricAssessmentConnection
   score: Float
   state: SubmissionState!
   submissionDraft: SubmissionDraft
@@ -3059,6 +3082,28 @@ interface SubmissionInterface {
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime
+  rubricAssessmentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionRubricAssessmentFilterInput = {}
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): RubricAssessmentConnection
   score: Float
   state: SubmissionState!
   submissionDraft: SubmissionDraft
@@ -3076,6 +3121,15 @@ input SubmissionOrderCriteria {
 enum SubmissionOrderField {
   _id
   gradedAt
+}
+
+input SubmissionRubricAssessmentFilterInput {
+  """
+  What submission attempt the rubric assessment should be returned for. If not
+  specified, it will return the rubric assessment for the current submisssion
+  or submission history.
+  """
+  forAttempt: Int = null
 }
 
 input SubmissionSearchFilterInput {

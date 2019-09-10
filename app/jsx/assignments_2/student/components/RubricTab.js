@@ -42,7 +42,7 @@ function transformRubricData(rubric) {
 function transformRubricAssessmentData(rubricAssessment) {
   const assessmentCopy = JSON.parse(JSON.stringify(rubricAssessment))
   assessmentCopy.data.forEach(rating => {
-    rating.criterion_id = rating.criterion.id
+    rating.criterion_id = rating.criterion ? rating.criterion.id : null
     rating.learning_outcome_id = rating.outcome ? rating.outcome._id : null
     delete rating.criterion
     delete rating.outcome
@@ -57,7 +57,8 @@ export default function RubricTab(props) {
       variables={{
         rubricID: props.assignment.rubric.id,
         submissionID: props.submission.id,
-        courseID: props.assignment.env.courseId
+        courseID: props.assignment.env.courseId,
+        submissionAttempt: props.submission.attempt
       }}
     >
       {({loading, error, data}) => {

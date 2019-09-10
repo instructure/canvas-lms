@@ -2501,11 +2501,25 @@ class Submission < ActiveRecord::Base
     !self.has_submission? && !self.graded?
   end
 
-  def visible_rubric_assessments_for(viewing_user)
+  def visible_rubric_assessments_for(viewing_user, attempt: nil)
     return [] unless posted? || grants_right?(viewing_user, :read_grade)
     return [] unless self.assignment.rubric_association
 
-    filtered_assessments = self.rubric_assessments.select do |a|
+    assessments =
+      if attempt
+        self.rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
+          if assessment.artifact_attempt == attempt
+            assessments_for_attempt << assessment
+          else
+            version = assessment.versions.find { |v| v.model.artifact_attempt == attempt }
+            assessments_for_attempt << version.model if version
+          end
+        end
+      else
+        self.rubric_assessments
+      end
+
+    filtered_assessments = assessments.select do |a|
       a.grants_right?(viewing_user, :read) &&
         a.rubric_association == self.assignment.rubric_association
     end

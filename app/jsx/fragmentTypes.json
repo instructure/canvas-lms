@@ -156,9 +156,6 @@
             "name": "RubricAssessment"
           },
           {
-            "name": "RubricAssessmentRating"
-          },
-          {
             "name": "RubricAssociation"
           },
           {

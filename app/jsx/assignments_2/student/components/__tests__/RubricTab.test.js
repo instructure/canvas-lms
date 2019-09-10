@@ -55,7 +55,8 @@ async function makeMocks(opts = {}) {
   const variables = {
     courseID: '1',
     rubricID: '1',
-    submissionID: '1'
+    submissionID: '1',
+    submissionAttempt: 0
   }
 
   const overrides = opts.graded ? gradedOverrides() : ungradedOverrides()
