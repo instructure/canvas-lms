@@ -54,7 +54,7 @@ const usersView = new PaginatedCollectionView({
   itemViewOptions: {
     course: ENV.course
   },
-  canViewLoginIdColumn: ENV.permissions.manage_admin_users || ENV.permissions.manage_students,
+  canViewLoginIdColumn: ENV.permissions.view_user_logins,
   canViewSisIdColumn: ENV.permissions.read_sis,
   buffer: 1000,
   template: rosterUsersTemplate
