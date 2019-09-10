@@ -65,6 +65,12 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
           root_folder.send_keys :space
           expect(root_folder).to have_attribute('aria-expanded', "false")
         end
+
+        it "expands a collapsed folder when you press the spacebar" do
+          sub_folder = fj('#right-side button:contains("subfolder")')
+          sub_folder.send_keys :space
+          expect(sub_folder).to have_attribute('aria-expanded', "true")
+        end
       end
     end
   end
