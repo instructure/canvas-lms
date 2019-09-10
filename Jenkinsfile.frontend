@@ -28,7 +28,13 @@ def setDockerUp () {
 }
 
 def cleanupDocker () {
-  sh 'build/new-jenkins/docker-cleanup.sh'
+  withEnv(['COMPOSE_FILE=docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml']) {
+    // Make sure to clean up the karma containers and image
+    sh 'docker-compose rm -fs karma'
+    sh 'docker rmi frontend_karma'
+    // Clean up all the other stuff
+    sh 'build/new-jenkins/docker-cleanup.sh'
+  }  
 }
 
 def isMerge () {
