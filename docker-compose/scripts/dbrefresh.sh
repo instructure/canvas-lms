@@ -8,6 +8,9 @@ aws s3 --region us-west-1 cp "s3://canvas-dev-db-dumps/$dbfilename" $dbfilepathg
 if [ $? -ne 0 ]
 then
  echo "Failed downloading s3://canvas-dev-db-dumps/$dbfilename"
+ echo "Make sure that awscli is installed: pip3 install awscli"
+ echo "Also, make sure and run 'aws configure' and put in your Access Key and Secret."
+ echo "Lastly, make sure your IAM account is in the Developers group. That's where the policy to access this bucket is defined."
  exit 1;
 fi
 
