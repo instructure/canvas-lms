@@ -55,7 +55,12 @@ export default class ClosedCaptionPanel extends Component {
       e.persist()
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
-          {id: shortId(), language: prevState.newSelectedLanguage, file: e.target.files[0]}
+          {
+            id: shortId(),
+            language: prevState.newSelectedLanguage,
+            file: e.target.files[0],
+            isNew: true
+          }
         ])
         this.props.updateSubtitles(subtitles)
         return {
@@ -74,7 +79,7 @@ export default class ClosedCaptionPanel extends Component {
     if (this.state.newSelectedFile) {
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
-          {id: shortId(), language: option, file: prevState.newSelectedFile}
+          {id: shortId(), language: option, file: prevState.newSelectedFile, isNew: true}
         ])
         this.props.updateSubtitles(subtitles)
         return {

@@ -36,9 +36,11 @@ export default function ClosedCaptionRow({closedCaption, trashButtonOnClick}) {
         <Text>{closedCaption.file.name}</Text>
       </Flex.Item>
       <Flex.Item textAlign="end" shrink grow>
-        <Button variant="icon" icon={IconDownloadLine}>
-          <ScreenReaderContent>Download {closedCaption.file.name}</ScreenReaderContent>
-        </Button>
+        {!closedCaption.isNew && (
+          <Button variant="icon" icon={IconDownloadLine}>
+            <ScreenReaderContent>Download {closedCaption.file.name}</ScreenReaderContent>
+          </Button>
+        )}
         <Button variant="icon" icon={IconTrashLine} onClick={onRowDelete}>
           <ScreenReaderContent>Delete {closedCaption.file.name}</ScreenReaderContent>
         </Button>

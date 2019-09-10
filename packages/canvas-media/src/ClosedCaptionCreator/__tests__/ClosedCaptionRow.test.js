@@ -29,7 +29,8 @@ function makeProps() {
       },
       file: {
         name: 'bestfileever.webvtt'
-      }
+      },
+      isNew: true
     },
     trashButtonOnClick: () => {}
   }
@@ -40,7 +41,6 @@ describe('ClosedCaptionRow', () => {
     const {getByText} = render(<ClosedCaptionRow {...makeProps()} />)
     expect(getByText('english')).toBeInTheDocument()
     expect(getByText('bestfileever.webvtt')).toBeInTheDocument()
-    expect(getByText('Download bestfileever.webvtt')).toBeInTheDocument()
     expect(getByText('Delete bestfileever.webvtt')).toBeInTheDocument()
   })
 
