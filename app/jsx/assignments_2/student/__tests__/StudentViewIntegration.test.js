@@ -17,9 +17,10 @@
  */
 import $ from 'jquery'
 import * as uploadFileModule from '../../../shared/upload_file'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {createCache} from '../../../canvas-apollo'
+import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../mocks'
 import React from 'react'
@@ -122,9 +123,11 @@ describe('student view integration tests', () => {
       })
 
       const {container, getAllByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <SubmissionIDQuery assignmentLid="1" />
-        </MockedProvider>
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <SubmissionIDQuery assignmentLid="1" />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
       )
 
       const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
@@ -179,7 +182,8 @@ describe('student view integration tests', () => {
       return mockResults
     }
 
-    it.skip('Displays the previous submission after loading more paginated histories', async () => { // TODO: get this to not timeout with instUI 6
+    it.skip('Displays the previous submission after loading more paginated histories', async () => {
+      // TODO: get this to not timeout with instUI 6
       const mocks = await createSubmissionHistoryMocks()
 
       const {findAllByText, findByText} = render(
@@ -223,7 +227,8 @@ describe('student view integration tests', () => {
       return mockResults
     }
 
-    it.skip('opens the RCE when the Start Entry button is clicked', async () => { // TODO: get this to work with latest @testing-library
+    it.skip('opens the RCE when the Start Entry button is clicked', async () => {
+      // TODO: get this to work with latest @testing-library
       const mocks = await createTextMocks({
         Assignment: () => ({submissionTypes: ['online_text_entry']}),
         SubmissionDraft: () => ({body: ''})

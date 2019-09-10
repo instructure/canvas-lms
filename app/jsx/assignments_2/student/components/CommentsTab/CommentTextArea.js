@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Alert} from '@instructure/ui-alerts'
+
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {Assignment} from '../../graphqlData/Assignment'
 import {Button} from '@instructure/ui-buttons'
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
@@ -31,8 +32,6 @@ import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {submissionCommentAttachmentsUpload} from '../../../../shared/upload_file'
 import {Submission} from '../../graphqlData/Submission'
 import {TextArea} from '@instructure/ui-forms'
-
-const ALERT_TIMEOUT = 5000
 
 export default class CommentTextArea extends Component {
   static propTypes = {
@@ -108,6 +107,7 @@ export default class CommentTextArea extends Component {
           attachmentIds = attachments.map(attachment => attachment.id)
         } catch (err) {
           this.setState({hasError: true, uploadingComments: false})
+          this.context.setOnFailure(I18n.t('Error sending submission comment'))
           return
         }
       }
@@ -134,27 +134,6 @@ export default class CommentTextArea extends Component {
       file.id = ++currIndex
     })
     this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...filesArray]}))
-  }
-
-  renderAlert(data, error) {
-    return (
-      <>
-        {data && (
-          <Alert
-            screenReaderOnly
-            liveRegion={() => document.getElementById('flash_screenreader_holder')}
-            timeout={ALERT_TIMEOUT}
-          >
-            {I18n.t('Submission comment sent')}
-          </Alert>
-        )}
-        {error && (
-          <Alert variant="error" margin="small" timeout={ALERT_TIMEOUT}>
-            {I18n.t('Error sending submission comment')}
-          </Alert>
-        )}
-      </>
-    )
   }
 
   handleRemoveFile = refsMap => e => {
@@ -185,13 +164,14 @@ export default class CommentTextArea extends Component {
   render() {
     return (
       <Mutation
+        onCompleted={() => this.context.setOnSuccess(I18n.t('Submission comment sent'))}
+        onError={() => this.context.setOnFailure(I18n.t('Error sending submission comment'))}
         optimisticResponse={this.optimisticResponse()}
         update={this.updateSubmissionCommentCache}
         mutation={CREATE_SUBMISSION_COMMENT}
       >
-        {(createSubmissionComment, {data, error}) => (
+        {createSubmissionComment => (
           <div>
-            {this.renderAlert(data, error || this.state.hasError)}
             <div>
               <TextArea
                 label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
@@ -262,3 +242,5 @@ export default class CommentTextArea extends Component {
     )
   }
 }
+
+CommentTextArea.contextType = AlertManagerContext

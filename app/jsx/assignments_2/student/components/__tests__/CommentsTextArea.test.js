@@ -15,28 +15,51 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import * as uploadFileModule from '../../../../shared/upload_file'
 import $ from 'jquery'
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {
   commentGraphqlMock,
+  legacyMockSubmission,
   mockAssignment,
   mockComments,
-  legacyMockSubmission,
   mockMultipleAttachments
 } from '../../test-utils'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render, wait, waitForElement} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
-import CommentTextArea from '../CommentsTab/CommentTextArea'
 import CommentsTab from '../CommentsTab'
-import * as uploadFileModule from '../../../../shared/upload_file'
+import CommentTextArea from '../CommentsTab/CommentTextArea'
 
 jest.setTimeout(10000)
+
+let mockedSetOnFailure = null
+let mockedSetOnSuccess = null
+
+function mockContext(children) {
+  return (
+    <AlertManagerContext.Provider
+      value={{
+        setOnFailure: mockedSetOnFailure,
+        setOnSuccess: mockedSetOnSuccess
+      }}
+    >
+      {children}
+    </AlertManagerContext.Provider>
+  )
+}
 
 describe('CommentTextArea', () => {
   beforeAll(() => {
     window.URL.createObjectURL = jest.fn()
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+  })
+
+  beforeEach(() => {
+    mockedSetOnFailure = jest.fn().mockResolvedValue({})
+    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
   })
 
   const uploadFiles = (element, files) => {
@@ -230,9 +253,11 @@ describe('CommentTextArea', () => {
     mockedComments.attachments = mockMultipleAttachments()
     const basicMock = commentGraphqlMock(mockedComments)
     const {container, findByPlaceholderText, findByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={basicMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await findByPlaceholderText('Submit a Comment')
     const fileInput = await waitForElement(() =>
@@ -249,7 +274,7 @@ describe('CommentTextArea', () => {
     fireEvent.click(await findByText('Send Comment'))
 
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
-    expect(await findByText('Submission comment sent')).toBeInTheDocument()
+    await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
   })
 
   it('users cannot send submission comments with not files or text', async () => {
@@ -285,12 +310,14 @@ describe('CommentTextArea', () => {
     const mockedComments = mockComments()
     mockedComments.attachments = mockMultipleAttachments()
     const errorMock = commentGraphqlMock(mockedComments)
-    errorMock[2].result = {errors: [{message: 'Error!'}]}
+    errorMock[2].error = new Error('aw shucks')
 
     const {container, getByPlaceholderText, getByText} = render(
-      <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={errorMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={errorMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     const fileInput = await waitForElement(() =>
@@ -306,9 +333,9 @@ describe('CommentTextArea', () => {
     fireEvent.click(getByText('Send Comment'))
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
 
-    expect(
-      await waitForElement(() => getByText('Error sending submission comment'))
-    ).toBeInTheDocument()
+    await wait(() =>
+      expect(mockedSetOnFailure).toHaveBeenCalledWith('Error sending submission comment')
+    )
   })
 
   it('notifies users of error when file fails to upload', async () => {
@@ -320,9 +347,11 @@ describe('CommentTextArea', () => {
     mockedComments.attachments = mockMultipleAttachments()
     const basicMock = commentGraphqlMock(mockedComments)
     const {container, getByPlaceholderText, getByText, queryAllByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={basicMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     const fileInput = await waitForElement(() =>
@@ -338,9 +367,7 @@ describe('CommentTextArea', () => {
     fireEvent.click(getByText('Send Comment'))
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
 
-    expect(
-      await waitForElement(() => getByText('Error sending submission comment'))
-    ).toBeInTheDocument()
+    expect(mockedSetOnFailure).toHaveBeenCalledWith('Error sending submission comment')
 
     // Should not allow user to submit again if comments have error
     expect(await waitForElement(() => queryAllByText('Send Comment'))).toHaveLength(0)

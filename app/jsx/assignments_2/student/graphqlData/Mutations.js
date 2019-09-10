@@ -84,7 +84,7 @@ export const CREATE_SUBMISSION_DRAFT = gql`
   ${SubmissionDraft.fragment}
 `
 
-export const MARK_SUBMISISON_COMMENT_READ = gql`
+export const MARK_SUBMISSION_COMMENT_READ = gql`
   mutation MarkSubmissionCommentsRead($commentIds: [ID!]!, $submissionId: ID!) {
     markSubmissionCommentsRead(
       input: {submissionCommentIds: $commentIds, submissionId: $submissionId}

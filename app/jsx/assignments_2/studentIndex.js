@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import AlertManager from '../shared/components/AlertManager'
 import {ApolloProvider, createClient} from '../canvas-apollo'
 import ErrorBoundary from '../shared/components/ErrorBoundary'
 import errorShipUrl from './student/SVG/ErrorShip.svg'
@@ -37,7 +38,9 @@ export default function renderAssignmentsApp(env, elt) {
           />
         }
       >
-        <SubmissionIDQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+        <AlertManager>
+          <SubmissionIDQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+        </AlertManager>
       </ErrorBoundary>
     </ApolloProvider>,
     elt

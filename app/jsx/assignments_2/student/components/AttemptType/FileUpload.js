@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {Assignment} from '../../graphqlData/Assignment'
 import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
@@ -87,17 +88,21 @@ export default class FileUpload extends Component {
     }
 
     if (files.length) {
-      const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
+      try {
+        const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
 
-      await this.props.createSubmissionDraft({
-        variables: {
-          id: this.props.submission.id,
-          attempt: this.props.submission.attempt || 1,
-          fileIds: this.getDraftAttachments()
-            .map(file => file._id)
-            .concat(newFiles.map(file => file.id))
-        }
-      })
+        await this.props.createSubmissionDraft({
+          variables: {
+            id: this.props.submission.id,
+            attempt: this.props.submission.attempt || 1,
+            fileIds: this.getDraftAttachments()
+              .map(file => file._id)
+              .concat(newFiles.map(file => file.id))
+          }
+        })
+      } catch (err) {
+        this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      }
     }
 
     if (this._isMounted) {
@@ -117,7 +122,6 @@ export default class FileUpload extends Component {
   }
 
   handleRemoveFile = async e => {
-    e.preventDefault()
     const fileId = parseInt(e.currentTarget.id, 10)
     const fileIndex = this.getDraftAttachments().findIndex(
       file => parseInt(file._id, 10) === fileId
@@ -190,7 +194,7 @@ export default class FileUpload extends Component {
             />
           }
           messages={this.state.messages}
-          onDropAccepted={this.handleDropAccepted}
+          onDropAccepted={files => this.handleDropAccepted(files)}
           onDropRejected={this.handleDropRejected}
         />
       </div>
@@ -277,3 +281,5 @@ export default class FileUpload extends Component {
     )
   }
 }
+
+FileUpload.contextType = AlertManagerContext
