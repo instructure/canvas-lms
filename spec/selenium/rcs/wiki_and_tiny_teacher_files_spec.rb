@@ -71,6 +71,13 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
           sub_folder.send_keys :space
           expect(sub_folder).to have_attribute('aria-expanded', "true")
         end
+
+        it "goes to the next item when pressing down" do
+          first_file = fj('#right-side button:contains("email.png")')
+          second_file = fj('#right-side button:contains("graded.png")')
+          first_file.send_keys :arrow_down
+          check_element_has_focus(second_file)
+        end
       end
     end
   end
