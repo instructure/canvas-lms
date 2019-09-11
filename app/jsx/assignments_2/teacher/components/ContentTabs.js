@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 import StudentsSearcher from './StudentsTab/StudentsSearcher'
@@ -42,7 +42,7 @@ export default function ContentTabs(props) {
   const {assignment} = props
   return (
     <TabList defaultSelectedIndex={0} variant="minimal">
-      <TabPanel title="Details">
+      <TabList.Panel title="Details">
         <Details
           assignment={assignment}
           onChangeAssignment={props.onChangeAssignment}
@@ -50,23 +50,23 @@ export default function ContentTabs(props) {
           invalidMessage={props.invalidMessage}
           readOnly={props.readOnly}
         />
-      </TabPanel>
-      <TabPanel title={I18n.t('Grading')}>
+      </TabList.Panel>
+      <TabList.Panel title={I18n.t('Grading')}>
         <div style={{width: '680px'}}>
           <Img src="/images/assignments2_grading_static.png" />
         </div>
-      </TabPanel>
-      <TabPanel title={I18n.t('Rubric')}>
+      </TabList.Panel>
+      <TabList.Panel title={I18n.t('Rubric')}>
         <div style={{width: '730px'}}>
           <Img src="/images/assignments2_rubric_static.png" />
         </div>
-      </TabPanel>
-      <TabPanel title={I18n.t('Students')}>
+      </TabList.Panel>
+      <TabList.Panel title={I18n.t('Students')}>
         <StudentsSearcher
           onMessageStudentsClick={props.onMessageStudentsClick}
           assignment={assignment}
         />
-      </TabPanel>
+      </TabList.Panel>
     </TabList>
   )
 }

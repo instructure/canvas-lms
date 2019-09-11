@@ -28,7 +28,7 @@ import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
 import {View, Grid} from '@instructure/ui-layout'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {TextInput, Select} from '@instructure/ui-forms'
 import {Heading} from '@instructure/ui-elements'
 
@@ -197,14 +197,14 @@ export default class PermissionsIndex extends Component {
           }
         />
         <TabList onChange={this.onTabChanged}>
-          <TabPanel title={I18n.t('Course Roles')}>
+          <TabList.Panel title={I18n.t('Course Roles')}>
             {this.renderHeader()}
             <ConnectedPermissionsTable />
-          </TabPanel>
-          <TabPanel title={I18n.t('Account Roles')}>
+          </TabList.Panel>
+          <TabList.Panel title={I18n.t('Account Roles')}>
             {this.renderHeader()}
             <ConnectedPermissionsTable />
-          </TabPanel>
+          </TabList.Panel>
         </TabList>
       </div>
     )

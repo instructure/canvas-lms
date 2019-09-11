@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!RubricManagement'
-import {TabList,  TabPanel } from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import ProficiencyTable from 'jsx/rubrics/ProficiencyTable'
 import RubricPanel from 'jsx/rubrics/RubricPanel'
 
@@ -36,15 +36,15 @@ export default class RubricManagement extends React.Component {
   render() {
     return (
       <TabList ref={tabList => { this.tabList = tabList }} defaultSelectedIndex={0}>
-        <TabPanel title={I18n.t('Account Rubrics')}>
+        <TabList.Panel title={I18n.t('Account Rubrics')}>
           <RubricPanel />
-        </TabPanel>
-        <TabPanel title={I18n.t('Learning Mastery')}>
+        </TabList.Panel>
+        <TabList.Panel title={I18n.t('Learning Mastery')}>
           <ProficiencyTable
             focusTab={this.focusTab(1)}
             accountId={this.props.accountId}
           />
-        </TabPanel>
+        </TabList.Panel>
       </TabList>
     )
   }
