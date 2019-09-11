@@ -22,7 +22,7 @@ import I18n from 'i18n!assignments_2'
 import {object, shape, string} from 'prop-types'
 import React from 'react'
 
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {
   IconCheckMarkIndeterminateLine,
   IconPublishSolid,
@@ -103,27 +103,27 @@ const TableFiles = props => {
           <div key={file.id}>
             <ScreenReaderContent>{I18n.t('type: file')}</ScreenReaderContent>
             <Flex>
-              <FlexItem padding="xx-small" size={props.columnWidths.thumbnailWidth}>
+              <Flex.Item padding="xx-small" size={props.columnWidths.thumbnailWidth}>
                 {getFileThumbnail(file, 'small')}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.nameWidth} grow>
+              </Flex.Item>
+              <Flex.Item padding="xx-small" size={props.columnWidths.nameWidth} grow>
                 {renderFileName(file.display_name)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.dateCreatedWidth}>
+              </Flex.Item>
+              <Flex.Item padding="xx-small" size={props.columnWidths.dateCreatedWidth}>
                 {renderDateCreated(file.created_at)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.dateModifiedWidth}>
+              </Flex.Item>
+              <Flex.Item padding="xx-small" size={props.columnWidths.dateModifiedWidth}>
                 {renderDateModified(file.updated_at)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.modifiedByWidth}>
+              </Flex.Item>
+              <Flex.Item padding="xx-small" size={props.columnWidths.modifiedByWidth}>
                 {renderModifiedBy(file.user)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.fileSizeWidth}>
+              </Flex.Item>
+              <Flex.Item padding="xx-small" size={props.columnWidths.fileSizeWidth}>
                 {renderFileSize(file.size)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.publishedWidth}>
+              </Flex.Item>
+              <Flex.Item padding="xx-small" size={props.columnWidths.publishedWidth}>
                 {renderPublishedState(file.locked)}
-              </FlexItem>
+              </Flex.Item>
             </Flex>
           </div>
         )

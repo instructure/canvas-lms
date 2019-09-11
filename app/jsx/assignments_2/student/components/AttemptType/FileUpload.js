@@ -33,7 +33,7 @@ import {uploadFiles} from '../../../../shared/upload_file'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {FileDrop} from '@instructure/ui-forms'
-import {Flex, FlexItem, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Flex, Grid, GridCol, GridRow} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
@@ -171,15 +171,15 @@ export default class FileUpload extends Component {
               message={
                 <Flex direction="column">
                   {this.props.assignment.allowedExtensions.length ? (
-                    <FlexItem>
+                    <Flex.Item>
                       {I18n.t('File permitted: %{fileTypes}', {
                         fileTypes: this.props.assignment.allowedExtensions
                           .map(ext => ext.toUpperCase())
                           .join(', ')
                       })}
-                    </FlexItem>
+                    </Flex.Item>
                   ) : null}
-                  <FlexItem padding="small 0 0">
+                  <Flex.Item padding="small 0 0">
                     <Text size="small">
                       {I18n.t('Drag and drop, or click to browse your computer')}
                     </Text>
@@ -188,7 +188,7 @@ export default class FileUpload extends Component {
                       courseID={this.props.assignment.env.courseId}
                       userID={this.props.assignment.env.currentUser.id}
                     />
-                  </FlexItem>
+                  </Flex.Item>
                 </Flex>
               }
             />

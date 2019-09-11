@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {get, keyBy, isUndefined, max, sum} from 'lodash'
 import I18n from 'i18n!edit_rubricRubric'
 import PropTypes from 'prop-types'
@@ -152,9 +152,9 @@ const Rubric = (props) => {
             <tr>
               <td colSpan="3">
                 <Flex justifyItems="end">
-                  <FlexItem data-selenium="rubric_total">
+                  <Flex.Item data-selenium="rubric_total">
                     {hideScoreTotal || noScore ? null : total}
-                  </FlexItem>
+                  </Flex.Item>
                 </Flex>
               </td>
             </tr>

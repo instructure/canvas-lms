@@ -19,7 +19,7 @@
 import {Assignment} from '../graphqlData/Assignment'
 import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
 import GradeDisplay from './GradeDisplay'
@@ -61,13 +61,13 @@ function currentSubmissionGrade(assignment, submission) {
       <Text size="small">
         {submission.submittedAt ? (
           <Flex justifyItems="end">
-            <FlexItem padding="0 xx-small 0 0">{I18n.t('Submitted')}</FlexItem>
-            <FlexItem>
+            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted')}</Flex.Item>
+            <Flex.Item>
               <FriendlyDatetime
                 dateTime={submission.submittedAt}
                 format={I18n.t('#date.formats.full')}
               />
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         ) : (
           I18n.t('Not submitted')

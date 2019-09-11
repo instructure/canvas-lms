@@ -20,7 +20,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-forms'
-import {Flex,  FlexItem } from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import I18n from 'i18n!edit_rubricPoints'
 
 import { assessmentShape } from './types'
@@ -78,7 +78,7 @@ const Points = (props) => {
       return (
         <div className="react-rubric-cell graded-points">
           <Flex alignItems="end" wrapItems>
-            <FlexItem size="4rem" margin="none small none none">
+            <Flex.Item size="4rem" margin="none small none none">
               <TextInput
                 inline
                 label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
@@ -90,10 +90,10 @@ const Points = (props) => {
                 value={pointString(points)}
                 width="4rem"
               />
-            </FlexItem>
-            <FlexItem margin="small none none none">
+            </Flex.Item>
+            <Flex.Item margin="small none none none">
               {`/ ${possibleString(pointsPossible)}`}
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </div>
       )

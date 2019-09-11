@@ -19,7 +19,7 @@
 import React from 'react'
 import {shape, object, func, string, oneOfType, arrayOf, node} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {View, Flex} from '@instructure/ui-layout'
 import {Heading, List, ListItem, Spinner, Text, Avatar, Badge} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
@@ -98,29 +98,29 @@ export default class MobileGlobalMenu extends React.Component {
         padding="medium large medium medium"
       >
         <Flex direction="row-reverse" margin="0 0 large 0">
-          <FlexItem>
+          <Flex.Item>
             <Button variant="icon" icon={IconXLine} onClick={this.props.onDismiss}>
               <ScreenReaderContent>Close</ScreenReaderContent>
             </Button>
-          </FlexItem>
-          <FlexItem grow shrink>
+          </Flex.Item>
+          <Flex.Item grow shrink>
             <Heading>
               <a className="ic-brand-mobile-global-nav-logo" href="/">
                 <span className="screenreader-only">{I18n.t('My Dashboard')}</span>
               </a>
             </Heading>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
         <List variant="unstyled" itemSpacing="medium">
           <ListItem>
             <Button variant="link" href="/" size="small" fluidWidth>
               <Flex>
-                <FlexItem width="3rem">
+                <Flex.Item width="3rem">
                   <IconDashboardLine inline={false} size="small" />
-                </FlexItem>
-                <FlexItem>
+                </Flex.Item>
+                <Flex.Item>
                   <Text size="medium">{I18n.t('Dashboard')}</Text>
-                </FlexItem>
+                </Flex.Item>
               </Flex>
             </Button>
           </ListItem>
@@ -132,16 +132,16 @@ export default class MobileGlobalMenu extends React.Component {
                 onToggle={ensureLoaded('profile')}
                 summary={
                   <Flex padding="xx-small small">
-                    <FlexItem width="3rem">
+                    <Flex.Item width="3rem">
                       <Avatar
                         name={this.props.current_user.display_name}
                         src={this.props.current_user.avatar_image_url}
                         size="x-small"
                       />
-                    </FlexItem>
-                    <FlexItem>
+                    </Flex.Item>
+                    <Flex.Item>
                       <Text color="brand">{I18n.t('Account')}</Text>
-                    </FlexItem>
+                    </Flex.Item>
                   </Flex>
                 }
               >
@@ -167,12 +167,12 @@ export default class MobileGlobalMenu extends React.Component {
             ) : (
               <Button variant="link" href="/login" fluidWidth>
                 <Flex>
-                  <FlexItem width="3rem">
+                  <Flex.Item width="3rem">
                     <IconLockLine inline={false} size="small" />
-                  </FlexItem>
-                  <FlexItem>
+                  </Flex.Item>
+                  <Flex.Item>
                     <Text size="medium">{I18n.t('Login')}</Text>
-                  </FlexItem>
+                  </Flex.Item>
                 </Flex>
               </Button>
             )}
@@ -186,12 +186,12 @@ export default class MobileGlobalMenu extends React.Component {
                 onToggle={ensureLoaded('accounts')}
                 summary={
                   <Flex padding="xx-small small">
-                    <FlexItem width="3rem">
+                    <Flex.Item width="3rem">
                       <IconAdminLine inline={false} size="small" color="brand" />
-                    </FlexItem>
-                    <FlexItem>
+                    </Flex.Item>
+                    <Flex.Item>
                       <Text color="brand">{I18n.t('Admin')}</Text>
-                    </FlexItem>
+                    </Flex.Item>
                   </Flex>
                 }
               >
@@ -228,12 +228,12 @@ export default class MobileGlobalMenu extends React.Component {
               onToggle={ensureLoaded('courses')}
               summary={
                 <Flex padding="xx-small small">
-                  <FlexItem width="3rem">
+                  <Flex.Item width="3rem">
                     <IconCoursesLine inline={false} size="small" color="brand" />
-                  </FlexItem>
-                  <FlexItem>
+                  </Flex.Item>
+                  <Flex.Item>
                     <Text color="brand">{I18n.t('Courses')}</Text>
-                  </FlexItem>
+                  </Flex.Item>
                 </Flex>
               }
             >
@@ -277,12 +277,12 @@ export default class MobileGlobalMenu extends React.Component {
                 onToggle={ensureLoaded('groups')}
                 summary={
                   <Flex padding="xx-small small">
-                    <FlexItem width="3rem">
+                    <Flex.Item width="3rem">
                       <IconGroupLine inline={false} size="small" color="brand" />
-                    </FlexItem>
-                    <FlexItem>
+                    </Flex.Item>
+                    <Flex.Item>
                       <Text color="brand">{I18n.t('Groups')}</Text>
-                    </FlexItem>
+                    </Flex.Item>
                   </Flex>
                 }
               >
@@ -320,22 +320,22 @@ export default class MobileGlobalMenu extends React.Component {
           <ListItem>
             <Button variant="link" href="/calendar" size="small" fluidWidth>
               <Flex>
-                <FlexItem width="3rem">
+                <Flex.Item width="3rem">
                   <IconCalendarMonthLine inline={false} size="small" />
-                </FlexItem>
-                <FlexItem>
+                </Flex.Item>
+                <Flex.Item>
                   <Text size="medium">{I18n.t('Calendar')}</Text>
-                </FlexItem>
+                </Flex.Item>
               </Flex>
             </Button>
           </ListItem>
           <ListItem>
             <Button variant="link" href="/inbox" size="small" fluidWidth>
               <Flex>
-                <FlexItem width="3rem">
+                <Flex.Item width="3rem">
                   <IconInboxLine inline={false} size="small" />
-                </FlexItem>
-                <FlexItem>
+                </Flex.Item>
+                <Flex.Item>
                   <Text size="medium">{I18n.t('Inbox')}</Text>
                   {!!this.props.DesktopNavComponent.state.unread_count && (
                     <Badge
@@ -344,7 +344,7 @@ export default class MobileGlobalMenu extends React.Component {
                       count={this.props.DesktopNavComponent.state.unread_count}
                     />
                   )}
-                </FlexItem>
+                </Flex.Item>
               </Flex>
             </Button>
           </ListItem>
@@ -352,7 +352,7 @@ export default class MobileGlobalMenu extends React.Component {
             <ListItem key={tool.href}>
               <Button variant="link" href={tool.href} size="small" fluidWidth>
                 <Flex>
-                  <FlexItem width="3rem">
+                  <Flex.Item width="3rem">
                     {tool.svgPath ? (
                       <svg
                         version="1.1"
@@ -370,10 +370,10 @@ export default class MobileGlobalMenu extends React.Component {
                     ) : (
                       <img width="1em" height="1em" src={tool.imgSrc} alt="" />
                     )}
-                  </FlexItem>
-                  <FlexItem>
+                  </Flex.Item>
+                  <Flex.Item>
                     <Text size="medium">{tool.label}</Text>
-                  </FlexItem>
+                  </Flex.Item>
                 </Flex>
               </Button>
             </ListItem>
@@ -387,12 +387,12 @@ export default class MobileGlobalMenu extends React.Component {
                 onToggle={ensureLoaded('help')}
                 summary={
                   <Flex padding="xx-small small">
-                    <FlexItem width="3rem">
+                    <Flex.Item width="3rem">
                       <IconQuestionLine inline={false} size="small" color="brand" />
-                    </FlexItem>
-                    <FlexItem>
+                    </Flex.Item>
+                    <Flex.Item>
                       <Text color="brand">{window.ENV.help_link_name || I18n.t('Help')}</Text>
-                    </FlexItem>
+                    </Flex.Item>
                   </Flex>
                 }
               >

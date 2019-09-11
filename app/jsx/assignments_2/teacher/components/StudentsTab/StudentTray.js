@@ -23,7 +23,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import {bool, func} from 'prop-types'
 import {TeacherAssignmentShape, UserShape} from '../../assignmentData'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Avatar, Heading, Link, Text} from '@instructure/ui-elements'
 import {Tray} from '@instructure/ui-overlays'
@@ -203,7 +203,7 @@ export default class StudentTray extends React.Component {
 
     return (
       <Flex>
-        <FlexItem grow textAlign="center">
+        <Flex.Item grow textAlign="center">
           <Text as="p" weight="bold" lineHeight="fit">
             {this.props.assignment.name}
           </Text>
@@ -211,7 +211,7 @@ export default class StudentTray extends React.Component {
             {displayString}
           </Text>
           {this.renderSpeedgraderLink()}
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }
@@ -227,7 +227,7 @@ export default class StudentTray extends React.Component {
 
           <div style={{margin: '0 auto auto -10%', width: '120%'}}>
             <Flex>
-              <FlexItem shrink textAlign="start">
+              <Flex.Item shrink textAlign="start">
                 <Button
                   size="small"
                   variant="icon"
@@ -236,8 +236,8 @@ export default class StudentTray extends React.Component {
                 >
                   <ScreenReaderContent>{I18n.t('Previous student')}</ScreenReaderContent>
                 </Button>
-              </FlexItem>
-              <FlexItem grow textAlign="center">
+              </Flex.Item>
+              <Flex.Item grow textAlign="center">
                 <Heading level="h3" as="h2">
                   <Button
                     size="large"
@@ -250,8 +250,8 @@ export default class StudentTray extends React.Component {
                     {student.shortName}
                   </Button>
                 </Heading>
-              </FlexItem>
-              <FlexItem shrink textAlign="end">
+              </Flex.Item>
+              <Flex.Item shrink textAlign="end">
                 <Button
                   size="small"
                   variant="icon"
@@ -260,7 +260,7 @@ export default class StudentTray extends React.Component {
                 >
                   <ScreenReaderContent>{I18n.t('Next student')}</ScreenReaderContent>
                 </Button>
-              </FlexItem>
+              </Flex.Item>
             </Flex>
           </div>
 

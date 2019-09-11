@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func} from 'prop-types'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {List, ListItem, Text} from '@instructure/ui-elements'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
 
@@ -125,17 +125,17 @@ export default function Layout(props) {
         id="AssignmentPostingPolicyTray__Buttons"
       >
         <Flex justifyItems="end">
-          <FlexItem margin="0 small 0 0">
+          <Flex.Item margin="0 small 0 0">
             <Button onClick={props.onDismiss} disabled={!props.allowCanceling}>
               {I18n.t('Cancel')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
 
-          <FlexItem>
+          <Flex.Item>
             <Button onClick={props.onSave} disabled={!props.allowSaving} variant="primary">
               {I18n.t('Save')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     </>

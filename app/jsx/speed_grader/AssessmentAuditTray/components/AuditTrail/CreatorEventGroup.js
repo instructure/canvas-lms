@@ -19,7 +19,7 @@
 import React, {PureComponent} from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text, TruncateText} from '@instructure/ui-elements'
@@ -59,16 +59,16 @@ export default class CreatorEventGroup extends PureComponent {
             id={`creator-event-group-${creator.key}`}
             summary={
               <Flex as="div" direction="row">
-                <FlexItem grow size="0" padding="none xx-small none none">
+                <Flex.Item grow size="0" padding="none xx-small none none">
                   <Text as="h3">
                     <TruncateText maxLines={1}>
                       <Text weight="bold">{creatorName}</Text> ({roleLabel})
                     </TruncateText>
                   </Text>
-                </FlexItem>
+                </Flex.Item>
 
                 {!anonymousOnly && (
-                  <FlexItem>
+                  <Flex.Item>
                     <Tooltip
                       on={['click', 'focus', 'hover']}
                       placement="start"
@@ -79,7 +79,7 @@ export default class CreatorEventGroup extends PureComponent {
                         <ScreenReaderContent>{I18n.t('Toggle tooltip')}</ScreenReaderContent>
                       </Button>
                     </Tooltip>
-                  </FlexItem>
+                  </Flex.Item>
                 )}
               </Flex>
             }

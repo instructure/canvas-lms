@@ -20,7 +20,7 @@ import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import {Assignment} from '../graphqlData/Assignment'
 import Attempt from './Attempt'
 import DateTitle from './DateTitle'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import GradeDisplay from './GradeDisplay'
 import {Heading} from '@instructure/ui-elements'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
@@ -83,9 +83,9 @@ class Header extends React.Component {
     // <a> tags without href elements are inaccessible by keyboard and should not normally
     // be used, this is a quick and dirty measure that will not persist to consumer use.
     return (
-      <FlexItem as="div" align="end" textAlign="end">
+      <Flex.Item as="div" align="end" textAlign="end">
         Calculated by: <a>Most Recent</a>
-      </FlexItem>
+      </Flex.Item>
     )
   }
   /* eslint-enable jsx-a11y/anchor-is-valid */
@@ -130,17 +130,17 @@ class Header extends React.Component {
 
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
           <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'}>
-            <FlexItem shrink>
+            <Flex.Item shrink>
               <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
-            </FlexItem>
-            <FlexItem grow align="start">
+            </Flex.Item>
+            <Flex.Item grow align="start">
               {this.renderLatestGrade()}
               {this.renderFakeMostRecent()}
               {this.props.submission && (
-                <FlexItem as="div" align="end" textAlign="end">
+                <Flex.Item as="div" align="end" textAlign="end">
                   <Flex direction="column">
                     {this.isSubmissionLate() && (
-                      <FlexItem grow>
+                      <Flex.Item grow>
                         <LatePolicyStatusDisplay
                           attempt={this.props.submission.attempt}
                           gradingType={this.props.assignment.gradingType}
@@ -149,17 +149,17 @@ class Header extends React.Component {
                           pointsDeducted={this.props.submission.deductedPoints}
                           grade={this.props.submission.grade}
                         />
-                      </FlexItem>
+                      </Flex.Item>
                     )}
-                    <FlexItem grow>
+                    <Flex.Item grow>
                       <SubmissionStatusPill
                         submissionStatus={this.props.submission.submissionStatus}
                       />
-                    </FlexItem>
+                    </Flex.Item>
                   </Flex>
-                </FlexItem>
+                </Flex.Item>
               )}
-            </FlexItem>
+            </Flex.Item>
           </Flex>
           {!this.state.isSticky && (
             <Attempt assignment={this.props.assignment} submission={this.props.submission} />

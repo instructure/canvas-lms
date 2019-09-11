@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {List, ListItem, Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -57,13 +57,13 @@ const FileList = props => {
       {files.map(file => (
         <ListItem key={file.id}>
           <Flex>
-            <FlexItem size="40px" padding="x-small small">
+            <Flex.Item size="40px" padding="x-small small">
               {getIcon(file)}
-            </FlexItem>
-            <FlexItem grow shrink>
+            </Flex.Item>
+            <Flex.Item grow shrink>
               <Text size="x-small">{file.name}</Text>
-            </FlexItem>
-            <FlexItem>
+            </Flex.Item>
+            <Flex.Item>
               <Button variant="link" size="small" onClick={previewHandler}>
                 <span aria-hidden title={I18n.t('Preview')}>
                   {I18n.t('Preview')}
@@ -72,9 +72,9 @@ const FileList = props => {
                   {I18n.t('Preview %{filename}', {filename: file.name})}
                 </ScreenReaderContent>
               </Button>
-            </FlexItem>
+            </Flex.Item>
             {canRemove && (
-              <FlexItem padding="0 small 0 x-small">
+              <Flex.Item padding="0 small 0 x-small">
                 <Button
                   icon={IconTrashLine}
                   id={file.id}
@@ -89,7 +89,7 @@ const FileList = props => {
                     {I18n.t('Remove %{filename}', {filename: file.name})}
                   </ScreenReaderContent>
                 </Button>
-              </FlexItem>
+              </Flex.Item>
             )}
           </Flex>
         </ListItem>

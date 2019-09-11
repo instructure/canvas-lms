@@ -21,7 +21,7 @@ import React from 'react'
 import I18n from 'i18n!assignments_2_student_points_display'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
@@ -55,7 +55,7 @@ function PointsDisplay(props) {
         {gradingType === 'points' ? I18n.t(' Points') : null}
       </ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
-        <FlexItem>
+        <Flex.Item>
           <Text transform="capitalize" size={displaySize} data-testid="grade-display">
             {GradeFormatHelper.formatGrade(receivedGrade, {
               gradingType,
@@ -65,7 +65,7 @@ function PointsDisplay(props) {
             })}
             {gradingType === 'points' ? I18n.t(' Points') : null}
           </Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </div>
   )
