@@ -22,7 +22,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes'
 import I18n from 'i18n!IndividualStudentMasteryOutcomeGroup'
 import {Flex, View} from '@instructure/ui-layout'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {List, ListItem, Pill, Text} from '@instructure/ui-elements'
+import {List, Pill, Text} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
@@ -68,13 +68,13 @@ export default class OutcomeGroup extends React.Component {
           <List variant="unstyled" delimiter="solid">
             {
               outcomes.sort(natcompare.byKey('title')).map((outcome) => (
-                <ListItem key={outcome.id} margin="0">
+                <List.Item key={outcome.id} margin="0">
                   <Outcome
                     outcome={outcome}
                     expanded={expandedOutcomes.has(outcome.expansionId)}
                     onExpansionChange={onExpansionChange}
                     outcomeProficiency={outcomeProficiency} />
-                </ListItem>
+                </List.Item>
               ))
             }
           </List>

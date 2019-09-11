@@ -25,7 +25,7 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {List, ListItem, Text} from '@instructure/ui-elements'
+import {List, Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 const getIcon = file => {
@@ -49,13 +49,13 @@ const FileList = props => {
 
   return (
     <List variant="unstyled" delimiter="solid">
-      <ListItem>
+      <List.Item>
         <Text size="x-small" weight="bold">
           {I18n.t('Attached')}
         </Text>
-      </ListItem>
+      </List.Item>
       {files.map(file => (
-        <ListItem key={file.id}>
+        <List.Item key={file.id}>
           <Flex>
             <Flex.Item size="40px" padding="x-small small">
               {getIcon(file)}
@@ -92,7 +92,7 @@ const FileList = props => {
               </Flex.Item>
             )}
           </Flex>
-        </ListItem>
+        </List.Item>
       ))}
     </List>
   )

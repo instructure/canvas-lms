@@ -21,7 +21,7 @@ import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {Heading, List, ListItem, Table} from '@instructure/ui-elements'
+import {Heading, List, Table} from '@instructure/ui-elements'
 import {TextInput} from '@instructure/ui-forms'
 import {Flex, View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
@@ -265,7 +265,7 @@ export class Whitelist extends Component {
                     <td>
                       <List variant="unstyled">
                         {this.props.whitelistedDomains.tools[domain].map(associatedTool => (
-                          <ListItem key={associatedTool.id}>{associatedTool.name}</ListItem>
+                          <List.Item key={associatedTool.id}>{associatedTool.name}</List.Item>
                         ))}
                       </List>
                     </td>

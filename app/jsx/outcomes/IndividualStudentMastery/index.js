@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryIndex'
 import {Flex} from '@instructure/ui-layout'
-import {List, ListItem, Spinner, Text} from '@instructure/ui-elements'
+import {List, Spinner, Text} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import OutcomeGroup from './OutcomeGroup'
 import fetchOutcomes from './fetchOutcomes'
@@ -138,7 +138,7 @@ class IndividualStudentMastery extends React.Component {
         <List variant="unstyled">
           {
             outcomeGroups.sort(natcompare.byKey('title')).map((outcomeGroup) => (
-              <ListItem key={outcomeGroup.id}>
+              <List.Item key={outcomeGroup.id}>
                 <OutcomeGroup
                   outcomeGroup={outcomeGroup}
                   outcomes={outcomes.filter((o) => (o.groupId.toString() === outcomeGroup.id.toString() ))}
@@ -147,7 +147,7 @@ class IndividualStudentMastery extends React.Component {
                   onExpansionChange={this.onElementExpansionChange}
                   outcomeProficiency={outcomeProficiency}
                />
-              </ListItem>
+              </List.Item>
             ))
           }
         </List>

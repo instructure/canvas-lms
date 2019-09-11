@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryOutcome'
 import {View, Flex} from '@instructure/ui-layout'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {List, ListItem, Pill, Text, TruncateText} from '@instructure/ui-elements'
+import {List, Pill, Text, TruncateText} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import UnassessedAssignment from './UnassessedAssignment'
@@ -105,9 +105,9 @@ export default class Outcome extends React.Component {
       <List variant="unstyled" delimiter="dashed">
       {
         results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
-          <ListItem key={result.id}>
+          <List.Item key={result.id}>
             <AssignmentResult result={result} outcome={outcome} outcomeProficiency={outcomeProficiency} />
-          </ListItem>
+          </List.Item>
         ))
       }
       {

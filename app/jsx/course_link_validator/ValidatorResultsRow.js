@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-layout'
-import {List, ListItem, Text, Link, Heading} from '@instructure/ui-elements'
+import {List, Text, Link, Heading} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 import {
   IconSettingsLine,
@@ -94,21 +94,21 @@ export default function ValidatorResultsRow(props) {
     errors.forEach(error => {
       const IconClass = error.image ? IconImageSolid : IconLinkSolid
       const link_text = getLinkText(error)
-      const link = <ListItem key={error.url}>
+      const link = <List.Item key={error.url}>
           <IconClass color="success"/>
           &ensp;
           <Link href={error.url}>{link_text}</Link>
-        </ListItem>
+        </List.Item>
       links.push(link)
     })
 
     rows.push(
-      <ListItem key={reason}>
+      <List.Item key={reason}>
         {REASON_DESCRIPTION[reason]}
         <List variant="unstyled" margin="none x-small small small">
           {links}
         </List>
-      </ListItem>
+      </List.Item>
     )
   })
 

@@ -20,7 +20,7 @@ import React from 'react'
 import {shape, object, func, string, oneOfType, arrayOf, node} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View, Flex} from '@instructure/ui-layout'
-import {Heading, List, ListItem, Spinner, Text, Avatar, Badge} from '@instructure/ui-elements'
+import {Heading, List, Spinner, Text, Avatar, Badge} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {
@@ -112,7 +112,7 @@ export default class MobileGlobalMenu extends React.Component {
           </Flex.Item>
         </Flex>
         <List variant="unstyled" itemSpacing="medium">
-          <ListItem>
+          <List.Item>
             <Button variant="link" href="/" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
@@ -123,8 +123,8 @@ export default class MobileGlobalMenu extends React.Component {
                 </Flex.Item>
               </Flex>
             </Button>
-          </ListItem>
-          <ListItem>
+          </List.Item>
+          <List.Item>
             {this.props.current_user && Object.keys(this.props.current_user).length ? (
               <ToggleDetails
                 iconPosition="end"
@@ -148,20 +148,20 @@ export default class MobileGlobalMenu extends React.Component {
                 <List variant="unstyled" itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.profileAreLoaded ? (
                     this.props.DesktopNavComponent.state.profile.map(tab => (
-                      <ListItem key={tab.id}>
+                      <List.Item key={tab.id}>
                         <Button variant="link" fluidWidth href={tab.html_url}>
                           <ActiveText url={tab.html_url}>{tab.label}</ActiveText>
                         </Button>
-                      </ListItem>
+                      </List.Item>
                     ))
                   ) : (
-                    <ListItem>
+                    <List.Item>
                       <Spinner margin="auto" size="small" title={I18n.t('Loading')} />
-                    </ListItem>
+                    </List.Item>
                   )}
-                  <ListItem>
+                  <List.Item>
                     <LogoutButton variant="link" fluidWidth />
-                  </ListItem>
+                  </List.Item>
                 </List>
               </ToggleDetails>
             ) : (
@@ -176,10 +176,10 @@ export default class MobileGlobalMenu extends React.Component {
                 </Flex>
               </Button>
             )}
-          </ListItem>
+          </List.Item>
 
           {window.ENV.current_user_roles && window.ENV.current_user_roles.includes('admin') && (
-            <ListItem>
+            <List.Item>
               <ToggleDetails
                 iconPosition="end"
                 fluidWidth
@@ -199,29 +199,29 @@ export default class MobileGlobalMenu extends React.Component {
                   {this.props.DesktopNavComponent.state.accountsAreLoaded ? (
                     this.props.DesktopNavComponent.state.accounts
                       .map(account => (
-                        <ListItem key={account.id}>
+                        <List.Item key={account.id}>
                           <Button variant="link" fluidWidth href={`/accounts/${account.id}`}>
                             <ActiveText url={`/accounts/${account.id}`}>{account.name}</ActiveText>
                           </Button>
-                        </ListItem>
+                        </List.Item>
                       ))
                       .concat([
-                        <ListItem key="all">
+                        <List.Item key="all">
                           <Button variant="link" fluidWidth href="/accounts">
                             {I18n.t('All Accounts')}
                           </Button>
-                        </ListItem>
+                        </List.Item>
                       ])
                   ) : (
-                    <ListItem>
+                    <List.Item>
                       <Spinner size="small" title={I18n.t('Loading')} />
-                    </ListItem>
+                    </List.Item>
                   )}
                 </List>
               </ToggleDetails>
-            </ListItem>
+            </List.Item>
           )}
-          <ListItem>
+          <List.Item>
             <ToggleDetails
               iconPosition="end"
               fluidWidth
@@ -241,7 +241,7 @@ export default class MobileGlobalMenu extends React.Component {
                 {this.props.DesktopNavComponent.state.coursesAreLoaded ? (
                   this.props.DesktopNavComponent.state.courses
                     .map(course => (
-                      <ListItem key={course.id}>
+                      <List.Item key={course.id}>
                         <Button variant="link" fluidWidth href={`/courses/${course.id}`}>
                           <ActiveText url={`/courses/${course.id}`}>
                             {course.name}
@@ -252,25 +252,25 @@ export default class MobileGlobalMenu extends React.Component {
                             )}
                           </ActiveText>
                         </Button>
-                      </ListItem>
+                      </List.Item>
                     ))
                     .concat([
-                      <ListItem key="all">
+                      <List.Item key="all">
                         <Button variant="link" fluidWidth href="/courses">
                           {I18n.t('All Courses')}
                         </Button>
-                      </ListItem>
+                      </List.Item>
                     ])
                 ) : (
-                  <ListItem>
+                  <List.Item>
                     <Spinner size="small" title={I18n.t('Loading')} />
-                  </ListItem>
+                  </List.Item>
                 )}
               </List>
             </ToggleDetails>
-          </ListItem>
+          </List.Item>
           {this.state.showGroups && (
-            <ListItem>
+            <List.Item>
               <ToggleDetails
                 iconPosition="end"
                 fluidWidth
@@ -290,7 +290,7 @@ export default class MobileGlobalMenu extends React.Component {
                   {this.props.DesktopNavComponent.state.groupsAreLoaded ? (
                     this.props.DesktopNavComponent.state.groups
                       .map(group => (
-                        <ListItem key={group.id}>
+                        <List.Item key={group.id}>
                           <Button
                             variant="link"
                             fluidWidth
@@ -299,25 +299,25 @@ export default class MobileGlobalMenu extends React.Component {
                           >
                             <ActiveText url={`/groups/${group.id}`}>{group.name}</ActiveText>
                           </Button>
-                        </ListItem>
+                        </List.Item>
                       ))
                       .concat([
-                        <ListItem key="all">
+                        <List.Item key="all">
                           <Button variant="link" fluidWidth margin="0 0 0 xx-small" href="/groups">
                             {I18n.t('All Groups')}
                           </Button>
-                        </ListItem>
+                        </List.Item>
                       ])
                   ) : (
-                    <ListItem>
+                    <List.Item>
                       <Spinner size="small" title={I18n.t('Loading')} />
-                    </ListItem>
+                    </List.Item>
                   )}
                 </List>
               </ToggleDetails>
-            </ListItem>
+            </List.Item>
           )}
-          <ListItem>
+          <List.Item>
             <Button variant="link" href="/calendar" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
@@ -328,8 +328,8 @@ export default class MobileGlobalMenu extends React.Component {
                 </Flex.Item>
               </Flex>
             </Button>
-          </ListItem>
-          <ListItem>
+          </List.Item>
+          <List.Item>
             <Button variant="link" href="/inbox" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
@@ -347,9 +347,9 @@ export default class MobileGlobalMenu extends React.Component {
                 </Flex.Item>
               </Flex>
             </Button>
-          </ListItem>
+          </List.Item>
           {this.state.externalTools.map(tool => (
-            <ListItem key={tool.href}>
+            <List.Item key={tool.href}>
               <Button variant="link" href={tool.href} size="small" fluidWidth>
                 <Flex>
                   <Flex.Item width="3rem">
@@ -376,11 +376,11 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex.Item>
                 </Flex>
               </Button>
-            </ListItem>
+            </List.Item>
           ))}
 
           {true /* TODO: put a check for if we should show help */ && (
-            <ListItem>
+            <List.Item>
               <ToggleDetails
                 iconPosition="end"
                 fluidWidth
@@ -404,7 +404,7 @@ export default class MobileGlobalMenu extends React.Component {
                   />
                 </View>
               </ToggleDetails>
-            </ListItem>
+            </List.Item>
           )}
         </List>
       </View>
