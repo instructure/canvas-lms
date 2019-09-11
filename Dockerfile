@@ -58,9 +58,6 @@ RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4
 ## don't get copied in. Only the fresh built ones are inside the container.
 COPY . /app
 
-# TODO: try connecting and running this. Before, i got it working by running npm install in client_apps/canvas_quizzes and gems/canvas_i18nliner and then root.
-# BUt, this is supposed to run npm install itself...
-
 # TODO: compile_assets is supposed to call npm install. However, If I don't do it myself in the canvas_i18nliner directory it fails with
 # the error below. May have something to do with the npm version of i18nliner. 
 # For now, just call npm install myself. To figure out the root cause and remove this, comment out this and compile_assets. Manually run
@@ -80,6 +77,7 @@ RUN cd /app/gems/canvas_i18nliner/ && npm install
 RUN bundle exec rake canvas:compile_assets --trace
 
 # Let either heroku.yml (for prod) or docker-compose.yml (for dev) specify the start command)
+# Decouple the container itself from how we'll start it in each env.
 CMD ["bash"]
 #CMD ["rails", "s", "-p", "3001", "-b", "0.0.0.0"]
 #CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
