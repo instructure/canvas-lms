@@ -17,7 +17,7 @@
  */
 
 import {Flex, View} from '@instructure/ui-layout'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconPlusLine} from '@instructure/ui-icons'
@@ -38,7 +38,7 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   developerKeyMenuItem(title, onClick) {
     return (
-      <MenuItem onClick={onClick} type="button">
+      <Menu.Item onClick={onClick} type="button">
         <Flex>
           <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
             <IconPlusLine />
@@ -48,7 +48,7 @@ export default class DeveloperKeyModalTrigger extends React.Component {
             {title}
           </Flex.Item>
         </Flex>
-      </MenuItem>
+      </Menu.Item>
     )
   }
 

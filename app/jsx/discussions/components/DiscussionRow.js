@@ -51,7 +51,7 @@ import {
   IconUserLine
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import LockIconView from 'compiled/views/LockIconView'
@@ -418,14 +418,14 @@ export class DiscussionRow extends Component {
   }
 
   createMenuItem = (itemKey, visibleItemLabel, screenReaderContent) => (
-    <MenuItem
+    <Menu.Item
       key={itemKey}
       value={{action: itemKey, id: this.props.discussion.id}}
       id={`${itemKey}-discussion-menu-option`}
     >
       {visibleItemLabel}
       <ScreenReaderContent>{screenReaderContent}</ScreenReaderContent>
-    </MenuItem>
+    </Menu.Item>
   )
 
   renderMenuToolIcon(menuTool) {
@@ -548,7 +548,7 @@ export class DiscussionRow extends Component {
     if (this.props.discussionTopicMenuTools.length > 0) {
       this.props.discussionTopicMenuTools.forEach(menuTool => {
         menuList.push(
-          <MenuItem
+          <Menu.Item
             key={menuTool.base_url}
             value={{
               action: 'ltiMenuTool',
@@ -560,7 +560,7 @@ export class DiscussionRow extends Component {
           >
             <span aria-hidden="true">{this.renderMenuToolIcon(menuTool)}</span>
             <ScreenReaderContent>{menuTool.title}</ScreenReaderContent>
-          </MenuItem>
+          </Menu.Item>
         )
       })
     }

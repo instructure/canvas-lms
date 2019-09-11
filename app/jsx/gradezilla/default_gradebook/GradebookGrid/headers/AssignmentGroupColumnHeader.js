@@ -21,7 +21,7 @@ import {bool, func, number, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-layout'
-import {Menu, MenuItem, MenuItemGroup} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -129,10 +129,10 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                     onDismiss={this.props.onMenuDismiss}
                   >
                     <Menu label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
-                      <MenuItemGroup
+                      <Menu.Group
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'ascending'
@@ -141,9 +141,9 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeAscending}
                         >
                           <span>{I18n.t('Grade - Low to High')}</span>
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'descending'
@@ -152,8 +152,8 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeDescending}
                         >
                           <span>{I18n.t('Grade - High to Low')}</span>
-                        </MenuItem>
-                      </MenuItemGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
                   </Menu>
                 </div>

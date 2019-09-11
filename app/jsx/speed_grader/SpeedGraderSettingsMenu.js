@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, string} from 'prop-types'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!SpeedGraderSettingsMenu'
 
@@ -61,32 +61,32 @@ export default function SpeedGraderSettingsMenu(props) {
       placement="bottom end"
       trigger={menuTrigger}
     >
-      <MenuItem name="options" onSelect={props.openOptionsModal} value="options">
+      <Menu.Item name="options" onSelect={props.openOptionsModal} value="options">
         <Text>{I18n.t('Options')}</Text>
-      </MenuItem>
+      </Menu.Item>
 
       {props.showModerationMenuItem && (
-        <MenuItem
+        <Menu.Item
           name="moderationPage"
           onSelect={handleModerationPageSelect}
           value="moderationPage"
         >
           <Text>{I18n.t('Moderation Page')}</Text>
-        </MenuItem>
+        </Menu.Item>
       )}
 
-      <MenuItem
+      <Menu.Item
         name="keyboardShortcuts"
         onSelect={props.openKeyboardShortcutsModal}
         value="keyboardShortcuts"
       >
         <Text>{I18n.t('Keyboard Shortcuts')}</Text>
-      </MenuItem>
+      </Menu.Item>
 
       {props.showHelpMenuItem && (
-        <MenuItem name="help" onSelect={handleHelpSelect} value="help">
+        <Menu.Item name="help" onSelect={handleHelpSelect} value="help">
           <Text>{I18n.t('Help')}</Text>
-        </MenuItem>
+        </Menu.Item>
       )}
     </Menu>
   )

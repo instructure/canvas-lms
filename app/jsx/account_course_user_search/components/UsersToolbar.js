@@ -22,7 +22,7 @@ import {IconGroupLine, IconMoreLine, IconPlusLine, IconStudentViewLine} from '@i
 import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Grid} from '@instructure/ui-layout'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-forms'
 import CanvasSelect from 'jsx/shared/components/CanvasSelect'
@@ -108,14 +108,14 @@ function renderKabobMenu(accountId) {
         }
       >
         {showAvatarItem && (
-          <MenuItem onClick={() => (window.location = `/accounts/${accountId}/avatars`)}>
+          <Menu.Item onClick={() => (window.location = `/accounts/${accountId}/avatars`)}>
             <IconStudentViewLine /> {I18n.t('Manage profile pictures')}
-          </MenuItem>
+          </Menu.Item>
         )}
         {showGroupsItem && (
-          <MenuItem onClick={() => (window.location = `/accounts/${accountId}/groups`)}>
+          <Menu.Item onClick={() => (window.location = `/accounts/${accountId}/groups`)}>
             <IconGroupLine /> {I18n.t('View user groups')}
-          </MenuItem>
+          </Menu.Item>
         )}
       </Menu>
     )
