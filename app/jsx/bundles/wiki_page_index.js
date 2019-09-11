@@ -34,6 +34,7 @@ const view = new WikiPageIndexView({
   collection: new WikiPageCollection(),
   contextAssetString: ENV.context_asset_string,
   default_editing_roles: ENV.DEFAULT_EDITING_ROLES,
+  wikiIndexPlacements: ENV.wiki_index_menu_tools,
   WIKI_RIGHTS: ENV.WIKI_RIGHTS
 })
 
