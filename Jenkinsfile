@@ -122,6 +122,7 @@ pipeline {
                 if [ -d .git/rebase-merge ]; then
                   echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
                   git rebase --abort
+                  git checkout $GERRIT_REFSPEC
                 fi
 
                 # store exit_status inline to  ensures the script doesn't exit here on failures
