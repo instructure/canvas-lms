@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/vi.json";
 import "../rce/languages/vi_VN";
+
 formatMessage.addLocale({ vi: locale });

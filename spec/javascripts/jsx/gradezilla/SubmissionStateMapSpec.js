@@ -78,8 +78,8 @@ function createAndSetupMap(assignment, student, opts = {}) {
   return map
 }
 
-QUnit.module('#setSubmissionCellState', function() {
-  test('the submission state is locked if assignment is not published', function() {
+QUnit.module('#setSubmissionCellState', () => {
+  test('the submission state is locked if assignment is not published', () => {
     const assignment = {
       id: '1',
       published: false
@@ -92,7 +92,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, true)
   })
 
-  test('the submission state has hideGrade set if assignment is not published', function() {
+  test('the submission state has hideGrade set if assignment is not published', () => {
     const assignment = {
       id: '1',
       published: false
@@ -105,7 +105,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, true)
   })
 
-  test('the submission state is locked if assignment is not visible', function() {
+  test('the submission state is locked if assignment is not visible', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -120,7 +120,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, true)
   })
 
-  test('the submission state has hideGrade set if assignment is not visible', function() {
+  test('the submission state has hideGrade set if assignment is not visible', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -135,7 +135,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, true)
   })
 
-  test('the submission state is not locked if assignment is published and visible', function() {
+  test('the submission state is not locked if assignment is published and visible', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -149,7 +149,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, false)
   })
 
-  test('the submission state has hideGrade not set if assignment is published and visible', function() {
+  test('the submission state has hideGrade not set if assignment is published and visible', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -163,7 +163,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, false)
   })
 
-  test('the submission state is locked when the student is not assigned', function() {
+  test('the submission state is locked when the student is not assigned', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -178,7 +178,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, true)
   })
 
-  test('the submission state is not locked if not moderated grading', function() {
+  test('the submission state is not locked if not moderated grading', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -192,7 +192,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, false)
   })
 
-  test('the submission state has hideGrade not set if not moderated grading', function() {
+  test('the submission state has hideGrade not set if not moderated grading', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -206,7 +206,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, false)
   })
 
-  test('the submission state is not locked if moderated grading and grades published', function() {
+  test('the submission state is not locked if moderated grading and grades published', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -221,7 +221,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, false)
   })
 
-  test('the submission state has hideGrade not set if moderated grading and grades published', function() {
+  test('the submission state has hideGrade not set if moderated grading and grades published', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -236,7 +236,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, false)
   })
 
-  test('the submission state is locked if moderated grading and grades not published', function() {
+  test('the submission state is locked if moderated grading and grades not published', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -251,7 +251,7 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.locked, true)
   })
 
-  test('the submission state has hideGrade not set if moderated grading and grades not published', function() {
+  test('the submission state has hideGrade not set if moderated grading and grades not published', () => {
     const assignment = {
       id: '1',
       published: true,
@@ -266,14 +266,14 @@ QUnit.module('#setSubmissionCellState', function() {
     strictEqual(submission.hideGrade, false)
   })
 
-  QUnit.module('when the assignment is anonymous', function(hooks) {
+  QUnit.module('when the assignment is anonymous', hooks => {
     let assignment
 
     hooks.beforeEach(() => {
       assignment = {id: '1', published: true, anonymous_grading: true}
     })
 
-    test('the submission state is locked when anonymize_students is true', function() {
+    test('the submission state is locked when anonymize_students is true', () => {
       assignment.anonymize_students = true
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
@@ -283,7 +283,7 @@ QUnit.module('#setSubmissionCellState', function() {
       strictEqual(submission.locked, true)
     })
 
-    test('the submission state is hidden when anonymize_students is true', function() {
+    test('the submission state is hidden when anonymize_students is true', () => {
       assignment.anonymize_students = true
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
@@ -293,7 +293,7 @@ QUnit.module('#setSubmissionCellState', function() {
       strictEqual(submission.hideGrade, true)
     })
 
-    test('the submission state is unlocked when the assignment is unmuted', function() {
+    test('the submission state is unlocked when the assignment is unmuted', () => {
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
         user_id: studentWithSubmission.id,
@@ -302,7 +302,7 @@ QUnit.module('#setSubmissionCellState', function() {
       strictEqual(submission.locked, false)
     })
 
-    test('the submission state is not hidden when the assignment is unmuted', function() {
+    test('the submission state is not hidden when the assignment is unmuted', () => {
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
         user_id: studentWithSubmission.id,
@@ -312,8 +312,8 @@ QUnit.module('#setSubmissionCellState', function() {
     })
   })
 
-  QUnit.module('no submission', function() {
-    test('the submission object is missing if the assignment is late', function() {
+  QUnit.module('no submission', () => {
+    test('the submission object is missing if the assignment is late', () => {
       const assignment = {
         id: '1',
         published: true,
@@ -324,7 +324,7 @@ QUnit.module('#setSubmissionCellState', function() {
       strictEqual(submission.missing, true)
     })
 
-    test('the submission object is not missing if the assignment is not late', function() {
+    test('the submission object is not missing if the assignment is not late', () => {
       const assignment = {
         id: '1',
         published: true,
@@ -338,7 +338,7 @@ QUnit.module('#setSubmissionCellState', function() {
     test(
       'the submission object is not missing, if the assignment is not late ' +
         'and there are no due dates',
-      function() {
+      () => {
         const assignment = {
           id: '1',
           published: true,
@@ -350,7 +350,7 @@ QUnit.module('#setSubmissionCellState', function() {
       }
     )
 
-    test('the submission object has seconds_late set to zero', function() {
+    test('the submission object has seconds_late set to zero', () => {
       const assignment = {
         id: '1',
         published: true,
@@ -361,7 +361,7 @@ QUnit.module('#setSubmissionCellState', function() {
       strictEqual(submission.seconds_late, 0)
     })
 
-    test('the submission object has late set to false', function() {
+    test('the submission object has late set to false', () => {
       const assignment = {
         id: '1',
         published: true,
@@ -372,7 +372,7 @@ QUnit.module('#setSubmissionCellState', function() {
       strictEqual(submission.late, false)
     })
 
-    test('the submission object has excused set to false', function() {
+    test('the submission object has excused set to false', () => {
       const assignment = {
         id: '1',
         published: true,

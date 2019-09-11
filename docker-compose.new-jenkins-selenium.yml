@@ -1,0 +1,12 @@
+# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
+version: "2.1"
+services:
+  web:
+    links:
+      - selenium-chrome
+    environment:
+      remote_url: http://selenium-chrome:4444/wd/hub
+      browser: chrome
+
+  selenium-chrome:
+    build: ./docker-compose/selenium-chrome

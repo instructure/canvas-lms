@@ -26,6 +26,7 @@ export default function EmbedPanel({embedCode, setEmbedCode, label}) {
       maxHeight="10rem"
       label={label}
       value={embedCode}
+      placeholder={label}
       onChange={e => setEmbedCode(e.target.value)}
     />
   )

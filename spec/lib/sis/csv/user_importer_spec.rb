@@ -885,6 +885,15 @@ describe SIS::CSV::UserImporter do
     expect(importer.errors[0][1]).to eq "The email address associated with user 'user_1' is invalid (email: 'None')"
   end
 
+  it "should have the row on the error object" do
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,None,active"
+    )
+    expect(importer.errors.length).to eq 1
+    expect(importer.batch.sis_batch_errors.first.row_info).to eq "user_1,user1,User,Uno,None,active,2\n"
+  end
+
   it "should not present an error for the same login_id with different case for same user" do
     process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",

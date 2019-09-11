@@ -199,7 +199,7 @@ test('gets empty due dates when there are no dates', () => {
   deepEqual(quiz.allDates(), [])
 })
 
-test('gets the due date for section instead of null', function() {
+test('gets the due date for section instead of null', () => {
   const dueAt = new Date('2013-11-27T11:01:00Z')
   const quiz = new Quiz({
     all_dates: [
@@ -272,7 +272,7 @@ test('includes allDates', () => {
   equal(json.allDates.length, 2)
 })
 
-test('includes singleSectionDueDate', function() {
+test('includes singleSectionDueDate', () => {
   const dueAt = new Date('2013-11-27T11:01:00Z')
   const quiz = new Quiz({
     all_dates: [

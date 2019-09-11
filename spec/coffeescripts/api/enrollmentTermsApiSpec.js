@@ -89,7 +89,7 @@ QUnit.module('list', {
   }
 })
 
-test('calls the resolved endpoint', function() {
+test('calls the resolved endpoint', () => {
   sandbox.stub($, 'ajaxJSON')
   api.list()
   ok($.ajaxJSON.calledWith('api/enrollment_terms'))

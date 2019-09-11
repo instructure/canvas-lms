@@ -28,9 +28,9 @@ import 'jqueryui/dialog'
 export function getUserServices (service_types, success, error) {
   if(!$.isArray(service_types)) { service_types = [service_types]; }
   let url = `/services?service_types=${  service_types.join(",")}`;
-  $.ajaxJSON(url, 'GET', {}, function(data) {
+  $.ajaxJSON(url, 'GET', {}, data => {
     if(success) { success(data); }
-  }, function(data) {
+  }, data => {
     if(error) { error(data); }
   });
 };
@@ -46,13 +46,13 @@ export function findLinkForService(service_type, callback) {
                       "<button class='btn search_button' type='submit'>"}${
                       htmlEscape(I18n.t('buttons.search', "Search"))  }</button></form>`);
     $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>");
-    $dialog.find("form").submit(function(event) {
+    $dialog.find("form").submit(event => {
       event.preventDefault();
       event.stopPropagation();
       let now = new Date();
       if(service_type == 'diigo' && lastLookup && now - lastLookup < 15000) {
         // let the user know we have to take things slow because of Diigo
-        setTimeout(function() {
+        setTimeout(() => {
           $dialog.find("form").submit();
         }, 15000 - (now - lastLookup));
         $dialog.find(".results").empty()
@@ -63,7 +63,7 @@ export function findLinkForService(service_type, callback) {
       lastLookup = new Date();
       let query = $dialog.find(".query").val();
       let url = $.replaceTags($dialog.data('reference_url'), 'query', query);
-      $.ajaxJSON(url, 'GET', {}, function(data) {
+      $.ajaxJSON(url, 'GET', {}, data => {
         $dialog.find(".results").empty();
         if( !data.length ) {
           $dialog.find(".results").append(htmlEscape(I18n.t('no_results_found', "No Results Found")));
@@ -82,7 +82,7 @@ export function findLinkForService(service_type, callback) {
             )
             .append($("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(data[idx].description || I18n.t('no_description', "No description")));
         }
-      }, function() {
+      }, () => {
         $dialog.find(".results").empty()
           .append(htmlEscape(I18n.t('errors.search_failed', "Search failed, please try again.")));
       });

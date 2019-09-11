@@ -39,7 +39,7 @@ QUnit.module('DueDateOverride#validateTokenInput', {
   }
 });
 
-test('rowKey can be prefixed with a zero', function () {
+test('rowKey can be prefixed with a zero', () => {
   const errorBoxSpy = sandbox.spy($.fn, 'errorBox');
   const view = new DueDateOverrideView();
   const errs = view.validateTokenInput({}, {});
@@ -63,7 +63,7 @@ QUnit.module('DueDateOverride#validateGroupOverrides', {
   }
 });
 
-test('rowKey can be prefixed with a zero', function () {
+test('rowKey can be prefixed with a zero', () => {
   const data = { assignment_overrides: [{ group_id: '42', rowKey: '01' }] };
 
   sandbox.stub(StudentGroupStore, 'fetchComplete').returns(true);
@@ -75,7 +75,7 @@ test('rowKey can be prefixed with a zero', function () {
   strictEqual(errorBoxSpy.calledOnce, true);
 });
 
-test('Does not date restrict individual student overrides', function () {
+test('Does not date restrict individual student overrides', () => {
   const data = { assignment_overrides: [{ student_ids: [20], rowKey: '16309' }] };
 
     sandbox.stub(StudentGroupStore, 'fetchComplete').returns(true);

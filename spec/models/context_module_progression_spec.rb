@@ -171,6 +171,16 @@ describe ContextModuleProgression do
         @submission = assignment.submit_homework(@user, body: "my homework")
       end
 
+      it "doesn't mark students that haven't submitted as in-progress" do
+        other_student = student_in_course(:course => @course, :active_all => true).user
+        progression = @module.evaluate_for(other_student)
+        # yes technically the requirement is "incomplete" if they haven't done anything
+        # and the jerk who named the column should feel bad
+        # but we actually use it for marking requirements that they've done something for
+        # and either need to wait for grading or improve their score to continue (hence the "i" icon)
+        expect(progression.incomplete_requirements).to be_empty
+      end
+
       it "does not evaluate requirements when grade has not posted" do
         @submission.update!(score: 100, posted_at: nil)
         progression = @module.context_module_progressions.find_by(user: @user)

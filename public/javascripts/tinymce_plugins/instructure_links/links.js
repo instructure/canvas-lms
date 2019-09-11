@@ -167,7 +167,7 @@ import YouTubeApi from './youtube_api'
             $service.click(function(event) {
               event.preventDefault();
               $("#instructure_link_prompt").dialog('close');
-              findLinkForService($(this).data('service').service, function(data) {
+              findLinkForService($(this).data('service').service, data => {
                 $("#instructure_link_prompt").dialog('close');
                 send($editor, 'create_link', {
                   title: data.title,
@@ -194,7 +194,7 @@ import YouTubeApi from './youtube_api'
         }
         $box.find(".auto_show").showIf(!$(this).attr('checked') && $box.hasClass('for_inline_content_can_auto_show'));
       });
-      $box.find(".actions").delegate('.embed_image_link', 'click', function(event) {
+      $box.find(".actions").delegate('.embed_image_link', 'click', event => {
         var $editor = $box.data('editor');
         var $target = $(event.target);
         event.preventDefault();
@@ -202,7 +202,7 @@ import YouTubeApi from './youtube_api'
         $box.dialog('close');
       });
       // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg
-      $box.find(".actions").delegate('.embed_youtube_link', 'click', function(event) {
+      $box.find(".actions").delegate('.embed_youtube_link', 'click', event => {
         event.preventDefault();
         $box.find("#instructure_link_prompt_form").triggerHandler('submit')
       });
@@ -382,8 +382,8 @@ import YouTubeApi from './youtube_api'
         $(this).remove();
       });
     });
-    ed.on('change', function() { updateLinks(ed); });
-    ed.on('SetContent', function() { updateLinks(ed, "contentJustSet"); } );
+    ed.on('change', () => { updateLinks(ed); });
+    ed.on('SetContent', () => { updateLinks(ed, "contentJustSet"); } );
     initializedEditors.set(ed, true)
   }
 

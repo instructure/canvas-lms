@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -24,7 +24,7 @@ import I18n from 'i18n!hide_assignment_grades_tray'
 
 export default function Description() {
   return (
-    <Fragment>
+    <>
       <View as="p" margin="0 0 small">
         <Text>
           {I18n.t(
@@ -54,6 +54,6 @@ export default function Description() {
           {I18n.t('You can begin sending notifications again by clicking the Post Grades link.')}
         </Text>
       </View>
-    </Fragment>
+    </>
   )
 }

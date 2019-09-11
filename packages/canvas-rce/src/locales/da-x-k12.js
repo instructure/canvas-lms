@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/da-x-k12.json"
 import "../rce/languages/da";
+
 formatMessage.addLocale({ "da-x-k12": locale });

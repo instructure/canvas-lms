@@ -26,7 +26,7 @@ import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
 
-  $(".add_user_link").click(function(event) {
+  $(".add_user_link").click(event => {
     event.preventDefault();
     $("#add_user_form :text").val("");
     var $dialog = $("#add_user_dialog");
@@ -70,8 +70,8 @@ import 'compiled/jquery.rails_flash_notifications'
           too_long: I18n.t("Login is too long"),
           invalid: I18n.t("Login is invalid: must be alphanumeric or an email address")
         };
-        var errors = _.uniq(_.map(data.pseudonym.unique_id, function(i){ return i.message; }));
-        _.each(errors, function(i){
+        var errors = _.uniq(_.map(data.pseudonym.unique_id, i => i.message));
+        _.each(errors, i => {
           errorList.push(messages[i] ? messages[i] : i);
         });
 
@@ -82,8 +82,8 @@ import 'compiled/jquery.rails_flash_notifications'
       if (data.pseudonym.sis_user_id) {
         errorList = [];
 
-        var errors = _.uniq(_.map(data.pseudonym.sis_user_id, function(i){ return i.message; }));
-        _.each(errors, function(i){
+        var errors = _.uniq(_.map(data.pseudonym.sis_user_id, i => i.message));
+        _.each(errors, i => {
           errorList.push(i);
         });
 
@@ -96,6 +96,6 @@ import 'compiled/jquery.rails_flash_notifications'
         .filter(".submit_button").text(I18n.t('user_add_failed_message', "Adding User Failed, please try again"));
     }
   });
-  $("#add_user_dialog .cancel_button").click(function() {
+  $("#add_user_dialog .cancel_button").click(() => {
     $("#add_user_dialog").dialog('close');
   });

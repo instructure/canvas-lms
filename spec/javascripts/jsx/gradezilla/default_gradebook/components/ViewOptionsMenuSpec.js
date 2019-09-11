@@ -105,7 +105,7 @@ function mountAndOpenOptions(props) {
 
 QUnit.module('ViewOptionsMenu#focus')
 
-test('trigger is focused', function() {
+test('trigger is focused', () => {
   const props = defaultProps()
   const wrapper = mount(<ViewOptionsMenu {...props} />, {
     attachTo: document.getElementById('fixtures')
@@ -560,7 +560,7 @@ test('clicking on "Points - Highest to Lowest" triggers onSortByPointsDescending
 
 QUnit.module('ViewOptionsMenu - Statuses')
 
-test('clicking Statuses calls onSelectShowStatusesModal', function() {
+test('clicking Statuses calls onSelectShowStatusesModal', () => {
   const props = {
     ...defaultProps(),
     onSelectShowStatusesModal: sinon.stub()

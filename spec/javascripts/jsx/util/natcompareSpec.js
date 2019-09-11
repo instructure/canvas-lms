@@ -32,7 +32,7 @@ const valuesToSort = [
 
 QUnit.module('sorts values properly when used to compare strings');
 
-test('puts remaining words in the right order since there are no collisions possible', function () {
+test('puts remaining words in the right order since there are no collisions possible', () => {
   const expectedSortedStrings = [
     'abel',
     'abel',

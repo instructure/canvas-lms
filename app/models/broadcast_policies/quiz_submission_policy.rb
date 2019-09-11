@@ -81,7 +81,7 @@ module BroadcastPolicies
     def quiz_posted?(quiz_submission)
       quiz = quiz_submission.quiz
       if quiz.assignment.context.post_policies_enabled?
-        quiz_submission.submission.posted?
+        quiz_submission.posted?
       else
         !quiz.muted?
       end

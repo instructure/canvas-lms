@@ -238,14 +238,6 @@ class OutcomesController < ApplicationController
     end
   end
 
-  def reorder_alignments
-    return unless authorized_action(@context, @current_user, :manage_outcomes)
-
-    @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
-    @alignments = @outcome.reorder_alignments(@context, params[:order].split(","))
-    render :json => @alignments.map{ |a| a.as_json(include: :learning_outcome) }
-  end
-
   def create
     return unless authorized_action(@context, @current_user, :manage_outcomes)
 

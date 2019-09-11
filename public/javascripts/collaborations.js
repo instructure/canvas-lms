@@ -37,9 +37,7 @@ import 'compiled/jquery.rails_flash_notifications'
         $collaboration.remove();
       }
       else{
-        var sortedCollaborations = visibleCollaborations.toArray().sort(function(a, b) {
-          return $(a).data("id") - $(b).data("id");
-        });
+        var sortedCollaborations = visibleCollaborations.toArray().sort((a, b) => $(a).data("id") - $(b).data("id"));
         if (sortedCollaborations.length <= sortedCollaborations.indexOf($collaboration[0])+1)
         {
           $(sortedCollaborations[sortedCollaborations.indexOf($collaboration[0])-1]).find(".title").focus()
@@ -48,7 +46,7 @@ import 'compiled/jquery.rails_flash_notifications'
         {
           $(sortedCollaborations[sortedCollaborations.indexOf($collaboration[0])+1]).find(".title").focus()
         }
-        $collaboration.slideUp(function() { $collaboration.remove(); });
+        $collaboration.slideUp(() => { $collaboration.remove(); });
       }
     },
 
@@ -91,7 +89,7 @@ import 'compiled/jquery.rails_flash_notifications'
       $collaboration.dim();
       $('#delete_collaboration_dialog').dialog('close');
 
-      $.ajaxJSON(url, 'DELETE', data, function(data) {
+      $.ajaxJSON(url, 'DELETE', data, data => {
         CollaborationsPage.Util.removeCollaboration($collaboration);
         $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'));
       }, $.noop);
@@ -153,14 +151,14 @@ import 'compiled/jquery.rails_flash_notifications'
 
     updateCollaboration: function(contentItem, collab_id) {
       var url = $('.collaboration_'+ collab_id + ' a.title')[0].href;
-      $.ajaxJSON( url, 'PUT', contentItem, this.collaborationSuccess, function( msg ) {
+      $.ajaxJSON( url, 'PUT', contentItem, this.collaborationSuccess, msg => {
         $.screenReaderFlashMessage(I18n.t('Collaboration update failed'));
       });
     },
 
     createCollaboration: function(contentItem){
       var url = $("#new_collaboration").attr('action')
-      $.ajaxJSON( url, 'POST', contentItem, this.collaborationSuccess, function( msg ) {
+      $.ajaxJSON( url, 'POST', contentItem, this.collaborationSuccess, msg => {
         $.screenReaderFlashMessage(I18n.t('Collaboration creation failed'));
       });
     },

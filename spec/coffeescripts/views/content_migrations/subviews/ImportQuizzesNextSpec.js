@@ -22,19 +22,19 @@ import assertions from 'helpers/assertions'
 
 QUnit.module('Import Quizzes Next', {})
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', assert => {
   const importQuizzesNext = new ImportQuizzesNextView({quizzesNextEnabled: true, model: new Backbone.Model()})
   const done = assert.async()
   assertions.isAccessible(importQuizzesNext, done, {a11yReport: true})
 })
 
-test('it should have checkbox enabled', function()  {
+test('it should have checkbox enabled', () => {
   const importQuizzesNext = new ImportQuizzesNextView({quizzesNextEnabled: true, model: new Backbone.Model()})
   importQuizzesNext.render()
   ok(importQuizzesNext.$el.find('#importQuizzesNext').is(':enabled'), 'import to quizzes next is enabled')
 })
 
-test('it should have checkbox disabled', function() {
+test('it should have checkbox disabled', () => {
   const importQuizzesNext = new ImportQuizzesNextView({quizzesNextEnabled: false, model: new Backbone.Model()})
   importQuizzesNext.render()
   ok(importQuizzesNext.$el.find('#importQuizzesNext').is(':disabled'), 'import to quizzes next is disabled')

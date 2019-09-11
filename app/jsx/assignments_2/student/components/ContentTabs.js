@@ -17,7 +17,7 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import AttemptTab from './AttemptTab'
+import SubmissionManager from './SubmissionManager'
 import {Badge} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
@@ -123,7 +123,7 @@ function ContentTabs(props) {
         <TabPanel
           title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
         >
-          <AttemptTab assignment={props.assignment} submission={props.submission} />
+          <SubmissionManager assignment={props.assignment} submission={props.submission} />
         </TabPanel>
         <TabPanel
           title={

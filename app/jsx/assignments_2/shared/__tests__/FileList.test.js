@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {render} from '@testing-library/react'
 
@@ -33,7 +33,7 @@ describe('FileList', () => {
   ]
   files.forEach((file, i) => (file.id = i))
 
-  it('renders an img tag if an image file is provided', async () => {
+  it('renders an img tag if an image file is provided', () => {
     const {container} = render(
       <MockedProvider>
         <FileList canRemove={false} files={files.slice(0, 1)} />
@@ -43,7 +43,7 @@ describe('FileList', () => {
     expect(container.querySelector(`img[alt="${files[0].name} preview"]`)).toBeInTheDocument()
   })
 
-  it('renders an icon if a non-image file is provided', async () => {
+  it('renders an icon if a non-image file is provided', () => {
     const {container} = render(
       <MockedProvider>
         <FileList canRemove={false} files={files.slice(1, 2)} />
@@ -53,7 +53,7 @@ describe('FileList', () => {
     expect(container.querySelector(`img[alt="${files[1].name} preview"]`)).toBeNull()
   })
 
-  it('renders a trash-can icon if able to remove files', async () => {
+  it('renders a trash-can icon if able to remove files', () => {
     const {container} = render(
       <MockedProvider>
         <FileList canRemove files={files.slice(0, 1)} removeFileHandler={jest.fn()} />
@@ -62,7 +62,7 @@ describe('FileList', () => {
     expect(container.querySelector('svg[name="IconTrash"]')).toBeInTheDocument()
   })
 
-  it('does not render a trash can icon if unable to remove files', async () => {
+  it('does not render a trash can icon if unable to remove files', () => {
     const {container} = render(
       <MockedProvider>
         <FileList canRemove={false} files={files.slice(0, 1)} />

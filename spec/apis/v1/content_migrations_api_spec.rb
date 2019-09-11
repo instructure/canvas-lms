@@ -402,7 +402,7 @@ describe ContentMigrationsController, type: :request do
       it "should error if upload file required but not provided" do
         @post_params.delete :pre_attachment
         json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
-        expect(json).to eq({"message"=>"File upload or url is required"})
+        expect(json).to eq({"message"=>"File upload, file_url, or content_export_id is required"})
       end
 
       it "should queue the migration when file finishes uploading" do
@@ -450,6 +450,56 @@ describe ContentMigrationsController, type: :request do
         expect(migration.migration_settings[:file_url]).to eq post_params[:settings][:file_url]
       end
 
+    end
+
+    context "by content_export_id" do
+      def stub_export(context, user, state, stub_attachment)
+        export = context.content_exports.create
+        export.export_type = 'common_cartridge'
+        export.workflow_state = state
+        export.user = user
+        export.attachment = export.attachments.create!(filename: 'test.imscc', uploaded_data: StringIO.new('test file')) if stub_attachment
+        export.save
+        export
+      end
+
+      it "links the file from the content export to the content migration" do
+        export = stub_export(@course, @user, 'exported', true)
+        post_params = { migration_type: 'common_cartridge_importer', settings: { content_export_id: export.id }}
+        json = api_call(:post, @migration_url, @params, post_params)
+        migration = ContentMigration.find json['id']
+        expect(migration.attachment).not_to be_nil
+        expect(migration.attachment.root_attachment).to eq export.attachment
+      end
+
+      it "verifies the content export exists" do
+        post_params = { migration_type: 'common_cartridge_importer', settings: { content_export_id: 0 }}
+        json = api_call(:post, @migration_url, @params, post_params)
+        expect(response.status).to eq 400
+        expect(json['message']).to eq 'invalid content export'
+        expect(ContentMigration.last).to be_pre_process_error
+      end
+
+      it "verifies the user has permission to read the content export" do
+        me = @user
+        course_with_teacher(active_all: true)
+        export = stub_export(@course, @teacher, 'exported', true)
+        @user = me
+        post_params = { migration_type: 'common_cartridge_importer', settings: { content_export_id: export.id }}
+        json = api_call(:post, @migration_url, @params, post_params)
+        expect(response.status).to eq 400
+        expect(json['message']).to eq 'invalid content export'
+        expect(ContentMigration.last).to be_pre_process_error
+      end
+
+      it "rejects an incomplete export" do
+        export = stub_export(@course, @user, 'exporting', false)
+        post_params = { migration_type: 'common_cartridge_importer', settings: { content_export_id: export.id }}
+        json = api_call(:post, @migration_url, @params, post_params)
+        expect(response.status).to eq 400
+        expect(json['message']).to eq 'content export is incomplete'
+        expect(ContentMigration.last).to be_pre_process_error
+      end
     end
 
     context "by LTI extension" do
@@ -680,6 +730,32 @@ describe ContentMigrationsController, type: :request do
       prev_export.update_attribute(:global_identifiers, false)
       json = api_call(:get, @migration_url + '?type=discussion_topics', @params.merge({type: 'discussion_topics'}))
       key = CC::CCHelper.create_key(@dt1, global: false)
+      expect(json.first["migration_id"]).to eq key
+      expect(json.first["property"]).to include key
+    end
+  end
+
+  describe 'content selection cross-shard' do
+    specs_require_sharding
+
+    it "should actually return local identifiers created from the correct shard if needed" do
+      @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
+      @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param}
+
+      @shard1.activate do
+        account = Account.create!
+        @cs_course = Course.create!(:account => account)
+        @dt1 = @cs_course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      end
+      @migration.migration_type = 'course_copy_importer'
+      @migration.migration_settings[:source_course_id] = @cs_course.id
+      @migration.source_course = @cs_course
+      @migration.save!
+
+      prev_export = @cs_course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export.update_attribute(:global_identifiers, false)
+      json = api_call(:get, @migration_url + '?type=discussion_topics', @params.merge({type: 'discussion_topics'}))
+      key = @shard1.activate { CC::CCHelper.create_key(@dt1, global: false) }
       expect(json.first["migration_id"]).to eq key
       expect(json.first["property"]).to include key
     end

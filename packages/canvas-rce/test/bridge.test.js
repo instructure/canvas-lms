@@ -26,14 +26,14 @@ describe("Editor/Sidebar bridge", () => {
   });
 
   it("focusEditor sets the active editor", () => {
-    let editor = {};
+    const editor = {};
     Bridge.focusEditor(editor);
     assert.equal(Bridge.activeEditor(), editor);
   });
 
   describe("detachEditor", () => {
-    let activeEditor = {};
-    let otherEditor = {};
+    const activeEditor = {};
+    const otherEditor = {};
 
     beforeEach(() => {
       Bridge.focusEditor(activeEditor);
@@ -52,15 +52,15 @@ describe("Editor/Sidebar bridge", () => {
 
   describe("renderEditor", () => {
     it("sets the active editor", () => {
-      let editor = {};
+      const editor = {};
       Bridge.renderEditor(editor);
       assert.equal(Bridge.activeEditor(), editor);
     });
 
     it("accepts the first editor rendered when many rendered in a row", () => {
-      let editor1 = { 1: 1 };
-      let editor2 = { 2: 2 };
-      let editor3 = { 3: 3 };
+      const editor1 = { 1: 1 };
+      const editor2 = { 2: 2 };
+      const editor3 = { 3: 3 };
       Bridge.renderEditor(editor1);
       Bridge.renderEditor(editor2);
       Bridge.renderEditor(editor3);
@@ -69,7 +69,7 @@ describe("Editor/Sidebar bridge", () => {
   });
 
   describe("insertLink", () => {
-    let link = {};
+    const link = {};
     let editor = {};
 
     beforeEach(() => {

@@ -203,7 +203,7 @@ import './jquery.templateData'
             .bind('dialogresize', function() {
               $(this).find('iframe').add('.fix_for_resizing_over_iframe').height($(this).height()).width($(this).width());
             })
-            .bind('dialogresizestop', function() {
+            .bind('dialogresizestop', () => {
               $(".fix_for_resizing_over_iframe").remove();
             })
             .bind('dialogresizestart', function() {
@@ -217,7 +217,7 @@ import './jquery.templateData'
                   .appendTo("body");
               });
             })
-            .bind('selection', function(event) {
+            .bind('selection', event => {
               var item = event.contentItems[0];
               if(item["@type"] === 'LtiLinkItem' && item.url) {
                 SelectContentDialog.handleContentItemResult(item, tool)
@@ -285,7 +285,7 @@ import './jquery.templateData'
             $service.append($img);
             $service.click(function(event) {
               event.preventDefault();
-              findLinkForService($(this).data('service').service, function(data) {
+              findLinkForService($(this).data('service').service, data => {
                 $("#content_tag_create_url").val(data.url);
                 $("#content_tag_create_title").val(data.title);
               });
@@ -320,7 +320,7 @@ import './jquery.templateData'
       }
       $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
     }
-    $("#select_context_content_dialog .cancel_button").click(function() {
+    $("#select_context_content_dialog .cancel_button").click(() => {
       $dialog.find('.alert').remove();
       $dialog.dialog('close');
     });
@@ -336,7 +336,7 @@ import './jquery.templateData'
         if(submitted && $.isFunction(submitted)) {
           submitted(item_data);
         }
-        setTimeout(function() {
+        setTimeout(() => {
           $dialog.dialog('close');
           $dialog.find('.alert').remove();
         }, 0);
@@ -461,16 +461,16 @@ import './jquery.templateData'
                 on_duplicate: 'rename',
                 no_redirect: true
               };
-              uploadFile(url, data, file).then(function(attachment) {
+              uploadFile(url, data, file).then(attachment => {
                 callback(attachment)
-              }).catch(function(response) {
+              }).catch(response => {
                 $("#select_context_content_dialog").loadingImage('remove');
                 $("#select_context_content_dialog").errorBox(I18n.t('errors.failed_to_create_item', 'Failed to Create new Item'));
               });
             } else {
-              $.ajaxJSON(url, 'POST', data, function(data) {
+              $.ajaxJSON(url, 'POST', data, data => {
                 callback(data);
-              }, function(data) {
+              }, data => {
                 $("#select_context_content_dialog").loadingImage('remove');
                 if (data && data.errors && data.errors.title[0] && data.errors.title[0].message && data.errors.title[0].message === "blank") {
                   $("#select_context_content_dialog").errorBox(I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.'));
@@ -509,7 +509,7 @@ import './jquery.templateData'
         if(!$select.hasClass('loaded')) {
           $select.find(".message").text("Loading...");
           var url = $("#select_context_content_dialog .external_tools_url").attr('href');
-          $.ajaxJSON(url, 'GET', {}, function(data) {
+          $.ajaxJSON(url, 'GET', {}, data => {
             $select.find(".message").remove();
             $select.addClass('loaded');
             $select.find(".tools").empty();
@@ -528,7 +528,7 @@ import './jquery.templateData'
               $tool.data('tool', tool);
               $select.find(".tools").append($tool.show());
             }
-          }, function(data) {
+          }, data => {
             $select.find(".message").text(I18n.t('errors.loading_failed', "Loading Failed"));
           });
         }

@@ -76,7 +76,7 @@ QUnit.module('quizzesNextSpeedGrading', {
   }
 })
 
-test('adds a message event listener to window', function() {
+test('adds a message event listener to window', () => {
   const fns = quizzesNextSpeedGrading(
     fakeEG,
     fakeIframeHolder,
@@ -87,7 +87,7 @@ test('adds a message event listener to window', function() {
   ok(addEventListenerStub.calledWith('message'))
 })
 
-test('sets grade to read only with a quizzesNext.register message', function() {
+test('sets grade to read only with a quizzesNext.register message', () => {
   const fns = quizzesNextSpeedGrading(
     fakeEG,
     fakeIframeHolder,
@@ -99,7 +99,7 @@ test('sets grade to read only with a quizzesNext.register message', function() {
   ok(fakeEG.setGradeReadOnly.calledWith(true))
 })
 
-test('calls the registerCallback with a quizzesNext.register message', function() {
+test('calls the registerCallback with a quizzesNext.register message', () => {
   const fns = quizzesNextSpeedGrading(
     fakeEG,
     fakeIframeHolder,
@@ -111,7 +111,7 @@ test('calls the registerCallback with a quizzesNext.register message', function(
   ok(registerCbStub.calledWith(fns.postChangeSubmissionMessage))
 })
 
-test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', function() {
+test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', () => {
   const fns = quizzesNextSpeedGrading(
     fakeEG,
     fakeIframeHolder,
@@ -123,7 +123,7 @@ test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', fu
   ok(refreshGradesCbStub.calledWith(fns.quizzesNextChange))
 })
 
-test('calls the correct functions on EG', function() {
+test('calls the correct functions on EG', () => {
   const fnsToCallOnEG = [
     'refreshSubmissionsToView',
     'showGrade',
@@ -144,12 +144,12 @@ test('calls the correct functions on EG', function() {
   const fakeSubmissionData = {}
   fns.quizzesNextChange(fakeSubmissionData)
 
-  fnsToCallOnEG.forEach(function(egFunction) {
+  fnsToCallOnEG.forEach(egFunction => {
     ok(fakeEG[egFunction].called)
   })
 })
 
-test('postChangeSubmissionMessage postMessage with the submission data', function() {
+test('postChangeSubmissionMessage postMessage with the submission data', () => {
   const fns = quizzesNextSpeedGrading(
     fakeEG,
     fakeIframeHolder,

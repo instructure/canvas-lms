@@ -133,6 +133,13 @@ describe "links", priority: "2" do
         expect_new_page_load { fln('Calendar').click }
         expect(f('.calendar_header')).to be_displayed
       end
+
+      it "should navigate to main content from skip_to_link" do
+        driver.action.send_keys(:tab).perform
+        expect(check_element_has_focus(f('a#skip_navigation_link'))).to eq(true)
+        driver.action.send_keys(:enter).perform
+        expect(driver.switch_to.active_element.attribute("id")).to eq("content")
+      end
     end
   end
 end

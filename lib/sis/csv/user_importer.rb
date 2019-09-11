@@ -64,6 +64,7 @@ module SIS
           sortable_name: row['sortable_name'],
           lineno: row['lineno'],
           csv: csv,
+          row: row,
           authentication_provider_id: row['authentication_provider_id']
         )
       end

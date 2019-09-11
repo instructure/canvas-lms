@@ -23,8 +23,8 @@ import sinon from "sinon";
 import sd from "skin-deep";
 
 describe("ImageUploadsList", () => {
-  let noop = () => {};
-  let defaultProps = {
+  const noop = () => {};
+  const defaultProps = {
     images: {
       records: [],
       isLoading: false,
@@ -35,7 +35,7 @@ describe("ImageUploadsList", () => {
   };
 
   it("calls for images on mount", () => {
-    let imagesSpy = sinon.spy();
+    const imagesSpy = sinon.spy();
     sd.shallowRender(
       <ImageUploadsList {...defaultProps} fetchImages={imagesSpy} />
     );

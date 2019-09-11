@@ -143,7 +143,7 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.find(".criterion_description").focus();
     });
 
-    $rubric_criterion_comments_dialog.find('.save_button').click(function () {
+    $rubric_criterion_comments_dialog.find('.save_button').click(() => {
       var comments   = $rubric_criterion_comments_dialog.find("textarea.criterion_comments").val(),
           $criterion = $rubric_criterion_comments_dialog.data('current_rating');
       if($criterion) {
@@ -153,7 +153,7 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.dialog('close');
     });
 
-    $rubric_criterion_comments_dialog.find(".cancel_button").click(function(event) {
+    $rubric_criterion_comments_dialog.find(".cancel_button").click(event => {
       $rubric_criterion_comments_dialog.dialog('close');
     });
 

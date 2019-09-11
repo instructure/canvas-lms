@@ -33,7 +33,6 @@ class QuestionBankPage {
   }
 
   constructor () {
-    this.onAddOutcome = this.onAddOutcome.bind(this)
     this.rootOutcomeGroup = new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP)
     this.attachEvents()
   }
@@ -54,13 +53,13 @@ class QuestionBankPage {
     $('.add_outcome_link').on('click', this.onAddOutcome)
   }
 
-  onAddOutcome (e) {
+  onAddOutcome = e => {
     e.preventDefault()
     if (!this.$els.dialog) {
       this.createDialog()
     }
     this.$els.dialog.show()
-  }
+  };
 
   onOutcomeImport (outcome) {
     const mastery = (outcome.quizMasteryLevel / 100.0) || 1.0

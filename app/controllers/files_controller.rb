@@ -857,9 +857,7 @@ class FilesController < ApplicationController
     end
 
     # check service authorization
-    begin
-      Canvas::Security.decode_jwt(params[:token], [ InstFS.jwt_secret ])
-    rescue
+    unless InstFS.validate_capture_jwt(params[:token])
       head :forbidden
       return
     end

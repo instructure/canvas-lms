@@ -68,6 +68,8 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
+  before_action :load_media_object
+
   # @{not an}API Show Media Object Details
   #
   # Returns the Details of the given Media Object.
@@ -78,32 +80,29 @@ class MediaObjectsController < ApplicationController
   #
   # @returns MediaObject
   def show
-    media_object = MediaObject.by_media_id(params[:media_object_id]).first
-    unless media_object
+    render :json => media_object_api_json(@media_object, @current_user, session)
+  end
+
+  def iframe_media_player
+    js_env media_sources: media_sources_json(@media_object)
+    js_bundle :media_player_iframe_content
+    render html: '', layout: 'layouts/bare'
+  end
+
+  private
+
+  def load_media_object
+    @media_object = MediaObject.by_media_id(params[:media_object_id]).first
+    unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
-      media_object = MediaObject.create_if_id_exists(params[:media_object_id])
-      media_object.send_later_enqueue_args(:retrieve_details, {
-        :singleton => "retrieve_media_details:#{media_object.media_id}"
+      @media_object = MediaObject.create_if_id_exists(params[:media_object_id])
+      @media_object.send_later_enqueue_args(:retrieve_details, {
+        :singleton => "retrieve_media_details:#{@media_object.media_id}"
       })
       increment_request_cost(Setting.get("missed_media_additional_request_cost", "200").to_i)
     end
 
-    media_object.viewed!
-    render :json => media_object_api_json(media_object, @current_user, session)
-  end
-
-  def iframe_media_player
-    media_object = MediaObject.by_media_id(params[:id]).first
-    js_bundle :media_player_iframe_content
-
-    media_sources = media_object.media_sources.map do |mo|
-      mo[:src] = mo[:url]
-      mo[:label] = "#{(mo[:bitrate].to_i / 1024).floor} kbps"
-      mo
-    end
-
-    js_env media_sources: media_sources
-    render html: '', layout: 'layouts/bare'
+    @media_object.viewed!
   end
 end

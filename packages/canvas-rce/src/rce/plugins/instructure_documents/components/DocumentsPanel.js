@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react';
-import {arrayOf, bool, func, shape, string} from 'prop-types';
+import React, {useEffect, useRef} from 'react';
+import {arrayOf, bool, func, shape, string, objectOf} from 'prop-types';
 import {fileShape} from './propTypes'
 import formatMessage from '../../../../format-message';
 
@@ -31,15 +31,15 @@ import {
   useIncrementalLoading
 } from '../../../../common/incremental-loading'
 
-function hasFiles(props) {
-  return props.documents.files.length > 0
+function hasFiles(documents) {
+  return documents.files.length > 0
 }
 
-function isEmpty(props) {
+function isEmpty(documents) {
   return (
-    !hasFiles(props) &&
-    !props.documents.hasMore &&
-    !props.documents.isLoading
+    !hasFiles(documents) &&
+    !documents.hasMore &&
+    !documents.isLoading
   );
 }
 
@@ -69,7 +69,8 @@ function renderLoadingError(_error) {
 }
 
 export default function DocumentsPanel(props) {
-  const {fetchInitialDocs, fetchNextDocs, documents} = props
+  const {fetchInitialDocs, fetchNextDocs, contextType} = props
+  const documents = props.documents[contextType]
   const {hasMore, isLoading, error, files} = documents
   const lastItemRef = useRef(null)
 
@@ -88,6 +89,12 @@ export default function DocumentsPanel(props) {
 
     records: files
   })
+
+  useEffect(() => {
+    if (hasMore && !isLoading && files.length === 0) {
+      fetchInitialDocs()
+    }
+  }, [contextType, files.length, hasMore, isLoading, fetchInitialDocs])
 
   const handleDocClick = file => {
     props.onLinkClick(file)
@@ -109,7 +116,7 @@ export default function DocumentsPanel(props) {
 
       {error && renderLoadingError(error)}
 
-      {isEmpty(props) && (
+      {isEmpty(documents) && (
         <View as="div" padding="medium">
           {formatMessage("No results.")}
         </View>
@@ -121,15 +128,14 @@ export default function DocumentsPanel(props) {
 
 DocumentsPanel.propTypes = {
   contextType: string.isRequired,
-  contextId: string.isRequired,
   fetchInitialDocs: func.isRequired,
   fetchNextDocs: func.isRequired,
   onLinkClick: func.isRequired,
-  documents: shape({
+  documents: objectOf(shape({
     files: arrayOf(shape(fileShape)).isRequired,
     bookmark: string,
     hasMore: bool,
     isLoading: bool,
     error: string
-  }).isRequired
+  })).isRequired
 }

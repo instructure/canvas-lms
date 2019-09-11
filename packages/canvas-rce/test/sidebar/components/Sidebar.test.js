@@ -32,7 +32,7 @@ describe("Sidebar", () => {
   };
 
   it("renders the panels when not hidden", () => {
-    let tree = sd.shallowRender(
+    const tree = sd.shallowRender(
       <Sidebar
         hidden={false}
         theme={{ loaded: true, variables: {} }}
@@ -48,7 +48,7 @@ describe("Sidebar", () => {
   });
 
   it("does not render the file panel when filesTabDisabled is true", () => {
-    let tree = sd.shallowRender(
+    const tree = sd.shallowRender(
       <Sidebar
         hidden={false}
         theme={{ loaded: true, variables: {} }}
@@ -65,8 +65,8 @@ describe("Sidebar", () => {
   });
 
   it("renders a hidden div when hidden", () => {
-    let tree = sd.shallowRender(
-      <Sidebar hidden={true} contextType="course" collections={collections} />
+    const tree = sd.shallowRender(
+      <Sidebar hidden contextType="course" collections={collections} />
     );
     assert.ok(!tree.subTree("LinksPanel"));
     assert.ok(!tree.subTree("ImagesPanel"));
@@ -113,9 +113,9 @@ describe("Sidebar", () => {
     });
 
     it("returns true if canUploadFiles is false and it has no files or folders", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <Sidebar
-          hidden={true}
+          hidden
           canUploadFiles={false}
           contextType="course"
           collections={collections}
@@ -125,10 +125,10 @@ describe("Sidebar", () => {
     });
 
     it("returns true if canUploadFiles is true and it has no files or folders", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <Sidebar
-          hidden={true}
-          canUploadFiles={true}
+          hidden
+          canUploadFiles
           contextType="course"
           collections={collections}
         />
@@ -137,10 +137,10 @@ describe("Sidebar", () => {
     });
 
     it("returns false if canUploadFiles is true and it has files", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <Sidebar
-          hidden={true}
-          canUploadFiles={true}
+          hidden
+          canUploadFiles
           contextType="course"
           collections={collections}
           files={files}
@@ -150,10 +150,10 @@ describe("Sidebar", () => {
     });
 
     it("returns false if canUploadFiles is true and it has folders", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <Sidebar
-          hidden={true}
-          canUploadFiles={true}
+          hidden
+          canUploadFiles
           contextType="course"
           collections={collections}
           files={folders}

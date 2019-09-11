@@ -25,7 +25,6 @@ import ExportList from '../webzip_export/components/ExportList'
 import ExportInProgress from '../webzip_export/components/ExportInProgress'
 import Errors from '../webzip_export/components/Errors'
   class WebZipExportApp extends React.Component {
-
     static webZipFormat (webZipExports, newExportId = null) {
       return webZipExports.map((webZipExport) => {
         const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : null
@@ -44,7 +43,6 @@ import Errors from '../webzip_export/components/Errors'
       super(props)
       this.finishedStates = ['generated', 'failed']
       this.state = {exports: [], errors: [], loaded: false}
-      this.getExports = this.getExports.bind(this)
     }
 
     componentDidMount () {
@@ -58,10 +56,10 @@ import Errors from '../webzip_export/components/Errors'
       }
     }
 
-    getExports (newExportId = null) {
+    getExports = (newExportId = null) => {
       const courseId = splitAssetString(ENV.context_asset_string)[1]
       this.loadExistingExports(courseId, newExportId)
-    }
+    };
 
     getExportsInProgress () {
       return this.state.exports.find(ex =>

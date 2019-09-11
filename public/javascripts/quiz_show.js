@@ -40,7 +40,7 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
       QuizLogAuditingEventDumper(true);
     }
 
-    $('#preview_quiz_button').click(function(e){
+    $('#preview_quiz_button').click(e => {
       $('#js-sequential-warning-dialogue div a').attr('href',$('#preview_quiz_button').attr('href'));
     });
 
@@ -48,7 +48,7 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
       if ($('#quiz_details').length) {
         return callback();
       } else {
-        return $.get(ENV.QUIZ_DETAILS_URL, function(html) {
+        return $.get(ENV.QUIZ_DETAILS_URL, html => {
           $("#quiz_details_wrapper").html(html);
           callback();
         });
@@ -100,10 +100,10 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
     });
 
     var hasOpenedQuizDetails = false;
-    $(".quiz_details_link").click(function(event) {
+    $(".quiz_details_link").click(event => {
       event.preventDefault();
       $("#quiz_details_wrapper").disableWhileLoading(
-        ensureStudentsLoaded(function() {
+        ensureStudentsLoaded(() => {
           var $quizResultsText = $('#quiz_details_text');
           $("#quiz_details").slideToggle();
           if (hasOpenedQuizDetails) {
@@ -128,9 +128,9 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
       );
     });
 
-    $(".message_students_link").click(function(event) {
+    $(".message_students_link").click(event => {
       event.preventDefault();
-      ensureStudentsLoaded(function(){
+      ensureStudentsLoaded(() => {
         var submissionList = ENV.QUIZ_SUBMISSION_LIST;
         var unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS;
         var submittedStudents = submissionList.SUBMITTED_STUDENTS;
@@ -150,7 +150,7 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
     $("#let_students_take_this_quiz_button").ifExists(function($link){
       var $unlock_for_how_long_dialog = $("#unlock_for_how_long_dialog");
 
-      $link.click(function(){
+      $link.click(() => {
         $unlock_for_how_long_dialog.dialog('open');
         return false;
       });
@@ -176,8 +176,8 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
       $lock_at.datetime_field();
     });
 
-    $('#lock_this_quiz_now_link').ifExists(function($link) {
-      $link.click(function(e) {
+    $('#lock_this_quiz_now_link').ifExists($link => {
+      $link.click(e => {
         e.preventDefault();
         $('#quiz_lock_form').submit();
       })

@@ -41,7 +41,7 @@ import $ from 'jquery'
 
     fetchSVG () {
       $.ajax(this.props.url, {
-        success: function (data) {
+        success: data => {
           this.svg = data;
 
           if (data.nodeType === DOCUMENT_NODE) {
@@ -58,7 +58,7 @@ import $ from 'jquery'
 
           this.svg.setAttribute('focusable', false);
           this.rootSpan.appendChild(this.svg);
-        }.bind(this)
+        }
       });
     }
 

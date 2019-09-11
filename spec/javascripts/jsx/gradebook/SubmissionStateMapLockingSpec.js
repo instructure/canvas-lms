@@ -50,42 +50,42 @@ function createAndSetupMap(assignment, opts = {}) {
 
 QUnit.module('SubmissionStateMap')
 
-test('submission is unlocked if not anonymous', function() {
+test('submission is unlocked if not anonymous', () => {
   const assignment = {id: '1', muted: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, false)
 })
 
-test('submission is unlocked if not muted', function() {
+test('submission is unlocked if not muted', () => {
   const assignment = {id: '1', anonymous_grading: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, false)
 })
 
-test('submission is locked if anonymize_students is true', function() {
+test('submission is locked if anonymize_students is true', () => {
   const assignment = {id: '1', anonymize_students: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, true)
 })
 
-test('submission is unlocked if not moderated', function() {
+test('submission is unlocked if not moderated', () => {
   const assignment = {id: '1', moderated_grading: false, grades_published: false}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, false)
 })
 
-test('submission is unlocked if grades are published', function() {
+test('submission is unlocked if grades are published', () => {
   const assignment = {id: '1', moderated_grading: false, grades_published: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.locked, false)
 })
 
-test('submission is locked if moderated and not published', function() {
+test('submission is locked if moderated and not published', () => {
   const assignment = {id: '1', moderated_grading: true, grades_published: false}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
@@ -94,14 +94,14 @@ test('submission is locked if moderated and not published', function() {
 
 QUnit.module('SubmissionStateMap with no grading periods')
 
-test('submission is locked for a student without assignment visibility', function() {
+test('submission is locked for a student without assignment visibility', () => {
   const assignment = {id: '1', effectiveDueDates: {}, only_visible_to_overrides: true}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   equal(state.locked, true)
 })
 
-test('submission is unlocked for an assigned student', function() {
+test('submission is unlocked for an assigned student', () => {
   const assignment = {id: '1', effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: null,

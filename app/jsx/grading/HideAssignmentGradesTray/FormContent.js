@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -51,7 +51,7 @@ export default function FormContent({
   const hasSections = sections.length > 0
 
   return (
-    <Fragment>
+    <>
       {hasSections && (
         <SpecificSections
           checked={hideBySections}
@@ -88,7 +88,7 @@ export default function FormContent({
           </FlexItem>
         </Flex>
       </View>
-    </Fragment>
+    </>
   )
 }
 

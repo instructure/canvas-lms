@@ -179,14 +179,14 @@ export default class LDBLoginPopup extends Backbone.View {
 
       const authenticate = this.authenticate(credentials)
 
-      authenticate.then(function(rc) {
+      authenticate.then(rc => {
         $delegate.triggerHandler('login_success')
         whnd.close()
         reset()
         return rc
       })
 
-      authenticate.fail(function(xhrError) {
+      authenticate.fail(xhrError => {
         $delegate.triggerHandler('login_failure', xhrError)
         return xhrError
       })
@@ -202,7 +202,7 @@ export default class LDBLoginPopup extends Backbone.View {
       const $head = $(whnd.document.head)
 
       // Inject the stylesheets.
-      _(styleSheets).each(function(href) {
+      _(styleSheets).each(href => {
         $head.append(`<link rel="stylesheet" href="${htmlEscape(href)}" />`)
       })
 

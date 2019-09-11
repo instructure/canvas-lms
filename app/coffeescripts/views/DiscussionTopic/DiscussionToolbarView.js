@@ -22,11 +22,6 @@ import 'jqueryui/button'
 // #
 // requires a MaterializedDiscussionTopic model
 export default class DiscussionToolbarView extends View {
-  constructor(...args) {
-    super(...args)
-    this.clearInputs = this.clearInputs.bind(this)
-  }
-
   static initClass() {
     this.prototype.els = {
       '#discussion-search': '$searchInput',
@@ -65,13 +60,13 @@ export default class DiscussionToolbarView extends View {
     return this.$deleted.button()
   }
 
-  clearInputs() {
+  clearInputs = () => {
     if (this.model.hasFilter()) return
     this.$searchInput.val('')
     this.$unread.prop('checked', false)
     this.$unread.button('refresh')
     return this.maybeDisableFields()
-  }
+  };
 
   toggleUnread() {
     // setTimeout so the ui can update the button before the rest

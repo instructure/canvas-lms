@@ -17,9 +17,9 @@
  */
 
 import {ApolloClient} from 'apollo-client'
-import {InMemoryCache} from 'apollo-cache-inmemory'
-import {MockLink} from 'react-apollo/test-utils'
 import {buildSchema} from 'graphql'
+import {InMemoryCache} from 'apollo-cache-inmemory'
+import {MockLink} from '@apollo/react-testing'
 import {validateGraphQLOperation} from './validateGraphQLOperation'
 
 // uses this.__myThing__ pattern to avoid conflicts with ApolloClient's members

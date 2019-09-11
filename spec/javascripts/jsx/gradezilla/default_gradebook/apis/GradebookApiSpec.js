@@ -149,7 +149,7 @@ test('sends the column data to the success handler', function() {
   })
 })
 
-QUnit.module('GradebookApi.updateSubmission', function(hooks) {
+QUnit.module('GradebookApi.updateSubmission', hooks => {
   const courseId = '1201'
   const assignmentId = '303'
   const userId = '201'
@@ -157,7 +157,7 @@ QUnit.module('GradebookApi.updateSubmission', function(hooks) {
   const submissionData = {all_submissions: [{id: 301, late_policy_status: 'none'}]}
   let server
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(() => {
     server = sinon.fakeServer.create({respondImmediately: true})
     const responseBody = JSON.stringify(submissionData)
     server.respondWith('PUT', updateSubmissionUrl, [
@@ -167,7 +167,7 @@ QUnit.module('GradebookApi.updateSubmission', function(hooks) {
     ])
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(() => {
     server.restore()
   })
 
@@ -176,39 +176,31 @@ QUnit.module('GradebookApi.updateSubmission', function(hooks) {
     return _.find(server.requests, request => request.url.includes(updateSubmissionUrl))
   }
 
-  test('sends a put request to the "update submission" url', function() {
-    return GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
-    }).then(() => {
-      const request = getRequest()
-      strictEqual(request.method, 'PUT')
-      strictEqual(request.url, updateSubmissionUrl)
-    })
-  })
+  test('sends a put request to the "update submission" url', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+    latePolicyStatus: 'none'
+  }).then(() => {
+    const request = getRequest()
+    strictEqual(request.method, 'PUT')
+    strictEqual(request.url, updateSubmissionUrl)
+  }))
 
-  test('includes params for updating a submission', function() {
-    return GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
-    }).then(() => {
-      const bodyData = JSON.parse(getRequest().requestBody)
-      deepEqual(bodyData.submission.late_policy_status, 'none')
-    })
-  })
+  test('includes params for updating a submission', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+    latePolicyStatus: 'none'
+  }).then(() => {
+    const bodyData = JSON.parse(getRequest().requestBody)
+    deepEqual(bodyData.submission.late_policy_status, 'none')
+  }))
 
-  test('includes params to request visibility for the submission', function() {
-    return GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
-    }).then(() => {
-      const bodyData = JSON.parse(getRequest().requestBody)
-      strictEqual(bodyData.include.includes('visibility'), true)
-    })
-  })
+  test('includes params to request visibility for the submission', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+    latePolicyStatus: 'none'
+  }).then(() => {
+    const bodyData = JSON.parse(getRequest().requestBody)
+    strictEqual(bodyData.include.includes('visibility'), true)
+  }))
 
-  test('sends the column data to the success handler', function() {
-    return GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
-    }).then(({data}) => {
-      deepEqual(data, submissionData)
-    })
-  })
+  test('sends the column data to the success handler', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+    latePolicyStatus: 'none'
+  }).then(({data}) => {
+    deepEqual(data, submissionData)
+  }))
 })

@@ -34,22 +34,32 @@ function newProps(checked = false, deepLinking = false) {
 
 let wrapper = 'empty wrapper'
 
+function WrappedCustomizationOption(props) {
+  return (
+    <table>
+      <tbody>
+        <CustomizationOption {...props} />
+      </tbody>
+    </table>
+  )
+}
+
 afterEach(() => {
   wrapper.unmount()
 })
 
 it("uses the 'name' prop for the checkbox", () => {
-  wrapper = mount(<CustomizationOption {...newProps()} />)
+  wrapper = mount(<WrappedCustomizationOption {...newProps()} />)
   expect(wrapper.find('Checkbox').instance().props.name).toEqual('manage_line_items')
 })
 
 it("checks the checkbox when 'checked' is true", () => {
-  wrapper = mount(<CustomizationOption {...newProps(true)} />)
+  wrapper = mount(<WrappedCustomizationOption {...newProps(true)} />)
   expect(wrapper.find('Checkbox').instance().props.checked).toBeTruthy()
 })
 
 it("uses the 'toogleStyle' prop", () => {
-  wrapper = mount(<CustomizationOption {...newProps()} />)
+  wrapper = mount(<WrappedCustomizationOption {...newProps()} />)
   expect(
     wrapper
       .find('td')
@@ -60,7 +70,7 @@ it("uses the 'toogleStyle' prop", () => {
 
 it("calls 'onChange' when changed", () => {
   const props = newProps()
-  wrapper = mount(<CustomizationOption {...props} />)
+  wrapper = mount(<WrappedCustomizationOption {...props} />)
   wrapper
     .find('Checkbox')
     .instance()
@@ -68,12 +78,12 @@ it("calls 'onChange' when changed", () => {
   expect(props.onChange).toHaveBeenCalled()
 })
 
-it("renders a deep linking tooltip if deepLinking is true", () => {
-  wrapper = mount(<CustomizationOption {...newProps(true, true)} />)
+it('renders a deep linking tooltip if deepLinking is true', () => {
+  wrapper = mount(<WrappedCustomizationOption {...newProps(true, true)} />)
   expect(wrapper.exists('Tooltip')).toBeTruthy()
 })
 
-it("does not render a deep linking tooltip if deepLinking is false", () => {
-  wrapper = mount(<CustomizationOption {...newProps()} />)
+it('does not render a deep linking tooltip if deepLinking is false', () => {
+  wrapper = mount(<WrappedCustomizationOption {...newProps()} />)
   expect(wrapper.exists('Tooltip')).toBeFalsy()
 })

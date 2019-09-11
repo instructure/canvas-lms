@@ -19,4 +19,5 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/en_CY.json";
 import "../rce/languages/en_GB";
+
 formatMessage.addLocale({ "en-GB-x-ukhe": locale });

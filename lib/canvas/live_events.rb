@@ -17,6 +17,7 @@
 
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
+    payload.compact! if LiveEvents.get_context&.dig(:compact_live_events)&.present?
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
     LiveEvents.post_event(
@@ -494,6 +495,7 @@ module Canvas::LiveEvents
     end
 
     post_event_stringified('asset_accessed', {
+      asset_name: asset_obj.try(:name) || asset_obj.try(:title),
       asset_type: asset_obj.class.reflection_type_name,
       asset_id: asset_obj.global_id,
       asset_subtype: asset_subtype,

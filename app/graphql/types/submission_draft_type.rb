@@ -47,6 +47,15 @@ module Types
       end
     end
 
+    field :meets_assignment_criteria, Boolean, null: false
+    def meets_assignment_criteria
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
+          object.meets_assignment_criteria?
+        end
+      end
+    end
+
     field :submission_attempt, Integer, null: false
   end
 end

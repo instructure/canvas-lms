@@ -42,12 +42,12 @@ describe("Sidebar reducer", () => {
 
   describe("REQUEST_PAGE", () => {
     it("sets the loading flag on the appropriate collection", () => {
-      let newState = reducer(state, actions.requestPage("announcements"));
+      const newState = reducer(state, actions.requestPage("announcements"));
       assert.equal(newState.collections.announcements.loading, true);
     });
 
     it("leaves the other collections alone", () => {
-      let newState = reducer(state, actions.requestPage("modules"));
+      const newState = reducer(state, actions.requestPage("modules"));
       assert.deepEqual(
         newState.collections.announcements,
         state.collections.announcements
@@ -55,7 +55,7 @@ describe("Sidebar reducer", () => {
     });
 
     it("leaves non-collection keys alone", () => {
-      let newState = reducer(state, actions.requestPage("announcements"));
+      const newState = reducer(state, actions.requestPage("announcements"));
       assert.equal(newState.contextType, state.contextType);
     });
   });
@@ -67,49 +67,43 @@ describe("Sidebar reducer", () => {
     };
 
     it("appends results to the appropriate collection", () => {
-      let newState = reducer(state, actions.receivePage("modules", page));
+      const newState = reducer(state, actions.receivePage("modules", page));
       assert.equal(newState.collections.modules.links.length, 2);
       assert.deepEqual(newState.collections.modules.links[1], page.links[0]);
     });
 
     it("updates the bookmark on the appropriate collection", () => {
-      let newState = reducer(state, actions.receivePage("modules", page));
+      const newState = reducer(state, actions.receivePage("modules", page));
       assert.equal(newState.collections.modules.bookmark, page.bookmark);
     });
 
     it("clears the loading flag on the appropriate collection", () => {
-      let newState = reducer(state, actions.receivePage("modules", page));
+      const newState = reducer(state, actions.receivePage("modules", page));
       assert.equal(newState.collections.modules.loading, false);
     });
 
     it("leaves the other collections alone", () => {
-      let newState = reducer(state, actions.requestPage("announcements", page));
+      const newState = reducer(state, actions.requestPage("announcements", page));
       assert.deepEqual(newState.collections.modules, state.collections.modules);
     });
   });
 
   describe("FAIL_PAGE", () => {
     it("clears the loading flag on the appropriate collection", () => {
-      let newState = reducer(state, actions.failPage("modules"));
+      const newState = reducer(state, actions.failPage("modules"));
       assert.equal(newState.collections.modules.loading, false);
     });
 
     it("clears the bookmark if the links are empty", () => {
-      let emptyModules = Object.assign({}, state.collections.modules, {
-        links: []
-      });
-      let emptyModulesCollections = Object.assign({}, state.collections, {
-        modules: emptyModules
-      });
-      let emptyModulesState = Object.assign({}, state, {
-        collections: emptyModulesCollections
-      });
-      let newState = reducer(emptyModulesState, actions.failPage("modules"));
+      const emptyModules = { ...state.collections.modules, links: []};
+      const emptyModulesCollections = { ...state.collections, modules: emptyModules};
+      const emptyModulesState = { ...state, collections: emptyModulesCollections};
+      const newState = reducer(emptyModulesState, actions.failPage("modules"));
       assert.equal(newState.collections.modules.bookmark, null);
     });
 
     it("leaves the links and bookmark on that collection alone otherwise", () => {
-      let newState = reducer(state, actions.failPage("modules"));
+      const newState = reducer(state, actions.failPage("modules"));
       assert.deepEqual(
         newState.collections.modules.links,
         state.collections.modules.links
@@ -121,7 +115,7 @@ describe("Sidebar reducer", () => {
     });
 
     it("leaves the other collections alone", () => {
-      let newState = reducer(state, actions.failPage("announcements"));
+      const newState = reducer(state, actions.failPage("announcements"));
       assert.deepEqual(newState.collections.modules, state.collections.modules);
     });
   });

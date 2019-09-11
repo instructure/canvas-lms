@@ -31,7 +31,7 @@ var find_outcome = (function() {
       var $dialog = $("#find_outcome_criterion_dialog");
       if(!$dialog.hasClass('loaded')) {
         $dialog.find(".loading_message").text(I18n.t('messages.loading_outcomes', "Loading Outcomes..."));
-        $.ajaxJSON($dialog.find(".outcomes_list_url").attr('href'), 'GET', {}, function(data) {
+        $.ajaxJSON($dialog.find(".outcomes_list_url").attr('href'), 'GET', {}, data => {
           var valids = [];
           for(var idx in data) {
             var outcome = data[idx].learning_outcome;
@@ -85,7 +85,7 @@ var find_outcome = (function() {
             }
             $dialog.find(".outcomes_select:not(.blank):first").click();
           }
-        }, function(data) {
+        }, data => {
           $dialog.find(".loading_message").text(I18n.t('errors.outcome_retrieval_failed', "Outcomes Retrieval failed unexpected.  Please try again."));
         });
       }
@@ -96,7 +96,7 @@ var find_outcome = (function() {
         height: 400
       });
     }
-  }
+  };
 })();
 window.find_outcome = find_outcome;
 $(document).ready(function() {

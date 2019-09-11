@@ -22,6 +22,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 import splitAssetString from 'compiled/str/splitAssetString'
 
@@ -153,7 +154,7 @@ export default class MobileContextMenu extends React.Component {
     if (storedTabs) {
       this.setState({tabs: JSON.parse(storedTabs), tabsHaveLoaded: true})
     }
-    const tabs = await (await fetch(url, {headers: {Accept: 'application/json'}})).json()
+    const tabs = await asJson(fetch(url, defaultFetchOptions))
     this.setState({tabs, tabsHaveLoaded: true})
     sessionStorage.setItem(url, JSON.stringify(tabs))
   }

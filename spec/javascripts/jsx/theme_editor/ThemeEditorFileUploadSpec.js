@@ -86,7 +86,7 @@ test('hasUserInput', () => {
   ok(component.hasUserInput(), 'non null input value')
 })
 
-test('handleFileChanged', function() {
+test('handleFileChanged', () => {
   const expected = {}
   sandbox.stub(window.URL, 'createObjectURL').returns(expected)
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
@@ -102,7 +102,7 @@ test('handleFileChanged', function() {
   ok(props.onChange.calledWith(expected), 'calls onChange with object url')
 })
 
-test('handleResetClicked', function() {
+test('handleResetClicked', () => {
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = component.fileInput
   subject.setAttribute('type', 'text')
@@ -124,7 +124,7 @@ test('handleResetClicked', function() {
   ok(props.onChange.calledWith(''), 'calls onChange empty string')
 })
 
-test('displayValue', function() {
+test('displayValue', () => {
   let component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   sandbox.stub(component, 'hasUserInput').returns(false)
   equal(component.displayValue(), '', 'no input or current value, returns empty string')

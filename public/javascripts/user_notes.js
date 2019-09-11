@@ -28,13 +28,13 @@ import './vendor/jquery.pageless'
     $('#user_note_list').pageless(ENV.user_note_list_pageless_options);
   }
 
-  $(".cancel_button").click(function() {
+  $(".cancel_button").click(() => {
     $("#create_entry").slideUp();
-  }).end().find(":text").keycodes('esc', function() {
+  }).end().find(":text").keycodes('esc', () => {
     $(".cancel_button").click();
   });
 
-  $("#new_user_note_button").click(function(event) {
+  $("#new_user_note_button").click(event => {
     event.preventDefault();
     $("#create_entry").slideDown();
     $("#add_entry_form").find(":text:first").focus().select();
@@ -61,13 +61,9 @@ import './vendor/jquery.pageless'
         .fillTemplateData({data:user_note})
         .find('.delete_user_note_link')
           .attr('href', action)
-          .attr('title', function (i, oldTitle) {
-            return oldTitle.replace('{{ title }}', user_note.title)
-          })
+          .attr('title', (i, oldTitle) => oldTitle.replace('{{ title }}', user_note.title))
           .find('.screenreader-only')
-            .text(function (i, oldText) {
-              return oldText.replace('{{ title }}', user_note.title)
-            })
+            .text((i, oldText) => oldText.replace('{{ title }}', user_note.title))
             .end()
           .end()
         .find('.formatted_note')

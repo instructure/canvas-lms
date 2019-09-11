@@ -17,10 +17,10 @@
  */
 
 export default function(ed, document, url) {
-  var ev = document.createEvent("CustomEvent");
+  const ev = document.createEvent("CustomEvent");
   ev.initCustomEvent("tinyRCE/initExternalTools", true, true, {
-    ed: ed,
-    url: url
+    ed,
+    url
   });
   document.dispatchEvent(ev);
 }

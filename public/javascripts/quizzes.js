@@ -110,7 +110,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     return $('#quiz_one_time_results').prop('checked');
   };
 
-  var renderDueDates = function(){
+  var renderDueDates = () => {
     if (ENV.QUIZ && ENV.ASSIGNMENT_OVERRIDES != null) {
 
       ENV.QUIZ.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES;
@@ -130,7 +130,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       });
       overrideView.render()
     }
-  }.bind(this);
+  };
 
   var clickSetCorrect = I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"),
       isSetCorrect = I18n.t('titles.set_as_correct', "This answer is set as correct"),
@@ -169,7 +169,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     var ret = false;
     var events = $._data($questionContent[0], 'events');
     if (events && events.change) {
-      events.change.forEach(function (event) {
+      events.change.forEach(event => {
         if (event.handler.origFuncNm === 'changeMultiFunc') {
           ret = true;
         }
@@ -270,7 +270,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       answer.answer_weight = numberHelper.parse(answer.answer_weight);
 
       // For every float_valued input, localize the string before display
-      $answer.find('input.float_value').each(function (idx, inputEl) {
+      $answer.find('input.float_value').each((idx, inputEl) => {
         answer[inputEl.name] = I18n.n(numberHelper.parse(answer[inputEl.name]));
       });
 
@@ -562,7 +562,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       var $select = $(document.createElement("select")).addClass('answer_select');
       var hadOne = false;
       if (question.question_type == 'calculated_question') {
-        $.each(question.variables, function(i, variable) {
+        $.each(question.variables, (i, variable) => {
           var $tr = $("<tr/>");
           var $td = $("<td class='name'/>");
           $td.text(variable.name);
@@ -579,7 +579,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           $question.find(".variable_definitions_holder").css('display', '');
           $question.find(".variable_definitions tbody").append($tr);
         });
-        $.each(question.formulas, function(i, formula) {
+        $.each(question.formulas, (i, formula) => {
           var $div = $("<div/>");
           $div.text(formula.formula);
           $question.find(".formulas_holder").css('display', '').find(".formulas_list").append($div);
@@ -599,7 +599,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           $tr.append($th);
           $question.find(".equation_combinations_holder_holder").css('display', '');
           $question.find(".equation_combinations thead").append($tr).show();
-          $.each(question.answers, function(i, data) {
+          $.each(question.answers, (i, data) => {
             var $tr = $("<tr/>");
             for(var idx in data.variables) {
               var $td = $("<td/>");
@@ -625,7 +625,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var $option = $(document.createElement('option'));
         $option.val("").text(I18n.t('choose_option', "[ Choose ]"));
         $select.append($option);
-        $.each(question.answers, function(i, data) {
+        $.each(question.answers, (i, data) => {
           data.answer_type = answer_type;
           if (n_correct == "all") {
             data.answer_weight = 100;
@@ -652,7 +652,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $text.append(" <span class='text_after_answers'>" + $.raw(question.text_after_answers) + "</span>");
       } else if (question.question_type == 'multiple_dropdowns_question' || question.question_type == 'fill_in_multiple_blanks_question') {
         var variables = {}
-        $.each(question.answers, function(i, data) {
+        $.each(question.answers, (i, data) => {
           variables[data.blank_id] = true;
         });
         $question.find(".blank_id_select").empty();
@@ -728,11 +728,11 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
         // We have to do the operations below to solve the problem of answer ids being overwritten by fillTemplateData
         if (answers) {
-          $question.find('.answers .answer .hidden.id').each(function(index, answerEl){
+          $question.find('.answers .answer .hidden.id').each((index, answerEl) => {
             $(answerEl).text(answers[index].id);
           });
 
-          $question.find('.answers .answer .id:not(.hidden)').each(function(index, answerEl){
+          $question.find('.answers .answer .id:not(.hidden)').each((index, answerEl) => {
             $(answerEl).text(answers[index].id);
           });
         }
@@ -1149,7 +1149,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     installValidators: function() {
       var that = correctAnswerVisibility;
 
-      that.$toggler.on('invalid:bad_range', function() {
+      that.$toggler.on('invalid:bad_range', () => {
         $('#quiz_hide_correct_answers_at').errorBox(
           I18n.t('errors.invalid_show_correct_answers_range',
           'Hide date cannot be before show date.'));
@@ -1497,7 +1497,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     }
 
     data.quiz.title = quiz.quiz_name;
-    quiz.questions.forEach(function(question) {
+    quiz.questions.forEach(question => {
       var q = {};
       q.question_name = question.question_name;
       q.assessment_question_id = question.assessment_question_id;
@@ -1546,7 +1546,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       numQuestions += parseInt(this.value);
     });
     if (inclusiveLimit ? (numQuestions > QUESTION_LIMIT) : (numQuestions >= QUESTION_LIMIT)) {
-      setTimeout(function() {
+      setTimeout(() => {
         alert(I18n.t('question_limit_reached', 'You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\n\nAs a workaround, consider spreading the material across multiple quizzes.', {count: numQuestions, limit: QUESTION_LIMIT}))
       });
       return true;
@@ -1681,13 +1681,13 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $foundOptions.removeClass('screenreader-only');
         // We have to do this bit so keyboard only users aren't confused
         // when their focus goes to something shown offscreen.
-        $foundOptions.find('[tabindex="-1"]').each(function (k,v) {
+        $foundOptions.find('[tabindex="-1"]').each((k, v) => {
           $(v).attr('tabindex', 0);
         });
       } else {
         $foundOptions.addClass('screenreader-only');
         // Same as above
-        $foundOptions.find('[tabindex="0"]').each(function (k,v) {
+        $foundOptions.find('[tabindex="0"]').each((k, v) => {
           $(v).attr('tabindex', -1);
         });
       }
@@ -1704,7 +1704,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $(this).triggerHandler('change');
     });
 
-    $quiz_options_form.on('serializing', function(e, data) {
+    $quiz_options_form.on('serializing', (e, data) => {
       var erratic = false;
 
       if ($('#enable_quiz_ip_filter').is(':checked')) {
@@ -1746,7 +1746,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $("#ip_filters_dialog").dialog('close');
     });
 
-    $(".ip_filtering_link").click(function(event) {
+    $(".ip_filtering_link").click(event => {
       event.preventDefault();
       var $dialog = $("#ip_filters_dialog");
       $dialog.dialog({
@@ -1756,7 +1756,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
         var url = ENV.QUIZ_IP_FILTERS_URL;
-        $.ajaxJSON(url, 'GET', {}, function(data) {
+        $.ajaxJSON(url, 'GET', {}, data => {
           var ip_filters = data.quiz_ip_filters;
           var idx, filter, $filter;
 
@@ -1774,7 +1774,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           } else {
             $dialog.find(".searching_message").text(I18n.t('no_filters_found', "No filters found"));
           }
-        }, function(data) {
+        }, data => {
           $dialog.find(".searching_message").text(I18n.t('errors.retrieving_filters_failed', "Retrieving Filters Failed"));
         });
       }
@@ -1797,7 +1797,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     });
 
-    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").change(function() {
+    $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").change(() => {
       var checked = $("#multiple_attempts_option").prop('checked') && $("#limit_attempts_option").prop('checked');
       if (checked) {
           $("#hide_results_only_after_last_holder").show();
@@ -1948,7 +1948,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var form = this;
 
         if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
-          promise = promise.pipe(function(promisedData) {
+          promise = promise.pipe(promisedData => {
             if (promisedData && promisedData.quiz) {
               conditionalRelease.editor.updateAssignment({
                 id: promisedData.quiz.assignment_id,
@@ -1956,9 +1956,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
                 points_possible: promisedData.quiz.points_possible
               });
             }
-            return conditionalRelease.editor.save().pipe(function() {
-              return promisedData;
-            });
+            return conditionalRelease.editor.save().pipe(() => promisedData);
           });
         }
         promise.then(success.bind(this), error.bind(this));
@@ -2012,7 +2010,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     });
 
-    $quiz_edit_wrapper.find(".save_quiz_button").click(function(event) {
+    $quiz_edit_wrapper.find(".save_quiz_button").click(event => {
       event.preventDefault();
       event.stopPropagation();
       $quiz_edit_wrapper
@@ -2022,7 +2020,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $quiz_options_form.data('submit_type', 'save_only').submit();
     }).end();
 
-    $quiz_edit_wrapper.find(".save_and_publish").click(function(event) {
+    $quiz_edit_wrapper.find(".save_and_publish").click(event => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -2041,7 +2039,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $("#questions").toggleClass('brief', !$(this).attr('checked'));
     }).triggerHandler('change');
 
-    $(".start_over_link").click(function(event) {
+    $(".start_over_link").click(event => {
       event.preventDefault();
       var result = confirm(I18n.t('confirms.scrap_and_restart', "Scrap this quiz and start from scratch?"));
       if (result) {
@@ -2049,7 +2047,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     });
 
-    $("#quiz_assignment_id").change(function(event) {
+    $("#quiz_assignment_id").change(event => {
       var previousData = $("#quiz_options").getTemplateData({textValues: ['assignment_id', 'title']});
       var assignment_id = $("#quiz_assignment_id").val();
       var quiz_title = $("#quiz_title_input").val();
@@ -2239,7 +2237,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         .find('.submit_button').text(I18n.t('buttons.update_question', 'Update Question'));
       $form.find(":input:visible:first").focus().select();
       $("html,body").scrollTo({top: $form.offset().top - 10, left: 0});
-      setTimeout(function() {
+      setTimeout(() => {
         $formQuestion.find(".question_content").triggerHandler('change');
         $formQuestion.addClass('ready');
       }, 100);
@@ -2318,7 +2316,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         });
 
         toggler.editButton = $link;
-        toggler.on('display', function() {
+        toggler.on('display', () => {
 
           $comment.removeClass('editing');
 
@@ -2375,7 +2373,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           regradeOption: REGRADE_OPTIONS[$question.data("questionID")],
           multipleAnswer: questionType === "multiple_answers_question"
         });
-        regradeOptions.on('update', function(regradeOption){
+        regradeOptions.on('update', regradeOption => {
           var newAnswerData = {regradeOption: regradeOption, newAnswer: newAnswer}
           toggleAnswer($question, newAnswerData)
         })
@@ -2432,9 +2430,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       var regradeTypes = ["multiple_choice_question",
                           "true_false_question",
                           "multiple_answers_question"];
-      return _.find(regradeTypes, function(className) {
-        return $el.hasClass(className);
-      })
+      return _.find(regradeTypes, className => $el.hasClass(className));
     }
 
     function disableRegrade(holder) {
@@ -2592,7 +2588,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $dialog.find(".find_banks").hide();
         $dialog.find(".message").show().text(I18n.t('loading_question_banks', "Loading Question Banks..."));
         var url = $dialog.find(".find_question_banks_url").attr('href');
-        $.ajaxJSON(url, 'GET', {}, function(banks) {
+        $.ajaxJSON(url, 'GET', {}, banks => {
           $dialog.find(".message").hide();
           $dialog.find(".find_banks").show();
           $dialog.addClass('loaded');
@@ -2604,7 +2600,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
             $bank.data('bank_data', bank);
             $bank.show();
           }
-        }, function(data) {
+        }, data => {
           $dialog.find(".message").text(I18n.t('errors.loading_banks_failed', "Question Banks failed to load, please try again"));
         });
       }
@@ -2621,7 +2617,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $findBankDialog.find(".bank.selected").removeClass('selected');
       $(this).addClass('selected');
       $findBankDialog.find(".submit_button").attr('disabled', false);
-    }).delegate('.submit_button', 'click', function() {
+    }).delegate('.submit_button', 'click', () => {
       var $bank = $findBankDialog.find(".bank.selected:first");
       var bank = $bank.data('bank_data');
       var $form = $findBankDialog.data('form');
@@ -2635,13 +2631,13 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $formBank.show()
         .fillTemplateData({data: bank}).data('bank_data', bank);
       $findBankDialog.dialog('close');
-    }).delegate('.cancel_button', 'click', function() {
+    }).delegate('.cancel_button', 'click', () => {
       $findBankDialog.dialog('close');
     });
 
     var $findQuestionDialog = $("#find_question_dialog");
 
-    $(".find_question_link").click(function(event) {
+    $(".find_question_link").click(event => {
       event.preventDefault();
       var $dialog = $findQuestionDialog;
       if (!$dialog.hasClass('loaded')) {
@@ -2649,7 +2645,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $dialog.find(".side_tabs_table").hide();
         $dialog.find(".message").show().text(I18n.t('loading_question_banks', "Loading Question Banks..."));
         var url = $dialog.find(".find_question_banks_url").attr('href');
-        $.ajaxJSON(url, 'GET', {}, function(banks) {
+        $.ajaxJSON(url, 'GET', {}, banks => {
           $dialog.find(".message").hide();
           $dialog.find(".side_tabs_table").show();
           $dialog.addClass('loaded');
@@ -2663,7 +2659,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
             $bank.show();
           }
           $dialog.find(".bank:not(.blank):first").click();
-        }, function(data) {
+        }, data => {
           $dialog.find(".message").text(I18n.t('errors.loading_banks_failed', "Question Banks failed to load, please try again"));
         });
       }
@@ -2718,18 +2714,18 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     });
 
-    $("#add_question_group_dialog .submit_button").click(function(event) {
+    $("#add_question_group_dialog .submit_button").click(event => {
       var $dialog = $("#add_question_group_dialog");
       $dialog.find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.creating_group', "Creating Group..."));
 
       var params = $dialog.getFormData();
       var newParams = {};
-      _.each(params, function(val, key) {
+      _.each(params, (val, key) => {
         newParams[key.replace('quiz_group[', 'quiz_groups[][')] = val;
       });
 
       var url = $dialog.find(".add_question_group_url").attr('href');
-      $.ajaxJSON(url, 'POST', newParams, function(data) {
+      $.ajaxJSON(url, 'POST', newParams, data => {
         $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.create_group', "Create Group"));
 
         var $group_top = $("#group_top_template").clone(true).attr('id', 'group_top_new');
@@ -2749,12 +2745,12 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
         updateFindQuestionDialogQuizGroups(group.id);
         $dialog.dialog('close');
-      }, function(data) {
+      }, data => {
         $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('errors.creating_group_failed', "Create Group Failed, Please Try Again"));
       });
     });
 
-    $("#add_question_group_dialog .cancel_button").click(function(event) {
+    $("#add_question_group_dialog .cancel_button").click(event => {
       $("#add_question_group_dialog").dialog('close');
       $("#quiz_group_select").val("none");
     });
@@ -2825,7 +2821,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       url = $.replaceTags(url, 'question_bank_id', bank.id);
       var page = ($findQuestionDialog.find(".page_link").data('page') || 0) + 1;
       url += "&page=" + page;
-      $.ajaxJSON(url, 'GET', {}, function(data) {
+      $.ajaxJSON(url, 'GET', {}, data => {
         $link.removeClass('loading');
         $findQuestionDialog.find(".page_link").data('page', page);
         $findQuestionDialog.find(".page_link").text(I18n.t('more_questions', "more questions"));
@@ -2840,18 +2836,18 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $findQuestionDialog.find(".question_message").hide();
         $findQuestionDialog.find(".question_list_holder").show();
         showQuestions(data);
-      }, function(data) {
+      }, data => {
         $link.removeClass('loading');
         $findQuestionDialog.find(".question_message").text(I18n.t('errors.loading_questions_failed', "Questions failed to load, please try again"));
         $findQuestionDialog.find(".page_link").text(I18n.t('errors.loading_more_questions_failed', "loading more questions failed"));
       });
-    }).delegate('.select_all_link', 'click', function(event) {
+    }).delegate('.select_all_link', 'click', event => {
       event.preventDefault();
       $findQuestionDialog.find(".question_list .found_question:not(.blank) :checkbox").attr('checked', true);
-    }).delegate('.clear_all_link', 'click', function(event) {
+    }).delegate('.clear_all_link', 'click', event => {
       event.preventDefault();
       $findQuestionDialog.find(".question_list .found_question:not(.blank) :checkbox").attr('checked', false);
-    }).delegate('.cancel_button', 'click', function(event) {
+    }).delegate('.cancel_button', 'click', event => {
       $findQuestionDialog.dialog('close');
     }).delegate('.group_button', 'click', function(event) {
       var $dialog = $("#add_found_questions_as_group_dialog");
@@ -2876,7 +2872,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       params.existing_questions = '1';
       var url = $findQuestionDialog.find(".add_questions_url").attr('href');
       $findQuestionDialog.find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.adding_questions', "Adding Questions..."));
-      $.ajaxJSON(url, 'POST', params, function(question_results) {
+      $.ajaxJSON(url, 'POST', params, question_results => {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.add_selected_questions', "Add Selected Questions"));
         $findQuestionDialog.find(".selected_side_tab").removeClass('selected_side_tab');
         var counter = 0;
@@ -2894,7 +2890,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         }
         setTimeout(nextQuestion, 10);
         $findQuestionDialog.dialog('close');
-      }, function(data) {
+      }, data => {
         $findQuestionDialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('errors.adding_questions_failed', "Adding Questions Failed, please try again"));
       });
     });
@@ -3037,15 +3033,13 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         }
       } else if (questionData.question_type == "fill_in_multiple_blanks_question" || questionData.question_type == "short_answer_question") {
         var checkForNotBlanks = function (elements) {
-          return elements.filter(function(i,element) {
-            return !!element.value;
-          }).length;
+          return elements.filter((i, element) => !!element.value).length;
         }
         if (questionData.question_type == "fill_in_multiple_blanks_question") {
           var $variables = $form.find(".blank_id_select > option");
-          $variables.each(function(i, answer_blank) {
+          $variables.each((i, answer_blank) => {
             var blankCount = 0;
-            $answers.filter(".answer_idx_" + i).each(function(i, element) {
+            $answers.filter(".answer_idx_" + i).each((i, element) => {
               var $validInputs = $(element).find( $("input[name='answer_text']")).not(".disabled_answer");
               if (checkForNotBlanks($validInputs) > 0) {blankCount += 1;}
             });
@@ -3093,7 +3087,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         data.answer_html = $answer.find(".answer_html").html();
 
         // Parse any of our float_valued inputs out of the user's locale for submission
-        $answer.find('input.float_value').each(function (idx, inputEl) {
+        $answer.find('input.float_value').each((idx, inputEl) => {
           data[inputEl.name] = numberHelper.parse($(inputEl).val());
         });
 
@@ -3150,9 +3144,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
             variable.value = numberHelper.parse($(this).text()) || 0;
             data.variables.push(variable);
           });
-          data.variables = data.variables.sort(function(a, b) {
-            return sorts[a.name] - sorts[b.name];
-          });
+          data.variables = data.variables.sort((a, b) => sorts[a.name] - sorts[b.name]);
           question.answers.push(data);
         });
       }
@@ -3191,7 +3183,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
       $displayQuestion.loadingImage();
       quiz.updateDisplayComments();
-      $.ajaxJSON(url, method, questionData, function(data) {
+      $.ajaxJSON(url, method, questionData, data => {
         $displayQuestion.loadingImage('remove');
         $displayQuestion.find('.question_name').focus();
 
@@ -3215,7 +3207,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           REGRADE_OPTIONS[questionData.id] = question.regrade_option;
           delete REGRADE_DATA['question_' + questionData.id];
         }
-      }, function(data) {
+      }, data => {
         $displayQuestion.formErrors(data);
       });
     });
@@ -3233,7 +3225,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     });
 
-    $(document).delegate("input.float_value", 'keydown', function(event) {
+    $(document).delegate("input.float_value", 'keydown', event => {
       if (event.keyCode > 57 && event.keyCode < 91 && event.keyCode != 69) {
         event.preventDefault();
       }
@@ -3251,7 +3243,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       }
     });
 
-    $(document).delegate("input.precision_value", 'keydown', function(event) {
+    $(document).delegate("input.precision_value", 'keydown', event => {
       // unless movement key || '0' through '9' || '-' || '+'
       if (event.keyCode > 57 && event.keyCode != 189 && event.keyCode != 187) {
         event.preventDefault();
@@ -3268,9 +3260,9 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       var question_data = $teaser.data('question');
       if (!question_data) {
         $teaser.find(".teaser.question_text").text(I18n.t('loading_question', "Loading Question..."));
-        $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
+        $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, question => {
           showQuestion(question);
-        }, function() {
+        }, () => {
           $teaser.find(".teaser.question_text").text(I18n.t('errors.loading_question_failed', "Loading Question Failed..."));
         });
       } else {
@@ -3312,7 +3304,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $(this).parents(".question_teaser").find(".question_teaser_link").click();
     });
 
-    $(".keep_editing_link").click(function(event) {
+    $(".keep_editing_link").click(event => {
       event.preventDefault();
       $(".question_generated,.question_preview").hide()
       $(".question_editing").show();
@@ -3332,7 +3324,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           data['quiz_group[question_points]'] = quizGroupQuestionPoints;
         }
         var newData = {};
-        _.each(data, function(val, key) {
+        _.each(data, (val, key) => {
           newData[key.replace('quiz_group[', 'quiz_groups[][')] = val;
         });
         return newData;
@@ -3428,7 +3420,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       },
 
       sortableItems: function() {
-        return this.$questions.children('.quiz_sortable').map(function(i, item) {
+        return this.$questions.children('.quiz_sortable').map((i, item) => {
           var item = $(item);
           var sortable = item;
 
@@ -3460,9 +3452,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       findGroups: function() {
         var intoGroups = [];
         if (this.selected.type == 'question') {
-          intoGroups = $.grep(this.items, function(item) {
-            return item.type == 'group';
-          });
+          intoGroups = $.grep(this.items, item => item.type == 'group');
         }
         return intoGroups;
       },
@@ -3477,9 +3467,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var moveSelect  = this.$form.find("#move_select_group");
 
         if (this.intoGroups.length > 0) {
-          options = $.map(this.intoGroups, function(g) {
-            return '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>';
-          });
+          options = $.map(this.intoGroups, g => '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>');
           options.unshift('<option value="top">' +
             htmlEscape(I18n.t('top_level', '-- Top level --')) +
           '</option>');
@@ -3503,11 +3491,8 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var filtered = this.itemsInGroup(value);
 
         // build options
-        var options = $.map(filtered, function(item) {
-          return '<option value="' + htmlEscape(item.type) + '_' + item.id + '">' +
-            htmlEscape(I18n.t('before_quiz_item', "before %{name}", {name: item.name})) +
-          '</option>';
-        });
+        var options = $.map(filtered, item => '<option value="' + htmlEscape(item.type) + '_' + item.id + '">' +
+          htmlEscape(I18n.t('before_quiz_item', "before %{name}", {name: item.name})) + '</option>');
         options.push('<option value="last">' +
           htmlEscape(I18n.t('at_the_bottom', "-- at the bottom --")) +
         '</option>');
@@ -3515,10 +3500,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       },
 
       itemsInGroup: function(group) {
-        return $.grep(this.items, function(item) {
-          return item.id != this.selected.id &&
-                 (group == 'top' ? item.top : item.group == group);
-        }.bind(this));
+        return $.grep(this.items, item => item.id != this.selected.id && (group == 'top' ? item.top : item.group == group));
       },
 
       showDialog: function() {
@@ -3535,9 +3517,9 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
         this.$form.find("h2").focus();
 
-        this.$form.find('#move_quiz_item_cancel_btn').on('click keyclick', function() {
+        this.$form.find('#move_quiz_item_cancel_btn').on('click keyclick', () => {
           this.$form.filter(":visible").dialog('close');
-        }.bind(this));
+        });
 
         this.$form.find('#move_quiz_item_submit_btn').on('click keyclick', this.saveMove.bind(this));
       },
@@ -3591,9 +3573,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
 
         // move to before the item chosen
         } else {
-          var beforeItem = $.grep(this.items, function(item) {
-            return item.type + "_" + item.id == place;
-          })[0].sortable;
+          var beforeItem = $.grep(this.items, item => item.type + "_" + item.id == place)[0].sortable;
           beforeItem.before(this.selected.sortable);
         }
 
@@ -3606,7 +3586,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var prev = this.selected.sortable;
         var items = this.itemsInGroup(this.selected.id);
         if (items.length) {
-          $.each(items, function(i, item) {
+          $.each(items, (i, item) => {
             prev.after(item.sortable);
             prev = item.sortable;
           });
@@ -3635,9 +3615,9 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         var url = item.attr('href');
         this.$questions.loadingImage();
 
-        $.ajaxJSON(url, 'POST', JSON.stringify({order: params}), function(data) {
+        $.ajaxJSON(url, 'POST', JSON.stringify({order: params}), data => {
           this.$questions.loadingImage('remove');
-        }.bind(this), {}, {contentType: "application/json"});
+        }, {}, {contentType: "application/json"});
       },
 
       buildGroupParams: function(group) {
@@ -3647,12 +3627,12 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         // rebuild the group list adding in our selection
         var selected = this.selected;
         var params = [];
-        $.each(this.itemsInGroup(group), function(i, item) {
+        $.each(this.itemsInGroup(group), (i, item) => {
           if (item.type + '_' + item.id == place) {
             params.push({type: selected.type, id: selected.id});
           }
           params.push({type: item.type, id: item.id});
-        }.bind(this));
+        });
 
         if (place == 'last') {
           params.push({type: selected.type, id: selected.id});
@@ -3660,7 +3640,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         return params;
       }
     }
-    $(document).on('click keydown', ".draggable-handle", function(event) {
+    $(document).on('click keydown', ".draggable-handle", event => {
       if (event.type == "keydown" && event.keyCode != 13 && event.keyCode != 32) { return; }
       event.preventDefault();
 
@@ -3668,7 +3648,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $(event.target), $("#questions"), $("#move_quiz_item_form")
       );
     });
-    $(document).on('focus blur', ".draggable-handle", function(e) {
+    $(document).on('focus blur', ".draggable-handle", e => {
       var warning = $(e.target).find('.accessibility-warning');
       warning[e.type == 'focusin' ? 'removeClass' : 'addClass']('screenreader-only');
     });
@@ -3778,7 +3758,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $container.loadingImage();
         var list = [];
 
-        $.each(items, function(i, $obj) {
+        $.each(items, (i, $obj) => {
           var object;
           if ($obj.hasClass('question_holder')) {
             var $question = $obj.find('.question');
@@ -3793,7 +3773,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           list.push(object)
         });
 
-        $.ajaxJSON(url, 'POST', JSON.stringify({order: list}), function(data) {
+        $.ajaxJSON(url, 'POST', JSON.stringify({order: list}), data => {
           $container.loadingImage('remove');
         }, {}, {contentType: "application/json"});
       }
@@ -3935,10 +3915,10 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         I18n.t('quiz'),
         ENV['CONDITIONAL_RELEASE_ENV']);
 
-      $('#questions').on("change DOMNodeRemoved DOMNodeInserted", function() {
+      $('#questions').on("change DOMNodeRemoved DOMNodeInserted", () => {
         conditionalRelease.assignmentUpToDate = false;
       });
-      $("#quiz_tabs").on("tabsbeforeactivate", function(event) {
+      $("#quiz_tabs").on("tabsbeforeactivate", event => {
         if (!conditionalRelease.assignmentUpToDate) {
           var id = null;
           if (quizModel) {
@@ -3964,8 +3944,8 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     if ($question.data('multiple_sets_question_bindings')) { return; }
     $question.data('multiple_sets_question_bindings', true);
 
-    $questionContent.bind('keypress', function (event) {
-      setTimeout(function () { $(event.target).triggerHandler('change'); }, 50);
+    $questionContent.bind('keypress', event => {
+      setTimeout(() => { $(event.target).triggerHandler('change'); }, 50);
     });
 
     if (!isChangeMultiFuncBound($questionContent)) {
@@ -4146,14 +4126,14 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
           return;
         } else {
           combinationIndex++;
-          setTimeout(function() {
+          setTimeout(() => {
             next();
           }, 500);
         }
       };
       setTimeout(next, 100);
     });
-    $question.find(".recompute_variables").click(function() {
+    $question.find(".recompute_variables").click(() => {
       var question_type = $question.find(".question_type").val();
       if (question_type != 'calculated_question') {
         return;
@@ -4165,7 +4145,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $(this).find(".variable_setting:first").trigger('change', in_dom ? { recompute: true, cache: true } : { cache: true });
       });
     });
-    $question.bind('settings_change', function(event, remove) {
+    $question.bind('settings_change', (event, remove) => {
       var question_type = $question.find(".question_type").val();
       if (question_type != 'calculated_question') {
         return;
@@ -4182,7 +4162,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $question.find(".combinations_holder").showIf($question.find(".combinations tbody tr").length > 0);
     });
 
-    $question.find(".variables").delegate('.variable_setting', 'change', function(event, options) {
+    $question.find(".variables").delegate('.variable_setting', 'change', (event, options) => {
       var question_type = $question.find(".question_type").val();
       if (question_type != 'calculated_question') {
         return;
@@ -4211,7 +4191,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
         $question.triggerHandler('settings_change', true);
       }
     });
-    $question.find(".help_with_equations_link").click(function(event) {
+    $question.find(".help_with_equations_link").click(event => {
       event.preventDefault();
       $("#calc_helper_methods").empty();
       var functions = calcCmd.functionList();
@@ -4228,8 +4208,8 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       });
     });
     $question.find(".combinations_option").attr('disabled', true);
-    $question.find(".question_content").bind('keypress', function(event) {
-      setTimeout(function() {$(event.target).triggerHandler('change')}, 50);
+    $question.find(".question_content").bind('keypress', event => {
+      setTimeout(() => {$(event.target).triggerHandler('change')}, 50);
     });
     $question.find(".question_content").bind('change', function(event) {
       var text = RichContentEditor.callOnRCE($(this), 'get_code');
@@ -4299,7 +4279,7 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     toggler.toggle();
   });
 
-  $(function() {
+  $(() => {
     $(document).on('change', function controlResultVisibilityFields() {
       // "Let Students See Their Quiz Responses" related fields visibility:
       if (isShowingResults()) {

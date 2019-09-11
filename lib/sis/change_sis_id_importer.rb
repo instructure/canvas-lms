@@ -87,10 +87,14 @@ module SIS
         column = details[:column] || :sis_source_id
         check_for_conflicting_ids(column, details, type, data_change)
         old_item = find_item_to_update(column, details, type, data_change)
-        updates = ids_to_change(column, data_change)
-        details[:scope].where(id: old_item.id).update_all(updates)
+        update_record(column, data_change, details, old_item)
         @things_to_update_batch_ids[type] << old_item.id
         @success_count += 1
+      end
+
+      def update_record(column, data_change, details, old_item)
+        updates = ids_to_change(column, data_change)
+        details[:scope].where(id: old_item.id).update_all(updates)
       end
 
       def ids_to_change(column, data_change)

@@ -38,21 +38,21 @@ function renderContentBaseOnAvailability({assignment, submission}) {
   } else if (submission === null) {
     // NOTE: handles case where user is not logged in
     return (
-      <React.Fragment>
+      <>
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
         >
           <LoggedOutTabs assignment={assignment} />
         </Suspense>
-      </React.Fragment>
+      </>
     )
   } else {
     return (
-      <React.Fragment>
+      <>
         <AssignmentToggleDetails description={assignment.description} />
         <ContentTabs assignment={assignment} submission={submission} />
-      </React.Fragment>
+      </>
     )
   }
 }

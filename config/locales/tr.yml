@@ -500,6 +500,7 @@ tr:
         checking_settings: "Turnitin ayarları denetleniyor..."
         invalid_settings: "Geçersiz Turnitin ayarları, lütfen hesap id'nizi ve paylaşılan gizli Turnitin anahtarını kontrol edin"
         setings_confirmed: "Turnitin ayarları doğrunladı!"
+    siteadmin: "Site Yöneticisi"
     titles: 
       configure_report: "Raporu Yapılandır"
       open_registration_delegated_warning_dialog: "Harici Kimlik Sağlayıcı Etkinleştirildi"
@@ -1711,6 +1712,7 @@ tr:
     default_name: "İsim Yok"
   add_collaboration_da9665ac: "İşbirliği Ekle"
   add_contact_method_d2dfea03: "İletişim Yöntemi Ekle"
+  add_content_58b4305a: "İçerik Ekle"
   add_content_to_module_name_589a8d54: "%{module_name} Modülüne İçerik Ekle"
   add_course_406cb773: "Ders Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
@@ -7241,6 +7243,7 @@ tr:
   ending_date_e1ea13a4: "Bitiş tarihi"
   ends_4fcb632: "Bitiyor:"
   ends_at_9a62b528: "Şu zaman bitiyor"
+  english_c60612e2: İngilizce
   enrolled_a6a517cd: Kayıtlı
   enrolled_as_272da3b9: "Şu rolde kayıt olundu"
   enrollment: 
@@ -8753,6 +8756,7 @@ tr:
   graph_bar_b5daa23d: "Grafik çubuğu"
   graphs_89fcfeb: Grafikler
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Harika şimdi bir dersiniz var... Sırada ne var? Şey, dersinizi tüm dünyaya açmadan önce, temelde her şeyin hazır olduğunu kontrol etmek isteyebilirsiniz. Dersinizin kullanıma hazır olduğundan emin olmak için soldaki listeyi inceleyin."
+  greek_65c5b3f7: Yunan
   green_15af4778: Yeşil
   group: 
     greater_than_1: "1'den büyük olmalıdır"
@@ -9625,6 +9629,7 @@ tr:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "Bu tarihe kadar kilitle"
+  language_6b3e2c7c: Dil
   last_enrollment_activity_10fe15ba: "Son Derse Kayıt Etkinliği"
   last_item_79583712: "Son Öğe:"
   last_login_54565109: "Son oturum açma"
@@ -9809,6 +9814,7 @@ tr:
   load_bank: 
     loading_banks: "Soru bankaları yükleniyor..."
   load_more_9ca37ccc: "Daha fazla yükle..."
+  load_more_a36f9cf9: "Daha fazla yükle"
   load_more_results_460f49a9: "Daha fazla sonuç yükle"
   loading_25990131: Yükleniyor...
   loading_bde52856: Yükleniyor
@@ -10095,6 +10101,7 @@ tr:
       submitting: "Medya Dosyası Gönderiliyor..."
   media_recording_77cddc52: "Medya Kaydı"
   media_recordings_749aef6d: "Medya Kayıtları"
+  media_submission_464829f0: "Çoklu Ortam Gönderimi"
   median_ed291842: Medyan
   median_score_4657e907: "Ortalama: %{score}"
   meets_expectations_bb179565: "Beklentileri Karşılıyor"

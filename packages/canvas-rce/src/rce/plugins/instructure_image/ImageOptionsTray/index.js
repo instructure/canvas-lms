@@ -17,42 +17,38 @@
  */
 
 import React, {useState} from 'react'
-import {bool, func, shape, string} from 'prop-types'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Button} from '@instructure/ui-buttons'
-import {CloseButton} from '@instructure/ui-buttons'
+import {bool, func, number, shape, string} from 'prop-types'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Button,CloseButton} from '@instructure/ui-buttons'
+
 import {Heading} from '@instructure/ui-elements'
 import {Checkbox, RadioInput, RadioInputGroup, Select, TextArea} from '@instructure/ui-forms'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Flex, View} from '@instructure/ui-layout'
 import {Tooltip, Tray} from '@instructure/ui-overlays'
 
+import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, imageSizes, labelForImageSize, scaleToSize} from '../ImageEmbedOptions'
 import formatMessage from '../../../../format-message'
-
-function labelForImageSize(imageSize) {
-  switch (imageSize) {
-    case 'small': {
-      return formatMessage('Small')
-    }
-    case 'medium': {
-      return formatMessage('Medium')
-    }
-    case 'large': {
-      return formatMessage('Large')
-    }
-    default: {
-      return formatMessage('Custom')
-    }
-  }
-}
+import DimensionsInput, { useDimensionsState } from '../../shared/DimensionsInput'
 
 export default function ImageOptionsTray(props) {
   const {imageOptions, onRequestClose, open} = props
 
+  const {naturalHeight, naturalWidth} = imageOptions
+  const currentHeight = imageOptions.appliedHeight || naturalHeight
+  const currentWidth = imageOptions.appliedWidth || naturalWidth
+
   const [altText, setAltText] = useState(imageOptions.altText)
   const [isDecorativeImage, setIsDecorativeImage] = useState(imageOptions.isDecorativeImage)
   const [displayAs, setDisplayAs] = useState('embed')
-  const [imageSize, setImageSize] = useState('medium')
+  const [imageSize, setImageSize] = useState(imageOptions.imageSize)
+  const [imageHeight, setImageHeight] = useState(currentHeight)
+  const [imageWidth, setImageWidth] = useState(currentWidth)
+
+  const dimensionsState = useDimensionsState(imageOptions, {
+    minHeight: MIN_HEIGHT,
+    minWidth: MIN_WIDTH
+  })
 
   const imageSizeOption = {label: labelForImageSize(imageSize), value: imageSize}
 
@@ -70,12 +66,34 @@ export default function ImageOptionsTray(props) {
 
   function handleImageSizeChange(event, selectedOption) {
     setImageSize(selectedOption.value)
+    if (selectedOption.value === CUSTOM) {
+      setImageHeight(currentHeight)
+      setImageWidth(currentWidth)
+    } else {
+      const {height, width} = scaleToSize(selectedOption.value, naturalWidth, naturalHeight)
+      setImageHeight(height)
+      setImageWidth(width)
+    }
   }
 
   function handleSave(event) {
     event.preventDefault()
     const savedAltText = isDecorativeImage ? '' : altText
-    props.onSave({altText: savedAltText, displayAs, imageSize, isDecorativeImage})
+
+    let appliedHeight = imageHeight
+    let appliedWidth = imageWidth
+    if (imageSize === CUSTOM) {
+      appliedHeight = dimensionsState.height
+      appliedWidth = dimensionsState.width
+    }
+
+    props.onSave({
+      altText: savedAltText,
+      appliedHeight,
+      appliedWidth,
+      displayAs,
+      isDecorativeImage
+    })
   }
 
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
@@ -101,6 +119,17 @@ export default function ImageOptionsTray(props) {
     </Flex>
   )
 
+  const messagesForSize = []
+  if (imageSize !== CUSTOM) {
+    messagesForSize.push({
+      text: formatMessage('{width} x {height}px', {height: imageHeight, width: imageWidth}),
+      type: 'hint'
+    })
+  }
+
+  const saveDisabled =
+    displayAs === 'embed' && ((!isDecorativeImage && altText === '') || (imageSize === CUSTOM && !dimensionsState.isValid))
+
   return (
     <Tray
       data-mce-component
@@ -116,13 +145,17 @@ export default function ImageOptionsTray(props) {
     >
       <Flex direction="column" height="100vh">
         <Flex.Item as="header" padding="medium">
-          <Flex direction="row">
-            <Flex.Item grow shrink>
-              <Heading as="h2">{formatMessage('Image Options')}</Heading>
+        <Flex direction="row">
+          <Flex.Item>
+              <CloseButton placemet="static" variant="icon" onClick={onRequestClose}>
+                {formatMessage('Close')}
+              </CloseButton>
             </Flex.Item>
 
-            <Flex.Item>
-              <CloseButton onClick={onRequestClose}>{formatMessage('Close')}</CloseButton>
+            <Flex.Item grow shrink>
+              <Heading as="h2" margin="none none none medium">
+                {formatMessage('Image Options')}
+              </Heading>
             </Flex.Item>
           </Flex>
         </Flex.Item>
@@ -169,20 +202,33 @@ export default function ImageOptionsTray(props) {
                   </RadioInputGroup>
                 </Flex.Item>
 
-                <Flex.Item margin="small none none none" padding="small">
-                  <Select
-                    label={formatMessage('Size')}
-                    onChange={handleImageSizeChange}
-                    selectedOption={imageSizeOption}
-                  >
-                    <option value="small">{labelForImageSize('small')}</option>
+                <Flex.Item margin="small none xx-small none">
+                  <View as="div" padding="small small xx-small small">
+                    <Select
+                      disabled={displayAs !== 'embed'}
+                      label={formatMessage('Size')}
+                      messages={messagesForSize}
+                      onChange={handleImageSizeChange}
+                      selectedOption={imageSizeOption}
+                    >
+                      {imageSizes.map(size => (
+                        <option key={size} value={size}>
+                          {labelForImageSize(size)}
+                        </option>
+                      ))}
+                    </Select>
+                  </View>
 
-                    <option value="medium">{labelForImageSize('medium')}</option>
-
-                    <option value="large">{labelForImageSize('large')}</option>
-
-                    <option value="custom">{labelForImageSize('custom')}</option>
-                  </Select>
+                  {imageSize === CUSTOM && (
+                    <View as="div" padding="xx-small small">
+                      <DimensionsInput
+                        dimensionsState={dimensionsState}
+                        disabled={displayAs !== 'embed'}
+                        minHeight={MIN_HEIGHT}
+                        minWidth={MIN_WIDTH}
+                      />
+                    </View>
+                  )}
                 </Flex.Item>
               </Flex>
             </Flex.Item>
@@ -194,7 +240,7 @@ export default function ImageOptionsTray(props) {
               textAlign="end"
             >
               <Button
-                disabled={!isDecorativeImage && altText === '' && displayAs === 'embed'}
+                disabled={saveDisabled}
                 onClick={handleSave}
                 variant="primary"
               >
@@ -211,7 +257,11 @@ export default function ImageOptionsTray(props) {
 ImageOptionsTray.propTypes = {
   imageOptions: shape({
     altText: string.isRequired,
-    isDecorativeImage: bool.isRequired
+    appliedHeight: number,
+    appliedWidth: number,
+    isDecorativeImage: bool.isRequired,
+    naturalHeight: number.isRequired,
+    naturalWidth: number.isRequired
   }).isRequired,
   onEntered: func,
   onExited: func,

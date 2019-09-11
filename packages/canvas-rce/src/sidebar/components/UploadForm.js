@@ -60,12 +60,12 @@ class UploadForm extends Component {
   }
 
   parentFolderId() {
-    let stateId = this.state.file.parentFolderId;
+    const stateId = this.state.file.parentFolderId;
     if (stateId) {
       return stateId;
     }
-    let firstKey = Object.keys(this.props.upload.folders)[0];
-    let firstFolder = this.props.upload.folders[firstKey];
+    const firstKey = Object.keys(this.props.upload.folders)[0];
+    const firstFolder = this.props.upload.folders[firstKey];
     if (firstFolder) {
       return firstFolder.id;
     }
@@ -80,7 +80,7 @@ class UploadForm extends Component {
 
   handleUpload(e) {
     e.preventDefault();
-    let fileMetaProps = { ...this.state.file };
+    const fileMetaProps = { ...this.state.file };
     if (this._usageRights) {
       fileMetaProps.usageRights = this._usageRights.value();
     }
@@ -109,7 +109,7 @@ class UploadForm extends Component {
   }
 
   handleFileChange(e) {
-    var file = e.target.files[0];
+    const file = e.target.files[0];
     let fileStateUpdate = { file: {} };
     if (file !== undefined) {
       fileStateUpdate = {
@@ -147,7 +147,7 @@ class UploadForm extends Component {
         variant="link"
         onClick={this.showForm.bind(this)}
       >
-        <span aria-hidden={true}>
+        <span aria-hidden>
           {icon}
           {" " + message}
         </span>
@@ -157,7 +157,7 @@ class UploadForm extends Component {
   }
 
   renderFolderOption({ folderId, depth }) {
-    let folder = this.props.upload.folders[folderId];
+    const folder = this.props.upload.folders[folderId];
     if (!folder) {
       return;
     }
@@ -175,17 +175,17 @@ class UploadForm extends Component {
   }
 
   renderFolderSelect() {
-    let screenreaderMessage = formatMessage(
+    const screenreaderMessage = formatMessage(
       "Select a folder to upload your file into"
     );
-    let labelText = formatMessage("Folder");
-    let label = (
+    const labelText = formatMessage("Folder");
+    const label = (
       <span>
-        <span aria-hidden={true}>{labelText}</span>
+        <span aria-hidden>{labelText}</span>
         <ScreenReaderContent>{screenreaderMessage}</ScreenReaderContent>
       </span>
     );
-    let flattenedFolders = this.flattenFolderTreeDepthFirst(
+    const flattenedFolders = this.flattenFolderTreeDepthFirst(
       this.props.upload.rootFolderId,
       this.props.upload.folderTree
     );
@@ -240,8 +240,8 @@ class UploadForm extends Component {
 
   renderForm() {
     if (this.props.upload.formExpanded) {
-      let screenreaderMessage = formatMessage("Select a file");
-      let errorMessage =
+      const screenreaderMessage = formatMessage("Select a file");
+      const errorMessage =
         this.props.upload.error &&
         this.props.upload.error.type === "QUOTA_EXCEEDED_UPLOAD"
           ? formatMessage(

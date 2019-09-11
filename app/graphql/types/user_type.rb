@@ -81,6 +81,16 @@ module Types
       end
     end
 
+    field :groups, [GroupType], null: true
+    def groups
+      Promise.all([
+        load_association(:groups),
+        load_association(:group_memberships)
+      ]).then do
+        object.groups.active
+      end
+    end
+
     field :summary_analytics, StudentSummaryAnalyticsType, null: true do
       argument :course_id, ID,
         "returns summary analytics for this course",

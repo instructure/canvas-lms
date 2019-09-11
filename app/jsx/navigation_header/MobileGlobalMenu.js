@@ -60,8 +60,8 @@ export default class MobileGlobalMenu extends React.Component {
 
   static propTypes = {
     current_user: shape({
-      display_name: string.isRequired,
-      avatar_image_url: string.isRequired
+      display_name: string,
+      avatar_image_url: string
     }),
     DesktopNavComponent: shape({
       ensureLoaded: func.isRequired,

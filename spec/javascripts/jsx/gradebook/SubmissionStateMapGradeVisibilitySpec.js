@@ -50,42 +50,42 @@ function createAndSetupMap(assignment, opts = {}) {
 
 QUnit.module('SubmissionStateMap')
 
-test('submission has grade visible if not anonymous', function() {
+test('submission has grade visible if not anonymous', () => {
   const assignment = {id: '1', muted: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, false)
 })
 
-test('submission has grade visible if not muted', function() {
+test('submission has grade visible if not muted', () => {
   const assignment = {id: '1', anonymous_grading: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, false)
 })
 
-test('submission has grade hidden if anonymize_students is true', function() {
+test('submission has grade hidden if anonymize_students is true', () => {
   const assignment = {id: '1', anonymize_students: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, true)
 })
 
-test('submission has grade visible if not moderated', function() {
+test('submission has grade visible if not moderated', () => {
   const assignment = {id: '1', moderated_grading: false, grades_published: false}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, false)
 })
 
-test('submission has grade visible if grades are published', function() {
+test('submission has grade visible if grades are published', () => {
   const assignment = {id: '1', moderated_grading: false, grades_published: true}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   strictEqual(state.hideGrade, false)
 })
 
-test('submission has grade visible if moderated and not published', function() {
+test('submission has grade visible if moderated and not published', () => {
   const assignment = {id: '1', moderated_grading: true, grades_published: false}
   const map = createAndSetupMap(assignment)
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
@@ -94,14 +94,14 @@ test('submission has grade visible if moderated and not published', function() {
 
 QUnit.module('SubmissionStateMap without grading periods')
 
-test('submission has grade hidden for a student without assignment visibility', function() {
+test('submission has grade hidden for a student without assignment visibility', () => {
   const assignment = {id: '1', effectiveDueDates: {}, only_visible_to_overrides: true}
   const map = createAndSetupMap(assignment, {hasGradingPeriods: false})
   const state = map.getSubmissionState({user_id: student.id, assignment_id: assignment.id})
   equal(state.hideGrade, true)
 })
 
-test('submission has grade visible for a student with assignment visibility', function() {
+test('submission has grade visible for a student with assignment visibility', () => {
   const assignment = {id: '1', effectiveDueDates: {}}
   assignment.effectiveDueDates[student.id] = {
     due_at: null,

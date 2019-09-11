@@ -37,6 +37,7 @@ import {SubmissionDraftDefaultMocks} from './graphqlData/SubmissionDraft'
 import {SubmissionHistoryDefaultMocks} from './graphqlData/SubmissionHistory'
 import {SubmissionInterfaceDefaultMocks} from './graphqlData/SubmissionInterface'
 import {UserDefaultMocks} from './graphqlData/User'
+import {UserGroupsDefaultMocks} from './graphqlData/UserGroups'
 
 function defaultMocks() {
   return {
@@ -59,7 +60,8 @@ function defaultMocks() {
     ...SubmissionDraftDefaultMocks,
     ...SubmissionHistoryDefaultMocks,
     ...SubmissionInterfaceDefaultMocks,
-    ...UserDefaultMocks
+    ...UserDefaultMocks,
+    ...UserGroupsDefaultMocks
   }
 }
 
@@ -100,7 +102,7 @@ function createMocks(overrides = []) {
  *       }
  *       ```
  */
-export async function mockQuery(query, overrides = [], variables = {}) {
+export function mockQuery(query, overrides = [], variables = {}) {
   // Turn the processed / normalized graphql-tag (gql) query back into a
   // string that can be used to make a query using graphql.js. Using gql is
   // super helpful for things like removing duplicate fragments, so we still

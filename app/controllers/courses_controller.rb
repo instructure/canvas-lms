@@ -145,6 +145,11 @@ require 'securerandom'
 #            "example": 25,
 #            "type": "integer"
 #         },
+#         "grade_passback_setting": {
+#            "description": "the grade_passback_setting set on the course",
+#            "example": "nightly_sync",
+#            "type": "string"
+#         },
 #         "created_at": {
 #           "description": "the date the course was created.",
 #           "example": "2012-05-01T00:00:00-06:00",
@@ -723,6 +728,9 @@ class CoursesController < ApplicationController
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
+  # @argument course[grade_passback_setting] [String]
+  #   Optional. The grade_passback_setting for the course. Only 'nightly_sync' and '' are allowed
+  #
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be 'on_campus', 'online', or 'blended')
   #
@@ -739,6 +747,12 @@ class CoursesController < ApplicationController
       if params_for_create.has_key?(:syllabus_body)
         params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
+
+     if params_for_create.key?(:grade_passback_setting)
+       grade_passback_setting = params_for_create.delete(:grade_passback_setting)
+       return unless authorized_action?(@course, @current_user, :manage_grades)
+       update_grade_passback_setting(grade_passback_setting)
+     end
 
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id)
@@ -2358,6 +2372,9 @@ class CoursesController < ApplicationController
   # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
+  # @argument course[grade_passback_setting] [String]
+  #   Optional. The grade_passback_setting for the course. Only 'nightly_sync' and '' are allowed
+  #
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
@@ -2489,6 +2506,13 @@ class CoursesController < ApplicationController
           end
         end
       end
+
+      if params_for_update.has_key?(:grade_passback_setting)
+        grade_passback_setting = params_for_update.delete(:grade_passback_setting)
+        return unless authorized_action?(@course, @current_user, :manage_grades)
+        update_grade_passback_setting(grade_passback_setting)
+      end
+
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
         params_for_update.delete :storage_quota
         params_for_update.delete :storage_quota_mb
@@ -3193,6 +3217,13 @@ class CoursesController < ApplicationController
 
   private
 
+  def update_grade_passback_setting(grade_passback_setting)
+    unless grade_passback_setting.blank? || grade_passback_setting == 'nightly_sync'
+      @course.errors.add(:grade_passback_setting, t("Invalid grade_passback_setting"))
+    end
+    @course.grade_passback_setting = grade_passback_setting.presence
+  end
+
   def active_group_memberships(users)
     @active_group_memberships ||= GroupMembership.active_for_context_and_users(@context, users).group_by(&:user_id)
   end
@@ -3204,7 +3235,7 @@ class CoursesController < ApplicationController
   def course_params
     return {} unless params[:course]
     params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
-      :grading_standard_id, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
+      :grading_standard_id, :grade_passback_setting, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
       :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,

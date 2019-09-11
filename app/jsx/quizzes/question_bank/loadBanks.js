@@ -32,14 +32,14 @@ export default function loadBanks () {
     var url = $("#bank_urls .managed_banks_url").attr('href');
     var $dialog = $("#move_question_dialog");
     $dialog.find("li.message").text(I18n.t('loading_banks', "Loading banks..."));
-    $.ajaxJSON(url, 'GET', {}, function(data) {
+    $.ajaxJSON(url, 'GET', {}, data => {
       for(var idx = 0; idx < data.length; idx++) {
         addBank(data[idx].assessment_question_bank);
       }
       $dialog.addClass('loaded');
       $dialog.find("li.bank.blank").show();
       $dialog.find("li.message").hide();
-    }, function(data) {
+    }, data => {
       $dialog.find("li.message").text(I18n.t("error_loading_banks", "Error loading banks"));
     });
 }

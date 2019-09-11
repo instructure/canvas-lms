@@ -61,5 +61,81 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       wait_for_ajaximations
       expect(sidebar_images.count).to eq 2
     end
+
+    it "should paginate images" do
+      wiki_page_tools_file_tree_setup(true, true)
+      150.times do |i|
+        image = @root_folder.attachments.build(:context => @course)
+        path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/graded.png')
+        image.display_name = "image #{i}"
+        image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        image.save!
+      end
+
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 50
+
+      # click the load more link; it should load another 50
+      fj('button:contains("Load more results")').click
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 100
+
+      # click the very last load more link
+      fj('button:contains("Load more results")').click
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 150
+    end
+
+    it "should show images uploaded on the files tab in the image list" do
+      wiki_page_tools_file_tree_setup(true, true)
+      click_files_tab
+      wait_for_ajaximations
+
+      expect(sidebar_files.length).to eq 4
+
+      wait_for_tiny(f("form.edit-form .edit-content"))
+      wiki_page_body = clear_wiki_rce
+
+      upload_image_to_files_in_rce
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.last
+      expect(sidebar_files.length).to eq 5
+      click_images_tab
+      wait_for_ajaximations
+
+      expect(fj("#right-side [role='button'] img:last").attribute('src')).to include "/thumbnails/#{@image.id}"
+      switch_editor_views(wiki_page_body)
+      expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
+    end
+
+    it "should add image via url" do
+      get "/courses/#{@course.id}/pages/blank"
+      wait_for_ajaximations
+      f('a.edit-wiki').click
+      add_url_image(driver, 'https://via.placeholder.com/150.jpg', 'alt text')
+      f('form.edit-form button.submit').click
+      expect(f('#wiki_page_show')).to be_displayed
+      check_element_attrs(f('#wiki_page_show img'), :src => 'https://via.placeholder.com/150.jpg', :alt => 'alt text')
+    end
+
+    describe "canvas images" do
+      before do
+        @course_root = Folder.root_folders(@course).first
+        @course_attachment = @course_root.attachments.create! :uploaded_data => jpeg_data_frd,
+                                                              :filename => 'course.jpg',
+                                                              :display_name => 'course.jpg',
+                                                              :context => @course
+        get "/courses/#{@course.id}/pages/blank"
+        wait_for_ajaximations
+        f('a.edit-wiki').click
+      end
+
+      it "should add a course image" do
+        add_canvas_image(driver, 'Course files', 'course.jpg')
+        f('form.edit-form button.submit').click
+        expect(f('#wiki_page_show')).to be_displayed
+      end
+    end
   end
 end

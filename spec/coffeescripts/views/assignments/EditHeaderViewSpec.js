@@ -62,7 +62,7 @@ test('renders', () => {
   ok(view.$('.header-bar-right').length > 0, 'header bar is rendered')
 })
 
-test('delete works for an un-saved assignment', function() {
+test('delete works for an un-saved assignment', () => {
   const view = editHeaderView()
   const cb = sandbox.stub(view, 'onDeleteSuccess')
   view.delete()
@@ -97,7 +97,7 @@ test('allows deleting assignments due in closed grading periods for admins', () 
   ok(view.$('.delete_assignment_link:not(.disabled)').length)
 })
 
-test('does not attempt to delete an assignment due in a closed grading period', function() {
+test('does not attempt to delete an assignment due in a closed grading period', () => {
   const view = editHeaderView({in_closed_grading_period: true})
   sandbox.stub(window, 'confirm').returns(true)
   sandbox.spy(view, 'delete')
@@ -121,7 +121,7 @@ QUnit.module('EditHeaderView - try deleting assignment', {
   }
 })
 
-test('attempt to delete an assignment, but clicked Cancel on confirmation box', function() {
+test('attempt to delete an assignment, but clicked Cancel on confirmation box', () => {
   const view = editHeaderView({in_closed_grading_period: false})
   sandbox.stub(window, 'confirm').returns(false)
   sandbox.spy(view, 'delete')

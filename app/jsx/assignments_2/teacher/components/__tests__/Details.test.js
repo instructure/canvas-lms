@@ -129,6 +129,58 @@ describe('Assignment Details', () => {
     expect(getByText('10/4/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available to
   })
 
+  it('renders override details when expand button is clicked', () => {
+    const assignment = mockAssignment({
+      dueAt: '2019-09-01T23:59:59-06:00',
+      lockAt: '2019-09-03T23:59:59-06:00',
+      unlockAt: '2019-08-28T00:00:00-06:00',
+      assignmentOverrides: {
+        nodes: [mockOverride(override1)]
+      },
+      submissionTypes: ['online_text_entry', 'online_url', 'online_upload']
+    })
+    const {getByText, getByTestId, getAllByTestId} = renderDetails(assignment)
+    const everyoneOverrideDetailButton = getByText('Everyone else')
+      .closest(`div[data-testid="Override"]`)
+      .querySelector('button')
+    expect(everyoneOverrideDetailButton.getAttribute('aria-expanded')).toBe('false')
+
+    everyoneOverrideDetailButton.click()
+    expect(everyoneOverrideDetailButton.getAttribute('aria-expanded')).toBe('true')
+    expect(getByTestId('OverrideDetail')).toBeInTheDocument()
+
+    // Dates
+    const overrideDetail = getByTestId('OverrideDetail')
+    expect(getAllByTestId('EditableDateTime', overrideDetail).length).toEqual(3)
+    // Due Date
+    expect(
+      getByText('Due:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`)
+    ).toBeInTheDocument()
+    // Available Date
+    expect(
+      getByText('Available:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`)
+    ).toBeInTheDocument()
+    // Until Date
+    expect(
+      getByText('Until:', overrideDetail).closest(`div[data-testid="AssignmentDate"]`)
+    ).toBeInTheDocument()
+
+    // 3 Submission Types: Text, URL & File
+    const submissionTypeContainer = getAllByTestId('OverrideSubmissionTypes', overrideDetail)
+    expect(submissionTypeContainer.length).toEqual(3)
+    expect(getByText('Item 1', submissionTypeContainer[0])).toBeInTheDocument()
+    expect(getByText('Text Entry', submissionTypeContainer[0])).toBeInTheDocument()
+    expect(getByText('Item 2', submissionTypeContainer[0])).toBeInTheDocument()
+    expect(getByText('URL', submissionTypeContainer[0])).toBeInTheDocument()
+    expect(getByText('Item 3', submissionTypeContainer[0])).toBeInTheDocument()
+    expect(getByText('File', submissionTypeContainer[0])).toBeInTheDocument()
+    expect(getByText('All Types Allowed', submissionTypeContainer[0])).toBeInTheDocument()
+
+    // Attempts
+    const attemptsDetailContainer = getByTestId('OverrideAttempts-Limit')
+    expect(getByText('Attempts Allowed', attemptsDetailContainer)).toBeInTheDocument()
+  })
+
   it('renders the Add Override button if !readOnly', () => {
     const assignment = mockAssignment({
       dueAt: null,

@@ -23,7 +23,7 @@ import WikiPageRevisionView from 'compiled/views/wiki/WikiPageRevisionView'
 
 QUnit.module('WikiPageRevisionView')
 
-test('binds to model change triggers', function() {
+test('binds to model change triggers', () => {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
   sandbox.mock(view)
@@ -32,7 +32,7 @@ test('binds to model change triggers', function() {
   revision.set('body', 'A New Body')
 })
 
-test('restore delegates to model.restore', function() {
+test('restore delegates to model.restore', () => {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
   sandbox.stub(view, 'windowLocation').returns({

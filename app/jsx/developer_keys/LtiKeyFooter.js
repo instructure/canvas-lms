@@ -58,10 +58,10 @@ export default class LtiKeyFooter extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <Button onClick={this.onCancel} margin="0 small 0 0">{I18n.t('Cancel')}</Button>
         {this.nextOrSaveButton()}
-      </React.Fragment>
+      </>
     )
   }
 }

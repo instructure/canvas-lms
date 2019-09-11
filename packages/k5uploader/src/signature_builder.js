@@ -7,7 +7,7 @@ export default function (params) {
   }
   names = names.sort();
   var s = '';
-  names.forEach(function(element){
+  names.forEach(element => {
     s += element;
     s += params[element];
   });

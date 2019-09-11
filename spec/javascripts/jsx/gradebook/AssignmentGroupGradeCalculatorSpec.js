@@ -31,25 +31,25 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with no submissions and n
   }
 })
 
-test('returns a current and final score of 0', function() {
+test('returns a current and final score of 0', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 0)
   equal(grades.final.score, 0)
 })
 
-test('includes 0 points possible', function() {
+test('includes 0 points possible', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.possible, 0)
   equal(grades.final.possible, 0)
 })
 
-test('includes assignment group attributes', function() {
+test('includes assignment group attributes', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.assignmentGroupId, 301)
   equal(grades.assignmentGroupWeight, 100)
 })
 
-test('uses a score unit of "points"', function() {
+test('uses a score unit of "points"', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.scoreUnit, 'points')
 })
@@ -74,82 +74,82 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with some assignments and
   }
 })
 
-test('adds all scores for current and final grades', function() {
+test('adds all scores for current and final grades', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 159)
   equal(grades.final.score, 159)
 })
 
-test('excludes assignment points on ungraded submissions for the current grade', function() {
+test('excludes assignment points on ungraded submissions for the current grade', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.possible, 284)
   equal(grades.final.possible, 1284)
 })
 
-test('ignores hidden submissions', function() {
+test('ignores hidden submissions', () => {
   submissions[1].hidden = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 117)
   equal(grades.final.score, 117)
 })
 
-test('excludes assignment points on hidden submissions', function() {
+test('excludes assignment points on hidden submissions', () => {
   submissions[1].hidden = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.possible, 193)
   equal(grades.final.possible, 1193)
 })
 
-test('ignores excused submissions', function() {
+test('ignores excused submissions', () => {
   submissions[1].excused = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 117)
   equal(grades.final.score, 117)
 })
 
-test('excludes assignment points on excused submissions', function() {
+test('excludes assignment points on excused submissions', () => {
   submissions[1].excused = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.possible, 193)
   equal(grades.final.possible, 1193)
 })
 
-test('excludes submissions "pending review" from the current grade', function() {
+test('excludes submissions "pending review" from the current grade', () => {
   submissions[1].workflow_state = 'pending_review'
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 117)
   equal(grades.current.possible, 193)
 })
 
-test('includes submissions "pending review" in the final grade', function() {
+test('includes submissions "pending review" in the final grade', () => {
   submissions[1].workflow_state = 'pending_review'
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.final.score, 159)
   equal(grades.final.possible, 1284)
 })
 
-test('excludes assignments "omitted from final grade" from the current grade', function() {
+test('excludes assignments "omitted from final grade" from the current grade', () => {
   assignmentGroup.assignments[2].omit_from_final_grade = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 145)
   equal(grades.current.possible, 229)
 })
 
-test('excludes assignments "omitted from final grade" from the final grade', function() {
+test('excludes assignments "omitted from final grade" from the final grade', () => {
   assignmentGroup.assignments[2].omit_from_final_grade = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.final.score, 145)
   equal(grades.final.possible, 1229)
 })
 
-test('excludes ungraded assignments "omitted from final grade" from the final grade', function() {
+test('excludes ungraded assignments "omitted from final grade" from the final grade', () => {
   assignmentGroup.assignments[4].omit_from_final_grade = true
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.final.score, 159)
   equal(grades.final.possible, 284)
 })
 
-test('eliminates multiple submissions for the same assignment', function() {
+test('eliminates multiple submissions for the same assignment', () => {
   submissions.push({...submissions[0]})
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 159)
@@ -158,7 +158,7 @@ test('eliminates multiple submissions for the same assignment', function() {
   equal(grades.final.possible, 1284)
 })
 
-test('avoids floating point rounding errors on submission percentages', function() {
+test('avoids floating point rounding errors on submission percentages', () => {
   submissions[0].score = 21.4
   assignments[0].points_possible = 40
 
@@ -182,7 +182,7 @@ QUnit.module(
   }
 )
 
-test('includes scores for submissions on unpointed assignments', function() {
+test('includes scores for submissions on unpointed assignments', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 20)
   equal(grades.final.score, 20)
@@ -203,7 +203,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     assignmentGroup = {id: '2201', rules: {drop_lowest: 1}, assignments}
   })
 
-  test('drops one submission to maximize overall percentage grade', function() {
+  test('drops one submission to maximize overall percentage grade', () => {
     // drop 31/40, keep 17/24, keep 6/10 = 23/34 = 67.6%
     // keep 31/40, drop 17/24, keep 6/10 = 37/50 = 74.0%
     // keep 31/40, keep 17/24, drop 6/10 = 48/64 = 75.0%
@@ -214,7 +214,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     ok(grades.final.submissions[2].drop)
   })
 
-  test('drops pointed assignments over unpointed assignments', function() {
+  test('drops pointed assignments over unpointed assignments', () => {
     assignmentGroup.assignments[0].points_possible = 0
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.score, 37)
@@ -223,27 +223,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     ok(grades.final.submissions[1].drop)
   })
 
-  test('excludes points possible from the assignment for the dropped submission', function() {
+  test('excludes points possible from the assignment for the dropped submission', () => {
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.possible, 64)
     equal(grades.final.possible, 64)
   })
 
-  test('ignores ungraded submissions for the current grade', function() {
+  test('ignores ungraded submissions for the current grade', () => {
     submissions[2].score = null
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.score, 31)
     equal(grades.final.score, 48)
   })
 
-  test('excludes points possible for assignments with ungraded submissions for the current grade', function() {
+  test('excludes points possible for assignments with ungraded submissions for the current grade', () => {
     submissions[2].score = null
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.possible, 40)
     equal(grades.final.possible, 64)
   })
 
-  test('accounts for impact on overall grade rather than score alone', function() {
+  test('accounts for impact on overall grade rather than score alone', () => {
     submissions[2].score = 7
 
     // drop 31/40, keep 17/24, keep 7/10 = 24/34 = 70.6%
@@ -258,7 +258,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     ok(grades.final.submissions[1].drop)
   })
 
-  test('does not drop submissions or assignments when drop_lowest is 0', function() {
+  test('does not drop submissions or assignments when drop_lowest is 0', () => {
     assignmentGroup.rules.drop_lowest = 0
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.score, 54, 'current score includes all submission scores')
@@ -372,7 +372,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
   }
 })
 
-test('drops multiple submissions to maximize overall percentage grade', function() {
+test('drops multiple submissions to maximize overall percentage grade', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
 
   // drop 100/100, drop 42/91, keep 14/55, keep 3/38, ignore -/1000 =  17/93  = 18.3%
@@ -402,7 +402,7 @@ test('drops multiple submissions to maximize overall percentage grade', function
   ok(grades.final.submissions[4].drop)
 })
 
-test('drops all but one score when drop_lowest is equal to the number of submissions', function() {
+test('drops all but one score when drop_lowest is equal to the number of submissions', () => {
   assignmentGroup.rules = {drop_lowest: 4}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 100)
@@ -424,7 +424,7 @@ test('drops all but one score when drop_lowest is equal to the number of submiss
 // This test is here because the reductive algorithm used for grading can
 // potentially enter into an infinite loop. While this setup data is indeed
 // ridiculous, its presence guarantees that the algorithm will always finish.
-test('works in ridiculous circumstances', function() {
+test('works in ridiculous circumstances', () => {
   submissions[0].score = null
   submissions[1].score = 3
   submissions[2].score = null
@@ -458,7 +458,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
     assignmentGroup = {id: 301, rules: {drop_highest: 1}, assignments}
   })
 
-  test('drops one submission to minimize overall percentage grade', function() {
+  test('drops one submission to minimize overall percentage grade', () => {
     // drop 31/40, keep 17/24, keep 6/10 = 23/34 = 67.6%
     // keep 31/40, drop 17/24, keep 6/10 = 37/50 = 74.0%
     // keep 31/40, keep 17/24, drop 6/10 = 48/64 = 75.0%
@@ -469,27 +469,27 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
     ok(grades.final.submissions[0].drop)
   })
 
-  test('excludes points possible from the assignment for the dropped submission', function() {
+  test('excludes points possible from the assignment for the dropped submission', () => {
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.possible, 34)
     equal(grades.final.possible, 34)
   })
 
-  test('ignores ungraded submissions for the current grade', function() {
+  test('ignores ungraded submissions for the current grade', () => {
     submissions[0].score = null
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.score, 6)
     equal(grades.final.score, 6)
   })
 
-  test('excludes points possible for assignments with ungraded submissions for the current grade', function() {
+  test('excludes points possible for assignments with ungraded submissions for the current grade', () => {
     submissions[0].score = null
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.possible, 10)
     equal(grades.final.possible, 50)
   })
 
-  test('accounts for impact on overall grade rather than score alone', function() {
+  test('accounts for impact on overall grade rather than score alone', () => {
     submissions[2].score = 10
 
     // drop 31/40, keep 17/24, keep 10/10 = 27/34 = 79.4%
@@ -504,7 +504,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
     ok(grades.final.submissions[2].drop)
   })
 
-  test('does not drop submissions or assignments when drop_highest is 0', function() {
+  test('does not drop submissions or assignments when drop_highest is 0', () => {
     assignmentGroup.rules.drop_highest = 0
     const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     equal(grades.current.score, 54, 'current score includes all submission scores')
@@ -618,7 +618,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule', {
   }
 })
 
-test('drops multiple submissions to minimize overall percentage grade', function() {
+test('drops multiple submissions to minimize overall percentage grade', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
 
   // drop 100/100, drop 42/91, keep 14/55, keep 30/38, ignore -/1000 =  34/93  = 36.6%
@@ -651,7 +651,7 @@ test('drops multiple submissions to minimize overall percentage grade', function
 // This behavior was explicitly written into the grade calculator. While
 // possibly unintended, this test is here to ensure this behavior is protected
 // until a decision is made to change it.
-test('does not drop any scores when drop_highest is equal to the number of submissions', function() {
+test('does not drop any scores when drop_highest is equal to the number of submissions', () => {
   assignmentGroup.rules = {drop_highest: 4}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 186)
@@ -673,7 +673,7 @@ test('does not drop any scores when drop_highest is equal to the number of submi
 // This behavior was explicitly written into the grade calculator. While
 // possibly unintended, this test is here to ensure this behavior is protected
 // until a decision is made to change it.
-test('does not drop any scores when drop_highest is greater than the number of submissions', function() {
+test('does not drop any scores when drop_highest is greater than the number of submissions', () => {
   assignmentGroup.rules = {drop_highest: 5}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 186)
@@ -715,7 +715,7 @@ QUnit.module(
   }
 )
 
-test('drops the most and least favorable scores', function() {
+test('drops the most and least favorable scores', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 56)
   equal(grades.current.possible, 146)
@@ -730,7 +730,7 @@ test('drops the most and least favorable scores', function() {
 // This behavior was explicitly written into the grade calculator. While
 // possibly unintended, this test is here to ensure this behavior is protected
 // until a decision is made to change it.
-test('does not drop higher scores when combined drop rules match the number of submissions', function() {
+test('does not drop higher scores when combined drop rules match the number of submissions', () => {
   assignmentGroup.rules = {drop_lowest: 2, drop_highest: 2}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 103)
@@ -752,7 +752,7 @@ test('does not drop higher scores when combined drop rules match the number of s
 // This behavior was explicitly written into the grade calculator. While
 // possibly unintended, this test is here to ensure this behavior is protected
 // until a decision is made to change it.
-test('does not drop higher scores when combined drop rules exceed the number of submissions', function() {
+test('does not drop higher scores when combined drop rules exceed the number of submissions', () => {
   assignmentGroup.rules = {drop_lowest: 2, drop_highest: 3}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 103)
@@ -792,7 +792,7 @@ QUnit.module(
   }
 )
 
-test('drops the same low-score submission regardless of submission order', function() {
+test('drops the same low-score submission regardless of submission order', () => {
   assignmentGroup.rules = {drop_lowest: 1}
   let grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   const droppedSubmission1 = _.find(grades.current.submissions, 'drop')
@@ -802,7 +802,7 @@ test('drops the same low-score submission regardless of submission order', funct
   equal(droppedSubmission1.assignment_id, droppedSubmission2.assignment_id)
 })
 
-test('drops the same high-score submission regardless of submission order', function() {
+test('drops the same high-score submission regardless of submission order', () => {
   assignmentGroup.rules = {drop_highest: 1}
   let grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   const droppedSubmission1 = _.find(grades.current.submissions, 'drop')
@@ -812,7 +812,7 @@ test('drops the same high-score submission regardless of submission order', func
   equal(droppedSubmission1.assignment_id, droppedSubmission2.assignment_id)
 })
 
-test('drops the same low-score submission for unpointed assignments', function() {
+test('drops the same low-score submission for unpointed assignments', () => {
   assignmentGroup.rules = {drop_lowest: 1}
   assignmentGroup.assignments[0].points_possible = 0
   assignmentGroup.assignments[1].points_possible = 0
@@ -826,7 +826,7 @@ test('drops the same low-score submission for unpointed assignments', function()
   equal(droppedSubmission1.assignment_id, droppedSubmission2.assignment_id)
 })
 
-test('drops the same high-score submission for unpointed assignments', function() {
+test('drops the same high-score submission for unpointed assignments', () => {
   assignmentGroup.rules = {drop_highest: 1}
   assignmentGroup.assignments[0].points_possible = 0
   assignmentGroup.assignments[1].points_possible = 0
@@ -858,21 +858,21 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with only unpointed assig
   }
 })
 
-test('drops the submission with the lowest score when drop_lowest is 1', function() {
+test('drops the submission with the lowest score when drop_lowest is 1', () => {
   assignmentGroup.rules = {drop_lowest: 1}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 35, 'all scores above the 0 are included')
   ok(grades.current.submissions[3].drop)
 })
 
-test('drops the submission with the highest score when drop_highest is 1', function() {
+test('drops the submission with the highest score when drop_highest is 1', () => {
   assignmentGroup.rules = {drop_highest: 1}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 15, 'all scores below the 20 are included')
   ok(grades.current.submissions[2].drop)
 })
 
-test('drops submissions that match the given rules', function() {
+test('drops submissions that match the given rules', () => {
   assignmentGroup.rules = {drop_highest: 1, drop_lowest: 2}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 10, 'only the score of 10 is included')
@@ -897,13 +897,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with only ungraded submis
   }
 })
 
-test('sets current score as 0', function() {
+test('sets current score as 0', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 0, 'current score is 0 points when all submissions are excluded')
   equal(grades.current.possible, 0, 'current possible is 0 when all assignment points are excluded')
 })
 
-test('sets final score as 0', function() {
+test('sets final score as 0', () => {
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.final.score, 0, 'final score is 0 points when all submissions are excluded')
   equal(grades.final.possible, 35, 'final possible is sum of all assignment points')
@@ -932,7 +932,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "never_drop" rule', {
   }
 })
 
-test('prevents submissions from being dropped for low scores', function() {
+test('prevents submissions from being dropped for low scores', () => {
   assignmentGroup.rules.drop_lowest = 1
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 56)
@@ -949,7 +949,7 @@ test('prevents submissions from being dropped for low scores', function() {
   notOk(grades.final.submissions[3].drop)
 })
 
-test('prevents submissions from being dropped for high scores', function() {
+test('prevents submissions from being dropped for high scores', () => {
   assignmentGroup.rules = {drop_highest: 1, never_drop: [201]}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 49)
@@ -966,7 +966,7 @@ test('prevents submissions from being dropped for high scores', function() {
   notOk(grades.final.submissions[3].drop)
 })
 
-test('considers multiple assignments', function() {
+test('considers multiple assignments', () => {
   assignmentGroup.rules = {drop_lowest: 1, never_drop: [203, 204]}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 49)
@@ -986,7 +986,7 @@ test('considers multiple assignments', function() {
 // This behavior was explicitly written into the grade calculator. While
 // possibly unintended, this test is here to ensure this behavior is protected
 // until a decision is made to change it.
-test('does not drop any scores when drop_lowest is equal to the number of droppable submissions', function() {
+test('does not drop any scores when drop_lowest is equal to the number of droppable submissions', () => {
   assignmentGroup.rules = {drop_lowest: 1, never_drop: [202, 203, 204]}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 68)
@@ -1006,7 +1006,7 @@ test('does not drop any scores when drop_lowest is equal to the number of droppa
 // This behavior was explicitly written into the grade calculator. While
 // possibly unintended, this test is here to ensure this behavior is protected
 // until a decision is made to change it.
-test('does not drop any scores when drop_highest is equal to the number of droppable submissions', function() {
+test('does not drop any scores when drop_highest is equal to the number of droppable submissions', () => {
   assignmentGroup.rules = {drop_highest: 1, never_drop: [202, 203, 204]}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   equal(grades.current.score, 68)
@@ -1023,7 +1023,7 @@ test('does not drop any scores when drop_highest is equal to the number of dropp
   notOk(grades.final.submissions[3].drop)
 })
 
-test('does not drop any low score submissions when all assignments are listed as "never drop"', function() {
+test('does not drop any low score submissions when all assignments are listed as "never drop"', () => {
   assignmentGroup.rules = {drop_lowest: 1, never_drop: [201, 202, 203, 204]}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   notOk(grades.current.submissions[0].drop)
@@ -1036,7 +1036,7 @@ test('does not drop any low score submissions when all assignments are listed as
   notOk(grades.final.submissions[3].drop)
 })
 
-test('does not drop any high score submissions when all assignments are listed as "never drop"', function() {
+test('does not drop any high score submissions when all assignments are listed as "never drop"', () => {
   assignmentGroup.rules = {drop_highest: 1, never_drop: [201, 202, 203, 204]}
   const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
   notOk(grades.current.submissions[0].drop)

@@ -51,20 +51,24 @@ $('body').on('click', '#primaryNavToggle', function () {
   }
 })
 
-let mobileNavigationComponent
-function renderMobileNav() {
-  if (mobileNavigationComponent) mobileNavigationComponent.forceUpdate()
-}
+const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
+if (globalNavTrayContainer) {
+  let mobileNavigationComponent
+  function renderMobileNav() {
+    if (mobileNavigationComponent) mobileNavigationComponent.forceUpdate()
+  }
 
-const DesktopNavComponent = ReactDOM.render(
-  <Navigation onDataRecieved={renderMobileNav} />,
-  document.getElementById('global_nav_tray_container')
-)
-
-const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
-if (mobileContextNavContainer) {
-  mobileNavigationComponent = ReactDOM.render(
-    <MobileNavigation DesktopNavComponent={DesktopNavComponent} />,
-    mobileContextNavContainer
+  const DesktopNavComponent = ReactDOM.render(
+    <Navigation onDataRecieved={renderMobileNav} />,
+    globalNavTrayContainer
   )
+
+  const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
+  if (mobileContextNavContainer) {
+    mobileNavigationComponent = ReactDOM.render(
+      <MobileNavigation DesktopNavComponent={DesktopNavComponent} />,
+      mobileContextNavContainer
+    )
+  }
 }
+

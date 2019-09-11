@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!discussions_v2'
-import React, {Component} from 'react'
+import React, {Component, Suspense, lazy} from 'react'
 import {func, bool, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
@@ -29,7 +29,9 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
+
+import CanvasTray from 'jsx/shared/components/CanvasTray'
+
 import {
   ConnectedDiscussionsContainer,
   DroppableConnectedDiscussionsContainer
@@ -49,6 +51,8 @@ import {discussionList} from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
+
+const ManagedCourseSelector = lazy(() => import('jsx/shared/components/ManagedCourseSelector'))
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -145,6 +149,7 @@ export default class DiscussionsIndex extends Component {
               title={I18n.t('Pinned Discussions')}
               discussions={this.props.pinnedDiscussions}
               deleteDiscussion={this.openDeleteDiscussionsModal}
+              pinned
               renderContainerBackground={() =>
                 pinnedDiscussionBackground({
                   permissions: this.props.permissions
@@ -212,7 +217,6 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            pinned={false}
             closedState={false}
             renderContainerBackground={() =>
               unpinnedDiscussionsBackground({
@@ -228,7 +232,6 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            pinned={false}
             closedState
             renderContainerBackground={() =>
               closedDiscussionBackground({
@@ -245,22 +248,24 @@ export default class DiscussionsIndex extends Component {
           />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <Tray
+          <CanvasTray
             open={this.props.copyToOpen}
             label={I18n.t('Copy To...')}
             onDismiss={() => this.props.setCopyToOpen(false)}
           >
-            <Heading>{I18n.t('Copy To...')}</Heading>
-          </Tray>
+            <Suspense fallback={<Spinner label={I18n.t('Loading...')} />}>
+              <ManagedCourseSelector />
+            </Suspense>
+          </CanvasTray>
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <Tray
+          <CanvasTray
             open={this.props.sendToOpen}
             label={I18n.t('Send To...')}
             onDismiss={() => this.props.setSendToOpen(false)}
           >
-            <Heading>{I18n.t('Send To...')}</Heading>
-          </Tray>
+            TODO: Implement
+          </CanvasTray>
         )}{' '}
       </View>
     )

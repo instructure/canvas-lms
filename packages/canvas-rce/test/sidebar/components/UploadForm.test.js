@@ -23,8 +23,8 @@ import sinon from "sinon";
 import sd from "skin-deep";
 
 describe("UploadForm", () => {
-  let noop = () => {};
-  let fakeEvent = {
+  const noop = () => {};
+  const fakeEvent = {
     preventDefault() {}
   };
   let upload, defaultProps;
@@ -46,7 +46,7 @@ describe("UploadForm", () => {
         collapse: "Nevermind",
         collapseScreenreader: "Nevermind FRD"
       },
-      upload: upload,
+      upload,
       fetchFolders: noop,
       startImageUpload: noop,
       startUpload: noop,
@@ -58,16 +58,16 @@ describe("UploadForm", () => {
   describe("form rendering", () => {
     it("renders form if expanded", () => {
       upload.formExpanded = true;
-      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
-      let instance = uploadComp.getMountedInstance();
-      let uploadForm = sd.shallowRender(instance.renderForm());
+      const uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      const instance = uploadComp.getMountedInstance();
+      const uploadForm = sd.shallowRender(instance.renderForm());
       assert.ok(uploadForm.subTree("form"));
     });
 
     it("is blank if form collapsed", () => {
       upload.formExpanded = false;
-      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
-      let instance = uploadComp.getMountedInstance();
+      const uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      const instance = uploadComp.getMountedInstance();
       assert.equal(null, instance.renderForm());
     });
 
@@ -84,7 +84,7 @@ describe("UploadForm", () => {
     });
 
     it("calls for folders on mounting", () => {
-      let foldersSpy = sinon.spy();
+      const foldersSpy = sinon.spy();
       sd.shallowRender(
         <UploadForm {...defaultProps} fetchFolders={foldersSpy} />
       );
@@ -92,21 +92,21 @@ describe("UploadForm", () => {
     });
 
     it("toggles form on expand link click", () => {
-      let toggleSpy = sinon.spy();
-      let uploadComp = sd.shallowRender(
+      const toggleSpy = sinon.spy();
+      const uploadComp = sd.shallowRender(
         <UploadForm {...defaultProps} toggleUploadForm={toggleSpy} />
       );
-      let vdom = uploadComp.getRenderOutput();
+      const vdom = uploadComp.getRenderOutput();
       vdom.props.children[0].props.onClick(fakeEvent);
       assert.ok(toggleSpy.called);
     });
 
     it("renders a Loading folders options when upload.loadingFolders is true", () => {
       upload.loadingFolders = true;
-      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
-      let instance = uploadComp.getMountedInstance();
-      let uploadForm = sd.shallowRender(instance.renderForm());
-      let options = uploadForm.subTree("Select").everySubTree("option");
+      const uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      const instance = uploadComp.getMountedInstance();
+      const uploadForm = sd.shallowRender(instance.renderForm());
+      const options = uploadForm.subTree("Select").everySubTree("option");
       assert(options.length === 1);
       assert(options[0].text() === "Loading folders...");
     });
@@ -120,10 +120,10 @@ describe("UploadForm", () => {
       };
       upload.rootFolderId = 1;
       upload.folderTree = { "1": [2, 3], "2": [], "3": [] };
-      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
-      let instance = uploadComp.getMountedInstance();
-      let uploadForm = sd.shallowRender(instance.renderForm());
-      let options = uploadForm.subTree("Select").everySubTree("option");
+      const uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      const instance = uploadComp.getMountedInstance();
+      const uploadForm = sd.shallowRender(instance.renderForm());
+      const options = uploadForm.subTree("Select").everySubTree("option");
       assert(options.length === 3);
     });
 
@@ -136,10 +136,10 @@ describe("UploadForm", () => {
       };
       upload.rootFolderId = 1;
       upload.folderTree = { "1": [2], "2": [3], "3": [] };
-      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
-      let instance = uploadComp.getMountedInstance();
-      let uploadForm = sd.shallowRender(instance.renderForm());
-      let options = uploadForm.subTree("Select").everySubTree("option");
+      const uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      const instance = uploadComp.getMountedInstance();
+      const uploadForm = sd.shallowRender(instance.renderForm());
+      const options = uploadForm.subTree("Select").everySubTree("option");
       assert.equal(
         options[0].toString(),
         "<option value={1}>\n  folder 1\n</option>"
@@ -162,9 +162,9 @@ describe("UploadForm", () => {
       };
       upload.rootFolderId = 1;
       upload.folderTree = { "2": [3], "3": [] };
-      let uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
-      let instance = uploadComp.getMountedInstance();
-      let uploadForm = sd.shallowRender(instance.renderForm());
+      const uploadComp = sd.shallowRender(<UploadForm {...defaultProps} />);
+      const instance = uploadComp.getMountedInstance();
+      const uploadForm = sd.shallowRender(instance.renderForm());
       assert.ok(uploadForm.subTree("form"));
     });
 
@@ -263,14 +263,14 @@ describe("UploadForm", () => {
     });
 
     it("disables the upload button when canceling file choice", () => {
-      mountedInstance.handleFileChange(fileChangeEvent); //add a file to the form
+      mountedInstance.handleFileChange(fileChangeEvent); // add a file to the form
       mountedInstance.setAltResolved(true);
       let vdom = sd
         .shallowRender(mountedInstance.renderForm())
         .subTree("Button")
         .getRenderOutput();
       assert.equal(vdom.props.disabled, false); // button should be enabled
-      mountedInstance.handleFileChange(emptyFileChangeEvent); //cancel/remove file from the form
+      mountedInstance.handleFileChange(emptyFileChangeEvent); // cancel/remove file from the form
       vdom = sd
         .shallowRender(mountedInstance.renderForm())
         .subTree("Button")
@@ -279,7 +279,7 @@ describe("UploadForm", () => {
     });
 
     it("disables the upload button when alt text resolution is reversed", () => {
-      mountedInstance.handleFileChange(fileChangeEvent); //add a file to the form
+      mountedInstance.handleFileChange(fileChangeEvent); // add a file to the form
       mountedInstance.setAltResolved(true);
       let vdom = sd
         .shallowRender(mountedInstance.renderForm())

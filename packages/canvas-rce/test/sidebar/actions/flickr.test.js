@@ -35,15 +35,15 @@ describe("Flickr data actions", () => {
   };
 
   function setupState(props) {
-    let { jwt, source } = Object.assign({}, defaults, props);
+    const { jwt, source } = { ...defaults, ...props};
     return { jwt, source };
   }
 
   describe("searchFlickr", () => {
     it("chains through search to results", done => {
-      let baseState = setupState();
+      const baseState = setupState();
       baseState.flickr = { searching: false };
-      let store = spiedStore(baseState);
+      const store = spiedStore(baseState);
       store.dispatch(actions.searchFlickr("weiqi")).then(() => {
         assert.ok(
           store.spy.calledWith({

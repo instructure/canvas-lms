@@ -19,9 +19,10 @@
 import formatMessage from "../../../format-message"
 import clickCallback from "./clickCallback"
 import bridge from '../../../bridge'
-import {getContentFromElement, FILE_LINK_TYPE} from '../shared/ContentSelection'
+import {isFileLink} from '../shared/ContentSelection'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
+
 const trayController = new LinkOptionsTrayController()
 
 const PLUGIN_KEY = 'links'
@@ -100,7 +101,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
         }
         callback(items)
       },
-      onSetup: function(api) {
+      onSetup(api) {
         function handleNodeChange(e) {
           api.setActive(!!getAnchorElement(ed, e.element))
         }
@@ -125,12 +126,10 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
       tooltip: buttonAriaLabel
     })
 
-    const isFileLink = ($element) => getContentFromElement($element, ed).type === FILE_LINK_TYPE
-
     ed.ui.registry.addContextToolbar('instructure-link-toolbar', {
       items: 'instructure-link-options',
       position: 'node',
-      predicate: isFileLink,
+      predicate: (elem) => isFileLink(elem, ed),
       scope: 'node'
     })
   }

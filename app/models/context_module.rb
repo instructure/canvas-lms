@@ -367,30 +367,38 @@ class ContextModule < ActiveRecord::Base
 
   def self.module_names(context)
     Rails.cache.fetch(['module_names', context].cache_key) do
-      names = {}
-      context.context_modules.not_deleted.pluck(:id, :name).each do |id, name|
-        names[id] = name
-      end
-      names
+      gather_module_names(context.context_modules.not_deleted)
+    end
+  end
+
+  def self.active_module_names(context)
+    Rails.cache.fetch(['active_module_names', context].cache_key) do
+      gather_module_names(context.context_modules.active)
+    end
+  end
+
+  def self.gather_module_names(scope)
+    scope.pluck(:id, :name).each_with_object({}) do |(id, name), names|
+      names[id] = name
     end
   end
 
   def prerequisites
-    @prerequisites ||= gather_prerequisites(self.context.context_modules.not_deleted)
+    @prerequisites ||= gather_prerequisites(ContextModule.module_names(self.context))
   end
 
   def active_prerequisites
-    @active_prerequisites ||= gather_prerequisites(self.context.context_modules.active)
+    @active_prerequisites ||= gather_prerequisites(ContextModule.active_module_names(self.context))
   end
 
-  def gather_prerequisites(scope)
+  def gather_prerequisites(module_names)
     all_prereqs = read_attribute(:prerequisites)
     return [] unless all_prereqs&.any?
-    active_ids = scope.where(:id => all_prereqs.pluck(:id)).pluck(:id)
-    all_prereqs.select{|pre| active_ids.member?(pre[:id])}
+    all_prereqs.select{|pre| module_names.key?(pre[:id])}.map{|pre| pre.merge(:name => module_names[pre[:id]])}
   end
 
   def prerequisites=(prereqs)
+    Rails.cache.delete(['module_names', context].cache_key) # ensure the module list is up to date
     if prereqs.is_a?(Array)
       # validate format, skipping invalid ones
       prereqs = prereqs.select do |pre|

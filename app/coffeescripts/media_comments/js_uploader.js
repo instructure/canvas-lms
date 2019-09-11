@@ -27,13 +27,6 @@ import FileInputManager from '../media_comments/file_input_manager'
    */
 export default class JsUploader {
   constructor() {
-    this.initialize = this.initialize.bind(this)
-    this.doUpload = this.doUpload.bind(this)
-    this.doUploadByFile = this.doUploadByFile.bind(this)
-    this.onFileError = this.onFileError.bind(this)
-    this.onUploadComplete = this.onUploadComplete.bind(this)
-    this.onUploaderReady = this.onUploaderReady.bind(this)
-    this.resetUploader = this.resetUploader.bind(this)
     this.dialogManager = new DialogManager()
     this.commentUiLoader = new CommentUiLoader()
     this.kSession = new KalturaSessionLoader()
@@ -52,9 +45,10 @@ export default class JsUploader {
   }
 
   onReady() {}
+
   // override this
 
-  initialize(mediaType, opts) {
+  initialize = (mediaType, opts) => {
     return this.commentUiLoader.loadTabs(html => {
       this.onReady()
       this.dialogManager.displayContent(html)
@@ -63,7 +57,7 @@ export default class JsUploader {
       this.createNeededFields()
       return this.bindEvents()
     })
-  }
+  };
 
   getKs() {
     return this.kSession.kalturaSession.ks
@@ -82,7 +76,7 @@ export default class JsUploader {
     return this.fileInputManager.resetFileInput(this.doUpload)
   }
 
-  doUpload() {
+  doUpload = () => {
     this.file = this.fileInputManager.getSelectedFile()
     if (this.uploader) this.resetUploader()
     const session = this.kSession.generateUploadOptions(this.fileInputManager.allowedMedia)
@@ -97,9 +91,9 @@ export default class JsUploader {
       this.fileInputManager.allowedMedia,
       this.file
     )
-  }
+  };
 
-  doUploadByFile(inputFile) {
+  doUploadByFile = inputFile => {
     this.file = inputFile
     if (this.uploader) {
       this.resetUploader()
@@ -109,29 +103,29 @@ export default class JsUploader {
     this.uploader.addEventListener('K5.fileError', this.onFileError)
     this.uploader.addEventListener('K5.complete', this.onUploadComplete)
     return this.uploader.addEventListener('K5.ready', this.onUploaderReady)
-  }
+  };
 
-  onFileError() {
+  onFileError = () => {
     return this.createNeededFields()
-  }
+  };
 
-  onUploadComplete(e) {
+  onUploadComplete = e => {
     this.resetUploader()
     if (!((e.title != null ? e.title.length : undefined) > 0)) {
       e.title = this.file.name
     }
     this.addEntry(e, this.file.type.includes("audio"))
     return this.dialogManager.hide()
-  }
+  };
 
-  onUploaderReady() {
+  onUploaderReady = () => {
     return this.uploader.uploadFile(this.file)
-  }
+  };
 
-  resetUploader() {
+  resetUploader = () => {
     this.uploader.removeEventListener('K5.fileError', this.onFileError)
     this.uploader.removeEventListener('K5.complete', this.onUploadComplete)
     this.uploader.removeEventListener('K5.ready', this.onUploaderReady)
     return this.uploader.destroy()
-  }
+  };
 }

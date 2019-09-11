@@ -68,18 +68,35 @@ describe('CourseActivitySummaryStore', () => {
       expect(CourseActivitySummaryStore.getState()).toEqual({streams: {1: {stream}}})
     })
 
-    it('handes 401 errors correctly state based on API response', async () => {
+    it('handes 401 errors correctly', async () => {
       expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined() // precondition
 
       jest.spyOn(window, 'fetch').mockImplementation(() =>
         Promise.resolve().then(() => ({
           status: 401,
           statusText: 'Unauthorized',
-          json: () =>
-            Promise.resolve().then(() => ({
-              status: 'unauthorized',
-              errors: [{message: 'user not authorized to perform that action'}]
-            }))
+          json: () => {
+            throw new Error('should never make it here')
+          }
+        }))
+      )
+      const errorFn = jest.fn()
+      CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
+      await wait(1)
+      expect(errorFn).toHaveBeenCalled()
+      expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined()
+    })
+
+    it('also handes 503 errors correctly ', async () => {
+      expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined() // precondition
+
+      jest.spyOn(window, 'fetch').mockImplementation(() =>
+        Promise.resolve().then(() => ({
+          status: 503,
+          statusText: 'Service Unavailable',
+          json: () => {
+            throw new Error('should never make it here')
+          }
         }))
       )
       const errorFn = jest.fn()

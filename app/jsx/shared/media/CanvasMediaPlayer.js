@@ -15,66 +15,55 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {arrayOf} from 'prop-types'
-import axios from 'axios'
+import {string} from 'prop-types'
 import LoadingIndicator from '../../assignments_2/shared/LoadingIndicator'
-import {MediaObjectShape} from './props'
 import React from 'react'
 import {VideoPlayer} from '@instructure/ui-media-player'
-
+import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 export default class CanvasMediaPlayer extends React.Component {
   static propTypes = {
-    mediaSources: arrayOf(MediaObjectShape)
+    media_id: string.isRequired,
+    media_sources: VideoPlayer.propTypes.sources
   }
 
-  state = {
-    mediaSources: this.props.mediaSources
+  static defaultProps = {
+    media_sources: []
   }
 
-  componentDidMount () {
-    const frames = window.parent.document.getElementsByTagName("iframe")
-    let containingIframe = null
-    for (let index = 0; index < frames.length; ++index) {
-      containingIframe = frames[index]
-      // eslint-disable-next-line eqeqeq
-      if (containingIframe.contentWindow == window) {
-        containingIframe.frameBorder = "none";
-        break
-      }
+  state = {media_sources: []}
+
+  componentDidMount() {
+    if (!this.props.media_sources.length) this.fetchSources()
+
+    const iframeEl = [...window.parent.document.getElementsByTagName('iframe')].find(
+      el => el.contentWindow === window
+    )
+    if (iframeEl) iframeEl.frameBorder = 'none'
+  }
+
+  async fetchSources() {
+    const url = `/media_objects/${this.props.media_id}/info`
+    let resp
+    try {
+      resp = await asJson(fetch(url, defaultFetchOptions))
+    } catch (e) {
+      // if there is a network error, just ignore and retry
     }
-    if (!this.props.mediaSources.length) {
-      this.pollInfo()
-    }
-  }
-
-  componentWillUnmount () {
-    clearTimeout(this.pollTimeout)
-  }
-
-  async pollInfo () {
-    const pathSplit = window.location.pathname.split('/')
-    const mediaObjectId = pathSplit[pathSplit.length-1]
-    const mediaObjectInfo = await this.fetchMediaObjectInfo(mediaObjectId)
-    if (mediaObjectInfo.data.media_sources.length) {
-      this.setState({ mediaSources: mediaObjectInfo.data.media_sources})
+    if (resp && resp.media_sources && resp.media_sources.length) {
+      this.setState({media_sources: resp.media_sources})
     } else {
-      this.pollTimeout = setTimeout(() => this.pollInfo(), 1000)
+      // if they're not present yet, try again in a little bit
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await this.fetchSources()
     }
-  }
-
-  async fetchMediaObjectInfo (mediaObjectId) {
-    const data = await axios.get(`${window.location.origin}/media_objects/${mediaObjectId}/info`)
-    return data
   }
 
   render() {
+    const sources = this.props.media_sources.length ? this.props.media_sources : this.state.media_sources
     return (
       <div>
-        {this.state.mediaSources.length ?
-            <VideoPlayer sources={this.state.mediaSources} /> : <LoadingIndicator />
-        }
+        {sources.length ? <VideoPlayer sources={sources} /> : <LoadingIndicator />}
       </div>
     )
   }

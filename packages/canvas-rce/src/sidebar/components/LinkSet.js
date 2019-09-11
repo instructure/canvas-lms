@@ -123,8 +123,8 @@ class LinkSet extends Component {
 
   render() {
     if (this.props.fetchNextPage) {
-      let hasMore = this.props.collection.hasMore || false;
-      let isLoading = this.props.collection.isLoading || false;
+      const hasMore = this.props.collection.hasMore || false;
+      const isLoading = this.props.collection.isLoading || false;
       return (
         <div>
           <LoadMore

@@ -21,18 +21,12 @@ import BaseUploader from './BaseUploader'
 import 'jquery.ajaxJSON'
 
 export default class FileUploader extends BaseUploader {
-  constructor(...args) {
-    super(...args)
-    this.onUploadPosted = this.onUploadPosted.bind(this)
-    this.addFileToCollection = this.addFileToCollection.bind(this)
-  }
-
-  onUploadPosted(fileJson) {
+  onUploadPosted = fileJson => {
     const file = this.addFileToCollection(fileJson)
     return this.deferred.resolve(file)
-  }
+  };
 
-  addFileToCollection(attrs) {
+  addFileToCollection = attrs => {
     const uploadedFile = new BBFile(attrs, 'no/url/needed/') // we've already done the upload, no preflight needed
 
     this.folder.files.add(uploadedFile)
@@ -45,5 +39,5 @@ export default class FileUploader extends BaseUploader {
       }
     }
     return uploadedFile
-  }
+  };
 }

@@ -20,7 +20,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import SubmissionStatus from 'jsx/gradezilla/default_gradebook/components/SubmissionStatus'
 
-QUnit.module('SubmissionStatus - Pills', function(hooks) {
+QUnit.module('SubmissionStatus - Pills', hooks => {
   let props
   let wrapper
 
@@ -57,7 +57,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     return shallow(<SubmissionStatus {...props} />)
   }
 
-  test('shows the "Muted" pill when the assignment is muted and not postPoliciesEnabled', function() {
+  test('shows the "Muted" pill when the assignment is muted and not postPoliciesEnabled', () => {
     props.assignment.muted = true
     wrapper = mountComponent()
     const mutedPills = wrapper
@@ -68,7 +68,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(mutedPills.length, 1)
   })
 
-  test('does not show the "Muted" pill when the assignment is not muted', function() {
+  test('does not show the "Muted" pill when the assignment is not muted', () => {
     props.assignment.muted = false
     wrapper = mountComponent()
     const pills = wrapper
@@ -79,7 +79,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(pills.length, 0)
   })
 
-  test('shows the "Unpublished" pill when the assignment is unpublished', function() {
+  test('shows the "Unpublished" pill when the assignment is unpublished', () => {
     props.assignment.published = false
     wrapper = mountComponent()
     const unpublishedPills = wrapper
@@ -90,7 +90,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(unpublishedPills.length, 1)
   })
 
-  test('does not show the "Unpublished" pill when the assignment is published', function() {
+  test('does not show the "Unpublished" pill when the assignment is published', () => {
     props.assignment.published = true
     wrapper = mountComponent()
     const pills = wrapper
@@ -101,7 +101,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(pills.length, 0)
   })
 
-  test('shows the "Dropped" pill when the submission is dropped', function() {
+  test('shows the "Dropped" pill when the submission is dropped', () => {
     props.submission.drop = true
     wrapper = mountComponent()
     const droppedPills = wrapper
@@ -112,7 +112,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(droppedPills.length, 1)
   })
 
-  test('does not show the "Dropped" pill when the submission is not dropped', function() {
+  test('does not show the "Dropped" pill when the submission is not dropped', () => {
     props.submission.drop = false
     wrapper = mountComponent()
     const pills = wrapper
@@ -123,7 +123,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(pills.length, 0)
   })
 
-  test('shows the "Excused" pill when the submission is excused', function() {
+  test('shows the "Excused" pill when the submission is excused', () => {
     props.submission.excused = true
     wrapper = mountComponent()
     const excusedPills = wrapper
@@ -134,7 +134,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
     strictEqual(excusedPills.length, 1)
   })
 
-  test('does not show the "Excused" pill when the submission is not excused', function() {
+  test('does not show the "Excused" pill when the submission is not excused', () => {
     props.submission.excused = false
     wrapper = mountComponent()
     const pills = wrapper
@@ -157,7 +157,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
       props.postPoliciesEnabled = true
     })
 
-    test('does not show the "Muted" pill when the assignment is muted', function() {
+    test('does not show the "Muted" pill when the assignment is muted', () => {
       props.assignment.muted = true
       wrapper = mountComponent()
       const mutedPills = wrapper
@@ -168,7 +168,7 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
       strictEqual(mutedPills.length, 0)
     })
 
-    test('shows the "Hidden" pill when the submission is graded and not posted', function() {
+    test('shows the "Hidden" pill when the submission is graded and not posted', () => {
       props.submission.score = 1
       props.submission.workflowState = 'graded'
       wrapper = mountComponent()
@@ -176,21 +176,21 @@ QUnit.module('SubmissionStatus - Pills', function(hooks) {
       strictEqual(hiddenPills.length, 1)
     })
 
-    test('does not show the "Hidden" pill when the submission is not graded', function() {
+    test('does not show the "Hidden" pill when the submission is not graded', () => {
       props.submission.workflowState = 'unsubmitted'
       wrapper = mountComponent()
       const hiddenPills = getHiddenPills()
       strictEqual(hiddenPills.length, 0)
     })
 
-    test('does not show the "Hidden" pill when the submission is posted', function() {
+    test('does not show the "Hidden" pill when the submission is posted', () => {
       props.submission.postedAt = new Date()
       wrapper = mountComponent()
       const hiddenPills = getHiddenPills()
       strictEqual(hiddenPills.length, 0)
     })
 
-    test('does not show the "Hidden" pill when the submission is not graded nor posted', function() {
+    test('does not show the "Hidden" pill when the submission is not graded nor posted', () => {
       wrapper = mountComponent()
       const hiddenPills = getHiddenPills()
       strictEqual(hiddenPills.length, 0)
@@ -235,7 +235,7 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
     return shallow(<SubmissionStatus {...props} />)
   }
 
-  test('when isInNoGradingPeriod is true, warns about submission not being in any grading period', function() {
+  test('when isInNoGradingPeriod is true, warns about submission not being in any grading period', () => {
     props.isInNoGradingPeriod = true
     wrapper = mountComponent()
     const warnings = wrapper
@@ -246,7 +246,7 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
     strictEqual(warnings.length, 1)
   })
 
-  test('when isInNoGradingPeriod is false, does not warn about submission not being in any grading period', function() {
+  test('when isInNoGradingPeriod is false, does not warn about submission not being in any grading period', () => {
     props.isInNoGradingPeriod = false
     wrapper = mountComponent()
     const warnings = wrapper
@@ -295,7 +295,7 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
     return shallow(<SubmissionStatus {...props} />)
   }
 
-  test('when isInClosedGradingPeriod is true, warns about submission not being in a closed grading period', function() {
+  test('when isInClosedGradingPeriod is true, warns about submission not being in a closed grading period', () => {
     props.isInClosedGradingPeriod = true
     wrapper = mountComponent()
     const warnings = wrapper
@@ -306,7 +306,7 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
     strictEqual(warnings.length, 1)
   })
 
-  test('when isInClosedGradingPeriod is false, does not warn about submission not being in a closed grading period', function() {
+  test('when isInClosedGradingPeriod is false, does not warn about submission not being in a closed grading period', () => {
     props.isInClosedGradingPeriod = false
     wrapper = mountComponent()
     const warnings = wrapper
@@ -355,7 +355,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
     return shallow(<SubmissionStatus {...props} />)
   }
 
-  test('when isInOtherGradingPeriod is true, warns about submission not being in another grading period', function() {
+  test('when isInOtherGradingPeriod is true, warns about submission not being in another grading period', () => {
     props.isInOtherGradingPeriod = true
     wrapper = mountComponent()
     const warnings = wrapper
@@ -366,7 +366,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
     strictEqual(warnings.length, 1)
   })
 
-  test('when isInOtherGradingPeriod is false, does not warn about submission not being in another grading period', function() {
+  test('when isInOtherGradingPeriod is false, does not warn about submission not being in another grading period', () => {
     props.isInOtherGradingPeriod = false
     wrapper = mountComponent()
     const warnings = wrapper
@@ -378,7 +378,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
   })
 })
 
-QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function(hooks) {
+QUnit.module('SubmissionStatus - Concluded Enrollment Warning', hooks => {
   let props
   let wrapper
   const message = "This student's enrollment has been concluded"
@@ -415,7 +415,7 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function(hooks) 
     return shallow(<SubmissionStatus {...props} />)
   }
 
-  test('when isConcluded is true, warns about enrollment being concluded', function() {
+  test('when isConcluded is true, warns about enrollment being concluded', () => {
     props.isConcluded = true
     wrapper = mountComponent()
     const warnings = wrapper
@@ -426,7 +426,7 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', function(hooks) 
     strictEqual(warnings.length, 1)
   })
 
-  test('when isConcluded is false, does not warn about enrollment being concluded', function() {
+  test('when isConcluded is false, does not warn about enrollment being concluded', () => {
     props.isConcluded = false
     wrapper = mountComponent()
     const warnings = wrapper

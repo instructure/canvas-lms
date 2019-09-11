@@ -33,30 +33,30 @@ export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBo
         // KeyboardShortcuts.coffee needs to listen to events
         // fired from inside the editor, so we pass out
         // keyup events to the document
-        ed.on('keyup', function(e){
+        ed.on('keyup', e => {
           $(document).trigger("editorKeyUp", [e]);
         });
 
-        ed.on('change', function() {
+        ed.on('change', () => {
           $editor.trigger('change');
         });
 
         // no equivalent of "onEvent" in tinymce4
-        ed.on('keyup keydown click mousedown', function() {
+        ed.on('keyup keydown click mousedown', () => {
           if(enableBookmarking && ed.selection) {
             $editor.data('last_bookmark', ed.selection.getBookmark(1));
           }
         });
 
         if (!ENV.use_rce_enhancements) {
-          ed.on('init', function(){
+          ed.on('init', () => {
             const getDefault = mod => mod.default ? mod.default : mod
             const EditorAccessibility = getDefault(require('compiled/editor/editorAccessibility'))
             new EditorAccessibility(ed).accessiblize();
           });
         }
 
-        ed.on('init', function(){
+        ed.on('init', () => {
           $(window).triggerHandler("resize");
 
           // this is a hack so that when you drag an image from the sidebar to the editor that it doesn't
@@ -65,7 +65,7 @@ export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBo
           // _mce_src="http://path/to/the/fullsize/image" to the images whose src="path/to/thumbnail/of/image/"
           // what this does is check to see if some DOM node that got inserted into the editor has the attribute _mce_src
           // and if it does, use that instead.
-          $(ed.contentDocument).bind("DOMNodeInserted", function(e){
+          $(ed.contentDocument).bind("DOMNodeInserted", e => {
             var target = e.target,
                 mceSrc;
             if (target.nodeType === 1 && target.nodeName === 'IMG'  && (mceSrc = $(target).data('url')) ) {
@@ -83,7 +83,7 @@ export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBo
           // quiz input (something to do with changing its value in a change
           // handler)
           if (!('onfocusout' in ed.contentWindow)) {
-            $(ed.contentWindow).blur(function(e) {
+            $(ed.contentWindow).blur(e => {
               if (!ed.removed && ed.undoManager.typing) {
                 ed.undoManager.typing = false;
                 ed.undoManager.add();
@@ -92,5 +92,5 @@ export default function setupAndFocusTinyMCEConfig (tinymce, autoFocus, enableBo
           }
         });
       } // function setup()
-    }
+    };
   };

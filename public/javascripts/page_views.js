@@ -32,17 +32,17 @@ if (update_url) {
       let secondsSinceLastEvent = 0
       const intervalInSeconds = 60 * 5
 
-      $(document).bind('page_view_update_url_received', function(event, new_update_url) {
+      $(document).bind('page_view_update_url_received', (event, new_update_url) => {
         update_url = new_update_url
       })
 
       let updateTrigger
-      $(document).bind('page_view_update', function(event, force) {
+      $(document).bind('page_view_update', (event, force) => {
         const data = {}
 
         if (force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
           data.interaction_seconds = interactionSeconds
-          $.ajaxJSON(update_url, 'PUT', data, null, function(result, xhr) {
+          $.ajaxJSON(update_url, 'PUT', data, null, (result, xhr) => {
             if (xhr.status === 422) {
               clearInterval(updateTrigger)
             }
@@ -51,7 +51,7 @@ if (update_url) {
         }
       })
 
-      updateTrigger = setInterval(function() {
+      updateTrigger = setInterval(() => {
         $(document).triggerHandler('page_view_update')
       }, 1000 * intervalInSeconds)
 
@@ -74,10 +74,10 @@ if (update_url) {
       )
 
       let eventInTime = false
-      $(document).bind('mousemove keypress mousedown focus', function() {
+      $(document).bind('mousemove keypress mousedown focus', () => {
         eventInTime = true
       })
-      setInterval(function() {
+      setInterval(() => {
         if (eventInTime) {
           interactionSeconds++
           if (INST && INST.interaction_context && INST.interaction_contexts) {

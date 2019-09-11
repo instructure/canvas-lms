@@ -26,7 +26,7 @@ const AssignmentAlert = props => {
   const ALERT_TIMEOUT = 5000
 
   return (
-    <React.Fragment>
+    <>
       {errorMessage && (
         <Alert
           variant="error"
@@ -48,7 +48,7 @@ const AssignmentAlert = props => {
           {successMessage}
         </Alert>
       )}
-    </React.Fragment>
+    </>
   )
 }
 

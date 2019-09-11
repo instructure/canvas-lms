@@ -20,7 +20,7 @@ import {mount} from 'enzyme'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm'
 
-QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
+QUnit.module('SubmissionCommentUpdateForm', hooks => {
   let props
   let wrapper
 
@@ -44,7 +44,7 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     return wrapper.find('Button').at(1)
   }
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(() => {
     props = {
       cancelCommenting() {},
       comment: 'A comment',
@@ -55,159 +55,159 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     }
   })
 
-  hooks.afterEach(function() {
+  hooks.afterEach(() => {
     wrapper.unmount()
   })
 
-  test('initializes with the original comment in the textarea', function() {
+  test('initializes with the original comment in the textarea', () => {
     wrapper = mountComponent()
     strictEqual(wrapper.find('textarea').instance().innerText, 'A comment')
   })
 
-  test('"Submit" button is present even if there is no text entered in the comment area', function() {
+  test('"Submit" button is present even if there is no text entered in the comment area', () => {
     props.comment = ''
     wrapper = mountComponent()
     strictEqual(submitButton().length, 1)
   })
 
-  test('"Cancel" button is present even if there is no text entered in the comment area', function() {
+  test('"Cancel" button is present even if there is no text entered in the comment area', () => {
     props.comment = ''
     wrapper = mountComponent()
     strictEqual(cancelButton().length, 1)
   })
 
-  test('"Submit" button is present if the content is all spaces', function() {
+  test('"Submit" button is present if the content is all spaces', () => {
     props.comment = '    '
     wrapper = mountComponent()
     strictEqual(submitButton().length, 1)
   })
 
-  test('"Cancel" button is present if the content is all spaces', function() {
+  test('"Cancel" button is present if the content is all spaces', () => {
     props.comment = '    '
     wrapper = mountComponent()
     strictEqual(cancelButton().length, 1)
   })
 
-  test('"Submit" button is present if there is text entered in the comment area', function() {
+  test('"Submit" button is present if there is text entered in the comment area', () => {
     wrapper = mountComponent()
     strictEqual(submitButton().length, 1)
   })
 
-  test('"Cancel" button is present if there is text entered in the comment area', function() {
+  test('"Cancel" button is present if there is text entered in the comment area', () => {
     wrapper = mountComponent()
     strictEqual(cancelButton().length, 1)
   })
 
-  test('"Submit" button is disabled if the current comment is the same as the comment prop passed in', function() {
+  test('"Submit" button is disabled if the current comment is the same as the comment prop passed in', () => {
     wrapper = mountComponent()
     strictEqual(submitButtonComponent().prop('disabled'), true)
   })
 
-  test('"Cancel" button is enabled if the current comment is the same as the comment prop passed in', function() {
+  test('"Cancel" button is enabled if the current comment is the same as the comment prop passed in', () => {
     wrapper = mountComponent()
     strictEqual(cancelButtonComponent().prop('disabled'), false)
   })
 
-  test('"Submit" button is disabled if the current comment after trimming is the same as the comment prop passed', function() {
+  test('"Submit" button is disabled if the current comment after trimming is the same as the comment prop passed', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: '    A comment    '}})
     strictEqual(submitButtonComponent().prop('disabled'), true)
   })
 
-  test('"Cancel" button is enabled if the current comment after trimming is the same as the comment prop passed', function() {
+  test('"Cancel" button is enabled if the current comment after trimming is the same as the comment prop passed', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: '    A comment    '}})
     strictEqual(cancelButtonComponent().prop('disabled'), false)
   })
 
-  test('"Submit" button is disabled if the all the content in the comment is removed', function() {
+  test('"Submit" button is disabled if the all the content in the comment is removed', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: ''}})
     strictEqual(submitButtonComponent().prop('disabled'), true)
   })
 
-  test('"Cancel" button is enabled if the all the content in the comment is removed', function() {
+  test('"Cancel" button is enabled if the all the content in the comment is removed', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: ''}})
     strictEqual(cancelButtonComponent().prop('disabled'), false)
   })
 
-  test('"Submit" button is disabled if the all the content in the comment is removed except for spaces', function() {
+  test('"Submit" button is disabled if the all the content in the comment is removed except for spaces', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: '     '}})
     strictEqual(submitButtonComponent().prop('disabled'), true)
   })
 
-  test('"Cancel" button is enabled if the all the content in the comment is removed except for spaces', function() {
+  test('"Cancel" button is enabled if the all the content in the comment is removed except for spaces', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: '     '}})
     strictEqual(cancelButtonComponent().prop('disabled'), false)
   })
 
-  test('"Submit" button is disabled while processing', function() {
+  test('"Submit" button is disabled while processing', () => {
     props.processing = true
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
     strictEqual(submitButtonComponent().prop('disabled'), true)
   })
 
-  test('"Cancel" button is disabled while processing', function() {
+  test('"Cancel" button is disabled while processing', () => {
     props.processing = true
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
     strictEqual(cancelButtonComponent().prop('disabled'), true)
   })
 
-  test('"Submit" button is enabled if the comment is changed and is not empty', function() {
+  test('"Submit" button is enabled if the comment is changed and is not empty', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
     strictEqual(submitButtonComponent().prop('disabled'), false)
   })
 
-  test('"Cancel" button is enabled if the comment is changed and is not empty', function() {
+  test('"Cancel" button is enabled if the comment is changed and is not empty', () => {
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
     strictEqual(cancelButtonComponent().prop('disabled'), false)
   })
 
-  test('"Submit" button has the text "Submit"', function() {
+  test('"Submit" button has the text "Submit"', () => {
     wrapper = mountComponent()
     strictEqual(submitButton().text(), 'Submit')
   })
 
-  test('"Cancel" button has the text "Cancel"', function() {
+  test('"Cancel" button has the text "Cancel"', () => {
     wrapper = mountComponent()
     strictEqual(cancelButton().text(), 'Cancel')
   })
 
-  test('"Submit" button label reads "Update Comment"', function() {
+  test('"Submit" button label reads "Update Comment"', () => {
     wrapper = mountComponent()
     strictEqual(submitButton().prop('label'), 'Update Comment')
   })
 
-  test('"Cancel" button label reads "Cancel Updating Comment"', function() {
+  test('"Cancel" button label reads "Cancel Updating Comment"', () => {
     wrapper = mountComponent()
     strictEqual(cancelButton().prop('label'), 'Cancel Updating Comment')
   })
 
-  test('TextArea has a placeholder message', function() {
+  test('TextArea has a placeholder message', () => {
     wrapper = mountComponent()
     strictEqual(wrapper.find('TextArea').prop('placeholder'), 'Leave a comment')
   })
 
-  test('TextArea has a label', function() {
+  test('TextArea has a label', () => {
     wrapper = mountComponent()
     ok(wrapper.find('label').contains(<ScreenReaderContent>Leave a comment</ScreenReaderContent>))
   })
 
-  test('focuses on the textarea when mounted', function() {
+  test('focuses on the textarea when mounted', () => {
     wrapper = mountComponent()
     const textareaFocus = sinon.stub(wrapper.instance().textarea, 'focus')
     wrapper.instance().componentDidMount()
     strictEqual(textareaFocus.callCount, 1)
   })
 
-  test('the default action is prevented when the button is clicked', function() {
+  test('the default action is prevented when the button is clicked', () => {
     props.updateSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     const event = {
@@ -218,7 +218,7 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     strictEqual(event.preventDefault.callCount, 1)
   })
 
-  test('clicking the "Submit" button calls setProcessing', function() {
+  test('clicking the "Submit" button calls setProcessing', () => {
     props.updateSubmissionComment = sinon.stub().resolves()
     props.setProcessing = sinon.stub()
     wrapper = mountComponent()
@@ -227,7 +227,7 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     strictEqual(props.setProcessing.callCount, 1)
   })
 
-  test('clicking the "Submit" button calls setProcessing with true', function() {
+  test('clicking the "Submit" button calls setProcessing with true', () => {
     props.updateSubmissionComment = sinon.stub().resolves()
     props.setProcessing = sinon.stub()
     wrapper = mountComponent()
@@ -236,7 +236,7 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     strictEqual(props.setProcessing.firstCall.args[0], true)
   })
 
-  test('updateSubmissionComment is called when the comment is valid and the button is clicked', function() {
+  test('updateSubmissionComment is called when the comment is valid and the button is clicked', () => {
     props.updateSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
@@ -244,7 +244,7 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     strictEqual(props.updateSubmissionComment.callCount, 1)
   })
 
-  test('passes the comment id when calling updateSubmissionComment', function() {
+  test('passes the comment id when calling updateSubmissionComment', () => {
     props.updateSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
@@ -252,7 +252,7 @@ QUnit.module('SubmissionCommentUpdateForm', function(hooks) {
     strictEqual(props.updateSubmissionComment.firstCall.args[1], '23')
   })
 
-  test('clicking the "Cancel" button triggers cancelCommenting', function() {
+  test('clicking the "Cancel" button triggers cancelCommenting', () => {
     props.cancelCommenting = sinon.stub()
     wrapper = mountComponent()
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})

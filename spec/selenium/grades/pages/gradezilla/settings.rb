@@ -78,7 +78,7 @@ module Gradezilla
     end
 
     def self.late_policy_increment_combobox(increment)
-      click_option(f('#late-submission-interval'), increment)
+      click_INSTUI_Select_option(f('#late-submission-interval'), increment)
     end
 
     def self.lowest_grade_percent_input

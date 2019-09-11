@@ -112,7 +112,7 @@ class GenericErrorPage extends React.Component {
         <ErrorPageHeader imageUrl={this.props.imageUrl} />
         <View margin="small" display="block">
           {!this.state.commentPosted && (
-            <React.Fragment>
+            <>
               <View margin="small" display="block">
                 <Text margin="0">{I18n.t('Help us improve by telling us what happened')}</Text>
               </View>
@@ -121,7 +121,7 @@ class GenericErrorPage extends React.Component {
                   {I18n.t('Report Issue')}
                 </Button>
               </View>
-            </React.Fragment>
+            </>
           )}
           {this.state.showingCommentBox && (
             <ErrorTextInputForm

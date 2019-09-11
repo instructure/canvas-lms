@@ -93,7 +93,7 @@ test('returns false when submssion type does includes a valid submission type an
 
 QUnit.module('DownloadSubmissionsDialogManager#showDialog')
 
-test('calls submissions downloading callback and opens downloadSubmissions dialog', function() {
+test('calls submissions downloading callback and opens downloadSubmissions dialog', () => {
   sandbox.stub(INST, 'downloadSubmissions')
   const submissionsDownloading = sinon.stub()
   const manager = new DownloadSubmissionsDialogManager(

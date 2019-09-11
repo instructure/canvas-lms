@@ -79,7 +79,7 @@ describe "Files API", type: :request do
     it 'includes include capture param in inst_fs token' do
       secret = 'secret'
       allow(InstFS).to receive(:enabled?).and_return true
-      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+      allow(InstFS).to receive(:jwt_secrets).and_return([secret])
       json = call_course_create_file
       query = Rack::Utils.parse_nested_query(URI(json['upload_url']).query)
       payload = Canvas::Security.decode_jwt(query['token'], [secret])
@@ -332,7 +332,7 @@ describe "Files API", type: :request do
 
     before do
       allow(InstFS).to receive(:enabled?).and_return true
-      allow(InstFS).to receive(:jwt_secret).and_return(secret)
+      allow(InstFS).to receive(:jwt_secrets).and_return([secret])
     end
 
     it "is not available without the InstFS feature" do

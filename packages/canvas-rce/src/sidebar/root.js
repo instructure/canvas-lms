@@ -28,7 +28,7 @@ import Bridge from "../bridge";
 export function renderIntoDiv(target, props = {}, renderCallback) {
   // create a new store for the Provider to use (it will then be passed on to
   // any container components under the Provider)
-  let store = configureStore(props);
+  const store = configureStore(props);
 
   // normalize props
   props = normalizeProps(props);

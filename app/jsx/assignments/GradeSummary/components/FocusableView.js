@@ -96,16 +96,14 @@ export default class FocusableView extends Component {
     this.bindVerticalScroll = $ref => {
       bindVerticalHandler(this.keyHandlers, $ref)
     }
-
-    this.handleKeyDown = this.handleKeyDown.bind(this)
   }
 
-  handleKeyDown(event) {
+  handleKeyDown = event => {
     const handler = this.keyHandlers[event.keyCode]
     if (handler) {
       handler(event)
     }
-  }
+  };
 
   render() {
     return (

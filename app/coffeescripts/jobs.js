@@ -37,10 +37,6 @@ let selected_job = null
 
 class FlavorGrid {
   constructor(options, type_name, grid_name) {
-    this.setTimer = this.setTimer.bind(this)
-    this.saveSelection = this.saveSelection.bind(this)
-    this.restoreSelection = this.restoreSelection.bind(this)
-    this.refresh = this.refresh.bind(this)
     this.options = options
     this.type_name = type_name
     this.grid_name = grid_name
@@ -53,18 +49,18 @@ class FlavorGrid {
     this.query = ''
   }
 
-  setTimer() {
+  setTimer = () => {
     return setTimeout(() => this.refresh(this.setTimer), this.options.refresh_rate)
-  }
+  };
 
-  saveSelection() {
+  saveSelection = () => {
     if (this.type_name === 'running') {
       this.oldSelected = {}
       return this.grid.getSelectedRows().map(row => (this.oldSelected[this.data[row].id] = true))
     }
-  }
+  };
 
-  restoreSelection() {
+  restoreSelection = () => {
     if (this.type_name === 'running') {
       let index = 0
       const newSelected = []
@@ -78,9 +74,9 @@ class FlavorGrid {
       this.grid.setSelectedRows(newSelected)
       return (this.restoringSelection = false)
     }
-  }
+  };
 
-  refresh(cb) {
+  refresh = cb => {
     return this.$element.queue(() =>
       $.ajaxJSON(this.options.url, 'GET', {flavor: this.options.flavor, q: this.query}, data => {
         this.saveSelection()
@@ -115,7 +111,7 @@ class FlavorGrid {
         return this.$element.dequeue()
       })
     )
-  }
+  };
 
   change_flavor(flavor) {
     this.options.flavor = flavor

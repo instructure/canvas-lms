@@ -58,28 +58,21 @@ class Header extends Component {
     unmuteAssignmentStatus: null
   }
 
-  constructor(props) {
-    super(props)
-
-    this.handleReleaseClick = this.handleReleaseClick.bind(this)
-    this.handleUnmuteClick = this.handleUnmuteClick.bind(this)
-  }
-
-  handleReleaseClick() {
+  handleReleaseClick = () => {
     const message = I18n.t(
       'Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.'
     )
     if (window.confirm(message)) {
       this.props.releaseGrades()
     }
-  }
+  };
 
-  handleUnmuteClick() {
+  handleUnmuteClick = () => {
     const message = I18n.t('Are you sure you want to post grades for this assignment to students?')
     if (window.confirm(message)) {
       this.props.unmuteAssignment()
     }
-  }
+  };
 
   render() {
     return (

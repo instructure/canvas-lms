@@ -36,7 +36,7 @@ import $ from 'jquery'
 	  	  foundInputsAndLables = [];
 
     function hideOrShowLabels(){
-      $.each(foundInputsAndLables, function(i, inputAndLable){
+      $.each(foundInputsAndLables, (i, inputAndLable) => {
         inputAndLable[1][inputAndLable[0].val() ? 'hide' : 'show']();
       });
     }
@@ -51,10 +51,10 @@ import $ from 'jquery'
 	    });
 
 	    $input
-        .focus(function(){
+        .focus(() => {
           $label.addClass('focus', 300);
         })
-        .blur(function(){
+        .blur(() => {
           $label.removeClass('focus', 300);
         })
         .bind('keyup', hideOrShowLabels);

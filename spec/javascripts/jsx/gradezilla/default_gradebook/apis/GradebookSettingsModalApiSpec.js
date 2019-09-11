@@ -61,11 +61,9 @@ QUnit.module('GradebookSettingsModalApi.fetchLatePolicy success', {
   }
 })
 
-test('returns the late policy', function() {
-  return fetchLatePolicy('19').then(({data}) => {
-    deepEqual(data, {latePolicy: latePolicyData})
-  })
-})
+test('returns the late policy', () => fetchLatePolicy('19').then(({data}) => {
+  deepEqual(data, {latePolicy: latePolicyData})
+}))
 
 QUnit.module('GradebookSettingsModalApi.fetchLatePolicy when late policy does not exist', {
   setup() {
@@ -87,11 +85,9 @@ QUnit.module('GradebookSettingsModalApi.fetchLatePolicy when late policy does no
   }
 })
 
-test('returns default late policy data when the response is a 404', function() {
-  return fetchLatePolicy('19').then(({data}) => {
-    deepEqual(data, {latePolicy: DEFAULT_LATE_POLICY_DATA})
-  })
-})
+test('returns default late policy data when the response is a 404', () => fetchLatePolicy('19').then(({data}) => {
+  deepEqual(data, {latePolicy: DEFAULT_LATE_POLICY_DATA})
+}))
 
 QUnit.module('GradebookSettingsModalApi.fetchLatePolicy when the request fails', {
   setup() {
@@ -109,11 +105,9 @@ QUnit.module('GradebookSettingsModalApi.fetchLatePolicy when the request fails',
   }
 })
 
-test('rejects the promise when the response is not a 200 or a 404', function() {
-  return fetchLatePolicy('19').catch(error => {
-    strictEqual(error.response.status, 500)
-  })
-})
+test('rejects the promise when the response is not a 200 or a 404', () => fetchLatePolicy('19').catch(error => {
+  strictEqual(error.response.status, 500)
+}))
 
 QUnit.module('GradebookSettingsModalApi.createLatePolicy', {
   setup() {

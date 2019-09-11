@@ -15,7 +15,7 @@ export function getPrefetchedXHR(id){
  */
 export function asAxios(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(res =>
+  return fetchRequest.then(checkStatus).then(res =>
     res.json().then(data => ({data, headers: {link: res.headers.get('Link')}}))
   )
 }
@@ -28,7 +28,7 @@ export function asAxios(fetchRequest) {
  */
 export function asJson(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(res => res.json())
+  return fetchRequest.then(checkStatus).then(res => res.json())
 }
 
 /**
@@ -39,5 +39,29 @@ export function asJson(fetchRequest) {
  */
 export function asText(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(res => res.text())
+  return fetchRequest.then(checkStatus).then(res => res.text())
+}
+
+
+/**
+ * filter a response to raise an error on a 400+ status
+ *
+ * @param {Promise<Response>} response
+ * @returns {Promise<Response>}
+ */
+export function checkStatus(response) {
+  if (response.status < 400) {
+    return response
+  } else {
+    const error = new Error(response.statusText)
+    error.response = response
+    throw error
+  }
+}
+
+export const defaultFetchOptions = {
+  credentials: 'same-origin',
+  headers: {
+    Accept: 'application/json+canvas-string-ids, application/json'
+  }
 }

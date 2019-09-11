@@ -24,7 +24,7 @@ import {
   mockMultipleAttachments
 } from '../../test-utils'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
-import {MockedProvider} from 'react-apollo/test-utils'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
 import CommentTextArea from '../CommentsTab/CommentTextArea'
@@ -45,7 +45,7 @@ describe('CommentTextArea', () => {
     })
   }
 
-  it('renders the CommentTextArea by default', async () => {
+  it('renders the CommentTextArea by default', () => {
     const {getByText} = render(
       <MockedProvider>
         <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
@@ -54,7 +54,7 @@ describe('CommentTextArea', () => {
     expect(getByText('Attach a File')).toBeInTheDocument()
   })
 
-  it('renders the input for controlling file inputs', async () => {
+  it('renders the input for controlling file inputs', () => {
     const {container} = render(
       <MockedProvider>
         <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />

@@ -23,7 +23,6 @@ import AvatarDialogView from '../views/profiles/AvatarDialogView'
 
 export default class AvatarWidget {
   constructor (el) {
-    this._openAvatarDialog = this._openAvatarDialog.bind(this)
     this.$el = $(el)
     this._attachEvents()
   }
@@ -40,7 +39,7 @@ export default class AvatarWidget {
   // e - Event object.
   //
   // Returns nothing.
-  _openAvatarDialog (e) {
+  _openAvatarDialog = e => {
     if (e != null) {
       e.preventDefault()
     }
@@ -48,5 +47,5 @@ export default class AvatarWidget {
       this.avatarDialog = new AvatarDialogView()
     }
     return this.avatarDialog.show()
-  }
+  };
 }

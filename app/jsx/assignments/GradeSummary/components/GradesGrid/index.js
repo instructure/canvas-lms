@@ -65,13 +65,11 @@ function studentsToPages(props) {
 
 export default class GradesGrid extends Component {
   static propTypes = {
-    /* eslint-disable react/no-unused-prop-types */
     anonymousStudents: bool.isRequired,
     assignment: shape({
       courseId: string.isRequired,
       id: string.isRequired
     }).isRequired,
-    /* eslint-enable react/no-unused-prop-types */
     disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
       graderId: string.isRequired
@@ -101,8 +99,6 @@ export default class GradesGrid extends Component {
   constructor(props) {
     super(props)
 
-    this.setPage = this.setPage.bind(this)
-
     this.state = {
       currentPageIndex: 0,
       pages: studentsToPages(props)
@@ -117,9 +113,9 @@ export default class GradesGrid extends Component {
     }
   }
 
-  setPage(page) {
+  setPage = page => {
     this.setState({currentPageIndex: page - 1})
-  }
+  };
 
   render() {
     const rows = this.state.pages[this.state.currentPageIndex]

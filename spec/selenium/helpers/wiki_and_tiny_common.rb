@@ -37,15 +37,6 @@ module WikiAndTinyCommon
     switch_editor_views(element)
   end
 
-  def wiki_page_tools_upload_file(form, type)
-    name, path, data = get_file({:text => 'testfile1.txt', :image => 'graded.png'}[type])
-
-    f("#{form} .file_name").send_keys(path)
-    wait_for_ajaximations
-    f("#{form}").submit
-    expect(f("body")).not_to contain_jqcss("#{form}:visible")
-  end
-
   def wiki_page_tools_file_tree_setup(skip_tree=false, skip_image_list=false)
     @root_folder = Folder.root_folders(@course).first
     @sub_folder = @root_folder.sub_folders.create!(:name => 'subfolder', :context => @course)
@@ -165,17 +156,30 @@ module WikiAndTinyCommon
   def add_image_to_rce
     get "/courses/#{@course.id}/pages/front-page/edit"
     wait_for_tiny(f("form.edit-form .edit-content"))
-    clear_wiki_rce
-    f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-    f('.upload_new_image_link').click
-    wait_for_animations
-    wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)
+    fj('[role="presentation"]:contains("Images")').click
+    fj('button:contains(" Upload a new image")').click
+    alt_text = "image file"
+    name, path, data = get_file({:image => 'graded.png'}[:image])
+    f("input[type='file']").send_keys(path)
+    f("input[name='alt_text']").send_keys(alt_text)
+    f("button[type='submit']").click
+    expect(f("body")).not_to contain_jqcss("input[type='file']:visible")
     in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce img')).to be_displayed
     end
 
-    f('form.edit-form button.submit').click
+    force_click('form.edit-form button.submit')
     wait_for_ajax_requests
+  end
+
+  def upload_image_to_files_in_rce
+    fj('button:contains("Upload a new file")').click
+    name, path, data = get_file({:image => 'graded.png'}[:image])
+    f("input[type='file']").send_keys(path)
+    button = f("button[type='submit']")
+    keep_trying_until { button.displayed? }
+    button.click
+    wait_for_ajaximations
   end
 
   def add_file_to_rce

@@ -119,7 +119,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
             // turn it into a false promise, i.e. never resolve
             var origPromise = loadingPromise;
             loadingPromise = $.Deferred();
-            origPromise.fail(function(){ loadingPromise.reject(); });
+            origPromise.fail(() => { loadingPromise.reject(); });
           }
           $form.disableWhileLoading(loadingPromise);
           if (oldOnSubmit) oldOnSubmit.apply(this, arguments);
@@ -211,7 +211,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
             args[$input.attr('name')] = file_list;
           }
         });
-        $.toMultipartForm(args, function(params) {
+        $.toMultipartForm(args, params => {
           $.sendFormAsBinary({
             url: action,
             body: params.body,
@@ -257,7 +257,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
             xhrError.call(this, request.response, request);
             $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, request, "0", null);
           }
-          setTimeout(function() {
+          setTimeout(() => {
             $form.attr({
               'ENCTYPE': priorEnctype,
               'encoding': priorEnctype,
@@ -831,7 +831,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
     }
     if (options.required) {
       var required = _.result(options, 'required')
-      $.each(required, function(i, name) {
+      $.each(required, (i, name) => {
         if (!data[name]) {
           if (!errors[name]) {
             errors[name] = [];
@@ -844,7 +844,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
       });
     }
     if(options.date_fields) {
-      $.each(options.date_fields, function(i, name) {
+      $.each(options.date_fields, (i, name) => {
         var $item = $form.find("input[name='" + name + "']").filter(".datetime_field_enabled");
         if ($item.length && $item.data('invalid')) {
           if (!errors[name]) {
@@ -855,7 +855,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
       });
     }
     if (options.numbers) {
-      $.each(options.numbers, function(i, name){
+      $.each(options.numbers, (i, name) => {
         var val = parseFloat(data[name]);
         if(isNaN(val)) {
           if(!errors[name]) {
@@ -866,7 +866,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
       });
     }
     if(options.property_validations) {
-      $.each(options.property_validations, function(name, validation) {
+      $.each(options.property_validations, (name, validation) => {
         if($.isFunction(validation)) {
           var result = validation.call($form, data[name], data);
           if(result) {
@@ -908,7 +908,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
     if(typeof(data_errors) == 'string') {
       data_errors = {base: data_errors};
     }
-    $.each(data_errors, function(i, val) {
+    $.each(data_errors, (i, val) => {
       if(typeof(val) == "string") {
         var newval = [];
         newval.push(val);
@@ -937,7 +937,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
         }
       }
       if($form.find(":input[name='" + i + "'],:input[name*='[" + i + "]']").length > 0) {
-        $.each(val, function(idx, msg) {
+        $.each(val, (idx, msg) => {
           if(!errors[i]) {
             errors[i] = htmlEscape(msg);
           } else {
@@ -945,7 +945,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
           }
         });
       } else {
-        $.each(val, function(idx, msg) {
+        $.each(val, (idx, msg) => {
           if(!errors.general) {
             errors.general = htmlEscape(msg);
           } else {
@@ -960,7 +960,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
     var currentTop = $(document).scrollTop();
     var errorDetails = {};
     $('#aria_alerts').empty();
-    $.each(errors, function(name, msg) {
+    $.each(errors, (name, msg) => {
       var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":visible").first();
       if(!$obj || $obj.length === 0) {
         var $hiddenInput = $form.find("[name='" + name + "'],[name*='[" + name + "]']").filter(":not(:visible)").first();
@@ -1035,9 +1035,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
 
       var cleanup = function() {
         var $screenReaderErrors = $("#flash_screenreader_holder").find("span");
-        var srError = _.find($screenReaderErrors, function(node){
-          return $(node).text() == $box.text();
-        });
+        var srError = _.find($screenReaderErrors, node => $(node).text() == $box.text());
         $box.remove();
         if(srError){
           $(srError).remove();
@@ -1121,9 +1119,7 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
         if($oldBox) {
           $oldBox.remove();
           $obj.data('associated_error_box', null);
-          var srError = _.find($screenReaderErrors, function(node){
-            return $(node).text() == $oldBox.text();
-          });
+          var srError = _.find($screenReaderErrors, node => $(node).text() == $oldBox.text());
           if(srError){
             $(srError).remove();
           };

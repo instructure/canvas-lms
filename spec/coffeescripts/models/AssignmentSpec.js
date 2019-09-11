@@ -873,7 +873,7 @@ QUnit.module('Assignment#singleSectionDueDate', {
   }
 })
 
-test('gets the due date for section instead of null', function() {
+test('gets the due date for section instead of null', () => {
   const dueAt = new Date('2013-11-27T11:01:00Z')
   const assignment = new Assignment({
     all_dates: [
@@ -1084,7 +1084,7 @@ test('includes allDates', () => {
   equal(json.allDates.length, 2)
 })
 
-test('includes singleSectionDueDate', function() {
+test('includes singleSectionDueDate', () => {
   const dueAt = new Date('2013-11-27T11:01:00Z')
   const assignment = new Assignment({
     all_dates: [
@@ -1260,7 +1260,7 @@ test('returns false if record is frozen', () => {
   equal(assignment.canFreeze(), false)
 })
 
-test('returns false if record uses quizzes 2', function() {
+test('returns false if record uses quizzes 2', () => {
   const assignment = new Assignment({
     name: 'foo',
     frozen_attributes: []
@@ -1283,7 +1283,7 @@ test('returns true if submission_types are in frozenAttributes', () => {
 
 QUnit.module('Assignment#duplicate_failed')
 
-test('make ajax call with right url when duplicate_failed is called', function() {
+test('make ajax call with right url when duplicate_failed is called', () => {
   const assignmentID = '200'
   const originalAssignmentID = '42'
   const courseID = '123'

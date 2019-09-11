@@ -20,17 +20,17 @@ export const REQUEST_DOCS = "REQUEST_DOCS";
 export const RECEIVE_DOCS = "RECEIVE_DOCS";
 export const FAIL_DOCS = "FAIL_DOCS";
 
-export function requestDocs() {
-  return { type: REQUEST_DOCS };
+export function requestDocs(contextType) {
+  return { type: REQUEST_DOCS, payload: {contextType} };
 }
 
-export function receiveDocs(docs) {
-  let { files, bookmark } = docs;
-  return { type: RECEIVE_DOCS, files, bookmark };
+export function receiveDocs({response, contextType}) {
+  const { files, bookmark } = response;
+  return { type: RECEIVE_DOCS, payload: {files, bookmark, contextType} };
 }
 
-export function failDocs( error) {
-  return { type: FAIL_DOCS, error };
+export function failDocs({error, contextType}) {
+  return { type: FAIL_DOCS, payload: {error, contextType} };
 }
 
 // dispatches the start of the load, requests a page for the collection from
@@ -38,13 +38,12 @@ export function failDocs( error) {
 // clears the load on failure
 export function fetchDocs() {
   return (dispatch, getState) => {
-    const { source, documents } = getState();
-    let bookmark = documents.bookmark;
-    dispatch(requestDocs());
-    return source
-      .fetchDocs(bookmark)
-      .then(docs => dispatch(receiveDocs(docs)))
-      .catch(error => dispatch(failDocs(error)));
+    const state = getState();
+    dispatch(requestDocs(state.contextType));
+    return state.source
+      .fetchDocs(state)
+      .then(response => dispatch(receiveDocs({response, contextType: state.contextType})))
+      .catch(error => dispatch(failDocs({error, contextType: state.contextType})));
   };
 }
 
@@ -53,8 +52,9 @@ export function fetchDocs() {
 export function fetchNextDocs() {
   return (dispatch, getState) => {
     const state = getState();
+    const documents = state.documents[state.contextType]
 
-    if (state.documents && !state.documents.isLoading && state.documents.bookmark) {
+    if (documents && !documents.isLoading && documents.hasMore) {
       return dispatch(fetchDocs());
     }
   };
@@ -65,9 +65,10 @@ export function fetchNextDocs() {
 export function fetchInitialDocs() {
   return (dispatch, getState) => {
     const state = getState();
+    const documents = state.documents[state.contextType]
 
-    if (state.documents.files && state.documents.files.length === 0) {
-      return dispatch(fetchNextDocs());
+    if (documents && documents.hasMore && !documents.isLoading && documents.files && documents.files.length === 0) {
+      return dispatch(fetchDocs());
     }
   };
 }

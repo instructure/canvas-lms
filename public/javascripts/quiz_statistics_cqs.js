@@ -26,6 +26,6 @@ import app from 'canvas_quizzes/apps/statistics'
     courseSectionsUrl: ENV.course_sections_url
   });
 
-  app.mount(document.body.querySelector('#content')).then(function() {
+  app.mount(document.body.querySelector('#content')).then(() => {
     console.log('Yeah!!!');
   });

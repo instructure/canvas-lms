@@ -77,7 +77,7 @@ import 'jquery.cookie'
   };
 
   // indicate we want stringified IDs for JSON responses
-  $.ajaxPrefilter("json", function( options, originalOptions, jqXHR ) {
+  $.ajaxPrefilter("json", (options, originalOptions, jqXHR) => {
     if (options.accepts.json)
       options.accepts.json = options.accepts.json + ', application/json+canvas-string-ids';
     else
@@ -90,7 +90,7 @@ import 'jquery.cookie'
     if (csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken);
   }
 
-  $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+  $.ajaxPrefilter((options, originalOptions, jqXHR) => {
     if ( !options.crossDomain ) CSRFProtection(jqXHR);
   });
 

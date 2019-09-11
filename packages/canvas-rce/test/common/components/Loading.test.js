@@ -23,8 +23,8 @@ import sd from "skin-deep";
 
 describe("Loading", () => {
   it("includes a screenreader-only message", () => {
-    let tree = sd.shallowRender(<Loading />);
-    let message = tree.subTree("ScreenReaderContent");
+    const tree = sd.shallowRender(<Loading />);
+    const message = tree.subTree("ScreenReaderContent");
     assert.equal([].join.call(message.props.children, ""), "Loading...");
   });
 });

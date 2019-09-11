@@ -150,9 +150,7 @@ let assignmentUtils = {
   },
 
   withOriginalErrorsNotIgnored(assignments) {
-    return _.filter(assignments, function(a) {
-      return (a.original_error || a.hadOriginalErrors) && !a.please_ignore
-    })
+    return _.filter(assignments, a => (a.original_error || a.hadOriginalErrors) && !a.please_ignore);
   },
 
   withErrors(assignments) {

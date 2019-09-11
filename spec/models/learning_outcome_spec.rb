@@ -974,7 +974,6 @@ describe LearningOutcome do
         [c1, c2].each { |c| outcome.align(nil, c, :mastery_type => "points") }
         assess_with.call(outcome, c1)
 
-        expect(outcome.alignments.length).to eq(3)
         expect(outcome).to be_assessed
         expect(outcome).to be_assessed(c1)
         expect(outcome).not_to be_assessed(c2)

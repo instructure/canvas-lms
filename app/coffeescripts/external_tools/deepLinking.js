@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!external_toolsdeepLinking'
 import $ from 'jquery'
+import '../jquery.rails_flash_notifications'
 
 export function handleContentItem(result, contentView, callback) {
   contentView.trigger('ready', {contentItems: [legacyContentItem(result)]})

@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Component} from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
-import Select from '@instructure/ui-core/lib/components/Select'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {TextInput} from '@instructure/ui-text-input'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
+
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 import {parseTextValue} from '../../../grading/helpers/GradeInputHelper'
 import {isUnusuallyHigh} from '../../../grading/helpers/OutlierScoreHelper'
+import CompleteIncompleteGradeInput from './GradeInput/CompleteIncompleteGradeInput'
 
 function normalizeSubmissionGrade(props) {
   const {submission, assignment, enterGradesAs: formatType, gradingScheme} = props
@@ -41,6 +42,7 @@ function normalizeSubmissionGrade(props) {
   }
 
   const formatOptions = {
+    defaultValue: '',
     formatType,
     gradingScheme,
     pointsPossible: assignment.pointsPossible,
@@ -89,24 +91,6 @@ function assignmentLabel(assignment, formatType) {
   }
 }
 
-function ExcusedSelect(props) {
-  return (
-    <Select {...props}>
-      <option value="">{I18n.t('Excused')}</option>
-    </Select>
-  )
-}
-
-function CompleteIncompleteSelect(props) {
-  return (
-    <Select {...props}>
-      <option value="">{I18n.t('Ungraded')}</option>
-      <option value="complete">{I18n.t('Complete')}</option>
-      <option value="incomplete">{I18n.t('Incomplete')}</option>
-    </Select>
-  )
-}
-
 function stateFromProps(props) {
   let normalizedGrade
 
@@ -129,7 +113,7 @@ function stateFromProps(props) {
   }
 }
 
-export default class GradeInput extends React.Component {
+export default class GradeInput extends Component {
   static propTypes = {
     assignment: shape({
       anonymizeStudents: bool.isRequired,
@@ -145,7 +129,7 @@ export default class GradeInput extends React.Component {
     }).isRequired,
     disabled: bool,
     enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
-    gradingScheme: arrayOf(Array).isRequired,
+    gradingScheme: arrayOf(Array),
     onSubmissionUpdate: func,
     pendingGradeInfo: shape({
       excused: bool.isRequired,
@@ -163,8 +147,9 @@ export default class GradeInput extends React.Component {
 
   static defaultProps = {
     disabled: false,
-    pendingGradeInfo: null,
+    gradingScheme: null,
     onSubmissionUpdate() {},
+    pendingGradeInfo: null,
     submissionUpdating: false
   }
 
@@ -189,15 +174,18 @@ export default class GradeInput extends React.Component {
   }
 
   handleTextBlur() {
-    const enteredGrade = this.state.grade.trim()
-
     this.setState(
-      {
-        formattedGrade: GradeFormatHelper.isExcused(enteredGrade)
-          ? GradeFormatHelper.excused()
-          : enteredGrade,
-        grade: this.state.grade.trim()
+      state => {
+        const enteredGrade = state.grade.trim()
+
+        return {
+          formattedGrade: GradeFormatHelper.isExcused(enteredGrade)
+            ? GradeFormatHelper.excused()
+            : enteredGrade,
+          grade: enteredGrade
+        }
       },
+
       () => {
         if (hasGradeChanged(this.props, this.state)) {
           this.handleGradeChange()
@@ -213,23 +201,18 @@ export default class GradeInput extends React.Component {
     })
   }
 
-  handleSelectChange(event) {
-    this.setState(
-      {
-        grade: event.target.value
-      },
-      this.handleGradeChange
-    )
+  handleSelectChange(grade) {
+    this.setState({grade}, this.handleGradeChange)
   }
 
   handleGradeChange() {
-    const gradingData = parseTextValue(this.state.grade, {
+    const gradeInfo = parseTextValue(this.state.grade, {
       enterGradesAs: this.props.enterGradesAs,
       gradingScheme: this.props.gradingScheme,
       pointsPossible: this.props.assignment.pointsPossible
     })
 
-    this.props.onSubmissionUpdate(this.props.submission, gradingData)
+    this.props.onSubmissionUpdate(this.props.submission, gradeInfo)
   }
 
   render() {
@@ -241,25 +224,45 @@ export default class GradeInput extends React.Component {
       )
     }
 
-    const inputProps = {
-      disabled:
-        this.props.disabled || this.props.submissionUpdating || this.props.submission.excused,
-      id: 'grade-detail-tray--grade-input',
-      label: assignmentLabel(this.props.assignment, this.props.enterGradesAs)
+    const isDisabled = this.props.disabled
+    const isBusy = this.props.submissionUpdating
+
+    let currentGradeInfo
+    if (this.props.pendingGradeInfo) {
+      currentGradeInfo = this.props.pendingGradeInfo
+    } else if (this.props.submission.excused) {
+      currentGradeInfo = {
+        enteredAs: 'excused',
+        excused: true,
+        grade: null,
+        score: null,
+        valid: true
+      }
+    } else {
+      currentGradeInfo = parseTextValue(this.state.grade, {
+        enterGradesAs: this.props.enterGradesAs,
+        gradingScheme: this.props.gradingScheme,
+        pointsPossible: this.props.assignment.pointsPossible
+      })
     }
 
     if (this.props.enterGradesAs === 'passFail') {
-      if (this.props.submission.excused) {
-        return <ExcusedSelect {...inputProps} />
-      }
-
       return (
-        <CompleteIncompleteSelect
-          {...inputProps}
+        <CompleteIncompleteGradeInput
+          anonymizeStudents={this.props.assignment.anonymizeStudents}
+          gradeInfo={currentGradeInfo}
+          isBusy={isBusy}
+          isDisabled={isDisabled}
           onChange={this.handleSelectChange}
-          value={this.state.grade == null ? '' : this.state.grade}
         />
       )
+    }
+
+    let interaction = 'enabled'
+    if (!isDisabled && isBusy) {
+      interaction = 'readonly'
+    } else if (isDisabled || currentGradeInfo.excused) {
+      interaction = 'disabled'
     }
 
     const messages = []
@@ -274,12 +277,14 @@ export default class GradeInput extends React.Component {
 
     return (
       <TextInput
-        {...inputProps}
-        inline
+        display="inline-block"
+        id="grade-detail-tray--grade-input"
+        interaction={interaction}
         messages={messages}
         onInput={this.handleTextChange}
         onBlur={this.handleTextBlur}
         placeholder="–"
+        renderLabel={() => assignmentLabel(this.props.assignment, this.props.enterGradesAs)}
         value={this.state.formattedGrade}
       />
     )

@@ -52,7 +52,7 @@ test('detach/reattach the publish icon view', () => {
   )
 })
 
-test('delegate useAsFrontPage to the model', function() {
+test('delegate useAsFrontPage to the model', () => {
   const model = new WikiPage({
     front_page: false,
     published: true

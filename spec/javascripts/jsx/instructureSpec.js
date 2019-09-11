@@ -31,7 +31,7 @@ QUnit.module('Enhance User Content', {
   }
 })
 
-test('youtube preview gets alt text from link data-preview-alt', function() {
+test('youtube preview gets alt text from link data-preview-alt', () => {
   const alt = 'test alt string'
   elem.innerHTML = `
     <div class="user_content">
@@ -45,7 +45,7 @@ test('youtube preview gets alt text from link data-preview-alt', function() {
   equal(elem.querySelector('.media_comment_thumbnail').alt, alt)
 })
 
-test('youtube preview ignores missing alt', function() {
+test('youtube preview ignores missing alt', () => {
   elem.innerHTML = `
     <div class="user_content">
       <a href="#" class="instructure_video_link">
@@ -58,7 +58,7 @@ test('youtube preview ignores missing alt', function() {
   ok(elem.querySelector('.media_comment_thumbnail').outerHTML.match('alt=""'))
 })
 
-test("enhance '.instructure_inline_media_comment' in questions", function() {
+test("enhance '.instructure_inline_media_comment' in questions", () => {
   const mediaCommentThumbnailSpy = sandbox.spy($.fn, 'mediaCommentThumbnail')
   elem.innerHTML = `
     <div class="user_content"></div>

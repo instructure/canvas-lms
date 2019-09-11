@@ -122,7 +122,7 @@ test('lock_info.unlock_at', () => {
   clock.restore()
 })
 
-test('useAsFrontPage for published wiki_pages_path', function() {
+test('useAsFrontPage for published wiki_pages_path', () => {
   const model = new WikiPage({
     front_page: false,
     published: true
@@ -133,7 +133,7 @@ test('useAsFrontPage for published wiki_pages_path', function() {
   ok(stub.calledOnce)
 })
 
-test('useAsFrontPage should not work on unpublished wiki_pages_path', function() {
+test('useAsFrontPage should not work on unpublished wiki_pages_path', () => {
   const model = new WikiPage({
     front_page: false,
     published: false

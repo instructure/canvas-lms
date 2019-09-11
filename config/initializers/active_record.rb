@@ -612,9 +612,11 @@ class ActiveRecord::Base
       rescue ActiveRecord::RecordNotUnique
       end
     end
-    result = transaction(:requires_new => true) { uncached { yield(retries) } }
-    connection.clear_query_cache
-    result
+    Shackles.activate(:master) do
+      result = transaction(:requires_new => true) { uncached { yield(retries) } }
+      connection.clear_query_cache
+      result
+    end
   end
 
   def self.current_xlog_location
@@ -1446,7 +1448,13 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(*args)
-    scope = self.class.all.klass.unscoped
+    unless CANVAS_RAILS5_2
+      # in rails 6.1, we can get rid of this entire monkeypatch
+      scope = self.class.current_scope&.clone || self.class.default_scoped
+      scope = scope.klass.unscoped
+    else
+      scope = self.class.all.klass.unscoped
+    end
     scope.scoping { super }
   end
 end
@@ -1615,8 +1623,22 @@ module TableRename
   end
 end
 
+module DefeatInspectionFilterMarshalling
+  def inspect
+    result = super
+    @inspection_filter = nil
+    result
+  end
+
+  def pretty_print(_pp)
+    super
+    @inspection_filter = nil
+  end
+end
+
 ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)
 
+ActiveRecord::Base.prepend(DefeatInspectionFilterMarshalling)
 ActiveRecord::Base.prepend(Canvas::CacheRegister::ActiveRecord::Base)
 ActiveRecord::Base.singleton_class.prepend(Canvas::CacheRegister::ActiveRecord::Base::ClassMethods)
 ActiveRecord::Relation.prepend(Canvas::CacheRegister::ActiveRecord::Relation)

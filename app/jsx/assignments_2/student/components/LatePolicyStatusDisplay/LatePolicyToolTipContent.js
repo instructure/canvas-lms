@@ -28,7 +28,7 @@ function LatePolicyToolTipContent(props) {
   //        submission into this component and let it grab the data itself.
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
-    <React.Fragment>
+    <>
       <AccessibleTipContent
         attempt={attempt}
         grade={grade}
@@ -86,7 +86,7 @@ function LatePolicyToolTipContent(props) {
           </Flex>
         </FlexItem>
       </Flex>
-    </React.Fragment>
+    </>
   )
 }
 

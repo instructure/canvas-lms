@@ -46,7 +46,6 @@
   if (!(window.Promise && Object.assign && Object.values && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
     get("#{javascript_path(polyfill_url)}");
   }
-  if (/Edge\\/1[2-7]/i.test(navigator.userAgent)) delete window.fetch
   if (!window.fetch) get("#{fetch_polyfill_url}");
 }();
       ))

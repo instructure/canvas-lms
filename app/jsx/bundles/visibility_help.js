@@ -35,7 +35,7 @@ $('.visibility_help_link').live('click', (event) => {
         width: 330
       })
 
-    $('#course_course_visibility option').each(function(_i, element) {
+    $('#course_course_visibility option').each((_i, element) => {
       $dialog.append($("<div/>").append($("<b/>", {text: element.innerText})))
       $dialog.append($("<div/>", {text: ENV.COURSE_VISIBILITY_OPTION_DESCRIPTIONS[element.value] || ''}))
     })

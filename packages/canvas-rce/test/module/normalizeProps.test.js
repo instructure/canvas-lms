@@ -37,8 +37,8 @@ describe("Rce normalizeProps", () => {
   });
 
   it("sets tinymce as provided, even over prop", () => {
-    let otherMCE = {};
-    let normalized = normalizeProps(
+    const otherMCE = {};
+    const normalized = normalizeProps(
       { ...props, tinymce: otherMCE },
       tinymce,
       MockMutationObserver
@@ -47,7 +47,7 @@ describe("Rce normalizeProps", () => {
   });
 
   it("normalizes the language", () => {
-    let normalized = normalizeProps(
+    const normalized = normalizeProps(
       { ...props, language: "mi-NZ" },
       tinymce,
       MockMutationObserver
@@ -56,7 +56,7 @@ describe("Rce normalizeProps", () => {
   });
 
   it("retains other props", () => {
-    let normalized = normalizeProps(
+    const normalized = normalizeProps(
       { ...props, textareaId: "textareaId" },
       tinymce,
       MockMutationObserver

@@ -25,7 +25,7 @@ import {
 } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import SlickGridSpecHelper from './GradebookGrid/GridSupport/SlickGridSpecHelper'
 
-QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
+QUnit.module('Gradebook Grid Column Ordering', suiteHooks => {
   let $fixture
   let gridSpecHelper
   let gradebook
@@ -175,7 +175,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
   }
 
-  suiteHooks.beforeEach(function() {
+  suiteHooks.beforeEach(() => {
     $fixture = document.createElement('div')
     document.body.appendChild($fixture)
     setFixtureHtml($fixture)
@@ -203,7 +203,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     createCustomColumns()
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     gradebook.destroy()
     DataLoader.loadGradebookData.restore()
     DataLoader.getDataForColumn.restore()
@@ -211,8 +211,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     $fixture.remove()
   })
 
-  QUnit.module('when initializing the grid', function() {
-    test('defaults assignment column order to assignment group positions when setting is not set', function() {
+  QUnit.module('when initializing the grid', () => {
+    test('defaults assignment column order to assignment group positions when setting is not set', () => {
       createGradebookAndAddData()
       const expectedOrder = [
         'assignment_2302',
@@ -226,7 +226,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts assignment columns by assignment name when setting is "name"', function() {
+    test('sorts assignment columns by assignment name when setting is "name"', () => {
       createGradebookAndAddData({
         gradebook_column_order_settings: {sortType: 'name', direction: 'ascending'}
       })
@@ -242,7 +242,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts assignment columns by assignment due date when setting is "due date"', function() {
+    test('sorts assignment columns by assignment due date when setting is "due date"', () => {
       createGradebookAndAddData({
         gradebook_column_order_settings: {sortType: 'due_date', direction: 'ascending'}
       })
@@ -258,7 +258,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts assignment columns by assignment points possible when setting is "points"', function() {
+    test('sorts assignment columns by assignment points possible when setting is "points"', () => {
       createGradebookAndAddData({
         gradebook_column_order_settings: {sortType: 'points', direction: 'ascending'}
       })
@@ -274,7 +274,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts assignment columns by module position when setting is "module position"', function() {
+    test('sorts assignment columns by module position when setting is "module position"', () => {
       createGradebookAndAddData({
         gradebook_column_order_settings: {sortType: 'module_position', direction: 'ascending'}
       })
@@ -291,8 +291,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('when sorting by default', function() {
-    test('sorts assignment columns by assignment group position', function() {
+  QUnit.module('when sorting by default', () => {
+    test('sorts assignment columns by assignment group position', () => {
       assignments.homework.splice(1, 1)
       assignments.quizzes.splice(1, 1)
       createGradebookAndAddData()
@@ -307,7 +307,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('additionally sorts assignment columns by position within assignment groups', function() {
+    test('additionally sorts assignment columns by position within assignment groups', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('default', 'ascending')
       const expectedOrder = [
@@ -322,7 +322,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('optionally sorts in descending order', function() {
+    test('optionally sorts in descending order', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('default', 'descending')
       const expectedOrder = [
@@ -338,8 +338,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('when sorting by name', function() {
-    test('sorts assignment columns by assignment name', function() {
+  QUnit.module('when sorting by name', () => {
+    test('sorts assignment columns by assignment name', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('name', 'ascending')
       const expectedOrder = [
@@ -354,7 +354,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('optionally sorts in descending order', function() {
+    test('optionally sorts in descending order', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('name', 'descending')
       const expectedOrder = [
@@ -370,8 +370,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('when sorting by due date', function() {
-    test('sorts assignment columns by assignment due date', function() {
+  QUnit.module('when sorting by due date', () => {
+    test('sorts assignment columns by assignment due date', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('due_date', 'ascending')
       const expectedOrder = [
@@ -386,7 +386,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts assignments with due dates before assignments without due dates', function() {
+    test('sorts assignments with due dates before assignments without due dates', () => {
       assignments.quizzes[0].due_at = null
       createGradebookAndAddData()
       arrangeColumnsBy('due_date', 'ascending')
@@ -402,7 +402,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('optionally sorts in descending order', function() {
+    test('optionally sorts in descending order', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('due_date', 'descending')
       const expectedOrder = [
@@ -418,8 +418,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('when sorting by points', function() {
-    test('sorts assignment columns by assignment points possible', function() {
+  QUnit.module('when sorting by points', () => {
+    test('sorts assignment columns by assignment points possible', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('points', 'ascending')
       const expectedOrder = [
@@ -434,7 +434,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('optionally sorts in descending order', function() {
+    test('optionally sorts in descending order', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('points', 'descending')
       const expectedOrder = [
@@ -450,8 +450,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('when sorting by module position', function() {
-    test('sorts assignment columns by module position', function() {
+  QUnit.module('when sorting by module position', () => {
+    test('sorts assignment columns by module position', () => {
       assignments.homework.splice(1, 1)
       createGradebookAndAddData()
       arrangeColumnsBy('module_position', 'ascending')
@@ -466,7 +466,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('additionally sorts assignment columns by position within modules', function() {
+    test('additionally sorts assignment columns by position within modules', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('module_position', 'ascending')
       const expectedOrder = [
@@ -481,7 +481,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts assignments with modules before assignments without modules', function() {
+    test('sorts assignments with modules before assignments without modules', () => {
       assignments.quizzes[0].module_ids = []
       assignments.quizzes[0].module_positions = []
       createGradebookAndAddData()
@@ -498,7 +498,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('optionally sorts in descending order', function() {
+    test('optionally sorts in descending order', () => {
       createGradebookAndAddData()
       arrangeColumnsBy('module_position', 'descending')
       const expectedOrder = [
@@ -514,8 +514,8 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
     })
   })
 
-  QUnit.module('when using a custom order', function() {
-    test('sorts all saved columns in the saved order', function() {
+  QUnit.module('when using a custom order', () => {
+    test('sorts all saved columns in the saved order', () => {
       const customOrder = [
         'total_grade',
         'assignment_group_2201',
@@ -531,7 +531,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), customOrder)
     })
 
-    test('sorts any unsaved columns after the saved order', function() {
+    test('sorts any unsaved columns after the saved order', () => {
       const customOrder = [
         'total_grade',
         'assignment_2301',
@@ -554,7 +554,7 @@ QUnit.module('Gradebook Grid Column Ordering', function(suiteHooks) {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    test('sorts unsaved columns by assignment group position', function() {
+    test('sorts unsaved columns by assignment group position', () => {
       const customOrder = [
         'total_grade',
         'assignment_2301',

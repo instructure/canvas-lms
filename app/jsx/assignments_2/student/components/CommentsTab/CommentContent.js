@@ -26,7 +26,7 @@ import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 
 function CommentContent(props) {
   return (
-    <React.Fragment>
+    <>
       {!props.comments.length && (
         <SVGWithTextPlaceholder
           text={I18n.t('Send a comment to your instructor about this assignment.')}
@@ -38,7 +38,7 @@ function CommentContent(props) {
         .map(comment => (
           <CommentRow key={comment._id} comment={comment} />
         ))}
-    </React.Fragment>
+    </>
   )
 }
 

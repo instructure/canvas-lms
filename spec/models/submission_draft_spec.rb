@@ -82,4 +82,67 @@ RSpec.describe SubmissionDraft do
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
+
+  describe '#meets_assignment_criteria?' do
+    context 'the assignment is an online_text_entry type' do
+      before(:once) do
+        @submission.assignment.submission_types = 'online_text_entry'
+      end
+
+      it 'returns true if there is a text body' do
+        @submission_draft.body = 'some body'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+      end
+
+      it 'returns false if the text body is empty' do
+        @submission_draft.body = ''
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if drafts exist for a different type' do
+        attachment = attachment_model
+        @submission_draft.attachments = [attachment]
+
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+    end
+
+    context 'the assignment is an online_upload type' do
+      before(:once) do
+        @submission.assignment.submission_types = 'online_upload'
+      end
+
+      it 'returns true if there are any attachments' do
+        attachment = attachment_model
+        @submission_draft.attachments = [attachment]
+
+        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+      end
+
+      it 'returns false if attachments is an empty array' do
+        @submission_draft.attachments = []
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if drafts exist for a different type' do
+        @submission_draft.body = 'some body'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+    end
+
+    context 'there are multiple submission types' do
+      before(:once) do
+        @submission.assignment.submission_types = 'online_text_entry,online_upload'
+      end
+
+      it 'returns true if a draft exists for any of the submission types' do
+        @submission_draft.body = 'some body'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+      end
+    end
+
+    it 'returns false if there are no draft states' do
+      expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+    end
+  end
 end

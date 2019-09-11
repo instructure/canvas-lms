@@ -25,7 +25,7 @@ import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
 import './jquery.templateData' /* fillTemplateData */
 
-  $(".add_course_link").click(function(event) {
+  $(".add_course_link").click(event => {
     event.preventDefault();
     $("#add_course_form :text").val("");
     $("#add_course_dialog").dialog({
@@ -66,6 +66,6 @@ import './jquery.templateData' /* fillTemplateData */
         .filter(".submit_button").text(I18n.t('course_add_failed_message', "Adding Course Failed, please try again"));
     }
   });
-  $("#add_course_dialog .cancel_button").click(function() {
+  $("#add_course_dialog .cancel_button").click(() => {
     $("#add_course_dialog").dialog('close');
   });

@@ -63,14 +63,20 @@ function lateDeductionInput(wrapper) {
 
 function lateDeductionIntervalSelect(wrapper) {
   return latePenaltiesForm(wrapper)
-    .find('select[type="text"]')
+    .find('CanvasSelect')
+    .at(0)
+}
+
+function lateDeductionIntervalSelectInput(wrapper) {
+  return latePenaltiesForm(wrapper)
+    .find('input')
     .at(0)
 }
 
 function lateSubmissionMinimumPercentInput(wrapper) {
   return latePenaltiesForm(wrapper)
     .find('input[type="text"]')
-    .at(1)
+    .at(2)
 }
 
 function missingDeductionCheckbox(wrapper) {
@@ -91,6 +97,13 @@ function spinner(wrapper) {
   return wrapper.find(Spinner)
 }
 
+function changeLateDeductionIntervalSelect(wrapper, value) {
+  // enzyme's simulate didn't work for 'change' on CanvasSelect for some unknown reason
+  return lateDeductionIntervalSelect(wrapper)
+    .props()
+    .onChange({target: {value}}, value)
+}
+
 QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
   let wrapper
 
@@ -98,17 +111,17 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
     wrapper.unmount()
   })
 
-  test('initializes with an alert showing if passed showAlert: true', function() {
+  test('initializes with an alert showing if passed showAlert: true', () => {
     wrapper = mountComponent({}, {showAlert: true})
     strictEqual(gradedSubmissionsAlert(wrapper).length, 1)
   })
 
-  test('does not initialize with an alert showing if passed showAlert: false', function() {
+  test('does not initialize with an alert showing if passed showAlert: false', () => {
     wrapper = mountComponent()
     strictEqual(gradedSubmissionsAlert(wrapper).length, 0)
   })
 
-  test('focuses on the missing submission input when the alert closes', function() {
+  test('focuses on the missing submission input when the alert closes', () => {
     wrapper = mountComponent({}, {showAlert: true})
     const instance = wrapper.instance()
     const input = instance.missingSubmissionDeductionInput
@@ -118,7 +131,7 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
     input.focus.restore()
   })
 
-  test('does not focus on the missing submission checkbox when the alert closes', function() {
+  test('does not focus on the missing submission checkbox when the alert closes', () => {
     wrapper = mountComponent({}, {showAlert: true})
     const instance = wrapper.instance()
     const checkbox = instance.missingSubmissionCheckbox
@@ -131,7 +144,7 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
   test(
     'focuses on the missing submission checkbox when the alert closes if the' +
       'missing submission input is disabled',
-    function() {
+    () => {
       const data = {...latePolicyData, missingSubmissionDeductionEnabled: false}
       wrapper = mountComponent({data}, {showAlert: true})
       const instance = wrapper.instance()
@@ -146,7 +159,7 @@ QUnit.module('LatePoliciesTabPanel: Alert', hooks => {
   test(
     'does not focus on the missing submission input when the alert closes if the' +
       'missing submission input is disabled',
-    function() {
+    () => {
       const data = {...latePolicyData, missingSubmissionDeductionEnabled: false}
       wrapper = mountComponent({data}, {showAlert: true})
       const instance = wrapper.instance()
@@ -542,114 +555,108 @@ test(
   }
 )
 
-QUnit.module('LatePoliciesTabPanel: late submission deduction interval select', {
-  teardown() {
-    this.wrapper.unmount()
-  }
-})
+QUnit.module('LatePoliciesTabPanel: late submission deduction interval select', hooks => {
+  let wrapper
 
-test('disables the late deduction interval select if the late deduction checkbox is unchecked', function() {
-  const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
-  this.wrapper = mountComponent({data})
-  ok(
-    lateDeductionIntervalSelect(this.wrapper)
-      .instance()
-      .getAttribute('aria-disabled')
-  )
-})
+  hooks.afterEach(() => {
+    wrapper.unmount()
+  })
 
-test('enables the late deduction interval select if the late deduction checkbox is checked', function() {
-  this.wrapper = mountComponent()
-  notOk(
-    lateDeductionIntervalSelect(this.wrapper)
-      .instance()
-      .getAttribute('aria-disabled')
-  )
-})
-
-test(
-  'calls the changeLatePolicy function with a new deduction interval when the late ' +
-    'sumbmission deduction interval select is changed',
-  function() {
-    const changeLatePolicy = sinon.stub()
-    this.wrapper = mountComponent({}, {changeLatePolicy})
-    lateDeductionIntervalSelect(this.wrapper).simulate('change', {target: {value: 'hour'}})
-    strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
-    deepEqual(
-      changeLatePolicy.getCall(0).args[0].changes,
-      {lateSubmissionInterval: 'hour'},
-      'sends the changes'
+  test('disables the late deduction interval select if the late deduction checkbox is unchecked', () => {
+    const data = {...latePolicyData, lateSubmissionDeductionEnabled: false}
+    wrapper = mountComponent({data})
+    ok(
+      lateDeductionIntervalSelectInput(wrapper)
+        .instance()
+        .getAttribute('aria-disabled')
     )
-  }
-)
+  })
 
-test(
-  'does not send any changes to the changeLatePolicy function when the late submission ' +
-    'deduction interval is changed back to its initial value',
-  function() {
+  test('enables the late deduction interval select if the late deduction checkbox is checked', () => {
+    wrapper = mountComponent()
+    notOk(
+      lateDeductionIntervalSelectInput(wrapper)
+        .instance()
+        .getAttribute('aria-disabled')
+    )
+  })
+
+  test('calls the changeLatePolicy function when the late sumbmission deduction interval select is changed', () => {
     const changeLatePolicy = sinon.stub()
-    this.wrapper = mountComponent({}, {changeLatePolicy})
-    const select = lateDeductionIntervalSelect(this.wrapper)
-    select.simulate('change', {target: {value: 'hour'}})
-    select.simulate('change', {target: {value: 'day'}})
-    strictEqual(changeLatePolicy.callCount, 2, 'calls changeLatePolicy')
-    deepEqual(changeLatePolicy.getCall(1).args[0].changes, {}, 'does not send any changes')
-  }
-)
+    wrapper = mountComponent({}, {changeLatePolicy})
+    changeLateDeductionIntervalSelect(wrapper, 'hour')
+    strictEqual(changeLatePolicy.callCount, 1)
+  })
 
-QUnit.module('LatePoliciesTabPanel: late submission minimum percent input', {
-  teardown() {
-    this.wrapper.unmount()
-  }
+  test('calls the changeLatePolicy function with a new deduction interval when the late sumbmission deduction interval select is changed', () => {
+    const changeLatePolicy = sinon.stub()
+    wrapper = mountComponent({}, {changeLatePolicy})
+    changeLateDeductionIntervalSelect(wrapper, 'hour')
+    const {
+      firstCall: {
+        args: [{changes}]
+      }
+    } = changeLatePolicy
+    deepEqual(changes, {lateSubmissionInterval: 'hour'})
+  })
+
+  test('does not send any changes to the changeLatePolicy function when the late submission deduction interval is changed back to its initial value', () => {
+    const changeLatePolicy = sinon.stub()
+    wrapper = mountComponent({}, {changeLatePolicy})
+    changeLateDeductionIntervalSelect(wrapper, 'hour')
+    changeLateDeductionIntervalSelect(wrapper, 'day')
+    const {
+      secondCall: {
+        args: [{changes}]
+      }
+    } = changeLatePolicy
+    deepEqual(changes, {})
+  })
 })
 
-test(
-  'calls the changeLatePolicy function with a new percent when the late submission ' +
-    'minimum percent input is changed and is valid',
-  function() {
+QUnit.module('LatePoliciesTabPanel: late submission minimum percent input', hooks => {
+  let wrapper
+
+  hooks.afterEach(() => {
+    wrapper.unmount()
+  })
+
+  test('calls the changeLatePolicy function with a new percent when the late submission minimum percent input is changed and is valid', () => {
     const changeLatePolicy = sinon.stub()
     const data = {
       ...latePolicyData,
       lateSubmissionMinimumPercent: 60,
       lateSubmissionMinimumPercentEnabled: true
     }
-    this.wrapper = mountComponent({data}, {changeLatePolicy})
-    lateSubmissionMinimumPercentInput(this.wrapper).simulate('change', {target: {value: '22'}})
+    wrapper = mountComponent({data}, {changeLatePolicy})
+    lateSubmissionMinimumPercentInput(wrapper).simulate('change', {target: {value: '22'}})
     strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(
       changeLatePolicy.getCall(0).args[0].changes,
       {lateSubmissionMinimumPercent: 22},
       'sends the changes'
     )
-  }
-)
+  })
 
-test(
-  'does not send any changes to the changeLatePolicy function when the late submission ' +
-    'minimum percent input is changed back to its initial value',
-  function() {
+  test('does not send any changes to the changeLatePolicy function when the late submission minimum percent input is changed back to its initial value', () => {
     const changeLatePolicy = sinon.stub()
     const data = {
       ...latePolicyData,
       lateSubmissionMinimumPercent: 60,
       lateSubmissionMinimumPercentEnabled: true
     }
-    this.wrapper = mountComponent({data}, {changeLatePolicy})
-    const input = lateSubmissionMinimumPercentInput(this.wrapper)
+    wrapper = mountComponent({data}, {changeLatePolicy})
+    const input = lateSubmissionMinimumPercentInput(wrapper)
     input.simulate('change', {target: {value: '22'}})
     input.simulate('change', {target: {value: '60'}})
     strictEqual(changeLatePolicy.callCount, 2, 'calls changeLatePolicy')
     deepEqual(changeLatePolicy.getCall(1).args[0].changes, {}, 'does not send any changes')
-  }
-)
+  })
 
-test(
-  'sets lateSubmissionMinimumPercentEnabled to true if the minimum percent is changed ' +
-    'from zero to non-zero',
-  function() {
+  test('sets lateSubmissionMinimumPercentEnabled to true if the minimum percent is changed from zero to non-zero', () => {
     const changeLatePolicy = sinon.stub()
-    this.wrapper = mountComponent({}, {changeLatePolicy})
-    const input = lateSubmissionMinimumPercentInput(this.wrapper)
+    wrapper = mountComponent({}, {changeLatePolicy})
+    const input = lateSubmissionMinimumPercentInput(wrapper)
     input.simulate('change', {target: {value: '22'}})
     strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(
@@ -657,21 +664,17 @@ test(
       {lateSubmissionMinimumPercent: 22, lateSubmissionMinimumPercentEnabled: true},
       'sends the changes'
     )
-  }
-)
+  })
 
-test(
-  'sets lateSubmissionMinimumPercentEnabled to false if the minimum percent is changed ' +
-    'from non-zero to zero',
-  function() {
+  test('sets lateSubmissionMinimumPercentEnabled to false if the minimum percent is changed from non-zero to zero', () => {
     const changeLatePolicy = sinon.stub()
     const data = {
       ...latePolicyData,
       lateSubmissionMinimumPercent: 60,
       lateSubmissionMinimumPercentEnabled: true
     }
-    this.wrapper = mountComponent({data}, {changeLatePolicy})
-    const input = lateSubmissionMinimumPercentInput(this.wrapper)
+    wrapper = mountComponent({data}, {changeLatePolicy})
+    const input = lateSubmissionMinimumPercentInput(wrapper)
     input.simulate('change', {target: {value: '0'}})
     strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(
@@ -679,16 +682,12 @@ test(
       {lateSubmissionMinimumPercent: 0, lateSubmissionMinimumPercentEnabled: false},
       'sends the changes'
     )
-  }
-)
+  })
 
-test(
-  'calls the changeLatePolicy function with a validationError if the late submission ' +
-    'minimum percent input is changed and is not numeric',
-  function() {
+  test('calls the changeLatePolicy function with a validationError if the late submission minimum percent input is changed and is not numeric', () => {
     const changeLatePolicy = sinon.stub()
-    this.wrapper = mountComponent({}, {changeLatePolicy})
-    lateSubmissionMinimumPercentInput(this.wrapper).simulate('change', {target: {value: 'abc'}})
+    wrapper = mountComponent({}, {changeLatePolicy})
+    lateSubmissionMinimumPercentInput(wrapper).simulate('change', {target: {value: 'abc'}})
     strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(changeLatePolicy.getCall(0).args[0].changes, {}, 'does not send changes')
     deepEqual(
@@ -696,23 +695,19 @@ test(
       {lateSubmissionMinimumPercent: 'Lowest possible grade must be numeric'},
       'sends validation errors'
     )
-  }
-)
+  })
 
-test('does not allow entering negative numbers for late submission minimum percent', function() {
-  this.wrapper = mountComponent()
-  const input = lateSubmissionMinimumPercentInput(this.wrapper)
-  input.simulate('change', {target: {value: '-0.1'}})
-  strictEqual(input.instance().value, '0')
-})
+  test('does not allow entering negative numbers for late submission minimum percent', () => {
+    wrapper = mountComponent()
+    const input = lateSubmissionMinimumPercentInput(wrapper)
+    input.simulate('change', {target: {value: '-0.1'}})
+    strictEqual(input.instance().value, '0')
+  })
 
-test(
-  'calls the changeLatePolicy function with a validationError if the late submission ' +
-    'minimum percent input is changed and is greater than 100',
-  function() {
+  test('calls the changeLatePolicy function with a validationError if the late submission minimum percent input is changed and is greater than 100', () => {
     const changeLatePolicy = sinon.stub()
-    this.wrapper = mountComponent({}, {changeLatePolicy})
-    lateSubmissionMinimumPercentInput(this.wrapper).simulate('change', {target: {value: '100.1'}})
+    wrapper = mountComponent({}, {changeLatePolicy})
+    lateSubmissionMinimumPercentInput(wrapper).simulate('change', {target: {value: '100.1'}})
     strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(changeLatePolicy.getCall(0).args[0].changes, {}, 'does not send changes')
     deepEqual(
@@ -720,15 +715,11 @@ test(
       {lateSubmissionMinimumPercent: 'Lowest possible grade must be between 0 and 100'},
       'sends validation errors'
     )
-  }
-)
+  })
 
-test(
-  'calls the changeLatePolicy function without a validationError for late submission ' +
-    'minimum percent if a valid input is entered after an invalid input is entered',
-  function() {
+  test('calls the changeLatePolicy function without a validationError for late submission minimum percent if a valid input is entered after an invalid input is entered', () => {
     const changeLatePolicy = sinon.stub()
-    this.wrapper = mountComponent(
+    wrapper = mountComponent(
       {
         validationErrors: {
           lateSubmissionMinimumPercent: 'Lowest possible grade must be between 0 and 100'
@@ -736,12 +727,12 @@ test(
       },
       {changeLatePolicy}
     )
-    lateSubmissionMinimumPercentInput(this.wrapper).simulate('change', {target: {value: '100'}})
+    lateSubmissionMinimumPercentInput(wrapper).simulate('change', {target: {value: '100'}})
     strictEqual(changeLatePolicy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(
       changeLatePolicy.getCall(0).args[0].validationErrors,
       {},
       'does not send validation errors for lateSubmissionMinimumPercent'
     )
-  }
-)
+  })
+})

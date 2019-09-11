@@ -975,6 +975,54 @@ describe MasterCourses::MasterMigration do
       expect(copy_assignment.description).to eq "<p><a id=\"\" class=\"instructure_file_link instructure_image_thumbnail \" title=\"lalala\" href=\"/courses/#{@copy_to.id}/files/#{copy_attachment.id}/download?wrap=1\" target=\"\">lalala</a></p>"
     end
 
+    it "removing an assignment from one module to another and deleting module should not make assignments disappear" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      from_module_1 = @copy_from.context_modules.create!(:name => "module 1 yo")
+      from_assignment_1 = @copy_from.assignments.create!(:title => "assignment 1 yo")
+      from_tag_1 = from_module_1.add_item({:id => from_assignment_1.id, :type => 'assignment', :indent => 1})
+      from_module_1.save!
+      from_module_2 = @copy_from.context_modules.create!(:name => "module 2 B")
+      from_assignment_2 = @copy_from.assignments.create!(:title => "assignment 2 B")
+      from_tag_2 = from_module_2.add_item({:id => from_assignment_2.id, :type => 'assignment', :indent => 1})
+      from_module_2.save!
+
+      run_master_migration
+      @copy_to.reload
+      expect(@copy_to.active_assignments.count).to eq 2
+      to_assignment_1 = @copy_to.assignments.where(:title => "assignment 1 yo").first!
+      to_assignment_2 = @copy_to.assignments.where(:title => "assignment 2 B").first!
+      expect(@copy_to.active_context_modules.count).to eq 2
+      expect(@copy_to.active_context_modules.where(:name => "module 1 yo").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_1.id]
+      expect(@copy_to.active_context_modules.where(:name => "module 2 B").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_2.id]
+
+      from_tag_2.position = 2
+      from_tag_2.context_module_id = from_module_1.id
+      from_tag_2.save!
+      from_module_1.touch
+      from_module_2.touch
+
+      run_master_migration
+      @copy_to.reload
+      expect(@copy_to.active_assignments.count).to eq 2
+      expect(@copy_to.active_context_modules.count).to eq 2
+      expect(@copy_to.active_context_modules.where(:name => "module 1 yo").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_1.id, to_assignment_2.id]
+
+      from_tag_2.position = 1
+      from_tag_2.context_module_id = from_module_2.id
+      from_tag_2.save!
+      from_module_1.touch
+      from_module_2.touch
+
+      run_master_migration
+      @copy_to.reload
+      expect(@copy_to.active_assignments.count).to eq 2
+      expect(@copy_to.active_context_modules.count).to eq 2
+      expect(@copy_to.active_context_modules.where(:name => "module 1 yo").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_1.id]
+      expect(@copy_to.active_context_modules.where(:name => "module 2 B").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_2.id]
+    end
+
     it "overwrites/removes availability dates and settings when pushing a locked quiz" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

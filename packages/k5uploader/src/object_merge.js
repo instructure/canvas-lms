@@ -4,7 +4,7 @@ export default function(objs) {
   }
   var combined = {};
   objs = objs.reverse();
-  objs.forEach(function(obj){
+  objs.forEach(obj => {
     for(var prop in obj) {
       combined[prop] = obj[prop]
     }

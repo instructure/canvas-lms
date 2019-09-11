@@ -60,7 +60,7 @@
     "jasmine_xhr": "1.0.2",
     "jshint-stylish-ex": "0.2.0",
     "canvas_react_i18n": "1.1.1",
-    "glob": "7.0.5",
+    "glob": "^7.0.5",
     "grunt": "0.4.5",
     "grunt-cli": "1.2.0",
     "lodash": "2.4.1",
@@ -68,8 +68,5 @@
     "requirejs": "~2.2.0",
     "react-tools": "0.11.2",
     "shelljs": "0.7.0"
-  },
-  "resolutions": {
-    "grunt-contrib-jasmine/jasmine-core": "2.6.4"
   }
 }

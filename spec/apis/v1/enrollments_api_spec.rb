@@ -734,6 +734,27 @@ describe EnrollmentsApiController, type: :request do
         expect(response.code).to eql '400'
         expect(response.body).to include("concluded")
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should properly restore an existing enrollment when self-enrolling a cross-shard user" do
+          @shard1.activate { @cs_user = user_with_pseudonym(:active_all => true) }
+          enrollment = @course.enroll_student(@cs_user)
+          enrollment.destroy
+
+          @me = @cs_user
+          json = api_call :post, @path, @path_options,
+            {
+              enrollment: {
+                user_id: 'self',
+                self_enrollment_code: @course.self_enrollment_code
+              }
+            }, {}, {:expected_status => 200}
+          expect(json['id']).to eq enrollment.id
+          expect(enrollment.reload).to be_active
+        end
+      end
     end
   end
 

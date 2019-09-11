@@ -33,7 +33,7 @@ function serialize(value) {
   return value;
 }
 
-QUnit.config['log'].unshift(function(details) {
+QUnit.config['log'].unshift(details => {
   try {
     details.actual = serialize(details.actual);
     details.expected = serialize(details.expected);

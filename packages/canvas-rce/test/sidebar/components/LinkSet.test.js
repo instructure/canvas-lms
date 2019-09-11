@@ -37,8 +37,8 @@ describe("LinkSet", () => {
   const noop = () => {};
 
   it("prevents default event handling when clicked with handler", () => {
-    let clicked = sinon.spy();
-    let tree = sd.shallowRender(
+    const clicked = sinon.spy();
+    const tree = sd.shallowRender(
       <LinkSet collection={collection} onLinkClick={clicked} />
     );
     const button = tree.everySubTree("a")[0];
@@ -48,8 +48,8 @@ describe("LinkSet", () => {
   });
 
   it("passes link data to provided onLinkClick when clicked", () => {
-    let clicked = sinon.spy();
-    let tree = sd.shallowRender(
+    const clicked = sinon.spy();
+    const tree = sd.shallowRender(
       <LinkSet collection={collection} onLinkClick={clicked} />
     );
     const button = tree.everySubTree("a")[0];
@@ -59,14 +59,14 @@ describe("LinkSet", () => {
   });
 
   it("does not throw on click when onLinkClick absent", () => {
-    let tree = sd.shallowRender(<LinkSet collection={collection} />);
+    const tree = sd.shallowRender(<LinkSet collection={collection} />);
     const button = tree.everySubTree("a")[0];
     const event = { preventDefault: noop };
     assert.doesNotThrow(() => button.props.onClick(event));
   });
 
   it("does not preventDefault on click when onLinkClick absent", () => {
-    let tree = sd.shallowRender(<LinkSet collection={collection} />);
+    const tree = sd.shallowRender(<LinkSet collection={collection} />);
     const button = tree.everySubTree("a")[0];
     const event = { preventDefault: sinon.spy() };
     button.props.onClick(event);
@@ -74,7 +74,7 @@ describe("LinkSet", () => {
   });
 
   it("calls fetchInitialPage on mount when provided", () => {
-    let fetchInitialPage = sinon.spy();
+    const fetchInitialPage = sinon.spy();
     sd.shallowRender(
       <LinkSet collection={collection} fetchInitialPage={fetchInitialPage} />
     );
@@ -82,18 +82,18 @@ describe("LinkSet", () => {
   });
 
   it("forwards fetchNextPage to LoadMore component", () => {
-    let fetchNextPage = sinon.spy();
-    let tree = sd.shallowRender(
+    const fetchNextPage = sinon.spy();
+    const tree = sd.shallowRender(
       <LinkSet collection={collection} fetchNextPage={fetchNextPage} />
     );
-    let loadMore = tree.subTree("LoadMore");
+    const loadMore = tree.subTree("LoadMore");
     loadMore.props.loadMore();
     assert.ok(fetchNextPage.called);
   });
 
   describe("rendering", () => {
     it("renders a button for each item", () => {
-      let tree = sd.shallowRender(
+      const tree = sd.shallowRender(
         <LinkSet collection={collection} fetchNextPage={noop} />
       );
       const buttons = tree.everySubTree("a");
@@ -119,7 +119,7 @@ describe("LinkSet", () => {
 
     describe("empty but might load more", () => {
       beforeEach(() => {
-        let initializingCollection = {
+        const initializingCollection = {
           links: [],
           hasMore: true,
           isLoading: true
@@ -140,7 +140,7 @@ describe("LinkSet", () => {
 
     describe("empty and done loading", () => {
       beforeEach(() => {
-        let emptyCollection = { links: [], hasMore: false, isLoading: false };
+        const emptyCollection = { links: [], hasMore: false, isLoading: false };
         tree = sd.shallowRender(
           <LinkSet collection={emptyCollection} fetchNextPage={noop} />
         );
@@ -157,7 +157,7 @@ describe("LinkSet", () => {
 
     describe("empty and failed loading", () => {
       beforeEach(() => {
-        let emptyCollection = {
+        const emptyCollection = {
           links: [],
           hasMore: false,
           isLoading: false,

@@ -43,5 +43,5 @@ export default function useIncrementalLoading(options) {
     recordCountRef.current = records.length
 
     return loader
-  }, [hasMore, isLoading, records.length])
+  }, [hasMore, isLoading, records.length, lastItemRef, onLoadInitial, onLoadMore])
 }

@@ -80,7 +80,7 @@ FakeDashboard.defaultProps = {
   showTodoList: () => {},
 }
 
-let plannerStub
+let plannerStub, saveDashboardViewStub, cardLoadSpy
 
 QUnit.module('Dashboard Header', {
   setup () {
@@ -93,6 +93,8 @@ QUnit.module('Dashboard Header', {
     }
     moxios.install()
     plannerStub = sinon.stub(DashboardHeader.prototype, 'loadPlannerComponent')
+    saveDashboardViewStub = sinon.stub(DashboardHeader.prototype, 'saveDashboardView')
+    cardLoadSpy = sinon.spy(DashboardHeader.prototype, 'loadCardDashboard')
   },
 
   teardown () {
@@ -100,6 +102,8 @@ QUnit.module('Dashboard Header', {
     moxios.uninstall()
     plannerStub.restore()
     ReactDOM.unmountComponentAtNode(container)
+    saveDashboardViewStub.restore()
+    cardLoadSpy.restore()
   }
 })
 
@@ -166,7 +170,6 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
 })
 
 test('it should switch dashboard view appropriately when changeDashboard is called', () => {
-  const stub = sinon.stub(DashboardHeader.prototype, 'saveDashboardView')
   let dashboardHeader = null
   ReactDOM.render(
     <FakeDashboard
@@ -178,18 +181,15 @@ test('it should switch dashboard view appropriately when changeDashboard is call
   dashboardHeader.changeDashboard('cards')
   strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
   strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
-  strictEqual(stub.callCount, 1)
+  strictEqual(saveDashboardViewStub.callCount, 1)
 
   dashboardHeader.changeDashboard('activity')
   strictEqual(document.getElementById('dashboard-activity').style.display, 'block')
   strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
-  strictEqual(stub.callCount, 2)
-  stub.restore()
+  strictEqual(saveDashboardViewStub.callCount, 2)
 })
 
 test('it should switch dashboard view appropriately with Student Planner enabled', () => {
-  const stub = sinon.stub(DashboardHeader.prototype, 'saveDashboardView')
-  const cardLoadSpy = sinon.spy(DashboardHeader.prototype, 'loadCardDashboard')
 
   let dashboardHeader = null
   ReactDOM.render(
@@ -227,10 +227,10 @@ test('it should switch dashboard view appropriately with Student Planner enabled
   dashboardHeader.changeDashboard('planner')
   strictEqual(cardLoadSpy.callCount, 1)
   strictEqual(plannerStub.callCount, 1)
-  stub.restore()
 })
 
 test('it should use the dashboard view endpoint when Student Planner is enabled', (assert) => {
+  saveDashboardViewStub.restore()
   const done = assert.async();
   let dashboardHeader = null
   ReactDOM.render(
@@ -252,7 +252,6 @@ test('it should use the dashboard view endpoint when Student Planner is enabled'
 })
 
 test('it should show the card dashboard if planner is selected, but not enabled', () => {
-  const stub = sinon.stub(DashboardHeader.prototype, 'saveDashboardView')
   ReactDOM.render(
     <FakeDashboard
       headerRef={() => false}
@@ -264,10 +263,10 @@ test('it should show the card dashboard if planner is selected, but not enabled'
   strictEqual(document.getElementById('dashboard-planner-header'), null)
   strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
   strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
-  stub.restore()
 })
 
 test('it should show a flash error if saving dashboard API call fails', (assert) => {
+  saveDashboardViewStub.restore()
   const done = assert.async();
   let dashboardHeader = null
   ReactDOM.render(
@@ -291,7 +290,6 @@ test('it should show a flash error if saving dashboard API call fails', (assert)
 })
 
 test('it should add planner classes to the page when planner is loaded', () => {
-  const stub = sinon.stub(DashboardHeader.prototype, 'saveDashboardView')
   let dashboardHeader = null
   ReactDOM.render(
     <FakeDashboard
@@ -303,5 +301,4 @@ test('it should add planner classes to the page when planner is loaded', () => {
   ok(document.body.classList.contains('dashboard-is-planner'))
   dashboardHeader.changeDashboard('cards')
   notOk(document.body.classList.contains('dashboard-is-planner'))
-  stub.restore()
 })

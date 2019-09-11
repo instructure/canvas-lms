@@ -74,7 +74,7 @@ describe(KeyboardShortcutModal, () => {
       return waitForInstUIModalCssTransitions()
     })
 
-    test('renders shortcuts prop', function() {
+    test('renders shortcuts prop', () => {
       expect(document.querySelectorAll('.keyboard_navigation')).toHaveLength(1)
       expect(document.querySelector('.keycode').innerHTML).toBe('j')
       expect(document.querySelector('.description').innerHTML).toBe('this is a test keyboard shortcut')

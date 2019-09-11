@@ -36,8 +36,7 @@ describe 'quizzes question creation' do
       @last_quiz = start_quiz_question
     end
 
-    it 'should create a quiz with a variety of quiz questions', priority: "1", test_id: 197489 do
-      skip('CORE-2714 when the rcs is enabled, this raises SpecTimeLimit::Error Exceeded the 35 sec target threshold for new/modified specs.')
+    it 'should create a quiz with variety of quiz questions', priority: "1", test_id: 197489 do
       quiz = @last_quiz
 
       create_multiple_choice_question

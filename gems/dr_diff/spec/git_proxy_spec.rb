@@ -120,7 +120,7 @@ module DrDiff
         let(:dirty_cmd) { "git diff --name-status" }
 
         before :each do
-          allow(git_proxy).to receive(:dirty?).and_return(true)
+          allow_any_instance_of(described_class).to receive(:dirty?).and_return(true)
         end
 
         it "uses the dirty command" do

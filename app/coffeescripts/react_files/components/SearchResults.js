@@ -62,13 +62,13 @@ export default {
   },
 
   translateErrors(errors) {
-    return _.map(errors, function(error) {
+    return _.map(errors, error => {
       if (error.message === '3 or more characters is required') {
         return {message: I18n.t('Please enter a search term with three or more characters')}
       } else {
         return error
       }
-    })
+    });
   },
 
   updateResults(props) {

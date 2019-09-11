@@ -49,7 +49,7 @@ QUnit.module('Gradebook', suiteHooks => {
       server.teardown()
     })
 
-    async function saveSettings(additionalSettings = {}) {
+    function saveSettings(additionalSettings = {}) {
       return new Promise(resolve => {
         gradebook.saveSettings(
           additionalSettings,

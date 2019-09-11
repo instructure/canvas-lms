@@ -121,27 +121,27 @@ test('renders with "Missing" selected if the submission is not excused and is mi
   strictEqual(radio.checked, true)
 })
 
-QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', function(suiteHooks) {
+QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', suiteHooks => {
   let wrapper
   let updateSubmission
 
-  suiteHooks.beforeEach(function() {
+  suiteHooks.beforeEach(() => {
     updateSubmission = sinon.stub()
     wrapper = mountComponent({updateSubmission})
   })
 
-  suiteHooks.afterEach(function() {
+  suiteHooks.afterEach(() => {
     wrapper.unmount()
   })
 
-  test('calls updateSubmission with the late policy status for the selected radio input', function() {
+  test('calls updateSubmission with the late policy status for the selected radio input', () => {
     const event = {target: {value: 'missing'}}
     wrapper.instance().handleRadioInputChanged(event)
     strictEqual(updateSubmission.callCount, 1)
     deepEqual(updateSubmission.getCall(0).args[0], {latePolicyStatus: 'missing'})
   })
 
-  test('calls updateSubmission with secondsLateOverride set to 0 if the "late" option is selected', function() {
+  test('calls updateSubmission with secondsLateOverride set to 0 if the "late" option is selected', () => {
     const event = {target: {value: 'late'}}
     wrapper.instance().handleRadioInputChanged(event)
     strictEqual(updateSubmission.callCount, 1)
@@ -151,20 +151,20 @@ QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', function(s
     })
   })
 
-  test('calls updateSubmission with excuse set to true if the "excused" option is selected', function() {
+  test('calls updateSubmission with excuse set to true if the "excused" option is selected', () => {
     const event = {target: {value: 'excused'}}
     wrapper.instance().handleRadioInputChanged(event)
     strictEqual(updateSubmission.callCount, 1)
     deepEqual(updateSubmission.getCall(0).args[0], {excuse: true})
   })
 
-  test('does not call updateSubmission if the radio input is already selected', function() {
+  test('does not call updateSubmission if the radio input is already selected', () => {
     const event = {target: {value: 'none'}}
     wrapper.instance().handleRadioInputChanged(event)
     strictEqual(updateSubmission.callCount, 0)
   })
 
-  test('does not queue up an update if there is not an update in flight', function() {
+  test('does not queue up an update if there is not an update in flight', () => {
     const event = {target: {value: 'excused'}}
     wrapper.instance().handleRadioInputChanged(event)
     wrapper.setProps({submissionUpdating: true})
@@ -173,32 +173,32 @@ QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', function(s
     strictEqual(updateSubmission.callCount, 1)
   })
 
-  QUnit.module('when a submission update is in flight', function(hooks) {
-    hooks.beforeEach(function() {
+  QUnit.module('when a submission update is in flight', hooks => {
+    hooks.beforeEach(() => {
       wrapper = mountComponent({updateSubmission, submissionUpdating: true})
     })
 
-    test('does not call updateSubmission', function() {
+    test('does not call updateSubmission', () => {
       const event = {target: {value: 'missing'}}
       wrapper.instance().handleRadioInputChanged(event)
       strictEqual(updateSubmission.callCount, 0)
     })
 
-    test('queues up an update to be executed when the in-flight update is finished', function() {
+    test('queues up an update to be executed when the in-flight update is finished', () => {
       const event = {target: {value: 'missing'}}
       wrapper.instance().handleRadioInputChanged(event)
       wrapper.setProps({submissionUpdating: false})
       strictEqual(updateSubmission.callCount, 1)
     })
 
-    test('queues up the update even it if matches the currently selected value', function() {
+    test('queues up the update even it if matches the currently selected value', () => {
       const event = {target: {value: 'none'}}
       wrapper.instance().handleRadioInputChanged(event)
       wrapper.setProps({submissionUpdating: false})
       strictEqual(updateSubmission.callCount, 1)
     })
 
-    test('only queues up one of multiple updates', function() {
+    test('only queues up one of multiple updates', () => {
       const firstEvent = {target: {value: 'missing'}}
       wrapper.instance().handleRadioInputChanged(firstEvent)
       const secondEvent = {target: {value: 'excused'}}
@@ -207,7 +207,7 @@ QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', function(s
       strictEqual(updateSubmission.callCount, 1)
     })
 
-    test('queues up only the most recent update', function() {
+    test('queues up only the most recent update', () => {
       const firstEvent = {target: {value: 'missing'}}
       wrapper.instance().handleRadioInputChanged(firstEvent)
       const secondEvent = {target: {value: 'excused'}}

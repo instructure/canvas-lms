@@ -106,7 +106,7 @@ test('ADD_TO_USERS action reducer invalid email', () => {
   equal(user.email, null, 'creates an email property if needed')
 })
 
-test('GOT_USERS action reducer', function() {
+test('GOT_USERS action reducer', () => {
   const initialState = {
     userList: {
       users: [],

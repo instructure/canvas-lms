@@ -66,7 +66,7 @@ import 'jqueryui/dialog'
           },
           title: "Embed content from Equella"
         })
-        .bind('equella_ready', function(event, data) {
+        .bind('equella_ready', (event, data) => {
           var clickedEditor = $box.data('editor') || ed;
           var selectedContent = ed.selection.getContent();
           if(selectedContent) { // selected content

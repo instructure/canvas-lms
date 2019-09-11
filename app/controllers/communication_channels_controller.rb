@@ -437,6 +437,8 @@ class CommunicationChannelsController < ApplicationController
 
     if @enrollment && (@enrollment.invited? || @enrollment.active?)
       @enrollment.re_send_confirmation!
+    elsif @enrollment && @user.registered?
+      # do nothing - the enrollment isn't available and they're already registered anyway
     else
       @cc = params[:id].present? ? @user.communication_channels.find(params[:id]) : @user.communication_channel
       @cc.send_confirmation!(@domain_root_account)

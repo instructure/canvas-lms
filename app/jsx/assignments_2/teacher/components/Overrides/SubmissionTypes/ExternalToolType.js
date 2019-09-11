@@ -45,7 +45,7 @@ export default class ExternalToolType extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <View
           borderWidth="small"
           borderRadius="medium"
@@ -72,7 +72,7 @@ export default class ExternalToolType extends React.Component {
             )}
           </Flex>
         </View>
-      </React.Fragment>
+      </>
     )
   }
 }

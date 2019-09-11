@@ -28,7 +28,7 @@ const restoreAxios = () => {
 }
 const mockAxios = adapter => {
   restoreAxios()
-  sandbox = sinon.sandbox.create()
+  sandbox = sinon.createSandbox()
   sandbox.stub(axios, 'post').callsFake(adapter)
 }
 const mockAxiosSuccess = (data = {}) => {

@@ -91,7 +91,7 @@ jQuery(function($){
     }
   });
   
-  $(".cant_delete_account_link").click(function() {
+  $(".cant_delete_account_link").click(() => {
     alert(I18n.t('alerts.subaccount_has_courses', "You can't delete a sub-account that has courses in it"));
     return false;
   });
@@ -140,7 +140,7 @@ jQuery(function($){
       $header.find(".collapse_sub_accounts_link").focus();
     } else {
       $header.loadingImage({image_size: 'small'});
-      $.ajaxJSON($(this).data('link'), 'GET', {}, function(data) {
+      $.ajaxJSON($(this).data('link'), 'GET', {}, data => {
         $header.loadingImage('remove').find(".expand_sub_accounts_link").hide();
         $header.find(".collapse_sub_accounts_link, .add_sub_account_link").show();
         $header.parent(".account").children("ul").empty().hide();
@@ -183,7 +183,7 @@ jQuery(function($){
         }
         $header.parent(".account").children("ul").slideDown();
         $header.find(".collapse_sub_accounts_link").focus();
-      }, function(data) {
+      }, data => {
       });
     }
     return false;

@@ -118,7 +118,7 @@ Object.entries({
       ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
     })
 
-    test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, function() {
+    test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
       const sortSpy = sinon.spy()
       const wrapper = mount(
         <UsersList

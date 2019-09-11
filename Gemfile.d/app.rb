@@ -19,7 +19,7 @@ if CANVAS_RAILS5_2
   gem 'rails', '5.2.3'
     gem 'loofah', '2.2.3'
 else
-  gem 'rails', '6.0.0.rc2'
+  gem 'rails', '6.0.0'
 end
 
 gem 'rack', '2.0.6'
@@ -32,12 +32,12 @@ gem 'builder', '3.2.3'
 gem 'tzinfo', '1.2.5'
 
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
-gem 'active_model_serializers',   '0.9.0alpha1',
+gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '5.0.2'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.14.5'
+gem 'switchman', '1.14.6'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -62,7 +62,7 @@ gem 'brotli', '0.2.3', require: false
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.15.11'
+gem 'inst-jobs', '0.15.13'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
 gem 'switchman-inst-jobs', '1.3.5'
@@ -133,7 +133,7 @@ gem 'academic_benchmarks', '0.0.11', require: false
 gem 'graphql', '1.9.7'
 gem 'graphql-batch', '0.4.1'
 
-gem 'prawn-rails', '1.2.0'
+gem 'prawn-rails', '1.3.0'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'

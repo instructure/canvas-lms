@@ -74,6 +74,7 @@ module.exports = {
     'one-var': 'off',
     'prefer-destructuring': 'off',
     'prefer-rest-params': 'off',
+    'prefer-template': 'off', // AirBnB says 'error', we don't care
     'eslint-comments/disable-enable-pair': ['error', {allowWholeFile: true}], // We are okay with turning rules off for the entirety of a file (though use it sparingly)
     'import/prefer-default-export': 'off',
     'jsx-a11y/label-has-for': 'off',
@@ -92,8 +93,12 @@ module.exports = {
     ],
     'react/default-props-match-prop-types': ['error', {allowRequiredDefaults: true}], // add the `allowRequiredDefaults: true` option to allow specifying something as a required prop (so you get propType error messages), but in case it's not present at runtime, I'll use `[]` as the default (so it is resilient)".
     'react/forbid-foreign-prop-types': 'off', // You can refer to proptypes within proptypes, but you shouldn't use proptypes in actual app code of the component
+    'react/jsx-no-bind': 'off',
+    'react/jsx-props-no-spreading': 'off',
     'react/no-danger': 'off', // dangerouslySetInnerHTML is already pretty explicit on making you aware of its danger
     'react/no-render-return-value': 'warn', // In future versions of react this will fail
+    'react/state-in-constructor': 'off',
+    'react/static-property-placement': 'off',
     'no-restricted-syntax': [
       // This is here because we are turning off 2 items from what AirBnB cares about.
       'error',
@@ -138,11 +143,12 @@ module.exports = {
         // top of something already copyrighted by someone else.
         mustMatch: 'Copyright '
       }
-    ]
+    ],
+    'no-unused-expressions': ['error', {'allowShortCircuit': true}]
   },
   settings: {
     react: {
-      version: '16'
+      version: 'detect'
     }
   },
   overrides: [

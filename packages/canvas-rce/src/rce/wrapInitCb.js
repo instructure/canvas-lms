@@ -27,12 +27,12 @@ export default function wrapInitCb(
 ) {
   MutationObserver =
     MutationObserver === undefined ? window.MutationObserver : MutationObserver;
-  let oldInitInstCb = editorOptions.init_instance_callback;
+  const oldInitInstCb = editorOptions.init_instance_callback;
   editorOptions.init_instance_callback = function(ed) {
-    let attrs = mirroredAttrs || {};
-    let el = ed.getElement();
+    const attrs = mirroredAttrs || {};
+    const el = ed.getElement();
     if (el) {
-      Object.keys(attrs).forEach(function(attr) {
+      Object.keys(attrs).forEach(attr => {
         el.setAttribute(attr, attrs[attr]);
       });
 

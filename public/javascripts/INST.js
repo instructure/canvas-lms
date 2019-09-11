@@ -47,7 +47,7 @@ INST.browser['no-touch'] = !INST.browser.touch
 // on dom ready, give the body those classes
 // so for example, if you were on IE6 the body would have the classes "ie" AND "ie6"
 const classesToAdd = $.map(INST.browser, (v, k) => (v === true ? k : undefined)).join(' ')
-$(function () {
+$(() => {
   $('body').addClass(classesToAdd)
 })
 

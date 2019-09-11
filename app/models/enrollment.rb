@@ -405,9 +405,10 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def update_linked_enrollments
+  def update_linked_enrollments(restore: false)
     observers.each do |observer|
-      if enrollment = active_linked_enrollment_for(observer)
+      enrollment = restore ? linked_enrollment_for(observer) : active_linked_enrollment_for(observer)
+      if enrollment
         enrollment.update_from(self)
       elsif self.saved_change_to_workflow_state? && self.workflow_state_before_last_save == 'inactive'
         create_linked_enrollment_for(observer)
@@ -1534,7 +1535,7 @@ class Enrollment < ActiveRecord::Base
       course_id: course,
       user_id: user,
       type: Array.wrap(types)
-    ).where.not(id: id, workflow_state: :deleted)
+    ).where.not(id: id).where.not(workflow_state: :deleted)
   end
 
   def remove_user_as_final_grader?

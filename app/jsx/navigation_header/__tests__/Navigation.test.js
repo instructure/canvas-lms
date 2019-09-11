@@ -18,6 +18,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Navigation from 'jsx/navigation_header/Navigation'
+import waitForExpect from 'wait-for-expect'
 
 describe('GlobalNavigation', () => {
   let componentHolder, $inbox_data
@@ -54,24 +55,29 @@ describe('GlobalNavigation', () => {
   })
 
   it('renders', () => {
+    fetch.mockResponse(JSON.stringify({unread_count: 0}))
     expect(() => renderComponent()).not.toThrow()
   })
 
   it('shows the inbox badge when necessary', async () => {
     fetch.mockResponse(JSON.stringify({unread_count: 12}))
     renderComponent()
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
-    expect($badge.text()).toBe('12 unread messages12')
+    let $badge
+    await waitForExpect(() => {
+      $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
+      expect($badge.text()).toBe('12 unread messages12')
+    })
     expect($badge.css('display')).toBe('')
   })
 
   it('does not show the inbox badge when the user has opted out of notifications', async () => {
     ENV.current_user_disabled_inbox = true
     renderComponent()
-    await new Promise(resolve => setTimeout(resolve, 100))
-    const $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
-    expect($badge.text()).toBe('0')
+    let $badge
+    await waitForExpect(() => {
+      $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
+      expect($badge.text()).toBe('0')
+    })
     expect($badge.css('display')).toBe('none')
   })
 })

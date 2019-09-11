@@ -25,25 +25,25 @@ import I18n from 'i18n!rubric_assessment'
 
 QUnit.module('RubricAssessment#roundAndFormat')
 
-test('rounds given number to two decimal places', function() {
+test('rounds given number to two decimal places', () => {
   strictEqual(rubric_assessment.roundAndFormat(42.325), '42.33')
   strictEqual(rubric_assessment.roundAndFormat(42.324), '42.32')
 })
 
-test('formats given number with I18n.n', function() {
+test('formats given number with I18n.n', () => {
   sandbox.stub(I18n, 'n').returns('formatted_number')
   strictEqual(rubric_assessment.roundAndFormat(42), 'formatted_number')
   strictEqual(I18n.n.callCount, 1)
   ok(I18n.n.calledWith(42))
 })
 
-test('returns empty string when passed null, undefined or empty string', function() {
+test('returns empty string when passed null, undefined or empty string', () => {
   strictEqual(rubric_assessment.roundAndFormat(null), '')
   strictEqual(rubric_assessment.roundAndFormat(undefined), '')
   strictEqual(rubric_assessment.roundAndFormat(''), '')
 })
 
-test('properly adds the "selected" class to a rating when score is equal', function() {
+test('properly adds the "selected" class to a rating when score is equal', () => {
   const $criterion = $(
     '<span>' +
       "<span class='rating'><span class='points'>5</span></span>" +
@@ -61,7 +61,7 @@ test('properly adds the "selected" class to a rating when score is equal', funct
   )
 })
 
-test('properly adds the "selected" class to proper rating when score is in range', function() {
+test('properly adds the "selected" class to proper rating when score is in range', () => {
   const $criterion = $(
     '<span>' +
       "<input type='checkbox' class='criterion_use_range' checked>" +
@@ -82,7 +82,7 @@ test('properly adds the "selected" class to proper rating when score is in range
 })
 
 QUnit.module('RubricAssessment#checkScoreAdjustment')
-test('displays a flash warning when rawPoints has been adjusted', function() {
+test('displays a flash warning when rawPoints has been adjusted', () => {
   const flashSpy = sinon.spy($, 'flashWarning')
   const $criterion = $(
     '<span>' +
@@ -103,7 +103,7 @@ test('displays a flash warning when rawPoints has been adjusted', function() {
   flashSpy.restore()
 })
 
-test('does not display a flash warning when rawPoints has not been adjusted', function() {
+test('does not display a flash warning when rawPoints has not been adjusted', () => {
   const flashSpy = sinon.spy($, 'flashWarning')
   const $criterion = $(
     '<span>' +

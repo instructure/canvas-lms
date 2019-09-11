@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 function uniqueEffectiveDueDates(assignment) {
-  const dueDates = _.map(assignment.effectiveDueDates, function(dueDateInfo) {
+  const dueDates = _.map(assignment.effectiveDueDates, dueDateInfo => {
     const dueAt = dueDateInfo.due_at
     return dueAt ? new Date(dueAt) : dueAt
   })

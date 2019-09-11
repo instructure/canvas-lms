@@ -16,34 +16,108 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from '../../graphqlData/Assignment'
 import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import I18n from 'i18n!assignments_2_text_entry'
+import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
+import elideString from '../../../../shared/helpers/elideString'
+import I18n from 'i18n!assignments_2_media_attempt'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
-import React, {useState} from 'react'
+import React from 'react'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import UploadMedia from '@instructure/canvas-media'
-import View from '@instructure/ui-layout/lib/components/View'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
+import View from '@instructure/ui-layout/lib/components/View'
 
-export default function MediaAttempt() {
-  const [mediaModalOpen, setMediaModalOpen] = useState(false)
+const languages = Object.keys(closedCaptionLanguages).map(key => {
+  return {id: key, label: closedCaptionLanguages[key]}
+})
 
-  return (
-    <View as="div" borderWidth="small">
-      <UploadMedia
-        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
-        onDismiss={() => setMediaModalOpen(false)}
-        open={mediaModalOpen}
-      />
-      <Billboard
-        heading={I18n.t('Add Media')}
-        hero={<IconAttachMediaLine color="brand" />}
-        message={
-          <Button size="small" variant="primary" onClick={() => setMediaModalOpen(true)}>
-            {I18n.t('Record/Upload')}
+export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
+
+export default class MediaAttempt extends React.Component {
+  static propTypes = {
+    assignment: Assignment.shape
+  }
+
+  state = {
+    mediaModalOpen: false,
+    mediaObject: null
+  }
+
+  onDismiss = (err, mediaObject) => {
+    this.setState({mediaModalOpen: false, mediaObject})
+  }
+
+  handleRemoveFile = () => {
+    this.setState({mediaObject: null})
+  }
+
+  renderMediaPlayer = () => {
+    const mediaObject = this.state.mediaObject.media_object
+    return (
+      <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+        <div style={{width: VIDEO_SIZE_OPTIONS.width, height: VIDEO_SIZE_OPTIONS.height}}>
+          <iframe
+            style={{width: '100%', height: '100%'}}
+            title={I18n.t('Media Submission')}
+            src={this.state.mediaObject.embedded_iframe_url}
+          />
+        </div>
+        <div>
+          <span aria-hidden title={mediaObject.title}>
+            {elideString(mediaObject.title)}
+          </span>
+          <ScreenReaderContent>{mediaObject.title}</ScreenReaderContent>
+          <Button
+            icon={IconTrash}
+            id={mediaObject.id}
+            margin="0 0 0 x-small"
+            onClick={this.handleRemoveFile}
+            size="small"
+          >
+            <ScreenReaderContent>
+              {I18n.t('Remove %{filename}', {filename: mediaObject.title})}
+            </ScreenReaderContent>
           </Button>
-        }
-      />
-    </View>
-  )
+        </div>
+      </div>
+    )
+  }
+
+  render() {
+    if (this.state.mediaObject) {
+      return this.renderMediaPlayer()
+    }
+
+    return (
+      <View as="div" borderWidth="small">
+        <UploadMedia
+          onDismiss={this.onDismiss}
+          contextId={this.props.assignment.env.courseId}
+          contextType="course"
+          open={this.state.mediaModalOpen}
+          tabs={{embed: false, record: true, upload: true}}
+          uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+          liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          languages={languages}
+        />
+        <Billboard
+          heading={I18n.t('Add Media')}
+          hero={<IconAttachMediaLine color="brand" />}
+          message={
+            <Button
+              size="small"
+              data-testid="media-modal-launch-button"
+              variant="primary"
+              onClick={() => this.setState({mediaModalOpen: true})}
+            >
+              {I18n.t('Record/Upload')}
+            </Button>
+          }
+        />
+      </View>
+    )
+  }
 }

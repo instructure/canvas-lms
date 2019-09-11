@@ -30,7 +30,7 @@ RSpec.describe LiveEvents::EventSerializerProvider do
       it 'serializes the asset' do
         expect(subject).to include(
           domain: asset.domain,
-          name: asset.name,
+          asset_name: asset.name,
           url: asset.url
         )
       end

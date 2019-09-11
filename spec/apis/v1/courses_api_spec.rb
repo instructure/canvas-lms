@@ -773,6 +773,7 @@ describe CoursesController, type: :request do
           'enrollment_term_id' => term.id,
           'public_syllabus_to_auth' => false,
           'grading_standard_id' => nil,
+          'grade_passback_setting' => nil,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
@@ -843,6 +844,7 @@ describe CoursesController, type: :request do
           'enrollment_term_id' => term.id,
           'public_syllabus_to_auth' => false,
           'grading_standard_id' => nil,
+          'grade_passback_setting' => nil,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
@@ -1168,6 +1170,23 @@ describe CoursesController, type: :request do
         json = api_call(:put, @path, @params, :course => { :apply_assignment_group_weights =>  false})
         @course.reload
         expect(@course.apply_group_weights?).to be_falsey
+      end
+
+      it "should update the grade_passback_setting" do
+        api_call(:put, @path, @params, course: { grade_passback_setting: 'nightly_sync' })
+        expect(@course.reload.grade_passback_setting).to eq 'nightly_sync'
+      end
+
+      it "should remove the grade_passback_setting" do
+        @course.update_attribute(:grade_passback_setting, 'nightly_sync')
+        api_call(:put, @path, @params, course: { grade_passback_setting: '' })
+        expect(@course.reload.grade_passback_setting).to be_nil
+      end
+
+      it "should only allow valid grade_passback_setting" do
+        json = api_call(:put, @path, @params, course: { grade_passback_setting: 'invalid' })
+        expect(json['errors']['grade_passback_setting'].first['message']).to eq 'Invalid grade_passback_setting'
+        expect(@course.reload.grade_passback_setting).to be_nil
       end
 
       it "should update the grading standard with account level standard" do
@@ -3350,6 +3369,7 @@ describe CoursesController, type: :request do
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
         'grading_standard_id' => nil,
+        'grade_passback_setting' => nil,
         'sis_course_id' => @course1.sis_course_id,
         'integration_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
@@ -3598,6 +3618,7 @@ describe CoursesController, type: :request do
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
+          'grade_passback_setting' => nil,
           'allow_student_organized_groups' => true,
           'hide_distribution_graphs' => false,
           'hide_final_grades' => false,
@@ -3647,6 +3668,7 @@ describe CoursesController, type: :request do
           'filter_speed_grader_by_student_group' => true,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
+          'grade_passback_setting' => nil,
           'allow_student_organized_groups' => false,
           'hide_distribution_graphs' => true,
           'hide_final_grades' => true,
@@ -3693,6 +3715,7 @@ describe CoursesController, type: :request do
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
+          'grade_passback_setting' => nil,
           'allow_student_organized_groups' => true,
           'hide_distribution_graphs' => false,
           'hide_final_grades' => false,

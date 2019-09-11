@@ -8,10 +8,11 @@
     "extract": "format-message extract \"src*/**/*.js\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",
     "lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
-    "lint:fix": "eslint --fix \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
+    "lint:fix": "eslint --fix \"src/**/*.js\" \"test/**/*.js\"",
     "test": "Test cafe will be added back to test as part of CORE-2995",
     "test": "yarn test:mocha && yarn test:jest",
     "test:mocha": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
+    "test:mocha:one": "BABEL_ENV=test-node mocha --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
     "test:jest": "jest",
     "test:cafe": "yarn build:cafe && yarn test:cafe:only",
     "test:cafe:only": "testcafe chrome testcafe/**/*.test.js",
@@ -33,7 +34,9 @@
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
-  "browserslist": ["extends @instructure/browserslist-config-canvas-lms"],
+  "browserslist": [
+    "extends @instructure/browserslist-config-canvas-lms"
+  ],
   "nyc": {
     "include": [
       "shared/**/*.js",
@@ -47,72 +50,22 @@
     "sourceMap": false,
     "instrument": false
   },
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "env": {
-      "es6": true,
-      "browser": true,
-      "node": true,
-      "mocha": true,
-      "jest": true
-    },
-    "globals": {
-      "Promise": false,
-      "tinymce": false
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:react/recommended",
-      "prettier",
-      "prettier/react",
-      "plugin:testcafe/recommended"
-    ],
-    "plugins": [
-      "react",
-      "mocha",
-      "notice",
-      "testcafe"
-    ],
-    "rules": {
-      "strict": 0,
-      "mocha/no-exclusive-tests": 2,
-      "mocha/handle-done-callback": 2,
-      "mocha/no-global-tests": 2,
-      "notice/notice": [
-        "error",
-        {
-          "templateFile": "../../config/copyright-template.js",
-          "mustMatch": "Copyright "
-        }
-      ]
-    },
-    "root": true,
-    "settings": {
-      "react": {
-        "version": "15.6.2"
-      }
-    }
-  },
   "dependencies": {
     "@instructure/canvas-theme": "^6.8.1",
-    "@instructure/media-capture": "^5",
+    "@instructure/k5uploader": ">=1",
+    "@instructure/media-capture": "^5.54.0",
     "@instructure/ui-a11y": "^6.8.1",
     "@instructure/ui-alerts": "^6.8.1",
     "@instructure/ui-billboard": "^6.8.1",
     "@instructure/ui-buttons": "^6.8.1",
     "@instructure/ui-color-utils": "^6.8.1",
     "@instructure/ui-elements": "^6.8.1",
+    "@instructure/ui-focusable": "^6.8.1",
+    "@instructure/ui-form-field": "^6.8.1",
     "@instructure/ui-forms": "^6.8.1",
     "@instructure/ui-icons": "^6.8.1",
     "@instructure/ui-layout": "^6.8.1",
-    "@instructure/ui-media-player": "^5",
+    "@instructure/ui-media-player": "^5.54.0",
     "@instructure/ui-overlays": "^6.8.1",
     "@instructure/ui-pagination": "^6.8.1",
     "@instructure/ui-react-utils": "^6.8.1",
@@ -150,10 +103,10 @@
     "@instructure/babel-preset-pretranslated-format-message": "^1",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/ui-babel-preset": "^6.8.1",
-    "@testing-library/dom": "^5",
-    "@testing-library/react": "^8",
-    "@testing-library/user-event": "^4.1.0",
-    "axe-testcafe": "^1.1.0",
+    "@testing-library/dom": "^6",
+    "@testing-library/react": "^9",
+    "@testing-library/user-event": "^4.2.0",
+    "axe-testcafe": "^3",
     "babel-loader": "^8.0.0",
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-inline-json-import": "^0.2.0",
@@ -162,19 +115,15 @@
     "babel-plugin-minify-guarded-expressions": "^0.4.3",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "cross-env": "^5.0.0",
-    "eslint": "^5",
-    "eslint-config-prettier": "^4",
-    "eslint-plugin-mocha": "^5",
-    "eslint-plugin-notice": "^0.7.7",
-    "eslint-plugin-react": "^7",
+    "eslint-plugin-mocha": "^6",
     "eslint-plugin-testcafe": "^0.2.1",
     "fetch-mock": "^6",
     "format-message-cli": "^6",
     "format-message-parse": "^6",
     "jest": "^24",
-    "jest-canvas-mock": "^1",
+    "jest-canvas-mock": "^2",
     "jest-environment-jsdom-fourteen": "^0.1.0",
-    "jest-junit": "^6.4.0",
+    "jest-junit": "^7",
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",
     "jsdomify": "^3",

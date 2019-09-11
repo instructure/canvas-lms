@@ -606,20 +606,8 @@ end
     end
   end
 
-  LOR_TYPES = [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation,
-               :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu,
-               :wiki_page_menu]
   def self.all_tools_for(context, options={})
-    #options[:type] is deprecated, use options[:placements] instead
     placements =* options[:placements] || options[:type]
-
-    #special LOR feature flag
-    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account))
-      valid_placements = placements.select{|placement| !LOR_TYPES.include?(placement.to_sym)}
-      return [] if valid_placements.size == 0 && placements.size > 0
-      placements = valid_placements
-    end
-
     contexts = []
     if options[:user]
       contexts << options[:user]

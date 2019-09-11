@@ -23,22 +23,31 @@ function fakeEditor() {
     $svgContainer = {
       html: jest.fn()
     }
+
     $ = jest.fn(() => this.$svgContainer)
+
     editorContainer = {
       querySelector: jest.fn()
     }
+
     execCommand = jest.fn()
+
     nodeChanged = jest.fn()
+
     on = jest.fn()
+
     off = jest.fn()
+
     selection = {
       getNode: jest.fn()
     }
+
     dom = {
       getParent: jest.fn(),
       getRoot: jest.fn(() => 'getRoot'),
       is: jest.fn()
     }
+
     ui = {
       registry: {
         addSplitButton: jest.fn(),

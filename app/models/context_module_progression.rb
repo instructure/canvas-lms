@@ -238,8 +238,9 @@ class ContextModuleProgression < ActiveRecord::Base
     return if subs.blank?
 
     if tag.course.post_policies_enabled?
-      if subs.any? { |sub| sub.is_a?(Submission) && !sub.posted? }
-        self.update_incomplete_requirement!(requirement, nil)
+      if unposted_sub = subs.detect { |sub| sub.is_a?(Submission) && !sub.posted? }
+        # don't mark the progress as in-progress if they haven't submitted
+        self.update_incomplete_requirement!(requirement, nil) unless unposted_sub.unsubmitted?
         return
       end
     elsif tag.assignment&.muted?

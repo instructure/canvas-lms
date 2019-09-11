@@ -62,7 +62,7 @@ QUnit.module('UnassignedUsersView', {
   }
 })
 
-test('opens the assignToGroupMenu', function() {
+test('opens the assignToGroupMenu', () => {
   view
     .$('.assign-to-group')
     .eq(0)

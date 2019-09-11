@@ -24,6 +24,10 @@ import translations from './src/i18n/indexLocales';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
+import {filterUselessConsoleMessages} from '@instructure/js-utils'
+
+filterUselessConsoleMessages(console)
+
 Enzyme.configure({
   disableLifecycleMethods: true,
   adapter: new Adapter()

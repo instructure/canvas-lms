@@ -189,6 +189,11 @@ describe GradebookUserIds do
         @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
         expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
       end
+
+      it "returns all students if the selected group has been deleted" do
+        group.destroy!
+        expect(gradebook_user_ids.user_ids).to match_array(@course.student_ids)
+      end
     end
 
     context "when no group is specified" do

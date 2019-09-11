@@ -17,149 +17,204 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
+
 import GradebookSelector from 'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
 
-QUnit.module('GradebookSelector', {
-  setup() {
-    this.setLocationStub = sandbox.stub(GradebookSelector.prototype, 'setLocation')
-    this.wrapper = mount(
-      <GradebookSelector courseUrl="http://someUrl/" learningMasteryEnabled navigate={() => {}} />
-    )
-  },
-  teardown() {
-    this.wrapper.unmount()
-  }
-})
+QUnit.module('Gradezilla > Individual Gradebook > Components > GradebookSelector', suiteHooks => {
+  let $container
+  let $tabsContainer
+  let component
+  let props
+  let tabsComponent
+  let tabsProps
 
-test('#selectDefaultGradebook calls setLocation', function() {
-  this.wrapper.find('select').simulate('change', {target: {value: 'default-gradebook'}})
-  const url = `${
-    this.wrapper.props().courseUrl
-  }/gradebook/change_gradebook_version?version=default`
-  ok(this.setLocationStub.withArgs(url).calledOnce)
-})
+  suiteHooks.beforeEach(() => {
+    $container = document.body.appendChild(document.createElement('div'))
+    $tabsContainer = document.body.appendChild(document.createElement('div'))
 
-test('#selectGradebookHistory calls setLocation', function() {
-  this.wrapper.find('select').simulate('change', {target: {value: 'gradebook-history'}})
-  const url = `${this.wrapper.props().courseUrl}/gradebook/history`
-  ok(this.setLocationStub.withArgs(url).calledOnce)
-})
-
-QUnit.module('Switching between ic-tabs', {
-  setup() {
-    const ICTabs = props => (
-      <ic-tabs>
-        <ic-tab onClick={props.firstOnClick} />
-        <ic-tab onClick={props.secondOnClick} />
-      </ic-tabs>
-    )
-
-    ICTabs.propTypes = {
-      firstOnClick: PropTypes.func.isRequired,
-      secondOnClick: PropTypes.func.isRequired
+    props = {
+      courseUrl: 'https://localhost/courses/1201',
+      learningMasteryEnabled: false,
+      navigate: sinon.stub()
     }
 
-    this.firstOnClickStub = sinon.stub()
-    this.secondOnClickStub = sinon.stub()
-    const ICTabsProps = {
-      firstOnClick: this.firstOnClickStub,
-      secondOnClick: this.secondOnClickStub
+    tabsProps = {
+      onTab1Click: sinon.stub(),
+      onTab2Click: sinon.stub()
     }
-    const element = React.createElement(ICTabs, ICTabsProps)
-    this.fixtures = document.getElementById('fixtures')
-    ReactDOM.render(element, this.fixtures)
-    this.wrapper = mount(
-      <GradebookSelector courseUrl="http://someUrl/" learningMasteryEnabled navigate={() => {}} />
-    )
-  },
 
-  teardown() {
-    ReactDOM.unmountComponentAtNode(this.fixtures)
-    this.wrapper.unmount()
+    component = null
+    tabsComponent = null
+  })
+
+  suiteHooks.afterEach(() => {
+    component.unmount()
+    $container.remove()
+
+    if (tabsComponent) {
+      tabsComponent.unmount()
+    }
+    $tabsContainer.remove()
+  })
+
+  function renderComponent() {
+    component = render(<GradebookSelector {...props} />, {container: $container})
+
+    if (props.learningMasteryEnabled) {
+      tabsComponent = render(
+        <ic-tabs>
+          <ic-tab onClick={tabsProps.onTab1Click} />
+          <ic-tab onClick={tabsProps.onTab2Click} />
+        </ic-tabs>,
+        {container: $tabsContainer}
+      )
+    }
   }
-})
 
-test('#selectIndividualGradebook calls click on the first ic-tab', function() {
-  this.wrapper.find('select').simulate('change', {target: {value: 'individual-gradebook'}})
-  ok(this.firstOnClickStub.calledOnce)
-})
-
-test('#selectLearningMastery calls click on the second ic-tab', function() {
-  this.wrapper.find('select').simulate('change', {target: {value: 'learning-mastery'}})
-  ok(this.secondOnClickStub.calledOnce)
-})
-
-test('defaults to Individual View', function() {
-  equal(this.wrapper.find('select').instance().value, 'individual-gradebook')
-})
-
-test('clicking on learning mastery changes the selected value to learning mastery', function() {
-  this.wrapper.find('select').simulate('change', {target: {value: 'learning-mastery'}})
-  equal(this.wrapper.find('select').instance().value, 'learning-mastery')
-})
-
-test('clicking on individual view changes the selected value to individual view', function() {
-  // by default individual-gradebook is selected
-  this.wrapper.find('select').simulate('change', {target: {value: 'learning-mastery'}})
-  this.wrapper.find('select').simulate('change', {target: {value: 'individual-gradebook'}})
-  equal(this.wrapper.find('select').instance().value, 'individual-gradebook')
-})
-
-QUnit.module('Menu Items Rendered with Learning Mastery Enabled', {
-  setup() {
-    this.wrapper = mount(
-      <GradebookSelector courseUrl="http://someUrl/" learningMasteryEnabled navigate={() => {}} />
-    )
-    this.menuItems = this.wrapper.find('option').map(option => option.instance())
-  },
-  teardown() {
-    this.wrapper.unmount()
+  function getSelect() {
+    return $container.querySelector('input[type="text"]')
   }
-})
 
-test('Individual View is first', function() {
-  equal(this.menuItems[0].textContent, 'Individual View')
-})
-
-test('Learning Mastery is second', function() {
-  equal(this.menuItems[1].textContent, 'Learning Mastery…')
-})
-
-test('Gradebook is third', function() {
-  equal(this.menuItems[2].textContent, 'Gradebook…')
-})
-
-test('Gradebook History is fourth', function() {
-  equal(this.menuItems[3].textContent, 'Gradebook History…')
-})
-
-QUnit.module('Menu Items Rendered with Learning Mastery Disabled', {
-  setup() {
-    this.wrapper = mount(
-      <GradebookSelector
-        courseUrl="http://someUrl/"
-        learningMasteryEnabled={false}
-        navigate={() => {}}
-      />
-    )
-    this.menuItems = this.wrapper.find('option').map(option => option.instance())
-  },
-  teardown() {
-    this.wrapper.unmount()
+  function clickToExpand() {
+    getSelect().click()
   }
-})
 
-test('Individual Gradebook is first', function() {
-  equal(this.menuItems[0].textContent, 'Individual View')
-})
+  function getOptionsList() {
+    const optionsListId = getSelect().getAttribute('aria-controls')
+    return document.getElementById(optionsListId)
+  }
 
-test('Gradebook is second', function() {
-  equal(this.menuItems[1].textContent, 'Gradebook…')
-})
+  function getOptions() {
+    return [...getOptionsList().querySelectorAll('[role="option"]')]
+  }
 
-test('Gradebook History Menu Item is third in the Menu', function() {
-  equal(this.menuItems[2].textContent, 'Gradebook History…')
+  function getOptionLabels() {
+    return getOptions().map($option => $option.textContent.trim())
+  }
+
+  function getOption(optionLabel) {
+    return getOptions().find($option => $option.textContent.trim() === optionLabel)
+  }
+
+  function getSelectedOptionLabel() {
+    return getSelect().value
+  }
+
+  function selectOption(optionLabel) {
+    getOption(optionLabel).click()
+  }
+
+  test('includes options for Gradebook pages', () => {
+    renderComponent()
+    clickToExpand()
+    deepEqual(getOptionLabels(), ['Individual View', 'Gradebook…', 'Gradebook History…'])
+  })
+
+  QUnit.module('"Gradebook…" option', () => {
+    test('calls the .navigate callback when clicked', () => {
+      renderComponent()
+      clickToExpand()
+      selectOption('Gradebook…')
+      strictEqual(props.navigate.callCount, 1)
+    })
+
+    test('includes the default gradebook url when calling the .navigate callback', () => {
+      renderComponent()
+      clickToExpand()
+      selectOption('Gradebook…')
+      const [url] = props.navigate.lastCall.args
+      equal(
+        url,
+        'https://localhost/courses/1201/gradebook/change_gradebook_version?version=default'
+      )
+    })
+  })
+
+  QUnit.module('"Gradebook History…" option', () => {
+    test('calls the .navigate callback when clicked', () => {
+      renderComponent()
+      clickToExpand()
+      selectOption('Gradebook History…')
+      strictEqual(props.navigate.callCount, 1)
+    })
+
+    test('includes the gradebook history url when calling the .navigate callback', () => {
+      renderComponent()
+      clickToExpand()
+      selectOption('Gradebook History…')
+      const [url] = props.navigate.lastCall.args
+      equal(url, 'https://localhost/courses/1201/gradebook/history')
+    })
+  })
+
+  QUnit.module('when learning mastery is enabled', hooks => {
+    hooks.beforeEach(() => {
+      props.learningMasteryEnabled = true
+    })
+
+    QUnit.module('"Individual View" option', () => {
+      test('is selected by default', () => {
+        renderComponent()
+        clickToExpand()
+        equal(getSelectedOptionLabel(), 'Individual View')
+      })
+
+      test('does not call the .navigate callback when clicked', () => {
+        renderComponent()
+        clickToExpand()
+        selectOption('Individual View')
+        strictEqual(props.navigate.callCount, 0)
+      })
+
+      test('clicks the first `ic-tab` when clicked', () => {
+        renderComponent()
+        // Select the second tab
+        clickToExpand()
+        selectOption('Learning Mastery…')
+        // Select the first tab
+        clickToExpand()
+        selectOption('Individual View…')
+        strictEqual(tabsProps.onTab1Click.callCount, 1)
+      })
+
+      test('"Individual View" is selected when displayed', () => {
+        renderComponent()
+        clickToExpand()
+        selectOption('Learning Mastery…')
+        clickToExpand()
+        selectOption('Individual View…')
+        equal(getSelectedOptionLabel(), 'Individual View')
+      })
+    })
+
+    QUnit.module('"Learning Mastery" option', () => {
+      test('is included', () => {
+        renderComponent()
+        clickToExpand()
+        ok(getOptionLabels().includes('Learning Mastery…'))
+      })
+
+      test('is selected when displayed', () => {
+        renderComponent()
+        clickToExpand()
+        selectOption('Learning Mastery…')
+        equal(getSelectedOptionLabel(), 'Learning Mastery')
+      })
+
+      test('option clicks the second `ic-tab` when clicked', () => {
+        renderComponent()
+        clickToExpand()
+        selectOption('Learning Mastery…')
+        strictEqual(tabsProps.onTab2Click.callCount, 1)
+      })
+
+      test('does not call the .navigate callback when clicked', () => {
+        renderComponent()
+        clickToExpand()
+        selectOption('Learning Mastery…')
+        strictEqual(props.navigate.callCount, 0)
+      })
+    })
+  })
 })

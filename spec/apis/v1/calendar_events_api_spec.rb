@@ -2230,11 +2230,53 @@ describe CalendarEventsApiController, type: :request do
     it "should return submissions with assignments" do
       assg = @course.assignments.create(workflow_state: 'published', due_at: 3.days.from_now, submission_types: "online_text_entry")
       assg.submit_homework @student, submission_type: "online_text_entry"
-      json = api_call(:get,
-        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&type=assignment&include[]=submission&context_codes[]=#{@ctx_str}", {
-        controller: 'calendar_events_api', action: 'user_index', format: 'json', type: 'assignment', include: ['submission'],
-        context_codes: @contexts, all_events: true, user_id: @student.id})
+      json = api_call(
+        :get,
+        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&type=assignment&include[]=submission&context_codes[]=#{@ctx_str}",
+        {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json', type: 'assignment', include: ['submission'],
+          context_codes: @contexts, all_events: true, user_id: @student.id
+        }
+      )
       expect(json.first['assignment']['submission']).not_to be_nil
+    end
+
+    it "allows specifying submission types" do
+      @course.assignments.create(
+        workflow_state: 'published', due_at: 3.days.from_now, submission_types: "online_text_entry"
+      )
+      wiki_assignment = @course.assignments.create(
+        workflow_state: 'published', due_at: 3.days.from_now, submission_types: "wiki_page"
+      )
+      @course.assignments.create(workflow_state: 'published', due_at: 3.days.from_now, submission_types: "not_graded")
+      json = api_call(
+        :get,
+        "/api/v1/users/#{@student.id}/calendar_events",
+        {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json', type: 'assignment',
+          context_codes: @contexts, all_events: true, user_id: @student.id, submission_types: ['wiki_page']
+        }
+      )
+      expect(json.map { |a| a.dig('assignment', 'id') }).to match_array [wiki_assignment.id]
+    end
+
+    it "allows specifying submission types to exclude" do
+      text_assignment = @course.assignments.create(
+        workflow_state: 'published', due_at: 3.days.from_now, submission_types: "online_text_entry"
+      )
+      @course.assignments.create(workflow_state: 'published', due_at: 3.days.from_now, submission_types: "wiki_page")
+      ungraded_assignment = @course.assignments.create(
+        workflow_state: 'published', due_at: 3.days.from_now, submission_types: "not_graded"
+      )
+      json = api_call(
+        :get,
+        "/api/v1/users/#{@student.id}/calendar_events",
+        {
+          controller: 'calendar_events_api', action: 'user_index', format: 'json', type: 'assignment',
+          context_codes: @contexts, all_events: true, user_id: @student.id, exclude_submission_types: ['wiki_page']
+        }
+      )
+      expect(json.map { |a| a.dig('assignment', 'id') }).to match_array [text_assignment.id, ungraded_assignment.id]
     end
   end
 

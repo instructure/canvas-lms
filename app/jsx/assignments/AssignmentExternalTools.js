@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import I18n from 'i18n!moderated_grading'
 import 'compiled/jquery.rails_flash_notifications'
 import iframeAllowances from '../external_apps/lib/iframeAllowances'
-import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
+import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@instructure/js-utils'
 
 class AssignmentExternalTools extends React.Component {
   constructor(props) {
@@ -66,7 +66,7 @@ class AssignmentExternalTools extends React.Component {
     const url = encodeURI(`${this.getDefinitionsUrl()}?placements[]=${this.props.placement}`)
 
     try {
-      const request = getPrefetchedXHR(url) || fetch(url, {headers: {Accept: 'application/json'}})
+      const request = getPrefetchedXHR(url) || fetch(url, defaultFetchOptions)
       const tools = await asJson(request)
       tools.forEach(t => (t.launch = this.getLaunch(t)))
       this.setState({tools})

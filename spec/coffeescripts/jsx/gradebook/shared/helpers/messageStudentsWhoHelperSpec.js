@@ -129,7 +129,7 @@ test('returns false if the cutoff is null or undefined', () => {
 
 QUnit.module('messageStudentsWhoHelper#callbackFn')
 
-test('returns the student ids filtered by the correct criteria', function() {
+test('returns the student ids filtered by the correct criteria', () => {
   const option = {
     criteriaFn(student, cutoff) {
       return student.score > cutoff
@@ -159,7 +159,7 @@ test('returns the student ids filtered by the correct criteria', function() {
 
 QUnit.module('messageStudentsWhoHelper#generateSubjectCallbackFn')
 
-test('generates a function that returns the subject string', function() {
+test('generates a function that returns the subject string', () => {
   const option = {
     subjectFn(assignment, cutoff) {
       return `name: ${assignment.name}, cutoff: ${cutoff}`
