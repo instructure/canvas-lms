@@ -23,6 +23,9 @@ services:
     command: /app/docker-compose/scripts/docker_compose_run.sh
     ports:
       - "3000:3000"
+    # Make changes done outside the container reflect inside the container without needing a rebuild by mounting a volume.
+    volumes:
+      - .:/app
     networks:
       - frontend
       - rubycas-server_frontend
