@@ -489,44 +489,6 @@ RSpec.configure do |config|
     Canvas.redis_used = false
   end
 
-  if CANVAS_RAILS5_2 && Bullet.enable?
-    config.before(:each) do |example|
-      Bullet.start_request
-      # we walk the example group chain until we reach one that actually recorded something
-      oncie = example.example_group
-      oncie = oncie.superclass while oncie && !oncie.onceler&.tape && oncie.superclass.respond_to?(:onceler)
-
-      possible_objects, impossible_objects = oncie.onceler.instance_variable_get(:@bullet_state)
-      possible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.possible_objects.add(object) }
-      impossible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.impossible_objects.add(object) }
-    end
-
-    config.after(:each) do
-      Bullet.perform_out_of_channel_notifications if Bullet.notification?
-      Bullet.end_request
-    end
-
-    Onceler.configure do |config|
-      config.before(:record) do
-        Bullet.start_request
-        possible_objects, impossible_objects =
-          onceler.parent&.instance_variable_get(:@bullet_state)
-        possible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.possible_objects.add(object) }
-        impossible_objects&.each { |object| Bullet::Detector::NPlusOneQuery.impossible_objects.add(object) }
-      end
-
-      config.after(:record) do |tape|
-        tape.onceler.instance_variable_set(:@bullet_state, [
-          Bullet::Detector::NPlusOneQuery.possible_objects.registry.values.map(&:to_a).flatten,
-          Bullet::Detector::NPlusOneQuery.impossible_objects.registry.values.map(&:to_a).flatten,
-        ])
-
-        Bullet.perform_out_of_channel_notifications if Bullet.notification?
-        Bullet.end_request
-      end
-    end
-  end
-
   #****************************************************************
   # There used to be a lot of factory methods here!
   # In an effort to move us toward a nicer test factory solution,
@@ -922,11 +884,7 @@ RSpec.configure do |config|
       return if return_type == :nil
       scope = klass.order("id DESC").limit(records.size)
       if return_type == :record
-        records = scope.to_a.reverse
-        if CANVAS_RAILS5_2 && Bullet.enable?
-          records.each { |record| Bullet::Detector::NPlusOneQuery.add_impossible_object(record) }
-        end
-        records
+        scope.to_a.reverse
       else
         scope.pluck(:id).reverse
       end

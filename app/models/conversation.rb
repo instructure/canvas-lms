@@ -321,12 +321,6 @@ class Conversation < ActiveRecord::Base
   end
 
   def preload_users_and_context_codes
-    # Bullet doesn't catch our sneaky narrow preload here, so manually notify it
-    if defined?(Bullet) && Bullet.start?
-      conversation_participants.each do |record|
-        Bullet::Detector::Association.add_object_associations(record, :user)
-      end
-    end
     users = User.where(:id => conversation_participants.map(&:user_id)).pluck(:id, :updated_at).map do |id, updated_at|
       User.send(:instantiate, 'id' => id, 'updated_at' => updated_at)
     end
