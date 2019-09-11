@@ -25,6 +25,7 @@ services:
       - "3000:3000"
     networks:
       - frontend
+      - rubycas-server_frontend
     environment:
       RACK_ENV: development
     depends_on:
@@ -32,6 +33,10 @@ services:
       - canvasredis
 networks:
   frontend:
+  # Bind to the external rubycas-server network so that the application can talk to that one using the
+  # service names as hostnames. E.g. from inside the joinweb container, the hostname ssoweb needs to resolve to the ssoweb container.
+  rubycas-server_frontend:
+    external: true
 
 volumes:
   canvas-db:
