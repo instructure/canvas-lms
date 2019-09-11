@@ -2041,7 +2041,7 @@ class Submission < ActiveRecord::Base
     opts[:draft] = !!opts[:draft_comment]
     if opts[:comment].empty?
       if opts[:media_comment_id]
-        opts[:comment] = t('media_comment', "This is a media comment.")
+        opts[:comment] = ''
       elsif opts[:attachments].try(:length)
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
@@ -2062,7 +2062,7 @@ class Submission < ActiveRecord::Base
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
                   :anonymous, :hidden, :provisional_grade_id, :draft, :attempt]
-    if opts[:comment].present?
+    if opts[:comment].present? || opts[:media_comment_id]
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment

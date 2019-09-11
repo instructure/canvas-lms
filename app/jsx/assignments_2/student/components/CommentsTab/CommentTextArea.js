@@ -103,6 +103,17 @@ export default class CommentTextArea extends Component {
     })
   }
 
+  onFileSelected = event => {
+    let currIndex = this.state.currentFiles.length
+      ? this.state.currentFiles[this.state.currentFiles.length - 1].id
+      : 0
+    const selectedFiles = [...event.currentTarget.files]
+    selectedFiles.forEach(file => {
+      file.id = ++currIndex
+    })
+    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles]}))
+  }
+
   onMediaModalDismiss = (err, mediaObject) => {
     if (!err && !mediaObject) {
       this.setState({mediaModalOpen: false})
@@ -124,25 +135,20 @@ export default class CommentTextArea extends Component {
     }
   }
 
-  onFileSelected = event => {
-    let currIndex = this.state.currentFiles.length
-      ? this.state.currentFiles[this.state.currentFiles.length - 1].id
-      : 0
-    const selectedFiles = [...event.currentTarget.files]
-    selectedFiles.forEach(file => {
-      file.id = ++currIndex
-    })
-    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles]}))
-  }
-
   onSendComment = createSubmissionComment => {
     this.setState({hasError: false, uploadingComments: true}, async () => {
+      const mediaObjectId = this.state.mediaObject
+        ? this.state.mediaObject.media_object.media_id
+        : null
       let attachmentIds = []
+      const filesWithoutMediaObject = this.state.currentFiles.filter(
+        file => file !== this.state.mediaObject
+      )
 
-      if (this.state.currentFiles.length) {
+      if (filesWithoutMediaObject.length) {
         try {
           const attachments = await submissionCommentAttachmentsUpload(
-            this.state.currentFiles,
+            filesWithoutMediaObject,
             this.props.assignment.env.courseId,
             this.props.assignment._id
           )
@@ -159,11 +165,17 @@ export default class CommentTextArea extends Component {
           id: this.props.submission.id,
           submissionAttempt: this.props.submission.attempt,
           comment: this.state.commentText,
-          fileIds: attachmentIds
+          fileIds: attachmentIds,
+          mediaObjectId
         }
       })
 
-      this.setState({commentText: '', currentFiles: [], uploadingComments: false})
+      this.setState({
+        commentText: '',
+        mediaObject: null,
+        currentFiles: [],
+        uploadingComments: false
+      })
     })
   }
 
@@ -265,6 +277,7 @@ export default class CommentTextArea extends Component {
                   margin="0 x-small 0 0"
                   size="small"
                   variant="icon"
+                  disabled={this.state.mediaObject}
                 >
                   <ScreenReaderContent>{I18n.t('Record Audio/Video')}</ScreenReaderContent>
                 </Button>

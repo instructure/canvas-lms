@@ -51,9 +51,16 @@ export const CREATE_SUBMISSION_COMMENT = gql`
     $submissionAttempt: Int!
     $comment: String!
     $fileIds: [ID!]
+    $mediaObjectId: ID
   ) {
     createSubmissionComment(
-      input: {submissionId: $id, attempt: $submissionAttempt, comment: $comment, fileIds: $fileIds}
+      input: {
+        submissionId: $id
+        attempt: $submissionAttempt
+        comment: $comment
+        fileIds: $fileIds
+        mediaObjectId: $mediaObjectId
+      }
     ) {
       submissionComment {
         ...SubmissionComment
