@@ -56,7 +56,7 @@ pipeline {
                         sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
                         def retries = 1
                         result = sh (
-                        script: 'build/new-jenkins/rspec-tests.sh',
+                          script: 'build/new-jenkins/rspec-tests.sh',
                           returnStatus:true
                         )
                         while (result != 0 && retries > 0) {

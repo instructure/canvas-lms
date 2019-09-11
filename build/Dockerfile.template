@@ -32,6 +32,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
 <% unless production? -%>
        postgresql-client-9.5 \
        unzip \
+       pbzip2 \
        fontforge \
 <% end -%>
   && apt-get clean \
