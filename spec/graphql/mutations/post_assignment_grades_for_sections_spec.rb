@@ -245,6 +245,45 @@ describe Mutations::PostAssignmentGradesForSections do
         expect(section1_submissions).to all(be_posted)
       end
     end
+
+    describe "Submissions Posted notification" do
+      let_once(:notification) { Notification.find_or_create_by!(category: "Grading", name: "Submissions Posted") }
+      let(:post_submissions_job) { Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last }
+      let(:teacher_enrollment) { course.teacher_enrollments.find_by!(user: teacher) }
+      let(:student) { User.create! }
+      let(:submissions_posted_messages) do
+        Message.where(
+          communication_channel: teacher.email_channel,
+          notification: notification
+        )
+      end
+
+      before(:each) do
+        section1.enroll_user(student, "StudentEnrollment", "active")
+        teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
+        teacher.email_channel.update!(workflow_state: :active)
+        teacher_enrollment.update!(workflow_state: :active)
+      end
+
+      it "broadcasts a notification when posting to everyone by sections" do
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
+        expect {
+          post_submissions_job.invoke_job
+        }.to change {
+          submissions_posted_messages.count
+        }.by(1)
+      end
+
+      it "broadcasts a notification when posting to everyone graded by sections" do
+        assignment.grade_student(student, grader: teacher, score: 1)
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id], graded_only: true), context)
+        expect {
+          post_submissions_job.invoke_job
+        }.to change {
+          submissions_posted_messages.count
+        }.by(1)
+      end
+    end
   end
 
   context "when user does not have grade permission" do

@@ -58,7 +58,7 @@ class Assignment < ActiveRecord::Base
   ].freeze
 
   attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress
-  attr_reader :assignment_changed
+  attr_reader :assignment_changed, :posting_params_for_notifications
   attr_writer :updating_user
 
   include MasterCourses::Restrictor
@@ -1105,6 +1105,16 @@ class Assignment < ActiveRecord::Base
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_unmuted?
+    }
+
+    p.dispatch :submissions_posted
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
+    p.data(&:posting_params_for_notifications)
+    p.whenever { |assignment|
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_submissions_posted?
     }
   end
 
@@ -3190,7 +3200,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false)
+  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil)
     submissions = if submission_ids.nil?
       self.submissions.active
     else
@@ -3227,6 +3237,7 @@ class Assignment < ActiveRecord::Base
     end
     self.send_later_if_production(:recalculate_module_progressions, submission_ids)
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
+    broadcast_submissions_posted(posting_params) if posting_params.present?
   end
 
   def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false)
@@ -3247,6 +3258,12 @@ class Assignment < ActiveRecord::Base
       update_muted_status!
     end
     progress.set_results(assignment_id: id, posted_at: nil, user_ids: user_ids) if progress.present?
+  end
+
+  def broadcast_submissions_posted(posting_params)
+    @posting_params_for_notifications = posting_params
+    self.broadcast_notifications
+    @posting_params_for_notifications = nil
   end
 
   def ensure_post_policy(post_manually:)

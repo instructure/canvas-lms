@@ -64,13 +64,19 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
     submission_ids = submissions_scope.pluck(:id)
     progress = course.progresses.new(tag: "post_assignment_grades")
 
+    posting_params = {
+      graded_only: !!input[:graded_only],
+      section_names: sections&.pluck(:name)
+    }
+
     if progress.save
       progress.process_job(
         assignment,
         :post_submissions,
         {preserve_method_args: true},
         progress: progress,
-        submission_ids: submission_ids
+        submission_ids: submission_ids,
+        posting_params: posting_params
       )
       return {assignment: assignment, progress: progress, sections: sections}
     else

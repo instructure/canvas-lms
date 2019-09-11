@@ -7816,6 +7816,56 @@ describe Assignment do
         end
       end
 
+      describe "Submissions Posted notification" do
+        let_once(:notification) { Notification.find_or_create_by!(category: "Grading", name: "Submissions Posted") }
+        let(:context) { { current_user: teacher } }
+        let(:teacher_enrollment) { @course.teacher_enrollments.find_by!(user: teacher) }
+        let(:section1) { @course.course_sections.create! }
+        let(:submissions_posted_messages) do
+          Message.where(
+            communication_channel: teacher.email_channel,
+            notification: notification
+          )
+        end
+
+        before(:each) do
+          section1.enroll_user(student1, "StudentEnrollment", "active")
+          teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
+          teacher.email_channel.update!(workflow_state: :active)
+          teacher_enrollment.update!(workflow_state: :active)
+        end
+
+        it "does not broadcast a notification when not including posting_params" do
+          expect { assignment.post_submissions }.not_to change { submissions_posted_messages.count }
+        end
+
+        it "broadcasts a notification when posting to everyone" do
+          assignment.post_submissions(posting_params: { graded_only: false })
+          body_text = "Grade changes and comments have been released for everyone."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+
+        it "broadcasts a notification when posting to everyone graded" do
+          assignment.grade_student(student1, grader: teacher, score: 1)
+          assignment.post_submissions(posting_params: { graded_only: true })
+          body_text = "Grade changes and comments have been released for everyone graded."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+
+        it "broadcasts a notification when posting to everyone in sections" do
+          assignment.post_submissions(posting_params: { graded_only: false, section_names: ["section 1"] })
+          body_text = "Grade changes and comments have been released for everyone in sections: section 1."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+
+        it "broadcasts a notification when posting to everyone graded in sections" do
+          assignment.grade_student(student1, grader: teacher, score: 1)
+          assignment.post_submissions(posting_params: { graded_only: true, section_names: ["section 1"] })
+          body_text = "Grade changes and comments have been released for everyone graded in sections: section 1."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+      end
+
       context "when given a Progress" do
         before(:each) do
           @progress = @course.progresses.create!(tag: "post_submissions")
