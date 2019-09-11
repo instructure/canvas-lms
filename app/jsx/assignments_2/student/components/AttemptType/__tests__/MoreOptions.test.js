@@ -25,7 +25,6 @@ import MoreOptions from '../MoreOptions'
 import React from 'react'
 
 jest.setTimeout(10000)
-jest.mock('axios')
 
 async function createGraphqlMocks(overrides = {}) {
   const userGroupOverrides = [{Node: () => ({__typename: 'User'})}]
@@ -58,8 +57,8 @@ async function createGraphqlMocks(overrides = {}) {
   ]
 }
 
-beforeAll(() => {
-  axios.get.mockImplementation(input => {
+beforeEach(() => {
+  jest.spyOn(axios, 'get').mockImplementation(input => {
     const resp = {headers: {}, data: []}
     if (input === '/api/v1/users/self/folders/root') {
       resp.data = {
