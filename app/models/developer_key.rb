@@ -313,14 +313,24 @@ class DeveloperKey < ActiveRecord::Base
 
     if affected_account.blank? || affected_account.site_admin?
       # Cleanup tools across all shards
-      Shard.with_each_shard do
-        send_later_enqueue_args(
-          method,
-          enqueue_args,
-          affected_account
-        )
-      end
+      send_later_enqueue_args(
+        :manage_external_tools_multi_shard,
+        enqueue_args,
+        enqueue_args,
+        method,
+        affected_account
+      )
     else
+      send_later_enqueue_args(
+        method,
+        enqueue_args,
+        affected_account
+      )
+    end
+  end
+
+  def manage_external_tools_multi_shard(enqueue_args, method, affected_account)
+    Shard.with_each_shard do
       send_later_enqueue_args(
         method,
         enqueue_args,
