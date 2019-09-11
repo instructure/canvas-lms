@@ -25,7 +25,7 @@ import {bindActionCreators} from 'redux'
 import {Spinner, Heading, Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Pagination, PaginationButton} from '@instructure/ui-pagination'
+import {Pagination} from '@instructure/ui-pagination'
 
 import AnnouncementRow from '../../shared/components/AnnouncementRow'
 import {ConnectedIndexHeader} from './IndexHeader'
@@ -143,14 +143,14 @@ export default class AnnouncementsIndex extends Component {
 
   renderPageButton(page) {
     return (
-      <PaginationButton
+      <Pagination.Page
         key={page}
         onClick={this.selectPage(page)}
         current={page === this.props.announcementsPage}
       >
         <ScreenReaderContent>{I18n.t('Page %{pageNum}', {pageNum: page})}</ScreenReaderContent>
         <span aria-hidden="true">{page}</span>
-      </PaginationButton>
+      </Pagination.Page>
     )
   }
 
