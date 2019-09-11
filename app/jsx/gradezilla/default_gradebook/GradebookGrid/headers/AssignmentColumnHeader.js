@@ -20,7 +20,7 @@ import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
 import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import 'message_students'
@@ -520,14 +520,14 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="center" width="auto" vAlign="top">
+            <Grid.Row>
+              <Grid.Col textAlign="center" width="auto" vAlign="top">
                 <div className="Gradebook__ColumnHeaderIndicators">
                   {postPoliciesEnabled && this.renderUnpostedSubmissionsIcon()}
                 </div>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center">
+              <Grid.Col textAlign="center">
                 <span className="Gradebook__ColumnHeaderDetail">
                   <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--primary">
                     {this.renderAssignmentLink()}
@@ -538,12 +538,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
                     postPoliciesEnabled={postPoliciesEnabled}
                   />
                 </span>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>{this.renderMenu()}</div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

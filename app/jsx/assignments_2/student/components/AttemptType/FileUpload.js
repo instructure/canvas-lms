@@ -33,7 +33,7 @@ import {uploadFiles} from '../../../../shared/upload_file'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {FileDrop} from '@instructure/ui-forms'
-import {Flex, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Flex, Grid} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
@@ -241,22 +241,22 @@ export default class FileUpload extends Component {
     return (
       <div data-testid="non-empty-upload">
         <Grid>
-          <GridRow key={firstFileRow.map(file => file._id).join()}>
-            <GridCol width={4}>{this.renderUploadBox()}</GridCol>
+          <Grid.Row key={firstFileRow.map(file => file._id).join()}>
+            <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
             {firstFileRow.map(file => (
-              <GridCol width={4} key={file._id} vAlign="bottom">
+              <Grid.Col width={4} key={file._id} vAlign="bottom">
                 {this.renderUploadedFile(file)}
-              </GridCol>
+              </Grid.Col>
             ))}
-          </GridRow>
+          </Grid.Row>
           {nextFileRows.map(row => (
-            <GridRow key={row.map(file => file._id).join()}>
+            <Grid.Row key={row.map(file => file._id).join()}>
               {row.map(file => (
-                <GridCol width={4} key={file._id} vAlign="bottom">
+                <Grid.Col width={4} key={file._id} vAlign="bottom">
                   {this.renderUploadedFile(file)}
-                </GridCol>
+                </Grid.Col>
               ))}
-            </GridRow>
+            </Grid.Row>
           ))}
         </Grid>
       </div>
@@ -270,9 +270,9 @@ export default class FileUpload extends Component {
           this.renderUploadBoxAndUploadedFiles()
         ) : (
           <Grid>
-            <GridRow>
-              <GridCol width={4}>{this.renderUploadBox()}</GridCol>
-            </GridRow>
+            <Grid.Row>
+              <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
+            </Grid.Row>
           </Grid>
         )}
 

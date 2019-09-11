@@ -20,7 +20,7 @@ import React from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {View, Grid} from '@instructure/ui-layout'
 
 import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
@@ -144,16 +144,16 @@ export default class StudentColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="start">
+            <Grid.Row>
+              <Grid.Col textAlign="start">
                 <View className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Student Name')}
                   </Text>
                 </View>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
                     contentRef={this.bindOptionsMenuContent}
@@ -315,8 +315,8 @@ export default class StudentColumnHeader extends ColumnHeader {
                     </MenuItemGroup>
                   </Menu>
                 </div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

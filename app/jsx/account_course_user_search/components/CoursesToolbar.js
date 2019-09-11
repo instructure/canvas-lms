@@ -22,7 +22,7 @@ import {isEqual, groupBy, map, compact} from 'lodash'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox, TextInput} from '@instructure/ui-forms'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import CanvasSelect from '../../shared/components/CanvasSelect'
 import I18n from 'i18n!account_course_user_search'
@@ -99,11 +99,11 @@ export default function CoursesToolbar({
     <div>
       <form onSubmit={preventDefault(onApplyFilters)} disabled={isLoading}>
         <Grid vAlign="top" startAt="medium">
-          <GridRow>
-            <GridCol>
+          <Grid.Row>
+            <Grid.Col>
               <Grid colSpacing="small" rowSpacing="small" startAt="large">
-                <GridRow>
-                  <GridCol width={2}>
+                <Grid.Row>
+                  <Grid.Col width={2}>
                     <CanvasSelect
                       id="termFilter"
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
@@ -112,8 +112,8 @@ export default function CoursesToolbar({
                     >
                       {termOptions}
                     </CanvasSelect>
-                  </GridCol>
-                  <GridCol width={2}>
+                  </Grid.Col>
+                  <Grid.Col width={2}>
                     <CanvasSelect
                       id="searchByFilter"
                       label={<ScreenReaderContent>{I18n.t('Search by')}</ScreenReaderContent>}
@@ -133,8 +133,8 @@ export default function CoursesToolbar({
                         </CanvasSelect.Option>
                       </CanvasSelect.Group>
                     </CanvasSelect>
-                  </GridCol>
-                  <GridCol width={8}>
+                  </Grid.Col>
+                  <Grid.Col width={8}>
                     <TextInput
                       type="search"
                       label={<ScreenReaderContent>{searchLabel}</ScreenReaderContent>}
@@ -152,10 +152,10 @@ export default function CoursesToolbar({
                       onFocus={() => toggleSRMessage(false)}
                       messages={errors.search_term && [{type: 'error', text: errors.search_term}]}
                     />
-                  </GridCol>
-                </GridRow>
-                <GridRow>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Col width="auto">
                     <Checkbox
                       checked={isEqual(draftFilters.enrollment_type, ['student'])}
                       onChange={e =>
@@ -163,28 +163,28 @@ export default function CoursesToolbar({
                       }
                       label={I18n.t('Hide courses without students')}
                     />
-                  </GridCol>
-                  <GridCol>
+                  </Grid.Col>
+                  <Grid.Col>
                     <Checkbox
                       checked={draftFilters.blueprint}
                       onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
                       label={I18n.t('Show only blueprint courses')}
                     />
-                  </GridCol>
-                </GridRow>
+                  </Grid.Col>
+                </Grid.Row>
               </Grid>
-            </GridCol>
+            </Grid.Col>
             {can_create_courses && (
-              <GridCol width="auto">
+              <Grid.Col width="auto">
                 <NewCourseModal terms={terms}>
                   <Button aria-label={I18n.t('Create new course')}>
                     <IconPlusLine />
                     {I18n.t('Course')}
                   </Button>
                 </NewCourseModal>
-              </GridCol>
+              </Grid.Col>
             )}
-          </GridRow>
+          </Grid.Row>
         </Grid>
       </form>
     </div>

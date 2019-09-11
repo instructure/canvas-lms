@@ -30,7 +30,7 @@ import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
 import {Badge, Heading, Pill, Text} from '@instructure/ui-elements'
-import {View, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {View, Grid} from '@instructure/ui-layout'
 import {
   IconAssignmentLine,
   IconBookmarkLine,
@@ -759,26 +759,26 @@ export class DiscussionRow extends Component {
             <span className="ic-drag-handle-container">{this.renderIcon()}</span>
             <span className="ic-discussion-content-container">
               <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
-                <GridRow vAlign="middle">
-                  <GridCol vAlign="middle" textAlign="start">
+                <Grid.Row vAlign="middle">
+                  <Grid.Col vAlign="middle" textAlign="start">
                     {this.renderTitle()}
                     {this.renderSectionsTooltip()}
-                  </GridCol>
-                  <GridCol vAlign="top" textAlign="end">
+                  </Grid.Col>
+                  <Grid.Col vAlign="top" textAlign="end">
                     {this.renderUpperRightBadges()}
-                  </GridCol>
-                </GridRow>
-                <GridRow>
-                  <GridCol textAlign="start">
+                  </Grid.Col>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Col textAlign="start">
                     <span aria-hidden="true">{this.renderLastReplyAt()}</span>
-                  </GridCol>
-                  <GridCol textAlign="center">
+                  </Grid.Col>
+                  <Grid.Col textAlign="center">
                     <span aria-hidden="true">{this.renderAvailabilityDate()}</span>
-                  </GridCol>
-                  <GridCol textAlign="end">
+                  </Grid.Col>
+                  <Grid.Col textAlign="end">
                     <span aria-hidden="true">{this.renderDueDate()}</span>
-                  </GridCol>
-                </GridRow>
+                  </Grid.Col>
+                </Grid.Row>
               </Grid>
             </span>
           </div>
@@ -804,11 +804,11 @@ export class DiscussionRow extends Component {
     return (
       <div>
         <Grid startAt="medium" vAlign="middle" colSpacing="none">
-          <GridRow>
+          <Grid.Row>
             {/* discussion topics is different for badges so we use our own read indicator instead of passing to isRead */}
-            <GridCol width="auto">{this.renderBlueUnreadBadge()}</GridCol>
-            <GridCol>{this.renderDiscussion()}</GridCol>
-          </GridRow>
+            <Grid.Col width="auto">{this.renderBlueUnreadBadge()}</Grid.Col>
+            <Grid.Col>{this.renderDiscussion()}</Grid.Col>
+          </Grid.Row>
         </Grid>
       </div>
     )

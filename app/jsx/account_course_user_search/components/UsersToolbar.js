@@ -21,7 +21,7 @@ import {string, func, shape, arrayOf} from 'prop-types'
 import {IconGroupLine, IconMoreLine, IconPlusLine, IconStudentViewLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {GridCol} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {Menu, MenuItem} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-forms'
@@ -39,7 +39,7 @@ export default function UsersToolbar(props) {
   return (
     <form onSubmit={preventDefault(props.onApplyFilters)}>
       <FormFieldGroup layout="columns" description="">
-        <GridCol width="auto">
+        <Grid.Col width="auto">
           <CanvasSelect
             id="userType"
             label={<ScreenReaderContent>{I18n.t('Filter by user type')}</ScreenReaderContent>}
@@ -55,7 +55,7 @@ export default function UsersToolbar(props) {
               </CanvasSelect.Option>
             ))}
           </CanvasSelect>
-        </GridCol>
+        </Grid.Col>
 
         <TextInput
           type="search"
@@ -75,7 +75,7 @@ export default function UsersToolbar(props) {
           messages={!!props.errors.search_term && [{type: 'error', text: props.errors.search_term}]}
         />
 
-        <GridCol width="auto">
+        <Grid.Col width="auto">
           {window.ENV.PERMISSIONS.can_create_users && (
             <CreateOrUpdateUserModal
               createOrUpdate="create"
@@ -89,7 +89,7 @@ export default function UsersToolbar(props) {
             </CreateOrUpdateUserModal>
           )}{' '}
           {renderKabobMenu(props.accountId)}
-        </GridCol>
+        </Grid.Col>
       </FormFieldGroup>
     </form>
   )

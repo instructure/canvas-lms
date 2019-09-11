@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import {Breadcrumb, BreadcrumbLink} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextArea, TextInput, Checkbox} from '@instructure/ui-forms'
@@ -235,15 +235,15 @@ import TimeBlockSelector from './TimeBlockSelector'
           </ScreenReaderContent>
           <div className="EditPage__Header">
             <Grid vAlign="middle">
-              <GridRow hAlign="end">
-                <GridCol width="auto">
+              <Grid.Row hAlign="end">
+                <Grid.Col width="auto">
                   <Button onClick={this.deleteGroup} disabled={this.state.isDeleting}>{I18n.t('Delete Group')}</Button>
                   &nbsp;
                   <Button href="/calendar">{I18n.t('Cancel')}</Button>
                   &nbsp;
                   <Button onClick={this.handleSave} variant="primary">{I18n.t('Save')}</Button>
-                </GridCol>
-              </GridRow>
+                </Grid.Col>
+              </Grid.Row>
             </Grid>
           </div>
           <FormFieldGroup

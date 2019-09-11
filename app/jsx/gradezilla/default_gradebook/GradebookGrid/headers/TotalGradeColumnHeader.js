@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {View, Grid} from '@instructure/ui-layout'
 
 import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
@@ -102,20 +102,20 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="center" width="auto">
+            <Grid.Row>
+              <Grid.Col textAlign="center" width="auto">
                 <div className="Gradebook__ColumnHeaderIndicators" />
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center">
+              <Grid.Col textAlign="center">
                 <View className="Gradebook__ColumnHeaderDetail">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Total')}
                   </Text>
                 </View>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
                     contentRef={this.bindOptionsMenuContent}
@@ -184,8 +184,8 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                     )}
                   </Menu>
                 </div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>
