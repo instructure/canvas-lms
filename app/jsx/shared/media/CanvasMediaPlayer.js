@@ -17,33 +17,49 @@
  */
 import {string} from 'prop-types'
 import LoadingIndicator from '../../assignments_2/shared/LoadingIndicator'
-import React from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {VideoPlayer} from '@instructure/ui-media-player'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
-export default class CanvasMediaPlayer extends React.Component {
-  static propTypes = {
-    media_id: string.isRequired,
-    media_sources: VideoPlayer.propTypes.sources
-  }
+export default function CanvasMediaPlayer(props) {
+  const [media_sources, setMedia_sources] = useState(props.media_sources)
+  const [retryTimerId, setRetryTimerId] = useState(0)
+  const containerRef = useRef(null)
+  const videoPlayerRef = useRef(null)
+  const myIframeRef = useRef(null)
 
-  static defaultProps = {
-    media_sources: []
-  }
-
-  state = {media_sources: []}
-
-  componentDidMount() {
-    if (!this.props.media_sources.length) this.fetchSources()
-
-    const iframeEl = [...window.parent.document.getElementsByTagName('iframe')].find(
+  useEffect(() => {
+    myIframeRef.current = [...window.parent.document.getElementsByTagName('iframe')].find(
       el => el.contentWindow === window
     )
-    if (iframeEl) iframeEl.frameBorder = 'none'
-  }
+    }, [])
 
-  async fetchSources() {
-    const url = `/media_objects/${this.props.media_id}/info`
+  useEffect(() => {
+    if (!props.media_sources.length) {
+      fetchSources()
+    }
+
+    return () => {
+      clearTimeout(retryTimerId)
+    }
+  }, [retryTimerId])
+
+  useEffect(() => {
+    if(videoPlayerRef.current) {
+      const player = containerRef.current.querySelector('video')
+      if(player) {
+        if (player.loadedmetadata || player.readyState >= 1) {
+          sizeVideoPlayer(player)
+        } else {
+          player.addEventListener('loadedmetadata', () => sizeVideoPlayer(player))
+        }
+      }
+    }
+  }, [media_sources.length])
+
+
+  async function fetchSources() {
+    const url = `/media_objects/${props.media_id}/info`
     let resp
     try {
       resp = await asJson(fetch(url, defaultFetchOptions))
@@ -51,20 +67,60 @@ export default class CanvasMediaPlayer extends React.Component {
       // if there is a network error, just ignore and retry
     }
     if (resp && resp.media_sources && resp.media_sources.length) {
-      this.setState({media_sources: resp.media_sources})
+      setMedia_sources(resp.media_sources)
     } else {
       // if they're not present yet, try again in a little bit
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await this.fetchSources()
+      await new Promise(resolve => {
+        const tid = setTimeout(resolve, 1000)
+        setRetryTimerId(tid)
+      })
     }
   }
 
-  render() {
-    const sources = this.props.media_sources.length ? this.props.media_sources : this.state.media_sources
-    return (
-      <div>
-        {sources.length ? <VideoPlayer sources={sources} /> : <LoadingIndicator />}
-      </div>
-    )
+  function sizeVideoPlayer(player) {
+    const videoPlayerContainer = myIframeRef.current
+    if(videoPlayerContainer) {
+      const width = player.videoWidth
+      const height = player.videoHeight
+      // key off width, because we know it's initially layed out landscape
+      // just wide enough for the controls to fit
+      const minSideLength = videoPlayerContainer.clientWidth
+      const w = Math.min(width, minSideLength)
+      videoPlayerContainer.style.width = `${w}px`
+      videoPlayerContainer.style.height = `${Math.round(w/width * height)}px`
+    }
   }
+
+  return (
+    <div ref={containerRef}>
+      {media_sources.length ?
+        <VideoPlayer
+          sources={media_sources}
+          ref={videoPlayerRef}
+          controls={(VPC) => {
+            return (
+              <VPC>
+                <VPC.PlayPauseButton />
+                <VPC.Timebar />
+                <VPC.Volume />
+                <VPC.PlaybackSpeed />
+                <VPC.TrackChooser />
+                <VPC.SourceChooser />
+                {document.fullscreenEnabled && <VPC.FullScreenButton />}
+              </VPC>
+            )
+          }}
+        /> :
+        <LoadingIndicator />}
+    </div>
+  )
+}
+
+CanvasMediaPlayer.propTypes = {
+  media_id: string.isRequired,
+  media_sources: VideoPlayer.propTypes.sources
+}
+
+CanvasMediaPlayer.defaultProps = {
+  media_sources: []
 }

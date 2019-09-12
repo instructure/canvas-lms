@@ -51,6 +51,7 @@
     "instrument": false
   },
   "dependencies": {
+    "@instructure/canvas-media": ">=1.0.0",
     "@instructure/canvas-theme": "6",
     "@instructure/k5uploader": ">=1",
     "@instructure/media-capture": "^5.54.0",
@@ -81,6 +82,7 @@
     "@tinymce/tinymce-react": "^3.0.1",
     "aphrodite": "^2",
     "bloody-offset": "0.0.0",
+    "classnames": "^2.2.5",
     "format-message": "^6",
     "format-message-generate-id": "^6",
     "isomorphic-fetch": "2.2.1",

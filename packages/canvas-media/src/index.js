@@ -50,6 +50,8 @@ export default class UploadMedia extends React.Component {
     liveRegion: func,
     contextId: string,
     contextType: string,
+    onStartUpload: func,
+    onComplete: func,
     onDismiss: func,
     open: bool,
     tabs: shape({
@@ -75,6 +77,7 @@ export default class UploadMedia extends React.Component {
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
       case PANELS.COMPUTER: {
+        this.props.onStartUpload && this.props.onStartUpload(this.state.theFile)
         saveMediaRecording(
           this.state.theFile,
           this.props.contextId,
@@ -100,9 +103,11 @@ export default class UploadMedia extends React.Component {
         if (this.subtitles.length > 0) {
           await saveClosedCaptions(data.media_object.media_id, this.subtitles)
         }
-        this.props.onDismiss(null, data)
-      } catch (_) {
+        this.props.onDismiss && this.props.onDismiss()
+        this.props.onComplete && this.props.onComplete(null, data)
+      } catch (ex) {
         // Handle error
+        console.error(ex) // eslint-disable-line no-console
       }
     }
   }

@@ -99,7 +99,10 @@ describe('saveMediaRecording', () => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
         await new Promise(setTimeout)
         expect(doneFunction2).toHaveBeenCalledTimes(1)
-        expect(doneFunction2.mock.calls[0][1].data).toBe('media object data')
+        expect(doneFunction2.mock.calls[0][1]).toEqual({
+          mediaObject: {data: 'media object data'},
+          uploadedFile: {file: 'thing'}
+        })
         expect(doneFunction2.mock.calls[0][0]).toBe(null)
       }
     )

@@ -485,6 +485,7 @@ CanvasRails::Application.routes.draw do
   get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
   get 'media_objects/:media_object_id/info' => 'media_objects#show', as: :media_object_info
   get 'media_objects_iframe/:media_object_id' => 'media_objects#iframe_media_player', as: :media_object_iframe
+  get 'media_objects_iframe' => 'media_objects#iframe_media_player', as: :media_object_iframe_href
   get 'media_objects/:media_object_id/media_tracks/:id' => 'media_tracks#show', as: :show_media_tracks
   post 'media_objects/:media_object_id/media_tracks' => 'media_tracks#create', as: :create_media_tracks
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks

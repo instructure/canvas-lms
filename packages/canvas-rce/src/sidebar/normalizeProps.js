@@ -23,6 +23,7 @@ export default function(props) {
     // default handlers, can be overridden by props
     onLinkClick: Bridge.insertLink,
     onImageEmbed: Bridge.embedImage,
+    onMediaEmbed: Bridge.embedMedia,
 
     // other props, including overrides
     ...props

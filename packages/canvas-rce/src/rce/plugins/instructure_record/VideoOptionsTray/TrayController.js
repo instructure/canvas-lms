@@ -23,7 +23,7 @@ import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
-export const VIDEO_SIZE_OPTIONS = { height: '432px', width: '768px' }
+export const VIDEO_SIZE_OPTIONS = { height: '225px', width: '400px' }
 
 export default class TrayController {
   constructor() {

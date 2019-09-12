@@ -67,7 +67,8 @@ export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecordi
   switch (selectedPanel) {
     case PANELS.COMPUTER: {
       const {theFile} = uploadData
-      saveMediaRecording(theFile, editor, onDismiss)
+      saveMediaRecording('media', theFile)
+      onDismiss()
       break;
     }
     case PANELS.EMBED: {

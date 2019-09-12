@@ -86,7 +86,7 @@ class MediaObjectsController < ApplicationController
   def iframe_media_player
     js_env media_sources: media_sources_json(@media_object)
     js_bundle :media_player_iframe_content
-    render html: '', layout: 'layouts/bare'
+    render html: "<div><div style='margin:1rem auto;'>#{I18n.t('Loading...')}</div></div>".html_safe, layout: 'layouts/bare'
   end
 
   private

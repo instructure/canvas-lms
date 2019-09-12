@@ -171,4 +171,22 @@ export default class Bridge {
       this.insertImage(image);
     }
   };
+
+  embedMedia = media => {
+    if (/video/.test(media.type || media.content_type)) {
+      this.insertVideo(media)
+    } else { // TODO: put audio in an audio player
+      this.insertLink(media)
+    }
+
+  }
+
+  insertVideo = video => {
+    if (this.focusedEditor) {
+      this.focusedEditor.insertVideo(video)
+    }
+    if (this.controller) {
+      this.controller.hideTray()
+    }
+  }
 }

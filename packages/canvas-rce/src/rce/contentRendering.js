@@ -20,6 +20,8 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {cleanUrl} from './contentInsertionUtils';
 import formatMessage from "../format-message";
+import {VIDEO_SIZE_OPTIONS} from './plugins/instructure_record/VideoOptionsTray/TrayController'
+
 
 export function renderLink(data, contents) {
   const linkAttrs = {...data}
@@ -95,4 +97,30 @@ export function constructJSXImageElement(image, opts = {}) {
 
 export function renderImage(image, opts) {
   return renderToStaticMarkup(constructJSXImageElement(image, opts));
+}
+
+export function videoIframeSrcFromFile(fileProps) {
+  return fileProps.embedded_iframe_url || `//${window.location.host}/media_objects_iframe?href=${encodeURIComponent(fileProps.href)}`
+}
+
+function constructJSXVideoEmbedding(video) {
+  const src = videoIframeSrcFromFile(video)
+  return (
+    <iframe
+      allow="fullscreen"
+      allowFullScreen="true"
+      data-media-id={`${video.media_id || video.id}`}
+      src={src}
+      style={{
+        width: VIDEO_SIZE_OPTIONS.width,
+        height: VIDEO_SIZE_OPTIONS.height,
+        display: 'inline-block'
+      }}
+      title={video.name}
+    />
+  )
+}
+
+export function renderVideo(video) {
+  return renderToStaticMarkup(constructJSXVideoEmbedding(video))
 }

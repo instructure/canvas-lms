@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useState} from 'react'
+import React, {Suspense, useEffect, useRef, useState} from 'react'
 import {arrayOf, bool, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 
 import {Billboard} from '@instructure/ui-billboard'
@@ -52,10 +52,32 @@ export default function ComputerPanel({
   } = uploadMediaTranslations.UploadMediaStrings
   const [messages, setMessages] = useState([])
   const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
+
+  // right-size the video player
+  const previewPanelRef = useRef(null)
+  const [videoPlayerWidth, setVideoPlayerWidth] = useState(300)
+  useEffect(() => {
+    if (previewPanelRef.current && theFile && isVideo(theFile.type)) {
+      const player = previewPanelRef.current.querySelector('video')
+      if (player) {
+        const maxWidth = 0.75 * previewPanelRef.current.clientWidth
+        if (player.loadedmetadata || player.readyState >= 1) {
+          const width = sizeVideoPlayer(player, maxWidth)
+          setVideoPlayerWidth(width)
+        } else {
+          player.addEventListener('loadedmetadata', () => {
+            const width = sizeVideoPlayer(player, maxWidth)
+            setVideoPlayerWidth(width)
+          })
+        }
+      }
+    }
+  }, [theFile])
+
   if (hasUploadedFile) {
     const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
     return (
-      <>
+      <div style={{position: 'relative'}} ref={previewPanelRef}>
         <Flex direction="row-reverse" margin="none none medium">
           <Flex.Item>
             <Button
@@ -76,7 +98,7 @@ export default function ComputerPanel({
             </PresentationContent>
           </Flex.Item>
         </Flex>
-        <View as="div" height="100%" width="100%" textAlign="center">
+        <View as="div" width={videoPlayerWidth} textAlign="center" margin="0 auto">
           <VideoPlayer sources={sources} />
         </View>
         <View display="block" padding="medium medium medium 0">
@@ -97,7 +119,7 @@ export default function ComputerPanel({
             />
           </Suspense>
         )}
-      </>
+      </div>
     )
   }
 
@@ -131,6 +153,22 @@ export default function ComputerPanel({
       />
     </div>
   )
+}
+
+function isVideo(type) {
+  return /^video/.test(type)
+}
+
+// set the width of the video player such that the longest
+// edge of the player is maxLen
+export function sizeVideoPlayer(player, maxLen) {
+  const width = player.videoWidth
+  const height = player.videoHeight
+  if (height > width) {
+    return `${(maxLen / height) * width}px`
+  } else {
+    return `${maxLen}px`
+  }
 }
 
 ComputerPanel.propTypes = {

@@ -35,12 +35,13 @@ import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 import StatusBar from './StatusBar';
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
-import {isImage} from './plugins/shared/fileTypeUtils'
+import {isImage, isVideo} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
+import {VIDEO_SIZE_OPTIONS} from './plugins/instructure_record/VideoOptionsTray/TrayController'
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
@@ -295,6 +296,9 @@ class RCEWrapper extends React.Component {
       }
       width = `${width}px`
       height = `${height}px`
+    } else if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
+      width = VIDEO_SIZE_OPTIONS.width
+      height = VIDEO_SIZE_OPTIONS.height
     } else {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
@@ -308,6 +312,12 @@ class RCEWrapper extends React.Component {
     />`;
 
     this.insertCode(markup);
+  }
+
+  insertVideo(video) {
+    const editor = this.mceInstance();
+    const element = contentInsertion.insertVideo(editor, video);
+    this.contentInserted(element);
   }
 
   removePlaceholders(name) {
