@@ -16,24 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createDiscussionsIndex from 'jsx/discussions'
-import ready from '@instructure/ready'
+import {handleActions} from 'redux-actions'
+import {actionTypes} from '../actions'
 
-ready(() => {
-const [contextType, contextId] = ENV.context_asset_string.split('_')
+function setCopyTo(state, action) {
+  const newState = {...state}
+  if (typeof action.payload.open === 'boolean') {
+    newState.open = action.payload.open
+  }
+  if (typeof action.payload.selection === 'object') {
+    newState.selection = action.payload.selection
+  }
+  return newState
+}
 
-const root = document.querySelector('#content')
-const app = createDiscussionsIndex(root, {
-  permissions: ENV.permissions,
-  roles: ENV.current_user_roles,
-  masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
-  discussionTopicMenuTools: ENV.discussion_topic_menu_tools,
-  contextCodes: [ENV.context_asset_string],
-  currentUserId: ENV.current_user.id,
-  DIRECT_SHARE_ENABLED: ENV.DIRECT_SHARE_ENABLED,
-  COURSE_ID: ENV.COURSE_ID,
-  contextType,
-  contextId
-})
-app.render()
-})
+function setCopyToOpen(state, action) {
+  return {...state, open: action.payload}
+}
+
+const reducer = handleActions(
+  {
+    [actionTypes.SET_COPY_TO_OPEN]: setCopyToOpen,
+    [actionTypes.SET_COPY_TO]: setCopyTo
+  },
+  {open: false, selection: {}}
+)
+
+export default reducer

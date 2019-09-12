@@ -36,9 +36,13 @@ export default async function doFetchApi({
   const fetchHeaders = {
     Accept: 'application/json+canvas-string-ids, application/json',
     'X-CSRF-Token': $.cookie('_csrf_token'),
-    ...headers
   }
-  if (body && typeof body !== 'string') body = JSON.stringify(body)
+  if (body && typeof body !== 'string') {
+    body = JSON.stringify(body)
+    fetchHeaders['Content-Type'] = 'application/json'
+  }
+  Object.assign(fetchHeaders, headers)
+
   const url = constructRelativeUrl({path, params})
   const response = await fetch(url, {headers: fetchHeaders, body, method, ...fetchOpts})
   if (!response.ok) {

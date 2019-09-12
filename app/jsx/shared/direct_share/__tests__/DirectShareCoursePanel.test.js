@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from 'jsx/shared/effects/useManagedCourseSearchApi'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 
@@ -43,6 +44,10 @@ describe('DirectShareCoursePanel', () => {
     })
   })
 
+  afterEach(() => {
+    fetchMock.restore()
+  })
+
   it('disables the copy button initially', () => {
     const {getByText} = render(<DirectShareCoursePanel />)
     expect(
@@ -59,11 +64,9 @@ describe('DirectShareCoursePanel', () => {
     fireEvent.click(getByText('abc'))
     const copyButton = getByText(/copy/i).closest('button')
     expect(copyButton.getAttribute('disabled')).toBe(null)
-    fireEvent.click(copyButton)
-    expect(handleStart).toHaveBeenCalledWith({id: 'abc', name: 'abc'})
   })
 
-  it('disables the copy button again when a search is initiated', () => {
+  it('disables the copy button again when a course search is initiated', () => {
     const {getByText, getByLabelText} = render(<DirectShareCoursePanel />)
     const input = getByLabelText(/select a course/i)
     fireEvent.click(input)
@@ -81,5 +84,57 @@ describe('DirectShareCoursePanel', () => {
     const {getByText} = render(<DirectShareCoursePanel onCancel={handleCancel} />)
     fireEvent.click(getByText(/cancel/i))
     expect(handleCancel).toHaveBeenCalled()
+  })
+
+  it('starts a copy operation and reports status', async () => {
+    fetchMock.postOnce(
+      'path:/api/v1/courses/abc/content_migrations',
+      {id: '8', workflow_state: 'running'}
+    )
+    const {getByText, getAllByText, getByLabelText} = render(
+      <DirectShareCoursePanel
+        sourceCourseId="42"
+        contentSelection={{discussion_topics: ['1123']}}
+      />)
+    const input = getByLabelText(/select a course/i)
+    fireEvent.click(input)
+    fireEvent.click(getByText('abc'))
+    const copyButton = getByText(/copy/i).closest('button')
+    fireEvent.click(copyButton)
+    expect(copyButton.getAttribute('disabled')).toBe('')
+    const [, fetchOptions] = fetchMock.lastCall()
+    expect(fetchOptions.method).toBe('POST')
+    expect(JSON.parse(fetchOptions.body)).toMatchObject({
+      migration_type: 'course_copy_importer',
+      select: {discussion_topics: ['1123']},
+      settings: {source_course_id: '42'}
+    })
+    expect(getAllByText(/start/i)).toHaveLength(2)
+    await act(() => fetchMock.flush(true))
+    expect(getAllByText(/success/)).toHaveLength(2)
+    expect(copyButton.getAttribute('disabled')).toBe('')
+  })
+
+  describe('errors', () => {
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation()
+    })
+
+    afterEach(() => {
+      console.error.mockRestore() // eslint-disable-line no-console
+    })
+
+    it('reports an error if the fetch fails', async () => {
+      fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
+      const {getByText, getAllByText, getByLabelText} = render(<DirectShareCoursePanel sourceCourseId="42" />)
+      const input = getByLabelText(/select a course/i)
+      fireEvent.click(input)
+      fireEvent.click(getByText('abc'))
+      const copyButton = getByText(/copy/i).closest('button')
+      fireEvent.click(copyButton)
+      await act(() => fetchMock.flush(true))
+      expect(getAllByText(/problem/i)).toHaveLength(2)
+      expect(copyButton.getAttribute('disabled')).toBe('')
+    })
   })
 })

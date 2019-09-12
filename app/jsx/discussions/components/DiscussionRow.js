@@ -112,7 +112,7 @@ export class DiscussionRow extends Component {
     connectDropTarget: func,
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
-    setCopyToOpen: func.isRequired,
+    setCopyTo: func.isRequired,
     setSendToOpen: func.isRequired,
     discussion: discussionShape.isRequired,
     discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
@@ -214,7 +214,10 @@ export class DiscussionRow extends Component {
         )
         break
       case 'copyTo':
-        this.props.setCopyToOpen(true)
+        this.props.setCopyTo({
+          open: true,
+          selection: {discussion_topics: [this.props.discussion.id]}
+        })
         break
       case 'sendTo':
         this.props.setSendToOpen(true)
@@ -821,7 +824,7 @@ const mapDispatch = dispatch => {
     'duplicateDiscussion',
     'toggleSubscriptionState',
     'updateDiscussion',
-    'setCopyToOpen',
+    'setCopyTo',
     'setSendToOpen'
   ]
   return bindActionCreators(select(actions, actionKeys), dispatch)

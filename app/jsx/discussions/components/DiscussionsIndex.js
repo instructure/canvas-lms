@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import {func, bool, string} from 'prop-types'
+import {func, bool, string, shape, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
@@ -67,8 +67,10 @@ export default class DiscussionsIndex extends Component {
     pinnedDiscussions: discussionList.isRequired,
     unpinnedDiscussions: discussionList.isRequired,
     copyToOpen: bool.isRequired,
+    copyToSelection: shape({discussion_topics: arrayOf(string)}),
     sendToOpen: bool.isRequired,
-    DIRECT_SHARE_ENABLED: bool.isRequired
+    DIRECT_SHARE_ENABLED: bool.isRequired,
+    COURSE_ID: string
   }
 
   state = {
@@ -246,6 +248,8 @@ export default class DiscussionsIndex extends Component {
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
           <DirectShareCourseTray
+            sourceCourseId={this.props.COURSE_ID}
+            contentSelection={this.props.copyToSelection}
             open={this.props.copyToOpen}
             onDismiss={() => this.props.setCopyToOpen(false)}
           />
@@ -293,9 +297,11 @@ const connectState = (state, ownProps) => {
     permissions: state.permissions,
     pinnedDiscussions: pinnedDiscussionIds.map(id => allDiscussions[id]),
     unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id]),
-    copyToOpen: state.copyToOpen,
+    copyToOpen: state.copyTo.open,
+    copyToSelection: state.copyTo.selection,
     sendToOpen: state.sendToOpen,
-    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
+    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
+    COURSE_ID: state.COURSE_ID
   }
   return {...ownProps, ...fromPagination, ...fromState}
 }
