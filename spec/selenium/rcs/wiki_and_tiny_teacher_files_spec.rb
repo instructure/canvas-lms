@@ -78,6 +78,13 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
           first_file.send_keys :arrow_down
           check_element_has_focus(second_file)
         end
+
+        it "goes to the previous item when pressing up" do
+          first_file = fj('#right-side button:contains("email.png")')
+          second_file = fj('#right-side button:contains("graded.png")')
+          second_file.send_keys :arrow_up
+          check_element_has_focus(first_file)
+        end
       end
     end
   end
