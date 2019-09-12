@@ -26,6 +26,34 @@ import CourseActivitySummaryStore from './CourseActivitySummaryStore'
 import DashboardCardMenu from './DashboardCardMenu'
 import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
 import {showFlashError} from '../shared/FlashAlert'
+import instFSOptimizedImageUrl from '../shared/helpers/instFSOptimizedImageUrl'
+
+export function DashboardCardHeaderHero({image, backgroundColor, hideColorOverlays, onClick}) {
+  if (image) {
+    return (
+      <div
+        className="ic-DashboardCard__header_image"
+        style={{backgroundImage: `url(${instFSOptimizedImageUrl(image, {x: 262, y: 146})})`}}
+      >
+        <div
+          className="ic-DashboardCard__header_hero"
+          style={{backgroundColor, opacity: hideColorOverlays ? 0 : 0.6}}
+          onClick={onClick}
+          aria-hidden="true"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="ic-DashboardCard__header_hero"
+      style={{backgroundColor}}
+      onClick={onClick}
+      aria-hidden="true"
+    />
+  )
+}
 
 export default class DashboardCard extends Component {
   // ===============
@@ -240,32 +268,6 @@ export default class DashboardCard extends Component {
     })
   }
 
-  renderHeaderHero() {
-    const {image, backgroundColor, hideColorOverlays} = this.props
-
-    if (image) {
-      return (
-        <div className="ic-DashboardCard__header_image" style={{backgroundImage: `url(${image})`}}>
-          <div
-            className="ic-DashboardCard__header_hero"
-            style={{backgroundColor, opacity: hideColorOverlays ? 0 : 0.6}}
-            onClick={this.headerClick}
-            aria-hidden="true"
-          />
-        </div>
-      )
-    }
-
-    return (
-      <div
-        className="ic-DashboardCard__header_hero"
-        style={{backgroundColor}}
-        onClick={this.headerClick}
-        aria-hidden="true"
-      />
-    )
-  }
-
   renderHeaderButton() {
     const {backgroundColor, hideColorOverlays} = this.props
 
@@ -331,7 +333,12 @@ export default class DashboardCard extends Component {
                   course: this.state.nicknameInfo.nickname
                 })}
           </span>
-          {this.renderHeaderHero()}
+          <DashboardCardHeaderHero
+            image={this.props.image}
+            backgroundColor={this.props.backgroundColor}
+            hideColorOverlays={this.props.hideColorOverlays}
+            onClick={this.headerClick}
+          />
           <a href={this.props.href} className="ic-DashboardCard__link">
             <div className="ic-DashboardCard__header_content">
               <h2
