@@ -1780,7 +1780,8 @@ EG = {
     isMostRecent
   ) {
     let $turnitinSimilarityScore = null
-    const showLegacyResubmit = isMostRecent && !submission.has_plagiarism_tool
+    const showLegacyResubmit =
+      isMostRecent && (jsonData.vericite_enabled || jsonData.turnitin_enabled)
 
     // build up new values based on this asset
     if (
