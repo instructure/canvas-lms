@@ -841,7 +841,7 @@ class SubmissionsApiController < ApplicationController
         comment = {
           comment: comment[:text_comment],
           author: @current_user,
-          hidden: @assignment.muted? && admin_in_context
+          hidden: @submission.hide_grade_from_student? && admin_in_context
         }.merge(
           comment.permit(:media_comment_id, :media_comment_type, :group_comment).to_unsafe_h
         ).with_indifferent_access
