@@ -760,7 +760,8 @@ class AssignmentsController < ApplicationController
     # the tool should be enabled, this URL was chosen because we sometimes
     # want the tool enabled in beta or test. NOTE: This is a stop-gap until
     # Quizzes.Next has a beta env.
-    @context.feature_enabled?(:quizzes_next) &&
+    !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
+      @context.feature_enabled?(:quizzes_next) &&
       quiz_lti_tool.present? &&
       quiz_lti_tool.url != 'http://void.url.inseng.net'
   end
