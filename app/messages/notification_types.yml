@@ -132,6 +132,8 @@
       delay_for: <%= 60*60 %>
     - name: Submission Grade Changed
       delay_for: <%= 5*60 %>
+    - name: Submission Posted
+      delay_for: 0
     - name: Quiz Regrade Finished
       delay_for: 0
 

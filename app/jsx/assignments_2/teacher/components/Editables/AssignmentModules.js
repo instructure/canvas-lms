@@ -24,7 +24,7 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import {Query, withApollo} from 'react-apollo'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 
 import SelectableText from './SelectableText'
 import {ModuleShape, COURSE_MODULES_QUERY, COURSE_MODULES_QUERY_LOCAL} from '../../assignmentData'

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import { mount } from 'enzyme'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import {RetrievingContent} from '../DeepLinkingResponse'
 
 let wrapper = 'empty wrapper'

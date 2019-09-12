@@ -4,7 +4,7 @@ docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all
 docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all
 
 echo "running docker images"
-docker ps
+docker ps -a
 echo "images locally"
 docker images
 echo "volumes left over"

@@ -20,10 +20,10 @@ import I18n from 'i18n!move_item_tray'
 import axios from 'axios'
 import React from 'react'
 import { string, func, arrayOf } from 'prop-types'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import View from '@instructure/ui-layout/lib/components/View'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import {Tray} from '@instructure/ui-overlays'
+import {Heading} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
+import {CloseButton} from '@instructure/ui-buttons'
 
 import { showFlashError } from '../shared/FlashAlert'
 import { itemShape, moveOptionsType } from './propTypes'
@@ -90,7 +90,6 @@ export default class MoveItemTray extends React.Component {
         onDismiss={this.close}
         onExited={this.onExited}
         placement="end"
-        closeButtonVariant="icon"
         shouldContainFocus
       >
         <CloseButton placement="start" onClick={this.close}>

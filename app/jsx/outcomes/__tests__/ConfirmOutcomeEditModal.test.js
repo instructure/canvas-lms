@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import { shallow } from 'enzyme'
 import { merge } from 'lodash'
 import ConfirmOutcomeEditModal, { showConfirmOutcomeEdit } from '../ConfirmOutcomeEditModal'
-import { ModalBody, ModalFooter } from '../../shared/components/InstuiModal'
+import Modal from '../../shared/components/InstuiModal'
 
 const defaultProps = (props = {}) => (
   merge({
@@ -44,23 +44,23 @@ it('renders the ConfirmOutcomeEditModal component', () => {
 
 it('renders the rubrics text if hasUpdateableRubrics', () => {
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({ hasUpdateableRubrics: true })} />)
-  expect(modal.find(ModalBody).render().text()).toMatch(/update all rubrics/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/update all rubrics/)
 })
 
 it('renders the masteryPoints text if mastery points modified', () => {
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({ modifiedFields: { masteryPoints: true } })} />)
-  expect(modal.find(ModalBody).render().text()).toMatch(/scoring criteria/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
 })
 
 it('renders the scoring method text if scoring method modified', () => {
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({ modifiedFields: { scoringMethod: true } })} />)
-  expect(modal.find(ModalBody).render().text()).toMatch(/scoring criteria/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
 })
 
 it('does not call onConfirm when canceled', () => {
   const onConfirm = jest.fn()
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({ hasUpdateableRubrics: true, onConfirm })} />)
-  modal.find(ModalFooter).find('#cancel-outcome-edit-modal').simulate('click')
+  modal.find(Modal.Footer).find('#cancel-outcome-edit-modal').simulate('click')
   expect(modal.state('show')).toBe(false)
   expect(onConfirm).not.toBeCalled()
 })
@@ -70,7 +70,7 @@ it('calls onConfirm when saved', () => {
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({ hasUpdateableRubrics: true, onConfirm })} />)
 
   jest.useFakeTimers()
-  modal.find(ModalFooter).find('#confirm-outcome-edit-modal').simulate('click')
+  modal.find(Modal.Footer).find('#confirm-outcome-edit-modal').simulate('click')
   jest.runAllTimers()
 
   expect(modal.state('show')).toBe(false)

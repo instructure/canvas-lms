@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {Alert} from '@instructure/ui-alerts'
 
 const AssignmentAlert = props => {
   const {errorMessage, onDismiss, successMessage} = props

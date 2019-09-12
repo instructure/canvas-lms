@@ -24,6 +24,8 @@ import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/
 import {SubmissionMocks} from '../../graphqlData/Submission'
 import ViewManager from '../ViewManager'
 
+jest.setTimeout(10000)
+
 async function mockStudentViewResult(overrides = {}) {
   const variables = {assignmentLid: '1', submissionID: '1'}
   const result = await mockQuery(STUDENT_VIEW_QUERY, overrides, variables)
@@ -240,22 +242,6 @@ describe('ViewManager', () => {
       const prevButton = getByText('View Previous Submission')
       fireEvent.click(prevButton)
       expect(getByText('View Previous Submission')).toBeInTheDocument()
-    })
-
-    it('is not displayed if we are at the earliest submission and pagination is exhausted', async () => {
-      const props = await makeProps({
-        currentAttempt: 3,
-        hasPreviousPage: false,
-        numSubmissionHistories: 1
-      })
-      const {getByText, queryByText} = render(
-        <MockedProvider>
-          <ViewManager {...props} />
-        </MockedProvider>
-      )
-      const prevButton = getByText('View Previous Submission')
-      fireEvent.click(prevButton)
-      await wait(() => expect(queryByText('View Previous Submission')).not.toBeInTheDocument())
     })
 
     it('changes the currently displayed submission to the previous one when clicked', async () => {

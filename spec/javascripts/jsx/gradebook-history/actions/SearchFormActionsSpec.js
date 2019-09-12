@@ -152,6 +152,10 @@ test('dispatches fetchHistoryFailure on failure', function() {
 
 QUnit.module('SearchFormActions getSearchOptions', {
   setup() {
+    // Some requests are still hitting the network.
+    // They must resolve so that specs can continue.
+    sandbox.server.respondImmediately = true
+
     this.userResponse = {
       data: Fixtures.userArray(),
       headers: {link: 'http://example.com/link-to-next-page'}
@@ -223,6 +227,10 @@ test('calls getUsersByName with enrollmentStates of ["completed"] if course is c
 
 QUnit.module('SearchFormActions getSearchOptionsNextPage', function(hooks) {
   hooks.beforeEach(function() {
+    // Some requests are still hitting the network.
+    // They must resolve so that specs can continue.
+    sandbox.server.respondImmediately = true
+
     this.userResponse = {
       data: Fixtures.userArray(),
       headers: {link: 'http://example.com/link-to-next-page'}

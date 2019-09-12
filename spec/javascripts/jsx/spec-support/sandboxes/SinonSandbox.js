@@ -18,6 +18,19 @@
 
 import sinon from 'sinon'
 
+/*
+ * You might be seeing something like this in your test:
+ * WARN LOG: 'You no longer need to manually create and restore a fake server'
+ *
+ * This means that you have used `sinon.createFakeServer()` to stub xhr calls to
+ * the network. You no longer need to create the fake server manually. However,
+ * you still need to handle requests made to the network as needed by the code
+ * under test.
+ *
+ * For documentation on faking network requests with sinon, visit:
+ * https://sinonjs.org/releases/latest/fake-xhr-and-server/
+ */
+
 export default class SinonSandbox {
   constructor(options) {
     this._options = options
@@ -31,13 +44,19 @@ export default class SinonSandbox {
     this._sandbox = sinon.createSandbox({
       ...sinon.defaultConfig,
       injectInto: global.sandbox,
-      properties: ['clock', 'mock', 'spy', 'stub'],
-      useFakeServer: false,
+      properties: ['clock', 'mock', 'server', 'spy', 'stub'],
+      useFakeServer: true,
       useFakeTimers: false
     })
 
     sinon.assert.fail = message => qunit.ok(false, message)
     sinon.assert.pass = message => qunit.ok(true, message)
+
+    sinon.createFakeServer = ({respondImmediately} = {respondImmediately: false}) => {
+      console.warn('You no longer need to manually create and restore a fake server')
+      this._sandbox.server.respondImmediately = respondImmediately
+      return this._sandbox.server
+    }
   }
 
   teardown() {

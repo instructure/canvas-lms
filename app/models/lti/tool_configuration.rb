@@ -48,7 +48,7 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.workflow_state = privacy_level || DEFAULT_PRIVACY_LEVEL
+      tool.workflow_state = canvas_extensions['privacy_level'] || DEFAULT_PRIVACY_LEVEL
       tool.use_1_3 = true
       tool
     end

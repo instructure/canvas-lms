@@ -23,9 +23,8 @@ import _ from 'underscore'
 import Backbone from 'Backbone'
 import Cache from '../../class/cache'
 import AssignmentGroup from '../../models/AssignmentGroup'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {

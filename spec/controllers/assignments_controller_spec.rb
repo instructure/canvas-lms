@@ -775,6 +775,12 @@ describe AssignmentsController do
               get :show, params: {course_id: @course.id, id: @assignment.id}
               expect(group_filter_setting).to be false
             end
+
+            it "is included when assignment is an external tool type" do
+              @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:SETTINGS]).to have_key(:filter_speed_grader_by_student_group)
+            end
           end
         end
 
@@ -850,6 +856,26 @@ describe AssignmentsController do
             get :show, params: {course_id: @course.id, id: @assignment.id}
             expect(assigns[:js_env]).not_to include(:selected_student_group_id)
           end
+
+          it "includes group_categories when assignment is an external tool type" do
+            @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).to have_key(:group_categories)
+          end
+
+          it "includes selected_student_group_id when assignment is an external tool type" do
+            @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+            first_group_id = @course.groups.first.id.to_s
+            @teacher.preferences[:gradebook_settings] = {
+              @course.id => {
+                'filter_rows_by' => {
+                  'student_group_id' => first_group_id
+                }
+              }
+            }
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+            expect(assigns[:js_env]).to have_key(:selected_student_group_id)
+          end
         end
 
         context "when filter_speed_grader_by_student_group? is false" do
@@ -891,6 +917,12 @@ describe AssignmentsController do
           user_session @teacher
           get :show, params: {course_id: @course.id, id: @assignment.id}
           expect(assigns[:js_env]).not_to have_key :speed_grader_url
+        end
+
+        it "includes speed_grader_url when assignment is an external tool type" do
+          @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).to have_key(:speed_grader_url)
         end
       end
     end

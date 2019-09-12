@@ -18,11 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import View from '@instructure/ui-layout/lib/components/View'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import IconMiniArrowEnd from '@instructure/ui-icons/lib/Solid/IconMiniArrowEnd'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-layout'
+import {IconMiniArrowDownSolid, IconMiniArrowEndSolid} from '@instructure/ui-icons'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar_student_ranges_view'
 import {transformScore} from '../../shared/conditional_release/score'
@@ -66,8 +64,8 @@ export default class StudentRangesView extends React.Component {
               summary={rangeTitle}
               onToggle={() => this.handleToggle(i)}
               size='large'
-              iconExpanded={IconMiniArrowDown}
-              icon={IconMiniArrowEnd}
+              iconExpanded={IconMiniArrowDownSolid}
+              icon={IconMiniArrowEndSolid}
             >
               <StudentRange
                 range={range}

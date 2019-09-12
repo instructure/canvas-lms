@@ -6,6 +6,7 @@
 
 build/
 !build/vendor/woff-code-latest.zip
+!build/gergich/
 docker-compose/
 !docker-compose/config/*
 docker-compose.local.*.yml

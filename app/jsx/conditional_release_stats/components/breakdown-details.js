@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import IconX from '@instructure/ui-icons/lib/Solid/IconX'
+import {Button} from '@instructure/ui-buttons'
+import {Tray} from '@instructure/ui-overlays'
+import {IconXSolid} from '@instructure/ui-icons'
 import I18n from 'i18n!cyoe_assignment_sidebar_breakdown_details'
 import StudentRangesView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
@@ -93,7 +93,7 @@ export default class BreakdownDetails extends React.Component {
                 onClick={this.props.closeSidebar}
               >
                 <span className="crs-breakdown-details__closeButtonIcon">
-                  <IconX title={I18n.t('Close details sidebar')} />
+                  <IconXSolid title={I18n.t('Close details sidebar')} />
                 </span>
               </Button>
             </span>

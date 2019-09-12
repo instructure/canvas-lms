@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 
 import {gradeInfo, gradeEntry} from '../GradeInput/PropTypes'
 import CellEditorComponent from '../CellEditorComponent'

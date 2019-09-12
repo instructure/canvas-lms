@@ -77,6 +77,10 @@ class SubmissionsBaseController < ApplicationController
     provisional = @assignment.moderated_grading? && params[:submission][:provisional]
     submission_json_exclusions = []
 
+    if @assignment.anonymous_peer_reviews && @submission.peer_reviewer?(@current_user)
+      submission_json_exclusions << :user_id
+    end
+
     if @submission.submission_type == "online_quiz" && @assignment.muted? && !@assignment.grants_right?(@current_user, :grade)
       submission_json_exclusions << :body
     end

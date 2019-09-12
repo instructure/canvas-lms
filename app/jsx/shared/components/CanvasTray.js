@@ -19,12 +19,10 @@
 import I18n from 'i18n!tray'
 import React from 'react'
 import {string, node} from 'prop-types'
-
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import View from '@instructure/ui-layout/lib/components/View'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-elements'
+import {Tray} from '@instructure/ui-overlays'
 
 import ErrorBoundary from './ErrorBoundary'
 import GenericErrorPage from './GenericErrorPage'

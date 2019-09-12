@@ -19,13 +19,10 @@
 import React from 'react'
 import I18n from 'i18n!IndividiualStudentMasteryAssignmentResult'
 import _ from 'lodash'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import IconHighlighter from '@instructure/ui-icons/lib/Line/IconHighlighter'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-elements'
+import {IconAssignmentLine, IconQuizLine, IconHighlighterLine} from '@instructure/ui-icons'
 import * as shapes from './shapes'
 import Ratings from '../../rubrics/Ratings'
 
@@ -43,7 +40,7 @@ const renderLinkedResult = (name, url, isQuiz) => (
     variant="link"
     href={url}
     theme={{mediumPadding: '0', mediumHeight: 'normal', fontWeight: '700'}}
-    icon={isQuiz ? IconQuiz : IconAssignment}
+    icon={isQuiz ? IconQuizLine : IconAssignmentLine}
   >
     {name}
   </Button>
@@ -52,7 +49,7 @@ const renderLinkedResult = (name, url, isQuiz) => (
 const renderUnlinkedResult = (name) => (
   <Flex alignItems="center">
     <FlexItem><Text size="medium">
-      <IconHighlighter />
+      <IconHighlighterLine />
     </Text></FlexItem>
     <FlexItem padding="0 x-small"><Text weight="bold">{ name }</Text></FlexItem>
   </Flex>

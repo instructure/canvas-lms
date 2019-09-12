@@ -25,7 +25,8 @@ module.exports = {
           'USE_ES_MODULES' in process.env
             ? process.env.USE_ES_MODULES !== 'false'
             : !process.env.JEST_WORKER_ID,
-        node: !!process.env.JEST_WORKER_ID
+        node: !!process.env.JEST_WORKER_ID,
+        transformImports: false
       }
     ]
   ],

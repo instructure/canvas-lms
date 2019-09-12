@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!LogoutButton'
 
 function readCookie(key) {

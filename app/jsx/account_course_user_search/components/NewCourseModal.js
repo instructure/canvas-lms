@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {node} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
+import {Button} from '@instructure/ui-buttons'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
-import InstuiModal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
+import Modal from '../../shared/components/InstuiModal'
 import CanvasSelect from '../../shared/components/CanvasSelect'
 
 import I18n from 'i18n!account_course_user_search'
@@ -103,7 +103,7 @@ export default class NewCourseModal extends React.Component {
 
     return (
       <span>
-        <InstuiModal
+        <Modal
           as="form"
           onSubmit={preventDefault(this.onSubmit)}
           open={isOpen}
@@ -113,7 +113,7 @@ export default class NewCourseModal extends React.Component {
           label={I18n.t('Add a New Course')}
           shouldCloseOnDocumentClick={false}
         >
-          <ModalBody>
+          <Modal.Body>
             <FormFieldGroup layout="stacked" rowSpacing="small" description="">
               <TextInput
                 label={I18n.t('Course Name')}
@@ -155,20 +155,20 @@ export default class NewCourseModal extends React.Component {
                   </CanvasSelect.Option>
                 ))}
                 {terms.loading && (
-                  <CanvasSelect.Option isDisabled>
+                  <CanvasSelect.Option key="loading" id="loading" value="loading" isDisabled>
                     {I18n.t('Loading more terms...')}
                   </CanvasSelect.Option>
                 )}
               </CanvasSelect>
             </FormFieldGroup>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Cancel')}</Button> &nbsp;
             <Button type="submit" variant="primary">
               {I18n.t('Add Course')}
             </Button>
-          </ModalFooter>
-        </InstuiModal>
+          </Modal.Footer>
+        </Modal>
         {React.Children.map(children, child =>
           // when you click whatever is the child element to this, open the modal
           React.cloneElement(child, {

@@ -21,11 +21,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ExternalToolDialogModal from './ExternalToolDialog/Modal'
 import ExternalToolDialogTray from './ExternalToolDialog/Tray'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {Alert} from '@instructure/ui-alerts'
 import I18n from 'i18n!ExternalToolDialog'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
-import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
+import {FlexItem} from '@instructure/ui-layout'
 import processEditorContentItems from '../deep_linking/processors/processEditorContentItems'
 
 const EMPTY_BUTTON = {

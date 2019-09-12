@@ -18,8 +18,8 @@
 
 import React from 'react'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 import { IconLock, IconUnlock } from './BlueprintLocks'
 import propTypes from '../propTypes'

@@ -49,5 +49,3 @@ export function renderIntoDiv(editorEl, props, cb) {
     import(`./locales/${language}`).then(() => render(editorEl, props, cb));
   }
 }
-
-export { renderIntoDiv as renderSidebarIntoDiv } from "./sidebar/root";

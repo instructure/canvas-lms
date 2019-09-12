@@ -21,8 +21,8 @@ import {bool, string, func, oneOf} from 'prop-types'
 
 import {Heading} from '@instructure/ui-elements'
 import {InPlaceEdit} from '@instructure/ui-editable'
-import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
-import createChainedFunction from '@instructure/ui-utils/lib/createChainedFunction'
+import {omitProps} from '@instructure/ui-react-utils'
+import {createChainedFunction} from '@instructure/ui-utils'
 
 export default class EditableHeading extends React.Component {
   static propTypes = {

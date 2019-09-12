@@ -17,18 +17,17 @@
  */
 
 import {Assignment} from '../../graphqlData/Assignment'
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
 import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
 import elideString from '../../../../shared/helpers/elideString'
 import I18n from 'i18n!assignments_2_media_attempt'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import {IconAttachMediaLine} from '@instructure/ui-icons'
+import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
 import React from 'react'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import UploadMedia from '@instructure/canvas-media'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}
@@ -71,7 +70,7 @@ export default class MediaAttempt extends React.Component {
           </span>
           <ScreenReaderContent>{mediaObject.title}</ScreenReaderContent>
           <Button
-            icon={IconTrash}
+            icon={IconTrashLine}
             id={mediaObject.id}
             margin="0 0 0 x-small"
             onClick={this.handleRemoveFile}

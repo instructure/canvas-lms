@@ -21,11 +21,8 @@ import { shallow } from 'enzyme'
 import ActAsModal from '../ActAsModal'
 import ActAsMask from '../ActAsMask'
 import ActAsPanda from '../ActAsPanda'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
+import {Text, Avatar, Spinner, Table} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 
 const props = {
   user: {

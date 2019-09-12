@@ -19,18 +19,15 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {string, bool, arrayOf, shape} from 'prop-types'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Avatar, Heading, List, ListItem, Spinner} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
 import LogoutButton from '../LogoutButton'
 
 function ProfileTab({id, html_url, label}) {
   return (
     <ListItem key={id}>
-      <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href={html_url}>
+      <Button variant="link" margin="none" href={html_url}>
         {label}
       </Button>
     </ListItem>
@@ -58,16 +55,16 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tab
         <Heading level="h3" as="h2">
           {userDisplayName}
         </Heading>
-        <LogoutButton size="small" margin="medium 0" />
+        <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List variant="unstyled" margin="0" itemSpacing="small">
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} />)
         ) : (
           <ListItem key="loading">
             <div style={{textAlign: 'center'}}>
-              <Spinner margin="medium" title="Loading" />
+              <Spinner margin="medium" renderTitle="Loading" />
             </div>
           </ListItem>
         )}

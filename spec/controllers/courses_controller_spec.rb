@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe CoursesController do
   describe "GET 'index'" do
@@ -2709,6 +2709,53 @@ describe CoursesController do
       json = json_parse(response.body)
       expect(json[0]).to include({ 'id' => student2.id })
       expect(json[1]).to include({ 'id' => student1.id })
+    end
+  end
+
+  describe '#content_share_users' do
+    before :once do
+      course_with_teacher(name: 'search teacher')
+      @course.root_account.enable_feature!(:direct_share)
+    end
+
+    it 'requires a search term' do
+      user_session(@teacher)
+      get 'content_share_users', params: {course_id: @course.id}
+      expect(response).to be_bad_request
+    end
+
+    it 'requires the user to have manage content permission for the course' do
+      course_with_student_logged_in
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
+      expect(response).to be_unauthorized
+    end
+
+    it 'requires the feature be enabled' do
+      @course.root_account.disable_feature!(:direct_share)
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
+      expect(response).to be_forbidden
+    end
+
+    it 'searches for teachers, TAs, and designers' do
+      user_session(@teacher)
+      @search_context = @course
+      course_with_teacher(name: 'course teacher')
+      course_with_ta(name: 'course ta')
+      course_with_designer(name: 'course designer')
+      course_with_student(name: 'course student')
+      course_with_observer(name: 'course observer')
+      get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['display_name']}).to match_array(['course teacher', 'course ta', 'course designer'])
+    end
+
+    it 'should not return the searching user' do
+      user_session(@teacher)
+      @search_context = @course
+      course_with_teacher(name: 'course teacher')
+      get 'content_share_users', params: {course_id: @search_context.id, search_term: 'teacher'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['display_name']}).to match_array(['course teacher'])
     end
   end
 end

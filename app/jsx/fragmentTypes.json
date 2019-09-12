@@ -6,6 +6,9 @@
         "name": "Node",
         "possibleTypes": [
           {
+            "name": "Account"
+          },
+          {
             "name": "Assignment"
           },
           {
@@ -61,6 +64,96 @@
           },
           {
             "name": "Submission"
+          },
+          {
+            "name": "Term"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "LegacyIDInterface",
+        "possibleTypes": [
+          {
+            "name": "Account"
+          },
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "ExternalTool"
+          },
+          {
+            "name": "ExternalUrl"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "GradingPeriod"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "GroupMembership"
+          },
+          {
+            "name": "GroupSet"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "ModuleExternalTool"
+          },
+          {
+            "name": "ModuleItem"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "PostPolicy"
+          },
+          {
+            "name": "Progress"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Rubric"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "SubmissionComment"
+          },
+          {
+            "name": "SubmissionDraft"
           },
           {
             "name": "Term"

@@ -65,13 +65,6 @@ class TabsController < ApplicationController
   #
   # Returns a paginated list of navigation tabs available in the current context.
   #
-  # @argument include[] [String, "external"]
-  #   "external":: Optionally include external tool tabs in the returned list of tabs (Only has effect for courses, not groups)
-  #
-  # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \
-  #          https://<canvas>/api/v1/courses/<course_id>/tabs\?include\="external"
-  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/groups/<group_id>/tabs"
@@ -107,7 +100,7 @@ class TabsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      render :json => tabs_available_json(@context, @current_user, session, Array(params[:include]))
+      render :json => tabs_available_json(@context, @current_user, session)
     end
   end
 

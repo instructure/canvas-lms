@@ -145,6 +145,7 @@ $.widget("ui.dialog", {
 				.addClass( "ui-dialog-title" )
 				.html( title )
 				.attr("role", "heading")
+				.attr("aria-level", "2")
 				.prependTo( uiDialogTitlebar ),
 
 			uiDialogButtonPane = ( this.uiDialogButtonPane = $( "<div>" ) )
@@ -892,5 +893,3 @@ $.extend( $.ui.dialog.overlay.prototype, {
 		$.ui.dialog.overlay.destroy( this.$el );
 	}
 });
-
-

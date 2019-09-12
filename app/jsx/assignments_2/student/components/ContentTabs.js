@@ -17,20 +17,20 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import SubmissionManager from './SubmissionManager'
-import {Badge} from '@instructure/ui-elements'
+import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
+import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2'
+
 import LoadingIndicator from '../../shared/LoadingIndicator'
-import React, {lazy, Suspense} from 'react'
+import React, {lazy, Suspense, useState} from 'react'
+import SubmissionManager from './SubmissionManager'
 import {Submission} from '../graphqlData/Submission'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import GradeDisplay from './GradeDisplay'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Tabs} from '@instructure/ui-tabs'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
 const RubricTab = lazy(() => import('./RubricTab'))
@@ -114,19 +114,27 @@ renderCommentsTab.propTypes = {
 }
 
 function ContentTabs(props) {
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
+
+  function handleTabChange(event, {index}) {
+    setSelectedTabIndex(index)
+  }
+
   return (
     <div data-testid="assignment-2-student-content-tabs">
       {props.submission.state === 'graded' || props.submission.state === 'submitted'
         ? currentSubmissionGrade(props.assignment, props.submission)
         : null}
-      <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel
-          title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+      <Tabs onRequestTabChange={handleTabChange} variant="default">
+        <Tabs.Panel
+          renderTitle={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+          selected={selectedTabIndex === 0}
         >
           <SubmissionManager assignment={props.assignment} submission={props.submission} />
-        </TabPanel>
-        <TabPanel
-          title={
+        </Tabs.Panel>
+        <Tabs.Panel
+          selected={selectedTabIndex === 1}
+          renderTitle={
             <span>
               {I18n.t('Comments')}{' '}
               {!!props.submission.unreadCommentCount && (
@@ -140,15 +148,15 @@ function ContentTabs(props) {
           }
         >
           {renderCommentsTab(props)}
-        </TabPanel>
+        </Tabs.Panel>
         {props.assignment.rubric && (
-          <TabPanel title={I18n.t('Rubric')}>
+          <Tabs.Panel renderTitle={I18n.t('Rubric')} selected={selectedTabIndex === 2}>
             <Suspense fallback={<LoadingIndicator />}>
               <RubricTab assignment={props.assignment} />
             </Suspense>
-          </TabPanel>
+          </Tabs.Panel>
         )}
-      </TabList>
+      </Tabs>
     </div>
   )
 }

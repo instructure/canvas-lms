@@ -18,11 +18,11 @@
 
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Button} from '@instructure/ui-buttons'
+import {IconExpandStartLine} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-elements'
+import {TextInput} from '@instructure/ui-forms'
 import I18n from 'i18n!gradezilla'
 
 import AssignmentGradeInput from '../AssignmentGradeInput'
@@ -211,7 +211,7 @@ export default class AssignmentRowCell extends Component {
                 size="small"
                 variant="icon"
               >
-                <IconExpandStart title={I18n.t('Open submission tray')} />
+                <IconExpandStartLine title={I18n.t('Open submission tray')} />
               </Button>
             </div>
           </div>

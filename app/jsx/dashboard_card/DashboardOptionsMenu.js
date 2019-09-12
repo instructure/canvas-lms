@@ -21,14 +21,10 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard'
 import axios from 'axios'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
+import {Button} from '@instructure/ui-buttons'
+import {IconMoreLine} from '@instructure/ui-icons'
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {

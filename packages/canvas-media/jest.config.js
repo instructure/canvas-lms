@@ -21,7 +21,10 @@ module.exports = {
     "<rootDir>/lib",
     "<rootDir>/es"
   ],
-  reporters: ["default", "jest-junit"],
+  reporters: [
+    "default",
+    ["jest-junit", {outputDirectory: './coverage'}]
+  ],
   setupFiles: [
     'jest-canvas-mock',
     '<rootDir>/jest/jest-setup.js'

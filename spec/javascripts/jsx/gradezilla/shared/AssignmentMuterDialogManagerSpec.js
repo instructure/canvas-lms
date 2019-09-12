@@ -54,8 +54,8 @@ QUnit.module('AssignmentMuterDialogManager', suiteHooks => {
 
   QUnit.module('#showDialog()', hooks => {
     hooks.beforeEach(() => {
-      sinon.spy(AssignmentMuter.prototype, 'confirmUnmute')
-      sinon.spy(AssignmentMuter.prototype, 'showDialog')
+      sinon.stub(AssignmentMuter.prototype, 'confirmUnmute')
+      sinon.stub(AssignmentMuter.prototype, 'showDialog')
     })
 
     hooks.afterEach(() => {

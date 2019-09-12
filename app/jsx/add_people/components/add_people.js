@@ -19,12 +19,10 @@
 import I18n from 'i18n!add_people'
 import React from 'react'
 import {bool, func, shape, arrayOf, oneOfType} from 'prop-types'
-import Modal, {ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Modal} from '@instructure/ui-overlays'
+import {CloseButton, Button} from '@instructure/ui-buttons'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {
   courseParamsShape,
   apiStateShape,
@@ -316,7 +314,7 @@ export default class AddPeople extends React.Component {
         tabIndex="-1"
         liveRegion={getLiveRegion}
       >
-        <ModalHeader>
+        <Modal.Header>
           <CloseButton
             buttonRef={c => { this.modalCloseBtn = c }}
             placement="end"
@@ -327,8 +325,8 @@ export default class AddPeople extends React.Component {
             {cancelLabel}
           </CloseButton>
           <Heading tabIndex="-1">{modalTitle}</Heading>
-        </ModalHeader>
-        <ModalBody>
+        </Modal.Header>
+        <Modal.Body>
           <div
             className="addpeople"
             tabIndex="-1"
@@ -341,8 +339,8 @@ export default class AddPeople extends React.Component {
             </ScreenReaderContent>
             {currentPanel}
           </div>
-        </ModalBody>
-        <ModalFooter>
+        </Modal.Body>
+        <Modal.Footer>
           <Button id="addpeople_cancel" onClick={this.close}>
             {cancelLabel}
           </Button>
@@ -358,7 +356,7 @@ export default class AddPeople extends React.Component {
               {nextLabel}
             </Button>
           )}
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
     )
   }

@@ -19,8 +19,8 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, array, func, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-elements'
 import HelpDialog from '../../help_dialog/HelpDialog'
 
 export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {

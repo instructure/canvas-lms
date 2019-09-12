@@ -25,7 +25,7 @@ import AssignmentDescription from './AssignmentDescription'
 import Overrides from './Overrides/Overrides'
 import AddHorizontalRuleButton from './AddHorizontalRuleButton'
 
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 
 Details.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,

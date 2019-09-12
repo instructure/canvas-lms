@@ -23,11 +23,11 @@ import {itemShape, moveOptionsType} from './propTypes'
 import {positions} from './positions'
 import React from 'react'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {FormField} from '@instructure/ui-form-field'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 export default class MoveSelect extends React.Component {
   static propTypes = {

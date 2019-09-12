@@ -61,6 +61,10 @@ describe LiveEvents::AsyncWorker do
     allow(@worker).to receive(:at_exit)
   end
 
+  after(:each) do
+    LiveEvents.statsd = nil
+  end
+
   describe "push" do
     it "should execute stuff pushed on the queue" do
       results_double = double

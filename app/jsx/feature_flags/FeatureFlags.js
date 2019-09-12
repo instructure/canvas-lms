@@ -19,14 +19,13 @@
 import React from 'react'
 import axios from 'axios'
 import I18n from 'i18n!feature_flags'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import IconInfo from '@instructure/ui-icons/lib/Line/IconInfo'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import { Table } from '@instructure/ui-table'
+import {Text, Spinner} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
+import {Tooltip} from '@instructure/ui-overlays'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Table} from '@instructure/ui-table'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
@@ -72,7 +71,7 @@ export default class FeatureFlags extends React.Component {
               on={['click', 'hover', 'focus']}
               variant="inverse"
             >
-              <Button variant="icon" icon={IconInfo}>
+              <Button variant="icon" icon={IconInfoLine}>
                 <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
               </Button>
             </Tooltip>

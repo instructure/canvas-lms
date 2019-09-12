@@ -62,25 +62,37 @@ export function renderLinkedImage(linkElem, image) {
 }
 
 export function constructJSXImageElement(image, opts = {}) {
-  const href = image.href || image.url;
-  let ret = <img alt={image.title || image.display_name} src={href} />;
-  if (image.alt_text) {
-    if (image.alt_text.decorativeSelected) {
-      ret = <img alt="" data-decorative="true" src={href} />;
+  const {href, url, title, display_name, alt_text, link, ...otherAttributes} = image
+  const src = href || url;
+  let altText = title || display_name
+  if (alt_text) {
+    if (alt_text.decorativeSelected) {
+      altText = ''
+      otherAttributes['data-is-decorative'] = 'true'
     } else {
-      ret = <img alt={image.alt_text.altText} src={href} />;
+      altText = alt_text.altText
     }
   }
-  if (image.link && !opts.doNotLink) {
-    ret = (
-      <a href={image.link} target="_blank" rel="noopener noreferrer">
+
+  const ret = (
+    <img
+      alt={altText}
+      src={src}
+      width={image.width}
+      height={image.height}
+      {...otherAttributes}
+    />
+  )
+  if (link && !opts.doNotLink) {
+    return(
+      <a href={link} target="_blank" rel="noopener noreferrer">
         {ret}
       </a>
     );
   }
-  return ret;
+  return ret
 }
 
-export function renderImage(image) {
-  return renderToStaticMarkup(constructJSXImageElement(image));
+export function renderImage(image, opts) {
+  return renderToStaticMarkup(constructJSXImageElement(image, opts));
 }

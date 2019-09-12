@@ -60,7 +60,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     }.compact
   end
 
-  before { user_session(admin) }
+  before {
+    user_session(admin)
+    settings['extensions'][0]['privacy_level'] = privacy_level
+  }
 
   shared_examples_for 'an action that requires manage developer keys' do |skip_404|
     context 'when the user has manage_developer_keys' do

@@ -178,7 +178,7 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
       <UnsplashSVG width="10em" />
       <TextInput
         type="search"
-        label={formatMessage('Search Term')}
+        renderLabel={formatMessage('Search Term')}
         value={term}
         onChange={(e, val) => {
           setFocusedImageIndex(0)
@@ -199,10 +199,7 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
           <View margin="small">
             {renderAlert(term, hasLoaded, totalResults, results, page, liveRegion)}
           </View>
-          <div
-            className={css(styles.container)}
-            data-testid="UnsplashResultsContainer"
-          >
+          <div className={css(styles.container)} data-testid="UnsplashResultsContainer">
             {results[page] &&
               results[page].map((resultImage, index) => (
                 <div
@@ -219,23 +216,25 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
                       setSelectedImage(resultImage.id)
                       setUnsplashData({
                         id: resultImage.id,
-                        url: resultImage.urls.link
+                        url: resultImage.urls.link,
+                        alt: resultImage.alt_text
                       })
                     }}
                   >
                     <div
                       className={css(styles.imageContainer)}
                       style={
-                          resultImage.id === selectedImage ? {
-                            border: `5px solid ${brandColor}`,
-                            padding: '2px'
-                          } : null}
-                      >
-                      {
-                        resultImage.id === selectedImage ?
-                        (<ScreenReaderContent>{formatMessage('Selected')}</ScreenReaderContent>) :
-                        null
+                        resultImage.id === selectedImage
+                          ? {
+                              border: `5px solid ${brandColor}`,
+                              padding: '2px'
+                            }
+                          : null
                       }
+                    >
+                      {resultImage.id === selectedImage ? (
+                        <ScreenReaderContent>{formatMessage('Selected')}</ScreenReaderContent>
+                      ) : null}
                       <Img
                         src={resultImage.urls.thumbnail}
                         alt={resultImage.alt_text}
@@ -243,11 +242,14 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
                         height="10em"
                       />
                     </div>
-                    </Button>
+                  </Button>
                   <div className={css(styles.imageAttribution)}>
-                    <Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} profileUrl={resultImage.user.url} />
+                    <Attribution
+                      name={resultImage.user.name}
+                      avatarUrl={resultImage.user.avatar}
+                      profileUrl={resultImage.user.url}
+                    />
                   </div>
-
                 </div>
               ))}
           </div>

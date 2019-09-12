@@ -249,7 +249,7 @@ test('renders neither a due or to do date if neither are available', () => {
 test('renders the SectionsTooltip component', () => {
   const discussion = { user_count: 200 }
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  equal(tree.find('SectionsTooltip Text').text(), 'All Sections')
+  equal(tree.find('SectionsTooltip Text').at(0).text(), 'All Sections')
   tree.unmount()
 })
 
@@ -259,7 +259,7 @@ test('renders the SectionsTooltip component with sections', () => {
     { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
   ]}
   const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
+  equal(tree.find('SectionsTooltip Text').at(0).text(), '2 Sectionssection 4section 2')
   tree.unmount()
 })
 
@@ -317,7 +317,7 @@ test('renders master course lock icon if masterCourseData is provided', (assert)
 
 test('renders drag icon', () => {
   const tree = mount(<DiscussionRow {...makeProps({draggable: true})} />)
-  const node = tree.find('IconDragHandle')
+  const node = tree.find('IconDragHandleLine')
   ok(node.exists())
   tree.unmount()
 })

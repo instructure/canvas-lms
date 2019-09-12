@@ -124,6 +124,7 @@ QUnit.module('EditView', {
     // don't clean up properly, we make sure that these run in a clean tiny state each time
     tinymce.remove()
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -614,6 +615,7 @@ QUnit.module('EditView: handleGroupCategoryChange', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -680,6 +682,7 @@ QUnit.module('#handleAnonymousGradingChange', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -757,6 +760,7 @@ QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -816,6 +820,7 @@ QUnit.module('EditView: group category inClosedGradingPeriod', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -855,6 +860,7 @@ QUnit.module('EditView: enableCheckbox', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
 
   teardown() {
@@ -902,6 +908,7 @@ QUnit.module('EditView: setDefaultsIfNew', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -971,6 +978,7 @@ QUnit.module('EditView: setDefaultsIfNew: no localStorage', {
     })
     sandbox.stub(userSettings, 'contextGet').returns(null)
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -1002,6 +1010,7 @@ QUnit.module('EditView: cacheAssignmentSettings', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -1046,6 +1055,7 @@ QUnit.module('EditView: Conditional Release', {
     })
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
 
   teardown() {
@@ -1138,6 +1148,7 @@ QUnit.module('Editview: Intra-Group Peer Review toggle', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -1192,6 +1203,7 @@ QUnit.module('EditView: Assignment Configuration Tools', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
 
   teardown() {
@@ -1256,8 +1268,11 @@ test('it is hidden if the plagiarism_detection_platform flag is disabled', funct
 
 QUnit.module('EditView: Assignment External Tools', {
   setup() {
-    fakeENV.setup({})
+    fakeENV.setup({
+      COURSE_ID: 1
+    })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
 
   teardown() {
@@ -1288,6 +1303,7 @@ QUnit.module('EditView: Quizzes 2', {
       COURSE_ID: 1
     })
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     this.view = editView({
       submission_types: ['external_tool'],
       is_quiz_lti_assignment: true
@@ -1327,6 +1343,7 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   });
 
   hooks.afterEach(() => {
@@ -1389,6 +1406,7 @@ QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
   hooks.beforeEach(() => {
     fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   })
 
   hooks.afterEach(() => {
@@ -1432,6 +1450,7 @@ QUnit.module('EditView: Anonymous Moderated Marking', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   })
 
   hooks.afterEach(() => {
@@ -1467,6 +1486,7 @@ QUnit.module('EditView#validateFinalGrader', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -1512,6 +1532,7 @@ QUnit.module('EditView#validateGraderCount', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -1570,6 +1591,7 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -1702,6 +1724,7 @@ QUnit.module('EditView#handleModeratedGradingChanged', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -1771,6 +1794,7 @@ QUnit.module('EditView#handleGraderCommentsVisibleToGradersChanged', (hooks) => 
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 
@@ -1823,6 +1847,7 @@ QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', (hooks) => {
       COURSE_ID: 1
     })
     server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     view = editView()
   })
 

@@ -305,6 +305,15 @@ class ContentMigrationsController < ApplicationController
   #   {api:ContentMigrationsController#update Update endpoint} and provide these
   #   copy parameters to start the import.
   #
+  # @argument select [Optional, Hash, "folders"|"files"|"attachments"|"quizzes"|"assignments"|"announcements"|"calendar_events"|"discussion_topics"|"modules"|"module_items"|"pages"|"rubrics"]
+  #   For +course_copy_importer+ migrations, this parameter allows you to select
+  #   the objects to copy without using the +selective_import+ argument and
+  #   +waiting_for_select+ state as is required for uploaded imports (though that
+  #   workflow is also supported for course copy migrations).
+  #   The keys are object types like 'files', 'folders', 'pages', etc. The value
+  #   for each key is a list of object ids. An id can be an integer or a string.
+  #   Multiple object types can be selected in the same call.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/content_migrations' \
@@ -504,6 +513,13 @@ class ContentMigrationsController < ApplicationController
         @content_migration.workflow_state = 'exported'
         params[:do_not_run] = true
       end
+    elsif params[:select] && params[:migration_type] == 'course_copy_importer'
+      copy_options = ContentMigration.process_copy_params(params[:select]&.to_unsafe_h,
+        global_identifiers: @content_migration.use_global_identifiers?,
+        for_content_export: true)
+      @content_migration.migration_settings[:migration_ids_to_import] ||= {}
+      @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+      @content_migration.copy_options = copy_options
     elsif params[:copy]
       copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h,
         global_identifiers: @content_migration.use_global_identifiers?)

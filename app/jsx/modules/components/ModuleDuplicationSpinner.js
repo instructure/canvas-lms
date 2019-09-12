@@ -19,9 +19,8 @@
 import I18n from 'i18n!modules'
 
 import React from 'react'
-import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid/'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {Spinner, Text} from '@instructure/ui-elements'
 
 export default function ModuleDuplicationSpinner(_props) {
   return (

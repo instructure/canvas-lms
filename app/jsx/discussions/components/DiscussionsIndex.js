@@ -17,20 +17,19 @@
  */
 
 import I18n from 'i18n!discussions_v2'
-import React, {Component, Suspense, lazy} from 'react'
+import React, {Component} from 'react'
 import {func, bool, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Spinner, Heading, Text} from '@instructure/ui-elements'
 
 import CanvasTray from 'jsx/shared/components/CanvasTray'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 import {
   ConnectedDiscussionsContainer,
@@ -51,8 +50,6 @@ import {discussionList} from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
-
-const ManagedCourseSelector = lazy(() => import('jsx/shared/components/ManagedCourseSelector'))
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -248,15 +245,10 @@ export default class DiscussionsIndex extends Component {
           />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <CanvasTray
+          <DirectShareCourseTray
             open={this.props.copyToOpen}
-            label={I18n.t('Copy To...')}
             onDismiss={() => this.props.setCopyToOpen(false)}
-          >
-            <Suspense fallback={<Spinner label={I18n.t('Loading...')} />}>
-              <ManagedCourseSelector />
-            </Suspense>
-          </CanvasTray>
+          />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
           <CanvasTray

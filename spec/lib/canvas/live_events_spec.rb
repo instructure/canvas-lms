@@ -845,12 +845,13 @@ describe Canvas::LiveEvents do
     it 'triggers a live event with user details' do
       user_with_pseudonym
 
-      session = { return_to: 'http://www.canvaslms.com/' }
+      session = { return_to: 'http://www.canvaslms.com/', session_id: SecureRandom.uuid }
       context = {
         user_id: @user.global_id.to_s,
         user_login: @pseudonym.unique_id,
         user_account_id: @pseudonym.global_account_id.to_s,
-        user_sis_id: @pseudonym.sis_user_id
+        user_sis_id: @pseudonym.sis_user_id,
+        session_id: session[:session_id]
       }
 
       expect_event(

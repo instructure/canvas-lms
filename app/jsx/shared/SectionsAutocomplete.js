@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import Select from '@instructure/ui-forms/lib/components/Select'
-import View from '@instructure/ui-layout/lib/components/View'
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
+import {Select} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-layout'
+import {AccessibleContent} from '@instructure/ui-a11y'
 import React from 'react'
 import $ from 'jquery'
 import I18n from 'i18n!sections_autocomplete'

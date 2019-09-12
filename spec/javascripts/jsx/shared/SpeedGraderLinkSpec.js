@@ -73,4 +73,15 @@ QUnit.module('SpeedGraderLink', suiteHooks => {
     const tooltip = document.getElementById(getLink().getAttribute('aria-describedby'))
     strictEqual(tooltip.innerText, 'tooltip text')
   })
+
+  test('has a class of "icon-speed-grader"', () => {
+    mountComponent()
+    strictEqual(getLink().className, 'icon-speed-grader')
+  })
+
+  test('takes optional classes', () => {
+    context.className = 'classA classB'
+    mountComponent()
+    strictEqual(getLink().className, 'icon-speed-grader classA classB')
+  })
 })

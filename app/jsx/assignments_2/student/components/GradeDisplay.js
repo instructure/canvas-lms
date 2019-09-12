@@ -20,9 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments_2_student_points_display'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
 const ACCESSIBLE = 'accessible'

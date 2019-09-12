@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Tooltip} from '@instructure/ui-overlays'
+import {Text} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!sections_tooltip'
 
 function sectionsOrTotalCount (props, propName, componentName) {

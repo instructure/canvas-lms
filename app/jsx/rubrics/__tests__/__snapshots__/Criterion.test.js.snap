@@ -61,6 +61,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -90,6 +91,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -106,6 +108,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -222,6 +225,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -251,6 +255,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -267,6 +272,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -383,6 +389,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -412,6 +419,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -428,6 +436,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -471,6 +480,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -536,6 +546,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -551,7 +562,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
 
 exports[`Free-form Rubric with a outcome criterion by default renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -567,6 +578,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the Thresh
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
@@ -589,6 +601,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -611,6 +624,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -686,6 +700,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -751,6 +766,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -766,7 +782,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -782,6 +798,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Th
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
@@ -804,6 +821,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -826,6 +844,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -901,6 +920,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -966,6 +986,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -981,7 +1002,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -997,6 +1018,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
@@ -1019,6 +1041,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -1041,6 +1064,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -1127,6 +1151,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1156,6 +1181,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -1172,6 +1198,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Ratings
       assessing={false}
@@ -1327,6 +1354,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1356,6 +1384,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -1372,6 +1401,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Ratings
       assessing={true}
@@ -1527,6 +1557,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1556,6 +1587,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Description of criterion
       </Text>
@@ -1572,6 +1604,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Ratings
       assessing={false}
@@ -1641,6 +1674,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -1706,6 +1740,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1721,7 +1756,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
 
 exports[`Point Rubric with a outcome criterion by default renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -1737,6 +1772,7 @@ exports[`Point Rubric with a outcome criterion by default renders the Threshold 
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
@@ -1759,6 +1795,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -1781,6 +1818,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Ratings
       assessing={false}
@@ -1895,6 +1933,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -1960,6 +1999,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1975,7 +2015,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
 
 exports[`Point Rubric with a outcome criterion when assessing renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -1991,6 +2031,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the Thresh
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
@@ -2013,6 +2054,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -2035,6 +2077,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Ratings
       assessing={true}
@@ -2149,6 +2192,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
     as="span"
     letterSpacing="normal"
     size="x-small"
+    wrap="normal"
   >
     view longer description
   </Text>
@@ -2214,6 +2258,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
+      wrap="normal"
     >
       <div
         dangerouslySetInnerHTML={
@@ -2229,7 +2274,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the OutcomeIcon sub-component(s) as expected 1`] = `
 <span>
-  <IconOutcomes />
+  <IconOutcomesLine />
    
   <ScreenReaderContent
     as="span"
@@ -2245,6 +2290,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   letterSpacing="normal"
   size="x-small"
   weight="normal"
+  wrap="normal"
 >
   threshold: 3
 </Text>
@@ -2267,6 +2313,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
         letterSpacing="normal"
         size="small"
         weight="normal"
+        wrap="normal"
       >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
@@ -2289,6 +2336,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   </th>
   <td
     className="ratings"
+    colSpan={null}
   >
     <Ratings
       assessing={false}

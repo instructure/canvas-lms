@@ -18,7 +18,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import {GridCol, GridRow} from '@instructure/ui-layout'
 import CustomizationForm from './CustomizationForm'
 import ToolConfigurationForm from './ToolConfigurationForm'
 

@@ -18,7 +18,7 @@
 
 import React, {PureComponent} from 'react'
 import {bool, element} from 'prop-types'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import {TextInput} from '@instructure/ui-forms'
 
 import {gradeEntry, gradeInfo, messages} from './PropTypes'
 

@@ -63,7 +63,10 @@ function CommentsTab(props) {
           >
             <div data-testid="comments-container">
               <CommentTextArea assignment={props.assignment} submission={props.submission} />
-              <CommentContent comments={data.submissionComments.commentsConnection.nodes} />
+              <CommentContent
+                comments={data.submissionComments.commentsConnection.nodes}
+                submission={props.submission}
+              />
             </div>
           </ErrorBoundary>
         )

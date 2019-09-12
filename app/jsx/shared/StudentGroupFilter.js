@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, func, shape, string} from 'prop-types'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
+import {FormField} from '@instructure/ui-form-field'
 import I18n from 'i18n!assignment'
 import React from 'react'
 

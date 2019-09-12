@@ -35,6 +35,10 @@ describe('ltiMessageHandler', () => {
   const origin = "http://localhost";
   const { assign } = window.location;
 
+  global.URL = jest.fn().mockImplementation(() => ({
+    searchParams: { append: jest.fn()}
+  }));
+
   beforeAll(() => {
     delete window.location;
     window.location = { assign: jest.fn() };

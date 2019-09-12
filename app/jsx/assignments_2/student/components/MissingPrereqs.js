@@ -19,10 +19,10 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {string} from 'prop-types'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Heading, Text} from '@instructure/ui-elements'
+
+import {Button} from '@instructure/ui-buttons'
 
 import locked1SVG from '../SVG/Locked1.svg'
 

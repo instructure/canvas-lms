@@ -19,8 +19,9 @@
 import {Assignment} from '../../graphqlData/Assignment'
 import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
-import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
+import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import elideString from '../../../../shared/helpers/elideString'
+import {getFileThumbnail} from '../../../../shared/helpers/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import MoreOptions from './MoreOptions'
@@ -28,14 +29,13 @@ import React, {Component} from 'react'
 import {Submission} from '../../graphqlData/Submission'
 import {uploadFiles} from '../../../../shared/upload_file'
 
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {FileDrop} from '@instructure/ui-forms'
+import {Flex, FlexItem, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {IconTrashLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 
 function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
@@ -73,7 +73,10 @@ export default class FileUpload extends Component {
   }
 
   handleLTIFiles = async e => {
-    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+    if (
+      e.data.messageType === 'LtiDeepLinkingResponse' ||
+      e.data.messageType === 'A2ExternalContentReady'
+    ) {
       await this.handleDropAccepted(e.data.content_items)
     }
   }
@@ -144,10 +147,6 @@ export default class FileUpload extends Component {
     document.getElementById(focusElement).focus()
   }
 
-  shouldDisplayThumbnail = file => {
-    return file.mimeClass === 'image' && file.thumbnailUrl
-  }
-
   renderUploadBox() {
     return (
       <div data-testid="upload-box">
@@ -203,18 +202,7 @@ export default class FileUpload extends Component {
       <Billboard
         heading={I18n.t('Uploaded')}
         headingLevel="h3"
-        hero={
-          this.shouldDisplayThumbnail(file) ? (
-            <img
-              alt={I18n.t('%{filename} preview', {filename: file.displayName})}
-              height="75"
-              src={file.thumbnailUrl}
-              width="75"
-            />
-          ) : (
-            getIconByType(file.mimeClass)
-          )
-        }
+        hero={getFileThumbnail(file, 'large')}
         message={
           <div>
             <span aria-hidden title={file.displayName}>
@@ -222,7 +210,7 @@ export default class FileUpload extends Component {
             </span>
             <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
             <Button
-              icon={IconTrash}
+              icon={IconTrashLine}
               id={file._id}
               margin="0 0 0 x-small"
               onClick={this.handleRemoveFile}

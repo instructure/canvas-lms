@@ -47,7 +47,6 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
   >
     <PopoverTrigger>
       <Link
-        as="button"
         disabled={false}
         iconPlacement="start"
         linkRef={[Function]}
@@ -63,7 +62,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
             }
           }
         >
-          <IconInfo />
+          <IconInfoLine />
         </span>
         <span>
           <ScreenReaderContent
@@ -77,12 +76,18 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
     <PopoverContent>
       <View
         as="div"
+        borderColor="default"
         debug={false}
         display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        focused={false}
         maxWidth="30rem"
         overflowX="visible"
         overflowY="visible"
         padding="large"
+        position="static"
+        shouldAnimateFocus={true}
       >
         <CloseButton
           buttonRef={[Function]}
@@ -99,11 +104,13 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
           as="span"
           letterSpacing="normal"
           size="small"
+          wrap="normal"
         >
           <Flex
             alignItems="stretch"
             as="span"
             direction="row"
+            elementRef={[Function]}
             inline={false}
             justifyItems="space-between"
             visualDebug={false}
@@ -111,6 +118,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
           >
             <FlexItem
               as="span"
+              elementRef={[Function]}
               grow={true}
               shrink={true}
             >
@@ -135,6 +143,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
             <FlexItem
               align="stretch"
               as="span"
+              elementRef={[Function]}
               grow={true}
               shrink={true}
             >
@@ -143,6 +152,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
                 letterSpacing="normal"
                 size="small"
                 weight="bold"
+                wrap="normal"
               >
                 <div>
                   <div
@@ -168,6 +178,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
               letterSpacing="normal"
               size="small"
               weight="bold"
+              wrap="normal"
             >
               Calculation Method
             </Text>
@@ -186,6 +197,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
                 letterSpacing="normal"
                 size="small"
                 weight="bold"
+                wrap="normal"
               >
                 Example
               </Text>
@@ -254,7 +266,6 @@ exports[`renders correctly with no results 1`] = `
   >
     <PopoverTrigger>
       <Link
-        as="button"
         disabled={false}
         iconPlacement="start"
         linkRef={[Function]}
@@ -270,7 +281,7 @@ exports[`renders correctly with no results 1`] = `
             }
           }
         >
-          <IconInfo />
+          <IconInfoLine />
         </span>
         <span>
           <ScreenReaderContent
@@ -284,12 +295,18 @@ exports[`renders correctly with no results 1`] = `
     <PopoverContent>
       <View
         as="div"
+        borderColor="default"
         debug={false}
         display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        focused={false}
         maxWidth="30rem"
         overflowX="visible"
         overflowY="visible"
         padding="large"
+        position="static"
+        shouldAnimateFocus={true}
       >
         <CloseButton
           buttonRef={[Function]}
@@ -306,11 +323,13 @@ exports[`renders correctly with no results 1`] = `
           as="span"
           letterSpacing="normal"
           size="small"
+          wrap="normal"
         >
           <Flex
             alignItems="stretch"
             as="span"
             direction="row"
+            elementRef={[Function]}
             inline={false}
             justifyItems="space-between"
             visualDebug={false}
@@ -318,6 +337,7 @@ exports[`renders correctly with no results 1`] = `
           >
             <FlexItem
               as="span"
+              elementRef={[Function]}
               grow={true}
               shrink={true}
             >
@@ -339,6 +359,7 @@ exports[`renders correctly with no results 1`] = `
             <FlexItem
               align="stretch"
               as="span"
+              elementRef={[Function]}
               grow={true}
               shrink={true}
             >
@@ -347,6 +368,7 @@ exports[`renders correctly with no results 1`] = `
                 letterSpacing="normal"
                 size="small"
                 weight="bold"
+                wrap="normal"
               >
                 <div>
                   <div
@@ -372,6 +394,7 @@ exports[`renders correctly with no results 1`] = `
               letterSpacing="normal"
               size="small"
               weight="bold"
+              wrap="normal"
             >
               Calculation Method
             </Text>
@@ -390,6 +413,7 @@ exports[`renders correctly with no results 1`] = `
                 letterSpacing="normal"
                 size="small"
                 weight="bold"
+                wrap="normal"
               >
                 Example
               </Text>
@@ -458,7 +482,6 @@ exports[`renders the OutcomePopover component 1`] = `
   >
     <PopoverTrigger>
       <Link
-        as="button"
         disabled={false}
         iconPlacement="start"
         linkRef={[Function]}
@@ -474,7 +497,7 @@ exports[`renders the OutcomePopover component 1`] = `
             }
           }
         >
-          <IconInfo />
+          <IconInfoLine />
         </span>
         <span>
           <ScreenReaderContent
@@ -488,12 +511,18 @@ exports[`renders the OutcomePopover component 1`] = `
     <PopoverContent>
       <View
         as="div"
+        borderColor="default"
         debug={false}
         display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        focused={false}
         maxWidth="30rem"
         overflowX="visible"
         overflowY="visible"
         padding="large"
+        position="static"
+        shouldAnimateFocus={true}
       >
         <CloseButton
           buttonRef={[Function]}
@@ -510,11 +539,13 @@ exports[`renders the OutcomePopover component 1`] = `
           as="span"
           letterSpacing="normal"
           size="small"
+          wrap="normal"
         >
           <Flex
             alignItems="stretch"
             as="span"
             direction="row"
+            elementRef={[Function]}
             inline={false}
             justifyItems="space-between"
             visualDebug={false}
@@ -522,6 +553,7 @@ exports[`renders the OutcomePopover component 1`] = `
           >
             <FlexItem
               as="span"
+              elementRef={[Function]}
               grow={true}
               shrink={true}
             >
@@ -546,6 +578,7 @@ exports[`renders the OutcomePopover component 1`] = `
             <FlexItem
               align="stretch"
               as="span"
+              elementRef={[Function]}
               grow={true}
               shrink={true}
             >
@@ -554,6 +587,7 @@ exports[`renders the OutcomePopover component 1`] = `
                 letterSpacing="normal"
                 size="small"
                 weight="bold"
+                wrap="normal"
               >
                 <div>
                   <div
@@ -579,6 +613,7 @@ exports[`renders the OutcomePopover component 1`] = `
               letterSpacing="normal"
               size="small"
               weight="bold"
+              wrap="normal"
             >
               Calculation Method
             </Text>
@@ -597,6 +632,7 @@ exports[`renders the OutcomePopover component 1`] = `
                 letterSpacing="normal"
                 size="small"
                 weight="bold"
+                wrap="normal"
               >
                 Example
               </Text>

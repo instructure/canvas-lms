@@ -18,15 +18,12 @@
 
 
 import I18n from 'i18n!generate_pairing_code'
-import React, { Component } from 'react'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, { ModalHeader, ModalBody, ModalFooter } from '@instructure/ui-overlays/lib/components/Modal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import IconGroup from '@instructure/ui-icons/lib/Line/IconGroup'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import React, {Component} from 'react'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-overlays'
+import {Heading, Text, Spinner} from '@instructure/ui-elements'
+import {IconGroupLine} from '@instructure/ui-icons'
+import {PresentationContent} from '@instructure/ui-a11y'
 import axios from 'axios'
 import {string} from 'prop-types'
 
@@ -94,7 +91,7 @@ export default class GeneratePairingCode extends Component {
     return (
       <div>
         <Button fluidWidth onClick={this.openModal}>
-          <IconGroup />
+          <IconGroupLine />
           {I18n.t('Pair with Observer')}
         </Button>
         <Modal
@@ -104,11 +101,11 @@ export default class GeneratePairingCode extends Component {
           label={I18n.t('Pair with Observer')}
           size='small'
         >
-          <ModalHeader>
+          <Modal.Header>
             {this.renderCloseButton()}
             <Heading>{I18n.t('Pair with Observer')}</Heading>
-          </ModalHeader>
-          <ModalBody>
+          </Modal.Header>
+          <Modal.Body>
             <Text>
               {this.props.name
                 ? messageWithName
@@ -126,10 +123,10 @@ export default class GeneratePairingCode extends Component {
                 : this.renderPairingCode()
               }
             </div>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.closeModal} variant="primary" className='pairing-code-ok'>{I18n.t('OK')}</Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </div>
     )

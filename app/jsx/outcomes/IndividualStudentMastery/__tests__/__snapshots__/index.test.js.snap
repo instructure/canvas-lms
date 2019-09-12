@@ -5,6 +5,7 @@ exports[`renders the component 1`] = `
   alignItems="center"
   as="span"
   direction="row"
+  elementRef={[Function]}
   inline={false}
   justifyItems="center"
   padding="medium"
@@ -13,6 +14,7 @@ exports[`renders the component 1`] = `
 >
   <FlexItem
     as="span"
+    elementRef={[Function]}
     grow={false}
     shrink={false}
   >

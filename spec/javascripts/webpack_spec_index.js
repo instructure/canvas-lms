@@ -17,7 +17,7 @@
  */
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { canvas } from '@instructure/ui-themes/lib'
+import {canvas} from '@instructure/ui-themes'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
 import setupRavenConsoleLoggingPlugin from '../../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin'
@@ -111,13 +111,15 @@ if (process.env.JSPEC_PATH) {
     requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))
   }
 
-  // Run the js tests in 2 different groups, half in each.
-  // In testing, the letter "q" was the midpoint. If one of these takes a lot
-  // longer than the other, we can adjust which letter of the alphabet we split on
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'js1')) {
-    requireAll(require.context('./jsx', !!'includeSubdirectories', /[a-q]Spec$/))
+  // Run the js tests in 3 different groups for speed but also for isolating pollution from other specs
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsa')) {
+    requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[a-f].*Spec$/))
   }
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'js2')) {
-    requireAll(require.context('./jsx', !!'includeSubdirectories', /[^a-q]Spec$/))
+  // run all the gradebook/grading/gradezilla tests on their own
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsg')) {
+    requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/g.*Spec/))
+  }
+  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsh')) {
+    requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[h-z].*Spec/))
   }
 }

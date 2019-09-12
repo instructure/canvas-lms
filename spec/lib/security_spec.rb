@@ -57,6 +57,7 @@ describe "security" do
 
   describe '#url_key_decrypt_data' do
     it 'should be able to decrypt' do
+      allow(Canvas::Security).to receive(:encryption_key).and_return("facdd3a131ddd8988b14f6e4e01039c93cfa0160")
       encrypted_data1 = "ywOHQZAfnsU351MRazIS2TZ5BM8IgbiuOYxrvecBcELXLdMvvW4CeAQ~qbbJvWGrYf9GwNBB~J1hDYUhq85eHr53KgtLIpg"
       encrypted_data2 = "NmJk7iV0hTz2ztUb50yuX3tCAcNbMKKQELiIMuu4SyLV~aGt-Ed5h1HRsF8n0~Id488slCbupK0V9n-6DpMg"
       expect(Canvas::Security.url_key_decrypt_data(encrypted_data1)).to eq 'abcde12345!@#$%^&*()~`/\\|+=-_🙂Ю'

@@ -19,15 +19,13 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Spinner, Table} from '@instructure/ui-elements'
 import ProficiencyRating from 'jsx/rubrics/ProficiencyRating'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
 import { fromJS, List } from 'immutable'
@@ -333,7 +331,7 @@ export default class ProficiencyTable extends React.Component {
               <td colSpan="4" style={{textAlign: 'center'}}>
                 <Button
                   onClick={this.addRow}
-                  icon={<IconPlus />}
+                  icon={<IconPlusLine />}
                   variant="circle-primary"
                 >
                   <ScreenReaderContent>

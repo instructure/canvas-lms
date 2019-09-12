@@ -20,16 +20,10 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import $ from 'jquery'
 
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
-import TextInput from '@instructure/ui-forms/lib/components/TextInput';
-import Select from '@instructure/ui-forms/lib/components/Select'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea';
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Grid from '@instructure/ui-layout/lib/components/Grid';
-import GridRow from '@instructure/ui-layout/lib/components/Grid/GridRow';
-import GridCol from '@instructure/ui-layout/lib/components/Grid/GridCol';
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {TextInput, Select, TextArea} from '@instructure/ui-forms'
+import {PresentationContent} from '@instructure/ui-a11y'
+import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
 
 const validationMessage = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 

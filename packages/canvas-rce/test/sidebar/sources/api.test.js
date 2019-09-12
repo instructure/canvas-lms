@@ -77,8 +77,8 @@ describe('sources/api', () => {
   })
 
   describe('initializeImages', () => {
-    it('sets requested to false', () => {
-      assert.equal(apiSource.initializeImages().requested, false)
+    it('sets hasMore to true', () => {
+      assert.equal(apiSource.initializeImages(props)[props.contextType].hasMore, true)
     })
   })
 
@@ -421,7 +421,7 @@ describe('sources/api', () => {
     })
 
     it('requests images from API', () => {
-      fetchMock.mock(/\/images\?/, {body})
+      fetchMock.mock(/\/documents\?.*content_types=image/, {body})
       return apiSource.fetchImages(props).then(page => {
         assert.deepEqual(page, body)
         fetchMock.restore()

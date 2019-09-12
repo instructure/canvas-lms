@@ -1732,6 +1732,29 @@ describe ExternalToolsController do
     end
   end
 
+  describe '#sessionless_launch' do
+    before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      user_session(@user)
+    end
+
+    it "generates a sessionless launch" do
+      @tool = new_valid_tool(@course)
+
+      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+
+      expect(controller).to receive(:log_asset_access).once
+      get :sessionless_launch, params: {:course_id => @course.id, verifier: verifier}
+    end
+
+  end
+
   def opaque_id(asset)
     if asset.respond_to?('lti_context_id')
       Lti::Asset.global_context_id_for(asset)

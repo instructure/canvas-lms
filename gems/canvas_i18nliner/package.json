@@ -15,7 +15,8 @@
   },
   "devDependencies": {
     "coffee-script": "^1.12.4",
-    "jasmine": "^2.5.3"
+    "jasmine": "^2.5.3",
+    "jasmine-pretty-html-reporter": "^0.2.5"
   },
   "peerDependencies": {},
   "scripts": {

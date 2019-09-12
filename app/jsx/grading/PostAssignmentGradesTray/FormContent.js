@@ -19,13 +19,10 @@
 import React from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {AccessibleContent} from '@instructure/ui-a11y'
+import {Badge, Spinner, Text} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
 
 import I18n from 'i18n!post_assignment_grades_tray'
 

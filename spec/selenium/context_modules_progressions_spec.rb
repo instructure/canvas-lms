@@ -173,6 +173,18 @@ describe "context modules" do
       get "/courses/#{@course.id}"
       expect(f("#content")).not_to contain_css('.module_progressions_link')
     end
+
+    it "should show progressions link if user has grading permission but not content management" do
+      RoleOverride.create!(:context => Account.default, :permission => 'manage_content', :role => teacher_role, :enabled => false)
+      get "/courses/#{@course.id}/modules"
+      expect(f("#content")).to contain_css('.module_progressions_link')
+    end
+
+    it "should not show progressions link in modules page if user lacks grading permission" do
+      RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :role => teacher_role, :enabled => false)
+      get "/courses/#{@course.id}/modules"
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
+    end
   end
 
   context "View Progress button" do

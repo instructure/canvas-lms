@@ -55,7 +55,7 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
     case 'UNSPLASH': {
       const { unsplashData } = uploadData
       source.pingbackUnsplash(unsplashData.id)
-      editor.insertContent(editor.dom.createHTML('img', {src: unsplashData.url}))
+      editor.insertContent(editor.dom.createHTML('img', {src: unsplashData.url, alt: unsplashData.alt}))
       break;
     }
     case 'URL': {

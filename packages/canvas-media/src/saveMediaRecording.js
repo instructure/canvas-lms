@@ -92,3 +92,26 @@ export default async function saveMediaRecording(file, contextId, contextType, d
     done(err)
   }
 }
+
+export async function saveClosedCaptions(mediaId, files) {
+  const axiosRequests = []
+  files.forEach(function(file) {
+    const p = new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = function(e) {
+        const content = e.target.result
+        const params = {
+          content,
+          locale: file.language.selectedOptionId
+        }
+        axios
+          .post(`/media_objects/${mediaId}/media_tracks`, params)
+          .then(resolve)
+          .catch(reject)
+      }
+      reader.readAsText(file.file)
+    })
+    axiosRequests.push(p)
+  })
+  return Promise.all(axiosRequests)
+}

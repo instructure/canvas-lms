@@ -18,20 +18,14 @@
 
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
-import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
-import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
-import IconOffSolid from '@instructure/ui-icons/lib/Solid/IconOff'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import 'message_students'
 import I18n from 'i18n!gradezilla'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
 import ColumnHeader from './ColumnHeader'

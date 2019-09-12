@@ -20,12 +20,10 @@ import I18n from 'i18n!add_people_duplicate_section'
 import React  from 'react'
 import PropTypes from 'prop-types'
 import shapes from './shapes'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Table, Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput, RadioInput} from '@instructure/ui-forms'
+import {Button} from '@instructure/ui-buttons'
 
   const CREATE_NEW = '__CREATE_NEW__';
   const SKIP = '__SKIP';

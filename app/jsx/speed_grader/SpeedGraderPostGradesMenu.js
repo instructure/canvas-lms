@@ -18,15 +18,14 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconEye from '@instructure/ui-icons/lib/Line/IconEye'
-import IconOff from '@instructure/ui-icons/lib/Line/IconOff'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Button} from '@instructure/ui-buttons'
+import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
+import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!SpeedGraderPostGradesMenu'
 
 export default function SpeedGraderPostGradesMenu(props) {
-  const Icon = props.allowPostingGrades ? IconOff : IconEye
+  const Icon = props.allowPostingGrades ? IconOffLine : IconEyeLine
   const menuTrigger = (
     <Button
       icon={<Icon className="speedgrader-postgradesmenu-icon" />}

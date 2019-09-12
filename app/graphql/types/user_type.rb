@@ -29,9 +29,9 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
 
     field :name, String, null: true
     field :sortable_name, String,
@@ -83,12 +83,7 @@ module Types
 
     field :groups, [GroupType], null: true
     def groups
-      Promise.all([
-        load_association(:groups),
-        load_association(:group_memberships)
-      ]).then do
-        object.groups.active
-      end
+      load_association(:current_groups)
     end
 
     field :summary_analytics, StudentSummaryAnalyticsType, null: true do

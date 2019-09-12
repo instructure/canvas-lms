@@ -19,12 +19,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconMoveUpTopSolid from '@instructure/ui-icons/lib/Solid/IconMoveUpTop'
-import IconMoveUpSolid from '@instructure/ui-icons/lib/Solid/IconMoveUp'
-import IconMoveDownSolid from '@instructure/ui-icons/lib/Solid/IconMoveDown'
-import IconMoveDownBottomSolid from '@instructure/ui-icons/lib/Solid/IconMoveDownBottom'
+import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
+import {
+  IconMoveUpTopSolid,
+  IconMoveUpSolid,
+  IconMoveDownSolid,
+  IconMoveDownBottomSolid
+} from '@instructure/ui-icons'
 
 class DashboardCardMovementMenu extends React.Component {
   static propTypes = {

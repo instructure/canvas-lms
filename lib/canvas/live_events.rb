@@ -392,6 +392,7 @@ module Canvas::LiveEvents
     ctx[:user_login] = pseudonym.unique_id
     ctx[:user_account_id] = pseudonym.account.global_id
     ctx[:user_sis_id] = pseudonym.sis_user_id
+    ctx[:session_id] = session[:session_id] if session[:session_id]
     post_event_stringified('logged_in', {
       redirect_url: session[:return_to]
     }, ctx)

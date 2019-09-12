@@ -24,14 +24,9 @@ import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
 import RestrictedRadioButtons from '../files/RestrictedRadioButtons'
 import DialogPreview from '../files/DialogPreview'
 import Folder from 'compiled/models/Folder'
-import Modal, {
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from '@instructure/ui-overlays/lib/components/Modal'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {Modal} from '@instructure/ui-overlays'
+import {CloseButton, Button} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-elements'
 import htmlEscape from 'str/htmlEscape'
 
 const MAX_FOLDERS_TO_SHOW = 2
@@ -155,7 +150,7 @@ UsageRightsDialog.render = function() {
       onDismiss={this.props.closeModal}
       label={I18n.t('Manage Usage Rights')}
     >
-      <ModalHeader>
+      <Modal.Header>
         <CloseButton
           buttonRef={e => (this.cancelXButton = e)}
           className="Button Button--icon-action"
@@ -167,8 +162,8 @@ UsageRightsDialog.render = function() {
           {I18n.t('Close')}
         </CloseButton>
         <Heading level="h4">{I18n.t('Manage Usage Rights')}</Heading>
-      </ModalHeader>
-      <ModalBody>
+      </Modal.Header>
+      <Modal.Body>
         <div ref={e => (this.form = e)} className="UsageRightsDialog__Content">
           <div>
             <div className="UsageRightsDialog__paddingFix grid-row">
@@ -190,8 +185,8 @@ UsageRightsDialog.render = function() {
             </div>
           </div>
         </div>
-      </ModalBody>
-      <ModalFooter>
+      </Modal.Body>
+      <Modal.Footer>
         <span className="UsageRightsDialog__Footer-Actions">
           <Button buttonRef={e => (this.cancelButton = e)} onClick={this.props.closeModal}>
             {I18n.t('Cancel')}
@@ -206,7 +201,7 @@ UsageRightsDialog.render = function() {
             {I18n.t('Save')}
           </Button>
         </span>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   )
 }

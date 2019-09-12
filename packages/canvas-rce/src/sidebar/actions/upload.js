@@ -111,7 +111,7 @@ export function removePlaceholdersFor(name) {
 
 }
 
-export function allUploadCompleteActions(results, fileMetaProps) {
+export function allUploadCompleteActions(results, fileMetaProps, contextType) {
   const actions = [];
   actions.push(completeUpload(results));
   const fileProps = {
@@ -128,7 +128,7 @@ export function allUploadCompleteActions(results, fileMetaProps) {
   );
 
   if (/^image\//.test(results["content-type"])) {
-    actions.push(images.createAddImage(results));
+    actions.push(images.createAddImage(results, contextType));
   }
   return actions;
 }
@@ -137,11 +137,12 @@ export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results);
 
   if (
-    selectedTabType == "images" &&
-    embedData.type == "image" &&
+    selectedTabType === 'images' &&
+    embedData.type === 'image' &&
     !(Bridge.existingContentToLink() && !Bridge.existingContentToLinkIsImg())
   ) {
-    Bridge.insertImage(results);
+    const {href, url, title, display_name, alt_text} = results
+    Bridge.insertImage({href, url, title, display_name, alt_text});
   } else {
     Bridge.insertLink({
       'data-canvas-previewable': isPreviewable(results['content-type']),
@@ -380,7 +381,7 @@ export function uploadPreflight(tabContext, fileMetaProps) {
         return embedUploadResult(results, tabContext);
       })
       .then(results => {
-        dispatch(allUploadCompleteActions(results, fileMetaProps));
+        dispatch(allUploadCompleteActions(results, fileMetaProps, contextType));
       })
       .catch(err => {
         // This may or may not be necessary depending on the upload

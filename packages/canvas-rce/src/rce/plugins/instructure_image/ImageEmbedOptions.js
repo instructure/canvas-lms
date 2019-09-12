@@ -29,6 +29,7 @@ export const EXTRA_LARGE = 'extra-large'
 export const CUSTOM = 'custom'
 
 export const imageSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
+export const defaultImageSize = 320
 
 const sizeByMaximumDimension = {
   200: SMALL,
@@ -38,8 +39,14 @@ const sizeByMaximumDimension = {
 }
 
 function parsedOrNull($element, attribute) {
-  const value = $element.getAttribute(attribute)
-  return value ? Number.parseInt(value, 10) : null
+  // when the image is first inserted into the rce, it's size
+  // is constrained by a style attribute with max-width, max-height.
+  // While it doesn't have a 'width' or 'height' attribute, we can
+  // still get its width and height directly from the img element
+  const value = $element.hasAttribute(attribute) ?
+    $element.getAttribute(attribute) :
+    $element[attribute]
+  return value ? Math.round(Number.parseInt(value, 10)) : null
 }
 
 function imageSizeFromKnownOptions(imageOptions) {

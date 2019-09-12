@@ -52,6 +52,9 @@ QUnit.module('DashboardCard Reordering', {
     ]
 
     fakeServer = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/activity_stream/summary', 200)
+    sandbox.fetch.mock('path:/api/v1/courses/2/activity_stream/summary', 200)
+    sandbox.fetch.mock('path:/api/v1/courses/3/activity_stream/summary', 200)
   },
   teardown() {
     fakeENV.teardown()

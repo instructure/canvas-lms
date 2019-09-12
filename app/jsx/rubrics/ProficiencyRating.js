@@ -18,13 +18,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!ProficiencyRating'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import {IconTrashLine} from '@instructure/ui-icons'
+import {Popover} from '@instructure/ui-overlays'
+import {RadioInput, TextInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import ColorPicker, { PREDEFINED_COLORS } from '../shared/ColorPicker'
 
 function formatColor (color) {
@@ -177,15 +176,15 @@ export default class ProficiencyRating extends React.Component {
             on="click"
             show={this.state.showColorPopover}
             onToggle={this.handleMenuToggle}>
-            <PopoverTrigger>
+            <Popover.Trigger>
               <Button ref={this.setColorRef} variant="link">
                 <div>
                   <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   {I18n.t('Change')}
                 </div>
               </Button>
-            </PopoverTrigger>
-            <PopoverContent>
+            </Popover.Trigger>
+            <Popover.Content>
               <ColorPicker
                 parentComponent="ProficiencyRating"
                 colors={PREDEFINED_COLORS}
@@ -202,7 +201,7 @@ export default class ProficiencyRating extends React.Component {
                 afterClose={this.handleMenuClose}
                 setStatusColor={this.setColor}
               />
-            </PopoverContent>
+            </Popover.Content>
           </Popover>
           <div className="delete">
             <Button
@@ -210,7 +209,7 @@ export default class ProficiencyRating extends React.Component {
               buttonRef={this.setTrashRef}
               onClick={this.handleDelete}
               variant="icon"
-              icon={<IconTrash />}
+              icon={<IconTrashLine />}
             >
               <ScreenReaderContent>
                 {I18n.t('Delete proficiency rating')}

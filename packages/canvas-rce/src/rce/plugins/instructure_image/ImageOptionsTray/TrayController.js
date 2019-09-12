@@ -18,9 +18,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { camelize } from '@instructure/ui-utils'
 
 import bridge from '../../../../bridge'
 import {asImageEmbed} from '../../shared/ContentSelection'
+import {renderImage} from '../../../contentRendering'
 import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
@@ -65,23 +67,38 @@ export default class TrayController {
     const {$img} = this
 
     if (imageOptions.displayAs === 'embed') {
-      $img.alt = imageOptions.altText
-      $img.setAttribute('data-is-decorative', imageOptions.isDecorativeImage)
-      $img.setAttribute('height', imageOptions.appliedHeight)
-      $img.setAttribute('width', imageOptions.appliedWidth)
+      // when the image was first added to the rce, we applied
+      // max-width and max-height. Remove them from the style now
+      const style = this._parseStyle($img)
+      delete style.maxWidth
+      delete style.maxHeight
+
+      const newImg = renderImage({
+        id: $img.id,
+        url: $img.src,
+        alt_text: {
+          decorativeSelected: imageOptions.isDecorativeImage,
+          altText: imageOptions.altText
+        },
+        width: imageOptions.appliedWidth,
+        height: imageOptions.appliedHeight,
+        style
+      })
+      editor.selection.setContent(newImg)
+
       // tell tinymce so the context toolbar resets
       editor.fire('ObjectResized', {
         target: $img,
         width: imageOptions.appliedWidth,
         height: imageOptions.appliedHeight
       })
-      this._dismissTray()
+
     } else {
       const link = `<a href="${$img.src}" target="_blank">${$img.src}</a>`
       editor.selection.setContent(link)
-      this._dismissTray()
-      editor.focus()
     }
+    this._dismissTray()
+    editor.focus()
   }
 
   _dismissTray() {
@@ -120,5 +137,19 @@ export default class TrayController {
       />
     )
     ReactDOM.render(element, this.$container)
+  }
+
+  _parseStyle(elem) {
+    const styl = elem.getAttribute('style')
+    if (styl) {
+      return styl.split(/;\s*/).reduce((sobj, oneStyle) => {
+        const [name, val] = oneStyle.split(/:\s*/)
+        if (name) {
+          sobj[camelize(name)] = val
+        }
+        return sobj
+      }, {})
+    }
+    return {}
   }
 }

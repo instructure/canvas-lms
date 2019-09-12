@@ -23,19 +23,13 @@ import React, {Component} from 'react'
 import {bool, node, string, func, shape, arrayOf, oneOf} from 'prop-types'
 import cx from 'classnames'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import View from '@instructure/ui-layout/lib/components/View'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu from '@instructure/ui-menu/lib/components/Menu'
-import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
-
-import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
+import {Heading, Avatar, Badge, Text} from '@instructure/ui-elements'
+import {Checkbox} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Button} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {IconMoreLine, IconDragHandleLine, IconPeerReviewLine} from '@instructure/ui-icons'
 import LockIconView from 'compiled/views/LockIconView'
 import {author as authorShape} from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
@@ -270,7 +264,7 @@ export default class CourseItemRow extends Component {
                     onToggle={this.toggleManageMenuShown}
                     trigger={
                       <Button variant="icon" size="small">
-                        <IconMore />
+                        <IconMoreLine />
                         <ScreenReaderContent>
                           {I18n.t('Manage options for %{name}', {name: this.props.title})}
                         </ScreenReaderContent>

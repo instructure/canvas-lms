@@ -58,9 +58,8 @@ describe Api::V1::Submission do
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s, 'student_id' => user.id }
-        fragment = { 'provisional_grade_id' => provisional_grade.id }
-        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
+        query = { assignment_id: assignment.id, student_id: user.id }
+        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query)
       end
 
       it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
@@ -73,9 +72,8 @@ describe Api::V1::Submission do
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s, 'anonymous_id' => submission.anonymous_id }
-        fragment = { 'provisional_grade_id' => provisional_grade.id }
-        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
+        query = { assignment_id: assignment.id, anonymous_id: submission.anonymous_id }
+        expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query)
       end
     end
   end

@@ -17,15 +17,22 @@
 #
 
 class OnlineSubmissionType < Types::BaseEnum
+  VALID_SUBMISSION_TYPES = %w[
+    online_text_entry
+    online_upload
+  ].freeze
+
   graphql_name 'OnlineSubmissionType'
   description 'Types that can be submitted online'
-  value('online_upload')
+
+  VALID_SUBMISSION_TYPES.each { |type| value(type) }
 end
 
 class Mutations::CreateSubmission < Mutations::BaseMutation
   graphql_name 'CreateSubmission'
 
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Assignment')
+  argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :submission_type, OnlineSubmissionType, required: true
 
@@ -36,31 +43,40 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     assignment = assignment.overridden_for(current_user)
     context = assignment.context
 
-    submission_type = input[:submission_type]
-    file_ids = (input[:file_ids] || []).compact.uniq
-
     verify_authorized_action!(assignment, :read)
     verify_authorized_action!(assignment, :submit)
 
-    attachments = current_user.attachments.active.where(id: file_ids)
-    unless file_ids.size == attachments.size
-      attachment_ids = attachments.map(&:id)
-      return graphql_error(
-        I18n.t(
-          'No attachments found for the following ids: %{ids}',
-          { ids: file_ids - attachment_ids.map(&:to_s) }
-        )
-      )
-    end
-
-    upload_errors = validate_online_upload(assignment, attachments) if submission_type == 'online_upload'
-    return upload_errors if upload_errors
-
+    submission_type = input[:submission_type]
     submission_params = {
-      body: 'Graphql dummy submission text entry',
-      submission_type: submission_type
+      attachments: [],
+      body: '',
+      require_submission_type_is_valid: true,
+      submission_type: submission_type,
     }
-    submission_params[:attachments] = copy_attachments_to_submissions_folder(context, attachments)
+
+    case submission_type
+    when 'online_text_entry'
+      submission_params[:body] = input[:body]
+    when 'online_upload'
+      file_ids = (input[:file_ids] || []).compact.uniq
+
+      attachments = current_user.attachments.active.where(id: file_ids)
+      unless file_ids.size == attachments.size
+        attachment_ids = attachments.map(&:id)
+        return validation_error(
+          I18n.t(
+            'No attachments found for the following ids: %{ids}',
+            { ids: file_ids - attachment_ids.map(&:to_s) }
+          ),
+          attribute: 'file_ids'
+        )
+      end
+
+      upload_errors = validate_online_upload(assignment, attachments)
+      return upload_errors if upload_errors
+
+      submission_params[:attachments] = copy_attachments_to_submissions_folder(context, attachments)
+    end
 
     submission = assignment.submit_homework(current_user, submission_params)
     {submission: submission}
@@ -74,14 +90,21 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
 
   # TODO: move file validation to the model
   def validate_online_upload(assignment, attachments)
-    return graphql_error(I18n.t('You must attach at least one file to this assignment')) if attachments.blank?
+    if attachments.blank?
+      return validation_error(
+        I18n.t('You must attach at least one file to this assignment'),
+        attribute: 'file_ids'
+      )
+    end
 
     # Probably a superfluous check considering how we retrieve the attachments
     attachments.each do |attachment|
       verify_authorized_action!(attachment, :read)
     end
 
-    graphql_error(I18n.t('Invalid file type')) unless extensions_allowed?(assignment, attachments)
+    unless extensions_allowed?(assignment, attachments)
+      validation_error(I18n.t('Invalid file type'), attribute: 'file_ids')
+    end
   end
 
   def extensions_allowed?(assignment, attachments)
@@ -105,13 +128,5 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
         attachment # in a weird context; leave it alone
       end
     end
-  end
-
-  def graphql_error(message)
-    {
-      errors: {
-        message: message
-      }
-    }
   end
 end

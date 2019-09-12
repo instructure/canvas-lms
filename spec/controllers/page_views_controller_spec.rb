@@ -98,6 +98,10 @@ describe PageViewsController do
       ConfigFile.stub('pv4', {})
     end
 
+    after do
+      ConfigFile.unstub
+    end
+
     describe "GET 'index'" do
       it "properly plumbs through time restrictions" do
         account_admin_user

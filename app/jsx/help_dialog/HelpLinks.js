@@ -19,10 +19,8 @@
 import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!help_dialog'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Button} from '@instructure/ui-buttons'
+import {List, ListItem, Spinner, Text} from '@instructure/ui-elements'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
   return (

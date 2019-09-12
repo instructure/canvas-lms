@@ -18,7 +18,7 @@
 
 import { changeTab, changeAccordion } from "../actions/ui";
 import { fetchInitialPage, fetchNextPage } from "../actions/data";
-import { fetchImages } from "../actions/images";
+import { fetchInitialImages, fetchNextImages } from "../actions/images";
 import {
   createMediaServerSession,
   fetchFolders,
@@ -41,7 +41,8 @@ export default function propsFromDispatch(dispatch) {
     fetchNextPage: key => dispatch(fetchNextPage(key)),
     toggleFolder: id => dispatch(toggleFolder(id)),
     fetchFolders: () => dispatch(fetchFolders()),
-    fetchImages: calledFromRender => dispatch(fetchImages(calledFromRender)),
+    fetchInitialImages: () => dispatch(fetchInitialImages()),
+    fetchNextImages: () => dispatch(fetchNextImages()),
     startUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadPreflight(tabContext, fileMetaProps)),
     flickrSearch: term => dispatch(searchFlickr(term)),

@@ -21,16 +21,11 @@ import I18n from 'i18n!assignments_2_text_entry'
 import React from 'react'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import {Submission} from '../../graphqlData/Submission'
-
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
-import IconText from '@instructure/ui-icons/lib/Line/IconText'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-
-RichContentEditor.preloadRemoteModule()
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
 
 export default class TextEntry extends React.Component {
   static propTypes = {
@@ -56,6 +51,7 @@ export default class TextEntry extends React.Component {
 
   componentDidMount() {
     this._isMounted = true
+    window.addEventListener('beforeunload', this.beforeunload.bind(this))
 
     if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
       this.loadRCE()
@@ -72,9 +68,18 @@ export default class TextEntry extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('beforeunload', this.beforeunload.bind(this))
 
     if (this.state.editorLoaded && !this.props.editingDraft) {
       this.unloadRCE()
+    }
+  }
+
+  // Warn the user if they are attempting to leave the page with unsaved data
+  beforeunload(e) {
+    if (this.state.editorLoaded && this.getDraftBody() !== this.getRCEText()) {
+      e.preventDefault()
+      e.returnValue = true
     }
   }
 
@@ -213,11 +218,19 @@ export default class TextEntry extends React.Component {
     )
   }
 
+  renderSubmission() {
+    return (
+      <View as="div" borderWidth="small" padding="xx-small" data-testid="text-submission">
+        <div dangerouslySetInnerHTML={{__html: this.props.submission.body}} />
+      </View>
+    )
+  }
+
   renderSavedDraft() {
     return (
       <Billboard
         heading={I18n.t('Text Entry')}
-        hero={<IconDocument />}
+        hero={<IconDocumentLine />}
         message={
           <div>
             <Button
@@ -231,7 +244,7 @@ export default class TextEntry extends React.Component {
             </Button>
             <Button
               data-testid="delete-text-draft"
-              icon={IconTrash}
+              icon={IconTrashLine}
               onClick={this.handleCancelButton}
             >
               <ScreenReaderContent>{I18n.t('Remove submission draft')}</ScreenReaderContent>
@@ -247,7 +260,7 @@ export default class TextEntry extends React.Component {
       <View as="div" borderWidth="small" data-testid="text-entry">
         <Billboard
           heading={I18n.t('Text Entry')}
-          hero={<IconText color="brand" />}
+          hero={<IconTextLine color="brand" />}
           message={
             <Button data-testid="start-text-entry" onClick={this.handleStartButton}>
               {I18n.t('Start Entry')}
@@ -259,7 +272,9 @@ export default class TextEntry extends React.Component {
   }
 
   render() {
-    if (this.getDraftBody() === null) {
+    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+      return this.renderSubmission()
+    } else if (this.getDraftBody() === null) {
       return this.renderInitialBox()
     } else {
       return this.props.editingDraft ? this.renderEditor() : this.renderSavedDraft()

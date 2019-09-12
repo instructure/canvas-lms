@@ -312,7 +312,7 @@
 
         <%= render partial: 'additional_settings', locals: { f: f } %>
 
-        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) && @account.feature_enabled?(:slack_notifications)%>
+        <% if !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:slack_notifications)%>
           <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
           <fieldset>
             <legend><%= t("Slack Api Key") %></legend>

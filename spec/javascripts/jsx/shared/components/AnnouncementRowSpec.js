@@ -98,7 +98,7 @@ test('renders "Posted on" date label if announcement is not delayed', () => {
 test('renders the SectionsTooltip component if canHaveSections: true', () => {
   const announcement = { user_count: 200 }
   const tree = mount(<AnnouncementRow {...makeProps({ announcement, canHaveSections: true })} />)
-  equal(tree.find('SectionsTooltip Text').text(), 'All Sections')
+  equal(tree.find('SectionsTooltip Text').at(0).text(), 'All Sections')
 })
 
 test('does not render the SectionsTooltip component if canHaveSections: false', () => {
@@ -113,7 +113,7 @@ test('renders the SectionsTooltip component with sections', () => {
     { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
   ]}
   const tree = mount(<AnnouncementRow {...makeProps({ announcement, canHaveSections: true })} />)
-  equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
+  equal(tree.find('SectionsTooltip Text').at(0).text(), '2 Sectionssection 4section 2')
 })
 
 test('does not render master course lock icon if masterCourseData is not provided', (assert) => {
@@ -138,7 +138,7 @@ test('renders master course lock icon if masterCourseData is provided', (assert)
 
 test('renders reply button icon if is not locked', () => {
   const tree = mount(<AnnouncementRow {...makeProps({ announcement: { locked: false } })} />)
-  const node = tree.find('IconReply')
+  const node = tree.find('IconReplyLine')
   ok(node.exists())
 })
 

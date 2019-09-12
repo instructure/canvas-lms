@@ -19,11 +19,11 @@
 import React from 'react'
 import $ from 'jquery'
 import {shape, func, object} from 'prop-types'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import {Tray} from '@instructure/ui-overlays'
 import preventDefault from 'compiled/fn/preventDefault'
 import I18n from 'i18n!MobileNavigation'
-import View from '@instructure/ui-layout/lib/components/View'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {View} from '@instructure/ui-layout'
+import {Spinner} from '@instructure/ui-elements'
 
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
@@ -69,7 +69,7 @@ export default class MobileNavigation extends React.Component {
     const closeGlobalNav = () => this.setState({globalNavIsOpen: false})
     const spinner = (
       <View display="block" textAlign="center">
-        <Spinner size="large" margin="large auto" title={I18n.t('...Loading')} />
+        <Spinner size="large" margin="large auto" renderTitle={I18n.t('...Loading')} />
       </View>
     )
     return (

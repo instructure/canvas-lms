@@ -20,7 +20,6 @@ import $ from 'jquery'
 import * as uploadFileModule from '../../../../shared/upload_file'
 import AttemptTab from '../AttemptTab'
 import {mockAssignmentAndSubmission} from '../../mocks'
-import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {render, waitForElement} from '@testing-library/react'
 import {SubmissionMocks} from '../../graphqlData/Submission'
@@ -32,12 +31,8 @@ describe('ContentTabs', () => {
         Assignment: () => ({submissionTypes: ['online_upload']})
       })
 
-      const {getByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} />
-        </MockedProvider>
-      )
-      expect(getByTestId('upload-pane')).toBeInTheDocument()
+      const {getByTestId} = render(<AttemptTab {...props} />)
+      expect(await waitForElement(() => getByTestId('upload-pane'))).toBeInTheDocument()
     })
 
     it('renders the file preview tab when the submission is submitted', async () => {
@@ -49,8 +44,8 @@ describe('ContentTabs', () => {
         })
       })
 
-      const {getByTestId} = render(<AttemptTab {...props} />)
-      expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
+      const {findByTestId} = render(<AttemptTab {...props} />)
+      expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
     describe('Uploading a file', () => {
@@ -69,11 +64,7 @@ describe('ContentTabs', () => {
           })
         })
 
-        const {getAllByText} = render(
-          <MockedProvider>
-            <AttemptTab {...props} />
-          </MockedProvider>
-        )
+        const {getAllByText} = render(<AttemptTab {...props} />)
         expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
       })
     })
@@ -92,8 +83,8 @@ describe('ContentTabs', () => {
           Assignment: () => ({submissionTypes: ['online_text_entry']})
         })
 
-        const {getByTestId} = render(<AttemptTab {...props} />)
-        expect(getByTestId('text-entry')).toBeInTheDocument()
+        const {findByTestId} = render(<AttemptTab {...props} />)
+        expect(await findByTestId('text-entry')).toBeInTheDocument()
       })
     })
   })

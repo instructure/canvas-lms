@@ -17,38 +17,44 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import I18n from 'i18n!assignments_2_logged_out_tabs'
 import LoginActionPrompt from './LoginActionPrompt'
-import React from 'react'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import React, {useState} from 'react'
+import {Tabs} from '@instructure/ui-tabs'
+import {Text} from '@instructure/ui-elements'
 
 LoggedOutTabs.propTypes = {
   assignment: Assignment.shape
 }
 
 function LoggedOutTabs(props) {
+  const {selectedTabIndex, setSelectedTabIndex} = useState(0)
+
+  function handleTabChange(event, {index}) {
+    setSelectedTabIndex(index)
+  }
+
   return (
     <div>
-      <TabList defaultSelectedIndex={0} variant="minimal">
-        {/* Alwasy attempt 1, cause there is no submission for logged out users */}
-        <TabPanel title={I18n.t('Attempt 1')}>
+      <Tabs onRequestTabChange={handleTabChange} variant="default">
+        {/* Always attempt 1, cause there is no submission for logged out users */}
+        <Tabs.Panel title={I18n.t('Attempt 1')} selected={selectedTabIndex === 0}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
               <LoginActionPrompt />
             </FlexItem>
           </Flex>
-        </TabPanel>
+        </Tabs.Panel>
 
-        <TabPanel title={I18n.t('Rubric')}>
+        <Tabs.Panel title={I18n.t('Rubric')} selected={selectedTabIndex === 1}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
               <Text>{`TODO: Input Rubric Content Here... ${props.assignment.title}`}</Text>
             </FlexItem>
           </Flex>
-        </TabPanel>
-      </TabList>
+        </Tabs.Panel>
+      </Tabs>
     </div>
   )
 }

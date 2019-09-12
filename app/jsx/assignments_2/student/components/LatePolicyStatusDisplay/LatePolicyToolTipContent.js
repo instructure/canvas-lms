@@ -18,8 +18,8 @@
 import I18n from 'i18n!assignments_2_thing'
 import PropTypes from 'prop-types'
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Text} from '@instructure/ui-elements'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 import AccessibleTipContent from './AccessibleTipContent'
 

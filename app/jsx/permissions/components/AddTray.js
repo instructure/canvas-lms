@@ -23,17 +23,13 @@ import I18n from 'i18n!permissions_v2_add_tray'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {roleIsCourseBaseRole} from '../helper/utils'
-
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import IconX from '@instructure/ui-icons/lib/Solid/IconX'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import {View} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {FormField} from '@instructure/ui-form-field'
+import {Heading, Spinner, Text} from '@instructure/ui-elements'
+import {IconXSolid} from '@instructure/ui-icons'
+import {TextInput} from '@instructure/ui-forms'
+import {Tray} from '@instructure/ui-overlays'
 
 export default class AddTray extends Component {
   static propTypes = {
@@ -115,7 +111,7 @@ export default class AddTray extends Component {
           onClick={this.hideTray}
           buttonRef={c => (this.closeButton = c)}
         >
-          <IconX title={I18n.t('Close')} />
+          <IconXSolid title={I18n.t('Close')} />
         </Button>
       </FlexItem>
       <FlexItem>

@@ -22,12 +22,11 @@ import mimeClass from 'compiled/util/mimeClass'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import {Flex, FlexItem} from '@instructure/ui-layout/lib/components'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, FlexItem} from '@instructure/ui-layout'
+import {IconTrashLine} from '@instructure/ui-icons'
+import {List, ListItem, Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 const getIcon = file => {
   if (mimeClass(file.type) === 'image') {
@@ -77,7 +76,7 @@ const FileList = props => {
             {canRemove && (
               <FlexItem padding="0 small 0 x-small">
                 <Button
-                  icon={IconTrash}
+                  icon={IconTrashLine}
                   id={file.id}
                   onClick={removeFileHandler(refsMap)}
                   ref={element => {

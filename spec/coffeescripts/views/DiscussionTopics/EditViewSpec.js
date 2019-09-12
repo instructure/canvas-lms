@@ -93,6 +93,7 @@ QUnit.module('EditView', {
   setup() {
     fakeENV.setup()
     this.server = sinon.fakeServer.create({respondImmediately: true})
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -370,6 +371,7 @@ QUnit.module('EditView - ConditionalRelease', {
     }
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create({respondImmediately: true})
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
   teardown() {
     this.server.restore()
@@ -565,6 +567,7 @@ QUnit.module('EditView: Assignment External Tools', {
   setup() {
     fakeENV.setup({})
     this.server = sinon.fakeServer.create()
+    sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
   },
 
   teardown() {

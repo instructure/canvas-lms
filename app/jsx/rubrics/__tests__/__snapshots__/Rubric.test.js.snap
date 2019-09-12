@@ -37,6 +37,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -66,6 +67,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -247,6 +249,7 @@ exports[`the Rubric component renders as expected 1`] = `
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -276,6 +279,7 @@ exports[`the Rubric component renders as expected 1`] = `
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -422,6 +426,7 @@ exports[`the Rubric component renders as expected 1`] = `
           <Flex
             as="span"
             direction="row"
+            elementRef={[Function]}
             inline={false}
             justifyItems="end"
             visualDebug={false}
@@ -430,6 +435,7 @@ exports[`the Rubric component renders as expected 1`] = `
             <FlexItem
               as="span"
               data-selenium="rubric_total"
+              elementRef={[Function]}
               grow={false}
               shrink={false}
             >
@@ -480,6 +486,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -509,6 +516,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -624,6 +632,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
           <Flex
             as="span"
             direction="row"
+            elementRef={[Function]}
             inline={false}
             justifyItems="end"
             visualDebug={false}
@@ -632,6 +641,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
             <FlexItem
               as="span"
               data-selenium="rubric_total"
+              elementRef={[Function]}
               grow={false}
               shrink={false}
             >
@@ -682,6 +692,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -711,6 +722,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         </th>
         <th
           className="ratings"
+          colSpan={null}
           scope="col"
         >
           Ratings
@@ -856,6 +868,7 @@ exports[`the Rubric component updates the total score when an individual criteri
           <Flex
             as="span"
             direction="row"
+            elementRef={[Function]}
             inline={false}
             justifyItems="end"
             visualDebug={false}
@@ -864,6 +877,7 @@ exports[`the Rubric component updates the total score when an individual criteri
             <FlexItem
               as="span"
               data-selenium="rubric_total"
+              elementRef={[Function]}
               grow={false}
               shrink={false}
             >

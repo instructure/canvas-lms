@@ -18,11 +18,11 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import I18n from 'i18n!assignments_2'
 import lockedSVG from '../SVG/Locked.svg'
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 
 function LockedAssignment(props) {
   const {assignment} = props

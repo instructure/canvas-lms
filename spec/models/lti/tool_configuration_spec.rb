@@ -174,7 +174,7 @@ module Lti
 
       before do
         tool_configuration.developer_key = developer_key
-        tool_configuration.privacy_level = 'public'
+        extensions['privacy_level'] = 'public'
       end
 
       shared_examples_for 'a new context external tool' do
@@ -211,7 +211,7 @@ module Lti
         end
 
         context 'when no privacy level is set' do
-          before { tool_configuration.privacy_level = nil }
+          before { extensions['privacy_level'] = nil }
 
           it 'sets the workflow_state to "anonymous"' do
             expect(subject.workflow_state).to eq 'anonymous'

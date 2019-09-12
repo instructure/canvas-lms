@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IconAdd from '@instructure/ui-icons/lib/Line/IconAdd'
-import IconEdit from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconGradebook from '@instructure/ui-icons/lib/Line/IconGradebook'
-import IconMuted from '@instructure/ui-icons/lib/Line/IconMuted'
-import IconQuestion from '@instructure/ui-icons/lib/Line/IconQuestion'
-import IconStandards from '@instructure/ui-icons/lib/Line/IconStandards'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconUnmuted from '@instructure/ui-icons/lib/Line/IconUnmuted'
+import {
+  IconAddLine,
+  IconEditLine,
+  IconGradebookLine,
+  IconMutedLine,
+  IconQuestionLine,
+  IconStandardsLine,
+  IconTrashLine,
+  IconUnmutedLine
+} from '@instructure/ui-icons'
 
 import * as AuditTrailHelpers from '../AuditTrailHelpers'
 import {buildEvent} from './AuditTrailSpecHelpers'
@@ -36,217 +38,217 @@ describe('AuditTrailHelpers', () => {
   describe('.iconFor()', () => {
     it('returns IconAdd for "assignment_created" events', () => {
       const event = buildEventOfType('assignment_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconMuted for "assignment_muted" events', () => {
       const event = buildEventOfType('assignment_muted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconMuted)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconMutedLine)
     })
 
     it('returns IconUnmuted for "assignment_unmuted" events', () => {
       const event = buildEventOfType('assignment_unmuted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconUnmuted)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconUnmutedLine)
     })
 
     it('returns IconEdit for "assignment_updated" events', () => {
       const event = buildEventOfType('assignment_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_area_created" events', () => {
       const event = buildEventOfType('docviewer_area_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_area_deleted" events', () => {
       const event = buildEventOfType('docviewer_area_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_area_updated" events', () => {
       const event = buildEventOfType('docviewer_area_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_comment_created" events', () => {
       const event = buildEventOfType('docviewer_comment_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_comment_deleted" events', () => {
       const event = buildEventOfType('docviewer_comment_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_comment_updated" events', () => {
       const event = buildEventOfType('docviewer_comment_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_free_draw_created" events', () => {
       const event = buildEventOfType('docviewer_free_draw_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_free_draw_deleted" events', () => {
       const event = buildEventOfType('docviewer_free_draw_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_free_draw_updated" events', () => {
       const event = buildEventOfType('docviewer_free_draw_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_free_text_created" events', () => {
       const event = buildEventOfType('docviewer_free_text_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_free_text_deleted" events', () => {
       const event = buildEventOfType('docviewer_free_text_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_free_text_updated" events', () => {
       const event = buildEventOfType('docviewer_free_text_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_highlight_created" events', () => {
       const event = buildEventOfType('docviewer_highlight_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_highlight_deleted" events', () => {
       const event = buildEventOfType('docviewer_highlight_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_highlight_updated" events', () => {
       const event = buildEventOfType('docviewer_highlight_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_point_created" events', () => {
       const event = buildEventOfType('docviewer_point_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_point_deleted" events', () => {
       const event = buildEventOfType('docviewer_point_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_point_updated" events', () => {
       const event = buildEventOfType('docviewer_point_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "docviewer_strikeout_created" events', () => {
       const event = buildEventOfType('docviewer_strikeout_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "docviewer_strikeout_deleted" events', () => {
       const event = buildEventOfType('docviewer_strikeout_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "docviewer_strikeout_updated" events', () => {
       const event = buildEventOfType('docviewer_strikeout_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconEdit for "grader_count_updated" events', () => {
       const event = buildEventOfType('grader_count_updated', {}, {grader_count: 2})
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconStandards for "grader_to_final_grader_anonymity_updated" events', () => {
       const event = buildEventOfType('grader_to_grader_anonymity_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandards)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandardsLine)
     })
 
     it('returns IconStandards for "grader_to_grader_anonymity_updated" events', () => {
       const event = buildEventOfType('grader_to_grader_anonymity_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandards)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandardsLine)
     })
 
     it('returns IconStandards for "grader_to_grader_comment_visibility_updated" events', () => {
       const event = buildEventOfType('grader_to_grader_comment_visibility_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandards)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandardsLine)
     })
 
     it('returns IconGradebook for "grades_posted" events', () => {
       const event = buildEventOfType('grades_posted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconGradebook)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconGradebookLine)
     })
 
     it('returns IconAdd for "provisional_grade_created" events', () => {
       const event = buildEventOfType('provisional_grade_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "provisional_grade_deleted" events', () => {
       const event = buildEventOfType('provisional_grade_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "provisional_grade_selected" events', () => {
       const event = buildEventOfType('provisional_grade_selected')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconEdit for "provisional_grade_updated" events', () => {
       const event = buildEventOfType('provisional_grade_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconAdd for "rubric_created" events', () => {
       const event = buildEventOfType('rubric_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "rubric_deleted" events', () => {
       const event = buildEventOfType('rubric_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "rubric_updated" events', () => {
       const event = buildEventOfType('rubric_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconStandards for "student_anonymity_updated" events', () => {
       const event = buildEventOfType('student_anonymity_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandards)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconStandardsLine)
     })
 
     it('returns IconAdd for "submission_comment_created" events', () => {
       const event = buildEventOfType('submission_comment_created')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAdd)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconAddLine)
     })
 
     it('returns IconTrash for "submission_comment_deleted" events', () => {
       const event = buildEventOfType('submission_comment_deleted')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrash)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconTrashLine)
     })
 
     it('returns IconEdit for "submission_comment_updated" events', () => {
       const event = buildEventOfType('submission_comment_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconEdit for "submission_updated" events', () => {
       const event = buildEventOfType('submission_updated')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEdit)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconEditLine)
     })
 
     it('returns IconQuestion for unknown events', () => {
       const event = buildEventOfType('unknown')
-      expect(AuditTrailHelpers.iconFor(event)).toBe(IconQuestion)
+      expect(AuditTrailHelpers.iconFor(event)).toBe(IconQuestionLine)
     })
   })
 

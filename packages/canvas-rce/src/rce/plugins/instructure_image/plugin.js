@@ -22,7 +22,8 @@ import {isImageEmbed} from '../shared/ContentSelection'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 
-const PLUGIN_KEY = 'images'
+const COURSE_PLUGIN_KEY = 'course_images'
+const USER_PLUGIN_KEY = 'user_images'
 
 const trayController = new TrayController()
 
@@ -45,19 +46,29 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
             text: formatMessage('Upload Image'),
             onAction: () => editor.execCommand('mceInstructureImage')
           },
-
           {
             type: 'menuitem',
-            text: contextType === 'user' ? formatMessage('My Images') : formatMessage('Course Images'),
+            text: formatMessage('My Images'),
             onAction() {
-              editor.focus(true) // activate the editor without changing focus
-              bridge.showTrayForPlugin(PLUGIN_KEY)
+              editor.focus(true)
+              bridge.showTrayForPlugin(USER_PLUGIN_KEY)
             }
           }
         ]
-        callback(items)
+
+        if (contextType === 'course') {
+          items.splice(1, 0, {
+            type: 'menuitem',
+            text: formatMessage('Course Images'),
+            onAction() {
+              editor.focus(true) // activate the editor without changing focus
+              bridge.showTrayForPlugin(COURSE_PLUGIN_KEY)
+            }
+          })
       }
-    })
+
+      callback(items)
+    }})
 
     /*
      * Register the Image "Options" button that will open the Image Options

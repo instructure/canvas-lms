@@ -18,9 +18,9 @@
 import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-forms'
+import {Flex,  FlexItem } from '@instructure/ui-layout'
 import I18n from 'i18n!edit_rubricPoints'
 
 import { assessmentShape } from './types'

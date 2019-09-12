@@ -8,6 +8,7 @@ exports[`The Points component renders the component when assessing with the expe
     alignItems="end"
     as="span"
     direction="row"
+    elementRef={[Function]}
     inline={false}
     justifyItems="start"
     visualDebug={false}
@@ -15,6 +16,7 @@ exports[`The Points component renders the component when assessing with the expe
   >
     <FlexItem
       as="span"
+      elementRef={[Function]}
       grow={false}
       margin="none small none none"
       shrink={false}
@@ -45,6 +47,7 @@ exports[`The Points component renders the component when assessing with the expe
     </FlexItem>
     <FlexItem
       as="span"
+      elementRef={[Function]}
       grow={false}
       margin="small none none none"
       shrink={false}

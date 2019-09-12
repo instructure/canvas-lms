@@ -19,8 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CutyCapt do
-  before(:each) do 
+  before(:each) do
     CutyCapt.config = nil
+  end
+
+  after :each do
+    CutyCapt.config = nil
+    ConfigFile.unstub
   end
 
   context "configuration" do
@@ -50,7 +55,7 @@ describe CutyCapt do
 
     it "should check for blacklisted ip blocks" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
-      
+
       expect(CutyCapt.verify_url("http://10.0.1.1/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://169.254.169.254/blah")).to be_falsey
       expect(CutyCapt.verify_url("http://4.4.4.4/blah")).to be_truthy

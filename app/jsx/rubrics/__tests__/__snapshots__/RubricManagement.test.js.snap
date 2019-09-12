@@ -3,6 +3,7 @@
 exports[`RubricManagement renders the RubricManagement component 1`] = `
 <TabList
   defaultSelectedIndex={0}
+  elementRef={[Function]}
   focus={false}
   variant="simple"
 >

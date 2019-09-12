@@ -19,10 +19,10 @@
 import React from 'react'
 import {func, string} from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
-import theme from '@instructure/ui-themes/lib/canvas/base'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconPlusLine} from '@instructure/ui-icons'
+import theme from '@instructure/canvas-theme'
 
 AddHorizontalRuleButton.propTypes = {
   onClick: func.isRequired,
@@ -57,7 +57,7 @@ export default function AddHorizontalRuleButton(props) {
       <span style={layoutStyle} aria-hidden="true">
         <hr style={ruleStyle} />
       </span>
-      <Button variant="circle-default" icon={IconPlus} onClick={props.onClick}>
+      <Button variant="circle-default" icon={IconPlusLine} onClick={props.onClick}>
         <ScreenReaderContent>{props.label}</ScreenReaderContent>
       </Button>
     </div>

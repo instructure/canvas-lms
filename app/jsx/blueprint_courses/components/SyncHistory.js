@@ -23,8 +23,7 @@ import { bindActionCreators } from 'redux'
 import I18n from 'i18n!blueprint_settingsSyncHistory'
 import select from '../../shared/select'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Text, Spinner} from '@instructure/ui-elements'
 import SyncHistoryItem from './SyncHistoryItem'
 
 import actions from '../actions'
