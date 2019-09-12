@@ -48,6 +48,13 @@ You can view the stream with the `tail_kinesis` tool:
 docker-compose run --rm web script/tail_kinesis http://kinesis:4567 live-events
 ```
 
+#### Stubbing Kinesis
+
+Instead of viewing events in the kinesis stream, you can also add this env variable
+to your docker compose configuration: `STUB_LIVE_EVENTS_KINESIS`, with any value.
+This will redirect live events from the kinesis stream to stdout. You still have
+to configure the live events plugin for this to work.
+
 #### Connecting to local Publisher Lambda
 
 The `live-events-publish repo should be checked out and running locally.
