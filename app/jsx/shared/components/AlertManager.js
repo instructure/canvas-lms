@@ -27,7 +27,8 @@ export const AlertManagerContext = React.createContext({
 export default class AlertManager extends React.Component {
   state = {
     alertStatus: null,
-    alertMessage: null
+    alertMessage: null,
+    key: 0
   }
 
   closeAlert = () => {
@@ -38,17 +39,19 @@ export default class AlertManager extends React.Component {
   }
 
   setOnFailure = alertMessage => {
-    this.setState({
+    this.setState(prevState => ({
       alertMessage,
-      alertStatus: 'error'
-    })
+      alertStatus: 'error',
+      key: prevState.key + 1
+    }))
   }
 
   setOnSuccess = alertMessage => {
-    this.setState({
+    this.setState(prevState => ({
       alertMessage,
-      alertStatus: 'success'
-    })
+      alertStatus: 'success',
+      key: prevState.key + 1
+    }))
   }
 
   renderAlert() {
@@ -56,9 +59,9 @@ export default class AlertManager extends React.Component {
     if (this.state.alertStatus === 'success') {
       return (
         <Alert
-          screenReaderOnly
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
           onDismiss={this.closeAlert}
+          screenReaderOnly
           timeout={ALERT_TIMEOUT}
         >
           {this.state.alertMessage}
@@ -67,11 +70,11 @@ export default class AlertManager extends React.Component {
     } else if (this.state.alertStatus === 'error') {
       return (
         <Alert
-          variant="error"
-          margin="small"
-          timeout={ALERT_TIMEOUT}
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
+          margin="small"
           onDismiss={this.closeAlert}
+          timeout={ALERT_TIMEOUT}
+          variant="error"
         >
           {this.state.alertMessage}
         </Alert>
@@ -80,6 +83,15 @@ export default class AlertManager extends React.Component {
   }
 
   render() {
+    const alertRegion = {
+      left: '300px',
+      maxWidth: '1125px',
+      position: 'fixed',
+      right: '120px',
+      top: '80px',
+      zIndex: '101'
+    }
+
     return (
       <AlertManagerContext.Provider
         value={{
@@ -87,7 +99,11 @@ export default class AlertManager extends React.Component {
           setOnSuccess: this.setOnSuccess
         }}
       >
-        {this.state.alertStatus && this.renderAlert()}
+        {this.state.alertStatus && (
+          <div key={this.state.key} style={alertRegion}>
+            {this.renderAlert()}
+          </div>
+        )}
         {this.props.children}
       </AlertManagerContext.Provider>
     )
