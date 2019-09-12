@@ -47,9 +47,10 @@ services:
       - ./lib:/app/lib
       - ./config:/app/config
       - ./log:/app/log
-      - ./public:/app/public
       - ./script:/app/script
       - ./spec:/app/spec
+     # Note: if you try and mount the entire "public" directory as a volume, it will mask the stuff generated inside 
+     # the container at build time during compile_assets and you'll get all sorts of "not found" console errors.
     networks:
       - bravendev
     environment:
