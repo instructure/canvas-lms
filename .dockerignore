@@ -1,4 +1,5 @@
 .git
+.bundle/config
 client_apps/canvas_quizzes/node_modules/
 client_apps/canvas_quizzes/dist/
 client_apps/canvas_quizzes/tmp/
@@ -14,8 +15,10 @@ packages/*/node_modules/
 packages/canvas-planner/lib
 public/dist/
 public/doc/
+public/assets/
 public/javascripts/client_apps/
 public/javascripts/translations/
+public/optimized/
 !public/javascripts/translations/_core_en.js
 tmp/
 vendor/bundle/
