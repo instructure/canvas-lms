@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
-import {Breadcrumb, BreadcrumbLink} from '@instructure/ui-breadcrumb'
+import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-layout'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -219,11 +219,11 @@ import TimeBlockSelector from './TimeBlockSelector'
       return (
         <div className="EditPage">
           <Breadcrumb label={I18n.t('You are here:')}>
-            <BreadcrumbLink href="/calendar">{I18n.t('Calendar')}</BreadcrumbLink>
+            <Breadcrumb.Link href="/calendar">{I18n.t('Calendar')}</Breadcrumb.Link>
             {this.state.appointmentGroup.title && (
-              <BreadcrumbLink>
+              <Breadcrumb.Link>
                 {I18n.t('Edit %{pageTitle}', {pageTitle: this.state.appointmentGroup.title})}
-              </BreadcrumbLink>
+              </Breadcrumb.Link>
             )}
           </Breadcrumb>
           <ScreenReaderContent>
