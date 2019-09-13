@@ -32,8 +32,9 @@ describe AcademicBenchmark::Converter do
     @cm.user = @user
     @cm.save!
 
-    @plugin.settings[:partner_id] = "instructure"
-    @plugin.settings[:partner_key] = "secret"
+    current_settings = @plugin.settings
+    new_settings = current_settings.merge(:partner_id => "instructure", :partner_key => "secret")
+    allow(@plugin).to receive(:settings).and_return(new_settings)
 
     @level_0_browse = File.join(File.dirname(__FILE__) + '/fixtures', 'api_all_standards_response.json')
     @florida_auth_list = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_auth_list_v3.json')
@@ -191,9 +192,9 @@ describe AcademicBenchmark::Converter do
     end
 
     it "should fail with an empty string partner ID" do
-      @plugin.settings['api_key'] = nil
-      @plugin.settings[:partner_id] = ""
-      @plugin.settings[:partner_key] = "a"
+      current_settings = @plugin.settings
+      new_settings = current_settings.merge('api_key' => nil, :partner_id => "", :partner_key => "a")
+      allow(@plugin).to receive(:settings).and_return(new_settings)
       @cm.export_content
       run_jobs
       @cm.reload
