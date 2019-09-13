@@ -11776,6 +11776,11 @@ tr:
         submitted_date: "gönderildi: %{date}"
       twitter: 
         body: "Canvas Uyarısı - Kısa Sınav Gönderildi : %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "%{title} için öğretmeniniz not değişiklikleri ve yeni yorumlar yayınladı. Bu değişiklikler şu an görülebilir."
+          link: "Buradan görebilirsiniz"
     summaries: 
       email: 
         daily_body: "Canvas hesabınızdan bazı bildirimlerin günlük raporunu almak için kayıt oldunuz. Aşağıda %{date} günü raporu bulunmaktadır:"
@@ -11914,6 +11919,7 @@ tr:
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Modere edilmiş notlandırma ayarı akran geribildirimli ödevler için etkinleştirilemez"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Modere edilmiş notlandırma ayarı notlandırılmamış ödevler için etkinleştirilemez"
   moderator_49b9f2e1: Moderatör
+  modified_by_c1584b3c: Değiştiren
   module_90d9fd32: Modül
   module_completed_50c50762: "Modül Tamamlandı"
   module_in_progress_fa600662: "Modül İşleniyor"
@@ -12201,6 +12207,7 @@ tr:
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   no_password_was_given_472222e5: "Şifre verilmedi"
   no_points_possible_368669d: "Olası Puan Yok"
+  no_results_3cda4e72: "Sonuç Yok"
   no_results_found_58717065: "Sonuç bulunamadı"
   no_score_yet_c94e919b: "Henüz puan yok"
   no_students_dd8de9f0: "Öğrenci Yok"
@@ -18394,6 +18401,11 @@ tr:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Özelleştirilmiş temanız başarılı bir şekilde uygulandı."
   your_email_address_f881e583: "E-Posta adresiniz"
   your_email_b5364bee: "E-Posta Adresiniz"
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Öğretim elemanı %{title} için not değişikliği ve yeni yorumlar yaptı. Bu değişiklikler şu anda görülebilir durumdadır.
+      
+      İncelemek için tıklayın:
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Mesajınız başarıyla gönderildi. Teşekkürler!"
   your_message_was_sent_977f6583: "Mesaj gönderildi!"
   your_name_7665e1d8: Adınız
