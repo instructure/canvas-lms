@@ -12142,6 +12142,11 @@ he:
         submitted_date: "הוגש: %{date}"
       twitter: 
         body: "התראת קנבס - בוחן הוגש: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "המרצה הפיץ עדכוני ציונים והערות על %{title}. כעת ניתן לצפות בעדכונים אלה."
+          link: "ניתן לראות זאת כאן "
     summaries: 
       email: 
         daily_body: "נרשמת לקבלת דוח יומי של כמה מהתראות מחשבון הקנבס שלך. ראה בהמשך את הדוח מתאריך %{date}:"
@@ -12309,6 +12314,7 @@ he:
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "אין אפשרות להפעיל הערכה מבוקרת עבור משימות ללא הערכה"
   moderator_49b9f2e1: מפקח
   moderator_sortorder_18063692: "מנחה%{sortOrder}"
+  modified_by_c1584b3c: "עודכן ע\"י"
   module_90d9fd32: מודול
   module_completed_50c50762: "המודול הושלם"
   module_filter_63b17d11: "מסנן מודולים"
@@ -12630,6 +12636,7 @@ he:
   no_placements_enabled_f705f28: "לא הופעלו הצבות"
   no_points_possible_368669d: "אין ניקוד אפשרי"
   no_points_possible_72db3a55: "אין ניקוד אפשרי"
+  no_results_3cda4e72: "אין תוצאות"
   no_results_f36777ee: "אין תוצאות"
   no_results_found_58717065: "לא נמצאו תוצאות"
   no_score_yet_c94e919b: "אין ציון עדיין"
@@ -19703,6 +19710,11 @@ he:
   your_email_b5364bee: "כתובת הדוא\"ל שלך"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      המנחה שלך פרסם שינויי הערכה והערות חדשות עבור %{title}. שנויים אלו ניתנים כעת לצפייה.
+      
+      ניתן לעיין בהם כאן:
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "הודעתך נשלחה, תודה!"
   your_message_was_sent_977f6583: "הודעתך נשלחהֱ!"
   your_name_7665e1d8: שמך
