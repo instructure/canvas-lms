@@ -97,3 +97,16 @@ test("sets the iframe allowances", () => {
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
   ok(wrapper.find('.tool_launch').instance().getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
 })
+
+test("sets the 'data-lti-launch' attribute on the iframe", () => {
+  const wrapper = mount(
+    <CollaborationsToolLaunch />
+  )
+  equal(
+    wrapper
+      .find('.tool_launch')
+      .instance()
+      .getAttribute('data-lti-launch'),
+    'true'
+  )
+})

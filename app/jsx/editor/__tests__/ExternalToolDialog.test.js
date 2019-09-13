@@ -201,6 +201,12 @@ describe('open', () => {
     expect(bind).toHaveBeenCalledWith('externalContentReady', instance.handleExternalContentReady)
   })
 
+  it('sets "data-lti-launch" attribute on iframe', async () => {
+    const instance = await getInstance(container)
+    instance.open({name: 'foo', id: 2})
+    expect(document.querySelector('iframe').getAttribute('data-lti-launch')).toBe('true')
+  })
+
   describe('tray', () => {
     it('does not set height or width for iframe', async () => {
       const instance = await getInstance(container)

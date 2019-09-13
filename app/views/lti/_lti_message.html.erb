@@ -82,7 +82,8 @@
     tabindex:"0",
     title:t('Tool Content'),
     style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};",
-    allow: Lti::Launch.iframe_allowances(request.user_agent).join('; ')
+    allow: Lti::Launch.iframe_allowances(request.user_agent).join('; '),
+    data: { 'lti-launch': true }
   ) %>
 
   <div class="after_external_content_info_alert screenreader-only-tool" tabindex="0">

@@ -204,6 +204,7 @@ export default class ExternalToolDialog extends React.Component {
             }}
             allow={iframeAllowances}
             borderstyle="0"
+            data-lti-launch="true"
           />
           <Flex.Item>
             <div
