@@ -12993,6 +12993,11 @@ nn:
         submitted_date: "innlevert: %{date}"
       twitter: 
         body: "Canvas-varsel – innlevert quiz: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "Faglæraren din har kunngjort endringar i vurderingane og nye kommentarar for %{title}. Du kan sjå endringane."
+          link: "Du ser det her"
     summaries: 
       email: 
         daily_body: "Du er registrert for å få ein dagleg rapport med varslar frå Canvas-kontoen din.  Nedanfor finn du rapporten for %{date}:"
@@ -13164,6 +13169,7 @@ nn:
   moderation_page_4061aa2b: Modereringsside
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Moderator %{sortOrder}"
+  modified_by_c1584b3c: "Endra av"
   module_90d9fd32: Modul
   module_completed_50c50762: "Modul er fullført"
   module_filter_63b17d11: Modulfilter
@@ -13527,6 +13533,7 @@ nn:
   no_placements_enabled_f705f28: "Ingen plasseringar er aktivert"
   no_points_possible_368669d: "Ingen moglege poeng"
   no_points_possible_72db3a55: "Ingen moglege poeng"
+  no_results_3cda4e72: "Ingen resultat"
   no_results_f36777ee: "Utan resultat"
   no_results_found_58717065: "Finn ikkje resultat"
   no_results_found_e4b686bd: "Finn ikkje resultat."
@@ -21494,6 +21501,11 @@ nn:
   your_email_b5364bee: "E-posten din"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Fila di vert lasta opp til karakterboka, og du kan gå at av sida når som helst. Om du har ei stor CSV-fil, kan det ta nokre minutt å oppdatere endringane. Om du vil hindre overskriving av data, må du stadfeste at opplastinga er fullført og karakterboka er korrekt før du utfører fleire endringar."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Fila di vert lasta opp til karakterboka, og du kan gå at av sida når som helst. Om du har ei stor CSV-fil, kan det ta nokre minutt å oppdatere endringane. Om du vil hindre overskriving av data, må du stadfeste at opplastinga er fullført og karakterboka er korrekt før du utfører fleire endringar."
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Faglæraren din har kunngjort endringar i vurderinga og nye kommentarar for %{title}. Du kan sjå endringane.
+      
+      Your can view it here:
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Meldinga di er send. Takk."
   your_message_was_sent_977f6583: "Meldinga di er send!"
   your_name_7665e1d8: "Namnet ditt"
