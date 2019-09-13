@@ -25,35 +25,35 @@ import DateHelper from 'jsx/shared/helpers/dateHelper'
 const DATE_RANGE_ERRORS = {
   due_at: {
     start_range: {
-      section: I18n.t('Due date cannot be before section start'),
-      course: I18n.t('Due date cannot be before course start'),
-      term: I18n.t('Due date cannot be before term start'),
+      get section(){ return I18n.t('Due date cannot be before section start')},
+      get course(){ return I18n.t('Due date cannot be before course start')},
+      get term(){ return I18n.t('Due date cannot be before term start')},
     },
     end_range: {
-      section: I18n.t('Due date cannot be after section end'),
-      course: I18n.t('Due date cannot be after course end'),
-      term: I18n.t('Due date cannot be after term end'),
+      get section(){ return I18n.t('Due date cannot be after section end')},
+      get course(){ return I18n.t('Due date cannot be after course end')},
+      get term(){ return I18n.t('Due date cannot be after term end')},
     },
   },
   unlock_at: {
     start_range: {
-      section: I18n.t('Unlock date cannot be before section start'),
-      course: I18n.t('Unlock date cannot be before course start'),
-      term: I18n.t('Unlock date cannot be before term start'),
+      get section(){ return I18n.t('Unlock date cannot be before section start')},
+      get course(){ return I18n.t('Unlock date cannot be before course start')},
+      get term(){ return I18n.t('Unlock date cannot be before term start')},
     },
     end_range: {
-      due: I18n.t('Unlock date cannot be after due date'),
-      lock: I18n.t('Unlock date cannot be after lock date'),
+      get due(){ return I18n.t('Unlock date cannot be after due date')},
+      get lock(){ return I18n.t('Unlock date cannot be after lock date')},
     },
   },
   lock_at: {
     start_range: {
-      due: I18n.t('Lock date cannot be before due date'),
+      get due(){ return I18n.t('Lock date cannot be before due date')},
     },
     end_range: {
-      section: I18n.t('Lock date cannot be after section end'),
-      course: I18n.t('Lock date cannot be after course end'),
-      term: I18n.t('Lock date cannot be after term end'),
+      get section(){ return I18n.t('Lock date cannot be after section end')},
+      get course(){ return I18n.t('Lock date cannot be after course end')},
+      get term(){ return I18n.t('Lock date cannot be after term end')},
     },
   },
 }
