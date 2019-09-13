@@ -87,6 +87,30 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         end
       end
     end
+
+    it "should show uploaded files in file tree and add them to the rce" do
+      wiki_page_tools_file_tree_setup(true, true)
+      click_files_tab
+      expect(sidebar_files.count).to eq 4
+
+      fj('button:contains(" Upload a new file")').click
+      _name, path, _data = get_file({:text => 'foo.txt'}[:text])
+      f("input[type='file']").send_keys(path)
+      button = f("button[type='submit']")
+      keep_trying_until { button.displayed? }
+      button.click
+      wait_for_ajaximations
+
+      expect(sidebar_files.count).to eq 5
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce')).to include_text('txt')
+      end
+
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
+      check_file(f('#wiki_page_show a.instructure_file_link'))
+    end
   end
 end
 

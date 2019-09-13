@@ -159,7 +159,7 @@ module WikiAndTinyCommon
     fj('[role="presentation"]:contains("Images")').click
     fj('button:contains(" Upload a new image")').click
     alt_text = "image file"
-    name, path, data = get_file({:image => 'graded.png'}[:image])
+    _name, path, _data = get_file({:image => 'graded.png'}[:image])
     f("input[type='file']").send_keys(path)
     f("input[name='alt_text']").send_keys(alt_text)
     f("button[type='submit']").click
@@ -174,7 +174,7 @@ module WikiAndTinyCommon
 
   def upload_image_to_files_in_rce
     fj('button:contains("Upload a new file")').click
-    name, path, data = get_file({:image => 'graded.png'}[:image])
+    _name, path, _data = get_file({:image => 'graded.png'}[:image])
     f("input[type='file']").send_keys(path)
     button = f("button[type='submit']")
     keep_trying_until { button.displayed? }
