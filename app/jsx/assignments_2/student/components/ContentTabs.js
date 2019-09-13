@@ -129,12 +129,14 @@ function ContentTabs(props) {
         : null}
       <Tabs onRequestTabChange={handleTabChange} variant="default">
         <Tabs.Panel
+          key="attempt-tab"
           renderTitle={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
           selected={selectedTabIndex === 0}
         >
           <SubmissionManager assignment={props.assignment} submission={props.submission} />
         </Tabs.Panel>
         <Tabs.Panel
+          key="comments-tab"
           selected={selectedTabIndex === 1}
           renderTitle={
             <span>
@@ -152,7 +154,11 @@ function ContentTabs(props) {
           {renderCommentsTab(props)}
         </Tabs.Panel>
         {props.assignment.rubric && (
-          <Tabs.Panel renderTitle={I18n.t('Rubric')} selected={selectedTabIndex === 2}>
+          <Tabs.Panel
+            key="rubrics-tab"
+            renderTitle={I18n.t('Rubric')}
+            selected={selectedTabIndex === 2}
+          >
             <Suspense fallback={<LoadingIndicator />}>
               <RubricTab assignment={props.assignment} submission={props.submission} />
             </Suspense>
