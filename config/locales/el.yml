@@ -9103,6 +9103,11 @@ el:
         submitted_date: "<mrk mid=\"6708\" mtype=\"seg\">υποβλήθηκε:</mrk> <mrk mid=\"6709\" mtype=\"seg\">%{date}</mrk>"
       twitter: 
         body: "<mrk mid=\"6710\" mtype=\"seg\">Ειδοποίηση Canvas - Υποβλήθηκε Κουίζ:</mrk> <mrk mid=\"6711\" mtype=\"seg\">%{quiz}, %{user_name}</mrk>"
+    submission_posted: 
+      email: 
+        html: 
+          body: "<mrk mid=\"613\" mtype=\"seg\">Ο εκπαιδευτής κοινοποίησε αλλαγές στη βαθμολογία και σχόλια για το %{title}.</mrk> <mrk mid=\"614\" mtype=\"seg\">Οι αλλαγές αυτές είναι τώρα ορατές.</mrk>"
+          link: "Μπορείτε να το δείτε εδώ"
     summaries: 
       email: 
         daily_body: "<mrk mid=\"2172\" mtype=\"seg\">Έχετε εγγραφεί για να λαμβάνετε μια ημερήσια αναφορά ορισμένων ειδοποιήσεων από τον λογαριασμό σας στο Canvas.</mrk>  <mrk mid=\"2173\" mtype=\"seg\">Παρακάτω θα βρείτε την αναφορά για τις %{date}:</mrk>"
@@ -9234,6 +9239,7 @@ el:
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Η ρύθμιση βαθμολόγησης από περισσότερους δεν μπορεί να ενεργοποιηθεί για εργασίες που έχουν υποβληθεί σε αξιολόγηση ομότιμων"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Η ρύθμιση βαθμολόγησης από περισσότερους δεν μπορεί να ενεργοποιηθεί για μη βαθμολογημένες εργασίες"
   moderator_49b9f2e1: Συντονιστής
+  modified_by_c1584b3c: "Τροποποιήθηκε Από"
   module_90d9fd32: Ενότητα
   module_completed_50c50762: "Η Ενότητα Ολοκληρώθηκε"
   module_in_progress_fa600662: "Η Ενότητα βρίσκεται Σε Εξέλιξη"
@@ -9380,6 +9386,7 @@ el:
   no_migration_file: "Αρχείο που απαιτείται για τη μεταφορά περιεχομένου."
   no_password_was_given_472222e5: "Δεν δόθηκε κωδικός πρόσβασης"
   no_placements_enabled_f705f28: "Δεν έχουν Ενεργοποιηθεί Τοποθετήσεις"
+  no_results_3cda4e72: "Δεν υπάρχουν Αποτελέσματα"
   no_results_f36777ee: "Κανένα αποτέλεσμα"
   no_results_found_58717065: "Δεν βρέθηκαν αποτελέσματα"
   no_score_yet_c94e919b: "Δεν υπάρχει ακόμη βαθμολογία"
@@ -14868,6 +14875,11 @@ el:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "To προσαρμοσμένο θέμα σας έχει εφαρμοστεί επιτυχώς."
   your_email_address_f881e583: "Η ηλεκτρονική σας διεύθυνση"
   your_email_b5364bee: "Η ηλεκτρονική σας διεύθυνση"
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      <mrk mid="5566" mtype="seg">Ο εκπαιδευτής κοινοποίησε αλλαγές στη βαθμολογία και σχόλια για το %{title}.</mrk> <mrk mid="5567" mtype="seg">Οι αλλαγές αυτές είναι τώρα ορατές.</mrk>
+      
+      <mrk mid="5568" mtype="seg">Μπορείτε να το δείτε εδώ:</mrk>
+      <mrk mid="5569" mtype="seg">%{url}</mrk>
   your_message_has_been_sent_thank_you_e0284316: "Το μήνυμά σας έχει αποσταλεί. Ευχαριστούμε!"
   your_message_was_sent_977f6583: "Το μήνυμά σας έχει αποσταλεί!"
   your_name_7665e1d8: "Το όνομά σας"
