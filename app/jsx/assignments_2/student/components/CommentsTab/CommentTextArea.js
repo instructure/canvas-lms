@@ -78,10 +78,14 @@ export default class CommentTextArea extends Component {
     }
   }
 
-  updateSubmissionCommentCache = (cache, submission) => {
+  updateSubmissionCommentCache = (cache, result) => {
+    if (result.data.createSubmissionComment.errors) {
+      return
+    }
+
     const {submissionComments} = JSON.parse(JSON.stringify(cache.readQuery(this.queryVariables())))
     submissionComments.commentsConnection.nodes = submissionComments.commentsConnection.nodes.concat(
-      [submission.data.createSubmissionComment.submissionComment]
+      [result.data.createSubmissionComment.submissionComment]
     )
     cache.writeQuery({
       ...this.queryVariables(),
@@ -164,7 +168,11 @@ export default class CommentTextArea extends Component {
   render() {
     return (
       <Mutation
-        onCompleted={() => this.context.setOnSuccess(I18n.t('Submission comment sent'))}
+        onCompleted={result =>
+          result.createSubmissionComment.errors
+            ? this.context.setOnFailure(I18n.t('Error sending submission comment'))
+            : this.context.setOnSuccess(I18n.t('Submission comment sent'))
+        }
         onError={() => this.context.setOnFailure(I18n.t('Error sending submission comment'))}
         optimisticResponse={this.optimisticResponse()}
         update={this.updateSubmissionCommentCache}
