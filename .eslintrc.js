@@ -85,6 +85,7 @@ module.exports = {
     'promise/avoid-new': 'off',
     'promise/no-nesting': 'off',
     'react/destructuring-assignment': 'off',
+    'react/forbid-prop-types': 'off', // AirBnB doesn't want you to use PropTypes.object, and we agree normally. But there are times where you just want to pass on an opaque object to something else and forcing people to make a PropTypes.shape for it doesn't add any value. People should still encourage each other to use PropTypes.shape normally, when it makes sense, in code-review but we're not going to -2 because of it.
     'react/no-typos': 'off',
     'react/sort-comp': 'off',
     'react/require-default-props': 'off',
