@@ -1411,9 +1411,14 @@ class Assignment < ActiveRecord::Base
         # a different unlock_at time, so include that in the singleton key so that different
         # unlock_at times are properly handled.
         singleton = "touch_on_unlock_assignment_#{self.global_id}_#{self.unlock_at}"
-        send_later_enqueue_args(:touch, { :run_at => self.unlock_at, :singleton => singleton })
+        send_later_enqueue_args(:touch_assignment_and_submittable, { :run_at => self.unlock_at, :singleton => singleton })
       end
     end
+  end
+
+  def touch_assignment_and_submittable
+    self.touch
+    self.submittable_object&.touch
   end
 
   def low_level_locked_for?(user, opts={})
