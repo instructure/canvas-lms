@@ -1,9 +1,0 @@
-test:
-  domain: localhost
-
-development:
-  domain: "canvasweb"
-
-production:
-  domain: <%= ENV['DOMAIN'] %>
-

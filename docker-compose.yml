@@ -1,5 +1,5 @@
 #Note: this file is used to bring up a development environment. For staging and production environments, see heroku.yml
-version: "3"
+version: "3.5"
 services:
 
   canvasdb:
@@ -7,7 +7,7 @@ services:
     volumes:
       - canvas-db:/var/lib/postgresql/data
     networks:
-      - frontend
+      - bravendev
     environment:
       POSTGRES_USER: canvas
       POSTGRES_DB: canvas
@@ -15,23 +15,57 @@ services:
   canvasredis:
     image: redis:2.6
     networks:
-      - frontend
+      - bravendev
 
   canvasweb:
     build:
       context: .
     command: /app/docker-compose/scripts/docker_compose_run.sh
+    # Temporarily replace the command above with this if you want the container to just stay open 
+    # so you can connect and troubleshoot b/c the container exits when you bring it up.
+    #tty: true
     ports:
       - "3000:3000"
+    # Mount some specific dirs as volumes (not persistent for now, we would have to name them to make them persist)
+    # so that you can make changes outside the container and have them reflect inside the container (and vice versa)
+    # without needing to rebuild the containter.
+    # Note: we don't mount the entire root directory, e.g ".", b/c it's easy for generated things to conflict between
+    # builds. E.g. if you run a bundle install outside the container, then .bundle/config will have it's path set and 
+    # then inside the container it may be wrong and not match what was built in the Dockerfile. Or if you recompile just
+    # a piece of the assets inside the container and then try to rebuild the whole container, you may end up with the piece
+    # you rebuilt to try something out in place after the rebuild which you would expect to be a clean state b/c the rebuild
+    # inside also changed the files outside and after the rebuild you end up mounting the old thing into the container when
+    # you really want a fresh copy.
+    # So we only mount the things we want to actively edit outside the container and have them reflected inside for dev
+    # purposes. For rarer things that we want to tinker with, do it inside the container, get it right, then copy it 
+    # outside and rebuild the container.
+    #
+    # Summary: IF YOU MAKE A CHANGE to any file not mounted here outside the container, you have to rebuild the container
+    # for the container to pick up the change!
+    volumes:
+      - ./app:/app/app
+      - ./lib:/app/lib
+      - ./config:/app/config
+      - ./log:/app/log
+      - ./script:/app/script
+      - ./spec:/app/spec
+     # Note: if you try and mount the entire "public" directory as a volume, it will mask the stuff generated inside 
+     # the container at build time during compile_assets and you'll get all sorts of "not found" console errors.
     networks:
-      - frontend
+      - bravendev
     environment:
       RACK_ENV: development
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     depends_on:
       - canvasdb
       - canvasredis
+
+# Note all Braven web app docker dev envs use this same network so they can talk to each other.
+# E.g. the hostname joinweb will resolve inside the ssoweb container if they are on the same docker network.
 networks:
-  frontend:
+  bravendev:
+    name: braven_dev_network
 
 volumes:
   canvas-db:

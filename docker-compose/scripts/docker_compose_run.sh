@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#sleep 15s until db is up and running
-sleep 15
-
 # When you stop the container, it doesn't clean itself up properly so it fails to start next time. Cleanup!
 if [ -e /app/tmp/pids/server.pid ]; then
   echo "Cleaning up previous server state"
@@ -27,20 +24,31 @@ fi
 
 cp -a /app/docker-compose/config/* /app/config/
 
+echo "Checking if the AWS ENV vars are setup"
+if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+  echo "The AWS ENV vars arent setup. One of the following is empty: AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+  exit 1
+else
+  echo "Ok!"
+fi
+
 # Not sure exactly why I need this, but after stopping and starting the container it dies with
 # an error saying i have to run this.  So just do it.
 bundle exec rake db:reset_encryption_key_hash
 
-# TODO: check if everything is setup and skip this step if so.
-bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
+# TODO: check if the database is already setup and if not, download and load the latest dev db.
+#bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
+echo "####"
+echo "If you are building this fresh and don't have a dev database setup/loaded, run the following and then restart:"
+echo ""
+echo "docker-compose exec canvasweb bundle exec rake db:create"
+echo "./docker-compose/scripts/dbrefresh.sh"
+echo ""
 
-#TODO: check if everything is setup and if not run this automatically. This stuff takes awhile and we only want to do it once, or if necessary.
-#echo ""
-#echo "Note: If this is the first time you're starting this container, you may have to run the following:"
-#echo ""
-#echo "    bundle exec rake canvas:compile_assets"
+echo "Starting rails app. Go to http://canvasweb:3000 to access it (assuming you've added canvasweb to /etc/hosts)"
+bundle exec bin/rails s -p 3000 -b '0.0.0.0'
 
-echo "Starting the rails app using puma"
-#bundle exec bin/rails s -p 3000 -b '0.0.0.0'
+# TODO: when we move to heroku, switch to puma"
 # Use puma to run rails instead of running it directly so that our dev env matches prod.
-bundle exec puma -C config/puma.rb
+#echo "Starting the rails app using puma"
+#bundle exec puma -C config/puma.rb
