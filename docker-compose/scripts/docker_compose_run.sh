@@ -24,6 +24,14 @@ fi
 
 cp -a /app/docker-compose/config/* /app/config/
 
+echo "Checking if the AWS ENV vars are setup"
+if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+  echo "The AWS ENV vars arent setup. One of the following is empty: AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+  exit 1
+else
+  echo "Ok!"
+fi
+
 # Not sure exactly why I need this, but after stopping and starting the container it dies with
 # an error saying i have to run this.  So just do it.
 bundle exec rake db:reset_encryption_key_hash
