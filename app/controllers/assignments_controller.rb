@@ -600,7 +600,7 @@ class AssignmentsController < ApplicationController
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
-      hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
+      hash[:CANCEL_TO] = set_cancel_to_url
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
       hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
@@ -632,6 +632,13 @@ class AssignmentsController < ApplicationController
       set_master_course_js_env_data(@assignment, @context)
       render :edit
     end
+  end
+
+  def set_cancel_to_url
+    if @assignment.quiz_lti? && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      return polymorphic_url([@context, :quizzes])
+    end
+    @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
   end
 
   # @API Delete an assignment

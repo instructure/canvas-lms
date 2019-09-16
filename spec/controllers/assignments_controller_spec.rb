@@ -1201,8 +1201,55 @@ describe AssignmentsController do
       end
     end
 
+    it "js_env CANCEL_TO points to quizzes when quiz_lti? is true" do
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.enable_feature! :quizzes_next
+      @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      @course.enable_feature! :quizzes_next
+      user_session(@teacher)
+      get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+      expect(assigns[:js_env][:CANCEL_TO]).to include('quizzes')
+    end
+
+    it "js_env CANCEL_TO points to assignments when quiz_lti? is not included" do
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.enable_feature! :quizzes_next
+      @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      @course.enable_feature! :quizzes_next
+      user_session(@teacher)
+      get 'new', params: { :course_id => @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:CANCEL_TO]).to include('assignments')
+    end
+
+    it "js_env CANCEL_TO points to assignments when newquizzes_on_quiz_page feature flag is off" do
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.enable_feature! :quizzes_next
+      @course.enable_feature! :quizzes_next
+      user_session(@teacher)
+      get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+      expect(assigns[:js_env][:CANCEL_TO]).to include('assignments')
+    end
+
     it "should require authorization" do
-      #controller.use_rails_error_handling!
+      # controller.use_rails_error_handling!
       get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
       assert_unauthorized
     end
