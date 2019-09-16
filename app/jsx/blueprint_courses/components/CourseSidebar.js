@@ -295,7 +295,7 @@ export default class CourseSidebar extends Component {
   renderSpinner (title) {
     return (
       <div style={{textAlign: 'center'}}>
-        <Spinner size="small" title={title} />
+        <Spinner size="small" renderTitle={title} />
         <Text size="small" as="p">{title}</Text>
       </div>
     )

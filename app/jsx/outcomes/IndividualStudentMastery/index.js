@@ -109,7 +109,7 @@ class IndividualStudentMastery extends React.Component {
   renderLoading () {
     return (
       <Flex justifyItems="center" alignItems="center" padding="medium">
-        <Flex.Item><Spinner size="large" title={I18n.t('Loading outcome results')} /></Flex.Item>
+        <Flex.Item><Spinner size="large" renderTitle={I18n.t('Loading outcome results')} /></Flex.Item>
       </Flex>
     )
   }

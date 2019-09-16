@@ -20,8 +20,8 @@ exports[`renders the component 1`] = `
   >
     <Spinner
       as="div"
+      renderTitle="Loading outcome results"
       size="large"
-      title="Loading outcome results"
       variant="default"
     />
   </FlexItem>

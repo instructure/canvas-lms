@@ -209,7 +209,7 @@ export default class StudentContextTray extends React.Component {
             >
               {loading ? (
                 <div className='StudentContextTray__Spinner'>
-                  <Spinner title={I18n.t('Loading')}
+                  <Spinner renderTitle={I18n.t('Loading')}
                     size='large'
                   />
                 </div>

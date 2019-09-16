@@ -39,7 +39,7 @@ function LoggedOutTabs(props) {
     <div>
       <Tabs onRequestTabChange={handleTabChange} variant="default">
         {/* Always attempt 1, cause there is no submission for logged out users */}
-        <Tabs.Panel title={I18n.t('Attempt 1')} selected={selectedTabIndex === 0}>
+        <Tabs.Panel renderTitle={I18n.t('Attempt 1')} selected={selectedTabIndex === 0}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <Flex.Item>
               <LoginActionPrompt />
@@ -47,7 +47,7 @@ function LoggedOutTabs(props) {
           </Flex>
         </Tabs.Panel>
 
-        <Tabs.Panel title={I18n.t('Rubric')} selected={selectedTabIndex === 1}>
+        <Tabs.Panel renderTitle={I18n.t('Rubric')} selected={selectedTabIndex === 1}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <Flex.Item>
               <Text>{`TODO: Input Rubric Content Here... ${props.assignment.title}`}</Text>

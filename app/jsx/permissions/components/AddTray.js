@@ -187,7 +187,7 @@ export default class AddTray extends Component {
   renderLoadingIndicator() {
     return (
       <View display="block" margin="auto">
-        <Spinner size="large" title={I18n.t('Saving New Role')} />
+        <Spinner size="large" renderTitle={I18n.t('Saving New Role')} />
       </View>
     )
   }

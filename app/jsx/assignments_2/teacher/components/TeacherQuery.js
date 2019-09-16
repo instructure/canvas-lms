@@ -38,7 +38,7 @@ export default function TeacherQuery({assignmentLid}) {
         if (loading) {
           return (
             <View as="div" textAlign="center" padding="large 0">
-              <Spinner size="large" title={I18n.t('Loading...')} />
+              <Spinner size="large" renderTitle={I18n.t('Loading...')} />
             </View>
           )
         } else if (error) {

@@ -126,7 +126,7 @@ export default class RSSFeedList extends React.Component {
     if (!this.props.hasLoadedFeed) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner size="small" title={I18n.t('Adding RSS Feed')} />
+          <Spinner size="small" renderTitle={I18n.t('Adding RSS Feed')} />
         </div>
       )
     } else {

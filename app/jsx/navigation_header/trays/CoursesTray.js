@@ -45,7 +45,7 @@ export default function CoursesTray({courses, hasLoaded}) {
           ])
         ) : (
           <List.Item>
-            <Spinner size="small" title={I18n.t('Loading')} />
+            <Spinner size="small" renderTitle={I18n.t('Loading')} />
           </List.Item>
         )}
       </List>

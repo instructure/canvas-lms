@@ -44,7 +44,7 @@ export class RetrievingContent extends React.Component {
       <div>
         <Flex justifyItems="center" margin="x-large 0 large 0">
           <Flex.Item>
-            <Spinner title={message} size="large" />
+            <Spinner renderTitle={message} size="large" />
           </Flex.Item>
         </Flex>
         <Flex justifyItems="center" margin="0 0 large">

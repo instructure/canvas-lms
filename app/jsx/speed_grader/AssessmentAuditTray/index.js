@@ -126,7 +126,7 @@ export default class AssessmentAuditTray extends Component {
               </View>
             </>
           ) : (
-            <Spinner title={I18n.t('Loading assessment audit trail')} />
+            <Spinner renderTitle={I18n.t('Loading assessment audit trail')} />
           )}
         </View>
       </Tray>

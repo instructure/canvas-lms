@@ -42,7 +42,7 @@ export default function FormContent({
   if (hidingGrades) {
     return (
       <View as="div" textAlign="center" padding="large">
-        <Spinner title={I18n.t('Hiding grades')} size="large" />
+        <Spinner renderTitle={I18n.t('Hiding grades')} size="large" />
       </View>
     )
   }

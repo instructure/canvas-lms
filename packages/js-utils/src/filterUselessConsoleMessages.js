@@ -29,7 +29,8 @@ const consoleMessagesToIgnore = {
     // /Please update the following components/, // Uncomment this if all the react 16.9 deprecations are cluttering up the console and you want to focus on something else
 
     // '@instructure/ui-select' itself generates this warning, we assume they will figure it out themselves
-    /\[Options\] is experimental and its API could change significantly in a future release[\s\S]*\(created by Selectable\)/,
+    /is experimental and its API could change significantly in a future release/,
+    'Warning: [Focusable] Exactly one focusable child is required (0 found).',
 
     // React 16.9+ generates these deprecation warnings but it doesn't do any good to hear about the ones for instUI. We can't do anything about them in this repo
     // Put any others we can't control here.

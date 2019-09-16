@@ -151,7 +151,7 @@ class DeveloperKeysApp extends React.Component {
               padding="large"
               textAlign="center"
             >
-              {listDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+              {listDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
               {this.showMoreButton()}
             </View>
           </TabList.Panel>
@@ -177,7 +177,7 @@ class DeveloperKeysApp extends React.Component {
                   padding="large"
                   textAlign="center"
                 >
-                  {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+                  {listInheritedDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
                   {this.showMoreInheritedButton()}
                 </View>
               </TabList.Panel>

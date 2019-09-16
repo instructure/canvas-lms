@@ -105,7 +105,7 @@ export default class DiscussionsIndex extends Component {
   renderSpinner(title) {
     return (
       <div className="discussions-v2__spinnerWrapper">
-        <Spinner size="large" title={title} />
+        <Spinner size="large" renderTitle={title} />
         <Text size="small" as="p">
           {title}
         </Text>

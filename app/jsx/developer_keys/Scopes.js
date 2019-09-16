@@ -51,7 +51,7 @@ export default class Scopes extends React.Component {
         <Grid.Row hAlign="space-around">
           <Grid.Col width={2}>
             <span id="scopes-loading-spinner">
-              <Spinner title={I18n.t('Loading Available Scopes')} />
+              <Spinner renderTitle={I18n.t('Loading Available Scopes')} />
             </span>
           </Grid.Col>
         </Grid.Row>

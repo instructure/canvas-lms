@@ -267,7 +267,7 @@ export default class DeveloperKeyModal extends React.Component {
           <Modal.Body>
             {this.isSaving
               ? <View as="div" textAlign="center">
-                  <Spinner title={I18n.t('Creating Key')} margin="0 0 0 medium" />
+                  <Spinner renderTitle={I18n.t('Creating Key')} margin="0 0 0 medium" />
                 </View>
               : <NewKeyForm
                   ref={this.setNewFormRef}

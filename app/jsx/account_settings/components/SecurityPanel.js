@@ -115,7 +115,7 @@ export class SecurityPanel extends Component {
             <Grid.Col>
               {!this.props.whitelistsHaveLoaded ? (
                 <View as="div" margin="large" padding="large" textAlign="center">
-                  <Spinner size="large" title={I18n.t('Loading')} />
+                  <Spinner size="large" renderTitle={I18n.t('Loading')} />
                 </View>
               ) : (
                 <ConnectedWhitelist

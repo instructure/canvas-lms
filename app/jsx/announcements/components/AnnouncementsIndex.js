@@ -104,7 +104,7 @@ export default class AnnouncementsIndex extends Component {
     if (condition) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner size="small" title={title} />
+          <Spinner size="small" renderTitle={title} />
           <Text size="small" as="p">
             {title}
           </Text>

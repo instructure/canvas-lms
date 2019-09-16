@@ -198,7 +198,7 @@ export default class SubmissionTray extends React.Component {
 
     return (
       <div style={{textAlign: 'center'}}>
-        <Spinner title={I18n.t('Loading comments')} size="large" />
+        <Spinner renderTitle={I18n.t('Loading comments')} size="large" />
       </div>
     )
   }

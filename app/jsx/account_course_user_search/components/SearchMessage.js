@@ -92,7 +92,7 @@ export default class SearchMessage extends Component {
         aria-label={I18n.t('Page %{pageNum}', {pageNum: pageNumber})}
       >
         {isCurrent && this.state.pageBecomingCurrent ? (
-          <Spinner size="x-small" title={I18n.t('Loading...')} />
+          <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
         ) : (
           I18n.n(pageNumber)
         )}

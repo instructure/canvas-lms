@@ -217,7 +217,7 @@ class LatePoliciesTabPanel extends React.Component {
     if (!this.props.latePolicy.data) {
       return (
         <div id="LatePoliciesTabPanel__Container-noContent">
-          <Spinner title={I18n.t('Loading')} size="large" margin="small" />
+          <Spinner renderTitle={I18n.t('Loading')} size="large" margin="small" />
         </div>
       )
     }

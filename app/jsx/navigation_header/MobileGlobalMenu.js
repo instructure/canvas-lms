@@ -156,7 +156,7 @@ export default class MobileGlobalMenu extends React.Component {
                     ))
                   ) : (
                     <List.Item>
-                      <Spinner margin="auto" size="small" title={I18n.t('Loading')} />
+                      <Spinner margin="auto" size="small" renderTitle={I18n.t('Loading')} />
                     </List.Item>
                   )}
                   <List.Item>
@@ -214,7 +214,7 @@ export default class MobileGlobalMenu extends React.Component {
                       ])
                   ) : (
                     <List.Item>
-                      <Spinner size="small" title={I18n.t('Loading')} />
+                      <Spinner size="small" renderTitle={I18n.t('Loading')} />
                     </List.Item>
                   )}
                 </List>
@@ -263,7 +263,7 @@ export default class MobileGlobalMenu extends React.Component {
                     ])
                 ) : (
                   <List.Item>
-                    <Spinner size="small" title={I18n.t('Loading')} />
+                    <Spinner size="small" renderTitle={I18n.t('Loading')} />
                   </List.Item>
                 )}
               </List>
@@ -310,7 +310,7 @@ export default class MobileGlobalMenu extends React.Component {
                       ])
                   ) : (
                     <List.Item>
-                      <Spinner size="small" title={I18n.t('Loading')} />
+                      <Spinner size="small" renderTitle={I18n.t('Loading')} />
                     </List.Item>
                   )}
                 </List>
