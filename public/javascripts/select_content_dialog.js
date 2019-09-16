@@ -51,7 +51,7 @@ import './jquery.templateData'
     ) {
       processSingleContentItem(event)
         .then((result) => {
-          const $dialog = $dialog || $("#resource_selection_dialog")
+          const $dialog = $("#resource_selection_dialog")
           const tool = $("#context_external_tools_select .tools .tool.selected").data('tool')
 
           $dialog.off("dialogbeforeclose", SelectContentDialog.dialogCancelHandler)
@@ -69,7 +69,7 @@ import './jquery.templateData'
           console.error(e)
         })
         .finally(() => {
-          const $dialog = $dialog || $("#resource_selection_dialog")
+          const $dialog = $("#resource_selection_dialog")
           $dialog.dialog('close')
         })
     }
