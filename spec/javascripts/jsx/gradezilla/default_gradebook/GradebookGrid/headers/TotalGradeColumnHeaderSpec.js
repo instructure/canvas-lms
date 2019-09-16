@@ -357,16 +357,24 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
         props.gradeDisplay.onSelect = sinon.stub()
       })
 
-      test('restores focus to the "Options" menu trigger', () => {
+      test('does not immediately restore focus', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Display as Percentage').click()
-        strictEqual(document.activeElement, getOptionsMenuTrigger())
+        notEqual(document.activeElement, getOptionsMenuTrigger())
       })
 
       test('calls the .gradeDisplay.onSelect callback', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Display as Percentage').click()
         strictEqual(props.gradeDisplay.onSelect.callCount, 1)
+      })
+
+      test('includes a focus-restoring callback when calling .gradeDisplay.onSelect', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Display as Percentage').click()
+        const [callback] = props.gradeDisplay.onSelect.lastCall.args
+        callback()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
       })
     })
   })
@@ -412,16 +420,24 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
         props.gradeDisplay.onSelect = sinon.stub()
       })
 
-      test('restores focus to the "Options" menu trigger', () => {
+      test('does not immediately restore focus', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Display as Points').click()
-        strictEqual(document.activeElement, getOptionsMenuTrigger())
+        notEqual(document.activeElement, getOptionsMenuTrigger())
       })
 
       test('calls the .gradeDisplay.onSelect callback', () => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Display as Points').click()
         strictEqual(props.gradeDisplay.onSelect.callCount, 1)
+      })
+
+      test('includes a focus-restoring callback when calling .gradeDisplay.onSelect', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Display as Points').click()
+        const [callback] = props.gradeDisplay.onSelect.lastCall.args
+        callback()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
       })
     })
   })
