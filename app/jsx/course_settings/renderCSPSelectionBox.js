@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this is the first module loaded by webpack (in the vendor bundle). It tells it
-// to load chunks from the CDN url configured in config/canvas_cdn.yml
-import webpackPublicPath from '../../frontend_build/webpackPublicPath'
-__webpack_public_path__ = (window.ENV && window.ENV.ASSET_HOST || '') + webpackPublicPath
+import axios from 'axios'
+import ReactDOM from 'react-dom'
+import React from 'react'
+import CSPSelectionBox from './components/CSPSelectionBox'
+
+export function renderCSPSelectionBox(containerElement) {
+  ReactDOM.render(
+    <CSPSelectionBox
+      courseId={ENV.COURSE_ID}
+      canManage={ENV.PERMISSIONS.manage_account_settings}
+      apiLibrary={axios}
+    />,
+    containerElement
+  )
+}
