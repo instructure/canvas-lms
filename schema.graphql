@@ -1077,6 +1077,7 @@ input CreateSubmissionDraftInput {
   body: String
   fileIds: [ID!]
   submissionId: ID!
+  url: String
 }
 
 """
@@ -2846,6 +2847,7 @@ type SubmissionDraft implements LegacyIDInterface {
   body: String
   meetsAssignmentCriteria: Boolean!
   submissionAttempt: Int!
+  url: URL
 }
 
 """

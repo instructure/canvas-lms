@@ -32,6 +32,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
+  argument :url, String, required: false
 
   field :submission_draft, Types::SubmissionDraftType, null: true
   def resolve(input:)
@@ -46,8 +47,9 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
       submission_attempt: input[:attempt] || (submission.attempt + 1)
     ).first_or_create!
     submission_draft.attachments = attachments
-    # for drafts we allow the body to be null or empty, so there's nothing to validate
+    # for drafts we allow the body and url to be null or empty, so there's nothing to validate
     submission_draft.body = input[:body]
+    submission_draft.url = input[:url]
     submission_draft.save!
 
     {submission_draft: submission_draft}

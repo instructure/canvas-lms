@@ -32,7 +32,8 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     submission_id: @submission.id,
     attempt: nil,
     body: nil,
-    file_ids: []
+    file_ids: [],
+    url: nil
   )
     <<~GQL
       mutation {
@@ -41,6 +42,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
           #{"attempt: #{attempt}" if attempt}
           #{"body: \"#{body}\"" if body}
           fileIds: #{file_ids}
+          #{"url: \"#{url}\"" if url}
         }) {
           submissionDraft {
             _id
@@ -50,6 +52,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
               displayName
             }
             body
+            url
           }
           errors {
             attribute
@@ -111,6 +114,28 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :body)
     ).to eq 'some text body'
+  end
+
+  it 'allows you to set a url on the submission draft' do
+    result = run_mutation(
+      submission_id: @submission.id,
+      attempt: @submission.attempt,
+      url: 'http://www.google.com'
+    )
+    expect(
+      result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
+    ).to eq 'http://www.google.com'
+  end
+
+  it 'returns an error if the url is not a valid url' do
+    result = run_mutation(
+      submission_id: @submission.id,
+      attempt: @submission.attempt,
+      url: 'ooo eee Im not a valid url'
+    )
+    expect(
+      result.dig(:data, :createSubmissionDraft, :errors, 0, :message)
+    ).to eq 'is not a valid URL'
   end
 
   it 'returns an error if the attachments are not owned by the user' do
