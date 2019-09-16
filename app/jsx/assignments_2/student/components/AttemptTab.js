@@ -107,7 +107,11 @@ export default class AttemptTab extends Component {
   renderUrlAttempt = () => {
     return (
       <Suspense fallback={<LoadingIndicator />}>
-        <UrlEntry />
+        <UrlEntry
+          createSubmissionDraft={this.props.createSubmissionDraft}
+          submission={this.props.submission}
+          updateEditingDraft={this.props.updateEditingDraft}
+        />
       </Suspense>
     )
   }

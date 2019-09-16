@@ -17,8 +17,6 @@
 #
 
 class SubmissionDraft < ActiveRecord::Base
-  include CustomValidations
-
   belongs_to :submission, inverse_of: :submission_drafts
   has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :delete_all
   has_many :attachments, through: :submission_draft_attachments
@@ -28,7 +26,22 @@ class SubmissionDraft < ActiveRecord::Base
   validates :submission, uniqueness: { scope: :submission_attempt }
   validates :body, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
   validate :submission_attempt_matches_submission
-  validates_as_url :url
+  validates :url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
+
+  before_save :validate_url
+
+  def validate_url
+    if self.url.present?
+      begin
+        # also updates the url with a scheme if missing and is a valid url
+        # otherwise leaves the url as whatever the user submitted as thier draft
+        value, = CanvasHttp.validate_url(self.url)
+        self.send("url=", value)
+      rescue URI::Error, ArgumentError
+        return
+      end
+    end
+  end
 
   def submission_attempt_matches_submission
     current_submission_attempt = self.submission&.attempt || 0
@@ -50,7 +63,13 @@ class SubmissionDraft < ActiveRecord::Base
       when 'online_upload'
         return true if self.attachments.present?
       when 'online_url'
-        return true if self.url.present?
+        return false if self.url.blank?
+        begin
+          CanvasHttp.validate_url(self.url)
+          return true
+        rescue URI::Error, ArgumentError
+          return false
+        end
       end
     end
 

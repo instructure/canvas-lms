@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
 import React from 'react'
+import {Submission} from '../../graphqlData/Submission'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -26,15 +28,42 @@ import {IconEyeLine, IconLinkLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-text-input'
 
+const ERROR_MESSAGE = [
+  {text: I18n.t('Please enter a valid url (e.g. http://example.com)'), type: 'error'}
+]
+
 class UrlEntry extends React.Component {
   state = {
-    value: '',
     messages: [],
-    displayPreviewIcon: false
+    typingTimeout: 0,
+    url: '',
+    valid: false
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.submission?.submissionDraft?.url &&
+      this.props.submission.submissionDraft.url !== prevProps.submission?.submissionDraft?.url
+    ) {
+      this.updateInputState()
+    }
   }
 
   componentDidMount() {
     window.addEventListener('beforeunload', this.beforeunload)
+    if (this.props.submission?.submissionDraft?.url) {
+      this.updateInputState()
+    }
+  }
+
+  updateInputState = () => {
+    const url = this.props.submission.submissionDraft.url
+    const valid = this.props.submission.submissionDraft.meetsAssignmentCriteria
+    this.setState({
+      messages: valid ? [] : ERROR_MESSAGE,
+      url,
+      valid
+    })
   }
 
   componentWillUnmount() {
@@ -49,13 +78,38 @@ class UrlEntry extends React.Component {
     }
   }
 
+  handleBlur = e => {
+    this.props.updateEditingDraft(false)
+    if (this.state.typingTimeout) {
+      clearTimeout(this.state.typingTimeout)
+    }
+    this.createSubmissionDraft(e.target.value)
+  }
+
   handleChange = e => {
+    this.props.updateEditingDraft(true)
+    if (this.state.typingTimeout) {
+      clearTimeout(this.state.typingTimeout)
+    }
+    const url = e.target.value
+
     this.setState({
-      value: e.target.value,
-      messages: e.target.validity.valid
-        ? []
-        : [{text: I18n.t('Please enter a url'), type: 'error'}],
-      displayPreviewIcon: e.target.validity.valid && e.target.value
+      typingTimeout: setTimeout(() => {
+        this.createSubmissionDraft(url)
+        this.props.updateEditingDraft(false)
+      }, 1000), // set a timeout of 1 second
+      url
+    })
+  }
+
+  createSubmissionDraft = async url => {
+    await this.props.createSubmissionDraft({
+      variables: {
+        id: this.props.submission.id,
+        activeSubmissionType: 'online_url',
+        attempt: this.props.submission.attempt || 1,
+        url
+      }
     })
   }
 
@@ -73,18 +127,19 @@ class UrlEntry extends React.Component {
             <TextInput
               renderLabel={<ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>}
               type="url"
-              placeholder={I18n.t('Paste URL')}
-              value={this.state.value}
+              placeholder={I18n.t('http://')}
+              value={this.state.url}
+              onBlur={this.handleBlur}
               onChange={this.handleChange}
               messages={this.state.messages}
             />
           </Flex.Item>
           <Flex.Item>
-            {this.state.displayPreviewIcon && (
+            {this.state.valid && (
               <Button
                 icon={IconEyeLine}
                 margin="0 0 0 x-small"
-                onClick={() => window.open(this.state.value)}
+                onClick={() => window.open(this.state.url)}
                 data-testid="preview-button"
               >
                 <ScreenReaderContent>{I18n.t('Preview website url')}</ScreenReaderContent>
@@ -107,6 +162,12 @@ class UrlEntry extends React.Component {
       </View>
     )
   }
+}
+
+UrlEntry.propTypes = {
+  createSubmissionDraft: func,
+  submission: Submission.shape,
+  updateEditingDraft: func
 }
 
 export default UrlEntry

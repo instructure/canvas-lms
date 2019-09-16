@@ -148,6 +148,14 @@ export default class SubmissionManager extends Component {
                 body: this.props.submission.submissionDraft.body
               })
             }
+            break
+          case 'online_url':
+            if (this.props.submission.submissionDraft.url) {
+              this.submitToGraphql(submitMutation, {
+                type,
+                url: this.props.submission.submissionDraft.url
+              })
+            }
         }
       })
     )

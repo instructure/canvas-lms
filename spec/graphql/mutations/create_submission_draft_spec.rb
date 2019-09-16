@@ -226,16 +226,17 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to include "Expected type 'DraftableSubmissionType!'"
   end
 
-  it 'returns an error if the url is not a valid url' do
+  it 'prefixes the url with a scheme if missing' do
+    @submission.assignment.update!(submission_types: 'online_url')
     result = run_mutation(
       submission_id: @submission.id,
       active_submission_type: 'online_url',
       attempt: @submission.attempt,
-      url: 'ooo eee Im not a valid url'
+      url: 'www.google.com'
     )
     expect(
-      result.dig(:data, :createSubmissionDraft, :errors, 0, :message)
-    ).to eq 'is not a valid URL'
+      result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
+    ).to eq 'http://www.google.com'
   end
 
   it 'returns an error if the attachments are not owned by the user' do

@@ -18,37 +18,85 @@
 
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
+import {mockSubmission} from '../../../mocks'
 import UrlEntry from '../UrlEntry'
 
+async function makeProps(overrides) {
+  const submission = await mockSubmission(overrides)
+  const props = {
+    submission,
+    createSubmissionDraft: jest.fn().mockResolvedValue({}),
+    updateEditingDraft: jest.fn()
+  }
+  return props
+}
+
 describe('UrlEntry', () => {
-  it('renders the website url input', () => {
-    const {getByTestId} = render(<UrlEntry />)
+  it('renders the website url input', async () => {
+    const props = await makeProps({
+      Submission: {
+        submissionDraft: {
+          activeSubmissionType: 'online_url',
+          attachments: () => [],
+          body: null,
+          meetsAssignmentCriteria: false,
+          url: null
+        }
+      }
+    })
+    const {getByTestId} = render(<UrlEntry {...props} />)
 
     expect(getByTestId('url-entry')).toBeInTheDocument()
   })
 
-  it('renders an error message when given an invalid url', () => {
-    const {container, getByText} = render(<UrlEntry />)
+  it('renders an error message when given an invalid url', async () => {
+    const props = await makeProps({
+      Submission: {
+        submissionDraft: {
+          activeSubmissionType: 'online_url',
+          attachments: () => [],
+          body: null,
+          meetsAssignmentCriteria: false,
+          url: 'not a valid url'
+        }
+      }
+    })
+    const {getByText} = render(<UrlEntry {...props} />)
 
-    const input = container.querySelector('input')
-    fireEvent.change(input, {target: {value: 'ooooh eeeee Im not a url'}})
-    expect(getByText('Please enter a url')).toBeInTheDocument()
+    expect(getByText('Please enter a valid url (e.g. http://example.com)')).toBeInTheDocument()
   })
 
-  it('only renders the preview button when it passes the url input validation', () => {
-    const {container, getByTestId} = render(<UrlEntry />)
+  it('renders the preview button when the url is considered valid', async () => {
+    const props = await makeProps({
+      Submission: {
+        submissionDraft: {
+          activeSubmissionType: 'online_url',
+          attachments: () => [],
+          body: null,
+          meetsAssignmentCriteria: true,
+          url: 'http://www.valid.com'
+        }
+      }
+    })
+    const {getByTestId} = render(<UrlEntry {...props} />)
 
-    const input = container.querySelector('input')
-    fireEvent.change(input, {target: {value: 'http://www.google.com'}})
     expect(getByTestId('preview-button')).toBeInTheDocument()
   })
 
-  it('opens a new window with the url when you press the preview button', () => {
+  it('opens a new window with the url when you press the preview button', async () => {
+    const props = await makeProps({
+      Submission: {
+        submissionDraft: {
+          activeSubmissionType: 'online_url',
+          attachments: () => [],
+          body: null,
+          meetsAssignmentCriteria: true,
+          url: 'http://www.reddit.com'
+        }
+      }
+    })
     window.open = jest.fn()
-    const {container, getByTestId} = render(<UrlEntry />)
-
-    const input = container.querySelector('input')
-    fireEvent.change(input, {target: {value: 'http://www.google.com'}})
+    const {getByTestId} = render(<UrlEntry {...props} />)
 
     const previewButton = getByTestId('preview-button')
     fireEvent.click(previewButton)
