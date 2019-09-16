@@ -45,29 +45,35 @@ function eraseFromArray(array, victim) {
 
 $.fn.disableWhileLoading = function(deferred, options) {
   return this.each(function() {
-    const opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options),
-      $this = $(this),
-      data = $this.data(),
-      thingsToWaitOn =
-        data.disabledWhileLoadingDeferreds || (data.disabledWhileLoadingDeferreds = []),
-      myDeferred = $.Deferred()
+    const opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options)
+    const $this = $(this)
+    const data = $this.data()
+    const thingsToWaitOn =
+      data.disabledWhileLoadingDeferreds || (data.disabledWhileLoadingDeferreds = [])
+    const myDeferred = $.Deferred()
 
-    $.when.apply($, thingsToWaitOn).done(function() {
-      let dataKey = 'disabled_' + $.guid++,
-        $disabledArea = $this.add($this.nextAll('.ui-dialog-buttonpane')),
+    $.when(...thingsToWaitOn).done(() => {
+      let dataKey
+      let $disabledArea
+      let $inputsToDisable
+      let $spinHolder
+      let previousSpinHolderDisplay
+      let disabled = false
+
+      const disabler = setTimeout(() => {
+        dataKey = 'disabled_' + $.guid++
+        $disabledArea = $this.add($this.nextAll('.ui-dialog-buttonpane'))
+        disabled = true
         //  todo: replace .andSelf with .addBack when JQuery is upgraded.
         $inputsToDisable = $disabledArea
           .find('*')
           .andSelf()
           .filter(':input')
-          .not(':disabled,[type=file]'),
-        $foundSpinHolder = $this.find('.spin_holder'),
-        $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this,
-        previousSpinHolderDisplay = $spinHolder.css('display'),
-        disabled = false
+          .not(':disabled,[type=file]')
+        const $foundSpinHolder = $this.find('.spin_holder')
+        $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this
+        previousSpinHolderDisplay = $spinHolder.css('display')
 
-      const disabler = setTimeout(function() {
-        disabled = true
         $inputsToDisable.prop('disabled', true)
         $spinHolder.show().spin(options)
         $($spinHolder.data().spinner.el).css({'max-width': '100px'})
