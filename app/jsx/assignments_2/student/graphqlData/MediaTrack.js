@@ -15,41 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
-import {MediaSource} from './MediaSource'
-import {MediaTrack} from './MediaTrack'
+import {shape, string} from 'prop-types'
 
-export const MediaObject = {
+export const MediaTrack = {
   fragment: gql`
-    fragment MediaObject on MediaObject {
-      id
+    fragment MediaTrack on MediaTrack {
       _id
-      mediaSources {
-        ...MediaSource
-      }
-      mediaTracks {
-        ...MediaTrack
-      }
-      mediaType
-      title
+      locale
+      content
+      kind
     }
-    ${MediaSource.fragment}
-    ${MediaTrack.fragment}
   `,
 
   shape: shape({
-    id: string.isRequired,
-    mediaSources: arrayOf(MediaSource.shape),
-    mediaType: string,
-    title: string
+    _id: string,
+    locale: string,
+    content: string,
+    kind: string
   })
 }
 
-export const MediaObjectDefaultMocks = {
-  MediaObject: () => ({
-    mediaSources: [{}],
-    mediaType: 'video',
-    title: 'Mocked Video'
+export const MediaTrackDefaultMocks = {
+  MediaTrack: () => ({
+    _id: '1',
+    locale: 'en',
+    content: 'en',
+    kind: 'subtitle'
   })
 }

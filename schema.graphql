@@ -1740,7 +1740,11 @@ type MediaSource {
   width: String
 }
 
-type MediaTrack {
+type MediaTrack implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
   content: String!
   kind: String
   locale: String
