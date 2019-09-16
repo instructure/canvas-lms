@@ -120,12 +120,12 @@ const Rubric = (props) => {
   }
 
   const headingCells = [
-    <th scope="col" className="rubric-criteria">
+    <th key='TableHeadingCriteria'scope="col" className="rubric-criteria">
       {I18n.t('Criteria')}
     </th>,
-    <th scope="col" colSpan={isSummary ? "2" : null} className="ratings">{I18n.t('Ratings')}</th>,
+    <th key='TableHeadingRatings' scope="col" colSpan={isSummary ? "2" : null} className="ratings">{I18n.t('Ratings')}</th>,
     showPointsColumn() ? (
-      <th className="rubric-points" scope="col">{I18n.t('Pts')}</th>
+      <th key='TableHeadingPoints'className="rubric-points" scope="col">{I18n.t('Pts')}</th>
     ) : null
   ]
 

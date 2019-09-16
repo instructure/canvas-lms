@@ -116,9 +116,11 @@ const commentElement = (assessment) => {
     return (
       <div>
         <Text size="small" weight="bold">{I18n.t("Comments")}</Text>
-        { assessment.comments_html ?
-          <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
-          : assessment.comments }
+        {
+          assessment.comments_html
+            ? <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
+            : <div>{assessment.comments}</div>
+        }
       </div>
     )
   }

@@ -24,6 +24,7 @@ module Types
     field :_id, ID, "legacy canvas id", method: :id, null: true
 
     field :comments, String, null: true
+    field :comments_html, String, null: true
 
     field :criterion, RubricCriterionType, <<~DESC, null: true
       The rubric criteria that this assessment is for

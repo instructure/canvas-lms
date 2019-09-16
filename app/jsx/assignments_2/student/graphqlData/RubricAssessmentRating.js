@@ -26,6 +26,7 @@ export const RubricAssessmentRating = {
         id: _id
       }
       comments
+      comments_html: commentsHtml
       description
       outcome {
         id: _id
@@ -40,6 +41,7 @@ export const RubricAssessmentRating = {
       id: string.isRequired
     }),
     comments: string,
+    comments_html: string,
     description: string,
     outcome: shape({
       id: string.isRequired

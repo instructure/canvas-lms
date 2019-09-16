@@ -2446,6 +2446,7 @@ type RubricAssessmentRating {
   """
   _id: ID
   comments: String
+  commentsHtml: String
 
   """
   The rubric criteria that this assessment is for
