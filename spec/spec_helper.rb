@@ -21,7 +21,7 @@ begin
 rescue LoadError
 end
 
-if ENV['KNAPSACK_ENABLED']
+if ENV['KNAPSACK_ENABLED'] == '1'
   puts "DEBUGGING FOR KNAPSACK: rspec run with args: #{ARGV}"
   require 'knapsack'
   Knapsack::Adapters::RSpecAdapter.bind
