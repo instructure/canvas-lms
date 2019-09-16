@@ -3,4 +3,4 @@
 #gem 'rails_12factor', group: :production
 
 # Structured JSON logging to stdout.
-gem "logjam_agent", github: "rshipp/logjam_agent"
+gem "logjam_agent", github: "beyond-z/logjam_agent"
