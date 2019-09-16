@@ -242,4 +242,6 @@ module Interfaces::SubmissionInterface
       end
     end
   end
+
+  field :url, Types::UrlType, null: true
 end

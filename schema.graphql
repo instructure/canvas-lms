@@ -1096,6 +1096,7 @@ input CreateSubmissionInput {
   body: String
   fileIds: [ID!]
   submissionType: OnlineSubmissionType!
+  url: String
 }
 
 """
@@ -2000,6 +2001,7 @@ Types that can be submitted online
 enum OnlineSubmissionType {
   online_text_entry
   online_upload
+  online_url
 }
 
 enum OrderDirection {
@@ -2756,6 +2758,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   submittedAt: DateTime
   unreadCommentCount: Int!
   updatedAt: DateTime
+  url: URL
   user: User
 }
 
@@ -2979,6 +2982,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   submittedAt: DateTime
   unreadCommentCount: Int!
   updatedAt: DateTime
+  url: URL
   user: User
 }
 
@@ -3117,6 +3121,7 @@ interface SubmissionInterface {
   submissionStatus: String
   submittedAt: DateTime
   unreadCommentCount: Int!
+  url: URL
   user: User
 }
 

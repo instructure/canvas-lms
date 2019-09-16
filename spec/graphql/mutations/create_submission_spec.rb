@@ -34,7 +34,8 @@ RSpec.describe Mutations::CreateSubmission do
     assignment_id: @assignment.id,
     submission_type: 'online_upload',
     body: nil,
-    file_ids: []
+    file_ids: [],
+    url: nil
   )
     <<~GQL
       mutation {
@@ -43,6 +44,7 @@ RSpec.describe Mutations::CreateSubmission do
           submissionType: #{submission_type}
           #{"body: \"#{body}\"" if body}
           fileIds: #{file_ids}
+          #{"url: \"#{url}\"" if url}
         }) {
           submission {
             _id
@@ -52,6 +54,7 @@ RSpec.describe Mutations::CreateSubmission do
               displayName
             }
             body
+            url
           }
           errors {
             attribute
@@ -148,6 +151,29 @@ RSpec.describe Mutations::CreateSubmission do
 
       expect(submission.workflow_state).to eq 'submitted'
       expect(result.dig(:data, :createSubmission, :submission, :body)).to eq('thundercougarfalconbird')
+    end
+  end
+
+  context 'when the submission_type is online_url' do
+    it 'returns an error if the url is not provided' do
+      @assignment.update!(submission_types: 'online_url')
+      result = run_mutation(submission_type: 'online_url')
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq 'URL entry submission cannot be empty'
+    end
+
+    it 'returns an error if the url is not valid' do
+      @assignment.update!(submission_types: 'online_url')
+      result = run_mutation(submission_type: 'online_url', url: 'not a valid url')
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq 'is not a valid URL'
+    end
+
+    it 'saves the url to the submission' do
+      @assignment.update!(submission_types: 'online_url')
+      result = run_mutation(submission_type: 'online_url', url: 'http://www.google.com')
+      submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
+
+      expect(submission.workflow_state).to eq 'submitted'
+      expect(result.dig(:data, :createSubmission, :submission, :url)).to eq 'http://www.google.com'
     end
   end
 

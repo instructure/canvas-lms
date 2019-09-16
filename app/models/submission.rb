@@ -1104,6 +1104,10 @@ class Submission < ActiveRecord::Base
       if self.body.blank?
         errors.add(:body, 'Text entry submission cannot be empty')
       end
+    when 'online_url'
+      if self.url.blank?
+        errors.add(:url, 'URL entry submission cannot be empty')
+      end
     end
   end
 
