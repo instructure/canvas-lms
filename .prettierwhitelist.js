@@ -28,6 +28,7 @@ const PRETTIER_WHITELIST = module.exports =  [
   appAndSpecDirsFor('announcements'),
   appAndSpecDirsFor('assignments/GradeSummary'),
   appAndSpecDirsFor('assignments_2'),
+  appAndSpecDirsFor('content_shares'),
   appAndSpecDirsFor('dashboard_card'),
   appAndSpecDirsFor('discussions'),
   appAndSpecDirsFor('editor'),

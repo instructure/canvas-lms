@@ -17,8 +17,19 @@
  */
 
 import React from 'react'
-import ReactDOM from "react-dom"
-import ReceivedContentView from "../content_shares/ReceivedContentView"
+import {render} from '@testing-library/react'
+import ContentHeading from '../ContentHeading'
 
-const container = document.getElementById('content')
-ReactDOM.render(<ReceivedContentView />, container)
+describe('reusable share page header', () => {
+  const svgUrl = 'http://pretty.svg'
+  const heading = 'The Corn'
+  const description = "Is as high as an elephant's eye"
+
+  it('renders title and description', () => {
+    const {getByText} = render(
+      <ContentHeading svgUrl={svgUrl} heading={heading} description={description} />
+    )
+    expect(getByText(heading)).toBeInTheDocument()
+    expect(getByText(description)).toBeInTheDocument()
+  })
+})

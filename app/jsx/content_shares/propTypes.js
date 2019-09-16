@@ -16,9 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from "react-dom"
-import ReceivedContentView from "../content_shares/ReceivedContentView"
+import {string, shape} from 'prop-types'
+import basicUser from 'jsx/shared/proptypes/user'
 
-const container = document.getElementById('content')
-ReactDOM.render(<ReceivedContentView />, container)
+export const contentShare = {
+  id: string.isRequired,
+  name: string.isRequired,
+  content_type: string.isRequired,
+  sender: shape(basicUser).isRequired,
+  created_at: string.isRequired,
+  updated_at: string.isRequired,
+  read_state: string.isRequired
+}

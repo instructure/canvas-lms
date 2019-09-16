@@ -16,9 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from "react-dom"
-import ReceivedContentView from "../content_shares/ReceivedContentView"
+export function mockShare(overrides = {}) {
+  return {
+    id: '1',
+    name: 'A Course Assignment',
+    content_type: 'assignment',
+    sender: {
+      id: '2',
+      display_name: 'sender name',
+      avatar_url: 'http://avatar_url'
+    },
+    created_at: '2019-07-04T12:00:00Z',
+    updated_at: '2019-07-24T12:00:00Z',
+    read_state: 'read',
+    ...overrides
+  }
+}
 
-const container = document.getElementById('content')
-ReactDOM.render(<ReceivedContentView />, container)
+export const assignmentShare = mockShare()
+export const discussionShare = mockShare({
+  id: 2,
+  name: 'A Course Discussion',
+  content_type: 'discussion',
+  created_at: '2019-07-05T12:00:00Z',
+  updated_at: '2019-07-25T12:00:00Z'
+})
