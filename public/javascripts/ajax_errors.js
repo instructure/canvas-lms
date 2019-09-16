@@ -22,7 +22,6 @@ import $ from 'jquery'
 import htmlEscape from './str/htmlEscape'
 import './jquery.ajaxJSON' // ajaxJSON, defaultAjaxError
 import 'compiled/jquery.rails_flash_notifications' // flashError
-import 'jqueryui/effects/drop'
 
   INST.errorCount = 0;
   window.onerror = function (msg, url, line, column, errorObj) {
