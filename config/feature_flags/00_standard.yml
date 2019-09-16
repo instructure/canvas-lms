@@ -466,3 +466,8 @@ compact_live_event_payloads:
   display_name: Remove null values from live event payloads
   description: Canvas will remove keys with null values from
     live event payloads if this feature is enabled.
+analytics_2:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Course and User Analytics
+  description: Show new analytics for course and user data
