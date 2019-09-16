@@ -2,5 +2,5 @@
 # Commented out until we actually cutover to Heroku since this disables the current logging on our AWS EC2 instance
 #gem 'rails_12factor', group: :production
 
-# New Relic tracking.
-gem 'newrelic_rpm'
+# Structured JSON logging to stdout.
+gem "logjam_agent", github: "beyond-z/logjam_agent"
