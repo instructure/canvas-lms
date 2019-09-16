@@ -44,7 +44,7 @@ const datepickerDefaults = {
   dayNamesShort: I18n.lookup('date.abbr_day_names'), // title text for column headings
   dayNamesMin: I18n.lookup('date.datepicker.column_headings'), // column headings for days (Sunday = 0)
   get firstDay(){ return I18n.t('first_day_index', '0')}, // first day of the week (Sun = 0)
-  showMonthAfterYear: I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y' // "month year" or "year month"
+  get showMonthAfterYear(){ return I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y'} // "month year" or "year month"
 }
 
 // adds datepicker and suggest functionality to the specified $field

@@ -26,7 +26,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 const TRANSLATIONS = {
-  more_external_tools: htmlEscape(I18n.t('more_external_tools', 'More External Tools'))
+  get more_external_tools() {
+    return htmlEscape(I18n.t('more_external_tools', 'More External Tools'))
+  }
 }
 
 const ExternalToolsPlugin = {
