@@ -32,6 +32,7 @@ import {MediaObjectDefaultMocks} from './graphqlData/MediaObject'
 import {MediaSourceDefaultMocks} from './graphqlData/MediaSource'
 import {MediaTrackDefaultMocks} from './graphqlData/MediaTrack'
 import {ModuleDefaultMocks} from './graphqlData/Module'
+import {MutationDefaultMocks} from './graphqlData/Mutations'
 import {ProficiencyRatingDefaultMocks} from './graphqlData/ProficiencyRating'
 import {RubricAssessmentDefaultMocks} from './graphqlData/RubricAssessment'
 import {RubricAssessmentRatingDefaultMocks} from './graphqlData/RubricAssessmentRating'
@@ -64,6 +65,7 @@ function defaultMocks() {
     ...MediaSourceDefaultMocks,
     ...MediaTrackDefaultMocks,
     ...ModuleDefaultMocks,
+    ...MutationDefaultMocks,
     ...ProficiencyRatingDefaultMocks,
     ...RubricAssessmentDefaultMocks,
     ...RubricAssessmentRatingDefaultMocks,
