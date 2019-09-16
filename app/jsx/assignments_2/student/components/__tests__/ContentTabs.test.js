@@ -141,6 +141,22 @@ describe('ContentTabs', () => {
     expect(getByTestId('grade-display')).toBeInTheDocument()
   })
 
+  it('does not display the grade of the current submission if it is submitted but not graded', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => SubmissionMocks.submitted
+    })
+    const {queryByTestId, queryByText} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submitted')).toBeInTheDocument()
+    expect(queryByTestId('friendly-date-time')).toBeInTheDocument()
+    expect(queryByTestId('grade-display')).toBeInTheDocument()
+    expect(queryByText('–/10 Points')).toBeInTheDocument()
+  })
+
   it('does not display the submitted time or grade of the current submission if it is unsubmitted', async () => {
     const props = await mockAssignmentAndSubmission()
     const {queryByTestId, queryByText} = render(

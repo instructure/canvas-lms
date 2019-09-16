@@ -48,6 +48,8 @@ function currentSubmissionGrade(assignment, submission) {
     right: '50px'
   }
 
+  const currentGrade = submission.state === 'graded' ? submission.grade : null
+
   return (
     <div style={tabBarAlign}>
       <Text weight="bold">
@@ -55,7 +57,7 @@ function currentSubmissionGrade(assignment, submission) {
           displaySize="medium"
           gradingType={assignment.gradingType}
           pointsPossible={assignment.pointsPossible}
-          receivedGrade={submission.grade}
+          receivedGrade={currentGrade}
         />
       </Text>
       <Text size="small">
