@@ -1623,6 +1623,10 @@ CanvasRails::Application.routes.draw do
       post 'image_selection/:id', action: :image_selection
     end
 
+    scope(controller: :immersive_reader) do
+      get 'immersive_reader/authenticate', action: :authenticate
+    end
+
     scope(controller: :search) do
       get 'search/rubrics', action: 'rubrics', as: 'search_rubrics'
       get 'search/recipients', action: 'recipients', as: 'search_recipients'
