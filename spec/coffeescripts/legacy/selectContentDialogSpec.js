@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import SelectContentDialog from 'select_content_dialog'
 
 QUnit.module('SelectContentDialog: Dialog options', {
@@ -45,4 +46,50 @@ test('opens a dialog with the dialog_title option', () => {
   const dialogTitle = 'To be, or not to be?'
   INST.selectContentDialog({dialog_title: dialogTitle})
   equal($.fn.dialog.getCall(0).args[0].title, dialogTitle)
+})
+
+QUnit.module('SelectContentDialog: deepLinkingListner', {
+  setup() {
+    $('#fixtures').html(`
+      <div>
+        <div id='select_context_content_dialog'></div>
+        <div id='resource_selection_dialog'></div>
+        <input type='text' id='external_tool_create_url' />
+        <input type='text' id='external_tool_create_title' />
+        <div id='context_external_tools_select'>
+          <span class='domain_message'"
+        </div>
+      </div>
+    `)
+  },
+  teardown() {
+    $('.ui-dialog').remove()
+    $('#fixtures').html('')
+  }
+})
+
+const deepLinkingEvent = {
+  data: {
+    messageType: 'LtiDeepLinkingResponse',
+    content_items: [
+      {
+        type: 'ltiResourceLink',
+        url: 'https://www.my-tool.com/launch-url',
+        title: 'My Tool'
+      }
+    ],
+    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
+  }
+}
+
+test('sets the tool url', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+  const {url} = deepLinkingEvent.data.content_items[0]
+  equal($('#external_tool_create_url').val(), url)
+})
+
+test('sets the tool title', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+  const {title} = deepLinkingEvent.data.content_items[0]
+  equal($('#external_tool_create_title').val(), title)
 })
