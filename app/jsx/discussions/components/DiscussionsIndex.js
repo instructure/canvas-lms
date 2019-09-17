@@ -50,6 +50,7 @@ import {discussionList} from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
+import contentShareShape from 'jsx/shared/proptypes/contentShare'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -69,6 +70,7 @@ export default class DiscussionsIndex extends Component {
     copyToOpen: bool.isRequired,
     copyToSelection: shape({discussion_topics: arrayOf(string)}),
     sendToOpen: bool.isRequired,
+    sendToSelection: contentShareShape,
     DIRECT_SHARE_ENABLED: bool.isRequired,
     COURSE_ID: string
   }
@@ -256,7 +258,9 @@ export default class DiscussionsIndex extends Component {
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
           <DirectShareUserModal
+            courseId={this.props.COURSE_ID}
             open={this.props.sendToOpen}
+            contentShare={this.props.sendToSelection}
             onDismiss={() => this.props.setSendToOpen(false)}
           />
         )}{' '}
@@ -299,7 +303,8 @@ const connectState = (state, ownProps) => {
     unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id]),
     copyToOpen: state.copyTo.open,
     copyToSelection: state.copyTo.selection,
-    sendToOpen: state.sendToOpen,
+    sendToOpen: state.sendTo.open,
+    sendToSelection: state.sendTo.selection,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
     COURSE_ID: state.COURSE_ID
   }

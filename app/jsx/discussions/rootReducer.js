@@ -31,6 +31,7 @@ import courseSettingsReducer from './reducers/courseSettingsReducer'
 import isSavingSettingsReducer from './reducers/isSavingSettingsReducer'
 import isSettingsModalOpenReducer from './reducers/isSettingsModalOpenReducer'
 import copyToReducer from './reducers/copyToReducer'
+import sendToReducer from './reducers/sendToReducer'
 
 const identity = (defaultState = null) => state => (state === undefined ? defaultState : state)
 
@@ -54,8 +55,8 @@ export default combineReducers({
   roles: identity({}),
   unpinnedDiscussionIds: unpinnedDiscussionReducer,
   userSettings: userSettingsReducer,
-  copyTo: copyToReducer, // handleAction(actionTypes.SET_COPY_TO_OPEN, (s, a) => a.payload, false),
-  sendToOpen: handleAction(actionTypes.SET_SEND_TO_OPEN, (s, a) => a.payload, false),
+  copyTo: copyToReducer,
+  sendTo: sendToReducer,
   DIRECT_SHARE_ENABLED: identity(false),
   COURSE_ID: identity(null)
 })

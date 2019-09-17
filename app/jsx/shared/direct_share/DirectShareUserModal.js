@@ -18,15 +18,30 @@
 
 import I18n from 'i18n!direct_share_user_modal'
 import React, {Suspense, lazy, useState} from 'react'
+import {string} from 'prop-types'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
+import contentShareShape from 'jsx/shared/proptypes/contentShare'
+import doFetchApi from 'jsx/shared/effects/doFetchApi'
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 
-export default function DirectShareUserModal({...modalProps}) {
+DirectShareUserModal.propTypes = {
+  contentShare: contentShareShape,
+  courseId: string
+}
+
+export default function DirectShareUserModal({contentShare, courseId, ...modalProps}) {
   const [selectedUsers, setSelectedUsers] = useState([])
+  const [postStatus, setPostStatus] = useState(null)
+
+  function resetState() {
+    setSelectedUsers([])
+    setPostStatus(null)
+  }
 
   function handleUserSelected(newUser) {
     if (!selectedUsers.find(user => user.id === newUser.id)) {
@@ -39,12 +54,30 @@ export default function DirectShareUserModal({...modalProps}) {
   }
 
   function handleDismiss() {
-    setSelectedUsers([])
+    resetState()
     modalProps.onDismiss()
   }
 
+  function startSendOperation() {
+    return doFetchApi({
+      method: 'POST',
+      path:'/api/v1/users/self/content_shares',
+      body: {
+        ...contentShare,
+        receiver_ids: selectedUsers.map(user => user.id)
+      }
+    })
+  }
+
   function handleSend() {
-    console.log('TODO: share content with users', selectedUsers)
+    setPostStatus('info')
+    startSendOperation()
+    .then(() => setPostStatus('success'))
+    .catch(err => {
+      console.error(err) // eslint-disable-line no-console
+      if (err.response) console.error(err.response) // eslint-disable-line no-console
+      setPostStatus('error')
+    })
   }
 
   function Footer() {
@@ -52,7 +85,7 @@ export default function DirectShareUserModal({...modalProps}) {
       <>
         <Button onClick={handleDismiss}>{I18n.t('Cancel')}</Button>
         <Button
-          disabled={selectedUsers.length === 0}
+          disabled={selectedUsers.length === 0 || postStatus}
           variant="primary"
           margin="0 0 0 x-small"
           onClick={handleSend}
@@ -69,11 +102,27 @@ export default function DirectShareUserModal({...modalProps}) {
     </View>
   )
 
+  let alertMessage = ''
+  if (postStatus === 'info') alertMessage = I18n.t('Starting content share')
+  else if (postStatus === 'success') alertMessage = I18n.t('Content share started successfully')
+  else if (postStatus === 'error') alertMessage = I18n.t('Error starting content share')
+
+  const alert = alertMessage
+  ? (
+    <Alert variant={postStatus}>
+      <div role="alert" aria-live="assertive" aria-atomic>{alertMessage}</div>
+      {postStatus === 'info' ? <Spinner renderTitle="" size="x-small" /> : null}
+    </Alert>
+  )
+  : null
+
   // TODO: should show the title of item being shared
   return (
     <CanvasModal label={I18n.t('Send To...')} size="medium" {...modalProps} footer={<Footer />}>
       <Suspense fallback={suspenseFallback}>
+        {alert}
         <DirectShareUserPanel
+          courseId={courseId}
           selectedUsers={selectedUsers}
           onUserSelected={handleUserSelected}
           onUserRemoved={handleUserRemoved}

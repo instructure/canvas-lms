@@ -18,18 +18,19 @@
 
 import I18n from 'i18n!direct_share_user_panel'
 import React from 'react'
-import {arrayOf, func} from 'prop-types'
+import {arrayOf, func, string} from 'prop-types'
 import {Tag} from '@instructure/ui-elements'
 import ContentShareUserSearchSelector from '../components/ContentShareUserSearchSelector'
 import basicUser from '../proptypes/user'
 
 DirectShareUserPanel.propTypes = {
+  courseId: string,
   selectedUsers: arrayOf(basicUser),
   onUserSelected: func, // basicUser => {}
   onUserRemoved: func // basicUser => {}
 }
 
-export default function DirectShareUserPanel({selectedUsers, onUserSelected, onUserRemoved}) {
+export default function DirectShareUserPanel({selectedUsers, onUserSelected, onUserRemoved, courseId}) {
   function renderSelectedUserTags() {
     return selectedUsers.map(user => (
       <Tag
@@ -43,7 +44,7 @@ export default function DirectShareUserPanel({selectedUsers, onUserSelected, onU
   }
 
   return <ContentShareUserSearchSelector
-    courseId={ENV.COURSE_ID}
+    courseId={courseId || ENV.COURSE_ID}
     onUserSelected={onUserSelected}
     renderBeforeInput={renderSelectedUserTags}
   />

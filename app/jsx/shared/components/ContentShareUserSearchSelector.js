@@ -26,10 +26,12 @@ import useContentShareUserSearchApi from '../effects/useContentShareUserSearchAp
 
 import UserSearchSelectorItem from './UserSearchSelectorItem'
 
+const {renderLabel, ...restOfSelectPropTypes} = CanvasAsyncSelect.propTypes
+
 ContentShareUserSearchSelector.propTypes = {
   courseId: string.isRequired,
   onUserSelected: func, // (basicUser) => {} (see proptypes/user.js)
-  ...CanvasAsyncSelect.propTypes
+  ...restOfSelectPropTypes
 }
 
 const MINIMUM_SEARCH_LENGTH = 3

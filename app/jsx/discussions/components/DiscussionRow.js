@@ -113,7 +113,7 @@ export class DiscussionRow extends Component {
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
     setCopyTo: func.isRequired,
-    setSendToOpen: func.isRequired,
+    setSendTo: func.isRequired,
     discussion: discussionShape.isRequired,
     discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     displayDeleteMenuItem: bool.isRequired,
@@ -220,7 +220,13 @@ export class DiscussionRow extends Component {
         })
         break
       case 'sendTo':
-        this.props.setSendToOpen(true)
+        this.props.setSendTo({
+          open: true,
+          selection: {
+            content_type: 'discussion_topic',
+            content_id: this.props.discussion.id
+          }
+        })
         break
 
       case 'masterypaths':
@@ -825,7 +831,7 @@ const mapDispatch = dispatch => {
     'toggleSubscriptionState',
     'updateDiscussion',
     'setCopyTo',
-    'setSendToOpen'
+    'setSendTo'
   ]
   return bindActionCreators(select(actions, actionKeys), dispatch)
 }

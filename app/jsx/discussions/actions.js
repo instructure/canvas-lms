@@ -68,6 +68,7 @@ const types = [
   'CLEAN_DISCUSSION_FOCUS',
   'SET_COPY_TO',
   'SET_COPY_TO_OPEN',
+  'SET_SEND_TO',
   'SET_SEND_TO_OPEN'
 ]
 
