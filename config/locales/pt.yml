@@ -16221,6 +16221,7 @@ pt:
       description: "Desagrupar o serviço de pesquisa de imagens"
       name: "Não espalhar"
     unsplash_settings: 
+      description: "Por favor [siga os passos](%{unsplash_wiki_url}) para definir uma nova aplicação no Unsplash."
       labels: 
         access_key: "Chave de acesso"
         application_name: "Nome da Aplicação"
