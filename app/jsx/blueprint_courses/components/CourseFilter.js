@@ -20,9 +20,9 @@ import I18n from 'i18n!blueprint_settingsCourseFilter'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {TextInput} from '@instructure/ui-forms'
-import Select from '@instructure/ui-core/lib/components/Select'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Grid} from '@instructure/ui-layout'
+import CanvasSelect from 'jsx/shared/components/CanvasSelect'
 import propTypes from '../propTypes'
 
 const { func } = PropTypes
@@ -61,9 +61,7 @@ export default class CourseFilter extends React.Component {
 
   onChange = () => {
     this.setState({
-      search: this.getSearchText(),
-      term: this.termInput.value,
-      subAccount: this.subAccountInput.value,
+      search: this.getSearchText()
     })
   }
 
@@ -87,9 +85,7 @@ export default class CourseFilter extends React.Component {
     setTimeout(() => {
       if (this.state.isActive) {
         const search = this.searchInput.value
-        const term = this.termInput.value
-        const subAccount = this.subAccountInput.value
-        const isEmpty = !search && !term && !subAccount
+        const isEmpty = !search
 
         if (isEmpty && !this.wrapper.contains(document.activeElement)) {
           this.setState({
@@ -101,6 +97,20 @@ export default class CourseFilter extends React.Component {
   }
 
   render () {
+    const termOptions = [
+      <CanvasSelect.Option key="all" id="all" value="">{I18n.t('Any Term')}</CanvasSelect.Option>,
+      ...this.props.terms.map(term => (
+          <CanvasSelect.Option key={term.id} id={term.id} value={term.id}>{term.name}</CanvasSelect.Option>
+        ))
+    ]
+
+    const subAccountOptions = [
+      <CanvasSelect.Option key="all" id="all" value="">{I18n.t('Any Sub-Account')}</CanvasSelect.Option>,
+      ...this.props.subAccounts.map(account => (
+          <CanvasSelect.Option key={account.id} id={account.id} value={account.id}>{account.name}</CanvasSelect.Option>
+        ))
+    ]
+
     return (
       <div className="bca-course-filter" ref={(c) => { this.wrapper = c }}>
         <Grid colSpacing="none">
@@ -119,38 +129,30 @@ export default class CourseFilter extends React.Component {
               />
             </Grid.Col>
             <Grid.Col width={2}>
-              <Select
-                selectRef={(c) => { this.termInput = c }}
+              <CanvasSelect
+                id="termsFilter"
                 key="terms"
-                onChange={this.onChange}
-                onFocus={this.handleFocus}
-                onBlur={this.handleBlur}
+                value={this.state.term}
+                onChange={(e, value) => this.setState({term: value})}
                 label={
                   <ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>
                 }
               >
-                <option key="all" value="">{I18n.t('Any Term')}</option>
-                {this.props.terms.map(term => (
-                  <option key={term.id} value={term.id}>{term.name}</option>
-                ))}
-              </Select>
+                {termOptions}
+              </CanvasSelect>
             </Grid.Col>
             <Grid.Col width={3}>
-              <Select
-                selectRef={(c) => { this.subAccountInput = c }}
+              <CanvasSelect
+                id="subAccountsFilter"
                 key="subAccounts"
-                onChange={this.onChange}
-                onFocus={this.handleFocus}
-                onBlur={this.handleBlur}
+                value={this.state.subAccount}
+                onChange={(e, value) => this.setState({subAccount: value})}
                 label={
                   <ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>
                 }
               >
-                <option key="all" value="">{I18n.t('Any Sub-Account')}</option>
-                {this.props.subAccounts.map(account => (
-                  <option key={account.id} value={account.id}>{account.name}</option>
-                ))}
-              </Select>
+                {subAccountOptions}
+              </CanvasSelect>
             </Grid.Col>
           </Grid.Row>
         </Grid>

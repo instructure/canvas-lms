@@ -113,7 +113,7 @@ export default class CourseSidebar extends Component {
         }),
       },
       children: (
-        <Suspense fallback={<div>{I18n.t('Loading assotiations...')}</div>}>
+        <Suspense fallback={<div>{I18n.t('Loading associations...')}</div>}>
           <BlueprintAssociations />
         </Suspense>
       ),

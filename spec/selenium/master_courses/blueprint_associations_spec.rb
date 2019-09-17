@@ -79,9 +79,9 @@ describe "Blueprint association settings" do
     it "course search dropdowns are populated", priority: "2", test_id: 3072438 do
       open_associations
       open_courses_list
-      select_boxes = ff('.bca-course-filter select')
-      expect(select_boxes[0]).to include_text("Default Term")
-      expect(select_boxes[1]).to include_text("sub account 0")
+
+      expect(term_options).to include 'Default Term'
+      expect(sub_account_options).to include 'sub account 0'
     end
   end
 end

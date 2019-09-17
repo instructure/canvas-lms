@@ -101,7 +101,7 @@ export default class CoursePicker extends React.Component {
     })
   }
 
-  // when user clicks "Courses" button to toggle visibliity
+  // when user clicks "Courses" button to toggle visibility
   onToggleCoursePicker = (event, isExpanded) => {
     this.setState({isExpanded})
   }
