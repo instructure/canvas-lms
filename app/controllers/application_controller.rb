@@ -2547,7 +2547,7 @@ class ApplicationController < ActionController::Base
       @streaming_template = true
       false
     else
-      Setting.get("disable_template_streaming_all", "false") != "true" &&
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming"] &&
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end
