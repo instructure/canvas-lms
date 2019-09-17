@@ -56,6 +56,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   DISABLED_STATE = 'disabled'.freeze
   QUIZ_LTI = 'Quizzes 2'.freeze
+  ANALYTICS_2 = 'fd75124a-140e-470f-944c-114d2d93bb40'.freeze
+  TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2 }.freeze
 
   workflow do
     state :anonymous
@@ -805,6 +807,11 @@ end
 
   def quiz_lti?
     tool_id == QUIZ_LTI
+  end
+
+  def feature_flag_enabled?
+    feature = TOOL_FEATURE_MAPPING[tool_id]
+    !feature || context.root_account.feature_enabled?(feature)
   end
 
   private

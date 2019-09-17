@@ -1575,6 +1575,38 @@ describe ContextExternalTool do
 
     end
 
+    describe '#feature_flag_enabled?' do
+      let(:tool) do
+        @course.root_account.context_external_tools.create(
+          name: 'feature_flagged',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          url: 'http://example.com/launch',
+          tool_id: ContextExternalTool::ANALYTICS_2
+        )
+      end
+
+      it 'should return true if the feature is enabled' do
+        @course.root_account.enable_feature!(:analytics_2)
+        expect(tool.feature_flag_enabled?).to be true
+      end
+
+      it 'should return false if the feature is disabled' do
+        expect(tool.feature_flag_enabled?).to be false
+      end
+
+      it "should return true if called on tools that aren't mapped to feature flags" do
+        other_tool = @course.context_external_tools.create!(
+          name: 'other_feature',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          url: 'http://example.com/launch',
+          tool_id: 'yo'
+        )
+        expect(other_tool.feature_flag_enabled?).to be true
+      end
+    end
+
     describe 'set_policy' do
       let(:tool) do
         @course.context_external_tools.create(

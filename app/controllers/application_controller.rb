@@ -236,9 +236,10 @@ class ApplicationController < ActionController::Base
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user}).to_a
 
-    tools.select!{|tool|
-      tool.visible_with_permission_check?(type, @current_user, context, session)
-    }
+    tools.select! do |tool|
+      tool.visible_with_permission_check?(type, @current_user, context, session) &&
+        tool.feature_flag_enabled?
+    end
 
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
