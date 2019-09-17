@@ -32,6 +32,7 @@ var glob = require("glob");
 
 // tell i18nliner's babylon how to handle `import('../foo').then`
 I18nliner.config.babylonPlugins.push('dynamicImport')
+I18nliner.config.babylonPlugins.push('optionalChaining')
 
 // explict subdirs, to work around perf issues
 // https://github.com/jenseng/i18nliner-js/issues/7
