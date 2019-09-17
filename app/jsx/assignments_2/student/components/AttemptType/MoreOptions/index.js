@@ -39,6 +39,7 @@ class MoreOptions extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('message', this.handleIframeTask)
   }
 
   handleIframeTask = e => {

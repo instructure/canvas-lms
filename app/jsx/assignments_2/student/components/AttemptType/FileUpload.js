@@ -64,6 +64,7 @@ export default class FileUpload extends Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('message', this.handleLTIFiles)
   }
 
   getDraftAttachments = () => {
