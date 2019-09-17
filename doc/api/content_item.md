@@ -1,23 +1,134 @@
-Using Content Item to Select Resources
+Using Deep Linking to Select Resources
 =================================
 ## Introduction
 
-Content-Item is an extension to LTI that allows data to be passed back to the
-Tool Consumer (i.e., Canvas) in context of an LTI Launch. A few common use cases
- are:
+Deep Linking (formerly named Content-Item) is an extension to LTI that allows 
+data to be passed back to the Tool Consumer (i.e., Canvas) in context of an LTI 
+Launch. A few common use cases are:
 
 *   Providing a teacher the ability to select a customized LTI launch link from
-the tool provider to be placed in the tool consumer.
+the tool provider to be placed in the tool consumer. 
 
 *   Allowing a student to submit an attachment for an assignment that is
 provided by a tool provider (i.e., the external tool).
 
 *   Embedding custom content into a rich text editor from a tool provider.
 
-To see the full spec for content item and other code examples see the
-[IMS Documentation](https://www.imsglobal.org/specs/lticiv1p0)
+Deep Linking is supported in the LTI 1.1 Outcomes Service and LTI Advantage 
+specifications. To see the full spec for content item and other code examples 
+see these documents:
+* <a href="https://www.imsglobal.org/specs/lticiv1p0" target="_blank">IMS LTI 
+1.1 Deep Linking v1.0 Documentation</a>
 
-## Content-Item Process
+* <a href="https://www.imsglobal.org/spec/lti-dl/v2p0" target="_blank">IMS LTI 
+Advantage Deep Linking v2.0 Documentation</a>
+
+Deep Linking is not applicable to all placements in Canvas, but can be used with
+ the following placements:
+
+* <a href="file.editor_button_placement.html" target="_blank">editor_button</a>:
+ Allows users that have access to the Canvas Rich Content 
+Editor to select a variety of content types from the tool and embed them 
+directly in the editor.
+
+* <a href="file.homework_submission_placement.html" target="_blank">homework_submission</a>:
+ Allows students to select a resource from the 
+external tool for assignments that are set up as File Upload submission types.
+
+* <a href="file.migration_selection_placement.html" target="_blank">migration_selection</a>:
+ Allows users that have permission to import course 
+content to launch to a tool to select a file (ex: 
+<a href="https://www.imsglobal.org/activity/common-cartridge" target="_blank">a 
+common cartridge file</a>) from a tool and have it imported into the course.
+
+* <a href="file.assignment_selection_placement.html" target="_blank">assignment_selection</a>:
+ Allows users that have permission to create 
+assignments to launch to a tool, select a deep link, and return it as an 
+External Tool submission type.
+
+* <a href="file.link_selection_placement.html" target="_blank">link_selection</a>: 
+Allows users that have permission to create module items to 
+launch to a tool, select a deep link, and return it as a module item.
+
+
+This document will continue referring to this process as "Content-Item" for LTI 
+1.1 and Deep Linking for LTI Advantage.
+
+# LTI Advantage Deep Linking Process
+
+LTI Advantage tools can be configured in Canvas to send an LTI launch request 
+with a deep linking message type for certain placements. The specific details of
+ a deep linking interaction are best presented in the <a 
+ href="https://www.imsglobal.org/spec/lti-dl/v2p0#lti-deep-linking-interaction" 
+ target="_blank">IMS LTI Deep Linking specification</a>. 
+ Instead this section will focus on tool configuration.
+
+## Configuring Deep Linking
+Deep linking is configured by <a 
+href="https://community.canvaslms.com/docs/DOC-16729-42141110178" 
+target="_blank">creating a Canvas LTI Developer Key</a> with a 
+`LtiDeepLinkingRequest` message type set on a supported placement. This can be 
+done via the UI, or by supplying Canvas with JSON. 
+
+For example, the following JSON would allow an LTI Advantage tool to be 
+installed that uses deep linking return items back to Canvas as an assignment or 
+within the canvas Rich Content Editor:
+
+```
+{  
+   "title":"Cool Deep Linking Tool ",
+   "scopes":[],
+   "extensions":[  
+      {  
+         "domain":"deeplinkexample.com",
+         "tool_id":"deep-linky",
+         "platform":"canvas.instructure.com",
+         "settings":{  
+            "text":"Cool Deep Linking Text",
+            "icon_url":"https://some.icon.url",
+            "placements":[                 
+               {  
+                  "text":"Embed Tool Content in Canvas RCE",
+                  "enabled":true,
+                  "icon_url":"https://some.icon.url",
+                  "placement":"editor_button",
+                  "message_type":"LtiDeepLinkingRequest",
+                  "target_link_uri":"https://your.target_link_uri/deeplinkexample"
+               },
+               {  
+                  "text":"Embed Tool Content as a Canvas Assignment",
+                  "enabled":true,
+                  "icon_url":"https://some.icon.url",
+                  "placement":"assignment_selection",
+                  "message_type":"LtiDeepLinkingRequest",
+                  "target_link_uri":"https://your.target_link_uri/deeplinkexample"
+               }
+            ]
+         }
+      }
+   ],
+   "public_jwk":{  
+      "kty":"RSA",
+      "alg":"RS256",
+      "e":"AQAB",
+      "kid":"8f796169-0ac4-48a3-a202-fa4f3d814fcd",
+      "n":"nZD7QWmIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yZLwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhM9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
+      "use":"sig"
+   },
+   "description":"1.3 Test Tool",
+   "target_link_uri":"https://your.target_link_uri",
+   "oidc_initiation_url":"https://your.oidc_initiation_url"
+}
+```
+
+Once the developer key is configured, it can then be used to 
+<a href="https://community.canvaslms.com/docs/DOC-16730-42141110273" 
+target="_blank">install the LTI tool</a>. Links will then be exposed in the 
+Canvas Rich Content Editor toolbar and Assignment edit view. Clicking the links
+will then initiate a deep linking LTI workflow to allow the user to select a 
+resource from the tool and have them embedded in Canvas.
+
+# LTI 1.1 Content-Item Process
 
 The first step in the content-item process is the sending of the
 `ContentItemSelectionRequest` message from the Tool Consumer to
@@ -89,14 +200,14 @@ is to be launched in the current frame. the `url` specifies the lti launch point
 , and the `mediaType` specifies that it is an lti launch.
 
 
-# Configuring Content-item
+## Configuring Content-item
 
 
 To use content-item, the tool provider must be configured correctly. The
 following is an overview of how to configure the tool provider to use
 content-item.
 
-## LTI Tool XML Configuration
+### LTI Tool XML Configuration
 
 Below is an example of a bare-bones tool provider LTI configuration that
 _does not_ use content-item:
@@ -129,20 +240,6 @@ XML would tell Canvas to add a link in the course navigation to the LTI tool:
       <lticm:property name="url">http://localhost:4040/messages/blti</lticm:property>
     </lticm:options>
 ```
-
-
-Content-item is not applicable to all placements in Canvas, but can be used with
- the following placements:
-
-**editor_button**
-
-**homework_submission**
-
-**migration_selection**
-
-**assignment_selection**
-
-**link_selection**
 
 For our example we will use **assignment_selection**.
 

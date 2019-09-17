@@ -69,7 +69,60 @@ curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools
   -F 'custom_fields[domain]=$Canvas.api.domain'
 ```
 
-## Via XML Configuration
+## Via JSON Configuration (LTI 1.3)
+JSON can be used to <a href="https://community.canvaslms.com/docs/DOC-16729-42141110178" target="_blank">configure an LTI 1.3 Developer Key</a>.
+
+The following JSON would create a developer key with the a placement specfic custom field and a tool-level custom field:
+
+```
+{  
+   "title":"Variable Expansion Tool",
+   "scopes":[  
+
+   ],
+   "extensions":[  
+      {  
+         "domain":"variableexpander.com",
+         "tool_id":"variable-expansion-example",
+         "platform":"canvas.instructure.com",
+         "settings":{  
+            "text":"Variation Expansion Tool Text",
+            "icon_url":"https://some.icon.url",
+            "placements":[  
+               {  
+                  "text":"User Navigation Placement",
+                  "enabled":true,
+                  "icon_url":"https://static.thenounproject.com/png/131630-200.png",
+                  "placement":"user_navigation",
+                  "message_type":"LtiResourceLinkRequest",
+                  "target_link_uri":"https://lti-ri.imsglobal.org/lti/tools/281/launches",
+                  "canvas_icon_class":"icon-lti",
+                  "custom_fields":{  
+                     "foo":"$Canvas.user.id"
+                  }
+               }
+            ]
+         }
+      }
+   ],
+   "public_jwk":{  
+      "kty":"RSA",
+      "alg":"RS256",
+      "e":"AQAB",
+      "kid":"8f796169-0ac4-48a3-a202-fa4f3d814fcd",
+      "n":"nZD7QWmIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yZLwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhM9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
+      "use":"sig"
+   },
+   "description":"1.3 Test Tool",
+   "custom_fields":{  
+      "bar":"$Canvas.user.sisid"
+   },
+   "target_link_uri":"https://your.target_link_uri",
+   "oidc_initiation_url":"https://your.oidc_initiation_url"
+}
+```
+
+## Via XML Configuration (LTI 1.1)
 Custom fields can also be <a href="/doc/api/file.tools_xml.html">configured via XML</a>.
 
 This would create a tool in a course with custom fields, some of which are specific for a
@@ -106,7 +159,6 @@ particular placement:
      </blti:extensions>
    </cartridge_basiclti_link>
 ```
-
 # Supported Substitutions
 ## Context.title
 The title of the context.
