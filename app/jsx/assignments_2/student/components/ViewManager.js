@@ -56,7 +56,7 @@ function getAssignmentEnvVariables() {
     moduleUrl: `${baseUrl}/modules`
   }
 
-  if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
+  if (ENV.PREREQS?.items?.[0]?.prev) {
     const prereq = ENV.PREREQS.items[0].prev
     env.modulePrereq = {
       title: prereq.title,
@@ -82,11 +82,7 @@ function getSubmissionHistories(submissionHistoriesQueryData) {
   }
 
   const historiesConnection = submissionHistoriesQueryData.node.submissionHistoriesConnection
-  if (historiesConnection && historiesConnection.nodes) {
-    return historiesConnection.nodes
-  } else {
-    return []
-  }
+  return historiesConnection?.nodes || []
 }
 
 function getAllSubmissions({initialQueryData, submissionHistoriesQueryData}) {
@@ -190,9 +186,7 @@ class ViewManager extends React.Component {
       return null
     }
 
-    const historiesConnection =
-      props.submissionHistoriesQueryData.node.submissionHistoriesConnection
-    return historiesConnection && historiesConnection.pageInfo
+    return props.submissionHistoriesQueryData.node.submissionHistoriesConnection?.pageInfo
   }
 
   getDisplayedSubmissionIndex = (opts = {}) => {
@@ -228,7 +222,7 @@ class ViewManager extends React.Component {
     const pageInfo = this.getPageInfo(opts)
     if (!pageInfo && state.displayedAttempt > 1) {
       return true
-    } else if (pageInfo && pageInfo.hasPreviousPage) {
+    } else if (pageInfo?.hasPreviousPage) {
       return true
     }
 
