@@ -15,18 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {Assignment} from '../graphqlData/Assignment'
-import errorShipUrl from '../SVG/ErrorShip.svg'
+import {arrayOf} from 'prop-types'
+import CanvasSelect from '../../../shared/components/CanvasSelect'
 import {fillAssessment} from '../../../rubrics/helpers'
-import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2'
-import LoadingIndicator from '../../shared/LoadingIndicator'
-import {Query} from 'react-apollo'
-import React from 'react'
-import Rubric from '../../../rubrics/Rubric'
-import {RUBRIC_QUERY} from '../graphqlData/Queries'
-import {Submission} from '../graphqlData/Submission'
+import {ProficiencyRating} from '../graphqlData/ProficiencyRating'
+import React, {useMemo, useState} from 'react'
+import {Rubric} from '../graphqlData/Rubric'
+import {RubricAssessment} from '../graphqlData/RubricAssessment'
+import RubricComponent from '../../../rubrics/Rubric'
 
 function transformRubricData(rubric) {
   const rubricCopy = JSON.parse(JSON.stringify(rubric))
@@ -51,62 +48,53 @@ function transformRubricAssessmentData(rubricAssessment) {
 }
 
 export default function RubricTab(props) {
+  // We need to hoist the learning_outcome_id up one level to match the expected
+  // props in the `<RubricComponent>`. Memoize this so we don't need to do it on
+  // every render
+  const rubric = useMemo(() => transformRubricData(props.rubric), [props.rubric])
+  const assessments = useMemo(
+    () => props.assessments?.map(assessment => transformRubricAssessmentData(assessment)),
+    [props.assessments]
+  )
+  const [displayedAssessmentId, setDisplayedAssessmentId] = useState(assessments?.[0]?._id)
+
+  // This will always be undefined if there are no assessments, or the displayed
+  // assessments if any assessments are present
+  const displayedAssessment = assessments?.find(
+    assessment => assessment._id === displayedAssessmentId
+  )
+  const rubricAssociation = displayedAssessment?.rubric_association
+
   return (
-    <Query
-      query={RUBRIC_QUERY}
-      variables={{
-        rubricID: props.assignment.rubric.id,
-        submissionID: props.submission.id,
-        courseID: props.assignment.env.courseId,
-        submissionAttempt: props.submission.attempt
-      }}
-    >
-      {({loading, error, data}) => {
-        if (loading) return <LoadingIndicator />
-        if (error) {
-          return (
-            <GenericErrorPage
-              imageUrl={errorShipUrl}
-              errorSubject={I18n.t('Assignments 2 Student initial query error')}
-              errorCategory={I18n.t('Assignments 2 Student Error Page')}
-            />
-          )
-        }
+    <div data-testid="rubric-tab">
+      {!!assessments?.length && (
+        <div style={{marginBottom: '22px', width: '275px'}}>
+          <CanvasSelect
+            label={I18n.t('Select Grader')}
+            value={displayedAssessment._id}
+            onChange={(e, optionValue) => setDisplayedAssessmentId(optionValue)}
+          >
+            {assessments.map(assessment => (
+              <CanvasSelect.Option key={assessment._id} value={assessment._id} id={assessment._id}>
+                {assessment.assessor?.name || I18n.t('Anonymous')}
+              </CanvasSelect.Option>
+            ))}
+          </CanvasSelect>
+        </div>
+      )}
 
-        const customRatings = data.course.account.proficiencyRatingsConnection
-          ? data.course.account.proficiencyRatingsConnection.nodes
-          : null
-
-        // TODO: Need to handle the case where there are multiple rubric assessments
-        //       here. Need designs, probably a dropdown to select the target assessment
-        const rubric = transformRubricData(data.rubric)
-        let rubricAssessment = null
-        let rubricAssociation = null
-        if (
-          data.submission &&
-          data.submission.rubricAssessmentsConnection &&
-          data.submission.rubricAssessmentsConnection.nodes &&
-          data.submission.rubricAssessmentsConnection.nodes.length !== 0
-        ) {
-          const assessmentData = data.submission.rubricAssessmentsConnection.nodes[0]
-          rubricAssessment = transformRubricAssessmentData(assessmentData)
-          rubricAssociation = rubricAssessment.rubric_association
-        }
-
-        return (
-          <Rubric
-            customRatings={customRatings}
-            rubric={rubric}
-            rubricAssessment={fillAssessment(rubric, rubricAssessment || {})}
-            rubricAssociation={rubricAssociation}
-          />
-        )
-      }}
-    </Query>
+      <RubricComponent
+        customRatings={props.proficiencyRatings}
+        rubric={rubric}
+        rubricAssessment={fillAssessment(rubric, displayedAssessment || {})}
+        rubricAssociation={rubricAssociation}
+      />
+    </div>
   )
 }
 
 RubricTab.propTypes = {
-  assignment: Assignment.shape,
-  submission: Submission.shape
+  assessments: arrayOf(RubricAssessment.shape),
+  proficiencyRatings: arrayOf(ProficiencyRating.shape),
+  rubric: Rubric.shape
 }

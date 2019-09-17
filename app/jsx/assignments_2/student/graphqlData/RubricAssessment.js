@@ -26,6 +26,10 @@ export const RubricAssessment = {
     fragment RubricAssessment on RubricAssessment {
       _id
       assessment_type: assessmentType
+      assessor {
+        _id
+        name
+      }
       data: assessmentRatings {
         ...RubricAssessmentRating
       }
@@ -41,6 +45,10 @@ export const RubricAssessment = {
   shape: shape({
     _id: string.isRequired,
     assessment_type: string,
+    assessor: shape({
+      _id: string.isRequired,
+      name: string
+    }),
     data: arrayOf(RubricAssessmentRating.shape),
     rubricAssociation: RubricAssociation.shape,
     score: number.isRequired

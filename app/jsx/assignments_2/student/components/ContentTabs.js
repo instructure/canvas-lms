@@ -33,7 +33,7 @@ import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import {Tabs} from '@instructure/ui-tabs'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
-const RubricTab = lazy(() => import('./RubricTab'))
+const RubricsQuery = lazy(() => import('./RubricsQuery'))
 
 ContentTabs.propTypes = {
   assignment: Assignment.shape,
@@ -160,7 +160,7 @@ function ContentTabs(props) {
             selected={selectedTabIndex === 2}
           >
             <Suspense fallback={<LoadingIndicator />}>
-              <RubricTab assignment={props.assignment} submission={props.submission} />
+              <RubricsQuery assignment={props.assignment} submission={props.submission} />
             </Suspense>
           </Tabs.Panel>
         )}

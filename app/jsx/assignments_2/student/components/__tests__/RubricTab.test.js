@@ -15,11 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
-import {MockedProvider} from '@apollo/react-testing'
+import {fireEvent, render} from '@testing-library/react'
+import {mockQuery} from '../../mocks'
 import React from 'react'
-import {render, waitForElement} from '@testing-library/react'
 import RubricTab from '../RubricTab'
 import {RUBRIC_QUERY} from '../../graphqlData/Queries'
 
@@ -27,7 +25,18 @@ function gradedOverrides() {
   return {
     Submission: () => ({
       rubricAssessmentsConnection: {
-        nodes: [{}]
+        nodes: [
+          {
+            _id: 1,
+            score: 5,
+            assessor: {name: 'assessor1'}
+          },
+          {
+            _id: 2,
+            score: 10,
+            assessor: null
+          }
+        ]
       }
     }),
     Course: () => ({
@@ -51,7 +60,7 @@ function ungradedOverrides() {
   }
 }
 
-async function makeMocks(opts = {}) {
+async function makeProps(opts = {}) {
   const variables = {
     courseID: '1',
     rubricID: '1',
@@ -71,94 +80,75 @@ async function makeMocks(opts = {}) {
   ]
 
   const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
-  return [
-    {
-      request: {
-        query: RUBRIC_QUERY,
-        variables
-      },
-      result
-    }
-  ]
-}
-
-async function makeProps() {
-  const props = await mockAssignmentAndSubmission({
-    Assignment: () => ({
-      rubric: {}
-    })
-  })
-  return props
+  return {
+    assessments: result.data.submission.rubricAssessmentsConnection?.nodes,
+    proficiencyRatings: result.data.course.account.proficiencyRatingsConnection?.nodes,
+    rubric: result.data.rubric
+  }
 }
 
 describe('RubricTab', () => {
   describe('ungraded rubric', () => {
     it('contains the rubric criteria heading', async () => {
-      const mocks = await makeMocks({graded: false})
-      const props = await makeProps()
-      const {getAllByText} = render(
-        <MockedProvider mocks={mocks}>
-          <RubricTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitForElement(() => getAllByText('Criteria')[1])).toBeInTheDocument()
+      const props = await makeProps({graded: false})
+      const {findAllByText} = render(<RubricTab {...props} />)
+      expect((await findAllByText('Criteria'))[1]).toBeInTheDocument()
     })
 
     it('contains the rubric ratings heading', async () => {
-      const mocks = await makeMocks({graded: false})
-      const props = await makeProps()
-      const {getAllByText} = render(
-        <MockedProvider mocks={mocks}>
-          <RubricTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitForElement(() => getAllByText('Ratings')[1])).toBeInTheDocument()
+      const props = await makeProps({graded: false})
+      const {findAllByText} = render(<RubricTab {...props} />)
+      expect((await findAllByText('Ratings'))[1]).toBeInTheDocument()
     })
 
     it('contains the rubric points heading', async () => {
-      const mocks = await makeMocks({graded: false})
-      const props = await makeProps()
-      const {getAllByText} = render(
-        <MockedProvider mocks={mocks}>
-          <RubricTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitForElement(() => getAllByText('Pts')[1])).toBeInTheDocument()
+      const props = await makeProps({graded: false})
+      const {findAllByText} = render(<RubricTab {...props} />)
+      expect((await findAllByText('Pts'))[1]).toBeInTheDocument()
     })
   })
 
   describe('graded rubric', () => {
     it('displays comments', async () => {
-      const mocks = await makeMocks({graded: true})
-      const props = await makeProps()
-      const {getAllByText} = render(
-        <MockedProvider mocks={mocks}>
-          <RubricTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitForElement(() => getAllByText('Comments')[0])).toBeInTheDocument()
+      const props = await makeProps({graded: true})
+      const {findAllByText} = render(<RubricTab {...props} />)
+      expect((await findAllByText('Comments'))[0]).toBeInTheDocument()
     })
 
     it('displays the points for a criteria', async () => {
-      const mocks = await makeMocks({graded: true})
-      const props = await makeProps()
-      const {getByText} = render(
-        <MockedProvider mocks={mocks}>
-          <RubricTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitForElement(() => getByText('6 / 6 pts'))).toBeInTheDocument()
+      const props = await makeProps({graded: true})
+      const {findByText} = render(<RubricTab {...props} />)
+      expect(await findByText('6 / 6 pts')).toBeInTheDocument()
     })
 
     it('displays the total points for the rubric assessment', async () => {
-      const mocks = await makeMocks({graded: true})
-      const props = await makeProps()
-      const {getByText} = render(
-        <MockedProvider mocks={mocks}>
-          <RubricTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitForElement(() => getByText('Total Points: 10'))).toBeInTheDocument()
+      const props = await makeProps({graded: true})
+      const {findByText} = render(<RubricTab {...props} />)
+      expect(await findByText('Total Points: 5')).toBeInTheDocument()
+    })
+
+    it('displays the name of the assessor if present', async () => {
+      const props = await makeProps({graded: true})
+      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      fireEvent.click(await findByLabelText('Select Grader'))
+      expect(await findByText('assessor1')).toBeInTheDocument()
+    })
+
+    it('displays "Anonymous" if the assessor is hidden', async () => {
+      const props = await makeProps({graded: true})
+      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      fireEvent.click(await findByLabelText('Select Grader'))
+      expect(await findByText('Anonymous')).toBeInTheDocument()
+    })
+
+    it('changes the score when selecting a different assessor', async () => {
+      const props = await makeProps({graded: true})
+      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+
+      expect(await findByText('Total Points: 5')).toBeInTheDocument()
+      fireEvent.click(await findByLabelText('Select Grader'))
+      fireEvent.click(await findByText('Anonymous'))
+      expect(await findByText('Total Points: 10')).toBeInTheDocument()
     })
   })
 })
