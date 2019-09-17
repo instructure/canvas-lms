@@ -175,10 +175,11 @@ import 'compiled/badge_counts'
     if(typeof ga === 'function') {
       ga('create', ENV["analytics"]["ga_tracking_id"]);
       $('.sm-course-menu').on('click', 'nav #section-tabs .section a', function(event) {
-        ga('send', 'event', 
-          'Course Navigation', 
+        var textToSend = $(this).clone().children().remove().end().text();
+        ga('send', 'event',
+          'Course Navigation',
           'clicked',
-          $(this).text()
+          textToSend
         );
       });
     }
