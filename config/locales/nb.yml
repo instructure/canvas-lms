@@ -15587,6 +15587,7 @@ nb:
   outcomesFindDialog: 
     confirm: 
       import_group: "Importer gruppen \"%{group}\" til gruppen \"%{target}\"?"
+      import_outcome: "Importer læringsmålet \"%{outcome}\" til gruppen \"%{target}\"?"
     dont_import: "Denne gruppen kan ikke importeres."
     flash: 
       importError: "Et avvik oppsto under importering. Forsøk igjen senere."
