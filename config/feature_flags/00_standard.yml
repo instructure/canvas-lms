@@ -397,9 +397,6 @@ slack_notifications:
   display_name: Slack Notifications
   description: The ability for users to receive notifications from slack
   applies_to: RootAccount
-  environments:
-      production:
-        state: disabled
 javascript_csp:
   state: allowed
   display_name: Content Security Policy
