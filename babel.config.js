@@ -46,6 +46,7 @@ module.exports = {
 // @instructure/ui-media-player uses the old pattern of putting things in /components like InstUI used to do
 if (!USE_ES_MODULES) {
   module.exports.plugins = [
+    '@babel/plugin-proposal-optional-chaining',
     [
       '@instructure/babel-plugin-transform-imports',
       {
