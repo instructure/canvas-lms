@@ -16206,6 +16206,7 @@ da:
       description: "Unsplash billedsøgningstjeneste"
       name: Unsplash
     unsplash_settings: 
+      description: "[Følg trinnene](%{unsplash_wiki_url}) for at opsætte en ny applikation på Unsplash."
       labels: 
         access_key: Adgangstast
         application_name: Ansøgningsnavn
