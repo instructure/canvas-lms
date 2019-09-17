@@ -14290,7 +14290,7 @@ is:
       description: "Unsplash myndaleitarþjónusta"
       name: Unsplash
     unsplash_settings: 
-      description: "Þú þarft að skrá [nýtt app á Unsplash ](%{unsplash_url})."
+      description: "Vinsamlega [fylgdu skrefunum](%{unsplash_wiki_url}) til að setja upp nýtt forrit á Unsplash."
       labels: 
         access_key: Aðgangslykill
         application_name: "Nafn forrits"
