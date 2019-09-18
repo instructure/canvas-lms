@@ -5,9 +5,9 @@
 # property set.  Don't declare `role :all`, it's a meta role.
 
 # Use private IPs since the server is behind a firewall and public IPs don't work there.
-role :app, %w{deploy@172.31.17.65}
-role :web, %w{deploy@172.31.17.65}
-role :db,  %w{deploy@172.31.17.65}
+role :app, %w{deploy@172.31.12.39}
+role :web, %w{deploy@172.31.12.39}
+role :db,  %w{deploy@172.31.12.39}
 
 set :branch, 'bz-master'
 
