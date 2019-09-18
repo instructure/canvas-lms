@@ -113,7 +113,7 @@ class SectionsController < ApplicationController
 
       includes = Array(params[:include])
 
-      sections = @context.active_course_sections.order(CourseSection.best_unicode_collation_key('name'))
+      sections = @context.active_course_sections.order(CourseSection.best_unicode_collation_key('name'), :id)
 
       unless params[:all].present?
         sections = Api.paginate(sections, self, api_v1_course_sections_url)
