@@ -1336,6 +1336,19 @@ describe CalendarEventsApiController, type: :request do
       expect(json.map { |event| event['title'] }).to eq %w[1 2 3]
     end
 
+    it 'does not return the description if the assignment is locked' do
+      student = user_factory(active_all: true, active_state: 'active')
+      @course.enroll_student(student, enrollment_state: 'active')
+      @course.assignments.create(description: 'foo', unlock_at: 1.day.from_now)
+
+      json = api_call_as_user(student, :get, "/api/v1/calendar_events", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :type => 'assignment', :context_codes => ["course_#{@course.id}"], all_events: true
+      })
+      expect(json.first).to have_key('description')
+      expect(json.first['description']).to be_nil
+    end
+
     it 'should sort and paginate assignments' do
       undated = (1..7).map {|i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: nil).first }
       dated = (1..18).map {|i| create_assignments(@course.id, 1, title: "#{@course.id}:#{i}", due_at: Time.parse('2012-01-20 12:00:00').advance(days: -i)).first }
