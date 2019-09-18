@@ -172,9 +172,13 @@ module WikiAndTinyCommon
     wait_for_ajax_requests
   end
 
-  def upload_image_to_files_in_rce
+  def upload_to_files_in_rce(image = false)
     fj('button:contains("Upload a new file")').click
-    _name, path, _data = get_file({:image => 'graded.png'}[:image])
+    if image == true
+      _name, path, _data = get_file({:image => 'graded.png'}[:image])
+    else
+      _name, path, _data = get_file({:text => 'foo.txt'}[:text])
+    end
     f("input[type='file']").send_keys(path)
     button = f("button[type='submit']")
     keep_trying_until { button.displayed? }
