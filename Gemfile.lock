@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/beyond-z/logjam_agent.git
+  revision: 078415697fa81f0e92bb7334a07dea2d72de2a88
+  specs:
+    logjam_agent (0.29.3)
+      activesupport
+      ffi-rzmq (>= 2.0.4)
+      ffi-rzmq-core (>= 1.0.5)
+      time_bandits (>= 0.6.0)
+
+GIT
   remote: https://github.com/ccutrer/redis-store.git
   revision: 72db36c56c6563fc65f213dcf8a1b77ddd22d1bb
   ref: 72db36c56c6563fc65f213dcf8a1b77ddd22d1bb
@@ -66,16 +76,6 @@ GIT
   specs:
     active_model_serializers (0.9.0.alpha1)
       activemodel (>= 3.2)
-
-GIT
-  remote: https://github.com/rshipp/logjam_agent.git
-  revision: 519d94489d0bf48ef72d511ad1f2de1b4c5404b5
-  specs:
-    logjam_agent (0.29.2)
-      activesupport
-      ffi-rzmq (>= 2.0.4)
-      ffi-rzmq-core (>= 1.0.5)
-      time_bandits (>= 0.6.0)
 
 PATH
   remote: gems/activesupport-suspend_callbacks
