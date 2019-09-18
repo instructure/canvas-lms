@@ -457,8 +457,8 @@ class UsersController < ApplicationController
   #
   # @argument enrollment_type [String]
   #   When set, only return users enrolled with the specified course-level base role.
-  #   This can be a base role type of 'StudentEnrollment', 'TeacherEnrollment',
-  #   'TaEnrollment', 'ObserverEnrollment', or 'DesignerEnrollment'.
+  #   This can be a base role type of 'student', 'teacher',
+  #   'ta', 'observer', or 'designer'.
   #
   # @argument sort [String, "username"|"email"|"sis_id"|"last_login"]
   #   The column to sort results by.
