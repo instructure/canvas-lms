@@ -26,6 +26,7 @@ export const Submission = {
   fragment: gql`
     fragment Submission on Submission {
       ...SubmissionInterface
+      _id
       id
     }
     ${SubmissionInterface.fragment}
@@ -33,6 +34,7 @@ export const Submission = {
 
   shape: shape({
     ...SubmissionInterface.shape.propTypes,
+    _id: string.isRequired,
     id: string.isRequired
   })
 }
@@ -40,6 +42,7 @@ export const Submission = {
 export const DefaultMocks = {
   Submission: () => ({
     ...SubmissionInterfaceDefaultMocks.SubmissionInterface(),
+    _id: '1',
     id: '1'
   })
 }

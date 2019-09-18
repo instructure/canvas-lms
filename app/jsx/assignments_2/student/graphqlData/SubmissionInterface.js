@@ -23,6 +23,10 @@ import {SubmissionFile} from './File'
 export const SubmissionInterface = {
   fragment: gql`
     fragment SubmissionInterface on SubmissionInterface {
+      attachment {
+        # this refers to the screenshot of the submission if it is a url submission
+        ...SubmissionFile
+      }
       attachments {
         ...SubmissionFile
       }
@@ -48,6 +52,7 @@ export const SubmissionInterface = {
   `,
 
   shape: shape({
+    attachment: SubmissionFile.shape,
     attachments: arrayOf(SubmissionFile.shape),
     attempt: number.isRequired,
     body: string,
@@ -68,6 +73,7 @@ export const SubmissionInterface = {
 
 export const DefaultMocks = {
   SubmissionInterface: () => ({
+    attachment: null,
     attachments: () => [],
     attempt: 0,
     body: null,

@@ -2657,6 +2657,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   """
   _id: ID!
   assignment: Assignment
+  attachment: File
   attachments: [File!]
   attempt: Int!
   body: String
@@ -2903,6 +2904,7 @@ enum SubmissionGradingStatus {
 
 type SubmissionHistory implements SubmissionInterface & Timestamped {
   assignment: Assignment
+  attachment: File
   attachments: [File!]
   attempt: Int!
   body: String
@@ -3052,6 +3054,7 @@ Types for submission or submission history
 """
 interface SubmissionInterface {
   assignment: Assignment
+  attachment: File
   attachments: [File!]
   attempt: Int!
   body: String

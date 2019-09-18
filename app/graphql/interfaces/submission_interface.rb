@@ -184,6 +184,11 @@ module Interfaces::SubmissionInterface
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
 
+  field :attachment, Types::FileType, null: true
+  def attachment
+    load_association(:attachment)
+  end
+
   field :attachments, [Types::FileType], null: true
   def attachments
     Loaders::IDLoader.for(Attachment).load_many(object.attachment_ids_for_version)

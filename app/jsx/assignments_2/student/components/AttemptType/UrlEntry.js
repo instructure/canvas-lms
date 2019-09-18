@@ -24,7 +24,8 @@ import {Submission} from '../../graphqlData/Submission'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
-import {IconEyeLine, IconLinkLine} from '@instructure/ui-icons'
+import {IconEyeLine, IconExternalLinkLine, IconLinkLine} from '@instructure/ui-icons'
+import {Link, Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-text-input'
 
@@ -151,16 +152,41 @@ class UrlEntry extends React.Component {
     )
   }
 
-  render() {
+  renderAttempt = () => (
+    <View as="div" borderWidth="small" data-testid="url-entry">
+      <Billboard
+        heading={I18n.t('Website Url')}
+        hero={<IconLinkLine color="brand" />}
+        message={this.renderURLInput()}
+      />
+    </View>
+  )
+
+  renderSubmission = () => {
     return (
-      <View as="div" borderWidth="small" data-testid="url-entry">
-        <Billboard
-          heading={I18n.t('Website Url')}
-          hero={<IconLinkLine color="brand" />}
-          message={this.renderURLInput()}
-        />
-      </View>
+      <Flex direction="column">
+        <Flex.Item textAlign="center" margin="small 0 medium 0">
+          <Text size="large">
+            <Link
+              icon={IconExternalLinkLine}
+              iconPlacement="end"
+              margin="small"
+              onClick={() => window.open(this.props.submission.url)}
+            >
+              {this.props.submission.url}
+            </Link>
+          </Text>
+        </Flex.Item>
+      </Flex>
     )
+  }
+
+  render() {
+    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+      return this.renderSubmission()
+    } else {
+      return this.renderAttempt()
+    }
   }
 }
 
