@@ -1443,7 +1443,20 @@ class User < ActiveRecord::Base
   end
 
   def custom_colors
-    preferences[:custom_colors] ||= {}
+    colors_hash = (preferences[:custom_colors] ||= {})
+    if Shard.current != self.shard
+      # translate asset strings to be relative to current shard
+      colors_hash = Hash[
+        colors_hash.map do |asset_string, value|
+          opts = asset_string.split("_")
+          id_relative_to_user_shard = opts.pop.to_i
+          next if id_relative_to_user_shard > Shard::IDS_PER_SHARD && Shard.shard_for(id_relative_to_user_shard) == self.shard # this is old data and should be ignored
+          new_id = Shard.relative_id_for(id_relative_to_user_shard, self.shard, Shard.current)
+          ["#{opts.join('_')}_#{new_id}", value]
+        end.compact
+      ]
+    end
+    colors_hash
   end
 
   def dashboard_positions
