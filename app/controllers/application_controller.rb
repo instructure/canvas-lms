@@ -245,12 +245,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def external_tools_display_hashes(type, context=@context, custom_settings=[])
+  def external_tools_display_hashes(type, context=@context, custom_settings=[], tool_ids: nil)
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
-      :root_account => @domain_root_account, :current_user => @current_user}).to_a
+      :root_account => @domain_root_account, :current_user => @current_user,
+      :tool_ids => tool_ids}).to_a
 
     tools.select! do |tool|
       tool.visible_with_permission_check?(type, @current_user, context, session) &&
@@ -261,6 +262,7 @@ class ApplicationController < ActionController::Base
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
   end
+  helper_method :external_tools_display_hashes
 
   def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
     url_params = {
@@ -272,6 +274,7 @@ class ApplicationController < ActionController::Base
       :title => tool.label_for(type, I18n.locale),
       :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }
+    hash.merge!(:tool_id => tool.tool_id) if tool.tool_id.present?
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
     extension_settings.each do |setting|

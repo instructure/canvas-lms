@@ -3275,6 +3275,36 @@ describe CoursesController, type: :request do
                           :format => 'json', :include => %w(custom_links) })
         expect(json.first).to have_key 'custom_links'
       end
+
+      context "analytics 2" do
+        before :once do
+          @tool = analytics_2_tool_factory
+          Account.default.enable_feature!(:analytics_2)
+        end
+
+        it "puts analytics 2 in custom links if installed" do
+          json = api_call_as_user(@ta, :get, "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.to_param,
+                            :format => 'json', :include => %w(custom_links) })
+          student1_json = json.find { |u| u['id'] == @student1.id }
+          expect(student1_json['custom_links']).to include({
+            'text' => 'Analytics 2',
+            'url' => "http://www.example.com/courses/#{@course1.id}/external_tools/#{@tool.id}?launch_type=student_context_card&student_id=#{@student1.id}",
+            'icon_class' => 'icon-analytics',
+            'tool_id' => ContextExternalTool::ANALYTICS_2
+          })
+          ta_json = json.find { |u| u['id'] == @ta.id }
+          expect(ta_json['custom_links'].map { |l| l['tool_id'] }).not_to include ContextExternalTool::ANALYTICS_2
+        end
+
+        it "respects tool permissions" do
+          json = api_call_as_user(@student1, :get, "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s,
+                            :format => 'json', :include => %w(custom_links) })
+          student2_json = json.find { |u| u['id'] == @student2.id }
+          expect(student2_json['custom_links'].map { |l| l['tool_id'] }).not_to include ContextExternalTool::ANALYTICS_2
+        end
+      end
     end
 
     it "should include observed users in the enrollments if requested" do

@@ -1577,13 +1577,7 @@ describe ContextExternalTool do
 
     describe '#feature_flag_enabled?' do
       let(:tool) do
-        @course.root_account.context_external_tools.create(
-          name: 'feature_flagged',
-          consumer_key: 'key',
-          shared_secret: 'secret',
-          url: 'http://example.com/launch',
-          tool_id: ContextExternalTool::ANALYTICS_2
-        )
+        analytics_2_tool_factory
       end
 
       it 'should return true if the feature is enabled' do

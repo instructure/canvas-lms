@@ -622,6 +622,7 @@ end
       scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
       scope = scope.placements(*placements)
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
+      scope = scope.where(tool_id: options[:tool_ids]) if options[:tool_ids].present?
       if Canvas::Plugin.value_to_boolean(options[:only_visible])
         scope = scope.visible(options[:current_user], context, options[:session], options[:visibility_placements], scope)
       end

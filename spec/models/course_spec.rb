@@ -4021,10 +4021,7 @@ describe Course, 'tabs_available' do
   end
 
   it 'hides tabs for feature flagged external tools' do
-    tool = @course.root_account.context_external_tools.create!(name: 'tool', consumer_key: 'key', shared_secret: 'secret', url: 'http://example.com',
-      tool_id: ContextExternalTool::ANALYTICS_2)
-    tool.course_navigation = {url: "http://example.com", visibility: 'admins', default: 'active'}
-    tool.save!
+    tool = analytics_2_tool_factory
 
     tabs = @course.external_tool_tabs({}, User.new)
     expect(tabs.map{|t| t[:id]}).not_to include(tool.asset_string)
