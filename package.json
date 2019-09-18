@@ -144,6 +144,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/ui-babel-preset": "6",
+    "@prettier/plugin-ruby": "^0.15.0",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
     "@testing-library/dom": "^6",
