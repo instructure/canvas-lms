@@ -681,6 +681,42 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # pulish a N.Q assignment from Quizzes Page
+  def publish_quizzes
+    if authorized_action(@context, @current_user, :manage_assignments)
+      @assignments = @context.assignments.active.where(id: params[:quizzes])
+      @assignments.each(&:publish!)
+
+      flash[:notice] = t('notices.quizzes_published',
+                         { :one => "1 quiz successfully published!",
+                           :other => "%{count} quizzes successfully published!" },
+                         :count => @assignments.length)
+
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
+    end
+  end
+
+  # unpulish a N.Q assignment from Quizzes Page
+  def unpublish_quizzes
+    if authorized_action(@context, @current_user, :manage_assignments)
+      @assignments = @context.assignments.active.where(id: params[:quizzes], workflow_state: 'published')
+      @assignments.each(&:unpublish!)
+
+      flash[:notice] = t('notices.quizzes_unpublished',
+                         { :one => "1 quiz successfully unpublished!",
+                           :other => "%{count} quizzes successfully unpublished!" },
+                         :count => @assignments.length)
+
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
+    end
+  end
+
   protected
 
   def set_default_tool_env!(context, hash)

@@ -25,9 +25,10 @@ import DateGroupCollection from '../collections/DateGroupCollection'
 import I18n from 'i18n!modelsQuiz'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'
+import PandaPubPoller from '../util/PandaPubPoller'
 
 export default class Quiz extends Backbone.Model {
-  initialize(attributes, options = {}) {
+  initialize() {
     this.publish = this.publish.bind(this)
     this.unpublish = this.unpublish.bind(this)
     this.dueAt = this.dueAt.bind(this)
@@ -51,6 +52,7 @@ export default class Quiz extends Backbone.Model {
     this.objectType = this.objectType.bind(this)
 
     super.initialize(...arguments)
+    this.initId()
     this.initAssignment()
     this.initAssignmentOverrides()
     this.initUrls()
@@ -62,6 +64,10 @@ export default class Quiz extends Backbone.Model {
   }
 
   // initialize attributes
+  initId() {
+    this.id = this.isQuizzesNext() ? `assignment_${this.get('id')}` : this.get('id')
+  }
+
   initAssignment() {
     if (this.attributes.assignment) {
       this.set('assignment', new Assignment(this.attributes.assignment))
@@ -78,12 +84,11 @@ export default class Quiz extends Backbone.Model {
 
   initUrls() {
     if (this.get('html_url')) {
-      this.set('base_url', this.get('html_url').replace(/quizzes\/\d+/, 'quizzes'))
-
+      this.set('base_url', this.get('html_url').replace(/(quizzes|assignments)\/\d+/, '$1'))
       this.set('url', `${this.get('base_url')}/${this.get('id')}`)
       this.set('edit_url', `${this.get('base_url')}/${this.get('id')}/edit`)
-      this.set('publish_url', `${this.get('base_url')}/publish`)
-      this.set('unpublish_url', `${this.get('base_url')}/unpublish`)
+      this.set('publish_url', this.publish_url())
+      this.set('unpublish_url', this.unpublish_url())
       this.set(
         'toggle_post_to_sis_url',
         `${this.get('base_url')}/${this.get('id')}/toggle_post_to_sis`
@@ -103,7 +108,9 @@ export default class Quiz extends Backbone.Model {
 
   initQuestionsCount() {
     const cnt = this.get('question_count')
-    return this.set('question_count_label', I18n.t('question_count', 'Question', {count: cnt}))
+    if (cnt) {
+      this.set('question_count_label', I18n.t('question_count', 'Question', {count: cnt}))
+    }
   }
 
   initPointsCount() {
@@ -115,8 +122,26 @@ export default class Quiz extends Backbone.Model {
     return this.set('possible_points_label', text)
   }
 
+  isQuizzesNext() {
+    return this.get('quiz_type') === 'quizzes.next'
+  }
+
   isUngradedSurvey() {
     return this.get('quiz_type') === 'survey'
+  }
+
+  publish_url() {
+    if (this.isQuizzesNext()) {
+      return `${this.get('base_url')}/publish/quiz`
+    }
+    return `${this.get('base_url')}/publish`
+  }
+
+  unpublish_url() {
+    if (this.isQuizzesNext()) {
+      return `${this.get('base_url')}/unpublish/quiz`
+    }
+    return `${this.get('base_url')}/unpublish`
   }
 
   initAllDates() {
@@ -127,7 +152,6 @@ export default class Quiz extends Backbone.Model {
   }
 
   // publishing
-
   publish() {
     this.set('published', true)
     return $.ajaxJSON(this.get('publish_url'), 'POST', {quizzes: [this.get('id')]})
@@ -162,6 +186,10 @@ export default class Quiz extends Backbone.Model {
     return this.set('lock_at', date)
   }
 
+  isDuplicating() {
+    return this.get('workflow_state') === 'duplicating'
+  }
+
   name(newName) {
     if (!(arguments.length > 0)) return this.get('title')
     return this.set('title', newName)
@@ -171,13 +199,73 @@ export default class Quiz extends Backbone.Model {
     return this.get('url')
   }
 
+  destroy(options) {
+    const opts = {
+      url: this.htmlUrl(),
+      ...options
+    }
+    Backbone.Model.prototype.destroy.call(this, opts)
+  }
+
   defaultDates() {
-    let group
-    return (group = new DateGroup({
+    return new DateGroup({
       due_at: this.get('due_at'),
       unlock_at: this.get('unlock_at'),
       lock_at: this.get('lock_at')
-    }))
+    })
+  }
+
+  // caller is original assignments
+  duplicate(callback) {
+    const course_id = this.get('course_id')
+    const assignment_id = this.get('id')
+    return $.ajaxJSON(
+      `/api/v1/courses/${course_id}/assignments/${assignment_id}/duplicate`,
+      'POST',
+      {quizzes: [assignment_id], result_type: 'Quiz'},
+      callback
+    )
+  }
+
+  // caller is failed assignments
+  duplicate_failed(callback) {
+    const target_course_id = this.get('course_id')
+    const target_assignment_id = this.get('id')
+    const original_course_id = this.get('original_course_id')
+    const original_assignment_id = this.get('original_assignment_id')
+    let query_string = `?target_assignment_id=${target_assignment_id}`
+    if (original_course_id !== target_course_id) {
+      // when it's a course copy failure
+      query_string += `&target_course_id=${target_course_id}`
+    }
+    $.ajaxJSON(
+      `/api/v1/courses/${original_course_id}/assignments/${original_assignment_id}/duplicate${query_string}`,
+      'POST',
+      {},
+      callback
+    )
+  }
+
+  pollUntilFinishedLoading(interval) {
+    if (this.isDuplicating()) {
+      this.pollUntilFinished(interval)
+    }
+  }
+
+  pollUntilFinished(interval) {
+    const course_id = this.get('course_id')
+    const id = this.get('id')
+    const poller = new PandaPubPoller(interval, interval * 5, done => {
+      this.fetch({url: `/api/v1/courses/${course_id}/assignments/${id}?result_type=Quiz`}).always(
+        () => {
+          done()
+          if (!this.isDuplicating()) {
+            return poller.stop()
+          }
+        }
+      )
+    })
+    poller.start()
   }
 
   multipleDueDates() {
@@ -193,10 +281,9 @@ export default class Quiz extends Backbone.Model {
   }
 
   allDates() {
-    let result
     const groups = this.get('all_dates')
     const models = (groups && groups.models) || []
-    return (result = _.map(models, group => group.toJSON()))
+    return _.map(models, group => group.toJSON())
   }
 
   singleSectionDueDate() {

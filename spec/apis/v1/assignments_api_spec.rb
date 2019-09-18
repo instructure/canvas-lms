@@ -1354,6 +1354,34 @@ describe AssignmentsApiController, type: :request do
         new_assignment = duplicated_assignments.where.not(id: failed_assignment.id).first
         expect(new_assignment.workflow_state).to eq('duplicating')
       end
+
+      context "when result_type is specified (Quizzes.Next serialization)" do
+        before do
+          @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+        end
+
+        it "outputs quiz shell json using quizzes.next serializer" do
+          url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
+            "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}" \
+            "&result_type=Quiz"
+
+          json = api_call_as_user(
+            @teacher, :post,
+            url,
+            {
+              controller: "assignments_api",
+              action: "duplicate",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: assignment.id.to_s,
+              target_assignment_id: failed_assignment.id,
+              target_course_id: course_copied.id,
+              result_type: 'Quiz'
+            }
+          )
+          expect(json['quiz_type']).to eq('quizzes.next')
+        end
+      end
     end
   end
 
@@ -4502,6 +4530,25 @@ describe AssignmentsApiController, type: :request do
           uri = URI(@json['url'])
           expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
           expect(uri.query).to include('assignment_id=')
+        end
+      end
+
+      context "when result_type is specified (Quizzes.Next serialization)" do
+        before do
+          @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+        end
+
+        it "outputs quiz shell json using quizzes.next serializer" do
+          @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                          { :controller => "assignments_api", :action => "show",
+                            :format => "json", :course_id => @course.id.to_s,
+                            :id => @assignment.id.to_s,
+                            :all_dates => true,
+                            result_type: 'Quiz'},
+                          {:override_assignment_dates => 'false'})
+          expect(json['quiz_type']).to eq('quizzes.next')
         end
       end
     end
