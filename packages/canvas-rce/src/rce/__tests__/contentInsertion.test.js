@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import * as contentInsertion from "../../src/rce/contentInsertion";
+import * as contentInsertion from "../contentInsertion";
+import {videoFromTray, videoFromUpload, audioFromTray, audioFromUpload} from './contentHelpers'
 
 describe("contentInsertion", () => {
   let editor, node;
@@ -74,6 +74,10 @@ describe("contentInsertion", () => {
     };
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   describe("insertLink", () => {
     let link;
 
@@ -93,8 +97,7 @@ describe("contentInsertion", () => {
     it("builds an anchor link with appropriate embed class", () => {
       link.embed = { type: "image" };
       contentInsertion.insertLink(editor, link);
-      assert.equal(
-        editor.content,
+      expect(editor.content).toEqual(
         '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
       );
     });
@@ -102,8 +105,7 @@ describe("contentInsertion", () => {
     it("uses link data to build html", () => {
       link.embed = { type: "scribd" };
       contentInsertion.insertLink(editor, link);
-      assert.equal(
-        editor.content,
+      expect(editor.content).toEqual(
         '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
       );
     });
@@ -112,8 +114,7 @@ describe("contentInsertion", () => {
       link.href = undefined;
       link.url = '/other/path'
       contentInsertion.insertLink(editor, link);
-      assert.equal(
-        editor.content,
+      expect(editor.content).toEqual(
         '<a href="/other/path" title="Here Be Links">Click On Me</a>'
       );
     });
@@ -121,8 +122,7 @@ describe("contentInsertion", () => {
     it("cleans a url with no protocol", () => {
       link.href = "www.google.com";
       contentInsertion.insertLink(editor, link);
-      assert.equal(
-        editor.content,
+      expect(editor.content).toEqual(
         '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>'
       );
     });
@@ -130,13 +130,13 @@ describe("contentInsertion", () => {
     it("sets embed id with media entry id for videos", () => {
       link.embed = { type: "video", id: "0_22h0jy7g" };
       contentInsertion.insertLink(editor, link);
-      assert.ok(editor.content.match(link.embed.id));
+      expect(editor.content.match(link.embed.id)).toBeTruthy()
     });
 
     it("sets embed id with media entry id for audio", () => {
       link.embed = { type: "audio", id: "0_22h0jy7g" };
       contentInsertion.insertLink(editor, link);
-      assert.ok(editor.content.match(link.embed.id));
+      expect(editor.content.match(link.embed.id)).toBeTruthy()
     });
   });
 
@@ -144,7 +144,7 @@ describe("contentInsertion", () => {
     it("accepts string content", () => {
       const content = "Some Chunk Of Content";
       contentInsertion.insertContent(editor, content);
-      assert.equal(editor.content, "Some Chunk Of Content");
+      expect(editor.content).toEqual("Some Chunk Of Content");
     });
 
     it("calls replaceTextareaSelection() when editor is hidden", () => {
@@ -157,7 +157,7 @@ describe("contentInsertion", () => {
         return elem;
       };
       contentInsertion.insertContent(editor, content);
-      assert.equal("blahcontent", elem.value);
+      expect("blahcontent").toEqual(elem.value);
     });
   });
 
@@ -173,8 +173,7 @@ describe("contentInsertion", () => {
 
     it("builds image html from image data", () => {
       contentInsertion.insertImage(editor, image);
-      assert.equal(
-        editor.content,
+      expect(editor.content).toEqual(
         '<img alt="Here Be Images" src="/some/path" style="max-width:320px;max-height:320px"/>'
       );
     });
@@ -182,8 +181,7 @@ describe("contentInsertion", () => {
     it("uses url if no href", () => {
       image.href = undefined;
       contentInsertion.insertImage(editor, image);
-      assert.equal(
-        editor.content,
+      expect(editor.content).toEqual(
         '<img alt="Here Be Images" src="/other/path" style="max-width:320px;max-height:320px"/>'
       );
     });
@@ -208,8 +206,7 @@ describe("contentInsertion", () => {
       });
 
       contentInsertion.insertImage(ed, image);
-      assert.equal(
-        ed.content,
+      expect(ed.content).toEqual(
         '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path"/></a>'
       );
     });
@@ -225,7 +222,7 @@ describe("contentInsertion", () => {
           node: undefined
         }
       };
-      assert.equal(true, contentInsertion.existingContentToLink(editor, link));
+      expect(contentInsertion.existingContentToLink(editor, link)).toBe(true)
     });
     it("returns false if content not selected", () => {
       const link = {
@@ -233,26 +230,26 @@ describe("contentInsertion", () => {
           node: false
         }
       };
-      assert.equal(false, contentInsertion.existingContentToLink(editor, link));
+      expect(contentInsertion.existingContentToLink(editor, link)).toBe(false)
     });
 
     it('returns true when only an editor is passed with a selection', () => {
       editor.selection.getContent = () => {
         return "content";
       };
-      assert.equal(true, contentInsertion.existingContentToLink(editor))
+      expect(contentInsertion.existingContentToLink(editor)).toBe(true)
     })
   });
 
   describe("existingContentToLinkIsImg", () => {
     it("returns false if no content selected", () => {
-      assert.equal(false, contentInsertion.existingContentToLinkIsImg(editor));
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false);
     });
     it("returns false if selected content is not img", () => {
       editor.selection.getContent = () => {
         return "content";
       };
-      assert.equal(false, contentInsertion.existingContentToLinkIsImg(editor));
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false);
     });
     it("returns true if selected content is img", () => {
       editor.selection.getContent = () => {
@@ -265,7 +262,66 @@ describe("contentInsertion", () => {
           }
         };
       };
-      assert.equal(true, contentInsertion.existingContentToLinkIsImg(editor));
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(true);
     });
   });
+
+  describe('insertVideo', () => {
+    beforeEach(() => {
+      // this is what's returned from editor.seletion.getEnd()
+      node = {
+        querySelector: () => 'the inserted iframe'
+      }
+    })
+
+
+    it('inserts video from upload into iframe', () => {
+      jest.spyOn(editor, 'insertContent')
+      const video = videoFromUpload()
+      const result = contentInsertion.insertVideo(editor, video)
+      expect(editor.insertContent).toHaveBeenCalledWith(
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="m-media-id" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+
+    it('inserts video from the course content tray', () => {
+      jest.spyOn(editor, 'insertContent')
+      const video = videoFromTray()
+      const result = contentInsertion.insertVideo(editor, video)
+      expect(editor.insertContent).toHaveBeenCalledWith(
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="17" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&amp;type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+  })
+
+  describe('insertAudio', () => {
+    beforeEach(() => {
+      // this is what's returned from editor.seletion.getEnd()
+      node = {
+        querySelector: () => 'the inserted iframe'
+      }
+    })
+
+    it('inserts audio from upload into iframe', () => {
+      jest.spyOn(editor, 'insertContent')
+      const audio = audioFromUpload()
+      const result = contentInsertion.insertAudio(editor, audio)
+      expect(editor.insertContent).toHaveBeenCalledWith(
+        '<iframe data-media-id="m-media-id" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+
+    it('inserts audio from the course content tray', () => {
+      jest.spyOn(editor, 'insertContent')
+      const audio = audioFromTray()
+      const result = contentInsertion.insertAudio(editor, audio)
+      expect(editor.insertContent).toHaveBeenCalledWith(
+        '<iframe data-media-id="29" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+  })
 });

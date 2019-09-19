@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {arrayOf, bool, func, instanceOf, oneOfType, string} from 'prop-types'
 import { StyleSheet, css } from "aphrodite";
 
@@ -29,7 +29,10 @@ import {Img, Text, TruncateText} from '@instructure/ui-elements'
 import {Flex, View} from '@instructure/ui-layout'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
-import RocketSVG from './RocketSVG'
+import RocketSVG from '@instructure/canvas-media/lib/RocketSVG'
+import useComputerPanelFocus from '@instructure/canvas-media/lib/useComputerPanelFocus'
+import useSizeVideoPlayer from '@instructure/canvas-media/lib/useSizeVideoPlayer'
+
 import formatMessage from '../../../../format-message'
 import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
 
@@ -93,23 +96,14 @@ export default function ComputerPanel({
     getPreview()
   })
 
-  const [clearButtonRef, setClearButtonRef] = useState(null)
-  const [panelRef, setPanelRef] = useState(null)
-  const [weHaveHadAFile, setWeHaveHadAFile] = useState(false)
-  useEffect(() => {
-    // don't manage focus until the user has done something
-    if (weHaveHadAFile) {
-      if(clearButtonRef) {
-        clearButtonRef.focus()
-      } else if (panelRef) {
-        panelRef.querySelector('input').focus()  // because FileDrop does not have a ref prop or a focus func
-      }
-    }
-    setWeHaveHadAFile(weHaveHadAFile || theFile)
-  })
+  const previewPanelRef = useRef(null)
+  const {playerWidth, playerHeight} = useSizeVideoPlayer(theFile, previewPanelRef, preview.isLoading)
 
+  const clearButtonRef = useRef(null)
+  const panelRef = useRef(null)
+  useComputerPanelFocus(theFile, panelRef, clearButtonRef)
 
-  function renderPreview(theFile) {
+  function renderPreview() {
     if (preview.isLoading) {
       return (
         <div aria-live="polite">
@@ -162,11 +156,13 @@ export default function ComputerPanel({
 
   if (hasUploadedFile) {
     return (
-      <>
+      <div style={{position: 'relative'}} ref={previewPanelRef}>
         <Flex direction="row-reverse" margin="none none medium">
           <Flex.Item>
             <Button
-              buttonRef={setClearButtonRef}
+              buttonRef={el => {
+                clearButtonRef.current = el
+              }}
               onClick={() => {
                 setFile(null)
                 setPreview({preview: null, isLoading: false, error: null})
@@ -185,18 +181,18 @@ export default function ComputerPanel({
           </Flex.Item>
         </Flex>
       {(isAudioOrVideo(theFile.type)) ?
-        (<View as="div" height="100%" width="100%" textAlign="center">
-          {renderPreview(theFile)}
+        (<View as="div" height={playerHeight} width={playerWidth} textAlign="center" margin="0 auto">
+          {renderPreview()}
         </View>) :
         <View as="div" height="300px" width="300px" margin="0 auto">
-          {renderPreview(theFile)}
+          {renderPreview()}
         </View>
       }
-      </>
+      </div>
     )
   }
   return (
-    <div ref={setPanelRef}>
+    <div ref={panelRef}>
       <FileDrop
         accept={accept}
         onDropAccepted={([file]) => {

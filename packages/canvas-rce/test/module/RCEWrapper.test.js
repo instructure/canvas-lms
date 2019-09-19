@@ -271,7 +271,7 @@ describe("RCEWrapper", () => {
         editor.dom.doc.appendChild(placeholder)
         const spy = sinon.spy()
         instance.checkReadyToGetCode(spy)
-        sinon.assert.calledWith(spy, 'An image is still being uploaded, if you continue the image will not be embedded properly.')
+        sinon.assert.calledWith(spy, 'Content is still being uploaded, if you continue it will not be embedded properly.')
       })
 
       it('returns true if promptFunc returns true', () => {
@@ -404,6 +404,40 @@ describe("RCEWrapper", () => {
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
       })
+
+      it('inserts a video file placeholder image with the proper metadata', () => {
+        const props = {
+          name: 'file.mov',
+          domObject: {},
+          contentType: 'video/quicktime'
+        }
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="file.mov"
+      style="width: 400px; height: 225px; border: solid 1px #8B969E;"
+    />`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
+      })
+
+      it('inserts an audio file placeholder image with the proper metadata', () => {
+        const props = {
+          name: 'file.mp3',
+          domObject: {},
+          contentType: 'audio/mp3'
+        }
+        const imageMarkup = `
+    <img
+      alt="Loading..."
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+      data-placeholder-for="file.mp3"
+      style="width: 300px; height: 2.813rem; border: solid 1px #8B969E;"
+    />`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(contentInsertionStub, editor, imageMarkup)
+      })
     })
 
 
@@ -435,6 +469,31 @@ describe("RCEWrapper", () => {
         contentInsertion.insertImage.restore();
       })
     })
+
+    describe("insert media", () => {
+      let insertedSpy
+
+      beforeEach(() => {
+        insertedSpy = sinon.spy(instance, 'contentInserted')
+      })
+
+      afterEach(()=> {
+        instance.contentInserted.restore()
+      })
+
+      it('inserts video', () => {
+        sinon.stub(contentInsertion, 'insertVideo').returns('<iframe/>')
+        instance.insertVideo({})
+        assert.equal(insertedSpy.getCall(0).args[0], '<iframe/>')
+      })
+
+      it('inserts audio', () => {
+        sinon.stub(contentInsertion, 'insertAudio').returns('<iframe/>')
+        instance.insertAudio({})
+        assert.equal(insertedSpy.getCall(0).args[0], '<iframe/>')
+      })
+    })
+
 
     describe("indicator", () => {
       it("does not indicate() if editor is hidden", () => {

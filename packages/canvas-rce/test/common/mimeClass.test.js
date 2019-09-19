@@ -51,7 +51,7 @@ describe("fileEmbed", () => {
     assert.equal(video.id, "42");
   });
 
-  it("returns maybe in place of media entry id if not provided", () => {
+    it("returns maybe in place of media entry id if not provided", () => {
     const video = fileEmbed(getBaseFile({ "content-type": "video/mp4" }));
     assert.equal(video.id, "maybe");
   });

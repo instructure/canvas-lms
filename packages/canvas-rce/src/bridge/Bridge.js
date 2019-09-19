@@ -175,8 +175,8 @@ export default class Bridge {
   embedMedia = media => {
     if (/video/.test(media.type || media.content_type)) {
       this.insertVideo(media)
-    } else { // TODO: put audio in an audio player
-      this.insertLink(media)
+    } else {
+      this.insertAudio(media)
     }
 
   }
@@ -184,6 +184,15 @@ export default class Bridge {
   insertVideo = video => {
     if (this.focusedEditor) {
       this.focusedEditor.insertVideo(video)
+    }
+    if (this.controller) {
+      this.controller.hideTray()
+    }
+  }
+
+  insertAudio = audio => {
+    if (this.focusedEditor) {
+      this.focusedEditor.insertAudio(audio)
     }
     if (this.controller) {
       this.controller.hideTray()

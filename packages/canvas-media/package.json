@@ -7,8 +7,8 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "test": "jest",
-    "jest": "jest",
+    "test": "jest --runInBand",
+    "jest": "jest --runInBand",
     "build:canvas": "babel --root-mode upward src -d es & JEST_WORKER_ID=true babel --root-mode upward src -d lib"
   },
   "repository": {

@@ -228,7 +228,7 @@ export default class UploadMedia extends React.Component {
     return (
       <Modal
         label={UPLOAD_MEDIA_LABEL}
-        size="medium"
+        size="large"
         onDismiss={this.onModalClose}
         open={this.props.open}
         shouldCloseOnDocumentClick={false}

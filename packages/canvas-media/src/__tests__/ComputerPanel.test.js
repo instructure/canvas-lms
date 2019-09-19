@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent, waitForElement} from '@testing-library/react'
 import {act} from 'react-dom/test-utils'
-import ComputerPanel, {sizeVideoPlayer} from '../ComputerPanel'
+import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 
 // polyfill URL.createObjectURL
@@ -153,35 +153,6 @@ describe('UploadMedia: ComputerPanel', () => {
       })
       expect(setHasUploadedFile).toHaveBeenCalledWith(false)
       expect(setFile).toHaveBeenCalledWith(null)
-    })
-  })
-
-  describe('sizeVideoPlayer', () => {
-    it('scales a landscape video', () => {
-      const player = {
-        videoWidth: 200,
-        videoHeight: 100
-      }
-      const width = sizeVideoPlayer(player, 300)
-      expect(width).toBe('300px')
-    })
-
-    it('scales a portrait video', () => {
-      const player = {
-        videoWidth: 100,
-        videoHeight: 200
-      }
-      const width = sizeVideoPlayer(player, 300)
-      expect(width).toBe('150px')
-    })
-
-    it('scales a square video', () => {
-      const player = {
-        videoWidth: 200,
-        videoHeight: 200
-      }
-      const width = sizeVideoPlayer(player, 300)
-      expect(width).toBe('300px')
     })
   })
 })

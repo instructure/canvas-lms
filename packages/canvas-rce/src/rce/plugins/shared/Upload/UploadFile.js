@@ -24,7 +24,7 @@ import {Heading, Spinner} from '@instructure/ui-elements'
 import {Tabs} from '@instructure/ui-tabs'
 import formatMessage from '../../../../format-message'
 import indicatorRegion from '../../../indicatorRegion'
-import {isImage} from '../fileTypeUtils'
+import {isImage, isAudioOrVideo} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
 import {StoreProvider} from "../StoreContext"
@@ -49,7 +49,13 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
         contentType: theFile.type,
         domObject: theFile
       }
-      storeProps.startMediaUpload(isImage(theFile.type) ? 'images' : 'documents', fileMetaData)
+      let tabContext = 'documents'
+      if (isImage(theFile.type)) {
+        tabContext = 'images'
+      } else if (isAudioOrVideo(theFile.type)) {
+        tabContext = 'media'
+      }
+      storeProps.startMediaUpload(tabContext, fileMetaData)
       break;
     }
     case 'UNSPLASH': {

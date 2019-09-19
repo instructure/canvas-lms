@@ -22,16 +22,8 @@ export function fileEmbed(file) {
 
   if (fileMimeClass === "image") {
     return { type: "image" };
-  } else if (fileMimeClass === "video") {
-    return {
-      type: "video",
-      id: fileMediaEntryId,
-      embedded_iframe_url: file.embedded_iframe_url,
-      media_id: file.media_id,
-      title: file.title
-    };
-  } else if (fileMimeClass === "audio") {
-    return { type: "audio", id: fileMediaEntryId };
+  } else if (fileMimeClass === "video" || fileMimeClass === "audio") {
+    return { type: fileMimeClass, id: fileMediaEntryId };
   } else if (file.preview_url) {
     return { type: "scribd" };
   } else {

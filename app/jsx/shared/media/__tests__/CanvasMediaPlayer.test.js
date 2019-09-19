@@ -19,20 +19,20 @@
 import React from 'react'
 import {render, waitForElement, act, cleanup} from '@testing-library/react'
 import waitForExpect from 'wait-for-expect'
-import CanvasMediaPlayer from '../CanvasMediaPlayer'
+import CanvasMediaPlayer, {sizeMediaPlayer} from '../CanvasMediaPlayer'
 
 afterEach(cleanup)
 
 const defaultMediaObject = () => ({
   bitrate: '12345',
-  content_type: 'mp4',
+  content_type: 'video/mp4',
   fileExt: 'mp4',
-  height: '1234',
+  height: '1000',
   isOriginal: 'false',
   size: '3123123123',
   src: 'anawesomeurl.test',
   label: 'an awesome label',
-  width: '12345'
+  width: '500'
 })
 
 describe('CanvasMediaPlayer', () => {
@@ -104,5 +104,77 @@ describe('CanvasMediaPlayer', () => {
     // even after the server response came back, it should still say Loading
     expect(component.getByText('Loading')).toBeInTheDocument()
     component.unmount()
+  })
+  describe('sizeMediaPlayer', () => {
+    it('sets an audio player size', () => {
+      const {width, height} = sizeMediaPlayer({}, 'audio', {})
+      expect(width).toBe('300px')
+      expect(height).toBe('3rem')
+    })
+
+    it('scales a video player', () => {
+      const player = {
+        videoWidth: 1000,
+        videoHeight: 600
+      }
+      const playerContainer = {
+        clientWidth: 500
+      }
+
+      const {width, height} = sizeMediaPlayer(player, 'video', playerContainer)
+
+      expect(width).toBe('500px')
+      expect(height).toBe(`${Math.round(.6 * 500)}px`)
+    })
+  })
+
+  describe('renders correct set of video controls', () => {
+    it('renders all the buttons', () => {
+      document.fullscreenEnabled = true
+      const {getByText, getByLabelText} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+        />
+      )
+      expect(getByText('Play')).toBeInTheDocument()
+      expect(getByLabelText('Timebar')).toBeInTheDocument()
+      expect(getByText('Unmuted')).toBeInTheDocument()
+      expect(getByText('Playback Speed')).toBeInTheDocument()
+      expect(getByText('Source Chooser')).toBeInTheDocument()
+      expect(getByText('Full Screen')).toBeInTheDocument()
+    })
+
+    it('skips fullscreen button when not enabled', () => {
+      document.fullscreenEnabled = false
+      const {queryByText, queryByLabelText} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+        />
+      )
+      expect(queryByText('Play')).toBeInTheDocument()
+      expect(queryByLabelText('Timebar')).toBeInTheDocument()
+      expect(queryByText('Unmuted')).toBeInTheDocument()
+      expect(queryByText('Playback Speed')).toBeInTheDocument()
+      expect(queryByText('Source Chooser')).toBeInTheDocument()
+      expect(queryByText('Full Screen')).not.toBeInTheDocument()
+    })
+
+    it('skips source chooser button when there is only 1 source', () => {
+      document.fullscreenEnabled = true
+      const {queryByText, queryByLabelText} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject()]}
+        />
+      )
+      expect(queryByText('Play')).toBeInTheDocument()
+      expect(queryByLabelText('Timebar')).toBeInTheDocument()
+      expect(queryByText('Unmuted')).toBeInTheDocument()
+      expect(queryByText('Playback Speed')).toBeInTheDocument()
+      expect(queryByText('Source Chooser')).not.toBeInTheDocument()
+      expect(queryByText('Full Screen')).toBeInTheDocument()
+    })
   })
 })

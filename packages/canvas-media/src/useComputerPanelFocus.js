@@ -15,23 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import {oneOf, string} from 'prop-types'
-import {Spinner} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
 
-export default function LoadingIndicator({translatedTitle, size}) {
-  return (
-    <View as="div" height="100%" width="100%" textAlign="center">
-      <Spinner renderTitle={() => translatedTitle} size={size} margin="0 0 0 medium" />
-    </View>
-  )
-}
+import {useEffect, useState} from 'react'
 
-LoadingIndicator.propTypes = {
-  translatedTitle: string.isRequired,
-  size: oneOf(['x-small', 'small', 'medium', 'large'])
-}
-LoadingIndicator.defaultProps = {
-  size: 'large'
+export default function useComputerPanelFocus(theFile, panelRef, clearButtonRef) {
+  const [weHaveHadAFile, setWeHaveHadAFile] = useState(false)
+
+  useEffect(() => {
+    if (weHaveHadAFile) {
+      if (clearButtonRef.current) {
+        clearButtonRef.current.focus()
+      } else if (panelRef.current) {
+        panelRef.current.querySelector('input').focus() // because FileDrop does not have a ref prop or a focus func
+      }
+    }
+    setWeHaveHadAFile(weHaveHadAFile || theFile)
+  }, [weHaveHadAFile, theFile]) // eslint-disable-line react-hooks/exhaustive-deps
 }

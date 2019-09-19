@@ -84,4 +84,8 @@ body#tinyrce {
   border-style: none;
 }
 
+iframe {
+  background-color: #eee;
+}
+
 @import 'our_custom_tiny_mce_stuff/_tinymce.editor_box.scss';

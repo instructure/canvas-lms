@@ -27,25 +27,25 @@ ready(() => {
   // or
   //  `http://canvas.example.com/media_objects_iframe/?href=http://url/to/file.mov`
   const media_id = window.location.pathname.split('media_objects_iframe/').pop()
-  const media_href_match = window.location.search.match(/href=([^&]+)/)
+  const media_href_match = window.location.search.match(/mediahref=([^&]+)/)
+  const is_audio = /type=audio/.test(window.location.search)
+  let type = is_audio ? 'audio' : 'video'
   let href_source
+
   if (media_href_match) {
-    href_source = [{
-      src: decodeURIComponent(media_href_match[1]),
-    }]
+    if (is_audio) {
+      type = 'audio'
+      href_source = decodeURIComponent(media_href_match[1])
+    } else {
+      href_source = [decodeURIComponent(media_href_match[1])]
+    }
   }
 
-  // TODO: when the fullscreen button is missing, the source chooser button is up against
-  // the right edge of the frame. When its popup menu is opened, the outset focus ring
-  // extends beyond the container's edge, causing a horiz. scrollbar, which steals vert.
-  // space and causes a vert. scrollbar, and this oscillates.
-  // remove the 3px margins when this jitter is fixed
-  const margin = document.fullscreenEnabled ? '0' : '3px 3px 0'
-  document.body.setAttribute('style', `margin: ${margin}; padding: 0; border-style: none`)
+  document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
 
   const div = document.body.firstElementChild
   ReactDOM.render(
-    <CanvasMediaPlayer media_id={media_id} media_sources={href_source || ENV.media_sources} />,
+    <CanvasMediaPlayer media_id={media_id} media_sources={href_source || ENV.media_sources} type={type} />,
     document.body.appendChild(div)
   )
 })

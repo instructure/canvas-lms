@@ -21,7 +21,7 @@ import * as images from "./images";
 import Bridge from "../../bridge";
 import {fileEmbed} from "../../common/mimeClass";
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
-import {isImage, isVideo} from '../../rce/plugins/shared/fileTypeUtils'
+import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
 
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
@@ -131,22 +131,24 @@ export function allUploadCompleteActions(results, fileMetaProps, contextType) {
   return actions;
 }
 
+function linkingExistingContent() {
+  return Bridge.existingContentToLink() || Bridge.existingContentToLinkIsImg()
+}
 export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results);
 
-  if (
-    selectedTabType === 'images' &&
-    isImage(embedData.type) &&
-    !(Bridge.existingContentToLink() && !Bridge.existingContentToLinkIsImg())
-  ) {
+  if (selectedTabType === 'images' && isImage(embedData.type) && !linkingExistingContent()) {
     const {href, url, title, display_name, alt_text} = results
     Bridge.insertImage({href, url, title, display_name, alt_text});
-  } else if (
-    selectedTabType === 'media' &&
-    isVideo(embedData.type) &&
-    !(Bridge.existingContentToLink() && !Bridge.existingContentToLinkIsImg())
-  ) {
-    Bridge.insertVideo(embedData)
+  } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type) && !linkingExistingContent()) {
+    Bridge.embedMedia({
+      id: embedData.id,
+      embedded_iframe_url: results.embedded_iframe_url,
+      href: results.url,
+      media_id: results.media_id,
+      title: results.title,
+      type: embedData.type
+    })
   } else {
     Bridge.insertLink({
       'data-canvas-previewable': isPreviewable(results['content-type']),
