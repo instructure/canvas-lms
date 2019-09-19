@@ -124,6 +124,33 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(sidebar_images.count).to eq 2
       expect(wiki_page_body[:value]).to be_empty
     end
+
+    it "should be able to upload a file and add the file to the rce" do
+      add_file_to_rce
+      check_file(f('#wiki_page_show a.instructure_file_link'))
+    end
+
+    it "should show files uploaded on the images tab in the file tree" do
+      wiki_page_tools_file_tree_setup(true, true)
+      click_files_tab
+      expect(sidebar_files.count).to eq 4
+
+      click_images_tab
+      upload_new_image.click
+      wiki_page_body = clear_wiki_rce
+      expect(sidebar_images.count).to eq 2
+      alt_text = "foo text"
+      _name, path, _data = get_file({:text => 'foo.txt'}[:text])
+      f("input[type='file']").send_keys(path)
+      f("input[name='alt_text']").send_keys(alt_text)
+      f("button[type='submit']").click
+      wait_for_ajaximations
+
+      expect(sidebar_images.count).to eq 2
+      click_files_tab
+      expect(sidebar_files.count).to eq 5
+      expect(wiki_page_body[:value]).to be_empty
+    end
   end
 end
 
