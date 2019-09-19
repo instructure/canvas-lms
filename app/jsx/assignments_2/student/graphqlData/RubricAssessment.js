@@ -29,6 +29,9 @@ export const RubricAssessment = {
       assessor {
         _id
         name
+        enrollments(courseId: $courseID) {
+          type
+        }
       }
       data: assessmentRatings {
         ...RubricAssessmentRating

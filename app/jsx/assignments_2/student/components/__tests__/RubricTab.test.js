@@ -29,12 +29,17 @@ function gradedOverrides() {
           {
             _id: 1,
             score: 5,
-            assessor: {name: 'assessor1'}
+            assessor: {name: 'assessor1', enrollments: []}
           },
           {
             _id: 2,
             score: 10,
             assessor: null
+          },
+          {
+            _id: 3,
+            score: 8,
+            assessor: {name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]}
           }
         ]
       }
@@ -132,6 +137,13 @@ describe('RubricTab', () => {
       const {findByLabelText, findByText} = render(<RubricTab {...props} />)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('assessor1')).toBeInTheDocument()
+    })
+
+    it('displays the assessor enrollment if present', async () => {
+      const props = await makeProps({graded: true})
+      const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+      fireEvent.click(await findByLabelText('Select Grader'))
+      expect(await findByText('assessor2 (TA)')).toBeInTheDocument()
     })
 
     it('displays "Anonymous" if the assessor is hidden', async () => {

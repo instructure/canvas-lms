@@ -25,6 +25,12 @@ import {Rubric} from '../graphqlData/Rubric'
 import {RubricAssessment} from '../graphqlData/RubricAssessment'
 import RubricComponent from '../../../rubrics/Rubric'
 
+const ENROLLMENT_STRINGS = {
+  StudentEnrollment: I18n.t('Student'),
+  TeacherEnrollment: I18n.t('Teacher'),
+  TaEnrollment: I18n.t('TA')
+}
+
 function transformRubricData(rubric) {
   const rubricCopy = JSON.parse(JSON.stringify(rubric))
   rubricCopy.criteria.forEach(criterion => {
@@ -45,6 +51,15 @@ function transformRubricAssessmentData(rubricAssessment) {
     delete rating.outcome
   })
   return assessmentCopy
+}
+
+function formatAssessor(assessor) {
+  if (!assessor?.name) {
+    return I18n.t('Anonymous')
+  }
+
+  const enrollment = ENROLLMENT_STRINGS[(assessor.enrollments?.[0]?.type)]
+  return enrollment ? `${assessor.name} (${enrollment})` : assessor.name
 }
 
 export default function RubricTab(props) {
@@ -68,7 +83,7 @@ export default function RubricTab(props) {
   return (
     <div data-testid="rubric-tab">
       {!!assessments?.length && (
-        <div style={{marginBottom: '22px', width: '275px'}}>
+        <div style={{marginBottom: '22px', width: '325px'}}>
           <CanvasSelect
             label={I18n.t('Select Grader')}
             value={displayedAssessment._id}
@@ -76,7 +91,7 @@ export default function RubricTab(props) {
           >
             {assessments.map(assessment => (
               <CanvasSelect.Option key={assessment._id} value={assessment._id} id={assessment._id}>
-                {assessment.assessor?.name || I18n.t('Anonymous')}
+                {formatAssessor(assessment.assessor)}
               </CanvasSelect.Option>
             ))}
           </CanvasSelect>
