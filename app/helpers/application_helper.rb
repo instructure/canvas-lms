@@ -450,13 +450,23 @@ module ApplicationHelper
 
   def inst_env
     global_inst_object = { :environment =>  Rails.env }
+
+    # TODO: get these kaltura settings out of the global INST object completely.
+    # Only load them when trying to record a video
+    if @context.try_rescue(:allow_media_comments?)
+      kalturaConfig = CanvasKaltura::ClientV3.config
+      if kalturaConfig
+        global_inst_object[:allowMediaComments] = true
+        global_inst_object[:kalturaSettings] = kalturaConfig.try(:slice,
+          'domain', 'resource_domain', 'rtmp_domain',
+          'partner_id', 'subpartner_id', 'player_ui_conf',
+          'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
+          'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'
+        )
+      end
+    end
+
     {
-      :allowMediaComments       => CanvasKaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice,
-                                    'domain', 'resource_domain', 'rtmp_domain',
-                                    'partner_id', 'subpartner_id', 'player_ui_conf',
-                                    'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
-                                    'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),

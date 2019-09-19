@@ -1207,7 +1207,7 @@ class Course < ActiveRecord::Base
   end
 
   def allow_media_comments?
-    true || [].include?(self.id)
+    true
   end
 
   def short_name
