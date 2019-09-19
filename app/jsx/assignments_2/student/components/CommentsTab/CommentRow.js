@@ -34,7 +34,7 @@ function CommentRow(props) {
     })
     mediaTracks = mediaObject?.mediaTracks.map(track => {
       return {
-        src: `media_objects/${mediaObject._id}/media_tracks/${track._id}`,
+        src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
         label: track.locale,
         type: track.kind,
         language: track.locale
