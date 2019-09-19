@@ -49,6 +49,7 @@ describe ContentSharesController do
         "sender" => nil,
       })
       expect(json['receivers'].first).to include({'id' => @teacher_2.id})
+      expect(json['content_export']).to be_present
     end
 
     it "returns 400 if required parameters aren't included" do
@@ -106,6 +107,7 @@ describe ContentSharesController do
         expect(json[0]['receivers'][0]['id']).to eq @teacher_2.id
         expect(json[0]['content_type']).to eq 'assignment'
         expect(json[0]['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json[0]['content_export']).to be_present
       end
 
       it "paginates sent content shares" do
@@ -150,6 +152,7 @@ describe ContentSharesController do
         expect(json[0]['receivers']).to eq([])
         expect(json[0]['content_type']).to eq 'assignment'
         expect(json[0]['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json[0]['content_export']).to be_present
       end
 
       it "paginates received content shares" do
@@ -202,6 +205,7 @@ describe ContentSharesController do
         expect(json['receivers'][0]['id']).to eq @teacher_2.id
         expect(json['content_type']).to eq 'assignment'
         expect(json['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json['content_export']).to be_present
       end
 
       it "scopes to user" do
@@ -298,6 +302,7 @@ describe ContentSharesController do
         expect(response).to be_successful
         json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
         expect(json['read_state']).to eq 'read'
+        expect(json['content_export']).to be_present
         expect(@received_share.reload.read_state).to eq 'read'
       end
 

@@ -34,6 +34,7 @@ module Api::V1::ContentShare
     json['sender'] = content_share.respond_to?(:sender) ? user_display_json(content_share.sender) : nil
     json['receivers'] = content_share.respond_to?(:receivers) ? content_share.receivers.map {|rec| user_display_json(rec)} : []
     json['content_type'] = get_content_type_from_export_settings(content_share.content_export.settings)
+    json['content_export'] = content_export_json(content_share.content_export, user, session)
     if content_share.content_export.context_type == 'Course'
       json['source_course'] = {
         id: content_share.content_export.context.id,
@@ -43,13 +44,23 @@ module Api::V1::ContentShare
     json
   end
 
+  def preload_content_exports(content_shares, additional_associations)
+    ActiveRecord::Associations::Preloader.new.preload(content_shares, [
+      {:content_export => [
+        :context,
+        :job_progress,
+        :attachment,
+      ]},
+      *additional_associations])
+  end
+
   def sent_content_shares_json(content_shares, user, session, opts = {})
-    ActiveRecord::Associations::Preloader.new.preload(content_shares, [{:content_export => :context}, :receivers])
+    preload_content_exports(content_shares, [:receivers])
     content_shares_json(content_shares, user, session, opts)
   end
 
   def received_content_shares_json(content_shares, user, session, opts = {})
-    ActiveRecord::Associations::Preloader.new.preload(content_shares, [{:content_export => :context}, :sender])
+    preload_content_exports(content_shares, [:sender])
     content_shares_json(content_shares, user, session, opts)
   end
 
