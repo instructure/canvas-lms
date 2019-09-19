@@ -2755,7 +2755,9 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     last: Int
   ): SubmissionHistoryConnection
   submissionStatus: String
+  submissionType: SubmissionType
   submittedAt: DateTime
+  turnitinData: [TurnitinData!]
   unreadCommentCount: Int!
   updatedAt: DateTime
   url: URL
@@ -2979,7 +2981,9 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   state: SubmissionState!
   submissionDraft: SubmissionDraft
   submissionStatus: String
+  submissionType: SubmissionType
   submittedAt: DateTime
+  turnitinData: [TurnitinData!]
   unreadCommentCount: Int!
   updatedAt: DateTime
   url: URL
@@ -3119,7 +3123,9 @@ interface SubmissionInterface {
   state: SubmissionState!
   submissionDraft: SubmissionDraft
   submissionStatus: String
+  submissionType: SubmissionType
   submittedAt: DateTime
+  turnitinData: [TurnitinData!]
   unreadCommentCount: Int!
   url: URL
   user: User
@@ -3275,6 +3281,14 @@ Contains timestamp metadata
 interface Timestamped {
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+union TurnitinContext = File | Submission
+
+type TurnitinData {
+  score: Float
+  status: String
+  target: TurnitinContext!
 }
 
 scalar URL
