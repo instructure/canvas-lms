@@ -229,9 +229,11 @@ describe ProfileController do
       end
 
       it "should show if user has any non-student enrollments" do
+        allow(Canvas::DynamicSettings).to receive(:find).and_return({'base_url' => 'the_ccv_url'})
         user_session(@teacher)
         get 'content_shares', params: {user_id: @teacher.id}
         expect(response).to render_template('content_shares')
+        expect(assigns.dig(:js_env, :COMMON_CARTRIDGE_VIEWER_URL)).to eq('the_ccv_url')
       end
 
       it "should 404 if user has only student enrollments" do
