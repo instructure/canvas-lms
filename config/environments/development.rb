@@ -1,8 +1,5 @@
 environment_configuration(defined?(config) && config) do |config|
   # Settings specified here will take precedence over those in config/application.rb
-  
-  # Temporarily disable New Relic until we get to the bottom of why it's not working.
-  ENV['NEW_RELIC_ENABLED'] = "false"
 
   # In the development environment your application's code is reloaded on
   # every request.  This slows down response time but is perfect for development

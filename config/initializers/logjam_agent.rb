@@ -1,6 +1,6 @@
 module LogjamAgent
   # Configure the application name (required). Must not contain dots or hyphens.
-  self.application_name = "canvas-lms"
+  self.application_name = "canvas_lms"
 
   # Configure the environment name (optional). Defaults to Rails.env.
   # self.environment_name = Rails.env
@@ -71,4 +71,13 @@ module LogjamAgent
   # all exceptions below a log level of Logger::ERROR. Logjam itself can then
   # display those soft exceptions differently. Defaults to `true`.
   # self.split_hard_and_soft_exceptions = true
+
+  # Patch the STDOUT Forwarder to send to Rails' logger instead, since stdout
+  # seems to get lost somewhere.
+  class STDOUTForwarder
+    def forward(data, options={})
+      msg = LogjamAgent.json_encode_payload(data)
+      Rails.logger.info msg
+    end
+  end
 end
