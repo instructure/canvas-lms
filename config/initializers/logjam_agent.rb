@@ -1,6 +1,6 @@
 module LogjamAgent
   # Configure the application name (required). Must not contain dots or hyphens.
-  self.application_name = "canvas-lms"
+  self.application_name = "canvas_lms"
 
   # Configure the environment name (optional). Defaults to Rails.env.
   # self.environment_name = Rails.env
