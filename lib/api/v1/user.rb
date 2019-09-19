@@ -161,6 +161,11 @@ module Api::V1::User
       ActiveRecord::Associations::Preloader.new.preload(context, :groups)
     end
 
+    if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses)
+      ActiveRecord::Associations::Preloader.new.preload(users, :communication_channels)
+    end
+    ActiveRecord::Associations::Preloader.new.preload(users, :pseudonyms)
+
     users.map{ |user| user_json(user, current_user, session, includes, context, enrollments, excludes) }
   end
 

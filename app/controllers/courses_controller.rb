@@ -1100,11 +1100,30 @@ class CoursesController < ApplicationController
     return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :manage_content)
-    users = UserSearch.for_user_in_context(params[:search_term], @context.root_account,
-      @current_user, session, {enrollment_type: ['Ta', 'Teacher', 'Designer']}).
-      where.not(id: @current_user.id)
-    users = Api.paginate(users, self, api_v1_course_content_share_users_url)
-    render :json => users.map { |u| user_display_json(u, @context.root_account) }
+
+    users_scope = User.where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(params[:search_term])).
+      where.not(id: @current_user.id).active.distinct
+    admin_users_scope = users_scope.joins(account_users: [:account, :role]).merge(AccountUser.active).merge(Account.active)
+
+    union_scope = users_scope.joins(enrollments: :course).merge(Enrollment.active.of_admin_type).merge(Course.active).
+      union(
+        root_account_scope(admin_users_scope.merge(Role.full_account_admin), @context.root_account_id),
+        root_account_scope(admin_users_scope.merge(Role.custom_account_admin_with_permission('manage_content')), @context.root_account_id),
+        sub_account_scope(admin_users_scope.merge(Role.full_account_admin), @context.root_account_id),
+        sub_account_scope(admin_users_scope.merge(Role.custom_account_admin_with_permission('manage_content')), @context.root_account_id)
+      ).
+      order(:name).
+      distinct
+    users = Api.paginate(union_scope, self, api_v1_course_content_share_users_url)
+    render :json => users_json(users, @current_user, session, ['avatar_url', 'email'])
+  end
+
+  def root_account_scope(scope, root_account_id)
+    scope.where(account_users: {account_id: root_account_id})
+  end
+
+  def sub_account_scope(scope, root_account_id)
+    scope.where(account_users: {accounts: {root_account_id: root_account_id}})
   end
 
   include Api::V1::PreviewHtml
