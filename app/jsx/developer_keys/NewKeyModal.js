@@ -94,7 +94,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   saveCustomizations = () => {
     const { store, actions, createLtiKeyState } = this.props
-    if(this.state.toolConfiguration.custom_fields === null) {
+    if(this.state.toolConfiguration?.custom_fields === null) {
       this.setState({showCustomizationMessages: true})
       return Promise.reject()
     }
