@@ -98,8 +98,7 @@ pipeline {
               rm config/cache_store.yml
               rmdir -p gerrit_builder/canvas-lms/config
               cp docker-compose/config/selenium.yml config/
-              cp docker-compose/config/database.yml.new-jenkins config/database.yml
-              cp docker-compose/config/cassandra.yml.new-jenkins config/cassandra.yml
+              cp -R docker-compose/config/new-jenkins config/new-jenkins
               cp config/delayed_jobs.yml.example config/delayed_jobs.yml
               cp config/domain.yml.example config/domain.yml
               cp config/external_migration.yml.example config/external_migration.yml
