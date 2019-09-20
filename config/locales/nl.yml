@@ -1737,6 +1737,7 @@ nl:
   add_attribute_6d6d4a65: "Een kenmerk toevoegen"
   add_bank: 
     default_name: Naamloos
+  add_cc_subtitle_a9ef4a66: "CC/ondertiteling toevoegen"
   add_collaboration_da9665ac: "Samenwerking toevoegen"
   add_contact_method_d2dfea03: "Een contactmethode toevoegen"
   add_content_58b4305a: "Inhoud toevoegen"
@@ -1945,6 +1946,7 @@ nl:
   all_student_groups_f74cd6c3: "Alle cursistengroepen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle cursisten hebben de toets gemaakt"
   all_students_have_taken_the_survey_494f9f42: "Alle cursisten hebben de enquête gemaakt"
+  all_submission_comments_have_been_marked_as_read_7595389d: "Alle opmerkingen bij de inlevering zijn gemarkeerd als gelezen."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle inzendingen moeten een geselecteerd cijfer hebben."
   all_terms_cd27b0fb: "Alle periodes"
   all_timezones_5e8afa7b: "Alle tijdzones"
@@ -1992,6 +1994,9 @@ nl:
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Hiermee kan een gebruiker de SIS-ID in de aanmeldingsgegevens van een gebruiker bekijken."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Hiermee kan een gebruiker de SIS-ID van gebruikers op de pagina Personen in een cursus bekijken."
   allows_admin_user_to_view_account_statistics_341f00d9: "Hiermee kan een beheerder accountstatistieken bekijken."
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      Hiermee kunnen beheerders een logboek bekijken dat informatie bevat over alle onlangs uitgevoerde
+      GraphQL-mutaties
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Beoordelaars toestaan het auditspoor van beoordelingen in SpeedGrader te bekijken voor anonieme of gemodereerde opdrachten."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Hiermee kun je aankondigingen voor een specifieke sectie maken"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Hiermee kun je discussies voor een specifieke sectie maken"
@@ -3761,6 +3766,7 @@ nl:
   before_using_this_feature_we_recommend_trying_the__1dea6042: "Voordat je deze functie gebruikt, raden wij aan de**%{t_theme_editor}** te proberen om eventuele branding uit te voeren. Door deze functie in te schakelen ontstaat de mogelijkheid om aangepaste JavaScript en CSS-bestanden te uploaden in de Thema-editor. Wijzigingen die met deze methode gemaakt zijn, kunnen strijdig kunnen zijn met toekomstige wijzigingen van de Canvas DOM (bv: element klasnamen of HTML-structuur) en worden daarom niet ondersteund. Degenen die gebruik maken van deze functie moeten een geavanceerd begrip van JavaScript en CSS hebben en  hun eigen code handhaven. *Gebruik op eigen risico! *"
   before_using_this_feature_we_recommend_trying_the__7e6f194e: "Alvorens deze functie te gebruiken raden we aan de *********%{t_theme_editor}********* te gebruiken om eventuele branding uit te voeren. Het inschakelen van deze functie biedt de mogelijkheid om aangepaste JavaScript en CSS-bestanden te uploaden in de Theme Editor. Aanpassingen die met deze methode gedaan zijn kunnen strijdig zijn met toekomstige wijzigingen van de Canvas DOM (bv: element klasnamen of HTML-structuur) en worden daarom niet ondersteund. Ook moet je ervoor zorgen dat alle wijzigingen die je maakt voor iedereen toegankelijk zijn, bijvoorbeeld wijzigingen die *screen readers*  gebruiken en **die wijzigingen** ***vertrouwen*** op de ****hoge contrast functie****. Instructure aanvaardt geen enkele aansprakelijkheid voor eventuele wijzigingen die je aanbrengt. Het is je eigen verantwoordelijkheid om ervoor te zorgen dat deze voldoen aan *****elke***** ******nalevings- ****** *******normen******* die in je rechtsgebied vereist zijn. Diegenen die gebruik maken van deze functie dienen een gevorderd begrip van JavaScript en CSS te hebben en moeten hun eigen code te behouden. ********Gebruik op eigen risico!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Voordat je jouw profiel kunt bewerken, moet je jouw e-mailadres (%{email}) verifiëren door op de link te klikken in de e-mail die we je gestuurd hebben. *Hier klikken om de e-mail opnieuw te versturen* als je de mail niet ziet, en bekijk je spamfolder."
+  begin_typing_to_search_7daa7b1: "Begin met typen om te zoeken"
   beginning_date_2d2a29ac: Begindatum
   behind_31e4e0fe: Achter
   belarusian_b2f19c76: Wit-Russisch
@@ -4423,6 +4429,7 @@ nl:
   can_destroy_subscription_to_data_service_data_b8dfca27: "Kan abonnement op gegevens van gegevensservice verwijderen."
   can_edit_this_page_role_selection_6ccec3c7: "Kan deze paginarolselectie bewerken"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan alleen activiteiten ondernemen met gebruikers in eigen sectie"
+  can_list_categorized_event_types_52596f7: "Kan gecategoriseerde typen gebeurtenissen vermelden."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan lijst met abonnementen op gegevens van gegevensservice weergeven."
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan gebruikersgegevens ophalen die gekoppeld zijn aan de inhoud waarin de tool is geïnstalleerd."
   can_show_subscription_to_data_service_data_688ce3: "Kan abonnement op gegevens van gegevensservice weergeven."
@@ -5967,6 +5974,7 @@ nl:
   copy_quiz_to_course_74f9c8c1: "Toets kopiëren naar cursus"
   copy_this_module_item_to_a_course_790a0cf4: "Kopieer dit module-item naar een cursus..."
   copy_this_module_to_a_course_ddd12cc7: "Kopieer deze module naar een cursus..."
+  copy_title_to_course_2a41a2f4: "%{title} kopiëren naar cursus"
   copy_title_to_course_ac71981a: "Kopieer {%title} naar cursus"
   copy_to_64f8456b: "Kopiëren naar..."
   copy_to_a5396a6f: "Kopiëren naar..."
@@ -6056,6 +6064,7 @@ nl:
   count_options_190d6373: 
     one: "1 optie"
     other: "%{count} Opties"
+  count_options_loaded_cd59cc3b: "%{count} opties geladen."
   count_page_views_b40102b3: 
     one: "1 paginaweergave"
     other: "%{count} paginaweergaven"
@@ -7345,9 +7354,11 @@ nl:
       - december
   date_at_time_25a04cd2: "%{date} om %{time}"
   date_created_87e265bc: "Datum aangemaakt"
+  date_created_b93b76fb: ", aanmaakdatum: "
   date_ee500367: Datum
   date_error_7b38f8ff: "Foute datum"
   date_is_required_9c6f5e83: "Datum is verplicht!"
+  date_modified_4d065406: ", wijigingsdatum: "
   date_modified_e1c8ac8f: "Datum gewijzigd"
   date_of_most_recent_bounce_b23d0119: "Datum van meest recente bounce"
   datepicker: 
@@ -9280,6 +9291,7 @@ nl:
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Bestand(en) worden meegeleverd op alle pagina's in de Canvas desktop applicatie."
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "Bestand(en) worden meegeleverd als gebruikerscontent getoond wordt in Canvas IOS of Android apps."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "Bestand(en) worden opgenomen als gebruikersinhoud weergegeven wordt binnen Canvas iOS of Android-apps, en in apps van derden gebouwd op onze API."
+  file_select_filename_folder_contents_9146bab7: "Bestand selecteren, inhoud van %{filename}-map"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} quota voor gebruikersbestand is van toepassing"
   file_status: 
     hidden_status: "Verborgen. Beschikbaar met een koppeling"
@@ -9570,6 +9582,7 @@ nl:
   grade_change_activity_75fb525: "Activiteit in verandering van een cijfer"
   grade_change_log_231f90e4: "Logboeken over cijferwijzigingen"
   grade_change_notifications_98461261: "Meldingen van wijziging van een cijfer"
+  grade_changes_and_new_comments_released_for_title__f1350f92: "Wijzigingen in de cijfers en nieuwe opmerkingen vrijgegeven voor: %{title}, %{course}"
   grade_changes_cb5a57a8: Cijferwijzigingen
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -11950,6 +11963,7 @@ nl:
     other: 
       one: "1 andere"
       other: "%{count} anderen"
+  list_collapsed_5f19f5bb: "Lijst samengevouwen"
   list_collapsed_9ac35920: "Lijst samengevouwen."
   list_collapsed_dde87718: "Lijst samengevouwen"
   list_expanded_efec2d0: "Lijst uitgevouwen."
@@ -12003,6 +12017,7 @@ nl:
   loading_more_results_def6df65: "Bezig met laden van meer resultaten"
   loading_more_sub_accounts_d0a30903: "Meer subaccounts laden..."
   loading_more_terms_4053e31f: "Meer items laden..."
+  loading_options_c823e98b: "Opties laden..."
   loading_outcome_results_96e21ce4: "Leerdoelresultaten laden"
   loading_permissions_28495bdb: "Machtigingen laden"
   loading_permissions_failed_73983eb3: "Laden van machtigingen is mislukt"
@@ -14110,6 +14125,11 @@ nl:
         submitted_date: "ingezonden op: %{date}"
       twitter: 
         body: "Canvas waarschuwing - Toets ingezonden: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "Je cursusleider heeft wijzigingen in de cijfers en nieuwe opmerkingen vrijgegeven voor %{title}. Deze wijzigingen zijn nu zichtbaar."
+          link: "Je kunt het hier bekijken"
     summaries: 
       email: 
         daily_body: "Je bent aangemeld voor een dagelijks rapport over enkele belangrijke meldingen van jouw Canvas-account. Hieronder vind je het rapport voor %{date}:"
@@ -14295,6 +14315,8 @@ nl:
   moderation_page_4061aa2b: "Pagna Modereren"
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Moderator %{sortOrder}"
+  modified_by_52d699e9: ", gewijzigd door: "
+  modified_by_c1584b3c: "Gewijzigd door"
   module_90d9fd32: Module
   module_completed_50c50762: "Module voltooid"
   module_filter_63b17d11: Modulefilter
@@ -14624,6 +14646,7 @@ nl:
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Naam
   name_3806192d: "Naam:"
+  name_4dee4600: ", naam: "
   name_app_has_been_deleted_fb2d9426: "%{name} app is verwijderd"
   name_badfe525: naam
   name_count_users_ccc93c3d: "%{name} (%{count} gebruikers)"
@@ -14645,6 +14668,7 @@ nl:
   name_only_5f56718e: "Alleen naam"
   name_options_bc5c95ce: "%{name} Opties"
   name_override_score_7f6a5216: "%{name} overschrijvingsscore"
+  name_parent_directory_b61d10a9: ", naam: bovenliggende map "
   name_quiz_15f55961: "%{name} (toets)"
   name_unposted_current_score_e98e95fd: "%{name} niet-gepubliceerde huidige score"
   name_unposted_final_score_124708d2: "%{name} niet-gepubliceerde eindscore"
@@ -14809,6 +14833,7 @@ nl:
   no_placements_enabled_f705f28: "Geen plaatsingen ingeschakeld"
   no_points_possible_368669d: "Geen punten mogelijk"
   no_points_possible_72db3a55: "Geen punten mogelijk"
+  no_results_3cda4e72: "Geen resultaten"
   no_results_f36777ee: "Geen resultaten"
   no_results_found_58717065: "Geen resultaten gevonden"
   no_results_found_e4b686bd: "Geen resultaten aangetroffen."
@@ -14851,6 +14876,7 @@ nl:
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Niet alle secties zullen aan dit item toegewezen worden."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "Niet alle instellingsopties, waaronder het tabblad Meldingen, zijn beschikbaar op subaccountniveau."
   not_anonymously_graded_87574f91: "Niet anoniem beoordeeld"
+  not_applicable_d5dfd285: "niet van toepassing"
   not_available_487d3648: "Niet beschikbaar"
   not_available_assignment_is_anonymous_94e77edf: "Niet beschikbaar; opdracht is anoniem"
   not_available_at_the_subaccount_level_3fc74ab: "Niet beschikbaar op subaccountniveau."
@@ -15366,6 +15392,7 @@ nl:
   option_4_aec96b1f: "Optie 4"
   option_index_6308524d: "Optie %{index}"
   option_name_ba758e08: "%{option_name}"
+  option_selected_737b6f72: "Geselecteerde optie:"
   option_selected_list_collapsed_70a356b4: "%{option} geselecteerd. Lijst samengevouwen."
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Je kunt desgewenst een byte-order mark opnemen in compatibele spreadsheetexports zodat deze voor gebruikers in sommige landen kunnen worden geïmporteerd in Excel."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Je kunt desgewenst een byte-order mark opnemen in exportbestanden van de Cijferlijst zodat deze voor gebruikers in sommige landen kunnen worden geïmporteerd in Excel."
@@ -19279,6 +19306,7 @@ nl:
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Bekijk een paar LTI-tools die uitstekend samenwerken met Canvas"
   see_turnitin_results_cd9d4a6c: "Turnitin resultaten zien"
   select_1e849959: "[ Selecteren ]"
+  select_a_course_4710371f: "Een cursus selecteren"
   select_a_grading_period_5ea50f1: "Een beoordelingsperiode selecteren..."
   select_a_grading_period_aab25483: "Een beoordelingsperiode selecteren..."
   select_a_log_type_to_search_247fc6b4: "Een type logbestand selecteren om te zoeken."
@@ -19431,6 +19459,7 @@ nl:
   send_this_module_item_to_another_user_14d4fd60: "Verzend dit module-item naar een andere gebruiker..."
   send_this_module_to_another_user_50cb27c8: "Verzend deze module naar een andere gebruiker..."
   send_title_to_user_526320bb: "Verzend {%title} naar gebruiker"
+  send_title_to_user_d952e233: "%{title} verzenden naar gebruiker"
   send_to_7881bf0e: "Verzenden naar..."
   send_to_b940900a: "Verzenden naar..."
   send_to_ce05b460: "Inleveren naar"
@@ -20401,6 +20430,7 @@ nl:
       users_matching_label: "Gebruikers overeenkomstig"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Alleen sitebeheerder. Maandelijks sturen naar 1 / %{denominator} gebruikers in ingeschakelde accounts."
   size_b30e1077: Grootte
+  size_f1873a2: ", grootte: "
   skip_to_content_22ad1d00: "Ga door naar Content"
   skipped_file_filename_due_to_error_94f0194: "Overgeslagen bestand %{filename} omwille van fout"
   skipping_unknown_file_type_cd1086ee: "Onbekende type bestand overslaan"
@@ -20606,6 +20636,8 @@ nl:
   starts_at_29843f98: "Beginnen bij"
   starts_ce584f1c: "Start:"
   state_66a67ba2: Status
+  state_published_e8914697: ", status: gepubliceerd"
+  state_unpublished_83c18d01: ", status: niet-gepubliceerd"
   statistics: 
     csv_columns: 
       attempt: poging
@@ -20828,6 +20860,7 @@ nl:
   submission_locked_a6074f8b: "Inlevering vergrendeld"
   submission_locked_image_93aced38: "Inlevering vergrendelde afbeelding"
   submission_options_5184a65b: "Opties voor inleveringen"
+  submission_posted_title_course_138bd744: "Inlevering gepost: %{title}, %{course}"
   submission_preview_383473ec: "Voorbeeld van inlevering"
   submission_requirement_8ba1ee08: Inleveringsvereiste
   submission_score_b7a291e8: "score van inzending"
@@ -21383,6 +21416,7 @@ nl:
   there_was_a_problem_loading_submissions_39855ff0: "Er is een probleem met het laden van inleveringen."
   there_was_a_problem_loading_the_gradebook_69b2a17: "Er is een probleem bij het laden van de cijferlijst."
   there_was_a_problem_logging_in_at_institution_5a298155: "Er is een probleem bij het aanmelden op %{institution}"
+  there_was_a_problem_marking_submission_comments_as_d4ba6711: "Er is een probleem met het als gelezen markeren van opmerkingen bij een inlevering."
   there_was_a_problem_overriding_the_grade_f6d83c4d: "Er is een probleem met het overschrijven van het cijfer."
   there_was_a_problem_posting_assignment_grades_958669e8: "Er is een probleem met het posten van de opdrachtcijfers."
   there_was_a_problem_posting_the_comment_75d15646: "Er is een probleem met het plaatsen van de opmerking"
@@ -21482,6 +21516,9 @@ nl:
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "Met deze functie maak je een SiteAdmin tabblad Releasetag om functies via de UI beschikbaar te stellen aan gebruikers. Bovendien wordt hiermee de UI van de oude Functieopties-tabbladen bijgewerkt."
   this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "Dankzij deze functie kunnen gebruikers van zogenaamde RTL-talen (talen met een schrijfrichting van rechts naar links) de in ontwikkeling zijnde RTL-indeling bekijken. Uiteindelijk wordt dit het standaardgedrag en zal deze optie worden verwijderd."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Deze functievlag kan door een accountbeheerder worden ingeschakeld als gebruikers van dat account die talen spreken die van rechts naar links worden geschreven (zoals Arabisch, Hebreeuws, Farsi), de RNL-lay-out wil laten zien terwijl wij erin aan het werken zijn. Zodra de functie \"klaar\" is, verdwijnt de functievlag en iedereen die een van deze talen spreekt, krijgt dan altijd de RNL-interface te zien."
+  this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
+      Deze functie zorgt ervoor dat de upload-API voor inleveringsbestanden het bestandstype controleert op basis van
+      de toegestane extensies van de gekoppelde opdracht.
   this_field_is_required_fa58c4a: "Dit veld is verplicht"
   this_field_name_is_required_988caebc: "Het veld \"%{name}\" is verplicht."
   this_field_name_is_required_b9196401: "Het veld \"naam\" is verplicht."
@@ -22172,10 +22209,14 @@ nl:
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_few_letters_to_start_searching_3334657b: "Typ enkele letters om te beginnen met zoeken"
+  type_at_least_3_characters_to_search_f3df561c: "Typ minimaal 3 tekens om te gaan zoeken."
   type_c8106334: Type
+  type_file_14f017c9: "type: bestand"
+  type_folder_115f3b07: "type: map"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' is geen geldige afbeeldingsoort (probeer jpg, png of gif)"
   type_of_change_1cb24a0e: "Type wijziging"
   type_of_item_8a37f69d: "Type item"
+  type_to_search_de63ad38: "Typ om te zoeken"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oh oh! Neem contact op met je vriendelijke catalogus ontwikkelaar. Foutbericht: %{message}"
   ukrainian_945b00b7: Oekraïens
   unable_to_accept_update_fd53a7e2: "Kan bijwerken niet accepteren"
@@ -23504,6 +23545,15 @@ nl:
   your_email_b5364bee: "Jouw E-mail"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Je bestand wordt geüpload naar de Cijferlijst, en je kunt deze pagina op elk gewenst moment verlaten. Als je een groot CSV-bestand hebt, kan het een paar minuten duren om je wijzigingen bij te werken. Om het overschrijven van gegevens te voorkomen, controleer of de upload voltooid is en of je Cijferlijst juist is, alvorens extra wijzigingen aan te brengen."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Je bestand wordt geüpload naar de Cijferlijst, en je kunt deze pagina op elk gewenst moment verlaten. Als je een groot CSV-bestand hebt, kan het een paar minuten duren om je wijzigingen te updaten. Om het overschrijven van gegevens te voorkomen, controleer of de upload voltooid is en of je Cijferlijst juist is, alvorens aanvullende wijzigingen aan te brengen."
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+      Je cursusleider heeft wijzigingen in de cijfers en nieuwe opmerkingen vrijgegeven voor %{title}, %{course}.
+      
+      Meer info op %{url}
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Je cursusleider heeft wijzigingen in de cijfers en nieuwe opmerkingen vrijgegeven voor %{title}. Deze wijzigingen zijn nu zichtbaar.
+      
+      Je kunt het hier bekijken: 
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Jouw bericht is verzonden. Dank je wel!"
   your_message_was_sent_977f6583: "Je bericht is verzonden!"
   your_name_7665e1d8: "Jouw naam"
