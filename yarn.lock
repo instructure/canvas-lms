@@ -1464,7 +1464,7 @@
     escape-html "^1"
     prop-types "^15"
 
-"@instructure/ui-flex@^6.12.0":
+"@instructure/ui-flex@6", "@instructure/ui-flex@^6.12.0":
   version "6.12.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-flex/-/ui-flex-6.12.0.tgz#57055510285201a3d50e86ac7f8b5d35713a3e51"
   integrity sha512-4nTaWz5sbGTZhC7DbHurjdYfyD4YluKw8DjG6uFlJurHuKfZ/o25ut0OHyA6wmsC7Jl+j7RGs0SLbGZKjEkddw==
@@ -17864,12 +17864,6 @@ script-loader@^0.7:
   integrity sha512-UMNLEvgOAQuzK8ji8qIscM3GIrRCWN6MmMXGD4SD5l6cSycgGsCo0tX5xRnfQcoghqct0tjHjcykgI1PyBE2aA==
   dependencies:
     raw-loader "~0.5.1"
-
-"scroll-into-view@git+https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab":
-  version "1.7.4"
-  resolved "git+https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab"
-  dependencies:
-    raf "^3.1.0"
 
 "scroll-into-view@https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab":
   version "1.7.4"

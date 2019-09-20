@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 
 import {LtiToolsModal} from '../index'
 
@@ -44,6 +44,12 @@ describe('RCE Plugins > LtiToolModal', () => {
         {
             title: "Tool 3",
             id: 3,
+            image: "https://www.edu-apps.org/assets/lti_public_resources/tool3.png",
+            onAction: () => {}
+        },
+        {
+            title: "Diffrient Tool",
+            id: 4,
             image: "https://www.edu-apps.org/assets/lti_public_resources/tool3.png",
             onAction: () => {}
         }
@@ -113,5 +119,22 @@ describe('RCE Plugins > LtiToolModal', () => {
     tool1.click()
     expect(doAction).toHaveBeenCalled()
     expect(onDismiss).toHaveBeenCalled()
+  })
+
+  describe('filtering', () => {
+    it('shows only results that match the filter value', () => {
+      const {getByText, queryByText, getByLabelText} = renderComponent()
+      const searchBox = getByLabelText('Search')
+      fireEvent.change(searchBox, { target: { value: 'diff' } })
+      expect(queryByText('Tool 1')).not.toBeInTheDocument()
+      expect(getByText('Diffrient Tool')).toBeInTheDocument()
+    })
+
+    it('shows a no results alert when there are no results', () => {
+      const {getByText, getByLabelText} = renderComponent()
+      const searchBox = getByLabelText('Search')
+      fireEvent.change(searchBox, { target: { value: 'instructure' } })
+      expect(getByText('No results found for instructure')).toBeInTheDocument()
+    })
   })
 })
