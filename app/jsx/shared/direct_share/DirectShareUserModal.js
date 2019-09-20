@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!direct_share_user_modal'
-import React, {Suspense, lazy, useState} from 'react'
+import React, {Suspense, lazy, useState, useRef} from 'react'
 import {string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -37,6 +37,7 @@ DirectShareUserModal.propTypes = {
 export default function DirectShareUserModal({contentShare, courseId, ...modalProps}) {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [postStatus, setPostStatus] = useState(null)
+  const previousOpen = useRef(modalProps.open)
 
   function resetState() {
     setSelectedUsers([])
@@ -51,11 +52,6 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   function handleUserRemoved(doomedUser) {
     setSelectedUsers(selectedUsers.filter(user => user.id !== doomedUser.id))
-  }
-
-  function handleDismiss() {
-    resetState()
-    modalProps.onDismiss()
   }
 
   function startSendOperation() {
@@ -83,9 +79,9 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   function Footer() {
     return (
       <>
-        <Button onClick={handleDismiss}>{I18n.t('Cancel')}</Button>
+        <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
-          disabled={selectedUsers.length === 0 || postStatus}
+          disabled={selectedUsers.length === 0 || postStatus !== null}
           variant="primary"
           margin="0 0 0 x-small"
           onClick={handleSend}
@@ -101,6 +97,13 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
       <Spinner renderTitle={I18n.t('Loading...')} />
     </View>
   )
+
+  // Reset the state when the open prop changes so we don't carry over state
+  // from the previously opened dialog
+  if (modalProps.open !== previousOpen.current) {
+    previousOpen.current = modalProps.open
+    resetState()
+  }
 
   let alertMessage = ''
   if (postStatus === 'info') alertMessage = I18n.t('Starting content share')

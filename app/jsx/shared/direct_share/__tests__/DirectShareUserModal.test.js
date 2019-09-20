@@ -28,6 +28,7 @@ describe('DirectShareUserModal', () => {
   let ariaLive
 
   beforeAll(() => {
+    window.ENV = {COURSE_ID: "42"}
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')
@@ -35,6 +36,7 @@ describe('DirectShareUserModal', () => {
   })
 
   afterAll(() => {
+    delete window.ENV
     if (ariaLive) ariaLive.remove()
   })
 
@@ -97,6 +99,20 @@ describe('DirectShareUserModal', () => {
     expect(getByText(/start/i)).toBeInTheDocument()
     await act(() => fetchMock.flush(true))
     expect(getByText(/success/i)).toBeInTheDocument()
+  })
+
+  it('clears user selection when the modal is closed', async () => {
+    fetchMock.get('*', [{id: 'abc', display_name: 'abc'}])
+    const {queryByText, getByText, findByLabelText, rerender} = render(<DirectShareUserModal open />)
+    const input = await findByLabelText('Send to:') // allow lazy code to load
+    fireEvent.focus(input)
+    fireEvent.change(input, {target: {value: 'abc'}})
+    act(() => jest.runAllTimers()) // let the debounce happen
+    await act(() => fetchMock.flush(true))
+    fireEvent.click(getByText('abc'))
+    rerender(<DirectShareUserModal open={false} />)
+    rerender(<DirectShareUserModal open />)
+    expect(queryByText('abc')).toBeNull()
   })
 
   describe('errors', () => {
