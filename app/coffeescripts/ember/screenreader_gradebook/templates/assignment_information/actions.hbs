@@ -9,15 +9,17 @@
     }}
   </label>
 </div>
-<div class="pad-box no-sides">
-  <button
-    id="message_students"
-    class="btn"
-    {{ action 'openDialog' 'message_students' target=view }}
-  >
-    {{#t}}Message students who...{{/t}}
-  </button>
-</div>
+{{#unless anonymizeStudents}}
+  <div class="pad-box no-sides">
+    <button
+      id="message_students"
+      class="btn"
+      {{ action 'openDialog' 'message_students' target=view }}
+    >
+      {{#t}}Message students who...{{/t}}
+    </button>
+  </div>
+{{/unless}}
 <div class="pad-box no-sides">
   <button
     id="set_default_grade"
