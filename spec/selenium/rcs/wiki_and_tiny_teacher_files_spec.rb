@@ -152,5 +152,34 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(wiki_page_body[:value]).to be_empty
     end
   end
+
+  context "wiki sidebar files and locking/hiding" do
+    before(:each) do
+      stub_rcs_config
+      course_with_teacher_logged_in(:active_all => true, :name => 'wiki course')
+      @root_folder = Folder.root_folders(@course).first
+      @sub_folder = @root_folder.sub_folders.create!(:name => "visible subfolder", :context => @course)
+    end
+
+    it "should show root folder in the sidebar if it is locked" do
+      @root_folder.locked = true
+      @root_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_files_tab
+      expect(fj("button:contains('course files')")).to be_displayed
+    end
+
+    it "should show root folder in the sidebar if it is hidden" do
+      @root_folder.workflow_state = 'hidden'
+      @root_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_files_tab
+      expect(fj("button:contains('course files')")).to be_displayed
+    end
+  end
 end
 
