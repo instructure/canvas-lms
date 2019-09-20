@@ -180,6 +180,51 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       click_files_tab
       expect(fj("button:contains('course files')")).to be_displayed
     end
+
+    it "should show sub-folder in the sidebar if it is locked" do
+      @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :locked => true)
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_files_tab
+      expect(sidebar_files.count).to eq 2
+      expect(ff('#right-side li')[1]).to include_text("visible subfolder")
+    end
+
+    it "should show sub-folder in the sidebar if it is hidden" do
+      @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :workflow_state => 'hidden')
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_files_tab
+      expect(sidebar_files.count).to eq 2
+    end
+
+    it "should show file in the sidebar if it is hidden" do
+      _visible_attachment = attachment_model(:uploaded_data => stub_file_data('foo.txt', nil, 'text/html'), :content_type => 'text/html')
+      attachment = attachment_model(:uploaded_data => stub_file_data('foo2.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      attachment.file_state = 'hidden'
+      attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_files_tab
+      expect(sidebar_files.count).to eq 3
+    end
+
+    it "should show file in the sidebar if it is locked" do
+      _visible_attachment = attachment_model(:uploaded_data => stub_file_data('foo.txt', nil, 'text/html'), :content_type => 'text/html')
+      attachment = attachment_model(:uploaded_data => stub_file_data('foo2.txt', nil, 'text/html'), :content_type => 'text/html')
+
+      attachment.locked = true
+      attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_files_tab
+      expect(sidebar_files.count).to eq 3
+    end
   end
 end
 
