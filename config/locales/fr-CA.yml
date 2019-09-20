@@ -1672,6 +1672,7 @@ fr-CA:
   add_attribute_6d6d4a65: "Ajouter un attribut"
   add_bank: 
     default_name: "Pas de nom"
+  add_cc_subtitle_a9ef4a66: "Ajouter un sous-titres/CC"
   add_collaboration_da9665ac: "Ajouter une collaboration"
   add_contact_method_d2dfea03: "Ajouter un mode de contact"
   add_content_58b4305a: "Ajouter un contenu"
@@ -1873,6 +1874,7 @@ fr-CA:
   all_student_groups_f74cd6c3: "Tous les groupes d’étudiant"
   all_students_have_taken_the_quiz_b558f8b4: "Tous les étudiants ont complété le questionnaire"
   all_students_have_taken_the_survey_494f9f42: "Tous les étudiants ont répondu à l’enquête"
+  all_submission_comments_have_been_marked_as_read_7595389d: "Tous les commentaires d’envoi ont été marqués comme lus."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Chaque envoi doit avoir une note sélectionnée."
   all_terms_cd27b0fb: "Tous les trimestres"
   all_timezones_5e8afa7b: "Tous les fuseaux horaires"
@@ -1918,6 +1920,9 @@ fr-CA:
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Permet à un utilisateur de voir l'ID SIS dans les détails de connexion d’un utilisateur."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permet à un utilisateur de voir les ID utilisateur SIS dans une page de Personnes d’un cours."
   allows_admin_user_to_view_account_statistics_341f00d9: "Permet à l’utilisateur administrateur de voir les statistiques du compte."
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      Permet aux administrateurs d'afficher un journal contenant des informations sur toutes les mutations GraphQL
+      récemment exécutées
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permet aux évaluateurs de consulter le plateau d’audit d'évaluation dans SpeedGrader pour les tâches modérées ou anonymes."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permet de créer des annonces pour une section spécifique"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permet de créer des discussions pour une section spécifique"
@@ -2188,7 +2193,7 @@ fr-CA:
   allows_user_to_view_user_sis_ids_68a9d218: "Permet à l'utilisateur de voir les ID SIS."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Permet à un utilisateur de voir les ID SIS de l’utilisateur dans une page de Personnes d’un cours."
   allows_users_to_edit_conferences_2d3c960c: "Permet aux utilisateurs de modifier les conférences."
-  allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet aux utilisateurs d'activer l'option « Lancer SpeedGrader filtré par groupe d'étudiants » pour les cours sur la page des paramètres du cours. Lorsqu'il est actif et qu'un groupe d'étudiants a été sélectionné dans le nouveau Carnet de notes, SpeedGrader ne chargera que les étudiants dans le groupe sélectionné."
+  allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet aux utilisateurs d'activer l'option « Lancer SpeedGrader filtré par groupe d'étudiants » pour les cours sur la page des paramètres du cours. Lorsqu'il est actif et qu'un groupe d'étudiants a été sélectionné dans le nouveau Carnet de notes, SpeedGrader ne chargera que les étudiants dans le groupe sélectionné."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Autoriser les utilisateurs possédant des numéros de téléphone internationaux à recevoir des SMS de Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Toujours
@@ -2411,7 +2416,7 @@ fr-CA:
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app} a/ont été(s) installé(s) par Admin et est/sont verrouillé(s)"
   app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "%{app} a/ont été(s) installé(s) par le cours maître et est/sont verrouillé(s)"
   app_was_installed_by_the_master_course_e55ba1d7: "%{app} a/ont été(s) installé(s) par le cours maître"
-  appears_at_the_top_of_the_global_navigation_tray_t_f293877e: "Apparaît en haut de la zone de navigation mondiale qui s'ouvre sur les écrans de taille mobile. hauteur d'affichage : 48px Formats acceptés : SVG, PNG, JPG et GIF"
+  appears_at_the_top_of_the_global_navigation_tray_t_f293877e: "Apparaît en haut de la zone de navigation mondiale qui s'ouvre sur les écrans de taille mobile. hauteur d'affichage : 48px Formats acceptés : SVG, PNG, JPG et GIF"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Ajoute un nombre à la fin de chaque titre d'événement (ex : Événement 1, Événement 2, etc.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Ajoute un nombre à la fin de chaque titre d'événement (ex : Événement 1, Événement 2, etc.)\" for=\"append_iterator"
   application: 
@@ -3555,6 +3560,7 @@ fr-CA:
   before_publishing_your_course_you_must_either_publ_cdfdc78c: "Avant de publier votre cours, vous devez soit publier un module,  ou choisir une page d'accueil différente."
   before_publishing_your_course_you_must_either_publ_cf84cad9: "Avant de publier votre cours, vous devez soit publier un module dans la page Modules, ou choisir une page d'accueil différente."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Avant de pouvoir modifier votre profil, vous devez vérifier votre adresse courriel (%{email}) en cliquant sur le lien indiqué dans le courriel que nous vous avons envoyé. Si vous ne l’aviez pas reçu, *cliquer pour renvoyer le courriel*, et veillez à consulter aussi vos pourriels."
+  begin_typing_to_search_7daa7b1: "Commencer à saisir les éléments de recherche"
   beginning_date_2d2a29ac: "Date de début"
   behind_31e4e0fe: Derrière
   belarusian_b2f19c76: Biélorusse
@@ -4137,7 +4143,7 @@ fr-CA:
   calendars: 
     event: 
       due: dû
-      event_title: "dû : %{event_title}"
+      event_title: "dû : %{event_title}"
     feed_title: "Flux Atom du calendrier de cours"
     show: 
       calendar_feed: "Flux de calendrier"
@@ -4190,6 +4196,7 @@ fr-CA:
   can_destroy_subscription_to_data_service_data_b8dfca27: "Peut détruire l'abonnement aux données du service de données."
   can_edit_this_page_role_selection_6ccec3c7: "Peut éditer cette sélection de rôle de page"
   can_interact_with_users_in_their_section_only_48cb8c43: "Interaction avec les utilisateurs possible dans leur section uniquement"
+  can_list_categorized_event_types_52596f7: "Peut énumérer les types d'événements catégorisés."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Peut énumérer les abonnements aux données du service de données."
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Peut récupérer les données utilisateur associées au contexte dans lequel l'outil est installé."
   can_show_subscription_to_data_service_data_688ce3: "Peut afficher l'abonnement aux données du service de données."
@@ -5623,6 +5630,7 @@ fr-CA:
   copy_quiz_to_course_74f9c8c1: "Copier le questionnaire vers le cours"
   copy_this_module_item_to_a_course_790a0cf4: "Copier cet élément du module dans un cours..."
   copy_this_module_to_a_course_ddd12cc7: "Copier ce module dans un cours..."
+  copy_title_to_course_2a41a2f4: "Copier %{title} au cours"
   copy_title_to_course_ac71981a: "Copier {%title} au cours"
   copy_to_64f8456b: "Copier à..."
   copy_to_a5396a6f: "Copier à..."
@@ -5711,6 +5719,7 @@ fr-CA:
   count_options_190d6373: 
     one: "1 Option"
     other: "%{count} Options"
+  count_options_loaded_cd59cc3b: "%{count} options chargées."
   count_page_views_b40102b3: 
     one: "1 consultation de page"
     other: "%{count} consultations de page"
@@ -6751,7 +6760,7 @@ fr-CA:
   current_provider_6c3f7f96: "Fournisseur actuel"
   current_score_6c81792: "Note actuelle"
   current_score_74777363: "Résultat actuel"
-  current_slack_api_key_9eba6a5: "Clé API Slack actuelle :"
+  current_slack_api_key_9eba6a5: "Clé API Slack actuelle :"
   current_theme_62e5e8cf: "Thème actuel"
   current_total_67bf5f72: "Total actuel :"
   current_volume_level_c55ab825: "Niveau de volume actuel"
@@ -6775,7 +6784,7 @@ fr-CA:
   custom_fields_fc3e55af: "Champs personnalisés"
   custom_gradebook_columns_81944594: "Colonnes de carnet de notes personnalisé"
   custom_link_details_35fd38fc: "Détails du lien personnalisé"
-  custom_reports_experimental_features_40bbfe7c: "Rapports personnalisés : Fonctions expérimentales"
+  custom_reports_experimental_features_40bbfe7c: "Rapports personnalisés : Fonctions expérimentales"
   customize_configuration_69c22ef3: "Personnaliser la configuration"
   customize_learning_mastery_ratings_4ace142a: "Personnaliser les notations de maîtrise de l’apprentissage"
   customize_this_menu_efa72a9: "Personnaliser ce menu"
@@ -6904,9 +6913,11 @@ fr-CA:
       - Décembre
   date_at_time_25a04cd2: "%{date} à %{time}"
   date_created_87e265bc: "Date créée"
+  date_created_b93b76fb: ", date créée : "
   date_ee500367: Date
   date_error_7b38f8ff: "Erreur de date"
   date_is_required_9c6f5e83: "La date est obligatoire!"
+  date_modified_4d065406: ", date modifiée : "
   date_modified_e1c8ac8f: "Date modifiée"
   date_of_most_recent_bounce_b23d0119: "Date du renvoi le plus récent"
   datepicker: 
@@ -8608,7 +8619,7 @@ fr-CA:
   file_name_too_long_ea535796: "le nom de fichier est trop long"
   file_not_available_1869c733: "fichier non disponible"
   file_not_found_9eec054c: "Fichier introuvable"
-  file_permitted_filetypes_714e4e8d: "Fichier autorisé : %{fileTypes}"
+  file_permitted_filetypes_714e4e8d: "Fichier autorisé : %{fileTypes}"
   file_preview_eedb43f2: "Aperçu du fichier"
   file_preview_overlay_87f7e5f: "Superposition de prévisualisation du fichier"
   file_previews: 
@@ -8622,6 +8633,7 @@ fr-CA:
         no_preview_available: "Aucun aperçu n’est disponible pour ce fichier."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Le ou les fichier(s) seront inclus sur toutes les pages du programme de bureau Canvas."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "Le ou les fichier(s) seront inclus quand le contenu d'utilisateur est affiché dans l'application Canvas iOS ou Android, et dans les applications de tierces parties construites sur notre API."
+  file_select_filename_folder_contents_9146bab7: "Sélection du fichier, contenu du dossier pour %{filename}"
   file_size_limit_user_file_quota_applies_19b9b466: "Le quota de fichier d'utilisateur de %{file_size_limit} s'applique"
   file_status: 
     hidden_status: "Masqué. Disponible via un lien"
@@ -8883,6 +8895,7 @@ fr-CA:
   grade_change_activity_75fb525: "Activité de modification des notes"
   grade_change_log_231f90e4: "Journal de modification de notation"
   grade_change_notifications_98461261: "Notifications de changement de notes"
+  grade_changes_and_new_comments_released_for_title__f1350f92: "Changements de note et nouveaux commentaires publiés pour : %{title}, %{course}"
   grade_changes_cb5a57a8: "Modifications aux notes"
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -11066,6 +11079,7 @@ fr-CA:
     other: 
       one: "1 autre"
       other: "%{count} autres"
+  list_collapsed_5f19f5bb: "Liste réduite"
   list_collapsed_9ac35920: "Liste réduite."
   list_collapsed_dde87718: "Liste réduite"
   list_expanded_efec2d0: "Liste développée."
@@ -11118,6 +11132,7 @@ fr-CA:
   loading_more_results_def6df65: "Chargement de résultats supplémentaires..."
   loading_more_sub_accounts_d0a30903: "Chargement de plus de sous-comptes..."
   loading_more_terms_4053e31f: "Chargement de plus de termes..."
+  loading_options_c823e98b: "Chargement des options..."
   loading_outcome_results_96e21ce4: "Chargement de résultats d’acquis"
   loading_permissions_28495bdb: "Chargement des autorisations en cours"
   loading_permissions_failed_73983eb3: "Le chargement des autorisations a échoué"
@@ -13031,6 +13046,11 @@ fr-CA:
         submitted_date: "envoyé : %{date}"
       twitter: 
         body: "Alerte Canvas - Questionnaire envoyé : %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "Votre instructeur a publié des changements de notes et de nouveaux commentaires pour %{title}. Ces changements sont maintenant visibles."
+          link: "Vous pouvez le consulter ici"
     summaries: 
       email: 
         daily_body: "Vous êtes inscrit pour recevoir un rapport quotidien des notifications de votre compte Canvas. Ci-dessous se trouve le rapport du %{date} :"
@@ -13210,6 +13230,8 @@ fr-CA:
   moderation_page_4061aa2b: "Page de modération"
   moderator_49b9f2e1: Modérateur
   moderator_sortorder_18063692: "Modérateur %{sortOrder}"
+  modified_by_52d699e9: ", modifié par : "
+  modified_by_c1584b3c: "Modifié par"
   module_90d9fd32: Module
   module_completed_50c50762: "Module terminé"
   module_filter_63b17d11: "Filtre du module"
@@ -13410,6 +13432,7 @@ fr-CA:
   name: "Outil d’importation Academic Benchmarks"
   name_1aed4a1b: Nom
   name_3806192d: "Nom :"
+  name_4dee4600: ", nom : "
   name_app_has_been_deleted_fb2d9426: "L’application %{name} a été supprimée"
   name_badfe525: nom
   name_count_users_ccc93c3d: "%{name} (%{count} utilisateurs)"
@@ -13431,6 +13454,7 @@ fr-CA:
   name_only_5f56718e: "Nom uniquement"
   name_options_bc5c95ce: "%{name} Options"
   name_override_score_7f6a5216: "surclasser le score de %{name}"
+  name_parent_directory_b61d10a9: ", nom : répertoire parent "
   name_quiz_15f55961: "%{name} (Questionnaire)"
   name_unposted_current_score_e98e95fd: "%{name} score actuel non publié"
   name_unposted_final_score_124708d2: "%{name} score final non publié"
@@ -13586,6 +13610,7 @@ fr-CA:
   no_placements_enabled_f705f28: "Aucun placement n'est activé"
   no_points_possible_368669d: "Pas de point possible"
   no_points_possible_72db3a55: "Aucun point possible"
+  no_results_3cda4e72: "Pas de résultat"
   no_results_f36777ee: "Aucun résultat"
   no_results_found_58717065: "Aucun résultat trouvé"
   no_results_found_e4b686bd: "Aucun résultat retourné"
@@ -13627,6 +13652,7 @@ fr-CA:
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Cet élément ne sera pas attribué à toutes les sections."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "Ce ne sont pas toutes les options de paramètres qui sont disponibles au niveau sous-compte, y compris l'onglet Notifications."
   not_anonymously_graded_87574f91: "Non noté de façon anonyme"
+  not_applicable_d5dfd285: "non applicable"
   not_available_487d3648: Indisponible
   not_available_assignment_is_anonymous_94e77edf: "Non disponible; la tâche est anonyme"
   not_available_at_the_subaccount_level_3fc74ab: "Non disponible au niveau sous-compte."
@@ -14119,6 +14145,7 @@ fr-CA:
   option_4_aec96b1f: "Option 4"
   option_index_6308524d: "Option %{index}"
   option_name_ba758e08: "%{option_name}"
+  option_selected_737b6f72: "Option sélectionnée :"
   option_selected_list_collapsed_70a356b4: "%{option} sélectionné. Liste réduite."
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Facultativement, inclure une marque d'ordre d'octet dans les exportations de carnets de notes compatibles afin qu'elles puissent être importées dans Excel pour les utilisateurs dans certains paramètres régionaux."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Facultativement, inclure une marque d'ordre d'octet dans les exportations de carnets de notes afin qu'elles puissent être importées dans Excel pour les utilisateurs dans certains paramètres régionaux."
@@ -15097,7 +15124,7 @@ fr-CA:
   pre_processing_92865c1d: Prétraitement
   prerequisite_completion_period_c562d63: "Période d'achèvement de prérequis"
   prerequisites_49659f16: "Conditions préalables :"
-  prerequisites_list_62d66d12: "Conditions préalables : %{list}"
+  prerequisites_list_62d66d12: "Conditions préalables : %{list}"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Conditions requises de la réalisation"
@@ -15555,7 +15582,7 @@ fr-CA:
     new: 
       payment_info: "Informations sur le paiement"
   purple_7678a9fc: Violet
-  push_notification_a6532ff3: "Notification « push »"
+  push_notification_a6532ff3: "Notification « push »"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Q : Qu’est-ce qui est noir, blanc, noir, blanc?  R : Un panda qui roule en bas d'une colline."
   qatar_974_7e9684ca: "Qatar (+974)"
   qti_display: QTI
@@ -16923,7 +16950,7 @@ fr-CA:
     sections_count: 
       one: "1 section"
       other: "%{count} sections"
-  recipients_a69b5e55: "Destinataires :"
+  recipients_a69b5e55: "Destinataires :"
   record_7c9448b: Enregistrer
   record_audio_14666880: "Enregistrer de l'audio"
   record_media_6637ff19: "Enregistrer un support média"
@@ -17696,6 +17723,7 @@ fr-CA:
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Voyez quelques outils LTI qui fonctionnent bien avec Canvas."
   see_turnitin_results_cd9d4a6c: "Voir les résultats de Turnitin"
   select_1e849959: "[ Sélectionner ]"
+  select_a_course_4710371f: "Sélectionner un cours"
   select_a_grading_period_5ea50f1: "Choisir une période de notation..."
   select_a_grading_period_aab25483: "Choisir la période de notation"
   select_a_log_type_to_search_247fc6b4: "Sélectionnez un type de journal à rechercher."
@@ -17846,6 +17874,7 @@ fr-CA:
   send_this_module_item_to_another_user_14d4fd60: "Envoyer cet élément du module à un autre utilisateur..."
   send_this_module_to_another_user_50cb27c8: "Envoyer ce module à un autre utilisateur..."
   send_title_to_user_526320bb: "Envoyer {%title} à l’utilisateur"
+  send_title_to_user_d952e233: "Envoyer %{title} à l'utilisateur"
   send_to_7881bf0e: "Envoyer à..."
   send_to_b940900a: "Envoyer à..."
   send_to_ce05b460: "Envoyer à"
@@ -18698,6 +18727,7 @@ fr-CA:
       page_title: "Institution suspendue"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Uniquement les administrateurs de site. Envoyer à 1 / %{denominator} utilisateurs associés à des comptes activés, mensuellement."
   size_b30e1077: Taille
+  size_f1873a2: ", taille : "
   skipped_file_filename_due_to_error_94f0194: "A ignoré le fichier %{filename} à cause d'une erreur"
   skipping_unknown_file_type_cd1086ee: "Ignorer le type de fichier inconnu"
   skype_18850ba7: Skype
@@ -18888,6 +18918,8 @@ fr-CA:
   starts_at_29843f98: "Commence à"
   starts_ce584f1c: "Commence :"
   state_66a67ba2: État
+  state_published_e8914697: ", état : publié"
+  state_unpublished_83c18d01: ", état : non publié"
   statistics: 
     csv_columns: 
       attempt: tentative
@@ -19100,6 +19132,7 @@ fr-CA:
   submission_locked_a6074f8b: "Envoi verrouillé"
   submission_locked_image_93aced38: "Envoi d’image verrouillé"
   submission_options_5184a65b: "Options de soumission"
+  submission_posted_title_course_138bd744: "Envoi publié : %{title}, %{course}"
   submission_preview_383473ec: "Aperçu de l'envoi"
   submission_requirement_8ba1ee08: "Exigence d’envoi"
   submission_score_b7a291e8: "Note de l’envoi"
@@ -19624,6 +19657,7 @@ fr-CA:
   there_was_a_problem_loading_students_5bdb6cf2: "Un problème est survenu lors du chargement des étudiants."
   there_was_a_problem_loading_submissions_39855ff0: "Un problème est survenu lors du chargement des envois."
   there_was_a_problem_logging_in_at_institution_5a298155: "Il y a eu un problème de connexion à %{institution}"
+  there_was_a_problem_marking_submission_comments_as_d4ba6711: "Une erreur est survenue en marquant les commentaire sur l’envoi comme lus."
   there_was_a_problem_overriding_the_grade_f6d83c4d: "Un problème est survenu lors du surclassement des notes."
   there_was_a_problem_posting_assignment_grades_958669e8: "Un problème est survenu lors de la publication des notes des tâches."
   there_was_a_problem_posting_the_comment_75d15646: "Un problème est survenu lors de la publication du commentaire"
@@ -19720,6 +19754,9 @@ fr-CA:
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "Cette fonctionnalité crée un onglet de fanion de libération SiteAdmin pour pouvoir libérer des fonctionnalités pour les utilisateurs par le biais de l'interface utilisateur. Elle retravaille également l'interface utilisateur pour les anciens onglets « Options de fonctionnalité »."
   this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "Cette fonctionnalité permet aux utilisateurs de langues de droite à gauche (RTL) de voir la mise en page RTL en cours de développement. Éventuellement, cela deviendra le comportement par défaut et cette option sera supprimée."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Cet indicateur de fonctionnalité est quelque chose qu'un compte peut activer s'il veut autoriser les utilisateurs de leur compte qui parlent des langues qui sont normalement écrites de droite à gauche (par exemple : arabe, hébreux, farsi) de voir la disposition RTL (droite à gauche) tandis que nous travaillons sur celle-ci. Dès que la fonctionnalité est « prête », ce fanion disparaîtra et quiconque parle l'une de ces langues verra toujours l'interface RTL."
+  this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
+      Cette fonctionnalité permet aux API de téléversement de fichiers d’envoi de vérifier le type de fichier par rapport
+      aux extensions autorisées de la tâche associée.
   this_field_is_required_fa58c4a: "Ce champ est obligatoire"
   this_field_name_is_required_988caebc: "Le champ « %{name} » est obligatoire."
   this_field_name_is_required_b9196401: "Le champ « nom » est obligatoire."
@@ -20398,10 +20435,14 @@ fr-CA:
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_few_letters_to_start_searching_3334657b: "Taper quelques lettres pour commencer la recherche"
+  type_at_least_3_characters_to_search_f3df561c: "Saisir au moins 3 caractères à rechercher."
   type_c8106334: Type
+  type_file_14f017c9: "type : fichier"
+  type_folder_115f3b07: "type : dossier"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "« %{type} » n'est pas un type d'image valide (essayez jpg, png ou gif)"
   type_of_change_1cb24a0e: "Type de modification"
   type_of_item_8a37f69d: "Type d'élément"
+  type_to_search_de63ad38: "Saisir le texte à rechercher"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oups! Contactez votre sympathique développeur de catalogue. Message d'erreur : %{message}"
   ukrainian_945b00b7: Ukrainien
   unable_to_accept_update_fd53a7e2: "Impossible d'accepter le mise à jour"
@@ -21658,6 +21699,15 @@ fr-CA:
   your_email_address_f881e583: "Votre adresse courriel"
   your_email_b5364bee: "Votre courriel"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Votre fichier est actuellement téléversé vers le Relevé de notes, vous pouvez quitter cette page à tout moment. Si votre fichier CSV était conséquent, vos changements pourraient prendre plusieurs minutes pour se mettre à jour. Pour éviter d'écraser des données, veuillez confirmer la fin du téléversement et que votre relevé de notes est correct avant d'y effectuer tout changement supplémentaire."
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+      Votre instructeur a publié des changements de notes et des nouveaux commentaires pour %{title}, %{course}.
+      
+      Plus de détails à %{url}
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Votre instructeur a publié des changements de note et de nouveaux commentaires pour %{title}. Ces modifications sont à présent accessibles.
+      
+      Vous pouvez les consulter : 
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Votre message a été envoyé. Merci!"
   your_message_was_sent_977f6583: "Votre message a été envoyé!"
   your_name_7665e1d8: "Votre nom"

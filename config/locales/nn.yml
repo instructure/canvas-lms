@@ -2275,6 +2275,7 @@ nn:
   an_error_ocurred_while_publishing_course_3760cf04: "Det oppstod ein feil under publisering av emnet"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Det oppstod eit problem under lagring av avtalegruppa"
   an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id}har allereie gjort krav på %{other_user_id} sin user_id "
+  an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id} eller innlogging med %{login} finst allereie"
   an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Ein eksisterande Canvas-brukar med %{user_id}har allereie gjort krav på %{other_user_id} sin user_id "
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Ein eksisterande Canvas-brukar med SIS-ID %{user_id}har allereie gjort krav på %{other_user_id} sin integration_id"
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
@@ -3361,6 +3362,7 @@ nn:
   attempt_current_attempt_of_max_attempts_427ed508: "Forsøk %{current_attempt} av %{max_attempts}"
   attempt_number_83dcd86a: "Forsøk %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Forsøker å finne eit egna feltseparatorteikn for vurderingseksportfiler basert på nummerformatet som brukast i ditt språk."
+  attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Forsøker å finne eit egna feltseparatorteikn for kompatible reknearkeksportar basert på nummerformatet som brukast i ditt språk."
   attempts_22baad: 
     one: Forsøk
     other: Forsøk
@@ -6573,6 +6575,7 @@ nn:
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Opprett så mange diskusjonsemne som du vil ha, anten som oppgåver
       som kan karaktersetjast eller som forum for deling av idear og informasjon.
+  create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "Opprett oppgåver med New Quizzes og migrer eksisterande Canvas quizar."
   create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Lag oppåver med Quizzes.Next og eksporter eksisterande Canvas quizar"
   create_assignment_68532ceb: "Opprette oppgåve"
   create_assignments_on_the_assignments_page_organiz_8838b18a: |-
@@ -10161,6 +10164,7 @@ nn:
     submit_this_support_request: "Send feilmelding"
     things: Ting
     training_services_portal: "Portal for opplæringstenester"
+    training_services_portal_sub: "Gå til Canvas sine opplæringsvideoar og -emne"
     which_course_is_this_question_about: "Kva emne gjeld spørsmålet?"
     your_email_address: "E-postadressa di"
   help_menu_links_51184b65: Hjelpemeny-lenke
@@ -19298,6 +19302,7 @@ nn:
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Vurderingar er posta til dei valde seksjonane for %{assignmentName}"
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Vurderingar er posta til %{postedTo} for %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Positivt utfall. Karakterane er publiserte i karakterboka."
+  success_the_post_policy_for_name_has_been_updated_ea92283f: "Retningslinjene for resultatposting for %{name} er oppdatert."
   successfully_created_a_set_38374719: "Settet er oppretta"
   successfully_deleted_discussion_title_a685f345: "Diskusjonen %{title} er sletta"
   successfully_deleted_the_comment_a8bbe561: "Kommentar er sletta"
@@ -19510,6 +19515,7 @@ nn:
   text_input_d3480b8c: Tekstoppføring
   thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Brukarkontoen er sletta.  Kontakt systemansvarleg og få kontoen aktivert på nytt."
+  the_ability_for_users_to_receive_notifications_fro_bbcf487b: "Korleis brukarar kan ta i mot varsel frå slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID for kontoen der rapporteringsbrukaren tilhøyrer"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "Algoritmen som brukast for å signere AuthnRequest-, LogoutRequest- og LogoutResponse-meldingar til autentiseringstenesta."
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: "Funksjonsvalet analyse må vere slått på i kontoinnstillingar for å sjå sider med analysedata."
@@ -20114,6 +20120,7 @@ nn:
       
       Dersom løyvet er slått av medan 'Brukarar - vis innloggings-ID' er slått på, vil ein brukar sjå e-postadressar som innloggings-ID-ar.
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
+  to_activate_this_communication_channel_enter_the_f_f465efc5: "For å aktivere denne kommunikasjonskanalen må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "For å legge til kunngjeringar, må 'Diskusjonar - moderer' òg vere slått på. For å sjå dei siste kunngjeringane på forsida, må boksen 'Vis siste kunngjeringar på forsida til emnet' vere merka av i emneinnstillingar."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "For å legge til, endre eller slette grupper må 'Grupper - legg til / endre / slette' òg vere slått på."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: "For å legge til brukarar i eit emne, må 'Brukarar - legg til / fjern studentar frå andre emne til dette emnet' og/eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassitentar' òg vere slått på."
@@ -20332,6 +20339,7 @@ nn:
   tool_placements_3f996c24: Verktøyplasseringar
   tool_privacy_level_9d392813: "Personvernnivå for verktøy"
   tool_supports_deep_linking_at_this_placement_561e1874: "Verktøyet støttar dyplenking frå denne plasseringa"
+  tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "Fann verktøy \"%{toolName}\" for klient-ID %{clientId}. Vil du installere det?"
   tool_type_afa58fcb: "Type verktøy"
   toolname_logo_6b639926: "%{toolName} Logo"
   tooltips: 
