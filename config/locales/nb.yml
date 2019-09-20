@@ -1737,6 +1737,7 @@ nb:
   add_attribute_6d6d4a65: "Legg til en attributt"
   add_bank: 
     default_name: "Uten navn"
+  add_cc_subtitle_a9ef4a66: "Legg til CC/Undertekst"
   add_collaboration_da9665ac: "Legg til samarbeid"
   add_contact_method_d2dfea03: "Legg til kontaktmetode"
   add_content_58b4305a: "Legg til innhold"
@@ -1945,6 +1946,7 @@ nb:
   all_student_groups_f74cd6c3: "Alle studentgrupper"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt testen"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
+  all_submission_comments_have_been_marked_as_read_7595389d: "Alle innleveringskommentarer er markert som lest."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle innleveringer må ha en valgt karakter."
   all_terms_cd27b0fb: "Alle semestre"
   all_timezones_5e8afa7b: "Alle tidssoner"
@@ -1992,6 +1994,9 @@ nb:
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Lar en bruker vise SIS-ID-en i en brukers innloggingsdetaljer."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Lar en bruker vise brukeres SIS-ID-er på et emnes Folk-side."
   allows_admin_user_to_view_account_statistics_341f00d9: "Lar en admin-bruker vise kontostatistikk."
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      Lar administratorer se en logg som inneholder informasjon om alle nylige utførelser av
+      GraphQL-mutasjoner
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Tillater rådgiver å vise vurderingens overvåkingbrett i SpeedGrader for anonyme eller modererte oppgaver."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillater opprettelse av kunngjøringer for en bestemt seksjon"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Lar deg opprette diskusjoner for en spesifikk seksjon"
@@ -3761,6 +3766,7 @@ nb:
   before_using_this_feature_we_recommend_trying_the__1dea6042: "Før du bruker denne funksjonen så anbefales å prøve **%{t_theme_editor}** for merkevarebygging. Å aktivere denne funksjonen gir anledning til å laste opp tilpasset JavaScript- og CSS-filer i temaredigering. Modifiseringer laget med denne metoden kan påvirke fremtidige endringer til Canvas DOM (f.eks. 'element class name' eller HTML struktur) og støttes derfor ikke. De som benytter denne funksjonen bør ha avansert forståelse av JavaScript og CSS, og må vedlikeholde deres egen kode. *Brukes på eget ansvar!*"
   before_using_this_feature_we_recommend_trying_the__7e6f194e: "Før du bruker denne funksjonen anbefaler vi at du forsøker *********%{t_theme_editor}********* for å utføre tilpasninger. Å aktivere denne funksjonen gir anledning til å laste opp tilpasset JavaScript- og CSS-filer i tema-redigering. Modifiseringer laget med denne metoden kan lage konflikt med fremtidige endringer til Canvas DOM (f. eks. element class name eller HTML-struktur) og er derfor ikke støttet. I tillegg trenger du å forsikre deg om at alle modifiseringer du foretar tilgjengelige for alle, inkludert for eksempel, de som benytter *skjermlesere* og **de** ***som er avhengig*** av den ****høyeste kontrastfunksjonen****. Instructure fraskriver seg ethvert ansvar for eventuelle endringer du gjør. Det er ditt ansvar å sikre at de *****overholder***** ******alle****** *******standarder******* som kan kreves i din jurisdiksjon. De som benytter denne funksjonen burde ha avansert forståelse av JavaScript og CSS, og må vedlikeholde sin egen kode. ********Brukes på egen risiko!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Før du kan redigere profilen din trenger du å verifisere e-postadressen din (%{email}) ved å klikke på lenken i e-posten vi sendte deg. Dersom du ikke ser den * klikk for å sende e-posten på nytt* og vær sikker på at du sjekker spam-boksen."
+  begin_typing_to_search_7daa7b1: "Begynn å skrive for å søke"
   beginning_date_2d2a29ac: Startdato
   behind_31e4e0fe: Bak
   belarusian_b2f19c76: Hviterussisk
@@ -4422,6 +4428,7 @@ nb:
   can_destroy_subscription_to_data_service_data_b8dfca27: "Kan ødelegge abonnement på datatjeneste-data."
   can_edit_this_page_role_selection_6ccec3c7: "Kan ikke redigere dette siderollevalget"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan kun samhandle med brukere i sin seksjon"
+  can_list_categorized_event_types_52596f7: "Kan liste kategoriserte hendelsestyper."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan liste opp abonnement på datatjeneste-data."
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan hente brukerdata assosiert med sammenheng med verktøyet det er installert i."
   can_show_subscription_to_data_service_data_688ce3: "Kan vise abonnement på datatjeneste-data."
@@ -5975,6 +5982,7 @@ nb:
   copy_quiz_to_course_74f9c8c1: "Kopier quiz til emne"
   copy_this_module_item_to_a_course_790a0cf4: "Kopier denne modulenheten til ett emne..."
   copy_this_module_to_a_course_ddd12cc7: "Kopier denne modulen til ett emne..."
+  copy_title_to_course_2a41a2f4: "Kopier %{title} til emne"
   copy_title_to_course_ac71981a: "Kopier {%title} til bruker"
   copy_to_64f8456b: "Kopier til..."
   copy_to_a5396a6f: "Kopier til..."
@@ -6064,6 +6072,7 @@ nb:
   count_options_190d6373: 
     one: "1 valg"
     other: "%{count} valg"
+  count_options_loaded_cd59cc3b: "%{count} alternativ lastet."
   count_page_views_b40102b3: 
     one: "1 sidevisning"
     other: "%{count} sidevisninger"
@@ -7354,9 +7363,11 @@ nb:
       - desember
   date_at_time_25a04cd2: "%{date} på %{time}"
   date_created_87e265bc: "Dato opprettet"
+  date_created_b93b76fb: ", dato opprettet: "
   date_ee500367: Dato
   date_error_7b38f8ff: "Dato Avvik"
   date_is_required_9c6f5e83: "Dato kreves!"
+  date_modified_4d065406: ", dato redigert: "
   date_modified_e1c8ac8f: "Dato redigert"
   date_of_most_recent_bounce_b23d0119: "Dato for siste avvisning"
   datepicker: 
@@ -9292,6 +9303,7 @@ nb:
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Filen(e) blir inkludert på alle sidene i Canvas PC-app"
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "Filen(e) blir inkludert når brukerinnholdet vises i Canvas iOS eller Android apper."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "Filen(e) blir inkludert når brukerinnholdet vises i Canvas iOS- eller Android-apper, og i tredjepartsapper bygget på vår API."
+  file_select_filename_folder_contents_9146bab7: "Filvalg, %{filename} mappeinnhold"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} gjeldende kvote brukerfil"
   file_status: 
     hidden_status: "Skjult. Tilgjengelig med en lenke"
@@ -9582,6 +9594,7 @@ nb:
   grade_change_activity_75fb525: Karakterendring
   grade_change_log_231f90e4: Karakterendringslogg
   grade_change_notifications_98461261: "Kunngjøring om endring i karakterer"
+  grade_changes_and_new_comments_released_for_title__f1350f92: "Karakterendringer og nye kommentarer kunngjort for: %{title}, %{course}"
   grade_changes_cb5a57a8: Karakterendringer
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -11970,6 +11983,7 @@ nb:
     other: 
       one: "1 annen"
       other: "%{count} andre"
+  list_collapsed_5f19f5bb: "Liste sammenfoldet"
   list_collapsed_9ac35920: "Liste sammenfoldet."
   list_collapsed_dde87718: "Liste sammenfoldet."
   list_expanded_efec2d0: "Liste utvidet"
@@ -12023,6 +12037,7 @@ nb:
   loading_more_results_def6df65: "Laster inn flere resultater…"
   loading_more_sub_accounts_d0a30903: "Laster inn flere underkontoer …"
   loading_more_terms_4053e31f: "Laster inn flere betegnelser …"
+  loading_options_c823e98b: "Laster alternativer..."
   loading_outcome_results_96e21ce4: "Laster resultater av læringsmål"
   loading_permissions_28495bdb: "Laster inn tillatelser"
   loading_permissions_failed_73983eb3: "Kunne ikke laste inn tillatelser"
@@ -14128,6 +14143,11 @@ nb:
         submitted_date: "levert: %{date}"
       twitter: 
         body: "Canvas-varsel – test innlevert: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "Instruktøren din har kunngjort karakterendringer og nye kommentarer for  %{title} Disse endringene kan nå vises."
+          link: "Du kan vise det her"
     summaries: 
       email: 
         daily_body: "Du har meldt deg på for å få en daglig rapport med varslinger fra Canvas-kontoen din. Nedenfor er rapporten for %{date}:"
@@ -14313,6 +14333,8 @@ nb:
   moderation_page_4061aa2b: Moderasjonsside
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Administrator %{sortOrder}"
+  modified_by_52d699e9: ", modifisert av: "
+  modified_by_c1584b3c: "Modifisert av"
   module_90d9fd32: Modul
   module_completed_50c50762: "Modul fullført"
   module_filter_63b17d11: Modulfilter
@@ -14639,6 +14661,7 @@ nb:
   name: "Academic Benchmark-importør"
   name_1aed4a1b: Navn
   name_3806192d: "Navn:"
+  name_4dee4600: ", navn: "
   name_app_has_been_deleted_fb2d9426: "%{name} app har blitt slettet"
   name_badfe525: navn
   name_count_users_ccc93c3d: "%{name} (%{count} Brukere)"
@@ -14660,6 +14683,7 @@ nb:
   name_only_5f56718e: "Kun navn"
   name_options_bc5c95ce: "%{name} Valg"
   name_override_score_7f6a5216: "%{name} resultatsopphevelse"
+  name_parent_directory_b61d10a9: ", navn: overforliggende mappe "
   name_quiz_15f55961: "%{name} (Test)"
   name_unposted_current_score_e98e95fd: "%{name} gjeldende resultat, ikke opplastet"
   name_unposted_final_score_124708d2: "%{name} endelig resultat, ikke opplastet"
@@ -14824,6 +14848,7 @@ nb:
   no_placements_enabled_f705f28: "Ingen plasseringer aktivert"
   no_points_possible_368669d: "Ingen mulige poeng"
   no_points_possible_72db3a55: "Ingen mulige poeng"
+  no_results_3cda4e72: "Ingen resultater"
   no_results_f36777ee: "Ingen resultater"
   no_results_found_58717065: "Ingen resultater funnet"
   no_results_found_e4b686bd: "Ingen resultater funnet."
@@ -14866,6 +14891,7 @@ nb:
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Ikke alle seksjoner vil bli tildelt dette elementet."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "Ikke alle innstillingsalternativer er tilgjengelige på underkontonivå, inkludert varslinger-fanen."
   not_anonymously_graded_87574f91: "Ikke karaktersatt anonymt"
+  not_applicable_d5dfd285: "Ikke relevant"
   not_available_487d3648: "Ikke tilgjengelig"
   not_available_assignment_is_anonymous_94e77edf: "Ikke tilgjengelig; oppgave er anonym"
   not_available_at_the_subaccount_level_3fc74ab: "Ikke tilgjengelig på underkontonivå."
@@ -15381,6 +15407,7 @@ nb:
   option_4_aec96b1f: "Valg 4"
   option_index_6308524d: "Valg %{index}"
   option_name_ba758e08: "%{option_name}"
+  option_selected_737b6f72: "Valg alternativ:"
   option_selected_list_collapsed_70a356b4: "%{option} valgt. Liste sammenfoldet."
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Inkluder valgfritt byte-order mark (BOM) i eksporter av regneark, slik at de kan bli importert til Excel for brukere i andre lokaliteter."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Inkludere valgfritt byte-order mark (BOM) i eksportering av karakteroversikter slik at de kan bli importert til Excel for brukere i andre lokaliteter."
@@ -19293,6 +19320,7 @@ nb:
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Se noen LTI-verktøy som fungerer bra med Canvas."
   see_turnitin_results_cd9d4a6c: "Se Turnitin-resultater"
   select_1e849959: "[ Velg ]"
+  select_a_course_4710371f: "Velg et emne"
   select_a_grading_period_5ea50f1: "Velg en vurderingsperiode..."
   select_a_grading_period_aab25483: "Velg en vurderingsperiode"
   select_a_log_type_to_search_247fc6b4: "Velg en loggtype å søke i."
@@ -19445,6 +19473,7 @@ nb:
   send_this_module_item_to_another_user_14d4fd60: "Send denne modulenheten til en annen bruker..."
   send_this_module_to_another_user_50cb27c8: "Send denne modulen til en annen bruker..."
   send_title_to_user_526320bb: "Send {%title} til bruker"
+  send_title_to_user_d952e233: "Send %{title} til bruker"
   send_to_7881bf0e: "Send til..."
   send_to_b940900a: "Send til..."
   send_to_ce05b460: "Send til"
@@ -20421,6 +20450,7 @@ nb:
       users_matching_label: "Matchende brukere"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Kun sideadmin. Send til 1 / %{denominator} brukere med aktive kontoer hver måned."
   size_b30e1077: Størrelse
+  size_f1873a2: ", størrelse: "
   skip_to_content_22ad1d00: "Gå til innhold"
   skipped_file_filename_due_to_error_94f0194: "Hoppet over fil %{filename} på grunn av et avvik"
   skipping_unknown_file_type_cd1086ee: "Hopper over ukjent fil type"
@@ -20625,6 +20655,8 @@ nb:
   starts_at_29843f98: "Starter på"
   starts_ce584f1c: "Starter:"
   state_66a67ba2: Tilstand
+  state_published_e8914697: ", status: publisert"
+  state_unpublished_83c18d01: ", status: ikke publisert"
   statistics: 
     csv_columns: 
       attempt: forsøk
@@ -20849,6 +20881,7 @@ nb:
   submission_locked_a6074f8b: "Innlevering låst"
   submission_locked_image_93aced38: "Innlevering låst bilde"
   submission_options_5184a65b: Innleveringsalternativer
+  submission_posted_title_course_138bd744: "Innleveringer publisert: %{title}, %{course}"
   submission_preview_383473ec: "Forhåndsvisning innlevering"
   submission_requirement_8ba1ee08: Innleveringskrav
   submission_score_b7a291e8: innleveringsresultat
@@ -21404,6 +21437,7 @@ nb:
   there_was_a_problem_loading_submissions_39855ff0: "Det oppstod et problem under lasting av innleveringer."
   there_was_a_problem_loading_the_gradebook_69b2a17: "Det var et problem ved lasting av karakteroversikt."
   there_was_a_problem_logging_in_at_institution_5a298155: "Det var et problem med innloggingen på %{institution}"
+  there_was_a_problem_marking_submission_comments_as_d4ba6711: "Der var et problem ved markering av kommentaren som lest."
   there_was_a_problem_overriding_the_grade_f6d83c4d: "Det var et problem med oppheving av karakteren."
   there_was_a_problem_posting_assignment_grades_958669e8: "Det oppsto et problem når oppgavekarakterene skulle settes inn."
   there_was_a_problem_posting_the_comment_75d15646: "Det oppstod et problem med å poste kommentaren"
@@ -21503,6 +21537,9 @@ nb:
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "Denne funksjonen oppretter en SiteAdmin-fane kalt Slipp Merknad for å slippe funksjoner til brukere gjennom brukergrensesnittet. Den omarbeider også brukergrensesnittet for den gamle fanen kalt Funksjonvalg."
   this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "Denne funksjonen tillater bruken av høyre-mot-venstre-språk for å se «høyre-mot-venstre»-oppsettet under utvikling. Etter hvert vil dette bli standard oppsett og dette valget vil fjernes."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Dette funksjonsflagget er noe en konto kan aktivere hvis de vil la brukerne av kontoen som snakker språk som vanligvis skrives fra høyre til venstre (f.eks: arabisk, hebraisk, farsi) for å se RTL-overlegget mens de jobber på det. så snart funksjonen er «klar» vil dette funksjonsflagget deaktiveres og alle som snakker ett av de språkene vil alltid kunne se RTL-grensesnittet."
+  this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
+      Denne funksjonen utfører en API-sjekk på innleveringsfilen mot
+      den tillatte utvidelser for den tilhørende oppgaven.
   this_field_is_required_fa58c4a: "Dette feltet er obligatorisk"
   this_field_name_is_required_988caebc: "Feltet \"%{name}\" er påkrevd."
   this_field_name_is_required_b9196401: "Feltet \"name\" påkrevd."
@@ -22192,10 +22229,14 @@ nb:
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_few_letters_to_start_searching_3334657b: "Skriv inn noen få bokstaver for å starte søket"
+  type_at_least_3_characters_to_search_f3df561c: "Skriv inn minst tre tegn for å søke."
   type_c8106334: Type
+  type_file_14f017c9: "type: fil"
+  type_folder_115f3b07: "type: mappe"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' er ikke en gyldig bildetype (forsøk jpg, png, eller gif)"
   type_of_change_1cb24a0e: "Type endring"
   type_of_item_8a37f69d: "Type element"
+  type_to_search_de63ad38: "Skriv inn for å lete"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "UH oh! Kontakt din vennlig Catalog Developer . Feilmelding: %{message}"
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikke akseptere oppdatering"
@@ -23528,6 +23569,15 @@ nb:
       Filen din blir lastet opp til karakterboken, og du kan forlate denne siden når som helst. Om du har en stor CSV-fil, kan dine endringer ta et par minutter å
       oppdateres. For å forhindre at noen data blir overskrivet, vennligst bekreft at
       opplastingen er fullført og at karakterboken er riktig før du gjør ytterligere endringer.
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+      Instruktøren din har kunngjort karakterendringer og nye kommentarer for %{title}, %{course}.
+      
+      Mer informasjon på %{url}
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Instruktøren din har kunngjort karakterendringer og nye kommentarer for %{title}. Disse endringene kan nå vises.
+      
+      Du kan se det her: 
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Din melding er sendt. Takk!"
   your_message_was_sent_977f6583: "Meldingen ble sendt!"
   your_name_7665e1d8: "Ditt navn"
