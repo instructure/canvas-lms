@@ -720,9 +720,11 @@ class BzController < ApplicationController
     data.save
 
     # now that the user's work is safely saved, we will go back and do addon work
-    # like micrograding
+    # like micrograding -- we only micro-grade (aka auto-grade) pages in modules, not assignments
+    # assignment magic fields are just for persistant storage.
+    is_wiki_page = request.referrer.match(/\/courses\/\d+\/pages\//)
 
-    if was_new && !was_optional && (field_type != 'checkbox' || !answer.nil?) # Checkboxes are optional by nature unless there is an answer
+    if is_wiki_page && was_new && !was_optional && (field_type != 'checkbox' || !answer.nil?) # Checkboxes are optional by nature unless there is an answer
       bzg = BZGrading.new
 
       course_id = request.referrer[/\/courses\/(\d+)\//, 1]
