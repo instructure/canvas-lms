@@ -41,30 +41,32 @@ pipeline {
         }
       }
     }
-    stage ('Contract Tests') {
-      parallel {
-        // Todo: This will run all contract tests consecutively, still need to get parallel depending on runtime
-        stage("API Contract Tests") {
-          steps {
-            timeout(time: 10) {
-              sh """
-                docker-compose exec -T web env \
-                  PACT_BROKER_HOST=inst-pact-broker.inseng.net \
-                  PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
-                  PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
-                  JENKINS_URL="this silliness is necessary." \
-                  DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
-                  bin/contracts-verify-api
-              """
-            }
-          }
-        }
 
-        stage("Live Events Contract Tests") {
-          steps {
-            echo("TODO  - live events")
-          }
+    stage ('Contract Tests') {
+      steps {
+        timeout(time: 10) {
+          sh """
+            docker-compose exec -T web env \
+              PACT_BROKER_HOST=inst-pact-broker.inseng.net \
+              PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
+              PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
+              JENKINS_URL="this silliness is necessary." \
+              DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
+              bin/contracts-verify-api
+          """
         }
+      }
+    }
+
+    stage("Live Events Contract Tests") {
+      steps {
+        sh """
+          docker-compose exec -T web env \
+            PACT_BROKER_HOST=inst-pact-broker.inseng.net \
+            PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
+            PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
+            bin/contracts-verify-live-events
+        """
       }
     }
   }
