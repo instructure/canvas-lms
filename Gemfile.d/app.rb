@@ -21,6 +21,7 @@ else
   gem 'rails', '5.1.3'
 end
 
+gem 'turnout', '~> 2.5'
 gem 'rack', '2.0.3'
 gem 'oauth2', '1.2.0', require: false
 
