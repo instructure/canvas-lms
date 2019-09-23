@@ -51,8 +51,10 @@ export default class ItemView extends Backbone.View {
       'click .quiz-send-to': 'sendQuizTo',
       'click .duplicate_assignment': 'onDuplicate',
       'click .duplicate-failed-retry': 'onDuplicateFailedRetry',
+      'click .migrate-failed-retry': 'onMigrateFailedRetry',
       'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
-      'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
+      'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel'
     }
 
     this.prototype.messages = {
@@ -135,16 +137,25 @@ export default class ItemView extends Backbone.View {
     e.preventDefault()
     const courseId = ENV.context_asset_string.split('_')[1]
     const quizId = this.options.model.id
-    const url = `/api/v1/courses/${courseId}/content_exports?export_type=quizzes2&quiz_id=${quizId}`
+    const url = `/api/v1/courses/${courseId}/content_exports?export_type=quizzes2&quiz_id=${quizId}&include[]=migrated_quiz`
     const dfd = $.ajaxJSON(url, 'POST')
     this.$el.disableWhileLoading(dfd)
     return $.when(dfd)
-      .done((response, status, deferred) => {
+      .done(response => {
+        this.addMigratedQuizToList(response)
         return $.flashMessage(I18n.t('Migration in progress'))
       })
       .fail(() => {
         return $.flashError(I18n.t('An error occurred while migrating.'))
       })
+  }
+
+  addMigratedQuizToList(response) {
+    if (!response) return
+    const quizzes = response.migrated_quiz
+    if (quizzes) {
+      this.addQuizToList(quizzes[0])
+    }
   }
 
   canDelete() {
@@ -248,6 +259,20 @@ export default class ItemView extends Backbone.View {
       })
   }
 
+  onMigrateFailedRetry(e) {
+    e.preventDefault()
+    const button = $(e.target)
+    button.prop('disabled', true)
+    this.model
+      .retry_migration(response => {
+        this.addMigratedQuizToList(response)
+        this.delete({silent: true})
+      })
+      .always(() => {
+        button.prop('disabled', false)
+      })
+  }
+
   toJSON() {
     const base = _.extend(this.model.toJSON(), this.options)
     base.quiz_menu_tools = ENV.quiz_menu_tools
@@ -268,8 +293,11 @@ export default class ItemView extends Backbone.View {
     base.canDuplicate = this.canDuplicate()
     base.isDuplicating = this.model.get('workflow_state') === 'duplicating'
     base.failedToDuplicate = this.model.get('workflow_state') === 'failed_to_duplicate'
+    base.isMigrating = this.model.get('workflow_state') === 'migrating'
+    base.failedToMigrate = this.model.get('workflow_state') === 'failed_to_migrate'
     base.showAvailability = this.model.multipleDueDates() || !this.model.defaultDates().available()
     base.showDueDate = this.model.multipleDueDates() || this.model.singleSectionDueDate()
+    base.name = this.model.name()
 
     base.is_locked =
       this.model.get('is_master_course_child_content') &&

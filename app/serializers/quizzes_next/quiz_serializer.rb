@@ -27,7 +27,7 @@ module QuizzesNext
                 :post_to_sis, :allowed_attempts, :permissions,
                 :html_url, :mobile_url, :can_duplicate,
                 :course_id, :original_course_id, :original_assignment_id,
-                :workflow_state, :original_assignment_name
+                :workflow_state, :original_assignment_name, :original_quiz_id
 
     def_delegators :@controller
 
@@ -69,6 +69,10 @@ module QuizzesNext
 
     def original_assignment_id
       object.duplicate_of&.id
+    end
+
+    def original_quiz_id
+      object.migrate_from_id
     end
 
     def original_assignment_name

@@ -1314,6 +1314,42 @@ describe Assignment do
     end
   end
 
+  describe "scope: migrating_for_too_long" do
+    subject { described_class.migrating_for_too_long }
+
+    let_once(:unpublished_assignment) do
+      @course.assignments.create!(workflow_state: 'unpublished', **assignment_valid_attributes)
+    end
+    let_once(:new_migrating_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'migrating',
+        duplication_started_at: 5.seconds.ago,
+        **assignment_valid_attributes
+      )
+    end
+    let_once(:old_migrating_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'migrating',
+        duplication_started_at: 20.minutes.ago,
+        **assignment_valid_attributes
+      )
+    end
+
+    it { is_expected.to eq([old_migrating_assignment]) }
+
+    describe ".clean_up_migrating_assignments" do
+      it "marks all assignments that have been migrating for too long as failed_to_migrate" do
+        expect(old_migrating_assignment.duplication_started_at).not_to be_nil
+        expect(old_migrating_assignment.workflow_state).to eq 'migrating'
+        described_class.clean_up_migrating_assignments
+        expect(
+          old_migrating_assignment.reload.duplication_started_at
+        ).to be_nil
+        expect(old_migrating_assignment.workflow_state).to eq 'failed_to_migrate'
+      end
+    end
+  end
+
   describe "#representatives" do
     context "individual students" do
       it "sorts by sortable_name" do

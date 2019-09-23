@@ -123,6 +123,27 @@ describe QuizzesNext::QuizSerializer do
     end
   end
 
+  context 'when the assignment is a migrated quiz' do
+    let(:quiz) do
+      Quizzes::Quiz.create(title: 'Quiz Name', context: context)
+    end
+
+    let(:assignment) do
+      group = context.assignment_groups.create(:name => "some group")
+      context.assignments.create(
+        title: 'some assignment',
+        assignment_group: group,
+        due_at: Time.zone.now + 1.week,
+        workflow_state: 'published',
+        migrate_from_id: quiz.id
+      )
+    end
+
+    it "serializes original_assignment_id" do
+      expect(subject[:original_quiz_id]).to eq(quiz.id)
+    end
+  end
+
   describe "permissions" do
     it "serializes permissions" do
       expect(subject[:permissions]).to include({

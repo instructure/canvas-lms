@@ -744,6 +744,19 @@ test('clicks on Retry button to trigger another duplicating request', () => {
   ok(model.duplicate_failed.called)
 })
 
+test('clicks on Retry button to trigger another migrating request', () => {
+  const model = buildAssignment({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_migrate'
+  })
+  const view = createView(model)
+  sandbox.spy(model, 'retry_migration')
+  view.$(`#assignment_${model.id} .migrate-failed-retry`).click()
+  ok(model.retry_migration.called)
+})
+
 test('cannot duplicate when user is not admin', () => {
   const model = buildAssignment({
     id: 1,

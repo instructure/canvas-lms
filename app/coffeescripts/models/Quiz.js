@@ -50,6 +50,8 @@ export default class Quiz extends Backbone.Model {
     this.toView = this.toView.bind(this)
     this.postToSISEnabled = this.postToSISEnabled.bind(this)
     this.objectType = this.objectType.bind(this)
+    this.isDuplicating = this.isDuplicating.bind(this)
+    this.isMigrating = this.isMigrating.bind(this)
 
     super.initialize(...arguments)
     this.initId()
@@ -190,6 +192,10 @@ export default class Quiz extends Backbone.Model {
     return this.get('workflow_state') === 'duplicating'
   }
 
+  isMigrating() {
+    return this.get('workflow_state') === 'migrating'
+  }
+
   name(newName) {
     if (!(arguments.length > 0)) return this.get('title')
     return this.set('title', newName)
@@ -246,24 +252,39 @@ export default class Quiz extends Backbone.Model {
     )
   }
 
+  // caller is failed migrated assignment
+  retry_migration(callback) {
+    const course_id = this.get('course_id')
+    const original_quiz_id = this.get('original_quiz_id')
+    $.ajaxJSON(
+      `/api/v1/courses/${course_id}/content_exports?export_type=quizzes2&quiz_id=${original_quiz_id}&include[]=migrated_quiz`,
+      'POST',
+      {},
+      callback
+    )
+  }
+
   pollUntilFinishedLoading(interval) {
     if (this.isDuplicating()) {
-      this.pollUntilFinished(interval)
+      this.pollUntilFinished(interval, this.isDuplicating)
+    }
+    if (this.isMigrating()) {
+      this.pollUntilFinished(interval, this.isMigrating)
     }
   }
 
-  pollUntilFinished(interval) {
+  pollUntilFinished(interval, isProcessing) {
     const course_id = this.get('course_id')
     const id = this.get('id')
     const poller = new PandaPubPoller(interval, interval * 5, done => {
-      this.fetch({url: `/api/v1/courses/${course_id}/assignments/${id}?result_type=Quiz`}).always(
-        () => {
-          done()
-          if (!this.isDuplicating()) {
-            return poller.stop()
-          }
+      this.fetch({
+        url: `/api/v1/courses/${course_id}/assignments/${id}?result_type=Quiz`
+      }).always(() => {
+        done()
+        if (!isProcessing()) {
+          return poller.stop()
         }
-      )
+      })
     })
     poller.start()
   }

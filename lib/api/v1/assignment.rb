@@ -183,6 +183,7 @@ module Api::V1::Assignment
     hash['original_course_id'] = assignment.duplicate_of&.course&.id
     hash['original_assignment_id'] = assignment.duplicate_of&.id
     hash['original_assignment_name'] = assignment.duplicate_of&.name
+    hash['original_quiz_id'] = assignment.migrate_from_id
     hash['workflow_state'] = assignment.workflow_state
 
     if assignment.quiz_lti?
@@ -740,6 +741,14 @@ module Api::V1::Assignment
         assignment.finish_duplicating
       else
         assignment.fail_to_duplicate
+      end
+    end
+
+    if assignment_params.key?('migrated_successfully')
+      if value_to_boolean(assignment_params[:migrated_successfully])
+        assignment.finish_migrating
+      else
+        assignment.fail_to_migrate
       end
     end
 

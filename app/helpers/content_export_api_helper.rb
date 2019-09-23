@@ -56,7 +56,7 @@ module ContentExportApiHelper
     # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)
     return unless authorized_action(export, current_user, :create)
 
-    opts = params.permit(:version).to_unsafe_h
+    opts = params.permit(:version, :failed_assignment_id).to_unsafe_h
     export.progress = 0
     if export.save
       export.queue_api_job(opts)

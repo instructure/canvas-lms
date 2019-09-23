@@ -9,7 +9,23 @@
     class="ig-row"
   {{/if}}
 >
-{{#if isDuplicating}}
+{{#if isMigrating}}
+  <div class="ig-row__layout">
+    {{>spinner}} {{#t}}Migrating "{{name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToMigrate}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with migrating "{{name}}"{{/t}}</span>
+  <div class="migrate-failed-actions">
+    <button class="migrate-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry migrating "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    <button class="duplicate-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel migrating "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}} {{#if isDuplicating}}
   <div class="ig-row__layout">
     {{>spinner}} {{#t}}Making a copy of "{{original_assignment_name}}"{{/t}}
   </div>
@@ -133,5 +149,5 @@
     {{/if}}
 
   </div>
-{{/if}}{{/if}}{{/if}}{{/if}}
+{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 </div>

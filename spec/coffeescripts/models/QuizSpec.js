@@ -365,7 +365,28 @@ test('make ajax call with right url when duplicate_failed is called', () => {
   )
 })
 
-QUnit.module('Assignment#pollUntilFinishedLoading', {
+QUnit.module('Quiz#retry_migration')
+
+test('make ajax call with right url when retry_migration is called', () => {
+  const assignmentID = '200'
+  const originalQuizID = '42'
+  const courseID = '123'
+  const quiz = new Quiz({
+    name: 'foo',
+    id: assignmentID,
+    original_quiz_id: originalQuizID,
+    course_id: courseID
+  })
+  const spy = sandbox.spy($, 'ajaxJSON')
+  quiz.retry_migration()
+  ok(
+    spy.withArgs(
+      `/api/v1/courses/${courseID}/content_exports?export_type=quizzes2&quiz_id=${originalQuizID}&include[]=migrated_quiz`
+    ).calledOnce
+  )
+})
+
+QUnit.module('Assignment#pollUntilFinishedLoading (duplicate)', {
   setup() {
     this.clock = sinon.useFakeTimers()
     this.quiz = new Quiz({workflow_state: 'duplicating'})
@@ -376,7 +397,7 @@ QUnit.module('Assignment#pollUntilFinishedLoading', {
   }
 })
 
-test('polls for updates', function() {
+test('polls for updates (duplicate)', function() {
   this.quiz.pollUntilFinishedLoading(4000)
   this.clock.tick(2000)
   notOk(this.quiz.fetch.called)
@@ -385,6 +406,34 @@ test('polls for updates', function() {
 })
 
 test('stops polling when the quiz has finished duplicating', function() {
+  this.quiz.pollUntilFinishedLoading(3000)
+  this.quiz.set({workflow_state: 'unpublished'})
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+})
+
+QUnit.module('Assignment#pollUntilFinishedLoading (migration)', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.quiz = new Quiz({workflow_state: 'migrating'})
+    sandbox.stub(this.quiz, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates (migration)', function() {
+  this.quiz.pollUntilFinishedLoading(4000)
+  this.clock.tick(2000)
+  notOk(this.quiz.fetch.called)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.called)
+})
+
+test('stops polling when the quiz has finished migrating', function() {
   this.quiz.pollUntilFinishedLoading(3000)
   this.quiz.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)

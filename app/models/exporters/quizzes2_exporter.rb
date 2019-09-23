@@ -38,6 +38,7 @@ module Exporters
       {
         assignment: {
           resource_link_id: @assignment.lti_resource_link_id,
+          assignment_id: @assignment.global_id,
           title: @quiz.title,
           context_title: @quiz.context.name,
           course_uuid: @course.uuid
@@ -45,9 +46,11 @@ module Exporters
       }
     end
 
-    def export
+    def export(opts = {})
       begin
-        create_assignment
+        failed_assignment_id = opts[:failed_assignment_id]
+        failed_assignment = Assignment.find_by(id: failed_assignment_id)
+        create_assignment(failed_assignment)
       rescue
         add_error(I18n.t("Error running Quizzes 2 export."), $ERROR_INFO)
         return false
@@ -57,29 +60,48 @@ module Exporters
 
     private
 
-    def assignment_group
-      @assignment_group ||=
-        course.assignment_groups.find_or_create_by(
-          name: GROUP_NAME,
-          workflow_state: 'available'
-        )
+    def assignment_group(failed_assignment)
+      return @_assignment_group if @_assignment_group.present?
+
+      if failed_assignment.present?
+        @_assignment_group = failed_assignment.assignment_group
+        return @_assignment_group if @_assignment_group.present?
+      end
+
+      @_assignment_group = course.assignment_groups.find_or_create_by(
+        name: GROUP_NAME,
+        workflow_state: 'available'
+      )
     end
 
-    def create_assignment
+    def create_assignment(failed_assignment)
       post_to_sis = Assignment.sis_grade_export_enabled?(course)
-      assignment_params = {
+      params = assignment_params(failed_assignment)
+
+      params[:post_to_sis] = quiz.assignment.post_to_sis if quiz.assignment && post_to_sis
+      assignment = course.assignments.create(params)
+      assignment.quiz_lti! && assignment.save!
+      @assignment = assignment
+    end
+
+    def assignment_params(failed_assignment)
+      params = {
         title: quiz.title,
         points_possible: quiz.points_possible,
         due_at: quiz.due_at,
         unlock_at: quiz.unlock_at,
         lock_at: quiz.lock_at,
-        assignment_group: assignment_group,
-        workflow_state: 'unpublished'
+        assignment_group: assignment_group(failed_assignment),
+        workflow_state: new_quizzes_page_enabled? ? 'migrating' : 'unpublished',
+        duplication_started_at: Time.zone.now,
+        migrate_from_id: @quiz.id
       }
-      assignment_params[:post_to_sis] = quiz.assignment.post_to_sis if quiz.assignment && post_to_sis
-      assignment = course.assignments.create(assignment_params)
-      assignment.quiz_lti! && assignment.save!
-      @assignment = assignment
+      params[:position] = failed_assignment.position if failed_assignment.present?
+      params
+    end
+
+    def new_quizzes_page_enabled?
+      @course.root_account.feature_enabled?(:newquizzes_on_quiz_page)
     end
   end
 end

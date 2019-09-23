@@ -68,6 +68,7 @@ export default class AssignmentListItemView extends Backbone.View
     'click .icon-unlock': 'onLockAssignment'
     'click .move_assignment': 'onMove'
     'click .duplicate-failed-retry': 'onDuplicateFailedRetry'
+    'click .migrate-failed-retry': 'onMigrateFailedRetry'
     'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel'
     'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
 
@@ -262,17 +263,33 @@ export default class AssignmentListItemView extends Backbone.View
     @model.collection.add(assignment)
     @focusOnAssignment(response)
 
+  addMigratedQuizToList: (response) =>
+    return unless response
+    quizzes = response.migrated_assignment
+    debugger
+    if quizzes
+      @addAssignmentToList(quizzes[0])
+
   onDuplicate: (e) =>
     return unless @canDuplicate()
     e.preventDefault()
     @model.duplicate(@addAssignmentToList)
 
-  onDuplicateFailedRetry: (e) =>
+  onDuplicateFailedRetry: (e, action) => 
     e.preventDefault()
     $button = $(e.target)
     $button.prop('disabled', true)
     @model.duplicate_failed((response) =>
       @addAssignmentToList(response)
+      @delete(silent: true)
+    ).always -> $button.prop('disabled', false)
+
+  onMigrateFailedRetry: (e, action) => 
+    e.preventDefault()
+    $button = $(e.target)
+    $button.prop('disabled', true)
+    @model.retry_migration((response) =>
+      @addMigratedQuizToList(response)
       @delete(silent: true)
     ).always -> $button.prop('disabled', false)
 

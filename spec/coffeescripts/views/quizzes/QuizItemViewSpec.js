@@ -474,6 +474,20 @@ test('clicks on Retry button to trigger another duplicating request', () => {
   ok(quiz.duplicate_failed.called)
 })
 
+test('clicks on Retry button to trigger another migrating request', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_migrate'
+  })
+  const dfd = $.Deferred()
+  const view = createView(quiz)
+  sandbox.stub(quiz, 'retry_migration').returns(dfd)
+  view.$(`.migrate-failed-retry`).simulate('click')
+  ok(quiz.retry_migration.called)
+})
+
 test('can duplicate when a user has permissons to manage assignments', () => {
   const quiz = createQuiz({
     id: 1,
