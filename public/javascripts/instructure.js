@@ -847,27 +847,32 @@ function handleYoutubeLink () {
     });
 
 
-    // in 2 seconds (to give time for everything else to load), find all the external links and add give them
+    // in 100ms (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)
     setTimeout(function() {
-      $("#content a:external,#content a.explicit_external_link")
-      // don't mess with the ones that were already processed in enhanceUserContent
-      .not(".external")
-      .each(function(){
+      const content = document.getElementById('content')
+      if (!content) return
+      const links = content.querySelectorAll(`a[href*="//"]:not([href*="${window.location.hostname}"])`) // technique for finding "external" links copied from https://davidwalsh.name/external-links-css
+      for (let i = 0; i < links.length; i++) {
+        const $link = $(links[i])
+        
+        // don't mess with the ones that were already processed in enhanceUserContent
+        if ($link.hasClass('external')) continue
+        
         var indicatorText = I18n.t('titles.external_link', 'Links to an external site.');
         var $linkIndicator = $('<span class="ui-icon ui-icon-extlink ui-icon-inline"/>').attr('title', indicatorText);
         $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText));
-        $(this)
+        $link
           .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
           .not(".exclude_external_icon")
           .addClass('external')
           .children("span.ui-icon-extlink").remove().end()
-          .html('<span>' + $(this).html() + '</span>')
+          .html('<span>' + $link.html() + '</span>')
           .attr('target', '_blank')
           .attr('rel', 'noreferrer noopener')
           .append($linkIndicator);
-      });
-    }, 2000);
+      }
+    }, 100);
   });
