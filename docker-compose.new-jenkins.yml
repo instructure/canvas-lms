@@ -23,6 +23,8 @@ services:
       KNAPSACK_EXCLUDE_REGEX: $KNAPSACK_EXCLUDE_REGEX
       KNAPSACK_TEST_DIR: $KNAPSACK_TEST_DIR
       KNAPSACK_GENERATE_REPORT: $KNAPSACK_GENERATE_REPORT
+      RERUNS_RETRY: $RERUNS_RETRY
+      MAX_FAIL: $MAX_FAIL
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine

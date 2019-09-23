@@ -35,6 +35,9 @@ pipeline {
     KNAPSACK_TEST_FILE_PATTERN = '{spec/selenium,gems/plugins/*/spec_canvas/selenium}/**/*_spec.rb'
     KNAPSACK_EXCLUDE_REGEX = '/performance/'
     KNAPSACK_TEST_DIR = 'spec'
+    // for now 1 until we stabilize some of the flaky specs
+    RERUNS_RETRY = 1
+    MAX_FAIL = 80
   }
 
   stages {
@@ -57,22 +60,7 @@ pipeline {
                         sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
                         sh 'build/new-jenkins/docker-compose-build-up.sh'
                         sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-                        def retries = 1
-                        result = sh (
-                          script: 'build/new-jenkins/rspec-tests.sh',
-                          returnStatus:true
-                        )
-                        while (result != 0 && retries > 0) {
-                          println "Re-Running failed tests"
-                          result = sh (
-                            script: 'build/new-jenkins/rspec-tests.sh only-failures',
-                            returnStatus: true
-                          )
-                          retries--
-                        }
-                        if (result != 0) {
-                          error("Rspec exited exit code ${result}")
-                        }
+                        sh 'build/new-jenkins/rspec-with-retries.sh'
                       }
                     }
                     catch (ex) {
