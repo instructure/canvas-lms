@@ -37,6 +37,7 @@ import {Flex, Grid} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
+import theme from '@instructure/canvas-theme'
 
 function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
@@ -182,50 +183,57 @@ export default class FileUpload extends Component {
   renderUploadBox() {
     return (
       <div data-testid="upload-box">
-        <FileDrop
-          accept={
-            this.props.assignment.allowedExtensions.length
-              ? this.props.assignment.allowedExtensions
-              : ''
-          }
-          allowMultiple
-          enablePreview
-          id="inputFileDrop"
-          data-testid="input-file-drop"
-          label={
-            <Billboard
-              heading={I18n.t('Upload File')}
-              hero={DEFAULT_ICON}
-              message={
-                <Flex direction="column">
-                  {this.props.assignment.allowedExtensions.length ? (
-                    <Flex.Item>
-                      {I18n.t('File permitted: %{fileTypes}', {
-                        fileTypes: this.props.assignment.allowedExtensions
-                          .map(ext => ext.toUpperCase())
-                          .join(', ')
-                      })}
-                    </Flex.Item>
-                  ) : null}
-                  <Flex.Item padding="small 0 0">
-                    <Text size="small">
-                      {I18n.t('Drag and drop, or click to browse your computer')}
-                    </Text>
-                    <MoreOptions
-                      assignmentID={this.props.assignment._id}
-                      courseID={this.props.assignment.env.courseId}
-                      handleCanvasFiles={this.handleCanvasFiles}
-                      userID={this.props.assignment.env.currentUser.id}
-                    />
-                  </Flex.Item>
-                </Flex>
+        <Flex direction="column">
+          <Flex.Item margin="0 0 small 0" overflowY="visible">
+            <FileDrop
+              accept={
+                this.props.assignment.allowedExtensions.length
+                  ? this.props.assignment.allowedExtensions
+                  : ''
               }
+              allowMultiple
+              enablePreview
+              id="inputFileDrop"
+              data-testid="input-file-drop"
+              label={
+                <Billboard
+                  heading={I18n.t('Upload File')}
+                  hero={DEFAULT_ICON}
+                  message={
+                    <Flex direction="column">
+                      {this.props.assignment.allowedExtensions.length ? (
+                        <Flex.Item>
+                          {I18n.t('File permitted: %{fileTypes}', {
+                            fileTypes: this.props.assignment.allowedExtensions
+                              .map(ext => ext.toUpperCase())
+                              .join(', ')
+                          })}
+                        </Flex.Item>
+                      ) : null}
+                      <Flex.Item padding="small 0 0">
+                        <Text size="small">
+                          {I18n.t('Drag and drop, or click to browse your computer')}
+                        </Text>
+                      </Flex.Item>
+                    </Flex>
+                  }
+                />
+              }
+              messages={this.state.messages}
+              onDropAccepted={files => this.handleDropAccepted(files)}
+              onDropRejected={this.handleDropRejected}
             />
-          }
-          messages={this.state.messages}
-          onDropAccepted={files => this.handleDropAccepted(files)}
-          onDropRejected={this.handleDropRejected}
-        />
+          </Flex.Item>
+          <Flex.Item textAlign="center">
+            <MoreOptions
+              assignmentID={this.props.assignment._id}
+              courseID={this.props.assignment.env.courseId}
+              handleCanvasFiles={this.handleCanvasFiles}
+              renderCanvasFiles
+              userID={this.props.assignment.env.currentUser.id}
+            />
+          </Flex.Item>
+        </Flex>
       </div>
     )
   }
@@ -294,7 +302,7 @@ export default class FileUpload extends Component {
 
   render() {
     return (
-      <div data-testid="upload-pane">
+      <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
         {this.getDraftAttachments().length !== 0 ? (
           this.renderUploadBoxAndUploadedFiles()
         ) : (

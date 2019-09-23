@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from '../../graphqlData/Assignment'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
+import MoreOptions from './MoreOptions'
 import React from 'react'
 import {Submission} from '../../graphqlData/Submission'
 
@@ -43,8 +45,7 @@ class UrlEntry extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.submission?.submissionDraft?.url &&
-      this.props.submission.submissionDraft.url !== prevProps.submission?.submissionDraft?.url
+      this.props.submission?.submissionDraft?.url !== prevProps.submission?.submissionDraft?.url
     ) {
       this.updateInputState()
     }
@@ -55,6 +56,7 @@ class UrlEntry extends React.Component {
     if (this.props.submission?.submissionDraft?.url) {
       this.updateInputState()
     }
+    window.addEventListener('message', this.handleLTIURLs)
   }
 
   updateInputState = () => {
@@ -69,11 +71,24 @@ class UrlEntry extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('beforeunload', this.beforeunload)
+    window.removeEventListener('message', this.handleLTIURLs)
+  }
+
+  handleLTIURLs = async e => {
+    if (
+      e.data.messageType === 'LtiDeepLinkingResponse' ||
+      e.data.messageType === 'A2ExternalContentReady'
+    ) {
+      if (e.data.content_items.length) {
+        const url = e.data.content_items[0].url
+        this.createSubmissionDraft(url)
+      }
+    }
   }
 
   // Warn the user if they are attempting to leave the page with an unsubmitted url entry
   beforeunload = e => {
-    if (this.state.value) {
+    if (this.state.url && this.state.url !== this.props.submission?.submissionDraft?.url) {
       e.preventDefault()
       e.returnValue = true
     }
@@ -116,14 +131,14 @@ class UrlEntry extends React.Component {
 
   renderURLInput = () => {
     const inputStyle = {
-      maxWidth: '600px',
+      maxWidth: '700px',
       marginLeft: 'auto',
       marginRight: 'auto'
     }
 
     return (
       <div style={inputStyle}>
-        <Flex justifyItems="center">
+        <Flex justifyItems="center" alignItems="start">
           <Flex.Item grow>
             <TextInput
               renderLabel={<ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>}
@@ -146,6 +161,13 @@ class UrlEntry extends React.Component {
                 <ScreenReaderContent>{I18n.t('Preview website url')}</ScreenReaderContent>
               </Button>
             )}
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 x-small">
+            <MoreOptions
+              assignmentID={this.props.assignment._id}
+              courseID={this.props.assignment.env.courseId}
+              userID={this.props.assignment.env.currentUser.id}
+            />
           </Flex.Item>
         </Flex>
       </div>
@@ -191,6 +213,7 @@ class UrlEntry extends React.Component {
 }
 
 UrlEntry.propTypes = {
+  assignment: Assignment.shape,
   createSubmissionDraft: func,
   submission: Submission.shape,
   updateEditingDraft: func
