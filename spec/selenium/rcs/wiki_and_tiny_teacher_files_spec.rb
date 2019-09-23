@@ -253,6 +253,50 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       wait_for_ajaximations
       expect(sidebar_images.count).to eq 2
     end
+
+    it "should show image files if their containing folder is hidden" do
+      @sub_folder.workflow_state = 'hidden'
+      @sub_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if the files navigation tab is hidden" do
+      @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
+      @course.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if they are hidden" do
+      @attachment.file_state = 'hidden'
+      @attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if they are locked" do
+      @attachment.locked = true
+      @attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
   end
 end
 
