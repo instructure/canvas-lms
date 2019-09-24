@@ -30,7 +30,8 @@ RSpec.describe ApplicationController do
       format: double(:html? => true),
       user_agent: nil,
       remote_ip: '0.0.0.0',
-      base_url: 'https://canvas.test'
+      base_url: 'https://canvas.test',
+      referer: nil
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -1113,7 +1114,8 @@ describe ApplicationController do
         client_ip: '0.0.0.0',
         producer: 'canvas',
         url: 'http://test.host',
-        http_method: 'GET'
+        http_method: 'GET',
+        referrer: nil
       }
     end
 
@@ -1134,6 +1136,15 @@ describe ApplicationController do
       controller.instance_variable_set(:@context, course_model(sis_source_id: 'banana'))
       controller.send(:setup_live_events_context)
       expect(LiveEvents.get_context[:context_sis_source_id]).to eq 'banana'
+    end
+
+    context "when there is a HTTP referrer" do
+      it "includes the referer in 'referrer' (two 'r's)" do
+        url = 'http://example.com/some-referer-url'
+        controller.request.headers['HTTP_REFERER'] = url
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(non_conditional_values.merge(referrer: url))
+      end
     end
 
     context 'when a domain_root_account exists' do

@@ -2488,6 +2488,8 @@ class ApplicationController < ActionController::Base
     ctx[:user_agent] = request.headers['User-Agent']
     ctx[:client_ip] = request.remote_ip
     ctx[:url] = request.url
+    # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
+    ctx[:referrer] = request.referer
     ctx[:producer] = 'canvas'
 
     if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
