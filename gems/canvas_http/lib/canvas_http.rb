@@ -29,8 +29,8 @@ module CanvasHttp
       @code = code
     end
   end
-  class RelativeUriError < ArgumentError; end
-  class InsecureUriError < ArgumentError; end
+  class RelativeUriError < CanvasHttp::Error; end
+  class InsecureUriError < CanvasHttp::Error; end
 
   def self.put(*args, &block)
     CanvasHttp.request(Net::HTTP::Put, *args, &block)

@@ -296,6 +296,7 @@ class ContextExternalTool < ActiveRecord::Base
   def process_extended_configuration
     return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
     tool_hash = nil
+    @config_errors = []
     begin
        converter = CC::Importer::BLTIConverter.new
        if config_type == 'by_url'
@@ -307,8 +308,6 @@ class ContextExternalTool < ActiveRecord::Base
        tool_hash = {:error => e.message}
     end
 
-
-    @config_errors = []
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == 'by_url'
@@ -328,7 +327,7 @@ class ContextExternalTool < ActiveRecord::Base
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
     @config_errors << [error_field, e.message]
-  rescue URI::Error
+  rescue URI::Error, CanvasHttp::Error
     @config_errors << [:config_url, "Invalid URL"]
   rescue ActiveRecord::RecordInvalid => e
     @config_errors += Array(e.record.errors)
