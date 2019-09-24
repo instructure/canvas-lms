@@ -387,7 +387,7 @@ module Lti
         end
 
         before do
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+          allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
         end
 
         it 'fetches JSON from the URL' do
@@ -395,7 +395,7 @@ module Lti
         end
 
         context 'when a timeout occurs' do
-          before { allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error) }
+          before { allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error) }
 
           it 'raises exception if timeout occurs' do
             expect{ tool_configuration }.to raise_error /Could not retrieve settings, the server response timed out./
@@ -408,7 +408,7 @@ module Lti
           before do
             allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
             allow(stubbed_response).to receive('[]').and_return('application/json')
-            allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+            allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
           end
 
           context 'when the response is "not found"' do

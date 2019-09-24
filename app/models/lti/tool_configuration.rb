@@ -82,8 +82,7 @@ module Lti
     private
 
     def self.retrieve_and_extract_configuration(url)
-
-      response = CC::Importer::BLTIConverter.new.fetch(url)
+      response = CanvasHttp.get(url)
 
       raise_error(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
       raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess

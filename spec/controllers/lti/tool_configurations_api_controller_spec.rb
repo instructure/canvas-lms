@@ -115,7 +115,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context 'when the request does not time out' do
       before do
-        allow_any_instance_of(Net::HTTP).to receive(:request).and_return(ok_response)
+        allow(CanvasHttp).to receive(:get).and_return(ok_response)
       end
 
       it 'uses the tool configuration JSON from the settings_url' do
@@ -143,7 +143,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context 'when the request times out' do
       before do
-        allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
+        allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       end
 
       it { is_expected.to have_http_status :unprocessable_entity }
@@ -162,7 +162,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
         allow(stubbed_response).to receive('[]').and_return('application/json')
-        allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+        allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
       end
 
       context 'when the response is "not found"' do
