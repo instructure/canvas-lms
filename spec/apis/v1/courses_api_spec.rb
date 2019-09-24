@@ -1177,6 +1177,17 @@ describe CoursesController, type: :request do
         expect(@course.reload.grade_passback_setting).to eq 'nightly_sync'
       end
 
+      it "should update the grade_passback_setting to disabled" do
+        api_call(:put, @path, @params, course: { grade_passback_setting: 'disabled' })
+        expect(@course.reload.grade_passback_setting).to eq 'disabled'
+      end
+
+      it "should update the grade_passback_setting to custom setting" do
+        Setting.set('valid_grade_passback_settings', 'one,two,three')
+        api_call(:put, @path, @params, course: { grade_passback_setting: 'one' })
+        expect(@course.reload.grade_passback_setting).to eq 'one'
+      end
+
       it "should remove the grade_passback_setting" do
         @course.update_attribute(:grade_passback_setting, 'nightly_sync')
         api_call(:put, @path, @params, course: { grade_passback_setting: '' })

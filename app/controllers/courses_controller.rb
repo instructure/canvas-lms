@@ -729,7 +729,7 @@ class CoursesController < ApplicationController
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
   # @argument course[grade_passback_setting] [String]
-  #   Optional. The grade_passback_setting for the course. Only 'nightly_sync' and '' are allowed
+  #   Optional. The grade_passback_setting for the course. Only 'nightly_sync', 'disabled', and '' are allowed
   #
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be 'on_campus', 'online', or 'blended')
@@ -3260,7 +3260,8 @@ class CoursesController < ApplicationController
   private
 
   def update_grade_passback_setting(grade_passback_setting)
-    unless grade_passback_setting.blank? || grade_passback_setting == 'nightly_sync'
+    valid_states = Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',')
+    unless grade_passback_setting.blank? || valid_states.include?(grade_passback_setting)
       @course.errors.add(:grade_passback_setting, t("Invalid grade_passback_setting"))
     end
     @course.grade_passback_setting = grade_passback_setting.presence
