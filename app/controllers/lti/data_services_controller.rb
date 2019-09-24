@@ -121,11 +121,17 @@ module Lti
     # @argument subscription[TransportType] [Required, String]
     #   Must be either 'sqs' or 'https'.
     #
+    # @argument subscription[OwnerId] [Optional, String]
+    #   The globalId of the user making the subscription. If not present, will default
+    #   to the tool id. The user will be validated to exist on account and have
+    #   the data_services permission, otherwise will throw a 422 error.
+    #
     # @returns DataServiceSubscription
     def create
       sub = params.require(:subscription)
       SubscriptionsValidator.validate_subscription_context!(sub)
-      response = Services::LiveEventsSubscriptionService.create(jwt_body, sub.to_unsafe_h)
+      sub = add_owner(sub.to_unsafe_h)
+      response = Services::LiveEventsSubscriptionService.create(jwt_body, sub)
       forward_service_response(response)
     end
 
@@ -255,6 +261,16 @@ module Lti
         sub.merge(UpdatedByType: 'person')
       else
         sub.merge(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool')
+      end
+    end
+
+    def add_owner(sub)
+      if params[:subscription][:OwnerId]
+        u = User.find(params[:subscription][:OwnerId])
+        raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
+        sub.merge(OwnerType: 'person')
+      else
+        sub.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool')
       end
     end
   end
