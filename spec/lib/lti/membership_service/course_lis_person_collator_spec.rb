@@ -145,6 +145,8 @@ module Lti::MembershipService
   end
 
   context 'course with multiple users' do
+    let(:user_sis_id) { "user_sis_id_01" }
+
     before(:each) do
       course_with_teacher
       @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
@@ -152,7 +154,9 @@ module Lti::MembershipService
       @course.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active')
       @designer = user_model
       @course.enroll_user(@designer, 'DesignerEnrollment', enrollment_state: 'active')
-      @student = user_model
+      @student = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
+        :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
+        :sis_user_id => user_sis_id, integration_id: 'int1')
       @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
       @observer = user_model
       @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active')
@@ -182,6 +186,19 @@ module Lti::MembershipService
         expect(designer.role).to match_array([IMS::LIS::Roles::Context::URNs::ContentDeveloper])
         expect(student.role).to match_array([IMS::LIS::Roles::Context::URNs::Learner])
         expect(observer.role).to match_array([IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner])
+      end
+
+      it 'adds the sis_id to the payload if present' do
+        collator = CourseLisPersonCollator.new(@course, @teacher)
+        memberships = collator.memberships
+
+        @teacher.reload
+        @student.reload
+
+        teacher = memberships.find { |m| m.member.user_id == @teacher.lti_context_id }
+        student = memberships.find { |m| m.member.user_id == @student.lti_context_id }
+
+        expect(student.member.sourced_id).to eq user_sis_id
       end
     end
   end
