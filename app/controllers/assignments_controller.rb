@@ -87,19 +87,21 @@ class AssignmentsController < ApplicationController
   def show
     Shackles.activate(:slave) do
       @assignment ||= @context.assignments.find(params[:id])
-      a2_enabled = @context.feature_enabled?(:assignments_2) &&
-                   (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
 
-      # We will need to do some additional work here about figuring out when we
-      # can short-circuit to A2 vs when we need to go through the rest of the
-      # method here.
-      if a2_enabled && @assignment.submission_types != 'external_tool'
+      # TODO: Make sure we aren't stripping out any needed functionality that is
+      #       happening when this controller is hit without A2 enabled. Specifically
+      #       `ensure_assignment_group`, `context_module_action`, and `log_asset_access`.
+      if @assignment.a2_enabled? && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
         unless can_do(@context, @current_user, :read_as_admin)
-          assignment_prereqs = context_module_sequence_items_by_asset_id(params[:id], "Assignment")
+          # TODO: Look at how the `@locked` stuff is used bellow, in A1 the pre-reqs are only being
+          #       calculated if needed, but we are doing it every time here.
+          assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+
           js_env({
             ASSIGNMENT_ID: params[:id],
             COURSE_ID: @context.id,
-            PREREQS: assignment_prereqs
+            PREREQS: assignment_prereqs,
+            SUBMISSION_ID: @assignment.submissions.where(user: @current_user).pluck(:id).first
           })
           css_bundle :assignments_2_student
           js_bundle :assignments_2_show_student
@@ -204,9 +206,9 @@ class AssignmentsController < ApplicationController
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
             js_bundle :assignments_2_show_teacher
+            render html: '', layout: true
+            return
           end
-          render html: '', layout: true
-          return
         end
 
         # everything else here is only for the old assignment page and can be

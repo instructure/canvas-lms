@@ -3216,6 +3216,13 @@ class Assignment < ActiveRecord::Base
     post_policy.update!(post_manually: post_manually)
   end
 
+  def a2_enabled?
+    return false unless course.feature_enabled?(:assignments_2)
+    return false if external_tool? || quiz? || discussion_topic? || wiki_page? ||
+      group_category? || peer_reviews?
+    true
+  end
+
   private
 
   def anonymous_grader_identities(index_by:)

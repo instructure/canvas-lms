@@ -117,21 +117,6 @@ export const SUBMISSION_HISTORIES_QUERY = gql`
   ${SubmissionHistory.fragment}
 `
 
-export const SUBMISSION_ID_QUERY = gql`
-  query GetAssignmentSubmissionID($assignmentLid: ID!) {
-    assignment(id: $assignmentLid) {
-      submissionsConnection(
-        last: 1
-        filter: {states: [unsubmitted, graded, pending_review, submitted]}
-      ) {
-        nodes {
-          id
-        }
-      }
-    }
-  }
-`
-
 export const USER_GROUPS_QUERY = gql`
   query GetUserGroups($userID: ID!) {
     legacyNode(_id: $userID, type: User) {
