@@ -77,6 +77,54 @@ describe Lti::DataServicesController do
         { subscription: subscription, account_id: root_account.lti_context_id, id: 'testid' }
       end
     end
+
+    let(:action) { :update }
+    let(:subId) { 'myid' }
+
+    context do
+      let(:params_overrides) do
+        { subscription: subscription, account_id: root_account.lti_context_id, id: subId }
+      end
+
+      it 'adds UpdatedBy and UpdatedByType if passed in for a tool' do
+        expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
+          hash_including(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool', Id: subId)
+        )
+        send_request
+      end
+    end
+
+    context do
+      let(:params_overrides) do
+        { subscription: subscription.merge(UpdatedBy: user.global_id), account_id: root_account.lti_context_id, id: subId }
+      end
+      let(:user) { account_admin_user(account: root_account) }
+
+      it 'adds UpdatedBy and UpdatedByType if passed in for a person' do
+        expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
+          hash_including('UpdatedBy' => user.global_id.to_s, UpdatedByType: 'person', Id: subId)
+        )
+        send_request
+      end
+
+      context 'with non admin user' do
+        let(:user) { user_model }
+
+        it 'raises an unprocessable_entity' do
+          send_request
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context 'with not found user' do
+        let(:user) { OpenStruct.new(global_id: 'notfound') }
+
+        it 'raises a 404' do
+          send_request
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
   end
 
   describe '#index' do

@@ -156,11 +156,16 @@ module Lti
     # @argument subscription[State] [Optional, String]
     #   Must be either 'Active' or 'Deleted"
     #
+    # @argument subscription[UpdatedBy] [Optional, String]
+    #   The globalId of the user updating the subscription. If not present, will default
+    #   to the tool id. The user will be validated to exist on account and have
+    #   the data_services permission, otherwise will throw a 422 error.
+    #
     # @returns DataServiceSubscription
     def update
       sub = params.require(:subscription)
       SubscriptionsValidator.validate_subscription_context!(sub) if sub[:ContextType]
-      updates = { 'Id': params[:id] }.merge(sub.to_unsafe_h)
+      updates = add_updater({ 'Id': params[:id] }.merge(sub.to_unsafe_h))
       response = Services::LiveEventsSubscriptionService.update(jwt_body, updates)
       forward_service_response(response)
     end
@@ -241,6 +246,16 @@ module Lti
 
     def message_type
       params[:message_type] || 'live-event'
+    end
+
+    def add_updater(sub)
+      if params[:subscription][:UpdatedBy]
+        u = User.find(params[:subscription][:UpdatedBy])
+        raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
+        sub.merge(UpdatedByType: 'person')
+      else
+        sub.merge(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool')
+      end
     end
   end
 end
