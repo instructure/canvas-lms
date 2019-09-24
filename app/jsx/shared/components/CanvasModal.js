@@ -27,9 +27,7 @@ import {Modal} from '@instructure/ui-overlays'
 
 import ErrorBoundary from './ErrorBoundary'
 import GenericErrorPage from './GenericErrorPage'
-
-// TODO: should put an official image in a better place as a generic default
-import errorShipUrl from 'jsx/assignments_2/student/SVG/ErrorShip.svg'
+import errorShipUrl from '../svg/ErrorShip.svg'
 
 CanvasModal.propTypes = {
   ...Modal.propTypes,

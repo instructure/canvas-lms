@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, string} from 'prop-types'
-import errorShipUrl from '../../../SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import GenericErrorPage from '../../../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_initial_query'

@@ -19,7 +19,7 @@
 import {arrayOf, shape, string} from 'prop-types'
 import axios from 'axios'
 import BreadcrumbLinkWithTip from './BreadcrumbLinkWithTip'
-import errorShipUrl from '../../../../SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '../../../../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2'

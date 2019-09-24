@@ -28,7 +28,7 @@ import set from 'lodash/set'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import ErrorBoundary from 'jsx/shared/components/ErrorBoundary'
 import GenericErrorPage from 'jsx/shared/components/GenericErrorPage/index'
-import errorShipUrl from '../../student/SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Mask} from '@instructure/ui-overlays'

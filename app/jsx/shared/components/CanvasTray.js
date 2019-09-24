@@ -26,9 +26,7 @@ import {Tray} from '@instructure/ui-overlays'
 
 import ErrorBoundary from './ErrorBoundary'
 import GenericErrorPage from './GenericErrorPage'
-
-// TODO: should put an official image in a better place as a generic default
-import errorShipUrl from 'jsx/assignments_2/student/SVG/ErrorShip.svg'
+import errorShipUrl from '../svg/ErrorShip.svg'
 
 /**
 This is a wrapper around an InstUi Tray component that provides:

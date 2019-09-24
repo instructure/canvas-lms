@@ -19,7 +19,7 @@
 import AlertManager from '../shared/components/AlertManager'
 import {ApolloProvider, createClient} from '../canvas-apollo'
 import ErrorBoundary from '../shared/components/ErrorBoundary'
-import errorShipUrl from './student/SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../shared/components/GenericErrorPage/index'
 import SubmissionIDQuery from './student/components/SubmissionIDQuery'
 import React from 'react'

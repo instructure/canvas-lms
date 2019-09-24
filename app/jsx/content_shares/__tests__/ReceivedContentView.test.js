@@ -46,4 +46,14 @@ describe('view of received content', () => {
     const {getByText} = render(<ReceivedContentView />)
     expect(getByText(shares[0].name)).toBeInTheDocument()
   })
+
+  it('raises an error on unsuccessful retrieval', () => {
+    useFetchApi.mockImplementationOnce(({loading, error}) => {
+      loading(false)
+      error('fetch error')
+    })
+    expect(() => {
+      render(<ReceivedContentView />)
+    }).toThrow('Retrieval of Received Shares failed')
+  })
 })
