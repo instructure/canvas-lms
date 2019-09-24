@@ -305,16 +305,16 @@ module Context
     end
   end
 
-  def self.get_account_or_parent_account(context)
+  def self.get_account_or_parent_account_global_id(context)
     case context
     when Account
-      context.root_account? ? context : context.parent_account
+      context.root_account? ? context.global_id : context.global_parent_account_id
     when Course
-      get_account(context.account)
+      context.global_account_id
     when CourseSection
-      get_account(context.course)
+      get_account_or_parent_account_global_id(context.course)
     when Group
-      get_account(context.context)
+      get_account_or_parent_account_global_id(context.context)
     end
   end
 

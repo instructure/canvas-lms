@@ -2465,7 +2465,7 @@ class ApplicationController < ActionController::Base
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
-    ctx[:context_account_id] = Context.get_account_or_parent_account(@context)&.global_id if @context
+    ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
 
     if @context_membership
       ctx[:context_role] =
