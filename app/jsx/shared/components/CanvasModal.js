@@ -38,13 +38,16 @@ CanvasModal.propTypes = {
   // Optional props to pass to the GenericErrorPage in ErrorBoundary
   errorSubject: string,
   errorCategory: string,
-  errorImageUrl: string
+  errorImageUrl: string,
+
+  closeButtonSize: string
 }
 
 CanvasModal.defaultProps = {
   padding: 'small',
   errorImageUrl: errorShipUrl,
-  footer: null
+  footer: null,
+  closeButtonSize: 'small'
 }
 
 export default function CanvasModal({
@@ -56,6 +59,7 @@ export default function CanvasModal({
   onDismiss,
   children,
   footer,
+  closeButtonSize,
   ...otherModalProps
 }) {
   return (
@@ -66,12 +70,14 @@ export default function CanvasModal({
             <Heading>{label}</Heading>
           </Flex.Item>
           <Flex.Item>
-            <CloseButton onClick={onDismiss}>{I18n.t('Close')}</CloseButton>
+            <CloseButton onClick={onDismiss} size={closeButtonSize}>
+              {I18n.t('Close')}
+            </CloseButton>
           </Flex.Item>
         </Flex>
       </Modal.Header>
-      <Modal.Body>
-        <View as="div" padding={padding}>
+      <Modal.Body padding={padding}>
+        <View as="div" height="100%">
           <ErrorBoundary
             errorComponent={
               <GenericErrorPage

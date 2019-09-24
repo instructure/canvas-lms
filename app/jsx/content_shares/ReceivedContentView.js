@@ -20,6 +20,7 @@ import React, {useState} from 'react'
 import I18n from 'i18n!content_share'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
+import PreviewModal from './PreviewModal'
 import {Spinner} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 
@@ -27,6 +28,7 @@ export default function ReceivedContentView() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [shares, setShares] = useState([])
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const getSharesUrl = '/api/v1/users/self/content_shares/received'
 
@@ -38,7 +40,7 @@ export default function ReceivedContentView() {
   })
 
   function onPreview(shareId) {
-    console.log(`onPreview action for ${shareId}`)
+    setPreviewOpen(true)
   }
 
   function onImport(shareId) {
@@ -59,6 +61,7 @@ export default function ReceivedContentView() {
       />
       <ReceivedTable shares={shares} onPreview={onPreview} onImport={onImport} />
       {isLoading && <Spinner renderTitle={I18n.t('Loading')} />}
+      <PreviewModal open={previewOpen} onDismiss={() => setPreviewOpen(false)} />
     </>
   )
 }
