@@ -352,8 +352,8 @@ module ApplicationHelper
       !@body_class_no_headers &&
       @current_user &&
       @context.is_a?(Course) &&
-      embedded_chat_enabled &&
-      external_tool_tab_visible('chat')
+      external_tool_tab_visible('chat') &&
+      embedded_chat_enabled
   end
 
   def active_external_tool_by_id(tool_id)
@@ -379,9 +379,10 @@ module ApplicationHelper
   end
 
   def external_tool_tab_visible(tool_id)
+    return false unless available_section_tabs.any?{|tc| tc[:external]} # if the course has no external tool tabs, we know it won't have a chat one so we can bail early before querying the db/redis for it
     tool = active_external_tool_by_id(tool_id)
     return false unless tool
-    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
+    available_section_tabs.find {|tc| tc[:id] == tool.asset_string}.present?
   end
 
   def license_help_link
