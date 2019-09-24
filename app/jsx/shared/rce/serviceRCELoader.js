@@ -23,6 +23,7 @@ import editorOptions from './editorOptions'
 import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'
 import splitAssetString from 'compiled/str/splitAssetString'
+import closedCaptionLanguages from '../closedCaptionLanguages'
 
 function getTrayProps() {
   if (!ENV.context_asset_string) {
@@ -137,7 +138,7 @@ const RCELoader = {
    * @return {Element} the textarea
    */
   getTargetTextarea(initialTarget) {
-    return $(initialTarget).get(0).type == 'textarea'
+    return $(initialTarget).get(0).type === 'textarea'
       ? $(initialTarget).get(0)
       : $(initialTarget)
           .find('textarea')
@@ -208,6 +209,21 @@ const RCELoader = {
       }
     }
 
+    const myLanguage = ENV.LOCALE
+    const languages = Object.keys(closedCaptionLanguages)
+      .map(locale => {
+        return {id: locale, label: closedCaptionLanguages[locale]}
+      })
+      .sort((a, b) => {
+        if (a.id === myLanguage) {
+          return -1
+        } else if (b.id === myLanguage) {
+          return 1
+        } else {
+          return a.label.localeCompare(b.label, myLanguage)
+        }
+      })
+
     return {
       defaultContent: textarea.value || tinyMCEInitOptions.defaultContent,
       editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),
@@ -217,7 +233,8 @@ const RCELoader = {
       onBlur: tinyMCEInitOptions.onBlur,
       textareaClassName: textarea.className,
       textareaId: textarea.id,
-      trayProps: getTrayProps()
+      trayProps: getTrayProps(),
+      languages
     }
   }
 }
