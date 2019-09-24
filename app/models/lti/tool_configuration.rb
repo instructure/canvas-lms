@@ -82,8 +82,7 @@ module Lti
     private
 
     def self.retrieve_and_extract_configuration(url)
-
-      response = CC::Importer::BLTIConverter.new.fetch(url)
+      response = CanvasHttp.get(url)
 
       raise_error(:configuration_url, 'Content type must be "application/json"') unless response['content-type'].include? 'application/json'
       raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
@@ -113,8 +112,8 @@ module Lti
       if configuration['public_jwk'].blank? && configuration['public_jwk_url'].blank?
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
-      if configuration['public_jwk'].present? 
-        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration['public_jwk']) 
+      if configuration['public_jwk'].present?
+        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration['public_jwk'])
         errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
       end
       schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration.compact)
