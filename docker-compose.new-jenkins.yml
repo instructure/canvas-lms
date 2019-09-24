@@ -9,7 +9,7 @@ services:
       - redis
       - cassandra
     environment:
-      ENCRYPTION_KEY: 598f25a47a708a96be4bd398cc512c71df1b24114e5af4f8f9c4d2ed777c9906519a07f9452e369a6fa27f8b31e8f768da1422fa47bbf9d8fbd46620dc863002
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
       RAILS_DB_NAME_TEST: 'canvas_test'
       RAILS_DB_HOST: postgres

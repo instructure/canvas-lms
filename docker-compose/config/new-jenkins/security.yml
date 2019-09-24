@@ -1,0 +1,3 @@
+test:
+  lti_iss: 'https://canvas.instructure.com'
+  encryption_key: <%= ENV["ENCRYPTION_KEY"] %>

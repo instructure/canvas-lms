@@ -103,7 +103,6 @@ pipeline {
               cp config/domain.yml.example config/domain.yml
               cp config/external_migration.yml.example config/external_migration.yml
               cp config/outgoing_mail.yml.example config/outgoing_mail.yml
-              cp config/security.yml.example config/security.yml
             '''
           }
         }
