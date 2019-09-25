@@ -4779,12 +4779,16 @@ describe Assignment do
     end
 
     it 'excludes students with completed enrollments by date when not differentiated' do
-      @course.start_at = 2.days.ago
-      @course.conclude_at = 1.day.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.save!
-      @assignment.update_attribute(:only_visible_to_overrides, false)
-      expect(@assignment.participants(by_date: true).include?(@student1)).to be_falsey
+      @course.update!(
+        conclude_at: 1.day.ago,
+        restrict_enrollments_to_course_dates: true,
+        start_at: 2.days.ago
+      )
+      # reload the course to clear any cached results of the participating_students_by_date scope
+      @course.reload
+
+      @assignment.update!(only_visible_to_overrides: false)
+      expect(@assignment.participants(by_date: true)).not_to include(@student1)
     end
 
     it 'excludes students without visibility' do
