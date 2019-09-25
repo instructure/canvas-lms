@@ -22,21 +22,14 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import {View} from '@instructure/ui-layout'
-import Dialog from '@instructure/ui-a11y/lib/components/Dialog'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import IconArrowStart from '@instructure/ui-icons/lib/Solid/IconArrowStart'
-import IconEdit from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconX from '@instructure/ui-icons/lib/Solid/IconX'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {Dialog, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Heading, Text} from '@instructure/ui-elements'
+import {IconArrowStartSolid, IconEditLine, IconTrashLine, IconXSolid} from '@instructure/ui-icons'
+import {Select, TextInput} from '@instructure/ui-forms'
+import {Tray} from '@instructure/ui-overlays'
 
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import actions from '../actions'
@@ -298,9 +291,9 @@ export default class RoleTray extends Component {
       buttonRef={c => (this.closeButton = c)}
     >
       {this.state.editTrayVisable ? (
-        <IconArrowStart title={I18n.t('Back')} />
+        <IconArrowStartSolid title={I18n.t('Back')} />
       ) : (
-        <IconX title={I18n.t('Close')} />
+        <IconXSolid title={I18n.t('Close')} />
       )}
     </Button>
   )
@@ -352,7 +345,7 @@ export default class RoleTray extends Component {
       buttonRef={c => (this.editButton = c)}
     >
       <Text color="brand">
-        <IconEdit title={I18n.t('Edit')} />
+        <IconEditLine title={I18n.t('Edit')} />
       </Text>
     </Button>
   )
@@ -366,7 +359,7 @@ export default class RoleTray extends Component {
       buttonRef={c => (this.deleteButton = c)}
     >
       <Text color="brand">
-        <IconTrash title={I18n.t('Delete')} />
+        <IconTrashLine title={I18n.t('Delete')} />
       </Text>
     </Button>
   )

@@ -53,9 +53,11 @@ class DueDateCacher
     self.executing_users ||= []
     self.executing_users.push(user)
 
-    result = yield
-
-    self.executing_users.pop
+    begin
+      result = yield
+    ensure
+      self.executing_users.pop
+    end
     result
   end
 

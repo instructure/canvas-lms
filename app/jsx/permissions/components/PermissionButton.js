@@ -20,17 +20,10 @@ import I18n from 'i18n!permission_button'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconPublish from '@instructure/ui-icons/lib/Solid/IconPublish'
-import IconTrouble from '@instructure/ui-icons/lib/Line/IconTrouble'
-import IconLock from '@instructure/ui-icons/lib/Solid/IconLock'
-import View from '@instructure/ui-layout/lib/components/View'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
+import {Text} from '@instructure/ui-elements'
+import {IconPublishSolid, IconTroubleLine, IconLockSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-layout'
+import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -134,11 +127,11 @@ export default class PermissionButton extends Component {
       >
         {this.props.permission.enabled ? (
           <Text color="success">
-            <IconPublish size="x-small" />
+            <IconPublishSolid size="x-small" />
           </Text>
         ) : (
           <Text color="error">
-            <IconTrouble size="x-small" />
+            <IconTroubleLine size="x-small" />
           </Text>
         )}
       </button>
@@ -290,7 +283,7 @@ export default class PermissionButton extends Component {
           }
         >
           <Text color="primary">
-            <IconLock />
+            <IconLockSolid />
           </Text>
         </div>
       </div>

@@ -33,7 +33,7 @@ pipeline {
   // Todo: This will run all contract tests consecutively, still need to get parallel depending on runtime
   stages {
     stage ('Contract Tests') {
-      agent { label 'docker' }
+      agent { label 'canvas-docker' }
       steps {
         timeout(time: 60) {
           sh 'printenv | sort'

@@ -31,6 +31,8 @@ import CommentTextArea from '../CommentsTab/CommentTextArea'
 import CommentsTab from '../CommentsTab'
 import * as uploadFileModule from '../../../../shared/upload_file'
 
+jest.setTimeout(10000)
+
 describe('CommentTextArea', () => {
   beforeAll(() => {
     window.URL.createObjectURL = jest.fn()
@@ -227,12 +229,12 @@ describe('CommentTextArea', () => {
     const mockedComments = mockComments()
     mockedComments.attachments = mockMultipleAttachments()
     const basicMock = commentGraphqlMock(mockedComments)
-    const {container, getByPlaceholderText, getByText} = render(
+    const {container, findByPlaceholderText, findByText} = render(
       <MockedProvider mocks={basicMock} addTypename>
         <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
       </MockedProvider>
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await findByPlaceholderText('Submit a Comment')
     const fileInput = await waitForElement(() =>
       container.querySelector('input[id="attachmentFile"]')
     )
@@ -244,10 +246,10 @@ describe('CommentTextArea', () => {
     uploadFiles(fileInput, [file1, file2, file3])
 
     fireEvent.change(textArea, {target: {value: 'lion'}})
-    fireEvent.click(getByText('Send Comment'))
+    fireEvent.click(await findByText('Send Comment'))
 
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
-    expect(await waitForElement(() => getByText('Submission comment sent'))).toBeInTheDocument()
+    expect(await findByText('Submission comment sent')).toBeInTheDocument()
   })
 
   it('users cannot send submission comments with not files or text', async () => {

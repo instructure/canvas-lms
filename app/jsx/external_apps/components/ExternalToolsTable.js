@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import store from '../lib/ExternalAppsStore'
 import ExternalToolsTableRow from './ExternalToolsTableRow'
 import InfiniteScroll from './InfiniteScroll'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import splitAssetString from 'compiled/str/splitAssetString'
 

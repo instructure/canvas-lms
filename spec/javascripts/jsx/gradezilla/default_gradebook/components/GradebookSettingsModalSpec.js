@@ -47,8 +47,16 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   let setCoursePostPolicyPromise
   let getAssignmentPostPoliciesPromise
   let updateCourseSettingsPromise
+  let originalQunitTimeout
 
   suiteHooks.beforeEach(() => {
+    originalQunitTimeout = QUnit.config.testTimeout
+    /*
+     * The InstUI `Modal` component is taking a while to transition,
+     * so QUnit needs to wait a little longer before timing out.
+     */
+    QUnit.config.testTimeout = 10000
+
     $container = document.createElement('div')
     document.body.appendChild($container)
 
@@ -156,6 +164,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     return ensureModalIsClosed().then(() => {
       ReactDOM.unmountComponentAtNode($container)
       $container.remove()
+      QUnit.config.testTimeout = originalQunitTimeout
     })
   })
 
@@ -209,7 +218,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   function ensureModalIsClosed() {
     if (getModalElement()) {
       component.close()
-      return  waitForModalClosed()
+      return waitForModalClosed()
     } else {
       return Promise.resolve()
     }
@@ -597,8 +606,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   QUnit.module('when updating the course post policy', hooks => {
     hooks.beforeEach(() => {
       sandbox.spy(FlashAlert, 'showFlashAlert')
-      sandbox.spy(props.postPolicies, 'setCoursePostPolicy')
-      sandbox.spy(props.postPolicies, 'setAssignmentPostPolicies')
+      sinon.spy(props.postPolicies, 'setCoursePostPolicy')
+      sinon.spy(props.postPolicies, 'setAssignmentPostPolicies')
 
       return mountOpenLoadAndSelectTab('Grade Posting Policy').then(() => {
         getManuallyPostGradesOption().click()
@@ -607,7 +616,6 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
 
     hooks.afterEach(() => {
-      props.postPolicies.setCoursePostPolicy.restore()
       FlashAlert.destroyContainer()
     })
 

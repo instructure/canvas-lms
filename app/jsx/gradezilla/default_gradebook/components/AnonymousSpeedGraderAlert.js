@@ -19,12 +19,12 @@
 import React from 'react'
 import {func, string} from 'prop-types'
 import I18n from 'i18n!gradezilla'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Mask from '@instructure/ui-overlays/lib/components/Mask'
-import Overlay from '@instructure/ui-overlays/lib/components/Overlay'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Mask, Overlay} from '@instructure/ui-overlays'
+
+import {Text} from '@instructure/ui-elements'
 
 class AnonymousSpeedGraderAlert extends React.Component {
   static propTypes = {

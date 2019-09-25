@@ -40,6 +40,7 @@ import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
+import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
@@ -214,6 +215,33 @@ class RCEWrapper extends React.Component {
   contentInserted(element) {
     this.indicateEditor(element);
     this.checkImageLoadError(element);
+    this.sizeEditorForContent(element)
+  }
+
+  // make a attempt at sizing the editor so that the new content fits.
+  // works under the assumptions the body's box-sizing is not content-box
+  // and that the content is w/in a <p> whose margin is 12px top and bottom
+  // (which, in canvas, is set in app/stylesheets/components/_ic-typography.scss)
+  sizeEditorForContent(elem) {
+    let height
+    if (elem && elem.nodeType === 1) {
+      height = elem.clientHeight
+    }
+    if (height) {
+      const ifr = this.iframe
+      if (ifr) {
+        const editor_body_style = ifr.contentWindow.getComputedStyle(this.iframe.contentDocument.body)
+        const editor_ht = ifr.contentDocument.body.clientHeight -
+                          parseInt(editor_body_style['padding-top'], 10) -
+                          parseInt(editor_body_style['padding-bottom'], 10)
+
+        const para_margin_ht = 24
+        const reserve_ht = Math.ceil(height + para_margin_ht)
+        if (reserve_ht > editor_ht) {
+          this.onResize(null,  {deltaY: reserve_ht - editor_ht})
+        }
+      }
+    }
   }
 
   checkImageLoadError(element) {
@@ -256,8 +284,17 @@ class RCEWrapper extends React.Component {
     if (isImage(fileMetaProps.contentType)) {
       const image = new Image();
       image.src = fileMetaProps.domObject.preview
-      width = `${image.width}px`
-      height = `${image.height}px`
+      width = image.width
+      height = image.height
+      if (width > defaultImageSize && image.width > image.height) {
+        width = defaultImageSize
+        height = image.height * width / image.width
+      } else if (height > defaultImageSize && image.height > image.width) {
+        height = defaultImageSize
+        width = image.width * height / image.height
+      }
+      width = `${width}px`
+      height = `${height}px`
     } else {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
@@ -561,9 +598,12 @@ class RCEWrapper extends React.Component {
   }
 
   doAutoResize = (e) => {
-    const contentElm = this.iframe.contentDocument.documentElement
-    if (contentElm.scrollHeight > contentElm.clientHeight) {
-      this.onResize(e, {deltaY: contentElm.scrollHeight - contentElm.clientHeight})
+    const ifr = this.iframe
+    if (ifr) {
+      const contentElm = ifr.contentDocument.documentElement
+      if (contentElm.scrollHeight > contentElm.clientHeight) {
+        this.onResize(e, {deltaY: contentElm.scrollHeight - contentElm.clientHeight})
+      }
     }
   }
 

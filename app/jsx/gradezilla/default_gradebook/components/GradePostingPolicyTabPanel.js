@@ -18,11 +18,10 @@
 
 import React, {Component} from 'react'
 import {bool, func, shape} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {List, ListItem, Text} from '@instructure/ui-elements'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+
 import {showFlashAlert} from '../../../shared/FlashAlert'
 
 import I18n from 'i18n!gradezilla'

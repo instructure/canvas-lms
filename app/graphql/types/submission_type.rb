@@ -35,8 +35,8 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, 'legacy canvas id', method: :id, null: false
     global_id_field :id
 
     # NOTE: In most cases you shouldn't add new fields here, instead they should

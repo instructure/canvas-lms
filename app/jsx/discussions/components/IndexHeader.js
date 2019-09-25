@@ -26,16 +26,13 @@ import propTypes from '../propTypes'
 import React, {Component} from 'react'
 import select from '../../shared/select'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import DiscussionSettings from './DiscussionSettings'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import View from '@instructure/ui-layout/lib/components/View'
+import {FormField} from '@instructure/ui-form-field'
+import {Grid, GridCol, GridRow, View} from '@instructure/ui-layout'
+import {IconPlusLine, IconSearchLine} from '@instructure/ui-icons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-forms'
 
 const filters = {
   all: I18n.t('All'),
@@ -138,7 +135,7 @@ export default class IndexHeader extends Component {
                     variant="primary"
                     id="add_discussion"
                   >
-                    <IconPlus />
+                    <IconPlusLine />
                     <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
                     <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
                   </Button>

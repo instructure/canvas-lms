@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '../../../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../../shared/components/InstuiModal'
 import I18n from 'i18n!react_scheduler'
 import Actions from '../../../calendar/scheduler/actions'
 import preventDefault from 'compiled/fn/preventDefault'
@@ -84,7 +84,7 @@ export default class FindAppointment extends React.Component {
           onDismiss={() => this.setState({isModalOpen: false})}
           label={I18n.t('Select Course')}
         >
-          <ModalBody>
+          <Modal.Body>
             <div className="ic-Form-control">
               <select
                 onChange={e => this.selectCourse(e.target.value)}
@@ -96,10 +96,10 @@ export default class FindAppointment extends React.Component {
                 )}
               </select>
             </div>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button variant="primary" type="submit">{I18n.t('Submit')}</Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </div>
     )

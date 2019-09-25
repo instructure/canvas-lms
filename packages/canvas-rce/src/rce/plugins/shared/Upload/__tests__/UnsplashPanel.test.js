@@ -304,7 +304,8 @@ describe.skip('UnsplashPanel', () => { // TODO: get this to work in react 16.9
     })
     expect(fakeSetUnsplashData).toHaveBeenCalledWith({
       url: fakeResults.results[0].urls.link,
-      id: fakeResults.results[0].id
+      id: fakeResults.results[0].id,
+      alt: "selective focus photography brown cat lying over black cat"
     })
   })
 

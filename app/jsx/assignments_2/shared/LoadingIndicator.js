@@ -17,13 +17,13 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 function LoadingIndicator() {
   return (
     <View as="div" height="100%" width="100%" textAlign="center">
-      <Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
+      <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
     </View>
   )
 }

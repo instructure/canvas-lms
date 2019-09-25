@@ -18,20 +18,14 @@
 
 import React from 'react'
 import {string, func, shape, arrayOf} from 'prop-types'
-import IconGroupLine from '@instructure/ui-icons/lib/Line/IconGroup'
-import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconStudentViewLine from '@instructure/ui-icons/lib/Line/IconStudentView'
-
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
-import {GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {IconGroupLine, IconMoreLine, IconPlusLine, IconStudentViewLine} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {GridCol} from '@instructure/ui-layout'
+import {Menu, MenuItem} from '@instructure/ui-menu'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-forms'
 import CanvasSelect from 'jsx/shared/components/CanvasSelect'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-
 import I18n from 'i18n!account_course_user_search'
 import preventDefault from 'compiled/fn/preventDefault'
 import CreateOrUpdateUserModal from '../../shared/components/CreateOrUpdateUserModal'
@@ -108,8 +102,8 @@ function renderKabobMenu(accountId) {
     return (
       <Menu
         trigger={
-          <Button theme={{iconPlusTextMargin: '0'}}>
-            <IconMoreLine margin="0" title={I18n.t('More People Options')} />
+          <Button icon={IconMoreLine}>
+            <ScreenReaderContent>{I18n.t('More People Options')}</ScreenReaderContent>
           </Button>
         }
       >

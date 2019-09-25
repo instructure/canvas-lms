@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!authentication_providers'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
+import {FormField} from '@instructure/ui-form-field'
 
 export default function AuthTypePicker({onChange, authTypes}) {
   const [selectedAuthType, setSelectedAuthType] = useState('default')

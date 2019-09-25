@@ -172,6 +172,24 @@ module Interfaces::SubmissionInterface
     Loaders::IDLoader.for(Attachment).load_many(object.attachment_ids_for_version)
   end
 
+  field :body, String, null: true
+  def body
+    Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+      Loaders::AssociationLoader.for(Assignment, :context).load(assignment).then do
+        Loaders::ApiContentAttachmentLoader.for(assignment.context).load(object.body).then do |preloaded_attachments|
+          GraphQLHelpers::UserContent.process(
+            object.body,
+            context: assignment.context,
+            in_app: context[:in_app],
+            request: context[:request],
+            preloaded_attachments: preloaded_attachments,
+            user: current_user
+          )
+        end
+      end
+    end
+  end
+
   field :submission_draft, Types::SubmissionDraftType, null: true
   def submission_draft
     load_association(:submission_drafts).then do |drafts|

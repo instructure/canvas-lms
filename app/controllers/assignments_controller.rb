@@ -148,6 +148,28 @@ class AssignmentsController < ApplicationController
 
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
+        env = js_env({COURSE_ID: @context.id})
+        env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
+
+        if env[:SETTINGS][:filter_speed_grader_by_student_group]
+          eligible_categories = @context.group_categories.active
+          eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
+          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
+
+          selected_group_id = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+          # If this is a group assignment and we had previously filtered by a
+          # group that isn't part of this assignment's group set, behave as if
+          # no group is selected.
+          if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
+            env[:selected_student_group_id] = selected_group_id
+          end
+        end
+
+        @assignment_presenter = AssignmentPresenter.new(@assignment)
+        if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?
+          env[:speed_grader_url] = context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id)
+        end
+
         if @assignment.quiz?
           return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
         elsif @assignment.discussion_topic? &&
@@ -175,7 +197,6 @@ class AssignmentsController < ApplicationController
         end
         js_env({
           ASSIGNMENT_ID: @assignment.id,
-          COURSE_ID: @context.id,
           PREREQS: assignment_prereqs
         })
 
@@ -190,9 +211,8 @@ class AssignmentsController < ApplicationController
 
         # everything else here is only for the old assignment page and can be
         # deleted once the :assignments_2 feature flag is deleted
-        @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
+        @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.key?(:unlock_at) # removed to allow proper translation on show page
 
-        @assignment_presenter = AssignmentPresenter.new(@assignment)
         if can_read_submissions
           @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
         end
@@ -210,33 +230,13 @@ class AssignmentsController < ApplicationController
 
         @similarity_pledge = pledge_text
 
-        env = js_env({
+        js_env({
           EULA_URL: tool_eula_url,
           EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
           PERMISSIONS: permissions,
           ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
           SIMILARITY_PLEDGE: @similarity_pledge
         })
-
-        env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
-
-        if env[:SETTINGS][:filter_speed_grader_by_student_group]
-          eligible_categories = @context.group_categories.active
-          eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
-          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
-
-          selected_group_id = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
-          # If this is a group assignment and we had previously filtered by a
-          # group that isn't part of this assignment's group set, behave as if
-          # no group is selected.
-          if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
-            env[:selected_student_group_id] = selected_group_id
-          end
-        end
-
-        if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?
-          env[:speed_grader_url] = context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id)
-        end
 
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)

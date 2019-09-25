@@ -20,12 +20,11 @@ import React from 'react'
 import { object } from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryUnassessedAssignment'
 import _ from 'lodash'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import View from '@instructure/ui-layout/lib/components/View'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import { ListItem } from '@instructure/ui-elements/lib/components/List'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {View} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
+import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
+import {ListItem} from '@instructure/ui-elements'
 
 const UnassessedAssignment = ({ assignment }) => {
   const { id, url, submission_types, title } = assignment
@@ -39,7 +38,7 @@ const UnassessedAssignment = ({ assignment }) => {
             theme={{mediumPadding: '0', mediumHeight: 'normal'}}
             icon={
               _.includes(submission_types, 'online_quiz') ?
-              IconQuiz : IconAssignment
+              IconQuizLine : IconAssignmentLine
             }
           >
             {title} ({ I18n.t('Not yet assessed') })

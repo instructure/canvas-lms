@@ -69,9 +69,14 @@ describe("sidebarHandlers", () => {
     testHandler("fetchFolders", upload, "fetchFolders");
   });
 
-  it("ties images fetch images to store", () => {
-    testHandler("fetchImages", images, "fetchImages", {});
+  it("ties images fetch initial images to store", () => {
+    testHandler("fetchInitialImages", images, "fetchInitialImages");
   });
+
+  it("ties images fetch next images to store", () => {
+    testHandler("fetchNextImages", images, "fetchNextImages");
+  });
+
 
   it("ties upload preflight to store", () => {
     testHandler("startUpload", upload, "uploadPreflight", "images", {

@@ -17,12 +17,10 @@
  */
 
 import React, {PureComponent} from 'react'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
-import View from '@instructure/ui-layout/lib/components/View'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Heading, TruncateText} from '@instructure/ui-elements'
+import {Tray} from '@instructure/ui-overlays'
 import I18n from 'i18n!post_grades_tray'
 
 import Layout from './Layout'

@@ -18,9 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Alert} from '@instructure/ui-alerts'
+import {Link, Text} from '@instructure/ui-elements'
 
 const container = document.getElementById('content_notice_container')
 if (container && ENV.CONTENT_NOTICES.length > 0) {

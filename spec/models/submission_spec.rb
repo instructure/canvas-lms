@@ -910,6 +910,46 @@ describe Submission do
       end
     end
 
+    describe "posting of missing submissions" do
+      before(:once) do
+        @course.enable_feature!(:new_gradebook)
+        PostPolicy.enable_feature!
+        late_policy_factory(course: @course, missing: 50)
+      end
+
+      context "when the submission was not previously posted" do
+        context "for an automatically-posted assignment" do
+          it "posts a previously-unscored submission if deducting points for missing submissions" do
+            submission.update!(late_policy_status: :missing)
+            expect(submission.posted_at).not_to be nil
+          end
+
+          it "does not post the submission if missing submission deduction is not enabled" do
+            @course.late_policy.update!(missing_submission_deduction_enabled: false)
+            expect {
+              submission.update!(late_policy_status: :missing)
+            }.not_to change { submission.reload.posted_at }
+          end
+
+          it "does not update the posted-at date of an already-posted submission" do
+            @assignment.post_submissions
+
+            expect {
+              submission.update!(late_policy_status: :missing)
+            }.not_to change { submission.reload.posted_at }
+          end
+        end
+
+        it "does not post submissions if the assignment is manually posted" do
+          @assignment.post_policy.update!(post_manually: true)
+
+          expect {
+            submission.update!(late_policy_status: :missing)
+          }.not_to change { submission.reload.posted_at }
+        end
+      end
+    end
+
     it "does not change the score of a missing submission if it already has one" do
       Timecop.freeze(1.day.from_now(@date)) do
         @assignment.grade_student(@student, grade: 1000, grader: @teacher)
@@ -1301,92 +1341,73 @@ describe Submission do
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
 
-  it "should log submissions with grade changes" do
-    submission_spec_model
+  describe "#grade_change_audit" do
+    let_once(:submission) { @assignment.submissions.find_by(user: @student) }
 
-    expect(Auditors::GradeChange).to receive(:record).once
-
-    @submission.score = 5
-    @submission.save!
-
-    @submission.grader_id = @user.id
-    @submission.save!
-  end
-
-  it "grade change event author can be set" do
-    submission_spec_model
-    assistant = User.create!
-    @course.enroll_ta(assistant, enrollment_state: "active")
-
-    expect(Auditors::GradeChange).to receive(:record).once do |submission|
-      expect(submission.grader_id).to eq assistant.id
+    it "should log submissions with grade changes" do
+      expect(Auditors::GradeChange).to receive(:record).once
+      submission.update!(grader: @teacher, score: 5)
     end
 
-    @submission.grade_change_event_author_id = assistant.id
-    @submission.score = 5
-    @submission.save!
-  end
+    it "grade change event author can be set" do
+      assistant = User.create!
+      @course.enroll_ta(assistant, enrollment_state: "active")
 
-  it "uses the existing grader_id as the author if grade_change_event_author_id is not set" do
-    submission_spec_model
-    @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      expect(Auditors::GradeChange).to receive(:record).once do |args|
+        expect(args[:submission].grader_id).to eq assistant.id
+      end
 
-    expect(Auditors::GradeChange).to receive(:record).once do |submission|
-      expect(submission.grader_id).to eq @teacher.id
+      submission.grade_change_event_author_id = assistant.id
+      submission.update!(score: 5)
     end
 
-    @submission.score = 5
-    @submission.save!
-  end
+    it "uses the existing grader_id as the author if grade_change_event_author_id is not set" do
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
 
-  it "should log excused submissions" do
-    submission_spec_model
+      expect(Auditors::GradeChange).to receive(:record).once do |args|
+        expect(args[:submission].grader_id).to eq @teacher.id
+      end
 
-    expect(Auditors::GradeChange).to receive(:record).once
+      submission.reload.update!(score: 5)
+    end
 
-    @submission.excused = true
-    @submission.save!
+    it "should log excused submissions" do
+      expect(Auditors::GradeChange).to receive(:record).once
+      submission.update!(excused: true, grader: @user)
+    end
 
-    @submission.grader_id = @user.id
-    @submission.save!
-  end
+    it "should log just one submission affected by assignment update" do
+      expect(Auditors::GradeChange).to receive(:record).twice
+      # only graded submissions are updated by assignment
+      submission.update!(score: 111, workflow_state: 'graded')
+      @assignment.update!(points_possible: 999)
+    end
 
-  it "should log submissions affected by assignment update" do
-    submission_spec_model
+    it "should not log ungraded submission change when assignment muted" do
+      expect(Auditors::GradeChange).to receive(:record).never
+      @assignment.mute!
+      @assignment.unmute!
+    end
 
-    expect(Auditors::GradeChange).to receive(:record).twice
+    it "inserts a grade change audit record by default" do
+      expect(Auditors::GradeChange::Stream).to receive(:insert).once
+      submission.grade_change_audit(force_audit: true)
+    end
 
-    # only graded submissions are updated by assignment
-    @submission.score = 111
-    @submission.workflow_state = 'graded'
-    @submission.save!
+    it "does not insert a grade change audit record if skip_insert is true" do
+      expect(Auditors::GradeChange::Stream).not_to receive(:insert)
+      submission.grade_change_audit(force_audit: true, skip_insert: true)
+    end
 
-    @assignment.points_possible = 999
-    @assignment.save!
-  end
+    it "emits a grade change live event when skip_insert is false" do
+      expect(Canvas::LiveEvents).to receive(:grade_changed).once
+      submission.grade_change_audit(force_audit: true, skip_insert: false)
+    end
 
-  it "should log graded submission change when assignment muted" do
-    submission_spec_model(submit_homework: true)
-    @submission.grade_it!
-
-    expect(Auditors::GradeChange).to receive(:record)
-    @assignment.mute!
-  end
-
-  it "should log graded submission change when assignment unmuted" do
-    @assignment.mute!
-    submission_spec_model(submit_homework: true)
-    @submission.grade_it!
-
-    expect(Auditors::GradeChange).to receive(:record)
-    @assignment.unmute!
-  end
-
-  it "should not log ungraded submission change when assignment muted" do
-    submission_spec_model
-    expect(Auditors::GradeChange).to receive(:record).never
-    @assignment.mute!
-    @assignment.unmute!
+    it "emits a grade change live event when skip_insert is true" do
+      expect(Canvas::LiveEvents).to receive(:grade_changed).once
+      submission.grade_change_audit(force_audit: true, skip_insert: true)
+    end
   end
 
   context "#graded_anonymously" do
@@ -1513,39 +1534,76 @@ describe Submission do
         expect(submission.messages_sent.keys).to eq ['Group Assignment Submitted Late']
       end
 
-      context "Assignment Unmuted" do
+      context "Submission Posted" do
         let(:submission) { @assignment.submissions.find_by!(user: @student) }
+        let(:submission_posted_messages) do
+          Message.where(
+            communication_channel: @student.email_channel,
+            notification: @submission_posted_notification
+          )
+        end
 
         before(:once) do
-          @assignment_unmuted_notification = Notification.create!(name: "Assignment Unmuted")
+          @submission_posted_notification = Notification.find_or_create_by(
+            category: "Grading",
+            name: "Submission Posted"
+          )
           @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
           @student.update!(email: "fakeemail@example.com")
           @student.email_channel.update!(workflow_state: :active)
         end
 
-        it "sends a notification when a submission is posted and assignment posts manually" do
-          @assignment.ensure_post_policy(post_manually: true)
-
-          expect {
-            @assignment.post_submissions(submission_ids: [submission.id])
-          }.to change {
-            DelayedMessage.where(
-              communication_channel: @student.email_channel,
-              notification: @assignment_unmuted_notification
-            ).count
-          }.by(1)
+        it "does not send a notification when a submission is not being posted" do
+          expect { submission.update!(body: "hello") }.not_to change { submission_posted_messages.count }
         end
 
-        it "does not send a notification when a submission is posted and assignment posts automatically" do
-          expect {
-            @assignment.grade_student(@student, grader: @teacher, score: 10)
-          }.not_to change {
-            DelayedMessage.where(
-              communication_channel: @student.email_channel,
-              notification: @assignment_unmuted_notification
-            ).count
-          }
+        context "when grade_posting_in_progress is true" do
+          before(:each) do
+            submission.grade_posting_in_progress = true
+          end
+
+          it "sends a notification when a submission is posted and assignment posts manually" do
+            @assignment.ensure_post_policy(post_manually: true)
+
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.to change {
+              submission_posted_messages.count
+            }.by(1)
+          end
+
+          it "sends a notification when a submission is posted and assignment posts automatically" do
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.to change {
+              submission_posted_messages.count
+            }.by(1)
+          end
+        end
+
+        context "when grade_posting_in_progress is false" do
+          before(:each) do
+            submission.grade_posting_in_progress = false
+          end
+
+          it "does not send a notification when a submission is posted and assignment posts manually" do
+            @assignment.ensure_post_policy(post_manually: true)
+
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.not_to change {
+              submission_posted_messages.count
+            }
+          end
+
+          it "does not send a notification when a submission is posted and assignment posts automatically" do
+            expect {
+              submission.update!(posted_at: Time.zone.now)
+            }.not_to change {
+              submission_posted_messages.count
+            }
+          end
         end
       end
     end

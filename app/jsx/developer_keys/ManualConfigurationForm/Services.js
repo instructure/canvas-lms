@@ -19,12 +19,11 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { Alert } from '@instructure/ui-alerts'
-import View from '@instructure/ui-layout/lib/components/View'
-import { CheckboxGroup } from '@instructure/ui-forms'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import { ToggleDetails } from '@instructure/ui-toggle-details';
+import {Alert} from '@instructure/ui-alerts'
+import {View} from '@instructure/ui-layout'
+import {CheckboxGroup, Checkbox} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class Services extends React.Component {
   constructor (props) {

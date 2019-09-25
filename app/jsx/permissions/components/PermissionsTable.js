@@ -24,10 +24,10 @@ import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import 'compiled/jquery.rails_flash_notifications'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-elements'
+import {Tooltip} from '@instructure/ui-overlays'
+import {View} from '@instructure/ui-layout'
 
 import actions from '../actions'
 import {ConnectedPermissionButton} from './PermissionButton'

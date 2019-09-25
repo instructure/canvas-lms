@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {func, number} from 'prop-types'
-import Pagination, {PaginationButton} from '@instructure/ui-pagination/lib/components/Pagination'
+import {Pagination, PaginationButton} from '@instructure/ui-pagination'
 import I18n from 'i18n!assignment_grade_summary'
 
 export default class PageNavigation extends Component {

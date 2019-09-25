@@ -500,17 +500,6 @@ describe("Upload data actions", () => {
         Bridge.existingContentToLink.restore();
         Bridge.existingContentToLinkIsImg.restore();
       });
-
-      it("embed image on image type and image selected", () => {
-        sinon.stub(Bridge, "existingContentToLink").callsFake(() => true);
-        sinon.stub(Bridge, "existingContentToLinkIsImg").callsFake(() => true);
-        actions.embedUploadResult({ "content-type": "image/png" }, "images");
-        sinon.assert.calledWithMatch(Bridge.insertImage, {
-          "content-type": "image/png"
-        });
-        Bridge.existingContentToLink.restore();
-        Bridge.existingContentToLinkIsImg.restore();
-      });
     });
   });
 

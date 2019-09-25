@@ -27,10 +27,11 @@ export const CREATE_SUBMISSION = gql`
     $assignmentLid: ID!
     $submissionID: ID!
     $type: OnlineSubmissionType!
+    $body: String
     $fileIds: [ID!]
   ) {
     createSubmission(
-      input: {assignmentId: $assignmentLid, submissionType: $type, fileIds: $fileIds}
+      input: {assignmentId: $assignmentLid, submissionType: $type, body: $body, fileIds: $fileIds}
     ) {
       submission {
         ...Submission
@@ -81,4 +82,17 @@ export const CREATE_SUBMISSION_DRAFT = gql`
   }
   ${Error.fragment}
   ${SubmissionDraft.fragment}
+`
+
+export const MARK_SUBMISISON_COMMENT_READ = gql`
+  mutation MarkSubmissionCommentsRead($commentIds: [ID!]!, $submissionId: ID!) {
+    markSubmissionCommentsRead(
+      input: {submissionCommentIds: $commentIds, submissionId: $submissionId}
+    ) {
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
 `

@@ -18,7 +18,7 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
@@ -26,7 +26,7 @@ import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import {Submission} from '../graphqlData/Submission'
-import theme from '@instructure/ui-themes/lib/canvas/base'
+import theme from '@instructure/canvas-theme'
 
 export default class SubmissionManager extends Component {
   static propTypes = {
@@ -49,10 +49,17 @@ export default class SubmissionManager extends Component {
   }
 
   updateSubmissionDraftCache = (cache, mutationResult) => {
-    const {assignment} = cache.readQuery({
-      query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id}
-    })
+    const {assignment} = JSON.parse(
+      JSON.stringify(
+        cache.readQuery({
+          query: STUDENT_VIEW_QUERY,
+          variables: {
+            assignmentLid: this.props.assignment._id,
+            submissionID: this.props.submission.id
+          }
+        })
+      )
+    )
 
     const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
@@ -92,13 +99,12 @@ export default class SubmissionManager extends Component {
     })
   }
 
-  submitFileUpload = async submitMutation => {
+  submitToGraphql = async (submitMutation, submitVars) => {
     await submitMutation({
       variables: {
         assignmentLid: this.props.assignment._id,
         submissionID: this.props.submission.id,
-        type: 'online_upload', // TODO: update to enable different submission types
-        fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id)
+        ...submitVars
       }
     })
   }
@@ -114,15 +120,25 @@ export default class SubmissionManager extends Component {
         switch (type) {
           case 'online_upload':
             if (
-              this.props.submission.submissionDraft &&
               this.props.submission.submissionDraft.attachments &&
               this.props.submission.submissionDraft.attachments.length > 0
             ) {
-              return this.submitFileUpload(submitMutation)
+              this.submitToGraphql(submitMutation, {
+                type,
+                fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id)
+              })
             }
             break
           case 'online_text_entry':
-          // TODO: add the online text entry submission handler
+            if (
+              this.props.submission.submissionDraft.body &&
+              this.props.submission.submissionDraft.body.length > 0
+            ) {
+              this.submitToGraphql(submitMutation, {
+                type,
+                body: this.props.submission.submissionDraft.body
+              })
+            }
         }
       })
     )

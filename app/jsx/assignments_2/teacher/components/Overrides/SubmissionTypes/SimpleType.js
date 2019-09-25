@@ -20,11 +20,10 @@ import React from 'react'
 import {bool, string, element, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
+import {IconTrashLine} from '@instructure/ui-icons'
 
 export default class SimpleType extends React.Component {
   static propTypes = {
@@ -65,7 +64,7 @@ export default class SimpleType extends React.Component {
             </FlexItem>
             {this.props.readOnly ? null : (
               <FlexItem margin="0 0 0 small" grow textAlign="end">
-                <Button icon={IconTrash} onClick={this.onDelete}>
+                <Button icon={IconTrashLine} onClick={this.onDelete}>
                   <ScreenReaderContent>{I18n.t('Delete this submission type')}</ScreenReaderContent>
                 </Button>
               </FlexItem>

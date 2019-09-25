@@ -43,7 +43,7 @@ test('uploadFile posts form data instead of json if necessary', () => {
     name: 'fake',
     'attachment[context_code]': 'course_1'
   };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
 
   return uploadFile(url, data, file, fakeAjaxLib).then(() => {
     ok(postStub.calledWith(url, 'name=fake&attachment%5Bcontext_code%5D=course_1&no_redirect=true'),
@@ -71,7 +71,7 @@ test('uploadFile requests no_redirect in preflight even if not specified', () =>
 
   const url = `/api/v1/courses/1/files`;
   const data = { name: 'fake' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
 
   return uploadFile(url, data, file, fakeAjaxLib).then(() => {
     ok(postStub.calledWith(url, { name: "fake", no_redirect: true }),
@@ -103,7 +103,7 @@ test('uploadFile threads through in direct to S3 case', () => {
 
   const url = `/api/v1/courses/1/files`;
   const data = { name: 'fake' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
 
   return uploadFile(url, data, file, fakeAjaxLib).then(() => {
     ok(getStub.calledWith(successUrl), 'made request to success url');
@@ -141,7 +141,7 @@ test('uploadFile threads through in inst-fs case', () => {
 
   const url = `/api/v1/courses/1/files`;
   const data = { name: 'fake' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
 
   return uploadFile(url, data, file, fakeAjaxLib).then(() => {
     ok(getStub.calledWith(successUrl), 'made request to success url');
@@ -177,7 +177,7 @@ test('uploadFile threads through in local-storage case', () => {
 
   const url = `/api/v1/courses/1/files`;
   const data = { name: 'fake' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
 
   return uploadFile(url, data, file, fakeAjaxLib).then((response) => {
     equal(response.id, 1, 'passed response through');
@@ -194,7 +194,7 @@ test('completeUpload upacks embedded "attachments" wrapper if any', () => {
   postStub.resolves({ data: {} });
   const fakeAjaxLib = { post: postStub };
 
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
 
   return completeUpload(preflightResponse, file, { ajaxLib: fakeAjaxLib }).then(() => {
     ok(postStub.calledWith(upload_url, sinon.match.any, sinon.match.any),
@@ -208,7 +208,7 @@ test('completeUpload wires up progress callback if any', () => {
   const fakeAjaxLib = { post: postStub };
 
   const preflightResponse = { upload_url: 'http://uploadUrl' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
   const options = {
     ajaxLib: fakeAjaxLib,
     onProgress: sinon.spy()
@@ -242,7 +242,7 @@ test('completeUpload skips GET after inst-fs upload if options.ignoreResult', ()
   };
 
   const preflightResponse = { upload_url: 'http://uploadUrl' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
   const options = {
     ajaxLib: fakeAjaxLib,
     ignoreResult: true
@@ -274,7 +274,7 @@ test('completeUpload appends avatar include in GET after upload if options.inclu
   };
 
   const preflightResponse = { upload_url: 'http://uploadUrl' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
   const options = {
     ajaxLib: fakeAjaxLib,
     includeAvatar: true
@@ -302,7 +302,7 @@ test('completeUpload to S3 posts withCredentials false', () => {
     upload_url: 'http://uploadUrl',
     success_url: successUrl
   };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
   const options = { ajaxLib: fakeAjaxLib };
 
   return completeUpload(preflightResponse, file, options).then(() => {
@@ -324,7 +324,7 @@ test('completeUpload to non-S3 posts withCredentials true', () => {
   };
 
   const preflightResponse = { upload_url: 'http://uploadUrl' };
-  const file = sinon.stub();
+  const file = new File(["fake"], "fake.txt");
   const options = { ajaxLib: fakeAjaxLib };
 
   return completeUpload(preflightResponse, file, options).then(() => {
@@ -405,7 +405,8 @@ test('completeUpload waits on progress after upload POST if given both a progres
 test('uploadFile differentiates network failures during preflight', () => {
   const fakeAjaxLib = { post: sinon.stub() };
   fakeAjaxLib.post.rejects({ message: 'Network Error' }); // preflight attempt
-  return uploadFile('http://preflightUrl', {}, sinon.stub(), fakeAjaxLib)
+  const file = new File(["fake"], "fake.txt");
+  return uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
     .then(() => ok(false, 'preflight should fail'))
     .catch(({ message }) => ok(message.match(/failed to initiate the upload/), 'correct error message'));
 });
@@ -414,7 +415,8 @@ test('uploadFile differentiates network failures during POST to upload_url', () 
   const fakeAjaxLib = { post: sinon.stub() };
   fakeAjaxLib.post.onCall(0).resolves({ data: { upload_url: 'http://uploadUrl' } }); // preflight
   fakeAjaxLib.post.onCall(1).rejects({ message: 'Network Error' }); // upload attempt
-  return uploadFile('http://preflightUrl', {}, sinon.stub(), fakeAjaxLib)
+  const file = new File(["fake"], "fake.txt");
+  return uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
     .then(() => ok(false, 'upload should fail'))
     .catch(({ message }) => ok(message.match(/service may be down/), 'correct error message'));
 });
@@ -427,7 +429,8 @@ test('uploadFile differentiates network failures after upload', () => {
   }}); // preflight
   fakeAjaxLib.post.onCall(1).resolves({ data: {} }); // upload
   fakeAjaxLib.get.rejects({ message: 'Network Error' }); // success url attempt
-  return uploadFile('http://preflightUrl', {}, sinon.stub(), fakeAjaxLib)
+  const file = new File(["fake"], "fake.txt");
+  return uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
     .then(() => ok(false, 'finalization should fail'))
     .catch(({ message }) => ok(message.match(/failed to complete the upload/), 'correct error message'));
 });

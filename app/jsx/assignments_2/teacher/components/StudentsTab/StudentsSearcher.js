@@ -36,7 +36,7 @@ import {TeacherAssignmentShape} from '../../assignmentData'
 import StudentSearchQuery from './StudentSearchQuery'
 import StudentsTable from './StudentsTable'
 import Filters from './Filters'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
 const STUDENT_SEARCH_DELAY = 750
 const MIN_SEARCH_CHARS = 3

@@ -43,7 +43,8 @@
 */
 
 import React from 'react'
-import {func, node, string} from 'prop-types'
+import {func, node, string, oneOfType} from 'prop-types'
+import {compact, castArray, isEqual} from 'lodash'
 import I18n from 'i18n!app_shared_components'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
@@ -76,8 +77,8 @@ export default class CanvasSelect extends React.Component {
 
   static propTypes = {
     id: string,
-    label: string.isRequired,
-    value: string.isRequired,
+    label: oneOfType([node, func]).isRequired,
+    value: string,
     onChange: func.isRequired,
     children: node,
     noOptionsLabel: string // unselectable option to display when there are no options
@@ -102,7 +103,7 @@ export default class CanvasSelect extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.value !== prevProps.value) {
+    if (this.props.value !== prevProps.value || !isEqual(this.props.children, prevProps.children)) {
       const option = this.getOptionByFieldValue('value', this.props.value)
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
@@ -148,6 +149,8 @@ export default class CanvasSelect extends React.Component {
       // children is 1 child
       if (matchComponentTypes(children, [CanvasSelectOption])) {
         return this.renderOption(children)
+      } else if (matchComponentTypes(children, [CanvasSelectGroup])) {
+        return this.renderGroup(children)
       } else {
         return this.renderNoOptionsOption()
       }
@@ -191,6 +194,7 @@ export default class CanvasSelect extends React.Component {
 
   renderGroup(group) {
     const {id, label, ...otherProps} = group.props
+    const children = compact(castArray(group.props.children))
     return (
       <Select.Group
         data-testid={`Group:${label}`}
@@ -198,7 +202,7 @@ export default class CanvasSelect extends React.Component {
         key={group.key || id || ++this.backupKey}
         {...otherProps}
       >
-        {group.props.children.map(c => this.renderOption(c))}
+        {children.map(c => this.renderOption(c))}
       </Select.Group>
     )
   }
@@ -280,7 +284,7 @@ export default class CanvasSelect extends React.Component {
     return option ? option.props.children : ''
   }
 
-  getOptionByFieldValue(field, value, options = this.props.children) {
+  getOptionByFieldValue(field, value, options = castArray(this.props.children)) {
     if (!this.props.children) return null
 
     let foundOpt = null
@@ -293,8 +297,9 @@ export default class CanvasSelect extends React.Component {
           foundOpt = o
         }
       } else if (matchComponentTypes(o, [CanvasSelectGroup])) {
-        for (let j = 0; j < o.props.children.length; ++j) {
-          const o2 = o.props.children[j]
+        const groupOptions = castArray(o.props.children)
+        for (let j = 0; j < groupOptions.length; ++j) {
+          const o2 = groupOptions[j]
           if (o2.props[field] === value) {
             foundOpt = o2
             break

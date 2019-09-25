@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@instructure/ui-themes/lib/canvas'
+import '@instructure/canvas-theme'
 import React from 'react'
 import GenericErrorPage from '../GenericErrorPage'
 import {render, fireEvent} from '@testing-library/react'

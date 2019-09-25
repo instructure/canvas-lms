@@ -20,8 +20,9 @@ module Types
   class RubricType < ApplicationObjectType
     graphql_name 'Rubric'
 
+    implements Interfaces::LegacyIDInterface
+
     global_id_field :id
-    field :_id, ID, 'legacy canvas id', method: :id, null: false
     field :context_id, String, null: false
 
     field :criteria, [CriterionType], null: false

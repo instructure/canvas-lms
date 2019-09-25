@@ -16,31 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {arrayOf, bool, func, instanceOf, oneOfType, string} from 'prop-types'
+import React, {Suspense, useState} from 'react'
+import {arrayOf, bool, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
-import {FileDrop} from '@instructure/ui-forms'
+import {Checkbox, FileDrop} from '@instructure/ui-forms'
 import {Flex, View} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
+import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
 import translationShape from './translationShape'
+
+const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionCreator'))
 
 export default function ComputerPanel({
   accept,
   hasUploadedFile,
   label,
+  languages,
+  liveRegion,
   setFile,
   setHasUploadedFile,
   theFile,
-  uploadMediaTranslations
+  uploadMediaTranslations,
+  updateSubtitles
 }) {
+  const {
+    ADD_CLOSED_CAPTIONS_OR_SUBTITLES,
+    LOADING_MEDIA
+  } = uploadMediaTranslations.UploadMediaStrings
   const [messages, setMessages] = useState([])
+  const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
   if (hasUploadedFile) {
     const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
     return (
@@ -68,6 +79,24 @@ export default function ComputerPanel({
         <View as="div" height="100%" width="100%" textAlign="center">
           <VideoPlayer sources={sources} />
         </View>
+        <View display="block" padding="medium medium medium 0">
+          <Checkbox
+            onChange={event => setMediaTracksCheckbox(event.target.checked)}
+            checked={mediaTracksCheckbox}
+            label={ADD_CLOSED_CAPTIONS_OR_SUBTITLES}
+            value="mediaTracks"
+          />
+        </View>
+        {mediaTracksCheckbox && (
+          <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
+            <ClosedCaptionPanel
+              languages={languages}
+              liveRegion={liveRegion}
+              uploadMediaTranslations={uploadMediaTranslations}
+              updateSubtitles={updateSubtitles}
+            />
+          </Suspense>
+        )}
       </>
     )
   }
@@ -108,8 +137,16 @@ ComputerPanel.propTypes = {
   accept: oneOfType([string, arrayOf(string)]),
   hasUploadedFile: bool,
   label: string.isRequired,
+  languages: arrayOf(
+    shape({
+      id: string,
+      label: string
+    })
+  ),
+  liveRegion: func,
   setFile: func.isRequired,
   setHasUploadedFile: func.isRequired,
   theFile: instanceOf(File),
-  uploadMediaTranslations: translationShape
+  uploadMediaTranslations: translationShape,
+  updateSubtitles: func.isRequired
 }

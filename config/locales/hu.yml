@@ -9965,6 +9965,11 @@ hu:
         submitted_date: "beadva: %{date}"
       twitter: 
         body: "Canvas-figyelmeztetés - Kvíz beadva: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "Az Ön oktatója módosított a jegyén és megjegyzéseket írt ehhez: %{title}. Ezek a módosítások már elérhetőek."
+          link: "Itt megtekintheti"
     summaries: 
       email: 
         daily_body: "Feliratkozott arra, hogy napi jelentést kapjon néhány értesítésről a Canvas-fiókjáról. Lent található a jelentés %{date} dátumra:"
@@ -10110,6 +10115,7 @@ hu:
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "A moderált értékelés beállítás nem engedélyezhető társértékelt feladatoknál"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "A moderált értékelés beállítás nem engedélyezhető nem értékelendő feladatokhoz"
   moderator_49b9f2e1: Moderátor
+  modified_by_c1584b3c: Módosította
   module_90d9fd32: Modul
   module_completed_50c50762: "Modul teljesítve"
   module_filter_63b17d11: Modulszűrő
@@ -10349,6 +10355,7 @@ hu:
   no_placements_enabled_f705f28: "Nincsenek engedélyezett elhelyezések"
   no_points_possible_368669d: "Nincsenek elérhető pontok"
   no_points_possible_72db3a55: "Nincsenek elérhető pontok"
+  no_results_3cda4e72: "Nincsenek eredmények"
   no_results_f36777ee: "Nincsenek eredmények"
   no_results_found_58717065: "Nincs találat"
   no_results_found_e4b686bd: "Nincs találat."
@@ -16400,6 +16407,10 @@ hu:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Egyéni téma sikeresen alkalmazva."
   your_email_address_f881e583: "Az Ön e-mail címe"
   your_email_b5364bee: "Az Ön e-mailje"
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Az Ön oktatója módosított a jegyén és megjegyzéseket írt ehhez: %{title}. Ezek a módosítások már elérhetőek.
+      Itt tekintheti meg:
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Üzenetét elküldtük! Köszönjük!"
   your_message_was_sent_977f6583: "Üzenetét elküldtük!"
   your_name_7665e1d8: "Az Ön neve"

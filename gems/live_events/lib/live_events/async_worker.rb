@@ -31,7 +31,7 @@ module LiveEvents
   # queue for cases when the process is shutting down.
 
   class AsyncWorker
-    attr_reader :logger
+    attr_accessor :logger, :stream_client, :stream_name
 
     MAX_BYTE_THRESHOLD = 5_000_000
     KINESIS_RECORD_SIZE_LIMIT = 1_000_000
@@ -79,6 +79,7 @@ module LiveEvents
     end
 
     def start!
+      return if @running
       @thread = Thread.new { self.run_thread }
       @running = true
       at_exit { stop! }

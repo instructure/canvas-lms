@@ -1025,11 +1025,11 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       answer_comment: "",
       answer_weight: 0,
       numerical_answer_type: "exact_answer",
-      answer_exact: "",
-      answer_error_margin: "",
-      answer_range_start: "",
-      answer_range_end: "",
-      answer_approximate: "",
+      answer_exact: "0",
+      answer_error_margin: "0",
+      answer_range_start: "0",
+      answer_range_end: "0",
+      answer_approximate: "0",
       answer_precision: "10"
     }
   };

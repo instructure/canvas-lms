@@ -144,7 +144,13 @@ export default class KyleMenu {
     // generated menus. This rule will not be honored if the returnFocusTo
     // element becomes disabled.
     if (this.opts.returnFocusTo && !this.opts.returnFocusTo.prop('disabled')) {
-      this.opts.returnFocusTo.focus()
+      // Wait for one frame to see if anything else has claimed focus.
+      requestAnimationFrame(() => {
+        if (document.body === document.activeElement) {
+          // If focus still remains on the document body, return focus to the originating element.
+          this.opts.returnFocusTo.focus()
+        }
+      })
     }
   }
 

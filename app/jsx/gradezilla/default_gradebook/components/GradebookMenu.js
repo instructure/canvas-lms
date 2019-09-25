@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {oneOf, bool, string, func} from 'prop-types'
-import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu, {MenuItem, MenuItemSeparator} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Menu, MenuItem, MenuItemSeparator} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
 
 class GradebookMenu extends React.Component {

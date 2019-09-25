@@ -29,32 +29,29 @@ import cx from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import View from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-
-import IconAssignmentLine from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconBookmarkLine from '@instructure/ui-icons/lib/Line/IconBookmark'
-import IconBookmarkSolid from '@instructure/ui-icons/lib/Solid/IconBookmark'
-import IconCopySolid from '@instructure/ui-icons/lib/Solid/IconCopy'
-import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconDuplicate from '@instructure/ui-icons/lib/Line/IconDuplicate'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
-import IconLtiLine from '@instructure/ui-icons/lib/Line/IconLti'
-import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
-import IconPinLine from '@instructure/ui-icons/lib/Line/IconPin'
-import IconPinSolid from '@instructure/ui-icons/lib/Solid/IconPin'
-import IconPublishSolid from '@instructure/ui-icons/lib/Solid/IconPublish'
-import IconTrashSolid from '@instructure/ui-icons/lib/Solid/IconTrash'
-import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
-import IconUnpublishedLine from '@instructure/ui-icons/lib/Line/IconUnpublished'
-import IconUpdownLine from '@instructure/ui-icons/lib/Line/IconUpdown'
-import IconUser from '@instructure/ui-icons/lib/Line/IconUser'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
+import {Badge, Heading, Pill, Text} from '@instructure/ui-elements'
+import {View, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {
+  IconAssignmentLine,
+  IconBookmarkLine,
+  IconBookmarkSolid,
+  IconCopySolid,
+  IconDragHandleLine,
+  IconDuplicateLine,
+  IconLockLine,
+  IconLtiLine,
+  IconPeerReviewLine,
+  IconPinLine,
+  IconPinSolid,
+  IconPublishSolid,
+  IconTrashSolid,
+  IconUnlockLine,
+  IconUnpublishedLine,
+  IconUpdownLine,
+  IconUserLine
+} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {MenuItem} from '@instructure/ui-menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import LockIconView from 'compiled/views/LockIconView'
@@ -466,7 +463,7 @@ export class DiscussionRow extends Component {
       const screenReaderContent = this.props.discussion.locked
         ? I18n.t('Open discussion %{title} for comments', {title: discussionTitle})
         : I18n.t('Close discussion %{title} for comments', {title: discussionTitle})
-      const icon = this.props.discussion.locked ? <IconUnlock /> : <IconLock />
+      const icon = this.props.discussion.locked ? <IconUnlockLine /> : <IconLockLine />
       menuList.push(
         this.createMenuItem(
           'togglelocked',
@@ -519,20 +516,20 @@ export class DiscussionRow extends Component {
         this.createMenuItem(
           'sendTo',
           <span aria-hidden="true">
-            <IconUser />
+            <IconUserLine />
             &nbsp;&nbsp;{I18n.t('Send To...')}
           </span>,
-          I18n.t('Send {%title} to user', {title: discussionTitle})
+          I18n.t('Send %{title} to user', {title: discussionTitle})
         )
       )
       menuList.push(
         this.createMenuItem(
           'copyTo',
           <span aria-hidden="true">
-            <IconDuplicate />
+            <IconDuplicateLine />
             &nbsp;&nbsp;{I18n.t('Copy To...')}
           </span>,
-          I18n.t('Copy {%title} to course', {title: discussionTitle})
+          I18n.t('Copy %{title} to course', {title: discussionTitle})
         )
       )
     }

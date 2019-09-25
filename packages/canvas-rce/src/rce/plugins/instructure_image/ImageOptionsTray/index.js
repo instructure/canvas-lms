@@ -145,17 +145,17 @@ export default function ImageOptionsTray(props) {
     >
       <Flex direction="column" height="100vh">
         <Flex.Item as="header" padding="medium">
-        <Flex direction="row">
-          <Flex.Item>
+          <Flex direction="row">
+            <Flex.Item grow shrink>
+              <Heading as="h2">
+                {formatMessage('Image Options')}
+              </Heading>
+            </Flex.Item>
+
+            <Flex.Item>
               <CloseButton placemet="static" variant="icon" onClick={onRequestClose}>
                 {formatMessage('Close')}
               </CloseButton>
-            </Flex.Item>
-
-            <Flex.Item grow shrink>
-              <Heading as="h2" margin="none none none medium">
-                {formatMessage('Image Options')}
-              </Heading>
             </Flex.Item>
           </Flex>
         </Flex.Item>

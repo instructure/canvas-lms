@@ -61,19 +61,16 @@ class ExternalContentController < ApplicationController
     end
     @headers = false
 
-    if @domain_root_account.feature_enabled?(:assignments_2)
-      js_env({
-        content_items: @retrieved_data,
-        message: params[:lti_msg],
-        log: params[:lti_log],
-        error_message: params[:lti_errormsg],
-        error_log: params[:lti_errorlog]
-      })
-      render template: 'lti/ims/deep_linking/deep_linking_response'
-    else
-      js_env(retrieved_data: (@retrieved_data || {}), lti_response_messages: lti_response_messages,
-           service: params[:service], service_id: params[:id])
-    end
+    js_env({
+      retrieved_data: (@retrieved_data || {}),
+      lti_response_messages: lti_response_messages,
+      service: params[:service],
+      service_id: params[:id],
+      message: params[:lti_msg],
+      log: params[:lti_log],
+      error_message: params[:lti_errormsg],
+      error_log: params[:lti_errorlog]
+    })
   end
 
   def normalize_deprecated_data!

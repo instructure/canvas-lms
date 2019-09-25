@@ -108,7 +108,14 @@ function handleYoutubeLink () {
     $(".user_content.unenhanced:visible")
       .each(function() {
         var $this = $(this);
-        $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
+        $this.find("img").each((i, img) => {
+          const handleWidth = () => $(img).css('maxWidth', Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth));
+          if (img.naturalWidth === 0) {
+            img.addEventListener('load', handleWidth);
+          } else {
+            handleWidth();
+          }
+        })
         $this.data('unenhanced_content_html', $this.html());
       })
       .find(".enhanceable_content").show()

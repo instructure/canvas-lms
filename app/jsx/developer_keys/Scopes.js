@@ -20,16 +20,12 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Billboard} from '@instructure/ui-billboard'
+import {Checkbox, TextInput} from '@instructure/ui-forms'
+import {Grid, GridCol, GridRow, View} from '@instructure/ui-layout'
+import {IconWarningLine, IconSearchLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Spinner, Text} from '@instructure/ui-elements'
 
 import ScopesList from './ScopesList'
 
@@ -75,7 +71,7 @@ export default class Scopes extends React.Component {
                     dispatch={this.props.dispatch}
                   />
                 : <Billboard
-                    hero={<IconWarning />}
+                    hero={<IconWarningLine />}
                     size="large"
                     headingAs="h2"
                     headingLevel="h2"

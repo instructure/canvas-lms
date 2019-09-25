@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconPlusLine} from '@instructure/ui-icons'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'

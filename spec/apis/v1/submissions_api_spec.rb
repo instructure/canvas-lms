@@ -1778,8 +1778,7 @@ describe 'Submissions API', type: :request do
         expect(json.first['provisional_grades']).to_not be_empty
         speedgrader_url = URI.parse(json.first['provisional_grades'].first['speedgrader_url'])
         expect(speedgrader_url).to match_path("/courses/#{@course.id}/gradebook/speed_grader").
-          and_query({'assignment_id' => @assignment.id, 'student_id' => @student.id}).
-          and_fragment({"provisional_grade_id" => @provisional_grade.id})
+          and_query({assignment_id: @assignment.id, student_id: @student.id})
       end
 
       it "can include users" do
@@ -4739,7 +4738,7 @@ describe 'Submissions API', type: :request do
                 "grade_matches_current_submission"=>true,
                 "graded_anonymously"=>nil,
                 "final"=>false,
-                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@student1.id}#%7B%22provisional_grade_id%22:#{pg.id}%7D"}]},
+                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@student1.id}"}]},
            {"id"=>@student2.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
@@ -4762,8 +4761,7 @@ describe 'Submissions API', type: :request do
         anonymous_id = @assignment.submission_for_student(@student1).anonymous_id
         json = json.map { |el| el['provisional_grades'][0] }.compact
         expect(json[0]['speedgrader_url']).to match_path("http://www.example.com/courses/#{@course.id}/gradebook/speed_grader").
-          and_query({'assignment_id' => @assignment.id, 'anonymous_id' => anonymous_id}).
-          and_fragment({ 'provisional_grade_id' => pg.id })
+          and_query({assignment_id: @assignment.id, anonymous_id: anonymous_id})
         expect(json[0]['scorer_id']).to eq @ta.id
         expect(json[0]['anonymous_grader_id']).to be_nil
       end

@@ -349,7 +349,6 @@ module GroupsCommon
 
   def expand_files_on_content_pane
     wait_for_ajaximations
-    skip("CORE-2714 figure out why the files tab shows up as disabled on the rcs sidebar in jenkins")
     fj('[role="tablist"] [role="presentation"]:not([aria-disabled]):contains("Files")').click
     wait_for_ajaximations
   end

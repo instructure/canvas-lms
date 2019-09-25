@@ -19,8 +19,7 @@
 import React from 'react'
 import { mount } from 'enzyme'
 
-import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconEyeLine from '@instructure/ui-icons/lib/Line/IconEye'
+import {IconEditLine, IconEyeLine} from '@instructure/ui-icons'
 
 import ActionButtons from '../ActionButtons'
 

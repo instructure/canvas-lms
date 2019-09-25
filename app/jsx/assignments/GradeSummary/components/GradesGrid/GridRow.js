@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 import GradeIndicator from './GradeIndicator'

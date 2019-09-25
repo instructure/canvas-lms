@@ -19,11 +19,10 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, bool, shape, string} from 'prop-types'
-import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Grid, GridRow, GridCol, View} from '@instructure/ui-layout'
+import {Heading, Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+
 import I18n from 'i18n!assignment_grade_summary'
 
 import * as GradeActions from '../../grades/GradeActions'

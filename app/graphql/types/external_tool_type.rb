@@ -53,8 +53,7 @@ module Types
 
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
-
-    field :_id, ID, 'legacy canvas id', null: false, method: :id
+    implements Interfaces::LegacyIDInterface
 
     field :url, Types::UrlType, null: true
     def url

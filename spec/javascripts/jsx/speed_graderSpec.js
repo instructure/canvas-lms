@@ -2715,15 +2715,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         strictEqual(setOrUpdateSubmission.callCount, 1)
       })
 
-      test('afterUpdateSubmissions calls showGrade', () => {
-        strictEqual(showGrade.callCount, 1)
-      })
-
-      test('afterUpdateSubmissions calls renders SpeedGraderPostGradesMenu', () => {
+      test('updateSubmissions re-renders SpeedGraderPostGradesMenu', () => {
         const callCount = render.getCalls().filter(call =>
           call.args[0].type.name === 'SpeedGraderPostGradesMenu'
         ).length
         strictEqual(callCount, 1)
+      })
+
+      test('afterUpdateSubmissions calls showGrade', () => {
+        strictEqual(showGrade.callCount, 1)
       })
     })
 
@@ -3204,76 +3204,93 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
   })
 
   QUnit.module('Anonymous Assignments', anonymousHooks => {
-    const assignment = {anonymize_students: true}
-    const originalJsonData = window.jsonData
-    const alpha = {anonymous_id: '00000'}
-    const omega = {anonymous_id: 'zzzzz'}
-    const alphaStudent = {
-      ...alpha,
-      submission_history: [],
-      rubric_assessments: []
-    }
-    const omegaStudent = {...omega}
-    const studentAnonymousIds = [alphaStudent.anonymous_id, omegaStudent.anonymous_id]
-    const sortedPair = [alphaStudent, omegaStudent]
-    const unsortedPair = [omegaStudent, alphaStudent]
-    const alphaEnrollment = {...alpha, course_section_id: '1'}
-    const omegaEnrollment = {...omega, course_section_id: '1'}
-    const alphaSubmissionComment = {
-      created_at: new Date().toISOString(),
-      publishable: false,
-      comment: 'a comment',
-      ...alpha
-    }
-    const omegaSubmissionComment = {
-      created_at: new Date().toISOString(),
-      publishable: false,
-      comment: 'another comment',
-      ...omega
-    }
-    const alphaSubmission = {
-      ...alpha,
-      grade_matches_current_submission: true,
-      workflow_state: 'graded',
-      submitted_at: new Date().toISOString(),
-      posted_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      score: 10,
-      grade: 'A',
-      assignment_id: '456',
-      versioned_attachments: [
-        {
-          attachment: {
-            id: 1,
-            display_name: 'submission.txt'
-          }
-        }
-      ],
-      submission_comments: [alphaSubmissionComment, omegaSubmissionComment]
-    }
-    alphaSubmission.submission_history = [{...alphaSubmission}]
-    const omegaSubmission = {
-      ...alphaSubmission,
-      ...omega,
-      workflow_state: 'submitted',
-      score: null,
-      grade: null
-    }
-    omegaSubmission.submission_history = [{...omegaSubmission}]
-    const windowJsonData = {
-      ...assignment,
-      context_id: '123',
-      context: {
-        students: sortedPair,
-        enrollments: [alphaEnrollment, omegaEnrollment],
-        active_course_sections: [],
-        rep_for_student: {}
-      },
-      submissions: [alphaSubmission, omegaSubmission],
-      gradingPeriods: []
-    }
+    let assignment
+    let originalJsonData
+    let alpha
+    let omega
+    let alphaStudent
+    let omegaStudent
+    let studentAnonymousIds
+    let sortedPair
+    let unsortedPair
+    let alphaEnrollment
+    let omegaEnrollment
+    let alphaSubmissionComment
+    let omegaSubmissionComment
+    let alphaSubmission
+    let omegaSubmission
+    let windowJsonData
 
     anonymousHooks.beforeEach(() => {
+      assignment = {anonymize_students: true}
+      originalJsonData = window.jsonData
+      alpha = {anonymous_id: '00000'}
+      omega = {anonymous_id: 'zzzzz'}
+      alphaStudent = {
+        ...alpha,
+        submission_history: [],
+        rubric_assessments: []
+      }
+      omegaStudent = {...omega}
+      studentAnonymousIds = [alphaStudent.anonymous_id, omegaStudent.anonymous_id]
+      sortedPair = [alphaStudent, omegaStudent]
+      unsortedPair = [omegaStudent, alphaStudent]
+      alphaEnrollment = {...alpha, course_section_id: '1'}
+      omegaEnrollment = {...omega, course_section_id: '1'}
+      alphaSubmissionComment = {
+        created_at: new Date().toISOString(),
+        publishable: false,
+        comment: 'a comment',
+        ...alpha
+      }
+      omegaSubmissionComment = {
+        created_at: new Date().toISOString(),
+        publishable: false,
+        comment: 'another comment',
+        ...omega
+      }
+      alphaSubmission = {
+        ...alpha,
+        grade_matches_current_submission: true,
+        workflow_state: 'graded',
+        submitted_at: new Date().toISOString(),
+        posted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        score: 10,
+        grade: 'A',
+        assignment_id: '456',
+        versioned_attachments: [
+          {
+            attachment: {
+              id: 1,
+              display_name: 'submission.txt'
+            }
+          }
+        ],
+        submission_comments: [alphaSubmissionComment, omegaSubmissionComment]
+      }
+      alphaSubmission.submission_history = [{...alphaSubmission}]
+      omegaSubmission = {
+        ...alphaSubmission,
+        ...omega,
+        workflow_state: 'submitted',
+        score: null,
+        grade: null
+      }
+      omegaSubmission.submission_history = [{...omegaSubmission}]
+      windowJsonData = {
+        ...assignment,
+        context_id: '123',
+        context: {
+          students: sortedPair,
+          enrollments: [alphaEnrollment, omegaEnrollment],
+          active_course_sections: [],
+          rep_for_student: {}
+        },
+        submissions: [alphaSubmission, omegaSubmission],
+        gradingPeriods: []
+      }
+
       fakeENV.setup({...window.ENV, force_anonymous_grading: true})
       window.jsonData = windowJsonData
     })
@@ -3726,8 +3743,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           })
 
           test('passes the allowHidingGrades prop as false if no submissions are posted', () => {
-            const alphaSubmissionPostedAt = alphaSubmission.posted_at
-            const omegaSubmissionPostedAt = omegaSubmission.posted_at
             alphaSubmission.posted_at = null
             omegaSubmission.posted_at = null
 
@@ -3735,21 +3750,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
 
             const [SpeedGraderPostGradesMenu] = findRenderCall()
             strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGrades, false)
-
-            alphaSubmission.posted_at = alphaSubmissionPostedAt
-            omegaSubmission.posted_at = omegaSubmissionPostedAt
           })
 
           test('passes the allowPostingGrades prop as true if any submissions are unposted', () => {
-            const alphaSubmissionPostedAt = alphaSubmission.posted_at
             alphaSubmission.posted_at = null
 
             SpeedGrader.EG.jsonReady()
 
             const [SpeedGraderPostGradesMenu] = findRenderCall()
             strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGrades, true)
-
-            alphaSubmission.posted_at = alphaSubmissionPostedAt
           })
 
           test('passes the allowPostingGrades prop as false if all submissions are posted', () => {
@@ -3766,12 +3775,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           })
 
           test('passes the hasGrades prop as false if no submissions are graded', () => {
-            const alphaSubmissionScore = alphaSubmission.score
             alphaSubmission.score = null
             SpeedGrader.EG.jsonReady()
             const [SpeedGraderPostGradesMenu] = findRenderCall()
             strictEqual(SpeedGraderPostGradesMenu.props.hasGrades, false)
-            alphaSubmission.score = alphaSubmissionScore
           })
         })
 
@@ -4195,6 +4202,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
     })
 
     QUnit.module('#setOrUpdateSubmission', hooks => {
+      function getPostOrHideGradesButton() {
+        return document.querySelector('#speed_grader_post_grades_menu_mount_point button[title="Post or Hide Grades"]')
+      }
+
       hooks.beforeEach(() => {
         fakeENV.setup({
           ...ENV,
@@ -4221,6 +4232,44 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       test('fetches student via anonymous_id', () => {
         const {submission} = SpeedGrader.EG.setOrUpdateSubmission(alphaSubmission)
         deepEqual(submission, alphaSubmission)
+      })
+
+      QUnit.module('when ENV.post_policies_enabled is true', postPolicyHooks => {
+        function getPostGradesMenuItem() {
+          getPostOrHideGradesButton().click()
+
+          const $trigger = getPostOrHideGradesButton()
+          const $menuContent = document.querySelector(`[aria-labelledby="${$trigger.id}"]`)
+          return $menuContent.querySelector('[role="menuitem"][name="postGrades"]')
+        }
+
+        postPolicyHooks.beforeEach(() => {
+          ENV.post_policies_enabled = true
+        })
+
+        postPolicyHooks.afterEach(() => {
+          delete ENV.post_policies_enabled
+        })
+
+        test('renders the post/hide grades menu if the updated submission matches an existing one', () => {
+          SpeedGrader.EG.setOrUpdateSubmission({anonymous_id: alphaStudent.anonymous_id, posted_at: new Date().toISOString()})
+          strictEqual(getPostGradesMenuItem().textContent, 'All Grades Posted')
+        })
+
+        test('updates the menu items based on the state of loaded submissions', () => {
+          SpeedGrader.EG.setOrUpdateSubmission({anonymous_id: alphaStudent.anonymous_id, posted_at: null})
+          strictEqual(getPostGradesMenuItem().textContent, 'Post Grades')
+        })
+
+        test('does not render the post/hide grades menu if the updated submission does not find a match', () => {
+          SpeedGrader.EG.setOrUpdateSubmission({anonymous_id: 'aahhh', posted_at: new Date().toISOString()})
+          notOk(getPostOrHideGradesButton())
+        })
+      })
+
+      test('does not attempt to render a hypothetical post/hide grades menu if post policies is not enabled', () => {
+        SpeedGrader.EG.setOrUpdateSubmission({user_id: alphaStudent.id, posted_at: new Date().toISOString()})
+        notOk(getPostOrHideGradesButton())
       })
     })
 
@@ -4651,11 +4700,14 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
     })
 
     QUnit.module('#renderSubmissionPreview', hooks => { /* eslint-disable-line qunit/no-identical-names */
-      const {context_id: course_id} = windowJsonData
-      const {assignment_id} = alphaSubmission
-      const {anonymous_id} = alphaStudent
+      let anonymousId
+      let assignmentId
+      let courseId
 
       hooks.beforeEach(() => {
+        anonymousId = alphaStudent.anonymous_id
+        assignmentId = alphaSubmission.assignment_id
+        courseId = windowJsonData.context_id
         fakeENV.setup({
           ...ENV,
           assignment_id: '17',
@@ -4685,17 +4737,20 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
         const {pathname, search} = new URL(iframeSrc, 'https://someUrl/')
         strictEqual(
           `${pathname}${search}`,
-          `/courses/${course_id}/assignments/${assignment_id}/anonymous_submissions/${anonymous_id}?preview=true&hide_student_name=1`
+          `/courses/${courseId}/assignments/${assignmentId}/anonymous_submissions/${anonymousId}?preview=true&hide_student_name=1`
         )
       })
     })
 
     QUnit.module('#attachmentIframeContents', hooks => {
-      const {context_id: course_id} = windowJsonData
-      const {assignment_id} = alphaSubmission
-      const {anonymous_id} = alphaStudent
+      let anonymousId
+      let assignmentId
+      let courseId
 
       hooks.beforeEach(() => {
+        anonymousId = alphaStudent.anonymous_id
+        assignmentId = alphaSubmission.assignment_id
+        courseId = windowJsonData.context_id
         fakeENV.setup({
           ...ENV,
           assignment_id: '17',
@@ -4709,7 +4764,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           <div id="submission_file_hidden">
             <a
               class="display_name"
-              href="/courses/${course_id}/assignments/${assignment_id}/submissions/{{anonymousId}}?download={{attachmentId}}">
+              href="/courses/${courseId}/assignments/${assignmentId}/submissions/{{anonymousId}}?download={{attachmentId}}">
             </a>
           </div>
         `)
@@ -4734,7 +4789,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
 
         strictEqual(
           div.children[0].getAttribute('src'),
-          `/courses/${course_id}/assignments/${assignment_id}/submissions/${anonymous_id}?download=101112`
+          `/courses/${courseId}/assignments/${assignmentId}/submissions/${anonymousId}?download=101112`
         )
       })
     })

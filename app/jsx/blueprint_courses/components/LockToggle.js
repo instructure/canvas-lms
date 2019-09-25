@@ -20,47 +20,45 @@ import I18n from 'i18n!blueprint_coursesLockToggle'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-overlays'
+import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 
-import IconLock from '@instructure/ui-icons/lib/Solid/IconBlueprintLock'
-import IconUnlock from '@instructure/ui-icons/lib/Solid/IconBlueprint'
+import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
 const modes = {
   ADMIN_LOCKED: {
     label: I18n.t('Locked'),
-    icon: IconLock,
+    icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Unlock'),
     variant: 'primary'
   },
   ADMIN_UNLOCKED: {
     label: I18n.t('Blueprint'),
-    icon: IconUnlock,
+    icon: IconBlueprintSolid,
     tooltip: I18n.t('Lock'),
     variant: 'default'
   },
   ADMIN_WILLUNLOCK: {
     label: I18n.t('Blueprint'),
-    icon: IconUnlock,
+    icon: IconBlueprintSolid,
     tooltip: I18n.t('Unlock'),
     variant: 'default'
   },
   ADMIN_WILLLOCK: {
     label: I18n.t('Locked'),
-    icon: IconLock,
+    icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Lock'),
     variant: 'primary'
   },
   TEACH_LOCKED: {
     label: I18n.t('Locked'),
-    icon: IconLock
+    icon: IconBlueprintLockSolid
   },
   TEACH_UNLOCKED: {
     label: I18n.t('Blueprint'),
-    icon: IconUnlock
+    icon: IconBlueprintSolid
   }
 }
 

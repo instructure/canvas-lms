@@ -20,7 +20,7 @@ import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {Submission} from '../graphqlData/Submission'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 
 export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1

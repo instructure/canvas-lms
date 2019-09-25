@@ -395,6 +395,53 @@ class UsersController < ApplicationController
     end
   end
 
+  def index
+    get_context
+    if @context.feature_enabled?(:course_user_search) && !params.key?(:term)
+      @account ||= @context
+      return course_user_search
+    end
+
+    return unless authorized_action(@context, @current_user, :read_roster)
+    @root_account = @context.root_account
+    @query = (params[:user] && params[:user][:name]) || params[:term]
+    js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
+    Shackles.activate(:slave) do
+      if @context && @context.is_a?(Account) && @query
+        @users = @context.users_name_like(@query)
+      elsif params[:enrollment_term_id].present? && @root_account == @context
+        @users = @context.fast_all_users.
+            where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
+              joins(:course).
+              where(Enrollment::QueryBuilder.new(:active).conditions).
+              where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
+      else
+        @users = @context.fast_all_users
+      end
+
+      @users = @users.paginate(:page => params[:page])
+
+      respond_to do |format|
+        if @users.length == 1 && params[:term]
+          format.html {
+            redirect_to(named_context_url(@context, :context_user_url, @users.first))
+          }
+        else
+          @enrollment_terms = []
+          if @root_account == @context
+            @enrollment_terms = @context.enrollment_terms.active
+          end
+          format.html
+        end
+        format.json {
+          cancel_cache_buster
+          expires_in 30.minutes
+          render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+        }
+      end
+    end
+  end
+
   # @API List users in account
   # A paginated list of of users associated with this account.
   #
@@ -406,7 +453,7 @@ class UsersController < ApplicationController
   #   a numeric form. It will only search against other fields if non-numeric
   #   in form, or if the numeric value doesn't yield any matches. Queries by
   #   administrative users will search on SIS ID, login ID, name, or email
-  #   address; non-administrative queries will only be compared against name.
+  #   address
   #
   # @argument enrollment_type [String]
   #   When set, only return users enrolled with the specified course-level base role.
@@ -425,77 +472,30 @@ class UsersController < ApplicationController
   #       -H 'Authorization: Bearer <token>'
   #
   # @returns [User]
-  def index
+  def api_index
     get_context
-    if !api_request? && @context.feature_enabled?(:course_user_search) && !params.key?(:term)
-      @account ||= @context
-      return course_user_search
+    return unless authorized_action(@context, @current_user, :read_roster)
+    search_term = params[:search_term].presence
+    page_opts = {}
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
+        {
+          order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
+          enrollment_type: params[:enrollment_type]
+        })
+      page_opts[:total_entries] = nil # doesn't calculate a total count
+    else
+      users = UserSearch.scope_for(@context, @current_user,
+        {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
+          enrollment_type: params[:enrollment_type]})
     end
 
-    if authorized_action(@context, @current_user, :read_roster)
-      @root_account = @context.root_account
-      @query = (params[:user] && params[:user][:name]) || params[:term]
-      js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
-      Shackles.activate(:slave) do
-        if @context && @context.is_a?(Account) && @query
-          @users = @context.users_name_like(@query)
-        elsif params[:enrollment_term_id].present? && @root_account == @context
-          @users = @context.fast_all_users.
-              where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
-                joins(:course).
-                where(Enrollment::QueryBuilder.new(:active).conditions).
-                where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
-        elsif !api_request?
-          @users = @context.fast_all_users
-        end
-
-        if api_request?
-          search_term = params[:search_term].presence
-          page_opts = {}
-          if search_term
-            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
-              {
-                order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
-                enrollment_type: params[:enrollment_type]
-              })
-            page_opts[:total_entries] = nil # doesn't calculate a total count
-          else
-            users = UserSearch.scope_for(@context, @current_user,
-              {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
-                enrollment_type: params[:enrollment_type]})
-          end
-
-          includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
-          includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
-          users = users.with_last_login if includes.include?('last_login') && !search_term
-          users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
-          user_json_preloads(users, includes.include?('email'))
-          return render :json => users.map { |u| user_json(u, @current_user, session, includes)}
-        else
-          @users ||= []
-          @users = @users.paginate(:page => params[:page])
-        end
-
-        respond_to do |format|
-          if @users.length == 1 && params[:term]
-            format.html {
-              redirect_to(named_context_url(@context, :context_user_url, @users.first))
-            }
-          else
-            @enrollment_terms = []
-            if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active
-            end
-            format.html
-          end
-          format.json {
-            cancel_cache_buster
-            expires_in 30.minutes
-            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
-          }
-        end
-      end
-    end
+    includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
+    includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
+    users = users.with_last_login if includes.include?('last_login') && !search_term
+    users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
+    user_json_preloads(users, includes.include?('email'))
+    render :json => users.map { |u| user_json(u, @current_user, session, includes)}
   end
 
 
@@ -1334,7 +1334,9 @@ class UsersController < ApplicationController
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                                         current_user: @current_user,
                                                                         current_pseudonym: @current_pseudonym,
-                                                                        tool: @tool})
+                                                                        tool: @tool}
+                                                  )
+    Canvas::LiveEvents.asset_access(@tool, "external_tools", @current_user.class.name, nil)
     adapter = if @tool.use_1_3?
       Lti::LtiAdvantageAdapter.new(
         tool: @tool,

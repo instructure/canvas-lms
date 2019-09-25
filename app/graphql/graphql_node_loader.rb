@@ -21,6 +21,8 @@ module GraphQLNodeLoader
     check_read_permission = make_permission_check(ctx, :read)
 
     case type
+    when "Account"
+      Loaders::IDLoader.for(Account).load(id).then(check_read_permission)
     when "Course"
       Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
     when "Assignment"

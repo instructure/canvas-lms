@@ -269,14 +269,25 @@ end
 RSpec::Matchers.define :and_query do |expected|
   match do |actual|
     query = Rack::Utils.parse_query(URI(actual).query)
-    values_match?(expected, query)
+
+    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
+    values_match?(expected_as_strings, query)
   end
 end
 
 RSpec::Matchers.define :and_fragment do |expected|
   match do |actual|
     fragment = JSON.parse(URI.decode_www_form_component(URI(actual).fragment))
-    values_match?(expected, fragment)
+    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
+    values_match?(expected_as_strings, fragment)
+  end
+end
+
+module RSpec::Matchers::Helpers
+  # allows for matchers to use symbols and literals even though URIs are always strings.
+  # i.e. `and_query({assignment_id: @assignment.id})`
+  def self.cast_to_strings(expected:)
+    expected.map {|k,v| [k.to_s, v.to_s]}.to_h
   end
 end
 
@@ -619,30 +630,35 @@ RSpec.configure do |config|
     importer
   end
 
+  def set_cache(new_cache)
+    cache_opts = {}
+    if new_cache == :redis_cache_store
+      if Canvas.redis_enabled?
+        cache_opts[:redis] = Canvas.redis
+      else
+        skip "redis required"
+      end
+    end
+    new_cache ||= :null_store
+    new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)
+    allow(Rails).to receive(:cache).and_return(new_cache)
+    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
+    allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
+    MultiCache.reset
+  end
+
   def specs_require_cache(new_cache=:memory_store)
     before :each do
-      skip "redis required" if new_cache == :redis_cache_store && !Canvas.redis_enabled?
-      new_cache = ActiveSupport::Cache.lookup_store(new_cache)
-      allow(Rails).to receive(:cache).and_return(new_cache)
-      allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-      allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-      allow(ActionController::Base).to receive(:perform_caching).and_return(true)
-      allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
-      MultiCache.reset
+      set_cache(new_cache)
     end
   end
 
   def enable_cache(new_cache=:memory_store)
-    new_cache ||= :null_store
-    new_cache = ActiveSupport::Cache.lookup_store(new_cache)
     previous_cache = Rails.cache
-    allow(Rails).to receive(:cache).and_return(new_cache)
-    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-    allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
     previous_perform_caching = ActionController::Base.perform_caching
-    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
-    allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
-    MultiCache.reset
+    set_cache(new_cache)
     if block_given?
       begin
         yield
@@ -915,6 +931,10 @@ RSpec.configure do |config|
         scope.pluck(:id).reverse
       end
     end
+  end
+
+  def skip_if_prepended_class_method_stubs_broken
+    skip("stubbing prepended class methods is broken in this version of ruby") if %w{2.4.6 2.5.1 2.5.3 2.6.0 2.6.2}.include?(RUBY_VERSION)
   end
 end
 

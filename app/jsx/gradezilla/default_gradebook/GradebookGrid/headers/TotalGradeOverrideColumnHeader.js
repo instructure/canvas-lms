@@ -17,9 +17,9 @@
  */
 
 import React, {PureComponent} from 'react'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Grid, GridCol, GridRow, View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
+
 import I18n from 'i18n!gradezilla'
 
 export default class TotalGradeOverrideColumnHeader extends PureComponent {

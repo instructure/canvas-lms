@@ -18,11 +18,10 @@
 
 import React, {Component} from 'react'
 
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 import PropTypes from 'prop-types'
 
-import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
-import safeCloneElement from '@instructure/ui-utils/lib/react/safeCloneElement'
+import {omitProps, safeCloneElement} from '@instructure/ui-react-utils'
 
 class Steps extends Component {
   static propTypes = {

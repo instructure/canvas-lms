@@ -19,8 +19,8 @@
 import React from 'react'
 import {bool, instanceOf, number, shape, string} from 'prop-types'
 import I18n from 'i18n!gradezilla'
-import View from '@instructure/ui-layout/lib/components/View'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
+import {View} from '@instructure/ui-layout'
+import {Pill} from '@instructure/ui-elements'
 import Message from './SubmissionStatus/Message'
 import {isHidden} from '../../../grading/helpers/SubmissionHelper'
 

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef} from 'react';
 import {arrayOf, bool, func, shape, string, objectOf} from 'prop-types';
-import {fileShape} from './propTypes'
+import {fileShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message';
 
 import {Text} from '@instructure/ui-elements'

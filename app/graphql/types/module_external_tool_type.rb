@@ -27,8 +27,8 @@ module Types
 
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, "legacy canvas id", null: false, method: :id
     field :url, String, null: true
 
     def modules

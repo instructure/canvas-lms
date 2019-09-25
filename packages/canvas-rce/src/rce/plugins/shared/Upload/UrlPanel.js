@@ -17,14 +17,19 @@
  */
 
 import React from 'react'
-import { string, func } from 'prop-types'
-import { TextInput } from '@instructure/ui-text-input'
+import {string, func} from 'prop-types'
+import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../../format-message'
 
-export default function UrlPanel ({fileUrl, setFileUrl}) {
+export default function UrlPanel({fileUrl, setFileUrl}) {
   return (
     <>
-      <TextInput label={formatMessage('File URL')} type="url" value={fileUrl} onChange={(e, val) => setFileUrl(val)} />
+      <TextInput
+        renderLabel={formatMessage('File URL')}
+        type="url"
+        value={fileUrl}
+        onChange={(e, val) => setFileUrl(val)}
+      />
     </>
   )
 }

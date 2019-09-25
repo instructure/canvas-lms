@@ -345,6 +345,17 @@ describe ContentMigrationsController, type: :request do
       expect(migration.job_progress).to be_nil
     end
 
+    it "should queue a course copy with immediate select" do
+      assignment = @course.assignments.create! title: 'test'
+      json = api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :select => {:assignments => [assignment.to_param]}, :settings => {:source_course_id => @course.to_param}})
+      expect(json["workflow_state"]).to eq 'running'
+      migration = ContentMigration.find json['id']
+      expect(migration.workflow_state).to eq "exporting"
+      expect(migration.job_progress).not_to be_nil
+      key = CC::CCHelper.create_key(assignment, global: true)
+      expect(migration.copy_options).to eq({'assignments' => {key => '1'}})
+    end
+
     it "should queue for course copy on concluded courses" do
       source_course = Course.create(name: 'source course')
       source_course.enroll_teacher(@user)

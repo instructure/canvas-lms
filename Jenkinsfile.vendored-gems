@@ -19,7 +19,7 @@
  */
 
 pipeline {
-  agent { label 'docker' }
+  agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
   }
@@ -44,27 +44,30 @@ pipeline {
 
       post {
         always {
-          // copy the test results from the container
-          sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
-          script {
-            def htmlFiles
-            // find all results files
-            dir ('spec_results') {
-              htmlFiles = findFiles glob: '*_results.html'
-            }
-            // publish html
-            publishHTML target: [
-              allowMissing: false,
-              alwaysLinkToLastBuild: false,
-              keepAll: true,
-              reportDir: "spec_results",
-              reportFiles: htmlFiles.join(','),
-              reportName: 'Test Report'
-              ]
+        // copy the test results from the container
+        sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
+        script {
+          def htmlFiles
+          // find all results files
+          dir ('spec_results') {
+            sh 'mv report.html canvas_i18nliner_results.html'
+            htmlFiles = findFiles glob: '*results.html'
+          }
+
+          // publish html
+          publishHTML target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: "spec_results",
+            reportFiles: htmlFiles.join(','),
+            reportName: 'Test Results'
+            ]
           }
         }
 
         cleanup {
+          sh 'rm -rf ./spec_results/'
           sh 'build/new-jenkins/docker-cleanup.sh'
         }
       }

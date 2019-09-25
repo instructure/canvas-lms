@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import {mount} from 'enzyme'
 
 import DeveloperKeysApp from 'jsx/developer_keys/App';
@@ -371,7 +371,7 @@ test('opens the key selection menu when the create button is clicked', () => {
 
   notOk(wrapper.find('Menu').first().find('Portal').exists())
   wrapper.find('Button').first().simulate('click')
-  ok(wrapper.find('Menu').first().find('Portal').prop('open'))
+  ok(wrapper.find('Menu').first().find('Portal').first().prop('open'))
   wrapper.unmount()
   window.ENV = {}
 })

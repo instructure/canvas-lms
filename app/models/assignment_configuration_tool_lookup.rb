@@ -35,6 +35,10 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     end
 
     def by_tool_proxy(tool_proxy)
+      by_tool_proxy_scope(tool_proxy).preload(:assignment).map(&:assignment)
+    end
+
+    def by_tool_proxy_scope(tool_proxy)
       message_handler = tool_proxy.resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
         mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
       end
@@ -42,7 +46,7 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
         tool_product_code: tool_proxy.product_family.product_code,
         tool_vendor_code: tool_proxy.product_family.vendor_code,
         tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
-      ).preload(:assignment).map(&:assignment)
+      )
     end
 
     def recreate_missing_subscriptions(account, message_handler)

@@ -19,8 +19,7 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import Image from '@instructure/ui-elements/lib/components/Img'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import {Img, Link} from '@instructure/ui-elements'
 
 import DeveloperKey from 'jsx/developer_keys/DeveloperKey';
 
@@ -127,13 +126,13 @@ test('includes No Email when userName is empty string and email is missing', () 
 
 test('includes an image when name is present', () => {
   const component = renderComponent(defaultProps)
-  ok(TestUtils.findRenderedComponentWithType(component, Image))
+  ok(TestUtils.findRenderedComponentWithType(component, Img))
 });
 
 test('includes an img box when name is null', () => {
   const propsModified = updateDefaultProps({ developerKey: { name: null } })
   const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedComponentWithType(component, Image))
+  ok(TestUtils.findRenderedComponentWithType(component, Img))
 });
 
 test('does not inactive when workflow_state is active', () => {

@@ -23,6 +23,7 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     class AssignmentGroupState < BaseEnum
       graphql_name "AssignmentGroupState"
@@ -32,7 +33,6 @@ module Types
     end
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", method: :id, null: false
     field :name, String, null: true
     field :rules, AssignmentGroupRulesType, method: :rules_hash, null: true
     field :group_weight, Float, null: true

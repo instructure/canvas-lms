@@ -1,0 +1,10 @@
+version: "2.1"
+services:
+  karma:
+    environment:
+      - JSPEC_GROUP
+    build:
+      context: .
+      dockerfile: ./build/new-jenkins/frontend/Dockerfile-karma
+      args:
+        image_name: $PATCHSET_TAG

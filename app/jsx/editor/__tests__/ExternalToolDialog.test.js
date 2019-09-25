@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ExternalToolDialog from '../ExternalToolDialog'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Transition from '@instructure/ui-motion/lib/components/Transition'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Transition} from '@instructure/ui-motion'
 import {send} from '../../shared/rce/RceCommandShim'
 
 // jest.mock('../../deep_linking/ContentItemProcessor')

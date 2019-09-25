@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@instructure/ui-themes/lib/canvas'
+import '@instructure/canvas-theme'
 import React from 'react'
 import CanvasSelect from '../CanvasSelect'
 import {render} from '@testing-library/react'
@@ -136,9 +136,7 @@ describe('CanvasSelect component', () => {
   })
 
   it('handles no children', () => {
-    const {getByText} = render(
-      <CanvasSelect {...selectProps({noOptionsLabel: 'No Options'})}></CanvasSelect>
-    )
+    const {getByText} = render(<CanvasSelect {...selectProps({noOptionsLabel: 'No Options'})} />)
     const label = getByText('Choose one')
     label.click()
 
@@ -191,6 +189,24 @@ describe('CanvasSelect component', () => {
       expect(getByText('One')).toBeInTheDocument()
       expect(getByText('Group B')).toBeInTheDocument()
       expect(getByText('Four')).toBeInTheDocument()
+    })
+
+    it('renders group with one option', () => {
+      const {getByText} = render(
+        <CanvasSelect {...selectProps()}>
+          <CanvasSelect.Group id="1" label="Group A">
+            <CanvasSelect.Option id="1" value="one">
+              One
+            </CanvasSelect.Option>
+          </CanvasSelect.Group>
+        </CanvasSelect>
+      )
+      expect(getByText('Choose one')).toBeInTheDocument()
+      const label = getByText('Choose one')
+      label.click()
+
+      expect(getByText('Group A')).toBeInTheDocument()
+      expect(getByText('One')).toBeInTheDocument()
     })
   })
 

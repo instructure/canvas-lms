@@ -23,7 +23,6 @@ module Api::V1::Tab
   def tabs_available_json(context, user, session, includes = [], precalculated_permissions: nil)
     json = context_tabs(context, user, precalculated_permissions: precalculated_permissions).map { |tab|
       tab_json(tab.with_indifferent_access, context, user, session) }
-    json.select!{|tab| tab[:type] != 'external'} unless includes.include?('external')
     json.sort!{|x,y| x['position'] <=> y['position']}
   end
 

@@ -21,11 +21,8 @@ import { shallow } from 'enzyme'
 import ActAsModal from 'jsx/actAs/ActAsModal'
 import ActAsMask from 'jsx/actAs/ActAsMask'
 import ActAsPanda from 'jsx/actAs/ActAsPanda'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Button} from '@instructure/ui-buttons'
+import {Avatar, Table, Text, Spinner} from '@instructure/ui-elements'
 
 QUnit.module('ActAsModal', {
   setup () {

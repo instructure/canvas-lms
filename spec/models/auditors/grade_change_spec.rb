@@ -45,7 +45,7 @@ describe Auditors::GradeChange do
     @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
     @event_time = Time.at(1.hour.ago.to_i) # cassandra doesn't remember microseconds
-    Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(@submission) }
+    Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(submission: @submission) }
   end
 
   def test_course_and_other_contexts
@@ -92,7 +92,7 @@ describe Auditors::GradeChange do
       # We don't want to index events for nil graders.
 
       @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher).first
-      @event = Auditors::GradeChange.record(@submission)
+      @event = Auditors::GradeChange.record(submission: @submission)
 
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
       expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
@@ -111,7 +111,7 @@ describe Auditors::GradeChange do
 
       @submission.score = 5
       @submission.grader_id = -1
-      @event = Auditors::GradeChange.record(@submission)
+      @event = Auditors::GradeChange.record(submission: @submission)
 
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
       expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
@@ -132,7 +132,7 @@ describe Auditors::GradeChange do
 
   it "reports excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
-    @event = Auditors::GradeChange.record(@excused)
+    @event = Auditors::GradeChange.record(submission: @excused)
 
     for_assignment = Auditors::GradeChange.for_assignment(@assignment)
     for_course = Auditors::GradeChange.for_course(@course)
@@ -149,9 +149,9 @@ describe Auditors::GradeChange do
 
   it "reports formerly excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
-    Auditors::GradeChange.record(@excused)
+    Auditors::GradeChange.record(submission: @excused)
     @unexcused = @assignment.grade_student(@student, grader: @teacher, excused: false).first
-    @event = Auditors::GradeChange.record(@unexcused)
+    @event = Auditors::GradeChange.record(submission: @unexcused)
 
     for_assignment = Auditors::GradeChange.for_assignment(@assignment)
     for_course = Auditors::GradeChange.for_course(@course)
@@ -173,7 +173,7 @@ describe Auditors::GradeChange do
 
   it "records excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
-    @event = Auditors::GradeChange.record(@excused)
+    @event = Auditors::GradeChange.record(submission: @excused)
 
     expect(@event.grade_before).to eql(@submission.grade)
     expect(@event.grade_after).to be_nil
@@ -183,9 +183,9 @@ describe Auditors::GradeChange do
 
   it "records formerly excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
-    Auditors::GradeChange.record(@excused)
+    Auditors::GradeChange.record(submission: @excused)
     @unexcused = @assignment.grade_student(@student, grader: @teacher, excused: false).first
-    @event = Auditors::GradeChange.record(@unexcused)
+    @event = Auditors::GradeChange.record(submission: @unexcused)
 
     expect(@event.grade_before).to be_nil
     expect(@event.grade_after).to be_nil
@@ -196,7 +196,7 @@ describe Auditors::GradeChange do
   it "records regraded submissions" do
     @submission.score = 5
     @submission.with_versioning(:explicit => true, &:save!)
-    @event = Auditors::GradeChange.record(@submission)
+    @event = Auditors::GradeChange.record(submission: @submission)
 
     expect(@event.score_before).to eq 8
     expect(@event.score_after).to eq 5
@@ -206,7 +206,7 @@ describe Auditors::GradeChange do
     @assignment.points_possible = 15
     @assignment.save!
     @submission.assignment_changed_not_sub = true
-    @event = Auditors::GradeChange.record(@submission)
+    @event = Auditors::GradeChange.record(submission: @submission)
 
     expect(@event.points_possible_before).to eq 10
     expect(@event.points_possible_after).to eq 15
@@ -256,5 +256,15 @@ describe Auditors::GradeChange do
       expect(page).to include(@event2)
       expect(page).not_to include(@event)
     end
+  end
+
+  it "inserts a record" do
+    expect(Auditors::GradeChange::Stream).to receive(:insert).once
+    Auditors::GradeChange.record(submission: @submission)
+  end
+
+  it "does not insert a record if skip_insert is true" do
+    expect(Auditors::GradeChange::Stream).not_to receive(:insert)
+    Auditors::GradeChange.record(submission: @submission, skip_insert: true)
   end
 end

@@ -59,8 +59,12 @@ export function ltiMessageHandler(e) {
         context = "accounts/" + ENV.DOMAIN_ROOT_ACCOUNT_ID;
       }
 
-      const tool_launch_url = `${data}"&full_win_launch_requested=1&platform_redirect_url=${window.location}`;
-      const launch_url = `${window.location.origin}/${context}/external_tools/retrieve?display=borderless&url=${encodeURIComponent(tool_launch_url)}`;
+      const tool_launch_url = new URL(data);
+      tool_launch_url.searchParams.append("full_win_launch_requested", "1");
+      // xsslint safeString.property window.location
+      tool_launch_url.searchParams.append("platform_redirect_url", window.location);
+
+      const launch_url = `${window.location.origin}/${context}/external_tools/retrieve?display=borderless&url=${encodeURIComponent(tool_launch_url.toString())}`;
       window.location.assign(launch_url);
     } else {
       console.error(`invalid messageType: ${e.data.messageType}`);

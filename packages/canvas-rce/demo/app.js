@@ -19,7 +19,8 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { Button } from '@instructure/ui-buttons'
-import { RadioInput, RadioInputGroup, Select, TextInput } from '@instructure/ui-forms'
+import { RadioInput, RadioInputGroup, Select } from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import { ToggleDetails } from '@instructure/ui-toggle-details'
 import '@instructure/canvas-theme';
 
@@ -173,13 +174,13 @@ class DemoOptions extends Component {
           </Select>
 
           <TextInput
-            label="API Host"
+            renderLabel="API Host"
             value={this.state.host}
             onChange={e => this.setState({ host: e.target.value })}
           />
 
           <TextInput
-            label="Canvas JWT"
+            renderLabel="Canvas JWT"
             value={this.state.jwt}
             onChange={e => this.setState({ jwt: e.target.value })}
           />
@@ -197,7 +198,7 @@ class DemoOptions extends Component {
           </Select>
 
           <TextInput
-            label="Context ID"
+            renderLabel="Context ID"
             value={this.state.contextId}
             onChange={e => this.setState({ contextId: e.target.value })}
           />

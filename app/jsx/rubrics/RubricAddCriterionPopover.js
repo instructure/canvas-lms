@@ -18,8 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Menu, { MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Menu,  MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!RubricAddCriterionPopover'
 import $ from 'jquery'
 

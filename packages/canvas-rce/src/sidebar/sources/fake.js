@@ -242,7 +242,7 @@ const brokenImage = {
 const IMAGE_RESPONSES = [
   {
     bookmark: 'http://canvas/images/2',
-    images: [
+    files: [
       images[0],
       brokenImage,
       ...images.slice(1, 10)
@@ -252,13 +252,13 @@ const IMAGE_RESPONSES = [
   {
     bookmark: 'http://canvas/images/3',
     bookmarkForThis: 'http://canvas/images/2',
-    images: images.slice(10, 20)
+    files: images.slice(10, 20)
   },
 
   {
     bookmark: null,
     bookmarkForThis: 'http://canvas/images/3',
-    images: images.slice(20)
+    files: images.slice(20)
   }
 ]
 
@@ -574,13 +574,14 @@ export function initializeFolders() {
   return {};
 }
 
-export function initializeImages() {
+export function initializeImages(props) {
   return {
-    records: [],
-    bookmark: undefined,
-    hasMore: false,
-    isLoading: false,
-    requested: false
+    [props.contextType]: {
+      files: [],
+      bookmark: undefined,
+      hasMore: true,
+      isLoading: false
+    }
   };
 }
 
@@ -632,7 +633,8 @@ export function fetchImages(props) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
-      if (props.bookmark) {
+      const bookmark = props.images[props.contextType] && props.images[props.contextType].bookmark
+      if (bookmark) {
         response = IMAGE_RESPONSES.find(response => response.bookmarkForThis === props.bookmark)
       } else {
         response = IMAGE_RESPONSES[0]

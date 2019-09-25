@@ -18,15 +18,12 @@
 
 import React from 'react'
 import {arrayOf, bool, func, number, objectOf, shape, string} from 'prop-types'
-
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Heading, Text} from '@instructure/ui-elements'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
 
 import natcompare from 'compiled/util/natcompare'
 
@@ -64,7 +61,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
 
   onDetailsToggled = () => {
     this.setState(prevState => ({detailsVisible: !prevState.detailsVisible}))
-  };
+  }
 
   handleGradeSelected = (_event, value) => {
     // If this is the current user's grade, we'll need to submit the changes
@@ -77,7 +74,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
       )
       this.props.onGradeSelected({selectedGrade})
     }
-  };
+  }
 
   renderRadioInputLabel(grade) {
     const {pointsPossible} = this.props

@@ -22,7 +22,7 @@ import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
 import {Query} from 'react-apollo'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import SelectableText from './SelectableText'
 import {
   AssignmentGroupShape,

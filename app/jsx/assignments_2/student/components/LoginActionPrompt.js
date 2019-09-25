@@ -19,10 +19,9 @@
 import I18n from 'i18n!assignments_2_login_action_prompt'
 import React from 'react'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
-import View from '@instructure/ui-layout/lib/components/View'
 
 import lockedSVG from '../SVG/Locked1.svg'
 

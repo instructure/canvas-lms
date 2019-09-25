@@ -531,6 +531,7 @@ describe UserList do
       expect(ul.users.first.initial_enrollment_type).to eq 'observer'
       #
       ul = UserList.new 'designer1@instructure.com', :initial_type => 'DesignerEnrollment'
+
       expect(ul.users.first.initial_enrollment_type).to be_nil
       #
       ul = UserList.new 'unknown1@instructure.com', :initial_type => 'UnknownThing'

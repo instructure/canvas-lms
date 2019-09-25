@@ -1973,7 +1973,7 @@ class Assignment < ActiveRecord::Base
     body url submission_type media_comment_id media_comment_type submitted_at
   ].freeze
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment attachments]).to_set
+                                    %w[comment group_comment attachments require_submission_type_is_valid]).to_set
 
   def submit_homework(original_student, opts={})
     eula_timestamp = opts[:eula_agreement_timestamp]
@@ -2000,6 +2000,8 @@ class Assignment < ActiveRecord::Base
                 end
     transaction do
       find_or_create_submissions(students, Submission.preload(:grading_period)) do |homework|
+        homework.require_submission_type_is_valid = opts[:require_submission_type_is_valid].present?
+
         # clear out attributes from prior submissions
         if opts[:submission_type].present?
           SUBMIT_HOMEWORK_ATTRS.each { |attr| homework[attr] = nil }

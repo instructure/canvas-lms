@@ -47,6 +47,11 @@ describe Messages::PeerReviewsHelper do
       assignment.update!(anonymous_peer_reviews: false)
       expect(get_submission_link(@assessment_request, @user)).to include('/submissions/')
     end
+
+    it 'should return a url with host' do
+      expect(HostUrl).to receive(:context_host).with(Account.default).and_return("customhost.example.com")
+      expect(get_submission_link(@assessment_request, @user)).to include("#{HostUrl.protocol}://customhost.example.com")
+    end
   end
 
   describe 'submission comments' do

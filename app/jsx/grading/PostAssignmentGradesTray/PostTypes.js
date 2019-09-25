@@ -18,12 +18,9 @@
 
 import React from 'react'
 import {bool, func, oneOf} from 'prop-types'
-
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 export const EVERYONE = 'everyone'

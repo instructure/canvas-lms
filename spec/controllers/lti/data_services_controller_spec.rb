@@ -41,6 +41,9 @@ describe Lti::DataServicesController do
     allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
     allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
     allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
+
+    root_account.lti_context_id = SecureRandom.uuid
+    root_account.save
   end
 
   describe '#create' do
@@ -49,7 +52,7 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/create"}
       let(:params_overrides) do
-        { subscription: subscription, account_id: root_account.id }
+        { subscription: subscription, account_id: root_account.lti_context_id }
       end
     end
   end
@@ -60,7 +63,7 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/show"}
       let(:params_overrides) do
-        { account_id: root_account.id, id: 'testid' }
+        { account_id: root_account.lti_context_id, id: 'testid' }
       end
     end
   end
@@ -71,7 +74,7 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/update"}
       let(:params_overrides) do
-        { subscription: subscription, account_id: root_account.id, id: 'testid' }
+        { subscription: subscription, account_id: root_account.lti_context_id, id: 'testid' }
       end
     end
   end
@@ -82,7 +85,7 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/list"}
       let(:params_overrides) do
-        { account_id: root_account.id }
+        { account_id: root_account.lti_context_id }
       end
     end
   end
@@ -93,7 +96,18 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/destroy"}
       let(:params_overrides) do
-        { account_id: root_account.id, id: 'testid' }
+        { account_id: root_account.lti_context_id, id: 'testid' }
+      end
+    end
+  end
+
+  describe '#event_types_index' do
+    it_behaves_like 'lti services' do
+      let(:action) { :event_types_index }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { 'https://canvas.instructure.com/lti/data_services/scope/list_event_types' }
+      let(:params_overrides) do
+        { account_id: root_account.lti_context_id, id: 'testid' }
       end
     end
   end

@@ -632,8 +632,6 @@ en:
   if_enabled_copyright_and_license_information_must__2a551827: If enabled, copyright and license information must be provided for files before they are published.
   lti_2_reregistration_afabde25: LTI 2 Reregistration
   enable_reregistration_for_lti_2_b2a10444: Enable reregistration for LTI 2
-  quiz_lti_plugin_a6256549: Quiz LTI Plugin
-  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: Use the new quiz LTI tool in place of regular canvas quizzes
   don_t_move_lti_query_params_to_post_body_5c80e037: Don't Move LTI Query Params to POST Body
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: If enabled, query parameters will not be copied to the POST body during an LTI launch.
   membership_service_configuration_d8ba5a74: Membership Service Configuration
@@ -2969,7 +2967,6 @@ en:
         prerequisites: Prerequisites
     tool_sequence_footer:
       edit_assignment_settings: Edit Assignment Settings
-      speed_grader: Speed Grader™
     index:
       titles:
         course_modules: Course Modules
@@ -10448,6 +10445,11 @@ en:
         submitted_date: 'submitted: %{date}'
       twitter:
         body: 'Canvas Alert - Quiz Submitted: %{quiz}, %{user_name}'
+    submission_posted:
+      email:
+        html:
+          link: You can view it here
+          body: Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
     summaries:
       email:
         subject: Recent Canvas Notifications
@@ -10817,6 +10819,7 @@ en:
   can_update_subscription_to_data_service_data_374a0c89: Can update subscription to data service data.
   can_list_subscriptions_to_data_service_data_b52d5e37: Can list subscriptions to data service data.
   can_destroy_subscription_to_data_service_data_b8dfca27: Can destroy subscription to data service data.
+  can_list_categorized_event_types_52596f7: Can list categorized event types.
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: An error occurred while attempting to contact Turnitin.
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.
   update_your_notification_settings_ed9564f3: Update your notification settings
@@ -10913,6 +10916,17 @@ en:
   canvas_alert_grade_change_date_for_name_56f680ed: 'Canvas Alert - Grade Change: %{date} for %{name}'
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} has been graded for %{name}."
   canvas_alert_graded_assignment_context_for_name_459fdf31: 'Canvas Alert - Graded: %{assignment}, %{context} for %{name}'
+  submission_posted_title_course_138bd744: 'Submission Posted: %{title}, %{course}'
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+    Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+
+    Your can view it here:
+    %{url}
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+    Your instructor has released grade changes and new comments for %{title}, %{course}.
+
+    More info at %{url}
+  grade_changes_and_new_comments_released_for_title__f1350f92: 'Grade changes and new comments released for: %{title}, %{course}'
   wiki_page_content_is_locked_or_not_yet_available_6fdad388: Wiki page content is locked or not yet available
   user_just_updated_title_88074ab2: "%{user} just updated %{title}"
   remove_name_as_an_admin_c296cf49: Remove %{name} as an admin
@@ -14808,11 +14822,11 @@ en:
   show_more_af9cbc16: Show More
   teacher_count_teachers_a92f7199: "%{teacher_count} teachers"
   no_courses_found_12d68a74: No courses found
+  show_courses_from_8a087f63: Show courses from
+  loading_more_terms_4053e31f: Loading more terms...
   search_courses_by_teacher_e9760a48: Search courses by teacher...
   search_courses_591bc900: Search courses...
   filter_by_term_cfe778b2: Filter by term
-  show_courses_from_8a087f63: Show courses from
-  loading_more_terms_4053e31f: Loading more terms...
   search_by_99d1ba5f: Search by
   hide_courses_without_students_fc6fc7a0: Hide courses without students
   create_new_course_e3ef9cd0: Create new course
@@ -15050,6 +15064,8 @@ en:
   show_report_to_students_a07888a6: Show report to students
   after_the_assignment_is_graded_53754607: After the assignment is graded
   after_the_due_date_eee89c9c: After the due date
+  select_group_to_grade_6df28d80: Select Group to Grade
+  must_select_a_student_group_first_15c6a3cb: Must select a student group first
   no_content_5dbc9acf: No Content
   until_6437a827: " until"
   to_1126ab55: " to"
@@ -15077,6 +15093,22 @@ en:
   media_submission_464829f0: Media Submission
   add_media_cfa37b54: Add Media
   record_upload_35dfb2ab: Record/Upload
+  file_select_filename_folder_contents_9146bab7: File select, %{filename} folder contents
+  name_4dee4600: ", name: "
+  date_created_b93b76fb: ", date created: "
+  date_modified_4d065406: ", date modified: "
+  modified_by_52d699e9: ", modified by: "
+  size_f1873a2: ", size: "
+  state_unpublished_83c18d01: ", state: unpublished"
+  state_published_e8914697: ", state: published"
+  not_applicable_d5dfd285: not applicable
+  type_file_14f017c9: 'type: file'
+  type_folder_115f3b07: 'type: folder'
+  name_parent_directory_b61d10a9: ", name: parent directory "
+  date_created_87e265bc: Date Created
+  date_modified_e1c8ac8f: Date Modified
+  modified_by_c1584b3c: Modified By
+  size_b30e1077: Size
   assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
   course_external_tools_query_error_d5110efe: Course external tools query error
   user_groups_query_error_bba6a6b7: User groups query error
@@ -15085,6 +15117,8 @@ en:
   text_entry_e1808b2f: Text Entry
   remove_submission_draft_f5c7f58b: Remove submission draft
   start_entry_4b491f60: Start Entry
+  all_submission_comments_have_been_marked_as_read_7595389d: All submission comments have been marked as read.
+  there_was_a_problem_marking_submission_comments_as_d4ba6711: There was a problem marking submission comments as read.
   send_a_comment_to_your_instructor_about_this_assig_83fd5960: Send a comment to your instructor about this assignment.
   at_791460b3: at
   submission_comment_sent_3f2af3d0: Submission comment sent
@@ -15437,8 +15471,6 @@ en:
   due_dates_520a6c08: Due Dates
   course_catalog_4cc7c8ce: Course Catalog
   recent_announcements_8becc59c: Recent Announcements
-  must_select_a_student_group_first_15c6a3cb: Must select a student group first
-  select_group_to_grade_6df28d80: Select Group to Grade
   please_upload_files_as_a_zip_5a2c799f: Please upload files as a .zip
   are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe:
     one: Are you sure you want to archive your copy of this conversation?
@@ -15870,8 +15902,8 @@ en:
   move_to_25d7ef11: Move To
   move_discussion_title_93ea7be1: Move discussion %{title}
   duplicate_discussion_title_6537ef4d: Duplicate discussion %{title}
-  send_title_to_user_526320bb: Send {%title} to user
-  copy_title_to_course_ac71981a: Copy {%title} to course
+  send_title_to_user_d952e233: Send %{title} to user
+  copy_title_to_course_2a41a2f4: Copy %{title} to course
   delete_discussion_title_a28df8b6: Delete discussion %{title}
   unread_c14cb06f: unread,
   due_date_2c6e4cfb: Due %{date}
@@ -16063,10 +16095,7 @@ en:
   file_not_found_9eec054c: File not found
   file_preview_overlay_87f7e5f: File Preview Overlay
   kind_7f0a88c4: Kind
-  size_b30e1077: Size
-  date_modified_e1c8ac8f: Date Modified
   last_modified_by_ca4bb5e1: Last Modified By
-  date_created_87e265bc: Date Created
   an_item_named_name_already_exists_in_this_location_147b7312: An item named "%{name}" already exists in this location. Do you want to replace the existing file?
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: A locked item named "%{name}" already exists in this location. Please enter a new name.
   change_name_to_568374c8: Change "%{name}" to
@@ -17557,6 +17586,7 @@ en:
   speedgrader_tm_44688790: SpeedGrader™
   select_one_8e0af564: Select One
   loading_media_32847745: Loading Media
+  add_cc_subtitle_a9ef4a66: Add CC/Subtitle
   drag_a_file_here_39357b48: Drag a File Here
   record_7c9448b: Record
   embed_828fac4a: Embed
@@ -17632,7 +17662,12 @@ en:
   disallow_comments_6d04b47a: Disallow Comments
   allow_comments_for_title_7ac9e00: Allow comments for %{title}
   disallow_comments_for_title_21f9c653: Disallow comments for %{title}
+  loading_options_c823e98b: Loading options...
+  list_collapsed_5f19f5bb: List Collapsed
+  option_selected_737b6f72: 'Option selected:'
   list_collapsed_9ac35920: List collapsed.
+  count_options_loaded_cd59cc3b: "%{count} options loaded."
+  type_to_search_de63ad38: Type to search
   list_expanded_efec2d0: List expanded.
   list_collapsed_dde87718: List collapsed
   option_selected_list_collapsed_70a356b4: "%{option} selected. List collapsed."
@@ -17660,7 +17695,10 @@ en:
   report_issue_b5f1db0e: Report Issue
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_submitted_d9934b: Comment submitted!
-  searching_for_courses_8cc5f904: Searching for courses...
+  no_results_3cda4e72: No Results
+  type_at_least_3_characters_to_search_f3df561c: Type at least 3 characters to search.
+  select_a_course_4710371f: Select a Course
+  begin_typing_to_search_7daa7b1: Begin typing to search
   common_timezones_2b00baba: Common Timezones
   all_timezones_5e8afa7b: All Timezones
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"

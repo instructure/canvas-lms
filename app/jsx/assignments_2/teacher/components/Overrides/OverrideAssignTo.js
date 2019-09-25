@@ -23,9 +23,9 @@ import React from 'react'
 import {bool, oneOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {FormField} from '@instructure/ui-form-field'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 import {OverrideShape} from '../../assignmentData'
 
 OverrideAssignTo.propTypes = {

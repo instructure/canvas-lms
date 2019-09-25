@@ -22,11 +22,10 @@ import moment from 'moment'
 import axios from 'axios'
 import I18n from 'i18n!last_attended'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import DateInput from '@instructure/ui-forms/lib/components/DateInput'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {View} from '@instructure/ui-layout'
+import {DateInput} from '@instructure/ui-forms'
+import {Text, Spinner} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import {showFlashError} from '../shared/FlashAlert'
 

@@ -17,6 +17,7 @@
  */
 
 import jQuery from 'jquery'
+import 'jquery.cookie'
 
 import submitHtmlForm from 'jsx/theme_editor/submitHtmlForm'
 

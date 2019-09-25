@@ -8547,6 +8547,11 @@ ko:
         submitted_date: "제출: %{date}"
       twitter: 
         body: "Canvas 알림 - 퀴즈 제출: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "교사가 %{title}에 대한 평점 변경 사항과 새 의견을 배포했습니다. 이제 변경 사항을 볼 수 있습니다."
+          link: "여기에서 볼 수 있음"
     summaries: 
       email: 
         daily_body: "Canvas 계정의 알림에 대한 일별 보고서를 받도록 등록했습니다. 아래는 %{date}의 보고서입니다:"
@@ -8804,6 +8809,7 @@ ko:
   no_marks_5e7d2b59: "표시 없음"
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   no_password_was_given_472222e5: "암호가 없음"
+  no_results_3cda4e72: "결과 없음"
   no_results_found_58717065: "결과 없음"
   no_students_have_taken_the_quiz_yet_e667644b: "어떤 학생도 이 퀴즈를 치르지 않음"
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
@@ -13276,6 +13282,11 @@ ko:
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "이 과제에 적어도 하나의 파일을 첨부해야 함"
   you_must_enter_a_date_f8eabfb1: "날짜를 입력해야 합니다."
   you_must_log_in_to_view_replies_9ccd4da0: "답변을 보기 위해서는 로그인해야 합니다."
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      교사가 %{title}에 대한 평점 변경 사항과 새 의견을 배포했습니다. 이제 변경 사항을 볼 수 있습니다.
+      
+      여기에서 볼 수 있습니다:
+      %{url}
   your_message_was_sent_977f6583: "메세지가 전송되었습니다!"
   your_password_has_been_changed_df0e72aa: "비밀번호가 변경되었습니다."
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"

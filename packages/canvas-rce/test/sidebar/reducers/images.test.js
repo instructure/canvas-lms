@@ -25,10 +25,14 @@ describe("Images reducer", () => {
 
   beforeEach(() => {
     state = {
-      records: [],
-      hasMore: false,
-      isLoading: false
-    };
+      course: {
+        files: [],
+        bookmark: null,
+        hasMore: false,
+        isLoading: false
+      },
+      contextType: 'course'
+    }
   });
 
   it("does not modify the state if for unknown actions", () => {
@@ -41,44 +45,49 @@ describe("Images reducer", () => {
     beforeEach(() => {
       action = {
         type: actions.ADD_IMAGE,
-        id: 1,
-        filename: "Foo",
-        display_name: "Bar",
-        preview_url: "some_url",
-        thumbnail_url: "other_url"
+        payload: {
+          newImage: {
+            id: 1,
+            filename: "Foo",
+            display_name: "Bar",
+            preview_url: "some_url",
+            thumbnail_url: "other_url"
+          },
+          contextType: 'course'
+        }
       };
     });
 
     it("adds a new object to images array", () => {
-      assert(images(state, action).records[0]);
+      assert(images(state, action).course.files[0]);
     });
 
     it("sets id from action", () => {
-      assert(images(state, action).records[0].id === action.id);
+      assert(images(state, action).course.files[0].id === action.payload.newImage.id);
     });
 
     it("sets filename from action", () => {
-      assert(images(state, action).records[0].filename === action.filename);
+      assert(images(state, action).course.files[0].filename === action.payload.newImage.filename);
     });
 
     it("sets display_name from action display_name", () => {
-      assert(images(state, action).records[0].type === action.fileType);
+      assert(images(state, action).course.files[0].type === action.payload.newImage.fileType);
     });
 
     it("sets preview_url from action preview_url", () => {
       assert(
-        images(state, action).records[0].preview_url === action.preview_url
+        images(state, action).course.files[0].preview_url === action.payload.newImage.preview_url
       );
     });
 
     it("sets thumbnail_url from action thumbnail_url", () => {
       assert(
-        images(state, action).records[0].thumbnail_url === action.thumbnail_url
+        images(state, action).course.files[0].thumbnail_url === action.payload.newImage.thumbnail_url
       );
     });
 
     it("sets href from action preview_url", () => {
-      assert(images(state, action).records[0].href === action.preview_url);
+      assert(images(state, action).course.files[0].href === action.payload.newImage.preview_url);
     });
   });
 
@@ -86,39 +95,43 @@ describe("Images reducer", () => {
     it("appends new records to the existing array", () => {
       const action = {
         type: actions.RECEIVE_IMAGES,
-        imageRecords: [{ id: 1 }, { id: 2 }]
+        payload: {
+          files: [{ id: 1 }, { id: 2 }],
+          contextType: 'course'
+        }
       };
-      assert.equal(images(state, action).records.length, 2);
+      assert.equal(images(state, action).course.files.length, 2);
     });
 
     it("hasMore if there's a bookmark", () => {
       const action = {
         type: actions.RECEIVE_IMAGES,
-        imageRecords: [{ id: 1 }, { id: 2 }],
-        bookmark: "some bookmark"
+        payload: {
+          files: [{ id: 1 }, { id: 2 }],
+          bookmark: "some bookmark",
+          contextType: 'course'
+        }
       };
-      assert(images(state, action).hasMore);
+      assert(images(state, action).course.hasMore);
     });
 
     it("clears isLoading state", () => {
       state.isLoading = true;
       const action = {
         type: actions.RECEIVE_IMAGES,
-        imageRecords: [{ id: 1 }, { id: 2 }]
+        payload: {
+          files: [{ id: 1 }, { id: 2 }],
+          contextType: 'course'
+        }
       };
-      assert.equal(images(state, action).isLoading, false);
+      assert.equal(images(state, action).course.isLoading, false);
     });
   });
 
   describe("REQUEST_IMAGES", () => {
     it("marks images as loading", () => {
-      const action = { type: actions.REQUEST_IMAGES };
-      assert(images(state, action).isLoading);
-    });
-
-    it("sets requested to true", () => {
-      const action = { type: actions.REQUEST_IMAGES };
-      assert(images(state, action).requested);
+      const action = { type: actions.REQUEST_IMAGES, payload: {contextType: 'user'} };
+      assert(images(state, action).user.isLoading);
     });
   });
 });

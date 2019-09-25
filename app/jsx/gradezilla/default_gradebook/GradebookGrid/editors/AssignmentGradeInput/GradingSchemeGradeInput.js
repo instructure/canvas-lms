@@ -18,10 +18,10 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, element, func, instanceOf, number, shape, string} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
+import {Button} from '@instructure/ui-buttons'
+import {Menu, MenuItem} from '@instructure/ui-menu'
+import {TextInput} from '@instructure/ui-forms'
+import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import I18n from 'i18n!gradezilla'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
 import {hasGradeChanged, parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
@@ -230,7 +230,7 @@ export default class GradingSchemeInput extends Component {
                 size="small"
                 variant="icon"
               >
-                <IconArrowOpenDownLine title={I18n.t('Open Grading Scheme menu')} />
+                <IconArrowOpenDownLine label={I18n.t('Open Grading Scheme menu')} />
               </Button>
             }
           >

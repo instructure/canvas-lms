@@ -20,11 +20,10 @@ import I18n from 'i18n!add_people_missing_people_section'
 import React from 'react'
 import PropTypes from 'prop-types'
 import shapes from './shapes'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Table} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput, Checkbox} from '@instructure/ui-forms'
+import {Button} from '@instructure/ui-buttons'
 
   const namePrompt = I18n.t('Click to add a name');
   const nameLabel = I18n.t("New user's name");

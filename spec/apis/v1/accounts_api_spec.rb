@@ -1096,13 +1096,6 @@ describe "Accounts API", type: :request do
           :format => 'json', :search_term => search_term })
       expect(json.length).to eql 3
 
-      search_term = Shard.global_id_for(@course)
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
-        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-          :format => 'json', :search_term => search_term })
-      expect(json.length).to eql 1
-      expect(json.first['name']).to eq @course.name
-
       # Should return empty result set
       search_term = "0000000000"
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
@@ -1129,6 +1122,20 @@ describe "Accounts API", type: :request do
           :format => 'json', :search_term => search_term })
       expect(json.length).to be 2
       expect(json.map{ |c| [c['id'], c['name']] }).to match_array([[@courses.first.id, @courses.first.name], [@courses.last.id, @courses.last.name]])
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should be able to search on global id" do
+        @course = @a1.courses.create!(:name => "whee")
+        search_term = Shard.global_id_for(@course)
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
+          { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+            :format => 'json', :search_term => search_term })
+        expect(json.length).to eql 1
+        expect(json.first['name']).to eq @course.name
+      end
     end
 
     context "blueprint courses" do

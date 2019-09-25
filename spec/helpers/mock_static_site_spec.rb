@@ -38,7 +38,7 @@ describe "a mock static site" do
       response = Net::HTTP.get('google.com', '/')
       expect(response).to include('sample page')
     end
-    
+
     it "finds a specific file" do
       MockStaticSite.new('google.com', 'sample_site')
       response = Net::HTTP.get('google.com', '/file.txt')
@@ -46,9 +46,12 @@ describe "a mock static site" do
     end
 
     it "only blocks the specified host" do
+      WebMock.enable!
+      WebMock.stub_request(:get, "http://notarealdomain-srsly.com/").
+        to_return(status: 200, body: "some other page", headers: {})
       MockStaticSite.new('google.com', 'sample_site')
       google_response = Net::HTTP.get('google.com', '/')
-      other_response = Net::HTTP.get('canvaslms.com', '/')
+      other_response = Net::HTTP.get('notarealdomain-srsly.com', '/')
 
       expect(google_response).to include('This is a sample page')
       expect(other_response).not_to include('This is a sample page')

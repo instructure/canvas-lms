@@ -18,12 +18,12 @@
 
 import React from 'react'
 import {render, fireEvent, wait} from '@testing-library/react'
-import {toLocaleString, browserTimeZone} from '@instructure/ui-i18n/lib/DateTime'
+import {DateTime} from '@instructure/ui-i18n'
 import {mockOverride, closest} from '../../../test-utils'
 import OverrideDates from '../OverrideDates'
 
 const locale = 'en'
-const timeZone = browserTimeZone()
+const timeZone = DateTime.browserTimeZone()
 
 describe('OverrideDates', () => {
   it('renders override dates', () => {
@@ -116,7 +116,7 @@ function failADate(whichDate) {
     // click the edit button
     const editDueBtn = closest(getByText(editButtonLabel[whichDate]), 'button')
     editDueBtn.click()
-    const dateDisplay = toLocaleString(override[whichDate], locale, timeZone, 'LL')
+    const dateDisplay = DateTime.toLocaleString(override[whichDate], locale, timeZone, 'LL')
     let dinput
     // wait for the popup
     await wait(() => {

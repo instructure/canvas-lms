@@ -24,7 +24,7 @@ import StepItem from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 
 function renderCollapsedContainer(step) {
   return (

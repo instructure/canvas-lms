@@ -22,7 +22,6 @@ import {DEFAULT_ICON} from '../../../../../shared/helpers/mimeClassIconHelper'
 import FileUpload from '../FileUpload'
 import {fireEvent, render, wait} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '../../../mocks'
-import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {SubmissionMocks} from '../../../graphqlData/Submission'
 
@@ -59,16 +58,12 @@ describe('FileUpload', () => {
 
   it('renders the upload tab by default', async () => {
     const props = await makeProps()
-    const {container, getByTestId, getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, getByTestId, getByText} = render(<FileUpload {...props} />)
     const emptyRender = getByTestId('upload-box')
 
     expect(emptyRender).toContainElement(getByText('Upload File'))
     expect(emptyRender).toContainElement(
-      container.querySelector(`svg[name=${DEFAULT_ICON.type.displayName}]`)
+      container.querySelector(`svg[name=${DEFAULT_ICON.type.displayName.replace('Line', '')}]`)
     )
   })
 
@@ -78,11 +73,7 @@ describe('FileUpload', () => {
       File: () => ({displayName: 'foobarbaz'})
     })
 
-    const {getByTestId, getAllByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getByTestId, getAllByText} = render(<FileUpload {...props} />)
     const uploadRender = getByTestId('non-empty-upload')
     expect(uploadRender).toContainElement(getAllByText('foobarbaz')[0])
   })
@@ -92,11 +83,7 @@ describe('FileUpload', () => {
       Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
       File: () => ({displayName: 'foobarbaz', mimeClass: 'image'})
     })
-    const {container, getByTestId} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, getByTestId} = render(<FileUpload {...props} />)
     const uploadRender = getByTestId('non-empty-upload')
     expect(uploadRender).toContainElement(container.querySelector('img[alt="foobarbaz preview"]'))
   })
@@ -107,11 +94,7 @@ describe('FileUpload', () => {
       File: () => ({displayName: 'foobarbaz', mimeClass: 'pdf'})
     })
 
-    const {container, getByTestId} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, getByTestId} = render(<FileUpload {...props} />)
     const uploadRender = getByTestId('non-empty-upload')
 
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconPdf"]'))
@@ -125,11 +108,7 @@ describe('FileUpload', () => {
       {id: '2', name: 'file2.jpg'}
     ])
 
-    const {container} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
@@ -153,11 +132,7 @@ describe('FileUpload', () => {
     })
     uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
 
-    render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    render(<FileUpload {...props} />)
 
     fireEvent(
       window,
@@ -194,11 +169,7 @@ describe('FileUpload', () => {
     })
     uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
 
-    const {container} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     uploadFiles(fileInput, [file])
@@ -220,11 +191,7 @@ describe('FileUpload', () => {
     })
     uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
 
-    const {container} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     uploadFiles(fileInput, [file])
@@ -246,11 +213,7 @@ describe('FileUpload', () => {
       File: () => ({_id: '1', displayName: 'foobarbaz'})
     })
 
-    const {container, getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, getByText} = render(<FileUpload {...props} />)
     const button = container.querySelector('button[id="1"]')
 
     expect(button).toContainElement(getByText('Remove foobarbaz'))
@@ -268,11 +231,7 @@ describe('FileUpload', () => {
       })
     })
 
-    const {container, getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, getByText} = render(<FileUpload {...props} />)
 
     attachmentOverrides.forEach(attachment => {
       const button = container.querySelector(`button[id="${attachment._id}"]`)
@@ -286,11 +245,7 @@ describe('FileUpload', () => {
       File: () => ({displayName: 'c'.repeat(22)})
     })
 
-    const {getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getByText} = render(<FileUpload {...props} />)
 
     expect(getByText(/^c+\.{3}c+$/)).toBeInTheDocument()
   })
@@ -302,22 +257,14 @@ describe('FileUpload', () => {
       File: () => ({displayName: filename})
     })
 
-    const {getAllByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getAllByText} = render(<FileUpload {...props} />)
 
     expect(getAllByText(filename)[0]).toBeInTheDocument()
   })
 
   it('displays the more options button in the upload box', async () => {
     const props = await mockAssignmentAndSubmission()
-    const {getByTestId, getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getByTestId, getByText} = render(<FileUpload {...props} />)
     const emptyRender = getByTestId('upload-box')
 
     expect(emptyRender).toContainElement(getByText('More Options'))
@@ -327,11 +274,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Assignment: () => ({allowedExtensions: ['jpg, png']})
     })
-    const {getByTestId, getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getByTestId, getByText} = render(<FileUpload {...props} />)
     const emptyRender = getByTestId('upload-box')
 
     expect(emptyRender).toContainElement(getByText('File permitted: JPG, PNG'))
@@ -339,11 +282,7 @@ describe('FileUpload', () => {
 
   it('does not display any allowed extensions if there are none', async () => {
     const props = await makeProps()
-    const {getByTestId, queryByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getByTestId, queryByText} = render(<FileUpload {...props} />)
     const emptyRender = getByTestId('upload-box')
 
     expect(emptyRender).not.toContainElement(queryByText('File permitted'))
@@ -353,11 +292,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Assignment: () => ({allowedExtensions: ['jpg']})
     })
-    const {container, getByText, queryByTestId} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, getByText, queryByTestId} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
 
@@ -371,11 +306,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Assignment: () => ({allowedExtensions: ['jpg']})
     })
-    const {container, queryByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {container, queryByText} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
 
@@ -387,11 +318,7 @@ describe('FileUpload', () => {
   it('renders a loading indicator when a file is being uploaded', async () => {
     const props = await makeProps()
     props.uploadingFiles = true
-    const {getByTestId, getByText} = render(
-      <MockedProvider>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
+    const {getByTestId, getByText} = render(<FileUpload {...props} />)
 
     const uploadingFilesRender = getByTestId('upload-pane')
     expect(uploadingFilesRender).toContainElement(getByText('Loading'))
