@@ -2379,6 +2379,14 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/ims/security') do
       get "security/jwks", action: :jwks, as: :jwks_show
     end
+
+    # Feature Flags
+    scope(controller: 'lti/feature_flags') do
+      %w(course account).each do |context|
+        prefix = "#{context}s/:#{context}_id"
+        get "/#{prefix}/feature_flags/:feature", action: :show
+      end
+    end
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

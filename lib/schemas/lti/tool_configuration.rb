@@ -49,20 +49,7 @@ module Schemas::Lti
           "type" => "array",
           "items" => {
             "type" => "string",
-            "enum" => [
-              "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-              "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly",
-              "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
-              "https://purl.imsglobal.org/spec/lti-ags/scope/score",
-              "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly",
-              "https://canvas.instructure.com/lti/public_jwk/scope/update",
-              "https://canvas.instructure.com/lti/data_services/scope/create",
-              "https://canvas.instructure.com/lti/data_services/scope/show",
-              "https://canvas.instructure.com/lti/data_services/scope/update",
-              "https://canvas.instructure.com/lti/data_services/scope/list",
-              "https://canvas.instructure.com/lti/data_services/scope/destroy",
-              "https://canvas.instructure.com/lti/data_services/scope/list_event_types"
-            ].freeze
+            "enum" => TokenScopes::LTI_SCOPES.keys.freeze
           }
         }.freeze,
         "extensions" => {
