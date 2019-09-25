@@ -617,14 +617,8 @@ describe "assignments" do
       close_visible_dialog
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
-      keep_trying_until do
-        expect(driver.execute_script(
-          "return $('.errorBox').filter('[id!=error_box_template]')"
-        )).to be_present
-      end
-      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      expect(visBoxes.first.text).to eq "Please create a group set"
+      error_box = f('.errorBox[role=alert]')
+      expect(f('.error_text', error_box).text).to eq "Please create a group set"
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
