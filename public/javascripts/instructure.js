@@ -109,7 +109,7 @@ function handleYoutubeLink () {
       .each(function() {
         var $this = $(this);
         $this.find("img").each((i, img) => {
-          const handleWidth = () => $(img).css('maxWidth', Math.min($content.width(), $this.width(), $(img).width()));
+          const handleWidth = () => $(img).css('maxWidth', Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth));
           if (img.naturalWidth === 0) {
             img.addEventListener('load', handleWidth);
           } else {
