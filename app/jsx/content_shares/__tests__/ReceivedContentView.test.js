@@ -47,6 +47,16 @@ describe('view of received content', () => {
     expect(getByText(shares[0].name)).toBeInTheDocument()
   })
 
+  it('displays a message instead of a table on an empty return', () => {
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success([])
+    })
+    const {queryByText, getByText} = render(<ReceivedContentView />)
+    expect(queryByText('Content shared by others to you')).toBeNull()
+    expect(getByText(/no content has been shared with you/i)).toBeInTheDocument()
+  })
+
   it('raises an error on unsuccessful retrieval', () => {
     useFetchApi.mockImplementationOnce(({loading, error}) => {
       loading(false)
