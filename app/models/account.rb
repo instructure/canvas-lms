@@ -1098,6 +1098,10 @@ class Account < ActiveRecord::Base
     }
     can :create_courses
 
+    # allow teachers to view term dates
+    given { |user| self.root_account? && !self.site_admin? && self.enrollments.active.of_instructor_type.where(:user_id => user).exists? }
+    can :read_terms
+
     # any logged in user can read global outcomes, but must be checked against the site admin
     given{ |user| self.site_admin? && user }
     can :read_global_outcomes
