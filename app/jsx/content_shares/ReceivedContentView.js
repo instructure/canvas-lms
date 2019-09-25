@@ -30,7 +30,7 @@ export default function ReceivedContentView() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [shares, setShares] = useState([])
-  const [previewOpen, setPreviewOpen] = useState(false)
+  const [currentPreviewShare, setCurrentPreviewShare] = useState(null)
 
   const getSharesUrl = '/api/v1/users/self/content_shares/received'
 
@@ -41,8 +41,8 @@ export default function ReceivedContentView() {
     path: getSharesUrl
   })
 
-  function onPreview(_shareId) {
-    setPreviewOpen(true)
+  function onPreview(share) {
+    setCurrentPreviewShare(share)
   }
 
   function onImport(shareId) {
@@ -71,7 +71,11 @@ export default function ReceivedContentView() {
         )}
       />
       {renderBody()}
-      <PreviewModal open={previewOpen} onDismiss={() => setPreviewOpen(false)} />
+      <PreviewModal
+        open={currentPreviewShare !== null}
+        share={currentPreviewShare}
+        onDismiss={() => setCurrentPreviewShare(null)}
+      />
     </>
   )
 }

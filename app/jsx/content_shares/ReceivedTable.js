@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {arrayOf, func, shape} from 'prop-types'
+import {arrayOf, func} from 'prop-types'
 import I18n from 'i18n!content_share'
 import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
@@ -27,10 +27,10 @@ import {IconMoreLine, IconEyeLine, IconImportLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-layout'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import {Avatar, Text} from '@instructure/ui-elements'
-import {contentShare} from './propTypes'
+import contentShareShape from 'jsx/shared/proptypes/contentShare'
 
 ReceivedTable.propTypes = {
-  shares: arrayOf(shape(contentShare)),
+  shares: arrayOf(contentShareShape),
   onPreview: func,
   onImport: func
 }
@@ -48,7 +48,7 @@ export default function ReceivedTable({shares, onPreview, onImport}) {
           </Button>
         }
       >
-        <Menu.Item data-testid="preview-menu-action" onSelect={() => onPreview(share.id)}>
+        <Menu.Item data-testid="preview-menu-action" onSelect={() => onPreview(share)}>
           <IconEyeLine /> <View margin="0 0 0 x-small">{I18n.t('Preview')}</View>
         </Menu.Item>
         <Menu.Item data-testid="import-menu-action" onSelect={() => onImport(share.id)}>

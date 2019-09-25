@@ -61,7 +61,7 @@ describe('content shares table', () => {
     const previewOption = getByTestId('preview-menu-action')
     fireEvent.click(previewOption)
     expect(onPreview).toHaveBeenCalledTimes(1)
-    expect(onPreview).toHaveBeenCalledWith(assignmentShare.id)
+    expect(onPreview).toHaveBeenCalledWith(assignmentShare)
     expect(onImport).toHaveBeenCalledTimes(0)
   })
 

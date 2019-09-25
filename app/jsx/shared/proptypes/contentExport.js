@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,27 +17,13 @@
  */
 
 import {oneOf, shape, string} from 'prop-types'
-import basicUser from 'jsx/shared/proptypes/user'
-import contentExport from 'jsx/shared/proptypes/contentExport'
+import attachmentShape from './attachment'
 
-const CONTENT_SHARE_TYPES = [
-  'assignment',
-  'discussion_topic',
-  'page',
-  'quiz',
-  'module',
-  'module_item'
-]
-
-const contentShareShape = shape({
+const contentExportShape = shape({
   id: string.isRequired,
-  name: string.isRequired,
-  content_type: oneOf(CONTENT_SHARE_TYPES).isRequired,
-  created_at: string.isRequired,
-  updated_at: string.isRequired,
-  read_state: string.isRequired,
-  sender: basicUser.isRequired,
-  content_export: contentExport
+  progress_url: string,
+  user_id: string,
+  workflow_state: oneOf(['created', 'exporting', 'exported', 'failed']),
+  attachment: attachmentShape
 })
-
-export default contentShareShape
+export default contentExportShape

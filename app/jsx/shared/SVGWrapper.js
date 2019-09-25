@@ -40,6 +40,7 @@ import $ from 'jquery'
     }
 
     fetchSVG () {
+      if (process.env.NODE_ENV === 'test') return
       $.ajax(this.props.url, {
         success: data => {
           this.svg = data;
