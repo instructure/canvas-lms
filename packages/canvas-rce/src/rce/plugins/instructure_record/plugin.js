@@ -20,7 +20,7 @@ import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 import TrayController from './VideoOptionsTray/TrayController'
-// import {isVideoElement} from '../shared/ContentSelection'
+import {isVideoElement} from '../shared/ContentSelection'
 
 const trayController = new TrayController()
 
@@ -86,7 +86,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
     ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
       items: 'instructure-video-options',
       position: 'node',
-      predicate: false,
+      predicate: isVideoElement,
       scope: 'node'
     })
   },

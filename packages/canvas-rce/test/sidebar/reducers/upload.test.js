@@ -59,7 +59,6 @@ describe('Upload reducer', () => {
           thumbnail_url: 'http://some.url.example.com'
         }
       }
-      state.uploads = []
     })
 
     it('turns uploading off', () => {

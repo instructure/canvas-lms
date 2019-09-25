@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import '@testing-library/jest-dom/extend-expect'
 import {render, fireEvent, waitForElement, cleanup} from '@testing-library/react'
 import {act} from 'react-dom/test-utils'
 import ComputerPanel from '../ComputerPanel'
@@ -124,6 +123,7 @@ describe('UploadFile: ComputerPanel', () => {
           hasUploadedFile
           setHasUploadedFile={handleSetHasUploadedFile}
           accept="image/*"
+          label="Upload File"
         />
       )
       expect(getByText('Generating preview...')).toBeInTheDocument()

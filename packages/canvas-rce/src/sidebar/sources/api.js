@@ -249,15 +249,15 @@ class RceApiSource {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
       .then(normalizeFileData)
-      .catch(e => {
+      .catch(_e => {
         this.alertFunc({
           text: formatMessage(
             'Something went wrong uploading, check your connection and try again.'
           ),
           variant: 'error'
         })
-        // eslint-disable-next-line no-console
-        console.error(e)
+
+        // console.error(e) // eslint-disable-line no-console
       })
   }
 
@@ -380,21 +380,21 @@ class RceApiSource {
       .then(checkStatus)
       .then(parseResponse)
       .catch(throwConnectionError)
-      .catch(e => {
+      .catch(_e => {
         this.alertFunc({
           text: formatMessage(
             'Something went wrong uploading, check your connection and try again.'
           ),
           variant: 'error'
         })
-        console.error(e) // eslint-disable-line no-console
+        // console.error(e) // eslint-disable-line no-console
       })
   }
 
   // @private
   normalizeUriProtocol(uri, windowOverride) {
     const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
-    if (windowHandle && windowHandle.location && windowHandle.location.protocol == 'https:') {
+    if (windowHandle && windowHandle.location && windowHandle.location.protocol === 'https:') {
       return uri.replace('http://', 'https://')
     }
     return uri

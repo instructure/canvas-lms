@@ -45,6 +45,7 @@
     "@instructure/ui-themes": "^6.8.1",
     "@instructure/ui-toggle-details": "^6.8.1",
     "@instructure/uid": "^6.8.1",
+    "@sheerun/mutationobserver-shim": "^0.3.2",
     "axios": "^0.18.0",
     "prop-types": "^15",
     "react": "^16",

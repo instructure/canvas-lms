@@ -98,35 +98,34 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
 
     describe('when the given element is a video container element', () => {
       beforeEach(() => {
-        $element = $container.appendChild(document.createElement('div'))
+        $element = $container.appendChild(document.createElement('span'))
+        $element.setAttribute('data-mce-p-data-media-id', '1234')
+        $element.setAttribute('data-mce-p-data-media-type', 'video')
+        $element.appendChild(document.createElement('iframe'))
       })
 
       it('returns None type if no id is present', () => {
+        $element.removeAttribute('data-mce-p-data-media-id')
         expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
       })
 
-      it('returns None type if there are no children', () => {
-        $element.id = 'media_object_1234'
-        expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
-      })
-
-      it('returns None type if there are more than one children', () => {
-        $element.id = 'media_object_1234'
-        $element.appendChild(document.createElement('iframe'))
-        $element.appendChild(document.createElement('span'))
-        $element.appendChild(document.createElement('span'))
+      it('returns None type if there is no iframe child', () => {
+        $element.innerHTML = ''
         expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
       })
 
       it('returns None type if children element is not an iframe', () => {
-        $element.id = 'media_object_1234'
-        $element.appendChild(document.createElement('span'))
+        $element.replaceChild(document.createElement('span'), $element.firstElementChild)
+        expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
+      })
+
+      it('returns None if no type is present', () => {
+        $element.removeAttribute('data-mce-p-data-media-type')
         expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
       })
 
       it('returns id if iframe and div are set', () => {
-        $element.id = 'media_object_1234'
-        $element.appendChild(document.createElement('iframe'))
+        $element.firstElementChild.setAttribute('src', 'data:text/html;charset=utf-8,<video/>')
         expect(getContentFromElement($element).id).toEqual('1234')
       })
     })
@@ -287,8 +286,9 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
     })
 
     it('detect a video element', () => {
-      const $selectedNode = document.createElement('div')
-      $selectedNode.id = 'foo_media_object'
+      const $selectedNode = document.createElement('span')
+      $selectedNode.setAttribute('data-mce-p-data-media-id', 'm-id')
+      $selectedNode.setAttribute('data-mce-p-data-media-type', 'video')
       $selectedNode.innerHTML = '<iframe/>'
       editor.setSelectedNode($selectedNode)
       expect(isFileLink($selectedNode)).toBeFalsy()

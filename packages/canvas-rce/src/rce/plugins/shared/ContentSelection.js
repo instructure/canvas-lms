@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fromImageEmbed} from '../instructure_image/ImageEmbedOptions'
+import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -77,23 +77,24 @@ export function asLink($element, editor) {
   }
 }
 
-function asVideoElement($element) {
-  if (!$element.id) {
-    return null
-  }
-
-  if ($element.childElementCount !== 1) {
-    return null
-  }
-
-  if (!$element.id.includes('media_object') || $element.children[0].tagName !== 'IFRAME') {
+// the video element is a bit tricky.
+// tinymce won't let me add many attributes to the iframe,
+// even though I've listed them in tinymce.config.js
+// extended_valid_elements.
+// we have to rely on the span tinymce wraps around the iframe
+// and it's attributes, even though this could change with future
+// tinymce releases.
+// see https://github.com/tinymce/tinymce/issues/5181
+export function asVideoElement($element) {
+  if (!isVideoElement($element)) {
     return null
   }
 
   return {
+    ...fromVideoEmbed($element),
     $element,
     type: VIDEO_EMBED_TYPE,
-    id: $element.id.split('_')[2]
+    id: $element.getAttribute('data-mce-p-data-media-id')
   }
 }
 
@@ -159,5 +160,25 @@ export function isImageEmbed($element) {
 }
 
 export function isVideoElement($element) {
-  return !!asVideoElement($element)
+  // the video is hosted in an iframe, but tinymce
+  // wraps it in a span with swizzled attribute names
+  if (!$element.getAttribute) {
+    return false
+  }
+
+  if ($element.firstElementChild?.tagName !== 'IFRAME') {
+    return false
+  }
+
+  const media_obj_id = $element.getAttribute('data-mce-p-data-media-id')
+  if (!media_obj_id) {
+    return false
+  }
+
+  const media_type = $element.getAttribute('data-mce-p-data-media-type')
+  if (media_type !== 'video') {
+    return false
+  }
+
+  return true
 }
