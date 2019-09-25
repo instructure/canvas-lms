@@ -44,13 +44,6 @@ development:
       # permissions (such as microphone/camera access) per-file. You must have wildcard
       # DNS set up for this to work.
       attachment_specific_file_domain: true
-      dynamodb.yml: |
-        auditors:
-          region: US East
-          access_key_id: ASDFASDF
-          secret_access_key: ZXCVZXCV
-          endpoint: http://localhost:8000
-          table_prefix: canvas_auditors
       ha_cache.yml: |
         cache_store: ha_store
         servers:
